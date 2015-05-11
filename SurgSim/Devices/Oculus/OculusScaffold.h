@@ -98,6 +98,6 @@ private:
 };
 
 };  // namespace Device
-};  // namespace SurgSim 
+};  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_OCULUS_OCULUSSCAFFOLD_H

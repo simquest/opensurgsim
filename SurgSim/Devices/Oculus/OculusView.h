@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_OCULUS_OCULUSVIEW_H
-#define SURGSIM_DEVICE_OCULUS_OCULUSVIEW_H
+#ifndef SURGSIM_DEVICES_OCULUS_OCULUSVIEW_H
+#define SURGSIM_DEVICES_OCULUS_OCULUSVIEW_H
 
 #include "SurgSim/Graphics/OsgView.h"
 
@@ -66,4 +66,4 @@ private:
 };  // namespace Graphics
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICE_OCULUS_OCULUSVIEW_H
+#endif  // SURGSIM_DEVICES_OCULUS_OCULUSVIEW_H

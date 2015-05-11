@@ -27,7 +27,7 @@ using SurgSim::Device::OculusView;
 TEST(OculusViewTests, Serialization)
 {
 	auto view = std::make_shared<SurgSim::Device::OculusView>("test name");
-	std::shared_ptr<SurgSim::Framework::Component> inputComponent = 
+	std::shared_ptr<SurgSim::Framework::Component> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
 	view->setValue("InputComponent", inputComponent);
 

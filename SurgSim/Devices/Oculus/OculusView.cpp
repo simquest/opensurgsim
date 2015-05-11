@@ -29,7 +29,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Device::OculusView, Ocu
 
 OculusView::OculusView(const std::string& name) : OsgView(name)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OculusView, std::shared_ptr<SurgSim::Framework::Component>, InputComponent, 
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OculusView, std::shared_ptr<SurgSim::Framework::Component>, InputComponent,
 									  getInputComponent, setInputComponent);
 }
 
@@ -42,7 +42,7 @@ bool OculusView::doWakeUp()
 	OsgView::doWakeUp();
 	osg::ref_ptr<SurgSim::Device::OculusDisplaySettings> displaySeetings =
 		new SurgSim::Device::OculusDisplaySettings(getOsgView()->getDisplaySettings());
-	
+
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_inputComponent->getData(&dataGroup);
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType projectionMatrix;

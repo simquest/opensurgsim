@@ -27,7 +27,8 @@ OculusDisplaySettings::OculusDisplaySettings()
 {
 }
 
-OculusDisplaySettings::OculusDisplaySettings(const osg::DisplaySettings* displaySettings) : osg::DisplaySettings(*displaySettings)
+OculusDisplaySettings::OculusDisplaySettings(const osg::DisplaySettings* displaySettings) :
+	osg::DisplaySettings(*displaySettings)
 {
 }
 

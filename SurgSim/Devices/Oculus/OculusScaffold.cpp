@@ -38,7 +38,7 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Device
 {
@@ -131,15 +131,15 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 				ovrFovPort defaultLeftFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
 				ovrFovPort defaultRightFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
 
-				ovrMatrix4f leftProjMatrix = ovrMatrix4f_Projection(defaultLeftFOV, 1.0f, 0.001f, 
+				ovrMatrix4f leftProjMatrix = ovrMatrix4f_Projection(defaultLeftFOV, 1.0f, 0.001f,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
-				ovrMatrix4f rightProjMatrix = ovrMatrix4f_Projection(defaultRightFOV, 1.0f, 0.001f, 
+				ovrMatrix4f rightProjMatrix = ovrMatrix4f_Projection(defaultRightFOV, 1.0f, 0.001f,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
 
 				inputData.matrices().set(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX,
 											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
 												(&leftProjMatrix.M[0][0]).cast<double>());
-				inputData.matrices().set(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, 
+				inputData.matrices().set(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX,
 											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
 												(&rightProjMatrix.M[0][0]).cast<double>());
 
@@ -150,7 +150,7 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 			}
 			else
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." << 
+				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." <<
 																" Registration failed";
 			}
 		}
@@ -210,7 +210,7 @@ bool OculusScaffold::doUpdate(double dt)
 	for (auto& device : m_state->registeredDevices)
 	{
 		DataGroup& inputData = device->deviceObject->getInputData();
-		
+
 		// Query the HMD for the current tracking state.
 		// If time in 2nd parameter is now or earlier, no pose prediction is made.
 		// Pose is reported in a right handed coordinate system, X->RIGHT, Y->UP, Z->OUT.
@@ -223,7 +223,7 @@ bool OculusScaffold::doUpdate(double dt)
 			ovrPosef ovrPose = ts.HeadPose.ThePose;
 
 			Vector3d position(ovrPose.Position.x, ovrPose.Position.y, ovrPose.Position.z);
-			Quaterniond orientation(ovrPose.Orientation.w, ovrPose.Orientation.x, 
+			Quaterniond orientation(ovrPose.Orientation.w, ovrPose.Orientation.x,
 									ovrPose.Orientation.y, ovrPose.Orientation.z);
 			RigidTransform3d pose = makeRigidTransform(orientation, position);
 
@@ -259,4 +259,4 @@ std::shared_ptr<OculusScaffold> OculusScaffold::getOrCreateSharedInstance()
 }
 
 };  // namespace Device
-};  // namespace SurgSim 
+};  // namespace SurgSim

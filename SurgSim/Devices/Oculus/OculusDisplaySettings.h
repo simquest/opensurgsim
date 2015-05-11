@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_DISPLAYSETTINGS_H
-#define SURGSIM_DEVICE_DISPLAYSETTINGS_H
+#ifndef SURGSIM_DEVICES_OCULUS_OCULUSDISPLAYSETTINGS_H
+#define SURGSIM_DEVICES_OCULUS_OCULUSDISPLAYSETTINGS_H
 
 #include <string>
 
@@ -35,18 +35,18 @@ public:
 
 	/// Constructor
 	/// \param displaySettings An instance of osg::DisplaySettings
-	OculusDisplaySettings(const osg::DisplaySettings* displaySettings);
+	explicit OculusDisplaySettings(const osg::DisplaySettings* displaySettings);
 
 	void setLeftEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
 	void setRightEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
 
 	/// This method returns the projection matrix for the left eye pulled from OculusSDK.
 	/// The parameter passed in is NOT used.
-    osg::Matrixd computeLeftEyeProjectionImplementation(const osg::Matrixd&) const override;
+	osg::Matrixd computeLeftEyeProjectionImplementation(const osg::Matrixd&) const override;
 
 	/// This method returns the projection matrix for the right eye pulled from OculusSDK.
 	/// The parameter passed in is NOT used.
-    osg::Matrixd computeRightEyeProjectionImplementation(const osg::Matrixd&) const override;
+	osg::Matrixd computeRightEyeProjectionImplementation(const osg::Matrixd&) const override;
 
 private:
 	osg::Matrixd m_leftEyeProjectionMatrix;
@@ -55,4 +55,4 @@ private:
 }; // namespace Device
 }; // namespace SurgSim
 
-#endif  // SURGSIM_DEVICE_DISPLAYSETTINGS_H
+#endif  // SURGSIM_DEVICES_OCULUS_OCULUSDISPLAYSETTINGS_H
