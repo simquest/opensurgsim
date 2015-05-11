@@ -95,6 +95,38 @@ public:
 	/// \return the current text color
 	virtual SurgSim::Math::Vector4d getColor() const = 0;
 
+	/// If set to true all the coordinate values are in screen-space coordinates (i.e. pixels), world spaces otherwise
+	/// \note ScreeenSpace is default, when using world coordinates the font size has to be adjusted to an appropriately
+	///       small value (e.g. 0.01m)
+	/// \param value whether to use screen space or world space coordinates
+	virtual void setUseScreenSpace(bool value) = 0;
+
+	/// \return whether using screen space coordinates
+	virtual bool isUsingScreenSpace() const = 0;
+
+	/// Draw a filled background behind the text
+	/// \param value whether to fill the background behind the text
+	virtual void setDrawBackground(bool value) = 0;
+
+	/// \return whether the background is being drawn or not
+	virtual bool isDrawingBackground()  const = 0;
+
+	/// Set the color of the background (if drawn)
+	/// \param color The color to use.
+	virtual void setBackgroundColor(Math::Vector4d color) = 0;
+
+	/// \return the color that the background uses
+	virtual Math::Vector4d getBackgroundColor() = 0;
+
+	/// Set the margin between background and text
+	/// \note If world coordinates is being used, this is also world coordinates and should be appropriately small,
+	///       if set too big, the background will filled the whole screen
+	/// \param margin the margin between text and background.
+	virtual void setBackgroundMargin(double margin) = 0;
+
+	/// \return the margin between the background and the text
+	virtual double getBackgroundMargin() const = 0;
+
 protected:
 	/// Optionally sets a maximum width to the text display, the text should be broken up into
 	/// multiple lines if the it is longer than width, if no value is given, or values <= 0 are used

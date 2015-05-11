@@ -74,7 +74,7 @@ void Representation::setGroupReferences(const std::vector<std::string>& groups)
 	}
 }
 
-std::vector<std::string> Representation::getGroupReferences()
+std::vector<std::string> Representation::getGroupReferences() const
 {
 	return std::vector<std::string>(std::begin(m_groups), std::end(m_groups));
 }
