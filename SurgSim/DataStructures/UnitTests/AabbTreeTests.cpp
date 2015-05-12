@@ -227,7 +227,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	ASSERT_NO_THROW(meshB->load(fileName));
 
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
-	meshB->setPose(rhsPose);
+	meshB->transform(rhsPose);
 
 	// update the AABB trees
 	meshA->update();

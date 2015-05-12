@@ -36,7 +36,7 @@ private:
 		v->resize(size);
 		for (size_t row = 0; row < size; row++)
 		{
-			(*v)(row) = fmod(-4.1 * row * row + 3.46, 5.0);
+			(*v)(row) = std::fmod(-4.1 * row * row + 3.46, 5.0);
 		}
 	}
 
@@ -47,9 +47,9 @@ private:
 		{
 			for (size_t col = 0; col < size; col++)
 			{
-				(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+				(*m)(row, col) = std::fmod((10.3 * std::cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}
-			}
+		}
 	}
 
 	void initializeDiagonalMatrix(Matrix* m)
@@ -58,7 +58,7 @@ private:
 		m->setZero();
 		for (size_t row = 0; row < size; row++)
 		{
-			(*m)(row, row) = fmod((10.3 * cos(static_cast<double>(row * row)) + 3.24), 10.0);
+			(*m)(row, row) = std::fmod((10.3 * std::cos(static_cast<double>(row * row)) + 3.24), 10.0);
 		}
 	}
 
@@ -73,8 +73,8 @@ private:
 		for (size_t rowBlockId = 0; rowBlockId < numBlocks; rowBlockId++)
 		{
 			for (int colBlockId = static_cast<int>(rowBlockId) - 1;
-				colBlockId <= static_cast<int>(rowBlockId) + 1;
-				colBlockId++)
+				 colBlockId <= static_cast<int>(rowBlockId) + 1;
+				 colBlockId++)
 			{
 				if (colBlockId < 0 || colBlockId >= static_cast<int>(numBlocks))
 				{
@@ -87,7 +87,7 @@ private:
 					{
 						size_t row = rowBlockId * BlockSize + rowInBlockId;
 						size_t col = colBlockId * BlockSize + colInBlockId;
-						(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+						(*m)(row, col) = fmod((10.3 * std::cos(static_cast<double>(row * col)) + 3.24), 10.0);
 					}
 				}
 			}

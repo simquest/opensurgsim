@@ -32,42 +32,32 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh()
 template <class VertexData, class EdgeData, class TriangleData>
 TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
 	const TriangleMesh<VertexData, EdgeData, TriangleData>& other) :
+	Vertices<VertexData>::Vertices(other),
 	SurgSim::Framework::Asset(),
 	m_edges(other.getEdges()),
 	m_triangles(other.getTriangles()),
 	m_freeTriangles(other.m_freeTriangles)
 {
-	for (auto& vertex : other.getVertices())
-	{
-		addVertex(vertex);
-	}
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
-	const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& other) :
+template <class V, class E, class T>
+TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(const TriangleMesh<V, E, T>& other) :
+	Vertices<VertexData>::Vertices(other),
 	SurgSim::Framework::Asset()
 {
-	for (size_t iVertex = 0; iVertex < other.getNumVertices(); ++iVertex)
+	m_edges.reserve(other.getEdges().size());
+	for (auto& edge : other.getEdges())
 	{
-		VertexType vertexData(other.getVertexPosition(iVertex));
-		addVertex(vertexData);
-	}
-	for (size_t iEdge = 0; iEdge < other.getNumEdges(); ++iEdge)
-	{
-		EdgeType edgeData((other.getEdge(iEdge)).verticesId, EdgeData());
-		addEdge(edgeData);
+		addEdge(EdgeType(edge));
 	}
 
-	auto& sourceTriangles = other.getTriangles();
 	size_t index = 0;
-	m_triangles.reserve(sourceTriangles.size());
-	for (auto sourceTriangle : sourceTriangles)
+	m_triangles.reserve(other.getTriangles().size());
+	for (auto& triangle : other.getTriangles())
 	{
-		TriangleType triangleData(sourceTriangle.verticesId, TriangleData());
-		addTriangle(triangleData);
-		if (!sourceTriangle.isValid)
+		addTriangle(TriangleType(triangle));
+		if (!triangle.isValid)
 		{
 			m_freeTriangles.push_back(index);
 		}

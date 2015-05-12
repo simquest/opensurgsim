@@ -71,6 +71,9 @@ public:
 	/// Set the maximum number of frames to store.
 	void setMaxNumberOfFrames(size_t numberOfFrames);
 
+	/// \return The maximum number of frames to store.
+	size_t getMaxNumberOfFrames();
+
 	/// \return Number of frames currently stored (not the maximum number of frames).
 	size_t getCurrentNumberOfFrames() const;
 

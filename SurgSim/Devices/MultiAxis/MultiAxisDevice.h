@@ -29,6 +29,7 @@ namespace Device
 class RawMultiAxisDevice;
 class PoseIntegrator;
 
+SURGSIM_STATIC_REGISTRATION(MultiAxisDevice);
 
 /// A class implementing the communication with a multi-axis controller input device, for example a 3DConnexion
 /// SpaceNavigator.
@@ -58,6 +59,8 @@ public:
 	/// Constructor.
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit MultiAxisDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::MultiAxisDevice);
 
 	/// Destructor.
 	virtual ~MultiAxisDevice();

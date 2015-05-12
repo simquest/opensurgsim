@@ -22,6 +22,7 @@
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
+using SurgSim::Math::SparseMatrix;
 
 namespace SurgSim
 {
@@ -53,6 +54,32 @@ bool MassSpringRepresentation::doInitialize()
 	{
 		spring->initialize(*m_initialState);
 	}
+
+	// Precompute the sparsity pattern for the global arrays. M is diagonal, the
+	// rest need to be calculated.
+	m_M.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	m_D.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	m_K.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	for (auto& spring : m_springs)
+	{
+		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode(),
+												getNumDofPerNode());
+		for (auto nodeId1 : spring->getNodeIds())
+		{
+			for (auto nodeId2 : spring->getNodeIds())
+			{
+				Math::addSubMatrix(block, static_cast<SparseMatrix::Index>(nodeId1),
+								   static_cast<SparseMatrix::Index>(nodeId2), &m_D, true);
+				Math::addSubMatrix(block, static_cast<SparseMatrix::Index>(nodeId1),
+								   static_cast<SparseMatrix::Index>(nodeId2), &m_K, true);
+			}
+		}
+	}
+	m_M.setIdentity();
+	m_M.makeCompressed();
+	Math::clearMatrix(&m_M);
+	m_D.makeCompressed();
+	m_K.makeCompressed();
 
 	return true;
 }
@@ -120,24 +147,26 @@ void MassSpringRepresentation::setRayleighDampingMass(double massCoef)
 }
 
 void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-														   const SurgSim::Math::Vector& generalizedForce,
-														   const SurgSim::Math::Matrix& K,
-														   const SurgSim::Math::Matrix& D)
+		const SurgSim::Math::Vector& generalizedForce,
+		const SurgSim::Math::Matrix& K,
+		const SurgSim::Math::Matrix& D)
 {
 	std::shared_ptr<MassSpringRepresentationLocalization> localization3D =
 		std::dynamic_pointer_cast<MassSpringRepresentationLocalization>(localization);
 	SURGSIM_ASSERT(localization3D != nullptr) <<
-		"Invalid localization type (not a MassSpringRepresentationLocalization)";
+			"Invalid localization type (not a MassSpringRepresentationLocalization)";
 
 	const size_t dofPerNode = getNumDofPerNode();
 
 	const size_t nodeId = localization3D->getLocalNode();
 	SURGSIM_ASSERT(nodeId >= 0 && nodeId < getNumMasses()) << "Invalid nodeId " << nodeId <<
-		". Valid range is {0.." << getNumMasses() << "}";
+			". Valid range is {0.." << getNumMasses() << "}";
 
 	m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce;
-	m_externalGeneralizedStiffness.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += K;
-	m_externalGeneralizedDamping.block(dofPerNode * nodeId, dofPerNode * nodeId, dofPerNode, dofPerNode) += D;
+	Math::addSubMatrix(K, static_cast<SparseMatrix::Index>(nodeId), static_cast<SparseMatrix::Index>(nodeId),
+					   &m_externalGeneralizedStiffness, true);
+	Math::addSubMatrix(D, static_cast<SparseMatrix::Index>(nodeId), static_cast<SparseMatrix::Index>(nodeId),
+					   &m_externalGeneralizedDamping, true);
 	m_hasExternalGeneralizedForce = true;
 }
 
@@ -152,11 +181,12 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	}
 
 	SURGSIM_ASSERT(3 * getNumMasses() == getNumDof()) <<
-		"Mismatch between the number of masses ("<<getNumMasses()<<") and the number of dof ("<<getNumDof()<<")";
+			"Mismatch between the number of masses (" << getNumMasses() <<
+			") and the number of dof (" << getNumDof() << ")";
 	SURGSIM_ASSERT(getNumMasses()) << "No masses specified yet, call addMass() prior to running the simulation";
 	SURGSIM_ASSERT(getNumSprings()) << "No springs specified yet, call addSpring() prior to running the simulation";
-	SURGSIM_ASSERT(getNumDof()) <<
-		"State has not been initialized yet, call setInitialState() prior to running the simulation";
+	SURGSIM_ASSERT(getNumDof()) << "State has not been initialized yet, call setInitialState() " <<
+								"prior to running the simulation";
 }
 
 Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
@@ -176,8 +206,8 @@ Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
 		m_f[*boundaryCondition] = 0.0;
 	}
@@ -185,52 +215,53 @@ Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	return m_f;
 }
 
-const Matrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
+const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
 
 	// Make sure the mass matrix has been properly allocated
-	m_M.setZero(state.getNumDof(), state.getNumDof());
+	Math::clearMatrix(&m_M);
 
-	Eigen::MatrixBase<Matrix>::DiagonalReturnType diagonal = m_M.diagonal();
-
-	for (size_t massId = 0; massId < getNumMasses(); massId++)
+	for (SparseMatrix::Index massId = 0; massId < static_cast<SparseMatrix::Index>(getNumMasses()); massId++)
 	{
-		setSubVector(Vector3d::Ones() * getMass(massId)->getMass(), massId, 3, &diagonal);
+		m_M.coeffRef(3 * massId, 3 * massId) = getMass(massId)->getMass();
+		m_M.coeffRef(3 * massId + 1, 3 * massId + 1) = getMass(massId)->getMass();
+		m_M.coeffRef(3 * massId + 2, 3 * massId + 2) = getMass(massId)->getMass();
 	}
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
-		diagonal[*boundaryCondition] = 1e9;
+		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 
 	return m_M;
 }
 
-const Matrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
+const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
-	using SurgSim::Math::addSubMatrix;
 
 	const double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.setZero(state.getNumDof(), state.getNumDof());
+	Math::clearMatrix(&m_D);
 
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
 	{
-		for (size_t massId = 0; massId < getNumMasses(); massId++)
+		for (SparseMatrix::Index massId = 0; massId < static_cast<SparseMatrix::Index>(getNumMasses()); massId++)
 		{
 			double coef = rayleighMass * getMass(massId)->getMass();
-			Eigen::MatrixBase<Matrix>::DiagonalReturnType Ddiagonal = m_D.diagonal();
-			setSubVector(Vector3d::Ones() * coef, massId, 3, &Ddiagonal);
+			m_D.coeffRef(3 * massId, 3 * massId) = coef;
+			m_D.coeffRef(3 * massId + 1, 3 * massId + 1) = coef;
+			m_D.coeffRef(3 * massId + 2, 3 * massId + 2) = coef;
 		}
 	}
 
@@ -257,23 +288,22 @@ const Matrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& 
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
-		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
+		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 
 	return m_D;
 }
 
-const Matrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
+const SparseMatrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::addSubMatrix;
-
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.setZero(state.getNumDof(), state.getNumDof());
+	Math::clearMatrix(&m_K);
 
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -288,34 +318,34 @@ const Matrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& 
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
-		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
+		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 
 	return m_K;
 }
 
 void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
-	Vector** f, Matrix** M, Matrix** D, Matrix** K)
+		Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K)
 {
 	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the force vector has been properly allocated and zeroed out
 	m_f.setZero(state.getNumDof());
 
 	// Make sure the mass matrix has been properly allocated
-	m_M.setZero(state.getNumDof(), state.getNumDof());
+	Math::clearMatrix(&m_M);
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	m_D.setZero(state.getNumDof(), state.getNumDof());
+	Math::clearMatrix(&m_D);
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	m_K.setZero(state.getNumDof(), state.getNumDof());
+	Math::clearMatrix(&m_K);
 
 	// Computes the mass matrix m_M
 	computeM(state);
@@ -331,7 +361,11 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
 	{
-		m_D.diagonal() += m_M.diagonal() * m_rayleighDamping.massCoefficient;
+		for (SparseMatrix::Index diagonal = 0; diagonal < static_cast<SparseMatrix::Index>(state.getNumDof());
+			 ++diagonal)
+		{
+			m_D.coeffRef(diagonal, diagonal) += m_M.coeff(diagonal, diagonal) * m_rayleighDamping.massCoefficient;
+		}
 	}
 	if (m_rayleighDamping.stiffnessCoefficient)
 	{
@@ -354,18 +388,21 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		boundaryCondition != std::end(state.getBoundaryConditions());
-		boundaryCondition++)
+		 boundaryCondition != std::end(state.getBoundaryConditions());
+		 boundaryCondition++)
 	{
-		m_M.diagonal()[*boundaryCondition] = 1e9;
+		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 
-		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
+		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 
-		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
-		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
-		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
+		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
+					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 
 		m_f[*boundaryCondition] = 0.0;
 	}
@@ -377,7 +414,7 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 }
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const SurgSim::Math::OdeState& state,
-	bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
+		bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	using SurgSim::Math::getSubVector;
 	using SurgSim::Math::addSubVector;
@@ -413,7 +450,8 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Surg
 	{
 		if (useGlobalStiffnessMatrix)
 		{
-			*force -= (scale * rayleighStiffness) * (m_K * v);
+			Math::Vector tempVector = (scale * rayleighStiffness) * (m_K * v);
+			*force -= tempVector;
 		}
 		else
 		{
@@ -426,7 +464,7 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Surg
 	}
 }
 
-void MassSpringRepresentation::addSpringsForce(Vector *force, const SurgSim::Math::OdeState& state, double scale)
+void MassSpringRepresentation::addSpringsForce(Vector* force, const SurgSim::Math::OdeState& state, double scale)
 {
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -434,7 +472,7 @@ void MassSpringRepresentation::addSpringsForce(Vector *force, const SurgSim::Mat
 	}
 }
 
-void MassSpringRepresentation::addGravityForce(Vector *f, const SurgSim::Math::OdeState& state, double scale)
+void MassSpringRepresentation::addGravityForce(Vector* f, const SurgSim::Math::OdeState& state, double scale)
 {
 	using SurgSim::Math::addSubVector;
 
@@ -452,7 +490,7 @@ static void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& tra
 {
 	size_t numNodes = x->size() / 3;
 	SURGSIM_ASSERT(static_cast<ptrdiff_t>(numNodes * 3) == x->size()) <<
-		"Unexpected number of dof in a MassSpring state vector (not a multiple of 3)";
+			"Unexpected number of dof in a MassSpring state vector (not a multiple of 3)";
 
 	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 	{
@@ -471,7 +509,7 @@ static void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& tra
 }
 
 void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-	const SurgSim::Math::RigidTransform3d& transform)
+		const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);

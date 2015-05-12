@@ -75,7 +75,7 @@ public:
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) override;
+	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) override;
 
 	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
 	/// to a complete system damping matrix D (assembly)
@@ -86,7 +86,7 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
 	/// \note Fem3DElementTetrahedron uses linear elasticity (not visco-elasticity), so it does not give any damping.
-	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale = 1.0) override;
+	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D, double scale = 1.0) override;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
 	/// to a complete system stiffness matrix K (assembly)
@@ -96,7 +96,8 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+					  double scale = 1.0) override;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
 	/// into a complete system data structure F, M, D, K (assembly)
@@ -108,10 +109,10 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	void addFMDK(const SurgSim::Math::OdeState& state,
-		SurgSim::Math::Vector* F,
-		SurgSim::Math::Matrix* M,
-		SurgSim::Math::Matrix* D,
-		SurgSim::Math::Matrix* K) override;
+				 SurgSim::Math::Vector* F,
+				 SurgSim::Math::SparseMatrix* M,
+				 SurgSim::Math::SparseMatrix* D,
+				 SurgSim::Math::SparseMatrix* K) override;
 
 	/// Adds the element matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given state)
 	/// into a complete system data structure F (assembly)
@@ -124,13 +125,13 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
-			const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
+				   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
 	SurgSim::Math::Vector computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
 			const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 	SurgSim::Math::Vector computeNaturalCoordinate(const SurgSim::Math::OdeState& state,
-		const SurgSim::Math::Vector& cartesianCoordinate) const override;
+			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
 	/// Computes the tetrahedron shape functions
@@ -141,23 +142,23 @@ protected:
 	/// \param[out] ci from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
 	/// \param[out] di from the shape function, Ni(x, y, z) = 1/6*volume (ai + bi.x + ci.y + di.z)
 	void computeShapeFunctions(const SurgSim::Math::OdeState& state,
-		double* volume,
-		std::array<double, 4>* ai,
-		std::array<double, 4>* bi,
-		std::array<double, 4>* ci,
-		std::array<double, 4>* di) const;
+							   double* volume,
+							   std::array<double, 4>* ai,
+							   std::array<double, 4>* bi,
+							   std::array<double, 4>* ci,
+							   std::array<double, 4>* di) const;
 
 	/// Computes the tetrahedron stiffness matrix
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 12, 12>* k);
+						  Eigen::Matrix<double, 12, 12>* k);
 
 	/// Computes the tetrahedron mass matrix
 	/// \param state The state to compute the mass matrix from
 	/// \param[out] m The mass matrix to store the result into
 	void computeMass(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 12, 12>* m);
+					 Eigen::Matrix<double, 12, 12>* m);
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// This method relies on a given stiffness matrix and does not evaluate it from the state
@@ -169,7 +170,7 @@ protected:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	void addForce(const SurgSim::Math::OdeState& state, const Eigen::Matrix<double, 12, 12>& k,
-		SurgSim::Math::Vector* F, double scale = 1.0);
+				  SurgSim::Math::Vector* F, double scale = 1.0);
 
 	/// Shape functions: Tetrahedron rest volume
 	double m_restVolume;

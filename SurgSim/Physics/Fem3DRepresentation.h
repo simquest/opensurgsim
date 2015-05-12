@@ -78,6 +78,15 @@ private:
 	std::unordered_map<size_t, size_t> createTriangleIdToElementIdMap(
 			std::shared_ptr<const SurgSim::Math::MeshShape> mesh);
 
+	std::shared_ptr<Localization> createNodeLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	std::shared_ptr<Localization> createTriangleLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	std::shared_ptr<Localization> createElementLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
 	/// Mapping from collision triangle's id to fem element id.
 	std::unordered_map<size_t, size_t> m_triangleIdToElementIdMap;
 };

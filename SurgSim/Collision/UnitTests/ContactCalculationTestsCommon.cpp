@@ -104,14 +104,14 @@ bool checkMeshLocalCoordinate(
 			contact = expected;
 		}
 		contactPresent &= checkMeshLocalCoordinate(
-							contact->penetrationPoints.first.meshLocalCoordinate,
+							contact->penetrationPoints.first.triangleMeshLocalCoordinate,
 							triangleContact->firstVertices,
-							triangleContact->penetrationPoints.first.meshLocalCoordinate,
+							triangleContact->penetrationPoints.first.triangleMeshLocalCoordinate,
 							expected->penetrationPoints.first.rigidLocalPosition.getValue());
 		contactPresent &= checkMeshLocalCoordinate(
-							contact->penetrationPoints.second.meshLocalCoordinate,
+							contact->penetrationPoints.second.triangleMeshLocalCoordinate,
 							triangleContact->secondVertices,
-							triangleContact->penetrationPoints.second.meshLocalCoordinate,
+							triangleContact->penetrationPoints.second.triangleMeshLocalCoordinate,
 							expected->penetrationPoints.second.rigidLocalPosition.getValue());
 	}
 

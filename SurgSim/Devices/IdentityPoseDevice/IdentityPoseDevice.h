@@ -25,7 +25,7 @@ namespace SurgSim
 {
 namespace Device
 {
-
+SURGSIM_STATIC_REGISTRATION(IdentityPoseDevice);
 
 /// A class implementing the identity pose device, which is a pretend device that doesn't move.
 ///
@@ -41,6 +41,8 @@ public:
 	/// Constructor.
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit IdentityPoseDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::IdentityPoseDevice);
 
 	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer);
 

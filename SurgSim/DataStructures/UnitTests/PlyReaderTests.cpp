@@ -69,6 +69,7 @@ TEST_F(PlyReaderTests, FindElementsAndProperties)
 
 	EXPECT_TRUE(reader.hasProperty("vertex", "x"));
 	EXPECT_TRUE(reader.hasProperty("vertex", "y"));
+	EXPECT_TRUE(reader.hasProperty("face", "nature"));
 	EXPECT_TRUE(reader.hasProperty("face", "vertex_indices"));
 	EXPECT_FALSE(reader.hasProperty("xxx", "vertex_indices"));
 	EXPECT_FALSE(reader.hasProperty("vertex", "vertex_indices"));
@@ -130,6 +131,7 @@ public:
 		}
 		faces.push_back(face);
 		extras.push_back(faceData.extra);
+		natures.push_back(faceData.nature);
 	}
 
 
@@ -146,6 +148,7 @@ public:
 		unsigned int faceCount;
 		unsigned int* faces;
 		int extra;
+		unsigned int nature;
 		int64_t overrun;
 	};
 
@@ -161,8 +164,35 @@ public:
 	std::vector<Vector3d> vertices;
 	std::vector<std::vector<unsigned int>> faces;
 	std::vector<int> extras;
-
+	std::vector<unsigned int> natures;
 };
+
+TEST_F(PlyReaderTests, ElementTwoPropertyTest)
+{
+	TestData testData;
+	PlyReader reader(findFile("Cube.ply"));
+
+	EXPECT_TRUE(reader.requestElement("face",
+									  std::bind(&TestData::beginFaces, &testData,
+											  std::placeholders::_1, std::placeholders::_2),
+									  std::bind(&TestData::newFace, &testData, std::placeholders::_1),
+									  nullptr));
+
+	EXPECT_TRUE(reader.requestScalarProperty("face", "nature",
+										   PlyReader::TYPE_UNSIGNED_INT,
+										   offsetof(TestData::FaceData, nature)));
+
+	EXPECT_TRUE(reader.requestListProperty("face", "vertex_indices",
+										   PlyReader::TYPE_UNSIGNED_INT,
+										   offsetof(TestData::FaceData, faces),
+										   PlyReader::TYPE_UNSIGNED_INT,
+										   offsetof(TestData::FaceData, faceCount)));
+
+	ASSERT_NO_THROW(reader.parseFile());
+
+	EXPECT_EQ(11, testData.natures[0]);
+	EXPECT_EQ(0, testData.natures[8]);
+}
 
 TEST_F(PlyReaderTests, ScalarReadTest)
 {

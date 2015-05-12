@@ -1,0 +1,24 @@
+/*!
+
+\page Oculus Oculus: Oculus Rift DK2
+
+This adds support for Oculus Rift DK2 virtual reality display.
+
+Supported Version
+-----------------
+Version 0.5.0.1 beta is the ONLY SDK tested and supported for Windows and GNU/Linux.
+
+Dependencies
+------------
+Oculus Rift SDK: SDK is available for Windows and GNU/Linux on Oculus Rift Developer
+<A HREF="https://developer.oculus.com/downloads/">website</A>. 
+
+For Windows, you must first install the Oculus Runtime package and download the Oculus SDK. 
+Then set an environment variable OCULUSSDK_DIR to the directory containing <tt>LibOVR</tt> (but
+do not include 'LibOVR' in the variable).
+For GNU/Linux, download the SDK package, extract it, run its configuration script FIRST, build the
+library, then install it. If the SDK is in a custom location, you must set an environment variable
+OCULUSSDK_DIR pointing to the install path. The default installed one will be picked if both exist.
+
+Then, in CMake, enable BUILD_DEVICE_OCULUS.
+*/

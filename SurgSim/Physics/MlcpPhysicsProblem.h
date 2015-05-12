@@ -17,7 +17,7 @@
 #define SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
 
 #include "SurgSim/Math/MlcpProblem.h"
-#include "SurgSim/Math/SparseMatrix.h"
+#include <Eigen/SparseCore>
 
 namespace SurgSim
 {
@@ -53,7 +53,7 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// of \f$c\f$ displacements of each degree of freedom of the constraints.
 	/// Given a set of constraints \f$\mathbf{G}(t, \mathbf{x})\f$, then
 	/// \f$\mathbf{H} = \frac{d \mathbf{G}}{d \mathbf{x}}\f$ (i.e., the constraints' tangential space).
-	Eigen::SparseMatrix<double, Eigen::RowMajor, ptrdiff_t> H;
+	Matrix H;
 
 	/// The matrix \f$\mathbf{C\;H^T}\f$, which is a matrix of size \f$n\times c\f$ that is used to convert the
 	/// vector of \f$c\f$ constraint forces to the \f$n\f$ displacements of each degree of freedom of the system.
@@ -61,14 +61,12 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 
 	/// Applies a new constraint to a specific Representation
 	/// \param newSubH New constraint to be added to H
-	/// \param subC Compliance matrix associated with the Representation
+	/// \param newCHt Compliance matrix (system matrix inverse) times newSubH
 	/// \param indexSubC Index of the Representation's compliance matrix
 	/// \param indexNewSubH Index of the new constraint within H
-	/// \tparam SubCDerivedType the CRTP derived type of the passed subC matrix, which usually can be deduced
-	template <typename SubCDerivedType>
 	void updateConstraint(
-		const Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>& newSubH,
-		const Eigen::MatrixBase<SubCDerivedType>& subC,
+		const Eigen::SparseVector<double>& newSubH,
+		const Vector& newCHt,
 		size_t indexSubC,
 		size_t indexNewSubH);
 
@@ -88,7 +86,5 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 
 };  // namespace Physics
 };  // namespace SurgSim
-
-#include "SurgSim/Physics/MlcpPhysicsProblem-inl.h"
 
 #endif  // SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H

@@ -37,15 +37,21 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::MeshShape, MeshShape);
 MeshShape::MeshShape() :
 	m_center(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN())),
 	m_volume(std::numeric_limits<double>::quiet_NaN()),
-	m_secondMomentOfVolume(Matrix33d::Constant(std::numeric_limits<double>::quiet_NaN())),
-	m_initialMesh(std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>()),
-	m_validPose(false)
+	m_secondMomentOfVolume(Matrix33d::Constant(std::numeric_limits<double>::quiet_NaN()))
 {
-	m_pose.linear() = Matrix33d::Constant(std::numeric_limits<double>::quiet_NaN());
-	m_pose.translation() = Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
 }
 
-const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId)
+MeshShape::MeshShape(const MeshShape& other) :
+	DataStructures::TriangleMesh<DataStructures::EmptyData, DataStructures::EmptyData, DataStructures::NormalData>
+		::TriangleMesh(other),
+	m_center(other.getCenter()),
+	m_volume(other.getVolume()),
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
+{
+	updateAabbTree();
+}
+
+const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId) const
 {
 	return getTriangle(triangleId).data.normal;
 }
@@ -79,6 +85,7 @@ bool MeshShape::calculateNormals()
 bool MeshShape::doUpdate()
 {
 	updateAabbTree();
+	computeVolumeIntegrals();
 	return calculateNormals();
 }
 
@@ -88,10 +95,7 @@ bool MeshShape::doLoad(const std::string& fileName)
 	{
 		return false;
 	}
-	m_initialMesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>(*shared_from_this());
-	updateAabbTree();
-	computeVolumeIntegrals();
-	return calculateNormals();
+	return update();
 }
 
 int MeshShape::getType() const
@@ -209,26 +213,15 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
-bool MeshShape::setPose(const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose)
 {
-	SURGSIM_ASSERT(getNumVertices() == m_initialMesh->getNumVertices())
-			<< "The initial mesh must have the same number of vertices as the MeshShape for setPose.";
-	if (!m_validPose || !pose.isApprox(m_pose))
-	{
-		m_pose = pose;
-		auto targetVertex = getVertices().begin();
-		auto const& vertices = m_initialMesh->getVertices();
-		for (auto it = vertices.cbegin(); it != vertices.cend(); ++it)
-		{
-			targetVertex->position = pose * it->position;
-			++targetVertex;
-		}
-		m_validPose = doUpdate();
-	}
-	return m_validPose;
+	auto transformed = std::make_shared<MeshShape>(*this);
+	transformed->transform(pose);
+	transformed->update();
+	return transformed;
 }
 
-std::shared_ptr<SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree()
+const std::shared_ptr<const SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree() const
 {
 	return m_aabbTree;
 }

@@ -15,6 +15,7 @@
 
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 
 namespace SurgSim
 {
@@ -34,6 +35,29 @@ Camera::Camera(const std::string& name) : Representation(name)
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatViewMatrix, getViewMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatProjectionMatrix, getProjectionMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatInverseViewMatrix, getInverseViewMatrix);
+
+	{
+		typedef std::array<double, 4> ParamType;
+		SURGSIM_ADD_SETTER(Camera, ParamType, PerspectiveProjection, setPerspectiveProjection);
+	}
+	{
+		typedef std::array<double, 6> ParamType;
+		SURGSIM_ADD_SETTER(Camera, ParamType, OrthogonalProjection, setOrthogonalProjection);
+	}
+	{
+		typedef std::array<int, 4> ParamType;
+
+		// Deal with the overloaded function, by casting to explicit function type
+		auto getter = (ParamType(Camera::*)(void) const)&Camera::getViewport;
+		auto setter = (void(Camera::*)(ParamType))&Camera::setViewport;
+
+		setAccessors("Viewport", std::bind(getter, this),
+					 std::bind(setter, this, std::bind(SurgSim::Framework::convert<ParamType>, std::placeholders::_1)));
+
+		setSerializable("Viewport",
+						std::bind(&YAML::convert<ParamType>::encode, std::bind(getter, this)),
+						std::bind(setter, this, std::bind(&YAML::Node::as<ParamType>, std::placeholders::_1)));
+	}
 }
 
 void Camera::setRenderGroupReference(const std::string& name)
@@ -65,6 +89,29 @@ bool Camera::addGroupReference(const std::string& name)
 	{
 		result = Representation::addGroupReference(name);
 	}
+	return result;
+}
+
+void Camera::setPerspectiveProjection(const std::array<double, 4>& val)
+{
+	setPerspectiveProjection(val[0], val[1], val[2], val[3]);
+}
+
+void Camera::setOrthogonalProjection(const std::array<double, 6>& val)
+{
+
+	setOrthogonalProjection(val[0], val[1], val[2], val[3], val[4], val[5]);
+}
+
+void Camera::setViewport(std::array<int, 4> val)
+{
+	setViewport(val[0], val[1], val[2], val[3]);
+}
+
+std::array<int, 4> Camera::getViewport() const
+{
+	std::array<int, 4> result;
+	getViewport(&result[0], &result[1], &result[2], &result[3]);
 	return result;
 }
 

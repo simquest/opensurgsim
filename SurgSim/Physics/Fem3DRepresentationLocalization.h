@@ -28,7 +28,9 @@ namespace Physics
 /// Implementation of Localization for Fem3DRepresentation
 ///
 /// Fem3DRepresentationLocalization tracks the global coordinates of an IndexedLocalCoordinate associated with an
-/// Fem3DRepresentation.  It is used, for example, as a helper class for filling out the MlcpPhysicsProblem in
+/// Fem3DRepresentation. The IndexedLocalCoordinate must be related to an FemElement (the index is an FemElement id and
+/// the local coordinates are the barycentric coordinates of the nodes in this FemElement).
+/// It is used, for example, as a helper class for filling out the MlcpPhysicsProblem in
 /// Fem3DRepresentationContact::doBuild, which constrains the motion of Fem3DRepresentation at a frictionless contact.
 class Fem3DRepresentationLocalization : public Localization
 {

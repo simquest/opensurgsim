@@ -22,11 +22,9 @@ namespace SurgSim
 namespace Graphics
 {
 
-template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-Mesh::Mesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& other)
-	: SurgSim::DataStructures::TriangleMesh<VertexData,
-											SurgSim::DataStructures::EmptyData,
-											SurgSim::DataStructures::EmptyData>(other)
+template <class V, class E, class T>
+Mesh::Mesh(const TriangleMesh<V, E, T>& other)
+	: DataStructures::TriangleMesh<VertexData, DataStructures::EmptyData, DataStructures::EmptyData>(other)
 {
 }
 

@@ -26,6 +26,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;
@@ -60,7 +61,7 @@ public:
 		size_t& nodes = nodesPerDimension[0];
 		SURGSIM_ASSERT(nodes > 0) << "Number of nodes incorrect: " << nodes;
 
-		auto fem = std::make_shared<Fem1DRepresentation>(name);
+		auto fem = std::make_shared<MockFem1DRepresentation>(name);
 		auto state = std::make_shared<SurgSim::Math::OdeState>();
 
 		state->setNumDof(fem->getNumDofPerNode(), nodes);
@@ -98,6 +99,7 @@ public:
 		}
 
 		fem->setInitialState(state);
+		fem->doInitialize();
 
 		return fem;
 	}
@@ -174,10 +176,10 @@ protected:
 
 		Vector& x = m_initialState->getPositions();
 		x << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			 m_L, 0.0, 0.0, 0.0, 0.0, 0.0;
+		m_L, 0.0, 0.0, 0.0, 0.0, 0.0;
 		Vector& v = m_initialState->getVelocities();
 		v << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			 2.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+		2.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
 		// Expected transformed values
 		m_expectedTransformedPositions.resize(m_initialState->getNumDof());
@@ -281,7 +283,7 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverPunctualLoadAnywhereTest)
 			double a = m_L * applyNode / (nodesPerDim - 1);
 			double x = m_L * lookNode / (nodesPerDim - 1);
 			double deflection = (x < a) ? load * x * x * (3 * a - x) / (6 * m_E * m_Iz)
-										: load * a * a * (3 * x - a) / (6 * m_E * m_Iz);
+								: load * a * a * (3 * x - a) / (6 * m_E * m_Iz);
 
 			EXPECT_NEAR(deflection, calculatedDeflection[lookIndex], 1e-8);
 		}

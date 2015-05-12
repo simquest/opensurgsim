@@ -14,16 +14,18 @@
 // limitations under the License.
 
 /** @file
- * Tests for the InputComponent class.
+ * Tests for the OutputComponent class.
  */
 
+#include <gtest/gtest.h>
 #include <memory>
 #include <string>
-#include <gtest/gtest.h>
-#include "SurgSim/Input/OutputComponent.h"
+#include <yaml-cpp/yaml.h>
+
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "yaml-cpp/yaml.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Input/OutputComponent.h"
 
 using SurgSim::Input::OutputComponent;
 using SurgSim::DataStructures::DataGroup;
@@ -39,14 +41,22 @@ TEST(OutputComponentTest, Accessors)
 	output.setDeviceName("OutputDevice");
 	EXPECT_EQ("Output", output.getName());
 	EXPECT_EQ("OutputDevice", output.getDeviceName());
+
+	SurgSim::DataStructures::DataGroupBuilder builder;
+	std::string name = "aBool";
+	builder.addBoolean(name);
+	DataGroup dataGroup = builder.createData();
+	dataGroup.booleans().set(name, true);
+	output.setData(dataGroup);
+	bool result = false;
+	ASSERT_TRUE(output.getData().booleans().get(name, &result));
+	EXPECT_TRUE(result);
 }
 
 TEST(OutputComponentTest, NotConnected)
 {
 	OutputComponent output("Output");
 	output.setDeviceName("OutputDevice");
-	DataGroup dataGroup;
-	EXPECT_THROW(output.setData(dataGroup), SurgSim::Framework::AssertionFailure);
 	EXPECT_FALSE(output.isDeviceConnected());
 }
 
