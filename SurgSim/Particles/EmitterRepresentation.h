@@ -42,7 +42,7 @@ class Shape;
 namespace Particles
 {
 
-class ParticleSystemRepresentation;
+class Representation;
 
 /// Emitting modes of the EmitterRepresentation
 enum EmitMode
@@ -154,8 +154,8 @@ private:
 	/// Shape of emitter.
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 
-	/// ParticleSystemRepresentation to emit to.
-	std::shared_ptr<ParticleSystemRepresentation> m_target;
+	/// Representation to emit to.
+	std::shared_ptr<Particles::Representation> m_target;
 
 	/// Logger used by the EmitterRepresentation
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;

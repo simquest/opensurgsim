@@ -38,16 +38,16 @@ class Logger;
 namespace Particles
 {
 
-/// The ParticleSystemRepresentation class defines the base class for all Particle System.
-class ParticleSystemRepresentation : public SurgSim::Framework::Representation
+/// The Representation class defines the base class for all Particle System.
+class Representation : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
 	/// \param name The representation's name
-	explicit ParticleSystemRepresentation(const std::string& name);
+	explicit Representation(const std::string& name);
 
 	/// Destructor
-	virtual ~ParticleSystemRepresentation();
+	virtual ~Representation();
 
 	/// Set the maximum number of particles of this system.
 	/// \note Once initialized, it can't be changed.

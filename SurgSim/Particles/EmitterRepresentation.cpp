@@ -21,7 +21,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Shape.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -74,7 +74,7 @@ bool EmitterRepresentation::doWakeUp()
 {
 	if (m_target == nullptr)
 	{
-		SURGSIM_LOG_SEVERE(m_logger) << "EmitterRepresentations need a ParticleSystemRepresentation to emit to.";
+		SURGSIM_LOG_SEVERE(m_logger) << "EmitterRepresentations need a Representation to emit to.";
 		return false;
 	}
 	if (m_shape == nullptr)
@@ -129,8 +129,7 @@ std::shared_ptr<SurgSim::Math::Shape> EmitterRepresentation::getShape() const
 
 void EmitterRepresentation::setTarget(const std::shared_ptr<SurgSim::Framework::Component> target)
 {
-	m_target = SurgSim::Framework::checkAndConvert<ParticleSystemRepresentation>(target,
-			"SurgSim::Particles::ParticleSystemRepresentation");
+	m_target = SurgSim::Framework::checkAndConvert<SurgSim::Particles::Representation>(target, "SurgSim::Particles::Representation");
 }
 
 const std::shared_ptr<SurgSim::Framework::Component> EmitterRepresentation::getTarget()

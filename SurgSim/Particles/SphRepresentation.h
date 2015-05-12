@@ -21,7 +21,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
 
 namespace SurgSim
 {
@@ -37,13 +37,13 @@ namespace Particles
 
 SURGSIM_STATIC_REGISTRATION(SphRepresentation);
 
-/// SphRepresentation is a ParticleSystemRepresentation dedicated to Smoothed-Particles Hydrodynamics (SPH).
+/// SphRepresentation is a Representation dedicated to Smoothed-Particles Hydrodynamics (SPH).
 /// This class is mostly based on these papers:
 /// "Particle-Based Fluid Simulation for Interactive Applications", M. Muller, D. Charypar, M. Gross.
 /// In Proceedings of ACM SIGGRAPH Symposium on Computer Animation (SCA) 2003, pp 154-159.
 /// "Interactive Blood Simulation for Virtual Surgery Based on Smoothed Particle Hydrodynamics", M. Muller,
 /// S. Schirm, M. Teschner. Journal of Technology and Health Care, ISSN 0928-7329, IOS Press, Amsterdam.
-class SphRepresentation : public ParticleSystemRepresentation
+class SphRepresentation : public Representation
 {
 public:
 	SURGSIM_CLASSNAME(SurgSim::Particles::SphRepresentation);

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Vector.h"
@@ -24,46 +24,46 @@ namespace SurgSim
 namespace Particles
 {
 
-ParticleSystemRepresentation::ParticleSystemRepresentation(const std::string& name) :
+Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
 	m_maxParticles(0u),
 	m_logger(SurgSim::Framework::Logger::getLogger("Particles"))
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticleSystemRepresentation, size_t, MaxParticles, getMaxParticles,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, size_t, MaxParticles, getMaxParticles,
 			setMaxParticles);
 }
 
-ParticleSystemRepresentation::~ParticleSystemRepresentation()
+Representation::~Representation()
 {
 }
 
-bool ParticleSystemRepresentation::doInitialize()
+bool Representation::doInitialize()
 {
 	return true;
 }
 
-void ParticleSystemRepresentation::setMaxParticles(size_t maxParticles)
+void Representation::setMaxParticles(size_t maxParticles)
 {
 	m_particles.getVertices().reserve(maxParticles);
 	m_maxParticles = maxParticles;
 }
 
-size_t ParticleSystemRepresentation::getMaxParticles() const
+size_t Representation::getMaxParticles() const
 {
 	return m_maxParticles;
 }
 
-Particles& ParticleSystemRepresentation::getParticles()
+Particles& Representation::getParticles()
 {
 	return m_particles;
 }
 
-const Particles& ParticleSystemRepresentation::getParticles() const
+const Particles& Representation::getParticles() const
 {
 	return m_particles;
 }
 
-bool ParticleSystemRepresentation::addParticle(const Particle& particle)
+bool Representation::addParticle(const Particle& particle)
 {
 	bool result;
 	auto& particles = m_particles.getVertices();
@@ -81,14 +81,14 @@ bool ParticleSystemRepresentation::addParticle(const Particle& particle)
 	return result;
 }
 
-bool ParticleSystemRepresentation::addParticle(const Math::Vector3d& position, const Math::Vector3d& velocity,
+bool Representation::addParticle(const Math::Vector3d& position, const Math::Vector3d& velocity,
 		double lifetime)
 {
 	ParticleData data = {lifetime, velocity};
 	return addParticle(Particle(position, data));
 }
 
-void ParticleSystemRepresentation::update(double dt)
+void Representation::update(double dt)
 {
 	auto& particles = m_particles.getVertices();
 	auto particle = particles.begin();

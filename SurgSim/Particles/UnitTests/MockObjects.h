@@ -19,10 +19,10 @@
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Particles/EmitterRepresentation.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
 
 
-class MockParticleSystem : public SurgSim::Particles::ParticleSystemRepresentation
+class MockParticleSystem : public SurgSim::Particles::Representation
 {
 public:
 	explicit MockParticleSystem(const std::string& name);

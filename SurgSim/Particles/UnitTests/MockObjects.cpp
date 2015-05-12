@@ -17,7 +17,7 @@
 
 
 MockParticleSystem::MockParticleSystem(const std::string& name) :
-	SurgSim::Particles::ParticleSystemRepresentation(name),
+	SurgSim::Particles::Representation(name),
 	updateCount(0)
 {
 }

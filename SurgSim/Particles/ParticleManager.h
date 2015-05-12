@@ -33,7 +33,7 @@ namespace Particles
 {
 
 class EmitterRepresentation;
-class ParticleSystemRepresentation;
+class Representation;
 
 class ParticleManager: public SurgSim::Framework::ComponentManager
 {
@@ -55,8 +55,8 @@ private:
 	bool doStartUp() override;
 	bool doUpdate(double dt) override;
 
-	/// ParticleSystemRepresentations managed by this manager
-	std::vector<std::shared_ptr<ParticleSystemRepresentation>> m_particleSystems;
+	/// Representations managed by this manager
+	std::vector<std::shared_ptr<Representation>> m_particleSystems;
 
 	/// EmitterRepresentations managed by this manager
 	std::vector<std::shared_ptr<EmitterRepresentation>> m_emitters;

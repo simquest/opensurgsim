@@ -18,7 +18,7 @@
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Particles/EmitterRepresentation.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
 
 
 namespace SurgSim
@@ -47,7 +47,7 @@ bool ParticleManager::doStartUp()
 
 bool ParticleManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-	std::shared_ptr<ParticleSystemRepresentation> particleSystem = tryAddComponent(component, &m_particleSystems);
+	std::shared_ptr<Representation> particleSystem = tryAddComponent(component, &m_particleSystems);
 	std::shared_ptr<EmitterRepresentation> emitter = tryAddComponent(component, &m_emitters);
 	return particleSystem != nullptr || emitter!= nullptr;
 }

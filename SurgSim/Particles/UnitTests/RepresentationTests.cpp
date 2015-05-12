@@ -20,7 +20,7 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/EmitterRepresentation.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
 #include "SurgSim/Particles/UnitTests/MockObjects.h"
 
 using SurgSim::Math::Vector3d;
@@ -31,7 +31,7 @@ namespace SurgSim
 namespace Particles
 {
 
-TEST(ParticleSystemRepresentationTest, ConstructorTest)
+TEST(RepresentationTest, ConstructorTest)
 {
 	ASSERT_NO_THROW(MockParticleSystem representation("representation"));
 
@@ -39,7 +39,7 @@ TEST(ParticleSystemRepresentationTest, ConstructorTest)
 	EXPECT_EQ(0u, representation.getMaxParticles());
 }
 
-TEST(ParticleSystemRepresentationTest, SetGetMaxParticles)
+TEST(RepresentationTest, SetGetMaxParticles)
 {
 	auto representation = std::make_shared<MockParticleSystem>("representation");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
@@ -48,7 +48,7 @@ TEST(ParticleSystemRepresentationTest, SetGetMaxParticles)
 	EXPECT_EQ(1u, representation->getMaxParticles());
 }
 
-TEST(ParticleSystemRepresentationTest, AddParticle)
+TEST(RepresentationTest, AddParticle)
 {
 	auto representation = std::make_shared<MockParticleSystem>("representation");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
@@ -64,7 +64,7 @@ TEST(ParticleSystemRepresentationTest, AddParticle)
 	EXPECT_NEAR(10.0, particle.data.lifetime, 1e-9);
 }
 
-TEST(ParticleSystemRepresentationTest, GetParticles)
+TEST(RepresentationTest, GetParticles)
 {
 	auto representation = std::make_shared<MockParticleSystem>("representation");
 	representation->setMaxParticles(100);
@@ -81,7 +81,7 @@ TEST(ParticleSystemRepresentationTest, GetParticles)
 	EXPECT_NEAR(expectedLifetime, particles[0].data.lifetime, 1e-9);
 }
 
-TEST(ParticleSystemRepresentationTest, MaxParticles)
+TEST(RepresentationTest, MaxParticles)
 {
 	auto representation = std::make_shared<MockParticleSystem>("representation");
 	representation->setMaxParticles(1);
@@ -89,7 +89,7 @@ TEST(ParticleSystemRepresentationTest, MaxParticles)
 	EXPECT_FALSE(representation->addParticle(Vector3d::Constant(2.0), Vector3d::Zero(), 10));
 }
 
-TEST(ParticleSystemRepresentationTest, Aging)
+TEST(RepresentationTest, Aging)
 {
 	auto representation = std::make_shared<MockParticleSystem>("representation");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();

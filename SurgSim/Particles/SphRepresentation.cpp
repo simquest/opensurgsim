@@ -28,7 +28,7 @@ namespace Particles
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Particles::SphRepresentation, SphRepresentation);
 
 SphRepresentation::SphRepresentation(const std::string& name) :
-	ParticleSystemRepresentation(name),
+	Representation(name),
 	m_massPerParticle(0.0),
 	m_densityReference(0.0),
 	m_gasStiffness(0.0),
@@ -165,7 +165,7 @@ const std::vector<SphRepresentation::PlaneConstraint>& SphRepresentation::getPla
 
 bool SphRepresentation::doInitialize()
 {
-	if (!ParticleSystemRepresentation::doInitialize())
+	if (!Representation::doInitialize())
 	{
 		return false;
 	}
