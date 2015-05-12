@@ -26,6 +26,7 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::MultiAxisDevice, MultiAxisDevice);
 
 MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
 	m_name(uniqueName),

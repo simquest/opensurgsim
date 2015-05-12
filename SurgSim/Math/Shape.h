@@ -58,7 +58,7 @@ typedef enum
 /// Generic rigid shape class defining a shape
 /// \note This class gives the ability to analyze the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
-class Shape : virtual public SurgSim::Framework::Accessible
+class Shape : virtual public SurgSim::Framework::Accessible, public Framework::FactoryBase<Shape>
 {
 public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
@@ -87,11 +87,6 @@ public:
 	/// \param pose The pose to transform the shape by
 	/// \return the posed shape
 	virtual std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose);
-
-	typedef SurgSim::Framework::ObjectFactory<SurgSim::Math::Shape> FactoryType;
-
-	/// \return The static class factory that is being used in the conversion.
-	static FactoryType& getFactory();
 
 	/// Get class name
 	virtual std::string getClassName() const;

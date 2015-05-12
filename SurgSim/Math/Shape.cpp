@@ -33,18 +33,12 @@ std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose)
 	return nullptr;
 }
 
-Shape::FactoryType& Shape::getFactory()
-{
-	static FactoryType factory;
-	return factory;
-}
-
 /// Get class name
 std::string Shape::getClassName() const
 {
 	SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-		"getClassName() called on Math::Shape base class, this is wrong" <<
-		" in almost all cases, this means there is a class that does not have getClassName() defined.";
+			"getClassName() called on Math::Shape base class, this is wrong" <<
+			" in almost all cases, this means there is a class that does not have getClassName() defined.";
 	return "SurgSim::Math::Shape";
 }
 
