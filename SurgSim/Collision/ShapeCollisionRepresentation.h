@@ -51,9 +51,8 @@ public:
 	// Set the shape to be used in this representation
 	// \param shape Shape to be used in this representation.
 	void setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape);
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
-	void update(const double& dt) override;
+	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 protected:
 	bool doInitialize() override;

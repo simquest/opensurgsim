@@ -52,9 +52,6 @@ public:
 		double stiffnessStretching, double dampingStretching,
 		double stiffnessBending, double dampingBending);
 
-protected:
-
-	bool doWakeUp() override;
 };
 
 };  // namespace Blocks

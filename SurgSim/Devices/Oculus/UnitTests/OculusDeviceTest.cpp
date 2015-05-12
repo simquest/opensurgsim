@@ -41,6 +41,14 @@ TEST(OculusDeviceTest, CreateAndInitializeDevice)
 	EXPECT_EQ("Oculus", device->getName());
 }
 
+TEST(OculusDeviceTest, Factory)
+{
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create(
+								 "SurgSim::Device::OculusDevice", "Device"));
+	EXPECT_NE(nullptr, device);
+}
+
 TEST(OculusDeviceTest, FinalizeDevice)
 {
 	auto device = std::make_shared<OculusDevice>("Oculus");

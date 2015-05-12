@@ -33,11 +33,6 @@ Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
 	return m_lu.solve(b);
 }
 
-Vector LinearSparseSolveAndInverseLU::solve(const Vector& b) const
-{
-	return m_lu.solve(b);
-}
-
 Matrix LinearSparseSolveAndInverseLU::getInverse() const
 {
 	return (m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols())));

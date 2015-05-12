@@ -28,18 +28,17 @@ OdeSolverLinearStatic::OdeSolverLinearStatic(OdeEquation* equation)
 	m_name = "Ode Solver Linear Static";
 }
 
-void OdeSolverLinearStatic::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
+void OdeSolverLinearStatic::solve(double dt, const OdeState& currentState, OdeState* newState)
 {
 	if (!m_initialized)
 	{
-		OdeSolverStatic::solve(dt, currentState, newState, computeCompliance);
+		OdeSolverStatic::solve(dt, currentState, newState);
 		m_initialized = true;
 	}
 	else
 	{
 		Vector& f = m_equation.computeF(currentState);
-		currentState.applyBoundaryConditionsToVector(&f);
-		Vector deltaX = m_complianceMatrix * f;
+		Vector deltaX = m_equation.applyCompliance(currentState, f);
 
 		// Compute the new state using the static scheme:
 		newState->getPositions() = currentState.getPositions()  + deltaX;

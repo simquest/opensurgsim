@@ -55,7 +55,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 
 	EXPECT_EQ(collisionRepresentation->getShapeType(), originalMesh->getType());
 
-	auto actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getShape());
+	auto actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape());
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 
@@ -63,18 +63,12 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 			Vector3d(8.7, -4.7, -3.1));
 	collisionRepresentation->setLocalPose(transform);
 	collisionRepresentation->update(dt);
-	EXPECT_TRUE(collisionRepresentation->isActive());
 
-	EXPECT_TRUE(expectedMesh->setPose(transform));
+	actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape());
+	expectedMesh->transform(transform);
+	EXPECT_TRUE(expectedMesh->update());
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
-
-	// The MeshShape fails to update due to numerical precision in normal calculation, making the collision rep inactive
-	transform = SurgSim::Math::makeRigidTranslation(Vector3d(1e100, 1e100, 1e100));
-	collisionRepresentation->setLocalPose(transform);
-	collisionRepresentation->update(dt);
-	EXPECT_FALSE(collisionRepresentation->isActive());
-	EXPECT_FALSE(expectedMesh->setPose(transform));
 }
 
 TEST(ShapeCollisionRepresentationTest, SerializationTest)

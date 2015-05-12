@@ -22,6 +22,8 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::OculusDevice, OculusDevice);
+
 OculusDevice::OculusDevice(const std::string& name) :
 	SurgSim::Input::CommonDevice(name, OculusScaffold::buildDeviceInputData())
 {

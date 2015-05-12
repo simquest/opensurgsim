@@ -138,12 +138,6 @@ boost::uuids::uuid Component::getUuid() const
 	return m_uuid;
 }
 
-Component::FactoryType& Component::getFactory()
-{
-	static FactoryType factory;
-	return factory;
-}
-
 std::string Component::getClassName() const
 {
 	SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "getClassName() called on Component base class, this is wrong" <<

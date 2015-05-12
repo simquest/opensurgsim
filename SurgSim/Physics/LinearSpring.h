@@ -72,14 +72,15 @@ public:
 	/// \param state The state to compute the damping matrix with
 	/// \param[in,out] D The complete system damping matrix to add the spring damping matrix into
 	/// \param scale A factor to scale the added damping matrix with
-	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale = 1.0) override;
+	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D, double scale = 1.0) override;
 
 	/// Adds the spring stiffness matrix K (= -df/dx) (computed for a given state) to a complete system stiffness
 	/// matrix K (assembly)
 	/// \param state The state to compute the stiffness matrix with
 	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
 	/// \param scale A factor to scale the added stiffness matrix with
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+					  double scale = 1.0) override;
 
 	/// Adds the spring force vector, mass, stiffness and damping matrices (computed for a given state) into a
 	/// complete system data structure F, D, K (assembly)
@@ -88,7 +89,7 @@ public:
 	/// \param[in,out] D The complete system damping matrix to add the spring damping matrix into
 	/// \param[in,out] K The complete system stiffness matrix to add the spring stiffness matrix into
 	void addFDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-						 SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override;
+				SurgSim::Math::SparseMatrix* D, SurgSim::Math::SparseMatrix* K) override;
 
 	/// Adds the spring matrix-vector contribution F += (alphaD.D + alphaK.K).x (computed for a given
 	/// state) into a complete system data structure F (assembly)
@@ -98,7 +99,7 @@ public:
 	/// \param vector A complete system vector to use as the vector in the matrix-vector multiplication
 	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
 	void addMatVec(const SurgSim::Math::OdeState& state, double alphaD, double alphaK,
-			const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* F) override;
+				   const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* F) override;
 
 	/// Comparison operator (equality)
 	/// \param spring Spring to compare it to
@@ -121,8 +122,8 @@ protected:
 	/// \note This method calculates only the 3x3 parts related to the force applied on the first node,
 	/// \note derived w.r.t. first node. By nature, we have dF2/dx2 = dF1/dx1 = -dF1/dx2 = -dF2/dx1.
 	bool computeDampingAndStiffness(const SurgSim::Math::OdeState& state,
-		SurgSim::Math::Matrix33d* De,
-		SurgSim::Math::Matrix33d* Ke);
+									SurgSim::Math::Matrix33d* De,
+									SurgSim::Math::Matrix33d* Ke);
 
 private:
 	/// Rest length (in m)

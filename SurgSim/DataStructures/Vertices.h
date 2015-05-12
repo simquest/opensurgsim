@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
 
@@ -110,6 +111,10 @@ public:
 	/// \param	positions	Vector containing new position for each vertex
 	/// \param	doUpdate	True to perform an update after setting the vertices, false to skip update; default is true.
 	void setVertexPositions(const std::vector<SurgSim::Math::Vector3d>& positions, bool doUpdate = true);
+
+	/// Apply a rigid transform to each vertex
+	/// \param pose the rigid transform to apply
+	void transform(const Math::RigidTransform3d& pose);
 
 	/// Compares the mesh with another one (equality)
 	/// \param mesh The Vertices to compare it to
