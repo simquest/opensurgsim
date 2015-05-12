@@ -1,1 +1,1 @@
-${CMAKE_BINARY_DIR}/SurgSim/Testing/Data/
+${PROJECT_BINARY_DIR}/SurgSim/Testing/Data/

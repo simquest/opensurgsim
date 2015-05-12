@@ -121,7 +121,7 @@ TEST(TransferPhysicsToPointCloudBehaviorTests, UpdateTest)
 
 TEST(TransferPhysicsToPointCloudBehaviorTests, SerializationTest)
 {
-    std::string filename = std::string("../../SurgSim/Testing/Data/Geometry/wound_deformable.ply");
+    std::string filename = std::string("MeshShapeData/wound_deformable.ply");
 
 	std::shared_ptr<SurgSim::Framework::Component> physics = std::make_shared<Fem3DRepresentation>("Fem3D");
 	auto fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(physics);

@@ -4,4 +4,4 @@ varying vec4 geomColor;
 void main(void)
 {
 	gl_FragColor = geomColor;
-};
+}
