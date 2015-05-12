@@ -27,10 +27,11 @@ namespace Device
 {
 
 /// A customized osg::DisplaySettings, to be used with Oculus device.
-/// It pulls the projection matrices from OculusSDK and pass them to OSG for rendering.
+/// It passes customized projection matrices to OSG for rendering.
 class OculusDisplaySettings : public osg::DisplaySettings
 {
 public:
+	/// Constructor
 	OculusDisplaySettings();
 
 	/// Constructor
