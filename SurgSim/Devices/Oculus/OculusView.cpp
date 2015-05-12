@@ -31,19 +31,41 @@ OculusView::OculusView(const std::string& name) : OsgView(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OculusView, std::shared_ptr<SurgSim::Framework::Component>, InputComponent,
 									  getInputComponent, setInputComponent);
+
+	// Default Settings of Oculus DK2
+	setFullScreen(true);
+	setDisplayType(View::DISPLAY_TYPE_HMD);
+	setStereoMode(View::STEREO_MODE_HORIZONTAL_SPLIT);
+	setScreenWidth(0.0631);
+	setScreenHeight(0.071);
+	setEyeSeparation(0.06);
+	setScreenDistance(0.10);
+	setTargetScreen(1); // Assume Oculus screen has ID 1
+
+	std::array<int, 2> dimensions = {1920, 1080};
+	setDimensions(dimensions);
 }
 
 OculusView::~OculusView()
 {
 }
 
-bool OculusView::doWakeUp()
+void OculusView::setInputComponent(std::shared_ptr<Framework::Component> input)
 {
-	SURGSIM_ASSERT(m_inputComponent) << "No InputComponent is connected to this view.";
+	m_inputComponent = Framework::checkAndConvert<Input::InputComponent>(input, "SurgSim::Input::InputComponent");
+}
 
-	OsgView::doWakeUp();
+std::shared_ptr<Input::InputComponent> OculusView::getInputComponent() const
+{
+	return m_inputComponent;
+}
+
+osg::ref_ptr<osg::DisplaySettings> OculusView::createDisplaySettings() const
+{
+	SURGSIM_ASSERT(m_inputComponent != nullptr) << "No InputComponent is connected to this view.";
+
 	osg::ref_ptr<SurgSim::Device::OculusDisplaySettings> displaySettings =
-		new SurgSim::Device::OculusDisplaySettings(getOsgView()->getDisplaySettings());
+		new SurgSim::Device::OculusDisplaySettings(OsgView::createDisplaySettings());
 
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_inputComponent->getData(&dataGroup);
@@ -57,21 +79,9 @@ bool OculusView::doWakeUp()
 	SURGSIM_ASSERT(
 		dataGroup.matrices().get(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, &projectionMatrix)) <<
 		"No right projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
-	displaySettings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
+	displaySettings->setRightEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
 
-	getOsgView()->setDisplaySettings(displaySettings);
-
-	return true;
-}
-
-void OculusView::setInputComponent(std::shared_ptr<Framework::Component> input)
-{
-	m_inputComponent = Framework::checkAndConvert<Input::InputComponent>(input, "SurgSim::Input::InputComponent");
-}
-
-std::shared_ptr<Input::InputComponent> OculusView::getInputComponent() const
-{
-	return m_inputComponent;
+	return displaySettings;
 }
 
 }; // namespace Device

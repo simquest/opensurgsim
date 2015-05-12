@@ -57,8 +57,7 @@ public:
 	std::shared_ptr<Input::InputComponent> getInputComponent() const;
 
 protected:
-	/// Wake up the view
-	bool doWakeUp() override;
+	osg::ref_ptr<osg::DisplaySettings> createDisplaySettings() const override;
 
 private:
 	std::shared_ptr<Input::InputComponent> m_inputComponent;
