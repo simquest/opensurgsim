@@ -40,7 +40,7 @@ OculusView::~OculusView()
 bool OculusView::doWakeUp()
 {
 	OsgView::doWakeUp();
-	osg::ref_ptr<SurgSim::Device::OculusDisplaySettings> displaySeetings =
+	osg::ref_ptr<SurgSim::Device::OculusDisplaySettings> displaySettings =
 		new SurgSim::Device::OculusDisplaySettings(getOsgView()->getDisplaySettings());
 
 	SurgSim::DataStructures::DataGroup dataGroup;
@@ -50,14 +50,14 @@ bool OculusView::doWakeUp()
 	SURGSIM_ASSERT(
 		dataGroup.matrices().get(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX, &projectionMatrix)) <<
 		"No left projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
-	displaySeetings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
+	displaySettings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
 
 	SURGSIM_ASSERT(
 		dataGroup.matrices().get(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, &projectionMatrix)) <<
 		"No right projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
-	displaySeetings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
+	displaySettings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
 
-	getOsgView()->setDisplaySettings(displaySeetings);
+	getOsgView()->setDisplaySettings(displaySettings);
 
 	return true;
 }
