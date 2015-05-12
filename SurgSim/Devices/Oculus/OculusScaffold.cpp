@@ -131,9 +131,9 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 				ovrFovPort defaultLeftFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
 				ovrFovPort defaultRightFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
 
-				ovrMatrix4f leftProjMatrix = ovrMatrix4f_Projection(defaultLeftFOV, 1.0f, 0.001f,
+				ovrMatrix4f leftProjMatrix = ovrMatrix4f_Projection(defaultLeftFOV, 0.1f, 10.0f,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
-				ovrMatrix4f rightProjMatrix = ovrMatrix4f_Projection(defaultRightFOV, 1.0f, 0.001f,
+				ovrMatrix4f rightProjMatrix = ovrMatrix4f_Projection(defaultRightFOV, 0.1f, 10.0f,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
 
 				inputData.matrices().set(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX,
@@ -170,8 +170,10 @@ bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto match = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-								 [&device](const std::unique_ptr<DeviceData>& info)
-								 { return info->deviceObject == device; });
+								  [&device](const std::unique_ptr<DeviceData>& info)
+		{
+			return info->deviceObject == device;
+		});
 
 		if (match != m_state->registeredDevices.end())
 		{
