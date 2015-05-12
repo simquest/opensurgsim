@@ -39,6 +39,8 @@ OculusView::~OculusView()
 
 bool OculusView::doWakeUp()
 {
+	SURGSIM_ASSERT(m_inputComponent) << "No InputComponent is connected to this view.";
+
 	OsgView::doWakeUp();
 	osg::ref_ptr<SurgSim::Device::OculusDisplaySettings> displaySettings =
 		new SurgSim::Device::OculusDisplaySettings(getOsgView()->getDisplaySettings());
