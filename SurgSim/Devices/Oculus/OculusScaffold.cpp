@@ -244,7 +244,8 @@ SurgSim::DataStructures::DataGroup OculusScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
 	builder.addPose(SurgSim::DataStructures::Names::POSE);
-	builder.addMatrix(SurgSim::DataStructures::Names::PROJECTION_MATRIX);
+	builder.addMatrix(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX);
+	builder.addMatrix(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX);
 	return builder.createData();
 }
 
