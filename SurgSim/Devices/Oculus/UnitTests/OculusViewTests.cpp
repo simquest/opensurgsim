@@ -24,6 +24,15 @@
 
 using SurgSim::Device::OculusView;
 
+TEST(OculusViewTests, InputComponent)
+{
+	auto view = std::make_shared<SurgSim::Device::OculusView>("OculusView");
+	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
+
+	EXPECT_NO_THROW(view->setInputComponent(inputComponent));
+	EXPECT_EQ(inputComponent, view->getInputComponent());
+}
+
 TEST(OculusViewTests, Serialization)
 {
 	auto view = std::make_shared<SurgSim::Device::OculusView>("test name");
