@@ -43,6 +43,14 @@ TEST(IdentityPoseDeviceTest, Name)
 	EXPECT_EQ("MyIdentityPoseDevice", device.getName());
 }
 
+TEST(IdentityPoseDeviceTest, Factory)
+{
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create(
+								 "SurgSim::Device::IdentityPoseDevice", "Device"));
+	EXPECT_NE(nullptr, device);
+}
+
 TEST(IdentityPoseDeviceTest, AddInputConsumer)
 {
 	IdentityPoseDevice device("MyIdentityPoseDevice");
@@ -58,7 +66,7 @@ TEST(IdentityPoseDeviceTest, AddInputConsumer)
 
 	// Check the data.
 	RigidTransform3d pose = SurgSim::Math::makeRigidTransform(SurgSim::Math::Vector3d(1.3, 32.0, 68.0),
-		SurgSim::Math::Vector3d(13.2, 2.8, 8.0), SurgSim::Math::Vector3d(273.0, -32.0, -6.0));
+							SurgSim::Math::Vector3d(13.2, 2.8, 8.0), SurgSim::Math::Vector3d(273.0, -32.0, -6.0));
 	ASSERT_TRUE(consumer->m_lastReceivedInput.poses().get(SurgSim::DataStructures::Names::POSE, &pose));
 	EXPECT_NEAR(0, (pose.matrix() - Matrix44d::Identity()).norm(), 1e-6);
 	bool button0 = false;
@@ -76,7 +84,7 @@ TEST(IdentityPoseDeviceTest, AddInputConsumer)
 	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
 	// We don't care if the first consumer was updated again or not.
 	EXPECT_TRUE((consumer->m_numTimesReceivedInput >= 1) && (consumer->m_numTimesReceivedInput <= 2)) <<
-		"consumer->m_numTimesReceivedInput = " << consumer->m_numTimesReceivedInput << std::endl;
+			"consumer->m_numTimesReceivedInput = " << consumer->m_numTimesReceivedInput << std::endl;
 }
 
 TEST(IdentityPoseDeviceTest, RemoveInputConsumer)

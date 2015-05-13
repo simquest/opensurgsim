@@ -25,6 +25,7 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgProgram.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
@@ -38,7 +39,6 @@
 
 #include <random>
 #include <array>
-#include "../OsgSceneryRepresentation.h"
 
 
 using SurgSim::Framework::Runtime;
@@ -151,13 +151,14 @@ struct OsgProgramRenderTests : public RenderTest
 		viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.1, 0.1, 0.1, 1.0));
 		viewElement->setPose(
 			makeRigidTransform(Vector3d(0.0, 0.0, -2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
+		viewElement->enableManipulator(true);
 	}
 
 	void run()
 	{
 		// Action
 		runtime->start();
-		boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 		runtime->stop();
 	}
 };

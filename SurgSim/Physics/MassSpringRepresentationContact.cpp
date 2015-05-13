@@ -39,18 +39,18 @@ MassSpringRepresentationContact::~MassSpringRepresentationContact()
 }
 
 void MassSpringRepresentationContact::doBuild(double dt,
-			const ConstraintData& data,
-			const std::shared_ptr<Localization>& localization,
-			MlcpPhysicsProblem* mlcp,
-			size_t indexOfRepresentation,
-			size_t indexOfConstraint,
-			ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 	using SurgSim::Math::Vector3d;
 
 	auto massSpring = std::static_pointer_cast<MassSpringRepresentation>(localization->getRepresentation());
 
-	if ( !massSpring->isActive())
+	if (!massSpring->isActive())
 	{
 		return;
 	}
@@ -87,7 +87,8 @@ void MassSpringRepresentationContact::doBuild(double dt,
 	m_newH.insert(3 * nodeId + 1) = n[1] * scale;
 	m_newH.insert(3 * nodeId + 2) = n[2] * scale;
 
-	mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, massSpring->applyCompliance(*(massSpring->getCurrentState()), m_newH),
+						   indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType MassSpringRepresentationContact::getMlcpConstraintType() const

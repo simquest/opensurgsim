@@ -237,6 +237,7 @@ TEST(OsgCameraTests, Serialization)
 	SurgSim::Math::Matrix44d projection = SurgSim::Math::Matrix44d::Random();
 	camera->setValue("ProjectionMatrix", projection);
 	camera->setValue("AmbientColor", SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4));
+	camera->setViewport(10, 20, 30, 50);
 
 	// Serialize.
 	YAML::Node node;
@@ -293,6 +294,24 @@ TEST(OsgCameraTests, SetProjection)
 
 	EXPECT_NO_THROW(camera->setValue("OrthogonalProjection", ortho));
 	EXPECT_TRUE(expectedOrtho.isApprox(camera->getProjectionMatrix()));
+}
+
+TEST(OsgCameraTests, Viewport)
+{
+	std::shared_ptr<OsgCamera> camera = std::make_shared<OsgCamera>("TestOsgCamera");
+
+	std::array<int, 4> original = {10, 20, 30, 40};
+	std::array<int, 4> result = {0, 0, 0, 0};
+
+	camera->setViewport(original[0], original[1], original[2], original[3]);
+	camera->getViewport(&result[0], &result[1], &result[2], &result[3]);
+
+	EXPECT_EQ(original, result);
+	camera->setViewport(0, 0, 0, 0);
+
+	camera->setValue("Viewport", original);
+	result = camera->getValue<std::array<int, 4>>("Viewport");
+	EXPECT_EQ(original, result);
 }
 
 }  // namespace Graphics

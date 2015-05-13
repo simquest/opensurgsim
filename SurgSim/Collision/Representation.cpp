@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
@@ -29,6 +31,28 @@ Representation::Representation(const std::string& name) :
 Representation::~Representation()
 {
 
+}
+
+const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
+{
+	Math::RigidTransform3d pose = getPose();
+	if (pose.isApprox(Math::RigidTransform3d::Identity()))
+	{
+		m_posedShape = getShape();
+		m_posedShapePose = Math::RigidTransform3d::Identity();
+	}
+	else if (m_posedShape == nullptr || !pose.isApprox(m_posedShapePose))
+	{
+		m_posedShape = getShape()->getTransformed(pose);
+		m_posedShapePose = pose;
+	}
+
+	return m_posedShape;
+}
+
+void Representation::invalidatePosedShape()
+{
+	m_posedShape = nullptr;
 }
 
 SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()

@@ -20,6 +20,7 @@
 
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -120,7 +121,7 @@ public:
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) = 0;
+	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) = 0;
 
 	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
 	/// to a complete system damping matrix D (assembly)
@@ -130,8 +131,8 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D,
-		double scale = 1.0) = 0;
+	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
+							double scale = 1.0) = 0;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
 	/// to a complete system stiffness matrix K (assembly)
@@ -141,8 +142,8 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K,
-		double scale = 1.0) = 0;
+	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+							  double scale = 1.0) = 0;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
 	/// into a complete system data structure F, M, D, K (assembly)
@@ -154,10 +155,10 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	virtual void addFMDK(const SurgSim::Math::OdeState& state,
-		SurgSim::Math::Vector* F,
-		SurgSim::Math::Matrix* M,
-		SurgSim::Math::Matrix* D,
-		SurgSim::Math::Matrix* K) = 0;
+						 SurgSim::Math::Vector* F,
+						 SurgSim::Math::SparseMatrix* M,
+						 SurgSim::Math::SparseMatrix* D,
+						 SurgSim::Math::SparseMatrix* K) = 0;
 
 	/// Adds the element matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given state)
 	/// into a complete system data structure F (assembly)
@@ -170,7 +171,7 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
+						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
 
 	/// Determines whether a given natural coordinate is valid
 	/// \param naturalCoordinate Coordinate to check
@@ -192,6 +193,22 @@ public:
 	virtual SurgSim::Math::Vector computeNaturalCoordinate(
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& cartesianCoordinate) const = 0;
+
+	/// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
+	/// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
+	/// support Eigen expression. If it is a Sparse storage type the alignment must be the same
+	/// as the SparseMatrix: Opt.
+	/// Note that no assertion or verification is done on this type.
+	/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+	/// \param subMatrix The sub-matrix (containing all the squared-blocks)
+	/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
+	/// \param blockSize The blocks size
+	/// \param[out] matrix The matrix to add the sub-matrix blocks into
+	/// \param initialize Optional parameter, default true. If true, the matrix form is assumed to be undefined and is
+	/// initialized when necessary. If false, the matrix form is assumed to be previously defined.
+	template <typename DerivedSub, typename T, int Opt, typename Index>
+	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
+							  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true);
 
 protected:
 	/// Sets the number of degrees of freedom per node
@@ -219,5 +236,7 @@ protected:
 } // namespace Physics
 
 } // namespace SurgSim
+
+#include "SurgSim/Physics/FemElement-inl.h"
 
 #endif // SURGSIM_PHYSICS_FEMELEMENT_H

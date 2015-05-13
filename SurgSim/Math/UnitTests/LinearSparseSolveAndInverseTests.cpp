@@ -66,9 +66,9 @@ private:
 	void initializeSparseMatrix(SparseMatrix* m)
 	{
 		m->resize(static_cast<SparseMatrix::Index>(size), static_cast<SparseMatrix::Index>(size));
-		for (SparseMatrix::Index row = 0; row < size; row++)
+		for (SparseMatrix::Index row = 0; row < static_cast<SparseMatrix::Index>(size); row++)
 		{
-			for (SparseMatrix::Index col = 0; col < size; col++)
+			for (SparseMatrix::Index col = 0; col < static_cast<SparseMatrix::Index>(size); col++)
 			{
 				(*m).insert(row, col) =
 					std::fmod((10.3 * std::cos(static_cast<double>(row * col)) + 3.24), 10.0);

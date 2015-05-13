@@ -66,9 +66,9 @@ TEST(OdeEquationTests, ComputesTest)
 		EXPECT_TRUE(m.computeK(state).isApprox(expectedK));
 		{
 			SurgSim::Math::Vector* F = nullptr;
-			SurgSim::Math::Matrix* M = nullptr;
-			SurgSim::Math::Matrix* D = nullptr;
-			SurgSim::Math::Matrix* K = nullptr;
+			SurgSim::Math::SparseMatrix* M = nullptr;
+			SurgSim::Math::SparseMatrix* D = nullptr;
+			SurgSim::Math::SparseMatrix* K = nullptr;
 
 			m.computeFMDK(state, &F, &M, &D, &K);
 			ASSERT_NE(nullptr, F);
@@ -99,9 +99,9 @@ TEST(OdeEquationTests, ComputesTest)
 		EXPECT_TRUE(m.computeK(state).isApprox(expectedK));
 		{
 			SurgSim::Math::Vector* F = nullptr;
-			SurgSim::Math::Matrix* M = nullptr;
-			SurgSim::Math::Matrix* D = nullptr;
-			SurgSim::Math::Matrix* K = nullptr;
+			SurgSim::Math::SparseMatrix* M = nullptr;
+			SurgSim::Math::SparseMatrix* D = nullptr;
+			SurgSim::Math::SparseMatrix* K = nullptr;
 
 			m.computeFMDK(state, &F, &M, &D, &K);
 			ASSERT_NE(nullptr, F);

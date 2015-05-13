@@ -126,6 +126,11 @@ void Timer::setMaxNumberOfFrames(size_t maxNumberOfFrames)
 	}
 }
 
+size_t Timer::getMaxNumberOfFrames()
+{
+	return m_maxNumberOfFrames;
+}
+
 size_t Timer::getCurrentNumberOfFrames() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);

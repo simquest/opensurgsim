@@ -234,8 +234,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 {
 	using SurgSim::Math::Vector3d;
 
-	Vector *F;
-	Matrix *M, *D, *K;
+	Vector* F;
+	SparseMatrix* M, *D, *K;
 
 	// No gravity, no Rayleigh damping
 	// computeF tests addFemElementsForce
@@ -252,6 +252,7 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
+
 		// Test combo method computeFMDK
 		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
 		EXPECT_TRUE((*F).isApprox(expectedF));
@@ -294,8 +295,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 {
 	using SurgSim::Math::Vector3d;
 
-	Vector *F;
-	Matrix *M, *D, *K;
+	Vector* F;
+	SparseMatrix* M, *D, *K;
 
 	// No gravity, Rayleigh damping
 	// computeF tests addFemElementsForce and addRayleighDampingForce
@@ -313,7 +314,7 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(
-			m_expectedDamping + m_expectedRayleighDamping)));
+										m_expectedDamping + m_expectedRayleighDamping)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
 		// Test combo method computeFMDK
 		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
@@ -344,7 +345,7 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping +
-			m_expectedRayleighDamping + Dext)));
+									m_expectedRayleighDamping + Dext)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
 		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
 		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
@@ -357,9 +358,10 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 {
 	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::SparseMatrix;
 
-	Vector *F;
-	Matrix *M, *D, *K;
+	Vector* F;
+	SparseMatrix* M, *D, *K;
 
 	// Gravity, no Rayleigh damping
 	// computeF tests addFemElementsForce and addGravityForce
@@ -417,9 +419,10 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 {
 	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::SparseMatrix;
 
-	Vector *F;
-	Matrix *M, *D, *K;
+	Vector* F;
+	SparseMatrix* M, *D, *K;
 
 	// Gravity, Rayleigh damping
 	// computeF tests addFemElementsForce, addRayleighDampingForce and addGravityForce
@@ -430,7 +433,7 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 	m_fem->wakeUp();
 
 	SurgSim::Math::Vector expectedF = m_expectedFemElementsForce + m_expectedRayleighDampingForce +
-		m_expectedGravityForce;
+									  m_expectedGravityForce;
 
 	{
 		SCOPED_TRACE("Without external force");
@@ -438,7 +441,7 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(
-			m_expectedDamping + m_expectedRayleighDamping)));
+										m_expectedDamping + m_expectedRayleighDamping)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
 		// Test combo method computeFMDK
 		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
@@ -469,7 +472,7 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping +
-			m_expectedRayleighDamping + Dext)));
+									m_expectedRayleighDamping + Dext)));
 		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
 		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
 		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
@@ -528,8 +531,8 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		auto fem = std::make_shared<MockFemRepresentation>("fem");
 
 		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
-		EXPECT_NO_THROW(fem->setComplianceWarping(true));
-		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
 
 		// Setup the initial state
 		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
@@ -549,13 +552,15 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		fem->wakeUp();
 
-		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
 		// update() will call updateNodesRotations() which will raise an exception in this case.
 		// This method has not been overridden.
-		EXPECT_THROW(fem->update(1e-3), SurgSim::Framework::AssertionFailure);
+		// This has been disabled. No assertion will be thrown until compliance warping is back
+		// in the code.
+		EXPECT_NO_THROW(fem->update(1e-3));
 	}
 
 	{
@@ -563,8 +568,8 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		auto fem = std::make_shared<MockFemRepresentationValidComplianceWarping>("fem");
 
 		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
-		EXPECT_NO_THROW(fem->setComplianceWarping(true));
-		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
 
 		// Setup the initial state
 		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
@@ -584,7 +589,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		fem->wakeUp();
 
-		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
@@ -592,7 +597,8 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		// This method has been overridden.
 		EXPECT_NO_THROW(fem->update(1e-3));
 
-		EXPECT_NO_THROW(EXPECT_TRUE((fem->getComplianceMatrix() / 1e-3).isIdentity()));
+		EXPECT_NO_THROW(EXPECT_TRUE((fem->applyCompliance(*initialState, Matrix::Identity(initialState->getNumDof(),
+									 initialState->getNumDof())) / 1e-3).isIdentity()));
 	}
 }
 
@@ -600,9 +606,9 @@ TEST_F(FemRepresentationTests, SerializationTest)
 {
 	auto fem = std::make_shared<MockFemRepresentation>("Test-Fem");
 
-	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", true));
-	EXPECT_TRUE(fem->getComplianceWarping());
-	EXPECT_TRUE(fem->getValue<bool>("ComplianceWarping"));
+	EXPECT_THROW(fem->setValue("ComplianceWarping", true), SurgSim::Framework::AssertionFailure);
+	EXPECT_FALSE(fem->getComplianceWarping());
+	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));
 	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", false));
 	EXPECT_FALSE(fem->getComplianceWarping());
 	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));

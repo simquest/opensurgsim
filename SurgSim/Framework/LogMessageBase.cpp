@@ -26,7 +26,7 @@ LogMessageBase::LogMessageBase(Logger* logger, int level)
 	: m_stream(), m_logger(logger)
 {
 	SURGSIM_ASSERT(logger) << "logger should not be a null pointer";
-	static std::string levelNames[5] = {"DEBUG   ", "INFO    ", "WARNING ", "SEVERE  ","CRITICAL"};
+	static std::string levelNames[5] = {"DEBUG   ", "INFO    ", "WARNING ", "SEVERE  ", "CRITICAL"};
 	std::time_t timeStamp;
 	std::time(&timeStamp);
 	::tm tm;
@@ -42,14 +42,14 @@ LogMessageBase::LogMessageBase(Logger* logger, int level)
 	}
 	char fillChar = m_stream.fill();
 	m_stream << std::setfill('0') <<
-		std::setw(2) << 1+tm.tm_mon << "." <<
-		std::setw(2) << tm.tm_mday << ' ' <<
-		std::setw(2) << tm.tm_hour << ':' <<
-		std::setw(2) << tm.tm_min << ':' <<
-		std::setw(2) << tm.tm_sec << ' ' <<
-		std::setfill(fillChar) <<
-		m_logger->getName() << " " <<
-		levelName << " ";
+			 std::setw(2) << 1 + tm.tm_mon << "." <<
+			 std::setw(2) << tm.tm_mday << ' ' <<
+			 std::setw(2) << tm.tm_hour << ':' <<
+			 std::setw(2) << tm.tm_min << ':' <<
+			 std::setw(2) << tm.tm_sec << ' ' <<
+			 std::setfill(fillChar) <<
+			 levelName << " " <<
+			 m_logger->getName() << " ";
 }
 
 }; // namespace Framework

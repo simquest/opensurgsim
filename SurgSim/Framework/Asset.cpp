@@ -76,12 +76,5 @@ void Asset::serializeFileName(SurgSim::Framework::Accessible* accessible)
 										  std::bind(&YAML::Node::as<std::string>, std::placeholders::_1)));
 }
 
-Asset::FactoryType& Asset::getFactory()
-{
-	static FactoryType factory;
-	return factory;
-}
-
-
 }; // Framework
 }; // SurgSim
