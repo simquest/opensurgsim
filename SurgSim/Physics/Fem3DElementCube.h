@@ -52,13 +52,14 @@ public:
 	explicit Fem3DElementCube(std::array<size_t, 8> nodeIds);
 
 	/// Constructor for FemElement object factory
-	/// \param nodeIds A vector of node ids, expecting 8, defining this cube element in an overall mesh
+	/// \param nodeIds A vector of node ids defining this cube element in an overall mesh
 	/// \note It is required that getVolume() is positive, to do so, it needs (looking at the cube from
 	/// \note the exterior, face normal 'n' pointing outward):
 	/// \note   the 1st  4 nodeIds (ABCD) should define any face CW            i.e. (AB^AC or AB^AD or AC^AD).n < 0
 	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
 	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 8
 	explicit Fem3DElementCube(std::vector<size_t> nodeIds);
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementCube);

@@ -287,13 +287,10 @@ const Vector3d& MockMassSpring::getGravityVector() const
 
 MockFemElement::MockFemElement() : FemElement(), m_isInitialized(false)
 {
-	setNumDofPerNode(3);
 }
 
 MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement(), m_isInitialized(false)
 {
-	setNumDofPerNode(3);
-
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
@@ -356,6 +353,7 @@ Vector MockFemElement::computeNaturalCoordinate(const OdeState& state, const Vec
 
 void MockFemElement::initialize(const OdeState& state)
 {
+	setNumDofPerNode(3);
 	FemElement::initialize(state);
 	const size_t numDof = 3 * m_nodeIds.size();
 	m_F = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));

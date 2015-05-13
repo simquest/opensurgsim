@@ -53,7 +53,7 @@ Fem2DElementTriangle::Fem2DElementTriangle(std::vector<size_t> nodeIds) :
 	m_restArea(0.0),
 	m_thickness(0.0)
 {
-	SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect nodes for Fem2D Triangle";
+	SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 

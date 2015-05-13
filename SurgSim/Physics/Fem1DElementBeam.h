@@ -38,13 +38,14 @@ class Fem1DElementBeam : public FemElement
 {
 public:
 	/// Constructor
-	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element with respect to a
+	/// \param nodeIds An array of 2 node ids defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
 
 	/// Constructor for FemElement object factory
-	/// \param nodeIds A vector of node ids, expecting 2 (A, B), defining this beam element with respect to a
+	/// \param nodeIds A vector of node ids defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 2
 	explicit Fem1DElementBeam(std::vector<size_t> nodeIds);
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam);

@@ -58,13 +58,14 @@ class Fem2DElementTriangle : public FemElement
 
 public:
 	/// Constructor
-	/// \param nodeIds An array of 3 node ids (A, B, C) defining this triangle element with respect to a
+	/// \param nodeIds An array of 3 node ids defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
 
 	/// Constructor for FemElement object factory
-	/// \param nodeIds A vector of node ids, expecting 3 (A, B, C), defining this triangle element with respect to a
+	/// \param nodeIds A vector of node ids defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 3
 	explicit Fem2DElementTriangle(std::vector<size_t> nodeIds);
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DElementTriangle);
