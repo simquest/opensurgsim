@@ -155,6 +155,7 @@ SET(LIBS
 	SurgSimFramework
 	SurgSimInput
 	SurgSimMath
+	SurgSimParticles
 )
 
 target_link_libraries(SurgSimPhysics ${LIBS})

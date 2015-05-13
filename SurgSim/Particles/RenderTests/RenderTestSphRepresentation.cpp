@@ -18,7 +18,6 @@
 #include <memory>
 
 #include "SurgSim/Blocks/TransferParticlesToPointCloudBehavior.h"
-#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
@@ -27,13 +26,12 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/EmitterRepresentation.h"
+#include "SurgSim/Particles/Emitter.h"
 #include "SurgSim/Particles/RandomSpherePointGenerator.h"
 #include "SurgSim/Particles/RenderTests/RenderTest.h"
 #include "SurgSim/Particles/SphRepresentation.h"
 
 using SurgSim::Blocks::TransferParticlesToPointCloudBehavior;
-using SurgSim::Framework::Behavior;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
@@ -80,8 +78,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createParticleSystem(const std
 	particlesRepresentation->addPlaneConstraint(planeConstraint);
 	sceneElement->addComponent(particlesRepresentation);
 
-	std::shared_ptr<SurgSim::Particles::EmitterRepresentation> sphereEmitter;
-	sphereEmitter = std::make_shared<SurgSim::Particles::EmitterRepresentation>("sphereEmitter");
+	std::shared_ptr<SurgSim::Particles::Emitter> sphereEmitter;
+	sphereEmitter = std::make_shared<SurgSim::Particles::Emitter>("sphereEmitter");
 	sphereEmitter->setLocalPose(SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.5, 1.0, 0.5)));
 	sphereEmitter->setTarget(particlesRepresentation);
 	sphereEmitter->setShape(std::make_shared<SurgSim::Math::SphereShape>(0.1));
@@ -115,8 +113,7 @@ TEST_F(RenderTests, SphRenderTest)
 {
 	scene->addSceneElement(createParticleSystem("Particles", Vector4d::Ones()));
 
-	// Particle manager runs at 500Hz
-	particlesManager->setRate(500.0);
+	physicsManager->setRate(500.0);
 
 	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 20000.0);
 }

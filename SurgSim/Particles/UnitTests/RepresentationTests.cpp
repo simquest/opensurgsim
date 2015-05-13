@@ -19,7 +19,7 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/EmitterRepresentation.h"
+#include "SurgSim/Particles/Emitter.h"
 #include "SurgSim/Particles/Representation.h"
 #include "SurgSim/Particles/UnitTests/MockObjects.h"
 

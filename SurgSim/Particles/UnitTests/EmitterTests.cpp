@@ -24,10 +24,11 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/EmitterRepresentation.h"
+#include "SurgSim/Particles/Emitter.h"
 #include "SurgSim/Particles/UnitTests/MockObjects.h"
 
 using SurgSim::Framework::Component;
@@ -45,10 +46,10 @@ namespace SurgSim
 namespace Particles
 {
 
-TEST(EmitterRepresentationTest, Constructor)
+TEST(EmitterTest, Constructor)
 {
-	std::shared_ptr<EmitterRepresentation> emitter;
-	ASSERT_NO_THROW(emitter = std::make_shared<EmitterRepresentation>("Emitter"));
+	std::shared_ptr<Emitter> emitter;
+	ASSERT_NO_THROW(emitter = std::make_shared<Emitter>("Emitter"));
 
 	EXPECT_EQ(EMIT_MODE_VOLUME, emitter->getMode());
 	EXPECT_EQ(0.0, emitter->getRate());
@@ -59,20 +60,20 @@ TEST(EmitterRepresentationTest, Constructor)
 	EXPECT_EQ(nullptr, emitter->getShape());
 }
 
-TEST(EmitterRepresentationTest, SetGetShape)
+TEST(EmitterTest, SetGetShape)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto sphere = std::make_shared<SurgSim::Math::SphereShape>(0.1);
 	auto particleSystem = std::make_shared<MockParticleSystem>("ParticleSystem");
 
 	{
-		auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+		auto emitter = std::make_shared<Emitter>("Emitter");
 		emitter->setTarget(particleSystem);
 		EXPECT_TRUE(emitter->initialize(runtime));
 		EXPECT_FALSE(emitter->wakeUp()) << "Without a shape, the emitter should not wakup";
 	}
 	{
-		auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+		auto emitter = std::make_shared<Emitter>("Emitter");
 		emitter->setTarget(particleSystem);
 		emitter->setShape(sphere);
 		EXPECT_EQ(sphere, emitter->getShape());
@@ -81,22 +82,22 @@ TEST(EmitterRepresentationTest, SetGetShape)
 	}
 }
 
-TEST(EmitterRepresentationTest, SetGetTarget)
+TEST(EmitterTest, SetGetTarget)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto sphere = std::make_shared<SurgSim::Math::SphereShape>(0.1);
 	auto particleSystem = std::make_shared<MockParticleSystem>("ParticleSystem");
 
 	{
-		auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
-		auto notParticleSystem = std::make_shared<EmitterRepresentation>("Not a ParticleSystem");
+		auto emitter = std::make_shared<Emitter>("Emitter");
+		auto notParticleSystem = std::make_shared<Emitter>("Not a ParticleSystem");
 		emitter->setShape(sphere);
 		EXPECT_THROW(emitter->setTarget(notParticleSystem), SurgSim::Framework::AssertionFailure);
 		EXPECT_TRUE(emitter->initialize(runtime));
 		EXPECT_FALSE(emitter->wakeUp()) << "Without a target, the emitter should not wakup";
 	}
 	{
-		auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+		auto emitter = std::make_shared<Emitter>("Emitter");
 		emitter->setShape(sphere);
 		EXPECT_NO_THROW(emitter->setTarget(particleSystem));
 		EXPECT_EQ(particleSystem, emitter->getTarget());
@@ -105,25 +106,25 @@ TEST(EmitterRepresentationTest, SetGetTarget)
 	}
 }
 
-TEST(EmitterRepresentationTest, SetGetMode)
+TEST(EmitterTest, SetGetMode)
 {
-	auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+	auto emitter = std::make_shared<Emitter>("Emitter");
 	EXPECT_THROW(emitter->setMode(EMIT_MODE_COUNT), SurgSim::Framework::AssertionFailure);
 	EXPECT_NO_THROW(emitter->setMode(EMIT_MODE_SURFACE));
 	EXPECT_EQ(EMIT_MODE_SURFACE, emitter->getMode());
 }
 
-TEST(EmitterRepresentationTest, GetSetRate)
+TEST(EmitterTest, GetSetRate)
 {
-	auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+	auto emitter = std::make_shared<Emitter>("Emitter");
 	EXPECT_THROW(emitter->setRate(-10.0), SurgSim::Framework::AssertionFailure);
 	EXPECT_NO_THROW(emitter->setRate(2.0));
 	EXPECT_EQ(2.0, emitter->getRate());
 }
 
-TEST(EmitterRepresentationTest, GetSetLifetimeRange)
+TEST(EmitterTest, GetSetLifetimeRange)
 {
-	auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+	auto emitter = std::make_shared<Emitter>("Emitter");
 
 	EXPECT_THROW(emitter->setLifetimeRange(std::make_pair(-1.0, 1.0)), SurgSim::Framework::AssertionFailure)
 		<< "Negative lifetimes should not be allowed";
@@ -136,9 +137,9 @@ TEST(EmitterRepresentationTest, GetSetLifetimeRange)
 	EXPECT_EQ(10.0, emitter->getLifetimeRange().second);
 }
 
-TEST(EmitterRepresentationTest, GetSetVelocityRange)
+TEST(EmitterTest, GetSetVelocityRange)
 {
-	auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+	auto emitter = std::make_shared<Emitter>("Emitter");
 
 	EXPECT_THROW(emitter->setVelocityRange(std::make_pair(Vector3d::Constant(20.0), Vector3d::Ones())),
 			SurgSim::Framework::AssertionFailure) << "Minimum velocity must be less than maximum";
@@ -150,7 +151,7 @@ TEST(EmitterRepresentationTest, GetSetVelocityRange)
 	EXPECT_TRUE(emitter->getVelocityRange().second.isApprox(Vector3d::Ones()));
 }
 
-TEST(EmitterRepresentationTest, Update)
+TEST(EmitterTest, Update)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto sphere = std::make_shared<SurgSim::Math::SphereShape>(0.1);
@@ -159,7 +160,7 @@ TEST(EmitterRepresentationTest, Update)
 	particleSystem->setMaxParticles(10);
 	particleSystem->initialize(runtime);
 
-	auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+	auto emitter = std::make_shared<Emitter>("Emitter");
 	emitter->setShape(sphere);
 	emitter->setTarget(particleSystem);
 	emitter->setMode(EMIT_MODE_SURFACE);
@@ -198,7 +199,7 @@ TEST(EmitterRepresentationTest, Update)
 	}
 }
 
-TEST(EmitterRepresentationTest, PosedUpdate)
+TEST(EmitterTest, PosedUpdate)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto sphere = std::make_shared<SurgSim::Math::SphereShape>(0.1);
@@ -207,7 +208,7 @@ TEST(EmitterRepresentationTest, PosedUpdate)
 	particleSystem->setMaxParticles(10);
 	particleSystem->initialize(runtime);
 
-	auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
+	auto emitter = std::make_shared<Emitter>("Emitter");
 	emitter->setShape(sphere);
 	emitter->setTarget(particleSystem);
 	emitter->setMode(EMIT_MODE_VOLUME);
@@ -229,14 +230,17 @@ TEST(EmitterRepresentationTest, PosedUpdate)
 			Vector3d(2.0, -2.0, 2.0));
 
 	emitter->update(1.0);
+	EXPECT_TRUE(emitter->getPose().isApprox(Math::RigidTransform3d::Identity()));
 	ASSERT_EQ(1, particleSystem->getParticles().getNumVertices());
 
 	emitter->setLocalPose(pose1);
 	emitter->update(1.0);
+	EXPECT_TRUE(emitter->getPose().isApprox(pose1));
 	ASSERT_EQ(2, particleSystem->getParticles().getNumVertices());
 
 	element->setPose(pose2);
 	emitter->update(1.0);
+	EXPECT_TRUE(emitter->getPose().isApprox(pose2 * pose1));
 	ASSERT_EQ(3, particleSystem->getParticles().getNumVertices());
 
 	auto particles = particleSystem->getParticles().getVertices();
@@ -245,10 +249,10 @@ TEST(EmitterRepresentationTest, PosedUpdate)
 	EXPECT_GT(sphere->getRadius(), ((pose2 * pose1).inverse() * particles[2].position).norm());
 }
 
-TEST(EmitterRepresentationTest, Serialization)
+TEST(EmitterTest, Serialization)
 {
-	auto emitter = std::make_shared<EmitterRepresentation>("Emitter");
-	EXPECT_EQ("SurgSim::Particles::EmitterRepresentation", emitter->getClassName());
+	auto emitter = std::make_shared<Emitter>("Emitter");
+	EXPECT_EQ("SurgSim::Particles::Emitter", emitter->getClassName());
 
 	const std::pair<double, double> expectedLifetimeRange(1.0, 10.0);
 	const int expectedMode = 1;
@@ -256,6 +260,8 @@ TEST(EmitterRepresentationTest, Serialization)
 	std::shared_ptr<Shape> expectedShape = std::make_shared<SurgSim::Math::SphereShape>(0.1);
 	std::shared_ptr<Component> expectedTarget = std::make_shared<MockParticleSystem>("ParticleSystem");
 	const std::pair<Vector3d, Vector3d> expectedVelocityRange(Vector3d::Ones(), Vector3d::Constant(2.0));
+	Math::RigidTransform3d expectedPose = makeRigidTransform(Eigen::AngleAxisd(0.25 * M_PI, Vector3d::UnitX()).matrix(),
+			Vector3d(1.0, 2.0, 3.0));
 
 	EXPECT_NO_THROW(emitter->setValue("LifetimeRange", expectedLifetimeRange));
 	EXPECT_NO_THROW(emitter->setValue("Mode", expectedMode));
@@ -263,14 +269,15 @@ TEST(EmitterRepresentationTest, Serialization)
 	EXPECT_NO_THROW(emitter->setValue("Shape", expectedShape));
 	EXPECT_NO_THROW(emitter->setValue("Target", expectedTarget));
 	EXPECT_NO_THROW(emitter->setValue("VelocityRange", expectedVelocityRange));
+	EXPECT_NO_THROW(emitter->setValue("LocalPose", expectedPose));
 
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<Component>::encode(*emitter));
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(10, node[emitter->getClassName()].size());
 
-	std::shared_ptr<EmitterRepresentation> decodedEmitter;
-	ASSERT_NO_THROW(decodedEmitter = std::dynamic_pointer_cast<EmitterRepresentation>(
+	std::shared_ptr<Emitter> decodedEmitter;
+	ASSERT_NO_THROW(decodedEmitter = std::dynamic_pointer_cast<Emitter>(
 				node.as<std::shared_ptr<Component>>()));
 
 	auto lifetimeRange = decodedEmitter->getValue<std::pair<double, double>>("LifetimeRange");
@@ -282,6 +289,7 @@ TEST(EmitterRepresentationTest, Serialization)
 	auto velocityRange = decodedEmitter->getValue<std::pair<Vector3d, Vector3d>>("VelocityRange");
 	EXPECT_TRUE(expectedVelocityRange.first.isApprox(velocityRange.first));
 	EXPECT_TRUE(expectedVelocityRange.second.isApprox(velocityRange.second));
+	EXPECT_TRUE(expectedPose.isApprox(decodedEmitter->getValue<Math::RigidTransform3d>("LocalPose")));
 }
 
 }; // namespace Particles
