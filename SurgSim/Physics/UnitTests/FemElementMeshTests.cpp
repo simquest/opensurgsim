@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Physics/FemElementMesh.h"
 
 using SurgSim::DataStructures::PlyReader;
@@ -24,16 +26,32 @@ namespace SurgSim
 namespace Physics
 {
 
-TEST(FemElement1DMeshReaderTests, DelegateTest)
+TEST(FemElementMeshReaderTests, DelegateTest)
 {
-	FemElement1DMesh mesh;
-	mesh.load("FemElementMeshTests/Fem1D.ply");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	std::string filePath = runtime->getApplicationData()->findFile("FemElementMeshTests/Fem1D.ply");
 
-	EXPECT_EQ(4, mesh.getNumElements());
-	EXPECT_EQ(0.11, mesh.getRadius());
-	EXPECT_EQ(0.21, mesh.getMassDensity());
-	EXPECT_EQ(0.31, mesh.getPoissonRatio());
-	EXPECT_EQ(0.41, mesh.getYoungModulus());
+	auto mesh1d = std::make_shared<FemElement1DMesh>();
+	mesh1d->load(filePath);
+
+	EXPECT_EQ(4, mesh1d->getNumElements());
+	EXPECT_EQ(3, mesh1d->getBoundaryConditions().size());
+	EXPECT_DOUBLE_EQ(0.11, mesh1d->getRadius());
+	EXPECT_DOUBLE_EQ(0.21, mesh1d->getMassDensity());
+	EXPECT_DOUBLE_EQ(0.31, mesh1d->getPoissonRatio());
+	EXPECT_DOUBLE_EQ(0.41, mesh1d->getYoungModulus());
+
+	filePath = runtime->getApplicationData()->findFile("FemElementMeshTests/Fem2D.ply");
+
+	auto mesh2d = std::make_shared<FemElement2DMesh>();
+	mesh2d->load(filePath);
+
+	EXPECT_EQ(3, mesh2d->getNumElements());
+	EXPECT_EQ(2, mesh2d->getBoundaryConditions().size());
+	EXPECT_DOUBLE_EQ(0.1, mesh2d->getThickness());
+	EXPECT_DOUBLE_EQ(0.2, mesh2d->getMassDensity());
+	EXPECT_DOUBLE_EQ(0.3, mesh2d->getPoissonRatio());
+	EXPECT_DOUBLE_EQ(0.4, mesh2d->getYoungModulus());
 }
 
 } // namespace Physics

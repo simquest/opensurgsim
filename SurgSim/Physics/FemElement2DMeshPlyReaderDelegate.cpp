@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/Valid.h"
-#include "SurgSim/Physics/FemElement1DMeshPlyReaderDelegate.h"
+#include "SurgSim/Physics/FemElement2DMeshPlyReaderDelegate.h"
 
 
 using SurgSim::DataStructures::PlyReader;
@@ -24,45 +24,45 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement1DMeshPlyReaderDelegate::FemElement1DMeshPlyReaderDelegate()
+FemElement2DMeshPlyReaderDelegate::FemElement2DMeshPlyReaderDelegate()
 {
 
 }
 
-FemElement1DMeshPlyReaderDelegate::FemElement1DMeshPlyReaderDelegate(std::shared_ptr<FemElement1DMesh> mesh) :
+FemElement2DMeshPlyReaderDelegate::FemElement2DMeshPlyReaderDelegate(std::shared_ptr<FemElement2DMesh> mesh) :
 	m_mesh(mesh)
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "The mesh cannot be null.";
 	mesh->clear();
 }
 
-bool FemElement1DMeshPlyReaderDelegate::registerDelegate(PlyReader* reader)
+bool FemElement2DMeshPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
 	// Vertex processing
 	reader->requestElement("vertex",
-						   std::bind(&FemElement1DMeshPlyReaderDelegate::beginVertices, this,
+						   std::bind(&FemElement2DMeshPlyReaderDelegate::beginVertices, this,
 									 std::placeholders::_1, std::placeholders::_2),
-						   std::bind(&FemElement1DMeshPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-						   std::bind(&FemElement1DMeshPlyReaderDelegate::endVertices, this, std::placeholders::_1));
+						   std::bind(&FemElement2DMeshPlyReaderDelegate::processVertex, this, std::placeholders::_1),
+						   std::bind(&FemElement2DMeshPlyReaderDelegate::endVertices, this, std::placeholders::_1));
 	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, x));
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, y));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, z));
 
 	// Element Processing
 	reader->requestElement(
-		"1d_element",
-		std::bind(&FemElement1DMeshPlyReaderDelegate::beginFemElements,
+		"2d_element",
+		std::bind(&FemElement2DMeshPlyReaderDelegate::beginFemElements,
 		this,
 		std::placeholders::_1,
 		std::placeholders::_2),
-		std::bind(&FemElement1DMeshPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
-		std::bind(&FemElement1DMeshPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
-	reader->requestListProperty("1d_element",
+		std::bind(&FemElement2DMeshPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
+		std::bind(&FemElement2DMeshPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
+	reader->requestListProperty("2d_element",
 		"vertex_indices",
 		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(FemElement1D, indices),
+		offsetof(FemElement2D, indices),
 		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(FemElement1D, vertexCount));
+		offsetof(FemElement2D, vertexCount));
 
 	// 6DOF processing
 	m_hasRotationDOF = reader->hasProperty("vertex", "thetaX") && reader->hasProperty("vertex", "thetaY") &&
@@ -83,45 +83,45 @@ bool FemElement1DMeshPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	{
 		reader->requestElement(
 			"boundary_condition",
-			std::bind(&FemElement1DMeshPlyReaderDelegate::beginBoundaryConditions,
+			std::bind(&FemElement2DMeshPlyReaderDelegate::beginBoundaryConditions,
 			this,
 			std::placeholders::_1,
 			std::placeholders::_2),
-			std::bind(&FemElement1DMeshPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
+			std::bind(&FemElement2DMeshPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
 			nullptr);
 		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 	}
 
-	// Radius Processing
+	// Thickness processing
 
 	reader->requestElement(
-		"radius",
+		"thickness",
 		std::bind(
-		&FemElement1DMeshPlyReaderDelegate::beginRadius, this, std::placeholders::_1, std::placeholders::_2),
+		&FemElement2DMeshPlyReaderDelegate::beginThickness, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
-		std::bind(&FemElement1DMeshPlyReaderDelegate::endRadius, this, std::placeholders::_1));
-	reader->requestScalarProperty("radius", "value", PlyReader::TYPE_DOUBLE, 0);
+		std::bind(&FemElement2DMeshPlyReaderDelegate::endThickness, this, std::placeholders::_1));
+	reader->requestScalarProperty("thickness", "value", PlyReader::TYPE_DOUBLE, 0);
 
 	// Material processing
 
 	reader->requestElement(
 		"material",
 		std::bind(
-			&FemElement1DMeshPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
+			&FemElement2DMeshPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
-		std::bind(&FemElement1DMeshPlyReaderDelegate::endMaterials, this, std::placeholders::_1));
+		std::bind(&FemElement2DMeshPlyReaderDelegate::endMaterials, this, std::placeholders::_1));
 	reader->requestScalarProperty("material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(Material, massDensity));
 	reader->requestScalarProperty("material", "poisson_ratio",
 								  PlyReader::TYPE_DOUBLE, offsetof(Material, poissonRatio));
 	reader->requestScalarProperty("material", "young_modulus",
 								  PlyReader::TYPE_DOUBLE, offsetof(Material, youngModulus));
 
-	reader->setEndParseFileCallback(std::bind(&FemElement1DMeshPlyReaderDelegate::endFile, this));
+	reader->setEndParseFileCallback(std::bind(&FemElement2DMeshPlyReaderDelegate::endFile, this));
 
 	return true;
 }
 
-bool FemElement1DMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
+bool FemElement2DMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
 	bool result = true;
 
@@ -130,11 +130,11 @@ bool FemElement1DMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 
-	result = result && reader.hasProperty("1d_element", "type");
-	result = result && reader.hasProperty("1d_element", "vertex_indices");
-	result = result && !reader.isScalar("1d_element", "vertex_indices");
+	result = result && reader.hasProperty("2d_element", "type");
+	result = result && reader.hasProperty("2d_element", "vertex_indices");
+	result = result && !reader.isScalar("2d_element", "vertex_indices");
 
-	result = result && reader.hasProperty("radius", "value");
+	result = result && reader.hasProperty("thickness", "value");
 
 	result = result && reader.hasProperty("material", "mass_density");
 	result = result && reader.hasProperty("material", "poisson_ratio");
@@ -143,14 +143,14 @@ bool FemElement1DMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader
 	return result;
 }
 
-void* FemElement1DMeshPlyReaderDelegate::beginVertices(const std::string &elementName, size_t vertexCount)
+void* FemElement2DMeshPlyReaderDelegate::beginVertices(const std::string &elementName, size_t vertexCount)
 {
 	m_vertexData.overrun1 = 0l;
 	m_vertexData.overrun2 = 0l;
 	return &m_vertexData;
 }
 
-void FemElement1DMeshPlyReaderDelegate::processVertex(const std::string& elementName)
+void FemElement2DMeshPlyReaderDelegate::processVertex(const std::string& elementName)
 {
 	FemElementStructs::RotationVectorData data;
 
@@ -172,32 +172,32 @@ void FemElement1DMeshPlyReaderDelegate::processVertex(const std::string& element
 	m_mesh->addVertex(vertex);
 }
 
-void FemElement1DMeshPlyReaderDelegate::endVertices(const std::string &elementName)
+void FemElement2DMeshPlyReaderDelegate::endVertices(const std::string &elementName)
 {
 	SURGSIM_ASSERT(m_vertexData.overrun1 == 0l && m_vertexData.overrun2 == 0l) <<
 			"There was an overrun while reading the vertex structures, it is likely that data " <<
 			"has become corrupted.";
 }
 
-void* FemElement1DMeshPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
+void* FemElement2DMeshPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
 {
 	m_elementData.overrun1 = 0l;
 	m_elementData.overrun2 = 0l;
 	return &m_elementData;
 }
 
-void FemElement1DMeshPlyReaderDelegate::processFemElement(const std::string& elementName)
+void FemElement2DMeshPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_elementData.vertexCount == 2) << "Cannot process 1D Element with "
+	SURGSIM_ASSERT(m_elementData.vertexCount == 3) << "Cannot process 2D Element with "
 		<< m_elementData.vertexCount << " vertices.";
 
-	FemElementStructs::FemElement1D femElement;
+	FemElementStructs::FemElement2D femElement;
 	femElement.nodeIds.resize(m_elementData.vertexCount);
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement.nodeIds.data());
 	m_mesh->addFemElement(femElement);
 }
 
-void FemElement1DMeshPlyReaderDelegate::endFemElements(const std::string& elementName)
+void FemElement2DMeshPlyReaderDelegate::endFemElements(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_elementData.overrun1 == 0 && m_elementData.overrun2 == 0) <<
 		"There was an overrun while reading the element structures, it is likely that data " <<
@@ -205,44 +205,43 @@ void FemElement1DMeshPlyReaderDelegate::endFemElements(const std::string& elemen
 	m_elementData.indices = nullptr;
 }
 
-void* FemElement1DMeshPlyReaderDelegate::beginRadius(const std::string& elementName, size_t radiusCount)
+void* FemElement2DMeshPlyReaderDelegate::beginThickness(const std::string& elementName, size_t thicknessCount)
 {
-	return &m_radius;
+	return &m_thickness;
 }
 
-void FemElement1DMeshPlyReaderDelegate::endRadius(const std::string &elementName)
+void FemElement2DMeshPlyReaderDelegate::endThickness(const std::string &elementName)
 {
-	SURGSIM_ASSERT(SurgSim::Math::isValid(m_radius)) << "No radius information processed.";
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_thickness)) << "No radius information processed.";
 }
 
-void* FemElement1DMeshPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
+void* FemElement2DMeshPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
 {
 	m_materialData.overrun = 0l;
 	return &m_materialData;
 }
 
-void FemElement1DMeshPlyReaderDelegate::endMaterials(const std::string& elementName)
+void FemElement2DMeshPlyReaderDelegate::endMaterials(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_materialData.overrun == 0) <<
 		"There was an overrun while reading the material structures, it is likely that data " <<
 		"has become corrupted.";
 }
 
-void* FemElement1DMeshPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
+void* FemElement2DMeshPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
 																  size_t boundaryConditionCount)
 {
 	return &m_boundaryConditionData;
 }
 
-void FemElement1DMeshPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
+void FemElement2DMeshPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
 	m_mesh->addBoundaryCondition(m_boundaryConditionData);
 }
 
-void FemElement1DMeshPlyReaderDelegate::endFile()
+void FemElement2DMeshPlyReaderDelegate::endFile()
 {
-	m_mesh->setRadius(m_radius);
-	m_mesh->setEnableShear(m_enableShear);
+	m_mesh->setThickness(m_thickness);
 	m_mesh->setMassDensity(m_materialData.massDensity);
 	m_mesh->setPoissonRatio(m_materialData.poissonRatio);
 	m_mesh->setYoungModulus(m_materialData.youngModulus);

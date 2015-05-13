@@ -27,7 +27,8 @@ namespace Physics
 {
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-FemElementMesh<VertexData, EdgeData, TriangleData, Element>::FemElementMesh()
+FemElementMesh<VertexData, EdgeData, TriangleData, Element>::FemElementMesh() :
+	m_massDensity(0), m_poissonRatio(0), m_youngModulus(0)
 {
 }
 

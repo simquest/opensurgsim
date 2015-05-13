@@ -100,9 +100,9 @@ public:
 protected:
 	std::vector<Element> m_femElements;
 	std::vector<size_t> m_boundaryConditions;
-	double m_youngModulus;
-	double m_poissonRatio;
 	double m_massDensity;
+	double m_poissonRatio;
+	double m_youngModulus;
 };
 
 class FemElement1DMesh : public FemElementMesh<FemElementStructs::RotationVectorData,
@@ -122,6 +122,42 @@ public:
 protected:
 	bool m_enableShear;
 	double m_radius;
+
+	// Asset API override
+	bool doLoad(const std::string& filePath) override;
+};
+
+class FemElement2DMesh : public FemElementMesh<FemElementStructs::RotationVectorData,
+												EmptyData, EmptyData, FemElementStructs::FemElement2D>
+{
+public:
+	FemElement2DMesh();
+
+	void load(const std::string& fileName);
+
+	double getThickness() const;
+
+	void setThickness(double thickness);
+
+protected:
+	double m_thickness;
+
+	// Asset API override
+	bool doLoad(const std::string& filePath) override;
+};
+
+class FemElement3DMesh : public FemElementMesh<EmptyData, EmptyData, EmptyData, FemElementStructs::FemElement3D>
+{
+public:
+	FemElement3DMesh();
+
+	void load(const std::string& fileName);
+
+	double getThickness() const;
+
+	void setThickness(double thickness);
+
+protected:
 
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;

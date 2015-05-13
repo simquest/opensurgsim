@@ -16,6 +16,7 @@
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Physics/FemElementMesh.h"
 #include "SurgSim/Physics/FemElement1DMeshPlyReaderDelegate.h"
+#include "SurgSim/Physics/FemElement2DMeshPlyReaderDelegate.h"
 
 template<>
 std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::RotationVectorData,
@@ -27,7 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement1DMesh::FemElement1DMesh()
+FemElement1DMesh::FemElement1DMesh() : FemElementMesh(), m_enableShear(false), m_radius(0.0)
 {
 }
 
@@ -66,7 +67,49 @@ bool FemElement1DMesh::doLoad(const std::string& filePath)
 		return false;
 	}
 
-	auto delegate = std::make_shared<FemElement1DMeshPlyReaderDelegate>(std::dynamic_pointer_cast<FemElement1DMesh>(shared_from_this()));
+	auto delegate = std::make_shared<FemElement1DMeshPlyReaderDelegate>(
+						std::dynamic_pointer_cast<FemElement1DMesh>(shared_from_this()));
+	if (!reader.parseWithDelegate(delegate))
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "The input file '" << filePath << "' does not have the property required by FEM element mesh.";
+		return false;
+	}
+
+	return true;
+}
+
+FemElement2DMesh::FemElement2DMesh() : FemElementMesh(), m_thickness(0)
+{
+}
+
+void FemElement2DMesh::load(const std::string& fileName)
+{
+	doLoad(fileName);
+}
+
+double FemElement2DMesh::getThickness() const
+{
+	return m_thickness;
+}
+
+void FemElement2DMesh::setThickness(double thickness)
+{
+	m_thickness = thickness;
+}
+
+bool FemElement2DMesh::doLoad(const std::string& filePath)
+{
+	SurgSim::DataStructures::PlyReader reader(filePath);
+	if (!reader.isValid())
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "'" << filePath << "' is an invalid .ply file.";
+		return false;
+	}
+
+	auto delegate = std::make_shared<FemElement2DMeshPlyReaderDelegate>(
+						std::dynamic_pointer_cast<FemElement2DMesh>(shared_from_this()));
 	if (!reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
