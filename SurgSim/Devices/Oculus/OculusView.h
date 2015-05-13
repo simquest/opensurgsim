@@ -16,7 +16,16 @@
 #ifndef SURGSIM_DEVICES_OCULUS_OCULUSVIEW_H
 #define SURGSIM_DEVICES_OCULUS_OCULUSVIEW_H
 
+#include <memory>
+#include <osg/ref_ptr>
+#include <string>
+
 #include "SurgSim/Graphics/OsgView.h"
+
+namespace osg
+{
+class DisplaySettings;
+}
 
 namespace SurgSim
 {
@@ -50,6 +59,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Device::OculusView);
 
 	/// Set the InputComponent this view connects to.
+	/// Projection matrices of the Oculus device are passed via the DataGroup the InputComponent carries.
 	/// \param input The InputComponent
 	void setInputComponent(std::shared_ptr<Framework::Component> input);
 
@@ -60,6 +70,7 @@ protected:
 	osg::ref_ptr<osg::DisplaySettings> createDisplaySettings() const override;
 
 private:
+	/// The InputComponent this view connects.
 	std::shared_ptr<Input::InputComponent> m_inputComponent;
 };
 

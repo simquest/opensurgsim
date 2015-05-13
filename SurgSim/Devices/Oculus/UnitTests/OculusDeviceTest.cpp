@@ -55,7 +55,7 @@ TEST(OculusDeviceTest, SetAndGetNearAndFarPlanes)
 
 	EXPECT_NO_THROW(device->setNearPlane(0.2f));
 	EXPECT_NO_THROW(device->setFarPlane(20.0f));
-	
+
 	EXPECT_FLOAT_EQ(0.2f, device->getNearPlane());
 	EXPECT_FLOAT_EQ(20.0f, device->getFarPlane());
 }

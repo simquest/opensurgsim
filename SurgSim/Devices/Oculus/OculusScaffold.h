@@ -20,7 +20,6 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/BasicThread.h"
-#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {

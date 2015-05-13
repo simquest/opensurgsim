@@ -15,6 +15,8 @@
 
 #include "SurgSim/Devices/Oculus/OculusView.h"
 
+#include <osg/DisplaySettings>
+
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Oculus/OculusDisplaySettings.h"
 #include "SurgSim/Framework/Component.h"
@@ -40,7 +42,7 @@ OculusView::OculusView(const std::string& name) : OsgView(name)
 	setScreenHeight(0.071);
 	setEyeSeparation(0.06);
 	setScreenDistance(0.10);
-	setTargetScreen(1); // Assume Oculus screen has ID 1
+	setTargetScreen(1); // Assume Oculus HMD has ID '1'.
 
 	std::array<int, 2> dimensions = {1920, 1080};
 	setDimensions(dimensions);
