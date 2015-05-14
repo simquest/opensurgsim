@@ -140,6 +140,10 @@ TEST_P(IntegrationSchemeAndCountParamTest, CubeTest)
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
+
 	fem->setIntegrationScheme(integrationScheme);
 
 	initializeRepresentation(fem);
