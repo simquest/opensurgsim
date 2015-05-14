@@ -167,7 +167,7 @@ private:
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 
 	/// Representation to emit to.
-	std::shared_ptr<Particles::Representation> m_target;
+	std::shared_ptr<SurgSim::Particles::Representation> m_target;
 
 	/// Local Pose of the Representation with respect to the SceneElement
 	SurgSim::Math::RigidTransform3d m_localPose;

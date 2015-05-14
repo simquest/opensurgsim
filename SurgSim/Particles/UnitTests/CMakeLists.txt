@@ -20,6 +20,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	EmitterTests.cpp
 	MockObjects.cpp
+	ParticlesCollisionRepresentationTests.cpp
 	PointGeneratorTests.cpp
 	RandomPointGeneratorTests.cpp
 	RepresentationTests.cpp

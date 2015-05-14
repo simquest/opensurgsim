@@ -30,6 +30,11 @@
 namespace SurgSim
 {
 
+namespace Collision
+{
+class Representation;
+};
+
 namespace Framework
 {
 class Logger;
@@ -81,6 +86,14 @@ public:
 	/// \param dt The time step.
 	void update(double dt);
 
+	/// Set the collision representation for this Particle Representation
+	/// \param representation The collision representation to be set
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
+
+	/// Get the collision representation for this Particle Representation
+	/// \return the collision representation
+	std::shared_ptr<SurgSim::Collision::Representation> getCollisionRepresentation() const;
+
 protected:
 	/// Implementation of the specific behavior of the particle system
 	/// \return True if update succeeded, False otherwise.
@@ -96,6 +109,9 @@ protected:
 
 	/// Logger used by the particle system.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// This entity's collision representation
+	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 };
 
 };  // namespace Particles

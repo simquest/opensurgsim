@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Particles/ParticlesCollisionRepresentation.h"
 
 
 namespace SurgSim
@@ -113,6 +114,32 @@ void Representation::update(double dt)
 		SURGSIM_LOG_WARNING(m_logger) << "Particle System " << getName() << " failed to update.";
 	}
 }
+
+std::shared_ptr<SurgSim::Collision::Representation> Representation::getCollisionRepresentation() const
+{
+	return m_collisionRepresentation;
+}
+
+void Representation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation)
+{
+	if (m_collisionRepresentation != representation)
+	{
+		auto oldCollisionRep = std::dynamic_pointer_cast<ParticlesCollisionRepresentation>(m_collisionRepresentation);
+		if (oldCollisionRep != nullptr)
+		{
+			oldCollisionRep->setParticleRepresentation(nullptr);
+		}
+		m_collisionRepresentation = representation;
+
+		auto newCollisionRep = std::dynamic_pointer_cast<ParticlesCollisionRepresentation>(representation);
+		if (newCollisionRep != nullptr)
+		{
+			newCollisionRep->setParticleRepresentation(
+					std::static_pointer_cast<SurgSim::Particles::Representation>(getSharedPtr()));
+		}
+	}
+}
+
 
 }; // namespace Particles
 }; // namespace SurgSim
