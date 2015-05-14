@@ -40,9 +40,6 @@ class Fem3DElementTetrahedron : public FemElement
 {
 public:
 	/// Constructor
-	Fem3DElementTetrahedron();
-
-	/// Constructor
 	/// \param nodeIds An array of 4 node ids defining this tetrahedron element in a overall mesh
 	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
 	/// \note This is required from the signed volume calculation method getVolume()
@@ -149,6 +146,9 @@ public:
 			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
+	/// Initializes variables needed before Initialize() is called
+	void init();
+
 	/// Computes the tetrahedron shape functions
 	/// \param state The deformable rest state to compute the shape function from
 	/// \param[out] volume the volume calculated with the given state

@@ -42,9 +42,6 @@ class Fem3DElementCube : public FemElement
 {
 public:
 	/// Constructor
-	Fem3DElementCube();
-
-	/// Constructor
 	/// \param nodeIds An array of 8 node ids defining this cube element in an overall mesh
 	/// \note It is required that getVolume() is positive, to do so, it needs (looking at the cube from
 	/// \note the exterior, face normal 'n' pointing outward):
@@ -155,6 +152,9 @@ public:
 			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
+	/// Initializes variables needed before Initialize() is called
+	void init();
+
 	/// Build the constitutive material 6x6 matrix
 	/// \param[out] constitutiveMatrix The 6x6 constitutive material matrix
 	void buildConstitutiveMaterialMatrix(Eigen::Matrix<double, 6, 6>* constitutiveMatrix);
