@@ -70,7 +70,8 @@ bool ParticleSystemRepresentation::addParticle(const Math::Vector3d& position, c
 	auto& particles = m_particles.getVertices();
 	if (particles.size() < m_maxParticles)
 	{
-		particles.emplace_back(position, ParticleData{lifetime, velocity});
+		ParticleData data = {lifetime, velocity};
+		particles.emplace_back(position, data);
 		result = true;
 	}
 	else
