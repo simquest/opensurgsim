@@ -259,6 +259,7 @@ class MockFemElement : public FemElement
 {
 public:
 	MockFemElement();
+	explicit MockFemElement(std::vector<size_t> nodeIds);
 
 	void addNode(size_t nodeId);
 

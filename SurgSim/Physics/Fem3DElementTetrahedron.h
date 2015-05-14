@@ -27,6 +27,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem3DElementTetrahedron);
 
 /// Class for Fem Element 3D based on a tetrahedron volume discretization
 /// \note The inertia property (mass) of the tetrahedron is derived from
@@ -39,12 +40,26 @@ class Fem3DElementTetrahedron : public FemElement
 {
 public:
 	/// Constructor
-	/// \param nodeIds An array of 4 node (A, B, C, D) ids defining this tetrahedron element in a overall mesh
+	Fem3DElementTetrahedron();
+
+	/// Constructor
+	/// \param nodeIds An array of 4 node ids defining this tetrahedron element in a overall mesh
 	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
 	/// \note This is required from the signed volume calculation method getVolume()
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
 	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
 	explicit Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds);
+
+	/// Constructor for FemElement object factory
+	/// \param nodeIds A vector of node ids defining this tetrahedron element in a overall mesh
+	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
+	/// \note This is required from the signed volume calculation method getVolume()
+	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
+	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 4
+	explicit Fem3DElementTetrahedron(std::vector<size_t> nodeIds);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementTetrahedron)
 
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
