@@ -104,7 +104,7 @@ void Fem3DRepresentationBilateral3D::doBuild(double dt,
 				m_newH.insert(3 * nodeIndex + axis) = coord.coordinate[index] * (dt * scale);
 			}
 		}
-		mlcp->updateConstraint(m_newH, fem3d->applyCompliance(*(fem3d->getCurrentState()), m_newH),
+		mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix() * m_newH,
 							   indexOfRepresentation, indexOfConstraint + axis);
 	}
 }

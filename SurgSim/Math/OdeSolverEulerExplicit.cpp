@@ -28,7 +28,7 @@ OdeSolverEulerExplicit::OdeSolverEulerExplicit(OdeEquation* equation)
 	m_name = "Ode Solver Euler Explicit";
 }
 
-void OdeSolverEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	// General equation to solve:
 	//   M.a(t) = f(t, x(t), v(t))
@@ -48,10 +48,15 @@ void OdeSolverEulerExplicit::solve(double dt, const OdeState& currentState, OdeS
 	// Compute the new state using the Euler Explicit scheme:
 	newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
 	newState->getVelocities() = currentState.getVelocities() + m_solution;
+
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(currentState);
+	}
 }
 
 void OdeSolverEulerExplicit::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
-		bool computeRHS)
+												  bool computeRHS)
 {
 	// General equation to solve:
 	//   M.a(t) = f(t, x(t), v(t))

@@ -102,6 +102,9 @@ public:
 
 	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
+	/// Gets the compliance matrix associated with motion
+	virtual const SurgSim::Math::Matrix& getComplianceMatrix() const;
+
 	void update(double dt) override;
 
 	void afterUpdate(double dt) override;

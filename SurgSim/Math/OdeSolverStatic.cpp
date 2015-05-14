@@ -28,7 +28,7 @@ OdeSolverStatic::OdeSolverStatic(OdeEquation* equation)
 	m_name = "Ode Solver Static";
 }
 
-void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	// General equation to solve:
 	//   K.deltaX = f(t) = Fext + Fint(t)
@@ -48,6 +48,11 @@ void OdeSolverStatic::solve(double dt, const OdeState& currentState, OdeState* n
 	newState->getPositions() = currentState.getPositions() + m_solution;
 	// Velocities are null in static mode (no time dependency)
 	newState->getVelocities().setZero();
+
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(currentState);
+	}
 }
 
 void OdeSolverStatic::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState, bool computeRHS)

@@ -155,6 +155,12 @@ Math::Matrix DeformableRepresentation::applyCompliance(const Math::OdeState& sta
 	return solution;
 }
 
+const SurgSim::Math::Matrix& DeformableRepresentation::getComplianceMatrix() const
+{
+	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+	return m_odeSolver->getComplianceMatrix();
+}
+
 void DeformableRepresentation::update(double dt)
 {
 	if (! isActive())

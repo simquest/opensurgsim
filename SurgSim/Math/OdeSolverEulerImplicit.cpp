@@ -52,7 +52,7 @@ double OdeSolverEulerImplicit::getNewtonRaphsonEpsilonConvergence() const
 	return m_epsilonConvergence;
 }
 
-void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	// General equation to solve:
 	//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
@@ -112,6 +112,12 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 		}
 
 		numIteration++;
+	}
+
+	// The compliance matrix (if requested) is computed w.r.t. the latest state.
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(currentState);
 	}
 }
 
