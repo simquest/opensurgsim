@@ -331,13 +331,14 @@ const Vector3d& MockMassSpring::getGravityVector() const
 }
 
 
-MockFemElement::MockFemElement() : FemElement(), m_isInitialized(false)
+MockFemElement::MockFemElement() : FemElement()
 {
-	setNumDofPerNode(3);
+	init();
 }
 
-MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement(), m_isInitialized(false)
+MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement()
 {
+	init();
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
@@ -397,6 +398,12 @@ Vector MockFemElement::computeCartesianCoordinate(const OdeState& state, const V
 Vector MockFemElement::computeNaturalCoordinate(const OdeState& state, const Vector& globalCoordinate) const
 {
 	return SurgSim::Math::Vector3d::Zero();
+}
+
+void MockFemElement::init()
+{
+	m_isInitialized = false;
+	setNumDofPerNode(3);
 }
 
 void MockFemElement::initialize(const OdeState& state)

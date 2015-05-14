@@ -31,21 +31,23 @@ namespace Physics
 
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementCube, Fem3DElementCube)
 
-Fem3DElementCube::Fem3DElementCube()
+Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 {
-	// Set the number of dof per node (3 in this case)
-	setNumDofPerNode(3);
-}
-
-Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds) : Fem3DElementCube()
-{
+	init();
 	m_nodeIds.assign( nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem3DElementCube::Fem3DElementCube(std::vector<size_t> nodeIds) : Fem3DElementCube()
+Fem3DElementCube::Fem3DElementCube(std::vector<size_t> nodeIds)
 {
+	init();
 	SURGSIM_ASSERT(nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+}
+
+void Fem3DElementCube::init()
+{
+	// Set the number of dof per node (3 in this case)
+	setNumDofPerNode(3);
 }
 
 void Fem3DElementCube::initialize(const SurgSim::Math::OdeState& state)

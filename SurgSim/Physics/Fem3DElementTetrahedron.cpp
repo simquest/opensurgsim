@@ -46,20 +46,22 @@ namespace Physics
 {
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementTetrahedron, Fem3DElementTetrahedron)
 
-Fem3DElementTetrahedron::Fem3DElementTetrahedron()
+Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds)
 {
-	setNumDofPerNode(3); // 3 dof per node (x, y, z)
-}
-
-Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds) : Fem3DElementTetrahedron()
-{
+	init();
 	m_nodeIds.assign(std::begin(nodeIds), std::end(nodeIds));
 }
 
-Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::vector<size_t> nodeIds) : Fem3DElementTetrahedron()
+Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::vector<size_t> nodeIds)
 {
+	init();
 	SURGSIM_ASSERT(nodeIds.size() == 4) << "Incorrect number of nodes for Fem3D Tetrahedron";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+}
+
+void Fem3DElementTetrahedron::init()
+{
+	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 }
 
 void Fem3DElementTetrahedron::initialize(const SurgSim::Math::OdeState& state)

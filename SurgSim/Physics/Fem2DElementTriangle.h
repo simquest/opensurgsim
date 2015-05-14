@@ -58,9 +58,6 @@ class Fem2DElementTriangle : public FemElement
 
 public:
 	/// Constructor
-	Fem2DElementTriangle();
-
-	/// Constructor
 	/// \param nodeIds An array of 3 node ids defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
@@ -163,6 +160,9 @@ public:
 			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
+	/// Initializes variables needed before Initialize() is called
+	void init();
+
 	/// Computes the triangle element's rotation given a state
 	/// \param state The state to compute the rotation from
 	/// \return The rotation matrix of the element in the given state
