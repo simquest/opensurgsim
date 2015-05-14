@@ -38,9 +38,6 @@ class Fem1DElementBeam : public FemElement
 {
 public:
 	/// Constructor
-	Fem1DElementBeam();
-
-	/// Constructor
 	/// \param nodeIds An array of 2 node ids defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
@@ -155,6 +152,9 @@ public:
 		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
+	/// Initializes variables needed before Initialize() is called
+	void init();
+
 	/// Computes the beam element's initial rotation
 	/// \param state The state to compute the rotation from
 	/// \note This method stores the result in m_R0
