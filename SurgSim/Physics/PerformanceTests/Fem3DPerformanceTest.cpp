@@ -140,6 +140,8 @@ TEST_P(IntegrationSchemeAndCountParamTest, CubeTest)
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
+
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
 	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
 	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
 	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
