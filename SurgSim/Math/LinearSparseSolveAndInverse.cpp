@@ -40,38 +40,38 @@ Matrix LinearSparseSolveAndInverseLU::getInverse() const
 
 void LinearSparseSolveAndInverseCG::setTolerance(double tolerance)
 {
-	m_cg.setTolerance(tolerance);
+	m_solver.setTolerance(tolerance);
 }
 
 double LinearSparseSolveAndInverseCG::getTolerance()
 {
-	return m_cg.tolerance();
+	return m_solver.tolerance();
 }
 
 void LinearSparseSolveAndInverseCG::setMaxIterations(SparseMatrix::Index iterations)
 {
-	m_cg.setMaxIterations(iterations);
+	m_solver.setMaxIterations(iterations);
 }
 
 SparseMatrix::Index LinearSparseSolveAndInverseCG::getMaxIterations()
 {
-	return m_cg.maxIterations();
+	return m_solver.maxIterations();
 }
 
 void LinearSparseSolveAndInverseCG::setMatrix(const SparseMatrix& matrix)
 {
 	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
-	m_cg.compute(matrix);
+	m_solver.compute(matrix);
 }
 
 Matrix LinearSparseSolveAndInverseCG::solve(const Matrix& b) const
 {
-	return m_cg.solve(b);
+	return m_solver.solve(b);
 }
 
 Matrix LinearSparseSolveAndInverseCG::getInverse() const
 {
-	return (m_cg.solve(Matrix::Identity(m_cg.rows(), m_cg.cols())));
+	return (m_solver.solve(Matrix::Identity(m_solver.rows(), m_solver.cols())));
 }
 
 }; // namespace Math

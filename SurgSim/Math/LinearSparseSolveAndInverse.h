@@ -71,7 +71,7 @@ private:
 	Eigen::SparseLU<SparseMatrix> m_lu;
 };
 
-/// Derivation for sparse LU solver
+/// Derivation for sparse CG solver
 class LinearSparseSolveAndInverseCG : public LinearSparseSolveAndInverse
 {
 public:
@@ -83,7 +83,7 @@ public:
 	/// \return the convergence tolerance
 	double getTolerance();
 
-	/// Set the maximum number fo iterations for conjugate gradient
+	/// Set the maximum number of iterations for conjugate gradient
 	/// \param iterations the new maximum number of iterations
 	void setMaxIterations(SparseMatrix::Index iterations);
 
@@ -98,7 +98,7 @@ public:
 	Matrix getInverse() const override;
 
 private:
-	Eigen::ConjugateGradient<SparseMatrix> m_cg;
+	Eigen::ConjugateGradient<SparseMatrix> m_solver;
 };
 
 }; // namespace Math

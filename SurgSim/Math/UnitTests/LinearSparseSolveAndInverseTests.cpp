@@ -119,13 +119,13 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseCGSetGetTests)
 {
 	LinearSparseSolveAndInverseCG solveAndInverse;
 
-	EXPECT_NE(solveAndInverse.getMaxIterations(), 100);
+	EXPECT_NE(100, solveAndInverse.getMaxIterations());
 	solveAndInverse.setMaxIterations(100);
-	EXPECT_EQ(solveAndInverse.getMaxIterations(), 100);
+	EXPECT_EQ(100, solveAndInverse.getMaxIterations());
 
-	EXPECT_NE(solveAndInverse.getTolerance(), 1.0e-03);
+	EXPECT_NE(1.0e-03, solveAndInverse.getTolerance());
 	solveAndInverse.setTolerance(1.0e-03);
-	EXPECT_EQ(solveAndInverse.getTolerance(), 1.0e-03);
+	EXPECT_EQ(1.0e-03, solveAndInverse.getTolerance());
 };
 
 TEST_F(LinearSparseSolveAndInverseTests, SparseCGInitializationTests)
