@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementCorotationalTetrahedron,
-				 Fem3DElementCorotationalTetrahedron);
+				 Fem3DElementCorotationalTetrahedron)
 
 Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds)
 	: Fem3DElementTetrahedron(nodeIds)

@@ -42,6 +42,9 @@ class Fem3DElementCube : public FemElement
 {
 public:
 	/// Constructor
+	Fem3DElementCube();
+
+	/// Constructor
 	/// \param nodeIds An array of 8 node ids defining this cube element in an overall mesh
 	/// \note It is required that getVolume() is positive, to do so, it needs (looking at the cube from
 	/// \note the exterior, face normal 'n' pointing outward):
@@ -62,7 +65,7 @@ public:
 	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 8
 	explicit Fem3DElementCube(std::vector<size_t> nodeIds);
 
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementCube);
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementCube)
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with

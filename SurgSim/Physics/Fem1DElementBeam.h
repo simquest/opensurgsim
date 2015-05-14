@@ -38,6 +38,9 @@ class Fem1DElementBeam : public FemElement
 {
 public:
 	/// Constructor
+	Fem1DElementBeam();
+
+	/// Constructor
 	/// \param nodeIds An array of 2 node ids defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
@@ -48,7 +51,7 @@ public:
 	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 2
 	explicit Fem1DElementBeam(std::vector<size_t> nodeIds);
 
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam);
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam)
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam

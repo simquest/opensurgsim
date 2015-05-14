@@ -30,9 +30,9 @@ namespace SurgSim
 
 namespace Physics
 {
-SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem1DElementBeam, Fem1DElementBeam);
+SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem1DElementBeam, Fem1DElementBeam)
 
-Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds) :
+Fem1DElementBeam::Fem1DElementBeam() :
 	m_G(0.0),
 	m_restLength(0.0),
 	m_radius(0.0),
@@ -47,23 +47,16 @@ Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds) :
 	m_Iz(0.0),
 	m_J(0.0)
 {
+	// 6 dof per node (x, y, z, thetaX, thetaY, thetaZ)
+	setNumDofPerNode(6);
+}
+
+Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds) : Fem1DElementBeam()
+{
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem1DElementBeam::Fem1DElementBeam(std::vector<size_t> nodeIds) :
-	m_G(0.0),
-	m_restLength(0.0),
-	m_radius(0.0),
-	m_A(0.0),
-	m_haveShear(true),
-	m_shearFactor(5.0 / 8.0),
-	m_Asy(0.0),
-	m_Asz(0.0),
-	m_Phi_y(0.0),
-	m_Phi_z(0.0),
-	m_Iy(0.0),
-	m_Iz(0.0),
-	m_J(0.0)
+Fem1DElementBeam::Fem1DElementBeam(std::vector<size_t> nodeIds) : Fem1DElementBeam()
 {
 	SURGSIM_ASSERT(nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
@@ -104,9 +97,6 @@ void Fem1DElementBeam::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
-
-	// 6 dof per node (x, y, z, thetaX, thetaY, thetaZ)
-	setNumDofPerNode(6);
 
 	SURGSIM_ASSERT(m_radius > 0) << "Fem1DElementBeam radius should be positive and non-zero.  Did you call "
 								 "setCrossSectionCircular(radius) ?";
