@@ -91,6 +91,8 @@ elseif(WDK_FOUND)
 	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_WDK_HID_HEADERS})
 endif()
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} ${MULTIAXIS_DEVICE_HEADERS} PARENT_SCOPE)
+
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
 	MultiAxisDevice

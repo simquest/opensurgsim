@@ -35,6 +35,8 @@ set(SIXENSE_DEVICE_HEADERS
 	SixenseThread.h
 )
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} ${OPENNI_DEVICE_HEADERS} PARENT_SCOPE)
+
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
 	SixenseDevice

@@ -35,6 +35,8 @@ set(SURGSIM_DEVICES_DOCUMENTATION
 	devices.dox
 )
 
+surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS}")
+
 foreach(DEVICE ${DEVICES})
 	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
 	option(BUILD_DEVICE_${DEVICE_UPPER_CASE} "Build ${DEVICE} device." OFF)
