@@ -58,6 +58,11 @@ set(MULTIAXIS_DEVICE_HEADERS
 	SystemInputDeviceHandle.h
 )
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
+	MultiAxisDevice.h
+	RawMultiAxisDevice.h
+	PARENT_SCOPE)
+
 set(MULTIAXIS_DEVICE_LINUX_SOURCES
 	linux/CreateInputDeviceHandle.cpp
 	linux/FileDescriptor.cpp
@@ -90,8 +95,6 @@ elseif(WDK_FOUND)
 	list(APPEND MULTIAXIS_DEVICE_SOURCES ${MULTIAXIS_DEVICE_WDK_HID_SOURCES})
 	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_WDK_HID_HEADERS})
 endif()
-
-set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} ${MULTIAXIS_DEVICE_HEADERS} PARENT_SCOPE)
 
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
