@@ -29,14 +29,7 @@ TextRepresentation::TextRepresentation(const std::string name) : Representation(
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TextRepresentation, std::shared_ptr<SurgSim::Framework::Asset>,
 									  Font, getFont, setFont);
 
-	// Enables the alternative use of the font file instead of the actual font object
-	DecoderType decoder = std::bind(&TextRepresentation::loadFont, this,
-									std::bind(&YAML::Node::as<std::string>, std::placeholders::_1));
-	setDecoder("FontFileName", decoder);
-
-	SetterType setter = std::bind(&TextRepresentation::loadFont, this,
-								  std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
-	setSetter("FontFileName", setter);
+	SURGSIM_ADD_SETTER(TextRepresentation, std::string, FontFileName, loadFont);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TextRepresentation, std::string, Text, getText, setText);
 
@@ -47,6 +40,18 @@ TextRepresentation::TextRepresentation(const std::string name) : Representation(
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, SurgSim::Math::Vector4d,
 									  Color, getColor, setColor);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, bool, UseScreenSpace,
+									  isUsingScreenSpace, setUseScreenSpace);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, bool, DrawBackground,
+									  isDrawingBackground, setDrawBackground);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, Math::Vector4d, BackgroundColor,
+									  getBackgroundColor, setBackgroundColor);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, float, BackgroundMargin,
+									  getBackgroundMargin, setBackgroundMargin);
 
 }
 
