@@ -168,6 +168,10 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeMatrixInitialization)
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	fem->setIntegrationScheme(integrationScheme);
 
 	timeInitializeRepresentation(fem);
@@ -183,6 +187,10 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeMatrixAssembly)
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	initializeRepresentation(fem);
 
 	timeMatrixAssembly(fem);
@@ -198,6 +206,10 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeComputeLinearSystem)
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	initializeRepresentation(fem);
 
 	timeComputeLinearSystem(fem);
@@ -213,6 +225,10 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeSolveSystem)
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	initializeRepresentation(fem);
 
 	timeSolveSystem(fem);
@@ -228,6 +244,10 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeInvertSystem)
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	initializeRepresentation(fem);
 
 	timeInvertSystem(fem);
