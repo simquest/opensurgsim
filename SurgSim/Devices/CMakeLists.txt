@@ -35,8 +35,6 @@ set(SURGSIM_DEVICES_DOCUMENTATION
 	devices.dox
 )
 
-surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS}")
-
 foreach(DEVICE ${DEVICES})
 	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
 	option(BUILD_DEVICE_${DEVICE_UPPER_CASE} "Build ${DEVICE} device." OFF)
@@ -45,6 +43,8 @@ foreach(DEVICE ${DEVICES})
 		list(APPEND SURGSIM_DEVICES_DOCUMENTATION ${DEVICE}/${DEVICE}.dox)
 	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 endforeach(DEVICE)
+
+surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS}")
 
 add_custom_target(SurgSimDevicesDocumentation SOURCES ${SURGSIM_DEVICES_DOCUMENTATION})
 set_target_properties(SurgSimDevicesDocumentation PROPERTIES FOLDER "Devices")
