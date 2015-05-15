@@ -55,7 +55,6 @@ OsgTextRepresentation::OsgTextRepresentation(const std::string& name) :
 
 	m_transform->addChild(m_geode);
 	m_transform->setCullingActive(false);
-	m_transform->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 
 	// Try to find default font, if this fails OSG will fall back to its own default, only a warning warranted
 	auto font = std::make_shared<OsgFont>();
@@ -71,11 +70,7 @@ OsgTextRepresentation::OsgTextRepresentation(const std::string& name) :
 	}
 
 	m_font = font;
-
-	// For now setup for HUD display
-	m_textNode->setCharacterSizeMode(osgText::TextBase::SCREEN_COORDS);
-	removeGroupReference(Representation::DefaultGroupName);
-	addGroupReference(Representation::DefaultHudGroupName);
+	setUseScreenSpace(true);
 }
 
 OsgTextRepresentation::~OsgTextRepresentation()
@@ -124,7 +119,10 @@ void OsgTextRepresentation::doUpdate(double dt)
 			m_needUpdate = false;
 		}
 	}
-	m_transform->setAttitude(osg::Quat(0.0, 0.0, 0.0, 1.0));
+	if (isUsingScreenSpace())
+	{
+		m_transform->setAttitude(osg::Quat(0.0, 0.0, 0.0, 1.0));
+	}
 }
 
 bool OsgTextRepresentation::doInitialize()
@@ -186,6 +184,68 @@ void OsgTextRepresentation::setOptionalMaximumWidth(SurgSim::DataStructures::Opt
 SurgSim::DataStructures::OptionalValue<double> OsgTextRepresentation::getOptionalMaximumWidth()
 {
 	return m_optionalWidth;
+}
+
+void OsgTextRepresentation::setDrawBackground(bool value)
+{
+	int drawMode = osgText::TextBase::TEXT;
+	if (value)
+	{
+		drawMode |= osgText::TextBase::FILLEDBOUNDINGBOX;
+	}
+
+	m_textNode->setDrawMode(drawMode);
+}
+
+bool OsgTextRepresentation::isDrawingBackground() const
+{
+	return (m_textNode->getDrawMode() & osgText::TextBase::FILLEDBOUNDINGBOX) != 0;
+}
+
+void OsgTextRepresentation::setBackgroundColor(Math::Vector4d color)
+{
+	m_textNode->setBoundingBoxColor(toOsg(color));
+}
+
+Math::Vector4d OsgTextRepresentation::getBackgroundColor()
+{
+	Math::Vector4d result = fromOsg(m_textNode->getBoundingBoxColor()).cast<double>();
+	return result;
+}
+
+void OsgTextRepresentation::setBackgroundMargin(double margin)
+{
+	m_textNode->setBoundingBoxMargin(static_cast<float>(margin));
+}
+
+double OsgTextRepresentation::getBackgroundMargin() const
+{
+	return m_textNode->getBoundingBoxMargin();
+}
+
+void OsgTextRepresentation::setUseScreenSpace(bool value)
+{
+	if (value == true)
+	{
+		removeGroupReference(Representation::DefaultGroupName);
+		addGroupReference(Representation::DefaultHudGroupName);
+		m_transform->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+		m_textNode->setCharacterSizeMode(osgText::TextBase::SCREEN_COORDS);
+	}
+	else
+	{
+		removeGroupReference(Representation::DefaultHudGroupName);
+		addGroupReference(Representation::DefaultGroupName);
+		m_transform->setReferenceFrame(osg::Transform::RELATIVE_RF);
+		m_textNode->setCharacterSizeMode(osgText::TextBase::OBJECT_COORDS);
+	}
+}
+
+bool OsgTextRepresentation::isUsingScreenSpace() const
+{
+	auto references = getGroupReferences();
+	auto found = std::find(references.begin(), references.end(), Representation::DefaultHudGroupName);
+	return (found != references.end());
 }
 
 void OsgTextRepresentation::setMaximumWidth(double width)
