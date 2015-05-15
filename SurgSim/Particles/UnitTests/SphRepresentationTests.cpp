@@ -18,7 +18,6 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/Particle.h"
 #include "SurgSim/Particles/SphRepresentation.h"
 
 using SurgSim::Math::Vector3d;
@@ -177,22 +176,19 @@ TEST(SphRepresentationTest, DoUpdate1ParticleTest)
 
 	sph->initialize(runtime);
 
-	Particle p;
-	p.setLifetime(10);
-	p.setPosition(SurgSim::Math::Vector3d::Zero());
-	p.setVelocity(SurgSim::Math::Vector3d::Zero());
-	sph->addParticle(p); // Add 1 particle in the sph system
-	EXPECT_EQ(1u, sph->getParticleReferences().size());
+	sph->addParticle(Math::Vector3d::Zero(), Math::Vector3d::Zero(), 10);
+	EXPECT_EQ(1u, sph->getParticles().getNumVertices());
 
 	EXPECT_NO_THROW(sph->update(dt));
-	EXPECT_EQ(1u, sph->getParticleReferences().size());
-	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getPosition()[0]);
-	EXPECT_LT(sph->getParticleReferences().front().getPosition()[1], 0.0);
-	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getPosition()[2]);
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_EQ(1u, particles.size());
+	EXPECT_DOUBLE_EQ(0.0, particles[0].position[0]);
+	EXPECT_GT(0.0, particles[0].position[1]);
+	EXPECT_DOUBLE_EQ(0.0, particles[0].position[2]);
 
-	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getVelocity()[0]);
-	EXPECT_LT(sph->getParticleReferences().front().getVelocity()[1], 0.0);
-	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getVelocity()[2]);
+	EXPECT_DOUBLE_EQ(0.0, particles[0].data.velocity[0]);
+	EXPECT_GT(0.0, particles[0].data.velocity[1]);
+	EXPECT_DOUBLE_EQ(0.0, particles[0].data.velocity[2]);
 }
 
 namespace
@@ -218,27 +214,24 @@ std::shared_ptr<SphRepresentation> set2ParticlesInteracting(double h, double dis
 
 	sph->initialize(runtime);
 
-	Particle p;
-	p.setLifetime(10);
-	p.setPosition(SurgSim::Math::Vector3d::Zero());
-	p.setVelocity(SurgSim::Math::Vector3d::Zero());
-	sph->addParticle(p); // Add 1 particle in the sph system
-	p.setPosition(SurgSim::Math::Vector3d(distance, 0.0, 0.0));
-	sph->addParticle(p); // Add 1 particle in the sph system
-	EXPECT_EQ(2u, sph->getParticleReferences().size());
+	sph->addParticle(Math::Vector3d::Zero(), Math::Vector3d::Zero(), 10);
+	sph->addParticle(Math::Vector3d(distance, 0.0, 0.0), Math::Vector3d::Zero(), 10);
+	EXPECT_EQ(2u, sph->getParticles().getNumVertices());
 
 	EXPECT_NO_THROW(sph->update(dt));
 
-	EXPECT_EQ(2u, sph->getParticleReferences().size());
-	for (auto particle : sph->getParticleReferences())
+	EXPECT_EQ(2u, sph->getParticles().getNumVertices());
+	size_t index = 0;
+	for (auto particle : sph->getParticles().getVertices())
 	{
-		std::string scope = "Particle "+boost::to_string(particle.getIndex());
+		std::string scope = "Particle "+boost::to_string(index);
 		SCOPED_TRACE(scope);
-		EXPECT_LT(particle.getPosition()[1], 0.0);
-		EXPECT_DOUBLE_EQ(0.0, particle.getPosition()[2]);
+		EXPECT_LT(particle.position[1], 0.0);
+		EXPECT_DOUBLE_EQ(0.0, particle.position[2]);
 
-		EXPECT_LT(particle.getVelocity()[1], 0.0);
-		EXPECT_DOUBLE_EQ(0.0, particle.getVelocity()[2]);
+		EXPECT_GT(0.0, particle.data.velocity[1]);
+		EXPECT_DOUBLE_EQ(0.0, particle.data.velocity[2]);
+		index++;
 	}
 
 	return sph;
@@ -254,14 +247,11 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesNotInteractingTest)
 	double distance = 10.0 * h; // Far from their radius of influence
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto x0 = sph->getParticleReferences().front().getPosition();
-	auto x1 = sph->getParticleReferences().back().getPosition();
-	auto v0 = sph->getParticleReferences().front().getPosition();
-	auto v1 = sph->getParticleReferences().back().getPosition();
-	EXPECT_DOUBLE_EQ(x0[1], x1[1]);
-	EXPECT_DOUBLE_EQ(v0[1], v1[1]);
-	double realDistance = (x0 - x1).norm();
-	EXPECT_DOUBLE_EQ(distance, realDistance);
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
+	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
+	double finalDistance = (particles[0].position - particles[1].position).norm();
+	EXPECT_DOUBLE_EQ(distance, finalDistance);
 }
 
 TEST(SphRepresentationTest, DoUpdate2ParticlesAttractingTest)
@@ -273,14 +263,11 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesAttractingTest)
 	double distance = h * 3.0 / 4.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto x0 = sph->getParticleReferences().front().getPosition();
-	auto x1 = sph->getParticleReferences().back().getPosition();
-	auto v0 = sph->getParticleReferences().front().getPosition();
-	auto v1 = sph->getParticleReferences().back().getPosition();
-	EXPECT_DOUBLE_EQ(x0[1], x1[1]);
-	EXPECT_DOUBLE_EQ(v0[1], v1[1]);
-	double finalDistance = (x0 - x1).norm();
-	EXPECT_LT(finalDistance, distance);
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
+	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
+	double finalDistance = (particles[0].position - particles[1].position).norm();
+	EXPECT_GT(distance, finalDistance);
 }
 
 TEST(SphRepresentationTest, DoUpdate2ParticlesRetractingTest)
@@ -292,14 +279,11 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesRetractingTest)
 	double distance = h * 1.0 / 4.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto x0 = sph->getParticleReferences().front().getPosition();
-	auto x1 = sph->getParticleReferences().back().getPosition();
-	auto v0 = sph->getParticleReferences().front().getPosition();
-	auto v1 = sph->getParticleReferences().back().getPosition();
-	EXPECT_DOUBLE_EQ(x0[1], x1[1]);
-	EXPECT_DOUBLE_EQ(v0[1], v1[1]);
-	double finalDistance = (x0 - x1).norm();
-	EXPECT_GT(finalDistance, distance);
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
+	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
+	double finalDistance = (particles[0].position - particles[1].position).norm();
+	EXPECT_LT(distance, finalDistance);
 }
 
 TEST(SphRepresentationTest, DoUpdate2ParticlesInEquilibriumTest)
@@ -311,14 +295,11 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesInEquilibriumTest)
 	double distance = h / 2.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto x0 = sph->getParticleReferences().front().getPosition();
-	auto x1 = sph->getParticleReferences().back().getPosition();
-	auto v0 = sph->getParticleReferences().front().getPosition();
-	auto v1 = sph->getParticleReferences().back().getPosition();
-	EXPECT_DOUBLE_EQ(x0[1], x1[1]);
-	EXPECT_DOUBLE_EQ(v0[1], v1[1]);
-	double finalDistance = (x0 - x1).norm();
-	EXPECT_NEAR(finalDistance, distance, pow(h, 2));
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
+	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
+	double finalDistance = (particles[0].position - particles[1].position).norm();
+	EXPECT_NEAR(distance, finalDistance, pow(h, 2));
 }
 
 TEST(SphRepresentationTest, SerializationTest)
