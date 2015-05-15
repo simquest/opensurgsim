@@ -113,5 +113,9 @@ TEST(OculusDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 800);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 1200);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.matrices().
+		hasData(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.matrices().
+		hasData(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX));
 }
