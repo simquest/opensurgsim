@@ -16,9 +16,8 @@
 #ifndef SURGSIM_DEVICES_OCULUS_OCULUSDISPLAYSETTINGS_H
 #define SURGSIM_DEVICES_OCULUS_OCULUSDISPLAYSETTINGS_H
 
-#include <string>
-
 #include <osg/DisplaySettings>
+
 #include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
@@ -42,22 +41,36 @@ public:
 	/// \param matrix Projection matrix for left eye
 	void setLeftEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
 
+	/// Get the projection matrix of the left eye
+	/// \return Projection matrix for left eye
+	SurgSim::Math::Matrix44d getLeftEyeProjectionMatrix() const;
+
 	/// Set the projection matrix of the right eye
 	/// \param matrix Projection matrix for right eye
 	void setRightEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
 
-	/// This method returns the projection matrix for the left eye pulled from OculusSDK.
+	/// Get the projection matrix of the right eye
+	/// \return Projection matrix for right eye
+	SurgSim::Math::Matrix44d getRightEyeProjectionMatrix() const;
+
+	/// This method returns the projection matrix set by setLeftEyeProjectionMatrix() method.
+	/// OSG calls this overriding function to get the left eye projection matrix to use.
 	/// The parameter passed in is NOT used.
 	osg::Matrixd computeLeftEyeProjectionImplementation(const osg::Matrixd&) const override;
 
-	/// This method returns the projection matrix for the right eye pulled from OculusSDK.
+	/// This method returns the projection matrix set by setRighttEyeProjectionMatrix() method.
+	/// OSG calls this overiding function to get the right eye projection matrix to use.
 	/// The parameter passed in is NOT used.
 	osg::Matrixd computeRightEyeProjectionImplementation(const osg::Matrixd&) const override;
 
 private:
+	/// Left eye projection matrix
 	osg::Matrixd m_leftEyeProjectionMatrix;
+
+	/// Right eye projection matrix
 	osg::Matrixd m_rightEyeProjectionMatrix;
 };
+
 }; // namespace Device
 }; // namespace SurgSim
 

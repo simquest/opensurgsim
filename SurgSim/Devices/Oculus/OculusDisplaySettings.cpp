@@ -22,12 +22,15 @@ namespace SurgSim
 namespace Device
 {
 
-OculusDisplaySettings::OculusDisplaySettings()
+OculusDisplaySettings::OculusDisplaySettings() : m_leftEyeProjectionMatrix(osg::Matrixd()),
+												 m_rightEyeProjectionMatrix(osg::Matrixd())
 {
 }
 
 OculusDisplaySettings::OculusDisplaySettings(const osg::DisplaySettings* displaySettings) :
-	osg::DisplaySettings(*displaySettings)
+	osg::DisplaySettings(*displaySettings),
+	m_leftEyeProjectionMatrix(osg::Matrixd()),
+	m_rightEyeProjectionMatrix(osg::Matrixd())
 {
 }
 
@@ -36,9 +39,19 @@ void OculusDisplaySettings::setLeftEyeProjectionMatrix(const SurgSim::Math::Matr
 	m_leftEyeProjectionMatrix = SurgSim::Graphics::toOsg(matrix);
 }
 
+SurgSim::Math::Matrix44d OculusDisplaySettings::getLeftEyeProjectionMatrix() const
+{
+	return SurgSim::Graphics::fromOsg(m_leftEyeProjectionMatrix);
+}
+
 void OculusDisplaySettings::setRightEyeProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
 {
 	m_rightEyeProjectionMatrix = SurgSim::Graphics::toOsg(matrix);
+}
+
+SurgSim::Math::Matrix44d OculusDisplaySettings::getRightEyeProjectionMatrix() const
+{
+	return SurgSim::Graphics::fromOsg(m_rightEyeProjectionMatrix);
 }
 
 osg::Matrixd OculusDisplaySettings::computeLeftEyeProjectionImplementation(const osg::Matrixd&) const
