@@ -45,13 +45,13 @@ void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::ve
 			{
 				Math::blockOperation(subMatrix.block(subRow, subCol, blockSize, blockSize),
 									 matrixRow, matrixCol, matrix,
-									 &Math::Operation<T, Opt, Index, Eigen::Block<const DerivedSub>>::add);
+									 &Math::Operation<Eigen::SparseMatrix<T, Opt, Index>, Eigen::Block<const DerivedSub>>::add);
 			}
 			else
 			{
 				Math::blockWithSearch(subMatrix.block(subRow, subCol, blockSize, blockSize),
 									  matrixRow, matrixCol, blockSize, blockSize, matrix,
-									  &Math::Operation<T, Opt, Index, Eigen::Block<const DerivedSub>>::add);
+									  &Math::Operation<Eigen::SparseMatrix<T, Opt, Index>, Eigen::Block<const DerivedSub>>::add);
 			}
 		}
 	}

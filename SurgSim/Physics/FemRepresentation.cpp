@@ -342,7 +342,7 @@ void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState&
 		blockWithoutSearch<Matrix, double>(getNodeTransformation(state, nodeId),
 										   startDiagonalIndex, startDiagonalIndex, numDofPerNode,
 										   numDofPerNode, &m_complianceWarpingTransformation,
-										   &Operation<double, 0, int, Matrix>::assign);
+										   &Operation<Eigen::SparseMatrix<double, 0, int>, Matrix>::assign);
 	}
 }
 
