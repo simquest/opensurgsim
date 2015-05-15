@@ -13,19 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/*
-#include <gtest/gtest.h>
-
-#include <unordered_map>
-#include <memory>
-*/
-
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/PerformanceTests/DivisibleCubeRepresentation.h"
-#include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/PerformanceTests/DivisibleCubeRepresentation.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -60,7 +53,7 @@ DivisibleCubeRepresentation::DivisibleCubeRepresentation(const std::string& name
 	addFemCubes(initialState);
 }
 
-bool DivisibleCubeRepresentation::noSetInitialize()
+bool DivisibleCubeRepresentation::initializeNoWakeUp()
 {
 	return doInitialize();
 }
@@ -82,6 +75,7 @@ size_t DivisibleCubeRepresentation::get1DIndexFrom3D(size_t i, size_t j, size_t 
 /// \param[in,out] state	The state to be filled up
 void DivisibleCubeRepresentation::fillUpDeformableState(std::shared_ptr<SurgSim::Math::OdeState> state)
 {
+	SURGSIM_ASSERT(state != nullptr);
 	state->setNumDof(getNumDofPerNode(), m_numNodesPerAxis * m_numNodesPerAxis * m_numNodesPerAxis);
 	SurgSim::Math::Vector& nodePositions = state->getPositions();
 

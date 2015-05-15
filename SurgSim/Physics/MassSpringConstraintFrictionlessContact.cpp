@@ -50,7 +50,7 @@ void MassSpringConstraintFrictionlessContact::doBuild(double dt,
 
 	auto massSpring = std::static_pointer_cast<MassSpringRepresentation>(localization->getRepresentation());
 
-	if ( !massSpring->isActive())
+	if (!massSpring->isActive())
 	{
 		return;
 	}
@@ -87,7 +87,8 @@ void MassSpringConstraintFrictionlessContact::doBuild(double dt,
 	m_newH.insert(3 * nodeId + 1) = n[1] * scale;
 	m_newH.insert(3 * nodeId + 2) = n[2] * scale;
 
-	mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, massSpring->applyCompliance(*(massSpring->getCurrentState()), m_newH),
+						   indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType MassSpringConstraintFrictionlessContact::getMlcpConstraintType() const

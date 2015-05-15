@@ -417,7 +417,30 @@ public:
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
+	void setPerspectiveProjection(double fovy, double aspect, double near, double far)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
 
+	void setOrthogonalProjection(double left, double right, double bottom, double top, double near, double far)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void setViewport(int x, int y, int width, int height)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	std::array<int, 4> getViewport() const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void getViewport(int* x, int* y, int* width, int* height) const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
 
 private:
 	/// Number of times the camera has been updated

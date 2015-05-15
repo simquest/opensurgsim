@@ -26,6 +26,8 @@ namespace SurgSim
 namespace Physics
 {
 
+SURGSIM_STATIC_REGISTRATION(Fem1DElementBeam);
+
 /// 1D FemElement based on a beam volume discretization with a fixed cross section
 ///
 /// The inertia property (mass) and the stiffness matrices are derived from "Theory of Matrix Structural Analysis" from
@@ -36,9 +38,17 @@ class Fem1DElementBeam : public FemElement
 {
 public:
 	/// Constructor
-	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element with respect to a
+	/// \param nodeIds An array of 2 node ids defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
+
+	/// Constructor for FemElement object factory
+	/// \param nodeIds A vector of node ids defining this beam element with respect to a
+	/// DeformableRepresentaitonState which is passed to the initialize method.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 2
+	explicit Fem1DElementBeam(std::vector<size_t> nodeIds);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam)
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam
@@ -84,7 +94,7 @@ public:
 	/// \note The element's mass matrix is a square matrix of size getNumDofPerNode() x getNumNodes().
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode()
-	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) override;
+	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) override;
 
 	/// Adds the element's damping matrix D (= -df/dv) (computed for a given state) to a complete system damping matrix
 	/// D (assembly)
@@ -95,7 +105,7 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode().
 	/// \note The beam uses linear elasticity (not visco-elasticity), so it does not have any damping.
-	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale = 1.0) override;
+	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D, double scale = 1.0) override;
 
 	/// Adds the element's stiffness matrix K (= -df/dx) (computed for a given state) to a complete system stiffness
 	/// matrix K (assembly)
@@ -105,7 +115,8 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes().
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode()
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
+	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
+					  double scale = 1.0) override;
 
 	/// Adds the element's force vector, mass, stiffness and damping matrices (computed for a given state) into a
 	/// complete system data structure F, M, D, K (assembly)
@@ -116,8 +127,8 @@ public:
 	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
 	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
 	/// getNumDofPerNode().
-	void addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, SurgSim::Math::Matrix* M,
-			SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override;
+	void addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, SurgSim::Math::SparseMatrix* M,
+				 SurgSim::Math::SparseMatrix* D, SurgSim::Math::SparseMatrix* K) override;
 
 	/// Adds the element's matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given
 	/// state) into a complete system data structure F (assembly)
@@ -141,6 +152,9 @@ public:
 		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
+	/// Initializes variables needed before Initialize() is called
+	void init();
+
 	/// Computes the beam element's initial rotation
 	/// \param state The state to compute the rotation from
 	/// \note This method stores the result in m_R0
@@ -150,7 +164,7 @@ protected:
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 12, 12>* k);
+						  Eigen::Matrix<double, 12, 12>* k);
 
 	/// Computes the beam's mass matrix
 	/// \param state The state to compute the stiffness matrix from

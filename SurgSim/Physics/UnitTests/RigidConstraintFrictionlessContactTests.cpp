@@ -83,13 +83,12 @@ TEST (RigidConstraintFrictionlessContactTests, SetGet_BuildMlcp_Test)
 	// Constraint H should be
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	Vector3d n_GP = n.cross(Vector3d(0.0, 0.0, 0.0));
-	SurgSim::Math::Matrix h = mlcpPhysicsProblem.H;
-	EXPECT_NEAR(dt * n[0]   , h(0, 0), epsilon);
-	EXPECT_NEAR(dt * n[1]   , h(0, 1), epsilon);
-	EXPECT_NEAR(dt * n[2]   , h(0, 2), epsilon);
-	EXPECT_NEAR(dt * n_GP[0], h(0, 3), epsilon);
-	EXPECT_NEAR(dt * n_GP[1], h(0, 4), epsilon);
-	EXPECT_NEAR(dt * n_GP[2], h(0, 5), epsilon);
+	EXPECT_NEAR(dt * n[0]   , mlcpPhysicsProblem.H(0, 0), epsilon);
+	EXPECT_NEAR(dt * n[1]   , mlcpPhysicsProblem.H(0, 1), epsilon);
+	EXPECT_NEAR(dt * n[2]   , mlcpPhysicsProblem.H(0, 2), epsilon);
+	EXPECT_NEAR(dt * n_GP[0], mlcpPhysicsProblem.H(0, 3), epsilon);
+	EXPECT_NEAR(dt * n_GP[1], mlcpPhysicsProblem.H(0, 4), epsilon);
+	EXPECT_NEAR(dt * n_GP[2], mlcpPhysicsProblem.H(0, 5), epsilon);
 
 	// ConstraintTypes should contain 0 entry as it is setup by the constraint and not the ConstraintImplementation
 	// This way, the constraint can verify that both ConstraintImplementation are the same type

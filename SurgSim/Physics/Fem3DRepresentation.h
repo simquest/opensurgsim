@@ -21,7 +21,6 @@
 #include <unordered_map>
 
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
@@ -77,6 +76,15 @@ private:
 	/// \return A map from the mesh's triangle ids to this object's fem elements.
 	std::unordered_map<size_t, size_t> createTriangleIdToElementIdMap(
 			std::shared_ptr<const SurgSim::Math::MeshShape> mesh);
+
+	std::shared_ptr<Localization> createNodeLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	std::shared_ptr<Localization> createTriangleLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	std::shared_ptr<Localization> createElementLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
 
 	/// Mapping from collision triangle's id to fem element id.
 	std::unordered_map<size_t, size_t> m_triangleIdToElementIdMap;

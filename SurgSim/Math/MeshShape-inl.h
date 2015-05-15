@@ -22,11 +22,10 @@ namespace SurgSim
 namespace Math
 {
 
-template <class VertexData, class EdgeData, class TriangleData>
-MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>& other) :
+template <class V, class E, class T>
+MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMesh<V, E, T>& other) :
 	SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData,
-	SurgSim::DataStructures::NormalData>::TriangleMesh(other),
-	m_initialMesh(std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>(other))
+	SurgSim::DataStructures::NormalData>::TriangleMesh(other)
 {
 	SURGSIM_ASSERT(other.isValid()) << "Invalid mesh";
 

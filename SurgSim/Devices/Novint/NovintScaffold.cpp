@@ -34,6 +34,7 @@
 #include "SurgSim/Framework/Clock.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -345,6 +346,9 @@ public:
 	/// Time of the initialization of the latest handle.
 	Clock::time_point initializationTime;
 
+	/// Timer to measure update rate.
+	Framework::Timer timer;
+
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
 	StateData(const StateData&) /*= delete*/;
@@ -389,6 +393,7 @@ NovintScaffold::NovintScaffold() :
 			errorCode = hdlGetError();
 		}
 	}
+	m_state->timer.setMaxNumberOfFrames(5000);
 
 	SURGSIM_LOG_DEBUG(m_logger) << "Novint: Shared scaffold created.";
 }
@@ -1025,6 +1030,15 @@ bool NovintScaffold::finalizeSdk()
 
 bool NovintScaffold::runHapticFrame()
 {
+	m_state->timer.markFrame();
+	if (m_state->timer.getCurrentNumberOfFrames() == m_state->timer.getMaxNumberOfFrames())
+	{
+		SURGSIM_LOG_INFO(m_logger) << std::setprecision(4)
+			<< "Rate: " << m_state->timer.getAverageFrameRate() << "Hz "
+			<< "(min individual frame " << 1.0 / m_state->timer.getMaxFramePeriod() << "Hz).";
+		m_state->timer.setMaxNumberOfFrames(static_cast<size_t>(m_state->timer.getAverageFrameRate() * 5.0));
+		m_state->timer.start();
+	}
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
 	for (auto& it = m_state->registeredDevices.begin();  it != m_state->registeredDevices.end();  ++it)

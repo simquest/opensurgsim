@@ -56,7 +56,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationPerformanceTests, IntersectionTes
 		pair->clearContacts();
 		meshARep->getCollisions().unsafeGet().clear();
 		meshBRep->getCollisions().unsafeGet().clear();
-		RigidTransform3d pose = 
+		RigidTransform3d pose =
 			Math::makeRigidTransform(Math::makeRotationQuaternion(2.0 * M_PI * i / loops, Vector3d::UnitX().eval()),
 			Vector3d(i, -1.5 * i, 0.0));
 		meshARep->setLocalPose(pose);

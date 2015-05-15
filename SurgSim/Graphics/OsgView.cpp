@@ -28,10 +28,14 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 #include <osgViewer/ViewerEventHandlers>
 #include <osg/DisplaySettings>
+
 
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
@@ -155,6 +159,7 @@ void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 
 	View::setCamera(camera);
 	m_view->setCamera(osgCamera->getOsgCamera());
+	osgCamera->setViewport(0, 0, m_dimensions[0], m_dimensions[1]);
 }
 
 void OsgView::update(double dt)
@@ -173,6 +178,12 @@ void OsgView::update(double dt)
 				m_areWindowSettingsDirty = false;
 			}
 		}
+	}
+	if (isManipulatorEnabled())
+	{
+		auto matrix = m_view->getCameraManipulator()->getMatrix();
+		auto pose = Math::RigidTransform3d(fromOsg(matrix));
+		getSceneElement()->getPoseComponent()->setPose(pose);
 	}
 }
 

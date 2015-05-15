@@ -62,13 +62,13 @@ public:
 	Mesh();
 
 	/// Copy constructor when the template data is a different type
-	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
-	/// \tparam	EdgeDataSource	Type of extra data stored in each edge
-	/// \tparam	TriangleDataSource	Type of extra data stored in each triangle
+	/// \tparam	V Type of extra data stored in each vertex
+	/// \tparam	E Type of extra data stored in each edge
+	/// \tparam	T Type of extra data stored in each triangle
 	/// \param other The mesh to be copied from. Vertex, edge and triangle data will not be copied
 	/// \note: Data of the input mesh, i.e. VertexDataSource, EdgeDataSource and TrianleDataSource will not be copied.
-	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-	explicit Mesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& other);
+	template <class V, class E, class T>
+	explicit Mesh(const TriangleMesh<V, E, T>& other);
 
 	/// Utility function to initialize a mesh with plain data,
 	/// \param	vertices 	An array of vertex coordinates.

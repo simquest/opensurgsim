@@ -40,6 +40,12 @@ void FemElement::initialize(const SurgSim::Math::OdeState& state)
 	SURGSIM_ASSERT(m_E > 0.0) << "Young modulus ("<<m_E<<") is invalid, it should be positive";
 }
 
+FemElement::FactoryType& FemElement::getFactory()
+{
+	static FactoryType factory;
+	return factory;
+}
+
 size_t FemElement::getNumDofPerNode() const
 {
 	return m_numDofPerNode;

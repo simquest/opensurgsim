@@ -41,23 +41,6 @@ RigidCollisionRepresentation::~RigidCollisionRepresentation()
 {
 }
 
-void RigidCollisionRepresentation::update(const double& dt)
-{
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getShape());
-	if (meshShape != nullptr && meshShape->isValid())
-	{
-		if (!meshShape->setPose(getPose()))
-		{
-			setLocalActive(false);
-			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/RigidCollisionRepresentation")) <<
-				"CollisionRepresentation '" << getName() << "' " <<
-				(getSceneElement() == nullptr ?
-				"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
-				"went inactive because its shape failed in moving to a pose of:" << std::endl << getPose().matrix();
-		}
-	}
-}
-
 void RigidCollisionRepresentation::setRigidRepresentation(
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation)
 {

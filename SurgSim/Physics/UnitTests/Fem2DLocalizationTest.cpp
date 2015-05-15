@@ -87,9 +87,9 @@ public:
 		m_validLocalPosition.coordinate[1] = 0.6;
 
 		m_invalidIndexLocalPosition.index = 3;
-		m_validLocalPosition.coordinate = SurgSim::Math::Vector::Zero(3);
-		m_validLocalPosition.coordinate[0] = 0.4;
-		m_validLocalPosition.coordinate[1] = 0.6;
+		m_invalidIndexLocalPosition.coordinate = SurgSim::Math::Vector::Zero(3);
+		m_invalidIndexLocalPosition.coordinate[0] = 0.4;
+		m_invalidIndexLocalPosition.coordinate[1] = 0.6;
 
 		m_invalidCoordinateLocalPosition.index = 1;
 		m_invalidCoordinateLocalPosition.coordinate = SurgSim::Math::Vector::Zero(3);
@@ -109,6 +109,9 @@ public:
 
 TEST_F(Fem2DLocalizationTest, ConstructorTest)
 {
+	// IndexedLocalCoordinate pointing to a node (node index + empty coordinate) are invalid. It will failed,
+	// either because the index is out of bound or because the coordinates are the wrong size (empty)
+	// This is tested by m_invalidIndexLocalPosition and m_invalidCoordinateLocalPosition
 	ASSERT_THROW(std::make_shared<Fem2DLocalization>(m_fem, m_invalidIndexLocalPosition),
 		SurgSim::Framework::AssertionFailure);
 

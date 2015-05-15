@@ -105,6 +105,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
 	FemElement.h
+	FemElement-inl.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
 	FixedConstraintFixedPoint.h
@@ -119,7 +120,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	MassSpringRepresentation.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
-	MlcpPhysicsProblem-inl.h
 	MlcpPhysicsSolution.h
 	PhysicsConvert.h
 	PhysicsManager.h

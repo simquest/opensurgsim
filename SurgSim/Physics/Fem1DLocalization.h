@@ -28,7 +28,8 @@ namespace Physics
 /// Implementation of Localization for Fem1DRepresentation
 ///
 /// Fem1DLocalization tracks the global coordinates of an IndexedLocalCoordinate associated with an
-/// Fem1DRepresentation.
+/// Fem1DRepresentation. The IndexedLocalCoordinate must be related to an FemElement (the index is an FemElement id and
+/// the local coordinates are the barycentric coordinates of the nodes in this FemElement).
 class Fem1DLocalization : public Localization
 {
 public:

@@ -63,9 +63,6 @@ public:
 	/// Reset the representation to its initial/default state
 	virtual void resetState();
 
-	/// Reset the representation parameters to their initial/default values
-	virtual void resetParameters();
-
 	/// Query the object number of degrees of freedom
 	/// \return The number of degrees of freedom
 	size_t getNumDof() const;

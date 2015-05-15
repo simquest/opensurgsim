@@ -109,7 +109,8 @@ void Fem3DConstraintFrictionlessContact::doBuild(double dt,
 		}
 	}
 
-	mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, fem3d->applyCompliance(*(fem3d->getCurrentState()), m_newH), indexOfRepresentation,
+						   indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType Fem3DConstraintFrictionlessContact::getMlcpConstraintType() const

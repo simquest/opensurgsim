@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
-#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/Fem3DConstraintFrictionlessContact.h"
@@ -40,11 +40,11 @@ using SurgSim::Math::Vector4d;
 
 namespace
 {
-	const double epsilon = 1e-10;
-	const double dt = 1e-3;
+const double epsilon = 1e-10;
+const double dt = 1e-3;
 };
 
-static void addTetraheadron(Fem3DRepresentation *fem,
+static void addTetraheadron(Fem3DRepresentation* fem,
 							size_t node0,
 							size_t node1,
 							size_t node2,
@@ -85,12 +85,12 @@ public:
 		// ( 1.00, 1.00,  0.00) + (0.24, -0.43, 0.55) + (-0.10,  0.09,  0.16) = ( 1.14,  0.66,  0.71)
 		// ( 1.00, 0.00, -1.00) + (0.24, -0.43, 0.55) + (-0.22,  0.12, -0.09) = ( 1.02, -0.31, -0.54)
 
-		state->getPositions().segment<3>(0 * 3) = Vector3d( 0.30, -0.57,  0.40);
-		state->getPositions().segment<3>(1 * 3) = Vector3d( 0.06,  0.63, -0.32);
+		state->getPositions().segment<3>(0 * 3) = Vector3d(0.30, -0.57,  0.40);
+		state->getPositions().segment<3>(1 * 3) = Vector3d(0.06,  0.63, -0.32);
 		state->getPositions().segment<3>(2 * 3) = Vector3d(-0.91,  0.72,  0.72);
-		state->getPositions().segment<3>(3 * 3) = Vector3d( 0.35,  0.52,  0.50);
-		state->getPositions().segment<3>(4 * 3) = Vector3d( 1.14,  0.66,  0.71);
-		state->getPositions().segment<3>(5 * 3) = Vector3d( 1.02, -0.31, -0.54);
+		state->getPositions().segment<3>(3 * 3) = Vector3d(0.35,  0.52,  0.50);
+		state->getPositions().segment<3>(4 * 3) = Vector3d(1.14,  0.66,  0.71);
+		state->getPositions().segment<3>(5 * 3) = Vector3d(1.02, -0.31, -0.54);
 
 		addTetraheadron(m_fem.get(), 0, 1, 2, 3, *state);
 		addTetraheadron(m_fem.get(), 0, 1, 3, 4, *state);
@@ -108,7 +108,7 @@ public:
 		m_fem->update(dt);
 	}
 
-	void setContactAt(const IndexedLocalCoordinate &coord)
+	void setContactAt(const IndexedLocalCoordinate& coord)
 	{
 		m_coord = coord;
 		m_localization = std::make_shared<Fem3DLocalization>(m_fem, m_coord);
@@ -155,7 +155,7 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpTest)
 	setContactAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
-		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+						  &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = Vector3d(0.30, -0.57,  0.40) - Vector3d::UnitY() * 9.81 * dt * dt;
 	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
@@ -166,7 +166,8 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpTest)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
 	// C = dt * m^{-1}
-	Eigen::Matrix<double, 18, 18> C = dt * m_fem->computeM(*m_fem->getPreviousState()).inverse();
+	Eigen::Matrix<double, 18, 18> denseMat = m_fem->computeM(*m_fem->getPreviousState());
+	Eigen::Matrix<double, 18, 18> C = dt * denseMat.inverse();
 
 	EXPECT_NEAR_EIGEN(C * H.transpose(), mlcpPhysicsProblem.CHt, epsilon);
 
@@ -190,13 +191,13 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpCoordinateTest)
 	setContactAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
-		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+						  &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	const Vector3d newPosition = (Vector3d( 0.30, -0.57,  0.40) * barycentric[0] +
-		Vector3d( 0.06,  0.63, -0.32) * barycentric[1] +
-		Vector3d( 0.35,  0.52,  0.50) * barycentric[2] +
-		Vector3d( 1.14,  0.66,  0.71) * barycentric[3]) -
-		Vector3d::UnitY() * 9.81 * dt * dt;
+	const Vector3d newPosition = (Vector3d(0.30, -0.57,  0.40) * barycentric[0] +
+								  Vector3d(0.06,  0.63, -0.32) * barycentric[1] +
+								  Vector3d(0.35,  0.52,  0.50) * barycentric[2] +
+								  Vector3d(1.14,  0.66,  0.71) * barycentric[3]) -
+								 Vector3d::UnitY() * 9.81 * dt * dt;
 	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
@@ -208,7 +209,14 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpCoordinateTest)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
 	// C = dt * m^{-1}
-	Eigen::Matrix<double, 18, 18> C = dt * m_fem->computeM(*m_fem->getPreviousState()).inverse();
+	SurgSim::Math::Matrix C;
+	SurgSim::Math::SparseMatrix M(18, 18);
+	M = m_fem->computeM(*m_fem->getPreviousState());
+	SurgSim::Math::LinearSparseSolveAndInverseLU solver;
+	SurgSim::Math::Vector b = SurgSim::Math::Vector::Zero(18);
+	solver.setMatrix(M);
+	C = solver.getInverse();
+	C *= dt;
 
 	EXPECT_NEAR_EIGEN(C * H.transpose(), mlcpPhysicsProblem.CHt, epsilon);
 
@@ -227,26 +235,18 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, 2, 1);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
-	Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t> localH;
-	localH.resize(5);
-	localH.reserve(5);
-	localH.insert(0) = 0.9478;
-	localH.insert(1) = -0.3807;
-	localH.insert(2) = 0.5536;
-	localH.insert(3) = -0.6944;
-	localH.insert(4) = 0.1815;
-	typedef SurgSim::Math::Dynamic::Operation<double, Eigen::RowMajor, ptrdiff_t,
-		Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>> Operation;
-	SurgSim::Math::blockOperation<Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>,
-		double, Eigen::RowMajor, ptrdiff_t>(localH, 0, 0, &mlcpPhysicsProblem.H, &Operation::add);
+	Eigen::Matrix<double, 1, 5> localH;
+	localH <<
+		   0.9478,  -0.3807,  0.5536, -0.6944,  0.1815;
+	mlcpPhysicsProblem.H.block<1, 5>(0, 0) = localH;
 
 	Eigen::Matrix<double, 5, 5> localC;
 	localC <<
-		-0.2294,  0.5160,  0.2520,  0.5941, -0.4854,
-		 0.1233, -0.4433,  0.3679,  0.9307,  0.2600,
-		 0.1988,  0.6637, -0.7591,  0.1475,  0.8517,
-		-0.5495, -0.4305,  0.3162, -0.7862,  0.7627,
-		-0.5754,  0.4108,  0.8445, -0.5565,  0.7150;
+		   -0.2294,  0.5160,  0.2520,  0.5941, -0.4854,
+		   0.1233, -0.4433,  0.3679,  0.9307,  0.2600,
+		   0.1988,  0.6637, -0.7591,  0.1475,  0.8517,
+		   -0.5495, -0.4305,  0.3162, -0.7862,  0.7627,
+		   -0.5754,  0.4108,  0.8445, -0.5565,  0.7150;
 	localC = localC * localC.transpose(); // force to be symmetric
 
 	Eigen::Matrix<double, 5, 1> localCHt = localC * localH.transpose();
@@ -266,13 +266,14 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 	setContactAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
-		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+						  &mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint,
+						  SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	const Vector3d newPosition = (Vector3d( 0.30, -0.57,  0.40) * barycentric[0] +
-		Vector3d( 0.06,  0.63, -0.32) * barycentric[1] +
-		Vector3d( 0.35,  0.52,  0.50) * barycentric[2] +
-		Vector3d( 1.14,  0.66,  0.71) * barycentric[3]) -
-		Vector3d::UnitY() * 9.81 * dt * dt;
+	const Vector3d newPosition = (Vector3d(0.30, -0.57,  0.40) * barycentric[0] +
+								  Vector3d(0.06,  0.63, -0.32) * barycentric[1] +
+								  Vector3d(0.35,  0.52,  0.50) * barycentric[2] +
+								  Vector3d(1.14,  0.66,  0.71) * barycentric[3]) -
+								 Vector3d::UnitY() * 9.81 * dt * dt;
 	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
@@ -283,7 +284,14 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H.block(indexOfConstraint, indexOfRepresentation, 1, 18), epsilon);
 
-	Eigen::Matrix<double, 18, 18> C = dt * m_fem->computeM(*m_fem->getPreviousState()).inverse();
+	SurgSim::Math::Matrix C;
+	SurgSim::Math::SparseMatrix M(18, 18);
+	M = m_fem->computeM(*m_fem->getPreviousState());
+	SurgSim::Math::LinearSparseSolveAndInverseLU solver;
+	SurgSim::Math::Vector b = SurgSim::Math::Vector::Zero(18);
+	solver.setMatrix(M);
+	C = solver.getInverse();
+	C *= dt;
 
 	EXPECT_NEAR_EIGEN(
 		C * H.transpose(), mlcpPhysicsProblem.CHt.block(indexOfRepresentation, indexOfConstraint, 18, 1), epsilon);
