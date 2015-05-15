@@ -39,6 +39,25 @@ TEST(OculusDeviceTest, CreateAndInitializeDevice)
 
 	EXPECT_TRUE(device->isInitialized());
 	EXPECT_EQ("Oculus", device->getName());
+
+	EXPECT_FLOAT_EQ(0.1f, device->getNearPlane());
+	EXPECT_FLOAT_EQ(10.0f, device->getFarPlane());
+}
+
+TEST(OculusDeviceTest, SetAndGetNearAndFarPlanes)
+{
+	auto device = std::make_shared<OculusDevice>("Oculus");
+	EXPECT_FLOAT_EQ(0.1f, device->getNearPlane());
+	EXPECT_FLOAT_EQ(10.0f, device->getFarPlane());
+
+	EXPECT_THROW(device->setNearPlane(-0.1f), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(device->setFarPlane(-10.0f), SurgSim::Framework::AssertionFailure);
+
+	EXPECT_NO_THROW(device->setNearPlane(0.2f));
+	EXPECT_NO_THROW(device->setFarPlane(20.0f));
+	
+	EXPECT_FLOAT_EQ(0.2f, device->getNearPlane());
+	EXPECT_FLOAT_EQ(20.0f, device->getFarPlane());
 }
 
 TEST(OculusDeviceTest, Factory)

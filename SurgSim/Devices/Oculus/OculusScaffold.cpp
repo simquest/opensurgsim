@@ -17,7 +17,6 @@
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
-#include <Eigen/core>
 #include <list>
 #include <memory>
 #include <OVR_CAPI_0_5_0.h>
@@ -131,9 +130,12 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 				ovrFovPort defaultLeftFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
 				ovrFovPort defaultRightFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
 
-				ovrMatrix4f leftProjMatrix = ovrMatrix4f_Projection(defaultLeftFOV, 0.1f, 10.0f,
+				float nearPlane = info->deviceObject->getNearPlane();
+				float farPlane = info->deviceObject->getFarPlane();
+
+				ovrMatrix4f leftProjMatrix = ovrMatrix4f_Projection(defaultLeftFOV, nearPlane, farPlane,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
-				ovrMatrix4f rightProjMatrix = ovrMatrix4f_Projection(defaultRightFOV, 0.1f, 10.0f,
+				ovrMatrix4f rightProjMatrix = ovrMatrix4f_Projection(defaultRightFOV, nearPlane, farPlane,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
 
 				inputData.matrices().set(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX,

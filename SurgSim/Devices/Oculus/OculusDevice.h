@@ -58,12 +58,32 @@ public:
 	bool initialize() override;
 	bool finalize() override;
 
+	/// Set the near plane
+	/// \param nearPlane The near plane
+	void setNearPlane(float nearPlane);
+
+	/// \return The near plane
+	float getNearPlane() const;
+
+	/// Set the far plane
+	/// \param farPlane The far plane
+	void setFarPlane(float farPlane);
+
+	/// \return The far plane
+	float getFarPlane() const;
+
 	/// Check whether this device is initialized.
 	/// \return True if this device is initialized; false otherwise.
 	bool isInitialized() const;
 
 private:
 	friend class OculusScaffold;
+
+	/// Near Plane
+	float m_nearPlane;
+
+	/// Far Plane
+	float m_farPlane;
 
 	/// Communication with hardware is handled by scaffold.
 	std::shared_ptr<OculusScaffold> m_scaffold;
