@@ -427,7 +427,7 @@ void blockOperation(const DerivedSub& subMatrix, Index rowStart, Index columnSta
 
 
 /// Wrapper functions for 'add' Operation
-template <class SparseType, class DerivedSub>
+template <class DerivedSub, class SparseType>
 void blockAddWithoutSearch(const DerivedSub& subMatrix,
 						   typename SparseType::Index rowStart, typename SparseType::Index columnStart,
 						   typename SparseType::Index n, typename SparseType::Index m,
@@ -436,7 +436,7 @@ void blockAddWithoutSearch(const DerivedSub& subMatrix,
 	blockWithoutSearch(subMatrix, rowStart, columnStart, n, m, matrix, &Operation<SparseType, DerivedSub>::add);
 }
 
-template <class SparseType, class DerivedSub>
+template <class DerivedSub, class SparseType>
 void blockAddWithSearch(const DerivedSub& subMatrix,
 						typename SparseType::Index rowStart, typename SparseType::Index columnStart,
 						typename SparseType::Index n, typename SparseType::Index m,
@@ -445,7 +445,7 @@ void blockAddWithSearch(const DerivedSub& subMatrix,
 	blockWithSearch(subMatrix, rowStart, columnStart, n, m, matrix, &Operation<SparseType, DerivedSub>::add);
 }
 
-template <class SparseType, class DerivedSub>
+template <class DerivedSub, class SparseType>
 void blockAdd(const DerivedSub& subMatrix,
 			  typename SparseType::Index rowStart, typename SparseType::Index columnStart,
 			  SparseType* matrix)
@@ -453,8 +453,16 @@ void blockAdd(const DerivedSub& subMatrix,
 	blockOperation(subMatrix, rowStart, columnStart, matrix, &Operation<SparseType, DerivedSub>::add);
 }
 
+template <class DerivedSub, class SparseType>
+void blockAdd(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix,
+			  typename SparseType::Index rowStart, typename SparseType::Index columnStart,
+			  SparseType* matrix)
+{
+	blockOperation(subMatrix, rowStart, columnStart, matrix, &Operation<SparseType, DerivedSub>::add);
+}
+
 /// Wrapper assign functions
-template <class SparseType, class DerivedSub>
+template <class DerivedSub, class SparseType>
 void blockAssignWithoutSearch(const DerivedSub& subMatrix,
 							  typename SparseType::Index rowStart, typename SparseType::Index columnStart,
 							  typename SparseType::Index n, typename SparseType::Index m,
@@ -463,7 +471,7 @@ void blockAssignWithoutSearch(const DerivedSub& subMatrix,
 	blockWithoutSearch(subMatrix, rowStart, columnStart, n, m, matrix, &Operation<SparseType, DerivedSub>::assign);
 }
 
-template <class SparseType, class DerivedSub>
+template <class DerivedSub, class SparseType>
 void blockAssignWithSearch(const DerivedSub& subMatrix,
 						   typename SparseType::Index rowStart, typename SparseType::Index columnStart,
 						   typename SparseType::Index n, typename SparseType::Index m,
@@ -472,8 +480,16 @@ void blockAssignWithSearch(const DerivedSub& subMatrix,
 	blockWithSearch(subMatrix, rowStart, columnStart, n, m, matrix, &Operation<SparseType, DerivedSub>::assign);
 }
 
-template <class SparseType, class DerivedSub>
+template <class DerivedSub, class SparseType>
 void blockAssign(const DerivedSub& subMatrix,
+				 typename SparseType::Index rowStart, typename SparseType::Index columnStart,
+				 SparseType* matrix)
+{
+	blockOperation(subMatrix, rowStart, columnStart, matrix, &Operation<SparseType, DerivedSub>::assign);
+}
+
+template <class DerivedSub, class SparseType>
+void blockAssign(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix,
 				 typename SparseType::Index rowStart, typename SparseType::Index columnStart,
 				 SparseType* matrix)
 {

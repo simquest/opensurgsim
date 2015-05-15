@@ -43,15 +43,12 @@ void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::ve
 			Index matrixCol = blockSize * static_cast<Index>(blockIds[block1]);
 			if (initialize)
 			{
-				Math::blockOperation(subMatrix.block(subRow, subCol, blockSize, blockSize),
-									 matrixRow, matrixCol, matrix,
-									 &Math::Operation<Eigen::SparseMatrix<T, Opt, Index>, Eigen::Block<const DerivedSub>>::add);
+				Math::blockAdd(subMatrix.block(subRow, subCol, blockSize, blockSize), matrixRow, matrixCol, matrix);
 			}
 			else
 			{
-				Math::blockWithSearch(subMatrix.block(subRow, subCol, blockSize, blockSize),
-									  matrixRow, matrixCol, blockSize, blockSize, matrix,
-									  &Math::Operation<Eigen::SparseMatrix<T, Opt, Index>, Eigen::Block<const DerivedSub>>::add);
+				Math::blockAddWithSearch(subMatrix.block(subRow, subCol, blockSize, blockSize),
+										 matrixRow, matrixCol, blockSize, blockSize, matrix);
 			}
 		}
 	}
