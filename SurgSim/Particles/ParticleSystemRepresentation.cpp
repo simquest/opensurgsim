@@ -63,15 +63,13 @@ const Particles& ParticleSystemRepresentation::getParticles() const
 	return m_particles;
 }
 
-bool ParticleSystemRepresentation::addParticle(const Math::Vector3d& position, const Math::Vector3d& velocity,
-		double lifetime)
+bool ParticleSystemRepresentation::addParticle(const Particle& particle)
 {
 	bool result;
 	auto& particles = m_particles.getVertices();
 	if (particles.size() < m_maxParticles)
 	{
-		ParticleData data = {lifetime, velocity};
-		particles.emplace_back(position, data);
+		particles.push_back(particle);
 		result = true;
 	}
 	else
@@ -83,19 +81,32 @@ bool ParticleSystemRepresentation::addParticle(const Math::Vector3d& position, c
 	return result;
 }
 
+bool ParticleSystemRepresentation::addParticle(const Math::Vector3d& position, const Math::Vector3d& velocity,
+		double lifetime)
+{
+	ParticleData data = {lifetime, velocity};
+	return addParticle(Particle(position, data));
+}
+
 void ParticleSystemRepresentation::update(double dt)
 {
 	auto& particles = m_particles.getVertices();
-	for (auto& particle : particles)
+	auto particle = particles.begin();
+	auto newEnd = particles.end();
+	while (particle != newEnd)
 	{
-		particle.data.lifetime -= dt;
+	   particle->data.lifetime -= dt;
+	   if (particle->data.lifetime <= 0.0)
+	   {
+		   --newEnd;
+		   std::swap(*particle, *newEnd);
+	   }
+	   else
+	   {
+		   ++particle;
+	   }
 	}
-
-	auto isDead = [](Particle& particle)
-	{
-		return particle.data.lifetime <= 0.0;
-	};
-	particles.erase(std::remove_if(particles.begin(), particles.end(), isDead), particles.end());
+	particles.erase(newEnd, particles.end());
 
 	if (!doUpdate(dt))
 	{

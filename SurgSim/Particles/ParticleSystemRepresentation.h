@@ -58,6 +58,11 @@ public:
 	size_t getMaxParticles() const;
 
 	/// Add a particle
+	/// \param particle The new particle
+	/// \return True if the particle was successfully added, false otherwise
+	bool addParticle(const Particle& particle);
+
+	/// Add a particle
 	/// \param position The position of the new particle
 	/// \param velocity The velocity of the new particle
 	/// \param lifetime The lenght of time the particle will exist

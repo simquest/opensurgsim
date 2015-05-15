@@ -27,7 +27,10 @@ namespace Particles
 
 struct ParticleData
 {
+	/// The lifetime of the particle [s]
 	double lifetime;
+
+	/// The velocity of the particle [m/s]
 	Math::Vector3d velocity;
 
 	/// Equality operator.
