@@ -27,8 +27,8 @@
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
-using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::MassSpringLocalization;
+using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::MockLocalization;
 using SurgSim::Physics::MockMassSpring;
 using SurgSim::Physics::MockSpring;
