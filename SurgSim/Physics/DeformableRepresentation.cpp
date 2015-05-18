@@ -32,6 +32,11 @@
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
+using SurgSim::Math::Matrix;
+using SurgSim::Math::OdeState;
+using SurgSim::Math::SparseMatrix;
+using SurgSim::Math::Vector;
+
 namespace SurgSim
 {
 
@@ -53,6 +58,7 @@ DeformableRepresentation::DeformableRepresentation(const std::string& name) :
 DeformableRepresentation::~DeformableRepresentation()
 {
 }
+
 void DeformableRepresentation::resetState()
 {
 	Representation::resetState();
@@ -80,8 +86,10 @@ void DeformableRepresentation::setInitialState(
 
 	m_hasExternalGeneralizedForce = false;
 	m_externalGeneralizedForce.setZero(getNumDof());
-	m_externalGeneralizedStiffness.setZero(getNumDof(), getNumDof());
-	m_externalGeneralizedDamping.setZero(getNumDof(), getNumDof());
+	m_externalGeneralizedStiffness.resize(static_cast<SparseMatrix::Index>(getNumDof()),
+										  static_cast<SparseMatrix::Index>(getNumDof()));
+	m_externalGeneralizedDamping.resize(static_cast<SparseMatrix::Index>(getNumDof()),
+										static_cast<SparseMatrix::Index>(getNumDof()));
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
@@ -120,21 +128,31 @@ const SurgSim::Math::Vector& DeformableRepresentation::getExternalGeneralizedFor
 	return m_externalGeneralizedForce;
 }
 
-const SurgSim::Math::Matrix& DeformableRepresentation::getExternalGeneralizedStiffness() const
+const SurgSim::Math::SparseMatrix& DeformableRepresentation::getExternalGeneralizedStiffness() const
 {
 	return m_externalGeneralizedStiffness;
 }
 
-const SurgSim::Math::Matrix& DeformableRepresentation::getExternalGeneralizedDamping() const
+const SurgSim::Math::SparseMatrix& DeformableRepresentation::getExternalGeneralizedDamping() const
 {
 	return m_externalGeneralizedDamping;
 }
 
-const SurgSim::Math::Matrix& DeformableRepresentation::getComplianceMatrix() const
+Math::Matrix DeformableRepresentation::applyCompliance(const Math::OdeState& state, const Math::Matrix& b)
 {
 	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
 
-	return m_odeSolver->getComplianceMatrix();
+	Math::Matrix bTemp = b;
+	for (auto condition : state.getBoundaryConditions())
+	{
+		Math::zeroRow(condition, &bTemp);
+	}
+	auto solution = m_odeSolver->getLinearSolver()->solve(bTemp);
+	for (auto condition : state.getBoundaryConditions())
+	{
+		Math::zeroRow(condition, &solution);
+	}
+	return solution;
 }
 
 void DeformableRepresentation::update(double dt)
@@ -262,7 +280,7 @@ bool DeformableRepresentation::doWakeUp()
 	using SurgSim::Math::OdeSolverLinearRungeKutta4;
 	using SurgSim::Math::OdeSolverLinearStatic;
 
-	using SurgSim::Math::LinearSolveAndInverseDenseMatrix;
+	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	// Transform the state with the initial pose
 	transformState(m_initialState, getPose());
@@ -318,8 +336,8 @@ bool DeformableRepresentation::doWakeUp()
 			return false;
 	}
 
-	// No assumption is made on the linear solver, we instantiate a general dense matrix solver
-	m_odeSolver->setLinearSolver(std::make_shared<LinearSolveAndInverseDenseMatrix>());
+	// No assumption is made on the linear solver, we instantiate a general sparse matrix solver
+	m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
 
 	return true;
 }

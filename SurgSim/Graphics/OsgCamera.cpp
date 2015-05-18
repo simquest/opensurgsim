@@ -258,6 +258,26 @@ void OsgCamera::detachCurrentRenderTarget()
 	m_renderTarget = nullptr;
 }
 
+void OsgCamera::setViewport(int x, int y, int width, int height)
+{
+	m_camera->setViewport(x, y, width, height);
+}
+
+void OsgCamera::getViewport(int* x, int* y, int* width, int* height) const
+{
+	SURGSIM_ASSERT(x != nullptr && y != nullptr && width != nullptr && height != nullptr)
+			<< "Parameter can't be nullptr.";
+
+	auto viewPort = m_camera->getViewport();
+
+	SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
+
+	*x = viewPort->x();
+	*y = viewPort->y();
+	*width = viewPort->width();
+	*height = viewPort->height();
+}
+
 void OsgCamera::setPerspectiveProjection(double fovy, double aspect, double near, double far)
 {
 	m_camera->setProjectionMatrixAsPerspective(fovy, aspect, near, far);

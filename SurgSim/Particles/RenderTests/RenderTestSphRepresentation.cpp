@@ -28,7 +28,6 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/EmitterRepresentation.h"
-#include "SurgSim/Particles/Particle.h"
 #include "SurgSim/Particles/RandomSpherePointGenerator.h"
 #include "SurgSim/Particles/RenderTests/RenderTest.h"
 #include "SurgSim/Particles/SphRepresentation.h"

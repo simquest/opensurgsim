@@ -20,6 +20,7 @@
 #include <map>
 #include <osg/MatrixTransform>
 #include <osg/ref_ptr>
+#include <osgUtil/UpdateVisitor>
 #include <string>
 
 #include "SurgSim/Graphics/OsgRepresentation.h"
@@ -35,11 +36,6 @@ namespace osg
 class Node;
 class Shader;
 };
-
-namespace osgUtil
-{
-class UpdateVisitor;
-}
 
 namespace SurgSim
 {

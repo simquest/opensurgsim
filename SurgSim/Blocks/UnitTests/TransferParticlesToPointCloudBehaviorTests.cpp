@@ -26,8 +26,6 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Particles/Particle.h"
-#include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/SphRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
@@ -38,9 +36,6 @@ using SurgSim::Framework::Runtime;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
-using SurgSim::Particles::Particle;
-using SurgSim::Particles::ParticleReference;
-using SurgSim::Particles::ParticleSystemRepresentation;
 using SurgSim::Particles::SphRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 
@@ -73,67 +68,44 @@ TEST(TransferParticlesToPointCloudBehaviorTests, SetGetTargetTest)
 	EXPECT_EQ(pointCloud, behavior->getTarget());
 }
 
-namespace anonymous
-{
-void testdoInitialize(bool setSource, bool setTarget, bool expectedValidation)
+TEST(TransferParticlesToPointCloudBehaviorTests, WakeUpTest)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
-	auto behaviorManager = std::make_shared<BehaviorManager>();
-	runtime->addManager(behaviorManager);
 
-	auto sceneElement = std::make_shared<BasicSceneElement>("scene element");
-	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+	auto particles = std::make_shared<SphRepresentation>("Particles");
+	particles->setMassPerParticle(1.0);
+	particles->setDensity(1.0);
+	particles->setGasStiffness(1.0);
+	particles->setKernelSupport(1.0);
 
-	if (setSource)
+	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+
 	{
-		auto particles = std::make_shared<SphRepresentation>("Particles");
-		particles->setMassPerParticle(1.0);
-		particles->setDensity(1.0);
-		particles->setGasStiffness(1.0);
-		particles->setKernelSupport(1.0);
-		behavior->setSource(particles);
+		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+		EXPECT_TRUE(behavior->initialize(runtime));
+		EXPECT_FALSE(behavior->wakeUp());
 	}
 
-	if (setTarget)
 	{
-		auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
 		behavior->setTarget(pointCloud);
-	}
-
-	sceneElement->addComponent(behavior);
-
-	// Add the scene element into the runtime->scene trigger a calls to doInitialize
-	if (expectedValidation)
-	{
-		EXPECT_NO_THROW(runtime->getScene()->addSceneElement(sceneElement));
-	}
-	else
-	{
-		EXPECT_THROW(runtime->getScene()->addSceneElement(sceneElement), SurgSim::Framework::AssertionFailure);
-	}
-}
-}; // namespace anonymous
-
-TEST(TransferParticlesToPointCloudBehaviorTests, DoInitializeTest)
-{
-	{
-		SCOPED_TRACE("Unset Source and Target");
-		anonymous::testdoInitialize(false, false, false);
+		EXPECT_TRUE(behavior->initialize(runtime));
+		EXPECT_FALSE(behavior->wakeUp());
 	}
 
 	{
-		SCOPED_TRACE("Unset Source and set Target");
-		anonymous::testdoInitialize(false, true, false);
+		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+		behavior->setSource(particles);
+		EXPECT_TRUE(behavior->initialize(runtime));
+		EXPECT_FALSE(behavior->wakeUp());
 	}
 
 	{
-		SCOPED_TRACE("Set Source and unset Target");
-		anonymous::testdoInitialize(true, false, false);
-	}
-
-	{
-		SCOPED_TRACE("Set Source and set Target");
-		anonymous::testdoInitialize(true, true, true);
+		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+		behavior->setSource(particles);
+		behavior->setTarget(pointCloud);
+		EXPECT_TRUE(behavior->initialize(runtime));
+		EXPECT_TRUE(behavior->wakeUp());
 	}
 }
 
@@ -162,54 +134,32 @@ TEST(TransferParticlesToPointCloudBehaviorTests, UpdateTest)
 
 	for (size_t particleId = 0; particleId < 10; particleId++)
 	{
-		Particle p;
-		p.setLifetime(100000);
-		p.setPosition(Vector3d(static_cast<double>(particleId), 0.0, 0.0));
-		p.setVelocity(Vector3d::Zero());
-		particles->addParticle(p);
+		particles->addParticle(Vector3d(static_cast<double>(particleId), 0.0, 0.0), Vector3d::Zero(), 100000);
 	}
 
 	// Test doInitialize(), doWakeUP()
 	EXPECT_NO_THROW(runtime->start());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
-	auto& allParticles = particles->getParticleReferences();
+	auto& allParticles = particles->getParticles();
 	auto target = pointCloud->getVertices();
 	ASSERT_NE(0, target->getNumVertices());
-	ASSERT_NE(0, allParticles.size());
-	ASSERT_EQ(particles->getMaxParticles(), target->getNumVertices());
+	ASSERT_NE(0, allParticles.getNumVertices());
 
 	size_t nodeId = 0;
-	for (std::list<ParticleReference>::iterator particle = allParticles.begin();
-		particle != allParticles.end();
-		particle++)
+	for (; nodeId < allParticles.getNumVertices(); nodeId++)
 	{
-		EXPECT_TRUE(particle->getPosition().isApprox(target->getVertex(nodeId).position));
-		nodeId++;
-	}
-	for (; nodeId < particles->getMaxParticles(); nodeId++)
-	{
-		EXPECT_TRUE(target->getVertex(nodeId).position.isZero());
-		nodeId++;
+		EXPECT_TRUE(allParticles.getVertex(nodeId).position.isApprox(target->getVertex(nodeId).position));
 	}
 
 	// Test TransferParticlesToGraphicsBehavior::update()
-	particles->removeParticle(allParticles.front());
-	particles->removeParticle(allParticles.back());
+	allParticles.getVertices().pop_back();
+	allParticles.getVertices().pop_back();
 	behavior->update(1.0);
 
-	nodeId = 0;
-	for (std::list<ParticleReference>::const_iterator particle = allParticles.cbegin();
-		particle != allParticles.cend();
-		particle++)
+	for (nodeId = 0; nodeId < allParticles.getNumVertices(); nodeId++)
 	{
-		EXPECT_TRUE(particle->getPosition().isApprox(target->getVertex(nodeId).position));
-		nodeId++;
-	}
-	for (; nodeId < particles->getMaxParticles(); nodeId++)
-	{
-		EXPECT_TRUE(target->getVertex(nodeId).position.isZero());
-		nodeId++;
+		EXPECT_TRUE(allParticles.getVertex(nodeId).position.isApprox(target->getVertex(nodeId).position));
 	}
 
 	runtime->stop();

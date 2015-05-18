@@ -114,7 +114,7 @@ public:
 			m_physicsManagerState->getMlcpProblem().A.setZero(nbConstraint, nbConstraint);
 			m_physicsManagerState->getMlcpProblem().b.setZero(nbConstraint);
 			m_physicsManagerState->getMlcpProblem().CHt.setZero(nbDof, nbConstraint);
-			m_physicsManagerState->getMlcpProblem().H.resize(nbConstraint, nbDof);
+			m_physicsManagerState->getMlcpProblem().H.setZero(nbConstraint, nbDof);
 			m_physicsManagerState->getMlcpProblem().mu.setZero(nbConstraint);
 			m_physicsManagerState->getMlcpProblem().constraintTypes.clear();
 

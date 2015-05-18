@@ -36,6 +36,8 @@ set(LEAP_DEVICE_HEADERS
 	LeapScaffold.h
 )
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} LeapDevice.h PARENT_SCOPE)
+
 surgsim_add_library(
    LeapDevice
    "${LEAP_DEVICE_SOURCES}"

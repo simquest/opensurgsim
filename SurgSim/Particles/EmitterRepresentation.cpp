@@ -21,7 +21,6 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Shape.h"
-#include "SurgSim/Particles/Particle.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
 
 using SurgSim::Math::Vector3d;
@@ -109,7 +108,7 @@ void EmitterRepresentation::update(double dt)
 		lifetime = m_zeroOneDistribution(m_generator);
 		lifetime = m_lifetimeRange.first + (m_lifetimeRange.second - m_lifetimeRange.first) * lifetime;
 
-		if (!m_target->addParticle(Particle(position, velocity, lifetime)))
+		if (!m_target->addParticle(position, velocity, lifetime))
 		{
 			SURGSIM_LOG_DEBUG(m_logger) << "Unable to add particle to " << m_target->getName();
 			break;

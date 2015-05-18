@@ -70,8 +70,8 @@ TEST(OsgUniformBaseTests, StateSetTest)
 	/// Remove the uniform from the state set
 	uniform.removeFromStateSet(stateSet.get());
 
-	EXPECT_EQ(0u, uniforms.size()) <<
-								   "State set should no longer have any uniforms, the uniform should have been removed!";
+	EXPECT_EQ(0u, uniforms.size())
+			<< "State set should no longer have any uniforms, the uniform should have been removed!";
 }
 
 }  // namespace Graphics

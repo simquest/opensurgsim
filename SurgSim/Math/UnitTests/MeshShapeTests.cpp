@@ -289,7 +289,7 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 	}
 }
 
-TEST_F(MeshShapeTest, SetPoseTest)
+TEST_F(MeshShapeTest, TransformTest)
 {
 	const std::string fileName = "MeshShapeData/staple_collision.ply";
 	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
@@ -300,7 +300,8 @@ TEST_F(MeshShapeTest, SetPoseTest)
 
 	RigidTransform3d transform = makeRigidTransform(Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5),
 			Vector3d(8.7, -4.7, -3.1));
-	EXPECT_TRUE(actualMesh->setPose(transform));
+	actualMesh->transform(transform);
+	EXPECT_TRUE(actualMesh->update());
 
 	Vector3d expectedPosition;
 	ASSERT_EQ(originalMesh->getNumVertices(), actualMesh->getNumVertices());
@@ -321,7 +322,8 @@ TEST_F(MeshShapeTest, SetPoseTest)
 	}
 
 	// Expect indeterminate normals due to numerical precision.
-	EXPECT_FALSE(actualMesh->setPose(makeRigidTranslation(Vector3d(1e100, 1e100, 1e100))));
+	actualMesh->transform(makeRigidTranslation(Vector3d(1e100, 1e100, 1e100)));
+	EXPECT_FALSE(actualMesh->update());
 }
 
 TEST_F(MeshShapeTest, NormalTest)

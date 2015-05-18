@@ -102,7 +102,7 @@ public:
 	/// Determines whether the associated coordinate is valid
 	/// \param coordinate Coordinate to check
 	/// \return True if coordinate is valid
-	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate &coordinate) const;
+	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -113,13 +113,18 @@ public:
 	/// Set the compliance warping flag
 	/// \param useComplianceWarping True to use compliance warping, False otherwise
 	/// \exception SurgSim::Framework::AssertionFailure If the call is done after initialization
+	/// \note Compliance warping is currently disabled in this version.
 	void setComplianceWarping(bool useComplianceWarping);
 
 	/// Get the compliance warping flag (default = false)
 	/// \return True if compliance warping is used, False otherwise
 	bool getComplianceWarping() const;
 
-	const SurgSim::Math::Matrix& getComplianceMatrix() const override;
+	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param b The input matrix b
+	/// \return Returns the matrix \f$C.b\f$
+	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
@@ -131,19 +136,19 @@ public:
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	const SurgSim::Math::Matrix& computeM(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::SparseMatrix& computeM(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	const SurgSim::Math::Matrix& computeD(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::SparseMatrix& computeD(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	const SurgSim::Math::Matrix& computeK(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::SparseMatrix& computeK(const SurgSim::Math::OdeState& state) override;
 
 	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
@@ -154,8 +159,8 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f, SurgSim::Math::Matrix** M,
-			SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
+	void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f, SurgSim::Math::SparseMatrix** M,
+					 SurgSim::Math::SparseMatrix** D, SurgSim::Math::SparseMatrix** K) override;
 
 protected:
 	/// Adds the Rayleigh damping forces
@@ -170,7 +175,8 @@ protected:
 	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is False
 	/// \note    the {mass|stiffness} component will be computed FemElement by FemElement
 	void addRayleighDampingForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state,
-		bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false, double scale = 1.0);
+								 bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false,
+								 double scale = 1.0);
 
 	/// Adds the FemElements forces to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the FemElements forces into
@@ -183,7 +189,7 @@ protected:
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the gravity force with
 	/// \note This method does not do anything if gravity is disabled
-	void addGravityForce(SurgSim::Math::Vector *f, const SurgSim::Math::OdeState& state, double scale = 1.0);
+	void addGravityForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state, double scale = 1.0);
 
 	bool doInitialize() override;
 
@@ -215,7 +221,8 @@ private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K
 	/// Matrices: D = damping, M = mass, K = stiffness
-	struct {
+	struct
+	{
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
@@ -223,8 +230,6 @@ private:
 	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
 
 	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
-
-	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
 
 	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
 	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;

@@ -18,8 +18,9 @@
 
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
@@ -57,7 +58,7 @@ typedef enum
 /// Generic rigid shape class defining a shape
 /// \note This class gives the ability to analyze the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
-class Shape : virtual public SurgSim::Framework::Accessible
+class Shape : virtual public SurgSim::Framework::Accessible, public Framework::FactoryBase<Shape>
 {
 public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
@@ -82,10 +83,10 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const = 0;
 
-	typedef SurgSim::Framework::ObjectFactory<SurgSim::Math::Shape> FactoryType;
-
-	/// \return The static class factory that is being used in the conversion.
-	static FactoryType& getFactory();
+	/// Get a copy of this shape with an applied rigid transform
+	/// \param pose The pose to transform the shape by
+	/// \return the posed shape
+	virtual std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose);
 
 	/// Get class name
 	virtual std::string getClassName() const;

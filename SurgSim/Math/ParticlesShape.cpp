@@ -30,6 +30,13 @@ ParticlesShape::ParticlesShape(double radius) :
 	m_radius(radius)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
+	update();
+}
+
+ParticlesShape::ParticlesShape(const ParticlesShape& other) :
+	DataStructures::Vertices<DataStructures::EmptyData>(other)
+{
+	update();
 }
 
 int ParticlesShape::getType() const
@@ -102,6 +109,14 @@ bool ParticlesShape::doUpdate()
 	m_aabbTree->set(std::move(items));
 
 	return true;
+}
+
+std::shared_ptr<Shape> ParticlesShape::getTransformed(const RigidTransform3d& pose)
+{
+	auto transformed = std::make_shared<ParticlesShape>(*this);
+	transformed->transform(pose);
+	transformed->update();
+	return transformed;
 }
 
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::getAabbTree() const

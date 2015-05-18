@@ -21,10 +21,7 @@ set(UNIT_TEST_SOURCES
 	EmitterRepresentationTests.cpp
 	MockObjects.cpp
 	ParticleManagerTests.cpp
-	ParticleReferenceTests.cpp
-	ParticlesStateTests.cpp
 	ParticleSystemRepresentationTests.cpp
-	ParticleTests.cpp
 	PointGeneratorTests.cpp
 	RandomPointGeneratorTests.cpp
 	SphRepresentationTests.cpp

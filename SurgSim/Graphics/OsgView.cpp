@@ -159,6 +159,7 @@ void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 
 	View::setCamera(camera);
 	m_view->setCamera(osgCamera->getOsgCamera());
+	osgCamera->setViewport(0, 0, m_dimensions[0], m_dimensions[1]);
 }
 
 void OsgView::update(double dt)

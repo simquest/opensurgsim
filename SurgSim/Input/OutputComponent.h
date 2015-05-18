@@ -71,6 +71,9 @@ public:
 	/// \param dataGroup The data to output.
 	void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
 
+	/// \return The data which may be empty.
+	DataStructures::DataGroup getData() const;
+
 	/// Overridden from Component, do nothing
 	virtual bool doInitialize();
 
