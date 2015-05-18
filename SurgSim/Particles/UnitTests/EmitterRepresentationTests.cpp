@@ -28,8 +28,6 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/EmitterRepresentation.h"
-#include "SurgSim/Particles/Particle.h"
-#include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/UnitTests/MockObjects.h"
 
 using SurgSim::Framework::Component;
@@ -174,29 +172,29 @@ TEST(EmitterRepresentationTest, Update)
 	ASSERT_TRUE(particleSystem->wakeUp());
 
 	emitter->update(0.1);
-	EXPECT_EQ(1, particleSystem->getParticleReferences().size());
+	EXPECT_EQ(1, particleSystem->getParticles().getNumVertices());
 
 	emitter->update(0.05);
-	EXPECT_EQ(1, particleSystem->getParticleReferences().size());
+	EXPECT_EQ(1, particleSystem->getParticles().getNumVertices());
 	emitter->update(0.05);
-	EXPECT_EQ(2, particleSystem->getParticleReferences().size());
+	EXPECT_EQ(2, particleSystem->getParticles().getNumVertices());
 
 	emitter->update(0.9);
-	EXPECT_EQ(10, particleSystem->getParticleReferences().size());
+	EXPECT_EQ(10, particleSystem->getParticles().getNumVertices());
 	emitter->update(0.2);
-	EXPECT_EQ(10, particleSystem->getParticleReferences().size())
+	EXPECT_EQ(10, particleSystem->getParticles().getNumVertices())
 		<< "Particles should not have been added, the particle system should have reached its maximum.";
 
 	particleSystem->update(1.0);
-	auto particles = particleSystem->getParticleReferences();
+	auto particles = particleSystem->getParticles().getVertices();
 	ASSERT_EQ(10, particles.size());
 	for (auto particle : particles)
 	{
-		EXPECT_NEAR(sphere->getRadius(), particle.getPosition().norm(), 1e-9);
-		EXPECT_LT(4.0, particle.getLifetime());
-		EXPECT_GT(9.0, particle.getLifetime());
-		EXPECT_TRUE((Vector3d::Ones().array() <= particle.getVelocity().array()).all());
-		EXPECT_TRUE((Vector3d::Constant(2.0).array() >= particle.getVelocity().array()).all());
+		EXPECT_NEAR(sphere->getRadius(), particle.position.norm(), 1e-9);
+		EXPECT_LT(4.0, particle.data.lifetime);
+		EXPECT_GT(9.0, particle.data.lifetime);
+		EXPECT_TRUE((Vector3d::Ones().array() <= particle.data.velocity.array()).all());
+		EXPECT_TRUE((Vector3d::Constant(2.0).array() >= particle.data.velocity.array()).all());
 	}
 }
 
@@ -231,21 +229,20 @@ TEST(EmitterRepresentationTest, PosedUpdate)
 			Vector3d(2.0, -2.0, 2.0));
 
 	emitter->update(1.0);
-	ASSERT_EQ(1, particleSystem->getParticleReferences().size());
+	ASSERT_EQ(1, particleSystem->getParticles().getNumVertices());
 
 	emitter->setLocalPose(pose1);
 	emitter->update(1.0);
-	ASSERT_EQ(2, particleSystem->getParticleReferences().size());
+	ASSERT_EQ(2, particleSystem->getParticles().getNumVertices());
 
 	element->setPose(pose2);
 	emitter->update(1.0);
-	ASSERT_EQ(3, particleSystem->getParticleReferences().size());
+	ASSERT_EQ(3, particleSystem->getParticles().getNumVertices());
 
-	std::vector<Particle> particles(particleSystem->getParticleReferences().cbegin(),
-			particleSystem->getParticleReferences().cend());
-	EXPECT_GT(sphere->getRadius(), particles[0].getPosition().norm());
-	EXPECT_GT(sphere->getRadius(), (pose1.inverse() * particles[1].getPosition()).norm());
-	EXPECT_GT(sphere->getRadius(), ((pose2 * pose1).inverse() * particles[2].getPosition()).norm());
+	auto particles = particleSystem->getParticles().getVertices();
+	EXPECT_GT(sphere->getRadius(), particles[0].position.norm());
+	EXPECT_GT(sphere->getRadius(), (pose1.inverse() * particles[1].position).norm());
+	EXPECT_GT(sphere->getRadius(), ((pose2 * pose1).inverse() * particles[2].position).norm());
 }
 
 TEST(EmitterRepresentationTest, Serialization)

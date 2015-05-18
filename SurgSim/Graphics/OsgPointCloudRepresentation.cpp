@@ -68,7 +68,7 @@ OsgPointCloudRepresentation::~OsgPointCloudRepresentation()
 
 void OsgPointCloudRepresentation::doUpdate(double dt)
 {
-	auto vertices = m_vertices->getVertices();
+	auto& vertices = m_vertices->getVertices();
 	size_t count = vertices.size();
 
 	// Check for size change in number of vertices

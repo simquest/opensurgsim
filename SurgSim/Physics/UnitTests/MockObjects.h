@@ -259,6 +259,7 @@ class MockFemElement : public FemElement
 {
 public:
 	MockFemElement();
+	explicit MockFemElement(std::vector<size_t> nodeIds);
 
 	void addNode(size_t nodeId);
 
@@ -279,6 +280,7 @@ public:
 	bool isInitialized() const;
 
 private:
+	void init();
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
 	bool m_isInitialized;

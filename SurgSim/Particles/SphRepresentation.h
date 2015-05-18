@@ -21,7 +21,6 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
 
 namespace SurgSim
@@ -35,9 +34,6 @@ class Grid;
 
 namespace Particles
 {
-
-class Particle;
-class ParticlesState;
 
 SURGSIM_STATIC_REGISTRATION(SphRepresentation);
 
@@ -156,10 +152,11 @@ public:
 	const std::vector<SphRepresentation::PlaneConstraint>& getPlaneConstraints() const;
 
 protected:
-	std::vector<SurgSim::Math::Vector3d> m_normal;  ///< Particles' normal
-	std::vector<double> m_density;                  ///< Particles' density
-	std::vector<double> m_pressure;                 ///< Particles' pressure
-	std::vector<double> m_mass;                     ///< Particles' mass
+	std::vector<SurgSim::Math::Vector3d> m_normal;  		///< Particles' normal
+	std::vector<SurgSim::Math::Vector3d> m_acceleration;	///< Particles' acceleration
+	std::vector<double> m_density;                  		///< Particles' density
+	std::vector<double> m_pressure;                 		///< Particles' pressure
+	std::vector<double> m_mass;                     		///< Particles' mass
 	double m_massPerParticle;                       ///< Mass per particle (determine the density of particle per m3)
 	double m_densityReference;                      ///< Density of the reference gas
 	double m_gasStiffness;                          ///< Stiffness of the gas considered

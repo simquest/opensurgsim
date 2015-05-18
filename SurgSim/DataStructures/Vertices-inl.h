@@ -43,6 +43,35 @@ Vertices<VertexData>::Vertices(const Vertices<V>& other)
 }
 
 template <class VertexData>
+template <class V>
+Vertices<VertexData>& Vertices<VertexData>::operator=(const Vertices<V>& other)
+{
+	auto& otherVertices = other.getVertices();
+
+	if (otherVertices.size() < m_vertices.size())
+	{
+		m_vertices.resize(otherVertices.size());
+	}
+	else
+	{
+		m_vertices.reserve(otherVertices.size());
+	}
+
+	auto vertex = m_vertices.begin();
+	auto otherVertex = otherVertices.begin();
+	for (; vertex != m_vertices.end(); ++vertex, ++otherVertex)
+	{
+		*vertex = *otherVertex;
+	}
+	for (; otherVertex != otherVertices.end(); ++otherVertex)
+	{
+		addVertex(VertexType(*otherVertex));
+	}
+
+	return *this;
+}
+
+template <class VertexData>
 Vertices<VertexData>::~Vertices()
 {
 }

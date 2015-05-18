@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
@@ -52,6 +53,10 @@ public:
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
 	virtual void initialize(const SurgSim::Math::OdeState& state);
+
+	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::vector<size_t>> FactoryType;
+
+	static FactoryType& getFactory();
 
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node

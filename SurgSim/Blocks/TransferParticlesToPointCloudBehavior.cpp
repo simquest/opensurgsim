@@ -22,7 +22,6 @@
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Particles/ParticleReference.h"
 #include "SurgSim/Particles/ParticleSystemRepresentation.h"
 
 using SurgSim::Framework::checkAndConvert;
@@ -72,49 +71,27 @@ std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation>
 
 void TransferParticlesToPointCloudBehavior::update(double dt)
 {
-	auto target = m_target->getVertices();
-	size_t nodeId = 0;
-
-	for (auto particle : m_source->getParticleReferences())
-	{
-		target->setVertexPosition(nodeId, particle.getPosition());
-		nodeId++;
-	}
-
-	for (; nodeId < m_source->getMaxParticles(); ++nodeId)
-	{
-		target->setVertexPosition(nodeId, SurgSim::Math::Vector3d::Zero());
-	}
+	*m_target->getVertices() = m_source->getParticles();
 }
 
 bool TransferParticlesToPointCloudBehavior::doInitialize()
 {
-	SURGSIM_ASSERT(m_source != nullptr) << "SetSource must be called prior to initialization";
-	SURGSIM_ASSERT(m_target != nullptr) << "SetTarget must be called prior to initialization";
-
 	return true;
 }
 
 bool TransferParticlesToPointCloudBehavior::doWakeUp()
 {
-	auto target = m_target->getVertices();
-
-	if (target->getNumVertices() == 0)
+	if (m_source == nullptr)
 	{
-		size_t nodeId = 0;
-
-		for (auto particle : m_source->getParticleReferences())
-		{
-			SurgSim::Graphics::PointCloud::VertexType vertex(particle.getPosition());
-			target->addVertex(vertex);
-			nodeId++;
-		}
-
-		for (; nodeId < m_source->getMaxParticles(); ++nodeId)
-		{
-			SurgSim::Graphics::PointCloud::VertexType vertex(SurgSim::Math::Vector3d::Zero());
-			target->addVertex(vertex);
-		}
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
+				getName() + "' must have a source.";
+		return false;
+	}
+	if (m_target == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
+				getName() + "' must have a target.";
+		return false;
 	}
 
 	return true;
