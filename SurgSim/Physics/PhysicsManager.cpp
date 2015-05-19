@@ -22,6 +22,7 @@
 #include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/FreeMotion.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/ParticleCollisionResponse.h"
 #include "SurgSim/Physics/PostUpdate.h"
 #include "SurgSim/Physics/PreUpdate.h"
 #include "SurgSim/Physics/PushResults.h"
@@ -61,6 +62,7 @@ bool PhysicsManager::doInitialize()
 	addComputation(std::make_shared<BuildMlcp>(copyState));
 	addComputation(std::make_shared<SolveMlcp>(copyState));
 	addComputation(std::make_shared<PushResults>(copyState));
+	addComputation(std::make_shared<ParticleCollisionResponse>(copyState));
 	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
 	addComputation(std::make_shared<PostUpdate>(copyState));
 

@@ -70,6 +70,21 @@ TEST(SphRepresentationTest, SetGetTest)
 	sph->setViscosity(0.04);
 	EXPECT_DOUBLE_EQ(0.04, sph->getViscosity());
 
+	EXPECT_DOUBLE_EQ(0.0, sph->getStiffness());
+	EXPECT_NO_THROW(sph->setStiffness(0.0));
+	sph->setStiffness(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getStiffness());
+
+	EXPECT_DOUBLE_EQ(0.0, sph->getDamping());
+	EXPECT_NO_THROW(sph->setDamping(0.0));
+	sph->setDamping(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getDamping());
+
+	EXPECT_DOUBLE_EQ(0.0, sph->getFriction());
+	EXPECT_NO_THROW(sph->setFriction(0.0));
+	sph->setFriction(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getFriction());
+
 	EXPECT_DOUBLE_EQ(0.0, sph->getKernelSupport());
 	EXPECT_THROW(sph->setKernelSupport(0.0), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(sph->setKernelSupport(-1.0), SurgSim::Framework::AssertionFailure);
@@ -320,6 +335,9 @@ TEST(SphRepresentationTest, SerializationTest)
 	sph->addPlaneConstraint(p);
 	sph->setSurfaceTension(10.1);
 	sph->setViscosity(11.11);
+	sph->setStiffness(12.12);
+	sph->setDamping(13.13);
+	sph->setFriction(0.14);
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*sph));
@@ -343,6 +361,9 @@ TEST(SphRepresentationTest, SerializationTest)
 	EXPECT_DOUBLE_EQ(sph->getSurfaceTension(),
 		newRepresentation->getValue<double>("SurfaceTension"));
 	EXPECT_DOUBLE_EQ(sph->getViscosity(), newRepresentation->getValue<double>("Viscosity"));
+	EXPECT_DOUBLE_EQ(sph->getStiffness(), newRepresentation->getValue<double>("Stiffness"));
+	EXPECT_DOUBLE_EQ(sph->getDamping(), newRepresentation->getValue<double>("Damping"));
+	EXPECT_DOUBLE_EQ(sph->getFriction(), newRepresentation->getValue<double>("Friction"));
 }
 
 }; // namespace Particles

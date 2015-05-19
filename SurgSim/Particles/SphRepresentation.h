@@ -139,6 +139,30 @@ public:
 	/// \return The length of the kernel support [m]
 	double getKernelSupport() const;
 
+	/// Set the particles stiffness when colliding
+	/// \param stiffness The stiffness [N/m]
+	void setStiffness(double stiffness);
+
+	/// Get the particles stiffness when colliding
+	/// \return The stiffness [N/m]
+	double getStiffness() const;
+
+	/// Set the particles damping when colliding
+	/// \param damping The damping [Ns/m]
+	void setDamping(double damping);
+
+	/// Get the particles damping when colliding
+	/// \return The damping [Ns/m]
+	double getDamping() const;
+
+	/// Set the sliding coefficient of friction for the particles during collisions
+	/// \param coefficient The sliding coefficient of friction
+	void setFriction(double friction);
+
+	/// Get the sliding coefficient of friction for the particles during collisions
+	/// \return The sliding coefficient of friction
+	double getFriction() const;
+
 	/// Add a plane constraint
 	/// \param planeConstraint to interact with the fluid
 	void addPlaneConstraint(const PlaneConstraint& planeConstraint);
@@ -161,6 +185,9 @@ protected:
 	double m_densityReference;                      ///< Density of the reference gas
 	double m_gasStiffness;                          ///< Stiffness of the gas considered
 	double m_surfaceTension;                        ///< Surface tension
+	double m_stiffness;                             ///< Collision stiffness
+	double m_damping;                               ///< Collision damping
+	double m_friction;                              ///< Collision sliding friction coefficient
 
 	SurgSim::Math::Vector3d m_gravity;              ///< 3D Gravity vector
 	double m_viscosity;                             ///< Viscosity coefficient
@@ -177,6 +204,8 @@ protected:
 	bool doInitialize() override;
 
 	bool doUpdate(double dt) override;
+
+	bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) override;
 
 	/// Compute the particles' acceleration given a time step dt
 	/// \param dt The time step to advance the simulation too
@@ -201,9 +230,6 @@ private:
 
 	/// Compute the Sph accelerations
 	virtual void computeAccelerations();
-
-	/// Compute collision detection and response against all plane constraints
-	virtual void handleCollisions();
 
 	/// Kernel poly6
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$

@@ -28,6 +28,11 @@ bool MockParticleSystem::doUpdate(double dt)
 	return true;
 }
 
+bool MockParticleSystem::doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions)
+{
+	return true;
+}
+
 MockEmitter::MockEmitter(const std::string& name) :
 	SurgSim::Particles::Emitter(name),
 	updateCount(0)

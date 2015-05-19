@@ -75,7 +75,7 @@ bool Representation::addParticle(const Particle& particle)
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Unable to add another particle, maximum has been reached ("
+		SURGSIM_LOG_DEBUG(m_logger) << "Unable to add another particle, maximum has been reached ("
 			<< m_maxParticles << ").";
 		result = false;
 	}
@@ -112,6 +112,18 @@ void Representation::update(double dt)
 	if (!doUpdate(dt))
 	{
 		SURGSIM_LOG_WARNING(m_logger) << "Particle System " << getName() << " failed to update.";
+	}
+}
+
+void Representation::handleCollisions(double dt)
+{
+	auto collisionRepresentation = m_collisionRepresentation;
+	if (collisionRepresentation != nullptr)
+	{
+		if (!doHandleCollisions(dt, collisionRepresentation->getCollisions().unsafeGet()))
+		{
+			SURGSIM_LOG_WARNING(m_logger) << "Particle System " << getName() << " failed to handle collisions.";
+		}
 	}
 }
 

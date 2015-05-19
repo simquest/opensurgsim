@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/Particles.h"
@@ -29,11 +30,6 @@
 
 namespace SurgSim
 {
-
-namespace Collision
-{
-class Representation;
-};
 
 namespace Framework
 {
@@ -86,6 +82,10 @@ public:
 	/// \param dt The time step.
 	void update(double dt);
 
+	/// Handle collisions with particle system
+	/// \param dt The time step.
+	void handleCollisions(double dt);
+
 	/// Set the collision representation for this Particle Representation
 	/// \param representation The collision representation to be set
 	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
@@ -98,6 +98,10 @@ protected:
 	/// Implementation of the specific behavior of the particle system
 	/// \return True if update succeeded, False otherwise.
 	virtual bool doUpdate(double dt) = 0;
+
+	/// Implementation of the specific collision handling of the particle system
+	/// \return True if succeeded, False otherwise.
+	virtual bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) = 0;
 
 	bool doInitialize() override;
 

@@ -31,6 +31,7 @@ public:
 
 private:
 	bool doUpdate(double dt) override;
+	virtual bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) override;
 };
 
 class MockEmitter : public SurgSim::Particles::Emitter
