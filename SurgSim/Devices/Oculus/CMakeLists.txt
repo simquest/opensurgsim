@@ -13,7 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OculusSdk 0.5.0.1 EXACT REQUIRED)
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	find_package(OculusSdk 0.6.0.0 EXACT REQUIRED)
+else()
+	find_package(OculusSdk 0.5.0.1 EXACT REQUIRED)
+endif()
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"

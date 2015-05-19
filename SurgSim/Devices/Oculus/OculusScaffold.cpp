@@ -19,7 +19,12 @@
 #include <boost/thread/mutex.hpp>
 #include <list>
 #include <memory>
+
+#ifdef WIN32
+#include <OVR_CAPI_0_6_0.h>
+#else
 #include <OVR_CAPI_0_5_0.h>
+#endif
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
@@ -49,8 +54,13 @@ struct OculusScaffold::DeviceData
 	/// \param index Index of Oculus device to be created. If exists, a valid handle will be held in 'handle'.
 	DeviceData(OculusDevice* device, int index) :
 		deviceObject(device),
-		handle(ovrHmd_Create(index))
+		handle(nullptr)
 	{
+#ifdef WIN32
+		ovrHmd_Create(index, &handle);
+#else
+		handle = ovrHmd_Create(index);
+#endif
 	}
 
 	~DeviceData()
@@ -88,7 +98,11 @@ OculusScaffold::OculusScaffold() :
 	// positional tracking is done at 60Hz.
 	setRate(1000.0);
 
-	ovr_Initialize();
+#ifdef WIN32
+	SURGSIM_ASSERT(ovrSuccess == ovr_Initialize(nullptr)) << "Oculus SDK initialization failed.";
+#else
+	SURGSIM_ASSERT(ovrTrue == ovr_Initialize(nullptr)) << "Oculus SDK initialization failed.";
+#endif
 }
 
 OculusScaffold::~OculusScaffold()
@@ -120,9 +134,15 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 		}
 		else
 		{
-			if (ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
-													   ovrTrackingCap_MagYawCorrection |
-													   ovrTrackingCap_Position, 0))
+#ifdef WIN32
+			if (ovrSuccess == ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
+																	 ovrTrackingCap_MagYawCorrection |
+																	 ovrTrackingCap_Position, 0))
+#else
+			if (ovrTrue == ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
+																  ovrTrackingCap_MagYawCorrection |
+																  ovrTrackingCap_Position, 0))
+#endif
 			{
 				m_state->registeredDevices.emplace_back(std::move(info));
 				SURGSIM_LOG_INFO(m_logger) << "Device " << getName() << ": registered.";
