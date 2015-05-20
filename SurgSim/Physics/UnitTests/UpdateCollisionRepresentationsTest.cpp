@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file UpdateCollisionsTest.cpp
-/// Tests for the UpdateCollisions Class
+/// \file UpdateCollisionRepresentationsTest.cpp
+/// Tests for the UpdateCollisionRepresentations Class
 
 #include <memory>
 #include <vector>
@@ -25,19 +25,19 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
-#include "SurgSim/Physics/UpdateCollisions.h"
+#include "SurgSim/Physics/UpdateCollisionRepresentations.h"
 
 using SurgSim::Physics::MockCollisionRepresentation;
 using SurgSim::Physics::PhysicsManagerState;
-using SurgSim::Physics::UpdateCollisions;
+using SurgSim::Physics::UpdateCollisionRepresentations;
 
-TEST(UpdateCollisionsTest, Construction)
+TEST(UpdateCollisionRepresentationsTest, Construction)
 {
-	EXPECT_NO_THROW(UpdateCollisions computation(true););
-	EXPECT_NO_THROW(UpdateCollisions computation(false););
+	EXPECT_NO_THROW(UpdateCollisionRepresentations computation(true););
+	EXPECT_NO_THROW(UpdateCollisionRepresentations computation(false););
 }
 
-TEST(UpdateCollisionsTest, Update)
+TEST(UpdateCollisionRepresentationsTest, Update)
 {
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
 
@@ -60,7 +60,7 @@ TEST(UpdateCollisionsTest, Update)
 	collision2->setLocalActive(false);
 
 	// Test compuation.update()
-	SurgSim::Physics::UpdateCollisions computation(false);
+	SurgSim::Physics::UpdateCollisionRepresentations computation(false);
 	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);
 
 	// Test the m_numberOfTimesUpdateCalled before calling update().

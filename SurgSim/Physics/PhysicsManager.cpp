@@ -27,7 +27,7 @@
 #include "SurgSim/Physics/PushResults.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/SolveMlcp.h"
-#include "SurgSim/Physics/UpdateCollisions.h"
+#include "SurgSim/Physics/UpdateCollisionRepresentations.h"
 
 namespace SurgSim
 {
@@ -55,13 +55,13 @@ bool PhysicsManager::doInitialize()
 	bool copyState = false;
 	addComputation(std::make_shared<PreUpdate>(copyState));
 	addComputation(std::make_shared<FreeMotion>(copyState));
-	addComputation(std::make_shared<UpdateCollisions>(copyState));
+	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
 	addComputation(std::make_shared<DcdCollision>(copyState));
 	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
 	addComputation(std::make_shared<BuildMlcp>(copyState));
 	addComputation(std::make_shared<SolveMlcp>(copyState));
 	addComputation(std::make_shared<PushResults>(copyState));
-	addComputation(std::make_shared<UpdateCollisions>(copyState));
+	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
 	addComputation(std::make_shared<PostUpdate>(copyState));
 
 	return true;

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_UPDATECOLLISIONS_H
-#define SURGSIM_PHYSICS_UPDATECOLLISIONS_H
+#ifndef SURGSIM_PHYSICS_UPDATECOLLISIONREPRESENTATIONS_H
+#define SURGSIM_PHYSICS_UPDATECOLLISIONREPRESENTATIONS_H
 
 #include "SurgSim/Physics/Computation.h"
 
@@ -24,15 +24,15 @@ namespace Physics
 {
 
 /// Computation that calls the CollisionRepresentations update() function
-class UpdateCollisions : public Computation
+class UpdateCollisionRepresentations : public Computation
 {
 public:
 	/// Constructor
 	/// \param doCopyState whether to copy the PhysicsManagerState on update
-	explicit UpdateCollisions(bool doCopyState);
+	explicit UpdateCollisionRepresentations(bool doCopyState);
 
 	/// Destructor
-	virtual ~UpdateCollisions();
+	virtual ~UpdateCollisionRepresentations();
 
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 		override;

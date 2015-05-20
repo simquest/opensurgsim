@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/UpdateCollisions.h"
+#include "SurgSim/Physics/UpdateCollisionRepresentations.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Collision/Representation.h"
 
@@ -21,18 +21,18 @@ namespace SurgSim
 {
 namespace Physics
 {
-UpdateCollisions::UpdateCollisions(bool doCopyState) :
+UpdateCollisionRepresentations::UpdateCollisionRepresentations(bool doCopyState) :
 	Computation(doCopyState)
 {
 
 }
 
-UpdateCollisions::~UpdateCollisions()
+UpdateCollisionRepresentations::~UpdateCollisionRepresentations()
 {
 
 }
 
-std::shared_ptr<PhysicsManagerState> SurgSim::Physics::UpdateCollisions::doUpdate(const double& dt,
+std::shared_ptr<PhysicsManagerState> SurgSim::Physics::UpdateCollisionRepresentations::doUpdate(const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;

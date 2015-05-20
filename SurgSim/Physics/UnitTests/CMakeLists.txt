@@ -74,7 +74,7 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationTest.cpp
 	RigidStateTest.cpp
 	SolveMlcpTests.cpp
-	UpdateCollisionsTest.cpp
+	UpdateCollisionRepresentationsTest.cpp
 	VirtualToolCouplerTest.cpp
 )
 

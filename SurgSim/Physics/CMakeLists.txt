@@ -71,7 +71,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidState.cpp
 	SolveMlcp.cpp
 	Spring.cpp
-	UpdateCollisions.cpp
+	UpdateCollisionRepresentations.cpp
 	VirtualToolCoupler.cpp
 )
 
@@ -138,7 +138,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidState.h
 	SolveMlcp.h
 	Spring.h
-	UpdateCollisions.h
+	UpdateCollisionRepresentations.h
 	VirtualToolCoupler.h
 )
 surgsim_create_library_header(Physics.h "${SURGSIM_PHYSICS_HEADERS}")
