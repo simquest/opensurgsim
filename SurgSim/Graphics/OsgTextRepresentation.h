@@ -86,8 +86,8 @@ public:
 	void setFontSize(double size) override;
 	double getFontSize() const override;
 
-	virtual void setUseScreenSpace(bool value) override;
-	virtual bool isUsingScreenSpace() const override;
+	void setUseScreenSpace(bool value) override;
+	bool isUsingScreenSpace() const override;
 
 	enum Anchor
 	{
