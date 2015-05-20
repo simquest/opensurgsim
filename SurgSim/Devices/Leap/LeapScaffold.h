@@ -47,7 +47,7 @@ private:
 	/// Internal shared state data type.
 	struct StateData;
 
-	/// Interal per-device information.
+	/// Internal per-device information.
 	struct DeviceData;
 
 	/// Class for receiving data from the Leap SDK
@@ -77,11 +77,6 @@ private:
 	/// \param info The device data
 	/// \return true on success, false on failure.
 	bool doRegisterDevice(DeviceData* info);
-
-	/// Do the Leap specific unregistration
-	/// \param info The device data
-	/// \return true on success, false on failure.
-	bool doUnregisterDevice(DeviceData* info);
 
 	/// Handle a new frame of data
 	void handleFrame();

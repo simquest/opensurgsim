@@ -47,7 +47,9 @@ public:
 		return m_uniform->getName();
 	}
 
-	/// Sets the value of the uniform from a YAML Node doing the correct conversion
+	/// Sets the value of the uniform from a YAML Node, the uniform is responsible for converting the node to its own
+	/// value
+	/// \param node YAML node for setting the uniform value
 	virtual void set(const YAML::Node& node) = 0;
 
 	/// Adds this uniform to the OSG state set

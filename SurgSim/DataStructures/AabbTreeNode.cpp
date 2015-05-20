@@ -47,10 +47,9 @@ void AabbTreeNode::splitNode(size_t maxNodeData)
 		{
 			auto count = std::max(leftData->getSize(), rightData->getSize());
 
-			// Arbitrary value 10
-			if (maxNodeData > 0 && count > 2 * maxNodeData)
+			if (maxNodeData > 0 && count > 3 * maxNodeData)
 			{
-				SURGSIM_LOG_DEBUG(Framework::Logger::getDefaultLogger())
+				SURGSIM_LOG_ONCE(Framework::Logger::getDefaultLogger(), WARNING)
 						<< "The aabb tree build process encountered some items that could not be split anymore "
 						<< "this may cause suboptimal behavior when querying the aabb tree.";
 			}
@@ -150,7 +149,7 @@ void AabbTreeNode::setData(std::list<AabbTreeData::Item>&& items, size_t maxNode
 	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
 	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
 
-	auto data = std::make_shared<AabbTreeData>(items);
+	auto data = std::make_shared<AabbTreeData>(std::move(items));
 	setData(data);
 	splitNode(maxNodeData);
 }

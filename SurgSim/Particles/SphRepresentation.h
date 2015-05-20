@@ -18,11 +18,8 @@
 
 #include <vector>
 
-#include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/ParticleReference.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
 
 namespace SurgSim
 {
@@ -36,39 +33,18 @@ class Grid;
 namespace Particles
 {
 
-class Particle;
-class ParticlesState;
-
 SURGSIM_STATIC_REGISTRATION(SphRepresentation);
 
-/// SphRepresentation is a ParticleSystemRepresentation dedicated to Smoothed-Particles Hydrodynamics (SPH).
+/// SphRepresentation is a Representation dedicated to Smoothed-Particles Hydrodynamics (SPH).
 /// This class is mostly based on these papers:
 /// "Particle-Based Fluid Simulation for Interactive Applications", M. Muller, D. Charypar, M. Gross.
 /// In Proceedings of ACM SIGGRAPH Symposium on Computer Animation (SCA) 2003, pp 154-159.
 /// "Interactive Blood Simulation for Virtual Surgery Based on Smoothed Particle Hydrodynamics", M. Muller,
 /// S. Schirm, M. Teschner. Journal of Technology and Health Care, ISSN 0928-7329, IOS Press, Amsterdam.
-class SphRepresentation : public ParticleSystemRepresentation
+class SphRepresentation : public Representation
 {
 public:
 	SURGSIM_CLASSNAME(SurgSim::Particles::SphRepresentation);
-
-	/// Data structure for constraining the fluid on the positive side of a plane
-	struct PlaneConstraint
-	{
-		/// Constructor initializing default value for stiffness and damping
-		PlaneConstraint() : stiffness(50000.0), damping(100.0)
-		{}
-
-		/// Plane equation \f$(n_x, n_y, n_z, d)\f$.
-		/// Any plane point P verifies \f$\mathbf{P}.dot(\mathbf{n}) + d = 0\f$
-		SurgSim::Math::Vector4d planeEquation;
-
-		/// Collision stiffness
-		double stiffness;
-
-		/// Collision damping
-		double damping;
-	};
 
 	/// Constructor
 	/// \param name The representation's name
@@ -143,27 +119,60 @@ public:
 	/// \return The length of the kernel support [m]
 	double getKernelSupport() const;
 
-	/// Add a plane constraint
-	/// \param planeConstraint to interact with the fluid
-	void addPlaneConstraint(const PlaneConstraint& planeConstraint);
+	/// Set the particles stiffness when colliding
+	/// \param stiffness The stiffness [N/m]
+	void setStiffness(double stiffness);
 
-	/// Set all the plane constraints
-	/// \param planeConstraints All the plane constraints interacting with the fluid
-	void setPlaneConstraints(const std::vector<SphRepresentation::PlaneConstraint>& planeConstraints);
+	/// Get the particles stiffness when colliding
+	/// \return The stiffness [N/m]
+	double getStiffness() const;
 
-	/// Get all the plane constraints
-	/// \return All plane constraints interacting with the fluid
-	const std::vector<SphRepresentation::PlaneConstraint>& getPlaneConstraints() const;
+	/// Set the particles damping when colliding
+	/// \param damping The damping [Ns/m]
+	void setDamping(double damping);
+
+	/// Get the particles damping when colliding
+	/// \return The damping [Ns/m]
+	double getDamping() const;
+
+	/// Set the sliding coefficient of friction for the particles during collisions
+	/// \param friction The sliding coefficient of friction
+	void setFriction(double friction);
+
+	/// Get the sliding coefficient of friction for the particles during collisions
+	/// \return The sliding coefficient of friction
+	double getFriction() const;
 
 protected:
-	std::vector<SurgSim::Math::Vector3d> m_normal;  ///< Particles' normal
-	SurgSim::Math::Vector m_density;                  ///< Particles' density
-	SurgSim::Math::Vector m_pressure;                 ///< Particles' pressure
-	SurgSim::Math::Vector m_mass;                     ///< Particles' mass
+	bool doInitialize() override;
+
+	bool doUpdate(double dt) override;
+
+	bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) override;
+
+	/// Compute the particles' acceleration given a time step dt
+	/// \param dt The time step to advance the simulation too
+	/// \note This method stores the accelerations in the state.
+	void computeAcceleration(double dt);
+
+	/// Compute the particles' velocity and position given a time step dt
+	/// \param dt The time step to advance the simulation too
+	/// \note This method integrates the ODE equation of the SPH, computing velocities and positions from the
+	/// \note accelerations and storing them in the state. Therefore computeAcceleration(dt) should be called before.
+	void computeVelocityAndPosition(double dt);
+
+	std::vector<SurgSim::Math::Vector3d> m_normal;  		///< Particles' normal
+	std::vector<SurgSim::Math::Vector3d> m_acceleration;	///< Particles' acceleration
+	std::vector<double> m_density;                  		///< Particles' density
+	std::vector<double> m_pressure;                 		///< Particles' pressure
+	std::vector<double> m_mass;                     		///< Particles' mass
 	double m_massPerParticle;                       ///< Mass per particle (determine the density of particle per m3)
 	double m_densityReference;                      ///< Density of the reference gas
 	double m_gasStiffness;                          ///< Stiffness of the gas considered
 	double m_surfaceTension;                        ///< Surface tension
+	double m_stiffness;                             ///< Collision stiffness
+	double m_damping;                               ///< Collision damping
+	double m_friction;                              ///< Collision sliding friction coefficient
 
 	SurgSim::Math::Vector3d m_gravity;              ///< 3D Gravity vector
 	double m_viscosity;                             ///< Viscosity coefficient
@@ -174,39 +183,18 @@ protected:
 	/// Grid acceleration to evaluate the kernels locally (storing the particles' index)
 	std::shared_ptr<SurgSim::DataStructures::Grid<size_t, 3>> m_grid;
 
-	/// Collision planes
-	std::vector<PlaneConstraint> m_planeConstraints;
-
-	bool doInitialize() override;
-
-	bool doUpdate(double dt) override;
-
-	/// Compute the particles' acceleration given a time step dt
-	/// \param dt The time step to advance the simulation too
-	/// \note This method stores the accelerations in the state.
-	virtual void computeAcceleration(double dt);
-
-	/// Compute the particles' velocity and position given a time step dt
-	/// \param dt The time step to advance the simulation too
-	/// \note This method integrates the ODE equation of the SPH, computing velocities and positions from the
-	/// \note accelerations and storing them in the state. Therefore computeAcceleration(dt) should be called before.
-	virtual void computeVelocityAndPosition(double dt);
-
 private:
 	/// Compute the neighbors
-	virtual void computeNeighbors();
+	void computeNeighbors();
 
 	/// Compute the density and pressure field
-	virtual void computeDensityAndPressureField();
+	void computeDensityAndPressureField();
 
 	/// Compute the normal field
-	virtual void computeNormalField();
+	void computeNormalField();
 
 	/// Compute the Sph accelerations
-	virtual void computeAccelerations();
-
-	/// Compute collision detection and response against all plane constraints
-	virtual void handleCollisions();
+	void computeAccelerations();
 
 	/// Kernel poly6
 	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
@@ -251,40 +239,5 @@ private:
 
 };  // namespace Particles
 };  // namespace SurgSim
-
-namespace YAML
-{
-/// Specialization of YAML::convert for SphRepresentation::PlaneConstraint
-template <>
-struct convert<SurgSim::Particles::SphRepresentation::PlaneConstraint>
-{
-	static Node encode(const SurgSim::Particles::SphRepresentation::PlaneConstraint rhs)
-	{
-		Node data, result;
-		data["PlaneEquation"] = rhs.planeEquation;
-		data["Stiffness"] = rhs.stiffness;
-		data["Damping"] = rhs.damping;
-		result["PlaneConstraint"] = data;
-		return result;
-	}
-	static bool decode(const Node& node, SurgSim::Particles::SphRepresentation::PlaneConstraint& rhs) //NOLINT
-	{
-		try
-		{
-			Node data = node["PlaneConstraint"];
-			rhs.planeEquation = data["PlaneEquation"].as<SurgSim::Math::Vector4d>();
-			rhs.stiffness= data["Stiffness"].as<double>();
-			rhs.damping = data["Damping"].as<double>();
-		}
-		catch (YAML::RepresentationException)
-		{
-			auto logger = SurgSim::Framework::Logger::getLogger("Particles");
-			SURGSIM_LOG(logger, WARNING) << "Bad conversion to SphRepresentation::PlaneConstraint";
-			return false;
-		}
-		return true;
-	}
-};
-}; // namespace YAML
 
 #endif  // SURGSIM_PARTICLES_SPHREPRESENTATION_H

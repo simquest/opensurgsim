@@ -44,10 +44,10 @@ public:
 	AabbTreeData(const AabbTreeData& data);
 
 	/// Constructor with list of items
-	AabbTreeData(const std::list<Item>& data);
+	explicit AabbTreeData(const std::list<Item>& data);
 
 	/// Constructor with moveable list of items
-	AabbTreeData(std::list<Item>&& data);
+	explicit AabbTreeData(std::list<Item>&& data);
 
 	/// Destructor
 	~AabbTreeData();

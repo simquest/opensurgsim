@@ -52,6 +52,10 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 
 	std::vector<size_t> nodeBoundaryConditions;
 	nodeBoundaryConditions.push_back(0);
+	// Adding in this boundary condition is not necessary for the physics of the system, but it allows us
+	// to better control the condition number for the linear system that the OdeStaticSolver
+	// generates. This results in a more stable and more accurate test.
+	nodeBoundaryConditions.push_back(1);
 
 	// MassSpring1D with a straight line would define springs only along 1 direction, which would result in
 	// stiffness matrix of rank n/3. The Z axis can be constrained entirely and the simulation
@@ -90,7 +94,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	massSpringElement->addComponent(physicsRepresentation);
 
 	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
+		std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -160,7 +164,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	massSpringElement->addComponent(physicsRepresentation);
 
 	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
+		std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -188,6 +192,11 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	std::vector<size_t> nodeBoundaryConditions;
 	nodeBoundaryConditions.push_back(0);
 	nodeBoundaryConditions.push_back(1);
+	// Adding in these two boundary conditions is not necessary for the physics of the system, but it allows us
+	// to better control the condition number for the linear system that the OdeStaticSolver
+	// generates. This results in a more stable and more accurate test.
+	nodeBoundaryConditions.push_back(2);
+	nodeBoundaryConditions.push_back(3);
 	std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities =
 	{
 		{
@@ -232,7 +241,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	massSpringElement->addComponent(physicsRepresentation);
 
 	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
+		std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);

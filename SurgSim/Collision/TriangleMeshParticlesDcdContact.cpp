@@ -25,8 +25,8 @@
 
 using SurgSim::DataStructures::IndexedLocalCoordinate;
 using SurgSim::DataStructures::Location;
-using SurgSim::Math::distancePointTriangle;
 using SurgSim::Math::barycentricCoordinates;
+using SurgSim::Math::distancePointTriangle;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 
@@ -42,13 +42,13 @@ TriangleMeshParticlesDcdContact::TriangleMeshParticlesDcdContact()
 
 std::pair<int,int> TriangleMeshParticlesDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_PARTICLES);
+	return std::pair<int,int>(Math::SHAPE_TYPE_MESH, Math::SHAPE_TYPE_PARTICLES);
 }
 
 void TriangleMeshParticlesDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	auto mesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(pair->getFirst()->getShape());
-	auto particles = std::static_pointer_cast<SurgSim::Math::ParticlesShape>(pair->getSecond()->getShape());
+	auto mesh = std::static_pointer_cast<Math::MeshShape>(pair->getFirst()->getPosedShape());
+	auto particles = std::static_pointer_cast<Math::ParticlesShape>(pair->getSecond()->getPosedShape());
 
 	auto contacts = calculateContact(*mesh, *particles);
 	for (auto& contact : contacts)
@@ -57,8 +57,8 @@ void TriangleMeshParticlesDcdContact::doCalculateContact(std::shared_ptr<Collisi
 	}
 }
 
-std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateContact(
-		const SurgSim::Math::MeshShape& mesh, const SurgSim::Math::ParticlesShape& particles)
+std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateContact(const Math::MeshShape& mesh,
+		const Math::ParticlesShape& particles)
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 	Vector3d closestPoint;
@@ -90,8 +90,9 @@ std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateCo
 				{
 					double depth = particleRadius - normal.dot(particlePosition - closestPoint);
 					barycentricCoordinates(closestPoint, vertices[0], vertices[1], vertices[2], normal, &coordinates);
-					auto penetrationPoints = std::make_pair(Location(IndexedLocalCoordinate(triangle, coordinates)),
-								Location(IndexedLocalCoordinate(particles.getVertex(particle).data.index, Vector())));
+					auto penetrationPoints = std::make_pair(
+							Location(IndexedLocalCoordinate(triangle, coordinates), DataStructures::Location::TRIANGLE),
+							Location(particle));
 					contacts.push_back(std::make_shared<Contact>(depth, Vector3d::Zero(), -normal, penetrationPoints));
 				}
 			}

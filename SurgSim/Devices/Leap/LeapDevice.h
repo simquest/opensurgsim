@@ -73,11 +73,9 @@ public:
 	/// \param type The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
 	void setHandType(HandType type);
 
-	/// \return true if this is a right hand
-	bool isRightHand();
-
-	/// \return true if this is a left hand
-	bool isLeftHand();
+	/// Get the type of hand, left or right
+	/// \return The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
+	HandType getHandType() const;
 
 	bool initialize() override;
 
@@ -92,7 +90,7 @@ private:
 
 	std::shared_ptr<LeapScaffold> m_scaffold;
 
-	int m_handType;
+	HandType m_handType;
 };
 
 };

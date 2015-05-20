@@ -29,19 +29,7 @@ SceneryRepresentation::SceneryRepresentation(const std::string& name) : Represen
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SceneryRepresentation, std::shared_ptr<SurgSim::Framework::Asset>,
 									  Model , getModel, setModel);
-
-
-	// Enables the alternative use of the model file instead of the actual mesh object
-	DecoderType decoder = std::bind(&SceneryRepresentation::loadModel,
-									this,
-									std::bind(&YAML::Node::as<std::string>, std::placeholders::_1));
-	setDecoder("ModelFileName", decoder);
-
-	SetterType setter = std::bind(&SceneryRepresentation::loadModel,
-								  this,
-								  std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
-
-	setSetter("ModelFileName", setter);
+	SURGSIM_ADD_SETTER(SceneryRepresentation, std::string, ModelFileName, loadModel);
 }
 
 

@@ -20,6 +20,8 @@
 #include <string>
 
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+
 
 namespace SurgSim
 {
@@ -33,8 +35,11 @@ class ParticlesShape;
 namespace Particles
 {
 
-class ParticleSystemRepresentation;
+class Representation;
 
+SURGSIM_STATIC_REGISTRATION(ParticlesCollisionRepresentation);
+
+/// A Collision Representation that can be attached to a Particle Representation
 class ParticlesCollisionRepresentation : public SurgSim::Collision::Representation
 {
 public:
@@ -46,28 +51,40 @@ public:
 	/// Destructor
 	virtual ~ParticlesCollisionRepresentation();
 
+	SURGSIM_CLASSNAME(SurgSim::Particles::ParticlesCollisionRepresentation);
+
 	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
 	int getShapeType() const override;
 
 	void update(const double& dt) override;
 
-	/// Sets the particle system to which this collision representation is connected
-	/// \param representation The paticle system that will be used to update the contained mesh
-	void setParticleSystem(std::shared_ptr<ParticleSystemRepresentation> representation);
+	/// Sets the particle representation this collision representation is connected
+	/// \param representation The paticle representation
+	void setParticleRepresentation(std::shared_ptr<SurgSim::Particles::Representation> representation);
 
-	/// \return The particle system that this collision representation is connected
-	const std::shared_ptr<ParticleSystemRepresentation> getParticleSystem() const;
+	/// Gets the particle representation this collision representation is connected
+	/// \return The particle representation
+	const std::shared_ptr<SurgSim::Particles::Representation> getParticleRepresentation() const;
+
+	/// Set the particles' radius
+	/// \param radius the radius being set to all particles
+	void setParticleRadius(double radius);
+
+	/// Get the radius of the particles
+	/// \return The particles' radius
+	double getParticleRadius() const;
 
 private:
 	bool doInitialize() override;
+
 	bool doWakeUp() override;
 
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::ParticlesShape> m_shape;
 
-	/// Reference to the particle system driving changes to this collision representation
-	std::weak_ptr<ParticleSystemRepresentation> m_particleSystem;
+	/// Reference to the particle representation driving changes to this collision representation
+	std::weak_ptr<SurgSim::Particles::Representation> m_particleRepresentation;
 };
 
 };

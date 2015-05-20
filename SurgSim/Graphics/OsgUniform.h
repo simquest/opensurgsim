@@ -31,7 +31,7 @@ namespace Graphics
 {
 
 /// OSG implementation of graphics uniform with a value of type T.
-/// \tparam	Value type
+/// \tparam	Value the value type of the uniform
 template <class T>
 class OsgUniform : public Uniform<T>, public OsgUniformBase
 {
@@ -41,12 +41,14 @@ public:
 	explicit OsgUniform(const std::string& name);
 
 	/// Sets the value of the uniform
+	/// \param value the value for this uniform
 	virtual void set(const T& value);
 
 	/// Sets the value of the uniform from a YAML Node doing the correct conversion
+	/// \param node the node that contains the value for this uniform
 	virtual void set(const YAML::Node& node);
 
-	/// Returns the value of the uniform
+	/// \return the value of the uniform
 	virtual const T& get() const;
 
 private:
@@ -65,7 +67,7 @@ public:
 	/// \param	numElements	Number of elements
 	OsgUniform(const std::string& name, size_t numElements);
 
-	/// Returns the number of elements
+	/// \return the number of elements in the uniform
 	virtual size_t getNumElements() const;
 
 	/// Sets the value of one of the uniform's elements
@@ -76,6 +78,11 @@ public:
 	/// Sets the value of all of the uniform's elements
 	/// \param	value	Array of values
 	virtual void set(const std::vector<T>& value);
+
+	/// Sets the value of the uniform from a YAML Node doing the correct conversion
+	/// \param node that contains the values for this uniform (needs to be sequence type)
+	/// \throws if the node is not of sequence type
+	virtual void set(const YAML::Node& node);
 
 	/// Gets the value of one of the uniform's elements
 	/// \param	index	Index of the element

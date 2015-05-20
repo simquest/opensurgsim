@@ -39,7 +39,7 @@ bool OdeState::operator ==(const OdeState& state) const
 
 bool OdeState::operator !=(const OdeState& state) const
 {
-	return ! ((*this) == state);
+	return !((*this) == state);
 }
 
 void OdeState::reset()
@@ -113,7 +113,8 @@ const SurgSim::Math::Vector3d OdeState::getVelocity(size_t nodeId) const
 void OdeState::addBoundaryCondition(size_t nodeId)
 {
 	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
-		"Number of dof per node = 0. Make sure to call setNumDof() prior to adding boundary conditions.";
+										  "Number of dof per node = 0. Make sure to call setNumDof() " <<
+										  "prior to adding boundary conditions.";
 
 	for (size_t nodeDofId = 0; nodeDofId < m_numDofPerNode; ++nodeDofId)
 	{
@@ -124,10 +125,11 @@ void OdeState::addBoundaryCondition(size_t nodeId)
 void OdeState::addBoundaryCondition(size_t nodeId, size_t nodeDofId)
 {
 	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
-		"Number of dof per node = 0. Make sure to call setNumDof() prior to adding boundary conditions.";
+										  "Number of dof per node = 0. Make sure to call setNumDof() " <<
+										  "prior to adding boundary conditions.";
 	SURGSIM_ASSERT(nodeId < m_numNodes) << "Invalid nodeId " << nodeId << " number of nodes is " << m_numNodes;
 	SURGSIM_ASSERT(nodeDofId < m_numDofPerNode) <<
-		"Invalid nodeDofId " << nodeDofId << " number of dof per node is " << m_numDofPerNode;
+			"Invalid nodeDofId " << nodeDofId << " number of dof per node is " << m_numDofPerNode;
 
 	size_t globalDofId = nodeId * m_numDofPerNode + nodeDofId;
 	if (! m_boundaryConditionsPerDof[globalDofId])
@@ -155,11 +157,11 @@ bool OdeState::isBoundaryCondition(size_t dof) const
 Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 {
 	SURGSIM_ASSERT(vector != nullptr && vector->size() >= 0 && static_cast<size_t>(vector->size()) == getNumDof())
-		<< "Invalid vector to apply boundary conditions on";
+			<< "Invalid vector to apply boundary conditions on";
 
-	for (std::vector<size_t>::const_iterator it = getBoundaryConditions().cbegin();
-		it != getBoundaryConditions().cend();
-		++it)
+	for (auto it = getBoundaryConditions().cbegin();
+		 it != getBoundaryConditions().cend();
+		 ++it)
 	{
 		(*vector)[*it] = 0.0;
 	}
@@ -169,10 +171,9 @@ Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 
 void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasCompliance) const
 {
-	SURGSIM_ASSERT(matrix != nullptr && matrix->rows() >= 0 && matrix->cols() >= 0
-				   && static_cast<size_t>(matrix->rows()) == getNumDof()
+	SURGSIM_ASSERT(matrix != nullptr && static_cast<size_t>(matrix->rows()) == getNumDof()
 				   && static_cast<size_t>(matrix->cols()) == getNumDof())
-		<< "Invalid matrix to apply boundary conditions on";
+			<< "Invalid matrix to apply boundary conditions on";
 
 	double complianceValue  = 0.0;
 
@@ -181,13 +182,37 @@ void OdeState::applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasComplianc
 		complianceValue = 1.0;
 	}
 
-	for (std::vector<size_t>::const_iterator it = getBoundaryConditions().cbegin();
-		it != getBoundaryConditions().cend();
-		++it)
+	for (auto it = getBoundaryConditions().cbegin();
+		 it != getBoundaryConditions().cend();
+		 ++it)
 	{
 		(*matrix).middleRows(*it, 1).setZero();
 		(*matrix).middleCols(*it, 1).setZero();
 		(*matrix)(*it, *it) = complianceValue;
+	}
+}
+
+void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCompliance) const
+{
+	SURGSIM_ASSERT(matrix != nullptr && static_cast<size_t>(matrix->rows()) == getNumDof()
+				   && static_cast<size_t>(matrix->cols()) == getNumDof())
+			<< "Invalid matrix to apply boundary conditions on";
+
+	double complianceValue  = 0.0;
+
+	if (hasCompliance)
+	{
+		complianceValue = 1.0;
+	}
+
+	for (auto it = getBoundaryConditions().cbegin();
+		 it != getBoundaryConditions().cend();
+		 ++it)
+	{
+		Math::zeroRow(static_cast<SparseMatrix::Index>(*it), matrix);
+		Math::zeroColumn(static_cast<SparseMatrix::Index>(*it), matrix);
+		(*matrix).coeffRef(static_cast<SparseMatrix::Index>(*it),
+						   static_cast<SparseMatrix::Index>(*it)) = complianceValue;
 	}
 }
 

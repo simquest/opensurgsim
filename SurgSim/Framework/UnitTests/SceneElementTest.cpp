@@ -66,6 +66,8 @@ TEST(SceneElementTest, UpdateFunctions)
 
 TEST(SceneElementTest, AddAndTestComponents)
 {
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
 	std::shared_ptr<MockSceneElement> element = std::make_shared<MockSceneElement>();
 	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>("TestComponent");
 
@@ -76,6 +78,15 @@ TEST(SceneElementTest, AddAndTestComponents)
 
 	// Scene in Component will not be set until initialization.
 	EXPECT_NE(component->getScene(), element->getScene());
+
+	// Verify the component made it to the manager
+	runtime->addManager(manager);
+	runtime->getScene()->addSceneElement(element);
+	runtime->start(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	ASSERT_EQ(1, manager->getComponents().size());
+	EXPECT_EQ(component, manager->getComponents()[0]);
+	runtime->stop();
 }
 
 TEST(SceneElementTest, AddAndAccessComponents)
@@ -104,6 +115,8 @@ TEST(SceneElementTest, AddAndAccessComponents)
 
 TEST(SceneElementTest, RemoveComponents)
 {
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
 	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
 
 	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
@@ -112,14 +125,25 @@ TEST(SceneElementTest, RemoveComponents)
 	EXPECT_TRUE(element->addComponent(component1));
 	EXPECT_TRUE(element->addComponent(component2));
 
+	runtime->addManager(manager);
+	runtime->getScene()->addSceneElement(element);
+	runtime->start(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_EQ(2, manager->getComponents().size());
+
 	EXPECT_TRUE(element->removeComponent("TestComponent2"));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent2"));
-
-	// Add back should work
-	EXPECT_TRUE(element->addComponent(component2));
+	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_EQ(1, manager->getComponents().size());
 
 	EXPECT_TRUE(element->removeComponent(component1));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent1"));
+	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_EQ(0, manager->getComponents().size());
+
+	runtime->stop();
 }
 
 TEST(SceneElementTest, GetComponentsTest)

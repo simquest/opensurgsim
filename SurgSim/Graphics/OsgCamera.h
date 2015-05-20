@@ -29,8 +29,8 @@
 #include <osg/Switch>
 
 #if defined(_MSC_VER)
-	#pragma warning(push)
-	#pragma warning(disable:4250)
+#pragma warning(push)
+#pragma warning(disable:4250)
 #endif
 
 namespace SurgSim
@@ -101,6 +101,18 @@ public:
 
 	void setGenerateTangents(bool value) override;
 
+	void setPerspectiveProjection(double fovy, double aspect, double near, double far) override;
+
+	void setOrthogonalProjection(
+		double left, double right,
+		double bottom, double top,
+		double near, double far) override;
+
+
+	void setViewport(int x, int y, int width, int height) override;
+
+	void getViewport(int* x, int* y, int* width, int* height) const override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
@@ -138,7 +150,7 @@ private:
 };  // namespace SurgSim
 
 #if defined(_MSC_VER)
-	#pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 #endif  // SURGSIM_GRAPHICS_OSGCAMERA_H

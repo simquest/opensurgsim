@@ -142,6 +142,8 @@ void OsgRepresentation::setVisible(bool val)
 	m_switch->setChildValue(m_materialProxy, val);
 }
 
+
+
 void OsgRepresentation::setGenerateTangents(bool value)
 {
 	if (value && m_tangentGenerator == nullptr)

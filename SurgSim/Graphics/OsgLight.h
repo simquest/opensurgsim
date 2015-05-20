@@ -47,6 +47,8 @@ namespace Graphics
 
 class OsgGroup;
 
+SURGSIM_STATIC_REGISTRATION(OsgLight);
+
 /// OpenScenegraph implementation for the Light interface
 class OsgLight : public OsgRepresentation, public Light
 {
@@ -59,6 +61,8 @@ public:
 	/// Constructor
 	explicit OsgLight(const std::string& name);
 	virtual ~OsgLight();
+
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgLight);
 
 	bool setGroup(std::shared_ptr<SurgSim::Graphics::Group> group) override;
 

@@ -51,7 +51,7 @@ public:
 	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
 		m_numHands++;
-		for (size_t i = 0; i < inputData.poses().size(); i++)
+		for (int i = 0; i < inputData.poses().getNumEntries(); i++)
 		{
 			auto sphere = std::make_shared<GlutSphere>(0.010, Vector3d::Unit(m_numHands % 3));
 			GlutRenderer::addObject(sphere);
@@ -62,7 +62,7 @@ public:
 	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
 		SurgSim::Math::RigidTransform3d pose;
-		for (size_t i = 0; i < inputData.poses().size(); i++)
+		for (int i = 0; i < inputData.poses().getNumEntries(); i++)
 		{
 			inputData.poses().get(i, &pose);
 			m_spheres[device + inputData.poses().getName(i)]->pose = pose;

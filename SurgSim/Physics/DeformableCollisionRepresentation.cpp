@@ -68,6 +68,7 @@ void DeformableCollisionRepresentation::update(const double& dt)
 			"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
 			"went inactive because its shape failed to update.";
 	}
+	invalidatePosedShape();
 }
 
 bool DeformableCollisionRepresentation::doInitialize()

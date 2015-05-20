@@ -42,11 +42,27 @@ namespace Graphics
 OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
 	m_viewer(new osgViewer::CompositeViewer())
 {
-	m_viewer->setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
 }
 
 OsgManager::~OsgManager()
 {
+}
+
+void OsgManager::setMultiThreading(bool val)
+{
+	if (val == true)
+	{
+		m_viewer->setThreadingModel(osgViewer::ViewerBase::ThreadPerContext);
+	}
+	else
+	{
+		m_viewer->setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
+	}
+}
+
+bool OsgManager::isMultiThreading() const
+{
+	return m_viewer->getThreadingModel() != osgViewer::ViewerBase::SingleThreaded;
 }
 
 std::shared_ptr<Group> OsgManager::getOrCreateGroup(const std::string& name)

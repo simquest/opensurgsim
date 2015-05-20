@@ -99,6 +99,13 @@ void OutputComponent::setData(const SurgSim::DataStructures::DataGroup& dataGrou
 	m_output->setData(dataGroup);
 }
 
+DataStructures::DataGroup OutputComponent::getData() const
+{
+	DataStructures::DataGroup data;
+	m_output->requestOutput("", &data);
+	return data;
+}
+
 bool OutputComponent::doInitialize()
 {
 	return true;

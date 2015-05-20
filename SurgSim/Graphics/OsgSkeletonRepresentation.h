@@ -37,11 +37,6 @@ class Node;
 class Shader;
 };
 
-namespace osgUtil
-{
-class UpdateVisitor;
-}
-
 namespace SurgSim
 {
 namespace Graphics

@@ -24,8 +24,22 @@ namespace SurgSim
 namespace Math
 {
 
-ParticlesShape::ParticlesShape() :
-	m_radius(0.005)
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::ParticlesShape, ParticlesShape);
+
+ParticlesShape::ParticlesShape(double radius) :
+	m_radius(radius)
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
+	update();
+}
+
+ParticlesShape::ParticlesShape(const ParticlesShape& other) :
+	DataStructures::Vertices<DataStructures::EmptyData>(other),
+	m_aabbTree(other.m_aabbTree),
+	m_radius(other.getRadius()),
+	m_center(other.getCenter()),
+	m_volume(other.getVolume()),
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
 }
 
@@ -36,24 +50,22 @@ int ParticlesShape::getType() const
 
 double ParticlesShape::getVolume() const
 {
-	SURGSIM_FAILURE() << "ParticlesShape::getVolume not implemented";
-	return 0.0;
+	return m_volume;
 }
 
 Vector3d ParticlesShape::getCenter() const
 {
-	return Vector3d::Zero();
+	return m_center;
 }
 
 Matrix33d ParticlesShape::getSecondMomentOfVolume() const
 {
-	SURGSIM_FAILURE() << "ParticlesShape::getSecondMomentOfVolume not implemented";
-	return Matrix33d::Zero();
+	return m_secondMomentOfVolume;
 }
 
 bool ParticlesShape::isValid() const
 {
-	return true;
+	return m_radius >= 0.0;
 }
 
 double ParticlesShape::getRadius() const
@@ -68,22 +80,47 @@ void ParticlesShape::setRadius(double radius)
 
 bool ParticlesShape::doUpdate()
 {
-	std::list<DataStructures::AabbTreeData::Item> items;
-
-	auto const& vertices = getVertices();
+	const double numParticles = static_cast<double>(getVertices().size());
 	const Vector3d radius = Vector3d::Constant(m_radius);
 
-	for (size_t id = 0; id < vertices.size(); ++id)
+	std::list<DataStructures::AabbTreeData::Item> items;
+	Vector3d totalPosition = Vector3d::Zero();
+	Matrix33d totalDisplacementSkewSquared = Matrix33d::Zero();
+	size_t id = 0;
+	for (auto const& vertex : getVertices())
 	{
-		const Vector3d& position = vertices[id].position;
-		SurgSim::Math::Aabbd aabb(position - radius, position + radius);
-		items.emplace_back(std::make_pair(std::move(aabb), id));
-	}
-	auto aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
-	aabbTree->set(std::move(items));
+		totalPosition += vertex.position;
 
-	m_aabbTree = aabbTree;
+		Matrix33d skewOfDisplacement = makeSkewSymmetricMatrix(vertex.position);
+		totalDisplacementSkewSquared += skewOfDisplacement * skewOfDisplacement;
+
+		SurgSim::Math::Aabbd aabb(vertex.position - radius, vertex.position + radius);
+		items.emplace_back(std::make_pair(std::move(aabb), id));
+
+		id++;
+	}
+
+	m_center = totalPosition / numParticles;
+
+	double sphereVolume = (4.0 / 3.0) * M_PI * m_radius * m_radius * m_radius;
+	m_volume =  sphereVolume * numParticles;
+
+	// Parallel Axis Theorem
+	m_secondMomentOfVolume = Matrix33d::Identity() * (2.0 / 5.0) * sphereVolume * m_radius * m_radius * numParticles;
+	m_secondMomentOfVolume -= sphereVolume * totalDisplacementSkewSquared;
+
+	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
+	m_aabbTree->set(std::move(items));
+
 	return true;
+}
+
+std::shared_ptr<Shape> ParticlesShape::getTransformed(const RigidTransform3d& pose)
+{
+	auto transformed = std::make_shared<ParticlesShape>(*this);
+	transformed->transform(pose);
+	transformed->update();
+	return transformed;
 }
 
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::getAabbTree() const

@@ -44,6 +44,11 @@ template <class Data>
 struct Vertex
 {
 	/// Constructor
+	Vertex()
+	{
+	}
+
+	/// Constructor
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra data to be stored in the vertex
 	explicit Vertex(const SurgSim::Math::Vector3d& position, const Data& data = Data()) :
@@ -52,8 +57,25 @@ struct Vertex
 	{
 	}
 
-	Vertex()
+	/// Copy constructor when the template data is a different type
+	/// In this case, no data will be copied
+	/// \tparam T type of data stored in the other Vertex
+	/// \param other the Vertex to copy from
+	template <class T>
+	explicit Vertex(const Vertex<T>& other) :
+		position(other.position)
 	{
+	}
+
+	/// Assignment when the template data is a different type
+	/// In this case, no data will be copied
+	/// \tparam T type of data stored in the other Vertex
+	/// \param other the Vertex to copy from
+	template <class T>
+	Vertex<Data>& operator=(const Vertex<T>& other)
+	{
+		position = other.position;
+		return *this;
 	}
 
 	/// Position of the vertex.

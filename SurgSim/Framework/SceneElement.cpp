@@ -99,6 +99,7 @@ bool SceneElement::removeComponent(const std::string& name)
 		{
 			auto runtime = getRuntime();
 			SURGSIM_ASSERT(nullptr != runtime) << "Runtime cannot be expired when removing a component " << getName();
+			found->second->setLocalActive(false);
 			runtime->removeComponent(found->second);
 		}
 

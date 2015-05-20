@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,30 +15,29 @@
 
 #include "SurgSim/Devices/Oculus/OculusScaffold.h"
 
-#include <list>
-#include <memory>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
-#include <OVR.h>
+#include <list>
+#include <memory>
+#include <OVR_CAPI_0_5_0.h>
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/DataStructures/DataGroupBuilder.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/SharedInstance.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Devices/Oculus/OculusDevice.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
-#include "OculusDevice.h"
-
-using SurgSim::Framework::Logger;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::Framework::Logger;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Device
 {
@@ -63,33 +62,19 @@ struct OculusScaffold::DeviceData
 	}
 
 	/// The device object wrapped in this class.
-	SurgSim::Device::OculusDevice* const deviceObject;
+	OculusDevice* const deviceObject;
 
 	/// Device handle
 	ovrHmd handle;
-
-private:
-	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
-	DeviceData(const DeviceData&) /*= delete*/;
-	DeviceData& operator=(const DeviceData&) /*= delete*/;
 };
 
 struct OculusScaffold::StateData
 {
-	StateData()
-	{
-	}
-
 	/// List of registered devices.
 	std::list<std::unique_ptr<OculusScaffold::DeviceData>> registeredDevices;
 
 	/// The mutex that protects the list of registered devices.
 	boost::mutex mutex;
-
-private:
-	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
-	StateData(const StateData&) /*= delete*/;
-	StateData& operator=(const StateData&) /*= delete*/;
 };
 
 OculusScaffold::OculusScaffold() :
@@ -123,7 +108,6 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 	else
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		// HW-Mar-2-2015-OculusScaffold only supports one device right now.
 		SURGSIM_ASSERT(m_state->registeredDevices.size() < 1) << "There is one registered Oculus device already." <<
 																 "OculusScaffold only supports one device right now";
 
@@ -146,15 +130,15 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 			}
 			else
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." << 
+				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." <<
 																" Registration failed";
 			}
 		}
-	}
 
-	if (result && !isRunning())
-	{
-		start(); // Start the scaffold thread if not running.
+		if (result && !isRunning())
+		{
+			start(); // Start the scaffold thread if not running.
+		}
 	}
 
 	return result;
@@ -178,12 +162,13 @@ bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
 		}
 	}
 
-	SURGSIM_LOG_IF(!result, m_logger, SEVERE) << __FUNCTION__ << "Attempted to release a non-registered device.";
-
+	// #threadsafety After unregistering, another thread could be in the process of registering.
 	if (isRunning() && m_state->registeredDevices.size() == 0)
 	{
 		stop();
 	}
+
+	SURGSIM_LOG_IF(!result, m_logger, SEVERE) << __FUNCTION__ << "Attempted to release a non-registered device.";
 
 	return result;
 }
@@ -205,7 +190,7 @@ bool OculusScaffold::doUpdate(double dt)
 	for (auto& device : m_state->registeredDevices)
 	{
 		DataGroup& inputData = device->deviceObject->getInputData();
-		
+
 		// Query the HMD for the current tracking state.
 		// If time in 2nd parameter is now or earlier, no pose prediction is made.
 		// Pose is reported in a right handed coordinate system, X->RIGHT, Y->UP, Z->OUT.
@@ -218,7 +203,7 @@ bool OculusScaffold::doUpdate(double dt)
 			ovrPosef ovrPose = ts.HeadPose.ThePose;
 
 			Vector3d position(ovrPose.Position.x, ovrPose.Position.y, ovrPose.Position.z);
-			Quaterniond orientation(ovrPose.Orientation.w, ovrPose.Orientation.x, 
+			Quaterniond orientation(ovrPose.Orientation.w, ovrPose.Orientation.x,
 									ovrPose.Orientation.y, ovrPose.Orientation.z);
 			RigidTransform3d pose = makeRigidTransform(orientation, position);
 
@@ -253,4 +238,4 @@ std::shared_ptr<OculusScaffold> OculusScaffold::getOrCreateSharedInstance()
 }
 
 };  // namespace Device
-};  // namespace SurgSim 
+};  // namespace SurgSim

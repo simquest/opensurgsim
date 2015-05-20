@@ -138,8 +138,8 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	auto meshA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getShape());
-	auto meshB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getShape());
+	auto meshA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getPosedShape());
+	auto meshB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getPosedShape());
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
 		= meshA->getAabbTree()->spatialJoin(*meshB->getAabbTree());
@@ -203,11 +203,11 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
 						normalA, &barycentricCoordinate);
-					penetrationPoints.first.meshLocalCoordinate.setValue(
+					penetrationPoints.first.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
 					SurgSim::Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
 						normalB, &barycentricCoordinate);
-					penetrationPoints.second.meshLocalCoordinate.setValue(
+					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
 
 					penetrationPoints.first.rigidLocalPosition.setValue(

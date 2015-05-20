@@ -488,6 +488,7 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 	info->scaledPose.translation() = info->position * 0.001;  // convert from millimeters to meters!
 
 	hdGetDoublev(HD_CURRENT_VELOCITY, info->linearVelocity.data());
+	info->linearVelocity *= 0.001;
 	//TODO(ryanbeasley): convert HD_CURRENT_ANGULAR_VELOCITY to a rotation vector and store in info->angularVelocity.
 
 	Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transform;

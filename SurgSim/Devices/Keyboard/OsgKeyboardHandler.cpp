@@ -54,6 +54,18 @@ bool OsgKeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 			break;
 	}
 
+	// We wan to to support some of the osg viewer keys, pass these through, we will still receive the event, but osg
+	// will also react here
+	int key = ea.getUnmodifiedKey();
+	if (key == 's' || key == 't' || key == 'v' || key == 'w')
+	{
+		// s: Stats Display
+		// t: texturing
+		// v: vsync
+		// w: wireframe
+		result = false;
+	}
+
 	return result;
 }
 

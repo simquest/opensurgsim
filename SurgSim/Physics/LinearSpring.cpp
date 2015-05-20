@@ -16,11 +16,13 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::OdeState;
+using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 
@@ -89,20 +91,21 @@ void LinearSpring::addForce(const OdeState& state, Vector* F, double scale)
 	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
+				"Spring (initial length = " << m_restLength << ") became degenerated " <<
+				"with 0 length => no force generated";
 		return;
 	}
 	u /= length;
 	double elongationPosition = length - m_restLength;
 	double elongationVelocity = (v1 - v0).dot(u);
-	const Vector3d f = scale * (m_stiffness* elongationPosition + m_damping * elongationVelocity) * u;
+	const Vector3d f = scale * (m_stiffness * elongationPosition + m_damping * elongationVelocity) * u;
 
 	// Assembly stage in F
 	F->segment<3>(3 * m_nodeIds[0]) += f;
 	F->segment<3>(3 * m_nodeIds[1]) -= f;
 }
 
-void LinearSpring::addDamping(const OdeState& state, Matrix* D, double scale)
+void LinearSpring::addDamping(const OdeState& state, Math::SparseMatrix* D, double scale)
 {
 	Matrix33d De;
 
@@ -120,13 +123,21 @@ void LinearSpring::addDamping(const OdeState& state, Matrix* D, double scale)
 	De *= scale;
 
 	// Assembly stage in D
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += De; // -dF1/dv1 = De
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= De; // -dF1/dv2 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= De; // -dF2/dv1 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += De; // -dF2/dv2 = De
+	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   D, false);
+	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   D, false);
+	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   D, false);
+	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   D, false);
 }
 
-void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
+void LinearSpring::addStiffness(const OdeState& state, Math::SparseMatrix* K, double scale)
 {
 	Matrix33d Ke;
 
@@ -144,13 +155,21 @@ void LinearSpring::addStiffness(const OdeState& state, Matrix* K, double scale)
 	Ke *= scale;
 
 	// Assembly stage in K
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += Ke; // -dF1/dx1 = Ke
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= Ke; // -dF1/dx2 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= Ke; // -dF2/dx1 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += Ke; // -dF2/dx2 = Ke
+	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   K, false);
+	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   K, false);
+	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   K, false);
+	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   K, false);
 }
 
-void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K)
+void LinearSpring::addFDK(const OdeState& state, Vector* F, Math::SparseMatrix* D, Math::SparseMatrix* K)
 {
 	Matrix33d De, Ke;
 
@@ -172,16 +191,32 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Matrix* D, Matrix* K
 	}
 
 	// Assembly stage in K
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += Ke; // -dF1/dx1 = Ke
-	K->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= Ke; // -dF1/dx2 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= Ke; // -dF2/dx1 =-Ke
-	K->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += Ke; // -dF2/dx2 = Ke
+	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   K, false);
+	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   K, false);
+	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   K, false);
+	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   K, false);
 
 	// Assembly stage in D
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[0]) += De; // -dF1/dv1 = De
-	D->block<3, 3>(3 * m_nodeIds[0], 3 * m_nodeIds[1]) -= De; // -dF1/dv2 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[0]) -= De; // -dF2/dv1 =-De
-	D->block<3, 3>(3 * m_nodeIds[1], 3 * m_nodeIds[1]) += De; // -dF2/dv2 = De
+	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   D, false);
+	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   D, false);
+	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+					   D, false);
+	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+					   D, false);
 }
 
 void LinearSpring::addMatVec(const OdeState& state, double alphaD, double alphaK, const Vector& vector, Vector* F)
@@ -228,8 +263,8 @@ bool LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* 
 	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"Spring (initial length = " << m_restLength <<
-			") became degenerated with 0 length => force derivative degenerated";
+				"Spring (initial length = " << m_restLength <<
+				") became degenerated with 0 length => force derivative degenerated";
 		return false;
 	}
 	u /= length;
@@ -257,18 +292,18 @@ bool LinearSpring::computeDampingAndStiffness(const OdeState& state, Matrix33d* 
 
 bool LinearSpring::operator ==(const Spring& spring) const
 {
-	const LinearSpring *ls = dynamic_cast<const LinearSpring*>(&spring);
+	const LinearSpring* ls = dynamic_cast<const LinearSpring*>(&spring);
 	if (! ls)
 	{
 		return false;
 	}
 	return m_nodeIds == ls->m_nodeIds &&
-		m_restLength == ls->m_restLength && m_stiffness == ls->m_stiffness && m_damping == ls->m_damping;
+		   m_restLength == ls->m_restLength && m_stiffness == ls->m_stiffness && m_damping == ls->m_damping;
 }
 
 bool LinearSpring::operator !=(const Spring& spring) const
 {
-	return ! ((*this) == spring);
+	return !((*this) == spring);
 }
 
 } // namespace Physics

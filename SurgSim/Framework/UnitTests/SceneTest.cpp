@@ -69,6 +69,33 @@ TEST(SceneTest, AddAndTestScene)
 	EXPECT_EQ(scene, element->getScene());
 }
 
+
+
+TEST(SceneTest, TryFind)
+{
+	auto runtime = std::make_shared<Runtime>();
+	auto scene = std::make_shared<Scene>(runtime);
+
+	auto element0 = std::make_shared<BasicSceneElement>("element0");
+	auto element1 = std::make_shared<BasicSceneElement>("element1");
+
+	auto component0 = std::make_shared<MockComponent>("component0");
+	auto component1 = std::make_shared<MockComponent>("component1");
+
+	element0->addComponent(component0);
+	element1->addComponent(component1);
+	scene->addSceneElement(element0);
+	scene->addSceneElement(element1);
+
+	std::shared_ptr<Component> result;
+
+	EXPECT_EQ(component0, scene->getComponent("element0", "component0"));
+	EXPECT_EQ(component1, scene->getComponent("element1", "component1"));
+
+	EXPECT_EQ(nullptr, scene->getComponent("element1", "xxx"));
+	EXPECT_EQ(nullptr, scene->getComponent("xxx", "component0"));
+}
+
 TEST(SceneTest, CheckForExpiredRuntime)
 {
 	auto runtime = std::make_shared<Runtime>();

@@ -1,18 +1,31 @@
-
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "SurgSim/Blocks/GraphicsUtilities.h"
 
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgTexture2d.h"
-#include "SurgSim/Graphics/OsgUniform.h"
-#include "SurgSim/Graphics/OsgTextureUniform.h"
 #include "SurgSim/Graphics/OsgProgram.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgUniformFactory.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgTextureUniform.h"
 
 namespace SurgSim
 {
@@ -61,7 +74,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createPlainMaterial(
 	auto material = std::make_shared<Graphics::OsgMaterial>(name);
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/s_mapping_material");
-	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/s_mapping_material" ;
+	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/s_mapping_material";
 	material->setProgram(program);
 
 	material->addUniform("vec4", "specularColor");
@@ -86,7 +99,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
 	auto material = std::make_shared<Graphics::OsgMaterial>(name);
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/ds_mapping_material");
-	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/ds_mapping_material" ;
+	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/ds_mapping_material";
 	material->setProgram(program);
 
 	material->addUniform("vec4", "specularColor");
@@ -114,7 +127,13 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 	auto material = std::make_shared<Graphics::OsgMaterial>(name);
 
 	auto program = Graphics::loadProgram(*Framework::Runtime::getApplicationData(), "Shaders/dns_mapping_material");
-	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/dns_mapping_material" ;
+	SURGSIM_ASSERT(program != nullptr) << "Could not load program" << "Shaders/dns_mapping_material";
+
+	// Prepare vertex attributes
+	auto osgProgram = program->getOsgProgram();
+	osgProgram->addBindAttribLocation("tangent", Graphics::TANGENT_VERTEX_ATTRIBUTE_ID);
+	osgProgram->addBindAttribLocation("bitangent", Graphics::BITANGENT_VERTEX_ATTRIBUTE_ID);
+
 	material->setProgram(program);
 
 	material->addUniform("vec4", "specularColor");
@@ -132,7 +151,8 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 	return material;
 }
 
-void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::string materialFilename, Materials materials)
+void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::string materialFilename,
+					const Materials& materials)
 {
 	static SurgSim::Graphics::OsgUniformFactory uniformFactory;
 	YAML::Node nodes;
@@ -146,31 +166,29 @@ void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::strin
 			auto elementName = name.substr(0, found);
 			auto componentName = name.substr(found + 1);
 
-			auto element = scene->getSceneElement(elementName);
-			SURGSIM_ASSERT(element != nullptr)
-				<< "SceneElement " << elementName << " not found in scene.";
-
-			auto component = std::dynamic_pointer_cast<Graphics::OsgRepresentation>(
-				element->getComponent(componentName));
-			SURGSIM_ASSERT(component != nullptr)
-				<< "Component " << componentName << " not found or not an OsgRepresentation.";
+			auto component = std::dynamic_pointer_cast<Graphics::OsgRepresentation>
+							 (scene->getComponent(elementName, componentName));
 
 			if (component != nullptr)
 			{
-				auto material = materials[materialName];
 
-				SURGSIM_ASSERT(material != nullptr)
-					<< "Could not find material " << materialName << " in the prebuilt materials.";
+				auto materialIt = materials.find(materialName);
 
+				SURGSIM_ASSERT(materialIt != materials.end())
+						<< "Could not find material " << materialName << " in the prebuilt materials.";
+
+				auto material = materialIt->second;
 				component->setMaterial(material);
 
 				auto propertyNodes = node->begin()->second["Properties"];
 				for (auto nodeIt = propertyNodes.begin(); nodeIt != propertyNodes.end(); ++nodeIt)
 				{
-					auto rawUniform = uniformFactory.create((*nodeIt)[0].as<std::string>(), (*nodeIt)[1].as<std::string>());
+					auto rawUniform = uniformFactory.create(
+										  (*nodeIt)[0].as<std::string>(), (*nodeIt)[1].as<std::string>()
+									  );
 					SURGSIM_ASSERT(rawUniform != nullptr)
-						<< "Could not create uniform " << (*nodeIt)[1].as<std::string>() << " of type "
-						<< (*nodeIt)[0].as<std::string>() << ".";
+							<< "Could not create uniform " << (*nodeIt)[1].as<std::string>() << " of type "
+							<< (*nodeIt)[0].as<std::string>() << ".";
 					auto uniform = std::dynamic_pointer_cast<Graphics::OsgUniformBase>(rawUniform);
 					uniform->set((*nodeIt)[2]);
 					component->addUniform(uniform);
@@ -181,7 +199,7 @@ void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::strin
 	else
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("GraphicsUtilities"))
-			<< "Could not find material definitions, visuals are going to be compromised.";
+				<< "Could not find material definitions, visuals are going to be compromised.";
 	}
 }
 

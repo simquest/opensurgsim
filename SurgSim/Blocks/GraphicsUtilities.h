@@ -1,10 +1,25 @@
-#ifndef BURRHOLE_GRAPHICS_H
-#define BURRHOLE_GRAPHICS_H
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef SURGSIM_BLOCKS_GRAPHICSUTILITIES_H
+#define SURGSIM_BLOCKS_GRAPHICSUTILITIES_H
 
 #include <memory>
 #include <unordered_map>
 #include <string>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 /// \file GraphicsUtilities.h
 /// The code in here is supposed to help create materials correctly, a lot of it is boilerplate that is repeated over
@@ -25,14 +40,15 @@ namespace Blocks
 
 typedef std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> Materials;
 
-/// Load and add a given texture to the material
+/// Provide a consistent interface to add texture uniforms on materials, adds the actual texture with a given minimum
+/// unit, or provides a placeholder uniform for the unit
 /// \param material The material for adding the texture
 /// \param uniform The name of the uniform to use
 /// \param unit The texture unit to use
 /// \param filename The file to use for the texture,
 /// \param repeat whether to create the texture as repeating
 /// \note if the texture filename is empty a placeholder uniform will be created using the unit as a value
-/// this us use objects with textures builtin without having to assign the texture to the material on creation
+/// this for using objects with textures built in without having to assign the texture to the material on creation
 void enable2DTexture(std::shared_ptr<SurgSim::Graphics::OsgMaterial> material,
 					 const std::string& uniform,
 					 int unit,
@@ -80,9 +96,29 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 	const std::string& diffuseMap = "",
 	const std::string& normalMap = "");
 
-void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, 
-					std::string materialFilename, 
-					Materials materials);
+/// Reads a material file, iterates over the components listed up in the material file and applies the materials and
+/// the appropriate material properties (if present) to the component, if the component is not found it will be ignored
+/// The material file is a yaml file with the following format
+///
+///     - SceneElementName/ComponentName>
+///         Material: MaterialName
+///         Properties:
+///             - [GLSLUniformType, UniformName, YamlEncodedValue]
+///             - [GLSLUniformType, UniformName, YamlEncodedValue]
+///     - SceneElementName/ComponentName
+///         Material: ...
+///
+/// The name of the SceneElement and the Component addressed need to be be separated by a '/' character.
+/// For each of the properties a uniform is created with the given GLSL type, name, and the YAML node will be passed
+/// to the uniform setter for conversion. If the type does not match what the appropriate GLSL type is, there will
+/// be an error.
+/// GLSLUniformType is e.g. vec3, vec4, float, mat4 ...
+/// \param scene The scene to traverse for component lookup
+/// \param materialFilename the YAML file that contains the descriptions
+/// \param materials lookup table for all the materials that are available
+void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene,
+					std::string materialFilename,
+					const Materials& materials);
 }
 }
 #endif

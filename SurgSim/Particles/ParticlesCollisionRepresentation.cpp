@@ -15,21 +15,25 @@
 
 #include "SurgSim/Particles/ParticlesCollisionRepresentation.h"
 
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/ParticlesShape.h"
 #include "SurgSim/Math/Shape.h"
-#include "SurgSim/Particles/Particle.h"
-#include "SurgSim/Particles/ParticleReference.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
+
 
 namespace SurgSim
 {
 namespace Particles
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Particles::ParticlesCollisionRepresentation,
+		ParticlesCollisionRepresentation);
+
 ParticlesCollisionRepresentation::ParticlesCollisionRepresentation(const std::string& name) :
 	SurgSim::Collision::Representation(name),
 	m_shape(std::make_shared<SurgSim::Math::ParticlesShape>())
 {
+	m_shape->setRadius(0.005);
 }
 
 ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
@@ -38,20 +42,8 @@ ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
 
 void ParticlesCollisionRepresentation::update(const double& dt)
 {
-	auto particleSystem = getParticleSystem();
-	std::list<ParticleReference> particles = particleSystem->getParticleReferences();
-
-	m_shape->getVertices().resize(particles.size());
-
-	auto vertex = m_shape->getVertices().begin();
-	auto particle = particles.begin();
-	for (; particle != particles.end(); ++particle, ++vertex)
-	{
-		vertex->position = particle->getPosition();
-		vertex->data.index = particle->getIndex();
-	}
-	m_shape->update();
-
+	*m_shape = getParticleRepresentation()->getParticles();
+	invalidatePosedShape();
 }
 
 bool ParticlesCollisionRepresentation::doInitialize()
@@ -61,14 +53,15 @@ bool ParticlesCollisionRepresentation::doInitialize()
 
 bool ParticlesCollisionRepresentation::doWakeUp()
 {
-	auto particleSystem = m_particleSystem.lock();
-	if (m_particleSystem.lock() == nullptr)
+	auto particleRepresentation = m_particleRepresentation.lock();
+	if (particleRepresentation == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getName()
-			<< ": does not have a ParticleSystemRepresentation.";
+			<< ": does not have a Particle Representation.";
 		return false;
 	}
-	m_shape->getVertices().reserve(particleSystem->getMaxParticles());
+
+	m_shape->getVertices().reserve(particleRepresentation->getMaxParticles());
 
 	update(0.0);
 	return true;
@@ -84,21 +77,32 @@ const std::shared_ptr<SurgSim::Math::Shape> ParticlesCollisionRepresentation::ge
 	return m_shape;
 }
 
-void ParticlesCollisionRepresentation::setParticleSystem(std::shared_ptr<ParticleSystemRepresentation> representation)
+void ParticlesCollisionRepresentation::setParticleRepresentation(
+		std::shared_ptr<SurgSim::Particles::Representation> representation)
 {
-	m_particleSystem = representation;
+	m_particleRepresentation = representation;
 }
 
-const std::shared_ptr<ParticleSystemRepresentation> ParticlesCollisionRepresentation::getParticleSystem() const
+const std::shared_ptr<SurgSim::Particles::Representation> ParticlesCollisionRepresentation::getParticleRepresentation()
+		const
 {
-	auto particleSystem = m_particleSystem.lock();
-	SURGSIM_ASSERT(particleSystem != nullptr) <<
-		"Failed to get the particle system.  The ParticlesCollisionRepresentation either was not "
-		"attached to a ParticleSystemRepresentation or the ParticleSystemRepresentation has expired.";
+	auto particleRepresentation = m_particleRepresentation.lock();
+	SURGSIM_ASSERT(particleRepresentation != nullptr) <<
+		"Failed to get the Particle Representation. The ParticlesCollisionRepresentation either was not "
+		"attached to a Particle Representation or the Particle Representation has expired.";
 
-	return particleSystem;
+	return particleRepresentation;
 }
 
+void ParticlesCollisionRepresentation::setParticleRadius(double radius)
+{
+	m_shape->setRadius(radius);
+}
+
+double ParticlesCollisionRepresentation::getParticleRadius() const
+{
+	return m_shape->getRadius();
+}
 
 };
 };

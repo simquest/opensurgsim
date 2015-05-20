@@ -107,6 +107,13 @@ void OsgUniform<std::vector<T>>::set(const std::vector<T>& value)
 }
 
 template <class T>
+void OsgUniform<std::vector<T>>::set(const YAML::Node& node)
+{
+	SURGSIM_ASSERT(node.IsSequence()) << "Yaml setter called on vector uniform with non-sequence yaml node.";
+	set(node.as<std::vector<T>>());
+}
+
+template <class T>
 typename std::vector<T>::const_reference OsgUniform<std::vector<T>>::getElement(size_t index) const
 {
 	return m_value[index];

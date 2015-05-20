@@ -55,6 +55,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	MassSpringRepresentationContact.cpp
 	MassSpringRepresentationLocalization.cpp
 	MlcpPhysicsProblem.cpp
+	ParticleCollisionResponse.cpp
 	PhysicsConvert.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
@@ -105,6 +106,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
 	FemElement.h
+	FemElement-inl.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
 	FixedRepresentation.h
@@ -119,8 +121,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	MassSpringRepresentationLocalization.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
-	MlcpPhysicsProblem-inl.h
 	MlcpPhysicsSolution.h
+	ParticleCollisionResponse.cpp
 	PhysicsConvert.h
 	PhysicsManager.h
 	PhysicsManagerState.h
@@ -155,6 +157,7 @@ SET(LIBS
 	SurgSimFramework
 	SurgSimInput
 	SurgSimMath
+	SurgSimParticles
 )
 
 target_link_libraries(SurgSimPhysics ${LIBS})

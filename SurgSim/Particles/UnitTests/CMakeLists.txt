@@ -18,15 +18,12 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	EmitterRepresentationTests.cpp
+	EmitterTests.cpp
 	MockObjects.cpp
-	ParticleManagerTests.cpp
-	ParticleReferenceTests.cpp
-	ParticlesStateTests.cpp
-	ParticleSystemRepresentationTests.cpp
-	ParticleTests.cpp
+	ParticlesCollisionRepresentationTests.cpp
 	PointGeneratorTests.cpp
 	RandomPointGeneratorTests.cpp
+	RepresentationTests.cpp
 	SphRepresentationTests.cpp
 )
 

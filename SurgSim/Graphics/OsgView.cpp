@@ -31,10 +31,11 @@
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 #include <osgViewer/ViewerEventHandlers>
 #include <osg/DisplaySettings>
-#include "../Math/RigidTransform.h"
+
 
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
@@ -158,6 +159,7 @@ void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 
 	View::setCamera(camera);
 	m_view->setCamera(osgCamera->getOsgCamera());
+	osgCamera->setViewport(0, 0, m_dimensions[0], m_dimensions[1]);
 }
 
 void OsgView::update(double dt)

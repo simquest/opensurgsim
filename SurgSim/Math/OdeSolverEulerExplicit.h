@@ -60,11 +60,11 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverEulerExplicit(OdeEquation* equation);
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
 
 protected:
 	void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
-		bool computeRHS = true) override;
+							  bool computeRHS = true) override;
 };
 
 }; // namespace Math

@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2015, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,29 +15,23 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
 	OculusDeviceTest.cpp
-	OculusScaffoldTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
 )
 
 set(LIBS
+	SurgSimDataStructures
+	SurgSimInput
+	SurgSimTesting
 	OculusDevice
 )
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires hardware and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_DEVICE_OCULUS
-	"Run the Oculus tests as part of unit tests.  (Requires hardware and Oculus SDK!)"
-	OFF)
-surgsim_add_unit_tests(OculusDeviceTest
-	RUN ${SURGSIM_TESTS_RUN_DEVICE_OCULUS})
+surgsim_add_unit_tests(OculusDeviceTest)
 
 target_link_libraries(OculusDeviceTest ${LIBS})
 
