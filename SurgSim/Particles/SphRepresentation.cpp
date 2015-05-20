@@ -18,6 +18,7 @@
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/DataStructures/Grid.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector;
@@ -61,8 +62,6 @@ SphRepresentation::SphRepresentation(const std::string& name) :
 		KernelSupport, getKernelSupport, setKernelSupport);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, SurgSim::Math::Vector3d,
 		Gravity, getGravity, setGravity);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, std::vector<PlaneConstraint>,
-		PlaneConstraints, getPlaneConstraints, setPlaneConstraints);
 }
 
 SphRepresentation::~SphRepresentation()
@@ -186,21 +185,6 @@ void SphRepresentation::setFriction(double friction)
 double SphRepresentation::getFriction() const
 {
 	return m_friction;
-}
-
-void SphRepresentation::addPlaneConstraint(const PlaneConstraint& planeConstraint)
-{
-	m_planeConstraints.push_back(planeConstraint);
-}
-
-void SphRepresentation::setPlaneConstraints(const std::vector<SphRepresentation::PlaneConstraint>& planeConstraints)
-{
-	m_planeConstraints = planeConstraints;
-}
-
-const std::vector<SphRepresentation::PlaneConstraint>& SphRepresentation::getPlaneConstraints() const
-{
-	return m_planeConstraints;
 }
 
 bool SphRepresentation::doInitialize()
