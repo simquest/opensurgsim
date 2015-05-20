@@ -33,8 +33,8 @@ set(SURGSIM_PARTICLES_HEADERS
 	PointGenerator.h
 	RandomBoxPointGenerator.h
 	RandomPointGenerator.h
-	Representation.h
 	RandomSpherePointGenerator.h
+	Representation.h
 	SphRepresentation.h
 )
 

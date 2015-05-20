@@ -137,7 +137,8 @@ std::shared_ptr<SurgSim::Math::Shape> Emitter::getShape() const
 
 void Emitter::setTarget(const std::shared_ptr<SurgSim::Framework::Component> target)
 {
-	m_target = SurgSim::Framework::checkAndConvert<SurgSim::Particles::Representation>(target, "SurgSim::Particles::Representation");
+	m_target = SurgSim::Framework::checkAndConvert<SurgSim::Particles::Representation>(target,
+			"SurgSim::Particles::Representation");
 }
 
 const std::shared_ptr<SurgSim::Framework::Component> Emitter::getTarget()

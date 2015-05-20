@@ -136,7 +136,7 @@ public:
 	double getDamping() const;
 
 	/// Set the sliding coefficient of friction for the particles during collisions
-	/// \param coefficient The sliding coefficient of friction
+	/// \param friction The sliding coefficient of friction
 	void setFriction(double friction);
 
 	/// Get the sliding coefficient of friction for the particles during collisions

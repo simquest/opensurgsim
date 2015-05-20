@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_EMITTERREPRESENTATION_H
-#define SURGSIM_PARTICLES_EMITTERREPRESENTATION_H
+#ifndef SURGSIM_PARTICLES_EMITTER_H
+#define SURGSIM_PARTICLES_EMITTER_H
 
 #include <cmath>
 #include <memory>
@@ -179,4 +179,4 @@ private:
 }; // namespace Particles
 }; // namespace SurgSim
 
-#endif // SURGSIM_PARTICLES_EMITTERREPRESENTATION_H
+#endif // SURGSIM_PARTICLES_EMITTER_H

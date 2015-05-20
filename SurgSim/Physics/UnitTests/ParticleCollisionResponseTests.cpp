@@ -45,7 +45,7 @@ private:
 		return true;
 	}
 
-	virtual bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) override
+	bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) override
 	{
 		handleCollisionsCount++;
 		return true;

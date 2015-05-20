@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
-#define SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
+#ifndef SURGSIM_PARTICLES_REPRESENTATION_H
+#define SURGSIM_PARTICLES_REPRESENTATION_H
 
 #include <boost/thread.hpp>
 #include <list>
@@ -121,4 +121,4 @@ protected:
 };  // namespace Particles
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
+#endif // SURGSIM_PARTICLES_REPRESENTATION_H
