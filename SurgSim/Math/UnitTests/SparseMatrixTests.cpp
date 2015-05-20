@@ -134,7 +134,7 @@ public:
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockAssignWithoutSearch<Derived, Eigen::SparseMatrix<T, Opt, I>>(sub, \
+			EXPECT_THROW((blockAssignWithoutSearch<Eigen::SparseMatrix<T, Opt, I>, Derived>(sub, \
 						  m_rowId, m_columnId, m_n, m_m, \
 						  nullptr)), SurgSim::Framework::AssertionFailure);
 
@@ -180,7 +180,7 @@ public:
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockAssignWithSearch<Derived, Eigen::SparseMatrix<T, Opt, I>>(sub, \
+			EXPECT_THROW((blockAssignWithSearch<Eigen::SparseMatrix<T, Opt, I>, Derived>(sub, \
 						  m_rowId, m_columnId, m_n, m_m, \
 						  nullptr)), SurgSim::Framework::AssertionFailure);
 
@@ -223,7 +223,7 @@ public:
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockAddWithSearch<Derived, Eigen::SparseMatrix<T, Opt, I>>(sub, \
+			EXPECT_THROW((blockAddWithSearch<Eigen::SparseMatrix<T, Opt, I>, Derived>(sub, \
 						  m_rowId, m_columnId, m_n, m_m, \
 						  nullptr)), SurgSim::Framework::AssertionFailure);
 
@@ -262,7 +262,7 @@ public:
 		SetUp();
 
 		// No recipient specified
-		EXPECT_THROW((blockAssign<Derived, Eigen::SparseMatrix<T, Opt, I>>(sub, \
+		EXPECT_THROW((blockAssign<Eigen::SparseMatrix<T, Opt, I>, Derived>(sub, \
 					  m_rowId, m_columnId, nullptr)), \
 					 SurgSim::Framework::AssertionFailure);
 
