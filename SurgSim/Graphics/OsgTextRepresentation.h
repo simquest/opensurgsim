@@ -76,7 +76,7 @@ public:
 	void setText(const std::string& text) override;
 	std::string getText() const override;
 
-	void loadFont(std::string fileName) override;
+	void loadFont(const std::string& fileName) override;
 	void setFont(std::shared_ptr<SurgSim::Framework::Asset> font) override;
 	std::shared_ptr<Font> getFont() const override;
 
