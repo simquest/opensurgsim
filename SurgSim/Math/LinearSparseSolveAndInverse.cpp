@@ -25,17 +25,17 @@ namespace Math
 void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 {
 	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
-	m_lu.compute(matrix);
+	m_solver.compute(matrix);
 }
 
 Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
 {
-	return m_lu.solve(b);
+	return m_solver.solve(b);
 }
 
 Matrix LinearSparseSolveAndInverseLU::getInverse() const
 {
-	return (m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols())));
+	return (m_solver.solve(Matrix::Identity(m_solver.rows(), m_solver.cols())));
 }
 
 void LinearSparseSolveAndInverseCG::setTolerance(double tolerance)

@@ -411,7 +411,7 @@ int main(int argc, char* argv[])
 		createFemSceneElement("wound",
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
-							  SurgSim::Math::LINEARSOLVER_LU,
+							  SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT,
 							  material);
 	wound->setPose(armPose);
 

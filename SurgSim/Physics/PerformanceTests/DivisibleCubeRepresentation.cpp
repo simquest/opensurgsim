@@ -58,11 +58,6 @@ bool DivisibleCubeRepresentation::initializeNoWakeUp()
 	return doInitialize();
 }
 
-std::shared_ptr<SurgSim::Math::OdeSolver> DivisibleCubeRepresentation::getOdeSolver()
-{
-	return m_odeSolver;
-}
-
 /// Convert a node index from a 3d indexing to a 1d indexing
 /// \param i, j, k Indices along the X, Y and Z axis
 /// \return Unique index of the corresponding point (to access a linear array for example)

@@ -22,6 +22,9 @@
 #endif
 
 #include <Eigen/SparseCore>
+#include <unordered_map>
+
+#include <boost/assign/list_of.hpp> // for 'map_list_of()'
 
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/SparseMatrix.h"
@@ -32,6 +35,19 @@ namespace SurgSim
 
 namespace Math
 {
+
+/// The linear numerical integration scheme supported
+/// Each Linear Solver should have its own entry in this enum
+enum LinearSolver
+{
+	LINEARSOLVER_LU = 0,
+	LINEARSOLVER_CONJUGATEGRADIENT
+};
+
+const std::unordered_map<LinearSolver, std::string, std::hash<int>> LinearSolverNames =
+			boost::assign::map_list_of
+			(LINEARSOLVER_LU, "LINEARSOLVER_LU")
+			(LINEARSOLVER_CONJUGATEGRADIENT, "LINEARSOLVER_CONJUGATEGRADIENT");
 
 /// LinearSparseSolveAndInverse aims at performing an efficient linear system resolution and
 /// calculating its inverse matrix at the same time.
@@ -68,7 +84,7 @@ public:
 	Matrix getInverse() const override;
 
 private:
-	Eigen::SparseLU<SparseMatrix> m_lu;
+	Eigen::SparseLU<SparseMatrix> m_solver;
 };
 
 /// Derivation for sparse CG solver

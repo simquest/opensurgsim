@@ -21,6 +21,7 @@
 
 #include <memory>
 
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeSolver.h"
@@ -68,6 +69,10 @@ public:
 
 	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const;
 
+	/// Return a pointer to the OdeSolver component
+	/// \return The ODE solver
+	virtual const std::shared_ptr<SurgSim::Math::OdeSolver> getOdeSolver();
+
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation
 	size_t getNumDofPerNode() const;
@@ -80,6 +85,15 @@ public:
 	/// Gets the numerical integration scheme
 	/// \return The integration scheme currently in use
 	SurgSim::Math::IntegrationScheme getIntegrationScheme() const;
+
+	/// Sets the linear algebraic solver
+	/// \param linearSolver The linear algebraic solver to use
+	/// \note Calling setLinearSolver after the component has been awoken will raise an assert
+	void setLinearSolver(SurgSim::Math::LinearSolver linearSolver);
+
+	/// Gets the linear algebraic solver
+	/// \return The linear solver currently in use
+	SurgSim::Math::LinearSolver getLinearSolver() const;
 
 	/// Add an external generalized force applied on a specific localization
 	/// \param localization where the generalized force is applied
@@ -166,6 +180,9 @@ protected:
 
 	/// Numerical Integration scheme (dynamic explicit/implicit solver)
 	SurgSim::Math::IntegrationScheme m_integrationScheme;
+
+	/// Linear algebraic solver used
+	SurgSim::Math::LinearSolver m_linearSolver;
 
 	/// Specify if the Ode Solver needs to be (re)loaded (do not exist yet, or integration scheme has changed)
 	bool m_needToReloadOdeSolver;

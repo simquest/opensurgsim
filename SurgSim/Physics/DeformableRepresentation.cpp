@@ -17,6 +17,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/OdeSolverEulerExplicit.h"
 #include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
@@ -47,10 +48,13 @@ DeformableRepresentation::DeformableRepresentation(const std::string& name) :
 	Representation(name),
 	SurgSim::Math::OdeEquation(),
 	m_numDofPerNode(0),
-	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER)
+	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER),
+	m_linearSolver(SurgSim::Math::LINEARSOLVER_LU)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableRepresentation, SurgSim::Math::IntegrationScheme, IntegrationScheme,
 									  getIntegrationScheme, setIntegrationScheme);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableRepresentation, SurgSim::Math::LinearSolver, LinearSolver,
+									  getLinearSolver, setLinearSolver);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableRepresentation, std::shared_ptr<SurgSim::Collision::Representation>,
 									  CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
 }
@@ -112,6 +116,11 @@ size_t DeformableRepresentation::getNumDofPerNode() const
 	return m_numDofPerNode;
 }
 
+const std::shared_ptr<SurgSim::Math::OdeSolver> DeformableRepresentation::getOdeSolver()
+{
+	return m_odeSolver;
+}
+
 void DeformableRepresentation::setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	SURGSIM_ASSERT(!isAwake()) << "You cannot set the integration scheme after the component has been awoken";
@@ -121,6 +130,17 @@ void DeformableRepresentation::setIntegrationScheme(SurgSim::Math::IntegrationSc
 SurgSim::Math::IntegrationScheme DeformableRepresentation::getIntegrationScheme() const
 {
 	return m_integrationScheme;
+}
+
+void DeformableRepresentation::setLinearSolver(SurgSim::Math::LinearSolver linearSolver)
+{
+	SURGSIM_ASSERT(!isAwake()) << "You cannot set the linear solver after the component has been awoken";
+	m_linearSolver = linearSolver;
+}
+
+SurgSim::Math::LinearSolver DeformableRepresentation::getLinearSolver() const
+{
+	return m_linearSolver;
 }
 
 const SurgSim::Math::Vector& DeformableRepresentation::getExternalGeneralizedForce() const
@@ -280,6 +300,7 @@ bool DeformableRepresentation::doWakeUp()
 	using SurgSim::Math::OdeSolverLinearRungeKutta4;
 	using SurgSim::Math::OdeSolverLinearStatic;
 
+	using SurgSim::Math::LinearSparseSolveAndInverseCG;
 	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	// Transform the state with the initial pose
@@ -336,8 +357,21 @@ bool DeformableRepresentation::doWakeUp()
 			return false;
 	}
 
-	// No assumption is made on the linear solver, we instantiate a general sparse matrix solver
-	m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
+
+	// Set the linear solver with initial settings on the ode solver
+	switch (m_linearSolver)
+	{
+		case SurgSim::Math::LINEARSOLVER_LU:
+			m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
+			break;
+		case SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT:
+			m_odeSolver->setLinearSolver(std::make_shared<LinearSparseSolveAndInverseCG>());
+			break;
+		default:
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+					<< "Linear solver not initialized, the linear solver is invalid";
+			return false;
+	}
 
 	return true;
 }

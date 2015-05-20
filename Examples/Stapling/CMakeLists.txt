@@ -29,6 +29,18 @@ set(STAPLING_HEADERS
 )
 surgsim_add_executable(Stapling "${STAPLING_SOURCES}" "${STAPLING_HEADERS}")
 
+set(STAPLING_CONJUGATE_GRADIENT_SOURCES
+	StapleElement.cpp
+	StaplerBehavior.cpp
+	StaplingConjugateGradient.cpp
+)
+set(STAPLING_HEADERS
+	StapleElement.h
+	StaplerBehavior.h
+)
+surgsim_add_executable(StaplingConjugateGradient 
+	"${STAPLING_CONJUGATE_GRADIENT_SOURCES}" "${STAPLING_HEADERS}")
+
 set(SERIALIZEDSTAPLING_SOURCES
 	SerializedStapling.cpp
 	StapleElement.cpp
@@ -50,6 +62,7 @@ set(LIBS
 )
 target_link_libraries(Stapling ${LIBS})
 target_link_libraries(SerializedStapling ${LIBS})
+target_link_libraries(StaplingConjugateGradient ${LIBS})
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -61,3 +74,4 @@ configure_file(
 
 set_target_properties(Stapling PROPERTIES FOLDER "Examples") 
 set_target_properties(SerializedStapling PROPERTIES FOLDER "Examples") 
+set_target_properties(StaplingConjugateGradient PROPERTIES FOLDER "Examples") 

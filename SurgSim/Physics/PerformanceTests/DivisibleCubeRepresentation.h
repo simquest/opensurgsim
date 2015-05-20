@@ -43,10 +43,6 @@ public:
 	/// \return Initialization success or failure
 	bool initializeNoWakeUp();
 
-	/// Return a pointer to the OdeSolver component
-	/// \return The ODE solver
-	std::shared_ptr<SurgSim::Math::OdeSolver> getOdeSolver();
-
 protected:
 	/// Convert a node index from a 3d indexing to a 1d indexing
 	/// \param i, j, k Indices along the X, Y and Z axis
