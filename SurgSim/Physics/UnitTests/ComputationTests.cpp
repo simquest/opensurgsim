@@ -20,8 +20,8 @@
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
