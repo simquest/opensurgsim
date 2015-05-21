@@ -28,10 +28,10 @@ namespace SurgSim
 
 namespace Physics
 {
-class RigidRepresentationState;
+class RigidState;
 class Localization;
 
-typedef RigidRepresentationBaseLocalization RigidRepresentationLocalization;
+typedef RigidLocalization RigidLocalization;
 
 SURGSIM_STATIC_REGISTRATION(RigidRepresentation);
 
@@ -135,7 +135,7 @@ private:
 
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
-	void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
+	void updateGlobalInertiaMatrices(const RigidState& state) override;
 };
 
 }; // Physics

@@ -27,33 +27,33 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableCollisionRepresentation.cpp
 	DeformableRepresentation.cpp
 	Fem1DElementBeam.cpp
+	Fem1DLocalization.cpp
 	Fem1DPlyReaderDelegate.cpp
 	Fem1DRepresentation.cpp
-	Fem1DRepresentationLocalization.cpp
 	Fem2DElementTriangle.cpp
+	Fem2DLocalization.cpp
 	Fem2DPlyReaderDelegate.cpp
 	Fem2DRepresentation.cpp
-	Fem2DRepresentationLocalization.cpp
+	Fem3DConstraintFixedPoint.cpp
+	Fem3DConstraintFrictionlessContact.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
+	Fem3DLocalization.cpp
 	Fem3DPlyReaderDelegate.cpp
 	Fem3DRepresentation.cpp
-	Fem3DRepresentationBilateral3D.cpp
-	Fem3DRepresentationContact.cpp
-	Fem3DRepresentationLocalization.cpp
 	FemElement.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
+	FixedConstraintFixedPoint.cpp
+	FixedConstraintFrictionlessContact.cpp
 	FixedRepresentation.cpp
-	FixedRepresentationBilateral3D.cpp
-	FixedRepresentationContact.cpp
 	FreeMotion.cpp
 	LinearSpring.cpp
 	Localization.cpp
+	MassSpringConstraintFrictionlessContact.cpp
+	MassSpringLocalization.cpp
 	MassSpringRepresentation.cpp
-	MassSpringRepresentationContact.cpp
-	MassSpringRepresentationLocalization.cpp
 	MlcpPhysicsProblem.cpp
 	PhysicsConvert.cpp
 	PhysicsManager.cpp
@@ -63,12 +63,12 @@ set(SURGSIM_PHYSICS_SOURCES
 	PushResults.cpp
 	Representation.cpp
 	RigidCollisionRepresentation.cpp
+	RigidConstraintFixedPoint.cpp
+	RigidConstraintFrictionlessContact.cpp
+	RigidLocalization.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
-	RigidRepresentationBaseLocalization.cpp
-	RigidRepresentationBilateral3D.cpp
-	RigidRepresentationContact.cpp
-	RigidRepresentationState.cpp
+	RigidState.cpp
 	SolveMlcp.cpp
 	Spring.cpp
 	UpdateCollisionRepresentations.cpp
@@ -89,35 +89,35 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
 	Fem1DElementBeam.h
+	Fem1DLocalization.h
 	Fem1DPlyReaderDelegate.h
 	Fem1DRepresentation.h
-	Fem1DRepresentationLocalization.h
 	Fem2DElementTriangle.h
+	Fem2DLocalization.h
 	Fem2DPlyReaderDelegate.h
 	Fem2DRepresentation.h
-	Fem2DRepresentationLocalization.h
+	Fem3DConstraintFixedPoint.h
+	Fem3DConstraintFrictionlessContact.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h
+	Fem3DLocalization.h
 	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
-	Fem3DRepresentationBilateral3D.h
-	Fem3DRepresentationContact.h
-	Fem3DRepresentationLocalization.h
 	FemElement.h
 	FemElement-inl.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
+	FixedConstraintFixedPoint.h
+	FixedConstraintFrictionlessContact.h
 	FixedRepresentation.h
-	FixedRepresentationBilateral3D.h
-	FixedRepresentationContact.h
 	FreeMotion.h
 	LinearSpring.h
 	Localization.h
 	Mass.h
+	MassSpringConstraintFrictionlessContact.h
+	MassSpringLocalization.h
 	MassSpringRepresentation.h
-	MassSpringRepresentationContact.h
-	MassSpringRepresentationLocalization.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
 	MlcpPhysicsSolution.h
@@ -129,13 +129,13 @@ set(SURGSIM_PHYSICS_HEADERS
 	PushResults.h
 	Representation.h
 	RigidCollisionRepresentation.h
+	RigidConstraintFixedPoint.h
+	RigidConstraintFrictionlessContact.h
+	RigidLocalization.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
-	RigidRepresentationBaseLocalization.h
-	RigidRepresentationBilateral3D.h
-	RigidRepresentationContact.h
-	RigidRepresentationState.h
+	RigidState.h
 	SolveMlcp.h
 	Spring.h
 	UpdateCollisionRepresentations.h
