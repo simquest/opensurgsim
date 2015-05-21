@@ -301,7 +301,6 @@ void FemRepresentation::update(double dt)
 void FemRepresentation::setComplianceWarping(bool useComplianceWarping)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Compliance warping cannot be modified once the component is initialized";
-	SURGSIM_ASSERT(!useComplianceWarping) << "Compliance warping is disabled in this version";
 
 	m_useComplianceWarping = useComplianceWarping;
 }

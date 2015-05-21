@@ -587,7 +587,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		fem->wakeUp();
 
-		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
