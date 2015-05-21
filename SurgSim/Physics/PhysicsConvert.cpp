@@ -15,12 +15,12 @@
 
 #include "SurgSim/Physics/PhysicsConvert.h"
 
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidState.h"
 
 namespace YAML
 {
 
-Node convert<SurgSim::Physics::RigidRepresentationState>::encode(const SurgSim::Physics::RigidRepresentationState& rhs)
+Node convert<SurgSim::Physics::RigidState>::encode(const SurgSim::Physics::RigidState& rhs)
 {
 	YAML::Node data(rhs.encode());
 
@@ -30,9 +30,9 @@ Node convert<SurgSim::Physics::RigidRepresentationState>::encode(const SurgSim::
 	return result;
 }
 
-bool convert<SurgSim::Physics::RigidRepresentationState>::decode(
+bool convert<SurgSim::Physics::RigidState>::decode(
 	const Node& node,
-	SurgSim::Physics::RigidRepresentationState& rhs) //NOLINT
+	SurgSim::Physics::RigidState& rhs) //NOLINT
 {
 	bool result = false;
 	if (node[rhs.getClassName()].IsDefined())

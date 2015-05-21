@@ -30,6 +30,8 @@ set(OCULUS_DEVICE_HEADERS
 	OculusScaffold.h
 )
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} OculusDevice.h PARENT_SCOPE)
+
 surgsim_add_library(
 	OculusDevice
 	"${OCULUS_DEVICE_SOURCES}"
