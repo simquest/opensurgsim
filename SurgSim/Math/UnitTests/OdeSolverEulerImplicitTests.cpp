@@ -63,13 +63,14 @@ void doSolveTest(bool computeCompliance)
 	{
 		MassPoint m;
 		MassPointState defaultState, state0, state1, state2;
-		T solver(&m);
-		solver.setNewtonRaphsonMaximumIteration(1);
+		auto solver = std::make_shared<T>(&m);
+		m.setOdeSolver(solver);
+		solver->setNewtonRaphsonMaximumIteration(1);
 
 		// ma = mg <=> a = g
 		// v(1) = g.dt + v(0)
 		// x(1) = v(1).dt + x(0)
-		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state0, &state1, computeCompliance);});
 		EXPECT_EQ(defaultState, state0);
 		EXPECT_NE(defaultState, state1);
 		EXPECT_TRUE(state1.getVelocities().isApprox(m.m_gravity * 1e-3 + state0.getVelocities()));
@@ -77,7 +78,7 @@ void doSolveTest(bool computeCompliance)
 
 		// v(2) = g.dt + v(1)
 		// x(2) = v(2).dt + x(1)
-		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state1, &state2, computeCompliance);});
 		EXPECT_NE(defaultState, state1);
 		EXPECT_NE(defaultState, state2);
 		EXPECT_NE(state2, state1);
@@ -88,13 +89,14 @@ void doSolveTest(bool computeCompliance)
 	{
 		MassPoint m(0.1);
 		MassPointState defaultState, state0, state1, state2;
-		T solver(&m);
-		solver.setNewtonRaphsonMaximumIteration(1);
+		auto solver = std::make_shared<T>(&m);
+		m.setOdeSolver(solver);
+		solver->setNewtonRaphsonMaximumIteration(1);
 
 		// ma = mg - c.v <=> a = g - c/m.v
 		// v(1) = (g - c/m.v(1)).dt + v(0) <=> v(1) = I.(1.0 + dt.c/m)^-1.(g.dt + v(0))
 		// x(1) = v(1).dt + x(0)
-		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state0, &state1, computeCompliance);});
 		EXPECT_EQ(defaultState, state0);
 		EXPECT_NE(defaultState, state1);
 		Matrix33d systemInverse = Matrix33d::Identity() * 1.0 / (1.0 + 1e-3 * 0.1 / m.m_mass);
@@ -103,7 +105,7 @@ void doSolveTest(bool computeCompliance)
 
 		// v(2) = (g - c/m.v(2)).dt + v(1) <=> v(2) = I.(1.0 + dt.c/m)^-1.(g.dt + v(1))
 		// x(2) = v(2).dt + x(1)
-		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state1, &state2, computeCompliance);});
 		EXPECT_NE(defaultState, state1);
 		EXPECT_NE(defaultState, state2);
 		EXPECT_NE(state1, state2);
@@ -144,13 +146,14 @@ void doComplexNonLinearOdeTest(size_t numNewtonRaphsonIteration, bool expectExac
 	state0.getPositions().setLinSpaced(1.4, 5.67);
 	state0.getVelocities().setLinSpaced(-0.4, -0.3);
 	double dt = 1e-3;
-	T solver(&odeEquation);
-	solver.setNewtonRaphsonMaximumIteration(numNewtonRaphsonIteration);
-	solver.setNewtonRaphsonEpsilonConvergence(1e-13);
+	auto solver = std::make_shared<T>(&odeEquation);
+	odeEquation.setOdeSolver(solver);
+	solver->setNewtonRaphsonMaximumIteration(numNewtonRaphsonIteration);
+	solver->setNewtonRaphsonEpsilonConvergence(1e-13);
 
-	ASSERT_NO_THROW({solver.solve(dt, state0, &state1);});
+	ASSERT_NO_THROW({solver->solve(dt, state0, &state1);});
 	// We do 2 iterations as Linear ode solver will do the 1st iteration as a normal non-linear ode solver
-	ASSERT_NO_THROW({solver.solve(dt, state1, &state2);});
+	ASSERT_NO_THROW({solver->solve(dt, state1, &state2);});
 
 	EXPECT_NE(state0, state1);
 	EXPECT_NE(state1, state2);
@@ -221,14 +224,15 @@ template <class T>
 void doComputeMatricesTest()
 {
 	MassPoint m;
-	T solver(&m);
+	auto solver = std::make_shared<T>(&m);
+	m.setOdeSolver(solver);
 	MassPointState state;
 	double dt = 1e-3;
 
 	Matrix expectedSystemMatrix = m.computeM(state) / dt + m.computeD(state) + dt * m.computeK(state);
-	EXPECT_NO_THROW(solver.computeMatrices(dt, state));
-	EXPECT_TRUE(solver.getSystemMatrix().isApprox(expectedSystemMatrix));
-	EXPECT_TRUE(solver.getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
+	EXPECT_NO_THROW(solver->computeMatrices(dt, state));
+	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));
+	EXPECT_TRUE(solver->getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
 }
 };
 

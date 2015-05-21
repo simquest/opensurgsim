@@ -63,12 +63,13 @@ void doSolveTest(bool computeCompliance)
 	{
 		MassPoint m;
 		MassPointState defaultState, state0, state1, state2;
-		T solver(&m);
+		auto solver = std::make_shared<T>(&m);
+		m.setOdeSolver(solver);
 
 		// ma = mg <=> a = g
 		// v(1) = g.dt + v(0)
 		// x(1) = v(0).dt + x(0)
-		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state0, &state1, computeCompliance);});
 		EXPECT_EQ(defaultState, state0);
 		EXPECT_NE(defaultState, state1);
 		EXPECT_TRUE(state1.getVelocities().isApprox(m.m_gravity * 1e-3 + state0.getVelocities()));
@@ -76,7 +77,7 @@ void doSolveTest(bool computeCompliance)
 
 		// v(2) = g.dt + v(1)
 		// x(2) = v(1).dt + x(1)
-		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state1, &state2, computeCompliance);});
 		EXPECT_NE(defaultState, state1);
 		EXPECT_NE(defaultState, state2);
 		EXPECT_NE(state2, state1);
@@ -87,12 +88,13 @@ void doSolveTest(bool computeCompliance)
 	{
 		MassPoint m(0.1);
 		MassPointState defaultState, state0, state1, state2;
-		T solver(&m);
+		auto solver = std::make_shared<T>(&m);
+		m.setOdeSolver(solver);
 
 		// ma = mg - c.v <=> a = g - c/m.v
 		// v(1) = (g - c/m.v).dt + v(0)
 		// x(1) = v(0).dt + x(0)
-		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state0, &state1, computeCompliance);});
 		EXPECT_EQ(defaultState, state0);
 		EXPECT_NE(defaultState, state1);
 		Vector3d acceleration0 = m.m_gravity - 0.1 * state0.getVelocities() / m.m_mass;
@@ -101,7 +103,7 @@ void doSolveTest(bool computeCompliance)
 
 		// v(2) = (g - c/m.v).dt + v(1)
 		// x(2) = v(1).dt + x(1)
-		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state1, &state2, computeCompliance);});
 		EXPECT_NE(defaultState, state1);
 		EXPECT_NE(defaultState, state2);
 		EXPECT_NE(state1, state2);
