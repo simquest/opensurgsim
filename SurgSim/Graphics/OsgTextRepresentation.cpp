@@ -146,7 +146,7 @@ bool OsgTextRepresentation::doInitialize()
 
 }
 
-void OsgTextRepresentation::loadFont(std::string fileName)
+void OsgTextRepresentation::loadFont(const std::string& fileName)
 {
 	auto newFont = std::make_shared<OsgFont>();
 	newFont->load(fileName);
