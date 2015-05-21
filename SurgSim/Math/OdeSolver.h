@@ -101,6 +101,7 @@ public:
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
+	/// \param computeCompliance True to explicitly compute the RHS vector, False otherwise
 	virtual void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) = 0;
 
 	/// Computes the system and compliance matrices for a given state
