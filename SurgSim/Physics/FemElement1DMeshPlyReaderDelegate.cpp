@@ -130,7 +130,7 @@ bool FemElement1DMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 
-	result = result && reader.hasProperty("1d_element", "type");
+	//result = result && reader.hasProperty("1d_element", "type");
 	result = result && reader.hasProperty("1d_element", "vertex_indices");
 	result = result && !reader.isScalar("1d_element", "vertex_indices");
 
@@ -191,9 +191,10 @@ void FemElement1DMeshPlyReaderDelegate::processFemElement(const std::string& ele
 	SURGSIM_ASSERT(m_elementData.vertexCount == 2) << "Cannot process 1D Element with "
 		<< m_elementData.vertexCount << " vertices.";
 
-	FemElementStructs::FemElement1D femElement;
-	femElement.nodeIds.resize(m_elementData.vertexCount);
-	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement.nodeIds.data());
+	auto femElement = std::make_shared<FemElementStructs::FemElement1D>();
+	femElement->type = "SurgSim::Physics::Fem1DElementBeam";
+	femElement->nodeIds.resize(m_elementData.vertexCount);
+	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
 	m_mesh->addFemElement(femElement);
 }
 
@@ -236,16 +237,19 @@ void* FemElement1DMeshPlyReaderDelegate::beginBoundaryConditions(const std::stri
 
 void FemElement1DMeshPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
-	m_mesh->addBoundaryCondition(m_boundaryConditionData);
+	m_mesh->addBoundaryCondition(static_cast<size_t>(m_boundaryConditionData));
 }
 
 void FemElement1DMeshPlyReaderDelegate::endFile()
 {
-	m_mesh->setRadius(m_radius);
-	m_mesh->setEnableShear(m_enableShear);
-	m_mesh->setMassDensity(m_materialData.massDensity);
-	m_mesh->setPoissonRatio(m_materialData.poissonRatio);
-	m_mesh->setYoungModulus(m_materialData.youngModulus);
+	for(auto element : m_mesh->getFemElements())
+	{
+		element->radius = m_radius;
+		element->enableShear = m_enableShear;
+		element->massDensity = m_materialData.massDensity;
+		element->poissonRatio = m_materialData.poissonRatio;
+		element->youngModulus = m_materialData.youngModulus;
+	}
 	m_mesh->update();
 }
 

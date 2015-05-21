@@ -65,6 +65,38 @@ Fem2DRepresentation::~Fem2DRepresentation()
 {
 }
 
+void Fem2DRepresentation::loadMesh(const std::string& fileName)
+{
+	m_filename = fileName;
+	auto mesh = std::make_shared<FemElement2DMesh>();
+	mesh->load(fileName);
+	setMesh(mesh);
+}
+
+void Fem2DRepresentation::setMesh(std::shared_ptr<Framework::Asset> mesh)
+{
+	auto femMesh = std::dynamic_pointer_cast<FemElement2DMesh>(mesh);
+	SURGSIM_ASSERT(femMesh != nullptr)
+			<< "Mesh for Fem2DRepresentation needs to be a SurgSim::Physics::FemElement2DMesh";
+	m_femElementMesh = femMesh;
+	auto state = std::make_shared<SurgSim::Math::OdeState>();
+	state->setNumDof(6, m_femElementMesh->getNumVertices());
+	for (size_t i = 0; i < m_femElementMesh->getNumVertices(); i++)
+	{
+		state->getPositions().segment<3>(6*i) = m_femElementMesh->getVertexPosition(i);
+	}
+	for (auto boundaryCondition : m_femElementMesh->getBoundaryConditions())
+	{
+		state->addBoundaryCondition(boundaryCondition);
+	}
+	FemRepresentation::setInitialState(state);
+}
+
+std::shared_ptr<FemElement2DMesh> Fem2DRepresentation::getMesh() const
+{
+	return m_femElementMesh;
+}
+
 void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K,
@@ -131,19 +163,42 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	m_hasExternalGeneralizedForce = true;
 }
 
-std::shared_ptr<FemPlyReaderDelegate> Fem2DRepresentation::getDelegate()
-{
-	auto thisAsSharedPtr = std::static_pointer_cast<Fem2DRepresentation>(shared_from_this());
-	auto readerDelegate = std::make_shared<Fem2DPlyReaderDelegate>(thisAsSharedPtr);
-
-	return readerDelegate;
-}
-
 void Fem2DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 		const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
+}
+
+bool Fem2DRepresentation::doInitialize()
+{
+	if (!m_filename.empty())
+	{
+		loadMesh(m_filename);
+	}
+
+	// If mesh is set, create the FemElements
+	if (m_femElementMesh != nullptr)
+	{
+		for (auto element : m_femElementMesh->getFemElements())
+		{
+			std::shared_ptr<FemElement> femElement;
+			if (m_femElementOverrideType.empty())
+			{
+				femElement = FemElement::getFactory().create(element->type, element);
+			}
+			else
+			{
+				femElement = FemElement::getFactory().create(m_femElementOverrideType, element);
+			}
+
+			m_femElements.push_back(femElement);
+		}
+	}
+
+	FemRepresentation::doInitialize();
+
+	return true;
 }
 
 } // namespace Physics

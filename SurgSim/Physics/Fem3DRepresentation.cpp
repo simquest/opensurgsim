@@ -77,6 +77,38 @@ Fem3DRepresentation::~Fem3DRepresentation()
 {
 }
 
+void Fem3DRepresentation::loadMesh(const std::string& fileName)
+{
+	m_filename = fileName;
+	auto mesh = std::make_shared<FemElement3DMesh>();
+	mesh->load(fileName);
+	setMesh(mesh);
+}
+
+void Fem3DRepresentation::setMesh(std::shared_ptr<Framework::Asset> mesh)
+{
+	auto femMesh = std::dynamic_pointer_cast<FemElement3DMesh>(mesh);
+	SURGSIM_ASSERT(femMesh != nullptr)
+			<< "Mesh for Fem3DRepresentation needs to be a SurgSim::Physics::FemElement3DMesh";
+	m_femElementMesh = femMesh;
+	auto state = std::make_shared<SurgSim::Math::OdeState>();
+	state->setNumDof(3, m_femElementMesh->getNumVertices());
+	for (size_t i = 0; i < m_femElementMesh->getNumVertices(); i++)
+	{
+		state->getPositions().segment<3>(3*i) = m_femElementMesh->getVertexPosition(i);
+	}
+	for (auto boundaryCondition : m_femElementMesh->getBoundaryConditions())
+	{
+		state->addBoundaryCondition(boundaryCondition);
+	}
+	FemRepresentation::setInitialState(state);
+}
+
+std::shared_ptr<FemElement3DMesh> Fem3DRepresentation::getMesh() const
+{
+	return m_femElementMesh;
+}
+
 void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K,
@@ -139,14 +171,6 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 		}
 	}
 	m_hasExternalGeneralizedForce = true;
-}
-
-std::shared_ptr<FemPlyReaderDelegate> Fem3DRepresentation::getDelegate()
-{
-	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(shared_from_this());
-	auto readerDelegate = std::make_shared<Fem3DPlyReaderDelegate>(thisAsSharedPtr);
-
-	return readerDelegate;
 }
 
 std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElementIdMap(
@@ -219,6 +243,37 @@ bool Fem3DRepresentation::doWakeUp()
 		auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(deformableCollision->getShape());
 		m_triangleIdToElementIdMap = createTriangleIdToElementIdMap(mesh);
 	}
+
+	return true;
+}
+
+bool Fem3DRepresentation::doInitialize()
+{
+	if (!m_filename.empty())
+	{
+		loadMesh(m_filename);
+	}
+
+	// If mesh is set, create the FemElements
+	if (m_femElementMesh != nullptr)
+	{
+		for (auto element : m_femElementMesh->getFemElements())
+		{
+			std::shared_ptr<FemElement> femElement;
+			if (m_femElementOverrideType.empty())
+			{
+				femElement = FemElement::getFactory().create(element->type, element);
+			}
+			else
+			{
+				femElement = FemElement::getFactory().create(m_femElementOverrideType, element);
+			}
+
+			m_femElements.push_back(femElement);
+		}
+	}
+
+	FemRepresentation::doInitialize();
 
 	return true;
 }

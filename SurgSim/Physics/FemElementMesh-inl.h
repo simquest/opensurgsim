@@ -27,13 +27,12 @@ namespace Physics
 {
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-FemElementMesh<VertexData, EdgeData, TriangleData, Element>::FemElementMesh() :
-	m_massDensity(0), m_poissonRatio(0), m_youngModulus(0)
+FemElementMesh<VertexData, EdgeData, TriangleData, Element>::FemElementMesh()
 {
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::addFemElement(const Element& element)
+size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::addFemElement(std::shared_ptr<Element> element)
 {
 	m_femElements.push_back(element);
 	return m_femElements.size() - 1;
@@ -46,19 +45,19 @@ size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getNumElemen
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-const std::vector<Element>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElements() const
+const std::vector<std::shared_ptr<Element>>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElements() const
 {
 	return m_femElements;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-std::vector<Element>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElements()
+std::vector<std::shared_ptr<Element>>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElements()
 {
 	return m_femElements;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-const Element& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElement(size_t id) const
+std::shared_ptr<Element> FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElement(size_t id) const
 {
 	return m_femElements[id];
 }
@@ -70,7 +69,7 @@ void FemElementMesh<VertexData, EdgeData, TriangleData, Element>::removeFemEleme
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::addBoundaryCondition(const size_t boundaryCondition)
+size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::addBoundaryCondition(size_t boundaryCondition)
 {
 	m_boundaryConditions.push_back(boundaryCondition);
 	return m_boundaryConditions.size() - 1;
@@ -89,7 +88,7 @@ std::vector<size_t>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-const size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getBoundaryCondition(size_t id) const
+size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getBoundaryCondition(size_t id) const
 {
 	return m_boundaryConditions[id];
 }
@@ -98,42 +97,6 @@ template <class VertexData, class EdgeData, class TriangleData, class Element>
 void FemElementMesh<VertexData, EdgeData, TriangleData, Element>::removeBoundaryCondition(size_t id)
 {
 	m_boundaryConditions.erase(m_boundaryConditions.begin() + id);
-}
-
-template <class VertexData, class EdgeData, class TriangleData, class Element>
-double FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getYoungModulus() const
-{
-	return m_youngModulus;
-}
-
-template <class VertexData, class EdgeData, class TriangleData, class Element>
-double FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getPoissonRatio() const
-{
-	return m_poissonRatio;
-}
-
-template <class VertexData, class EdgeData, class TriangleData, class Element>
-double FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getMassDensity() const
-{
-	return m_massDensity;
-}
-
-template <class VertexData, class EdgeData, class TriangleData, class Element>
-void FemElementMesh<VertexData, EdgeData, TriangleData, Element>::setYoungModulus(double modulus)
-{
-	m_youngModulus = modulus;
-}
-
-template <class VertexData, class EdgeData, class TriangleData, class Element>
-void FemElementMesh<VertexData, EdgeData, TriangleData, Element>::setPoissonRatio(double ratio)
-{
-	m_poissonRatio = ratio;
-}
-
-template <class VertexData, class EdgeData, class TriangleData, class Element>
-void FemElementMesh<VertexData, EdgeData, TriangleData, Element>::setMassDensity(double density)
-{
-	m_massDensity = density;
 }
 
 } // namespace Physics

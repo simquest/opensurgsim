@@ -48,6 +48,17 @@ bool FemElement2DMeshPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, y));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, z));
 
+	// 6DOF processing
+	m_hasRotationDOF = reader->hasProperty("vertex", "thetaX") && reader->hasProperty("vertex", "thetaY") &&
+							  reader->hasProperty("vertex", "thetaZ");
+
+	if (m_hasRotationDOF)
+	{
+		reader->requestScalarProperty("vertex", "thetaX", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaX));
+		reader->requestScalarProperty("vertex", "thetaY", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaY));
+		reader->requestScalarProperty("vertex", "thetaZ", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaZ));
+	}
+
 	// Element Processing
 	reader->requestElement(
 		"2d_element",
@@ -63,17 +74,6 @@ bool FemElement2DMeshPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		offsetof(FemElement2D, indices),
 		PlyReader::TYPE_UNSIGNED_INT,
 		offsetof(FemElement2D, vertexCount));
-
-	// 6DOF processing
-	m_hasRotationDOF = reader->hasProperty("vertex", "thetaX") && reader->hasProperty("vertex", "thetaY") &&
-							  reader->hasProperty("vertex", "thetaZ");
-
-	if (m_hasRotationDOF)
-	{
-		reader->requestScalarProperty("vertex", "thetaX", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaX));
-		reader->requestScalarProperty("vertex", "thetaY", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaY));
-		reader->requestScalarProperty("vertex", "thetaZ", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaZ));
-	}
 
 	// Boundary Condition processing
 
@@ -130,7 +130,7 @@ bool FemElement2DMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 
-	result = result && reader.hasProperty("2d_element", "type");
+	//result = result && reader.hasProperty("2d_element", "type");
 	result = result && reader.hasProperty("2d_element", "vertex_indices");
 	result = result && !reader.isScalar("2d_element", "vertex_indices");
 
@@ -167,7 +167,7 @@ void FemElement2DMeshPlyReaderDelegate::processVertex(const std::string& element
 		data.thetaZ = 0.0;
 	}
 
-	FemElement1DMesh::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z), data);
+	FemElement2DMesh::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z), data);
 
 	m_mesh->addVertex(vertex);
 }
@@ -191,9 +191,10 @@ void FemElement2DMeshPlyReaderDelegate::processFemElement(const std::string& ele
 	SURGSIM_ASSERT(m_elementData.vertexCount == 3) << "Cannot process 2D Element with "
 		<< m_elementData.vertexCount << " vertices.";
 
-	FemElementStructs::FemElement2D femElement;
-	femElement.nodeIds.resize(m_elementData.vertexCount);
-	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement.nodeIds.data());
+	auto femElement = std::make_shared<FemElementStructs::FemElement2D>();
+	femElement->type = "SurgSim::Physics::Fem2DElementTriangle";
+	femElement->nodeIds.resize(m_elementData.vertexCount);
+	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
 	m_mesh->addFemElement(femElement);
 }
 
@@ -236,15 +237,18 @@ void* FemElement2DMeshPlyReaderDelegate::beginBoundaryConditions(const std::stri
 
 void FemElement2DMeshPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
-	m_mesh->addBoundaryCondition(m_boundaryConditionData);
+	m_mesh->addBoundaryCondition(static_cast<size_t>(m_boundaryConditionData));
 }
 
 void FemElement2DMeshPlyReaderDelegate::endFile()
 {
-	m_mesh->setThickness(m_thickness);
-	m_mesh->setMassDensity(m_materialData.massDensity);
-	m_mesh->setPoissonRatio(m_materialData.poissonRatio);
-	m_mesh->setYoungModulus(m_materialData.youngModulus);
+	for(auto element : m_mesh->getFemElements())
+	{
+		element->thickness = m_thickness;
+		element->massDensity = m_materialData.massDensity;
+		element->poissonRatio = m_materialData.poissonRatio;
+		element->youngModulus = m_materialData.youngModulus;
+	}
 	m_mesh->update();
 }
 

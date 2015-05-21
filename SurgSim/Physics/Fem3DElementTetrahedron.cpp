@@ -52,11 +52,15 @@ Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds)
 	m_nodeIds.assign(std::begin(nodeIds), std::end(nodeIds));
 }
 
-Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::vector<size_t> nodeIds)
+Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::shared_ptr<FemElementStructs::FemElement> elementData)
 {
 	init();
-	SURGSIM_ASSERT(nodeIds.size() == 4) << "Incorrect number of nodes for Fem3D Tetrahedron";
-	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	auto data = std::static_pointer_cast<FemElementStructs::FemElement3D>(elementData);
+	SURGSIM_ASSERT(data->nodeIds.size() == 4) << "Incorrect number of nodes for Fem3D Tetrahedron";
+	m_nodeIds.assign(data->nodeIds.begin(), data->nodeIds.end());
+	setMassDensity(data->massDensity);
+	setPoissonRatio(data->poissonRatio);
+	setYoungModulus(data->youngModulus);
 }
 
 void Fem3DElementTetrahedron::init()

@@ -76,7 +76,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Set the file name which contains the tetrahedral mesh. File will be loaded by 'doInitialize()' call.
 	std::shared_ptr<Fem3DRepresentation> physicsRepresentation = std::make_shared<Fem3DRepresentation>("Physics");
-	physicsRepresentation->setFilename(filename);
+	physicsRepresentation->loadMesh(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	sceneElement->addComponent(physicsRepresentation);
 

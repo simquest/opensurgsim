@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -44,13 +45,10 @@ namespace Physics
 TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 {
 	auto fem = std::make_shared<Fem3DRepresentation>("Representation");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	std::string path = findFile("PlyReaderTests/Tetrahedron.ply");
-	ASSERT_TRUE(!path.empty());
-	PlyReader reader(path);
-	auto delegate = std::make_shared<Fem3DPlyReaderDelegate>(fem);
-
-	ASSERT_TRUE(reader.parseWithDelegate(delegate));
+	fem->loadMesh("PlyReaderTests/Tetrahedron.ply");
+	fem->initialize(runtime);
 
 	// Vertices
 	ASSERT_EQ(3u, fem->getNumDofPerNode());

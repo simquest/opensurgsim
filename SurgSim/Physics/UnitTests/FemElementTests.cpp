@@ -218,59 +218,74 @@ TEST(FemElementTests, IsValidCoordinate)
 
 TEST(FemElementTests, FactoryTest)
 {
-	std::vector<size_t> mockNodes;
-	mockNodes.push_back(2);
+	auto mockElement = std::make_shared<FemElementStructs::FemElement>();
+	mockElement->nodeIds.push_back(2);
 	FemElement::getFactory().registerClass<MockFemElement>("MockFemElement");
-	auto mockFem = FemElement::getFactory().create("MockFemElement", mockNodes);
+	auto mockFem = FemElement::getFactory().create("MockFemElement", mockElement);
 	EXPECT_NE(nullptr, mockFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<MockFemElement>(mockFem));
 
-	std::vector<size_t> beamNodes;
-	beamNodes.push_back(1);
-	beamNodes.push_back(2);
-	auto beamFem = FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam", beamNodes);
+	auto beamElement = std::make_shared<FemElementStructs::FemElement1D>();
+	beamElement->nodeIds.push_back(1);
+	beamElement->nodeIds.push_back(2);
+	beamElement->radius = 0.4;
+	beamElement->enableShear = false;
+	beamElement->massDensity = 0.4;
+	beamElement->poissonRatio = 0.4;
+	beamElement->youngModulus = 0.4;
+	auto beamFem = FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam", beamElement);
 	EXPECT_NE(nullptr, beamFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem1DElementBeam>(beamFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam", mockNodes));
+	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam", mockElement));
 
-	std::vector<size_t> triNodes;
-	triNodes.push_back(1);
-	triNodes.push_back(2);
-	triNodes.push_back(3);
-	auto triFem = FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle", triNodes);
+	auto triElement = std::make_shared<FemElementStructs::FemElement2D>();
+	triElement->nodeIds.push_back(1);
+	triElement->nodeIds.push_back(2);
+	triElement->nodeIds.push_back(3);
+	triElement->thickness = 0.4;
+	triElement->massDensity = 0.4;
+	triElement->poissonRatio = 0.4;
+	triElement->youngModulus = 0.4;
+	auto triFem = FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle", triElement);
 	EXPECT_NE(nullptr, triFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem2DElementTriangle>(triFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle", beamNodes));
+	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle", beamElement));
 
-	std::vector<size_t> tetNodes;
-	tetNodes.push_back(1);
-	tetNodes.push_back(2);
-	tetNodes.push_back(3);
-	tetNodes.push_back(1);
-	auto coTetFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCorotationalTetrahedron", tetNodes);
+	auto tetElement = std::make_shared<FemElementStructs::FemElement3D>();
+	tetElement->nodeIds.push_back(1);
+	tetElement->nodeIds.push_back(2);
+	tetElement->nodeIds.push_back(3);
+	tetElement->nodeIds.push_back(1);
+	tetElement->massDensity = 0.4;
+	tetElement->poissonRatio = 0.4;
+	tetElement->youngModulus = 0.4;
+	auto coTetFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCorotationalTetrahedron", tetElement);
 	EXPECT_NE(nullptr, coTetFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCorotationalTetrahedron>(coTetFem));
 	ASSERT_ANY_THROW(FemElement::getFactory().create(
-		"SurgSim::Physics::Fem3DElementCorotationalTetrahedron", triNodes));
+		"SurgSim::Physics::Fem3DElementCorotationalTetrahedron", triElement));
 
-	std::vector<size_t> cubeNodes;
-	cubeNodes.push_back(1);
-	cubeNodes.push_back(2);
-	cubeNodes.push_back(3);
-	cubeNodes.push_back(4);
-	cubeNodes.push_back(5);
-	cubeNodes.push_back(6);
-	cubeNodes.push_back(7);
-	cubeNodes.push_back(8);
-	auto cubeFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCube", cubeNodes);
+	auto cubeElement = std::make_shared<FemElementStructs::FemElement3D>();
+	cubeElement->nodeIds.push_back(1);
+	cubeElement->nodeIds.push_back(2);
+	cubeElement->nodeIds.push_back(3);
+	cubeElement->nodeIds.push_back(4);
+	cubeElement->nodeIds.push_back(5);
+	cubeElement->nodeIds.push_back(6);
+	cubeElement->nodeIds.push_back(7);
+	cubeElement->nodeIds.push_back(8);
+	cubeElement->massDensity = 0.4;
+	cubeElement->poissonRatio = 0.4;
+	cubeElement->youngModulus = 0.4;
+	auto cubeFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCube", cubeElement);
 	EXPECT_NE(nullptr, cubeFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCube>(cubeFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCube", tetNodes));
+	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCube", tetElement));
 
-	auto tetFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementTetrahedron", tetNodes);
+	auto tetFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementTetrahedron", tetElement);
 	EXPECT_NE(nullptr, tetFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementTetrahedron>(tetFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem3DElementTetrahedron", cubeNodes));
+	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem3DElementTetrahedron", cubeElement));
 }
 
 } // namespace Physics

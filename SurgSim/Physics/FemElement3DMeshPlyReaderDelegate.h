@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENT2DMESHPLYREADERDELEGATE_H
-#define SURGSIM_PHYSICS_FEMELEMENT2DMESHPLYREADERDELEGATE_H
+#ifndef SURGSIM_PHYSICS_FEMELEMENT3DMESHPLYREADERDELEGATE_H
+#define SURGSIM_PHYSICS_FEMELEMENT3DMESHPLYREADERDELEGATE_H
 
 #include <array>
 #include <memory>
@@ -34,15 +34,15 @@ namespace SurgSim
 namespace Physics
 {
 
-class FemElement2DMeshPlyReaderDelegate : public PlyReaderDelegate
+class FemElement3DMeshPlyReaderDelegate : public PlyReaderDelegate
 {
 public:
 	/// Default constructor.
-	FemElement2DMeshPlyReaderDelegate();
+	FemElement3DMeshPlyReaderDelegate();
 
 	/// Constructor.
 	/// \param mesh The mesh to be used, it will be cleared by the constructor.
-	explicit FemElement2DMeshPlyReaderDelegate(std::shared_ptr<FemElement2DMesh> mesh);
+	explicit FemElement3DMeshPlyReaderDelegate(std::shared_ptr<FemElement3DMesh> mesh);
 
 protected:
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
@@ -93,16 +93,6 @@ protected:
 	/// \param elementName Name of the element.
 	void endMaterials(const std::string& elementName);
 
-	/// Callback function, begin the processing of radius.
-	/// \param elementName Name of the element.
-	/// \param radiusCount Number of radii.
-	/// \return memory for radius data to the reader.
-	void* beginThickness(const std::string& elementName, size_t radiusCount);
-
-	/// Callback function, end the processing of radius.
-	/// \param elementName Name of the element.
-	void endThickness(const std::string& elementName);
-
 	/// Callback function, begin the processing of boundary conditions.
 	/// \param elementName Name of the element.
 	/// \param boundaryConditionCount Number of boundary conditions.
@@ -116,7 +106,7 @@ protected:
 	void endFile();
 
 private:
-	struct FemElement2D
+	struct FemElement3D
 	{
 		unsigned int type;   // “LinearBeam”, “CorotationalTetrahedron”…
 		int64_t overrun1; ///< Used to check for buffer overruns
@@ -134,21 +124,13 @@ private:
 		int64_t overrun; ///< Used to check for buffer overruns
 	} m_materialData;
 
-	struct Vertex6DData
+	struct VertexData
 	{
 		double x;
 		double y;
 		double z;
 		int64_t overrun1; ///< Used to check for buffer overruns
-		double thetaX;
-		double thetaY;
-		double thetaZ;
-		int64_t overrun2; ///< Used to check for buffer overruns
 	} m_vertexData;
-
-	bool m_hasRotationDOF;
-
-	double m_thickness;
 
 	/// Flag indicating if the associated file has boundary conditions
 	bool m_hasBoundaryConditions;
@@ -156,10 +138,10 @@ private:
 	/// Internal data to receive the "boundary_condition" element
 	unsigned int m_boundaryConditionData;
 
-	std::shared_ptr<FemElement2DMesh> m_mesh;
+	std::shared_ptr<FemElement3DMesh> m_mesh;
 };
 
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENT2DMESHPLYREADERDELEGATE_H
+#endif // SURGSIM_PHYSICS_FEMELEMENT3DMESHPLYREADERDELEGATE_H

@@ -22,6 +22,7 @@
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Physics/FemElementMesh.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
@@ -49,6 +50,10 @@ public:
 	/// Destructor
 	virtual ~Fem3DRepresentation();
 
+	void loadMesh(const std::string& fileName) override;
+	void setMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh);
+	std::shared_ptr<FemElement3DMesh> getMesh() const;
+
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
@@ -67,9 +72,9 @@ protected:
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 			const SurgSim::Math::RigidTransform3d& transform) override;
 
-private:
-	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+	bool doInitialize() override;
 
+private:
 	/// Produces a mapping from the provided mesh's triangle ids to this object's fem element ids. The mesh's vertices
 	/// must be identical to this object's fem element nodes.
 	/// \param mesh The mesh used to produce the mapping.
@@ -88,6 +93,8 @@ private:
 
 	/// Mapping from collision triangle's id to fem element id.
 	std::unordered_map<size_t, size_t> m_triangleIdToElementIdMap;
+
+	std::shared_ptr<FemElement3DMesh> m_femElementMesh;
 };
 
 } // namespace Physics

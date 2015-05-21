@@ -60,7 +60,7 @@ struct FemElement2D : public FemElement
 	double thickness;
 };
 
-struct FemElement3D : public FemElement{};
+struct FemElement3D : public FemElement {};
 } // namespace FemElementStructs
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
@@ -69,40 +69,29 @@ class FemElementMesh : public SurgSim::DataStructures::TriangleMesh<VertexData, 
 public:
 	FemElementMesh();
 
-	size_t addFemElement(const Element& element);
+	size_t addFemElement(std::shared_ptr<Element> element);
 
 	size_t getNumElements() const;
 
-	const std::vector<Element>& getFemElements() const;
-	std::vector<Element>& getFemElements();
+	const std::vector<std::shared_ptr<Element>>& getFemElements() const;
+	std::vector<std::shared_ptr<Element>>& getFemElements();
 
-	const Element& getFemElement(size_t id) const;
+	std::shared_ptr<Element> getFemElement(size_t id) const;
 
 	void removeFemElement(size_t id);
 
-	size_t addBoundaryCondition(const size_t boundaryCondition);
+	size_t addBoundaryCondition(size_t boundaryCondition);
 
 	const std::vector<size_t>& getBoundaryConditions() const;
 	std::vector<size_t>& getBoundaryConditions();
 
-	const size_t getBoundaryCondition(size_t id) const;
+	size_t getBoundaryCondition(size_t id) const;
 
 	void removeBoundaryCondition(size_t id);
 
-	double getYoungModulus() const;
-	double getPoissonRatio() const;
-	double getMassDensity() const;
-
-	void setYoungModulus(double modulus);
-	void setPoissonRatio(double ratio);
-	void setMassDensity(double density);
-
 protected:
-	std::vector<Element> m_femElements;
+	std::vector<std::shared_ptr<Element>> m_femElements;
 	std::vector<size_t> m_boundaryConditions;
-	double m_massDensity;
-	double m_poissonRatio;
-	double m_youngModulus;
 };
 
 class FemElement1DMesh : public FemElementMesh<FemElementStructs::RotationVectorData,
@@ -111,18 +100,7 @@ class FemElement1DMesh : public FemElementMesh<FemElementStructs::RotationVector
 public:
 	FemElement1DMesh();
 
-	void load(const std::string& fileName);
-
-	bool isEnableShear() const;
-	double getRadius() const;
-
-	void setEnableShear(bool enableShear);
-	void setRadius(double radius);
-
 protected:
-	bool m_enableShear;
-	double m_radius;
-
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
 };
@@ -133,29 +111,16 @@ class FemElement2DMesh : public FemElementMesh<FemElementStructs::RotationVector
 public:
 	FemElement2DMesh();
 
-	void load(const std::string& fileName);
-
-	double getThickness() const;
-
-	void setThickness(double thickness);
-
 protected:
-	double m_thickness;
-
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
 };
 
-class FemElement3DMesh : public FemElementMesh<EmptyData, EmptyData, EmptyData, FemElementStructs::FemElement3D>
+class FemElement3DMesh : public FemElementMesh<EmptyData, EmptyData, EmptyData,
+												FemElementStructs::FemElement3D>
 {
 public:
 	FemElement3DMesh();
-
-	void load(const std::string& fileName);
-
-	double getThickness() const;
-
-	void setThickness(double thickness);
 
 protected:
 

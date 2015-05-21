@@ -37,11 +37,12 @@ Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 	m_nodeIds.assign( nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem3DElementCube::Fem3DElementCube(std::vector<size_t> nodeIds)
+Fem3DElementCube::Fem3DElementCube(std::shared_ptr<FemElementStructs::FemElement> elementData)
 {
 	init();
-	SURGSIM_ASSERT(nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
-	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	auto data = std::static_pointer_cast<FemElementStructs::FemElement3D>(elementData);
+	SURGSIM_ASSERT(data->nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
+	m_nodeIds.assign(data->nodeIds.begin(), data->nodeIds.end());
 }
 
 void Fem3DElementCube::init()

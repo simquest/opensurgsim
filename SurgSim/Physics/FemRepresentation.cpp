@@ -44,8 +44,7 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename,
-									  getFilename, setFilename);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename, getFilename, loadMesh);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, ComplianceWarping,
 									  getComplianceWarping, setComplianceWarping);
 }
@@ -54,63 +53,13 @@ FemRepresentation::~FemRepresentation()
 {
 }
 
-void FemRepresentation::setFilename(const std::string& filename)
+void FemRepresentation::overrideFemElementType(const std::string& type)
 {
-	m_filename = filename;
-}
-
-const std::string& FemRepresentation::getFilename() const
-{
-	return m_filename;
-}
-
-bool FemRepresentation::loadFile()
-{
-	using SurgSim::Framework::Logger;
-
-	bool result = true;
-	if (m_filename.empty())
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Filename is empty";
-		result = false;
-	}
-	else
-	{
-		std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
-		if (filePath.empty())
-		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-					"File " << m_filename << " can not be found.";
-			result = false;
-		}
-
-		auto reader = std::make_shared<SurgSim::DataStructures::PlyReader>(filePath);
-		if (result && !reader->isValid())
-		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-					"File " << m_filename << " is invalid.";
-			result = false;
-		}
-
-		if (result && !reader->parseWithDelegate(getDelegate()))
-		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
-			result = false;
-		}
-	}
-
-	return result;
+	m_femElementOverrideType = type;
 }
 
 bool FemRepresentation::doInitialize()
 {
-	if (!m_filename.empty() && !loadFile())
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-				"Failed to initialize from file " << m_filename;
-		return false;
-	}
-
 	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
 
 	// Initialize the FemElements
@@ -487,6 +436,11 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSi
 	*M = &m_M;
 	*D = &m_D;
 	*K = &m_K;
+}
+
+const std::string& FemRepresentation::getFilename() const
+{
+	return m_filename;
 }
 
 void FemRepresentation::addRayleighDampingForce(

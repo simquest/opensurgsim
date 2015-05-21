@@ -47,11 +47,16 @@ Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem2DElementTriangle::Fem2DElementTriangle(std::vector<size_t> nodeIds)
+Fem2DElementTriangle::Fem2DElementTriangle(std::shared_ptr<FemElementStructs::FemElement> elementData)
 {
 	init();
-	SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
-	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	auto data = std::static_pointer_cast<FemElementStructs::FemElement2D>(elementData);
+	SURGSIM_ASSERT(data->nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
+	m_nodeIds.assign(data->nodeIds.begin(), data->nodeIds.end());
+	setThickness(data->thickness);
+	setMassDensity(data->massDensity);
+	setPoissonRatio(data->poissonRatio);
+	setYoungModulus(data->youngModulus);
 }
 
 void Fem2DElementTriangle::setThickness(double thickness)

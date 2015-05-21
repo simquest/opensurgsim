@@ -19,6 +19,7 @@
 #include <array>
 
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemElementMesh.h"
 
 namespace SurgSim
 {
@@ -63,10 +64,10 @@ public:
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
 
 	/// Constructor for FemElement object factory
-	/// \param nodeIds A vector of node ids defining this triangle element with respect to a
+	/// \param elementData A FemElement struct defining this triangle element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 3
-	explicit Fem2DElementTriangle(std::vector<size_t> nodeIds);
+	explicit Fem2DElementTriangle(std::shared_ptr<FemElementStructs::FemElement> elementData);
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DElementTriangle)
 

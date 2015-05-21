@@ -52,17 +52,9 @@ public:
 	/// Destructor
 	virtual ~FemRepresentation();
 
-	/// Sets the name of the file to be loaded
-	/// \param filename The name of the file to be loaded
-	void setFilename(const std::string& filename);
+	virtual void loadMesh(const std::string& filename) = 0;
 
-	/// Gets the name of the file to be loaded
-	/// \return filename The name of the file to be loaded
-	const std::string& getFilename() const;
-
-	/// Loads the file
-	/// \return true if successful
-	bool loadFile();
+	void overrideFemElementType(const std::string& type);
 
 	/// Adds a FemElement
 	/// \param element The FemElement to add to the representation
@@ -163,6 +155,9 @@ public:
 					 SurgSim::Math::SparseMatrix** D, SurgSim::Math::SparseMatrix** K) override;
 
 protected:
+	/// Gets name of file to encode for serialization
+	const std::string& getFilename() const;
+
 	/// Adds the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
 	/// \param state The state vector containing positions and velocities
@@ -207,17 +202,15 @@ protected:
 	/// Useful information per node
 	std::vector<double> m_massPerNode; ///< Useful in setting up the gravity force F=mg
 
-	/// Filename for loading the fem representation.
-	std::string m_filename;
-
-private:
-	/// To be implemented by derived classes.
-	/// \return The delegate to load the corresponding derived class.
-	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() = 0;
-
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
+	/// Override class name passed to FemElement factory
+	std::string m_femElementOverrideType;
+
+	std::string m_filename;
+
+private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K
 	/// Matrices: D = damping, M = mass, K = stiffness

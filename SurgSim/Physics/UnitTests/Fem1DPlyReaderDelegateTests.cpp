@@ -34,7 +34,7 @@ TEST(Fem1DRepresentationReaderTests, DelegateTest)
 	auto femRepresentation = std::make_shared<Fem1DRepresentation>("Representation");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	femRepresentation->setFilename("PlyReaderTests/Fem1D.ply");
+	femRepresentation->loadMesh("PlyReaderTests/Fem1D.ply");
 	ASSERT_TRUE(femRepresentation->initialize(runtime));
 
 	// Vertices

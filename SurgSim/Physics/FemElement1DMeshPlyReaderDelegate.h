@@ -155,7 +155,7 @@ private:
 	bool m_hasBoundaryConditions;
 
 	/// Internal data to receive the "boundary_condition" element
-	size_t m_boundaryConditionData;
+	unsigned int m_boundaryConditionData;
 
 	std::shared_ptr<FemElement1DMesh> m_mesh;
 };

@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file Fem3DRepresentationTests.cpp
-/// This file tests the non-abstract functionalities of the base class FemRepresentation
+/// This file tests the non-abstract functionalities of the base class fem3DRepresentation
 
 #include <gtest/gtest.h>
 
@@ -129,22 +129,15 @@ TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
 	EXPECT_TRUE(m_fem->getInitialState()->getVelocities().isApprox(expectedV));
 }
 
-TEST_F(Fem3DRepresentationTests, SetGetFilenameTest)
-{
-	createFem();
-	ASSERT_NO_THROW(m_fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
-	ASSERT_NO_THROW(m_fem->getFilename());
-	ASSERT_EQ("Data/PlyReaderTests/Tetrahedron.ply", m_fem->getFilename());
-}
-
 TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 {
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	{
 		SCOPED_TRACE("Initialize with a valid file name");
 		createFem();
-		m_fem->setFilename("PlyReaderTests/Tetrahedron.ply");
+		m_fem->loadMesh("PlyReaderTests/Tetrahedron.ply");
 		// Fem3DRepresentation::initialize() will call Fem3DRepresentation::doInitialize(), which should load the file.
-		ASSERT_NO_THROW(ASSERT_TRUE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"))));
+		ASSERT_NO_THROW(ASSERT_TRUE(m_fem->initialize(runtime)));
 		EXPECT_EQ(3u, m_fem->getNumDofPerNode());
 		EXPECT_EQ(3u * 26u, m_fem->getNumDof());
 		EXPECT_EQ(24u, m_fem->getInitialState()->getNumBoundaryConditions());
@@ -153,38 +146,26 @@ TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 	{
 		SCOPED_TRACE("Initialize with an invalid file name");
 		createFem();
-		m_fem->setFilename("Non existent fake name");
-		EXPECT_FALSE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		EXPECT_ANY_THROW(m_fem->loadMesh("Non existent fake name"));
 	}
 
 	{
 		SCOPED_TRACE("Initialize with file name not set");
 		createFem();
-		// Fem3DRepresentation will not try to load file, but FemRepresentation::doInitialize() will throw.
-		EXPECT_ANY_THROW(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
-	}
-
-	{
-		SCOPED_TRACE("Initialization called on object instance");
-		Fem3DRepresentation fem("fem3d");
-		fem.setFilename("PlyReaderTests/Tetrahedron.ply");
-		// It throws because within doInitialize(), 'this' Fem3DRepresentation will be passed as a shared_ptr<> to
-		// the Fem3DRepresentationPlyReaderDelegate.
-		EXPECT_ANY_THROW(fem.initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		// Fem3DRepresentation will not try to load file, but fem3DRepresentation::doInitialize() will throw.
+		EXPECT_ANY_THROW(m_fem->initialize(runtime));
 	}
 
 	{
 		SCOPED_TRACE("Loading file with incorrect PLY format");
 		createFem();
-		m_fem->setFilename("PlyReaderTests/WrongPlyTetrahedron.ply");
-		EXPECT_FALSE(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		EXPECT_ANY_THROW(m_fem->loadMesh("PlyReaderTests/WrongPlyTetrahedron.ply"));
 	}
 
 	{
 		SCOPED_TRACE("Loading file with incorrect data");
 		createFem();
-		m_fem->setFilename("PlyReaderTests/WrongDataTetrahedron.ply");
-		EXPECT_ANY_THROW(m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt")));
+		EXPECT_ANY_THROW(m_fem->loadMesh("PlyReaderTests/WrongDataTetrahedron.ply"););
 	}
 }
 
@@ -194,7 +175,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	createFem();
-	ASSERT_NO_THROW(m_fem->setFilename("Geometry/wound_deformable.ply"));
+	ASSERT_NO_THROW(m_fem->loadMesh("Geometry/wound_deformable.ply"));
 
 	auto triangleMesh = std::make_shared<SurgSim::Math::MeshShape>();
 	triangleMesh->load("Geometry/wound_deformable.ply");
@@ -449,8 +430,9 @@ TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
 TEST_F(Fem3DRepresentationTests, SerializationTest)
 {
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Test-Fem3D");
-	const std::string filename = "TestFilename";
-	fem3DRepresentation->setFilename(filename);
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	const std::string filename = "PlyReaderTests/Fem3DCube.ply";
+	fem3DRepresentation->loadMesh(filename);
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
 	fem3DRepresentation->setCollisionRepresentation(collisionRepresentation);
 
@@ -462,6 +444,7 @@ TEST_F(Fem3DRepresentationTests, SerializationTest)
 	std::shared_ptr<Fem3DRepresentation> newRepresentation;
 	ASSERT_NO_THROW(newRepresentation = std::dynamic_pointer_cast<Fem3DRepresentation>(
 											node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem3DRepresentation", newRepresentation->getClassName());
 	EXPECT_EQ(filename, newRepresentation->getValue<std::string>("Filename"));

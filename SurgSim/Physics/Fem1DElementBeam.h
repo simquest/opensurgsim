@@ -46,7 +46,7 @@ public:
 	/// \param nodeIds A vector of node ids defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 2
-	explicit Fem1DElementBeam(std::vector<size_t> nodeIds);
+	explicit Fem1DElementBeam(std::shared_ptr<FemElementStructs::FemElement> elementData);
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam)
 

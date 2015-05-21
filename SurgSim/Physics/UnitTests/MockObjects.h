@@ -259,7 +259,7 @@ class MockFemElement : public FemElement
 {
 public:
 	MockFemElement();
-	explicit MockFemElement(std::vector<size_t> nodeIds);
+	explicit MockFemElement(std::shared_ptr<FemElementStructs::FemElement> elementData);
 
 	void addNode(size_t nodeId);
 
@@ -297,11 +297,13 @@ public:
 	/// Destructor
 	virtual ~MockFemRepresentation();
 
+	void loadMesh(const std::string& filename) override;
+
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 									 const SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::Matrix& K,
 									 const SurgSim::Math::Matrix& D) override;
 
-	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+	std::shared_ptr<FemPlyReaderDelegate> getDelegate();
 
 	std::shared_ptr<OdeSolver> getOdeSolver() const;
 

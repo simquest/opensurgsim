@@ -38,11 +38,17 @@ Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem1DElementBeam::Fem1DElementBeam(std::vector<size_t> nodeIds)
+Fem1DElementBeam::Fem1DElementBeam(std::shared_ptr<FemElementStructs::FemElement> elementData)
 {
 	init();
-	SURGSIM_ASSERT(nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
-	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	auto data = std::static_pointer_cast<FemElementStructs::FemElement1D>(elementData);
+	SURGSIM_ASSERT(data->nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
+	m_nodeIds.assign(data->nodeIds.begin(), data->nodeIds.end());
+	setShearingEnabled(data->enableShear);
+	setRadius(data->radius);
+	setMassDensity(data->massDensity);
+	setPoissonRatio(data->poissonRatio);
+	setYoungModulus(data->youngModulus);
 }
 
 void Fem1DElementBeam::setRadius(double radius)

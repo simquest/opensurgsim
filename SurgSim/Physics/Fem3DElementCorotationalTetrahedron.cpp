@@ -34,8 +34,8 @@ Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::ar
 {
 }
 
-Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::vector<size_t> nodeIds)
-	: Fem3DElementTetrahedron(nodeIds)
+Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::shared_ptr<FemElementStructs::FemElement> elementData)
+	: Fem3DElementTetrahedron(elementData)
 {
 }
 

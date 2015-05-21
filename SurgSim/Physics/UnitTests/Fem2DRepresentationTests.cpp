@@ -24,6 +24,7 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/Fem2DRepresentationLocalization.h"
@@ -200,6 +201,11 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 TEST(Fem2DRepresentationTests, SerializationTest)
 {
 	auto fem2DRepresentation = std::make_shared<SurgSim::Physics::Fem2DRepresentation>("Test-Fem2D");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	const std::string filename = "PlyReaderTests/Fem2D.ply";
+	fem2DRepresentation->loadMesh(filename);
+	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
+	fem2DRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*fem2DRepresentation));
@@ -212,6 +218,7 @@ TEST(Fem2DRepresentationTests, SerializationTest)
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem2DRepresentation", newRepresentation->getClassName());
+	EXPECT_EQ(filename, newRepresentation->getValue<std::string>("Filename"));
 }
 
 } // namespace Physics

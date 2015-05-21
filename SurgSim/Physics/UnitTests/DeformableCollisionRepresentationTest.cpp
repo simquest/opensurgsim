@@ -126,7 +126,7 @@ TEST_F(DeformableCollisionRepresentationTest, UpdateAndInitializationTest)
 	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->update(0.0));
 
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Fem3DRepresentation");
-	fem3DRepresentation->setFilename(m_filename);
+	fem3DRepresentation->loadMesh(m_filename);
 
 	// Member data 'odeState' will be created while loading.
 	ASSERT_TRUE(fem3DRepresentation->initialize(m_runtime));

@@ -36,10 +36,13 @@ TEST(FemElementMeshReaderTests, DelegateTest)
 
 	EXPECT_EQ(4, mesh1d->getNumElements());
 	EXPECT_EQ(3, mesh1d->getBoundaryConditions().size());
-	EXPECT_DOUBLE_EQ(0.11, mesh1d->getRadius());
-	EXPECT_DOUBLE_EQ(0.21, mesh1d->getMassDensity());
-	EXPECT_DOUBLE_EQ(0.31, mesh1d->getPoissonRatio());
-	EXPECT_DOUBLE_EQ(0.41, mesh1d->getYoungModulus());
+	for (auto element : mesh1d->getFemElements())
+	{
+		EXPECT_DOUBLE_EQ(0.11, element->radius);
+		EXPECT_DOUBLE_EQ(0.21, element->massDensity);
+		EXPECT_DOUBLE_EQ(0.31, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(0.41, element->youngModulus);
+	}
 
 	filePath = runtime->getApplicationData()->findFile("FemElementMeshTests/Fem2D.ply");
 
@@ -48,10 +51,13 @@ TEST(FemElementMeshReaderTests, DelegateTest)
 
 	EXPECT_EQ(3, mesh2d->getNumElements());
 	EXPECT_EQ(2, mesh2d->getBoundaryConditions().size());
-	EXPECT_DOUBLE_EQ(0.1, mesh2d->getThickness());
-	EXPECT_DOUBLE_EQ(0.2, mesh2d->getMassDensity());
-	EXPECT_DOUBLE_EQ(0.3, mesh2d->getPoissonRatio());
-	EXPECT_DOUBLE_EQ(0.4, mesh2d->getYoungModulus());
+	for (auto element : mesh2d->getFemElements())
+	{
+		EXPECT_DOUBLE_EQ(0.1, element->thickness);
+		EXPECT_DOUBLE_EQ(0.2, element->massDensity);
+		EXPECT_DOUBLE_EQ(0.3, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(0.4, element->youngModulus);
+	}
 }
 
 } // namespace Physics

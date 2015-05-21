@@ -336,10 +336,10 @@ MockFemElement::MockFemElement() : FemElement()
 	init();
 }
 
-MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement()
+MockFemElement::MockFemElement(std::shared_ptr<FemElementStructs::FemElement> elementData) : FemElement()
 {
 	init();
-	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	m_nodeIds.assign(elementData->nodeIds.begin(), elementData->nodeIds.end());
 }
 
 void MockFemElement::addNode(size_t nodeId)
@@ -437,6 +437,11 @@ MockFemRepresentation::MockFemRepresentation(const std::string& name) : FemRepre
 
 MockFemRepresentation::~MockFemRepresentation()
 {
+}
+
+void MockFemRepresentation::loadMesh(const std::string &filename)
+{
+	m_filename = filename;
 }
 
 void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
