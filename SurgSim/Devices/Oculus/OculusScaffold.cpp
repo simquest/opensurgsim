@@ -23,7 +23,7 @@
 #include <OVR_Version.h>
 #if 6 == OVR_MAJOR_VERSION
 #include <OVR_CAPI_0_6_0.h>
-#elif 5 == OVR_MAJOR_VERSION 
+#elif 5 == OVR_MAJOR_VERSION
 #include <OVR_CAPI_0_5_0.h>
 #endif
 
