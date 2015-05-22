@@ -20,11 +20,13 @@
 #include <list>
 #include <memory>
 
-#ifdef WIN32
+#include <OVR_Version.h>
+#if 6 == OVR_MAJOR_VERSION
 #include <OVR_CAPI_0_6_0.h>
-#else
+#elif 5 == OVR_MAJOR_VERSION 
 #include <OVR_CAPI_0_5_0.h>
 #endif
+
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
@@ -56,9 +58,9 @@ struct OculusScaffold::DeviceData
 		deviceObject(device),
 		handle(nullptr)
 	{
-#ifdef WIN32
+#if 6 == OVR_MAJOR_VERSION
 		ovrHmd_Create(index, &handle);
-#else
+#elif 5 == OVR_MAJOR_VERSION
 		handle = ovrHmd_Create(index);
 #endif
 	}
@@ -98,9 +100,9 @@ OculusScaffold::OculusScaffold() :
 	// positional tracking is done at 60Hz.
 	setRate(1000.0);
 
-#ifdef WIN32
+#if 6 == OVR_MAJOR_VERSION
 	SURGSIM_ASSERT(ovrSuccess == ovr_Initialize(nullptr)) << "Oculus SDK initialization failed.";
-#else
+#elif 5 == OVR_MAJOR_VERSION
 	SURGSIM_ASSERT(ovrTrue == ovr_Initialize(nullptr)) << "Oculus SDK initialization failed.";
 #endif
 }
@@ -134,11 +136,11 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 		}
 		else
 		{
-#ifdef WIN32
+#if 6 == OVR_MAJOR_VERSION
 			if (ovrSuccess == ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
 																	 ovrTrackingCap_MagYawCorrection |
 																	 ovrTrackingCap_Position, 0))
-#else
+#elif 5 == OVR_MAJOR_VERSION
 			if (ovrTrue == ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
 																  ovrTrackingCap_MagYawCorrection |
 																  ovrTrackingCap_Position, 0))
