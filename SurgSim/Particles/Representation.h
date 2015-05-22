@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
-#define SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
+#ifndef SURGSIM_PARTICLES_REPRESENTATION_H
+#define SURGSIM_PARTICLES_REPRESENTATION_H
 
 #include <boost/thread.hpp>
 #include <list>
@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/Particles.h"
@@ -38,16 +39,16 @@ class Logger;
 namespace Particles
 {
 
-/// The ParticleSystemRepresentation class defines the base class for all Particle System.
-class ParticleSystemRepresentation : public SurgSim::Framework::Representation
+/// The Representation class defines the base class for all Particle System.
+class Representation : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
 	/// \param name The representation's name
-	explicit ParticleSystemRepresentation(const std::string& name);
+	explicit Representation(const std::string& name);
 
 	/// Destructor
-	virtual ~ParticleSystemRepresentation();
+	virtual ~Representation();
 
 	/// Set the maximum number of particles of this system.
 	/// \note Once initialized, it can't be changed.
@@ -81,10 +82,26 @@ public:
 	/// \param dt The time step.
 	void update(double dt);
 
+	/// Handle collisions with particle system
+	/// \param dt The time step.
+	void handleCollisions(double dt);
+
+	/// Set the collision representation for this Particle Representation
+	/// \param representation The collision representation to be set
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
+
+	/// Get the collision representation for this Particle Representation
+	/// \return the collision representation
+	std::shared_ptr<SurgSim::Collision::Representation> getCollisionRepresentation() const;
+
 protected:
 	/// Implementation of the specific behavior of the particle system
 	/// \return True if update succeeded, False otherwise.
 	virtual bool doUpdate(double dt) = 0;
+
+	/// Implementation of the specific collision handling of the particle system
+	/// \return True if succeeded, False otherwise.
+	virtual bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) = 0;
 
 	bool doInitialize() override;
 
@@ -96,9 +113,12 @@ protected:
 
 	/// Logger used by the particle system.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// This entity's collision representation
+	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 };
 
 };  // namespace Particles
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PARTICLES_PARTICLESYSTEMREPRESENTATION_H
+#endif // SURGSIM_PARTICLES_REPRESENTATION_H

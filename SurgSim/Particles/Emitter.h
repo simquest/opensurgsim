@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PARTICLES_EMITTERREPRESENTATION_H
-#define SURGSIM_PARTICLES_EMITTERREPRESENTATION_H
+#ifndef SURGSIM_PARTICLES_EMITTER_H
+#define SURGSIM_PARTICLES_EMITTER_H
 
 #include <cmath>
 #include <memory>
 #include <random>
 
 #include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/RandomPointGenerator.h"
 
@@ -42,9 +42,9 @@ class Shape;
 namespace Particles
 {
 
-class ParticleSystemRepresentation;
+class Representation;
 
-/// Emitting modes of the EmitterRepresentation
+/// Emitting modes of the Emitter
 enum EmitMode
 {
 	/// Emit particles from within the shapes volume
@@ -55,24 +55,24 @@ enum EmitMode
 	EMIT_MODE_COUNT
 };
 
-SURGSIM_STATIC_REGISTRATION(EmitterRepresentation);
+SURGSIM_STATIC_REGISTRATION(Emitter);
 
-/// EmitterRepresentation emits particles into a ParticleSystem
-class EmitterRepresentation : public SurgSim::Framework::Representation
+/// Emitter emits particles into a ParticleSystem
+class Emitter : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
-	/// \param name The representation's name
-	explicit EmitterRepresentation(const std::string& name);
+	/// \param name The Emitter's name
+	explicit Emitter(const std::string& name);
 
 	/// Destructor
-	virtual ~EmitterRepresentation();
+	virtual ~Emitter();
 
-	SURGSIM_CLASSNAME(SurgSim::Particles::EmitterRepresentation);
+	SURGSIM_CLASSNAME(SurgSim::Particles::Emitter);
 
-	/// Update the emitter
-	/// \param dt The time step.
-	virtual void update(double dt);
+	void update(double dt) override;
+
+	int getTargetManagerType() const override;
 
 	/// Set the target to emit to.
 	/// \param target The ParticleSystem to emit to.
@@ -123,6 +123,18 @@ public:
 	/// Get the range of velocities of the emitted particles.
 	const std::pair<SurgSim::Math::Vector3d, SurgSim::Math::Vector3d>& getVelocityRange() const;
 
+	/// Set the pose of the Emitter with respect to the Scene Element
+	/// \param pose The pose to set the Emitter to
+	virtual void setLocalPose(const SurgSim::Math::RigidTransform3d& pose);
+
+	/// Get the pose of the Emitter with respect to the Scene Element
+	/// \return The pose of this Emitter
+	virtual SurgSim::Math::RigidTransform3d getLocalPose() const;
+
+	/// Get the pose of the Emitter in world coordinates
+	/// \return The pose of this Emitter
+	virtual SurgSim::Math::RigidTransform3d getPose() const;
+
 private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
@@ -154,14 +166,17 @@ private:
 	/// Shape of emitter.
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 
-	/// ParticleSystemRepresentation to emit to.
-	std::shared_ptr<ParticleSystemRepresentation> m_target;
+	/// Representation to emit to.
+	std::shared_ptr<SurgSim::Particles::Representation> m_target;
 
-	/// Logger used by the EmitterRepresentation
+	/// Local Pose of the Representation with respect to the SceneElement
+	SurgSim::Math::RigidTransform3d m_localPose;
+
+	/// Logger used by the Emitter
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 }; // namespace Particles
 }; // namespace SurgSim
 
-#endif // SURGSIM_PARTICLES_EMITTERREPRESENTATION_H
+#endif // SURGSIM_PARTICLES_EMITTER_H

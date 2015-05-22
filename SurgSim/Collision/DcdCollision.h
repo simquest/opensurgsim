@@ -30,6 +30,7 @@
 #include "SurgSim/Collision/SphereSphereDcdContact.h"
 #include "SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h"
 #include "SurgSim/Collision/SpherePlaneDcdContact.h"
+#include "SurgSim/Collision/TriangleMeshParticlesDcdContact.h"
 #include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
 

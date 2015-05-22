@@ -61,6 +61,7 @@ set(UNIT_TEST_SOURCES
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
 	MockObjects.cpp
+	ParticleCollisionResponseTests.cpp
 	PhysicsManagerStateTests.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
@@ -87,9 +88,10 @@ set(UNIT_TEST_HEADERS
 set(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
-	SurgSimPhysics
-	SurgSimMath
 	SurgSimInput
+	SurgSimMath
+	SurgSimParticles
+	SurgSimPhysics
 	MlcpTestIO
 	IdentityPoseDevice
 )

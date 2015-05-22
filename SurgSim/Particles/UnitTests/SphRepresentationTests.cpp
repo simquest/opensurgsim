@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/SphRepresentation.h"
@@ -70,41 +71,26 @@ TEST(SphRepresentationTest, SetGetTest)
 	sph->setViscosity(0.04);
 	EXPECT_DOUBLE_EQ(0.04, sph->getViscosity());
 
+	EXPECT_DOUBLE_EQ(0.0, sph->getStiffness());
+	EXPECT_NO_THROW(sph->setStiffness(0.0));
+	sph->setStiffness(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getStiffness());
+
+	EXPECT_DOUBLE_EQ(0.0, sph->getDamping());
+	EXPECT_NO_THROW(sph->setDamping(0.0));
+	sph->setDamping(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getDamping());
+
+	EXPECT_DOUBLE_EQ(0.0, sph->getFriction());
+	EXPECT_NO_THROW(sph->setFriction(0.0));
+	sph->setFriction(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getFriction());
+
 	EXPECT_DOUBLE_EQ(0.0, sph->getKernelSupport());
 	EXPECT_THROW(sph->setKernelSupport(0.0), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(sph->setKernelSupport(-1.0), SurgSim::Framework::AssertionFailure);
 	sph->setKernelSupport(0.04);
 	EXPECT_DOUBLE_EQ(0.04, sph->getKernelSupport());
-}
-
-TEST(SphRepresentationTest, AddGetConstraintPlaneTest)
-{
-	auto sph = std::make_shared<SphRepresentation>("representation");
-
-	EXPECT_EQ(0u, sph->getPlaneConstraints().size());
-
-	SphRepresentation::PlaneConstraint p1;
-	p1.damping = 0.5;
-	p1.stiffness = 0.6;
-	p1.planeEquation = SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4);
-	EXPECT_NO_THROW(sph->addPlaneConstraint(p1));
-	EXPECT_EQ(1u, sph->getPlaneConstraints().size());
-	EXPECT_DOUBLE_EQ(0.5, sph->getPlaneConstraints()[0].damping);
-	EXPECT_DOUBLE_EQ(0.6, sph->getPlaneConstraints()[0].stiffness);
-	EXPECT_TRUE(sph->getPlaneConstraints()[0].planeEquation.isApprox(SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4)));
-
-	SphRepresentation::PlaneConstraint p2;
-	p2.damping = 0.55;
-	p2.stiffness = 0.66;
-	p2.planeEquation = SurgSim::Math::Vector4d(0.11, 0.22, 0.33, 0.44);
-	EXPECT_NO_THROW(sph->addPlaneConstraint(p2));
-	EXPECT_EQ(2u, sph->getPlaneConstraints().size());
-	EXPECT_DOUBLE_EQ(0.5, sph->getPlaneConstraints()[0].damping);
-	EXPECT_DOUBLE_EQ(0.6, sph->getPlaneConstraints()[0].stiffness);
-	EXPECT_TRUE(sph->getPlaneConstraints()[0].planeEquation.isApprox(SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4)));
-	EXPECT_DOUBLE_EQ(0.55, sph->getPlaneConstraints()[1].damping);
-	EXPECT_DOUBLE_EQ(0.66, sph->getPlaneConstraints()[1].stiffness);
-	EXPECT_TRUE(sph->getPlaneConstraints()[1].planeEquation.isApprox(SurgSim::Math::Vector4d(0.11, 0.22, 0.33, 0.44)));
 }
 
 TEST(SphRepresentationTest, DoInitializeTest)
@@ -304,8 +290,6 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesInEquilibriumTest)
 
 TEST(SphRepresentationTest, SerializationTest)
 {
-	typedef SurgSim::Particles::SphRepresentation::PlaneConstraint PlaneConstraint;
-
 	auto sph = std::make_shared<SphRepresentation>("TestSphRepresentation");
 	sph->setDensity(1.1);
 	sph->setGasStiffness(2.2);
@@ -313,13 +297,11 @@ TEST(SphRepresentationTest, SerializationTest)
 	sph->setKernelSupport(3.3);
 	sph->setMassPerParticle(4.4);
 	sph->setMaxParticles(5);
-	SphRepresentation::PlaneConstraint p;
-	p.stiffness = 6.6;
-	p.damping = 7.7;
-	p.planeEquation.setLinSpaced(8.8, 9.9);
-	sph->addPlaneConstraint(p);
 	sph->setSurfaceTension(10.1);
 	sph->setViscosity(11.11);
+	sph->setStiffness(12.12);
+	sph->setDamping(13.13);
+	sph->setFriction(0.14);
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*sph));
@@ -334,15 +316,11 @@ TEST(SphRepresentationTest, SerializationTest)
 	EXPECT_DOUBLE_EQ(sph->getKernelSupport(), newRepresentation->getValue<double>("KernelSupport"));
 	EXPECT_DOUBLE_EQ(sph->getMassPerParticle(), newRepresentation->getValue<double>("MassPerParticle"));
 	EXPECT_EQ(sph->getMaxParticles(), newRepresentation->getValue<size_t>("MaxParticles"));
-	auto planeConstraints = newRepresentation->getValue<std::vector<PlaneConstraint>>("PlaneConstraints");
-	EXPECT_EQ(sph->getPlaneConstraints().size(), planeConstraints.size());
-	EXPECT_EQ(1u, planeConstraints.size());
-	EXPECT_TRUE(sph->getPlaneConstraints()[0].planeEquation.isApprox(planeConstraints[0].planeEquation));
-	EXPECT_DOUBLE_EQ(sph->getPlaneConstraints()[0].stiffness, planeConstraints[0].stiffness);
-	EXPECT_DOUBLE_EQ(sph->getPlaneConstraints()[0].damping, planeConstraints[0].damping);
-	EXPECT_DOUBLE_EQ(sph->getSurfaceTension(),
-		newRepresentation->getValue<double>("SurfaceTension"));
+	EXPECT_DOUBLE_EQ(sph->getSurfaceTension(), newRepresentation->getValue<double>("SurfaceTension"));
 	EXPECT_DOUBLE_EQ(sph->getViscosity(), newRepresentation->getValue<double>("Viscosity"));
+	EXPECT_DOUBLE_EQ(sph->getStiffness(), newRepresentation->getValue<double>("Stiffness"));
+	EXPECT_DOUBLE_EQ(sph->getDamping(), newRepresentation->getValue<double>("Damping"));
+	EXPECT_DOUBLE_EQ(sph->getFriction(), newRepresentation->getValue<double>("Friction"));
 }
 
 }; // namespace Particles

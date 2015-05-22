@@ -28,9 +28,6 @@ void RenderTests::SetUp()
 	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	runtime->addManager(graphicsManager);
 
-	particlesManager = std::make_shared<SurgSim::Particles::ParticleManager>();
-	runtime->addManager(particlesManager);
-
 	physicsManager = std::make_shared<SurgSim::Physics::PhysicsManager>();
 	runtime->addManager(physicsManager);
 
