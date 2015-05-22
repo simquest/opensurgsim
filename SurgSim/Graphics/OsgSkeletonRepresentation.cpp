@@ -215,7 +215,7 @@ std::shared_ptr<Model> OsgSkeletonRepresentation::getModel() const
 	return m_model;
 }
 
-void OsgSkeletonRepresentation::setSkinningShaderFileName(std::string fileName)
+void OsgSkeletonRepresentation::setSkinningShaderFileName(const std::string& fileName)
 {
 	m_skinningShaderFileName = fileName;
 }

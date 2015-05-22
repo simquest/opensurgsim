@@ -159,7 +159,7 @@ void VirtualToolCoupler::update(double dt)
 		inputLinearVelocity = inputAlignment.linear() * inputLinearVelocity;
 		inputAngularVelocity = inputAlignment.rotation() * inputAngularVelocity;
 
-		RigidRepresentationState objectState(m_rigid->getCurrentState());
+		RigidState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
 		Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
 		Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;

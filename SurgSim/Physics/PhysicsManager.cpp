@@ -22,6 +22,7 @@
 #include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/FreeMotion.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/ParticleCollisionResponse.h"
 #include "SurgSim/Physics/PostUpdate.h"
 #include "SurgSim/Physics/PreUpdate.h"
 #include "SurgSim/Physics/PushResults.h"
@@ -61,6 +62,7 @@ bool PhysicsManager::doInitialize()
 	addComputation(std::make_shared<BuildMlcp>(copyState));
 	addComputation(std::make_shared<SolveMlcp>(copyState));
 	addComputation(std::make_shared<PushResults>(copyState));
+	addComputation(std::make_shared<ParticleCollisionResponse>(copyState));
 	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
 	addComputation(std::make_shared<PostUpdate>(copyState));
 
@@ -122,8 +124,8 @@ void PhysicsManager::removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collis
 bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	std::shared_ptr<Representation> representation = tryAddComponent(component, &m_representations);
-	std::shared_ptr<SurgSim::Collision::Representation> collisionRep =
-		tryAddComponent(component, &m_collisionRepresentations);
+	std::shared_ptr<Collision::Representation> collisionRep = tryAddComponent(component, &m_collisionRepresentations);
+	std::shared_ptr<Particles::Representation> particles = tryAddComponent(component, &m_particleRepresentations);
 	std::shared_ptr<ConstraintComponent> constraintComponent = tryAddComponent(component, &m_constraintComponents);
 	return representation != nullptr || collisionRep != nullptr || constraintComponent != nullptr;
 }
@@ -147,6 +149,7 @@ bool PhysicsManager::doUpdate(double dt)
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList(1, state);
 	state->setRepresentations(m_representations);
 	state->setCollisionRepresentations(m_collisionRepresentations);
+	state->setParticleRepresentations(m_particleRepresentations);
 	state->setConstraintComponents(m_constraintComponents);
 
 	{
