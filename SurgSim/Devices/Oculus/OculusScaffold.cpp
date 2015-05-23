@@ -146,8 +146,30 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 																  ovrTrackingCap_Position, 0))
 #endif
 			{
+				DataGroup& inputData = info->deviceObject->getInputData();
+
+				// Query the HMD for the left and right projection matrices.
+				ovrFovPort defaultLeftFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
+				ovrFovPort defaultRightFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
+
+				float nearPlane = info->deviceObject->getNearPlane();
+				float farPlane = info->deviceObject->getFarPlane();
+
+				ovrMatrix4f leftProjection = ovrMatrix4f_Projection(defaultLeftFov, nearPlane, farPlane,
+																	ovrProjectionModifier::ovrProjection_RightHanded);
+				ovrMatrix4f rightProjection = ovrMatrix4f_Projection(defaultRightFov, nearPlane, farPlane,
+																	ovrProjectionModifier::ovrProjection_RightHanded);
+
+				inputData.matrices().set(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX,
+											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
+												(&leftProjection.M[0][0]).cast<double>());
+				inputData.matrices().set(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX,
+											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
+												(&rightProjection.M[0][0]).cast<double>());
+
 				m_state->registeredDevices.emplace_back(std::move(info));
 				SURGSIM_LOG_INFO(m_logger) << "Device " << getName() << ": registered.";
+
 				result = true;
 			}
 			else
@@ -172,8 +194,10 @@ bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto match = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-								 [&device](const std::unique_ptr<DeviceData>& info)
-								 { return info->deviceObject == device; });
+								  [&device](const std::unique_ptr<DeviceData>& info)
+		{
+			return info->deviceObject == device;
+		});
 
 		if (match != m_state->registeredDevices.end())
 		{
@@ -246,6 +270,8 @@ SurgSim::DataStructures::DataGroup OculusScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
 	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	builder.addMatrix(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX);
+	builder.addMatrix(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX);
 	return builder.createData();
 }
 
