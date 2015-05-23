@@ -21,6 +21,7 @@
 #include "SurgSim/Devices/Oculus/OculusDisplaySettings.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Input/InputComponent.h"
 
 namespace SurgSim
@@ -71,18 +72,20 @@ osg::ref_ptr<osg::DisplaySettings> OculusView::createDisplaySettings() const
 
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_inputComponent->getData(&dataGroup);
-	SurgSim::DataStructures::DataGroup::DynamicMatrixType projectionMatrix;
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType leftProjectionMatrix;
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType rightProjectionMatrix;
 
-	SURGSIM_ASSERT(
-		dataGroup.matrices().get(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX, &projectionMatrix)) <<
-		"No left projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
-	displaySettings->setLeftEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
-
-	SURGSIM_ASSERT(
-		dataGroup.matrices().get(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, &projectionMatrix)) <<
-		"No right projection matrix can be retrieved for device: " << m_inputComponent->getDeviceName();
-	displaySettings->setRightEyeProjectionMatrix(projectionMatrix.block<4,4>(0, 0));
-
+	if (dataGroup.matrices().get(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX, &leftProjectionMatrix) &&
+		dataGroup.matrices().get(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX, &rightProjectionMatrix))
+	{
+		displaySettings->setLeftEyeProjectionMatrix(leftProjectionMatrix.block<4,4>(0, 0));
+		displaySettings->setRightEyeProjectionMatrix(rightProjectionMatrix.block<4,4>(0, 0));
+	}
+	else
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("OculusView")) <<
+			"No projection matrices for left/right eye.";
+	}
 	return displaySettings;
 }
 
