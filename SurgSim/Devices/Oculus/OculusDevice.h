@@ -32,9 +32,11 @@ SURGSIM_STATIC_REGISTRATION(OculusDevice);
 /// A class implementing the communication with Oculus Rift DK2.
 ///
 /// \par Application input provided by the device:
-///   | type       | name              |                                        |
-///   | ----       | ----              | ---                                    |
-///   | pose       | "pose"            | %Device pose (units are meters).       |
+///   | type       | name					|                                        |
+///   | ----       | ----					| ---                                    |
+///   | pose       | "pose"					| %Device pose (units are meters).       |
+///   | matrix     | "leftProjectionMatix"  | %Projection matrix for left eye        |
+///   | matrix     | "rghtProjectionMatix"  | %Projection matrix for right eye       |
 ///
 /// \par Application output used by the device: none.
 /// \note The axes of the pose of the HMD are a right-handed system: X & Z are in the plane of the floor,
