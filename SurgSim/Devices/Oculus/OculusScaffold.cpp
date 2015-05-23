@@ -127,23 +127,23 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 				DataGroup& inputData = info->deviceObject->getInputData();
 
 				// Query the HMD for the left and right projection matrices.
-				ovrFovPort defaultLeftFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
-				ovrFovPort defaultRightFOV = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
+				ovrFovPort defaultLeftFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
+				ovrFovPort defaultRightFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
 
 				float nearPlane = info->deviceObject->getNearPlane();
 				float farPlane = info->deviceObject->getFarPlane();
 
-				ovrMatrix4f leftProjMatrix = ovrMatrix4f_Projection(defaultLeftFOV, nearPlane, farPlane,
+				ovrMatrix4f leftProjection = ovrMatrix4f_Projection(defaultLeftFov, nearPlane, farPlane,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
-				ovrMatrix4f rightProjMatrix = ovrMatrix4f_Projection(defaultRightFOV, nearPlane, farPlane,
+				ovrMatrix4f rightProjection = ovrMatrix4f_Projection(defaultRightFov, nearPlane, farPlane,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
 
 				inputData.matrices().set(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX,
 											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
-												(&leftProjMatrix.M[0][0]).cast<double>());
+												(&leftProjection.M[0][0]).cast<double>());
 				inputData.matrices().set(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX,
 											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
-												(&rightProjMatrix.M[0][0]).cast<double>());
+												(&rightProjection.M[0][0]).cast<double>());
 
 				m_state->registeredDevices.emplace_back(std::move(info));
 				SURGSIM_LOG_INFO(m_logger) << "Device " << getName() << ": registered.";
