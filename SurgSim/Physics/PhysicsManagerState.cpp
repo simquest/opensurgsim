@@ -102,6 +102,27 @@ const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
 	return m_activeCollisionRepresentations;
 }
 
+void PhysicsManagerState::setParticleRepresentations(const std::vector<std::shared_ptr<Particles::Representation>>& val)
+{
+	m_particleRepresentations = val;
+}
+
+const std::vector<std::shared_ptr<Particles::Representation>>& PhysicsManagerState::getParticleRepresentations()
+{
+	return m_particleRepresentations;
+}
+
+void PhysicsManagerState::setActiveParticleRepresentations(
+	const std::vector<std::shared_ptr<Particles::Representation>>& val)
+{
+	m_activeParticleRepresentations = val;
+}
+
+const std::vector<std::shared_ptr<Particles::Representation>>& PhysicsManagerState::getActiveParticleRepresentations()
+{
+	return m_activeParticleRepresentations;
+}
+
 void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val)
 {
 	m_constraintComponents = val;

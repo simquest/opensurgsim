@@ -31,6 +31,8 @@ set(KEYBOARD_DEVICE_HEADERS
 	OsgKeyboardHandler.h
 )
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} KeyboardDevice.h PARENT_SCOPE)
+
 surgsim_add_library(
 	KeyboardDevice
 	"${KEYBOARD_DEVICE_SOURCES}"

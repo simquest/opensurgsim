@@ -206,10 +206,10 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 	// Add constraint to factory.
 	ConstraintImplementation::getFactory().addImplementation(
 		typeid(RigidRepresentation),
-		std::make_shared<MockRigidConstraintBilateral3D>());
+		std::make_shared<MockRigidConstraintFixedPoint>());
 	ConstraintImplementation::getFactory().addImplementation(
 		typeid(FixedRepresentation),
-		std::make_shared<MockFixedConstraintBilateral3D>());
+		std::make_shared<MockFixedConstraintFixedPoint>());
 
 	// Prep the list of constraints: use only 1 constraint
 	{

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OculusSdk 0.5.0.1 EXACT REQUIRED)
+find_package(OculusSdk)
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
@@ -34,6 +34,8 @@ set(OCULUS_DEVICE_HEADERS
 	OculusScaffold.h
 	OculusView.h
 )
+
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} OculusDevice.h PARENT_SCOPE)
 
 surgsim_add_library(
 	OculusDevice

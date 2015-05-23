@@ -77,17 +77,17 @@ MockRigidRepresentation::MockRigidRepresentation() : RigidRepresentation("MockRi
 {
 }
 
-RigidRepresentationState& MockRigidRepresentation::getInitialState()
+RigidState& MockRigidRepresentation::getInitialState()
 {
 	return m_initialState;
 }
 
-RigidRepresentationState& MockRigidRepresentation::getCurrentState()
+RigidState& MockRigidRepresentation::getCurrentState()
 {
 	return m_currentState;
 }
 
-RigidRepresentationState& MockRigidRepresentation::getPreviousState()
+RigidState& MockRigidRepresentation::getPreviousState()
 {
 	return m_previousState;
 }
@@ -96,17 +96,17 @@ MockFixedRepresentation::MockFixedRepresentation() : FixedRepresentation("MockFi
 {
 }
 
-RigidRepresentationState& MockFixedRepresentation::getInitialState()
+RigidState& MockFixedRepresentation::getInitialState()
 {
 	return m_initialState;
 }
 
-RigidRepresentationState& MockFixedRepresentation::getCurrentState()
+RigidState& MockFixedRepresentation::getCurrentState()
 {
 	return m_currentState;
 }
 
-RigidRepresentationState& MockFixedRepresentation::getPreviousState()
+RigidState& MockFixedRepresentation::getPreviousState()
 {
 	return m_previousState;
 }
@@ -131,8 +131,8 @@ void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<L
 		const Math::Matrix& K,
 		const Math::Matrix& D)
 {
-	std::shared_ptr<MockDeformableRepresentationLocalization> loc =
-		std::dynamic_pointer_cast<MockDeformableRepresentationLocalization>(localization);
+	std::shared_ptr<MockDeformableLocalization> loc =
+		std::dynamic_pointer_cast<MockDeformableLocalization>(localization);
 
 	m_externalGeneralizedForce.segment<3>(3 * loc->getLocalNode()) += generalizedForce;
 	Math::addSubMatrix(K, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
@@ -331,9 +331,15 @@ const Vector3d& MockMassSpring::getGravityVector() const
 }
 
 
-MockFemElement::MockFemElement() : FemElement(), m_isInitialized(false)
+MockFemElement::MockFemElement() : FemElement()
 {
-	setNumDofPerNode(3);
+	init();
+}
+
+MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement()
+{
+	init();
+	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
 void MockFemElement::addNode(size_t nodeId)
@@ -394,6 +400,12 @@ Vector MockFemElement::computeNaturalCoordinate(const OdeState& state, const Vec
 	return SurgSim::Math::Vector3d::Zero();
 }
 
+void MockFemElement::init()
+{
+	m_isInitialized = false;
+	setNumDofPerNode(3);
+}
+
 void MockFemElement::initialize(const OdeState& state)
 {
 	FemElement::initialize(state);
@@ -432,8 +444,8 @@ void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localiza
 		const SurgSim::Math::Matrix& K,
 		const SurgSim::Math::Matrix& D)
 {
-	std::shared_ptr<MockDeformableRepresentationLocalization> loc =
-		std::dynamic_pointer_cast<MockDeformableRepresentationLocalization>(localization);
+	std::shared_ptr<MockDeformableLocalization> loc =
+		std::dynamic_pointer_cast<MockDeformableLocalization>(localization);
 
 	size_t numDofPerNode = getNumDofPerNode();
 	m_externalGeneralizedForce.segment(numDofPerNode * loc->getLocalNode(), numDofPerNode) += generalizedForce;
@@ -486,59 +498,59 @@ const std::shared_ptr<OdeSolver> MockFem1DRepresentation::getOdeSolver() const
 }
 
 
-MockFixedConstraintBilateral3D::MockFixedConstraintBilateral3D() : ConstraintImplementation()
+MockFixedConstraintFixedPoint::MockFixedConstraintFixedPoint() : ConstraintImplementation()
 {
 }
 
-MockFixedConstraintBilateral3D::~MockFixedConstraintBilateral3D()
+MockFixedConstraintFixedPoint::~MockFixedConstraintFixedPoint()
 {
 }
 
-SurgSim::Math::MlcpConstraintType MockFixedConstraintBilateral3D::getMlcpConstraintType() const
-{
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
-}
-
-size_t MockFixedConstraintBilateral3D::doGetNumDof() const
-{
-	return 3;
-}
-
-void MockFixedConstraintBilateral3D::doBuild(double dt,
-		const ConstraintData& data,
-		const std::shared_ptr<Localization>& localization,
-		MlcpPhysicsProblem* mlcp,
-		size_t indexOfRepresentation,
-		size_t indexOfConstraint,
-		ConstraintSideSign sign)
-{
-}
-
-MockRigidConstraintBilateral3D::MockRigidConstraintBilateral3D() : ConstraintImplementation()
-{
-}
-
-MockRigidConstraintBilateral3D::~MockRigidConstraintBilateral3D()
-{
-}
-
-SurgSim::Math::MlcpConstraintType MockRigidConstraintBilateral3D::getMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType MockFixedConstraintFixedPoint::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 }
 
-size_t MockRigidConstraintBilateral3D::doGetNumDof() const
+size_t MockFixedConstraintFixedPoint::doGetNumDof() const
 {
 	return 3;
 }
 
-void MockRigidConstraintBilateral3D::doBuild(double dt,
-		const ConstraintData& data,
-		const std::shared_ptr<Localization>& localization,
-		MlcpPhysicsProblem* mlcp,
-		size_t indexOfRepresentation,
-		size_t indexOfConstraint,
-		ConstraintSideSign sign)
+void MockFixedConstraintFixedPoint::doBuild(double dt,
+											 const ConstraintData& data,
+											 const std::shared_ptr<Localization>& localization,
+											 MlcpPhysicsProblem* mlcp,
+											 size_t indexOfRepresentation,
+											 size_t indexOfConstraint,
+											 ConstraintSideSign sign)
+{
+}
+
+MockRigidConstraintFixedPoint::MockRigidConstraintFixedPoint() : ConstraintImplementation()
+{
+}
+
+MockRigidConstraintFixedPoint::~MockRigidConstraintFixedPoint()
+{
+}
+
+SurgSim::Math::MlcpConstraintType MockRigidConstraintFixedPoint::getMlcpConstraintType() const
+{
+	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+}
+
+size_t MockRigidConstraintFixedPoint::doGetNumDof() const
+{
+	return 3;
+}
+
+void MockRigidConstraintFixedPoint::doBuild(double dt,
+											 const ConstraintData& data,
+											 const std::shared_ptr<Localization>& localization,
+											 MlcpPhysicsProblem* mlcp,
+											 size_t indexOfRepresentation,
+											 size_t indexOfConstraint,
+											 ConstraintSideSign sign)
 {
 }
 

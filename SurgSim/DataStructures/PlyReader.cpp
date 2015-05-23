@@ -57,7 +57,7 @@ struct PlyReader::Data
 };
 
 
-PlyReader::PlyReader(std::string filename) :
+PlyReader::PlyReader(const std::string& filename) :
 	m_filename(filename), m_data(new Data())
 {
 	m_data->plyFile = ply_open_for_reading(
@@ -91,7 +91,7 @@ bool PlyReader::isValid() const
 	return m_data->plyFile != nullptr;
 }
 
-bool PlyReader::requestElement(std::string elementName,
+bool PlyReader::requestElement(const std::string& elementName,
 							   std::function<void* (const std::string&, size_t)> startElementCallback,
 							   std::function<void (const std::string&)> processElementCallback,
 							   std::function<void (const std::string&)> endElementCallback)
@@ -115,13 +115,14 @@ bool PlyReader::requestElement(std::string elementName,
 	return result;
 }
 
-bool PlyReader::requestScalarProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset)
+bool PlyReader::requestScalarProperty(const std::string& elementName, const std::string& propertyName,
+									  int dataType, int dataOffset)
 {
 	return requestProperty(elementName, propertyName, dataType, dataOffset, 0, 0);
 }
 
-bool PlyReader::requestListProperty(std::string elementName,
-									std::string propertyName,
+bool PlyReader::requestListProperty(const std::string& elementName,
+									const std::string& propertyName,
 									int dataType, int dataOffset,
 									int countType, int countOffset)
 {
@@ -138,8 +139,8 @@ void PlyReader::setEndParseFileCallback(std::function<void (void)> endParseFileC
 	m_endParseFileCallback = endParseFileCallback;
 }
 
-bool PlyReader::requestProperty(std::string elementName,
-								std::string propertyName,
+bool PlyReader::requestProperty(const std::string& elementName,
+								const std::string& propertyName,
 								int dataType, int dataOffset,
 								int countType, int countOffset)
 {
@@ -321,14 +322,14 @@ bool PlyReader::parseWithDelegate(std::shared_ptr<PlyReaderDelegate> delegate)
 	return result;
 }
 
-bool PlyReader::hasElement(std::string elementName) const
+bool PlyReader::hasElement(const std::string& elementName) const
 {
 	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
 	return find_element(m_data->plyFile, elementName.c_str()) != nullptr;
 }
 
-bool PlyReader::hasProperty(std::string elementName, std::string propertyName) const
+bool PlyReader::hasProperty(const std::string& elementName, const std::string& propertyName) const
 {
 	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
@@ -342,7 +343,7 @@ bool PlyReader::hasProperty(std::string elementName, std::string propertyName) c
 	return result;
 }
 
-bool PlyReader::isScalar(std::string elementName, std::string propertyName) const
+bool PlyReader::isScalar(const std::string& elementName, const std::string& propertyName) const
 {
 	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 

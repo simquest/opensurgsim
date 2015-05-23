@@ -103,7 +103,7 @@ public:
 
 	/// Gets group references.
 	/// \return	The group references.
-	std::vector<std::string> getGroupReferences();
+	std::vector<std::string> getGroupReferences() const;
 
 	/// Function to remove an unwanted reference.
 	/// \param group The name of the reference that should be removed
