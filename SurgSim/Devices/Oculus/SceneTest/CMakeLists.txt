@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(Boost 1.54 COMPONENTS program_options)
+
 link_directories(
 	${Boost_LIBRARY_DIRS}
 )
