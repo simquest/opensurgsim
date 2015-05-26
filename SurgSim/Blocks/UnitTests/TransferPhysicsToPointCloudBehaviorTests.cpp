@@ -79,7 +79,7 @@ TEST(TransferPhysicsToPointCloudBehaviorTests, UpdateTest)
 	auto sceneElement = std::make_shared<BasicSceneElement>("scene element");
 
 	auto physics = std::make_shared<Fem3DRepresentation>("Fem3D");
-	physics->setFilename("Geometry/wound_deformable.ply");
+	physics->setFilename("wound_deformable.ply");
 
 	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
 	auto behavior = std::make_shared<TransferPhysicsToPointCloudBehavior>("Behavior");
@@ -121,7 +121,7 @@ TEST(TransferPhysicsToPointCloudBehaviorTests, UpdateTest)
 
 TEST(TransferPhysicsToPointCloudBehaviorTests, SerializationTest)
 {
-    std::string filename = std::string("MeshShapeData/wound_deformable.ply");
+	std::string filename = std::string("wound_deformable_with_texture.ply");
 
 	std::shared_ptr<SurgSim::Framework::Component> physics = std::make_shared<Fem3DRepresentation>("Fem3D");
 	auto fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(physics);

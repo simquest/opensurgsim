@@ -69,7 +69,7 @@ TEST(AabbTreeTests, BuildTest)
 	auto tree = std::make_shared<AabbTree>(3);
 
 	auto mesh = std::make_shared<TriangleMeshPlain>();
-	mesh->load("Geometry/arm_collision.ply");
+	mesh->load("arm_collision.ply");
 
 	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
 	{
@@ -88,7 +88,7 @@ TEST(AabbTreeTests, BatchBuildTest)
 	auto tree = std::make_shared<AabbTree>(3);
 
 	auto mesh = std::make_shared<TriangleMeshPlain>();
-	mesh->load("Geometry/arm_collision.ply");
+	mesh->load("arm_collision.ply");
 
 	std::list<AabbTreeData::Item> items;
 	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
@@ -145,7 +145,7 @@ TEST(AabbTreeTests, MeshIntersectionTest)
 	auto tree = std::make_shared<AabbTree>(3);
 
 	auto mesh = std::make_shared<TriangleMeshPlain>();
-	mesh->load("Geometry/arm_collision.ply");
+	mesh->load("arm_collision.ply");
 
 	Aabbd expectedBigBox;
 
@@ -218,7 +218,7 @@ static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const s
 TEST(AabbTreeTests, SpatialJoinTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	const std::string fileName = "staple_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
 	ASSERT_NO_THROW(meshA->load(fileName));

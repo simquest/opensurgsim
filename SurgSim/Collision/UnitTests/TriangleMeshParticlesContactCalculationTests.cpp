@@ -84,7 +84,7 @@ TEST(TriangleMeshParticlesContactCalculationTests, CollisionTests)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	auto cube = std::make_shared<DataStructures::TriangleMeshPlain>();
-	cube->load("TriangleMeshBaseTests/Cube.ply");
+	cube->load("Cube.ply");
 
 	{
 		SCOPED_TRACE("No intersection, no particles");

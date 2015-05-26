@@ -50,9 +50,9 @@ class PlyReaderTests : public ::testing::Test
 TEST_F(PlyReaderTests, InitTest)
 {
 	ASSERT_NO_THROW(PlyReader("xxx"));
-	ASSERT_NO_THROW(PlyReader(findFile("Cube.ply")));
+	ASSERT_NO_THROW(PlyReader(findFile("Cube_with_physics.ply")));
 
-	PlyReader reader(findFile("Cube.ply"));
+	PlyReader reader(findFile("Cube_with_physics.ply"));
 	EXPECT_TRUE(reader.isValid());
 
 	PlyReader reader2(findFile("xxx"));
@@ -61,7 +61,7 @@ TEST_F(PlyReaderTests, InitTest)
 
 TEST_F(PlyReaderTests, FindElementsAndProperties)
 {
-	PlyReader reader(findFile("Cube.ply"));
+	PlyReader reader(findFile("Cube_with_physics.ply"));
 
 	EXPECT_TRUE(reader.hasElement("vertex"));
 	EXPECT_TRUE(reader.hasElement("face"));
@@ -170,7 +170,7 @@ public:
 TEST_F(PlyReaderTests, ElementTwoPropertyTest)
 {
 	TestData testData;
-	PlyReader reader(findFile("Cube.ply"));
+	PlyReader reader(findFile("Cube_with_physics.ply"));
 
 	EXPECT_TRUE(reader.requestElement("face",
 									  std::bind(&TestData::beginFaces, &testData,
@@ -280,7 +280,7 @@ TEST_F(PlyReaderTests, ListReadTest)
 
 TEST_F(PlyReaderTests, TriangleMeshDelegateTest)
 {
-	PlyReader reader(findFile("Cube.ply"));
+	PlyReader reader(findFile("Cube_with_physics.ply"));
 	auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate<MeshType>>();
 
 	// parseWithDeletegate() will first call setDelegate(), then parseFile() if previous step successed.

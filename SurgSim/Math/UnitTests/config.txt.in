@@ -1,2 +1,2 @@
 ${CMAKE_CURRENT_BINARY_DIR}/MlcpTestData/
-${PROJECT_BINARY_DIR}/SurgSim/Testing/
+${PROJECT_BINARY_DIR}/SurgSim/Testing/Data/

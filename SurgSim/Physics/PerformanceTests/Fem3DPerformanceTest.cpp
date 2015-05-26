@@ -79,7 +79,7 @@ public:
 
 	void initializeRepresentation(std::shared_ptr<Fem3DRepresentation> fem)
 	{
-		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"));
 		fem->wakeUp();
 		m_physicsManager->executeAdditions(fem);
 	}
@@ -124,7 +124,7 @@ TEST_P(IntegrationSchemeParamTest, WoundTest)
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
 
 	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("wound");
-	fem->setFilename("Data/Fem3DPerformanceTest/wound_deformable.ply");
+	fem->setFilename("wound_deformable.ply");
 	fem->setIntegrationScheme(integrationScheme);
 
 	initializeRepresentation(fem);

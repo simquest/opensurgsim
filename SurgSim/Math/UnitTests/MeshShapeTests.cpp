@@ -241,7 +241,7 @@ TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 
 TEST_F(MeshShapeTest, SerializationTest)
 {
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	const std::string fileName = "Geometry/staple_collision.ply";
 	auto meshShape = std::make_shared<MeshShape>();
 	EXPECT_NO_THROW(meshShape->load(fileName));
 	EXPECT_TRUE(meshShape->isValid());
@@ -269,7 +269,7 @@ TEST_F(MeshShapeTest, SerializationTest)
 
 TEST_F(MeshShapeTest, CreateAabbTreeTest)
 {
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	const std::string fileName = "Geometry/staple_collision.ply";
 	auto meshShape = std::make_shared<MeshShape>();
 	EXPECT_NO_THROW(meshShape->load(fileName));
 
@@ -291,7 +291,7 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 
 TEST_F(MeshShapeTest, TransformTest)
 {
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	const std::string fileName = "Geometry/staple_collision.ply";
 	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
 	ASSERT_NO_THROW(mesh->load(fileName));
 
@@ -384,13 +384,13 @@ TEST_F(MeshShapeTest, DoLoadTest)
 	{
 		SCOPED_TRACE("Normal load should succeed");
 		auto meshShape = std::make_shared<MeshShape>();
-		EXPECT_NO_THROW(meshShape->load("MeshShapeData/staple_collision.ply"));
+		EXPECT_NO_THROW(meshShape->load("Geometry/staple_collision.ply"));
 		EXPECT_TRUE(meshShape->isValid());
 	}
 
 	{
 		SCOPED_TRACE("Load through parameter should succeed");
-		auto fileName = std::string("MeshShapeData/staple_collision.ply");
+		auto fileName = std::string("Geometry/staple_collision.ply");
 		auto meshShape = std::make_shared<MeshShape>();
 
 		EXPECT_NO_THROW(meshShape->setValue("FileName", fileName));
@@ -400,7 +400,7 @@ TEST_F(MeshShapeTest, DoLoadTest)
 	{
 		SCOPED_TRACE("Load of invalid mesh should throw");
 		auto meshShape = std::make_shared<MeshShape>();
-		EXPECT_THROW(meshShape->load("MeshShapeData/InvalidMesh.ply"), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(meshShape->load("Geometry/InvalidMesh.ply"), SurgSim::Framework::AssertionFailure);
 	}
 
 	{
