@@ -35,7 +35,7 @@ const std::string valueName = "Value";
 
 template <class T>
 YAML::Node YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::encode(
-	const SurgSim::DataStructures::OptionalValue<T>& rhs)
+			const SurgSim::DataStructures::OptionalValue<T>& rhs)
 {
 	Node node;
 	node[SurgSim::DataStructures::Convert::hasValueName] = rhs.hasValue();
@@ -52,14 +52,34 @@ YAML::Node YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::encode(
 
 template <class T>
 bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
-	const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs) //NOLINT
+			const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs) //NOLINT
 {
 	bool result = true;
-	if (node[SurgSim::DataStructures::Convert::hasValueName].as<bool>())
+	if (node.IsMap())
+	{
+		if (node[SurgSim::DataStructures::Convert::hasValueName].as<bool>())
+		{
+			try
+			{
+				rhs.setValue(node[SurgSim::DataStructures::Convert::valueName].as<T>());
+			}
+			catch (YAML::RepresentationException)
+			{
+				result = false;
+				auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
+				SURGSIM_LOG(logger, WARNING) << "Bad conversion";
+			}
+		}
+		else
+		{
+			rhs.invalidate();
+		}
+	}
+	else if (node.IsScalar())
 	{
 		try
 		{
-			rhs.setValue(node[SurgSim::DataStructures::Convert::valueName].as<T>());
+			rhs.setValue(node.as<T>());
 		}
 		catch (YAML::RepresentationException)
 		{
@@ -67,10 +87,6 @@ bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
 			SURGSIM_LOG(logger, WARNING) << "Bad conversion";
 		}
-	}
-	else
-	{
-		rhs.invalidate();
 	}
 	return result;
 }

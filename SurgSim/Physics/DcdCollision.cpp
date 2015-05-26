@@ -43,10 +43,16 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
+
+	auto& representations = state->getActiveCollisionRepresentations();
+	for (auto& representation : representations)
+	{
+		representation->getCollisions().unsafeGet().clear();
+	}
+
 	updatePairs(result);
 
 	auto& pairs = result->getCollisionPairs();
-
 	auto it = pairs.cbegin();
 	auto itEnd = pairs.cend();
 	while (it != itEnd)
@@ -56,7 +62,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 		++it;
 	}
 
-	auto& representations = state->getActiveCollisionRepresentations();
 	for (auto& representation : representations)
 	{
 		representation->getCollisions().publish();
@@ -86,6 +91,7 @@ void DcdCollision::populateCalculationTable()
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereSphereDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SpherePlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::TriangleMeshParticlesDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::TriangleMeshPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::TriangleMeshTriangleMeshDcdContact>());
 }
@@ -96,11 +102,6 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 
 	if (representations.size() > 1)
 	{
-		for (auto it = std::begin(representations); it != std::end(representations); ++it)
-		{
-			(*it)->getCollisions().unsafeGet().clear();
-		}
-
 		std::vector<std::shared_ptr<CollisionPair>> pairs;
 		auto firstEnd = std::end(representations);
 		--firstEnd;

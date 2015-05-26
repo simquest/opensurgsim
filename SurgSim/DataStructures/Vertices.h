@@ -63,6 +63,13 @@ public:
 	template <class V>
 	explicit Vertices(const Vertices<V>& other);
 
+	/// Assignment when the template data is a different type
+	/// In this case, no data will be copied
+	/// \tparam V type of data stored in the other Vertices
+	/// \param other the Vertices to copy from
+	template <class V>
+	Vertices<VertexData>& operator=(const Vertices<V>& other);
+
 	/// Destructor
 	virtual ~Vertices();
 
