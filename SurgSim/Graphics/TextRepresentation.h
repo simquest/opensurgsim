@@ -48,7 +48,7 @@ public:
 
 	/// Load the font with the given file name, this will overwrite the current font
 	/// \param fileName the file that should be used to load the font
-	virtual void loadFont(std::string fileName) = 0;
+	virtual void loadFont(const std::string& fileName) = 0;
 
 	/// Replace the current font with the one passed
 	/// \param font the new font to be used

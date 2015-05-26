@@ -31,37 +31,38 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
 	Fem1DElementBeamTests.cpp
+	Fem1DLocalizationTest.cpp
 	Fem1DMechanicalValidationTests.cpp
 	Fem1DPlyReaderDelegateTests.cpp
-	Fem1DRepresentationLocalizationTest.cpp
 	Fem1DRepresentationTests.cpp
 	Fem2DElementTriangleTests.cpp
+	Fem2DLocalizationTest.cpp
 	Fem2DMechanicalValidationTests.cpp
 	Fem2DPlyReaderDelegateTests.cpp
-	Fem2DRepresentationLocalizationTest.cpp
 	Fem2DRepresentationTests.cpp
+	Fem3DConstraintFixedPointTests.cpp
+	Fem3DConstraintFrictionlessContactTests.cpp
 	Fem3DElementCorotationalTetrahedronTests.cpp
 	Fem3DElementCubeTests.cpp
 	Fem3DElementTetrahedronTests.cpp
+	Fem3DLocalizationTest.cpp
 	Fem3DPlyReaderDelegateTests.cpp
-	Fem3DRepresentationBilateral3DTests.cpp
-	Fem3DRepresentationContactTests.cpp
-	Fem3DRepresentationLocalizationTest.cpp
 	Fem3DRepresentationTests.cpp
 	FemElementMeshTests.cpp
 	FemElementTests.cpp
 	FemRepresentationTests.cpp
-	FixedRepresentationBilateral3DTests.cpp
-	FixedRepresentationContactTests.cpp
+	FixedConstraintFixedPointTests.cpp
+	FixedConstraintFrictionlessContactTests.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
+	MassSpringConstraintFrictionlessContactTest.cpp
+	MassSpringLocalizationTest.cpp
 	MassSpringMechanicalValidationTests.cpp
-	MassSpringRepresentationContactTest.cpp
-	MassSpringRepresentationLocalizationTest.cpp
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
 	MockObjects.cpp
+	ParticleCollisionResponseTests.cpp
 	PhysicsManagerStateTests.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
@@ -69,11 +70,11 @@ set(UNIT_TEST_SOURCES
 	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp
-	RigidRepresentationBaseLocalizationTest.cpp
-	RigidRepresentationBilateral3DTests.cpp
-	RigidRepresentationContactTests.cpp
-	RigidRepresentationStateTest.cpp
+	RigidConstraintFixedPointTests.cpp
+	RigidConstraintFrictionlessContactTests.cpp
+	RigidLocalizationTest.cpp
 	RigidRepresentationTest.cpp
+	RigidStateTest.cpp
 	SolveMlcpTests.cpp
 	UpdateCollisionRepresentationsTest.cpp
 	VirtualToolCouplerTest.cpp
@@ -88,9 +89,10 @@ set(UNIT_TEST_HEADERS
 set(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
-	SurgSimPhysics
-	SurgSimMath
 	SurgSimInput
+	SurgSimMath
+	SurgSimParticles
+	SurgSimPhysics
 	MlcpTestIO
 	IdentityPoseDevice
 )

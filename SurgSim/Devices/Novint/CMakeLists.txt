@@ -47,6 +47,12 @@ set(NOVINT_DEVICE_HEADERS
 	NovintScaffold.h
 )
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
+	Novint7DofDevice.h
+	NovintCommonDevice.h
+	NovintDevice.h
+	PARENT_SCOPE)
+
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
 	NovintDevice

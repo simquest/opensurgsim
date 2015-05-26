@@ -32,7 +32,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidState.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 #include "SurgSim/Testing/MockInputComponent.h"
@@ -67,7 +67,7 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		rigidBody->setLinearDamping(0.0);
 		rigidBody->setShape(std::make_shared<SphereShape>(0.1));
 
-		RigidRepresentationState state;
+		RigidState state;
 		state.setAngularVelocity(Vector3d::Zero());
 		state.setLinearVelocity(Vector3d::Zero());
 		state.setPose(RigidTransform3d::Identity());
@@ -222,7 +222,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
-	RigidRepresentationState state = rigidBody->getCurrentState();
+	RigidState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getPose().translation().isZero(epsilon));
@@ -257,7 +257,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacementWithOffset)
 	runSystem(2500);
 	EXPECT_TRUE(rigidBody->isActive());
 
-	RigidRepresentationState state = rigidBody->getCurrentState();
+	RigidState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getPose().translation().isApprox(inputOffset.translation(), epsilon))
@@ -291,7 +291,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)
 	virtualToolCoupler->wakeUp();
 	rigidBody->wakeUp();
 
-	RigidRepresentationState state = rigidBody->getCurrentState();
+	RigidState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
 	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
@@ -340,7 +340,7 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
-	RigidRepresentationState state = rigidBody->getCurrentState();
+	RigidState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getPose().translation().isZero(epsilon));
@@ -377,7 +377,7 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
-	RigidRepresentationState state = rigidBody->getCurrentState();
+	RigidState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 

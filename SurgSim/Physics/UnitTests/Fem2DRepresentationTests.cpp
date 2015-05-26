@@ -26,8 +26,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
+#include "SurgSim/Physics/Fem2DLocalization.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/Fem2DRepresentationLocalization.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
@@ -135,7 +135,7 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	femRepCoordinate.index = 0;
 	femRepCoordinate.coordinate = SurgSim::Math::Vector::Zero(3);
 	femRepCoordinate.coordinate[0] = 1.0;
-	auto localization = std::make_shared<Fem2DRepresentationLocalization>(fem, femRepCoordinate);
+	auto localization = std::make_shared<Fem2DLocalization>(fem, femRepCoordinate);
 	auto wrongLocalizationType = std::make_shared<MockLocalization>();
 
 	Vector FLocalWrongSize = Vector::Ones(2 * fem->getNumDofPerNode());

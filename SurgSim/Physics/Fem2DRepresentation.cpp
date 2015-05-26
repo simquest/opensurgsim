@@ -18,9 +18,9 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
+#include "SurgSim/Physics/Fem2DLocalization.h"
 #include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/Fem2DRepresentationLocalization.h"
 #include "SurgSim/Physics/FemElement.h"
 
 using SurgSim::Math::SparseMatrix;
@@ -115,9 +115,9 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
 			") was expecting a square matrix of size " << dofPerNode;
 
-	std::shared_ptr<Fem2DRepresentationLocalization> localization2D =
-		std::dynamic_pointer_cast<Fem2DRepresentationLocalization>(localization);
-	SURGSIM_ASSERT(localization2D != nullptr) << "Invalid localization type (not a Fem2DRepresentationLocalization)";
+	std::shared_ptr<Fem2DLocalization> localization2D =
+		std::dynamic_pointer_cast<Fem2DLocalization>(localization);
+	SURGSIM_ASSERT(localization2D != nullptr) << "Invalid localization type (not a Fem2DLocalization)";
 
 	const size_t elementId = localization2D->getLocalPosition().index;
 	const SurgSim::Math::Vector& coordinate = localization2D->getLocalPosition().coordinate;

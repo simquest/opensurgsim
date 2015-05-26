@@ -44,5 +44,7 @@ foreach(DEVICE ${DEVICES})
 	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 endforeach(DEVICE)
 
+surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS}")
+
 add_custom_target(SurgSimDevicesDocumentation SOURCES ${SURGSIM_DEVICES_DOCUMENTATION})
 set_target_properties(SurgSimDevicesDocumentation PROPERTIES FOLDER "Devices")

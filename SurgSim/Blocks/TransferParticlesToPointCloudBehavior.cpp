@@ -22,7 +22,7 @@
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Representation.h"
 
 using SurgSim::Framework::checkAndConvert;
 
@@ -46,8 +46,8 @@ TransferParticlesToPointCloudBehavior::TransferParticlesToPointCloudBehavior(con
 void TransferParticlesToPointCloudBehavior::setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
 {
 	SURGSIM_ASSERT(nullptr != source) << "'source' can not be nullptr.";
-	m_source = checkAndConvert<SurgSim::Particles::ParticleSystemRepresentation>(
-				   source, "SurgSim::Particles::ParticleSystemRepresentation");
+	m_source = checkAndConvert<SurgSim::Particles::Representation>(
+				   source, "SurgSim::Particles::Representation");
 }
 
 void TransferParticlesToPointCloudBehavior::setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
@@ -57,8 +57,7 @@ void TransferParticlesToPointCloudBehavior::setTarget(const std::shared_ptr<Surg
 				   target, "SurgSim::Graphics::PointCloudRepresentation");
 }
 
-std::shared_ptr<SurgSim::Particles::ParticleSystemRepresentation>
-	TransferParticlesToPointCloudBehavior::getSource() const
+std::shared_ptr<SurgSim::Particles::Representation> TransferParticlesToPointCloudBehavior::getSource() const
 {
 	return m_source;
 }

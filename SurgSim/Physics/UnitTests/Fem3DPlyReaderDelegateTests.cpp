@@ -29,7 +29,7 @@ using SurgSim::DataStructures::PlyReader;
 
 namespace
 {
-std::string findFile(std::string filename)
+std::string findFile(const std::string& filename)
 {
 	const SurgSim::Framework::ApplicationData data("config.txt");
 

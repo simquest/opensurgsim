@@ -388,7 +388,7 @@ public:
 	{
 		return a;
 	}
-	void setA(std::string val)
+	void setA(const std::string& val)
 	{
 		a = val;
 	}
@@ -398,7 +398,7 @@ public:
 	{
 		return b;
 	}
-	void setB(std::string val)
+	void setB(const std::string& val)
 	{
 		b = val;
 	}
@@ -408,7 +408,7 @@ public:
 	{
 		return c;
 	}
-	void setC(std::string val)
+	void setC(const std::string& val)
 	{
 		c = val;
 	}
