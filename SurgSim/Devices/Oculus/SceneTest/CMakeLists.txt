@@ -52,5 +52,4 @@ SET(LIBS
 
 target_link_libraries(OculusSceneTest ${LIBS})
 
-# Put YamlSimulation into folder "Examples"
 set_target_properties(OculusSceneTest PROPERTIES FOLDER "Devices") 

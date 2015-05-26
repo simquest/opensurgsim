@@ -13,20 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
+#include <array>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <boost/program_options.hpp>
 
+#include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Framework/Framework.h"
 #include "SurgSim/Graphics/Graphics.h"
-#include "SurgSim/Blocks/Blocks.h"
 #include "SurgSim/Input/Input.h"
 #include "SurgSim/Math/Math.h"
 
 // Include this for linking only
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/Oculus/OculusDevice.h"
 #include "SurgSim/Devices/Oculus/OculusView.h"
-#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 
 using namespace SurgSim;
 using Math::Vector3d;
@@ -35,8 +39,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char* argv[])
 {
-
-	// Parse commandline parameters
+	// Parse command-line parameters
 	std::string sceneFileName;
 	po::options_description visible("Allowed options");
 	visible.add_options()("help", "produce help message")
