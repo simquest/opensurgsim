@@ -45,7 +45,8 @@ size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getNumElemen
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-const std::vector<std::shared_ptr<Element>>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElements() const
+const std::vector<std::shared_ptr<Element>>&
+	FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElements() const
 {
 	return m_femElements;
 }

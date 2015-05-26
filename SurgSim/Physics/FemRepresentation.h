@@ -54,6 +54,8 @@ public:
 
 	virtual void loadMesh(const std::string& filename) = 0;
 
+	/// Override the FemElement type pulled from the object factory
+	/// \param type A string of the full registered OSS class name in the factory
 	void overrideFemElementType(const std::string& type);
 
 	/// Adds a FemElement
@@ -156,6 +158,7 @@ public:
 
 protected:
 	/// Gets name of file to encode for serialization
+	/// \return The name of the file describing the physics mesh
 	const std::string& getFilename() const;
 
 	/// Adds the Rayleigh damping forces
@@ -205,9 +208,10 @@ protected:
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
-	/// Override class name passed to FemElement factory
+	/// Override class name passed to FemElement factory if not empty
 	std::string m_femElementOverrideType;
 
+	/// Name of file describing the physics mesh
 	std::string m_filename;
 
 private:

@@ -39,12 +39,12 @@ class Fem1DElementBeam : public FemElement
 public:
 	/// Constructor
 	/// \param nodeIds An array of 2 node ids defining this beam element with respect to a
-	/// DeformableRepresentaitonState which is passed to the initialize method.
+	/// DeformableRepresentationState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
 
 	/// Constructor for FemElement object factory
-	/// \param nodeIds A vector of node ids defining this beam element with respect to a
-	/// DeformableRepresentaitonState which is passed to the initialize method.
+	/// \param elementData A FemElement struct defining this beam element with respect to a
+	/// DeformableRepresentationState which is passed to the initialize method.
 	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 2
 	explicit Fem1DElementBeam(std::shared_ptr<FemElementStructs::FemElement> elementData);
 
@@ -144,12 +144,12 @@ public:
 						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
 
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
-		const SurgSim::Math::OdeState& state,
-		const SurgSim::Math::Vector& naturalCoordinate) const;
+			const SurgSim::Math::OdeState& state,
+			const SurgSim::Math::Vector& naturalCoordinate) const;
 
 	SurgSim::Math::Vector computeNaturalCoordinate(
-		const SurgSim::Math::OdeState& state,
-		const SurgSim::Math::Vector& cartesianCoordinate) const override;
+			const SurgSim::Math::OdeState& state,
+			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
 	/// Initializes variables needed before Initialize() is called

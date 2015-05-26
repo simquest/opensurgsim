@@ -41,7 +41,7 @@ class Fem3DElementCorotationalTetrahedron : public Fem3DElementTetrahedron
 {
 public:
 	/// Constructor
-	/// \param elementData A FemElement3D struct defining this tetrahedron element in a overall mesh
+	/// \param nodeIds A vector of node ids defining this tetrahedron element in a overall mesh
 	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
 	/// \note This is required from the signed volume calculation method getVolume()
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
@@ -49,7 +49,7 @@ public:
 	explicit Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds);
 
 	/// Constructor for FemElement object factory
-	/// \param nodeIds A vector of node ids defining this tetrahedron element in a overall mesh
+	/// \param elementData A FemElement3D struct defining this tetrahedron element in a overall mesh
 	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
 	/// \note This is required from the signed volume calculation method getVolume()
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the

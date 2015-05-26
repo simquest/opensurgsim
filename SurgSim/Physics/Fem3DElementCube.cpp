@@ -40,9 +40,13 @@ Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 Fem3DElementCube::Fem3DElementCube(std::shared_ptr<FemElementStructs::FemElement> elementData)
 {
 	init();
-	auto data = std::static_pointer_cast<FemElementStructs::FemElement3D>(elementData);
-	SURGSIM_ASSERT(data->nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
-	m_nodeIds.assign(data->nodeIds.begin(), data->nodeIds.end());
+	auto element3DData = std::dynamic_pointer_cast<FemElementStructs::FemElement3D>(elementData);
+	SURGSIM_ASSERT(element3DData != nullptr) << "Incorrect struct type passed";
+	SURGSIM_ASSERT(element3DData->nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
+	m_nodeIds.assign(element3DData->nodeIds.begin(), element3DData->nodeIds.end());
+	setMassDensity(element3DData->massDensity);
+	setPoissonRatio(element3DData->poissonRatio);
+	setYoungModulus(element3DData->youngModulus);
 }
 
 void Fem3DElementCube::init()
@@ -69,7 +73,7 @@ void Fem3DElementCube::initialize(const SurgSim::Math::OdeState& state)
 	for (auto nodeId = m_nodeIds.cbegin(); nodeId != m_nodeIds.cend(); ++nodeId)
 	{
 		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < state.getNumNodes()) <<
-				"Invalid nodeId " << *nodeId << " expected in range [0.." << state.getNumNodes() - 1 << "]";
+						"Invalid nodeId " << *nodeId << " expected in range [0.." << state.getNumNodes() - 1 << "]";
 	}
 
 	// Store the rest state for this cube in m_elementRestPosition
@@ -206,17 +210,17 @@ void Fem3DElementCube::evaluateJ(const SurgSim::Math::OdeState& state, double ep
 		J->computeInverseAndDetWithCheck(*Jinv, *detJ, invertible);
 
 		SURGSIM_ASSERT(invertible) <<
-								   "Found a non invertible matrix J\n" << *J << "\ndet(J)=" << *detJ <<
-								   ") while computing Fem3DElementCube stiffness matrix\n";
+									  "Found a non invertible matrix J\n" << *J << "\ndet(J)=" << *detJ <<
+									  ") while computing Fem3DElementCube stiffness matrix\n";
 		SURGSIM_LOG_IF(*detJ <= 1e-8 && *detJ >= -1e-8, Logger::getLogger("Physics"), WARNING) <<
-				"Found an invalid matrix J\n" << *J << "\ninvertible, but det(J)=" << *detJ <<
-				") while computing Fem3DElementCube stiffness matrix\n";
+								  "Found an invalid matrix J\n" << *J << "\ninvertible, but det(J)=" << *detJ <<
+								  ") while computing Fem3DElementCube stiffness matrix\n";
 	}
 }
 
 void Fem3DElementCube::evaluateStrainDisplacement(double epsilon, double eta, double mu,
-		const SurgSim::Math::Matrix33d& Jinv,
-		Eigen::Matrix<double, 6, 24>* B) const
+												  const SurgSim::Math::Matrix33d& Jinv,
+												  Eigen::Matrix<double, 6, 24>* B) const
 {
 	SURGSIM_ASSERT(B != nullptr) << "Trying to evaluate the strain-displacmenet with a nullptr";
 
@@ -229,10 +233,10 @@ void Fem3DElementCube::evaluateStrainDisplacement(double epsilon, double eta, do
 		// Compute dNi/d(x,y,z) = dNi/d(epsilon,eta,mu) d(epsilon,eta,mu)/d(x,y,z)
 		//                      = J^{-1}.dNi/d(epsilon,eta,mu)
 		Vector3d dNidEpsilonEtaMu(
-			dShapeFunctiondepsilon(index, epsilon, eta, mu),
-			dShapeFunctiondeta(index, epsilon, eta, mu),
-			dShapeFunctiondmu(index, epsilon, eta, mu)
-		);
+					dShapeFunctiondepsilon(index, epsilon, eta, mu),
+					dShapeFunctiondeta(index, epsilon, eta, mu),
+					dShapeFunctiondmu(index, epsilon, eta, mu)
+					);
 		Vector3d dNidxyz = Jinv * dNidEpsilonEtaMu;
 
 		// B = (dNi/dx      0      0)
@@ -255,7 +259,7 @@ void Fem3DElementCube::evaluateStrainDisplacement(double epsilon, double eta, do
 }
 
 void Fem3DElementCube::buildConstitutiveMaterialMatrix(
-	Eigen::Matrix<double, 6, 6>* constitutiveMatrix)
+		Eigen::Matrix<double, 6, 6>* constitutiveMatrix)
 {
 	// Compute the elasticity material matrix
 	// which is commonly based on the Lame coefficients (1st = lambda, 2nd = mu = shear modulus):
@@ -269,12 +273,12 @@ void Fem3DElementCube::buildConstitutiveMaterialMatrix(
 }
 
 void Fem3DElementCube::addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeState& state,
-		const SurgSim::Math::gaussQuadraturePoint& epsilon,
-		const SurgSim::Math::gaussQuadraturePoint& eta,
-		const SurgSim::Math::gaussQuadraturePoint& mu,
-		Eigen::Matrix<double, 6, 24>* strain,
-		Eigen::Matrix<double, 6, 24>* stress,
-		Eigen::Matrix<double, 24, 24>* k)
+													   const SurgSim::Math::gaussQuadraturePoint& epsilon,
+													   const SurgSim::Math::gaussQuadraturePoint& eta,
+													   const SurgSim::Math::gaussQuadraturePoint& mu,
+													   Eigen::Matrix<double, 6, 24>* strain,
+													   Eigen::Matrix<double, 6, 24>* stress,
+													   Eigen::Matrix<double, 24, 24>* k)
 {
 	SurgSim::Math::Matrix33d J, Jinv;
 	double detJ;
@@ -292,10 +296,10 @@ void Fem3DElementCube::addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeS
 }
 
 void Fem3DElementCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state,
-		const SurgSim::Math::gaussQuadraturePoint& epsilon,
-		const SurgSim::Math::gaussQuadraturePoint& eta,
-		const SurgSim::Math::gaussQuadraturePoint& mu,
-		Eigen::Matrix<double, 24, 24>* m)
+											const SurgSim::Math::gaussQuadraturePoint& epsilon,
+											const SurgSim::Math::gaussQuadraturePoint& eta,
+											const SurgSim::Math::gaussQuadraturePoint& mu,
+											Eigen::Matrix<double, 24, 24>* m)
 {
 	// This helper method hels to compute:
 	// M = rho * integration{over volume} {phi^T.phi} dV
@@ -415,12 +419,12 @@ double Fem3DElementCube::getVolume(const SurgSim::Math::OdeState& state) const
 	}
 
 	SURGSIM_ASSERT(v > 1e-12) << "Fem3DElementCube ill-defined, its volume is " << v << std::endl <<
-							  "Please make sure the element is not degenerate and " <<
-							  "check the node ordering of your element formed by node ids " <<
-							  m_nodeIds[0] << " " << m_nodeIds[1] << " " << m_nodeIds[2] << " " <<
-							  m_nodeIds[3] << " " <<
-							  m_nodeIds[4] << " " << m_nodeIds[5] << " " << m_nodeIds[6] << " " <<
-							  m_nodeIds[7] << std::endl;
+								 "Please make sure the element is not degenerate and " <<
+								 "check the node ordering of your element formed by node ids " <<
+								 m_nodeIds[0] << " " << m_nodeIds[1] << " " << m_nodeIds[2] << " " <<
+								 m_nodeIds[3] << " " <<
+								 m_nodeIds[4] << " " << m_nodeIds[5] << " " << m_nodeIds[6] << " " <<
+								 m_nodeIds[7] << std::endl;
 
 	return v;
 }
@@ -428,38 +432,38 @@ double Fem3DElementCube::getVolume(const SurgSim::Math::OdeState& state) const
 double Fem3DElementCube::shapeFunction(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
-		   (1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
-		   (1 + eta * m_shapeFunctionsEtaSign[i]) *
-		   (1 + mu * m_shapeFunctionsMuSign[i]);
+			(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
+			(1 + eta * m_shapeFunctionsEtaSign[i]) *
+			(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
 double Fem3DElementCube::dShapeFunctiondepsilon(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
-		   m_shapeFunctionsEpsilonSign[i] *
-		   (1 + eta * m_shapeFunctionsEtaSign[i]) *
-		   (1 + mu * m_shapeFunctionsMuSign[i]);
+			m_shapeFunctionsEpsilonSign[i] *
+			(1 + eta * m_shapeFunctionsEtaSign[i]) *
+			(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
 double Fem3DElementCube::dShapeFunctiondeta(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
-		   (1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
-		   m_shapeFunctionsEtaSign[i] *
-		   (1 + mu * m_shapeFunctionsMuSign[i]);
+			(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
+			m_shapeFunctionsEtaSign[i] *
+			(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
 double Fem3DElementCube::dShapeFunctiondmu(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
-		   (1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
-		   (1 + eta * m_shapeFunctionsEtaSign[i]) *
-		   m_shapeFunctionsMuSign[i];
+			(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
+			(1 + eta * m_shapeFunctionsEtaSign[i]) *
+			m_shapeFunctionsMuSign[i];
 }
 
 SurgSim::Math::Vector Fem3DElementCube::computeCartesianCoordinate(
-	const SurgSim::Math::OdeState& state,
-	const SurgSim::Math::Vector& naturalCoordinate) const
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
 			<< "naturalCoordinate must be normalized and length 8 within [0 1].";
@@ -477,8 +481,8 @@ SurgSim::Math::Vector Fem3DElementCube::computeCartesianCoordinate(
 }
 
 SurgSim::Math::Vector Fem3DElementCube::computeNaturalCoordinate(
-	const SurgSim::Math::OdeState& state,
-	const SurgSim::Math::Vector& cartesianCoordinate) const
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& cartesianCoordinate) const
 {
 	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
 	return SurgSim::Math::Vector3d::Zero();

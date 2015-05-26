@@ -28,15 +28,12 @@ namespace Physics
 
 TEST(FemElementMeshReaderTests, DelegateTest)
 {
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	std::string filePath = runtime->getApplicationData()->findFile("FemElementMeshTests/Fem1D.ply");
-
 	auto mesh1d = std::make_shared<FemElement1DMesh>();
-	mesh1d->load(filePath);
+	mesh1d->load("FemElementMeshTests/Fem1D.ply");
 
 	EXPECT_EQ(4, mesh1d->getNumElements());
 	EXPECT_EQ(3, mesh1d->getBoundaryConditions().size());
-	for (auto element : mesh1d->getFemElements())
+	for (auto& element : mesh1d->getFemElements())
 	{
 		EXPECT_DOUBLE_EQ(0.11, element->radius);
 		EXPECT_DOUBLE_EQ(0.21, element->massDensity);
@@ -44,16 +41,26 @@ TEST(FemElementMeshReaderTests, DelegateTest)
 		EXPECT_DOUBLE_EQ(0.41, element->youngModulus);
 	}
 
-	filePath = runtime->getApplicationData()->findFile("FemElementMeshTests/Fem2D.ply");
-
 	auto mesh2d = std::make_shared<FemElement2DMesh>();
-	mesh2d->load(filePath);
+	mesh2d->load("FemElementMeshTests/Fem2D.ply");
 
 	EXPECT_EQ(3, mesh2d->getNumElements());
 	EXPECT_EQ(2, mesh2d->getBoundaryConditions().size());
-	for (auto element : mesh2d->getFemElements())
+	for (auto& element : mesh2d->getFemElements())
 	{
 		EXPECT_DOUBLE_EQ(0.1, element->thickness);
+		EXPECT_DOUBLE_EQ(0.2, element->massDensity);
+		EXPECT_DOUBLE_EQ(0.3, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(0.4, element->youngModulus);
+	}
+
+	auto mesh3d = std::make_shared<FemElement3DMesh>();
+	mesh3d->load("FemElementMeshTests/Fem3D.ply");
+
+	EXPECT_EQ(3, mesh3d->getNumElements());
+	EXPECT_EQ(2, mesh3d->getBoundaryConditions().size());
+	for (auto& element : mesh3d->getFemElements())
+	{
 		EXPECT_DOUBLE_EQ(0.2, element->massDensity);
 		EXPECT_DOUBLE_EQ(0.3, element->poissonRatio);
 		EXPECT_DOUBLE_EQ(0.4, element->youngModulus);
