@@ -27,6 +27,7 @@
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h" // Needed for object factory registration
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
@@ -125,6 +126,7 @@ TEST(TransferPhysicsToPointCloudBehaviorTests, SerializationTest)
 
 	std::shared_ptr<SurgSim::Framework::Component> physics = std::make_shared<Fem3DRepresentation>("Fem3D");
 	auto fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(physics);
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	fem3d->loadFem(filename);
 
 	std::shared_ptr<SurgSim::Framework::Component> pointCloud =
