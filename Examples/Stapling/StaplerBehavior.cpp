@@ -104,7 +104,7 @@ const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& Staple
 	return m_virtualTeeth;
 }
 
-void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName)
+void StaplerBehavior::enableStaplingForSceneElement(const std::string& sceneElementName)
 {
 	m_stapleEnabledSceneElements.push_back(sceneElementName);
 }

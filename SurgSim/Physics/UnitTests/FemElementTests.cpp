@@ -259,7 +259,8 @@ TEST(FemElementTests, FactoryTest)
 	tetElement->massDensity = 0.4;
 	tetElement->poissonRatio = 0.4;
 	tetElement->youngModulus = 0.4;
-	auto coTetFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCorotationalTetrahedron", tetElement);
+	auto coTetFem = FemElement::getFactory().create(
+				"SurgSim::Physics::Fem3DElementCorotationalTetrahedron", tetElement);
 	EXPECT_NE(nullptr, coTetFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCorotationalTetrahedron>(coTetFem));
 	ASSERT_ANY_THROW(FemElement::getFactory().create(

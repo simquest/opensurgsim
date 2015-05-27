@@ -60,12 +60,12 @@ class Fem2DElementTriangle : public FemElement
 public:
 	/// Constructor
 	/// \param nodeIds An array of 3 node ids defining this triangle element with respect to a
-	/// DeformableRepresentaitonState which is passed to the initialize method.
+	/// DeformableRepresentationState which is passed to the initialize method.
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
 
 	/// Constructor for FemElement object factory
 	/// \param elementData A FemElement struct defining this triangle element with respect to a
-	/// DeformableRepresentaitonState which is passed to the initialize method.
+	/// DeformableRepresentationState which is passed to the initialize method.
 	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 3
 	explicit Fem2DElementTriangle(std::shared_ptr<FemElementStructs::FemElement> elementData);
 

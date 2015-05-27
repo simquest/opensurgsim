@@ -17,43 +17,30 @@
 #include <memory>
 #include <vector>
 
-#include "SurgSim/Physics/FreeMotion.h"
-#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Particles/Representation.h"
+#include "SurgSim/Physics/ParticleCollisionResponse.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
+
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-
-FreeMotion::FreeMotion(bool doCopyState) : Computation(doCopyState)
+ParticleCollisionResponse::ParticleCollisionResponse(bool doCopyState) :
+	Computation(doCopyState)
 {
-
 }
 
-FreeMotion::~FreeMotion()
+std::shared_ptr<PhysicsManagerState> ParticleCollisionResponse::doUpdate(const double& dt,
+		const std::shared_ptr<PhysicsManagerState>& state)
 {
-
-}
-
-std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
-	const double& dt,
-	const std::shared_ptr<PhysicsManagerState>& state)
-{
-	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
-
-	auto& representations = result->getActiveRepresentations();
-	for (auto& representation : representations)
-	{
-		representation->update(dt);
-	}
 
 	auto& particleRepresentations = result->getActiveParticleRepresentations();
 	for (auto& representation : particleRepresentations)
 	{
-		representation->update(dt);
+		representation->handleCollisions(dt);
 	}
 
 	return result;

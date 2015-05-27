@@ -29,16 +29,23 @@
 
 namespace SurgSim
 {
-namespace Framework
-{
-class Component;
-}
 
 namespace Collision
 {
 class CollisionPair;
 class Representation;
 }
+
+namespace Framework
+{
+class Component;
+}
+
+namespace Particles
+{
+class Representation;
+}
+
 namespace Physics
 {
 
@@ -108,7 +115,9 @@ private:
 
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
-	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
+	std::vector<std::shared_ptr<Collision::Representation>> m_collisionRepresentations;
+
+	std::vector<std::shared_ptr<Particles::Representation>> m_particleRepresentations;
 
 	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
 

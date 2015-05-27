@@ -50,13 +50,14 @@ Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds)
 Fem2DElementTriangle::Fem2DElementTriangle(std::shared_ptr<FemElementStructs::FemElement> elementData)
 {
 	init();
-	auto data = std::static_pointer_cast<FemElementStructs::FemElement2D>(elementData);
-	SURGSIM_ASSERT(data->nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
-	m_nodeIds.assign(data->nodeIds.begin(), data->nodeIds.end());
-	setThickness(data->thickness);
-	setMassDensity(data->massDensity);
-	setPoissonRatio(data->poissonRatio);
-	setYoungModulus(data->youngModulus);
+	auto element2DData = std::dynamic_pointer_cast<FemElementStructs::FemElement2D>(elementData);
+	SURGSIM_ASSERT(element2DData != nullptr) << "Incorrect struct type passed";
+	SURGSIM_ASSERT(element2DData->nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
+	m_nodeIds.assign(element2DData->nodeIds.begin(), element2DData->nodeIds.end());
+	setThickness(element2DData->thickness);
+	setMassDensity(element2DData->massDensity);
+	setPoissonRatio(element2DData->poissonRatio);
+	setYoungModulus(element2DData->youngModulus);
 }
 
 void Fem2DElementTriangle::setThickness(double thickness)
@@ -96,7 +97,7 @@ void Fem2DElementTriangle::initialize(const SurgSim::Math::OdeState& state)
 	FemElement::initialize(state);
 
 	SURGSIM_ASSERT(m_thickness > 0.0) << "Fem2DElementTriangle thickness should be positive and non-zero. " <<
-									  "Did you call setThickness(thickness) ?";
+										 "Did you call setThickness(thickness) ?";
 
 	// Store the rest state for this beam in m_x0
 	getSubVector(state.getPositions(), m_nodeIds, 6, &m_x0);
@@ -190,7 +191,7 @@ void Fem2DElementTriangle::addMatVec(const SurgSim::Math::OdeState& state, doubl
 }
 
 void Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 18, 18>* localMassMatrix)
+													Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {
 	double mass = m_rho * m_restArea * m_thickness;
 
@@ -206,7 +207,7 @@ void Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeStat
 }
 
 void Fem2DElementTriangle::computeLocalPlateMass(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 18, 18>* localMassMatrix)
+												 Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {
 	double coefZ = 2.0 * m_restArea * m_rho * m_thickness;
 	double coefTheta = m_restArea * m_rho * (m_thickness * m_thickness * m_thickness) / 6.0;
@@ -216,15 +217,15 @@ void Fem2DElementTriangle::computeLocalPlateMass(const SurgSim::Math::OdeState& 
 		for (size_t nodeId2 = 0; nodeId2 < 3; ++nodeId2)
 		{
 			localMassMatrix->block<3, 3>(6 * nodeId1 + 2, 6 * nodeId2 + 2) =
-				coefZ * m_integral_dT_d.block<3, 3>(3 * nodeId1, 3 * nodeId2) +
-				coefTheta * m_integralHxiHxj.block<3, 3>(3 * nodeId1, 3 * nodeId2) +
-				coefTheta * m_integralHyiHyj.block<3, 3>(3 * nodeId1, 3 * nodeId2);
+					coefZ * m_integral_dT_d.block<3, 3>(3 * nodeId1, 3 * nodeId2) +
+					coefTheta * m_integralHxiHxj.block<3, 3>(3 * nodeId1, 3 * nodeId2) +
+					coefTheta * m_integralHyiHyj.block<3, 3>(3 * nodeId1, 3 * nodeId2);
 		}
 	}
 }
 
 void Fem2DElementTriangle::computeLocalMass(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 18, 18>* localMassMatrix)
+											Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {
 	localMassMatrix->setIdentity();
 	computeLocalMembraneMass(state, localMassMatrix);
@@ -250,7 +251,7 @@ void Fem2DElementTriangle::computeMass(const SurgSim::Math::OdeState& state,
 }
 
 void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 18, 18>* localStiffnessMatrix)
+												 Eigen::Matrix<double, 18, 18>* localStiffnessMatrix)
 {
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	// Compute the membrane local strain-displacement matrix
@@ -280,7 +281,7 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 	membraneElasticMaterial *= m_E / (1.0 - m_nu * m_nu);
 	// Membrane local stiffness matrix = integral(strain:stress)
 	Matrix66Type membraneKLocal =
-		membraneStrainDisplacement.transpose() * membraneElasticMaterial * membraneStrainDisplacement;
+			membraneStrainDisplacement.transpose() * membraneElasticMaterial * membraneStrainDisplacement;
 	membraneKLocal *= m_thickness * m_restArea;
 
 	// Thin-plate part from "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
@@ -314,13 +315,13 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 
 			// Thin-plate part
 			localStiffnessMatrix->block<3, 3>(6 * row + 2, 6 * column + 2) =
-				plateKLocal.block<3, 3>(3 * row, 3 * column);
+					plateKLocal.block<3, 3>(3 * row, 3 * column);
 		}
 	}
 }
 
 void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state,
-		Eigen::Matrix<double, 18, 18>* stiffnessMatrix)
+											Eigen::Matrix<double, 18, 18>* stiffnessMatrix)
 {
 	computeLocalStiffness(state, &m_KLocal);
 
@@ -358,9 +359,9 @@ SurgSim::Math::Matrix33d Fem2DElementTriangle::computeRotation(const SurgSim::Ma
 			<< "Degenerate triangle A=C, A=(" << A.transpose() << ") C=(" << C.transpose() << ")";
 	Vector3d k = i.cross(j);
 	SURGSIM_ASSERT(!k.isZero()) << "Degenerate triangle ABC aligned or B=C, " <<
-								"A=(" << A.transpose() << ") " <<
-								"B=(" << B.transpose() << ") " <<
-								"C=(" << C.transpose() << ")";
+								   "A=(" << A.transpose() << ") " <<
+								   "B=(" << B.transpose() << ") " <<
+								   "C=(" << C.transpose() << ")";
 	k.normalize();
 	j = k.cross(i);
 	j.normalize();
@@ -374,8 +375,8 @@ SurgSim::Math::Matrix33d Fem2DElementTriangle::computeRotation(const SurgSim::Ma
 }
 
 SurgSim::Math::Vector Fem2DElementTriangle::computeCartesianCoordinate(
-	const SurgSim::Math::OdeState& state,
-	const SurgSim::Math::Vector& naturalCoordinate) const
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 3.";
 
@@ -392,8 +393,8 @@ SurgSim::Math::Vector Fem2DElementTriangle::computeCartesianCoordinate(
 }
 
 SurgSim::Math::Vector Fem2DElementTriangle::computeNaturalCoordinate(
-	const SurgSim::Math::OdeState& state,
-	const SurgSim::Math::Vector& cartesianCoordinate) const
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& cartesianCoordinate) const
 {
 	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
 	return SurgSim::Math::Vector3d::Zero();
@@ -756,11 +757,11 @@ void Fem2DElementTriangle::computeIntegral_HyHyT()
 void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::OdeState& restState)
 {
 	SURGSIM_ASSERT(m_nodeIds[0] < restState.getNumNodes()) << "Invalid nodeId[0] = " << m_nodeIds[0] <<
-			", the number of nodes is " << restState.getNumNodes();
+															  ", the number of nodes is " << restState.getNumNodes();
 	SURGSIM_ASSERT(m_nodeIds[1] < restState.getNumNodes()) << "Invalid nodeId[1] = " << m_nodeIds[1] <<
-			", the number of nodes is " << restState.getNumNodes();
+															  ", the number of nodes is " << restState.getNumNodes();
 	SURGSIM_ASSERT(m_nodeIds[2] < restState.getNumNodes()) << "Invalid nodeId[2] = " << m_nodeIds[2] <<
-			", the number of nodes is " << restState.getNumNodes();
+															  ", the number of nodes is " << restState.getNumNodes();
 
 	const SurgSim::Math::Vector3d a = restState.getPosition(m_nodeIds[0]);
 	const SurgSim::Math::Vector3d b = restState.getPosition(m_nodeIds[1]);
@@ -784,15 +785,15 @@ void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::
 
 	// Note that by construction, we should have x0=y0=0 and y1=0
 	SURGSIM_ASSERT(std::abs(x0) < epsilon && std::abs(y0) < epsilon && std::abs(y1) < epsilon) <<
-			"Membrane local transform problem. We should have x0=y0=y1=0, but we have x0=" << x0 <<
-			" y0=" << y0 << " y1=" << y1;
+					  "Membrane local transform problem. We should have x0=y0=y1=0, but we have x0=" << x0 <<
+					  " y0=" << y0 << " y1=" << y1;
 	x0 = y0 = y1 = 0.0; // Force it to exactly 0 for numerical purpose
 
 	// Also note that x1>=0 and y2>=0 by construction
 	SURGSIM_ASSERT(x1 >= 0 && y2 >= 0) <<
-									   "Membrane local transform problem. We should have " <<
-									   "x1>=0 and y2>=0, but we have x1=" << x1 <<
-									   " y2=" << y2;
+										  "Membrane local transform problem. We should have " <<
+										  "x1>=0 and y2>=0, but we have x1=" << x1 <<
+										  " y2=" << y2;
 
 	// Note: 2Area(ABC) = 2A = (x0y1 + x1y2 + x2y0 - x0y2 - x1y0 - x2y1) =
 	//                   (x1-x2)(y1-y0) - (x1-x0)(y1-y2) = x12y10 - x10y12
@@ -800,10 +801,10 @@ void Fem2DElementTriangle::computeShapeFunctionsParameters(const SurgSim::Math::
 	// 2A = x1y2  (with x1>=0 and y2>=0)
 	m_restArea = x1 * y2 / 2.0;
 	SURGSIM_ASSERT(m_restArea != 0.0) << "Triangle with null area, A=(" << a.transpose() <<
-									  "), B=(" << b.transpose() << "), C=(" << c.transpose() << ")";
+										 "), B=(" << b.transpose() << "), C=(" << c.transpose() << ")";
 	SURGSIM_ASSERT(m_restArea > 0.0) << "Triangle with negtive area, Area = " << m_restArea <<
-									 ", A=(" << a.transpose() << "), B=(" << b.transpose() << "), C=(" <<
-									 c.transpose() << ")";
+										", A=(" << a.transpose() << "), B=(" << b.transpose() << "), C=(" <<
+										c.transpose() << ")";
 
 	// Membrane shape functions
 	// Notation: yij = yi - yj (reminder Przemieniecki use  1-based indexing, while we use 0-based)

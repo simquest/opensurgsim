@@ -41,6 +41,8 @@ struct RotationVectorData
 
 struct FemElement
 {
+	virtual ~FemElement(){}
+
 	std::string type;   // “LinearBeam”, “CorotationalTetrahedron”…
 
 	std::vector<size_t> nodeIds;
@@ -95,7 +97,7 @@ protected:
 };
 
 class FemElement1DMesh : public FemElementMesh<FemElementStructs::RotationVectorData,
-												EmptyData, EmptyData, FemElementStructs::FemElement1D>
+		EmptyData, EmptyData, FemElementStructs::FemElement1D>
 {
 public:
 	FemElement1DMesh();
@@ -106,7 +108,7 @@ protected:
 };
 
 class FemElement2DMesh : public FemElementMesh<FemElementStructs::RotationVectorData,
-												EmptyData, EmptyData, FemElementStructs::FemElement2D>
+		EmptyData, EmptyData, FemElementStructs::FemElement2D>
 {
 public:
 	FemElement2DMesh();
@@ -117,7 +119,7 @@ protected:
 };
 
 class FemElement3DMesh : public FemElementMesh<EmptyData, EmptyData, EmptyData,
-												FemElementStructs::FemElement3D>
+		FemElementStructs::FemElement3D>
 {
 public:
 	FemElement3DMesh();

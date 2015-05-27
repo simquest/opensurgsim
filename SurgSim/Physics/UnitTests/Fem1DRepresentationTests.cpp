@@ -224,7 +224,7 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 
 TEST(Fem1DRepresentationTests, SerializationTest)
 {
-	auto fem1DRepresentation = std::make_shared<Fem1DRepresentation>("Test-Fem1D");
+	auto fem1DRepresentation = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Test-Fem1D");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	const std::string filename = "PlyReaderTests/Fem1D.ply";
 	fem1DRepresentation->loadMesh(filename);

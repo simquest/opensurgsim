@@ -41,14 +41,15 @@ Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds)
 Fem1DElementBeam::Fem1DElementBeam(std::shared_ptr<FemElementStructs::FemElement> elementData)
 {
 	init();
-	auto data = std::static_pointer_cast<FemElementStructs::FemElement1D>(elementData);
-	SURGSIM_ASSERT(data->nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
-	m_nodeIds.assign(data->nodeIds.begin(), data->nodeIds.end());
-	setShearingEnabled(data->enableShear);
-	setRadius(data->radius);
-	setMassDensity(data->massDensity);
-	setPoissonRatio(data->poissonRatio);
-	setYoungModulus(data->youngModulus);
+	auto element1DData = std::dynamic_pointer_cast<FemElementStructs::FemElement1D>(elementData);
+	SURGSIM_ASSERT(element1DData != nullptr) << "Incorrect struct type passed";
+	SURGSIM_ASSERT(element1DData->nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
+	m_nodeIds.assign(element1DData->nodeIds.begin(), element1DData->nodeIds.end());
+	setShearingEnabled(element1DData->enableShear);
+	setRadius(element1DData->radius);
+	setMassDensity(element1DData->massDensity);
+	setPoissonRatio(element1DData->poissonRatio);
+	setYoungModulus(element1DData->youngModulus);
 }
 
 void Fem1DElementBeam::setRadius(double radius)
@@ -108,7 +109,7 @@ void Fem1DElementBeam::initialize(const SurgSim::Math::OdeState& state)
 	FemElement::initialize(state);
 
 	SURGSIM_ASSERT(m_radius > 0) << "Fem1DElementBeam radius should be positive and non-zero.  Did you call "
-								 "setCrossSectionCircular(radius) ?";
+									"setCrossSectionCircular(radius) ?";
 
 	m_A = M_PI * (m_radius * m_radius);
 	m_Iz = M_PI * (m_radius * m_radius * m_radius * m_radius) / 4.0;
@@ -378,8 +379,8 @@ void Fem1DElementBeam::computeInitialRotation(const SurgSim::Math::OdeState& sta
 }
 
 SurgSim::Math::Vector Fem1DElementBeam::computeCartesianCoordinate(
-	const SurgSim::Math::OdeState& state,
-	const SurgSim::Math::Vector& naturalCoordinate) const
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 2.";
 
@@ -396,8 +397,8 @@ SurgSim::Math::Vector Fem1DElementBeam::computeCartesianCoordinate(
 }
 
 SurgSim::Math::Vector Fem1DElementBeam::computeNaturalCoordinate(
-	const SurgSim::Math::OdeState& state,
-	const SurgSim::Math::Vector& cartesianCoordinate) const
+		const SurgSim::Math::OdeState& state,
+		const SurgSim::Math::Vector& cartesianCoordinate) const
 {
 	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
 	return SurgSim::Math::Vector3d::Zero();

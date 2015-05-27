@@ -83,10 +83,11 @@ void Fem1DRepresentation::setMesh(std::shared_ptr<Framework::Asset> mesh)
 			<< "Mesh for Fem1DRepresentation needs to be a SurgSim::Physics::FemElement1DMesh";
 	m_femElementMesh = femMesh;
 	auto state = std::make_shared<SurgSim::Math::OdeState>();
-	state->setNumDof(6, m_femElementMesh->getNumVertices());
+
+	state->setNumDof(getNumDofPerNode(), m_femElementMesh->getNumVertices());
 	for (size_t i = 0; i < m_femElementMesh->getNumVertices(); i++)
 	{
-		state->getPositions().segment<3>(6*i) = m_femElementMesh->getVertexPosition(i);
+		state->getPositions().segment<3>(getNumDofPerNode() * i) = m_femElementMesh->getVertexPosition(i);
 	}
 	for (auto boundaryCondition : m_femElementMesh->getBoundaryConditions())
 	{
@@ -101,25 +102,25 @@ std::shared_ptr<FemElement1DMesh> Fem1DRepresentation::getMesh() const
 }
 
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-		const SurgSim::Math::Vector& generalizedForce,
-		const SurgSim::Math::Matrix& K,
-		const SurgSim::Math::Matrix& D)
+													  const SurgSim::Math::Vector& generalizedForce,
+													  const SurgSim::Math::Matrix& K,
+													  const SurgSim::Math::Matrix& D)
 {
 	const size_t dofPerNode = getNumDofPerNode();
 	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
 
 	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
 	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
-			"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
+				"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
 	SURGSIM_ASSERT(K.size() == 0 || (K.rows() == expectedSize && K.cols() == expectedSize)) <<
-			"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
-			") was expecting a square matrix of size " << dofPerNode;
+				"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
+				") was expecting a square matrix of size " << dofPerNode;
 	SURGSIM_ASSERT(D.size() == 0 || (D.rows() == expectedSize && D.cols() == expectedSize)) <<
-			"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
-			") was expecting a square matrix of size " << dofPerNode;
+				"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
+				") was expecting a square matrix of size " << dofPerNode;
 
 	std::shared_ptr<Fem1DLocalization> localization1D =
-		std::dynamic_pointer_cast<Fem1DLocalization>(localization);
+			std::dynamic_pointer_cast<Fem1DLocalization>(localization);
 	SURGSIM_ASSERT(localization1D != nullptr) << "Invalid localization type (not a Fem1DLocalization)";
 
 	const size_t elementId = localization1D->getLocalPosition().index;
@@ -164,7 +165,7 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 }
 
 void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-		const SurgSim::Math::RigidTransform3d& transform)
+										 const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
@@ -180,7 +181,7 @@ bool Fem1DRepresentation::doInitialize()
 	// If mesh is set, create the FemElements
 	if (m_femElementMesh != nullptr)
 	{
-		for (auto element : m_femElementMesh->getFemElements())
+		for (auto& element : m_femElementMesh->getFemElements())
 		{
 			std::shared_ptr<FemElement> femElement;
 			if (m_femElementOverrideType.empty())
@@ -196,9 +197,7 @@ bool Fem1DRepresentation::doInitialize()
 		}
 	}
 
-	FemRepresentation::doInitialize();
-
-	return true;
+	return FemRepresentation::doInitialize();
 }
 
 } // namespace Physics
