@@ -14,14 +14,14 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Physics/FemElementMesh.h"
-#include "SurgSim/Physics/FemElement1DMeshPlyReaderDelegate.h"
-#include "SurgSim/Physics/FemElement2DMeshPlyReaderDelegate.h"
-#include "SurgSim/Physics/FemElement3DMeshPlyReaderDelegate.h"
+#include "SurgSim/Physics/Fem.h"
+#include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
+#include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
+#include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 
 template<>
 std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::RotationVectorData,
-	EmptyData, EmptyData>::m_className = "SurgSim::Physics::FemElementMesh";
+	EmptyData, EmptyData>::m_className = "SurgSim::Physics::Fem";
 
 namespace SurgSim
 {
@@ -29,11 +29,11 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement1DMesh::FemElement1DMesh() : FemElementMesh()
+Fem1D::Fem1D() : Fem()
 {
 }
 
-bool FemElement1DMesh::doLoad(const std::string& filePath)
+bool Fem1D::doLoad(const std::string& filePath)
 {
 	SurgSim::DataStructures::PlyReader reader(filePath);
 	if (!reader.isValid())
@@ -43,8 +43,8 @@ bool FemElement1DMesh::doLoad(const std::string& filePath)
 		return false;
 	}
 
-	auto delegate = std::make_shared<FemElement1DMeshPlyReaderDelegate>(
-						std::dynamic_pointer_cast<FemElement1DMesh>(shared_from_this()));
+	auto delegate = std::make_shared<Fem1DPlyReaderDelegate>(
+						std::dynamic_pointer_cast<Fem1D>(shared_from_this()));
 	if (!reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
@@ -55,11 +55,11 @@ bool FemElement1DMesh::doLoad(const std::string& filePath)
 	return true;
 }
 
-FemElement2DMesh::FemElement2DMesh() : FemElementMesh()
+Fem2D::Fem2D() : Fem()
 {
 }
 
-bool FemElement2DMesh::doLoad(const std::string& filePath)
+bool Fem2D::doLoad(const std::string& filePath)
 {
 	SurgSim::DataStructures::PlyReader reader(filePath);
 	if (!reader.isValid())
@@ -69,8 +69,8 @@ bool FemElement2DMesh::doLoad(const std::string& filePath)
 		return false;
 	}
 
-	auto delegate = std::make_shared<FemElement2DMeshPlyReaderDelegate>(
-						std::dynamic_pointer_cast<FemElement2DMesh>(shared_from_this()));
+	auto delegate = std::make_shared<Fem2DPlyReaderDelegate>(
+						std::dynamic_pointer_cast<Fem2D>(shared_from_this()));
 	if (!reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
@@ -81,11 +81,11 @@ bool FemElement2DMesh::doLoad(const std::string& filePath)
 	return true;
 }
 
-FemElement3DMesh::FemElement3DMesh()
+Fem3D::Fem3D()
 {
 }
 
-bool FemElement3DMesh::doLoad(const std::string& filePath)
+bool Fem3D::doLoad(const std::string& filePath)
 {
 	SurgSim::DataStructures::PlyReader reader(filePath);
 	if (!reader.isValid())
@@ -95,8 +95,8 @@ bool FemElement3DMesh::doLoad(const std::string& filePath)
 		return false;
 	}
 
-	auto delegate = std::make_shared<FemElement3DMeshPlyReaderDelegate>(
-						std::dynamic_pointer_cast<FemElement3DMesh>(shared_from_this()));
+	auto delegate = std::make_shared<Fem3DPlyReaderDelegate>(
+						std::dynamic_pointer_cast<Fem3D>(shared_from_this()));
 	if (!reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())

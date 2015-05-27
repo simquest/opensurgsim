@@ -222,12 +222,69 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isApprox(2.0 * D));
 }
 
+TEST(Fem1DRepresentationTests, LoadMeshTest)
+{
+	auto femRepresentation = std::make_shared<Fem1DRepresentation>("Representation");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	femRepresentation->loadFem("PlyReaderTests/Fem1D.ply");
+	ASSERT_TRUE(femRepresentation->initialize(runtime));
+
+	// Vertices
+	ASSERT_EQ(6u, femRepresentation->getNumDofPerNode());
+	ASSERT_EQ(6u * 7u, femRepresentation->getNumDof());
+
+	Vector3d vertex0(1.1, 1.2, -1.3);
+	Vector3d vertex6(9.100000, 9.200000, 9.300000);
+
+	EXPECT_TRUE(vertex0.isApprox(femRepresentation->getInitialState()->getPosition(0)));
+	EXPECT_TRUE(vertex6.isApprox(femRepresentation->getInitialState()->getPosition(6)));
+
+	// Number of beams
+	ASSERT_EQ(4u, femRepresentation->getNumFemElements());
+
+	std::array<size_t, 2> beam0 = {0, 1};
+	std::array<size_t, 2> beam2 = {3, 5};
+
+	EXPECT_TRUE(std::equal(std::begin(beam0), std::end(beam0),
+						   std::begin(femRepresentation->getFemElement(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(beam2), std::end(beam2),
+						   std::begin(femRepresentation->getFemElement(2)->getNodeIds())));
+
+	// Boundary conditions
+	ASSERT_EQ(3u * 6u, femRepresentation->getInitialState()->getNumBoundaryConditions());
+
+	// Boundary condition 0 is on node 8
+	size_t boundaryNode0 = 2;
+	size_t boundaryNode2 = 5;
+
+	EXPECT_EQ(6 * boundaryNode0, femRepresentation->getInitialState()->getBoundaryConditions().at(0));
+	EXPECT_EQ(6 * boundaryNode0 + 1, femRepresentation->getInitialState()->getBoundaryConditions().at(1));
+	EXPECT_EQ(6 * boundaryNode0 + 2, femRepresentation->getInitialState()->getBoundaryConditions().at(2));
+	EXPECT_EQ(6 * boundaryNode2, femRepresentation->getInitialState()->getBoundaryConditions().at(12));
+	EXPECT_EQ(6 * boundaryNode2 + 1, femRepresentation->getInitialState()->getBoundaryConditions().at(13));
+	EXPECT_EQ(6 * boundaryNode2 + 2, femRepresentation->getInitialState()->getBoundaryConditions().at(14));
+
+	// Material
+	for (size_t i = 0; i < femRepresentation->getNumFemElements(); ++i)
+	{
+		auto fem = femRepresentation->getFemElement(i);
+		EXPECT_DOUBLE_EQ(0.21, fem->getMassDensity());
+		EXPECT_DOUBLE_EQ(0.31, fem->getPoissonRatio());
+		EXPECT_DOUBLE_EQ(0.41, fem->getYoungModulus());
+
+		auto fem1DBeam = std::dynamic_pointer_cast<SurgSim::Physics::Fem1DElementBeam>(fem);
+		ASSERT_NE(nullptr, fem1DBeam);
+		EXPECT_DOUBLE_EQ(0.11, fem1DBeam->getRadius());
+	}
+}
+
 TEST(Fem1DRepresentationTests, SerializationTest)
 {
 	auto fem1DRepresentation = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Test-Fem1D");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	const std::string filename = "PlyReaderTests/Fem1D.ply";
-	fem1DRepresentation->loadMesh(filename);
+	fem1DRepresentation->loadFem(filename);
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
 	fem1DRepresentation->setCollisionRepresentation(collisionRepresentation);
 

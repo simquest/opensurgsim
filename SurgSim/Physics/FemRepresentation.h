@@ -52,7 +52,7 @@ public:
 	/// Destructor
 	virtual ~FemRepresentation();
 
-	virtual void loadMesh(const std::string& filename) = 0;
+	virtual void loadFem(const std::string& filename) = 0;
 
 	/// Override the FemElement type pulled from the object factory
 	/// \param type A string of the full registered OSS class name in the factory
@@ -161,6 +161,9 @@ protected:
 	/// \return The name of the file describing the physics mesh
 	const std::string& getFilename() const;
 
+	/// Indicates if loadFem has been called
+	const bool isFemLoaded() const;
+
 	/// Adds the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
 	/// \param state The state vector containing positions and velocities
@@ -213,6 +216,9 @@ protected:
 
 	/// Name of file describing the physics mesh
 	std::string m_filename;
+
+	/// Indicates if loadFem was called
+	bool m_isFemLoaded;
 
 private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENTMESH_INL_H
-#define SURGSIM_PHYSICS_FEMELEMENTMESH_INL_H
+#ifndef SURGSIM_PHYSICS_FEM_INL_H
+#define SURGSIM_PHYSICS_FEM_INL_H
 
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Log.h"
@@ -27,75 +27,75 @@ namespace Physics
 {
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-FemElementMesh<VertexData, EdgeData, TriangleData, Element>::FemElementMesh()
+Fem<VertexData, EdgeData, TriangleData, Element>::Fem()
 {
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::addFemElement(std::shared_ptr<Element> element)
+size_t Fem<VertexData, EdgeData, TriangleData, Element>::addFemElement(std::shared_ptr<Element> element)
 {
 	m_femElements.push_back(element);
 	return m_femElements.size() - 1;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getNumElements() const
+size_t Fem<VertexData, EdgeData, TriangleData, Element>::getNumElements() const
 {
 	return m_femElements.size();
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
 const std::vector<std::shared_ptr<Element>>&
-	FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElements() const
+	Fem<VertexData, EdgeData, TriangleData, Element>::getFemElements() const
 {
 	return m_femElements;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-std::vector<std::shared_ptr<Element>>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElements()
+std::vector<std::shared_ptr<Element>>& Fem<VertexData, EdgeData, TriangleData, Element>::getFemElements()
 {
 	return m_femElements;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-std::shared_ptr<Element> FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getFemElement(size_t id) const
+std::shared_ptr<Element> Fem<VertexData, EdgeData, TriangleData, Element>::getFemElement(size_t id) const
 {
 	return m_femElements[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-void FemElementMesh<VertexData, EdgeData, TriangleData, Element>::removeFemElement(size_t id)
+void Fem<VertexData, EdgeData, TriangleData, Element>::removeFemElement(size_t id)
 {
 	m_femElements.erase(m_femElements.begin() + id);
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::addBoundaryCondition(size_t boundaryCondition)
+size_t Fem<VertexData, EdgeData, TriangleData, Element>::addBoundaryCondition(size_t boundaryCondition)
 {
 	m_boundaryConditions.push_back(boundaryCondition);
 	return m_boundaryConditions.size() - 1;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-const std::vector<size_t>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getBoundaryConditions() const
+const std::vector<size_t>& Fem<VertexData, EdgeData, TriangleData, Element>::getBoundaryConditions() const
 {
 	return m_boundaryConditions;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-std::vector<size_t>& FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getBoundaryConditions()
+std::vector<size_t>& Fem<VertexData, EdgeData, TriangleData, Element>::getBoundaryConditions()
 {
 	return m_boundaryConditions;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-size_t FemElementMesh<VertexData, EdgeData, TriangleData, Element>::getBoundaryCondition(size_t id) const
+size_t Fem<VertexData, EdgeData, TriangleData, Element>::getBoundaryCondition(size_t id) const
 {
 	return m_boundaryConditions[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-void FemElementMesh<VertexData, EdgeData, TriangleData, Element>::removeBoundaryCondition(size_t id)
+void Fem<VertexData, EdgeData, TriangleData, Element>::removeBoundaryCondition(size_t id)
 {
 	m_boundaryConditions.erase(m_boundaryConditions.begin() + id);
 }
@@ -103,4 +103,4 @@ void FemElementMesh<VertexData, EdgeData, TriangleData, Element>::removeBoundary
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMELEMENTMESH_INL_H
+#endif // SURGSIM_PHYSICS_FEM_INL_H

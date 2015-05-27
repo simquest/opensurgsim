@@ -20,8 +20,8 @@
 
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Fem.h"
 #include "SurgSim/Physics/FemElement.h"
-#include "SurgSim/Physics/FemElementMesh.h"
 
 namespace SurgSim
 {

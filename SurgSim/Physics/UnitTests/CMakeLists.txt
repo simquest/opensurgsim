@@ -48,7 +48,6 @@ set(UNIT_TEST_SOURCES
 	Fem3DLocalizationTest.cpp
 	Fem3DPlyReaderDelegateTests.cpp
 	Fem3DRepresentationTests.cpp
-	FemElementMeshTests.cpp
 	FemElementTests.cpp
 	FemRepresentationTests.cpp
 	FixedConstraintFixedPointTests.cpp

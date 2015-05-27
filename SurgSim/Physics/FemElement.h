@@ -22,7 +22,7 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/FemElementMesh.h"
+#include "SurgSim/Physics/Fem.h"
 
 namespace SurgSim
 {

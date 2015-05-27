@@ -50,7 +50,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// Add the Fem3d component
 	// Note that we only specify the filename that contains the full geometrical and physical description.
 	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("fem3d");
-	fem->loadMesh(filename);
+	fem->loadFem(filename);
 	fem->setIntegrationScheme(integrationScheme);
 	sceneElement->addComponent(fem);
 

@@ -43,10 +43,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DPlyReaderDelegate.cpp
 	Fem3DRepresentation.cpp
 	FemElement.cpp
-	FemElement1DMeshPlyReaderDelegate.cpp
-	FemElement2DMeshPlyReaderDelegate.cpp
-	FemElement3DMeshPlyReaderDelegate.cpp
-	FemElementMesh.cpp
+	Fem.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
 	FixedConstraintFixedPoint.cpp
@@ -111,11 +108,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentation.h
 	FemElement.h
 	FemElement-inl.h
-	FemElement1DMeshPlyReaderDelegate.h
-	FemElement2DMeshPlyReaderDelegate.h
-	FemElement3DMeshPlyReaderDelegate.h
-	FemElementMesh.h
-	FemElementMesh-inl.h
+	Fem.h
+	Fem-inl.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
 	FixedConstraintFixedPoint.h

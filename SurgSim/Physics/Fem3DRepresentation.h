@@ -22,7 +22,7 @@
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Physics/FemElementMesh.h"
+#include "SurgSim/Physics/Fem.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
@@ -50,9 +50,9 @@ public:
 	/// Destructor
 	virtual ~Fem3DRepresentation();
 
-	void loadMesh(const std::string& fileName) override;
+	void loadFem(const std::string& fileName) override;
 	void setMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh);
-	std::shared_ptr<FemElement3DMesh> getMesh() const;
+	std::shared_ptr<Fem3D> getMesh() const;
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 
@@ -94,7 +94,7 @@ private:
 	/// Mapping from collision triangle's id to fem element id.
 	std::unordered_map<size_t, size_t> m_triangleIdToElementIdMap;
 
-	std::shared_ptr<FemElement3DMesh> m_femElementMesh;
+	std::shared_ptr<Fem3D> m_fem;
 };
 
 } // namespace Physics

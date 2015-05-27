@@ -439,7 +439,7 @@ MockFemRepresentation::~MockFemRepresentation()
 {
 }
 
-void MockFemRepresentation::loadMesh(const std::string &filename)
+void MockFemRepresentation::loadFem(const std::string &filename)
 {
 	m_filename = filename;
 }

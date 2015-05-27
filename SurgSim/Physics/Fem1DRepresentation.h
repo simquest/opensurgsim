@@ -20,7 +20,7 @@
 #include <string>
 
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Physics/FemElementMesh.h"
+#include "SurgSim/Physics/Fem.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
@@ -47,9 +47,9 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DRepresentation);
 
-	void loadMesh(const std::string& fileName) override;
+	void loadFem(const std::string& fileName) override;
 	void setMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh);
-	std::shared_ptr<FemElement1DMesh> getMesh() const;
+	std::shared_ptr<Fem1D> getMesh() const;
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 									 const SurgSim::Math::Vector& generalizedForce,
@@ -66,7 +66,7 @@ protected:
 	bool doInitialize() override;
 
 private:
-	std::shared_ptr<FemElement1DMesh> m_femElementMesh;
+	std::shared_ptr<Fem1D> m_fem;
 };
 
 } // namespace Physics

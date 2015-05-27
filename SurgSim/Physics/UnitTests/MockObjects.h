@@ -297,7 +297,7 @@ public:
 	/// Destructor
 	virtual ~MockFemRepresentation();
 
-	void loadMesh(const std::string& filename) override;
+	void loadFem(const std::string& filename) override;
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 									 const SurgSim::Math::Vector& generalizedForce, const SurgSim::Math::Matrix& K,

@@ -77,37 +77,38 @@ Fem3DRepresentation::~Fem3DRepresentation()
 {
 }
 
-void Fem3DRepresentation::loadMesh(const std::string& fileName)
+void Fem3DRepresentation::loadFem(const std::string& fileName)
 {
 	m_filename = fileName;
-	auto mesh = std::make_shared<FemElement3DMesh>();
+	auto mesh = std::make_shared<Fem3D>();
 	mesh->load(fileName);
 	setMesh(mesh);
+	m_isFemLoaded = true;
 }
 
 void Fem3DRepresentation::setMesh(std::shared_ptr<Framework::Asset> mesh)
 {
-	auto femMesh = std::dynamic_pointer_cast<FemElement3DMesh>(mesh);
+	auto femMesh = std::dynamic_pointer_cast<Fem3D>(mesh);
 	SURGSIM_ASSERT(femMesh != nullptr)
-			<< "Mesh for Fem3DRepresentation needs to be a SurgSim::Physics::FemElement3DMesh";
-	m_femElementMesh = femMesh;
+			<< "Mesh for Fem3DRepresentation needs to be a SurgSim::Physics::Fem3D";
+	m_fem = femMesh;
 	auto state = std::make_shared<SurgSim::Math::OdeState>();
 
-	state->setNumDof(getNumDofPerNode(), m_femElementMesh->getNumVertices());
-	for (size_t i = 0; i < m_femElementMesh->getNumVertices(); i++)
+	state->setNumDof(getNumDofPerNode(), m_fem->getNumVertices());
+	for (size_t i = 0; i < m_fem->getNumVertices(); i++)
 	{
-		state->getPositions().segment<3>(getNumDofPerNode() * i) = m_femElementMesh->getVertexPosition(i);
+		state->getPositions().segment<3>(getNumDofPerNode() * i) = m_fem->getVertexPosition(i);
 	}
-	for (auto boundaryCondition : m_femElementMesh->getBoundaryConditions())
+	for (auto boundaryCondition : m_fem->getBoundaryConditions())
 	{
 		state->addBoundaryCondition(boundaryCondition);
 	}
 	FemRepresentation::setInitialState(state);
 }
 
-std::shared_ptr<FemElement3DMesh> Fem3DRepresentation::getMesh() const
+std::shared_ptr<Fem3D> Fem3DRepresentation::getMesh() const
 {
-	return m_femElementMesh;
+	return m_fem;
 }
 
 void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
@@ -250,15 +251,15 @@ bool Fem3DRepresentation::doWakeUp()
 
 bool Fem3DRepresentation::doInitialize()
 {
-	if (!m_filename.empty())
+	if (!m_filename.empty() && !isFemLoaded())
 	{
-		loadMesh(m_filename);
+		loadFem(m_filename);
 	}
 
 	// If mesh is set, create the FemElements
-	if (m_femElementMesh != nullptr)
+	if (m_fem != nullptr)
 	{
-		for (auto& element : m_femElementMesh->getFemElements())
+		for (auto& element : m_fem->getFemElements())
 		{
 			std::shared_ptr<FemElement> femElement;
 			if (m_femElementOverrideType.empty())

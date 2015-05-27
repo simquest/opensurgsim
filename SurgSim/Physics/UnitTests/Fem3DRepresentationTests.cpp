@@ -135,7 +135,7 @@ TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 	{
 		SCOPED_TRACE("Initialize with a valid file name");
 		createFem();
-		m_fem->loadMesh("PlyReaderTests/Tetrahedron.ply");
+		m_fem->loadFem("PlyReaderTests/Tetrahedron.ply");
 		// Fem3DRepresentation::initialize() will call Fem3DRepresentation::doInitialize(), which should load the file.
 		ASSERT_NO_THROW(ASSERT_TRUE(m_fem->initialize(runtime)));
 		EXPECT_EQ(3u, m_fem->getNumDofPerNode());
@@ -146,7 +146,7 @@ TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 	{
 		SCOPED_TRACE("Initialize with an invalid file name");
 		createFem();
-		EXPECT_ANY_THROW(m_fem->loadMesh("Non existent fake name"));
+		EXPECT_ANY_THROW(m_fem->loadFem("Non existent fake name"));
 	}
 
 	{
@@ -159,13 +159,13 @@ TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 	{
 		SCOPED_TRACE("Loading file with incorrect PLY format");
 		createFem();
-		EXPECT_ANY_THROW(m_fem->loadMesh("PlyReaderTests/WrongPlyTetrahedron.ply"));
+		EXPECT_ANY_THROW(m_fem->loadFem("PlyReaderTests/WrongPlyTetrahedron.ply"));
 	}
 
 	{
 		SCOPED_TRACE("Loading file with incorrect data");
 		createFem();
-		EXPECT_ANY_THROW(m_fem->loadMesh("PlyReaderTests/WrongDataTetrahedron.ply"););
+		EXPECT_ANY_THROW(m_fem->loadFem("PlyReaderTests/WrongDataTetrahedron.ply"););
 	}
 }
 
@@ -175,7 +175,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	createFem();
-	ASSERT_NO_THROW(m_fem->loadMesh("Geometry/wound_deformable.ply"));
+	ASSERT_NO_THROW(m_fem->loadFem("Geometry/wound_deformable.ply"));
 
 	auto triangleMesh = std::make_shared<SurgSim::Math::MeshShape>();
 	triangleMesh->load("Geometry/wound_deformable.ply");
@@ -427,12 +427,67 @@ TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
 	EXPECT_TRUE(m_fem->getExternalGeneralizedDamping().isApprox(2.0 * D));
 }
 
+TEST_F(Fem3DRepresentationTests, LoadMeshTest)
+{
+	auto fem = std::make_shared<Fem3DRepresentation>("Representation");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	fem->loadFem("PlyReaderTests/Tetrahedron.ply");
+	fem->initialize(runtime);
+
+	// Vertices
+	ASSERT_EQ(3u, fem->getNumDofPerNode());
+	ASSERT_EQ(3u * 26u, fem->getNumDof());
+
+	Vector3d vertex0(1.0, 1.0, -1.0);
+	Vector3d vertex25(-1.0, -1.0, 1.0);
+
+	EXPECT_TRUE(vertex0.isApprox(fem->getInitialState()->getPosition(0)));
+	EXPECT_TRUE(vertex25.isApprox(fem->getInitialState()->getPosition(25)));
+
+	// Tetrahedrons
+	ASSERT_EQ(12u, fem->getNumFemElements());
+
+	std::array<size_t, 4> tetrahedron0 = {0, 1, 2, 3};
+	std::array<size_t, 4> tetrahedron2 = {10, 25, 11, 9};
+
+	EXPECT_TRUE(std::equal(std::begin(tetrahedron0), std::end(tetrahedron0),
+						   std::begin(fem->getFemElement(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(tetrahedron2), std::end(tetrahedron2),
+						   std::begin(fem->getFemElement(11)->getNodeIds())));
+
+	// Boundary conditions
+	ASSERT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
+
+	// Boundary condition 0 is on node 8
+	size_t boundaryNode0 = 8;
+	size_t boundaryNode7 = 11;
+
+	EXPECT_EQ(3 * boundaryNode0, fem->getInitialState()->getBoundaryConditions().at(0));
+	EXPECT_EQ(3 * boundaryNode0 + 1, fem->getInitialState()->getBoundaryConditions().at(1));
+	EXPECT_EQ(3 * boundaryNode0 + 2, fem->getInitialState()->getBoundaryConditions().at(2));
+	EXPECT_EQ(3 * boundaryNode7, fem->getInitialState()->getBoundaryConditions().at(21));
+	EXPECT_EQ(3 * boundaryNode7 + 1, fem->getInitialState()->getBoundaryConditions().at(22));
+	EXPECT_EQ(3 * boundaryNode7 + 2, fem->getInitialState()->getBoundaryConditions().at(23));
+
+	// Material
+	auto fem2 = fem->getFemElement(2);
+	EXPECT_DOUBLE_EQ(0.1432, fem2->getMassDensity());
+	EXPECT_DOUBLE_EQ(0.224, fem2->getPoissonRatio());
+	EXPECT_DOUBLE_EQ(0.472, fem2->getYoungModulus());
+
+	auto fem8 = fem->getFemElement(8);
+	EXPECT_DOUBLE_EQ(0.1432, fem8->getMassDensity());
+	EXPECT_DOUBLE_EQ(0.224, fem8->getPoissonRatio());
+	EXPECT_DOUBLE_EQ(0.472, fem8->getYoungModulus());
+}
+
 TEST_F(Fem3DRepresentationTests, SerializationTest)
 {
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Test-Fem3D");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	const std::string filename = "PlyReaderTests/Fem3DCube.ply";
-	fem3DRepresentation->loadMesh(filename);
+	fem3DRepresentation->loadFem(filename);
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
 	fem3DRepresentation->setCollisionRepresentation(collisionRepresentation);
 

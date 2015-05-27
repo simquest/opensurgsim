@@ -44,7 +44,7 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename, getFilename, loadMesh);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename, getFilename, loadFem);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, ComplianceWarping,
 									  getComplianceWarping, setComplianceWarping);
 }
@@ -442,6 +442,11 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSi
 const std::string& FemRepresentation::getFilename() const
 {
 	return m_filename;
+}
+
+const bool FemRepresentation::isFemLoaded() const
+{
+	return m_isFemLoaded;
 }
 
 void FemRepresentation::addRayleighDampingForce(

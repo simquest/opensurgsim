@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMELEMENTMESH_H
-#define SURGSIM_PHYSICS_FEMELEMENTMESH_H
+#ifndef SURGSIM_PHYSICS_FEM_H
+#define SURGSIM_PHYSICS_FEM_H
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
@@ -66,10 +66,10 @@ struct FemElement3D : public FemElement {};
 } // namespace FemElementStructs
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-class FemElementMesh : public SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>
+class Fem : public SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>
 {
 public:
-	FemElementMesh();
+	Fem();
 
 	size_t addFemElement(std::shared_ptr<Element> element);
 
@@ -96,33 +96,33 @@ protected:
 	std::vector<size_t> m_boundaryConditions;
 };
 
-class FemElement1DMesh : public FemElementMesh<FemElementStructs::RotationVectorData,
+class Fem1D : public Fem<FemElementStructs::RotationVectorData,
 		EmptyData, EmptyData, FemElementStructs::FemElement1D>
 {
 public:
-	FemElement1DMesh();
+	Fem1D();
 
 protected:
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
 };
 
-class FemElement2DMesh : public FemElementMesh<FemElementStructs::RotationVectorData,
+class Fem2D : public Fem<FemElementStructs::RotationVectorData,
 		EmptyData, EmptyData, FemElementStructs::FemElement2D>
 {
 public:
-	FemElement2DMesh();
+	Fem2D();
 
 protected:
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
 };
 
-class FemElement3DMesh : public FemElementMesh<EmptyData, EmptyData, EmptyData,
+class Fem3D : public Fem<EmptyData, EmptyData, EmptyData,
 		FemElementStructs::FemElement3D>
 {
 public:
-	FemElement3DMesh();
+	Fem3D();
 
 protected:
 
@@ -133,6 +133,6 @@ protected:
 } // namespace DataStructures
 } // namespace SurgSim
 
-#include "SurgSim/Physics/FemElementMesh-inl.h"
+#include "SurgSim/Physics/Fem-inl.h"
 
-#endif // SURGSIM_PHYSICS_FEMELEMENTMESH_H
+#endif // SURGSIM_PHYSICS_FEM_H
