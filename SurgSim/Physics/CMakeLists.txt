@@ -26,6 +26,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	DcdCollision.cpp
 	DeformableCollisionRepresentation.cpp
 	DeformableRepresentation.cpp
+	Fem.cpp
 	Fem1DElementBeam.cpp
 	Fem1DLocalization.cpp
 	Fem1DPlyReaderDelegate.cpp
@@ -43,7 +44,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DPlyReaderDelegate.cpp
 	Fem3DRepresentation.cpp
 	FemElement.cpp
-	Fem.cpp
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
 	FixedConstraintFixedPoint.cpp
@@ -90,6 +90,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	DcdCollision.h
 	DeformableCollisionRepresentation.h
 	DeformableRepresentation.h
+	Fem.h
+	Fem-inl.h
 	Fem1DElementBeam.h
 	Fem1DLocalization.h
 	Fem1DPlyReaderDelegate.h
@@ -108,8 +110,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentation.h
 	FemElement.h
 	FemElement-inl.h
-	Fem.h
-	Fem-inl.h
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
 	FixedConstraintFixedPoint.h
