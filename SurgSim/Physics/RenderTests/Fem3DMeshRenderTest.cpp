@@ -86,7 +86,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 TEST_F(RenderTests, SimulatedWoundRenderTest)
 {
 	runtime->getScene()->addSceneElement(createFemSceneElement("Fem",
-										 "wound_deformable.ply",
+										 "Geometry/wound_deformable.ply",
 										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
 
 	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 5000.0);

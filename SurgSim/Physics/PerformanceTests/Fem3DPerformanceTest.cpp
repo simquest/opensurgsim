@@ -124,7 +124,7 @@ TEST_P(IntegrationSchemeParamTest, WoundTest)
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
 
 	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("wound");
-	fem->setFilename("wound_deformable.ply");
+	fem->setFilename("Geometry/wound_deformable.ply");
 	fem->setIntegrationScheme(integrationScheme);
 
 	initializeRepresentation(fem);

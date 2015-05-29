@@ -1,2 +1,2 @@
 ${CMAKE_CURRENT_SOURCE_DIR}/Data/
-${PROJECT_BINARY_DIR}/SurgSim/Testing/Data/Geometry/
+${PROJECT_BINARY_DIR}/SurgSim/Testing/Data/

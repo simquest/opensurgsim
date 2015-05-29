@@ -316,7 +316,7 @@ TEST(OctreeNodeTests, DoLoadOctree)
 {
 	SurgSim::Framework::ApplicationData appData("config.txt");
 	auto octree = std::make_shared<OctreeNode<SurgSim::DataStructures::EmptyData>>();
-	ASSERT_NO_THROW(octree->load("staple.ply", appData));
+	ASSERT_NO_THROW(octree->load("Geometry/staple.ply", appData));
 
 	ASSERT_TRUE(nullptr != octree);
 	auto boundingBox = octree->getBoundingBox();

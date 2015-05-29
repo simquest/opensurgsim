@@ -41,7 +41,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	const std::string fileName = "staple_collision.ply";
+	const std::string fileName = "Geometry/staple_collision.ply";
 	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
 	ASSERT_NO_THROW(mesh->load(fileName));
 
@@ -75,7 +75,7 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 {
 	SurgSim::Framework::Runtime runtime("config.txt");
 
-	const std::string fileName = "staple_collision.ply";
+	const std::string fileName = "Geometry/staple_collision.ply";
 	std::shared_ptr<SurgSim::Math::Shape> shape = std::make_shared<SurgSim::Math::MeshShape>();
 	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
 	EXPECT_NO_THROW(meshShape->load(fileName));
