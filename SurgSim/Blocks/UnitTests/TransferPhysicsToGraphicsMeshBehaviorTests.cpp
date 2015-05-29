@@ -28,7 +28,7 @@
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/Fem3DElementTetrahedron.h" // Needed for object factory registration
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 

@@ -195,7 +195,7 @@ void Fem2DPlyReaderDelegate::processFemElement(const std::string& elementName)
 	femElement->type = "SurgSim::Physics::Fem2DElementTriangle";
 	femElement->nodeIds.resize(m_elementData.vertexCount);
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
-	m_mesh->addFemElement(femElement);
+	m_mesh->addElement(femElement);
 }
 
 void Fem2DPlyReaderDelegate::endFemElements(const std::string& elementName)
@@ -242,7 +242,7 @@ void Fem2DPlyReaderDelegate::processBoundaryCondition(const std::string& element
 
 void Fem2DPlyReaderDelegate::endFile()
 {
-	for(auto element : m_mesh->getFemElements())
+	for(auto element : m_mesh->getElements())
 	{
 		element->thickness = m_thickness;
 		element->massDensity = m_materialData.massDensity;

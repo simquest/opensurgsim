@@ -52,9 +52,9 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	std::array<size_t, 4> tetrahedron2 = {10, 25, 11, 9};
 
 	EXPECT_TRUE(std::equal(std::begin(tetrahedron0), std::end(tetrahedron0),
-						   std::begin(fem->getFemElement(0)->nodeIds)));
+						   std::begin(fem->getElement(0)->nodeIds)));
 	EXPECT_TRUE(std::equal(std::begin(tetrahedron2), std::end(tetrahedron2),
-						   std::begin(fem->getFemElement(11)->nodeIds)));
+						   std::begin(fem->getElement(11)->nodeIds)));
 
 	// Boundary conditions
 	ASSERT_EQ(8u, fem->getBoundaryConditions().size());
@@ -69,12 +69,12 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	EXPECT_EQ(11, fem->getBoundaryCondition(7));
 
 	// Material
-	auto fem2 = fem->getFemElement(2);
+	auto fem2 = fem->getElement(2);
 	EXPECT_DOUBLE_EQ(0.1432, fem2->massDensity);
 	EXPECT_DOUBLE_EQ(0.224, fem2->poissonRatio);
 	EXPECT_DOUBLE_EQ(0.472, fem2->youngModulus);
 
-	auto fem8 = fem->getFemElement(8);
+	auto fem8 = fem->getElement(8);
 	EXPECT_DOUBLE_EQ(0.1432, fem8->massDensity);
 	EXPECT_DOUBLE_EQ(0.224, fem8->poissonRatio);
 	EXPECT_DOUBLE_EQ(0.472, fem8->youngModulus);
@@ -100,8 +100,8 @@ TEST(Fem3DRepresentationReaderTests, CubeMeshDelegateTest)
 	std::array<size_t, 8> cube0 = {0, 1, 2, 3, 4, 5, 6, 7};
 	std::array<size_t, 8> cube2 = {3, 4, 5, 0, 2, 6, 8, 7};
 
-	EXPECT_TRUE(std::equal(std::begin(cube0), std::end(cube0), std::begin(fem->getFemElement(0)->nodeIds)));
-	EXPECT_TRUE(std::equal(std::begin(cube2), std::end(cube2), std::begin(fem->getFemElement(2)->nodeIds)));
+	EXPECT_TRUE(std::equal(std::begin(cube0), std::end(cube0), std::begin(fem->getElement(0)->nodeIds)));
+	EXPECT_TRUE(std::equal(std::begin(cube2), std::end(cube2), std::begin(fem->getElement(2)->nodeIds)));
 
 	// Boundary conditions
 	ASSERT_EQ(2u, fem->getBoundaryConditions().size());
@@ -110,12 +110,12 @@ TEST(Fem3DRepresentationReaderTests, CubeMeshDelegateTest)
 	EXPECT_EQ(5, fem->getBoundaryCondition(1));
 
 	// Material
-	auto fem2 = fem->getFemElement(2);
+	auto fem2 = fem->getElement(2);
 	EXPECT_DOUBLE_EQ(0.2, fem2->massDensity);
 	EXPECT_DOUBLE_EQ(0.3, fem2->poissonRatio);
 	EXPECT_DOUBLE_EQ(0.4, fem2->youngModulus);
 
-	auto fem1 = fem->getFemElement(1);
+	auto fem1 = fem->getElement(1);
 	EXPECT_DOUBLE_EQ(0.2, fem1->massDensity);
 	EXPECT_DOUBLE_EQ(0.3, fem1->poissonRatio);
 	EXPECT_DOUBLE_EQ(0.4, fem1->youngModulus);

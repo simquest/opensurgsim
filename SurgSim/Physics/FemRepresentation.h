@@ -157,12 +157,9 @@ public:
 					 SurgSim::Math::SparseMatrix** D, SurgSim::Math::SparseMatrix** K) override;
 
 protected:
-	/// Gets name of file to encode for serialization
-	/// \return The name of the file describing the physics mesh
+	/// Gets Fem mesh to encode for serialization
+	/// \return The Fem mesh
 	const std::string& getFilename() const;
-
-	/// Indicates if loadFem has been called
-	const bool isFemLoaded() const;
 
 	/// Adds the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
@@ -216,9 +213,6 @@ protected:
 
 	/// Name of file describing the physics mesh
 	std::string m_filename;
-
-	/// Indicates if loadFem was called
-	bool m_isFemLoaded;
 
 private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)

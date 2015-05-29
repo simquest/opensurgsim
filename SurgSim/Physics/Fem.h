@@ -65,22 +65,46 @@ struct FemElement2D : public FemElement
 struct FemElement3D : public FemElement {};
 } // namespace FemElementStructs
 
+/// Base class for a data structure for holding FEM mesh data of different dimensions
+///
+/// Fem itself should not be used directly itself as it contains no overrde for doLoad since the implementation is
+/// depedent on the dimension of the FEM you are trying to load. Each dimension overrides the doLoad function present
+/// in Asset using its own version of an FemPlyReaderDelegate. Each dimension supports loading both linear and
+/// corotational models.
+///
+/// \tparam VertexData  Type of extra data stored in each vertex
+/// \tparam	EdgeData	Type of extra data stored in each edge
+/// \tparam	TriangleData	Type of extra data stored in each triangle
+/// \tparam Element		Type of FEM element the mesh will be storing
+/// \sa	TriangleMesh
 template <class VertexData, class EdgeData, class TriangleData, class Element>
 class Fem : public SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>
 {
 public:
+	/// Default constructor
 	Fem();
 
-	size_t addFemElement(std::shared_ptr<Element> element);
+	/// Adds FEM element to mesh of Element template type
+	/// \param element A shared pointer of the Element template type
+	/// \return The new size of the vector of elements
+	size_t addElement(std::shared_ptr<Element> element);
 
+	/// Gets number of FEM elements in the mesh
+	/// \return The number of FEM elements stored
 	size_t getNumElements() const;
 
-	const std::vector<std::shared_ptr<Element>>& getFemElements() const;
-	std::vector<std::shared_ptr<Element>>& getFemElements();
+	/// Gets entire FEM element vector
+	/// \return A const vector of all FEM elements stored in the mesh
+	const std::vector<std::shared_ptr<Element>>& getElements() const;
+	std::vector<std::shared_ptr<Element>>& getElements();
 
-	std::shared_ptr<Element> getFemElement(size_t id) const;
+	/// Gets entire FEM element vector (non-const)
+	/// \return A vector of all FEM elements stored in the mesh
+	std::shared_ptr<Element> getElement(size_t id) const;
 
-	void removeFemElement(size_t id);
+	/// Removes FEM element from mesh
+	/// \param id The element to remove
+	void removeElement(size_t id);
 
 	size_t addBoundaryCondition(size_t boundaryCondition);
 
@@ -92,10 +116,13 @@ public:
 	void removeBoundaryCondition(size_t id);
 
 protected:
-	std::vector<std::shared_ptr<Element>> m_femElements;
+	/// Vector of individual elements
+	std::vector<std::shared_ptr<Element>> m_elements;
 	std::vector<size_t> m_boundaryConditions;
 };
 
+/// Fem class data structure implementation for 1-Dimensional FEMs
+/// \sa Fem
 class Fem1D : public Fem<FemElementStructs::RotationVectorData,
 		EmptyData, EmptyData, FemElementStructs::FemElement1D>
 {
@@ -107,6 +134,8 @@ protected:
 	bool doLoad(const std::string& filePath) override;
 };
 
+/// Fem class data structure implementation for 2-Dimensional FEMs
+/// \sa Fem
 class Fem2D : public Fem<FemElementStructs::RotationVectorData,
 		EmptyData, EmptyData, FemElementStructs::FemElement2D>
 {
@@ -118,6 +147,8 @@ protected:
 	bool doLoad(const std::string& filePath) override;
 };
 
+/// Fem class data structure implementation for 3-Dimensional FEMs
+/// \sa Fem
 class Fem3D : public Fem<EmptyData, EmptyData, EmptyData,
 		FemElementStructs::FemElement3D>
 {
@@ -125,7 +156,6 @@ public:
 	Fem3D();
 
 protected:
-
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
 };

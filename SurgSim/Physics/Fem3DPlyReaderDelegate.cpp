@@ -156,7 +156,7 @@ void Fem3DPlyReaderDelegate::processFemElement(const std::string& elementName)
 	femElement->type = "SurgSim::Physics::Fem3DElementTetrahedron";
 	femElement->nodeIds.resize(m_elementData.vertexCount);
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
-	m_mesh->addFemElement(femElement);
+	m_mesh->addElement(femElement);
 }
 
 void Fem3DPlyReaderDelegate::endFemElements(const std::string& elementName)
@@ -193,7 +193,7 @@ void Fem3DPlyReaderDelegate::processBoundaryCondition(const std::string& element
 
 void Fem3DPlyReaderDelegate::endFile()
 {
-	for(auto element : m_mesh->getFemElements())
+	for(auto element : m_mesh->getElements())
 	{
 		element->massDensity = m_materialData.massDensity;
 		element->poissonRatio = m_materialData.poissonRatio;

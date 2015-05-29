@@ -444,11 +444,6 @@ const std::string& FemRepresentation::getFilename() const
 	return m_filename;
 }
 
-const bool FemRepresentation::isFemLoaded() const
-{
-	return m_isFemLoaded;
-}
-
 void FemRepresentation::addRayleighDampingForce(
 		SurgSim::Math::Vector* force, const SurgSim::Math::OdeState& state,
 		bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)

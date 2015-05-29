@@ -74,7 +74,6 @@ void Fem1DRepresentation::loadFem(const std::string& fileName)
 	auto mesh = std::make_shared<Fem1D>();
 	mesh->load(fileName);
 	setMesh(mesh);
-	m_isFemLoaded = true;
 }
 
 void Fem1DRepresentation::setMesh(std::shared_ptr<Framework::Asset> mesh)
@@ -174,7 +173,7 @@ void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 
 bool Fem1DRepresentation::doInitialize()
 {
-	if (!m_filename.empty() && !isFemLoaded())
+	if (!m_filename.empty() && m_fem == nullptr)
 	{
 		loadFem(m_filename);
 	}
@@ -182,7 +181,7 @@ bool Fem1DRepresentation::doInitialize()
 	// If mesh is set, create the FemElements
 	if (m_fem != nullptr)
 	{
-		for (auto& element : m_fem->getFemElements())
+		for (auto& element : m_fem->getElements())
 		{
 			std::shared_ptr<FemElement> femElement;
 			if (m_femElementOverrideType.empty())

@@ -32,41 +32,41 @@ Fem<VertexData, EdgeData, TriangleData, Element>::Fem()
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-size_t Fem<VertexData, EdgeData, TriangleData, Element>::addFemElement(std::shared_ptr<Element> element)
+size_t Fem<VertexData, EdgeData, TriangleData, Element>::addElement(std::shared_ptr<Element> element)
 {
-	m_femElements.push_back(element);
-	return m_femElements.size() - 1;
+	m_elements.push_back(element);
+	return m_elements.size() - 1;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
 size_t Fem<VertexData, EdgeData, TriangleData, Element>::getNumElements() const
 {
-	return m_femElements.size();
+	return m_elements.size();
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
 const std::vector<std::shared_ptr<Element>>&
-	Fem<VertexData, EdgeData, TriangleData, Element>::getFemElements() const
+	Fem<VertexData, EdgeData, TriangleData, Element>::getElements() const
 {
-	return m_femElements;
+	return m_elements;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-std::vector<std::shared_ptr<Element>>& Fem<VertexData, EdgeData, TriangleData, Element>::getFemElements()
+std::vector<std::shared_ptr<Element>>& Fem<VertexData, EdgeData, TriangleData, Element>::getElements()
 {
-	return m_femElements;
+	return m_elements;
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-std::shared_ptr<Element> Fem<VertexData, EdgeData, TriangleData, Element>::getFemElement(size_t id) const
+std::shared_ptr<Element> Fem<VertexData, EdgeData, TriangleData, Element>::getElement(size_t id) const
 {
-	return m_femElements[id];
+	return m_elements[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>
-void Fem<VertexData, EdgeData, TriangleData, Element>::removeFemElement(size_t id)
+void Fem<VertexData, EdgeData, TriangleData, Element>::removeElement(size_t id)
 {
-	m_femElements.erase(m_femElements.begin() + id);
+	m_elements.erase(m_elements.begin() + id);
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class Element>

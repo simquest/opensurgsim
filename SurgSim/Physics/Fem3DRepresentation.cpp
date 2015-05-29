@@ -83,7 +83,6 @@ void Fem3DRepresentation::loadFem(const std::string& fileName)
 	auto mesh = std::make_shared<Fem3D>();
 	mesh->load(fileName);
 	setMesh(mesh);
-	m_isFemLoaded = true;
 }
 
 void Fem3DRepresentation::setMesh(std::shared_ptr<Framework::Asset> mesh)
@@ -251,7 +250,7 @@ bool Fem3DRepresentation::doWakeUp()
 
 bool Fem3DRepresentation::doInitialize()
 {
-	if (!m_filename.empty() && !isFemLoaded())
+	if (!m_filename.empty() && m_fem == nullptr)
 	{
 		loadFem(m_filename);
 	}
@@ -259,7 +258,7 @@ bool Fem3DRepresentation::doInitialize()
 	// If mesh is set, create the FemElements
 	if (m_fem != nullptr)
 	{
-		for (auto& element : m_fem->getFemElements())
+		for (auto& element : m_fem->getElements())
 		{
 			std::shared_ptr<FemElement> femElement;
 			if (m_femElementOverrideType.empty())
