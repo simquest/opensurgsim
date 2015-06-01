@@ -1,45 +1,42 @@
 
 #include "../loadVtkUnstructuredData.h"
 
-using TetrahedronMeshType = SurgSim::DataStructures::TetrahedronMesh<
-    SurgSim::DataStructures::EmptyData,
-    SurgSim::DataStructures::EmptyData,
-    SurgSim::DataStructures::EmptyData,
-    SurgSim::DataStructures::EmptyData>;
-
 int main(int ac, char **av)
 {
     if(ac == 2)
     {
-        std::shared_ptr<TetrahedronMeshType> tetrahedonMesh = std::make_shared<TetrahedronMeshType>();
+        std::shared_ptr<Fem3DTetrahedron> fem = std::make_shared<Fem3DTetrahedron>();
         std::string filename(av[1]);
-        loadVtkUnstructuredData(filename,tetrahedonMesh);
+        loadVtkUnstructuredData(filename,fem);
 
-        std::cout << "Number vertices: " << tetrahedonMesh->getNumVertices() << std::endl;
-        std::cout << "Number tetrahedrons: " << tetrahedonMesh->getNumTetrahedrons() << std::endl;
-        std::cout << "Number surface triangles: " << tetrahedonMesh->getNumTriangles() << std::endl;
+        std::cout << "Number vertices: " << fem->getNumVertices() << std::endl;
+        std::cout << "Number tetrahedrons: " << fem->getNumTetrahedrons() << std::endl;
+        std::cout << "Number surface triangles: " << fem->getNumTriangles() << std::endl;
+        std::cout << "Mass Density: " << fem->getMassDensity() << std::endl;
+        std::cout << "Poisson's Ratio: " << fem->getPoissonRatio() << std::endl;
+        std::cout << "Young's Ratio: " << fem->getYoungModulus() << std::endl;
 
-        for(size_t i = 0; i < tetrahedonMesh->getNumVertices(); ++i)
+        for(size_t i = 0; i < fem->getNumVertices(); ++i)
         {
-            std::cout << tetrahedonMesh->getVertex(i).position << std::endl;
+            std::cout << fem->getVertex(i).position << std::endl;
         }
 
-        for(size_t i = 0; i < tetrahedonMesh->getNumTetrahedrons(); ++i)
+        for(size_t i = 0; i < fem->getNumTetrahedrons(); ++i)
         {
             std::cout << "[ ";
             for(size_t j = 0; j < 4; ++j)
             {
-                std::cout << tetrahedonMesh->getTetrahedron(i).verticesId[j] << " ";
+                std::cout << fem->getTetrahedron(i).verticesId[j] << " ";
             }
             std::cout << "]" << std::endl;
         }
 
-        for(size_t i = 0; i < tetrahedonMesh->getNumTriangles(); ++i)
+        for(size_t i = 0; i < fem->getNumTriangles(); ++i)
         {
             std::cout << "[ ";
             for(size_t j = 0; j < 3; ++j)
             {
-                std::cout << tetrahedonMesh->getTriangle(i).verticesId[j] << " ";
+                std::cout << fem->getTriangle(i).verticesId[j] << " ";
             }
             std::cout << "]" << std::endl;
         }
