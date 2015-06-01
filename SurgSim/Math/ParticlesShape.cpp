@@ -34,9 +34,13 @@ ParticlesShape::ParticlesShape(double radius) :
 }
 
 ParticlesShape::ParticlesShape(const ParticlesShape& other) :
-	DataStructures::Vertices<DataStructures::EmptyData>(other)
+	DataStructures::Vertices<DataStructures::EmptyData>(other),
+	m_aabbTree(other.m_aabbTree),
+	m_radius(other.getRadius()),
+	m_center(other.getCenter()),
+	m_volume(other.getVolume()),
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
-	update();
 }
 
 int ParticlesShape::getType() const

@@ -157,6 +157,9 @@ protected:
 
 	/// Wake up the view
 	bool doWakeUp() override;
+
+	/// \return The DisplaySettings to be used in this view
+	virtual osg::ref_ptr<osg::DisplaySettings> createDisplaySettings() const;
 private:
 
 	/// Patch the StatsHandler rendering

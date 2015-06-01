@@ -15,12 +15,11 @@
 
 #include "SurgSim/Particles/SphRepresentation.h"
 
+#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/DataStructures/Grid.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/Particle.h"
-#include "SurgSim/Particles/ParticleReference.h"
-#include "SurgSim/Particles/ParticlesState.h"
 
 using SurgSim::Math::Vector;
 
@@ -31,11 +30,14 @@ namespace Particles
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Particles::SphRepresentation, SphRepresentation);
 
 SphRepresentation::SphRepresentation(const std::string& name) :
-	ParticleSystemRepresentation(name),
+	Representation(name),
 	m_massPerParticle(0.0),
 	m_densityReference(0.0),
 	m_gasStiffness(0.0),
 	m_surfaceTension(0.0),
+	m_stiffness(0.0),
+	m_damping(0.0),
+	m_friction(0.0),
 	m_gravity(SurgSim::Math::Vector3d(0.0, -9.81, 0.0)),
 	m_viscosity(0.0),
 	m_h(0.0)
@@ -51,11 +53,15 @@ SphRepresentation::SphRepresentation(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
 		Viscosity, getViscosity, setViscosity);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		Stiffness, getStiffness, setStiffness);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		Damping, getDamping, setDamping);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
+		Friction, getFriction, setFriction);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double,
 		KernelSupport, getKernelSupport, setKernelSupport);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, SurgSim::Math::Vector3d,
 		Gravity, getGravity, setGravity);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, std::vector<PlaneConstraint>,
-		PlaneConstraints, getPlaneConstraints, setPlaneConstraints);
 }
 
 SphRepresentation::~SphRepresentation()
@@ -151,24 +157,39 @@ double SphRepresentation::getKernelSupport() const
 	return m_h;
 }
 
-void SphRepresentation::addPlaneConstraint(const PlaneConstraint& planeConstraint)
+void SphRepresentation::setStiffness(double stiffness)
 {
-	m_planeConstraints.push_back(planeConstraint);
+	m_stiffness = stiffness;
 }
 
-void SphRepresentation::setPlaneConstraints(const std::vector<SphRepresentation::PlaneConstraint>& planeConstraints)
+double SphRepresentation::getStiffness() const
 {
-	m_planeConstraints = planeConstraints;
+	return m_stiffness;
 }
 
-const std::vector<SphRepresentation::PlaneConstraint>& SphRepresentation::getPlaneConstraints() const
+void SphRepresentation::setDamping(double damping)
 {
-	return m_planeConstraints;
+	m_damping = damping;
+}
+
+double SphRepresentation::getDamping() const
+{
+	return m_damping;
+}
+
+void SphRepresentation::setFriction(double friction)
+{
+	m_friction = friction;
+}
+
+double SphRepresentation::getFriction() const
+{
+	return m_friction;
 }
 
 bool SphRepresentation::doInitialize()
 {
-	if (!ParticleSystemRepresentation::doInitialize())
+	if (!Representation::doInitialize())
 	{
 		return false;
 	}
@@ -183,6 +204,7 @@ bool SphRepresentation::doInitialize()
 		"The kernel support needs to be set prior to adding the component in the SceneElement";
 
 	m_normal.resize(m_maxParticles);
+	m_acceleration.resize(m_maxParticles);
 	m_density.resize(m_maxParticles);
 	m_pressure.resize(m_maxParticles);
 	m_mass.resize(m_maxParticles);
@@ -205,9 +227,6 @@ bool SphRepresentation::doUpdate(double dt)
 	// Compute acceleration
 	computeAcceleration(dt);
 
-	// Handle the collisions by affecting the accelerations
-	handleCollisions();
-
 	// Integrate ODE to determine new velocity and position
 	computeVelocityAndPosition(dt);
 
@@ -224,132 +243,141 @@ void SphRepresentation::computeAcceleration(double dt)
 
 void SphRepresentation::computeVelocityAndPosition(double dt)
 {
-	m_state->getVelocities() += dt * m_state->getAccelerations();
-	m_state->getPositions() += dt * m_state->getVelocities();
+	auto& particles = m_particles.getVertices();
+	for (size_t i = 0; i < particles.size(); i++)
+	{
+		particles[i].data.velocity += dt * m_acceleration[i];
+		particles[i].position += dt * particles[i].data.velocity;
+	}
 }
 
 void SphRepresentation::computeNeighbors()
 {
 	m_grid->reset();
 
-	for (auto const& particleI : getParticleReferences())
+	auto&  particles = m_particles.getVertices();
+	for (size_t i = 0; i < particles.size(); i++)
 	{
-		m_grid->addElement(particleI.getIndex(), particleI.getPosition());
+		m_grid->addElement(i, particles[i].position);
 	}
 }
 
 void SphRepresentation::computeDensityAndPressureField()
 {
-	for (auto& particleI : getParticleReferences())
+	auto& particles = m_particles.getVertices();
+	for (size_t i = 0; i < particles.size(); i++)
 	{
-		size_t indexI = particleI.getIndex();
-		const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
-
 		// Calculate the particle's density
 		double densityI = 0.0;
-		for (auto indexJ : m_grid->getNeighbors(indexI))
+		for (auto j : m_grid->getNeighbors(i))
 		{
-			const Eigen::VectorBlock<Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
-			densityI += m_mass[indexJ] * kernelPoly6(xI - xJ);
+			densityI += m_mass[j] * kernelPoly6(particles[i].position - particles[j].position);
 		}
-		m_density[indexI] = densityI;
+		m_density[i] = densityI;
 
 		// Calculate the particle's pressure
-		m_pressure[indexI] = m_gasStiffness * (m_density[indexI] - m_densityReference);
+		m_pressure[i] = m_gasStiffness * (m_density[i] - m_densityReference);
 	}
 }
 
 void SphRepresentation::computeNormalField()
 {
-	for (auto& particleI : getParticleReferences())
+	SurgSim::Math::Vector3d normalI;
+	SurgSim::Math::Vector3d gradient;
+	auto& particles = m_particles.getVertices();
+	for (size_t i = 0; i < particles.size(); i++)
 	{
-		const size_t indexI = particleI.getIndex();
-		const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
-
 		// Calculate the particle's normal (gradient of the color field)
-		SurgSim::Math::Vector3d normalI = SurgSim::Math::Vector3d::Zero();
-		for (auto indexJ : m_grid->getNeighbors(indexI))
+		normalI = SurgSim::Math::Vector3d::Zero();
+		for (auto j : m_grid->getNeighbors(i))
 		{
-			const Eigen::VectorBlock<Vector, 3> xJ = m_state->getPositions().segment<3>(3 * indexJ);
-			normalI += m_mass[indexJ] / m_density[indexJ] * kernelPoly6Gradient(xI - xJ);
+			gradient = kernelPoly6Gradient(particles[i].position - particles[j].position);
+			normalI += m_mass[j] / m_density[j] * gradient;
 		}
-		m_normal[indexI] = normalI;
+		m_normal[i] = normalI;
 	}
 }
 
 void SphRepresentation::computeAccelerations()
 {
-	SurgSim::Math::Vector3d f;
-
-	m_state->getAccelerations().setZero();
-
-	for (auto& particleI : getParticleReferences())
+	auto& particles = m_particles.getVertices();
+	for (size_t i = 0; i < particles.size(); i++)
 	{
-		const size_t indexI = particleI.getIndex();
-		const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
-		const Eigen::VectorBlock<const Vector, 3> vI = particleI.getVelocity();
+		m_acceleration[i] = SurgSim::Math::Vector3d::Zero();
+	}
 
-		for (auto indexJ : m_grid->getNeighbors(indexI))
+	SurgSim::Math::Vector3d f;
+	SurgSim::Math::Vector3d gradient;
+	SurgSim::Math::Vector3d unitNormal;
+	SurgSim::Math::Vector3d localGravity = getPose().inverse().linear() * m_gravity;
+	for (size_t i = 0; i < particles.size(); i++)
+	{
+		for (auto j : m_grid->getNeighbors(i))
 		{
 			// Consider symmetry here
-			if (indexJ <= indexI)
+			if (j <= i)
 			{
 				continue;
 			}
 
-			SurgSim::Math::Vector3d rij = xI - m_state->getPositions().segment<3>(3 * indexJ);
-			SurgSim::Math::Vector3d vji = -vI + m_state->getVelocities().segment<3>(3 * indexJ);
+			SurgSim::Math::Vector3d rij = particles[i].position - particles[j].position;
+			SurgSim::Math::Vector3d vji = -particles[i].data.velocity + particles[j].data.velocity;
 
 			// Pressure force
-			SurgSim::Math::Vector3d grad = kernelSpikyGradient(rij);
-			f = (-m_mass[indexJ] * (m_pressure[indexI] + m_pressure[indexJ]) / (2.0 * m_density[indexI])) * grad;
+			gradient = kernelSpikyGradient(rij);
+			f = (-m_mass[j] * (m_pressure[i] + m_pressure[j]) / (2.0 * m_density[i])) * gradient;
 
 			// Viscosity force
 			double laplacian = kernelViscosityLaplacian(rij);
-			f += (m_viscosity * m_mass[indexJ] * vji / m_density[indexJ]) * laplacian;
+			f += (m_viscosity * m_mass[j] * vji / m_density[j]) * laplacian;
 
 			// Surface tension force
 			double laplacianPoly6 = kernelPoly6Laplacian(rij);
-			double normalNorm = m_normal[indexJ].norm();
+			double normalNorm = m_normal[j].norm();
 			if (normalNorm > 20.0)
 			{
-				SurgSim::Math::Vector3d unitNormal = m_normal[indexJ] / normalNorm;
-				f += -m_surfaceTension * m_mass[indexJ] / m_density[indexJ] * laplacianPoly6 * unitNormal;
+				unitNormal = m_normal[j] / normalNorm;
+				f += -m_surfaceTension * m_mass[j] / m_density[j] * laplacianPoly6 * unitNormal;
 			}
 
 			// Action/reaction application on the pair of particles
-			particleI.setAcceleration(particleI.getAcceleration() + f);
-			m_state->getAccelerations().segment<3>(3 * indexJ) -= f;
+			m_acceleration[i] += f;
+			m_acceleration[j] -= f;
 		}
 
 		// Compute the acceleration from the forces
-		particleI.setAcceleration(particleI.getAcceleration() / m_density[indexI]);
+		m_acceleration[i] /= m_density[i];
 
 		// Adding the gravity term (F = rho.g)
-		particleI.setAcceleration(particleI.getAcceleration() + m_gravity);
+		m_acceleration[i] += localGravity;
 	}
 }
 
-void SphRepresentation::handleCollisions()
+bool SphRepresentation::doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions)
 {
-	for (auto planeConstraint : m_planeConstraints)
+	const Math::RigidTransform3d inversePose = getPose().inverse();
+
+	for (auto& collision : collisions)
 	{
-		auto n = planeConstraint.planeEquation.segment<3>(0);
-
-		for (auto& particleI : getParticleReferences())
+		for (auto& contact : collision.second)
 		{
-			const Eigen::VectorBlock<const Vector, 3> xI = particleI.getPosition();
-			double penetration = xI.dot(n) + planeConstraint.planeEquation[3];
+			Math::Vector3d normal = inversePose.linear() * contact->normal;
+			size_t index = contact->penetrationPoints.first.index.getValue();
+			auto& particle = m_particles.getVertices()[index];
 
-			if (penetration < 0.0)
-			{
-				const Eigen::VectorBlock<const Vector, 3> vI = particleI.getVelocity();
-				double forceIntensity = planeConstraint.stiffness * penetration +
-										planeConstraint.damping * vI.dot(n);
-				particleI.setAcceleration(particleI.getAcceleration() - forceIntensity * n);
-			}
+			double velocityAlongNormal = particle.data.velocity.dot(normal);
+			double forceIntensity = m_stiffness * contact->depth - m_damping * velocityAlongNormal;
+
+			Math::Vector3d tangentVelocity = particle.data.velocity - velocityAlongNormal * normal;
+			Math::Vector3d forceDirection = normal - m_friction * tangentVelocity.normalized();
+			Math::Vector3d accelerationCorrection = (forceIntensity / m_mass[index]) * forceDirection;
+
+			m_acceleration[index] += accelerationCorrection;
+			particle.data.velocity += dt * accelerationCorrection;
+			particle.position += dt * dt * accelerationCorrection;
 		}
 	}
+	return true;
 }
 
 double SphRepresentation::kernelPoly6(const SurgSim::Math::Vector3d& rij)

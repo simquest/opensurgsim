@@ -25,11 +25,11 @@
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
 
 using SurgSim::DataStructures::Location;
 using SurgSim::Math::SphereShape;

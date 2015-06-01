@@ -161,6 +161,20 @@ void testOptionalValueSerialization(Type value)
 		// Verify
 		EXPECT_FALSE(newOptionalValue.hasValue());
 	}
+
+	// Test for scalar assignment, assigning an optional value from a node that contains
+	// only the value of the correct type should succeed and not throw
+	{
+		OptionalValue<Type> optionalValue;
+		YAML::Node node;
+		node = value;
+
+		EXPECT_NO_THROW(optionalValue = node.as<OptionalValue<Type>>());
+
+		// Verify
+		EXPECT_TRUE(optionalValue.hasValue());
+		EXPECT_EQ(value, *optionalValue);
+	}
 }
 
 TEST(OptionalValueTests, Serialization)

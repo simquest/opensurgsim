@@ -21,6 +21,7 @@
 
 #include <memory>
 
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeSolver.h"
@@ -74,12 +75,23 @@ public:
 
 	/// Sets the numerical integration scheme
 	/// \param integrationScheme The integration scheme to use
-	/// \note Calling setIntegrationScheme after the component has been awoken will raise an assert
+	/// \exception SurgSim::Framework::AssertionFailure raised if setLinearSolver
+	/// is called after the component has been awoken.
 	void setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme);
 
 	/// Gets the numerical integration scheme
 	/// \return The integration scheme currently in use
 	SurgSim::Math::IntegrationScheme getIntegrationScheme() const;
+
+	/// Sets the linear algebraic solver
+	/// \param linearSolver The linear algebraic solver to use
+	/// \exception SurgSim::Framework::AssertionFailure raised if setLinearSolver
+	/// is called after the component has been awoken.
+	void setLinearSolver(SurgSim::Math::LinearSolver linearSolver);
+
+	/// Gets the linear algebraic solver
+	/// \return The linear solver currently in use
+	SurgSim::Math::LinearSolver getLinearSolver() const;
 
 	/// Add an external generalized force applied on a specific localization
 	/// \param localization where the generalized force is applied
@@ -169,6 +181,9 @@ protected:
 
 	/// Numerical Integration scheme (dynamic explicit/implicit solver)
 	SurgSim::Math::IntegrationScheme m_integrationScheme;
+
+	/// Linear algebraic solver used
+	SurgSim::Math::LinearSolver m_linearSolver;
 
 	/// Specify if the Ode Solver needs to be (re)loaded (do not exist yet, or integration scheme has changed)
 	bool m_needToReloadOdeSolver;

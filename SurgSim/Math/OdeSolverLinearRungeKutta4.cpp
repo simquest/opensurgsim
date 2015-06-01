@@ -29,7 +29,8 @@ OdeSolverLinearRungeKutta4::OdeSolverLinearRungeKutta4(OdeEquation* equation)
 	m_name = "Ode Solver Linear Runge Kutta 4";
 }
 
-void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
+void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState,
+									   bool computeCompliance)
 {
 	if (!m_initialized)
 	{

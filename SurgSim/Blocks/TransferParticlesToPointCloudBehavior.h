@@ -34,14 +34,14 @@ class PointCloudRepresentation;
 
 namespace Particles
 {
-class ParticleSystemRepresentation;
+class Representation;
 }
 
 namespace Blocks
 {
 SURGSIM_STATIC_REGISTRATION(TransferParticlesToPointCloudBehavior);
 
-/// Behavior to copy positions of a ParticleSystemRepresentation to a PointCloud.
+/// Behavior to copy positions of a Particles::Representation to a PointCloud.
 class TransferParticlesToPointCloudBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -61,7 +61,7 @@ public:
 
 	/// Get the particles representation which sends the positions
 	/// \return The Physics representation which produces positions.
-	std::shared_ptr<SurgSim::Particles::ParticleSystemRepresentation> getSource() const;
+	std::shared_ptr<SurgSim::Particles::Representation> getSource() const;
 
 	/// Get the point cloud representation which receives the positions
 	/// \return The Graphics PointCloud representation which receives positions.
@@ -73,8 +73,8 @@ private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
-	/// The ParticleSystemRepresentation from which the positions come.
-	std::shared_ptr<SurgSim::Particles::ParticleSystemRepresentation> m_source;
+	/// The Particles::Representation from which the positions come.
+	std::shared_ptr<SurgSim::Particles::Representation> m_source;
 
 	/// The Graphics PointCloud Representation to which the vertices's positions are set.
 	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> m_target;
