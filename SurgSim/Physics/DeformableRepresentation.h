@@ -69,17 +69,14 @@ public:
 
 	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const;
 
-	/// Return a pointer to the OdeSolver component
-	/// \return The ODE solver
-	virtual const std::shared_ptr<SurgSim::Math::OdeSolver> getOdeSolver();
-
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation
 	size_t getNumDofPerNode() const;
 
 	/// Sets the numerical integration scheme
 	/// \param integrationScheme The integration scheme to use
-	/// \note Calling setIntegrationScheme after the component has been awoken will raise an assert
+	/// \exception SurgSim::Framework::AssertionFailure raised if setLinearSolver
+	/// is called after the component has been awoken.
 	void setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme);
 
 	/// Gets the numerical integration scheme
@@ -88,7 +85,8 @@ public:
 
 	/// Sets the linear algebraic solver
 	/// \param linearSolver The linear algebraic solver to use
-	/// \note Calling setLinearSolver after the component has been awoken will raise an assert
+	/// \exception SurgSim::Framework::AssertionFailure raised if setLinearSolver
+	/// is called after the component has been awoken.
 	void setLinearSolver(SurgSim::Math::LinearSolver linearSolver);
 
 	/// Gets the linear algebraic solver

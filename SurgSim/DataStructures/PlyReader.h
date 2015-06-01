@@ -112,7 +112,7 @@ public:
 
 	/// Constructor.
 	/// \param	filename	Filename of the .ply file.
-	explicit PlyReader(std::string filename);
+	explicit PlyReader(const std::string& filename);
 
 	/// Destructor.
 	virtual ~PlyReader();
@@ -129,7 +129,7 @@ public:
 	/// \param	endElementCallback	  	The callback to be used when all of the elements of this type have been read.
 	///
 	/// \return	true if there is a element elementName in the .ply file and it has not been requested yet.
-	bool requestElement(std::string elementName,
+	bool requestElement(const std::string& elementName,
 						std::function<void* (const std::string&, size_t)> startElementCallback,
 						std::function<void (const std::string&)> processElementCallback,
 						std::function<void (const std::string&)> endElementCallback);
@@ -147,7 +147,8 @@ public:
 	/// \param dataOffset The offset of the data in your data structure where the data should be stored.
 	/// \return true if the property exists and has not been registered yet and is a scalar property,
 	/// 		otherwise false.
-	bool requestScalarProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset);
+	bool requestScalarProperty(const std::string& elementName, const std::string& propertyName,
+		int dataType, int dataOffset);
 
 	/// Request a list property for parsing.
 	/// Use this for when you want the information from a list property from the .ply file. The item in your
@@ -163,27 +164,27 @@ public:
 	/// \param countOffset The offset for storing the count.
 	///
 	/// \return true if it succeeds, false if it fails.
-	bool requestListProperty(std::string elementName,
-							 std::string propertyName,
+	bool requestListProperty(const std::string& elementName,
+							 const std::string& propertyName,
 							 int dataType, int dataOffset,
 							 int countType, int countOffset);
 
 	/// Query if this elementName is in the .ply file
 	/// \param elementName Name of the element.
 	/// \return true if yes, false otherwise.
-	bool hasElement(std::string elementName) const;
+	bool hasElement(const std::string& elementName) const;
 
 	/// Query if 'elementName' has the given property.
 	/// \param elementName  Name of the element.
 	/// \param propertyName Name of the property.
 	/// \return true if the element exists and has the property, false otherwise.
-	bool hasProperty(std::string elementName, std::string propertyName) const;
+	bool hasProperty(const std::string& elementName, const std::string& propertyName) const;
 
 	/// Query if the property of the give element is scalar.
 	/// \param elementName  Name of the element.
 	/// \param propertyName Name of the property.
 	/// \return true if the element exists and has the property and it is a scalar value.
-	bool isScalar(std::string elementName, std::string propertyName) const;
+	bool isScalar(const std::string& elementName, const std::string& propertyName) const;
 
 	/// Sets a delegate for parsing and then parse the file.
 	/// \param delegate The delegate.
@@ -217,8 +218,8 @@ private:
 	/// \param countOffset The offset for storing the count.
 	///
 	/// \return true if it succeeds, false if it fails.
-	bool requestProperty(std::string elementName,
-						 std::string propertyName,
+	bool requestProperty(const std::string& elementName,
+						 const std::string& propertyName,
 						 int dataType, int dataOffset,
 						 int countType, int countOffset);
 

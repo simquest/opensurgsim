@@ -24,7 +24,6 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/ParticleManager.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 
 namespace SurgSim
@@ -45,7 +44,6 @@ public:
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager;
-	std::shared_ptr<SurgSim::Particles::ParticleManager> particlesManager;
 	std::shared_ptr<SurgSim::Physics::PhysicsManager> physicsManager;
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager;
 	std::shared_ptr<SurgSim::Framework::Scene> scene;

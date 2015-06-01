@@ -26,6 +26,7 @@ void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 {
 	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
 	m_solver.compute(matrix);
+	SURGSIM_ASSERT(m_solver.info() == Eigen::Success) << m_solver.lastErrorMessage();
 }
 
 Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const

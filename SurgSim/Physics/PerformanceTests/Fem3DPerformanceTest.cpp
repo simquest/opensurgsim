@@ -29,6 +29,7 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/PerformanceTests/DivisibleCubeRepresentation.h"
+#include "SurgSim/Physics/PerformanceTests/MockFem3DRepresentation.h"
 #include "SurgSim/Testing/MockPhysicsManager.h"
 
 using SurgSim::Math::Vector3d;
@@ -95,7 +96,24 @@ public:
 		m_physicsManager->doStartUp();
 	}
 
-	void initializeRepresentation(std::shared_ptr<Fem3DRepresentation> fem)
+	void initializeRepresentation(std::shared_ptr<MockFem3DRepresentation> fem)
+	{
+		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->wakeUp();
+		std::shared_ptr<SurgSim::Math::LinearSparseSolveAndInverseCG> solver =
+			std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(
+				fem->getOdeSolver()->getLinearSolver());
+		if (solver != nullptr)
+		{
+			solver->setMaxIterations(static_cast<SurgSim::Math::SparseMatrix::Index>(
+										 maxIterationConstant * fem->getNumDof()));
+			solver->setTolerance(tolerance);
+		}
+
+		m_physicsManager->executeAdditions(fem);
+	}
+
+	void initializeRepresentation(std::shared_ptr<DivisibleCubeRepresentation> fem)
 	{
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		fem->wakeUp();
@@ -155,7 +173,7 @@ TEST_P(IntegrationSchemeParamTest, WoundTest)
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
 	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 
-	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("wound");
+	auto fem = std::make_shared<SurgSim::Physics::MockFem3DRepresentation>("wound");
 	fem->setFilename("Data/Fem3DPerformanceTest/wound_deformable.ply");
 	fem->setIntegrationScheme(integrationScheme);
 	fem->setLinearSolver(linearSolver);
@@ -175,6 +193,12 @@ TEST_P(IntegrationSchemeAndCountParamTest, CubeTest)
 	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
+
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
+
 	fem->setIntegrationScheme(integrationScheme);
 	fem->setLinearSolver(linearSolver);
 

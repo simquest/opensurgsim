@@ -29,6 +29,15 @@ ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<V>& other
 	update();
 }
 
+template <class V>
+ParticlesShape& ParticlesShape::operator=(const SurgSim::DataStructures::Vertices<V>& other)
+{
+	DataStructures::Vertices<DataStructures::EmptyData>::operator=(other);
+	update();
+	return *this;
+}
+
+
 }; // namespace Math
 }; // namespace SurgSim
 

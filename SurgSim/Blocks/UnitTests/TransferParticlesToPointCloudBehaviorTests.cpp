@@ -190,7 +190,7 @@ TEST(TransferParticlesToPointCloudBehaviorTests, SerializationTest)
 
 	EXPECT_EQ("SurgSim::Blocks::TransferParticlesToPointCloudBehavior", newBehavior->getClassName());
 	EXPECT_NE(nullptr,
-		newBehavior->getValue<std::shared_ptr<SurgSim::Particles::ParticleSystemRepresentation>>("Source"));
+		newBehavior->getValue<std::shared_ptr<SurgSim::Particles::Representation>>("Source"));
 	EXPECT_NE(nullptr,
 		newBehavior->getValue<std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation>>("Target"));
 }

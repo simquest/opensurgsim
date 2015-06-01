@@ -19,7 +19,14 @@
 #include <boost/thread/mutex.hpp>
 #include <list>
 #include <memory>
+
+#include <OVR_Version.h>
+#if 6 == OVR_MAJOR_VERSION
+#include <OVR_CAPI_0_6_0.h>
+#elif 5 == OVR_MAJOR_VERSION
 #include <OVR_CAPI_0_5_0.h>
+#endif
+
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
@@ -49,8 +56,13 @@ struct OculusScaffold::DeviceData
 	/// \param index Index of Oculus device to be created. If exists, a valid handle will be held in 'handle'.
 	DeviceData(OculusDevice* device, int index) :
 		deviceObject(device),
-		handle(ovrHmd_Create(index))
+		handle(nullptr)
 	{
+#if 6 == OVR_MAJOR_VERSION
+		ovrHmd_Create(index, &handle);
+#elif 5 == OVR_MAJOR_VERSION
+		handle = ovrHmd_Create(index);
+#endif
 	}
 
 	~DeviceData()
@@ -88,7 +100,11 @@ OculusScaffold::OculusScaffold() :
 	// positional tracking is done at 60Hz.
 	setRate(1000.0);
 
-	ovr_Initialize();
+#if 6 == OVR_MAJOR_VERSION
+	SURGSIM_ASSERT(ovrSuccess == ovr_Initialize(nullptr)) << "Oculus SDK initialization failed.";
+#elif 5 == OVR_MAJOR_VERSION
+	SURGSIM_ASSERT(ovrTrue == ovr_Initialize(nullptr)) << "Oculus SDK initialization failed.";
+#endif
 }
 
 OculusScaffold::~OculusScaffold()
@@ -120,12 +136,40 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 		}
 		else
 		{
-			if (ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
-													   ovrTrackingCap_MagYawCorrection |
-													   ovrTrackingCap_Position, 0))
+#if 6 == OVR_MAJOR_VERSION
+			if (ovrSuccess == ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
+																	 ovrTrackingCap_MagYawCorrection |
+																	 ovrTrackingCap_Position, 0))
+#elif 5 == OVR_MAJOR_VERSION
+			if (ovrTrue == ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
+																  ovrTrackingCap_MagYawCorrection |
+																  ovrTrackingCap_Position, 0))
+#endif
 			{
+				DataGroup& inputData = info->deviceObject->getInputData();
+
+				// Query the HMD for the left and right projection matrices.
+				ovrFovPort defaultLeftFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
+				ovrFovPort defaultRightFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
+
+				float nearPlane = info->deviceObject->getNearPlane();
+				float farPlane = info->deviceObject->getFarPlane();
+
+				ovrMatrix4f leftProjection = ovrMatrix4f_Projection(defaultLeftFov, nearPlane, farPlane,
+																	ovrProjectionModifier::ovrProjection_RightHanded);
+				ovrMatrix4f rightProjection = ovrMatrix4f_Projection(defaultRightFov, nearPlane, farPlane,
+																	ovrProjectionModifier::ovrProjection_RightHanded);
+
+				inputData.matrices().set(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX,
+											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
+												(&leftProjection.M[0][0]).cast<double>());
+				inputData.matrices().set(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX,
+											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
+												(&rightProjection.M[0][0]).cast<double>());
+
 				m_state->registeredDevices.emplace_back(std::move(info));
 				SURGSIM_LOG_INFO(m_logger) << "Device " << getName() << ": registered.";
+
 				result = true;
 			}
 			else
@@ -150,8 +194,10 @@ bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto match = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-								 [&device](const std::unique_ptr<DeviceData>& info)
-								 { return info->deviceObject == device; });
+								  [&device](const std::unique_ptr<DeviceData>& info)
+		{
+			return info->deviceObject == device;
+		});
 
 		if (match != m_state->registeredDevices.end())
 		{
@@ -224,6 +270,8 @@ SurgSim::DataStructures::DataGroup OculusScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
 	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	builder.addMatrix(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX);
+	builder.addMatrix(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX);
 	return builder.createData();
 }
 

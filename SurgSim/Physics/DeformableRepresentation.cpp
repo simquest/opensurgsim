@@ -116,11 +116,6 @@ size_t DeformableRepresentation::getNumDofPerNode() const
 	return m_numDofPerNode;
 }
 
-const std::shared_ptr<SurgSim::Math::OdeSolver> DeformableRepresentation::getOdeSolver()
-{
-	return m_odeSolver;
-}
-
 void DeformableRepresentation::setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	SURGSIM_ASSERT(!isAwake()) << "You cannot set the integration scheme after the component has been awoken";

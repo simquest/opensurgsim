@@ -1,0 +1,22 @@
+- SurgSim::Framework::BasicSceneElement:
+    Name: CameraText
+    Components:
+      - SurgSim::Blocks::DriveElementFromInputBehavior:
+          Name: Driver
+          Source:
+            SurgSim::Input::InputComponent:
+              Name: Input
+              Id: 9b77c4e2-e9ea-484f-bfca-72121189dcb6
+      - SurgSim::Graphics::OsgTextRepresentation:
+          Name: Text
+          Text: This is the text for this text I would hope it gets wrapped
+          MaximumWidth: 0.4
+          FontSize: 0.02
+          UseScreenSpace: false
+          LocalPose:
+            Quaternion: [0, 0, 0, 1]
+            Translation: [-0.2, 0, -1.5]
+          Color: [0.81, 0.81, 0.0, 1.0]
+          DrawBackground: true
+          BackgroundColor: [0.05, 0.05, 0.6, 1.0]
+          BackgroundMargin: 0.005

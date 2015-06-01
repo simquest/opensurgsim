@@ -18,11 +18,11 @@
 
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/Particles/EmitterRepresentation.h"
-#include "SurgSim/Particles/ParticleSystemRepresentation.h"
+#include "SurgSim/Particles/Emitter.h"
+#include "SurgSim/Particles/Representation.h"
 
 
-class MockParticleSystem : public SurgSim::Particles::ParticleSystemRepresentation
+class MockParticleSystem : public SurgSim::Particles::Representation
 {
 public:
 	explicit MockParticleSystem(const std::string& name);
@@ -31,31 +31,16 @@ public:
 
 private:
 	bool doUpdate(double dt) override;
+	bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) override;
 };
 
-class MockEmitter : public SurgSim::Particles::EmitterRepresentation
+class MockEmitter : public SurgSim::Particles::Emitter
 {
 public:
 	explicit MockEmitter(const std::string& name);
 	void update(double dt) override;
 	int updateCount;
 };
-
-class MockParticleBehavior : public SurgSim::Framework::Behavior
-{
-public:
-	explicit MockParticleBehavior(const std::string& name);
-
-	int getTargetManagerType() const override;
-	void update(double dt) override;
-
-	int updateCount;
-
-private:
-	bool doInitialize() override;
-	bool doWakeUp() override;
-};
-
 
 #endif //SURGSIM_PARTICLES_UNITTESTS_MOCKOBJECTS_H
 

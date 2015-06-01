@@ -93,10 +93,21 @@ private:
 TEST_F(LinearSparseSolveAndInverseTests, SparseLUInitializationTests)
 {
 	SparseMatrix nonSquare(9, 18);
+	SparseMatrix square(18, 18);
 	nonSquare.setZero();
+
+	for (SparseMatrix::Index counter = 0; counter < 18; ++counter)
+	{
+		square.insert(counter, counter) = 1.0;
+	}
+	square.makeCompressed();
 
 	LinearSparseSolveAndInverseLU solveAndInverse;
 	EXPECT_THROW(solveAndInverse.setMatrix(nonSquare), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(solveAndInverse.setMatrix(square));
+
+	clearMatrix(&square);
+	EXPECT_THROW(solveAndInverse.setMatrix(square), SurgSim::Framework::AssertionFailure);
 };
 
 TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
@@ -131,10 +142,21 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseCGSetGetTests)
 TEST_F(LinearSparseSolveAndInverseTests, SparseCGInitializationTests)
 {
 	SparseMatrix nonSquare(9, 18);
+	SparseMatrix square(18, 18);
 	nonSquare.setZero();
+
+	for (SparseMatrix::Index counter = 0; counter < 18; ++counter)
+	{
+		square.insert(counter, counter) = 1.0;
+	}
+	square.makeCompressed();
 
 	LinearSparseSolveAndInverseCG solveAndInverse;
 	EXPECT_THROW(solveAndInverse.setMatrix(nonSquare), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(solveAndInverse.setMatrix(square));
+
+	clearMatrix(&square);
+	EXPECT_NO_THROW(solveAndInverse.setMatrix(square));
 };
 
 TEST_F(LinearSparseSolveAndInverseTests, SparseCGMatrixComponentsTest)

@@ -76,7 +76,7 @@ public:
 		m_nonIdentityTransform = SurgSim::Math::makeRigidTransform(q, t);
 		m_identityTransform = SurgSim::Math::RigidTransform3d::Identity();
 
-		m_localization0 =  std::make_shared<SurgSim::Physics::MockDeformableRepresentationLocalization>();
+		m_localization0 =  std::make_shared<SurgSim::Physics::MockDeformableLocalization>();
 		m_localization0->setLocalNode(0);
 	}
 
@@ -89,7 +89,7 @@ protected:
 	SurgSim::Math::RigidTransform3d m_nonIdentityTransform;
 
 	// Localization of node 0, to apply external force
-	std::shared_ptr<SurgSim::Physics::MockDeformableRepresentationLocalization> m_localization0;
+	std::shared_ptr<SurgSim::Physics::MockDeformableLocalization> m_localization0;
 };
 
 TEST_F(DeformableRepresentationTest, ConstructorTest)
