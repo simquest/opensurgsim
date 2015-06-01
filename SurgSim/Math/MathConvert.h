@@ -22,6 +22,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/OdeSolver.h"
 
 namespace SurgSim
@@ -55,7 +56,7 @@ struct convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
 /// Specialization for Eigen Row Vectors, which are the type that Vector2x, Vector3x use
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int Rows, int MOpt>
-struct convert <typename Eigen::Matrix<Type,Rows,1,MOpt>>
+struct convert <typename Eigen::Matrix<Type, Rows, 1, MOpt>>
 {
 	static Node encode(const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
 	static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs); //NOLINT
@@ -91,6 +92,13 @@ struct convert<SurgSim::Math::IntegrationScheme>
 {
 	static Node encode(const SurgSim::Math::IntegrationScheme& rhs);
 	static bool decode(const Node& node, SurgSim::Math::IntegrationScheme& rhs); //NOLINT
+};
+
+template <>
+struct convert<SurgSim::Math::LinearSolver>
+{
+	static Node encode(const SurgSim::Math::LinearSolver& rhs);
+	static bool decode(const Node& node, SurgSim::Math::LinearSolver& rhs); //NOLINT
 };
 
 };

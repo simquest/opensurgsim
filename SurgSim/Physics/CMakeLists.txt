@@ -122,7 +122,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
 	MlcpPhysicsSolution.h
-	ParticleCollisionResponse.cpp
+	ParticleCollisionResponse.h
 	PhysicsConvert.h
 	PhysicsManager.h
 	PhysicsManagerState.h
