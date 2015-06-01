@@ -179,9 +179,9 @@ public:
 		{
 			const auto&  mat = fem->getOdeSolver()->getSystemMatrix().toDense();
 			const auto& inv = mat.inverse();
-//			EXPECT_TRUE((mat * inv).isApprox(Math::Matrix::Identity(mat.rows(),
-//											 mat.cols()))) << "Mat: " << std::endl << mat <<
-//													 std::endl << "Inverse: " << std::endl << inv << std::endl;
+			EXPECT_TRUE((mat * inv).isApprox(Math::Matrix::Identity(mat.rows(),
+											 mat.cols()))) << "Mat: " << std::endl << mat <<
+													 std::endl << "Inverse: " << std::endl << inv << std::endl;
 		}
 		totalTime.endFrame();
 		RecordProperty("Duration", boost::to_string(totalTime.getCumulativeTime()));
