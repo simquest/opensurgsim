@@ -152,7 +152,7 @@ void* Fem1DPlyReaderDelegate::beginVertices(const std::string &elementName, size
 
 void Fem1DPlyReaderDelegate::processVertex(const std::string& elementName)
 {
-	FemElementStructs::RotationVectorData data;
+	FemElementStructs::Fem1DVectorData data;
 
 	if (m_hasRotationDOF)
 	{

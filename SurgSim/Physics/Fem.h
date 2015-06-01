@@ -39,6 +39,12 @@ struct RotationVectorData
 	double thetaZ;
 };
 
+struct Fem1DVectorData : public RotationVectorData{};
+
+struct Fem2DVectorData : public RotationVectorData{};
+
+struct Fem3DVectorData : public RotationVectorData{};
+
 struct FemElement
 {
 	virtual ~FemElement(){}
@@ -123,7 +129,7 @@ protected:
 
 /// Fem class data structure implementation for 1-Dimensional FEMs
 /// \sa Fem
-class Fem1D : public Fem<FemElementStructs::RotationVectorData,
+class Fem1D : public Fem<FemElementStructs::Fem1DVectorData,
 		EmptyData, EmptyData, FemElementStructs::FemElement1D>
 {
 public:
@@ -136,7 +142,7 @@ protected:
 
 /// Fem class data structure implementation for 2-Dimensional FEMs
 /// \sa Fem
-class Fem2D : public Fem<FemElementStructs::RotationVectorData,
+class Fem2D : public Fem<FemElementStructs::Fem2DVectorData,
 		EmptyData, EmptyData, FemElementStructs::FemElement2D>
 {
 public:
@@ -149,7 +155,7 @@ protected:
 
 /// Fem class data structure implementation for 3-Dimensional FEMs
 /// \sa Fem
-class Fem3D : public Fem<EmptyData, EmptyData, EmptyData,
+class Fem3D : public Fem<FemElementStructs::Fem3DVectorData, EmptyData, EmptyData,
 		FemElementStructs::FemElement3D>
 {
 public:

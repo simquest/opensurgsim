@@ -20,14 +20,24 @@
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 
 template<>
-std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::RotationVectorData,
-	EmptyData, EmptyData>::m_className = "SurgSim::Physics::Fem";
+std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::Fem1DVectorData,
+	EmptyData, EmptyData>::m_className = "SurgSim::Physics::Fem1D";
+
+template<>
+std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::Fem2DVectorData,
+	EmptyData, EmptyData>::m_className = "SurgSim::Physics::Fem2D";
+
+template<>
+std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::Fem3DVectorData,
+	EmptyData, EmptyData>::m_className = "SurgSim::Physics::Fem3D";
 
 namespace SurgSim
 {
 
 namespace Physics
 {
+
+SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::Fem1D, Fem1D)
 
 Fem1D::Fem1D() : Fem()
 {
