@@ -29,13 +29,13 @@ class MockFem3DRepresentation : public SurgSim::Physics::Fem3DRepresentation
 public:
 	/// Constructor:
 	/// \param name Name of the Fem3DRepresentation
-	MockFem3DRepresentation::MockFem3DRepresentation(const std::string& name)
+	MockFem3DRepresentation(const std::string& name)
 		: Fem3DRepresentation(name)
 	{
 	}
 
 	/// \return the ODE solver being used
-	std::shared_ptr<SurgSim::Math::OdeSolver> MockFem3DRepresentation::getOdeSolver()
+	std::shared_ptr<SurgSim::Math::OdeSolver> getOdeSolver()
 	{
 		return m_odeSolver;
 	}
