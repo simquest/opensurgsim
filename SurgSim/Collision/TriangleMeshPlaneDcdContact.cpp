@@ -62,6 +62,7 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 
 	double d;
 	Vector3d normal;
+	size_t vertexId = 0;
 	for (auto& vertex : mesh->getVertices())
 	{
 		d = planeNormal.dot(vertex.position) + planeD;
@@ -70,13 +71,17 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 			// Create the contact
 			normal = representationPlane->getPose().linear() * plane->getNormal();
 			std::pair<Location, Location> penetrationPoints;
+			penetrationPoints.first.nodeMeshLocalCoordinate.setValue(
+					DataStructures::IndexedLocalCoordinate(vertexId, Math::Vector()));
 			penetrationPoints.first.rigidLocalPosition.setValue(
 				representationTriangleMesh->getPose().inverse() * vertex.position);
+
 			penetrationPoints.second.rigidLocalPosition.setValue(
 				representationPlane->getPose().inverse() * (vertex.position - normal * d));
 
 			pair->addContact(-d, normal, penetrationPoints);
 		}
+		vertexId++;
 	}
 }
 
