@@ -4,14 +4,23 @@ find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
 add_executable(loadVtkUnstructuredData MACOSX_BUNDLE main.cpp)
+add_executable(scene MACOSX_BUNDLE scene.cpp)
+
+set(LIBS
+	SurgSimBlocks
+	SurgSimFramework
+	SurgSimGraphics
+	SurgSimPhysics
+)
 
 if(VTK_LIBRARIES)
-  target_link_libraries(loadVtkUnstructuredData ${VTK_LIBRARIES} ${Boost_LIBRARIES}
-    )
+	set(LIBS ${LIBS} ${VTK_LIBRARIES} ${Boost_LIBRARIES})
 else()
-  target_link_libraries(loadVtkUnstructuredData vtkHybrid ${Boost_LIBRARIES}
-    )
+	set(LIBS ${LIBS} vtkHybrid ${Boost_LIBRARIES})
 endif()
+
+target_link_libraries(loadVtkUnstructuredData ${LIBS})
+target_link_libraries(scene ${LIBS})
 
 set(TEST_MESH
 "<?xml version=\"1.0\"?>

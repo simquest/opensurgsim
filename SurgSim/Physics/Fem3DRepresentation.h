@@ -20,7 +20,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Modules/VtkUnstructuredFEMReader/loadVtkUnstructuredData.h"
+#include "Modules/VtkUnstructuredFEMReader/Fem3DTetrahedron.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"

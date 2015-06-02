@@ -1,3 +1,6 @@
+#ifndef LOAD_VTK_UNSTRUCTURED_DATA_H
+#define LOAD_VTK_UNSTRUCTURED_DATA_H
+
 #include <iostream>
 #include <memory>
 #include <array>
@@ -19,51 +22,8 @@
 #include "SurgSim/DataStructures/TetrahedronMesh.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 
-typedef SurgSim::DataStructures::TetrahedronMesh<SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData,
-		SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData> TetrahedronBase;
+#include "Fem3DTetrahedron.h"
 
-class Fem3DTetrahedron : public TetrahedronBase
-{
-public:
-	Fem3DTetrahedron()
-	{
-	}
-
-	void setMassDensity(double value)
-	{
-		m_massDensity = value;
-	}
-
-	double getMassDensity()
-	{
-		return m_massDensity;
-	}
-
-	void setPoisonRatio(double value)
-	{
-		m_poissonRatio = value;
-	}
-
-	double getPoissonRatio()
-	{
-		return m_poissonRatio;
-	}
-
-	void setYoungModulus(double value)
-	{
-		m_youngModulus = value;
-	}
-
-	double getYoungModulus()
-	{
-		return m_youngModulus;
-	}
-
-private:
-	double m_massDensity;
-	double m_poissonRatio;
-	double m_youngModulus;
-};
 
 void loadVtkUnstructuredData(const std::string &filename, std::shared_ptr<Fem3DTetrahedron> fem)
 {
@@ -135,3 +95,5 @@ void loadVtkUnstructuredData(const std::string &filename, std::shared_ptr<Fem3DT
     }
 
 }
+
+#endif //LOAD_VTK_UNSTRUCTURED_DATA_H
