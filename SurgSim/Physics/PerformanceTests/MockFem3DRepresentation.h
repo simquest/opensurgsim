@@ -29,7 +29,7 @@ class MockFem3DRepresentation : public SurgSim::Physics::Fem3DRepresentation
 public:
 	/// Constructor:
 	/// \param name Name of the Fem3DRepresentation
-	MockFem3DRepresentation(const std::string& name)
+	explicit MockFem3DRepresentation(const std::string& name)
 		: Fem3DRepresentation(name)
 	{
 	}
