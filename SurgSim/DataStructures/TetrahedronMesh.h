@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "SurgSim/DataStructures/MeshElement.h"
-#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 
 namespace SurgSim
 {
@@ -57,13 +57,9 @@ namespace DataStructures
 /// \sa Vertices
 /// \sa MeshElement
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
-class TetrahedronMesh : public Vertices<VertexData>
+class TetrahedronMesh : public TriangleMesh<VertexData, EdgeData, TriangleData>
 {
 public:
-	/// Edge type for convenience (Ids of the 2 vertices)
-	typedef MeshElement<2, EdgeData> EdgeType;
-	/// Triangle type for convenience (Ids of the 3 vertices)
-	typedef MeshElement<3, TriangleData> TriangleType;
 	/// Tetrahedron type for convenience (Ids of the 4 vertices)
 	typedef MeshElement<4, TetrahedronData> TetrahedronType;
 
@@ -73,23 +69,6 @@ public:
 	/// Destructor
 	virtual ~TetrahedronMesh();
 
-	/// Adds an edge to the mesh.
-	/// No checking on the edge's vertices is performed.
-	/// Recommend that subclasses with a specific purpose (such as for use in collision detection) have a
-	/// createEdge(vertices, other data...) method which performs any checking desired and sets up the edge data based
-	/// on the vertices and other parameters.
-	/// \param	edge	Edge to add to the mesh
-	/// \return	Unique ID of the new edge.
-	size_t addEdge(const EdgeType& edge);
-
-	/// Adds a triangle to the mesh.
-	/// \param	triangle	Triangle to add to the mesh
-	/// Recommend that subclasses with a specific purpose (such as for use in collision detection) have a
-	/// createTriangle(vertices, other data...) method which performs any checking desired and sets up the triangle data
-	/// based on the vertices and other parameters.
-	/// \return	Unique ID of the new triangle.
-	size_t addTriangle(const TriangleType& triangle);
-
 	/// Adds a tetrahedron to the mesh.
 	/// \param	tetrahedron	Tetrahedron to add to the mesh
 	/// Recommend that subclasses with a specific purpose (such as for use in collision detection) have a
@@ -98,31 +77,9 @@ public:
 	/// \return	Unique ID of the new tetrahedron.
 	size_t addTetrahedron(const TetrahedronType& tetrahedron);
 
-	/// Returns the number of edges in this mesh.
-	/// \return The number of edges
-	size_t getNumEdges() const;
-
-	/// Returns the number of triangles in this mesh.
-	/// \return The number of triangles
-	size_t getNumTriangles() const;
-
 	/// Returns the number of tetrahedrons in this mesh.
 	/// \return The number of tetrahedrons
 	size_t getNumTetrahedrons() const;
-
-	/// Returns a vector containing the position of each edge.
-	/// \return The vector containing all edges
-	const std::vector<EdgeType>& getEdges() const;
-	/// Returns a vector containing the position of each edge (non const version).
-	/// \return The vector containing all edges
-	std::vector<EdgeType>& getEdges();
-
-	/// Returns a vector containing the position of each triangle.
-	/// \return The vector containing all triangles
-	const std::vector<TriangleType>& getTriangles() const;
-	/// Returns a vector containing the position of each triangle (non const version).
-	/// \return The vector containing all triangles
-	std::vector<TriangleType>& getTriangles();
 
 	/// Returns a vector containing the position of each tetrahedron.
 	/// \return The vector containing all tetrahedrons
@@ -131,33 +88,13 @@ public:
 	/// \return The vector containing all tetrahedrons
 	std::vector<TetrahedronType>& getTetrahedrons();
 
-	/// Returns the specified edge.
-	/// \param id The edge's id
-	/// \return The edge id
-	/// \note No check is performed on the id
-	const EdgeType& getEdge(size_t id) const;
-	/// Returns the specified edge (non const version).
-	/// \param id The edge's id
-	/// \return The edge id
-	/// \note No check is performed on the id
-	EdgeType& getEdge(size_t id);
-
 	/// Returns the specified triangle.
-	/// \param id The triangle's id
-	/// \return The triangle id
-	/// \note No check is performed on the id
-	const TriangleType& getTriangle(size_t id) const;
-	/// Returns the specified triangle (non const version).
-	/// \param id The triangle's id
-	/// \return The triangle id
-	/// \note No check is performed on the id
-	TriangleType& getTriangle(size_t id);
-
 	/// Returns the specified tetrahedron.
 	/// \param id The tetrahedron's id
 	/// \return The tetrahedron id
 	/// \note No check is performed on the id
 	const TetrahedronType& getTetrahedron(size_t id) const;
+
 	/// Returns the specified tetrahedron (non const version).
 	/// \param id The tetrahedron's id
 	/// \return The tetrahedron id
@@ -169,30 +106,23 @@ public:
 	bool isValid() const;
 
 protected:
-	/// Remove all edges from the mesh.
-	virtual void doClearEdges();
-
-	/// Remove all triangles from the mesh.
-	virtual void doClearTriangles();
-
 	/// Remove all tetrahedrons from the mesh.
 	virtual void doClearTetrahedrons();
+
+	using TriangleMesh<VertexData, EdgeData, TriangleData>::doClearVertices;
+	using TriangleMesh<VertexData, EdgeData, TriangleData>::doClearEdges;
+	using TriangleMesh<VertexData, EdgeData, TriangleData>::doClearTriangles;
 
 	/// Internal comparison of meshes of the same type: returns true if equal, false if not equal.
 	/// Override this method to provide custom comparison. Basic TriangleMesh implementation compares vertices,
 	/// edges and triangles: the order of vertices, edges, and triangles must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
 	virtual bool isEqual(const Vertices<VertexData>& mesh) const;
+
 private:
 
 	/// Clear mesh to return to an empty state (no vertices, no edges, no triangles, no m_tetrahedrons).
 	virtual void doClear();
-
-	/// Edges
-	std::vector<EdgeType> m_edges;
-
-	/// Triangles
-	std::vector<TriangleType> m_triangles;
 
 	/// Tetrahedrons
 	std::vector<TetrahedronType> m_tetrahedrons;

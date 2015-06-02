@@ -29,6 +29,8 @@ using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TetrahedronMesh;
 using SurgSim::Math::Vector3d;
 
+typedef TetrahedronMesh<EmptyData, EmptyData, EmptyData, EmptyData> TetrahedronMeshNoData;
+
 class TetrahedronMeshTest : public ::testing::Test
 {
 public:
@@ -214,50 +216,6 @@ public:
 TEST_F(TetrahedronMeshTest, InitTest)
 {
 	ASSERT_NO_THROW({MockTetrahedronMesh mesh;});
-
-	/// Make sure we can create triangle meshes with each possible combination of void data.
-	/// One void entry
-	typedef TetrahedronMesh<EmptyData, MockEdgeData, MockTriangleData, MockTetrahedronData> TetrahedronMeshNoVertexData;
-	typedef TetrahedronMesh<MockVertexData, EmptyData, MockTriangleData, MockTetrahedronData> TetrahedronMeshNoEdgeData;
-	typedef TetrahedronMesh<MockVertexData, MockEdgeData, EmptyData, MockTetrahedronData> TetrahedronMeshNoTriangleData;
-	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, EmptyData> TetrahedronMeshNoTetrahedronData;
-	ASSERT_NO_THROW({TetrahedronMeshNoVertexData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshNoEdgeData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshNoTriangleData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshNoTetrahedronData mesh;});
-
-	/// Two void entries
-	typedef TetrahedronMesh<EmptyData, EmptyData, MockTriangleData, MockTetrahedronData>
-		TetrahedronMeshNoVertexOrEdgeData;
-	typedef TetrahedronMesh<EmptyData, MockEdgeData, EmptyData, MockTetrahedronData>
-		TetrahedronMeshNoVertexOrTriangleData;
-	typedef TetrahedronMesh<EmptyData, MockEdgeData, MockTriangleData, EmptyData>
-		TetrahedronMeshNoVertexOrTetrahedronData;
-	typedef TetrahedronMesh<MockVertexData, EmptyData, EmptyData, MockTetrahedronData>
-		TetrahedronMeshNoEdgeOrTriangleData;
-	typedef TetrahedronMesh<MockVertexData, EmptyData, MockTriangleData, EmptyData>
-		TetrahedronMeshNoEdgeOrTetrahedronData;
-	typedef TetrahedronMesh<MockVertexData, MockEdgeData, EmptyData, EmptyData>
-		TetrahedronMeshNoTriangleOrTetrahedronData;
-	ASSERT_NO_THROW({TetrahedronMeshNoVertexOrEdgeData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshNoVertexOrTriangleData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshNoVertexOrTetrahedronData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshNoEdgeOrTriangleData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshNoEdgeOrTetrahedronData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshNoTriangleOrTetrahedronData mesh;});
-
-	/// Three void entries
-	typedef TetrahedronMesh<EmptyData, EmptyData, EmptyData, MockTetrahedronData> TetrahedronMeshOnlyTetrahedronData;
-	typedef TetrahedronMesh<EmptyData, EmptyData, MockTriangleData, EmptyData> TetrahedronMeshOnlyTriangleData;
-	typedef TetrahedronMesh<EmptyData, MockEdgeData, EmptyData, EmptyData> TetrahedronMeshOnlyEdgeData;
-	typedef TetrahedronMesh<MockVertexData, EmptyData, EmptyData, EmptyData> TetrahedronMeshOnlyVertexData;
-	ASSERT_NO_THROW({TetrahedronMeshOnlyTetrahedronData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshOnlyTriangleData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshOnlyEdgeData mesh;});
-	ASSERT_NO_THROW({TetrahedronMeshOnlyVertexData mesh;});
-
-	/// Four void entries
-	typedef TetrahedronMesh<EmptyData, EmptyData, EmptyData, EmptyData> TetrahedronMeshNoData;
 	ASSERT_NO_THROW({TetrahedronMeshNoData mesh;});
 }
 
