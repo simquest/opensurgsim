@@ -80,6 +80,14 @@ Fem3DRepresentation::~Fem3DRepresentation()
 
 void Fem3DRepresentation::setFem3D(std::shared_ptr<Fem3DTetrahedron> mesh)
 {
+	auto state = std::make_shared<SurgSim::Math::OdeState>();
+	state->setNumDof(getNumDofPerNode(), mesh->getNumVertices());
+	for (size_t i = 0; i < mesh->getNumVertices(); i++)
+	{
+		state->getPositions().segment<3>(getNumDofPerNode() * i) = mesh->getVertexPosition(i);
+	}
+	FemRepresentation::setInitialState(state);
+
 	for (auto tetrahedron : mesh->getTetrahedrons())
 	{
 		auto tetElement = std::make_shared<Fem3DElementTetrahedron>(tetrahedron.verticesId);

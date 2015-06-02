@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
 
 set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
