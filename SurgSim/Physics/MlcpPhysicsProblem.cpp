@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
@@ -30,7 +31,7 @@ void MlcpPhysicsProblem::setZero(size_t numDof, size_t numConstraintDof, size_t 
 {
 	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
 
-	H.setZero(numConstraintDof, numDof);
+	H.resize(numConstraintDof, numDof);
 	CHt.setZero(numDof, numConstraintDof);
 }
 
@@ -62,7 +63,13 @@ void MlcpPhysicsProblem::updateConstraint(
 
 	// Vector newCHt = subC * newSubH;
 	A.col(indexNewSubH) += H.middleCols(indexSubC, newCHt.rows()) * newCHt;
-	H.block(indexNewSubH, indexSubC, 1, newCHt.rows()) += newSubH.transpose();
+
+	// Calculate: H.block(indexNewSubH, indexSubC, 1, newCHt.rows()) += newSubH.transpose();
+	for (Eigen::SparseVector<double>::InnerIterator it(newSubH); it; ++it)
+	{
+		H.coeffRef(indexNewSubH, indexSubC + it.index()) += it.value();
+	}
+
 	CHt.block(indexSubC, indexNewSubH, newCHt.rows(), 1) += newCHt;
 	A.row(indexNewSubH) += newSubH.transpose() * CHt.middleRows(indexSubC, newCHt.rows());
 }
