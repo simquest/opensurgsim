@@ -20,6 +20,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "Modules/VtkUnstructuredFEMReader/loadVtkUnstructuredData.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"
@@ -48,6 +49,9 @@ public:
 
 	/// Destructor
 	virtual ~Fem3DRepresentation();
+
+	/// VTK mesh for Ricardo
+	void setFem3D(std::shared_ptr<Fem3DTetrahedron> mesh);
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 

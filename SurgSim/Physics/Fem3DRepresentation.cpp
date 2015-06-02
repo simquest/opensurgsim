@@ -23,6 +23,7 @@
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -75,6 +76,19 @@ Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 
 Fem3DRepresentation::~Fem3DRepresentation()
 {
+}
+
+void Fem3DRepresentation::setFem3D(std::shared_ptr<Fem3DTetrahedron> mesh)
+{
+	for (auto tetrahedron : mesh->getTetrahedrons())
+	{
+		auto tetElement = std::make_shared<Fem3DElementTetrahedron>(tetrahedron.verticesId);
+		tetElement->setMassDensity(mesh->getMassDensity());
+		tetElement->setPoissonRatio(mesh->getPoissonRatio());
+		tetElement->setYoungModulus(mesh->getYoungModulus());
+
+		addFemElement(tetElement);
+	}
 }
 
 void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
