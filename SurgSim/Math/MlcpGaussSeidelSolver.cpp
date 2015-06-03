@@ -143,8 +143,8 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 			"Convergence criteria (" << *convergenceCriteria << ") is greater than before " << *iteration <<
 			" Gauss Seidel iterations (" << *initialConvergenceCriteria << ").";
 
-	//SURGSIM_LOG_IF(!(*validSignorini), m_logger, WARNING) <<
-	//	"Signorini not verified after " << *iteration << " Gauss Seidel iterations.";
+	SURGSIM_LOG_IF(!(*validSignorini), m_logger, WARNING) <<
+		"Signorini not verified after " << *iteration << " Gauss Seidel iterations.";
 
 	return (SurgSim::Math::isValid(*convergenceCriteria) && *convergenceCriteria <= m_epsilonConvergence);
 }
