@@ -107,7 +107,8 @@ public:
 	/// Computes the system and compliance matrices for a given state
 	/// \param dt The time step
 	/// \param state The state to compute the system and compliance matrices for
-	void computeMatrices(double dt, const OdeState& state);
+	/// \param computeCompliance True to explicitly compute the compliance matrix, False otherwise
+	void computeMatrices(double dt, const OdeState& state, bool computeCompliance = true);
 
 	/// Queries the current system matrix
 	/// \return The latest system matrix calculated

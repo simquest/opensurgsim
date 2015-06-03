@@ -70,7 +70,11 @@ public:
 	virtual Matrix solve(const Matrix& b) const = 0;
 
 	/// \return The linear system's inverse matrix, i.e. the inverse of the matrix provided on the last setMatrix call
-	virtual Matrix getInverse() const = 0;
+	virtual Matrix getInverse() const;
+
+protected:
+	/// A dense copy of the system matrix for use when an inverse is necessary.
+	Matrix m_denseMatrix;
 };
 
 /// Derivation for sparse LU solver
@@ -80,8 +84,6 @@ public:
 	void setMatrix(const SparseMatrix& matrix) override;
 
 	Matrix solve(const Matrix& b) const override;
-
-	Matrix getInverse() const override;
 
 private:
 	Eigen::SparseLU<SparseMatrix> m_solver;
@@ -110,8 +112,6 @@ public:
 	void setMatrix(const SparseMatrix& matrix) override;
 
 	Matrix solve(const Matrix& b) const override;
-
-	Matrix getInverse() const override;
 
 private:
 	Eigen::ConjugateGradient<SparseMatrix> m_solver;

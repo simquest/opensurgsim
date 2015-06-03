@@ -115,7 +115,7 @@ public:
 		totalTime.beginFrame();
 		for (int i = 0; i < frameCount; i++)
 		{
-			fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()));
+			fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()), false);
 		}
 		totalTime.endFrame();
 		RecordProperty("Duration", boost::to_string(totalTime.getCumulativeTime()));
@@ -123,7 +123,7 @@ public:
 
 	void timeComputeLinearSystem(std::shared_ptr<DivisibleCubeRepresentation> fem)
 	{
-		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()));
+		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()), false);
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
 		for (int i = 0; i < frameCount; i++)
@@ -136,7 +136,7 @@ public:
 
 	void timeSolveSystem(std::shared_ptr<DivisibleCubeRepresentation> fem)
 	{
-		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()));
+		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()), false);
 		fem->getOdeSolver()->getLinearSolver()->setMatrix(fem->getOdeSolver()->getSystemMatrix());
 		std::shared_ptr<SurgSim::Math::LinearSparseSolveAndInverseCG> solver =
 			std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(
@@ -160,7 +160,7 @@ public:
 
 	void timeInvertSystem(std::shared_ptr<DivisibleCubeRepresentation> fem)
 	{
-		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()));
+		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()), false);
 		fem->getOdeSolver()->getLinearSolver()->setMatrix(fem->getOdeSolver()->getSystemMatrix());
 		std::shared_ptr<SurgSim::Math::LinearSparseSolveAndInverseCG> solver =
 			std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(
@@ -174,10 +174,9 @@ public:
 
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
-		// Inversion takes a long time. Only do it once.
-		for (int i = 0; i < 1; i++)
+		for (int i = 0; i < frameCount; i++)
 		{
-			fem->getOdeSolver()->getLinearSolver()->getInverse();
+			const auto&  inv = fem->getOdeSolver()->getLinearSolver()->getInverse();
 		}
 		totalTime.endFrame();
 		RecordProperty("Duration", boost::to_string(totalTime.getCumulativeTime()));
