@@ -16,6 +16,7 @@
 #include "SurgSim/Devices/Oculus/OculusDevice.h"
 
 #include "SurgSim/Devices/Oculus/OculusScaffold.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
@@ -25,7 +26,9 @@ namespace Device
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::OculusDevice, OculusDevice);
 
 OculusDevice::OculusDevice(const std::string& name) :
-	SurgSim::Input::CommonDevice(name, OculusScaffold::buildDeviceInputData())
+	SurgSim::Input::CommonDevice(name, OculusScaffold::buildDeviceInputData()),
+	m_nearPlane(0.1f),
+	m_farPlane(10.0f)
 {
 }
 
@@ -61,6 +64,32 @@ bool OculusDevice::finalize()
 bool OculusDevice::isInitialized() const
 {
 	return (m_scaffold != nullptr);
+}
+
+void OculusDevice::setNearPlane(float nearPlane)
+{
+	SURGSIM_ASSERT(nearPlane > 0.0f) << "Can not use a negative near plane.";
+	SURGSIM_LOG_IF(nearPlane > m_farPlane, SurgSim::Framework::Logger::getLogger("Device/OculusDevice"), WARNING) <<
+		__FUNCTION__ << "Trying to set a near plane that is greater than the far plane.";
+	m_nearPlane = nearPlane;
+}
+
+float OculusDevice::getNearPlane() const
+{
+	return m_nearPlane;
+}
+
+void OculusDevice::setFarPlane(float farPlane)
+{
+	SURGSIM_ASSERT(farPlane > 0.0f) << "Can not use a negative far plane.";
+	SURGSIM_LOG_IF(farPlane < m_nearPlane, SurgSim::Framework::Logger::getLogger("Device/OculusDevice"), WARNING) <<
+		__FUNCTION__ << "Trying to set a far plane that is smaller than the near plane.";
+	m_farPlane = farPlane;
+}
+
+float OculusDevice::getFarPlane() const
+{
+	return m_farPlane;
 }
 
 };  // namespace Device

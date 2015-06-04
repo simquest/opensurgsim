@@ -40,7 +40,7 @@ TEST(SolveMlcpTest, CanConstruct)
 	ASSERT_NO_THROW({std::shared_ptr<SolveMlcp> solveMlcpComputation = std::make_shared<SolveMlcp>();});
 }
 
-static void testMlcp(std::string filename, double contactTolerance, double solverPrecision, size_t maxIteration)
+static void testMlcp(const std::string& filename, double contactTolerance, double solverPrecision, size_t maxIteration)
 {
 	std::shared_ptr<MlcpTestData> data = loadTestData(filename);
 	ASSERT_NE(nullptr, data) << "Could not load data file 'mlcpOriginalTest.txt'";

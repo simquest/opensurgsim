@@ -36,8 +36,8 @@
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Mass.h"
+#include "SurgSim/Physics/MassSpringLocalization.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
-#include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
@@ -96,9 +96,9 @@ public:
 	MockRigidRepresentation();
 
 	// Non constant access to the states
-	RigidRepresentationState& getInitialState();
-	RigidRepresentationState& getCurrentState();
-	RigidRepresentationState& getPreviousState();
+	RigidState& getInitialState();
+	RigidState& getCurrentState();
+	RigidState& getPreviousState();
 };
 
 class MockFixedRepresentation : public FixedRepresentation
@@ -107,22 +107,22 @@ public:
 	MockFixedRepresentation();
 
 	// Non constant access to the states
-	RigidRepresentationState& getInitialState();
-	RigidRepresentationState& getCurrentState();
-	RigidRepresentationState& getPreviousState();
+	RigidState& getInitialState();
+	RigidState& getCurrentState();
+	RigidState& getPreviousState();
 };
 
-class MockDeformableRepresentationLocalization : public SurgSim::Physics::Localization
+class MockDeformableLocalization : public SurgSim::Physics::Localization
 {
 public:
-	MockDeformableRepresentationLocalization() {}
+	MockDeformableLocalization(){}
 
-	explicit MockDeformableRepresentationLocalization(std::shared_ptr<Representation> representation) : Localization()
+	explicit MockDeformableLocalization(std::shared_ptr<Representation> representation) : Localization()
 	{
 		setRepresentation(representation);
 	}
 
-	virtual ~MockDeformableRepresentationLocalization() {}
+	virtual ~MockDeformableLocalization(){}
 
 	void setLocalNode(size_t nodeID)
 	{
@@ -259,6 +259,7 @@ class MockFemElement : public FemElement
 {
 public:
 	MockFemElement();
+	explicit MockFemElement(std::vector<size_t> nodeIds);
 
 	void addNode(size_t nodeId);
 
@@ -279,6 +280,7 @@ public:
 	bool isInitialized() const;
 
 private:
+	void init();
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
 	bool m_isInitialized;
@@ -332,11 +334,11 @@ public:
 	bool doInitialize() override;
 };
 
-class MockFixedConstraintBilateral3D : public ConstraintImplementation
+class MockFixedConstraintFixedPoint : public ConstraintImplementation
 {
 public:
-	MockFixedConstraintBilateral3D();
-	virtual ~MockFixedConstraintBilateral3D();
+	MockFixedConstraintFixedPoint();
+	virtual ~MockFixedConstraintFixedPoint();
 
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
@@ -352,11 +354,11 @@ private:
 				 ConstraintSideSign sign) override;
 };
 
-class MockRigidConstraintBilateral3D : public ConstraintImplementation
+class MockRigidConstraintFixedPoint : public ConstraintImplementation
 {
 public:
-	MockRigidConstraintBilateral3D();
-	virtual ~MockRigidConstraintBilateral3D();
+	MockRigidConstraintFixedPoint();
+	virtual ~MockRigidConstraintFixedPoint();
 
 	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 

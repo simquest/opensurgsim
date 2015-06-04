@@ -110,7 +110,7 @@ void integrateRK4(double dt, const MassPoint& m, const RungeKuttaState& yn, Rung
 }
 
 template<class T>
-void doSolveTest()
+void doSolveTest(bool computeCompliance)
 {
 	Vector deltaWithoutViscosity;
 	Vector deltaWithViscosity;
@@ -125,9 +125,8 @@ void doSolveTest()
 		currentState = defaultState;
 		newState = defaultState;
 
-		auto solver = std::make_shared<T>(&m);
-		m.setOdeSolver(solver);
-		ASSERT_NO_THROW({solver->solve(dt, currentState, &newState);});
+		T solver(&m);
+		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState, computeCompliance);});
 		EXPECT_EQ(defaultState, currentState);
 		EXPECT_NE(defaultState, newState);
 
@@ -152,9 +151,8 @@ void doSolveTest()
 		currentState = defaultState;
 		newState = defaultState;
 
-		auto solver = std::make_shared<T>(&m);
-		m.setOdeSolver(solver);
-		ASSERT_NO_THROW({solver->solve(dt, currentState, &newState);});
+		T solver(&m);
+		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState, computeCompliance);});
 		EXPECT_EQ(defaultState, currentState);
 		EXPECT_NE(defaultState, newState);
 
@@ -195,14 +193,14 @@ void doSolveTest()
 
 		// 1st time step
 		integrateRK4(dt, m, yn, &yn_plus_1);
-		ASSERT_NO_THROW({solver->solve(dt, currentState, &newState);});
+		ASSERT_NO_THROW({solver->solve(dt, currentState, &newState, computeCompliance);});
 
 		EXPECT_TRUE(newState.getPositions().isApprox(yn_plus_1.position));
 		EXPECT_TRUE(newState.getVelocities().isApprox(yn_plus_1.velocity));
 
 		// 2nd time step
 		integrateRK4(dt, m, yn_plus_1, &yn_plus_2);
-		ASSERT_NO_THROW({solver->solve(dt, newState, &newState2);});
+		ASSERT_NO_THROW({solver->solve(dt, newState, &newState2, computeCompliance);});
 
 		EXPECT_TRUE(newState2.getPositions().isApprox(yn_plus_2.position));
 		EXPECT_TRUE(newState2.getVelocities().isApprox(yn_plus_2.velocity));
@@ -219,8 +217,7 @@ void doSolveTest()
 		currentState.getVelocities().setConstant(1.0);
 
 		auto solver = std::make_shared<T>(&m);
-		EXPECT_NO_THROW(m.setOdeSolver(solver));
-
+		m.setOdeSolver(solver);
 		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
 		RungeKuttaState yn_plus_1, yn_plus_2;
 
@@ -229,13 +226,13 @@ void doSolveTest()
 
 		// 1st time step
 		integrateRK4(dt, m, yn, &yn_plus_1);
-		ASSERT_NO_THROW({solver->solve(dt, currentState, &newState);});
+		ASSERT_NO_THROW({solver->solve(dt, currentState, &newState, computeCompliance);});
 		EXPECT_TRUE(newState.getPositions().isApprox(yn_plus_1.position));
 		EXPECT_TRUE(newState.getVelocities().isApprox(yn_plus_1.velocity));
 
 		// 2nd time step
 		integrateRK4(dt, m, yn_plus_1, &yn_plus_2);
-		ASSERT_NO_THROW({solver->solve(dt, newState, &newState2);});
+		ASSERT_NO_THROW({solver->solve(dt, newState, &newState2, computeCompliance);});
 		EXPECT_TRUE(newState2.getPositions().isApprox(yn_plus_2.position));
 		EXPECT_TRUE(newState2.getVelocities().isApprox(yn_plus_2.velocity));
 	}
@@ -246,11 +243,20 @@ TEST(OdeSolverRungeKutta4, SolveTest)
 {
 	{
 		SCOPED_TRACE("OdeSolverRungeKutta4 computing the compliance matrix");
-		doSolveTest<OdeSolverRungeKutta4>();
+		doSolveTest<OdeSolverRungeKutta4>(true);
 	}
 	{
+		SCOPED_TRACE("OdeSolverRungeKutta4 not computing the compliance matrix");
+		doSolveTest<OdeSolverRungeKutta4>(false);
+	}
+
+	{
 		SCOPED_TRACE("OdeSolverLinearRungeKutta4 computing the compliance matrix");
-		doSolveTest<OdeSolverLinearRungeKutta4>();
+		doSolveTest<OdeSolverLinearRungeKutta4>(true);
+	}
+	{
+		SCOPED_TRACE("OdeSolverLinearRungeKutta4 not computing the compliance matrix");
+		doSolveTest<OdeSolverLinearRungeKutta4>(false);
 	}
 }
 
@@ -268,9 +274,7 @@ void doComputeMatricesTest()
 	Matrix expectedSystemMatrix = m.computeM(state) / dt;
 	EXPECT_NO_THROW(solver->computeMatrices(dt, state));
 	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));
-	EXPECT_TRUE(m.applyCompliance(state, Matrix::Identity(state.getNumDof(),
-								  state.getNumDof())).isApprox(expectedSystemMatrix.inverse()));
-
+	EXPECT_TRUE(solver->getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
 }
 };
 

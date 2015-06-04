@@ -264,8 +264,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -327,8 +327,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -389,8 +389,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -454,8 +454,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -531,8 +531,8 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		auto fem = std::make_shared<MockFemRepresentation>("fem");
 
 		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
-		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
-		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(fem->setComplianceWarping(true));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
 
 		// Setup the initial state
 		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
@@ -552,15 +552,13 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		fem->wakeUp();
 
-		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
 		// update() will call updateNodesRotations() which will raise an exception in this case.
 		// This method has not been overridden.
-		// This has been disabled. No assertion will be thrown until compliance warping is back
-		// in the code.
-		EXPECT_NO_THROW(fem->update(1e-3));
+		EXPECT_THROW(fem->update(1e-3), SurgSim::Framework::AssertionFailure);
 	}
 
 	{
@@ -568,8 +566,8 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		auto fem = std::make_shared<MockFemRepresentationValidComplianceWarping>("fem");
 
 		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
-		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
-		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(fem->setComplianceWarping(true));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
 
 		// Setup the initial state
 		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
@@ -589,7 +587,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		fem->wakeUp();
 
-		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
@@ -606,9 +604,9 @@ TEST_F(FemRepresentationTests, SerializationTest)
 {
 	auto fem = std::make_shared<MockFemRepresentation>("Test-Fem");
 
-	EXPECT_THROW(fem->setValue("ComplianceWarping", true), SurgSim::Framework::AssertionFailure);
-	EXPECT_FALSE(fem->getComplianceWarping());
-	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));
+	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", true));
+	EXPECT_TRUE(fem->getComplianceWarping());
+	EXPECT_TRUE(fem->getValue<bool>("ComplianceWarping"));
 	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", false));
 	EXPECT_FALSE(fem->getComplianceWarping());
 	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));

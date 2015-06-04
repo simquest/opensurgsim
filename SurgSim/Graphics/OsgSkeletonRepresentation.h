@@ -64,7 +64,7 @@ public:
 
 	/// Set the file containing the skinning shader.
 	/// \param fileName The file containing the skinning shader.
-	void setSkinningShaderFileName(std::string fileName);
+	void setSkinningShaderFileName(const std::string& fileName);
 
 	/// \return The file containing the skinning shader.
 	std::string getSkinningShaderFileName() const;

@@ -1,0 +1,38 @@
+- SurgSim::Framework::BasicSceneElement:
+    Name: View
+    Components:
+      - SurgSim::Blocks::DriveElementFromInputBehavior:
+          Name: Driver
+          Source:
+            SurgSim::Input::InputComponent:
+              Name: Input
+              Id: 9b77c4e2-e9ea-484f-bfca-72121189dcb6
+      - SurgSim::Input::InputComponent:
+          Name: Input
+          Id: 9b77c4e2-e9ea-484f-bfca-72121189dcb6
+          DeviceName: Tracker
+          LocalPose:
+            Quaternion: [0, 0, 0, 1]
+            Translation: [0, 0.5, 2.0]
+      - SurgSim::Graphics::OsgView:
+          Name: View
+          FullScreen: true
+          Dimensions:
+            - 1920
+            - 1080
+          TargetScreen: 2
+          Camera:
+            SurgSim::Graphics::OsgCamera:
+              Id: 9018dd38-c1ae-4e80-a27a-dc24e4b75d35
+              Name: Camera
+          DisplayType: 1
+          StereoMode: 2
+          EyeSeparation: 0.06
+          ScreenHeight: 0.071
+          ScreenDistance: 0.10
+          ScreenWidth: 0.0631
+      - SurgSim::Graphics::OsgCamera:
+          Id: 9018dd38-c1ae-4e80-a27a-dc24e4b75d35
+          Name: Camera
+          ProjectionMatrix: [[0.8390996311772799, 0, 0, 0], [0, 0.8390996311772799, 0, 0], [0, 0, -1.002002002002002, -0.02002002002002002], [0, 0, -1, 0]]
+          RenderGroupReference: __OssDefault__

@@ -29,12 +29,13 @@ OdeSolverLinearRungeKutta4::OdeSolverLinearRungeKutta4(OdeEquation* equation)
 	m_name = "Ode Solver Linear Runge Kutta 4";
 }
 
-void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, OdeState* newState,
+									   bool computeCompliance)
 {
 	if (!m_initialized)
 	{
 		// The compliance matrix is constant and used in all following calls, so we force its calculation on 1st pass.
-		OdeSolverRungeKutta4::solve(dt, currentState, newState);
+		OdeSolverRungeKutta4::solve(dt, currentState, newState, true);
 		m_initialized = true;
 	}
 	else

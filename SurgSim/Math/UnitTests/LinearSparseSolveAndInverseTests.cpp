@@ -93,10 +93,21 @@ private:
 TEST_F(LinearSparseSolveAndInverseTests, SparseLUInitializationTests)
 {
 	SparseMatrix nonSquare(9, 18);
+	SparseMatrix square(18, 18);
 	nonSquare.setZero();
+
+	for (SparseMatrix::Index counter = 0; counter < 18; ++counter)
+	{
+		square.insert(counter, counter) = 1.0;
+	}
+	square.makeCompressed();
 
 	LinearSparseSolveAndInverseLU solveAndInverse;
 	EXPECT_THROW(solveAndInverse.setMatrix(nonSquare), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(solveAndInverse.setMatrix(square));
+
+	clearMatrix(&square);
+	EXPECT_THROW(solveAndInverse.setMatrix(square), SurgSim::Framework::AssertionFailure);
 };
 
 TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
@@ -115,6 +126,75 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseLUMatrixComponentsTest)
 	EXPECT_TRUE(inverseMatrix.isApprox(Matrix::Identity(18, 18)));
 };
 
+TEST_F(LinearSparseSolveAndInverseTests, SparseCGSetGetTests)
+{
+	LinearSparseSolveAndInverseCG solveAndInverse;
+
+	EXPECT_NE(100, solveAndInverse.getMaxIterations());
+	solveAndInverse.setMaxIterations(100);
+	EXPECT_EQ(100, solveAndInverse.getMaxIterations());
+
+	EXPECT_NE(1.0e-03, solveAndInverse.getTolerance());
+	solveAndInverse.setTolerance(1.0e-03);
+	EXPECT_EQ(1.0e-03, solveAndInverse.getTolerance());
+};
+
+TEST_F(LinearSparseSolveAndInverseTests, SparseCGInitializationTests)
+{
+	SparseMatrix nonSquare(9, 18);
+	SparseMatrix square(18, 18);
+	nonSquare.setZero();
+
+	for (SparseMatrix::Index counter = 0; counter < 18; ++counter)
+	{
+		square.insert(counter, counter) = 1.0;
+	}
+	square.makeCompressed();
+
+	LinearSparseSolveAndInverseCG solveAndInverse;
+	EXPECT_THROW(solveAndInverse.setMatrix(nonSquare), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(solveAndInverse.setMatrix(square));
+
+	clearMatrix(&square);
+	EXPECT_NO_THROW(solveAndInverse.setMatrix(square));
+};
+
+TEST_F(LinearSparseSolveAndInverseTests, SparseCGMatrixComponentsTest)
+{
+	setupSparseMatrixTest();
+	double lowPrecision = 1.0e-05;
+	double highPrecision = 1.0e-10;
+
+	LinearSparseSolveAndInverseCG solveAndInverse;
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
+
+	EXPECT_TRUE(x.isApprox(expectedX, lowPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+	EXPECT_FALSE(x.isApprox(expectedX, highPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+
+	inverseMatrix = solveAndInverse.solve(denseMatrix);
+	EXPECT_TRUE(inverseMatrix.isApprox(Matrix::Identity(18, 18), lowPrecision)) << std::endl << "Identity: " <<
+			inverseMatrix << std::endl;
+	EXPECT_FALSE(inverseMatrix.isApprox(Matrix::Identity(18, 18), highPrecision)) << std::endl << "Identity: " <<
+			inverseMatrix << std::endl;
+
+	solveAndInverse.setTolerance(highPrecision);
+	solveAndInverse.setMaxIterations(20);
+	x = solveAndInverse.solve(b);
+	EXPECT_TRUE(x.isApprox(expectedX, lowPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+	EXPECT_FALSE(x.isApprox(expectedX, highPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+
+	solveAndInverse.setMaxIterations(50);
+	x = solveAndInverse.solve(b);
+	EXPECT_TRUE(x.isApprox(expectedX, highPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
+			"Expected: " << expectedX.transpose() << std::endl;
+
+};
 
 }; // namespace Math
 

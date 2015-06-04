@@ -30,7 +30,7 @@ FixedRepresentation::~FixedRepresentation()
 {
 }
 
-void FixedRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
+void FixedRepresentation::updateGlobalInertiaMatrices(const RigidState& state)
 {
 	// Do Nothing it is a fixed object
 }

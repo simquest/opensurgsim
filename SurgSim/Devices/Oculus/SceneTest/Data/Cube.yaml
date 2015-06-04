@@ -1,0 +1,8 @@
+- SurgSim::Framework::BasicSceneElement:
+    Name: Graphics
+    Components:
+      - SurgSim::Graphics::OsgBoxRepresentation:
+          Name: Box
+          Size: [0.1, 0.1, 0.1]
+      - SurgSim::Graphics::OsgAxesRepresentation:
+          Name: Axes
