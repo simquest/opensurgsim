@@ -31,22 +31,27 @@ namespace Physics
 
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementCube, Fem3DElementCube)
 
+Fem3DElementCube::Fem3DElementCube()
+{
+	init();
+}
+
 Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 {
 	init();
-	m_nodeIds.assign( nodeIds.cbegin(), nodeIds.cend());
+	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem3DElementCube::Fem3DElementCube(std::shared_ptr<FemElementStructs::FemElement> elementData)
+void Fem3DElementCube::setData(std::vector<size_t> nodeIds,
+							   std::shared_ptr<FemElementStructs::FemElementParameter> data)
 {
-	init();
-	auto element3DData = std::dynamic_pointer_cast<FemElementStructs::FemElement3D>(elementData);
-	SURGSIM_ASSERT(element3DData != nullptr) << "Incorrect struct type passed";
-	SURGSIM_ASSERT(element3DData->nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
-	m_nodeIds.assign(element3DData->nodeIds.begin(), element3DData->nodeIds.end());
-	setMassDensity(element3DData->massDensity);
-	setPoissonRatio(element3DData->poissonRatio);
-	setYoungModulus(element3DData->youngModulus);
+	auto elementData = std::dynamic_pointer_cast<FemElementStructs::FemElement3DParameter>(data);
+	SURGSIM_ASSERT(elementData != nullptr) << "Incorrect struct type passed";
+	SURGSIM_ASSERT(nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
+	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	setMassDensity(elementData->massDensity);
+	setPoissonRatio(elementData->poissonRatio);
+	setYoungModulus(elementData->youngModulus);
 }
 
 void Fem3DElementCube::init()

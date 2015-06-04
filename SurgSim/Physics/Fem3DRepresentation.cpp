@@ -263,12 +263,35 @@ bool Fem3DRepresentation::doInitialize()
 			std::shared_ptr<FemElement> femElement;
 			if (m_femElementOverrideType.empty())
 			{
-				femElement = FemElement::getFactory().create(element->type, element);
+				femElement = FemElement::getFactory().create(element->data->type);
 			}
 			else
 			{
-				femElement = FemElement::getFactory().create(m_femElementOverrideType, element);
+				femElement = FemElement::getFactory().create(m_femElementOverrideType);
 			}
+
+			std::vector<size_t> nodeIds;
+			nodeIds.assign(element->verticesId.begin(), element->verticesId.end());
+			femElement->setData(nodeIds, element->data);
+
+			m_femElements.push_back(femElement);
+		}
+
+		for (auto& element : m_fem->getCubes())
+		{
+			std::shared_ptr<FemElement> femElement;
+			if (m_femElementOverrideType.empty())
+			{
+				femElement = FemElement::getFactory().create(element->data->type);
+			}
+			else
+			{
+				femElement = FemElement::getFactory().create(m_femElementOverrideType);
+			}
+
+			std::vector<size_t> nodeIds;
+			nodeIds.assign(element->verticesId.begin(), element->verticesId.end());
+			femElement->setData(nodeIds, element->data);
 
 			m_femElements.push_back(femElement);
 		}

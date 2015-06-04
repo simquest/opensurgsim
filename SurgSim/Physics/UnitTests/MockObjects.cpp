@@ -336,10 +336,13 @@ MockFemElement::MockFemElement() : FemElement()
 	init();
 }
 
-MockFemElement::MockFemElement(std::shared_ptr<FemElementStructs::FemElement> elementData) : FemElement()
+void MockFemElement::setData(std::vector<size_t> nodeIds, std::shared_ptr<FemElementStructs::FemElementParameter> data)
 {
-	init();
-	m_nodeIds.assign(elementData->nodeIds.begin(), elementData->nodeIds.end());
+	SURGSIM_ASSERT(nodeIds.size() == 1) << "Incorrect number of nodes for Mock Fem";
+	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	setMassDensity(data->massDensity);
+	setPoissonRatio(data->poissonRatio);
+	setYoungModulus(data->youngModulus);
 }
 
 void MockFemElement::addNode(size_t nodeId)

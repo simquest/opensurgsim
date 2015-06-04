@@ -23,6 +23,7 @@
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
+#include "SurgSim/Physics/Fem.h"
 
 namespace SurgSim
 {
@@ -52,6 +53,8 @@ public:
 	/// Destructor
 	virtual ~FemRepresentation();
 
+	/// Loads the FEM file into an Fem class data structure
+	/// \param filename The file to load
 	virtual void loadFem(const std::string& filename) = 0;
 
 	/// Override the FemElement type pulled from the object factory

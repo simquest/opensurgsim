@@ -41,23 +41,28 @@ namespace Physics
 {
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem2DElementTriangle, Fem2DElementTriangle)
 
+Fem2DElementTriangle::Fem2DElementTriangle()
+{
+	init();
+}
+
 Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds)
 {
 	init();
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem2DElementTriangle::Fem2DElementTriangle(std::shared_ptr<FemElementStructs::FemElement> elementData)
+void Fem2DElementTriangle::setData(std::vector<size_t> nodeIds,
+								   std::shared_ptr<FemElementStructs::FemElementParameter> data)
 {
-	init();
-	auto element2DData = std::dynamic_pointer_cast<FemElementStructs::FemElement2D>(elementData);
-	SURGSIM_ASSERT(element2DData != nullptr) << "Incorrect struct type passed";
-	SURGSIM_ASSERT(element2DData->nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
-	m_nodeIds.assign(element2DData->nodeIds.begin(), element2DData->nodeIds.end());
-	setThickness(element2DData->thickness);
-	setMassDensity(element2DData->massDensity);
-	setPoissonRatio(element2DData->poissonRatio);
-	setYoungModulus(element2DData->youngModulus);
+	auto elementData = std::dynamic_pointer_cast<FemElementStructs::FemElement2DParameter>(data);
+	SURGSIM_ASSERT(elementData != nullptr);
+	SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
+	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	setThickness(elementData->thickness);
+	setMassDensity(elementData->massDensity);
+	setPoissonRatio(elementData->poissonRatio);
+	setYoungModulus(elementData->youngModulus);
 }
 
 void Fem2DElementTriangle::setThickness(double thickness)

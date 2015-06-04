@@ -42,6 +42,9 @@ class Fem3DElementCube : public FemElement
 {
 public:
 	/// Constructor
+	Fem3DElementCube();
+
+	/// Constructor
 	/// \param nodeIds An array of 8 node ids defining this cube element in an overall mesh
 	/// \note It is required that getVolume() is positive, to do so, it needs (looking at the cube from
 	/// \note the exterior, face normal 'n' pointing outward):
@@ -51,18 +54,11 @@ public:
 	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
 	explicit Fem3DElementCube(std::array<size_t, 8> nodeIds);
 
-	/// Constructor for FemElement object factory
-	/// \param elementData A FemElement3D struct defining this cube element in an overall mesh
-	/// \note It is required that getVolume() is positive, to do so, it needs (looking at the cube from
-	/// \note the exterior, face normal 'n' pointing outward):
-	/// \note   the 1st  4 nodeIds (ABCD) should define any face CW            i.e. (AB^AC or AB^AD or AC^AD).n < 0
-	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
-	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
-	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
-	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 8
-	explicit Fem3DElementCube(std::shared_ptr<FemElementStructs::FemElement> elementData);
-
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementCube)
+
+	/// Set the element data
+	/// \param data A MeshElement that conatins all required Fem3D data
+	void setData(std::vector<size_t> nodeIds, std::shared_ptr<FemElementStructs::FemElementParameter> data) override;
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with

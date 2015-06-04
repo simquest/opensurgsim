@@ -218,75 +218,88 @@ TEST(FemElementTests, IsValidCoordinate)
 
 TEST(FemElementTests, FactoryTest)
 {
-	auto mockElement = std::make_shared<FemElementStructs::FemElement>();
-	mockElement->nodeIds.push_back(2);
+	std::vector<size_t> nodeIds;
+
+	// Mock Element
+	std::array<size_t, 1> mockNodes = {2};
+	auto mockData = std::make_shared<FemElementStructs::FemElementParameter>();
+	mockData->massDensity = 0.5;
+	mockData->poissonRatio = 0.5;
+	mockData->youngModulus = 0.5;
+	auto mockElement = std::make_shared<SurgSim::DataStructures::MeshElement<1,
+			std::shared_ptr<FemElementStructs::FemElementParameter>>>(mockNodes, mockData);
 	FemElement::getFactory().registerClass<MockFemElement>("MockFemElement");
-	auto mockFem = FemElement::getFactory().create("MockFemElement", mockElement);
+	auto mockFem = FemElement::getFactory().create("MockFemElement");
 	EXPECT_NE(nullptr, mockFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<MockFemElement>(mockFem));
+	nodeIds.assign(mockElement->verticesId.begin(), mockElement->verticesId.end());
+	EXPECT_NO_THROW(mockFem->setData(nodeIds, mockElement->data));
 
-	auto beamElement = std::make_shared<FemElementStructs::FemElement1D>();
-	beamElement->nodeIds.push_back(1);
-	beamElement->nodeIds.push_back(2);
-	beamElement->radius = 0.4;
-	beamElement->enableShear = false;
-	beamElement->massDensity = 0.4;
-	beamElement->poissonRatio = 0.4;
-	beamElement->youngModulus = 0.4;
-	auto beamFem = FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam", beamElement);
+	// Beam Element
+	std::array<size_t, 2> beamNodes = {1, 2};
+	auto beamData = std::make_shared<FemElementStructs::FemElement1DParameter>();
+	beamData->radius = 0.4;
+	beamData->enableShear = false;
+	beamData->massDensity = 0.4;
+	beamData->poissonRatio = 0.4;
+	beamData->youngModulus = 0.4;
+	auto beamElement = std::make_shared<BeamType>(beamNodes, beamData);
+	auto beamFem = FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam");
 	EXPECT_NE(nullptr, beamFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem1DElementBeam>(beamFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam", mockElement));
+	nodeIds.clear();
+	nodeIds.assign(beamElement->verticesId.begin(), beamElement->verticesId.end());
+	EXPECT_NO_THROW(beamFem->setData(nodeIds, beamElement->data));
 
-	auto triElement = std::make_shared<FemElementStructs::FemElement2D>();
-	triElement->nodeIds.push_back(1);
-	triElement->nodeIds.push_back(2);
-	triElement->nodeIds.push_back(3);
-	triElement->thickness = 0.4;
-	triElement->massDensity = 0.4;
-	triElement->poissonRatio = 0.4;
-	triElement->youngModulus = 0.4;
-	auto triFem = FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle", triElement);
+	// Triangle Element
+	std::array<size_t, 3> triNodes = {1, 2, 3};
+	auto triData = std::make_shared<FemElementStructs::FemElement2DParameter>();
+	triData->thickness = 0.4;
+	triData->massDensity = 0.4;
+	triData->poissonRatio = 0.4;
+	triData->youngModulus = 0.4;
+	auto triElement = std::make_shared<TriangleType>(triNodes, triData);
+	auto triFem = FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle");
 	EXPECT_NE(nullptr, triFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem2DElementTriangle>(triFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle", beamElement));
+	nodeIds.clear();
+	nodeIds.assign(triElement->verticesId.begin(), triElement->verticesId.end());
+	EXPECT_NO_THROW(triFem->setData(nodeIds, triElement->data));
 
-	auto tetElement = std::make_shared<FemElementStructs::FemElement3D>();
-	tetElement->nodeIds.push_back(1);
-	tetElement->nodeIds.push_back(2);
-	tetElement->nodeIds.push_back(3);
-	tetElement->nodeIds.push_back(1);
-	tetElement->massDensity = 0.4;
-	tetElement->poissonRatio = 0.4;
-	tetElement->youngModulus = 0.4;
-	auto coTetFem = FemElement::getFactory().create(
-				"SurgSim::Physics::Fem3DElementCorotationalTetrahedron", tetElement);
-	EXPECT_NE(nullptr, coTetFem);
-	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCorotationalTetrahedron>(coTetFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create(
-		"SurgSim::Physics::Fem3DElementCorotationalTetrahedron", triElement));
-
-	auto cubeElement = std::make_shared<FemElementStructs::FemElement3D>();
-	cubeElement->nodeIds.push_back(1);
-	cubeElement->nodeIds.push_back(2);
-	cubeElement->nodeIds.push_back(3);
-	cubeElement->nodeIds.push_back(4);
-	cubeElement->nodeIds.push_back(5);
-	cubeElement->nodeIds.push_back(6);
-	cubeElement->nodeIds.push_back(7);
-	cubeElement->nodeIds.push_back(8);
-	cubeElement->massDensity = 0.4;
-	cubeElement->poissonRatio = 0.4;
-	cubeElement->youngModulus = 0.4;
-	auto cubeFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCube", cubeElement);
-	EXPECT_NE(nullptr, cubeFem);
-	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCube>(cubeFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCube", tetElement));
-
-	auto tetFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementTetrahedron", tetElement);
+	// Tetrahedron and Corotational Tet Elements
+	std::array<size_t, 4> tetNodes = {1, 2, 3, 1};
+	auto tetData = std::make_shared<FemElementStructs::FemElement3DParameter>();
+	tetData->massDensity = 0.4;
+	tetData->poissonRatio = 0.4;
+	tetData->youngModulus = 0.4;
+	auto tetElement = std::make_shared<TetrahedronType>(tetNodes, tetData);
+	auto tetFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementTetrahedron");
 	EXPECT_NE(nullptr, tetFem);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementTetrahedron>(tetFem));
-	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem3DElementTetrahedron", cubeElement));
+	nodeIds.clear();
+	nodeIds.assign(tetElement->verticesId.begin(), tetElement->verticesId.end());
+	EXPECT_NO_THROW(tetFem->setData(nodeIds, tetElement->data));
+	auto coTetFem = FemElement::getFactory().create(
+				"SurgSim::Physics::Fem3DElementCorotationalTetrahedron");
+	EXPECT_NE(nullptr, coTetFem);
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCorotationalTetrahedron>(coTetFem));
+	nodeIds.clear();
+	nodeIds.assign(tetElement->verticesId.begin(), tetElement->verticesId.end());
+	EXPECT_NO_THROW(coTetFem->setData(nodeIds, tetElement->data));
+
+	// Cube Element
+	std::array<size_t, 8> cubeNodes = {1, 2, 3, 4, 5, 6, 7, 8};
+	auto cubeData = std::make_shared<FemElementStructs::FemElement3DParameter>();
+	cubeData->massDensity = 0.4;
+	cubeData->poissonRatio = 0.4;
+	cubeData->youngModulus = 0.4;
+	auto cubeElement = std::make_shared<CubeType>(cubeNodes, cubeData);
+	auto cubeFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCube");
+	EXPECT_NE(nullptr, cubeFem);
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCube>(cubeFem));
+	nodeIds.clear();
+	nodeIds.assign(cubeElement->verticesId.begin(), cubeElement->verticesId.end());
+	EXPECT_NO_THROW(cubeFem->setData(nodeIds, cubeElement->data));
 }
 
 } // namespace Physics

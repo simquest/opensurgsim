@@ -191,10 +191,11 @@ void Fem2DPlyReaderDelegate::processFemElement(const std::string& elementName)
 	SURGSIM_ASSERT(m_elementData.vertexCount == 3) << "Cannot process 2D Element with "
 		<< m_elementData.vertexCount << " vertices.";
 
-	auto femElement = std::make_shared<FemElementStructs::FemElement2D>();
-	femElement->type = "SurgSim::Physics::Fem2DElementTriangle";
-	femElement->nodeIds.resize(m_elementData.vertexCount);
-	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
+	std::array<size_t, 3> nodes;
+	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, nodes.data());
+	auto data = std::make_shared<FemElementStructs::FemElement2DParameter>();
+	data->type = "SurgSim::Physics::Fem2DElementTriangle";
+	auto femElement = std::make_shared<TriangleType>(nodes, data);
 	m_mesh->addElement(femElement);
 }
 
@@ -244,10 +245,10 @@ void Fem2DPlyReaderDelegate::endFile()
 {
 	for(auto element : m_mesh->getElements())
 	{
-		element->thickness = m_thickness;
-		element->massDensity = m_materialData.massDensity;
-		element->poissonRatio = m_materialData.poissonRatio;
-		element->youngModulus = m_materialData.youngModulus;
+		element->data->thickness = m_thickness;
+		element->data->massDensity = m_materialData.massDensity;
+		element->data->poissonRatio = m_materialData.poissonRatio;
+		element->data->youngModulus = m_materialData.youngModulus;
 	}
 	m_mesh->update();
 }

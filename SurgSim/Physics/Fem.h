@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_FEM_H
 
 #include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 
 using SurgSim::DataStructures::EmptyData;
@@ -39,37 +40,40 @@ struct RotationVectorData
 	double thetaZ;
 };
 
+// These 3 structs are to differentiate for m_classname in TriangleMesh
 struct Fem1DVectorData : public RotationVectorData{};
-
 struct Fem2DVectorData : public RotationVectorData{};
-
 struct Fem3DVectorData : public RotationVectorData{};
 
-struct FemElement
+struct FemElementParameter
 {
-	virtual ~FemElement(){}
+	virtual ~FemElementParameter(){}
 
 	std::string type;   // “LinearBeam”, “CorotationalTetrahedron”…
 
-	std::vector<size_t> nodeIds;
 	double youngModulus;
 	double poissonRatio;
 	double massDensity;
 };
 
-struct FemElement1D : public FemElement
+struct FemElement1DParameter : public FemElementParameter
 {
 	double radius;
 	bool enableShear;
 };
 
-struct FemElement2D : public FemElement
+struct FemElement2DParameter : public FemElementParameter
 {
 	double thickness;
 };
 
-struct FemElement3D : public FemElement {};
+struct FemElement3DParameter : public FemElementParameter {};
 } // namespace FemElementStructs
+
+typedef SurgSim::DataStructures::MeshElement<2, std::shared_ptr<FemElementStructs::FemElement1DParameter>> BeamType;
+typedef SurgSim::DataStructures::MeshElement<3, std::shared_ptr<FemElementStructs::FemElement2DParameter>> TriangleType;
+typedef SurgSim::DataStructures::MeshElement<4, std::shared_ptr<FemElementStructs::FemElement3DParameter>> TetrahedronType;
+typedef SurgSim::DataStructures::MeshElement<8, std::shared_ptr<FemElementStructs::FemElement3DParameter>> CubeType;
 
 /// Base class for a data structure for holding FEM mesh data of different dimensions
 ///
@@ -129,8 +133,7 @@ protected:
 
 /// Fem class data structure implementation for 1-Dimensional FEMs
 /// \sa Fem
-class Fem1D : public Fem<FemElementStructs::Fem1DVectorData,
-		EmptyData, EmptyData, FemElementStructs::FemElement1D>
+class Fem1D : public Fem<FemElementStructs::Fem1DVectorData, EmptyData, EmptyData, BeamType>
 {
 public:
 	Fem1D();
@@ -142,8 +145,7 @@ protected:
 
 /// Fem class data structure implementation for 2-Dimensional FEMs
 /// \sa Fem
-class Fem2D : public Fem<FemElementStructs::Fem2DVectorData,
-		EmptyData, EmptyData, FemElementStructs::FemElement2D>
+class Fem2D : public Fem<FemElementStructs::Fem2DVectorData, EmptyData, EmptyData, TriangleType>
 {
 public:
 	Fem2D();
@@ -155,15 +157,27 @@ protected:
 
 /// Fem class data structure implementation for 3-Dimensional FEMs
 /// \sa Fem
-class Fem3D : public Fem<FemElementStructs::Fem3DVectorData, EmptyData, EmptyData,
-		FemElementStructs::FemElement3D>
+class Fem3D : public Fem<FemElementStructs::Fem3DVectorData, EmptyData, EmptyData, TetrahedronType>
 {
 public:
 	Fem3D();
 
+	size_t addCube(std::shared_ptr<CubeType> cube);
+
+	size_t getNumCubes() const;
+
+	const std::vector<std::shared_ptr<CubeType> >& getCubes() const;
+	std::vector<std::shared_ptr<CubeType>>& getCubes();
+
+	std::shared_ptr<CubeType> getCube(size_t id) const;
+
+	void removeCube(size_t id);
+
 protected:
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
+
+	std::vector<std::shared_ptr<CubeType>> m_cubeElements;
 };
 
 } // namespace DataStructures

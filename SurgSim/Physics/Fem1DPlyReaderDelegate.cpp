@@ -191,10 +191,11 @@ void Fem1DPlyReaderDelegate::processFemElement(const std::string& elementName)
 	SURGSIM_ASSERT(m_elementData.vertexCount == 2) << "Cannot process 1D Element with "
 		<< m_elementData.vertexCount << " vertices.";
 
-	auto femElement = std::make_shared<FemElementStructs::FemElement1D>();
-	femElement->type = "SurgSim::Physics::Fem1DElementBeam";
-	femElement->nodeIds.resize(m_elementData.vertexCount);
-	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
+	std::array<size_t, 2> nodes;
+	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, nodes.data());
+	auto data = std::make_shared<FemElementStructs::FemElement1DParameter>();
+	data->type = "SurgSim::Physics::Fem1DElementBeam";
+	auto femElement = std::make_shared<BeamType>(nodes, data);
 	m_mesh->addElement(femElement);
 }
 
@@ -244,11 +245,11 @@ void Fem1DPlyReaderDelegate::endFile()
 {
 	for(auto element : m_mesh->getElements())
 	{
-		element->radius = m_radius;
-		element->enableShear = m_enableShear;
-		element->massDensity = m_materialData.massDensity;
-		element->poissonRatio = m_materialData.poissonRatio;
-		element->youngModulus = m_materialData.youngModulus;
+		element->data->radius = m_radius;
+		element->data->enableShear = m_enableShear;
+		element->data->massDensity = m_materialData.massDensity;
+		element->data->poissonRatio = m_materialData.poissonRatio;
+		element->data->youngModulus = m_materialData.youngModulus;
 	}
 	m_mesh->update();
 }

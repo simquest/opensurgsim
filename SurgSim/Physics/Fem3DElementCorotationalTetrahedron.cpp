@@ -29,14 +29,13 @@ namespace Physics
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementCorotationalTetrahedron,
 				 Fem3DElementCorotationalTetrahedron)
 
-Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds) :
-	Fem3DElementTetrahedron(nodeIds)
+Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron() :
+	Fem3DElementTetrahedron()
 {
 }
 
-Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(
-		std::shared_ptr<FemElementStructs::FemElement> elementData) :
-	Fem3DElementTetrahedron(elementData)
+Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds) :
+	Fem3DElementTetrahedron(nodeIds)
 {
 }
 

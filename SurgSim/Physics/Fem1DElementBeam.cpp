@@ -32,24 +32,29 @@ namespace Physics
 {
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem1DElementBeam, Fem1DElementBeam)
 
+Fem1DElementBeam::Fem1DElementBeam()
+{
+	init();
+}
+
 Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds)
 {
 	init();
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem1DElementBeam::Fem1DElementBeam(std::shared_ptr<FemElementStructs::FemElement> elementData)
+void Fem1DElementBeam::setData(std::vector<size_t> nodeIds,
+							   std::shared_ptr<FemElementStructs::FemElementParameter> data)
 {
-	init();
-	auto element1DData = std::dynamic_pointer_cast<FemElementStructs::FemElement1D>(elementData);
-	SURGSIM_ASSERT(element1DData != nullptr) << "Incorrect struct type passed";
-	SURGSIM_ASSERT(element1DData->nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
-	m_nodeIds.assign(element1DData->nodeIds.begin(), element1DData->nodeIds.end());
-	setShearingEnabled(element1DData->enableShear);
-	setRadius(element1DData->radius);
-	setMassDensity(element1DData->massDensity);
-	setPoissonRatio(element1DData->poissonRatio);
-	setYoungModulus(element1DData->youngModulus);
+	auto elementData = std::dynamic_pointer_cast<FemElementStructs::FemElement1DParameter>(data);
+	SURGSIM_ASSERT(elementData != nullptr);
+	SURGSIM_ASSERT(nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
+	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	setShearingEnabled(elementData->enableShear);
+	setRadius(elementData->radius);
+	setMassDensity(elementData->massDensity);
+	setPoissonRatio(elementData->poissonRatio);
+	setYoungModulus(elementData->youngModulus);
 }
 
 void Fem1DElementBeam::setRadius(double radius)
