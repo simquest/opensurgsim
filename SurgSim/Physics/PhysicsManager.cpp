@@ -132,10 +132,10 @@ bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::
 
 bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-	bool removed1 = tryRemoveComponent(component, &m_representations);
-	bool removed2 = tryRemoveComponent(component, &m_collisionRepresentations);
-	bool removed3 = tryRemoveComponent(component, &m_constraintComponents);
-	return removed1 || removed2 || removed3;
+	return tryRemoveComponent(component, &m_representations) ||
+		tryRemoveComponent(component, &m_collisionRepresentations) ||
+		tryRemoveComponent(component, &m_constraintComponents) ||
+		tryRemoveComponent(component, &m_particleRepresentations);
 }
 
 bool PhysicsManager::doUpdate(double dt)
