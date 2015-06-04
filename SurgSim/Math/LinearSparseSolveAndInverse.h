@@ -74,7 +74,7 @@ public:
 
 protected:
 	/// A dense copy of the system matrix for use when an inverse is necessary.
-	Matrix m_denseMatrix;
+	SparseMatrix m_matrix;
 };
 
 /// Derivation for sparse LU solver
