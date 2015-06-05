@@ -265,7 +265,7 @@ void FemRepresentation::update(double dt)
 	{
 		if (!m_isInitialComplianceMatrixComputed)
 		{
-			m_odeSolver->computeMatrices(dt, *m_initialState);
+			m_odeSolver->computeMatrices(dt, *m_initialState, true);
 			m_isInitialComplianceMatrixComputed = true;
 		}
 		m_odeSolver->solve(dt, *m_currentState, m_newState.get(), false);
