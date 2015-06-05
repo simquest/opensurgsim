@@ -20,18 +20,12 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
+#include "SurgSim/Physics/Fem.h"
 
 namespace SurgSim
 {
-
-namespace Math
-{
-class OdeState;
-};
-
 namespace Physics
 {
-class FemRepresentation;
 
 /// Common part of implementation of PlyReaderDelegate for FemRepresentations.
 /// This is an abstract class and needs to be inherited.
@@ -40,8 +34,7 @@ class FemPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
 	/// Constructor
-	/// \param fem The object that is updated when PlyReader::parseFile is called.
-	explicit FemPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem);
+	FemPlyReaderDelegate();
 
 protected:
 	// \return Name of the element (1/2/3D), which this delegate processes.
@@ -50,25 +43,22 @@ protected:
 	bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
 	bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
 
-	/// Callback for beginning of PlyReader::parseFile.
-	void startParseFile();
-
 	/// Callback for end of PlyReader::parseFile.
-	virtual void endParseFile();
+	virtual void endParseFile() = 0;
 
 	/// Callback function, begin the processing of vertices.
 	/// \param elementName Name of the element.
 	/// \param vertexCount Number of vertices.
 	/// \return memory for vertex data to the reader.
-	void* beginVertices(const std::string& elementName, size_t vertexCount);
+	virtual void* beginVertices(const std::string& elementName, size_t vertexCount) = 0;
 
 	/// Callback function to process one vertex.
 	/// \param elementName Name of the element.
-	void processVertex(const std::string& elementName);
+	virtual void processVertex(const std::string& elementName) = 0;
 
 	/// Callback function to finalize processing of vertices.
 	/// \param elementName Name of the element.
-	void endVertices(const std::string& elementName);
+	virtual void endVertices(const std::string& elementName) = 0;
 
 	/// Callback function, begin the processing of FemElements.
 	/// \param elementName Name of the element.
@@ -102,26 +92,14 @@ protected:
 
 	/// Callback function to process one boundary condition.
 	/// \param elementName Name of the element.
-	void processBoundaryCondition(const std::string& elementName);
+	virtual void processBoundaryCondition(const std::string& elementName) = 0;
 
 protected:
 	/// Flag indicating if the associated file has boundary conditions
 	bool m_hasBoundaryConditions;
 
 	/// Internal data to receive the "boundary_condition" element
-	size_t m_boundaryConditionData;
-
-	/// Internal iterator to save the "vertex" element
-	double* m_vertexIterator;
-
-	/// Internal data to receive the "vertex" element
-	std::array<double, 3> m_vertexData;
-
-	/// The fem that will be created by loading
-	std::shared_ptr<FemRepresentation> m_fem;
-
-	/// The state that will be created by loading
-	std::shared_ptr<SurgSim::Math::OdeState> m_state;
+	unsigned int m_boundaryConditionData;
 
 	/// Internal data to receive the "material" data
 	struct MaterialData
@@ -135,12 +113,13 @@ protected:
 	/// Internal data to receive the fem element
 	struct ElementData
 	{
-		ElementData();
+		unsigned int type;   // “LinearBeam”, “CorotationalTetrahedron”…
+		int64_t overrun1; ///< Used to check for buffer overruns
 
 		unsigned int* indices;
 		unsigned int vertexCount;
-		int64_t overrun; ///< Used to check for buffer overruns
-	} m_femData;
+		int64_t overrun2; ///< Used to check for buffer overruns
+	} m_elementData;
 };
 
 } // namespace Physics

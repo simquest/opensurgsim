@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/Valid.h"
+#include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 
 
@@ -26,7 +27,6 @@ namespace Physics
 
 Fem1DPlyReaderDelegate::Fem1DPlyReaderDelegate()
 {
-
 }
 
 Fem1DPlyReaderDelegate::Fem1DPlyReaderDelegate(std::shared_ptr<Fem1D> mesh) :
@@ -34,6 +34,11 @@ Fem1DPlyReaderDelegate::Fem1DPlyReaderDelegate(std::shared_ptr<Fem1D> mesh) :
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "The mesh cannot be null.";
 	mesh->clear();
+}
+
+std::string Fem1DPlyReaderDelegate::getElementName() const
+{
+	return "1d_element";
 }
 
 bool Fem1DPlyReaderDelegate::registerDelegate(PlyReader* reader)
@@ -48,26 +53,6 @@ bool Fem1DPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, y));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, z));
 
-	// Element Processing
-	reader->requestElement(
-		"1d_element",
-		std::bind(&Fem1DPlyReaderDelegate::beginFemElements,
-		this,
-		std::placeholders::_1,
-		std::placeholders::_2),
-		std::bind(&Fem1DPlyReaderDelegate::processFemElement, this, std::placeholders::_1),
-		std::bind(&Fem1DPlyReaderDelegate::endFemElements, this, std::placeholders::_1));
-	reader->requestListProperty("1d_element",
-		"vertex_indices",
-		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(FemElement1D, indices),
-		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(FemElement1D, vertexCount));
-
-	// 6DOF processing
-	m_hasRotationDOF = reader->hasProperty("vertex", "thetaX") && reader->hasProperty("vertex", "thetaY") &&
-							  reader->hasProperty("vertex", "thetaZ");
-
 	if (m_hasRotationDOF)
 	{
 		reader->requestScalarProperty("vertex", "thetaX", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaX));
@@ -75,25 +60,7 @@ bool Fem1DPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		reader->requestScalarProperty("vertex", "thetaZ", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaZ));
 	}
 
-	// Boundary Condition processing
-
-	m_hasBoundaryConditions = reader->hasProperty("boundary_condition", "vertex_index");
-
-	if (m_hasBoundaryConditions)
-	{
-		reader->requestElement(
-			"boundary_condition",
-			std::bind(&Fem1DPlyReaderDelegate::beginBoundaryConditions,
-			this,
-			std::placeholders::_1,
-			std::placeholders::_2),
-			std::bind(&Fem1DPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
-			nullptr);
-		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
-	}
-
 	// Radius Processing
-
 	reader->requestElement(
 		"radius",
 		std::bind(
@@ -102,45 +69,35 @@ bool Fem1DPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		std::bind(&Fem1DPlyReaderDelegate::endRadius, this, std::placeholders::_1));
 	reader->requestScalarProperty("radius", "value", PlyReader::TYPE_DOUBLE, 0);
 
-	// Material processing
-
-	reader->requestElement(
-		"material",
-		std::bind(
-			&Fem1DPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
-		nullptr,
-		std::bind(&Fem1DPlyReaderDelegate::endMaterials, this, std::placeholders::_1));
-	reader->requestScalarProperty("material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(Material, massDensity));
-	reader->requestScalarProperty("material", "poisson_ratio",
-								  PlyReader::TYPE_DOUBLE, offsetof(Material, poissonRatio));
-	reader->requestScalarProperty("material", "young_modulus",
-								  PlyReader::TYPE_DOUBLE, offsetof(Material, youngModulus));
-
-	reader->setEndParseFileCallback(std::bind(&Fem1DPlyReaderDelegate::endFile, this));
+	FemPlyReaderDelegate::registerDelegate(reader);
 
 	return true;
 }
 
 bool Fem1DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
-	bool result = true;
+	bool result = FemPlyReaderDelegate::fileIsAcceptable(reader);
 
-	// Shortcut test if one fails ...
-	result = result && reader.hasProperty("vertex", "x");
-	result = result && reader.hasProperty("vertex", "y");
-	result = result && reader.hasProperty("vertex", "z");
-
-	//result = result && reader.hasProperty("1d_element", "type");
-	result = result && reader.hasProperty("1d_element", "vertex_indices");
-	result = result && !reader.isScalar("1d_element", "vertex_indices");
+	// 6DOF processing
+	m_hasRotationDOF = reader.hasProperty("vertex", "thetaX") && reader.hasProperty("vertex", "thetaY") &&
+							  reader.hasProperty("vertex", "thetaZ");
 
 	result = result && reader.hasProperty("radius", "value");
 
-	result = result && reader.hasProperty("material", "mass_density");
-	result = result && reader.hasProperty("material", "poisson_ratio");
-	result = result && reader.hasProperty("material", "young_modulus");
-
 	return result;
+}
+
+void Fem1DPlyReaderDelegate::endParseFile()
+{
+	for(auto element : m_mesh->getElements())
+	{
+		element->data->radius = m_radius;
+		element->data->enableShear = m_enableShear;
+		element->data->massDensity = m_materialData.massDensity;
+		element->data->poissonRatio = m_materialData.poissonRatio;
+		element->data->youngModulus = m_materialData.youngModulus;
+	}
+	m_mesh->update();
 }
 
 void* Fem1DPlyReaderDelegate::beginVertices(const std::string &elementName, size_t vertexCount)
@@ -152,7 +109,7 @@ void* Fem1DPlyReaderDelegate::beginVertices(const std::string &elementName, size
 
 void Fem1DPlyReaderDelegate::processVertex(const std::string& elementName)
 {
-	FemElementStructs::Fem1DVectorData data;
+	FemElementStructs::RotationVectorData data;
 
 	if (m_hasRotationDOF)
 	{
@@ -179,13 +136,6 @@ void Fem1DPlyReaderDelegate::endVertices(const std::string &elementName)
 			"has become corrupted.";
 }
 
-void* Fem1DPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
-{
-	m_elementData.overrun1 = 0l;
-	m_elementData.overrun2 = 0l;
-	return &m_elementData;
-}
-
 void Fem1DPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_elementData.vertexCount == 2) << "Cannot process 1D Element with "
@@ -194,17 +144,10 @@ void Fem1DPlyReaderDelegate::processFemElement(const std::string& elementName)
 	std::array<size_t, 2> nodes;
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, nodes.data());
 	auto data = std::make_shared<FemElementStructs::FemElement1DParameter>();
-	data->type = "SurgSim::Physics::Fem1DElementBeam";
+	static Fem1DElementBeam beam;
+	data->type = beam.getClassName();
 	auto femElement = std::make_shared<BeamType>(nodes, data);
 	m_mesh->addElement(femElement);
-}
-
-void Fem1DPlyReaderDelegate::endFemElements(const std::string& elementName)
-{
-	SURGSIM_ASSERT(m_elementData.overrun1 == 0 && m_elementData.overrun2 == 0) <<
-		"There was an overrun while reading the element structures, it is likely that data " <<
-		"has become corrupted.";
-	m_elementData.indices = nullptr;
 }
 
 void* Fem1DPlyReaderDelegate::beginRadius(const std::string& elementName, size_t radiusCount)
@@ -217,41 +160,9 @@ void Fem1DPlyReaderDelegate::endRadius(const std::string &elementName)
 	SURGSIM_ASSERT(SurgSim::Math::isValid(m_radius)) << "No radius information processed.";
 }
 
-void* Fem1DPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
-{
-	m_materialData.overrun = 0l;
-	return &m_materialData;
-}
-
-void Fem1DPlyReaderDelegate::endMaterials(const std::string& elementName)
-{
-	SURGSIM_ASSERT(m_materialData.overrun == 0) <<
-		"There was an overrun while reading the material structures, it is likely that data " <<
-		"has become corrupted.";
-}
-
-void* Fem1DPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
-																  size_t boundaryConditionCount)
-{
-	return &m_boundaryConditionData;
-}
-
 void Fem1DPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
 	m_mesh->addBoundaryCondition(static_cast<size_t>(m_boundaryConditionData));
-}
-
-void Fem1DPlyReaderDelegate::endFile()
-{
-	for(auto element : m_mesh->getElements())
-	{
-		element->data->radius = m_radius;
-		element->data->enableShear = m_enableShear;
-		element->data->massDensity = m_materialData.massDensity;
-		element->data->poissonRatio = m_materialData.poissonRatio;
-		element->data->youngModulus = m_materialData.youngModulus;
-	}
-	m_mesh->update();
 }
 
 } // namespace Physics

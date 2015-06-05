@@ -40,11 +40,6 @@ struct RotationVectorData
 	double thetaZ;
 };
 
-// These 3 structs are to differentiate for m_classname in TriangleMesh
-struct Fem1DVectorData : public RotationVectorData{};
-struct Fem2DVectorData : public RotationVectorData{};
-struct Fem3DVectorData : public RotationVectorData{};
-
 struct FemElementParameter
 {
 	virtual ~FemElementParameter(){}
@@ -71,8 +66,10 @@ struct FemElement3DParameter : public FemElementParameter {};
 } // namespace FemElementStructs
 
 typedef SurgSim::DataStructures::MeshElement<2, std::shared_ptr<FemElementStructs::FemElement1DParameter>> BeamType;
-typedef SurgSim::DataStructures::MeshElement<3, std::shared_ptr<FemElementStructs::FemElement2DParameter>> TriangleType;
-typedef SurgSim::DataStructures::MeshElement<4, std::shared_ptr<FemElementStructs::FemElement3DParameter>> TetrahedronType;
+typedef SurgSim::DataStructures::MeshElement<3,
+						std::shared_ptr<FemElementStructs::FemElement2DParameter>> TriangleType;
+typedef SurgSim::DataStructures::MeshElement<4,
+						std::shared_ptr<FemElementStructs::FemElement3DParameter>> TetrahedronType;
 typedef SurgSim::DataStructures::MeshElement<8, std::shared_ptr<FemElementStructs::FemElement3DParameter>> CubeType;
 
 /// Base class for a data structure for holding FEM mesh data of different dimensions
@@ -87,8 +84,9 @@ typedef SurgSim::DataStructures::MeshElement<8, std::shared_ptr<FemElementStruct
 /// \tparam	TriangleData	Type of extra data stored in each triangle
 /// \tparam Element		Type of FEM element the mesh will be storing
 /// \sa	TriangleMesh
-template <class VertexData, class EdgeData, class TriangleData, class Element>
-class Fem : public SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>
+template <class VertexData, class Element>
+class Fem : public SurgSim::DataStructures::Vertices<VertexData>, public SurgSim::Framework::Asset,
+		public std::enable_shared_from_this<Fem<VertexData, Element>>
 {
 public:
 	/// Default constructor
@@ -106,61 +104,89 @@ public:
 	/// Gets entire FEM element vector
 	/// \return A const vector of all FEM elements stored in the mesh
 	const std::vector<std::shared_ptr<Element>>& getElements() const;
-	std::vector<std::shared_ptr<Element>>& getElements();
 
 	/// Gets entire FEM element vector (non-const)
 	/// \return A vector of all FEM elements stored in the mesh
+	std::vector<std::shared_ptr<Element>>& getElements();
+
+	/// Retrieve a specific element from the mesh
+	/// \param id The id in the element vector
+	/// \return A shared pointer to the element
 	std::shared_ptr<Element> getElement(size_t id) const;
 
-	/// Removes FEM element from mesh
-	/// \param id The element to remove
-	void removeElement(size_t id);
-
+	/// Add boundary condition to mesh
+	/// \param boundaryCondition A vertex id that has a boundary condition
+	/// \return The new size of the vector of boundary conditions
 	size_t addBoundaryCondition(size_t boundaryCondition);
 
+	/// Gets entire vector of boundary conditions
+	/// \return A vector of boundary conditions
 	const std::vector<size_t>& getBoundaryConditions() const;
+
+	/// Gets entire vector of boundary conditions (non-const)
+	/// \return A vector of boundary conditions
 	std::vector<size_t>& getBoundaryConditions();
 
+	/// Retrieves a specific boundary condition
+	/// \param id The id of the boundary condition in the vector
+	/// \return The vertex id which has a boundary condition
 	size_t getBoundaryCondition(size_t id) const;
 
-	void removeBoundaryCondition(size_t id);
-
 protected:
+	/// Shared loading method for all 3 dimensions
+	/// \note Assign template class to the proper dimension PlyReaderDelegate
+	template <class PlyType, class FemType>
+	bool loadFemFile(const std::string& filename);
+
 	/// Vector of individual elements
 	std::vector<std::shared_ptr<Element>> m_elements;
+
+	/// Vector of vertex ids that have boundary conditions
 	std::vector<size_t> m_boundaryConditions;
 };
 
+SURGSIM_STATIC_REGISTRATION(Fem1D);
+
 /// Fem class data structure implementation for 1-Dimensional FEMs
 /// \sa Fem
-class Fem1D : public Fem<FemElementStructs::Fem1DVectorData, EmptyData, EmptyData, BeamType>
+class Fem1D : public Fem<FemElementStructs::RotationVectorData, BeamType>
 {
 public:
 	Fem1D();
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1D);
+
 protected:
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
 };
 
+SURGSIM_STATIC_REGISTRATION(Fem2D);
+
 /// Fem class data structure implementation for 2-Dimensional FEMs
 /// \sa Fem
-class Fem2D : public Fem<FemElementStructs::Fem2DVectorData, EmptyData, EmptyData, TriangleType>
+class Fem2D : public Fem<FemElementStructs::RotationVectorData, TriangleType>
 {
 public:
 	Fem2D();
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2D);
+
 protected:
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
 };
 
+SURGSIM_STATIC_REGISTRATION(Fem3D);
+
 /// Fem class data structure implementation for 3-Dimensional FEMs
 /// \sa Fem
-class Fem3D : public Fem<FemElementStructs::Fem3DVectorData, EmptyData, EmptyData, TetrahedronType>
+class Fem3D : public Fem<EmptyData, TetrahedronType>
 {
 public:
 	Fem3D();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3D);
 
 	size_t addCube(std::shared_ptr<CubeType> cube);
 
@@ -170,8 +196,6 @@ public:
 	std::vector<std::shared_ptr<CubeType>>& getCubes();
 
 	std::shared_ptr<CubeType> getCube(size_t id) const;
-
-	void removeCube(size_t id);
 
 protected:
 	// Asset API override

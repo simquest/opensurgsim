@@ -19,18 +19,6 @@
 #include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 
-template<>
-std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::Fem1DVectorData,
-	EmptyData, EmptyData>::m_className = "SurgSim::Physics::Fem1D";
-
-template<>
-std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::Fem2DVectorData,
-	EmptyData, EmptyData>::m_className = "SurgSim::Physics::Fem2D";
-
-template<>
-std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Physics::FemElementStructs::Fem3DVectorData,
-	EmptyData, EmptyData>::m_className = "SurgSim::Physics::Fem3D";
-
 namespace SurgSim
 {
 
@@ -38,6 +26,8 @@ namespace Physics
 {
 
 SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::Fem1D, Fem1D)
+SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::Fem2D, Fem2D)
+SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::Fem3D, Fem3D)
 
 Fem1D::Fem1D() : Fem()
 {
@@ -45,24 +35,7 @@ Fem1D::Fem1D() : Fem()
 
 bool Fem1D::doLoad(const std::string& filePath)
 {
-	SurgSim::DataStructures::PlyReader reader(filePath);
-	if (!reader.isValid())
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "'" << filePath << "' is an invalid .ply file.";
-		return false;
-	}
-
-	auto delegate = std::make_shared<Fem1DPlyReaderDelegate>(
-						std::dynamic_pointer_cast<Fem1D>(shared_from_this()));
-	if (!reader.parseWithDelegate(delegate))
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "The input file '" << filePath << "' does not have the property required by FEM element mesh.";
-		return false;
-	}
-
-	return true;
+	return loadFemFile<Fem1DPlyReaderDelegate, Fem1D>(filePath);
 }
 
 Fem2D::Fem2D() : Fem()
@@ -71,24 +44,7 @@ Fem2D::Fem2D() : Fem()
 
 bool Fem2D::doLoad(const std::string& filePath)
 {
-	SurgSim::DataStructures::PlyReader reader(filePath);
-	if (!reader.isValid())
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "'" << filePath << "' is an invalid .ply file.";
-		return false;
-	}
-
-	auto delegate = std::make_shared<Fem2DPlyReaderDelegate>(
-						std::dynamic_pointer_cast<Fem2D>(shared_from_this()));
-	if (!reader.parseWithDelegate(delegate))
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "The input file '" << filePath << "' does not have the property required by FEM element mesh.";
-		return false;
-	}
-
-	return true;
+	return loadFemFile<Fem2DPlyReaderDelegate, Fem2D>(filePath);
 }
 
 Fem3D::Fem3D()
@@ -121,31 +77,9 @@ std::shared_ptr<CubeType> Fem3D::getCube(size_t id) const
 	return m_cubeElements[id];
 }
 
-void Fem3D::removeCube(size_t id)
-{
-	m_cubeElements.erase(m_cubeElements.begin() + id);
-}
-
 bool Fem3D::doLoad(const std::string& filePath)
 {
-	SurgSim::DataStructures::PlyReader reader(filePath);
-	if (!reader.isValid())
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "'" << filePath << "' is an invalid .ply file.";
-		return false;
-	}
-
-	auto delegate = std::make_shared<Fem3DPlyReaderDelegate>(
-						std::dynamic_pointer_cast<Fem3D>(shared_from_this()));
-	if (!reader.parseWithDelegate(delegate))
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "The input file '" << filePath << "' does not have the property required by FEM element mesh.";
-		return false;
-	}
-
-	return true;
+	return loadFemFile<Fem3DPlyReaderDelegate, Fem3D>(filePath);
 }
 
 } // namespace Physics

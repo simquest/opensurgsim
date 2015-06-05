@@ -21,20 +21,15 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
-#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem.h"
-
-using SurgSim::DataStructures::EmptyData;
-using SurgSim::DataStructures::PlyReader;
-using SurgSim::DataStructures::PlyReaderDelegate;
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-class Fem2DPlyReaderDelegate : public PlyReaderDelegate
+class Fem2DPlyReaderDelegate : public FemPlyReaderDelegate
 {
 public:
 	/// Default constructor.
@@ -45,6 +40,8 @@ public:
 	explicit Fem2DPlyReaderDelegate(std::shared_ptr<Fem2D> mesh);
 
 protected:
+	std::string getElementName() const override;
+
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
 	/// \return true if it succeeds, false otherwise.
@@ -55,43 +52,25 @@ protected:
 	/// \return true if it succeeds, false otherwise.
 	bool fileIsAcceptable(const PlyReader& reader);
 
+	void endParseFile() override;
+
 	/// Callback function, begin the processing of vertices.
 	/// \param elementName Name of the element.
 	/// \param vertexCount Number of vertices.
 	/// \return memory for vertex data to the reader.
-	void* beginVertices(const std::string& elementName, size_t vertexCount);
+	void* beginVertices(const std::string& elementName, size_t vertexCount) override;
 
 	/// Callback function to process one vertex.
 	/// \param elementName Name of the element.
-	void processVertex(const std::string& elementName);
+	void processVertex(const std::string& elementName) override;
 
 	/// Callback function to finalize processing of vertices.
 	/// \param elementName Name of the element.
-	void endVertices(const std::string& elementName);
-
-	/// Callback function, begin the processing of FemElements.
-	/// \param elementName Name of the element.
-	/// \param elementCount Number of elements.
-	/// \return memory for FemElement data to the reader.
-	void* beginFemElements(const std::string& elementName, size_t elementCount);
+	void endVertices(const std::string& elementName) override;
 
 	/// Callback function to process one FemElement.
 	/// \param elementName Name of the element.
-	void processFemElement(const std::string& elementName);
-
-	/// Callback function to finalize processing of FemElements.
-	/// \param elementName Name of the element.
-	void endFemElements(const std::string& elementName);
-
-	/// Callback function, begin the processing of materials.
-	/// \param elementName Name of the element.
-	/// \param materialCount Number of materials.
-	/// \return memory for material data to the reader.
-	void* beginMaterials(const std::string& elementName, size_t materialCount);
-
-	/// Callback function, end the processing of materials.
-	/// \param elementName Name of the element.
-	void endMaterials(const std::string& elementName);
+	void processFemElement(const std::string& elementName) override;
 
 	/// Callback function, begin the processing of radius.
 	/// \param elementName Name of the element.
@@ -103,37 +82,11 @@ protected:
 	/// \param elementName Name of the element.
 	void endThickness(const std::string& elementName);
 
-	/// Callback function, begin the processing of boundary conditions.
-	/// \param elementName Name of the element.
-	/// \param boundaryConditionCount Number of boundary conditions.
-	/// \return memory for boundary conditions data to the reader.
-	void* beginBoundaryConditions(const std::string& elementName, size_t boundaryConditionCount);
-
 	/// Callback function to process one boundary condition.
 	/// \param elementName Name of the element.
-	void processBoundaryCondition(const std::string& elementName);
-
-	void endFile();
+	void processBoundaryCondition(const std::string& elementName) override;
 
 private:
-	struct FemElement2D
-	{
-		unsigned int type;   // “LinearBeam”, “CorotationalTetrahedron”…
-		int64_t overrun1; ///< Used to check for buffer overruns
-
-		unsigned int* indices;
-		unsigned int vertexCount;
-		int64_t overrun2; ///< Used to check for buffer overruns
-	} m_elementData;
-
-	struct Material
-	{
-		double massDensity;
-		double poissonRatio;
-		double youngModulus;
-		int64_t overrun; ///< Used to check for buffer overruns
-	} m_materialData;
-
 	struct Vertex6DData
 	{
 		double x;
@@ -149,12 +102,6 @@ private:
 	bool m_hasRotationDOF;
 
 	double m_thickness;
-
-	/// Flag indicating if the associated file has boundary conditions
-	bool m_hasBoundaryConditions;
-
-	/// Internal data to receive the "boundary_condition" element
-	unsigned int m_boundaryConditionData;
 
 	std::shared_ptr<Fem2D> m_mesh;
 };

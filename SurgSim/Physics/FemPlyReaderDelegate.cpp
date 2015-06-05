@@ -14,10 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemPlyReaderDelegate.h"
-#include "SurgSim/Physics/FemRepresentation.h"
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -26,31 +24,12 @@ namespace SurgSim
 namespace Physics
 {
 
-FemPlyReaderDelegate::FemPlyReaderDelegate(std::shared_ptr<FemRepresentation> fem) :
-	m_hasBoundaryConditions(false),
-	m_boundaryConditionData(std::numeric_limits<size_t>::quiet_NaN()),
-	m_vertexIterator(nullptr),
-	m_fem(fem)
-{
-}
-
-FemPlyReaderDelegate::ElementData::ElementData() : indices(nullptr), vertexCount(0)
+FemPlyReaderDelegate::FemPlyReaderDelegate()
 {
 }
 
 bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
-	// Vertex processing
-	reader->requestElement(
-		"vertex",
-		std::bind(
-		&FemPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
-		std::bind(&FemPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-		std::bind(&FemPlyReaderDelegate::endVertices, this, std::placeholders::_1));
-	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, 0 * sizeof(m_vertexData[0]));
-	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
-	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
-
 	// Element Processing
 	reader->requestElement(
 		getElementName(),
@@ -95,7 +74,6 @@ bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty(
 		"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
 
-	reader->setStartParseFileCallback(std::bind(&FemPlyReaderDelegate::startParseFile, this));
 	reader->setEndParseFileCallback(std::bind(&FemPlyReaderDelegate::endParseFile, this));
 
 	return true;
@@ -122,59 +100,19 @@ bool FemPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 	return result;
 }
 
-void FemPlyReaderDelegate::startParseFile()
-{
-	SURGSIM_ASSERT(nullptr != m_fem) << "The FemRepresentation cannot be nullptr.";
-	SURGSIM_ASSERT(0 == m_fem->getNumFemElements()) <<
-		"The FemRepresentation already contains fem elements, so it cannot be initialized.";
-	SURGSIM_ASSERT(nullptr == m_fem->getInitialState()) << "The FemRepresentation already has an initial state";
-
-	m_state = std::make_shared<SurgSim::Math::OdeState>();
-}
-
-void FemPlyReaderDelegate::endParseFile()
-{
-	for (size_t i = 0; i < m_fem->getNumFemElements(); ++i)
-	{
-		m_fem->getFemElement(i)->setMassDensity(m_materialData.massDensity);
-		m_fem->getFemElement(i)->setPoissonRatio(m_materialData.poissonRatio);
-		m_fem->getFemElement(i)->setYoungModulus(m_materialData.youngModulus);
-	}
-
-	m_fem->setInitialState(m_state);
-}
-
-void* FemPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
-{
-	m_state->setNumDof(m_fem->getNumDofPerNode(), vertexCount);
-	m_vertexIterator = m_state->getPositions().data();
-
-	return m_vertexData.data();
-}
-
-void FemPlyReaderDelegate::processVertex(const std::string& elementName)
-{
-	std::copy(std::begin(m_vertexData), std::end(m_vertexData), m_vertexIterator);
-	m_vertexIterator += m_fem->getNumDofPerNode();
-}
-
-void FemPlyReaderDelegate::endVertices(const std::string& elementName)
-{
-	m_vertexIterator = nullptr;
-}
-
 void* FemPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
 {
-	m_femData.overrun = 0l;
-	return &m_femData;
+	m_elementData.overrun1 = 0l;
+	m_elementData.overrun2 = 0l;
+	return &m_elementData;
 }
 
 void FemPlyReaderDelegate::endFemElements(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_femData.overrun == 0) <<
+	SURGSIM_ASSERT(m_elementData.overrun1 == 0 && m_elementData.overrun2 == 0) <<
 		"There was an overrun while reading the element structures, it is likely that data " <<
 		"has become corrupted.";
-	m_femData.indices = nullptr;
+	m_elementData.indices = nullptr;
 }
 
 void* FemPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
@@ -194,11 +132,6 @@ void* FemPlyReaderDelegate::beginBoundaryConditions(const std::string& elementNa
 																  size_t boundaryConditionCount)
 {
 	return &m_boundaryConditionData;
-}
-
-void FemPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
-{
-	m_state->addBoundaryCondition(m_boundaryConditionData);
 }
 
 } // namespace SurgSim
