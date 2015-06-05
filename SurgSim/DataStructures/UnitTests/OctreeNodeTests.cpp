@@ -336,6 +336,9 @@ TEST(OctreeNodeTests, DoLoadOctree)
 	EXPECT_TRUE(octree->getChild(0)->getChild(2)->hasChildren());
 
 	EXPECT_TRUE(octree->getChild(0)->getChild(2)->getChild(2)->isActive());
+
+	EXPECT_EQ(octree->getChild(0)->getChild(0)->getChild(0)->getChild(0)->getBoundingBox().sizes(),
+		Vector3d(0.001, 0.001, 0.001));
 }
 
 TEST(OctreeNodeTests, NeighborhoodTestSimple)
