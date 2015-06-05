@@ -22,7 +22,10 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -35,6 +38,8 @@ using SurgSim::Math::Vector3d;
 namespace
 {
 static const double dt = 0.001;
+static const double maxIterationConstant = 0.1;
+static const double tolerance = 1.0e-03;
 static const int frameCount = 10;
 
 static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::hash<int>> getIntegrationSchemeNames()
@@ -57,8 +62,23 @@ static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::ha
 	return result;
 }
 
+static std::unordered_map<SurgSim::Math::LinearSolver, std::string, std::hash<int>> getLinearSolverNames()
+{
+	std::unordered_map<SurgSim::Math::LinearSolver, std::string, std::hash<int>> result;
+
+#define FEM3DSOLUTIONCOMPONENTSTEST_MAP_NAME(map, name) (map)[name] = #name
+	FEM3DSOLUTIONCOMPONENTSTEST_MAP_NAME(result, SurgSim::Math::LINEARSOLVER_LU);
+	FEM3DSOLUTIONCOMPONENTSTEST_MAP_NAME(result, SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT);
+#undef FEM3DSOLUTIONCOMPONENTSTEST_MAP_NAME
+
+	return result;
+}
+
 static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::hash<int>> IntegrationSchemeNames
 		= getIntegrationSchemeNames();
+
+static std::unordered_map<SurgSim::Math::LinearSolver, std::string, std::hash<int>> LinearSolverNames
+		= getLinearSolverNames();
 }
 
 namespace SurgSim
@@ -95,7 +115,7 @@ public:
 		totalTime.beginFrame();
 		for (int i = 0; i < frameCount; i++)
 		{
-			fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()));
+			fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()), false);
 		}
 		totalTime.endFrame();
 		RecordProperty("Duration", boost::to_string(totalTime.getCumulativeTime()));
@@ -103,7 +123,7 @@ public:
 
 	void timeComputeLinearSystem(std::shared_ptr<DivisibleCubeRepresentation> fem)
 	{
-		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()));
+		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()), false);
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
 		for (int i = 0; i < frameCount; i++)
@@ -116,8 +136,18 @@ public:
 
 	void timeSolveSystem(std::shared_ptr<DivisibleCubeRepresentation> fem)
 	{
-		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()));
+		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()), false);
 		fem->getOdeSolver()->getLinearSolver()->setMatrix(fem->getOdeSolver()->getSystemMatrix());
+		std::shared_ptr<SurgSim::Math::LinearSparseSolveAndInverseCG> solver =
+			std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(
+				fem->getOdeSolver()->getLinearSolver());
+		if (solver != nullptr)
+		{
+			solver->setMaxIterations(static_cast<SurgSim::Math::SparseMatrix::Index>(
+										 maxIterationConstant * fem->getNumDof()));
+			solver->setTolerance(tolerance);
+		}
+
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
 		for (int i = 0; i < frameCount; i++)
@@ -130,8 +160,18 @@ public:
 
 	void timeInvertSystem(std::shared_ptr<DivisibleCubeRepresentation> fem)
 	{
-		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()));
+		fem->getOdeSolver()->computeMatrices(dt, *(fem->getInitialState()), false);
 		fem->getOdeSolver()->getLinearSolver()->setMatrix(fem->getOdeSolver()->getSystemMatrix());
+		std::shared_ptr<SurgSim::Math::LinearSparseSolveAndInverseCG> solver =
+			std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(
+				fem->getOdeSolver()->getLinearSolver());
+		if (solver != nullptr)
+		{
+			solver->setMaxIterations(static_cast<SurgSim::Math::SparseMatrix::Index>(
+										 maxIterationConstant * fem->getNumDof()));
+			solver->setTolerance(tolerance);
+		}
+
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
 		for (int i = 0; i < frameCount; i++)
@@ -155,7 +195,8 @@ protected:
 
 class ComponentIntegrationSchemeAndCountParamTest
 	: public Fem3DSolutionComponentsTestBase,
-	  public ::testing::WithParamInterface<std::tuple<SurgSim::Math::IntegrationScheme, int>>
+	  public ::testing::WithParamInterface<std::tuple<SurgSim::Math::IntegrationScheme,
+	  SurgSim::Math::LinearSolver, int>>
 {
 };
 
@@ -163,12 +204,19 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeMatrixInitialization)
 {
 	int numCubes;
 	SurgSim::Math::IntegrationScheme integrationScheme;
-	std::tie(integrationScheme, numCubes) = GetParam();
+	SurgSim::Math::LinearSolver linearSolver;
+	std::tie(integrationScheme, linearSolver, numCubes) = GetParam();
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
+	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	fem->setIntegrationScheme(integrationScheme);
+	fem->setLinearSolver(linearSolver);
 
 	timeInitializeRepresentation(fem);
 }
@@ -177,12 +225,20 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeMatrixAssembly)
 {
 	int numCubes;
 	SurgSim::Math::IntegrationScheme integrationScheme;
-	std::tie(integrationScheme, numCubes) = GetParam();
+	SurgSim::Math::LinearSolver linearSolver;
+	std::tie(integrationScheme, linearSolver, numCubes) = GetParam();
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
+	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
+	fem->setLinearSolver(linearSolver);
+
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	initializeRepresentation(fem);
 
 	timeMatrixAssembly(fem);
@@ -192,12 +248,20 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeComputeLinearSystem)
 {
 	int numCubes;
 	SurgSim::Math::IntegrationScheme integrationScheme;
-	std::tie(integrationScheme, numCubes) = GetParam();
+	SurgSim::Math::LinearSolver linearSolver;
+	std::tie(integrationScheme, linearSolver, numCubes) = GetParam();
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
+	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
+	fem->setLinearSolver(linearSolver);
+
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	initializeRepresentation(fem);
 
 	timeComputeLinearSystem(fem);
@@ -207,12 +271,20 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeSolveSystem)
 {
 	int numCubes;
 	SurgSim::Math::IntegrationScheme integrationScheme;
-	std::tie(integrationScheme, numCubes) = GetParam();
+	SurgSim::Math::LinearSolver linearSolver;
+	std::tie(integrationScheme, linearSolver, numCubes) = GetParam();
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
+	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
+	fem->setLinearSolver(linearSolver);
+
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	initializeRepresentation(fem);
 
 	timeSolveSystem(fem);
@@ -222,12 +294,20 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeInvertSystem)
 {
 	int numCubes;
 	SurgSim::Math::IntegrationScheme integrationScheme;
-	std::tie(integrationScheme, numCubes) = GetParam();
+	SurgSim::Math::LinearSolver linearSolver;
+	std::tie(integrationScheme, linearSolver, numCubes) = GetParam();
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
+	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 	RecordProperty("CubeDivisions", boost::to_string(numCubes));
 
 	auto fem = std::make_shared<DivisibleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(integrationScheme);
+	fem->setLinearSolver(linearSolver);
+
+	// We need to add some boundary conditions for the static solver to not run into a singular matrix
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(0);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(1);
+	std::const_pointer_cast<SurgSim::Math::OdeState>(fem->getInitialState())->addBoundaryCondition(2);
 	initializeRepresentation(fem);
 
 	timeInvertSystem(fem);
@@ -247,6 +327,8 @@ INSTANTIATE_TEST_CASE_P(
 					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
 					   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
 					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4),
+					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU,
+							   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT),
 					   ::testing::Values(2, 3, 4, 5, 6, 7, 8)));
 
 } // namespace Physics

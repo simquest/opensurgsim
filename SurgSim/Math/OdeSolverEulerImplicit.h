@@ -44,11 +44,11 @@ public:
 	/// \return The Newton-Raphson algorithm epsilon convergence
 	double getNewtonRaphsonEpsilonConvergence() const;
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
 
 protected:
 	void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
-							  bool computeRHS = true) override;
+		bool computeRHS = true) override;
 
 	/// Newton-Raphson maximum number of iteration (1 => linearization)
 	size_t m_maximumIteration;

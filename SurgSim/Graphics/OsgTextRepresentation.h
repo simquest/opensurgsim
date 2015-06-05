@@ -76,7 +76,7 @@ public:
 	void setText(const std::string& text) override;
 	std::string getText() const override;
 
-	void loadFont(std::string fileName) override;
+	void loadFont(const std::string& fileName) override;
 	void setFont(std::shared_ptr<SurgSim::Framework::Asset> font) override;
 	std::shared_ptr<Font> getFont() const override;
 
@@ -86,8 +86,8 @@ public:
 	void setFontSize(double size) override;
 	double getFontSize() const override;
 
-	virtual void setUseScreenSpace(bool value) override;
-	virtual bool isUsingScreenSpace() const override;
+	void setUseScreenSpace(bool value) override;
+	bool isUsingScreenSpace() const override;
 
 	enum Anchor
 	{

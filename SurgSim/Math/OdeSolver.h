@@ -101,16 +101,21 @@ public:
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	virtual void solve(double dt, const OdeState& currentState, OdeState* newState) = 0;
+	/// \param computeCompliance True to explicitly compute the compliance matrix, False otherwise
+	virtual void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) = 0;
 
 	/// Computes the system and compliance matrices for a given state
 	/// \param dt The time step
 	/// \param state The state to compute the system and compliance matrices for
-	void computeMatrices(double dt, const OdeState& state);
+	/// \param computeCompliance True to explicitly compute the compliance matrix, False otherwise
+	void computeMatrices(double dt, const OdeState& state, bool computeCompliance = true);
 
 	/// Queries the current system matrix
 	/// \return The latest system matrix calculated
 	const SparseMatrix& getSystemMatrix() const;
+
+	/// \return The latest compliance matrix computed (either by calling solve or computeMatrices)
+	const Matrix& getComplianceMatrix() const;
 
 protected:
 	/// Allocates the system and compliance matrices
@@ -126,6 +131,12 @@ protected:
 	/// \note The method should prepare the linear solver m_linearSolver to be used with the m_systemMatrix
 	virtual void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
 									  bool computeRHS = true) = 0;
+
+	/// Helper method computing the compliance matrix from the system matrix and setting the boundary conditions
+	/// \param state The state describing the boundary conditions
+	/// \note The full system is not re-evaluated from the state, the current m_systemMatrix is directly used.
+	/// \note This method supposes that the linear solver has been updated with the current m_systemMatrix.
+	void computeComplianceMatrixFromSystemMatrix(const OdeState& state);
 
 	/// Name for this solver
 	/// \note MUST be set by the derived classes
@@ -145,6 +156,9 @@ protected:
 
 	/// Linear system solution and rhs vectors (including boundary conditions)
 	Vector m_solution, m_rhs;
+
+	/// Compliance matrix which is the inverse of the system matrix, including boundary conditions
+	Matrix m_complianceMatrix;
 };
 
 }; // namespace Math

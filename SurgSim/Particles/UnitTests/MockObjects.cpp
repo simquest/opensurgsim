@@ -17,7 +17,7 @@
 
 
 MockParticleSystem::MockParticleSystem(const std::string& name) :
-	SurgSim::Particles::ParticleSystemRepresentation(name),
+	SurgSim::Particles::Representation(name),
 	updateCount(0)
 {
 }
@@ -28,40 +28,20 @@ bool MockParticleSystem::doUpdate(double dt)
 	return true;
 }
 
+bool MockParticleSystem::doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions)
+{
+	return true;
+}
+
 MockEmitter::MockEmitter(const std::string& name) :
-	SurgSim::Particles::EmitterRepresentation(name),
+	SurgSim::Particles::Emitter(name),
 	updateCount(0)
 {
 }
 
 void MockEmitter::update(double dt)
 {
-	SurgSim::Particles::EmitterRepresentation::update(dt);
+	SurgSim::Particles::Emitter::update(dt);
 	updateCount++;
 }
 
-MockParticleBehavior::MockParticleBehavior(const std::string& name) :
-	SurgSim::Framework::Behavior(name),
-	updateCount(0)
-{
-}
-
-bool MockParticleBehavior::doInitialize()
-{
-	return true;
-}
-
-bool MockParticleBehavior::doWakeUp()
-{
-	return true;
-}
-
-void MockParticleBehavior::update(double dt)
-{
-	updateCount++;
-}
-
-int MockParticleBehavior::getTargetManagerType() const
-{
-	return SurgSim::Framework::MANAGER_TYPE_PARTICLES;
-}

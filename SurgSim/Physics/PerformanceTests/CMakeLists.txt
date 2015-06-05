@@ -28,6 +28,7 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	DivisibleCubeRepresentation.h
+	MockFem3DRepresentation.h
 )
 
 set(LIBS
