@@ -44,8 +44,6 @@ surgsim_add_unit_tests(SurgSimParticlesRenderTest)
 
 set_target_properties(SurgSimParticlesRenderTest PROPERTIES FOLDER "Particles")
 
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/TriangleMeshBaseTests/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-
 # Configure the path for the data files
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"

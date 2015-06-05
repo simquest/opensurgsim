@@ -174,7 +174,7 @@ TEST_P(IntegrationSchemeParamTest, WoundTest)
 	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 
 
-	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("wound");
+	auto fem = std::make_shared<SurgSim::Physics::MockFem3DRepresentation>("wound");
 	fem->setFilename("Geometry/wound_deformable.ply");
 	fem->setIntegrationScheme(integrationScheme);
 	fem->setLinearSolver(linearSolver);
