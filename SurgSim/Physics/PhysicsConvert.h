@@ -22,7 +22,7 @@ namespace SurgSim
 {
 namespace Physics
 {
-class RigidRepresentationState;
+class RigidState;
 }
 }
 
@@ -30,10 +30,10 @@ namespace YAML
 {
 
 template <>
-struct convert<SurgSim::Physics::RigidRepresentationState>
+struct convert<SurgSim::Physics::RigidState>
 {
-	static Node encode(const SurgSim::Physics::RigidRepresentationState& rhs);
-	static bool decode(const Node& node, SurgSim::Physics::RigidRepresentationState& rhs); //NOLINT
+	static Node encode(const SurgSim::Physics::RigidState& rhs);
+	static bool decode(const Node& node, SurgSim::Physics::RigidState& rhs); //NOLINT
 };
 
 

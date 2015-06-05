@@ -62,6 +62,15 @@ TEST(RawMultiAxisDeviceTest, Name)
 	EXPECT_EQ("TestRawMultiAxis", device->getName());
 }
 
+TEST(RawMultiAxisDeviceTest, Factory)
+{
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create(
+								 "SurgSim::Device::RawMultiAxisDevice", "Device"));
+	EXPECT_NE(nullptr, device);
+}
+
+
 static void testCreateDeviceSeveralTimes(bool doSleep)
 {
 	for (int i = 0;  i < 6;  ++i)

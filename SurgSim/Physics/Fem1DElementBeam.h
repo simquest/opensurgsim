@@ -26,6 +26,8 @@ namespace SurgSim
 namespace Physics
 {
 
+SURGSIM_STATIC_REGISTRATION(Fem1DElementBeam);
+
 /// 1D FemElement based on a beam volume discretization with a fixed cross section
 ///
 /// The inertia property (mass) and the stiffness matrices are derived from "Theory of Matrix Structural Analysis" from
@@ -36,9 +38,17 @@ class Fem1DElementBeam : public FemElement
 {
 public:
 	/// Constructor
-	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element with respect to a
+	/// \param nodeIds An array of 2 node ids defining this beam element with respect to a
 	/// DeformableRepresentaitonState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
+
+	/// Constructor for FemElement object factory
+	/// \param nodeIds A vector of node ids defining this beam element with respect to a
+	/// DeformableRepresentaitonState which is passed to the initialize method.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 2
+	explicit Fem1DElementBeam(std::vector<size_t> nodeIds);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam)
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam
@@ -142,6 +152,9 @@ public:
 		const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
+	/// Initializes variables needed before Initialize() is called
+	void init();
+
 	/// Computes the beam element's initial rotation
 	/// \param state The state to compute the rotation from
 	/// \note This method stores the result in m_R0

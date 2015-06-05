@@ -27,12 +27,16 @@ namespace Device
 {
 class OculusScaffold;
 
+SURGSIM_STATIC_REGISTRATION(OculusDevice);
+
 /// A class implementing the communication with Oculus Rift DK2.
 ///
 /// \par Application input provided by the device:
-///   | type       | name              |                                        |
-///   | ----       | ----              | ---                                    |
-///   | pose       | "pose"            | %Device pose (units are meters).       |
+///   | type       | name					|                                        |
+///   | ----       | ----					| ---                                    |
+///   | pose       | "pose"					| %Device pose (units are meters).       |
+///   | matrix     | "leftProjectionMatix"  | %Projection matrix for left eye        |
+///   | matrix     | "rghtProjectionMatix"  | %Projection matrix for right eye       |
 ///
 /// \par Application output used by the device: none.
 /// \note The axes of the pose of the HMD are a right-handed system: X & Z are in the plane of the floor,
@@ -48,11 +52,27 @@ public:
 	/// \param name A unique name for the device.
 	explicit OculusDevice(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Device::OculusDevice);
+
 	/// Destructor.
 	virtual ~OculusDevice();
 
 	bool initialize() override;
 	bool finalize() override;
+
+	/// Set the near plane
+	/// \param nearPlane The near plane
+	void setNearPlane(float nearPlane);
+
+	/// \return The near plane
+	float getNearPlane() const;
+
+	/// Set the far plane
+	/// \param farPlane The far plane
+	void setFarPlane(float farPlane);
+
+	/// \return The far plane
+	float getFarPlane() const;
 
 	/// Check whether this device is initialized.
 	/// \return True if this device is initialized; false otherwise.
@@ -60,6 +80,12 @@ public:
 
 private:
 	friend class OculusScaffold;
+
+	/// Near Plane
+	float m_nearPlane;
+
+	/// Far Plane
+	float m_farPlane;
 
 	/// Communication with hardware is handled by scaffold.
 	std::shared_ptr<OculusScaffold> m_scaffold;

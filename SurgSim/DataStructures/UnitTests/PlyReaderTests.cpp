@@ -25,7 +25,7 @@ using SurgSim::Math::Vector3d;
 
 namespace
 {
-std::string findFile(std::string filename)
+std::string findFile(const std::string& filename)
 {
 	std::vector<std::string> paths;
 	paths.push_back("Data/");

@@ -58,6 +58,11 @@ set(MULTIAXIS_DEVICE_HEADERS
 	SystemInputDeviceHandle.h
 )
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
+	MultiAxisDevice.h
+	RawMultiAxisDevice.h
+	PARENT_SCOPE)
+
 set(MULTIAXIS_DEVICE_LINUX_SOURCES
 	linux/CreateInputDeviceHandle.cpp
 	linux/FileDescriptor.cpp

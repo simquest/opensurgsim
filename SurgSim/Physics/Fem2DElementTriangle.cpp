@@ -39,15 +39,19 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem2DElementTriangle, Fem2DElementTriangle)
 
 Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds)
-	: m_restArea(0.0),
-	  m_thickness(0.0)
 {
-	// 6 dof per node (x, y, z, thetaX, thetaY, thetaZ)
-	setNumDofPerNode(6);
-
+	init();
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
+}
+
+Fem2DElementTriangle::Fem2DElementTriangle(std::vector<size_t> nodeIds)
+{
+	init();
+	SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
+	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
 void Fem2DElementTriangle::setThickness(double thickness)
@@ -70,6 +74,15 @@ double Fem2DElementTriangle::getVolume(const SurgSim::Math::OdeState& state) con
 	const Vector3d C = state.getPosition(m_nodeIds[2]);
 
 	return m_thickness * (B - A).cross(C - A).norm() / 2.0;
+}
+
+void Fem2DElementTriangle::init()
+{
+	m_restArea = 0.0;
+	m_thickness = 0.0;
+
+	// 6 dof per node (x, y, z, thetaX, thetaY, thetaZ)
+	setNumDofPerNode(6);
 }
 
 void Fem2DElementTriangle::initialize(const SurgSim::Math::OdeState& state)

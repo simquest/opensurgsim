@@ -194,22 +194,7 @@ bool OsgView::doInitialize()
 
 bool OsgView::doWakeUp()
 {
-	osg::ref_ptr<osg::DisplaySettings> displaySettings = new osg::DisplaySettings;
-	displaySettings->setDefaults();
-
-	if (isStereo())
-	{
-		displaySettings->setStereo(isStereo());
-		displaySettings->setStereoMode(StereoModeEnums[getStereoMode()]);
-		displaySettings->setDisplayType(DisplayTypeEnums[getDisplayType()]);
-		displaySettings->setEyeSeparation(static_cast<float>(getEyeSeparation()));
-		displaySettings->setScreenDistance(static_cast<float>(getScreenDistance()));
-		displaySettings->setScreenWidth(static_cast<float>(getScreenWidth()));
-		displaySettings->setScreenHeight(static_cast<float>(getScreenHeight()));
-	}
-
-
-	m_view->setDisplaySettings(displaySettings);
+	m_view->setDisplaySettings(createDisplaySettings());
 
 	osg::ref_ptr<osgViewer::ViewConfig> viewConfig;
 
@@ -249,6 +234,25 @@ bool OsgView::doWakeUp()
 
 
 	return true;
+}
+
+osg::ref_ptr<osg::DisplaySettings> OsgView::createDisplaySettings() const
+{
+	osg::ref_ptr<osg::DisplaySettings> displaySettings = new osg::DisplaySettings;
+	displaySettings->setDefaults();
+
+	if (isStereo())
+	{
+		displaySettings->setStereo(isStereo());
+		displaySettings->setStereoMode(StereoModeEnums[getStereoMode()]);
+		displaySettings->setDisplayType(DisplayTypeEnums[getDisplayType()]);
+		displaySettings->setEyeSeparation(static_cast<float>(getEyeSeparation()));
+		displaySettings->setScreenDistance(static_cast<float>(getScreenDistance()));
+		displaySettings->setScreenWidth(static_cast<float>(getScreenWidth()));
+		displaySettings->setScreenHeight(static_cast<float>(getScreenHeight()));
+	}
+
+	return displaySettings;
 }
 
 void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)

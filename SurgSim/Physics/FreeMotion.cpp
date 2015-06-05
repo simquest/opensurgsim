@@ -43,9 +43,15 @@ std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
 {
 	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
-	auto& representations = result->getActiveRepresentations();
 
+	auto& representations = result->getActiveRepresentations();
 	for (auto& representation : representations)
+	{
+		representation->update(dt);
+	}
+
+	auto& particleRepresentations = result->getActiveParticleRepresentations();
+	for (auto& representation : particleRepresentations)
 	{
 		representation->update(dt);
 	}

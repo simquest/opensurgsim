@@ -18,22 +18,24 @@ include_directories(
 	"${OPENSCENEGRAPH_INCLUDE_DIR}"
 )
 
-set(Mouse_DEVICE_SOURCES
+set(MOUSE_DEVICE_SOURCES
 	MouseDevice.cpp
 	MouseScaffold.cpp
 	OsgMouseHandler.cpp
 )
 
-set(Mouse_DEVICE_HEADERS
+set(MOUSE_DEVICE_HEADERS
 	MouseDevice.h
 	MouseScaffold.h
 	OsgMouseHandler.h
 )
 
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} MouseDevice.h PARENT_SCOPE)
+
 surgsim_add_library(
 	MouseDevice
-	"${Mouse_DEVICE_SOURCES}"
-	"${Mouse_DEVICE_HEADERS}"
+	"${MOUSE_DEVICE_SOURCES}"
+	"${MOUSE_DEVICE_HEADERS}"
 )
 
 set(LIBS

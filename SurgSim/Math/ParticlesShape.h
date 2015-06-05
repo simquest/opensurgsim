@@ -55,6 +55,12 @@ public:
 	template <class V>
 	explicit ParticlesShape(const SurgSim::DataStructures::Vertices<V>& other);
 
+	/// Assignment when the template data is a different type
+	/// \tparam V type of data stored in the other Vertices
+	/// \param other the Vertices to copy from
+	template <class V>
+	ParticlesShape& operator=(const Vertices<V>& other);
+
 	SURGSIM_CLASSNAME(SurgSim::Math::ParticlesShape);
 
 	/// Get the AabbTree

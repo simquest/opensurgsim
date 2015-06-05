@@ -21,8 +21,6 @@
 
 #include <gtest/gtest.h>
 
-#include <Eigen/LU> 		// needed for determinant() and inverse()
-
 #include "SurgSim/Math/OdeSolverStatic.h"
 #include "SurgSim/Math/OdeSolverLinearStatic.h"
 #include "SurgSim/Math/UnitTests/MockObject.h"
@@ -57,14 +55,15 @@ TEST(OdeSolverStatic, ConstructorTest)
 namespace
 {
 template<class T>
-void doSolveTest()
+void doSolveTest(bool computeCompliance)
 {
 	MassPointsForStatic m;
 	MassPointsStateForStatic defaultState, currentState, newState;
+
 	auto solver = std::make_shared<T>(&m);
 	EXPECT_NO_THROW(m.setOdeSolver(solver));
 
-	ASSERT_NO_THROW({solver->solve(1e-3, currentState, &newState);});
+	ASSERT_NO_THROW({solver->solve(1e-3, currentState, &newState, computeCompliance);});
 	EXPECT_EQ(defaultState, currentState);
 	EXPECT_NE(defaultState, newState);
 
@@ -82,11 +81,20 @@ TEST(OdeSolverStatic, SolveTest)
 {
 	{
 		SCOPED_TRACE("Static computing the compliance matrix");
-		doSolveTest<OdeSolverStatic>();
+		doSolveTest<OdeSolverStatic>(true);
 	}
 	{
+		SCOPED_TRACE("Static not computing the compliance matrix");
+		doSolveTest<OdeSolverStatic>(false);
+	}
+
+	{
 		SCOPED_TRACE("LinearStatic computing the compliance matrix");
-		doSolveTest<OdeSolverLinearStatic>();
+		doSolveTest<OdeSolverLinearStatic>(true);
+	}
+	{
+		SCOPED_TRACE("LinearStatic not computing the compliance matrix");
+		doSolveTest<OdeSolverLinearStatic>(false);
 	}
 }
 
@@ -106,7 +114,6 @@ void doComputeMatricesTest()
 	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));
 	EXPECT_TRUE(m.applyCompliance(state, Matrix::Identity(state.getNumDof(),
 								  state.getNumDof())).isApprox(expectedSystemMatrix.inverse()));
-
 }
 };
 

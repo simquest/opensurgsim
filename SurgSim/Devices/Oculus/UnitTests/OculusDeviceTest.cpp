@@ -39,6 +39,33 @@ TEST(OculusDeviceTest, CreateAndInitializeDevice)
 
 	EXPECT_TRUE(device->isInitialized());
 	EXPECT_EQ("Oculus", device->getName());
+
+	EXPECT_FLOAT_EQ(0.1f, device->getNearPlane());
+	EXPECT_FLOAT_EQ(10.0f, device->getFarPlane());
+}
+
+TEST(OculusDeviceTest, SetAndGetNearAndFarPlanes)
+{
+	auto device = std::make_shared<OculusDevice>("Oculus");
+	EXPECT_FLOAT_EQ(0.1f, device->getNearPlane());
+	EXPECT_FLOAT_EQ(10.0f, device->getFarPlane());
+
+	EXPECT_THROW(device->setNearPlane(-0.1f), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(device->setFarPlane(-10.0f), SurgSim::Framework::AssertionFailure);
+
+	EXPECT_NO_THROW(device->setNearPlane(0.2f));
+	EXPECT_NO_THROW(device->setFarPlane(20.0f));
+
+	EXPECT_FLOAT_EQ(0.2f, device->getNearPlane());
+	EXPECT_FLOAT_EQ(20.0f, device->getFarPlane());
+}
+
+TEST(OculusDeviceTest, Factory)
+{
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create(
+								 "SurgSim::Device::OculusDevice", "Device"));
+	EXPECT_NE(nullptr, device);
 }
 
 TEST(OculusDeviceTest, FinalizeDevice)
@@ -105,5 +132,9 @@ TEST(OculusDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 800);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 1200);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.matrices().
+		hasData(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.matrices().
+		hasData(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX));
 }

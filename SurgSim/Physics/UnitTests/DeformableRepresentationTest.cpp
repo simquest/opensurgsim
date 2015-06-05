@@ -76,7 +76,7 @@ public:
 		m_nonIdentityTransform = SurgSim::Math::makeRigidTransform(q, t);
 		m_identityTransform = SurgSim::Math::RigidTransform3d::Identity();
 
-		m_localization0 =  std::make_shared<SurgSim::Physics::MockDeformableRepresentationLocalization>();
+		m_localization0 =  std::make_shared<SurgSim::Physics::MockDeformableLocalization>();
 		m_localization0->setLocalNode(0);
 	}
 
@@ -89,7 +89,7 @@ protected:
 	SurgSim::Math::RigidTransform3d m_nonIdentityTransform;
 
 	// Localization of node 0, to apply external force
-	std::shared_ptr<SurgSim::Physics::MockDeformableRepresentationLocalization> m_localization0;
+	std::shared_ptr<SurgSim::Physics::MockDeformableLocalization> m_localization0;
 };
 
 TEST_F(DeformableRepresentationTest, ConstructorTest)
@@ -519,7 +519,7 @@ TEST_F(DeformableRepresentationTest, SerializationTest)
 		EXPECT_EQ(1u, node.size());
 
 		YAML::Node data = node["SurgSim::Physics::MockDeformableRepresentation"];
-		EXPECT_EQ(9u, data.size());
+		EXPECT_EQ(10u, data.size());
 
 		std::shared_ptr<MockDeformableRepresentation> newRepresentation;
 		newRepresentation = std::dynamic_pointer_cast<MockDeformableRepresentation>

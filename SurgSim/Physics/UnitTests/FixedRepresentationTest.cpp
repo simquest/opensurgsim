@@ -27,7 +27,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidState.h"
 
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
@@ -37,7 +37,7 @@ using SurgSim::Math::SphereShape;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::RigidCollisionRepresentation;
-using SurgSim::Physics::RigidRepresentationState;
+using SurgSim::Physics::RigidState;
 
 class FixedRepresentationTest : public ::testing::Test
 {

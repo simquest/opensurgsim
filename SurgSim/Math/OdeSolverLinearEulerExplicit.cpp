@@ -28,12 +28,13 @@ OdeSolverLinearEulerExplicit::OdeSolverLinearEulerExplicit(OdeEquation* equation
 	m_name = "Ode Solver Linear Euler Explicit";
 }
 
-void OdeSolverLinearEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverLinearEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState,
+		bool computeCompliance)
 {
 	if (!m_initialized)
 	{
 		// The compliance matrix is constant and used in all following calls, so we force its calculation on 1st pass.
-		OdeSolverEulerExplicit::solve(dt, currentState, newState);
+		OdeSolverEulerExplicit::solve(dt, currentState, newState, true);
 		m_initialized = true;
 	}
 	else

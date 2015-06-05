@@ -28,11 +28,11 @@ OdeSolverLinearStatic::OdeSolverLinearStatic(OdeEquation* equation)
 	m_name = "Ode Solver Linear Static";
 }
 
-void OdeSolverLinearStatic::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverLinearStatic::solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance)
 {
 	if (!m_initialized)
 	{
-		OdeSolverStatic::solve(dt, currentState, newState);
+		OdeSolverStatic::solve(dt, currentState, newState, computeCompliance);
 		m_initialized = true;
 	}
 	else
