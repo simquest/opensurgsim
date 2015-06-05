@@ -176,7 +176,7 @@ public:
 		totalTime.beginFrame();
 		for (int i = 0; i < frameCount; i++)
 		{
-			const auto&  inv = fem->getOdeSolver()->getLinearSolver()->getInverse();
+			fem->getOdeSolver()->getLinearSolver()->getInverse();
 		}
 		totalTime.endFrame();
 		RecordProperty("Duration", boost::to_string(totalTime.getCumulativeTime()));

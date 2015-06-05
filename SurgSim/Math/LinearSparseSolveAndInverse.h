@@ -73,7 +73,7 @@ public:
 	virtual Matrix getInverse() const;
 
 protected:
-	/// A dense copy of the system matrix for use when an inverse is necessary.
+	/// A copy of the system matrix for use when an inverse is necessary.
 	SparseMatrix m_matrix;
 };
 
