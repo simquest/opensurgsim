@@ -191,7 +191,6 @@ void ComponentManager::addComponents(
 void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 										const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
 {
-	m_logger->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 	for (auto it = beginIt; it != endIt; ++it)
 	{
 		if ((*it)->isInitialized() && !(*it)->isAwake())
