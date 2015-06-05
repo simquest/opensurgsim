@@ -177,29 +177,29 @@ public:
 		{
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m,\
 						  &m_matrixWithExtraCoefficients,\
-						  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)),\
+						  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
 						  SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
 			EXPECT_THROW((blockWithSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m,\
-						  nullptr, &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)),\
+						  nullptr, &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
 						  SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall,\
-						  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)),\
+						  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
 						  SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients,\
-						  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)),\
+						  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
 						  SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
 			EXPECT_NO_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients,\
-							 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)));
+							 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
 
 			if (success)
 			{
@@ -223,29 +223,29 @@ public:
 		if (subTooSmall)
 		{
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients,\
-						  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::add)),\
+						  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)),\
 						  SurgSim::Framework::AssertionFailure);
 		}
 		else
 		{
 			// No recipient specified
 			EXPECT_THROW((blockWithSearch<Derived, T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr,\
-						  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::add)),\
+						  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)),\
 						  SurgSim::Framework::AssertionFailure);
 
 			// Recipient too small
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixTooSmall,
-						  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::add)),\
+						  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)),\
 						  SurgSim::Framework::AssertionFailure);
 
 			// Recipient does not have all the block coefficients (missing coefficients in the block)
 			EXPECT_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixMissingCoefficients,
-						  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::add)),\
+						  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)),\
 						  SurgSim::Framework::AssertionFailure);
 
 			// Recipient is correct and sub is correct
 			EXPECT_NO_THROW((blockWithSearch(sub, m_rowId, m_columnId, m_n, m_m, &m_matrixWithExtraCoefficients,
-							 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::add)));
+							 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)));
 
 			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> dense(m_matrixWithExtraCoefficients);
 			Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> denseSub(sub);
@@ -272,36 +272,36 @@ public:
 
 		// No recipient specified
 		EXPECT_THROW((blockOperation<Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr,\
-					  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)),\
+					  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
 					  SurgSim::Framework::AssertionFailure);
 
 		// Recipient too small
 		EXPECT_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixTooSmall,\
-					  &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)),\
+					  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
 					  SurgSim::Framework::AssertionFailure);
 
 		// With a recipient that has all the coefficients and no other on the rows/columns
 		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients,
-						 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)));
+						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
 		EXPECT_TRUE((m_matrixWithoutExtraCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithoutExtraCoefficientsExpected.isApprox(m_matrixWithoutExtraCoefficients));
 
 		// With a recipient that has all the coefficients and others on the rows/columns
 		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients,
-						 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)));
+						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
 		EXPECT_TRUE((m_matrixWithExtraCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithExtraCoefficientsExpected.isApprox(m_matrixWithExtraCoefficients));
 
 		// With a recipient that does not have all the block coefficients (missing coefficients in the block)
 		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients,
-						 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)));
+						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
 		EXPECT_TRUE((m_matrixMissingCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 		EXPECT_TRUE(m_matrixWithoutExtraCoefficientsExpected.isApprox(m_matrixMissingCoefficients));
 
 		// With an empty recipient
 		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
 		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixEmpty,
-						 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)));
+						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
 		EXPECT_TRUE((m_matrixEmpty.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
 	}
 
@@ -316,7 +316,7 @@ public:
 		// With an empty recipient
 		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
 		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixEmpty,\
-						 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::assign)));
+						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
 		EXPECT_TRUE(m_matrixEmpty.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub));
 	}
 
@@ -353,7 +353,7 @@ public:
 		m_matrixOne.makeCompressed();
 
 		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixOne,\
-						 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::add)));
+						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)));
 		EXPECT_TRUE(m_matrixOne.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub + one));
 	}
 
@@ -386,7 +386,7 @@ public:
 		m_matrixOne.makeCompressed();
 
 		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixOne,\
-						 &Operation<Eigen::SparseMatrix<T, Opt, I>, Derived>::add)));
+						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)));
 		EXPECT_TRUE(m_matrixOne.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub + one));
 	}
 

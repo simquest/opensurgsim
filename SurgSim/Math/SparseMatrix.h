@@ -31,11 +31,12 @@ namespace Math
 typedef Eigen::SparseMatrix<double> SparseMatrix;
 
 /// Helper class to run operation a column/row of a matrix to a chunk of memory where the size is dynamically defined
-/// \tparam SparseType The type of the SparseVector/SparseMatrix containing the chunk of memory
 /// \tparam DerivedSub The class of the matrix from which the data are copied
+/// \tparam SparseType The type of the SparseVector/SparseMatrix containing the chunk of memory
 /// \tparam StorageOrder The storage option of the SparseType
-template <class SparseType, class DerivedSub,
-	int StorageOrder = ((SparseType::Flags & Eigen::RowMajorBit) == Eigen::RowMajorBit) ? Eigen::RowMajor : Eigen::ColMajor>
+template <class DerivedSub, class SparseType,
+	int StorageOrder =
+	((SparseType::Flags & Eigen::RowMajorBit) == Eigen::RowMajorBit) ? Eigen::RowMajor : Eigen::ColMajor>
 class Operation
 {
 public:
@@ -70,8 +71,8 @@ public:
 };
 
 /// Specialization for column major storage
-template <class SparseType, class DerivedSub>
-class Operation<SparseType, DerivedSub, Eigen::ColMajor>
+template <class DerivedSub, class SparseType>
+class Operation<DerivedSub, SparseType, Eigen::ColMajor>
 {
 public:
 	typedef typename SparseType::Scalar T;
@@ -113,8 +114,8 @@ public:
 };
 
 /// Specialization for row major storage
-template <class SparseType, class DerivedSub>
-class Operation<SparseType, DerivedSub, Eigen::RowMajor>
+template <class DerivedSub, class SparseType>
+class Operation<DerivedSub, SparseType, Eigen::RowMajor>
 {
 public:
 	typedef typename SparseType::Scalar T;
@@ -185,12 +186,12 @@ public:
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
 					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					 void (Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub>::*op)
+					 void (Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::*op)
 					   (T*, Index, Index, Index, const DerivedSub&, Index))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
-	static Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub> operation;
+	static Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
 				  "Both matrices should use the same Scalar type");
@@ -266,11 +267,11 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index rowStart, Index columnStart,
 					Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					void (Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub>::*op)(T*, const T&))
+					void (Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::*op)(T*, const T&))
 {
 	typedef typename DerivedSub::InnerIterator InnerIterator;
 
-	static Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub> operation;
+	static Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>> operation;
 
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
@@ -316,9 +317,9 @@ void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index 
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void blockOperation(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
 					Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					void (Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub>::*op)(T*, const T&))
+					void (Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::*op)(T*, const T&))
 {
-	static Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub> operation;
+	static Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>> operation;
 
 	static_assert(std::is_same<T, typename DerivedSub::Scalar>::value,
 				  "Both matrices should use the same Scalar type");
@@ -360,14 +361,14 @@ void addSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockIdCo
 	{
 		blockOperation(subMatrix, static_cast<Index>(subMatrix.rows() * blockIdRow),
 					   static_cast<Index>(subMatrix.cols() * blockIdCol), matrix,
-					   &Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub>::add);
+					   &Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::add);
 	}
 	else
 	{
 		blockWithSearch(subMatrix, static_cast<Index>(subMatrix.rows() * blockIdRow),
 						static_cast<Index>(subMatrix.cols() * blockIdCol),
 						static_cast<Index>(subMatrix.rows()), static_cast<Index>(subMatrix.cols()), matrix,
-						&Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub>::add);
+						&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::add);
 	}
 }
 
@@ -389,14 +390,14 @@ void assignSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockI
 	{
 		blockOperation(subMatrix, static_cast<Index>(subMatrix.rows() * blockIdRow),
 			static_cast<Index>(subMatrix.cols() * blockIdCol), matrix,
-			&Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub>::assign);
+			&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::assign);
 	}
 	else
 	{
 		blockWithSearch(subMatrix, static_cast<Index>(subMatrix.rows() * blockIdRow),
 			static_cast<Index>(subMatrix.cols() * blockIdCol),
 			static_cast<Index>(subMatrix.rows()), static_cast<Index>(subMatrix.cols()), matrix,
-			&Operation<Eigen::SparseMatrix<T, Opt, Index>, DerivedSub>::assign);
+			&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::assign);
 	}
 }
 
