@@ -119,52 +119,6 @@ public:
 		m->makeCompressed();
 	}
 
-	//template <class Derived>
-	//void TestSetWithoutSearchDynamic(const Derived& sub, bool subTooSmall = false, bool success = true)
-	//{
-	//	using SurgSim::Math::blockWithoutSearch;
-
-	//	SetUp();
-
-	//	if (subTooSmall)
-	//	{
-	//		EXPECT_THROW((blockAssignWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
-	//					&m_matrixWithoutExtraCoefficients)), SurgSim::Framework::AssertionFailure);
-	//	}
-	//	else
-	//	{
-	//		// No recipient specified
-	//		EXPECT_THROW((blockAssignWithoutSearch<Eigen::SparseMatrix<T, Opt, I>, Derived>(sub, \
-	//					  m_rowId, m_columnId, m_n, m_m, \
-	//					  nullptr)), SurgSim::Framework::AssertionFailure);
-
-	//		// Recipient too small
-	//		EXPECT_THROW((blockAssignWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m,
-	//					  &m_matrixTooSmall)), SurgSim::Framework::AssertionFailure);
-
-	//		// Recipient does not have all the block coefficients (missing coefficients in the block)
-	//		EXPECT_THROW((blockAssignWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
-	//					  &m_matrixMissingCoefficients)), SurgSim::Framework::AssertionFailure);
-
-	//		// Recipient has extra coefficients on the block rows/columns
-	//		EXPECT_THROW((blockAssignWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
-	//					  &m_matrixWithExtraCoefficients)), SurgSim::Framework::AssertionFailure);
-
-	//		// Recipient is correct and sub is correct
-	//		EXPECT_NO_THROW((blockAssignWithoutSearch(sub, m_rowId, m_columnId, m_n, m_m, \
-	//						 &m_matrixWithoutExtraCoefficients)));
-
-	//		if (success)
-	//		{
-	//			EXPECT_TRUE(m_matrixWithoutExtraCoefficients.isApprox(m_matrixWithoutExtraCoefficientsExpected));
-	//		}
-	//		else
-	//		{
-	//			EXPECT_FALSE(m_matrixWithoutExtraCoefficients.isApprox(m_matrixWithoutExtraCoefficientsExpected));
-	//		}
-	//	}
-	//}
-
 	template <class Derived>
 	void TestSetWithSearchDynamic(const Derived& sub, bool subTooSmall = false, bool success = true)
 	{

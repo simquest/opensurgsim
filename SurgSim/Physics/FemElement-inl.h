@@ -43,7 +43,8 @@ void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::ve
 		{
 			Index subCol = blockSize * block1;
 			Index matrixCol = blockSize * static_cast<Index>(blockIds[block1]);
-			addSubMatrix(subMatrix.block(subRow, subCol, blockSize, blockSize), matrixRow, matrixCol, matrix,initialize);
+			addSubMatrix(subMatrix.block(subRow, subCol, blockSize, blockSize),
+				matrixRow, matrixCol, matrix, initialize);
 		}
 	}
 }
