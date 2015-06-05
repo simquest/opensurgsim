@@ -98,7 +98,7 @@ public:
 
 	void initializeRepresentation(std::shared_ptr<MockFem3DRepresentation> fem)
 	{
-		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"));
 		fem->wakeUp();
 		std::shared_ptr<SurgSim::Math::LinearSparseSolveAndInverseCG> solver =
 			std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(
