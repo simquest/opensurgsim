@@ -347,12 +347,10 @@ void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState&
 	using SurgSim::Math::assignSubMatrix;
 
 	typedef Eigen::SparseMatrix<double>::Index Index;
-	Index numDofPerNode = static_cast<Index>(getNumDofPerNode());
 	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
 	{
-		Index startDiagonalIndex = numDofPerNode * static_cast<Index>(nodeId);
-		assignSubMatrix(getNodeTransformation(state, nodeId),
-						startDiagonalIndex, startDiagonalIndex, &m_complianceWarpingTransformation, false);
+		assignSubMatrix(getNodeTransformation(state, nodeId), static_cast<Index>(nodeId),
+			static_cast<Index>(nodeId), &m_complianceWarpingTransformation, false);
 	}
 }
 
