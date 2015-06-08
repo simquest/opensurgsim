@@ -222,12 +222,12 @@ TEST(FemElementTests, FactoryTest)
 
 	// Mock Element
 	std::array<size_t, 1> mockNodes = {2};
-	auto mockData = std::make_shared<FemElementStructs::FemElementParameter>();
-	mockData->massDensity = 0.5;
-	mockData->poissonRatio = 0.5;
-	mockData->youngModulus = 0.5;
+	FemElementStructs::FemElementParameter mockData;
+	mockData.massDensity = 0.5;
+	mockData.poissonRatio = 0.5;
+	mockData.youngModulus = 0.5;
 	auto mockElement = std::make_shared<SurgSim::DataStructures::MeshElement<1,
-			std::shared_ptr<FemElementStructs::FemElementParameter>>>(mockNodes, mockData);
+			FemElementStructs::FemElementParameter>>(mockNodes, mockData);
 	FemElement::getFactory().registerClass<MockFemElement>("MockFemElement");
 	auto mockFem = FemElement::getFactory().create("MockFemElement");
 	EXPECT_NE(nullptr, mockFem);
@@ -237,12 +237,12 @@ TEST(FemElementTests, FactoryTest)
 
 	// Beam Element
 	std::array<size_t, 2> beamNodes = {1, 2};
-	auto beamData = std::make_shared<FemElementStructs::FemElement1DParameter>();
-	beamData->radius = 0.4;
-	beamData->enableShear = false;
-	beamData->massDensity = 0.4;
-	beamData->poissonRatio = 0.4;
-	beamData->youngModulus = 0.4;
+	FemElementStructs::FemElement1DParameter beamData;
+	beamData.radius = 0.4;
+	beamData.enableShear = false;
+	beamData.massDensity = 0.4;
+	beamData.poissonRatio = 0.4;
+	beamData.youngModulus = 0.4;
 	auto beamElement = std::make_shared<BeamType>(beamNodes, beamData);
 	auto beamFem = FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam");
 	EXPECT_NE(nullptr, beamFem);
@@ -253,11 +253,11 @@ TEST(FemElementTests, FactoryTest)
 
 	// Triangle Element
 	std::array<size_t, 3> triNodes = {1, 2, 3};
-	auto triData = std::make_shared<FemElementStructs::FemElement2DParameter>();
-	triData->thickness = 0.4;
-	triData->massDensity = 0.4;
-	triData->poissonRatio = 0.4;
-	triData->youngModulus = 0.4;
+	FemElementStructs::FemElement2DParameter triData;
+	triData.thickness = 0.4;
+	triData.massDensity = 0.4;
+	triData.poissonRatio = 0.4;
+	triData.youngModulus = 0.4;
 	auto triElement = std::make_shared<TriangleType>(triNodes, triData);
 	auto triFem = FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle");
 	EXPECT_NE(nullptr, triFem);
@@ -268,10 +268,10 @@ TEST(FemElementTests, FactoryTest)
 
 	// Tetrahedron and Corotational Tet Elements
 	std::array<size_t, 4> tetNodes = {1, 2, 3, 1};
-	auto tetData = std::make_shared<FemElementStructs::FemElement3DParameter>();
-	tetData->massDensity = 0.4;
-	tetData->poissonRatio = 0.4;
-	tetData->youngModulus = 0.4;
+	FemElementStructs::FemElement3DParameter tetData;
+	tetData.massDensity = 0.4;
+	tetData.poissonRatio = 0.4;
+	tetData.youngModulus = 0.4;
 	auto tetElement = std::make_shared<TetrahedronType>(tetNodes, tetData);
 	auto tetFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementTetrahedron");
 	EXPECT_NE(nullptr, tetFem);
@@ -289,10 +289,10 @@ TEST(FemElementTests, FactoryTest)
 
 	// Cube Element
 	std::array<size_t, 8> cubeNodes = {1, 2, 3, 4, 5, 6, 7, 8};
-	auto cubeData = std::make_shared<FemElementStructs::FemElement3DParameter>();
-	cubeData->massDensity = 0.4;
-	cubeData->poissonRatio = 0.4;
-	cubeData->youngModulus = 0.4;
+	FemElementStructs::FemElement3DParameter cubeData;
+	cubeData.massDensity = 0.4;
+	cubeData.poissonRatio = 0.4;
+	cubeData.youngModulus = 0.4;
 	auto cubeElement = std::make_shared<CubeType>(cubeNodes, cubeData);
 	auto cubeFem = FemElement::getFactory().create("SurgSim::Physics::Fem3DElementCube");
 	EXPECT_NE(nullptr, cubeFem);

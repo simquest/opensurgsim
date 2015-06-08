@@ -22,7 +22,7 @@
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Physics/Fem.h"
+#include "SurgSim/Physics/Fem3D.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
@@ -37,8 +37,6 @@ namespace Physics
 {
 SURGSIM_STATIC_REGISTRATION(Fem3DRepresentation);
 
-class FemPlyReaderDelegate;
-
 /// Finite Element Model 3D is a fem built with 3D FemElement
 class Fem3DRepresentation : public FemRepresentation
 {
@@ -51,8 +49,8 @@ public:
 	virtual ~Fem3DRepresentation();
 
 	void loadFem(const std::string& fileName) override;
-	void setMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh);
-	std::shared_ptr<Fem3D> getMesh() const;
+	void setFem(std::shared_ptr<SurgSim::Framework::Asset> mesh);
+	std::shared_ptr<Fem3D> getFem() const;
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
 

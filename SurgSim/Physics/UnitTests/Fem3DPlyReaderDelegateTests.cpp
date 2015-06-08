@@ -70,14 +70,14 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 
 	// Material
 	auto fem2 = fem->getElement(2);
-	EXPECT_DOUBLE_EQ(0.1432, fem2->data->massDensity);
-	EXPECT_DOUBLE_EQ(0.224, fem2->data->poissonRatio);
-	EXPECT_DOUBLE_EQ(0.472, fem2->data->youngModulus);
+	EXPECT_DOUBLE_EQ(0.1432, fem2->data.massDensity);
+	EXPECT_DOUBLE_EQ(0.224, fem2->data.poissonRatio);
+	EXPECT_DOUBLE_EQ(0.472, fem2->data.youngModulus);
 
 	auto fem8 = fem->getElement(8);
-	EXPECT_DOUBLE_EQ(0.1432, fem8->data->massDensity);
-	EXPECT_DOUBLE_EQ(0.224, fem8->data->poissonRatio);
-	EXPECT_DOUBLE_EQ(0.472, fem8->data->youngModulus);
+	EXPECT_DOUBLE_EQ(0.1432, fem8->data.massDensity);
+	EXPECT_DOUBLE_EQ(0.224, fem8->data.poissonRatio);
+	EXPECT_DOUBLE_EQ(0.472, fem8->data.youngModulus);
 }
 
 TEST(Fem3DRepresentationReaderTests, CubeMeshDelegateTest)
@@ -111,14 +111,14 @@ TEST(Fem3DRepresentationReaderTests, CubeMeshDelegateTest)
 
 	// Material
 	auto fem2 = fem->getCube(2);
-	EXPECT_DOUBLE_EQ(0.2, fem2->data->massDensity);
-	EXPECT_DOUBLE_EQ(0.3, fem2->data->poissonRatio);
-	EXPECT_DOUBLE_EQ(0.4, fem2->data->youngModulus);
+	EXPECT_DOUBLE_EQ(0.2, fem2->data.massDensity);
+	EXPECT_DOUBLE_EQ(0.3, fem2->data.poissonRatio);
+	EXPECT_DOUBLE_EQ(0.4, fem2->data.youngModulus);
 
 	auto fem1 = fem->getCube(1);
-	EXPECT_DOUBLE_EQ(0.2, fem1->data->massDensity);
-	EXPECT_DOUBLE_EQ(0.3, fem1->data->poissonRatio);
-	EXPECT_DOUBLE_EQ(0.4, fem1->data->youngModulus);
+	EXPECT_DOUBLE_EQ(0.2, fem1->data.massDensity);
+	EXPECT_DOUBLE_EQ(0.3, fem1->data.poissonRatio);
+	EXPECT_DOUBLE_EQ(0.4, fem1->data.youngModulus);
 }
 
 } // Physics

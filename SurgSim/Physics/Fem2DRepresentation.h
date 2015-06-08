@@ -21,7 +21,7 @@
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Physics/Fem.h"
+#include "SurgSim/Physics/Fem2D.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
@@ -30,8 +30,6 @@ namespace SurgSim
 namespace Physics
 {
 SURGSIM_STATIC_REGISTRATION(Fem2DRepresentation);
-
-class Fem2DPlyReaderDelegate;
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
 class Fem2DRepresentation : public FemRepresentation
@@ -47,8 +45,8 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DRepresentation);
 
 	void loadFem(const std::string& fileName) override;
-	void setMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh);
-	std::shared_ptr<Fem2D> getMesh() const;
+	void setFem(std::shared_ptr<SurgSim::Framework::Asset> mesh);
+	std::shared_ptr<Fem2D> getFem() const;
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,

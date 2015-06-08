@@ -93,10 +93,10 @@ void Fem2DPlyReaderDelegate::endParseFile()
 {
 	for(auto element : m_mesh->getElements())
 	{
-		element->data->thickness = m_thickness;
-		element->data->massDensity = m_materialData.massDensity;
-		element->data->poissonRatio = m_materialData.poissonRatio;
-		element->data->youngModulus = m_materialData.youngModulus;
+		element->data.thickness = m_thickness;
+		element->data.massDensity = m_materialData.massDensity;
+		element->data.poissonRatio = m_materialData.poissonRatio;
+		element->data.youngModulus = m_materialData.youngModulus;
 	}
 	m_mesh->update();
 }
@@ -118,12 +118,6 @@ void Fem2DPlyReaderDelegate::processVertex(const std::string& elementName)
 		data.thetaY = m_vertexData.thetaY;
 		data.thetaZ = m_vertexData.thetaZ;
 	}
-	else
-	{
-		data.thetaX = 0.0;
-		data.thetaY = 0.0;
-		data.thetaZ = 0.0;
-	}
 
 	Fem2D::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z), data);
 
@@ -144,9 +138,9 @@ void Fem2DPlyReaderDelegate::processFemElement(const std::string& elementName)
 
 	std::array<size_t, 3> nodes;
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, nodes.data());
-	auto data = std::make_shared<FemElementStructs::FemElement2DParameter>();
+	FemElementStructs::FemElement2DParameter data;
 	static Fem2DElementTriangle triangle;
-	data->type = triangle.getClassName();
+	data.type = triangle.getClassName();
 	auto femElement = std::make_shared<TriangleType>(nodes, data);
 	m_mesh->addElement(femElement);
 }

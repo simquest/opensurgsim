@@ -58,7 +58,7 @@ public:
 
 	/// Set the element data
 	/// \param data A MeshElement that conatins all required Fem3D data
-	void setData(std::vector<size_t> nodeIds, std::shared_ptr<FemElementStructs::FemElementParameter> data) override;
+	void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) override;
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with

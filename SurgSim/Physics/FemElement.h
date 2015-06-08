@@ -64,8 +64,7 @@ public:
 	/// \param begin Iterator to beginning of node id container
 	/// \param end Itertor to end of node id container
 	/// \param data The Fem Element parameter data
-	virtual void setData(std::vector<size_t> nodeIds,
-						 std::shared_ptr<FemElementStructs::FemElementParameter> data) = 0;
+	virtual void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) = 0;
 
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node

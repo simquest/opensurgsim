@@ -47,7 +47,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam)
 
-	void setData(std::vector<size_t> nodeIds, std::shared_ptr<FemElementStructs::FemElementParameter> data) override;
+	void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) override;
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam

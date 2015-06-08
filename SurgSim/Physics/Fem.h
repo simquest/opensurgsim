@@ -16,61 +16,20 @@
 #ifndef SURGSIM_PHYSICS_FEM_H
 #define SURGSIM_PHYSICS_FEM_H
 
-#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
-
-using SurgSim::DataStructures::EmptyData;
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Framework/Asset.h"
+#include "SurgSim/Physics/FemElementStructs.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-namespace FemElementStructs
-{
-struct RotationVectorData
-{
-	bool operator==(const RotationVectorData& rhs) const
-	{
-		return (thetaX == rhs.thetaX && thetaY == rhs.thetaY && thetaZ == rhs.thetaZ);
-	}
-	double thetaX;
-	double thetaY;
-	double thetaZ;
-};
-
-struct FemElementParameter
-{
-	virtual ~FemElementParameter(){}
-
-	std::string type;   // “LinearBeam”, “CorotationalTetrahedron”…
-
-	double youngModulus;
-	double poissonRatio;
-	double massDensity;
-};
-
-struct FemElement1DParameter : public FemElementParameter
-{
-	double radius;
-	bool enableShear;
-};
-
-struct FemElement2DParameter : public FemElementParameter
-{
-	double thickness;
-};
-
-struct FemElement3DParameter : public FemElementParameter {};
-} // namespace FemElementStructs
-
-typedef SurgSim::DataStructures::MeshElement<2, std::shared_ptr<FemElementStructs::FemElement1DParameter>> BeamType;
-typedef SurgSim::DataStructures::MeshElement<3,
-						std::shared_ptr<FemElementStructs::FemElement2DParameter>> TriangleType;
-typedef SurgSim::DataStructures::MeshElement<4,
-						std::shared_ptr<FemElementStructs::FemElement3DParameter>> TetrahedronType;
-typedef SurgSim::DataStructures::MeshElement<8, std::shared_ptr<FemElementStructs::FemElement3DParameter>> CubeType;
+typedef SurgSim::DataStructures::MeshElement<2, FemElementStructs::FemElement1DParameter> BeamType;
+typedef SurgSim::DataStructures::MeshElement<3, FemElementStructs::FemElement2DParameter> TriangleType;
+typedef SurgSim::DataStructures::MeshElement<4, FemElementStructs::FemElement3DParameter> TetrahedronType;
+typedef SurgSim::DataStructures::MeshElement<8, FemElementStructs::FemElement3DParameter> CubeType;
 
 /// Base class for a data structure for holding FEM mesh data of different dimensions
 ///
@@ -80,8 +39,6 @@ typedef SurgSim::DataStructures::MeshElement<8, std::shared_ptr<FemElementStruct
 /// corotational models.
 ///
 /// \tparam VertexData  Type of extra data stored in each vertex
-/// \tparam	EdgeData	Type of extra data stored in each edge
-/// \tparam	TriangleData	Type of extra data stored in each triangle
 /// \tparam Element		Type of FEM element the mesh will be storing
 /// \sa	TriangleMesh
 template <class VertexData, class Element>
@@ -145,66 +102,7 @@ protected:
 	std::vector<size_t> m_boundaryConditions;
 };
 
-SURGSIM_STATIC_REGISTRATION(Fem1D);
-
-/// Fem class data structure implementation for 1-Dimensional FEMs
-/// \sa Fem
-class Fem1D : public Fem<FemElementStructs::RotationVectorData, BeamType>
-{
-public:
-	Fem1D();
-
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1D);
-
-protected:
-	// Asset API override
-	bool doLoad(const std::string& filePath) override;
-};
-
-SURGSIM_STATIC_REGISTRATION(Fem2D);
-
-/// Fem class data structure implementation for 2-Dimensional FEMs
-/// \sa Fem
-class Fem2D : public Fem<FemElementStructs::RotationVectorData, TriangleType>
-{
-public:
-	Fem2D();
-
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2D);
-
-protected:
-	// Asset API override
-	bool doLoad(const std::string& filePath) override;
-};
-
-SURGSIM_STATIC_REGISTRATION(Fem3D);
-
-/// Fem class data structure implementation for 3-Dimensional FEMs
-/// \sa Fem
-class Fem3D : public Fem<EmptyData, TetrahedronType>
-{
-public:
-	Fem3D();
-
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3D);
-
-	size_t addCube(std::shared_ptr<CubeType> cube);
-
-	size_t getNumCubes() const;
-
-	const std::vector<std::shared_ptr<CubeType> >& getCubes() const;
-	std::vector<std::shared_ptr<CubeType>>& getCubes();
-
-	std::shared_ptr<CubeType> getCube(size_t id) const;
-
-protected:
-	// Asset API override
-	bool doLoad(const std::string& filePath) override;
-
-	std::vector<std::shared_ptr<CubeType>> m_cubeElements;
-};
-
-} // namespace DataStructures
+} // namespace Physics
 } // namespace SurgSim
 
 #include "SurgSim/Physics/Fem-inl.h"

@@ -336,13 +336,13 @@ MockFemElement::MockFemElement() : FemElement()
 	init();
 }
 
-void MockFemElement::setData(std::vector<size_t> nodeIds, std::shared_ptr<FemElementStructs::FemElementParameter> data)
+void MockFemElement::setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data)
 {
 	SURGSIM_ASSERT(nodeIds.size() == 1) << "Incorrect number of nodes for Mock Fem";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
-	setMassDensity(data->massDensity);
-	setPoissonRatio(data->poissonRatio);
-	setYoungModulus(data->youngModulus);
+	setMassDensity(data.massDensity);
+	setPoissonRatio(data.poissonRatio);
+	setYoungModulus(data.youngModulus);
 }
 
 void MockFemElement::addNode(size_t nodeId)
@@ -444,7 +444,6 @@ MockFemRepresentation::~MockFemRepresentation()
 
 void MockFemRepresentation::loadFem(const std::string &filename)
 {
-	m_filename = filename;
 }
 
 void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,

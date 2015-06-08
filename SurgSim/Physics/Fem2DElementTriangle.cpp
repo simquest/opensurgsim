@@ -52,11 +52,9 @@ Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-void Fem2DElementTriangle::setData(std::vector<size_t> nodeIds,
-								   std::shared_ptr<FemElementStructs::FemElementParameter> data)
+void Fem2DElementTriangle::setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data)
 {
-	auto elementData = std::dynamic_pointer_cast<FemElementStructs::FemElement2DParameter>(data);
-	SURGSIM_ASSERT(elementData != nullptr);
+	auto elementData = (struct FemElementStructs::FemElement2DParameter*) &data;
 	SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 	setThickness(elementData->thickness);

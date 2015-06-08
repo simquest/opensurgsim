@@ -299,7 +299,7 @@ TEST(Fem1DRepresentationTests, SerializationTest)
 	ASSERT_NE(nullptr, newRepresentation);
 
 	EXPECT_EQ("SurgSim::Physics::Fem1DRepresentation", newRepresentation->getClassName());
-	EXPECT_EQ(filename, newRepresentation->getValue<std::string>("Filename"));
+	EXPECT_EQ(filename, newRepresentation->getFem()->getValue<std::string>("FileName"));
 }
 
 } // namespace Physics

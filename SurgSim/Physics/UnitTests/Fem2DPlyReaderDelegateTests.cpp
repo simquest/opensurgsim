@@ -63,9 +63,9 @@ TEST(Fem2DRepresentationReaderTests, DelegateTest)
 	for (size_t i = 0; i < fem->getNumElements(); ++i)
 	{
 		auto element = fem->getElement(i);
-		EXPECT_DOUBLE_EQ(0.2, element->data->massDensity);
-		EXPECT_DOUBLE_EQ(0.3, element->data->poissonRatio);
-		EXPECT_DOUBLE_EQ(0.4, element->data->youngModulus);
+		EXPECT_DOUBLE_EQ(0.2, element->data.massDensity);
+		EXPECT_DOUBLE_EQ(0.3, element->data.poissonRatio);
+		EXPECT_DOUBLE_EQ(0.4, element->data.youngModulus);
 	}
 }
 

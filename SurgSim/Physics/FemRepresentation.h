@@ -160,10 +160,6 @@ public:
 					 SurgSim::Math::SparseMatrix** D, SurgSim::Math::SparseMatrix** K) override;
 
 protected:
-	/// Gets Fem mesh to encode for serialization
-	/// \return The Fem mesh
-	const std::string& getFilename() const;
-
 	/// Adds the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
 	/// \param state The state vector containing positions and velocities
@@ -213,9 +209,6 @@ protected:
 
 	/// Override class name passed to FemElement factory if not empty
 	std::string m_femElementOverrideType;
-
-	/// Name of file describing the physics mesh
-	std::string m_filename;
 
 private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)

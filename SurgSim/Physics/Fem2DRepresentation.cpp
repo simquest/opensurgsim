@@ -56,6 +56,9 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem2DRepresent
 
 Fem2DRepresentation::Fem2DRepresentation(const std::string& name) : FemRepresentation(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Fem2DRepresentation, std::shared_ptr<SurgSim::Framework::Asset>, Fem, getFem,
+									  setFem);
+	SURGSIM_ADD_SETTER(Fem2DRepresentation, std::string, FemFileName, loadFem)
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation but needs to be set by all
 	// concrete derived classes
 	m_numDofPerNode = 6;
@@ -67,18 +70,18 @@ Fem2DRepresentation::~Fem2DRepresentation()
 
 void Fem2DRepresentation::loadFem(const std::string& fileName)
 {
-	m_filename = fileName;
 	auto mesh = std::make_shared<Fem2D>();
 	mesh->load(fileName);
-	setMesh(mesh);
+	setFem(mesh);
 }
 
-void Fem2DRepresentation::setMesh(std::shared_ptr<Framework::Asset> mesh)
+void Fem2DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 {
 	auto femMesh = std::dynamic_pointer_cast<Fem2D>(mesh);
 	SURGSIM_ASSERT(femMesh != nullptr)
 			<< "Mesh for Fem2DRepresentation needs to be a SurgSim::Physics::Fem2D";
 	m_fem = femMesh;
+	SURGSIM_ASSERT(m_fem != nullptr) << "Fem member variable was not set properly";
 	auto state = std::make_shared<SurgSim::Math::OdeState>();
 
 	state->setNumDof(getNumDofPerNode(), m_fem->getNumVertices());
@@ -93,7 +96,7 @@ void Fem2DRepresentation::setMesh(std::shared_ptr<Framework::Asset> mesh)
 	FemRepresentation::setInitialState(state);
 }
 
-std::shared_ptr<Fem2D> Fem2DRepresentation::getMesh() const
+std::shared_ptr<Fem2D> Fem2DRepresentation::getFem() const
 {
 	return m_fem;
 }
@@ -173,32 +176,23 @@ void Fem2DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState
 
 bool Fem2DRepresentation::doInitialize()
 {
-	if (!m_filename.empty() && m_fem == nullptr)
+	for (auto& element : m_fem->getElements())
 	{
-		loadFem(m_filename);
-	}
-
-	// If mesh is set, create the FemElements
-	if (m_fem != nullptr)
-	{
-		for (auto& element : m_fem->getElements())
+		std::shared_ptr<FemElement> femElement;
+		if (m_femElementOverrideType.empty())
 		{
-			std::shared_ptr<FemElement> femElement;
-			if (m_femElementOverrideType.empty())
-			{
-				femElement = FemElement::getFactory().create(element->data->type);
-			}
-			else
-			{
-				femElement = FemElement::getFactory().create(m_femElementOverrideType);
-			}
-
-			std::vector<size_t> nodeIds;
-			nodeIds.assign(element->verticesId.begin(), element->verticesId.end());
-			femElement->setData(nodeIds, element->data);
-
-			m_femElements.push_back(femElement);
+			femElement = FemElement::getFactory().create(element->data.type);
 		}
+		else
+		{
+			femElement = FemElement::getFactory().create(m_femElementOverrideType);
+		}
+
+		std::vector<size_t> nodeIds;
+		nodeIds.assign(element->verticesId.begin(), element->verticesId.end());
+		femElement->setData(nodeIds, element->data);
+
+		m_femElements.push_back(femElement);
 	}
 
 	return FemRepresentation::doInitialize();

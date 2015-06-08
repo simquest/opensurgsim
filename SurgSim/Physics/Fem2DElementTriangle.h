@@ -68,7 +68,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DElementTriangle)
 
-	void setData(std::vector<size_t> nodeIds, std::shared_ptr<FemElementStructs::FemElementParameter> data) override;
+	void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) override;
 
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle

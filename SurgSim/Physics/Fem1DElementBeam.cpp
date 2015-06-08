@@ -43,11 +43,9 @@ Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-void Fem1DElementBeam::setData(std::vector<size_t> nodeIds,
-							   std::shared_ptr<FemElementStructs::FemElementParameter> data)
+void Fem1DElementBeam::setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data)
 {
-	auto elementData = std::dynamic_pointer_cast<FemElementStructs::FemElement1DParameter>(data);
-	SURGSIM_ASSERT(elementData != nullptr);
+	auto elementData = (struct FemElementStructs::FemElement1DParameter*) &data;
 	SURGSIM_ASSERT(nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 	setShearingEnabled(elementData->enableShear);

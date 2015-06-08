@@ -42,11 +42,9 @@ Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-void Fem3DElementCube::setData(std::vector<size_t> nodeIds,
-							   std::shared_ptr<FemElementStructs::FemElementParameter> data)
+void Fem3DElementCube::setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data)
 {
-	auto elementData = std::dynamic_pointer_cast<FemElementStructs::FemElement3DParameter>(data);
-	SURGSIM_ASSERT(elementData != nullptr) << "Incorrect struct type passed";
+	auto elementData = (struct FemElementStructs::FemElement3DParameter*) &data;
 	SURGSIM_ASSERT(nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 	setMassDensity(elementData->massDensity);

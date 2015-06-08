@@ -13,10 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Physics/Fem.h"
-#include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
-#include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
+#include "SurgSim/Physics/Fem3D.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 
 namespace SurgSim
@@ -25,27 +22,7 @@ namespace SurgSim
 namespace Physics
 {
 
-SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::Fem1D, Fem1D)
-SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::Fem2D, Fem2D)
 SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::Fem3D, Fem3D)
-
-Fem1D::Fem1D() : Fem()
-{
-}
-
-bool Fem1D::doLoad(const std::string& filePath)
-{
-	return loadFemFile<Fem1DPlyReaderDelegate, Fem1D>(filePath);
-}
-
-Fem2D::Fem2D() : Fem()
-{
-}
-
-bool Fem2D::doLoad(const std::string& filePath)
-{
-	return loadFemFile<Fem2DPlyReaderDelegate, Fem2D>(filePath);
-}
 
 Fem3D::Fem3D()
 {

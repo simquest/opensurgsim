@@ -57,11 +57,9 @@ Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds)
 	m_nodeIds.assign(std::begin(nodeIds), std::end(nodeIds));
 }
 
-void Fem3DElementTetrahedron::setData(std::vector<size_t> nodeIds,
-									  std::shared_ptr<FemElementStructs::FemElementParameter> data)
+void Fem3DElementTetrahedron::setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data)
 {
-	auto elementData = std::dynamic_pointer_cast<FemElementStructs::FemElement3DParameter>(data);
-	SURGSIM_ASSERT(elementData != nullptr) << "Incorrect struct type passed";
+	auto elementData = (struct FemElementStructs::FemElement3DParameter*) &data;
 	SURGSIM_ASSERT(nodeIds.size() == 4) << "Incorrect number of nodes for Fem3D Tetrahedron";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 	setMassDensity(elementData->massDensity);

@@ -21,7 +21,7 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/Physics/Fem.h"
+#include "SurgSim/Physics/Fem2D.h"
 #include "SurgSim/Physics/FemPlyReaderDelegate.h"
 
 namespace SurgSim
