@@ -174,7 +174,8 @@ public:
 
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
-		for (int i = 0; i < frameCount; i++)
+		// Inversion takes a long time. Only do it once.
+		for (int i = 0; i < 1; i++)
 		{
 			fem->getOdeSolver()->getLinearSolver()->getInverse();
 		}

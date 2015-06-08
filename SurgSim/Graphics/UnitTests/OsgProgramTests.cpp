@@ -179,15 +179,11 @@ void expectFileContents(const std::string& filePath, const std::string& contents
 
 TEST(OsgProgramTests, LoadShaderSourceTest)
 {
-	ASSERT_TRUE(boost::filesystem::exists("Data"));
+	SurgSim::Framework::ApplicationData data("config.txt");
 
-	std::vector<std::string> paths;
-	paths.push_back("Data/OsgProgramTests");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	std::string vertexShaderPath = data.findFile("shader.vert");
-	std::string geometryShaderPath = data.findFile("shader.geom");
-	std::string fragmentShaderPath = data.findFile("shader.frag");
+	std::string vertexShaderPath   = data.findFile("OsgProgramTests/shader.vert");
+	std::string geometryShaderPath = data.findFile("OsgProgramTests/shader.geom");
+	std::string fragmentShaderPath = data.findFile("OsgProgramTests/shader.frag");
 
 	ASSERT_NE("", vertexShaderPath) << "Could not find vertex shader!";
 	ASSERT_NE("", geometryShaderPath) << "Could not find geometry shader!";

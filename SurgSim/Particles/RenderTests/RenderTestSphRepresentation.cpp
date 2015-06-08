@@ -42,7 +42,7 @@ std::shared_ptr<Framework::SceneElement> createCube()
 	auto element = std::make_shared<Framework::BasicSceneElement>("cube");
 
 	auto mesh = std::make_shared<Math::MeshShape>();
-	mesh->load("Cube.ply");
+	mesh->load("Geometry/Cube.ply");
 
 	auto collision = std::make_shared<Collision::ShapeCollisionRepresentation>("collision");
 	collision->setShape(mesh);

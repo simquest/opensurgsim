@@ -61,14 +61,14 @@ TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 	int numSteps = 100;
 
 	auto sceneryObject1 = std::make_shared<OsgSceneryRepresentation>("Torus1");
-	sceneryObject1->loadModel("OsgSceneryRepresentationTests/Torus.obj");
+	sceneryObject1->loadModel("Geometry/Torus.obj");
 	sceneryObject1->setLocalPose(SurgSim::Math::makeRigidTransform(
 									 SurgSim::Math::Quaterniond::Identity(),	startPosition1));
 	viewElement->addComponent(sceneryObject1);
 
 	auto sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("Torus2");
 	auto torus = std::make_shared<OsgModel>();
-	torus->load("OsgSceneryRepresentationTests/Torus.osgb");
+	torus->load("Geometry/Torus.osgb");
 	sceneryObject2->setModel(torus);
 	sceneryObject2->setLocalPose(SurgSim::Math::makeRigidTransform(
 									 SurgSim::Math::Quaterniond::Identity(),	startPosition2));

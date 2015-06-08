@@ -31,8 +31,6 @@ set(LIBS
 	SurgSimFramework
 )
 
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-
 # Configure the path for the data files
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"

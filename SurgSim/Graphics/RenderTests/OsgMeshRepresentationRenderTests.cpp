@@ -98,7 +98,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 
 	auto material = std::make_shared<OsgMaterial>("material");
 	auto texture = std::make_shared<OsgTexture2d>();
-	texture->loadImage(applicationData->findFile("OsgMeshRepresentationRenderTests/cube.png"));
+	texture->loadImage(applicationData->findFile("Textures/CubeMap_rgb_rotate.png"));
 
 	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<SurgSim::Graphics::OsgTexture2d>>>("oss_diffuseMap");
 	uniform2d->set(texture);
@@ -188,7 +188,7 @@ TEST_F(OsgMeshRepresentationRenderTests, TextureTest)
 {
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Mesh");
-	graphics->loadMesh("OsgMeshRepresentationRenderTests/wound_deformable.ply");
+	graphics->loadMesh("Geometry/wound_deformable_with_texture.ply");
 
 	// Create material to transport the Textures
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
@@ -222,12 +222,12 @@ TEST_F(OsgMeshRepresentationRenderTests, TextureTest)
 TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 {
 	std::string textureFilename;
-	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("OsgMeshRepresentationRenderTests/wound.png",
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/wound_deformable.png",
 				&textureFilename));
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Mesh");
-	graphics->loadMesh("OsgMeshRepresentationRenderTests/wound_deformable.ply");
+	graphics->loadMesh("Geometry/wound_deformable_with_texture.ply");
 
 	// Create material to transport the Textures
 
