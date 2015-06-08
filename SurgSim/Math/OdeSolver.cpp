@@ -63,13 +63,16 @@ void OdeSolver::allocate(size_t size)
 	m_rhs.resize(size);
 }
 
-void OdeSolver::computeMatrices(double dt, const OdeState& state)
+void OdeSolver::computeMatrices(double dt, const OdeState& state, bool computeCompliance)
 {
 	/// Compute the system matrix (and discard the RHS calculation)
 	assembleLinearSystem(dt, state, state, false);
 
 	/// Compute the compliance matrix
-	computeComplianceMatrixFromSystemMatrix(state);
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(state);
+	}
 }
 
 void OdeSolver::computeComplianceMatrixFromSystemMatrix(const OdeState& state)
