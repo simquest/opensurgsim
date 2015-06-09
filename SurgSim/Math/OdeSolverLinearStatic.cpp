@@ -37,6 +37,8 @@ void OdeSolverLinearStatic::solve(double dt, const OdeState& currentState, OdeSt
 	}
 	else
 	{
+		m_equation.update(currentState, true, false, false, false);
+
 		Vector& f = m_equation.computeF(currentState);
 		Vector deltaX = m_equation.applyCompliance(currentState, f);
 

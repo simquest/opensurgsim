@@ -52,6 +52,8 @@ void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState
 	}
 	else
 	{
+		m_equation.update(currentState, true, false, false, false);
+
 		Vector& f = m_equation.computeF(currentState);
 		f -= m_constantK * currentState.getVelocities() * dt;
 		Vector deltaV = m_equation.applyCompliance(currentState, f);

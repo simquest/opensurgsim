@@ -40,6 +40,8 @@ void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, 
 	}
 	else
 	{
+		m_equation.update(currentState, true, false, false, false);
+
 		// General equation to solve:
 		//   M.a(t) = F(t, x(t), v(t)), which is an ode of order 2 that can be reduced to an ode of order 1:
 		// y' = (x)' = (          v          ) = f(t, y)
