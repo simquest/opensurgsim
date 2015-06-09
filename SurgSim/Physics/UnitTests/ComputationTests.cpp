@@ -79,6 +79,7 @@ TEST(ComputationTests, PreparePhysicsState)
 	// Add a constraint.
 	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
 	// Constraint type.
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 
 	{
@@ -91,7 +92,7 @@ TEST(ComputationTests, PreparePhysicsState)
 		std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 
 		// Create the constraint.
-		expectedConstraints.push_back(std::make_shared<Constraint>(constraintType, data,
+		expectedConstraints.push_back(std::make_shared<Constraint>(type, constraintType, data,
 			rigid1, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
 			rigid2, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero())));
 		physicsState->setConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, expectedConstraints);

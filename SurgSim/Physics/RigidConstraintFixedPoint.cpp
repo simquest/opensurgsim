@@ -115,9 +115,9 @@ void RigidConstraintFixedPoint::doBuild(double dt,
 	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix()*m_newH, indexOfRepresentation, indexOfConstraint + 2);
 }
 
-SurgSim::Math::MlcpConstraintType RigidConstraintFixedPoint::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType RigidConstraintFixedPoint::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t RigidConstraintFixedPoint::doGetNumDof() const

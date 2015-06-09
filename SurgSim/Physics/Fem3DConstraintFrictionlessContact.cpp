@@ -113,9 +113,9 @@ void Fem3DConstraintFrictionlessContact::doBuild(double dt,
 						   indexOfConstraint);
 }
 
-SurgSim::Math::MlcpConstraintType Fem3DConstraintFrictionlessContact::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType Fem3DConstraintFrictionlessContact::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	return SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 }
 
 size_t Fem3DConstraintFrictionlessContact::doGetNumDof() const

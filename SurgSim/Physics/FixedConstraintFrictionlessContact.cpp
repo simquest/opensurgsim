@@ -69,9 +69,9 @@ void FixedConstraintFrictionlessContact::doBuild(double dt,
 	b[indexOfConstraint] += violation * scale;
 }
 
-SurgSim::Math::MlcpConstraintType FixedConstraintFrictionlessContact::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType FixedConstraintFrictionlessContact::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	return SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 }
 
 size_t FixedConstraintFrictionlessContact::doGetNumDof() const

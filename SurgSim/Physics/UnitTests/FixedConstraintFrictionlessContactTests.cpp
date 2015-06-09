@@ -59,7 +59,7 @@ TEST (FixedConstraintFrictionlessContactTests, SetGet_BuildMlcp_Test)
 	std::shared_ptr<FixedConstraintFrictionlessContact> implementation =
 			std::make_shared<FixedConstraintFrictionlessContact>();
 
-	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
+	EXPECT_EQ(SurgSim::Physics::FRICTIONLESS_3DCONTACT, implementation->getConstraintType());
 	EXPECT_EQ(1u, implementation->getNumDof());
 
 	ContactConstraintData constraintData;

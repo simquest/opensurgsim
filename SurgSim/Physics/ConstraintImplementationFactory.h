@@ -21,7 +21,7 @@
 #include <typeindex>
 #include <unordered_map>
 
-#include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Physics/ConstraintType.h"
 #include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
@@ -52,7 +52,7 @@ public:
 	/// \return	a pointer to an implementation if the implementation can be found, nullptr otherwise.
 	std::shared_ptr<ConstraintImplementation> getImplementation(
 		std::type_index representationType,
-		SurgSim::Math::MlcpConstraintType constraintType);
+		ConstraintType constraintType);
 
 	/// Add an implementation to the internal directory.
 	/// \param typeIndex The type of representation associated with the implementation.
@@ -63,7 +63,7 @@ private:
 
 	/// Lookup table for constraint implementations
 	std::unordered_map<std::type_index,
-		std::array<std::shared_ptr<ConstraintImplementation>, SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES>>
+		std::array<std::shared_ptr<ConstraintImplementation>, SurgSim::Physics::NUM_CONSTRAINT_TYPES>>
 		m_implementations;
 };
 

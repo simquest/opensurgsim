@@ -506,9 +506,9 @@ MockFixedConstraintFixedPoint::~MockFixedConstraintFixedPoint()
 {
 }
 
-SurgSim::Math::MlcpConstraintType MockFixedConstraintFixedPoint::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType MockFixedConstraintFixedPoint::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t MockFixedConstraintFixedPoint::doGetNumDof() const
@@ -534,9 +534,9 @@ MockRigidConstraintFixedPoint::~MockRigidConstraintFixedPoint()
 {
 }
 
-SurgSim::Math::MlcpConstraintType MockRigidConstraintFixedPoint::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType MockRigidConstraintFixedPoint::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t MockRigidConstraintFixedPoint::doGetNumDof() const
@@ -569,9 +569,9 @@ Vector3d MockLocalization::doCalculatePosition(double time)
 }
 
 
-SurgSim::Math::MlcpConstraintType MockConstraintImplementation::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType MockConstraintImplementation::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t MockConstraintImplementation::doGetNumDof() const

@@ -25,15 +25,14 @@ namespace SurgSim
 namespace Physics
 {
 
-Constraint::Constraint(
-	SurgSim::Math::MlcpConstraintType constraintType,
+Constraint::Constraint(ConstraintType constraintType, Math::MlcpConstraintType mlcpConstraintType,
 	std::shared_ptr<ConstraintData> data,
 	std::shared_ptr<Representation> representation0,
 	const SurgSim::DataStructures::Location& location0,
 	std::shared_ptr<Representation> representation1,
 	const SurgSim::DataStructures::Location& location1)
 {
-	setInformation(constraintType, data, representation0, location0, representation1, location1);
+	setInformation(constraintType, mlcpConstraintType, data, representation0, location0, representation1, location1);
 }
 
 Constraint::~Constraint()
@@ -63,9 +62,9 @@ size_t Constraint::getNumDof() const
 	return m_numDof;
 }
 
-SurgSim::Math::MlcpConstraintType Constraint::getType()
+SurgSim::Math::MlcpConstraintType Constraint::getMlcpType()
 {
-	return m_constraintType;
+	return m_mlcpConstraintType;
 }
 
 void Constraint::build(double dt,
@@ -94,7 +93,7 @@ void Constraint::build(double dt,
 		indexOfConstraint,
 		CONSTRAINT_NEGATIVE_SIDE);
 
-	mlcp->constraintTypes.push_back(m_constraintType);
+	mlcp->constraintTypes.push_back(m_mlcpConstraintType);
 }
 
 bool Constraint::isActive()
@@ -112,8 +111,8 @@ void Constraint::doBuild(double dt,
 {
 }
 
-void Constraint::setInformation(
-	SurgSim::Math::MlcpConstraintType constraintType,
+void Constraint::setInformation(SurgSim::Physics::ConstraintType constraintType,
+	SurgSim::Math::MlcpConstraintType mlcpConstraintType,
 	std::shared_ptr<ConstraintData> data,
 	std::shared_ptr<Representation> representation0,
 	const SurgSim::DataStructures::Location& location0,
@@ -121,6 +120,7 @@ void Constraint::setInformation(
 	const SurgSim::DataStructures::Location& location1)
 {
 	m_constraintType = constraintType;
+	m_mlcpConstraintType = mlcpConstraintType;
 	SURGSIM_ASSERT(data != nullptr) << "ConstraintData can't be nullptr";
 	SURGSIM_ASSERT(representation0 != nullptr) << "First representation can't be nullptr";
 	SURGSIM_ASSERT(representation1 != nullptr) << "Second representation can't be nullptr";

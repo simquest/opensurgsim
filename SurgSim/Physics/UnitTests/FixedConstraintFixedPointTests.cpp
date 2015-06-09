@@ -47,7 +47,7 @@ TEST(FixedConstraintFixedPointTests, Constants)
 {
 	FixedConstraintFixedPoint constraint;
 
-	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, constraint.getMlcpConstraintType());
+	EXPECT_EQ(SurgSim::Physics::FIXED_3DPOINT, constraint.getConstraintType());
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 

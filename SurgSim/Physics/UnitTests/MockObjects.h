@@ -340,7 +340,7 @@ public:
 	MockFixedConstraintFixedPoint();
 	virtual ~MockFixedConstraintFixedPoint();
 
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:
 	size_t doGetNumDof() const override;
@@ -360,7 +360,7 @@ public:
 	MockRigidConstraintFixedPoint();
 	virtual ~MockRigidConstraintFixedPoint();
 
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:
 	size_t doGetNumDof() const override;
@@ -400,7 +400,7 @@ private:
 class MockConstraintImplementation : public ConstraintImplementation
 {
 public:
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:
 	size_t doGetNumDof() const override;
@@ -439,14 +439,15 @@ inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepres
 {
 	using SurgSim::DataStructures::Location;
 
-	static auto type = (new MockConstraintImplementation())->getMlcpConstraintType();
+	static auto type = (new MockConstraintImplementation())->getConstraintType();
+	auto mlcptype = SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
 	if (firstRepresentation->getConstraintImplementation(type) == nullptr)
 	{
 		ConstraintImplementation::getFactory().addImplementation(typeid(MockRepresentation),
 				std::make_shared<MockConstraintImplementation>());
 	}
 
-	return std::make_shared<Constraint>(type, std::make_shared<ConstraintData>(),
+	return std::make_shared<Constraint>(type, mlcptype, std::make_shared<ConstraintData>(),
 										firstRepresentation, Location(),
 										secondRepresentation, Location());
 }

@@ -40,7 +40,8 @@ public:
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	Constraint(
-		SurgSim::Math::MlcpConstraintType constraintType,
+		SurgSim::Physics::ConstraintType constraintType,
+		SurgSim::Math::MlcpConstraintType mlcpConstraintType,
 		std::shared_ptr<ConstraintData> data,
 		std::shared_ptr<Representation> representation0,
 		const SurgSim::DataStructures::Location& location0,
@@ -57,7 +58,8 @@ public:
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	void setInformation(
-		SurgSim::Math::MlcpConstraintType constraintType,
+		SurgSim::Physics::ConstraintType constraintType,
+		SurgSim::Math::MlcpConstraintType mlcpConstraintType,
 		std::shared_ptr<ConstraintData> data,
 		std::shared_ptr<Representation> representation0,
 		const SurgSim::DataStructures::Location& location0,
@@ -82,9 +84,13 @@ public:
 	/// \return The number of degree of freedom for this constraint.
 	size_t getNumDof() const;
 
+	/// Gets the ConstraintType
+	/// \return The type
+	SurgSim::Physics::ConstraintType getType();
+
 	/// Gets the ConstraintType for this constraint.
 	/// \return	The type.
-	SurgSim::Math::MlcpConstraintType getType();
+	SurgSim::Math::MlcpConstraintType getMlcpType();
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint.
 	/// \param dt The time step.
@@ -113,7 +119,10 @@ private:
 	size_t m_numDof;
 
 	/// The type of this constraint
-	SurgSim::Math::MlcpConstraintType m_constraintType;
+	SurgSim::Physics::ConstraintType m_constraintType;
+
+	/// The type of this mlcp constraint
+	SurgSim::Math::MlcpConstraintType m_mlcpConstraintType;
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step

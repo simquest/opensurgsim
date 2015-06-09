@@ -91,9 +91,9 @@ void MassSpringConstraintFrictionlessContact::doBuild(double dt,
 						   indexOfRepresentation, indexOfConstraint);
 }
 
-SurgSim::Math::MlcpConstraintType MassSpringConstraintFrictionlessContact::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType MassSpringConstraintFrictionlessContact::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	return SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 }
 
 size_t MassSpringConstraintFrictionlessContact::doGetNumDof() const
