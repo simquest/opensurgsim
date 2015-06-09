@@ -15,6 +15,7 @@
 
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
@@ -25,6 +26,12 @@ namespace Math
 const std::shared_ptr<OdeState> OdeEquation::getInitialState() const
 {
 	return m_initialState;
+}
+
+void OdeEquation::update(const OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK)
+{
+	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Math/OdeEquation"))
+		<< "OdeEquation::update() has been called. One of the sub-classes has not overriden it.";
 }
 
 }; // namespace Math

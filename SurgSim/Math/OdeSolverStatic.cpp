@@ -65,6 +65,8 @@ void OdeSolverStatic::assembleLinearSystem(double dt, const OdeState& state, con
 	//   systemMatrix . solution   = rhs
 	// Therefore systemMatrix = K, solution = deltaX, rhs = f(t)
 
+	m_equation.update(state, true, false, false, true);
+
 	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.computeK(state);
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);

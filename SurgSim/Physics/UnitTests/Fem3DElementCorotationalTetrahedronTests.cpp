@@ -61,16 +61,12 @@ public:
 
 	const Eigen::Matrix<double, 12, 12> getRotatedStiffnessMatrix(const SurgSim::Math::OdeState& state) const
 	{
-		Eigen::Matrix<double, 12, 12> RKRt;
-		computeRotationMassAndStiffness(state, nullptr, nullptr, &RKRt);
-		return RKRt;
+		return m_RKRt;
 	}
 
 	const Eigen::Matrix<double, 12, 12> getRotatedMassMatrix(const SurgSim::Math::OdeState& state) const
 	{
-		Eigen::Matrix<double, 12, 12> RMRt;
-		computeRotationMassAndStiffness(state, nullptr, &RMRt, nullptr);
-		return RMRt;
+		return m_RMRt;
 	}
 
 	/// Compute the rotation, mass and stiffness matrices of the element from the given state
@@ -86,9 +82,7 @@ public:
 
 	const SurgSim::Math::Matrix33d getRotation(const SurgSim::Math::OdeState& state) const
 	{
-		SurgSim::Math::Matrix33d R;
-		computeRotationMassAndStiffness(state, &R, nullptr, nullptr);
-		return R;
+		return m_R;
 	}
 
 	const SurgSim::Math::Matrix44d getVInverse() const
@@ -350,6 +344,7 @@ void testAddStiffness(MockFem3DElementCorotationalTet* tet,
 	SurgSim::Math::OdeState state;
 
 	defineCurrentState(state0, &state, t, false);
+	tet->update(state, false, false, false, true);
 
 	Matrix expectedK = Matrix::Zero(state.getNumDof(), state.getNumDof());
 	SurgSim::Math::addSubMatrix(scale * tet->getRotatedStiffnessMatrix(state), tet->getNodeIds(), 3, &expectedK);
@@ -375,7 +370,8 @@ void testAddMass(MockFem3DElementCorotationalTet* tet,
 	SurgSim::Math::OdeState state;
 
 	defineCurrentState(state0, &state, t, false);
-
+	tet->update(state, false, true, false, false);
+	
 	Eigen::Matrix<double, 12, 12> M0 = tet->getNonRotatedMassMatrix();
 	Matrix33d R;
 	Eigen::Matrix<double, 12, 12> Mrot;
@@ -405,7 +401,8 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 	SurgSim::Math::OdeState state;
 
 	defineCurrentState(state0, &state, t, false);
-
+	tet->update(state, true, true, true, true);
+	
 	Eigen::Matrix<double, 12, 12> K0 = tet->getNonRotatedStiffnessMatrix();
 	Eigen::Matrix<double, 12, 12> M0 = tet->getNonRotatedMassMatrix();
 	Matrix33d R;
@@ -549,6 +546,8 @@ void testAddForce(MockFem3DElementCorotationalTet* tet,
 	Eigen::Matrix<double, 12, 1> x, x0;
 	SurgSim::Math::getSubVector(state0.getPositions(), tet->getNodeIds(), 3, &x0);
 	defineCurrentState(state0, &statet, t, addLocalDeformation);
+	tet->update(statet, true, false, false, false);
+
 	SurgSim::Math::getSubVector(statet.getPositions(), tet->getNodeIds(), 3, &x);
 
 	// Note that the element rotation is not necessarily the RigidTransform rotation
@@ -635,6 +634,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 
 	SurgSim::Math::OdeState state;
 	defineCurrentState(m_restState, &state, transformation, true);
+	tet.update(state, false, true, true, true);
 
 	Eigen::Matrix<double, 12, 12> M = tet.getRotatedMassMatrix(state);
 	Eigen::Matrix<double, 12, 12> K = tet.getRotatedStiffnessMatrix(state);

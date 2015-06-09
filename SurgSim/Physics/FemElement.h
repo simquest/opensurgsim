@@ -210,6 +210,14 @@ public:
 	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
 							  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true);
 
+	/// Update the FemElement based on the given state.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param updateF Flag to specify whether F needs to be updated.
+	/// \param updateM Flag to specify whether M needs to be updated.
+	/// \param updateD Flag to specify whether D needs to be updated.
+	/// \param updateK Flag to specify whether K needs to be updated.
+	virtual void update(const Math::OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK);
+
 protected:
 	/// Sets the number of degrees of freedom per node
 	/// \param numDofPerNode The number of dof per node

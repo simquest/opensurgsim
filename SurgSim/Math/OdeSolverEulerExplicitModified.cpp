@@ -68,6 +68,8 @@ void OdeSolverEulerExplicitModified::assembleLinearSystem(double dt, const OdeSt
 	//   systemMatrix . x      = b
 	// Therefore, systemMatrix = M/dt, x = deltaV and b = f
 
+	m_equation.update(state, true, true, false, false);
+
 	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.computeM(state) / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);

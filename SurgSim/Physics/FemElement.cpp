@@ -115,6 +115,12 @@ bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinat
 			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
 }
 
+void FemElement::update(const Math::OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK)
+{
+	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Physics/FemElement"))
+		<< "FemElement::update() has been called. One of the sub-classes has not overriden it.";
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

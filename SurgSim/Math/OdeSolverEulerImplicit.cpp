@@ -137,6 +137,8 @@ void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& sta
 	// More terms are coming from the Newton-Raphson iterations (see class OdeSolverEulerImplicit doxygen doc for
 	// more details)
 
+	m_equation.update(state, true, true, true, true);
+
 	SparseMatrix* M;
 	SparseMatrix* D;
 	SparseMatrix* K;

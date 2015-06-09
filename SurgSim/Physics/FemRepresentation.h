@@ -164,6 +164,8 @@ public:
 	void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f, SurgSim::Math::SparseMatrix** M,
 					 SurgSim::Math::SparseMatrix** D, SurgSim::Math::SparseMatrix** K) override;
 
+	void update(const SurgSim::Math::OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK) override;
+
 protected:
 	/// Adds the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into

@@ -88,6 +88,8 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 void OdeSolverRungeKutta4::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
 												bool computeRHS)
 {
+	m_equation.update(state, true, true, false, false);
+
 	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.computeM(state) / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);

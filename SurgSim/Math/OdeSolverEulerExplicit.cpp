@@ -67,6 +67,9 @@ void OdeSolverEulerExplicit::assembleLinearSystem(double dt, const OdeState& sta
 	//   systemMatrix . solution = rhs
 	// Therefore, systemMatrix = M/dt, solution = deltaV and rhs = f
 
+	// Update the stiffness matrix
+	m_equation.update(state, true, true, false, true);
+
 	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.computeM(state) / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);

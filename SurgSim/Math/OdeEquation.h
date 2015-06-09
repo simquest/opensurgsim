@@ -96,6 +96,14 @@ public:
 	/// \return The matrix \f$C.b\f$
 	virtual Matrix applyCompliance(const OdeState& state, const Matrix& b) = 0;
 
+	/// Update the OdeEquation (and support data) based on the given state.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param updateF Flag to specify whether F needs to be updated.
+	/// \param updateM Flag to specify whether M needs to be updated.
+	/// \param updateD Flag to specify whether D needs to be updated.
+	/// \param updateK Flag to specify whether K needs to be updated.
+	virtual void update(const OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK);
+
 protected:
 	/// The initial state (which defines the ODE initial conditions \f$(x0, v0)\f$)
 	/// \note MUST be set by the derived classes
