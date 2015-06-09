@@ -333,12 +333,12 @@ const Vector3d& MockMassSpring::getGravityVector() const
 
 MockFemElement::MockFemElement() : FemElement()
 {
-	init();
+	initializeMembers();
 }
 
 MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement()
 {
-	init();
+	initializeMembers();
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
@@ -400,7 +400,7 @@ Vector MockFemElement::computeNaturalCoordinate(const OdeState& state, const Vec
 	return SurgSim::Math::Vector3d::Zero();
 }
 
-void MockFemElement::init()
+void MockFemElement::initializeMembers()
 {
 	m_isInitialized = false;
 	setNumDofPerNode(3);

@@ -280,7 +280,7 @@ public:
 	bool isInitialized() const;
 
 private:
-	void init();
+	void initializeMembers();
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
 	bool m_isInitialized;
