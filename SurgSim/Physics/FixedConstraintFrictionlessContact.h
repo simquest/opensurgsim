@@ -37,8 +37,8 @@ public:
 	virtual ~FixedConstraintFrictionlessContact();
 
 
-	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return The MLCP constraint type corresponding to this constraint implementation
+	/// Gets the constraint type for this ConstraintImplementation
+	/// \return The constraint type corresponding to this constraint implementation
 	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:

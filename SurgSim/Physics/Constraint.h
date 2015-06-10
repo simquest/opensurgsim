@@ -36,6 +36,7 @@ public:
 	/// Sets all the values for this constraints, does validation on the parameters and will throw if something
 	/// is wrong with the constraint.
 	/// \param constraintType The constraint type.
+	/// \param mlcpConstraintType The MLCP constraint type.
 	/// \param data The data for this constraint.
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
@@ -54,6 +55,7 @@ public:
 	/// Sets all the values for this constraints, does validation on the parameters and will throw if something
 	/// is wrong with the constraint.
 	/// \param constraintType The constraint type.
+	/// \param mlcpConstraintType The MLCP constraint type.
 	/// \param data The data for this constraint.
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
@@ -88,7 +90,7 @@ public:
 	/// \return The type
 	SurgSim::Physics::ConstraintType getType();
 
-	/// Gets the ConstraintType for this constraint.
+	/// Gets the MlcpConstraintType for this constraint.
 	/// \return	The type.
 	SurgSim::Math::MlcpConstraintType getMlcpType();
 
