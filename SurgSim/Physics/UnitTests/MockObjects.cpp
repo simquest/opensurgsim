@@ -115,7 +115,7 @@ MockDeformableRepresentation::MockDeformableRepresentation(const std::string& na
 	SurgSim::Physics::DeformableRepresentation(name)
 {
 	this->m_numDofPerNode = 3;
-	m_F = Vector::LinSpaced(3, 1.0, 3.0);
+	m_f = Vector::LinSpaced(3, 1.0, 3.0);
 	m_M.resize(3, 3);
 	m_M.setIdentity();
 
@@ -144,36 +144,24 @@ void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<L
 	m_hasExternalGeneralizedForce = true;
 }
 
-Vector& MockDeformableRepresentation::computeF(const OdeState& state)
+void MockDeformableRepresentation::computeF(const OdeState& state)
 {
-	return m_F;
 }
 
-const SparseMatrix& MockDeformableRepresentation::computeM(const OdeState& state)
+void MockDeformableRepresentation::computeM(const OdeState& state)
 {
-	return m_M;
 }
 
-const SparseMatrix& MockDeformableRepresentation::computeD(const OdeState& state)
+void MockDeformableRepresentation::computeD(const OdeState& state)
 {
-	return m_D;
 }
 
-const SparseMatrix& MockDeformableRepresentation::computeK(const OdeState& state)
+void MockDeformableRepresentation::computeK(const OdeState& state)
 {
-	return m_K;
 }
 
-void MockDeformableRepresentation::computeFMDK(const OdeState& state,
-		Vector** f,
-		SparseMatrix** M,
-		SparseMatrix** D,
-		SparseMatrix** K)
+void MockDeformableRepresentation::computeFMDK(const OdeState& state)
 {
-	*f = &m_F;
-	*M = &m_M;
-	*D = &m_D;
-	*K = &m_K;
 }
 
 void MockDeformableRepresentation::transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform)

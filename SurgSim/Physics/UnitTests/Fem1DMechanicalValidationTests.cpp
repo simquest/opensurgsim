@@ -234,7 +234,8 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndLoadedTest)
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = load;
-	Matrix stiffness = fem->computeK(*fem->getInitialState());
+	fem->update(*(m_fem->getInitialState()), Math::OdeEquationUpdate::K);
+	Matrix stiffness = fem->getK();
 
 	// Apply boundary conditions
 	fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
@@ -267,7 +268,8 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverPunctualLoadAnywhereTest)
 
 		Vector applyForce = Vector::Zero(nodesPerDim * 6);
 		applyForce[applyIndex] = load;
-		Matrix stiffness = fem->computeK(*fem->getInitialState());
+		fem->update(*(m_fem->getInitialState()), Math::OdeEquationUpdate::K);
+		Matrix stiffness = fem->getK();
 
 		// Apply boundary conditions
 		fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
@@ -305,7 +307,8 @@ TEST_F(Fem1DMechanicalValidationTests, CantileverEndBentTest)
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = moment;
-	Matrix stiffness = fem->computeK(*fem->getInitialState());
+	fem->update(*(m_fem->getInitialState()), Math::OdeEquationUpdate::K);
+	Matrix stiffness = fem->getK();
 
 	// Apply boundary conditions
 	fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
@@ -341,7 +344,8 @@ TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamCenterLoadedTest)
 
 	Vector applyForce = Vector::Zero(nodesPerDim * 6);
 	applyForce[applyIndex] = load;
-	Matrix stiffness = fem->computeK(*fem->getInitialState());
+	fem->update(*(m_fem->getInitialState()), Math::OdeEquationUpdate::K);
+	Matrix stiffness = fem->getK();
 
 	// Apply boundary conditions
 	fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);
@@ -375,7 +379,8 @@ TEST_F(Fem1DMechanicalValidationTests, EndSupportedBeamIntermediatelyLoadedTest)
 
 		Vector applyForce = Vector::Zero(nodesPerDim * 6);
 		applyForce[applyIndex] = load;
-		Matrix stiffness = fem->computeK(*fem->getInitialState());
+		fem->update(*(m_fem->getInitialState()), Math::OdeEquationUpdate::K);
+		Matrix stiffness = fem->getK();
 
 		// Apply boundary conditions
 		fem->getInitialState()->applyBoundaryConditionsToVector(&applyForce);

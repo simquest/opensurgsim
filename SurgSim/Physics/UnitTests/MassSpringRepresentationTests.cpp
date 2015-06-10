@@ -23,6 +23,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
+#include "SurgSim/Physics/UnitTests/DeformableTestsUtility.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Math::Vector;
@@ -348,9 +349,6 @@ TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::SparseMatrix;
 
-	Vector* F;
-	SparseMatrix* M, *D, *K;
-
 	addMasses();
 	addSprings();
 	createLocalization();
@@ -364,16 +362,8 @@ TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(m_expectedSpringsForce)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(m_expectedDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(m_expectedSpringsForce));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_massSpring, *m_initialState, m_expectedSpringsForce, m_expectedMass,
+			m_expectedDamping, m_expectedStiffness);
 	}
 
 	size_t numDofPerNode = m_massSpring->getNumDofPerNode();
@@ -392,15 +382,9 @@ TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 		externalK.block(0, 0, numDofPerNode, numDofPerNode) = externalLocalK;
 		externalD.block(0, 0, numDofPerNode, numDofPerNode) = externalLocalD;
 		m_massSpring->addExternalGeneralizedForce(m_localization, externalLocalForce, externalLocalK, externalLocalD);
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(
-										m_expectedSpringsForce + externalForce)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(
-										m_expectedStiffness + externalK)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(m_expectedDamping + externalD)));
-		EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(m_expectedSpringsForce + externalForce));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + externalK));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + externalD));
+
+		testOdeEquationUpdate(m_massSpring, *m_initialState, m_expectedSpringsForce + externalForce, m_expectedMass,
+			m_expectedDamping + externalD, m_expectedStiffness + externalK);
 	}
 }
 
@@ -408,9 +392,6 @@ TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndDampingTest)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::SparseMatrix;
-
-	Vector* F;
-	SparseMatrix* M, *D, *K;
 
 	addMasses();
 	addSprings();
@@ -429,17 +410,8 @@ TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(
-										m_expectedDamping + m_expectedRayleighDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedForce));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_massSpring, *m_initialState, expectedForce, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping, m_expectedStiffness);
 	}
 
 	size_t numDofPerNode = m_massSpring->getNumDofPerNode();
@@ -458,15 +430,9 @@ TEST_F(MassSpringRepresentationTests, ComputesWithNoGravityAndDampingTest)
 		externalK.block(0, 0, numDofPerNode, numDofPerNode) = externalLocalK;
 		externalD.block(0, 0, numDofPerNode, numDofPerNode) = externalLocalD;
 		m_massSpring->addExternalGeneralizedForce(m_localization, externalLocalForce, externalLocalK, externalLocalD);
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce + externalForce)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(
-										m_expectedStiffness + externalK)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(
-										m_expectedDamping + m_expectedRayleighDamping + externalD)));
-		EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedForce + externalForce));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + externalK));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping + externalD));
+
+		testOdeEquationUpdate(m_massSpring, *m_initialState, expectedForce + externalForce, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping + externalD, m_expectedStiffness + externalK);
 	}
 }
 
@@ -474,9 +440,6 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndNoDampingTest)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::SparseMatrix;
-
-	Vector* F;
-	SparseMatrix* M, *D, *K;
 
 	addMasses();
 	addSprings();
@@ -493,16 +456,8 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(m_expectedDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedForce));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_massSpring, *m_initialState, expectedForce, m_expectedMass,
+			m_expectedDamping, m_expectedStiffness);
 	}
 
 	size_t numDofPerNode = m_massSpring->getNumDofPerNode();
@@ -521,14 +476,9 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndNoDampingTest)
 		externalK.block(0, 0, numDofPerNode, numDofPerNode) = externalLocalK;
 		externalD.block(0, 0, numDofPerNode, numDofPerNode) = externalLocalD;
 		m_massSpring->addExternalGeneralizedForce(m_localization, externalLocalForce, externalLocalK, externalLocalD);
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce + externalForce)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(
-										m_expectedStiffness + externalK)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(m_expectedDamping + externalD)));
-		EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedForce + externalForce));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + externalK));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + externalD));
+
+		testOdeEquationUpdate(m_massSpring, *m_initialState, expectedForce + externalForce, m_expectedMass,
+			m_expectedDamping + externalD, m_expectedStiffness + externalK);
 	}
 }
 
@@ -536,9 +486,6 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndDampingTest)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::SparseMatrix;
-
-	Vector* F;
-	SparseMatrix* M, *D, *K;
 
 	addMasses();
 	addSprings();
@@ -558,17 +505,8 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(
-										m_expectedDamping + m_expectedRayleighDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedForce));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_massSpring, *m_initialState, expectedForce, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping, m_expectedStiffness);
 	}
 
 	size_t numDofPerNode = m_massSpring->getNumDofPerNode();
@@ -587,14 +525,8 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndDampingTest)
 		externalK.block(0, 0, numDofPerNode, numDofPerNode) = externalLocalK;
 		externalD.block(0, 0, numDofPerNode, numDofPerNode) = externalLocalD;
 		m_massSpring->addExternalGeneralizedForce(m_localization, externalLocalForce, externalLocalK, externalLocalD);
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeF(*m_initialState).isApprox(expectedForce + externalForce)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeK(*m_initialState).isApprox(
-										m_expectedStiffness + externalK)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_massSpring->computeD(*m_initialState).isApprox(
-										m_expectedDamping + m_expectedRayleighDamping + externalD)));
-		EXPECT_NO_THROW(m_massSpring->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedForce + externalForce));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + externalK));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping + externalD));
+
+		testOdeEquationUpdate(m_massSpring, *m_initialState, expectedForce + externalForce, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping + externalD, m_expectedStiffness + externalK);
 	}
 }

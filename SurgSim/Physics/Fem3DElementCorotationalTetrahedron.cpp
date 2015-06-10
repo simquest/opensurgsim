@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DElementCorotationalTetrahedron.h"
 
@@ -62,7 +63,7 @@ void Fem3DElementCorotationalTetrahedron::initialize(const SurgSim::Math::OdeSta
 							   "  C = (" << state.getPosition(m_nodeIds[2]).transpose() << ")" << std::endl <<
 							   "  D = (" << state.getPosition(m_nodeIds[3]).transpose() << ")" << std::endl;
 
-	update(state, true, true, true, true);
+	update(state, Math::OdeEquationUpdate::FMDK);
 }
 
 void Fem3DElementCorotationalTetrahedron::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
@@ -146,24 +147,24 @@ void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeStat
 	addSubVector(resultLocal, m_nodeIds, 3, result);
 }
 
-void Fem3DElementCorotationalTetrahedron::update(const Math::OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK)
+void Fem3DElementCorotationalTetrahedron::update(const Math::OdeState& state, int options)
 {
 	SurgSim::Math::Matrix33d* rotation = nullptr;
 	Eigen::Matrix<double, 12, 12>* RMRt = nullptr;
 	Eigen::Matrix<double, 12, 12>* RKRt = nullptr;
 
-	if (updateF)
+	if (options & Math::OdeEquationUpdate::F)
 	{
 		rotation = &m_R;
 		RKRt = &m_RKRt;
 	}
 
-	if (updateM)
+	if (options & Math::OdeEquationUpdate::M)
 	{
 		RMRt = &m_RMRt;
 	}
 
-	if (updateK)
+	if (options & Math::OdeEquationUpdate::K)
 	{
 		RKRt = &m_RKRt;
 	}

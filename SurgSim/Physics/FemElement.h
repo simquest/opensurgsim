@@ -212,11 +212,8 @@ public:
 
 	/// Update the FemElement based on the given state.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
-	/// \param updateF Flag to specify whether F needs to be updated.
-	/// \param updateM Flag to specify whether M needs to be updated.
-	/// \param updateD Flag to specify whether D needs to be updated.
-	/// \param updateK Flag to specify whether K needs to be updated.
-	virtual void update(const Math::OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK);
+	/// \param options Flag to specify which of the F, M, D, K needs to be updated
+	virtual void update(const Math::OdeState& state, int options);
 
 protected:
 	/// Sets the number of degrees of freedom per node

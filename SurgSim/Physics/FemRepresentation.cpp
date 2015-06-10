@@ -360,7 +360,7 @@ void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState&
 	}
 }
 
-SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
+void FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	m_f.setZero(state.getNumDof());
@@ -374,11 +374,9 @@ SurgSim::Math::Vector& FemRepresentation::computeF(const SurgSim::Math::OdeState
 	{
 		m_f += m_externalGeneralizedForce;
 	}
-
-	return m_f;
 }
 
-const SurgSim::Math::SparseMatrix& FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
+void FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the mass matrix has been properly allocated and zeroed out
 	Math::clearMatrix(&m_M);
@@ -387,11 +385,9 @@ const SurgSim::Math::SparseMatrix& FemRepresentation::computeM(const SurgSim::Ma
 	{
 		(*femElement)->addMass(state, &m_M);
 	}
-
-	return m_M;
 }
 
-const SurgSim::Math::SparseMatrix& FemRepresentation::computeD(const SurgSim::Math::OdeState& state)
+void FemRepresentation::computeD(const SurgSim::Math::OdeState& state)
 {
 	const double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayleighMass = m_rayleighDamping.massCoefficient;
@@ -428,11 +424,9 @@ const SurgSim::Math::SparseMatrix& FemRepresentation::computeD(const SurgSim::Ma
 	{
 		m_D += m_externalGeneralizedDamping;
 	}
-
-	return m_D;
 }
 
-const SurgSim::Math::SparseMatrix& FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
+void FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
 	Math::clearMatrix(&m_K);
@@ -447,13 +441,9 @@ const SurgSim::Math::SparseMatrix& FemRepresentation::computeK(const SurgSim::Ma
 	{
 		m_K += m_externalGeneralizedStiffness;
 	}
-
-	return m_K;
 }
 
-void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
-									SurgSim::Math::SparseMatrix** M, SurgSim::Math::SparseMatrix** D,
-									SurgSim::Math::SparseMatrix** K)
+void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	m_f.setZero(state.getNumDof());
@@ -496,22 +486,18 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state, SurgSi
 		m_K += m_externalGeneralizedStiffness;
 		m_D += m_externalGeneralizedDamping;
 	}
-
-	*f = &m_f;
-	*M = &m_M;
-	*D = &m_D;
-	*K = &m_K;
 }
 
-void FemRepresentation::update(const SurgSim::Math::OdeState& state, bool updateF, bool updateM,
-							   bool updateD, bool updateK)
+void FemRepresentation::update(const SurgSim::Math::OdeState& state, int options)
 {
 	// This function updates the matrices needed to calculate F, M, D, K for each element.
 	// Note that the relevant matrices are updated only for non-linear elements.
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->update(state, updateF, updateM, updateD, updateK);
+		(*femElement)->update(state, options);
 	}
+
+	OdeEquation::update(state, options);
 }
 
 void FemRepresentation::addRayleighDampingForce(

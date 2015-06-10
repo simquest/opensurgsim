@@ -78,7 +78,7 @@ public:
 				   double alphaM, double alphaD, double alphaK,
 				   const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) override;
 
-	void update(const Math::OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK) override;
+	void update(const Math::OdeState& state, int options) override;
 
 protected:
 	/// Compute the rotation, mass and stiffness matrices of the element from the given state

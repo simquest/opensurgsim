@@ -174,32 +174,14 @@ public:
 									 const SurgSim::Math::Matrix& K,
 									 const SurgSim::Math::Matrix& D) override;
 
-	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
-	/// This API will be tested in derived classes when the API will be provided
-	Vector& computeF(const OdeState& state) override;
-
-	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
-	/// This API will be tested in derived classes when the API will be provided
-	const SparseMatrix& computeM(const OdeState& state) override;
-
-	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
-	/// This API will be tested in derived classes when the API will be provided
-	const SparseMatrix& computeD(const OdeState& state) override;
-
-	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
-	/// This API will be tested in derived classes when the API will be provided
-	const SparseMatrix& computeK(const OdeState& state) override;
-
-	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
-	/// This API will be tested in derived classes when the API will be provided
-	void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) override;
-
 protected:
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 						const SurgSim::Math::RigidTransform3d& transform) override;
-
-	Vector m_F;
-	SparseMatrix m_M, m_D, m_K;
+	void computeF(const OdeState& state) override;
+	void computeM(const OdeState& state) override;
+	void computeD(const OdeState& state) override;
+	void computeK(const OdeState& state) override;
+	void computeFMDK(const OdeState& state) override;
 };
 
 class MockSpring : public SurgSim::Physics::Spring

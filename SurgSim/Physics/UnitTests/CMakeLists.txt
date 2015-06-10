@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	DcdCollisionTests.cpp
 	DeformableCollisionRepresentationTest.cpp
 	DeformableRepresentationTest.cpp
+	DeformableTestsUtility.cpp
 	EigenGtestAsserts.cpp
 	Fem1DElementBeamTests.cpp
 	Fem1DLocalizationTest.cpp
@@ -81,6 +82,7 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	CommonTests.h
+	DeformableTestsUtility.h
 	EigenGtestAsserts.h
 	MockObjects.h
 )

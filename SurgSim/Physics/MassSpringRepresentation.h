@@ -106,42 +106,15 @@ public:
 	/// \param dt The time step (in seconds)
 	void beforeUpdate(double dt) override;
 
-	/// Evaluation of the RHS function f(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
-	/// \return The vector containing f(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	SurgSim::Math::Vector& computeF(const SurgSim::Math::OdeState& state) override;
+	void computeF(const SurgSim::Math::OdeState& state) override;
 
-	/// Evaluation of the LHS matrix M(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
-	/// \return The matrix M(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	const SurgSim::Math::SparseMatrix& computeM(const SurgSim::Math::OdeState& state) override;
+	void computeM(const SurgSim::Math::OdeState& state) override;
 
-	/// Evaluation of D = -df/dv (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix D = -df/dv(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	const SurgSim::Math::SparseMatrix& computeD(const SurgSim::Math::OdeState& state) override;
+	void computeD(const SurgSim::Math::OdeState& state) override;
 
-	/// Evaluation of K = -df/dx (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix K = -df/dx(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	const SurgSim::Math::SparseMatrix& computeK(const SurgSim::Math::OdeState& state) override;
+	void computeK(const SurgSim::Math::OdeState& state) override;
 
-	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
-	/// When all the terms are needed, this method can perform optimization in evaluating everything together
-	/// \param state (x, v) the current position and velocity to evaluate the various terms with
-	/// \param[out] f The RHS f(x,v)
-	/// \param[out] M The matrix M(x,v)
-	/// \param[out] D The matrix D = -df/dv(x,v)
-	/// \param[out] K The matrix K = -df/dx(x,v)
-	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
-	/// \note computeF(), computeM(), computeD(), computeK()
-	void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f,
-					 SurgSim::Math::SparseMatrix** M, SurgSim::Math::SparseMatrix** D,
-					 SurgSim::Math::SparseMatrix** K) override;
+	void computeFMDK(const SurgSim::Math::OdeState& state) override;
 
 protected:
 	/// Add the Rayleigh damping forces
