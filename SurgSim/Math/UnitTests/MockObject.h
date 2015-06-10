@@ -46,59 +46,18 @@ public:
 	explicit MassPoint(double viscosity = 0.0) :
 		m_mass(0.456),
 		m_viscosity(viscosity),
-		m_gravity(0.0, -9.81, 0.0),
-		m_f(3),
-		m_M(3, 3),
-		m_D(3, 3),
-		m_K(3, 3)
+		m_gravity(0.0, -9.81, 0.0)
 	{
+		m_f.resize(3);
+		m_M.resize(3, 3);
+		m_D.resize(3, 3);
+		m_K.resize(3, 3);
 		this->m_initialState = std::make_shared<MassPointState>();
 	}
 
 	void disableGravity()
 	{
 		m_gravity.setZero();
-	}
-
-	Vector& computeF(const OdeState& state) override
-	{
-		m_f = m_mass * m_gravity - m_viscosity * state.getVelocities();
-		return m_f;
-	}
-
-	const SparseMatrix& computeM(const OdeState& state) override
-	{
-		m_M.setIdentity();
-		m_M *= m_mass;
-		return m_M;
-	}
-
-	const SparseMatrix& computeD(const OdeState& state) override
-	{
-		m_D.setIdentity();
-		m_D *= m_viscosity;
-		return m_D;
-	}
-
-	const SparseMatrix& computeK(const OdeState& state) override
-	{
-		m_K.setZero();
-		return m_K;
-	}
-
-	void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) override
-	{
-		m_M.setIdentity();
-		m_M *= m_mass;
-		m_D.setIdentity();
-		m_D *= m_viscosity;
-		m_K.setZero();
-		m_f = m_mass * m_gravity - m_viscosity * state.getVelocities();
-
-		*f = &m_f;
-		*K = &m_K;
-		*D = &m_D;
-		*M = &m_M;
 	}
 
 	Matrix applyCompliance(const OdeState& state, const Matrix& b) override
@@ -127,8 +86,39 @@ public:
 	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
 	double m_mass, m_viscosity;
 	Vector3d m_gravity;
-	Vector m_f;
-	SparseMatrix m_M, m_D, m_K;
+
+protected:
+	void computeF(const OdeState& state) override
+	{
+		m_f = m_mass * m_gravity - m_viscosity * state.getVelocities();
+	}
+
+	void computeM(const OdeState& state) override
+	{
+		m_M.setIdentity();
+		m_M *= m_mass;
+	}
+
+	void computeD(const OdeState& state) override
+	{
+		m_D.setIdentity();
+		m_D *= m_viscosity;
+	}
+
+	void computeK(const OdeState& state) override
+	{
+		m_K.setZero();
+	}
+
+	void computeFMDK(const OdeState& state) override
+	{
+		m_M.setIdentity();
+		m_M *= m_mass;
+		m_D.setIdentity();
+		m_D *= m_viscosity;
+		m_K.setZero();
+		m_f = m_mass * m_gravity - m_viscosity * state.getVelocities();
+	}
 };
 
 
@@ -152,12 +142,13 @@ class MassPointsForStatic : public SurgSim::Math::OdeEquation
 public:
 	/// Constructor
 	MassPointsForStatic() :
-		m_f(9),
-		m_gravityForce(9),
-		m_D(9, 9),
-		m_K(9, 9),
-		m_M(9, 9)
+		m_gravityForce(9)
 	{
+		m_f.resize(9);
+		m_M.resize(9, 9);
+		m_D.resize(9, 9);
+		m_K.resize(9, 9);
+
 		m_f.setZero();
 		m_K.setZero();
 		m_gravityForce.setZero();
@@ -172,30 +163,51 @@ public:
 		return m_gravityForce;
 	}
 
-	Vector& computeF(const OdeState& state) override
+	Matrix applyCompliance(const OdeState& state, const Matrix& b) override
 	{
+		SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+
+		Math::Matrix bTemp = b;
+		for (auto condition : state.getBoundaryConditions())
+		{
+			Math::zeroRow(condition, &bTemp);
+		}
+		auto solution = m_odeSolver->getLinearSolver()->solve(bTemp);
+		for (auto condition : state.getBoundaryConditions())
+		{
+			Math::zeroRow(condition, &solution);
+		}
+		return solution;
+	}
+
+	void setOdeSolver(std::shared_ptr<SurgSim::Math::OdeSolver> solver)
+	{
+		m_odeSolver = solver;
+	}
+
+protected:
+	void computeF(const OdeState& state) override
+	{
+		computeK(state);
+
 		// Internal deformation forces
-		m_f = -computeK(state) * (state.getPositions() - m_initialState->getPositions());
+		m_f = -m_K * (state.getPositions() - m_initialState->getPositions());
 
 		// Gravity pulling on the free nodes
 		m_f += m_gravityForce;
-
-		return m_f;
 	}
 
-	const SparseMatrix& computeM(const OdeState& state) override
+	void computeM(const OdeState& state) override
 	{
 		m_M.setZero();
-		return m_M;
 	}
 
-	const SparseMatrix& computeD(const OdeState& state) override
+	void computeD(const OdeState& state) override
 	{
 		m_D.setZero();
-		return m_D;
 	}
 
-	const SparseMatrix& computeK(const OdeState& state) override
+	void computeK(const OdeState& state) override
 	{
 		// A fake but valid stiffness matrix (node 0 fixed)
 		// Desired matrix is:
@@ -235,49 +247,20 @@ public:
 			}
 		}
 		m_K.setFromTriplets(tripletList.begin(), tripletList.end());
-		return m_K;
 	}
 
-	void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) override
+	void computeFMDK(const OdeState& state) override
 	{
-		m_f = computeF(state);
-		m_M = computeM(state);
-		m_D = computeD(state);
-		m_K = computeK(state);
-
-		*f = &m_f;
-		*K = &m_K;
-		*D = &m_D;
-		*M = &m_M;
-	}
-
-	Matrix applyCompliance(const OdeState& state, const Matrix& b) override
-	{
-		SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
-
-		Math::Matrix bTemp = b;
-		for (auto condition : state.getBoundaryConditions())
-		{
-			Math::zeroRow(condition, &bTemp);
-		}
-		auto solution = m_odeSolver->getLinearSolver()->solve(bTemp);
-		for (auto condition : state.getBoundaryConditions())
-		{
-			Math::zeroRow(condition, &solution);
-		}
-		return solution;
-	}
-
-	void setOdeSolver(std::shared_ptr<SurgSim::Math::OdeSolver> solver)
-	{
-		m_odeSolver = solver;
+		computeF(state);
+		computeM(state);
+		computeD(state);
+		computeK(state);
 	}
 
 private:
 	/// Ode solver (its type depends on the numerical integration scheme)
 	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
-	Vector m_f, m_gravityForce;
-	SparseMatrix m_D, m_K, m_M;
+	Vector m_gravityForce;
 };
 
 /// Class for the complex non-linear ODE a = x.v^2
@@ -285,50 +268,13 @@ class OdeComplexNonLinear : public OdeEquation
 {
 public:
 	/// Constructor
-	OdeComplexNonLinear() : m_f(3), m_M(3, 3), m_D(3, 3), m_K(3, 3)
+	OdeComplexNonLinear()
 	{
+		m_f.resize(3);
+		m_M.resize(3, 3);
+		m_D.resize(3, 3);
+		m_K.resize(3, 3);
 		this->m_initialState = std::make_shared<MassPointState>();
-	}
-
-	Vector& computeF(const OdeState& state) override
-	{
-		double v2 = state.getVelocities().dot(state.getVelocities());
-		m_f = v2 * state.getPositions();
-		return m_f;
-	}
-
-	const SparseMatrix& computeM(const OdeState& state) override
-	{
-		m_M.setIdentity();
-		return m_M;
-	}
-
-	const SparseMatrix& computeD(const OdeState& state) override
-	{
-		m_D = 2.0 * state.getPositions() * state.getVelocities().transpose().sparseView();
-		return m_D;
-	}
-
-	const SparseMatrix& computeK(const OdeState& state) override
-	{
-		m_K.resize(static_cast<SparseMatrix::Index>(state.getNumDof()),
-				   static_cast<SparseMatrix::Index>(state.getNumDof()));
-		m_K.setIdentity();
-		m_K *= state.getVelocities().squaredNorm();
-		return m_K;
-	}
-
-	void computeFMDK(const OdeState& state, Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K) override
-	{
-		computeF(state);
-		computeM(state);
-		computeD(state);
-		computeK(state);
-
-		*f = &m_f;
-		*K = &m_K;
-		*D = &m_D;
-		*M = &m_M;
 	}
 
 	Matrix applyCompliance(const OdeState& state, const Matrix& b) override
@@ -353,11 +299,42 @@ public:
 		m_odeSolver = solver;
 	}
 
+protected:
+	void computeF(const OdeState& state) override
+	{
+		double v2 = state.getVelocities().dot(state.getVelocities());
+		m_f = v2 * state.getPositions();
+	}
+
+	void computeM(const OdeState& state) override
+	{
+		m_M.setIdentity();
+	}
+
+	void computeD(const OdeState& state) override
+	{
+		m_D = 2.0 * state.getPositions() * state.getVelocities().transpose().sparseView();
+	}
+
+	void computeK(const OdeState& state) override
+	{
+		m_K.resize(static_cast<SparseMatrix::Index>(state.getNumDof()),
+			static_cast<SparseMatrix::Index>(state.getNumDof()));
+		m_K.setIdentity();
+		m_K *= state.getVelocities().squaredNorm();
+	}
+
+	void computeFMDK(const OdeState& state) override
+	{
+		computeF(state);
+		computeM(state);
+		computeD(state);
+		computeK(state);
+	}
+
 private:
 	/// Ode solver (its type depends on the numerical integration scheme)
 	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;
-	Vector m_f;
-	SparseMatrix m_M, m_D, m_K;
 };
 
 }; // Math

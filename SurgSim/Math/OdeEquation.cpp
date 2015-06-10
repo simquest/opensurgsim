@@ -28,10 +28,54 @@ const std::shared_ptr<OdeState> OdeEquation::getInitialState() const
 	return m_initialState;
 }
 
-void OdeEquation::update(const OdeState& state, bool updateF, bool updateM, bool updateD, bool updateK)
+const Vector& OdeEquation::getF()
 {
-	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Math/OdeEquation"))
-		<< "OdeEquation::update() has been called. One of the sub-classes has not overriden it.";
+	return m_f;
+}
+
+const SparseMatrix& OdeEquation::getM()
+{
+	return m_M;
+}
+
+const SparseMatrix& OdeEquation::getD()
+{
+	return m_D;
+}
+
+const SparseMatrix& OdeEquation::getK()
+{
+	return m_K;
+}
+
+void OdeEquation::update(const OdeState& state, int options)
+{
+	if (options == OdeEquationUpdate::FMDK)
+	{
+		computeFMDK(state);
+	}
+	else
+	{
+		if (options & OdeEquationUpdate::F)
+		{
+			computeF(state);
+		}
+
+		if (options & OdeEquationUpdate::M)
+		{
+			computeM(state);
+		}
+
+		if (options & OdeEquationUpdate::D)
+		{
+			computeD(state);
+		}
+
+		if (options & OdeEquationUpdate::K)
+		{
+			computeK(state);
+		}
+	}
 }
 
 }; // namespace Math

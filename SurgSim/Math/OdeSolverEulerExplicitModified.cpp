@@ -68,10 +68,10 @@ void OdeSolverEulerExplicitModified::assembleLinearSystem(double dt, const OdeSt
 	//   systemMatrix . x      = b
 	// Therefore, systemMatrix = M/dt, x = deltaV and b = f
 
-	m_equation.update(state, true, true, false, false);
+	m_equation.update(state, OdeEquationUpdate::F | OdeEquationUpdate::M);
 
 	// Computes the LHS systemMatrix
-	m_systemMatrix = m_equation.computeM(state) / dt;
+	m_systemMatrix = m_equation.getM() / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
@@ -80,7 +80,7 @@ void OdeSolverEulerExplicitModified::assembleLinearSystem(double dt, const OdeSt
 	// Computes the RHS vector
 	if (computeRHS)
 	{
-		m_rhs = m_equation.computeF(state);
+		m_rhs = m_equation.getF();
 		state.applyBoundaryConditionsToVector(&m_rhs);
 	}
 }

@@ -56,22 +56,28 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	newState->getPositions()  = currentState.getPositions()  + m_k1.velocity * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k1.acceleration * dt / 2.0;
 	m_k2.velocity = newState->getVelocities();
+	m_equation.update(*newState, OdeEquationUpdate::F);
+	Vector f = m_equation.getF();
 	m_k2.acceleration =
-		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt);
+		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&f) / dt);
 
 	// 3rd evaluate k3
 	newState->getPositions()  = currentState.getPositions()  + m_k2.velocity * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k2.acceleration * dt / 2.0;
 	m_k3.velocity = newState->getVelocities();
+	m_equation.update(*newState, OdeEquationUpdate::F);
+	f = m_equation.getF();
 	m_k3.acceleration =
-		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt);
+		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&f) / dt);
 
 	// 4th evaluate k4
 	newState->getPositions()  = currentState.getPositions()  + m_k3.velocity * dt;
 	newState->getVelocities() = currentState.getVelocities() + m_k3.acceleration * dt;
 	m_k4.velocity = newState->getVelocities();
+	m_equation.update(*newState, OdeEquationUpdate::F);
+	f = m_equation.getF();
 	m_k4.acceleration =
-		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&m_equation.computeF(*newState)) / dt);
+		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&f) / dt);
 
 	// Compute the new state using Runge Kutta 4 integration scheme:
 	newState->getPositions()  = currentState.getPositions() +
@@ -88,10 +94,10 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 void OdeSolverRungeKutta4::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
 												bool computeRHS)
 {
-	m_equation.update(state, true, true, false, false);
+	m_equation.update(state, OdeEquationUpdate::F | OdeEquationUpdate::M);
 
 	// Computes the LHS systemMatrix
-	m_systemMatrix = m_equation.computeM(state) / dt;
+	m_systemMatrix = m_equation.getM() / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
@@ -100,7 +106,7 @@ void OdeSolverRungeKutta4::assembleLinearSystem(double dt, const OdeState& state
 	// Computes the RHS vector
 	if (computeRHS)
 	{
-		m_rhs = m_equation.computeF(state);
+		m_rhs = m_equation.getF();
 		state.applyBoundaryConditionsToVector(&m_rhs);
 	}
 }

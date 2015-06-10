@@ -65,10 +65,10 @@ void OdeSolverStatic::assembleLinearSystem(double dt, const OdeState& state, con
 	//   systemMatrix . solution   = rhs
 	// Therefore systemMatrix = K, solution = deltaX, rhs = f(t)
 
-	m_equation.update(state, true, false, false, true);
+	m_equation.update(state, OdeEquationUpdate::F | OdeEquationUpdate::K);
 
 	// Computes the LHS systemMatrix
-	m_systemMatrix = m_equation.computeK(state);
+	m_systemMatrix = m_equation.getK();
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
@@ -77,7 +77,7 @@ void OdeSolverStatic::assembleLinearSystem(double dt, const OdeState& state, con
 	// Computes the RHS vector
 	if (computeRHS)
 	{
-		m_rhs = m_equation.computeF(state);
+		m_rhs = m_equation.getF();
 		state.applyBoundaryConditionsToVector(&m_rhs);
 	}
 }
