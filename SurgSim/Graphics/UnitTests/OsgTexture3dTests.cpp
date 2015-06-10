@@ -53,13 +53,9 @@ TEST(OsgTexture3dTests, SetSizeTest)
 
 TEST(OsgTexture3dTests, LoadAndClearImageTest)
 {
-	ASSERT_TRUE(boost::filesystem::exists("Data"));
+	SurgSim::Framework::ApplicationData data("config.txt");
 
-	std::vector<std::string> paths;
-	paths.push_back("Data/OsgTextureTests");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	std::string imagePath = data.findFile("CheckerBoard.png");
+	std::string imagePath = data.findFile("Textures/CheckerBoard.png");
 
 	ASSERT_NE("", imagePath) << "Could not find image file!";
 
@@ -97,16 +93,12 @@ TEST(OsgTexture3dTests, LoadAndClearImageTest)
 
 TEST(OsgTexture3dTests, LoadImageSlicesTest)
 {
-	ASSERT_TRUE(boost::filesystem::exists("Data"));
+	SurgSim::Framework::ApplicationData data("config.txt");
 
-	std::vector<std::string> paths;
-	paths.push_back("Data/OsgTextureTests");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	std::string slice0Path = data.findFile("Brdf0.png");
+	std::string slice0Path = data.findFile("Textures/Brdf0.png");
 	ASSERT_NE("", slice0Path) << "Could not find image file for slice 0!";
 
-	std::string slice1Path = data.findFile("Brdf1.png");
+	std::string slice1Path = data.findFile("Textures/Brdf1.png");
 	ASSERT_NE("", slice1Path) << "Could not find image file for slice 1!";
 
 	std::vector<std::string> slicePaths;

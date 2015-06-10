@@ -55,13 +55,9 @@ TEST(OsgTextureCubeMapTests, SetSizeTest)
 
 TEST(OsgTextureCubeMapTests, LoadAndClearImageTest)
 {
-	ASSERT_TRUE(boost::filesystem::exists("Data"));
+	SurgSim::Framework::ApplicationData data("config.txt");
 
-	std::vector<std::string> paths;
-	paths.push_back("Data/OsgTextureTests");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	std::string imagePath = data.findFile("CubeMap.png");
+	std::string imagePath = data.findFile("Textures/CubeMap_axes.png");
 
 	ASSERT_NE("", imagePath) << "Could not find image file!";
 
@@ -100,28 +96,24 @@ TEST(OsgTextureCubeMapTests, LoadAndClearImageTest)
 
 TEST(OsgTextureCubeMapTests, LoadImageFacesTest)
 {
-	ASSERT_TRUE(boost::filesystem::exists("Data"));
+	SurgSim::Framework::ApplicationData data("config.txt");
 
-	std::vector<std::string> paths;
-	paths.push_back("Data/OsgTextureTests");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	std::string negativeXPath = data.findFile("NegativeX.png");
+	std::string negativeXPath = data.findFile("Textures/NegativeX.png");
 	ASSERT_NE("", negativeXPath) << "Could not find image file for (-X) face!";
 
-	std::string positiveXPath = data.findFile("PositiveX.png");
+	std::string positiveXPath = data.findFile("Textures/PositiveX.png");
 	ASSERT_NE("", positiveXPath) << "Could not find image file for (+X) face!";
 
-	std::string negativeYPath = data.findFile("NegativeY.png");
+	std::string negativeYPath = data.findFile("Textures/NegativeY.png");
 	ASSERT_NE("", negativeYPath) << "Could not find image file for (-Y) face!";
 
-	std::string positiveYPath = data.findFile("PositiveY.png");
+	std::string positiveYPath = data.findFile("Textures/PositiveY.png");
 	ASSERT_NE("", positiveYPath) << "Could not find image file for (+Y) face!";
 
-	std::string negativeZPath = data.findFile("NegativeZ.png");
+	std::string negativeZPath = data.findFile("Textures/NegativeZ.png");
 	ASSERT_NE("", negativeZPath) << "Could not find image file for (-Z) face!";
 
-	std::string positiveZPath = data.findFile("PositiveZ.png");
+	std::string positiveZPath = data.findFile("Textures/PositiveZ.png");
 	ASSERT_NE("", positiveZPath) << "Could not find image file for (+Z) face!";
 
 	// Load the images

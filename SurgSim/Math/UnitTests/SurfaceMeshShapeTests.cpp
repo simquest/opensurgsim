@@ -120,7 +120,7 @@ TEST_F(SurfaceMeshShapeTest, NonAlignedDiskShapeTest)
 TEST_F(SurfaceMeshShapeTest, SerializationTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	const std::string fileName = "Geometry/staple_collision.ply";
 	auto surfaceMeshShape = std::make_shared<SurgSim::Math::SurfaceMeshShape>();
 	surfaceMeshShape->load(fileName);
 

@@ -179,7 +179,7 @@ TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	const std::string fileName = "Geometry/staple_collision.ply";
 	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
 	EXPECT_NO_THROW(mesh->load(fileName));
 

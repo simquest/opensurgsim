@@ -59,6 +59,7 @@ if(GLUT_FOUND)
 	add_subdirectory(VisualTestCommon)
 endif(GLUT_FOUND)
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# Copy all shared data which can be used by other component's unit tests
+file(COPY Data  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set_target_properties(SurgSimTesting PROPERTIES FOLDER "Testing")

@@ -22,21 +22,23 @@ namespace SurgSim
 namespace Math
 {
 
+
+Matrix LinearSparseSolveAndInverse::getInverse() const
+{
+	return m_matrix.toDense().inverse();
+}
+
 void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 {
 	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
 	m_solver.compute(matrix);
 	SURGSIM_ASSERT(m_solver.info() == Eigen::Success) << m_solver.lastErrorMessage();
+	m_matrix = matrix;
 }
 
 Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
 {
 	return m_solver.solve(b);
-}
-
-Matrix LinearSparseSolveAndInverseLU::getInverse() const
-{
-	return (m_solver.solve(Matrix::Identity(m_solver.rows(), m_solver.cols())));
 }
 
 void LinearSparseSolveAndInverseCG::setTolerance(double tolerance)
@@ -63,16 +65,12 @@ void LinearSparseSolveAndInverseCG::setMatrix(const SparseMatrix& matrix)
 {
 	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
 	m_solver.compute(matrix);
+	m_matrix = matrix;
 }
 
 Matrix LinearSparseSolveAndInverseCG::solve(const Matrix& b) const
 {
 	return m_solver.solve(b);
-}
-
-Matrix LinearSparseSolveAndInverseCG::getInverse() const
-{
-	return (m_solver.solve(Matrix::Identity(m_solver.rows(), m_solver.cols())));
 }
 
 }; // namespace Math
