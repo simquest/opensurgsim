@@ -75,6 +75,7 @@ void TransferPhysicsToGraphicsMeshBehavior::update(double dt)
 	{
 		m_target->getMesh()->setVertexPosition(nodeId, state->getPosition(nodeId));
 	}
+	m_target->getMesh()->dirty();
 }
 
 bool TransferPhysicsToGraphicsMeshBehavior::doInitialize()
