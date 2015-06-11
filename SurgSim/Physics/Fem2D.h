@@ -27,7 +27,7 @@ SURGSIM_STATIC_REGISTRATION(Fem2D);
 
 /// Fem class data structure implementation for 2-Dimensional FEMs
 /// \sa Fem
-class Fem2D : public Fem<FemElementStructs::RotationVectorData, TriangleType>
+class Fem2D : public Fem<FemElementStructs::RotationVectorData, FemElementStructs::FemElement2DParameter>
 {
 public:
 	Fem2D();

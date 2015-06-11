@@ -45,9 +45,13 @@ public:
 	/// DeformableRepresentationState which is passed to the initialize method.
 	explicit Fem1DElementBeam(std::array<size_t, 2> nodeIds);
 
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam)
+	/// Constructor for FemElement object factory
+	/// \param elementData A FemElement struct defining this beam element with respect to a
+	/// DeformableRepresentationState which is passed to the initialize method.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 2
+	explicit Fem1DElementBeam(std::shared_ptr<FemElementStructs::FemElementParameter> elementData);
 
-	void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) override;
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DElementBeam)
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam

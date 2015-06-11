@@ -16,7 +16,6 @@
 #ifndef SURGSIM_PHYSICS_FEM_H
 #define SURGSIM_PHYSICS_FEM_H
 
-#include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Physics/FemElementStructs.h"
@@ -26,15 +25,10 @@ namespace SurgSim
 namespace Physics
 {
 
-typedef SurgSim::DataStructures::MeshElement<2, FemElementStructs::FemElement1DParameter> BeamType;
-typedef SurgSim::DataStructures::MeshElement<3, FemElementStructs::FemElement2DParameter> TriangleType;
-typedef SurgSim::DataStructures::MeshElement<4, FemElementStructs::FemElement3DParameter> TetrahedronType;
-typedef SurgSim::DataStructures::MeshElement<8, FemElementStructs::FemElement3DParameter> CubeType;
-
 /// Base class for a data structure for holding FEM mesh data of different dimensions
 ///
 /// Fem itself should not be used directly itself as it contains no overrde for doLoad since the implementation is
-/// depedent on the dimension of the FEM you are trying to load. Each dimension overrides the doLoad function present
+/// dependent on the dimension of the FEM you are trying to load. Each dimension overrides the doLoad function present
 /// in Asset using its own version of an FemPlyReaderDelegate. Each dimension supports loading both linear and
 /// corotational models.
 ///

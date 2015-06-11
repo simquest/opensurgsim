@@ -42,14 +42,16 @@ Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-void Fem3DElementCube::setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data)
+Fem3DElementCube::Fem3DElementCube(std::shared_ptr<FemElementStructs::FemElementParameter> elementData)
 {
-	auto elementData = (struct FemElementStructs::FemElement3DParameter*) &data;
-	SURGSIM_ASSERT(nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
-	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
-	setMassDensity(elementData->massDensity);
-	setPoissonRatio(elementData->poissonRatio);
-	setYoungModulus(elementData->youngModulus);
+	init();
+	auto element3DData = std::dynamic_pointer_cast<FemElementStructs::FemElement3DParameter>(elementData);
+	SURGSIM_ASSERT(element3DData != nullptr) << "Incorrect struct type passed";
+	SURGSIM_ASSERT(element3DData->nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
+	m_nodeIds.assign(element3DData->nodeIds.begin(), element3DData->nodeIds.end());
+	setMassDensity(element3DData->massDensity);
+	setPoissonRatio(element3DData->poissonRatio);
+	setYoungModulus(element3DData->youngModulus);
 }
 
 void Fem3DElementCube::init()

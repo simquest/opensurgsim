@@ -51,9 +51,16 @@ public:
 	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
 	explicit Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds);
 
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementTetrahedron)
+	/// Constructor for FemElement object factory
+	/// \param elementData A FemElement3D struct defining this tetrahedron element in a overall mesh
+	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
+	/// \note This is required from the signed volume calculation method getVolume()
+	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
+	/// \note simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 4
+	explicit Fem3DElementTetrahedron(std::shared_ptr<FemElementStructs::FemElementParameter> elementData);
 
-	void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) override;
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementTetrahedron)
 
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with

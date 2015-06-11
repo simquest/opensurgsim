@@ -27,7 +27,7 @@ SURGSIM_STATIC_REGISTRATION(Fem1D);
 
 /// Fem class data structure implementation for 1-Dimensional FEMs
 /// \sa Fem
-class Fem1D : public Fem<FemElementStructs::RotationVectorData, BeamType>
+class Fem1D : public Fem<FemElementStructs::RotationVectorData, FemElementStructs::FemElement1DParameter>
 {
 public:
 	Fem1D();

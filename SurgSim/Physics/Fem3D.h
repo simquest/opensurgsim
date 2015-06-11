@@ -28,27 +28,16 @@ SURGSIM_STATIC_REGISTRATION(Fem3D);
 
 /// Fem class data structure implementation for 3-Dimensional FEMs
 /// \sa Fem
-class Fem3D : public Fem<SurgSim::DataStructures::EmptyData, TetrahedronType>
+class Fem3D : public Fem<SurgSim::DataStructures::EmptyData, FemElementStructs::FemElement3DParameter>
 {
 public:
 	Fem3D();
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3D);
 
-	size_t addCube(std::shared_ptr<CubeType> cube);
-
-	size_t getNumCubes() const;
-
-	const std::vector<std::shared_ptr<CubeType> >& getCubes() const;
-	std::vector<std::shared_ptr<CubeType>>& getCubes();
-
-	std::shared_ptr<CubeType> getCube(size_t id) const;
-
 protected:
 	// Asset API override
 	bool doLoad(const std::string& filePath) override;
-
-	std::vector<std::shared_ptr<CubeType>> m_cubeElements;
 };
 
 } // namespace Physics

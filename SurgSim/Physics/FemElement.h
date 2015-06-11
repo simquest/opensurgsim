@@ -16,7 +16,6 @@
 #ifndef SURGSIM_PHYSICS_FEMELEMENT_H
 #define SURGSIM_PHYSICS_FEMELEMENT_H
 
-#include <iterator>
 #include <vector>
 
 #include "SurgSim/Framework/ObjectFactory.h"
@@ -56,15 +55,9 @@ public:
 	/// \param state The state to initialize the FemElement with
 	virtual void initialize(const SurgSim::Math::OdeState& state);
 
-	typedef SurgSim::Framework::ObjectFactory<FemElement> FactoryType;
+	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::shared_ptr<FemElementStructs::FemElementParameter>> FactoryType;
 
 	static FactoryType& getFactory();
-
-	/// Set element data from FEM data structure
-	/// \param begin Iterator to beginning of node id container
-	/// \param end Itertor to end of node id container
-	/// \param data The Fem Element parameter data
-	virtual void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) = 0;
 
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node

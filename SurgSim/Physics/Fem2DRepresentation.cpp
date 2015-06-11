@@ -62,6 +62,8 @@ Fem2DRepresentation::Fem2DRepresentation(const std::string& name) : FemRepresent
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation but needs to be set by all
 	// concrete derived classes
 	m_numDofPerNode = 6;
+
+	m_fem = std::make_shared<Fem2D>();
 }
 
 Fem2DRepresentation::~Fem2DRepresentation()
@@ -181,16 +183,12 @@ bool Fem2DRepresentation::doInitialize()
 		std::shared_ptr<FemElement> femElement;
 		if (m_femElementOverrideType.empty())
 		{
-			femElement = FemElement::getFactory().create(element->data.type);
+			femElement = FemElement::getFactory().create(element->type, element);
 		}
 		else
 		{
-			femElement = FemElement::getFactory().create(m_femElementOverrideType);
+			femElement = FemElement::getFactory().create(m_femElementOverrideType, element);
 		}
-
-		std::vector<size_t> nodeIds;
-		nodeIds.assign(element->verticesId.begin(), element->verticesId.end());
-		femElement->setData(nodeIds, element->data);
 
 		m_femElements.push_back(femElement);
 	}

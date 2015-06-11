@@ -70,17 +70,11 @@ void Fem3DPlyReaderDelegate::endParseFile()
 {
 	for(auto element : m_mesh->getElements())
 	{
-		element->data.massDensity = m_materialData.massDensity;
-		element->data.poissonRatio = m_materialData.poissonRatio;
-		element->data.youngModulus = m_materialData.youngModulus;
+		element->massDensity = m_materialData.massDensity;
+		element->poissonRatio = m_materialData.poissonRatio;
+		element->youngModulus = m_materialData.youngModulus;
 	}
 
-	for(auto element : m_mesh->getCubes())
-	{
-		element->data.massDensity = m_materialData.massDensity;
-		element->data.poissonRatio = m_materialData.poissonRatio;
-		element->data.youngModulus = m_materialData.youngModulus;
-	}
 	m_mesh->update();
 }
 
@@ -109,25 +103,21 @@ void Fem3DPlyReaderDelegate::processFemElement(const std::string& elementName)
 	SURGSIM_ASSERT(m_elementData.vertexCount == 4 || m_elementData.vertexCount == 8) <<
 			"Cannot process 3D Element with " << m_elementData.vertexCount << " vertices.";
 
-	FemElementStructs::FemElement3DParameter data;
+	auto femElement = std::make_shared<FemElementStructs::FemElement3DParameter>();
 	if (m_elementData.vertexCount == 8)
 	{
-		std::array<size_t, 8> nodes;
-		std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, nodes.data());
 		static Fem3DElementCube cube;
-		data.type = cube.getClassName();
-		auto femElement = std::make_shared<CubeType>(nodes, data);
-		m_mesh->addCube(femElement);
+		femElement->type = cube.getClassName();
 	}
 	else
 	{
-		std::array<size_t, 4> nodes;
-		std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, nodes.data());
-		static Fem3DElementTetrahedron tet;
-		data.type = tet.getClassName();
-		auto femElement = std::make_shared<TetrahedronType>(nodes, data);
-		m_mesh->addElement(femElement);
+		static Fem3DElementTetrahedron tetrahedron;
+		femElement->type = tetrahedron.getClassName();
 	}
+
+	femElement->nodeIds.resize(m_elementData.vertexCount);
+	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
+	m_mesh->addElement(femElement);
 }
 
 void Fem3DPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)

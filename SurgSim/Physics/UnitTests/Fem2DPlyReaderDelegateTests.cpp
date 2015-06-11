@@ -49,9 +49,9 @@ TEST(Fem2DRepresentationReaderTests, DelegateTest)
 	std::array<size_t, 3> triangle2 = {3, 4, 5};
 
 	EXPECT_TRUE(std::equal(std::begin(triangle0), std::end(triangle0),
-						   std::begin(fem->getElement(0)->verticesId)));
+						   std::begin(fem->getElement(0)->nodeIds)));
 	EXPECT_TRUE(std::equal(std::begin(triangle2), std::end(triangle2),
-						   std::begin(fem->getElement(2)->verticesId)));
+						   std::begin(fem->getElement(2)->nodeIds)));
 
 	// Boundary conditions
 	ASSERT_EQ(2u, fem->getBoundaryConditions().size());
@@ -63,9 +63,9 @@ TEST(Fem2DRepresentationReaderTests, DelegateTest)
 	for (size_t i = 0; i < fem->getNumElements(); ++i)
 	{
 		auto element = fem->getElement(i);
-		EXPECT_DOUBLE_EQ(0.2, element->data.massDensity);
-		EXPECT_DOUBLE_EQ(0.3, element->data.poissonRatio);
-		EXPECT_DOUBLE_EQ(0.4, element->data.youngModulus);
+		EXPECT_DOUBLE_EQ(0.2, element->massDensity);
+		EXPECT_DOUBLE_EQ(0.3, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(0.4, element->youngModulus);
 	}
 }
 

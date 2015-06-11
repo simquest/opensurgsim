@@ -28,32 +28,6 @@ Fem3D::Fem3D()
 {
 }
 
-size_t Fem3D::addCube(std::shared_ptr<CubeType> cube)
-{
-	m_cubeElements.push_back(cube);
-	return m_cubeElements.size() - 1;
-}
-
-size_t Fem3D::getNumCubes() const
-{
-	return m_cubeElements.size();
-}
-
-const std::vector<std::shared_ptr<CubeType>>&Fem3D::getCubes() const
-{
-	return m_cubeElements;
-}
-
-std::vector<std::shared_ptr<CubeType> >& Fem3D::getCubes()
-{
-	return m_cubeElements;
-}
-
-std::shared_ptr<CubeType> Fem3D::getCube(size_t id) const
-{
-	return m_cubeElements[id];
-}
-
 bool Fem3D::doLoad(const std::string& filePath)
 {
 	return loadFemFile<Fem3DPlyReaderDelegate, Fem3D>(filePath);

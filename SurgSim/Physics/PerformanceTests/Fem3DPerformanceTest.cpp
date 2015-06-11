@@ -75,11 +75,13 @@ public:
 
 		m_physicsManager->doInitialize();
 		m_physicsManager->doStartUp();
+
+		m_runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	}
 
 	void initializeRepresentation(std::shared_ptr<Fem3DRepresentation> fem)
 	{
-		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->initialize(m_runtime);
 		fem->wakeUp();
 		m_physicsManager->executeAdditions(fem);
 	}
@@ -105,6 +107,7 @@ public:
 
 protected:
 	std::shared_ptr<SurgSim::Testing::MockPhysicsManager> m_physicsManager;
+	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
 };
 
 class IntegrationSchemeParamTest : public Fem3DPerformanceTestBase,

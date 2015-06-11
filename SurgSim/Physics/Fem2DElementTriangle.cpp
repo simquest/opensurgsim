@@ -52,15 +52,17 @@ Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds)
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-void Fem2DElementTriangle::setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data)
+Fem2DElementTriangle::Fem2DElementTriangle(std::shared_ptr<FemElementStructs::FemElementParameter> elementData)
 {
-	auto elementData = (struct FemElementStructs::FemElement2DParameter*) &data;
-	SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
-	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
-	setThickness(elementData->thickness);
-	setMassDensity(elementData->massDensity);
-	setPoissonRatio(elementData->poissonRatio);
-	setYoungModulus(elementData->youngModulus);
+	init();
+	auto element2DData = std::dynamic_pointer_cast<FemElementStructs::FemElement2DParameter>(elementData);
+	SURGSIM_ASSERT(element2DData != nullptr) << "Incorrect struct type passed";
+	SURGSIM_ASSERT(element2DData->nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
+	m_nodeIds.assign(element2DData->nodeIds.begin(), element2DData->nodeIds.end());
+	setThickness(element2DData->thickness);
+	setMassDensity(element2DData->massDensity);
+	setPoissonRatio(element2DData->poissonRatio);
+	setYoungModulus(element2DData->youngModulus);
 }
 
 void Fem2DElementTriangle::setThickness(double thickness)

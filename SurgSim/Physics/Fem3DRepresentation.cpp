@@ -74,6 +74,8 @@ Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation
 	// but needs to be set by all concrete derived classes
 	m_numDofPerNode = 3;
+
+	m_fem = std::make_shared<Fem3D>();
 }
 
 Fem3DRepresentation::~Fem3DRepresentation()
@@ -258,35 +260,12 @@ bool Fem3DRepresentation::doInitialize()
 		std::shared_ptr<FemElement> femElement;
 		if (m_femElementOverrideType.empty())
 		{
-			femElement = FemElement::getFactory().create(element->data.type);
+			femElement = FemElement::getFactory().create(element->type, element);
 		}
 		else
 		{
-			femElement = FemElement::getFactory().create(m_femElementOverrideType);
+			femElement = FemElement::getFactory().create(m_femElementOverrideType, element);
 		}
-
-		std::vector<size_t> nodeIds;
-		nodeIds.assign(element->verticesId.begin(), element->verticesId.end());
-		femElement->setData(nodeIds, element->data);
-
-		m_femElements.push_back(femElement);
-	}
-
-	for (auto& element : m_fem->getCubes())
-	{
-		std::shared_ptr<FemElement> femElement;
-		if (m_femElementOverrideType.empty())
-		{
-			femElement = FemElement::getFactory().create(element->data.type);
-		}
-		else
-		{
-			femElement = FemElement::getFactory().create(m_femElementOverrideType);
-		}
-
-		std::vector<size_t> nodeIds;
-		nodeIds.assign(element->verticesId.begin(), element->verticesId.end());
-		femElement->setData(nodeIds, element->data);
 
 		m_femElements.push_back(femElement);
 	}

@@ -39,6 +39,11 @@ Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::ar
 {
 }
 
+Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::shared_ptr<FemElementStructs::FemElementParameter> elementData) :
+	Fem3DElementTetrahedron(elementData)
+{
+}
+
 void Fem3DElementCorotationalTetrahedron::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Initialize the linear tetrahedron element (this computes the linear stiffness matrix)

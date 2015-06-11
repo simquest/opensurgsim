@@ -22,6 +22,7 @@ namespace Physics
 {
 namespace FemElementStructs
 {
+
 struct RotationVectorData
 {
 	RotationVectorData()
@@ -53,6 +54,7 @@ struct FemElementParameter
 
 	std::string type;   // “LinearBeam”, “CorotationalTetrahedron”…
 
+	std::vector<size_t> nodeIds;
 	double youngModulus;
 	double poissonRatio;
 	double massDensity;
@@ -83,6 +85,7 @@ struct FemElement2DParameter : public FemElementParameter
 };
 
 struct FemElement3DParameter : public FemElementParameter {};
+
 } // namespace FemElementStructs
 } // namespace Physics
 } // namespace SurgSim

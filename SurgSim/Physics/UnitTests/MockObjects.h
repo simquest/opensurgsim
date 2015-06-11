@@ -259,8 +259,7 @@ class MockFemElement : public FemElement
 {
 public:
 	MockFemElement();
-
-	void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) override;
+	explicit MockFemElement(std::shared_ptr<FemElementStructs::FemElementParameter> elementData);
 
 	void addNode(size_t nodeId);
 

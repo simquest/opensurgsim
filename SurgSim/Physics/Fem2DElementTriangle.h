@@ -66,9 +66,13 @@ public:
 	/// DeformableRepresentationState which is passed to the initialize method.
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
 
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DElementTriangle)
+	/// Constructor for FemElement object factory
+	/// \param elementData A FemElement struct defining this triangle element with respect to a
+	/// DeformableRepresentationState which is passed to the initialize method.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 3
+	explicit Fem2DElementTriangle(std::shared_ptr<FemElementStructs::FemElementParameter> elementData);
 
-	void setData(std::vector<size_t> nodeIds, const FemElementStructs::FemElementParameter& data) override;
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DElementTriangle)
 
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle
