@@ -43,13 +43,13 @@ SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem2DElementTri
 
 Fem2DElementTriangle::Fem2DElementTriangle(std::array<size_t, 3> nodeIds)
 {
-	init();
+	initializeMembers();
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
 Fem2DElementTriangle::Fem2DElementTriangle(std::vector<size_t> nodeIds)
 {
-	init();
+	initializeMembers();
 	SURGSIM_ASSERT(nodeIds.size() == 3) << "Incorrect number of nodes for Fem2D Triangle";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
@@ -76,7 +76,7 @@ double Fem2DElementTriangle::getVolume(const SurgSim::Math::OdeState& state) con
 	return m_thickness * (B - A).cross(C - A).norm() / 2.0;
 }
 
-void Fem2DElementTriangle::init()
+void Fem2DElementTriangle::initializeMembers()
 {
 	m_restArea = 0.0;
 	m_thickness = 0.0;
