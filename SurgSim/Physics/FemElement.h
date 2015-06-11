@@ -55,7 +55,8 @@ public:
 	/// \param state The state to initialize the FemElement with
 	virtual void initialize(const SurgSim::Math::OdeState& state);
 
-	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::shared_ptr<FemElementStructs::FemElementParameter>> FactoryType;
+	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::shared_ptr<FemElementStructs::FemElementParameter>>
+		FactoryType;
 
 	static FactoryType& getFactory();
 

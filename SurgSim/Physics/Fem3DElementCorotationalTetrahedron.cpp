@@ -39,7 +39,8 @@ Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::ar
 {
 }
 
-Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(std::shared_ptr<FemElementStructs::FemElementParameter> elementData) :
+Fem3DElementCorotationalTetrahedron::Fem3DElementCorotationalTetrahedron(
+	std::shared_ptr<FemElementStructs::FemElementParameter> elementData) :
 	Fem3DElementTetrahedron(elementData)
 {
 }
