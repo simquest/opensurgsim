@@ -18,6 +18,7 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/Fem3DConstraintFrictionlessContact.h"
@@ -128,7 +129,8 @@ public:
 
 TEST_F(Fem3DConstraintFrictionlessContactTests, ConstructorTest)
 {
-	ASSERT_NO_THROW({
+	ASSERT_NO_THROW(
+	{
 		Fem3DConstraintFrictionlessContact femContact;
 	});
 }
@@ -235,10 +237,20 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, 2, 1);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
-	Eigen::Matrix<double, 1, 5> localH;
-	localH <<
-		   0.9478,  -0.3807,  0.5536, -0.6944,  0.1815;
-	mlcpPhysicsProblem.H.block<1, 5>(0, 0) = localH;
+	Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t> localH;
+	localH.resize(5);
+	localH.reserve(5);
+	localH.insert(0) = 0.9478;
+	localH.insert(1) = -0.3807;
+	localH.insert(2) = 0.5536;
+	localH.insert(3) = -0.6944;
+	localH.insert(4) = 0.1815;
+
+	mlcpPhysicsProblem.H.coeffRef(0, 0) += localH.coeff(0);
+	mlcpPhysicsProblem.H.coeffRef(0, 1) += localH.coeff(1);
+	mlcpPhysicsProblem.H.coeffRef(0, 2) += localH.coeff(2);
+	mlcpPhysicsProblem.H.coeffRef(0, 3) += localH.coeff(3);
+	mlcpPhysicsProblem.H.coeffRef(0, 4) += localH.coeff(4);
 
 	Eigen::Matrix<double, 5, 5> localC;
 	localC <<

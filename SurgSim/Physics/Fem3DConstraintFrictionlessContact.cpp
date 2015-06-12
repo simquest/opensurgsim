@@ -36,12 +36,12 @@ Fem3DConstraintFrictionlessContact::~Fem3DConstraintFrictionlessContact()
 }
 
 void Fem3DConstraintFrictionlessContact::doBuild(double dt,
-	const ConstraintData& data,
-	const std::shared_ptr<Localization>& localization,
-	MlcpPhysicsProblem* mlcp,
-	size_t indexOfRepresentation,
-	size_t indexOfConstraint,
-	ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 	using SurgSim::Math::Vector3d;
 
@@ -109,7 +109,7 @@ void Fem3DConstraintFrictionlessContact::doBuild(double dt,
 		}
 	}
 
-	mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix() * m_newH, indexOfRepresentation,
+	mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix() * m_newH.transpose(), indexOfRepresentation,
 						   indexOfConstraint);
 }
 
