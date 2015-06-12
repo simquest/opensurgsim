@@ -41,9 +41,9 @@ public:
 	/// Destructor
 	virtual ~MassSpringConstraintFrictionlessContact();
 
-	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	/// Gets the constraint type for this ConstraintImplementation
+	/// \return The constraint type corresponding to this constraint implementation
+	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:
 	/// Gets the number of degrees of freedom for a frictionless contact.

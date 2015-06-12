@@ -109,9 +109,9 @@ void Fem3DConstraintFixedPoint::doBuild(double dt,
 	}
 }
 
-SurgSim::Math::MlcpConstraintType Fem3DConstraintFixedPoint::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType Fem3DConstraintFixedPoint::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t Fem3DConstraintFixedPoint::doGetNumDof() const

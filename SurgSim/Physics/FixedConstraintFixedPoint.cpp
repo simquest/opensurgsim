@@ -56,9 +56,9 @@ void FixedConstraintFixedPoint::doBuild(double dt,
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
 }
 
-SurgSim::Math::MlcpConstraintType FixedConstraintFixedPoint::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType FixedConstraintFixedPoint::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t FixedConstraintFixedPoint::doGetNumDof() const

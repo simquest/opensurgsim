@@ -144,7 +144,7 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 	// Set the representation list in the Physics Manager State
 	m_physicsManagerState->setRepresentations(m_usedRepresentations);
 	// The type of constraint.
-	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	// Prep the list of constraints: use only 1 constraint
 	{
@@ -202,7 +202,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 	// Set the representation list in the Physics Manager State
 	m_physicsManagerState->setRepresentations(m_usedRepresentations);
 	// The type of constraint.
-	auto constraintType = SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FIXED_3DPOINT;
 	// Add constraint to factory.
 	ConstraintImplementation::getFactory().addImplementation(
 		typeid(RigidRepresentation),
@@ -265,7 +265,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 	// Set the representation list in the Physics Manager State
 	m_physicsManagerState->setRepresentations(m_usedRepresentations);
 	// The type of constraint.
-	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	// Prep the list of constraints: use 2 constraints
 	{
@@ -346,7 +346,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 	// Set the representation list in the Physics Manager State
 	m_physicsManagerState->setRepresentations(m_usedRepresentations);
 	// The type of constraint.
-	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	// Prep the list of constraints: use 2 constraints
 	{

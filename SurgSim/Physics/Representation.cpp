@@ -119,7 +119,7 @@ void Representation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collisi
 }
 
 std::shared_ptr<ConstraintImplementation> Representation::getConstraintImplementation(
-	SurgSim::Math::MlcpConstraintType type)
+	SurgSim::Physics::ConstraintType type)
 {
 	auto implementation = ConstraintImplementation::getFactory().getImplementation(typeid(*this), type);
 	if (implementation == nullptr)

@@ -94,9 +94,9 @@ void RigidConstraintFrictionlessContact::doBuild(double dt,
 	mlcp->updateConstraint(m_newH, C * m_newH.transpose(), indexOfRepresentation, indexOfConstraint);
 }
 
-SurgSim::Math::MlcpConstraintType RigidConstraintFrictionlessContact::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType RigidConstraintFrictionlessContact::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	return SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 }
 
 size_t RigidConstraintFrictionlessContact::doGetNumDof() const

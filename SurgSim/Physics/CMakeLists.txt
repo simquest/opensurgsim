@@ -84,6 +84,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	ConstraintData.h
 	ConstraintImplementation.h
 	ConstraintImplementationFactory.h
+	ConstraintType.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
 	DcdCollision.h

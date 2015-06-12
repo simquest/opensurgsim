@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Localization.h"
@@ -25,14 +26,17 @@ namespace SurgSim
 namespace Physics
 {
 
-Constraint::Constraint(
-	SurgSim::Math::MlcpConstraintType constraintType,
+Constraint::Constraint(ConstraintType constraintType,
 	std::shared_ptr<ConstraintData> data,
 	std::shared_ptr<Representation> representation0,
 	const SurgSim::DataStructures::Location& location0,
 	std::shared_ptr<Representation> representation1,
 	const SurgSim::DataStructures::Location& location1)
 {
+	m_mlcpMap[FIXED_3DPOINT] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	m_mlcpMap[FIXED_3DROTATION_VECTOR] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	m_mlcpMap[FRICTIONAL_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT;
+	m_mlcpMap[FRICTIONLESS_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 	setInformation(constraintType, data, representation0, location0, representation1, location1);
 }
 
@@ -63,7 +67,7 @@ size_t Constraint::getNumDof() const
 	return m_numDof;
 }
 
-SurgSim::Math::MlcpConstraintType Constraint::getType()
+ConstraintType Constraint::getType()
 {
 	return m_constraintType;
 }
@@ -94,7 +98,8 @@ void Constraint::build(double dt,
 		indexOfConstraint,
 		CONSTRAINT_NEGATIVE_SIDE);
 
-	mlcp->constraintTypes.push_back(m_constraintType);
+	mlcp->constraintTypes.push_back(
+				(m_constraintType != INVALID_CONSTRAINT) ? m_mlcpMap[m_constraintType] : Math::MLCP_INVALID_CONSTRAINT);
 }
 
 bool Constraint::isActive()
@@ -112,8 +117,7 @@ void Constraint::doBuild(double dt,
 {
 }
 
-void Constraint::setInformation(
-	SurgSim::Math::MlcpConstraintType constraintType,
+void Constraint::setInformation(ConstraintType constraintType,
 	std::shared_ptr<ConstraintData> data,
 	std::shared_ptr<Representation> representation0,
 	const SurgSim::DataStructures::Location& location0,

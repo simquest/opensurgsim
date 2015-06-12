@@ -160,7 +160,7 @@ TEST_F(ConstraintTests, TestConstructor)
 	Location fixedLoc(m_contactPositionPlane);
 	Location rigidLoc(m_contactPositionSphere);
 
-	auto type = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	ASSERT_NO_THROW({Constraint c(type, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);});
 
@@ -177,8 +177,8 @@ TEST_F(ConstraintTests, TestConstructor)
 	Constraint c(type, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);
 
 	EXPECT_EQ(m_constraintData, c.getData());
-	EXPECT_EQ(type, c.getImplementations().first->getMlcpConstraintType());
-	EXPECT_EQ(type, c.getImplementations().second->getMlcpConstraintType());
+	EXPECT_EQ(type, c.getImplementations().first->getConstraintType());
+	EXPECT_EQ(type, c.getImplementations().second->getConstraintType());
 	EXPECT_EQ(fixedRep, c.getLocalizations().first->getRepresentation());
 	EXPECT_EQ(rigidRep, c.getLocalizations().second->getRepresentation());
 }
@@ -191,7 +191,7 @@ TEST_F(ConstraintTests, TestGetNumDof)
 	Location fixedLoc(m_contactPositionPlane);
 	Location rigidLoc(m_contactPositionSphere);
 
-	auto type = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact");
@@ -220,7 +220,8 @@ TEST_F(ConstraintTests, TestGetNumDof)
 // Constraint: (Sphere - Plane).n >= 0 with n=(0 1 0) The normal should be the contact normal on the 2nd object
 TEST_F(ConstraintTests, TestBuildMlcpSpherePlane)
 {
-	auto type = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto type =SurgSim::Physics::FRICTIONLESS_3DCONTACT;
+	auto mlcptype = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 	m_n.setZero();
 	m_n[1] = 1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
@@ -264,7 +265,7 @@ TEST_F(ConstraintTests, TestBuildMlcpSpherePlane)
 
 	// ConstraintTypes should contain 1 entry SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
 	ASSERT_EQ(1u, m_mlcpPhysicsProblem.constraintTypes.size());
-	EXPECT_EQ(type, m_mlcpPhysicsProblem.constraintTypes[0]);
+	EXPECT_EQ(mlcptype, m_mlcpPhysicsProblem.constraintTypes[0]);
 }
 
 // Test case: Rigid sphere at (0 0 0) with radius 0.01 colliding with Fixed plane Y=0
@@ -273,7 +274,8 @@ TEST_F(ConstraintTests, TestBuildMlcpSpherePlane)
 // Constraint: (Plane - Sphere).n >= 0 with n=(0 -1 0) The normal should be the contact normal on the 2nd object
 TEST_F(ConstraintTests, TestBuildMlcpPlaneSphere)
 {
-	auto type = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
+	auto mlcptype = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 	m_n.setZero();
 	m_n[1] = -1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
@@ -317,7 +319,7 @@ TEST_F(ConstraintTests, TestBuildMlcpPlaneSphere)
 
 	// ConstraintTypes should contain 1 entry SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
 	ASSERT_EQ(1u, m_mlcpPhysicsProblem.constraintTypes.size());
-	EXPECT_EQ(type, m_mlcpPhysicsProblem.constraintTypes[0]);
+	EXPECT_EQ(mlcptype, m_mlcpPhysicsProblem.constraintTypes[0]);
 }
 
 };  //  namespace Physics
