@@ -48,11 +48,7 @@ protected:
 
 	void endParseFile() override;
 
-	void* beginVertices(const std::string& elementName, size_t vertexCount) override;
-
 	void processVertex(const std::string& elementName) override;
-
-	void endVertices(const std::string& elementName) override;
 
 	void processFemElement(const std::string& elementName) override;
 
@@ -69,19 +65,6 @@ protected:
 	void processBoundaryCondition(const std::string& elementName) override;
 
 private:
-	/// Vertex data containing 6 dofs (3 translational and 3 rotational)
-	struct Vertex6DData
-	{
-		double x;
-		double y;
-		double z;
-		int64_t overrun1; ///< Used to check for buffer overruns
-		double thetaX;
-		double thetaY;
-		double thetaZ;
-		int64_t overrun2; ///< Used to check for buffer overruns
-	} m_vertexData;
-
 	/// Flag to notify if the ply file provides rotational data for the vertices or not
 	bool m_hasRotationDOF;
 

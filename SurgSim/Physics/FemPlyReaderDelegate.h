@@ -50,7 +50,7 @@ protected:
 	/// \param elementName Name of the element.
 	/// \param vertexCount Number of vertices.
 	/// \return memory for vertex data to the reader.
-	virtual void* beginVertices(const std::string& elementName, size_t vertexCount) = 0;
+	virtual void* beginVertices(const std::string& elementName, size_t vertexCount);
 
 	/// Callback function to process one vertex.
 	/// \param elementName Name of the element.
@@ -58,7 +58,7 @@ protected:
 
 	/// Callback function to finalize processing of vertices.
 	/// \param elementName Name of the element.
-	virtual void endVertices(const std::string& elementName) = 0;
+	virtual void endVertices(const std::string& elementName);
 
 	/// Callback function, begin the processing of FemElements.
 	/// \param elementName Name of the element.
@@ -95,6 +95,19 @@ protected:
 	virtual void processBoundaryCondition(const std::string& elementName) = 0;
 
 protected:
+	/// Vertex data containing 6 dofs (3 translational and 3 rotational)
+	struct Vertex6DData
+	{
+		double x;
+		double y;
+		double z;
+		int64_t overrun1; ///< Used to check for buffer overruns
+		double thetaX;
+		double thetaY;
+		double thetaZ;
+		int64_t overrun2; ///< Used to check for buffer overruns
+	} m_vertexData;
+
 	/// Flag indicating if the associated file has boundary conditions
 	bool m_hasBoundaryConditions;
 

@@ -121,5 +121,13 @@ TEST(Fem3DRepresentationReaderTests, CubeMeshDelegateTest)
 	EXPECT_DOUBLE_EQ(0.4, fem1->youngModulus);
 }
 
+TEST(Fem3DRepresentationReaderTests, WrongPlyWithRotationDof)
+{
+	auto fem = std::make_shared<Fem3D>();
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	ASSERT_THROW(fem->load("PlyReaderTests/Wrong3DFileWithRotationData.ply"), SurgSim::Framework::AssertionFailure);
+}
+
 } // Physics
 } // SurgSim

@@ -100,6 +100,19 @@ bool FemPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 	return result;
 }
 
+void* FemPlyReaderDelegate::beginVertices(const std::string &elementName, size_t vertexCount)
+{
+	m_vertexData.overrun1 = 0l;
+	return &m_vertexData;
+}
+
+void FemPlyReaderDelegate::endVertices(const std::string &elementName)
+{
+	SURGSIM_ASSERT(m_vertexData.overrun1 == 0l) <<
+		"There was an overrun while reading the vertex structures, it is likely that data " <<
+		"has become corrupted.";
+}
+
 void* FemPlyReaderDelegate::beginFemElements(const std::string& elementName, size_t elementCount)
 {
 	m_elementData.overrun1 = 0l;

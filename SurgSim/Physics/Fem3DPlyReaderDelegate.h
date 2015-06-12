@@ -48,11 +48,7 @@ protected:
 
 	void endParseFile() override;
 
-	void* beginVertices(const std::string& elementName, size_t vertexCount) override;
-
 	void processVertex(const std::string& elementName) override;
-
-	void endVertices(const std::string& elementName) override;
 
 	void processFemElement(const std::string& elementName) override;
 
@@ -62,15 +58,6 @@ protected:
 	void endFile();
 
 private:
-	/// Vertex data containing 3 dofs (3 translational)
-	struct VertexData
-	{
-		double x;
-		double y;
-		double z;
-		int64_t overrun1; ///< Used to check for buffer overruns
-	} m_vertexData;
-
 	/// Fem3D mesh asset to contain the ply file information
 	std::shared_ptr<Fem3D> m_mesh;
 };

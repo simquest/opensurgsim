@@ -101,13 +101,6 @@ void Fem2DPlyReaderDelegate::endParseFile()
 	m_mesh->update();
 }
 
-void* Fem2DPlyReaderDelegate::beginVertices(const std::string &elementName, size_t vertexCount)
-{
-	m_vertexData.overrun1 = 0l;
-	m_vertexData.overrun2 = 0l;
-	return &m_vertexData;
-}
-
 void Fem2DPlyReaderDelegate::processVertex(const std::string& elementName)
 {
 	FemElementStructs::RotationVectorData data;
@@ -122,13 +115,6 @@ void Fem2DPlyReaderDelegate::processVertex(const std::string& elementName)
 	Fem2D::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z), data);
 
 	m_mesh->addVertex(vertex);
-}
-
-void Fem2DPlyReaderDelegate::endVertices(const std::string &elementName)
-{
-	SURGSIM_ASSERT(m_vertexData.overrun1 == 0l && m_vertexData.overrun2 == 0l) <<
-			"There was an overrun while reading the vertex structures, it is likely that data " <<
-			"has become corrupted.";
 }
 
 void Fem2DPlyReaderDelegate::processFemElement(const std::string& elementName)

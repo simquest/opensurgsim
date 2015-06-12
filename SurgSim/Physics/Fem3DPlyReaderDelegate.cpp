@@ -50,9 +50,9 @@ bool Fem3DPlyReaderDelegate::registerDelegate(PlyReader* reader)
 									 std::placeholders::_1, std::placeholders::_2),
 						   std::bind(&Fem3DPlyReaderDelegate::processVertex, this, std::placeholders::_1),
 						   std::bind(&Fem3DPlyReaderDelegate::endVertices, this, std::placeholders::_1));
-	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(VertexData, x));
-	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(VertexData, y));
-	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(VertexData, z));
+	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, x));
+	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, y));
+	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, z));
 
 	FemPlyReaderDelegate::registerDelegate(reader);
 
@@ -62,6 +62,10 @@ bool Fem3DPlyReaderDelegate::registerDelegate(PlyReader* reader)
 bool Fem3DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
 	bool result = FemPlyReaderDelegate::fileIsAcceptable(reader);
+
+	SURGSIM_ASSERT(!reader.hasProperty("vertex", "thetaX") &&
+		!reader.hasProperty("vertex", "thetaY") && !reader.hasProperty("vertex", "thetaZ")) <<
+		"An Fem3d model cannot contain rotational data (only 3 translational degrees of freedom)";
 
 	return result;
 }
@@ -78,24 +82,11 @@ void Fem3DPlyReaderDelegate::endParseFile()
 	m_mesh->update();
 }
 
-void* Fem3DPlyReaderDelegate::beginVertices(const std::string &elementName, size_t vertexCount)
-{
-	m_vertexData.overrun1 = 0l;
-	return &m_vertexData;
-}
-
 void Fem3DPlyReaderDelegate::processVertex(const std::string& elementName)
 {
 	Fem3D::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z));
 
 	m_mesh->addVertex(vertex);
-}
-
-void Fem3DPlyReaderDelegate::endVertices(const std::string &elementName)
-{
-	SURGSIM_ASSERT(m_vertexData.overrun1 == 0l) <<
-			"There was an overrun while reading the vertex structures, it is likely that data " <<
-			"has become corrupted.";
 }
 
 void Fem3DPlyReaderDelegate::processFemElement(const std::string& elementName)
