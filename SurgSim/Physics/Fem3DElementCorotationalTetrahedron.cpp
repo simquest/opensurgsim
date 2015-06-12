@@ -147,7 +147,7 @@ void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeStat
 	addSubVector(resultLocal, m_nodeIds, 3, result);
 }
 
-void Fem3DElementCorotationalTetrahedron::update(const Math::OdeState& state, int options)
+void Fem3DElementCorotationalTetrahedron::doUpdate(const Math::OdeState& state, int options)
 {
 	SurgSim::Math::Matrix33d* rotation = nullptr;
 	Eigen::Matrix<double, 12, 12>* RMRt = nullptr;

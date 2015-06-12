@@ -117,8 +117,13 @@ bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinat
 
 void FemElement::update(const Math::OdeState& state, int options)
 {
+	doUpdate(state, options);
+}
+
+void FemElement::doUpdate(const Math::OdeState& state, int options)
+{
 	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Physics/FemElement"))
-		<< "FemElement::update() has been called. One of the sub-classes has not overriden it.";
+		<< "FemElement::doUpdate() has been called. One of the sub-classes has not overriden it.";
 }
 
 } // namespace Physics

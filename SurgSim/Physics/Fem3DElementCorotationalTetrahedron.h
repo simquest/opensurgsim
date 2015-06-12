@@ -78,8 +78,6 @@ public:
 				   double alphaM, double alphaD, double alphaK,
 				   const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) override;
 
-	void update(const Math::OdeState& state, int options) override;
-
 protected:
 	/// Compute the rotation, mass and stiffness matrices of the element from the given state
 	/// \param state The state to compute the rotation and jacobians from
@@ -88,6 +86,8 @@ protected:
 	/// \note The model is not viscoelastic but purely elastic, so there is no damping matrix here.
 	void computeRotationMassAndStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
 										 Eigen::Matrix<double, 12, 12>* Me, Eigen::Matrix<double, 12, 12>* Ke) const;
+
+	void doUpdate(const Math::OdeState& state, int options) override;
 
 	/// The constant inverse matrix of the undeformed tetrahedron homogeneous 4 points coordinates.
 	/// This is useful to compute the deformation gradient from which the element rotation is extracted.
