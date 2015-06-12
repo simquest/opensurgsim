@@ -172,3 +172,6 @@ surgsim_cpplint_this_tree(cpplint)
 set(OPENSURGSIM_INCLUDE_DIRS ${SURGSIM_SOURCE_DIR} CACHE INTERNAL "OSS Include Directories")
 set(OPENSURGSIM_DATA_DIR ${SURGSIM_SOURCE_DIR}/Data CACHE INTERNAL "OSS Data Directory")
 set(OPENSURGSIM_LIBRARIES ${SURGSIM_EXPORT_TARGETS} CACHE INTERNAL "OSS Exported Libraries")
+
+# Copy OpenSurgSim Data folder containing common shaders and fonts to the Build folder
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

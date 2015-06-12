@@ -101,8 +101,8 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 
 TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 {
-	std::string checkerTexturePath = applicationData->findFile("OsgScreenSpaceQuadRenderTests/CheckerBoard.png");
-	std::string rectangleTexturePath = applicationData->findFile("OsgScreenSpaceQuadRenderTests/Rectangle.png");
+	std::string checkerTexturePath = applicationData->findFile("Textures/CheckerBoard.png");
+	std::string rectangleTexturePath = applicationData->findFile("Textures/Rectangle.png");
 
 	EXPECT_NE("", checkerTexturePath) << "Could not find checker texture shader!";
 	EXPECT_NE("", rectangleTexturePath) << "Could not find rectangle texture!";

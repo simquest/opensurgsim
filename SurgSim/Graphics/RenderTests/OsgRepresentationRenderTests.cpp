@@ -240,7 +240,7 @@ TEST_F(OsgRepresentationRenderTests, TangentTest)
 {
 	auto element = std::make_shared<Framework::BasicSceneElement>("sphere");
 	auto graphics = std::make_shared<OsgSceneryRepresentation>("sphere");
-	graphics->loadModel("OsgRepresentationRenderTests/sphere0_5.obj");
+	graphics->loadModel("Geometry/sphere0_5.obj");
 	//graphics->setDrawAsWireFrame(true);
 
 	viewElement->enableManipulator(true);

@@ -32,10 +32,10 @@ TEST(TriangleMeshTriangleMeshContactCalculationPerformanceTests, IntersectionTes
 
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	auto meshA = std::make_shared<MeshShape>();
-	meshA->load("MeshShapeData/stapler_collision.ply");
+	meshA->load("Geometry/stapler_collision.ply");
 
 	auto meshB = std::make_shared<MeshShape>();
-	meshB->load("MeshShapeData/wound_deformable.ply");
+	meshB->load("Geometry/wound_deformable_with_texture.ply");
 
 	std::shared_ptr<ShapeCollisionRepresentation> meshARep =
 		std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 0");

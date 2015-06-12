@@ -519,7 +519,7 @@ TEST_F(DeformableRepresentationTest, SerializationTest)
 		EXPECT_EQ(1u, node.size());
 
 		YAML::Node data = node["SurgSim::Physics::MockDeformableRepresentation"];
-		EXPECT_EQ(9u, data.size());
+		EXPECT_EQ(10u, data.size());
 
 		std::shared_ptr<MockDeformableRepresentation> newRepresentation;
 		newRepresentation = std::dynamic_pointer_cast<MockDeformableRepresentation>

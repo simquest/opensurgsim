@@ -336,7 +336,7 @@ TEST(OsgRepresentationTests, TangentGenerationTest)
 {
 	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
 	auto scenery = std::make_shared<OsgSceneryRepresentation>("scenery");
-	scenery->loadModel("OsgRepresentationTests/sphere0_5.obj");
+	scenery->loadModel("Geometry/sphere0_5.obj");
 
 	EXPECT_FALSE(scenery->isGeneratingTangents());
 	scenery->setGenerateTangents(true);

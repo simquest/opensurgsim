@@ -156,7 +156,7 @@ public:
 
 protected:
 	/// Initializes variables needed before Initialize() is called
-	void init();
+	void initializeMembers();
 
 	/// Build the constitutive material 6x6 matrix
 	/// \param[out] constitutiveMatrix The 6x6 constitutive material matrix

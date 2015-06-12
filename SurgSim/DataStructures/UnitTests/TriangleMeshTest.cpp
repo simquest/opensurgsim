@@ -623,20 +623,20 @@ TEST_F(TriangleMeshTest, LoadTest)
 	{
 		SCOPED_TRACE("Load existent file which contains invalid mesh should throw");
 		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
-		EXPECT_THROW(mesh->load("MeshShapeData/InvalidMesh.ply"), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(mesh->load("Geometry/InvalidMesh.ply"), SurgSim::Framework::AssertionFailure);
 	}
 
 	{
 		SCOPED_TRACE("Load existent file which contains valid mesh should not throw");
 		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
-		EXPECT_NO_THROW(mesh->load("MeshShapeData/staple_collision.ply"));
+		EXPECT_NO_THROW(mesh->load("Geometry/staple_collision.ply"));
 	}
 
 	{
 		SCOPED_TRACE("Load Cube.ply and check mesh");
 		auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
-		mesh->load("TriangleMeshBaseTests/Cube.ply");
-		ASSERT_NO_THROW(mesh->load("TriangleMeshBaseTests/Cube.ply"));
+		mesh->load("Geometry/Cube.ply");
+		ASSERT_NO_THROW(mesh->load("Geometry/Cube.ply"));
 
 		EXPECT_EQ(26u, mesh->getNumVertices());
 		EXPECT_EQ(12u, mesh->getNumTriangles());

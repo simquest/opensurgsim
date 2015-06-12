@@ -123,6 +123,8 @@ public:
 	/// \return Returns the matrix \f$C.b\f$
 	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
+	const SurgSim::Math::Matrix& getComplianceMatrix() const override;
+
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
@@ -223,6 +225,8 @@ private:
 	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
 
 	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
+
+	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
 
 	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
 	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;

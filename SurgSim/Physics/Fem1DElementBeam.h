@@ -156,7 +156,7 @@ public:
 
 protected:
 	/// Initializes variables needed before Initialize() is called
-	void init();
+	void initializeMembers();
 
 	/// Computes the beam element's initial rotation
 	/// \param state The state to compute the rotation from

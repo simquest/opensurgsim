@@ -78,8 +78,6 @@ set(LIBS
 )
 
 file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(

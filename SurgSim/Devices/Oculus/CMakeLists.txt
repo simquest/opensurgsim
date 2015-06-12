@@ -57,6 +57,7 @@ target_link_libraries(OculusDevice ${LIBS})
 if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
+	add_subdirectory(SceneTest)
 
 	if(GLUT_FOUND)
 		add_subdirectory(VisualTest)

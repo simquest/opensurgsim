@@ -44,7 +44,6 @@ set(UNIT_TEST_HEADERS
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(

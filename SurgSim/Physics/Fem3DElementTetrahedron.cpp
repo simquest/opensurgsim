@@ -48,18 +48,18 @@ SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementTet
 
 Fem3DElementTetrahedron::Fem3DElementTetrahedron()
 {
-	init();
+	initializeMembers();
 }
 
 Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds)
 {
-	init();
+	initializeMembers();
 	m_nodeIds.assign(std::begin(nodeIds), std::end(nodeIds));
 }
 
 Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::shared_ptr<FemElementStructs::FemElementParameter> elementData)
 {
-	init();
+	initializeMembers();
 	auto element3DData = std::dynamic_pointer_cast<FemElementStructs::FemElement3DParameter>(elementData);
 	SURGSIM_ASSERT(element3DData != nullptr) << "Incorrect struct type passed";
 	SURGSIM_ASSERT(element3DData->nodeIds.size() == 4) << "Incorrect number of nodes for Fem3D Tetrahedron";
@@ -69,7 +69,7 @@ Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::shared_ptr<FemElementStruc
 	setYoungModulus(element3DData->youngModulus);
 }
 
-void Fem3DElementTetrahedron::init()
+void Fem3DElementTetrahedron::initializeMembers()
 {
 	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 }

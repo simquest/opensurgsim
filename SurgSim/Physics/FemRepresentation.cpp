@@ -214,13 +214,17 @@ void FemRepresentation::update(double dt)
 	{
 		if (!m_isInitialComplianceMatrixComputed)
 		{
-			m_odeSolver->computeMatrices(dt, *m_initialState);
+			m_odeSolver->computeMatrices(dt, *m_initialState, true);
 			m_isInitialComplianceMatrixComputed = true;
 		}
-		m_odeSolver->solve(dt, *m_currentState, m_newState.get());
+		m_odeSolver->solve(dt, *m_currentState, m_newState.get(), false);
 
 		// Update the compliance matrix by first updating the nodes transformation
 		updateNodesTransformation(*m_newState);
+
+		// Then, update the compliance matrix using compliance warping
+		m_complianceWarpingMatrix = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
+									m_complianceWarpingTransformation.transpose();
 	}
 	else
 	{
@@ -246,7 +250,6 @@ void FemRepresentation::update(double dt)
 void FemRepresentation::setComplianceWarping(bool useComplianceWarping)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Compliance warping cannot be modified once the component is initialized";
-	SURGSIM_ASSERT(!useComplianceWarping) << "Compliance warping is disabled in this version";
 
 	m_useComplianceWarping = useComplianceWarping;
 }
@@ -267,6 +270,17 @@ Math::Matrix FemRepresentation::applyCompliance(const Math::OdeState& state, con
 																m_complianceWarpingTransformation.transpose() * b));
 	}
 	return DeformableRepresentation::applyCompliance(state, b);
+}
+
+const SurgSim::Math::Matrix& FemRepresentation::getComplianceMatrix() const
+{
+	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
+
+	if (m_useComplianceWarping)
+	{
+		return m_complianceWarpingMatrix;
+	}
+	return m_odeSolver->getComplianceMatrix();
 }
 
 SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)

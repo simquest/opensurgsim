@@ -28,14 +28,13 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	DivisibleCubeRepresentation.h
+	MockFem3DRepresentation.h
 )
 
 set(LIBS
 	SurgSimInput
 	SurgSimPhysics
 )
-
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Configure the path for the data files
 configure_file(
