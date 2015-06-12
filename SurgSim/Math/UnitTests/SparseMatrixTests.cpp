@@ -438,44 +438,6 @@ tuple<double, TypeValue<Eigen::ColMajor>, int>,
 	  tuple<float, TypeValue<Eigen::RowMajor>, ptrdiff_t >> MyTypes;
 TYPED_TEST_CASE(SparseMatrices, MyTypes);
 
-//TYPED_TEST(SparseMatrices, setSubMatrixWithoutSearchDynamicCall)
-//{
-//	typedef typename tuple_element<0, TypeParam>::type T;
-//	const int Opt = tuple_element<1, TypeParam>::type::value;
-//	const int OtherOpt = (Opt == Eigen::ColMajor ? Eigen::RowMajor : Eigen::ColMajor);
-//
-//	{
-//		SCOPED_TRACE("Test with static dense input sub-matrix");
-//		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 3, 4, Opt>(), true); ///< Sub too small (1D)
-//		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 3, 3, Opt>(), true); ///< Sub too small (2D)
-//		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 4, 4, Opt>());
-//		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 4, 4, OtherOpt>());
-//		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-//		this->TestSetWithoutSearchDynamic(this->template getStaticMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
-//	}
-//
-//	{
-//		SCOPED_TRACE("Test with dynamic dense input sub-matrix");
-//		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 3, 4, Opt>(), true); ///< Sub too small 1D
-//		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 3, 3, Opt>(), true); ///< Sub too small 2D
-//		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 4, 4, Opt>());
-//		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 4, 4, OtherOpt>());
-//		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-//		this->TestSetWithoutSearchDynamic(this->template getDynamicMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
-//	}
-//
-//	{
-//		SCOPED_TRACE("Test with sparse input sub-matrix");
-//		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 3, 4, Opt>(), true); ///< Sub too small 1D
-//		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 3, 3, Opt>(), true); ///< Sub too small 2D
-//		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 4, 4, Opt>());
-//		/// Wrong SparseMatrix alignment: in general, this may lead to Eigen failure (program exit).
-//		//this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 4, 4, OtherOpt>(), false, false);
-//		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 6, 4, Opt>()); ///< Sub larger (1D)
-//		this->TestSetWithoutSearchDynamic(this->template getSparseMatrix<T, 5, 6, Opt>()); ///< Sub larger (2D)
-//	}
-//}
-
 TYPED_TEST(SparseMatrices, setSubMatrixWithSearchDynamicCall)
 {
 	typedef typename tuple_element<0, TypeParam>::type T;
