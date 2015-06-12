@@ -39,12 +39,12 @@ MassSpringConstraintFrictionlessContact::~MassSpringConstraintFrictionlessContac
 }
 
 void MassSpringConstraintFrictionlessContact::doBuild(double dt,
-			const ConstraintData& data,
-			const std::shared_ptr<Localization>& localization,
-			MlcpPhysicsProblem* mlcp,
-			size_t indexOfRepresentation,
-			size_t indexOfConstraint,
-			ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 	using SurgSim::Math::Vector3d;
 
@@ -87,13 +87,13 @@ void MassSpringConstraintFrictionlessContact::doBuild(double dt,
 	m_newH.insert(3 * nodeId + 1) = n[1] * scale;
 	m_newH.insert(3 * nodeId + 2) = n[2] * scale;
 
-	mlcp->updateConstraint(m_newH, massSpring->applyCompliance(*(massSpring->getCurrentState()), m_newH),
+	mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix() * m_newH.transpose(),
 						   indexOfRepresentation, indexOfConstraint);
 }
 
-SurgSim::Math::MlcpConstraintType MassSpringConstraintFrictionlessContact::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType MassSpringConstraintFrictionlessContact::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	return SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 }
 
 size_t MassSpringConstraintFrictionlessContact::doGetNumDof() const

@@ -48,18 +48,18 @@ SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementTet
 
 Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::array<size_t, 4> nodeIds)
 {
-	init();
+	initializeMembers();
 	m_nodeIds.assign(std::begin(nodeIds), std::end(nodeIds));
 }
 
 Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::vector<size_t> nodeIds)
 {
-	init();
+	initializeMembers();
 	SURGSIM_ASSERT(nodeIds.size() == 4) << "Incorrect number of nodes for Fem3D Tetrahedron";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
-void Fem3DElementTetrahedron::init()
+void Fem3DElementTetrahedron::initializeMembers()
 {
 	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 }

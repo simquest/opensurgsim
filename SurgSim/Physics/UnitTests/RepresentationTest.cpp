@@ -193,7 +193,7 @@ public:
 	{}
 
 	std::shared_ptr<SurgSim::Physics::ConstraintImplementation>
-		getConstraintImplementation(SurgSim::Math::MlcpConstraintType type)
+		getConstraintImplementation(SurgSim::Physics::ConstraintType type)
 	{
 		return RigidRepresentation::getConstraintImplementation(type);
 	}
@@ -208,7 +208,7 @@ TEST(RepresentationTest, ConstraintTest)
 	auto representation = std::make_shared<MockRigidRepresentation>("rep");
 
 	// Test the getConstraintImplementation
-	EXPECT_TRUE(representation->getConstraintImplementation(implementation->getMlcpConstraintType())
+	EXPECT_TRUE(representation->getConstraintImplementation(implementation->getConstraintType())
 		== nullptr);
 
 	// Add the constraint implementation.
@@ -216,6 +216,6 @@ TEST(RepresentationTest, ConstraintTest)
 		implementation);
 
 	// Test the getConstraintImplementation
-	EXPECT_TRUE(representation->getConstraintImplementation(implementation->getMlcpConstraintType())
+	EXPECT_TRUE(representation->getConstraintImplementation(implementation->getConstraintType())
 		!= nullptr);
 }

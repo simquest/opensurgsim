@@ -21,6 +21,7 @@
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
+#include <array>
 #include <memory>
 
 namespace SurgSim
@@ -40,7 +41,7 @@ public:
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	Constraint(
-		SurgSim::Math::MlcpConstraintType constraintType,
+		ConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
 		std::shared_ptr<Representation> representation0,
 		const SurgSim::DataStructures::Location& location0,
@@ -57,7 +58,7 @@ public:
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	void setInformation(
-		SurgSim::Math::MlcpConstraintType constraintType,
+		ConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
 		std::shared_ptr<Representation> representation0,
 		const SurgSim::DataStructures::Location& location0,
@@ -82,9 +83,9 @@ public:
 	/// \return The number of degree of freedom for this constraint.
 	size_t getNumDof() const;
 
-	/// Gets the ConstraintType for this constraint.
-	/// \return	The type.
-	SurgSim::Math::MlcpConstraintType getType();
+	/// Gets the ConstraintType
+	/// \return The type
+	ConstraintType getType();
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint.
 	/// \param dt The time step.
@@ -102,6 +103,9 @@ public:
 	bool isActive();
 
 private:
+	/// Constraint-MLCP mapping
+	std::array<Math::MlcpConstraintType, NUM_CONSTRAINT_TYPES> m_mlcpMap;
+
 	/// Specific data associated to this constraint
 	std::shared_ptr<ConstraintData> m_data;
 
@@ -113,7 +117,7 @@ private:
 	size_t m_numDof;
 
 	/// The type of this constraint
-	SurgSim::Math::MlcpConstraintType m_constraintType;
+	ConstraintType m_constraintType;
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step

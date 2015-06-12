@@ -20,8 +20,8 @@
 #include <typeindex>
 
 #include "SurgSim/Framework/Representation.h"
-#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/ConstraintType.h"
 
 namespace SurgSim
 {
@@ -124,7 +124,7 @@ public:
 	/// Get a constraint implementation of the given type for this representation.
 	/// \param type The type of constraint.
 	/// \return A contact constraint implementation or nullptr.
-	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Math::MlcpConstraintType type);
+	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Physics::ConstraintType type);
 
 protected:
 	/// Set the number of degrees of freedom

@@ -328,12 +328,12 @@ void MockMassSpring::clearFMDK()
 
 MockFemElement::MockFemElement() : FemElement()
 {
-	init();
+	initializeMembers();
 }
 
 MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement()
 {
-	init();
+	initializeMembers();
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
@@ -395,7 +395,7 @@ Vector MockFemElement::computeNaturalCoordinate(const OdeState& state, const Vec
 	return SurgSim::Math::Vector3d::Zero();
 }
 
-void MockFemElement::init()
+void MockFemElement::initializeMembers()
 {
 	m_isInitialized = false;
 	setNumDofPerNode(3);
@@ -509,9 +509,9 @@ MockFixedConstraintFixedPoint::~MockFixedConstraintFixedPoint()
 {
 }
 
-SurgSim::Math::MlcpConstraintType MockFixedConstraintFixedPoint::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType MockFixedConstraintFixedPoint::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t MockFixedConstraintFixedPoint::doGetNumDof() const
@@ -537,9 +537,9 @@ MockRigidConstraintFixedPoint::~MockRigidConstraintFixedPoint()
 {
 }
 
-SurgSim::Math::MlcpConstraintType MockRigidConstraintFixedPoint::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType MockRigidConstraintFixedPoint::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t MockRigidConstraintFixedPoint::doGetNumDof() const
@@ -572,9 +572,9 @@ Vector3d MockLocalization::doCalculatePosition(double time)
 }
 
 
-SurgSim::Math::MlcpConstraintType MockConstraintImplementation::getMlcpConstraintType() const
+SurgSim::Physics::ConstraintType MockConstraintImplementation::getConstraintType() const
 {
-	return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
 size_t MockConstraintImplementation::doGetNumDof() const

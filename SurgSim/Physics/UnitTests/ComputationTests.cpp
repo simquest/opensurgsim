@@ -79,7 +79,7 @@ TEST(ComputationTests, PreparePhysicsState)
 	// Add a constraint.
 	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
 	// Constraint type.
-	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	{
 		// Create first representation.

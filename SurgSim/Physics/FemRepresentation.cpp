@@ -344,19 +344,13 @@ SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Ma
 
 void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::blockWithoutSearch;
-	using SurgSim::Math::Matrix;
-	using SurgSim::Math::Operation;
+	using SurgSim::Math::assignSubMatrix;
 
 	typedef Eigen::SparseMatrix<double>::Index Index;
-	Index numDofPerNode = static_cast<Index>(getNumDofPerNode());
 	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
 	{
-		Index startDiagonalIndex = numDofPerNode * static_cast<Index>(nodeId);
-		blockWithoutSearch<Matrix, double>(getNodeTransformation(state, nodeId),
-										   startDiagonalIndex, startDiagonalIndex, numDofPerNode,
-										   numDofPerNode, &m_complianceWarpingTransformation,
-										   &Operation<double, 0, int, Matrix>::assign);
+		assignSubMatrix(getNodeTransformation(state, nodeId), static_cast<Index>(nodeId),
+			static_cast<Index>(nodeId), &m_complianceWarpingTransformation, false);
 	}
 }
 

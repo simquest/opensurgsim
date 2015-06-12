@@ -264,7 +264,7 @@ public:
 	bool isInitialized() const;
 
 private:
-	void init();
+	void initializeMembers();
 	Vector m_F;
 	Matrix m_M, m_D, m_K;
 	bool m_isInitialized;
@@ -326,7 +326,7 @@ public:
 	MockFixedConstraintFixedPoint();
 	virtual ~MockFixedConstraintFixedPoint();
 
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:
 	size_t doGetNumDof() const override;
@@ -346,7 +346,7 @@ public:
 	MockRigidConstraintFixedPoint();
 	virtual ~MockRigidConstraintFixedPoint();
 
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:
 	size_t doGetNumDof() const override;
@@ -386,7 +386,7 @@ private:
 class MockConstraintImplementation : public ConstraintImplementation
 {
 public:
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:
 	size_t doGetNumDof() const override;
@@ -425,7 +425,7 @@ inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepres
 {
 	using SurgSim::DataStructures::Location;
 
-	static auto type = (new MockConstraintImplementation())->getMlcpConstraintType();
+	static auto type = (new MockConstraintImplementation())->getConstraintType();
 	if (firstRepresentation->getConstraintImplementation(type) == nullptr)
 	{
 		ConstraintImplementation::getFactory().addImplementation(typeid(MockRepresentation),

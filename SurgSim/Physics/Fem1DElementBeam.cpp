@@ -34,13 +34,13 @@ SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem1DElementBea
 
 Fem1DElementBeam::Fem1DElementBeam(std::array<size_t, 2> nodeIds)
 {
-	init();
+	initializeMembers();
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
 Fem1DElementBeam::Fem1DElementBeam(std::vector<size_t> nodeIds)
 {
-	init();
+	initializeMembers();
 	SURGSIM_ASSERT(nodeIds.size() == 2) << "Incorrect number of nodes for a Fem1D Beam";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
@@ -76,7 +76,7 @@ double Fem1DElementBeam::getVolume(const SurgSim::Math::OdeState& state) const
 	return m_A * (B - A).norm();
 }
 
-void Fem1DElementBeam::init()
+void Fem1DElementBeam::initializeMembers()
 {
 	m_G = 0.0;
 	m_restLength = 0.0;

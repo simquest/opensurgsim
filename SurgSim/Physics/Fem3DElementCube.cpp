@@ -33,18 +33,18 @@ SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementCub
 
 Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
 {
-	init();
+	initializeMembers();
 	m_nodeIds.assign( nodeIds.cbegin(), nodeIds.cend());
 }
 
 Fem3DElementCube::Fem3DElementCube(std::vector<size_t> nodeIds)
 {
-	init();
+	initializeMembers();
 	SURGSIM_ASSERT(nodeIds.size() == 8) << "Incorrect number of nodes for Fem3D cube";
 	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
 }
 
-void Fem3DElementCube::init()
+void Fem3DElementCube::initializeMembers()
 {
 	// Set the number of dof per node (3 in this case)
 	setNumDofPerNode(3);

@@ -147,7 +147,7 @@ public:
 
 protected:
 	/// Initializes variables needed before Initialize() is called
-	void init();
+	void initializeMembers();
 
 	/// Computes the tetrahedron shape functions
 	/// \param state The deformable rest state to compute the shape function from
