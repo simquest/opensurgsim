@@ -108,8 +108,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 				data->setPlaneEquation((*contactsIt)->normal, (*contactsIt)->depth);
 
 				constraints.push_back(std::make_shared<Constraint>(
-					SurgSim::Physics::FRICTIONLESS_3DCONTACT,
-					SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, data,
+					SurgSim::Physics::FRICTIONLESS_3DCONTACT, data,
 					physicsRepresentations.first, *locations.first,
 					physicsRepresentations.second, *locations.second));
 			}

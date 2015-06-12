@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Localization.h"
@@ -25,14 +26,19 @@ namespace SurgSim
 namespace Physics
 {
 
-Constraint::Constraint(ConstraintType constraintType, Math::MlcpConstraintType mlcpConstraintType,
+Constraint::Constraint(ConstraintType constraintType,
 	std::shared_ptr<ConstraintData> data,
 	std::shared_ptr<Representation> representation0,
 	const SurgSim::DataStructures::Location& location0,
 	std::shared_ptr<Representation> representation1,
 	const SurgSim::DataStructures::Location& location1)
 {
-	setInformation(constraintType, mlcpConstraintType, data, representation0, location0, representation1, location1);
+	m_mlcpMap[INVALID_CONSTRAINT] = Math::MLCP_INVALID_CONSTRAINT;
+	m_mlcpMap[FIXED_3DPOINT] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	m_mlcpMap[FIXED_3DROTATION_VECTOR] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	m_mlcpMap[FRICTIONAL_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT;
+	m_mlcpMap[FRICTIONLESS_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	setInformation(constraintType, data, representation0, location0, representation1, location1);
 }
 
 Constraint::~Constraint()
@@ -62,11 +68,6 @@ size_t Constraint::getNumDof() const
 	return m_numDof;
 }
 
-SurgSim::Math::MlcpConstraintType Constraint::getMlcpType()
-{
-	return m_mlcpConstraintType;
-}
-
 void Constraint::build(double dt,
 	MlcpPhysicsProblem* mlcp,
 	size_t indexOfRepresentation0,
@@ -93,7 +94,7 @@ void Constraint::build(double dt,
 		indexOfConstraint,
 		CONSTRAINT_NEGATIVE_SIDE);
 
-	mlcp->constraintTypes.push_back(m_mlcpConstraintType);
+	mlcp->constraintTypes.push_back(m_mlcpMap[m_constraintType]);
 }
 
 bool Constraint::isActive()
@@ -112,7 +113,6 @@ void Constraint::doBuild(double dt,
 }
 
 void Constraint::setInformation(SurgSim::Physics::ConstraintType constraintType,
-	SurgSim::Math::MlcpConstraintType mlcpConstraintType,
 	std::shared_ptr<ConstraintData> data,
 	std::shared_ptr<Representation> representation0,
 	const SurgSim::DataStructures::Location& location0,
@@ -120,7 +120,6 @@ void Constraint::setInformation(SurgSim::Physics::ConstraintType constraintType,
 	const SurgSim::DataStructures::Location& location1)
 {
 	m_constraintType = constraintType;
-	m_mlcpConstraintType = mlcpConstraintType;
 	SURGSIM_ASSERT(data != nullptr) << "ConstraintData can't be nullptr";
 	SURGSIM_ASSERT(representation0 != nullptr) << "First representation can't be nullptr";
 	SURGSIM_ASSERT(representation1 != nullptr) << "Second representation can't be nullptr";

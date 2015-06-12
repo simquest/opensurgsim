@@ -161,21 +161,20 @@ TEST_F (ConstraintTests, TestConstructor)
 	Location rigidLoc(m_contactPositionSphere);
 
 	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
-	auto mlcptype = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 
-	ASSERT_NO_THROW({Constraint c(type, mlcptype, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);});
+	ASSERT_NO_THROW({Constraint c(type, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);});
 
 	EXPECT_THROW(
-	{ Constraint c(type, mlcptype, nullptr, nullptr, fixedLoc, nullptr, fixedLoc); },
+	{ Constraint c(type, nullptr, nullptr, fixedLoc, nullptr, fixedLoc); },
 	SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(
-	{ Constraint c(type, mlcptype, m_constraintData, nullptr, fixedLoc, nullptr, fixedLoc); },
+	{ Constraint c(type, m_constraintData, nullptr, fixedLoc, nullptr, fixedLoc); },
 	SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(
-	{ Constraint c(type, mlcptype, m_constraintData, fixedRep, fixedLoc, nullptr, fixedLoc); },
+	{ Constraint c(type, m_constraintData, fixedRep, fixedLoc, nullptr, fixedLoc); },
 	SurgSim::Framework::AssertionFailure);
 
-	Constraint c(type, mlcptype, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);
+	Constraint c(type, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);
 
 	EXPECT_EQ(m_constraintData, c.getData());
 	EXPECT_EQ(type, c.getImplementations().first->getConstraintType());
@@ -193,11 +192,10 @@ TEST_F (ConstraintTests, TestGetNumDof)
 	Location rigidLoc(m_contactPositionSphere);
 
 	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
-	auto mlcptype = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact");
-		Constraint c(type, mlcptype, m_constraintData,
+		Constraint c(type, m_constraintData,
 			m_fixed, m_locFixedPlane,
 			m_rigid, m_locRigidSphere);
 		EXPECT_EQ(1u, c.getNumDof());
@@ -205,13 +203,13 @@ TEST_F (ConstraintTests, TestGetNumDof)
 
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact between 2 fixed representations");
-		Constraint c(type, mlcptype, m_constraintData, fixedRep, fixedLoc, fixedRep, fixedLoc);
+		Constraint c(type, m_constraintData, fixedRep, fixedLoc, fixedRep, fixedLoc);
 		EXPECT_EQ(1u, c.getNumDof());
 	}
 
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact between 1 fixed representation and 1 rigid representation");
-		Constraint c(type, mlcptype, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);
+		Constraint c(type, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);
 		EXPECT_EQ(1u, c.getNumDof());
 	}
 }
@@ -227,7 +225,7 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 	m_n.setZero();
 	m_n[1] = 1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
-	m_constraint = std::make_shared<Constraint>(type, mlcptype, m_constraintData,
+	m_constraint = std::make_shared<Constraint>(type, m_constraintData,
 												m_rigid, m_locRigidSphere,
 												m_fixed, m_locFixedPlane);
 
@@ -280,7 +278,7 @@ TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 	m_n.setZero();
 	m_n[1] = -1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
-	m_constraint = std::make_shared<Constraint>(type, mlcptype, m_constraintData,
+	m_constraint = std::make_shared<Constraint>(type, m_constraintData,
 		m_fixed, m_locFixedPlane,
 		m_rigid, m_locRigidSphere);
 

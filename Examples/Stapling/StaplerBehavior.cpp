@@ -265,8 +265,7 @@ void StaplerBehavior::createStaple()
 					targetContact->penetrationPoints.second.rigidLocalPosition.getValue()));
 
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
-		auto constraint = std::make_shared<SurgSim::Physics::Constraint>(
-			SurgSim::Physics::FIXED_3DPOINT, SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT,
+		auto constraint = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Physics::FIXED_3DPOINT,
 			std::make_shared<SurgSim::Physics::ConstraintData>(), stapleRepresentation,
 			stapleConstraintLocation, targetPhysicsRepresentation, targetContact->penetrationPoints.second);
 

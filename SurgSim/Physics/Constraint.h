@@ -21,6 +21,7 @@
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
+#include <array>
 #include <memory>
 
 namespace SurgSim
@@ -36,13 +37,11 @@ public:
 	/// Sets all the values for this constraints, does validation on the parameters and will throw if something
 	/// is wrong with the constraint.
 	/// \param constraintType The constraint type.
-	/// \param mlcpConstraintType The MLCP constraint type.
 	/// \param data The data for this constraint.
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	Constraint(
 		SurgSim::Physics::ConstraintType constraintType,
-		SurgSim::Math::MlcpConstraintType mlcpConstraintType,
 		std::shared_ptr<ConstraintData> data,
 		std::shared_ptr<Representation> representation0,
 		const SurgSim::DataStructures::Location& location0,
@@ -55,13 +54,11 @@ public:
 	/// Sets all the values for this constraints, does validation on the parameters and will throw if something
 	/// is wrong with the constraint.
 	/// \param constraintType The constraint type.
-	/// \param mlcpConstraintType The MLCP constraint type.
 	/// \param data The data for this constraint.
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	void setInformation(
 		SurgSim::Physics::ConstraintType constraintType,
-		SurgSim::Math::MlcpConstraintType mlcpConstraintType,
 		std::shared_ptr<ConstraintData> data,
 		std::shared_ptr<Representation> representation0,
 		const SurgSim::DataStructures::Location& location0,
@@ -90,10 +87,6 @@ public:
 	/// \return The type
 	SurgSim::Physics::ConstraintType getType();
 
-	/// Gets the MlcpConstraintType for this constraint.
-	/// \return	The type.
-	SurgSim::Math::MlcpConstraintType getMlcpType();
-
 	/// Builds subset of an Mlcp physics problem associated to this constraint.
 	/// \param dt The time step.
 	/// \param [in,out] mlcpPhysicsProblem The Mlcp physics problem to be filled up.
@@ -110,6 +103,9 @@ public:
 	bool isActive();
 
 private:
+	/// Constraint-MLCP mapping
+	std::array<Math::MlcpConstraintType, NUM_CONSTRAINT_TYPES> m_mlcpMap;
+
 	/// Specific data associated to this constraint
 	std::shared_ptr<ConstraintData> m_data;
 
@@ -122,9 +118,6 @@ private:
 
 	/// The type of this constraint
 	SurgSim::Physics::ConstraintType m_constraintType;
-
-	/// The type of this mlcp constraint
-	SurgSim::Math::MlcpConstraintType m_mlcpConstraintType;
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step
