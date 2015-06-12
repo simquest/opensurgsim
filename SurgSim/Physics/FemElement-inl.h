@@ -32,27 +32,17 @@ void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::ve
 									  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
 									  bool initialize)
 {
+	using SurgSim::Math::addSubMatrix;
+
 	const Index numBlocks = static_cast<Index>(blockIds.size());
 	for (Index block0 = 0; block0 < numBlocks; block0++)
 	{
 		Index subRow = blockSize * block0;
-		Index matrixRow = blockSize * static_cast<Index>(blockIds[block0]);
 		for (Index block1 = 0; block1 < numBlocks; block1++)
 		{
 			Index subCol = blockSize * block1;
-			Index matrixCol = blockSize * static_cast<Index>(blockIds[block1]);
-			if (initialize)
-			{
-				Math::blockOperation(subMatrix.block(subRow, subCol, blockSize, blockSize),
-									 matrixRow, matrixCol, matrix,
-									 &Math::Operation<T, Opt, Index, Eigen::Block<const DerivedSub>>::add);
-			}
-			else
-			{
-				Math::blockWithSearch(subMatrix.block(subRow, subCol, blockSize, blockSize),
-									  matrixRow, matrixCol, blockSize, blockSize, matrix,
-									  &Math::Operation<T, Opt, Index, Eigen::Block<const DerivedSub>>::add);
-			}
+			addSubMatrix(subMatrix.block(subRow, subCol, blockSize, blockSize),
+				static_cast<Index>(blockIds[block0]), static_cast<Index>(blockIds[block1]), matrix, initialize);
 		}
 	}
 }
