@@ -95,7 +95,7 @@ protected:
 
 	// The mass matrix.
 	Eigen::Matrix<double, 12, 12> m_RMRt;
-	
+
 	// The stiffness matrix
 	Eigen::Matrix<double, 12, 12> m_RKRt;
 

@@ -235,7 +235,7 @@ public:
 	{
 		return m_externalGeneralizedDamping;
 	}
-	
+
 	void clearFMDK();
 };
 

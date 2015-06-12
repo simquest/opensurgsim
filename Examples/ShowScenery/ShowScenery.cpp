@@ -21,7 +21,7 @@
 #include "SurgSim/Graphics/Graphics.h"
 #include "SurgSim/Math/Math.h"
 
-using namespace SurgSim;
+using SurgSim;
 using Math::Vector3d;
 
 namespace po = boost::program_options;

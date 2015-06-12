@@ -241,7 +241,7 @@ TEST_F(MassSpringConstraintFrictionlessContactTest, BuildMlcpIndiciesTest)
 	setContactAtNode(1);
 
 	implementation->build(dt, m_constraintData, m_localization,
-						  &mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	// b -> E -> [#constraints, 1]
 	const Vector3d newPosition = m_extremities[1] - Vector3d::UnitY() * 9.81 * dt * dt;

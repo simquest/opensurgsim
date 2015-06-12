@@ -70,7 +70,7 @@ void Fem3DElementCorotationalTetrahedron::addForce(const SurgSim::Math::OdeState
 		double scale)
 {
 	Eigen::Matrix<double, 12, 1> x, R_x0, f;
-	
+
 	// R.K.(R^-1.x - x0) = Fext
 	// 0 = Fext + Fint     with Fint = -R.K.R^-1.(x - R.x0)
 	getSubVector(state.getPositions(), m_nodeIds, 3, &x);
@@ -102,7 +102,7 @@ void Fem3DElementCorotationalTetrahedron::addFMDK(const SurgSim::Math::OdeState&
 		SurgSim::Math::SparseMatrix* K)
 {
 	Eigen::Matrix<double, 12, 1> x, R_x0, f;
-	
+
 	// Assemble the force Fint = -R.K.R^-1.(x - R.x0)
 	getSubVector(state.getPositions(), m_nodeIds, 3, &x);
 	for (size_t nodeId = 0; nodeId < 4; ++nodeId)

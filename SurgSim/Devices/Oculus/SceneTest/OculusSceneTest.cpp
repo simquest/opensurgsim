@@ -32,7 +32,7 @@
 #include "SurgSim/Devices/Oculus/OculusDevice.h"
 #include "SurgSim/Devices/Oculus/OculusView.h"
 
-using namespace SurgSim;
+using SurgSim;
 using Math::Vector3d;
 
 namespace po = boost::program_options;

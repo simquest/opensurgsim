@@ -372,7 +372,7 @@ void testAddMass(MockFem3DElementCorotationalTet* tet,
 
 	defineCurrentState(state0, &state, t, false);
 	tet->update(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
-	
+
 	Eigen::Matrix<double, 12, 12> M0 = tet->getNonRotatedMassMatrix();
 	Matrix33d R = tet->getRotation(state);
 	Eigen::Matrix<double, 12, 12> R12x12 = make12x12(Eigen::Matrix<double, 3, 3>(R));
@@ -401,7 +401,7 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 
 	defineCurrentState(state0, &state, t, false);
 	tet->update(state, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
-	
+
 	Eigen::Matrix<double, 12, 12> K0 = tet->getNonRotatedStiffnessMatrix();
 	Eigen::Matrix<double, 12, 12> M0 = tet->getNonRotatedMassMatrix();
 	Matrix33d R = tet->getRotation(state);
