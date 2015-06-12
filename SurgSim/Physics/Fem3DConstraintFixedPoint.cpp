@@ -36,12 +36,12 @@ Fem3DConstraintFixedPoint::~Fem3DConstraintFixedPoint()
 }
 
 void Fem3DConstraintFixedPoint::doBuild(double dt,
-											 const ConstraintData& data,
-											 const std::shared_ptr<Localization>& localization,
-											 MlcpPhysicsProblem* mlcp,
-											 size_t indexOfRepresentation,
-											 size_t indexOfConstraint,
-											 ConstraintSideSign sign)
+										const ConstraintData& data,
+										const std::shared_ptr<Localization>& localization,
+										MlcpPhysicsProblem* mlcp,
+										size_t indexOfRepresentation,
+										size_t indexOfConstraint,
+										ConstraintSideSign sign)
 {
 	std::shared_ptr<Fem3DRepresentation> fem3d
 		= std::static_pointer_cast<Fem3DRepresentation>(localization->getRepresentation());
@@ -104,7 +104,7 @@ void Fem3DConstraintFixedPoint::doBuild(double dt,
 				m_newH.insert(3 * nodeIndex + axis) = coord.coordinate[index] * (dt * scale);
 			}
 		}
-		mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix() * m_newH,
+		mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix() * m_newH.transpose(),
 							   indexOfRepresentation, indexOfConstraint + axis);
 	}
 }

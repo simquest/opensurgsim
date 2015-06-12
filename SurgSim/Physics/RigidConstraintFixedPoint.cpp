@@ -34,12 +34,12 @@ RigidConstraintFixedPoint::~RigidConstraintFixedPoint()
 }
 
 void RigidConstraintFixedPoint::doBuild(double dt,
-											 const ConstraintData& data,
-											 const std::shared_ptr<Localization>& localization,
-											 MlcpPhysicsProblem* mlcp,
-											 size_t indexOfRepresentation,
-											 size_t indexOfConstraint,
-											 ConstraintSideSign sign)
+										const ConstraintData& data,
+										const std::shared_ptr<Localization>& localization,
+										MlcpPhysicsProblem* mlcp,
+										size_t indexOfRepresentation,
+										size_t indexOfConstraint,
+										ConstraintSideSign sign)
 {
 	std::shared_ptr<RigidRepresentation> rigid
 		= std::static_pointer_cast<RigidRepresentation>(localization->getRepresentation());
@@ -100,19 +100,22 @@ void RigidConstraintFixedPoint::doBuild(double dt,
 	m_newH.insert(0) = dt * scale;
 	m_newH.insert(3 + 1) = -dt * scale * GP.z();
 	m_newH.insert(3 + 2) = dt * scale * GP.y();
-	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix()*m_newH, indexOfRepresentation, indexOfConstraint + 0);
+	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix()*m_newH.transpose(), indexOfRepresentation,
+						   indexOfConstraint + 0);
 
 	m_newH.setZero();
 	m_newH.insert(1) = dt * scale;
 	m_newH.insert(3 + 0) = dt * scale * GP.z();
 	m_newH.insert(3 + 2) = -dt * scale * GP.x();
-	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix()*m_newH, indexOfRepresentation, indexOfConstraint + 1);
+	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix()*m_newH.transpose(), indexOfRepresentation,
+						   indexOfConstraint + 1);
 
 	m_newH.setZero();
 	m_newH.insert(2) = dt * scale;
 	m_newH.insert(3 + 0) = -dt * scale * GP.y();
 	m_newH.insert(3 + 1) = dt * scale * GP.x();
-	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix()*m_newH, indexOfRepresentation, indexOfConstraint + 2);
+	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix()*m_newH.transpose(), indexOfRepresentation,
+						   indexOfConstraint + 2);
 }
 
 SurgSim::Math::MlcpConstraintType RigidConstraintFixedPoint::getMlcpConstraintType() const

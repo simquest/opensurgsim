@@ -24,7 +24,9 @@
 #include <string>
 #include <memory>
 
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Particles/SphRepresentation.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/PhysicsManager.h"
@@ -98,6 +100,20 @@ TEST_F(PhysicsManagerTest, AddRemoveRepresentation)
 	EXPECT_TRUE(testDoRemoveComponent(representation2));
 }
 
+TEST_F(PhysicsManagerTest, AddRemoveCollisionRepresentation)
+{
+	auto representation1 = std::make_shared<Collision::ShapeCollisionRepresentation>("Rep1");
+	auto representation2 = std::make_shared<Collision::ShapeCollisionRepresentation>("Rep2");
+
+	EXPECT_TRUE(testDoAddComponent(representation1));
+	EXPECT_TRUE(testDoAddComponent(representation2));
+	EXPECT_FALSE(testDoAddComponent(representation1));
+
+	EXPECT_TRUE(testDoRemoveComponent(representation1));
+	EXPECT_FALSE(testDoRemoveComponent(representation1));
+	EXPECT_TRUE(testDoRemoveComponent(representation2));
+}
+
 TEST_F(PhysicsManagerTest, AddRemoveConstraintComponent)
 {
 	auto constraintComponent1 = std::make_shared<ConstraintComponent>("component1");
@@ -115,6 +131,20 @@ TEST_F(PhysicsManagerTest, AddRemoveConstraintComponent)
 	EXPECT_TRUE(testDoRemoveComponent(constraintComponent1));
 	EXPECT_FALSE(testDoRemoveComponent(constraintComponent1));
 	EXPECT_TRUE(testDoRemoveComponent(constraintComponent2));
+}
+
+TEST_F(PhysicsManagerTest, AddRemoveParticleRepresentation)
+{
+	auto representation1 = std::make_shared<Particles::SphRepresentation>("Rep1");
+	auto representation2 = std::make_shared<Particles::SphRepresentation>("Rep2");
+
+	EXPECT_TRUE(testDoAddComponent(representation1));
+	EXPECT_TRUE(testDoAddComponent(representation2));
+	EXPECT_FALSE(testDoAddComponent(representation1));
+
+	EXPECT_TRUE(testDoRemoveComponent(representation1));
+	EXPECT_FALSE(testDoRemoveComponent(representation1));
+	EXPECT_TRUE(testDoRemoveComponent(representation2));
 }
 
 TEST_F(PhysicsManagerTest, AddRemoveExcludedCollisionPair)

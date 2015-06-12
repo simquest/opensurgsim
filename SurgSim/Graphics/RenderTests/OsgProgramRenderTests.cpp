@@ -59,8 +59,8 @@ std::shared_ptr<Program> loadExampleProgram(const SurgSim::Framework::Applicatio
 {
 	std::shared_ptr<Program> program = std::make_shared<OsgProgram>();
 
-	std::string vertexShaderPath = data.findFile("OsgShaderRenderTests/shader.vert");
-	std::string geometryShaderPath = data.findFile("OsgShaderRenderTests/shader.geom");
+	std::string vertexShaderPath   = data.findFile("OsgShaderRenderTests/shader.vert");
+	std::string geometryShaderPath = data.findFile("OsgShaderRenderTests/shader_axis_mirrored.geom");
 	std::string fragmentShaderPath = data.findFile("OsgShaderRenderTests/shader.frag");
 
 	EXPECT_NE("", vertexShaderPath) << "Could not find vertex shader!";
@@ -100,12 +100,12 @@ std::shared_ptr<OsgTextureCubeMap> loadAxisCubeMap(
 {
 	std::array<std::string, 6> filenames;
 
-	bool success = data.tryFindFile(prefix + "negx.png", &filenames[0]);
-	success = data.tryFindFile(prefix + "posx.png", &filenames[1]) && success;
-	success = data.tryFindFile(prefix + "negy.png", &filenames[2]) && success;
-	success = data.tryFindFile(prefix + "posy.png", &filenames[3]) && success;
-	success = data.tryFindFile(prefix + "negz.png", &filenames[4]) && success;
-	success = data.tryFindFile(prefix + "posz.png", &filenames[5]) && success;
+	bool success = data.tryFindFile(prefix + "NegativeX.png", &filenames[0]);
+	success = data.tryFindFile(prefix + "PositiveX.png", &filenames[1]) && success;
+	success = data.tryFindFile(prefix + "NegativeY.png", &filenames[2]) && success;
+	success = data.tryFindFile(prefix + "PositiveY.png", &filenames[3]) && success;
+	success = data.tryFindFile(prefix + "NegativeZ.png", &filenames[4]) && success;
+	success = data.tryFindFile(prefix + "PositiveZ.png", &filenames[5]) && success;
 
 	EXPECT_TRUE(success) << "One or more files are missing";
 
@@ -310,9 +310,9 @@ TEST_F(OsgProgramRenderTests, Metal)
 	{
 		// Provide the Diffuse environment map
 		// Axis map is used for testing mapping
-//		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
+		// auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "Textures/");
 		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile(
-						"OsgShaderRenderTests/reflectionDiffuse.png", &filename));
+						"Textures/CubeMap_reflection_diffuse.png", &filename));
 		auto texture = std::make_shared<OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "diffuseEnvMap");
@@ -323,9 +323,9 @@ TEST_F(OsgProgramRenderTests, Metal)
 	{
 		// Provide the Specular environment map
 		// Axis map is used for testing mapping
-//		auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "OsgShaderRenderTests/axis/");
+		// auto texture = loadAxisCubeMap(*runtime->getApplicationData(), "Textures/");
 		EXPECT_TRUE(runtime->getApplicationData()->tryFindFile(
-						"OsgShaderRenderTests/reflectionSpecular.png", &filename));
+						"Textures/CubeMap_reflection_specular.png", &filename));
 		auto texture = std::make_shared<OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "specularEnvMap");
@@ -347,7 +347,7 @@ TEST_F(OsgProgramRenderTests, NormalMap)
 {
 	// Assign the object used for testing to the representation
 	auto graphics = std::make_shared<OsgSceneryRepresentation>("scenery");
-	graphics->loadModel("OsgShaderRenderTests/cube.osgt");
+	graphics->loadModel("Geometry/cube.osgt");
 
 	auto representation = std::dynamic_pointer_cast<Representation>(graphics);
 	representation->setGenerateTangents(true);
@@ -370,7 +370,7 @@ TEST_F(OsgProgramRenderTests, NormalMap)
 
 	add2DTexture(material, "shadowMap", 8, "Textures/black.png");
 	add2DTexture(material, "diffuseMap", 0, "Textures/checkered.png");
-	add2DTexture(material, "normalMap", 1, "OsgShaderRenderTests/bricks.png");
+	add2DTexture(material, "normalMap", 1, "Textures/bricks.png");
 	representation->setMaterial(material);
 
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Graphics");

@@ -39,12 +39,12 @@ RigidConstraintFrictionlessContact::~RigidConstraintFrictionlessContact()
 }
 
 void RigidConstraintFrictionlessContact::doBuild(double dt,
-			const ConstraintData& data,
-			const std::shared_ptr<Localization>& localization,
-			MlcpPhysicsProblem* mlcp,
-			size_t indexOfRepresentation,
-			size_t indexOfConstraint,
-			ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 	std::shared_ptr<Representation> representation = localization->getRepresentation();
 	std::shared_ptr<RigidRepresentation> rigid = std::static_pointer_cast<RigidRepresentation>(representation);
@@ -91,7 +91,7 @@ void RigidConstraintFrictionlessContact::doBuild(double dt,
 	m_newH.insert(4) = dt * scale * rotation[1];
 	m_newH.insert(5) = dt * scale * rotation[2];
 
-	mlcp->updateConstraint(m_newH, C * m_newH, indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, C * m_newH.transpose(), indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType RigidConstraintFrictionlessContact::getMlcpConstraintType() const

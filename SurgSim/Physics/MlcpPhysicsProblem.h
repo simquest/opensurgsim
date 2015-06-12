@@ -17,7 +17,7 @@
 #define SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
 
 #include "SurgSim/Math/MlcpProblem.h"
-#include <Eigen/SparseCore>
+#include "SurgSim/Math/SparseMatrix.h"
 
 namespace SurgSim
 {
@@ -53,7 +53,7 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// of \f$c\f$ displacements of each degree of freedom of the constraints.
 	/// Given a set of constraints \f$\mathbf{G}(t, \mathbf{x})\f$, then
 	/// \f$\mathbf{H} = \frac{d \mathbf{G}}{d \mathbf{x}}\f$ (i.e., the constraints' tangential space).
-	Matrix H;
+	Eigen::SparseMatrix<double, Eigen::RowMajor, ptrdiff_t> H;
 
 	/// The matrix \f$\mathbf{C\;H^T}\f$, which is a matrix of size \f$n\times c\f$ that is used to convert the
 	/// vector of \f$c\f$ constraint forces to the \f$n\f$ displacements of each degree of freedom of the system.
