@@ -43,14 +43,11 @@ struct RotationVectorData
 };
 
 /// FemElementParameter is a structure containing the parameters of an fem element following
-/// the Hook's law of deformation (linear deformation) either locally (corotational model) or globally (linear model).
+/// the Hooke's law of deformation (linear deformation) either locally (corotational model) or globally (linear model).
 struct FemElementParameter
 {
-	FemElementParameter()
+	FemElementParameter() : youngModulus(0.0), poissonRatio(0.0), massDensity(0.0)
 	{
-		youngModulus = 0.0;
-		poissonRatio = 0.0;
-		massDensity = 0.0;
 	}
 
 	virtual ~FemElementParameter(){}
@@ -63,30 +60,28 @@ struct FemElementParameter
 	double massDensity;
 };
 
+/// FemElement1DParameter is a FemElementParameter structure specialized for 1D element.
 struct FemElement1DParameter : public FemElementParameter
 {
-	FemElement1DParameter()
+	FemElement1DParameter() : radius(0.0), enableShear(false)
 	{
-		FemElementParameter();
-		radius = 0.0;
-		enableShear = false;
 	}
 
 	double radius;
 	bool enableShear;
 };
 
+/// FemElement2DParameter is a FemElementParameter structure specialized for 2D element.
 struct FemElement2DParameter : public FemElementParameter
 {
-	FemElement2DParameter()
+	FemElement2DParameter() : thickness(0.0)
 	{
-		FemElementParameter();
-		thickness = 0.0;
 	}
 
 	double thickness;
 };
 
+/// FemElement3DParameter is a FemElementParameter structure specialized for 3D element.
 struct FemElement3DParameter : public FemElementParameter {};
 
 } // namespace FemElementStructs
