@@ -42,34 +42,18 @@ public:
 protected:
 	std::string getElementName() const override;
 
-	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
-	/// \param reader The reader that should be used.
-	/// \return true if it succeeds, false otherwise.
-	bool registerDelegate(PlyReader* reader);
+	bool registerDelegate(PlyReader* reader) override;
 
-	/// Check whether this file is acceptable to the delegate, overridden from \sa PlyReaderDelegate.
-	/// \param reader The reader that should be used.
-	/// \return true if it succeeds, false otherwise.
-	bool fileIsAcceptable(const PlyReader& reader);
+	bool fileIsAcceptable(const PlyReader& reader) override;
 
 	void endParseFile() override;
 
-	/// Callback function, begin the processing of vertices.
-	/// \param elementName Name of the element.
-	/// \param vertexCount Number of vertices.
-	/// \return memory for vertex data to the reader.
 	void* beginVertices(const std::string& elementName, size_t vertexCount) override;
 
-	/// Callback function to process one vertex.
-	/// \param elementName Name of the element.
 	void processVertex(const std::string& elementName) override;
 
-	/// Callback function to finalize processing of vertices.
-	/// \param elementName Name of the element.
 	void endVertices(const std::string& elementName) override;
 
-	/// Callback function to process one FemElement.
-	/// \param elementName Name of the element.
 	void processFemElement(const std::string& elementName) override;
 
 	/// Callback function, begin the processing of radius.
@@ -82,11 +66,10 @@ protected:
 	/// \param elementName Name of the element.
 	void endRadius(const std::string& elementName);
 
-	/// Callback function to process one boundary condition.
-	/// \param elementName Name of the element.
 	void processBoundaryCondition(const std::string& elementName) override;
 
 private:
+	/// Vertex data containing 6 dofs (3 translational and 3 rotational)
 	struct Vertex6DData
 	{
 		double x;
@@ -99,11 +82,15 @@ private:
 		int64_t overrun2; ///< Used to check for buffer overruns
 	} m_vertexData;
 
+	/// Flag to notify if the ply file provides rotational data for the vertices or not
 	bool m_hasRotationDOF;
 
+	/// Element's radius information
 	double m_radius;
+	/// Element's shear information
 	bool m_enableShear;
 
+	/// Fem1D mesh asset to contain the ply file information
 	std::shared_ptr<Fem1D> m_mesh;
 };
 

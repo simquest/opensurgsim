@@ -23,7 +23,7 @@ namespace Physics
 
 SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::Fem1D, Fem1D)
 
-Fem1D::Fem1D() : Fem()
+Fem1D::Fem1D()
 {
 }
 

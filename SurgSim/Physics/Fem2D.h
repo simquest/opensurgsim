@@ -30,6 +30,7 @@ SURGSIM_STATIC_REGISTRATION(Fem2D);
 class Fem2D : public Fem<FemElementStructs::RotationVectorData, FemElementStructs::FemElement2DParameter>
 {
 public:
+	/// Default constructor
 	Fem2D();
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2D);

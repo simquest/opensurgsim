@@ -23,24 +23,27 @@ namespace Physics
 namespace FemElementStructs
 {
 
+/// RotationVectorData is a structure containing the rotational dof per vertex
+/// The nature of the rotation depends on the underlying Representation,
+/// but right now all OSS's representations use rotation vector for rotational dof.
 struct RotationVectorData
 {
-	RotationVectorData()
+	RotationVectorData() : thetaX(0.0), thetaY(0.0), thetaZ(0.0)
 	{
-		thetaX = 0.0;
-		thetaY = 0.0;
-		thetaZ = 0.0;
 	}
 
 	bool operator==(const RotationVectorData& rhs) const
 	{
 		return (thetaX == rhs.thetaX && thetaY == rhs.thetaY && thetaZ == rhs.thetaZ);
 	}
+
 	double thetaX;
 	double thetaY;
 	double thetaZ;
 };
 
+/// FemElementParameter is a structure containing the parameters of an fem element following
+/// the Hook's law of deformation (linear deformation) either locally (corotational model) or globally (linear model).
 struct FemElementParameter
 {
 	FemElementParameter()

@@ -91,11 +91,11 @@ void Fem3DRepresentation::loadFem(const std::string& fileName)
 
 void Fem3DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 {
+	SURGSIM_ASSERT(mesh != nullptr) << "Mesh for Fem3DRepresentation cannot be a nullptr";
 	auto femMesh = std::dynamic_pointer_cast<Fem3D>(mesh);
 	SURGSIM_ASSERT(femMesh != nullptr)
 			<< "Mesh for Fem3DRepresentation needs to be a SurgSim::Physics::Fem3D";
 	m_fem = femMesh;
-	SURGSIM_ASSERT(m_fem != nullptr) << "Fem member variable was not set properly";
 	auto state = std::make_shared<SurgSim::Math::OdeState>();
 
 	state->setNumDof(getNumDofPerNode(), m_fem->getNumVertices());

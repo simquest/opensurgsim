@@ -46,7 +46,13 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DRepresentation);
 
 	void loadFem(const std::string& fileName) override;
+
+	/// Sets the fem mesh asset
+	/// \param mesh The fem mesh to assign to this representation
+	/// \exception SurgSim::Framework::AssertionFailure if mesh is nullptr or it's actual type is not Fem1D
 	void setFem(std::shared_ptr<SurgSim::Framework::Asset> mesh);
+
+	/// \return The fem mesh asset as a Fem1D
 	std::shared_ptr<Fem1D> getFem() const;
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
@@ -55,15 +61,13 @@ public:
 									 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
 protected:
-	/// Transform a state using a given transformation
-	/// \param[in,out] state The state to be transformed
-	/// \param transform The transformation to apply
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 						const SurgSim::Math::RigidTransform3d& transform) override;
 
 	bool doInitialize() override;
 
 private:
+	/// The Fem1DRepresentation's asset as a Fem1D
 	std::shared_ptr<Fem1D> m_fem;
 };
 

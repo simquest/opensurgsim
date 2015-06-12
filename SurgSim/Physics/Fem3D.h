@@ -31,6 +31,7 @@ SURGSIM_STATIC_REGISTRATION(Fem3D);
 class Fem3D : public Fem<SurgSim::DataStructures::EmptyData, FemElementStructs::FemElement3DParameter>
 {
 public:
+	/// Default constructor
 	Fem3D();
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3D);

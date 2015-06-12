@@ -42,43 +42,27 @@ public:
 protected:
 	std::string getElementName() const override;
 
-	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
-	/// \param reader The reader that should be used.
-	/// \return true if it succeeds, false otherwise.
-	bool registerDelegate(PlyReader* reader);
+	bool registerDelegate(PlyReader* reader) override;
 
-	/// Check whether this file is acceptable to the delegate, overridden from \sa PlyReaderDelegate.
-	/// \param reader The reader that should be used.
-	/// \return true if it succeeds, false otherwise.
-	bool fileIsAcceptable(const PlyReader& reader);
+	bool fileIsAcceptable(const PlyReader& reader) override;
 
 	void endParseFile() override;
 
-	/// Callback function, begin the processing of vertices.
-	/// \param elementName Name of the element.
-	/// \param vertexCount Number of vertices.
-	/// \return memory for vertex data to the reader.
 	void* beginVertices(const std::string& elementName, size_t vertexCount) override;
 
-	/// Callback function to process one vertex.
-	/// \param elementName Name of the element.
 	void processVertex(const std::string& elementName) override;
 
-	/// Callback function to finalize processing of vertices.
-	/// \param elementName Name of the element.
 	void endVertices(const std::string& elementName) override;
 
-	/// Callback function to process one FemElement.
-	/// \param elementName Name of the element.
 	void processFemElement(const std::string& elementName) override;
 
-	/// Callback function to process one boundary condition.
-	/// \param elementName Name of the element.
 	void processBoundaryCondition(const std::string& elementName) override;
 
+	/// End file callback
 	void endFile();
 
 private:
+	/// Vertex data containing 3 dofs (3 translational)
 	struct VertexData
 	{
 		double x;
@@ -87,6 +71,7 @@ private:
 		int64_t overrun1; ///< Used to check for buffer overruns
 	} m_vertexData;
 
+	/// Fem3D mesh asset to contain the ply file information
 	std::shared_ptr<Fem3D> m_mesh;
 };
 
