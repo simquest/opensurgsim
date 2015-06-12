@@ -37,7 +37,7 @@ using SurgSim::Math::Vector3d;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 namespace SurgSim
@@ -152,7 +152,7 @@ protected:
 	}
 };
 
-TEST_F (ConstraintTests, TestConstructor)
+TEST_F(ConstraintTests, TestConstructor)
 {
 	auto fixedRep = std::make_shared<FixedRepresentation>("fixed");
 	auto rigidRep = std::make_shared<RigidRepresentation>("rigid");
@@ -183,7 +183,7 @@ TEST_F (ConstraintTests, TestConstructor)
 	EXPECT_EQ(rigidRep, c.getLocalizations().second->getRepresentation());
 }
 
-TEST_F (ConstraintTests, TestGetNumDof)
+TEST_F(ConstraintTests, TestGetNumDof)
 {
 	auto fixedRep = std::make_shared<FixedRepresentation>("fixed");
 	auto rigidRep = std::make_shared<RigidRepresentation>("rigid");
@@ -196,8 +196,8 @@ TEST_F (ConstraintTests, TestGetNumDof)
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact");
 		Constraint c(type, m_constraintData,
-			m_fixed, m_locFixedPlane,
-			m_rigid, m_locRigidSphere);
+					 m_fixed, m_locFixedPlane,
+					 m_rigid, m_locRigidSphere);
 		EXPECT_EQ(1u, c.getNumDof());
 	}
 
@@ -218,15 +218,15 @@ TEST_F (ConstraintTests, TestGetNumDof)
 // Contact location on the rigid sphere is (0 -0.01 0)
 // Contact location on the fixed plane is (0 0 0)
 // Constraint: (Sphere - Plane).n >= 0 with n=(0 1 0) The normal should be the contact normal on the 2nd object
-TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
+TEST_F(ConstraintTests, TestBuildMlcpSpherePlane)
 {
 	auto type = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 	m_n.setZero();
 	m_n[1] = 1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
 	m_constraint = std::make_shared<Constraint>(type, m_constraintData,
-												m_rigid, m_locRigidSphere,
-												m_fixed, m_locFixedPlane);
+				   m_rigid, m_locRigidSphere,
+				   m_fixed, m_locFixedPlane);
 
 	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
 	{
@@ -242,7 +242,7 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 
 	// Fill up the Mlcp
 	m_constraint->build(m_dt, &m_mlcpPhysicsProblem, m_indexSphereRepresentation, m_indexPlaneRepresentation,
-		m_indexConstraint);
+						m_indexConstraint);
 
 	// Violation b should be exactly -radius (the sphere center is on the plane)
 	// This should not depend on the ordering of the object...the violation remains the same no matter what
@@ -254,13 +254,13 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 	double sign = 1.0;
 	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
 
-	SurgSim::Math::Matrix h = m_mlcpPhysicsProblem.H;
-	EXPECT_NEAR(sign * m_dt * m_n[0] , h(0, 0), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[1] , h(0, 1), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[2] , h(0, 2), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[0], h(0, 3), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[1], h(0, 4), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[2], h(0, 5), epsilon);
+	SurgSim::Math::Matrix H = m_mlcpPhysicsProblem.H;
+	EXPECT_NEAR(sign * m_dt * m_n[0] , H(0, 0), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[1] , H(0, 1), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[2] , H(0, 2), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[0], H(0, 3), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[1], H(0, 4), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[2], H(0, 5), epsilon);
 
 	// ConstraintTypes should contain 1 entry SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
 	ASSERT_EQ(1u, m_mlcpPhysicsProblem.constraintTypes.size());
@@ -271,15 +271,15 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 // Contact location on the rigid sphere is (0 -0.01 0)
 // Contact location on the fixed plane is (0 0 0)
 // Constraint: (Plane - Sphere).n >= 0 with n=(0 -1 0) The normal should be the contact normal on the 2nd object
-TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
+TEST_F(ConstraintTests, TestBuildMlcpPlaneSphere)
 {
 	auto type = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 	m_n.setZero();
 	m_n[1] = -1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
 	m_constraint = std::make_shared<Constraint>(type, m_constraintData,
-		m_fixed, m_locFixedPlane,
-		m_rigid, m_locRigidSphere);
+				   m_fixed, m_locFixedPlane,
+				   m_rigid, m_locRigidSphere);
 
 	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
 	{
@@ -295,7 +295,7 @@ TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 
 	// Fill up the Mlcp
 	m_constraint->build(m_dt, &m_mlcpPhysicsProblem, m_indexPlaneRepresentation, m_indexSphereRepresentation,
-		m_indexConstraint);
+						m_indexConstraint);
 
 	// Violation b should be exactly -radius (the sphere center is on the plane)
 	// This should not depend on the ordering of the object...the violation remains the same no matter what
