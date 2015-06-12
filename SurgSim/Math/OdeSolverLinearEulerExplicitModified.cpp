@@ -39,7 +39,7 @@ void OdeSolverLinearEulerExplicitModified::solve(double dt, const OdeState& curr
 	}
 	else
 	{
-		m_equation.update(currentState, ODEEQUATIONUPDATE_F);
+		m_equation.updateFMDK(currentState, ODEEQUATIONUPDATE_F);
 
 		const Vector& f = m_equation.getF();
 		Vector deltaV = m_equation.applyCompliance(currentState, f);

@@ -56,7 +56,7 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	newState->getPositions()  = currentState.getPositions()  + m_k1.velocity * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k1.acceleration * dt / 2.0;
 	m_k2.velocity = newState->getVelocities();
-	m_equation.update(*newState, ODEEQUATIONUPDATE_F);
+	m_equation.updateFMDK(*newState, ODEEQUATIONUPDATE_F);
 	Vector f = m_equation.getF();
 	m_k2.acceleration =
 		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&f) / dt);
@@ -65,7 +65,7 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	newState->getPositions()  = currentState.getPositions()  + m_k2.velocity * dt / 2.0;
 	newState->getVelocities() = currentState.getVelocities() + m_k2.acceleration * dt / 2.0;
 	m_k3.velocity = newState->getVelocities();
-	m_equation.update(*newState, ODEEQUATIONUPDATE_F);
+	m_equation.updateFMDK(*newState, ODEEQUATIONUPDATE_F);
 	f = m_equation.getF();
 	m_k3.acceleration =
 		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&f) / dt);
@@ -74,7 +74,7 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 	newState->getPositions()  = currentState.getPositions()  + m_k3.velocity * dt;
 	newState->getVelocities() = currentState.getVelocities() + m_k3.acceleration * dt;
 	m_k4.velocity = newState->getVelocities();
-	m_equation.update(*newState, ODEEQUATIONUPDATE_F);
+	m_equation.updateFMDK(*newState, ODEEQUATIONUPDATE_F);
 	f = m_equation.getF();
 	m_k4.acceleration =
 		m_linearSolver->solve(*currentState.applyBoundaryConditionsToVector(&f) / dt);
@@ -94,7 +94,7 @@ void OdeSolverRungeKutta4::solve(double dt, const OdeState& currentState, OdeSta
 void OdeSolverRungeKutta4::assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
 												bool computeRHS)
 {
-	m_equation.update(state, ODEEQUATIONUPDATE_F | ODEEQUATIONUPDATE_M);
+	m_equation.updateFMDK(state, ODEEQUATIONUPDATE_F | ODEEQUATIONUPDATE_M);
 
 	// Computes the LHS systemMatrix
 	m_systemMatrix = m_equation.getM() / dt;

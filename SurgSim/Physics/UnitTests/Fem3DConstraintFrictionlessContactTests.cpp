@@ -166,7 +166,7 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpTest)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
 	// C = dt * m^{-1}
-	m_fem->update(*(m_fem->getPreviousState()), SurgSim::Math::ODEEQUATIONUPDATE_M);
+	m_fem->updateFMDK(*(m_fem->getPreviousState()), SurgSim::Math::ODEEQUATIONUPDATE_M);
 	Eigen::Matrix<double, 18, 18> denseMat = m_fem->getM();
 	Eigen::Matrix<double, 18, 18> C = dt * denseMat.inverse();
 
@@ -212,7 +212,7 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpCoordinateTest)
 	// C = dt * m^{-1}
 	SurgSim::Math::Matrix C;
 	SurgSim::Math::SparseMatrix M(18, 18);
-	m_fem->update(*(m_fem->getPreviousState()), SurgSim::Math::ODEEQUATIONUPDATE_M);
+	m_fem->updateFMDK(*(m_fem->getPreviousState()), SurgSim::Math::ODEEQUATIONUPDATE_M);
 	M = m_fem->getM();
 	SurgSim::Math::LinearSparseSolveAndInverseLU solver;
 	SurgSim::Math::Vector b = SurgSim::Math::Vector::Zero(18);
@@ -288,7 +288,7 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 
 	SurgSim::Math::Matrix C;
 	SurgSim::Math::SparseMatrix M(18, 18);
-	m_fem->update(*m_fem->getPreviousState(), SurgSim::Math::ODEEQUATIONUPDATE_M);
+	m_fem->updateFMDK(*m_fem->getPreviousState(), SurgSim::Math::ODEEQUATIONUPDATE_M);
 	M = m_fem->getM();
 	SurgSim::Math::LinearSparseSolveAndInverseLU solver;
 	SurgSim::Math::Vector b = SurgSim::Math::Vector::Zero(18);

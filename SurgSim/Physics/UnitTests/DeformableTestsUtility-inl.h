@@ -28,18 +28,18 @@ void SurgSim::Physics::testOdeEquationUpdate(std::shared_ptr<T> rep,
 
 	auto odeEquation = std::dynamic_pointer_cast<SurgSim::Math::OdeEquation>(rep);
 
-	odeEquation->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_F);
+	odeEquation->updateFMDK(state, OdeEquationUpdate::ODEEQUATIONUPDATE_F);
 	EXPECT_NO_THROW(EXPECT_TRUE(odeEquation->getF().isApprox(expectedF)));
-	odeEquation->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_M);
+	odeEquation->updateFMDK(state, OdeEquationUpdate::ODEEQUATIONUPDATE_M);
 	EXPECT_NO_THROW(EXPECT_TRUE(odeEquation->getM().isApprox(expectedM)));
-	odeEquation->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_D);
+	odeEquation->updateFMDK(state, OdeEquationUpdate::ODEEQUATIONUPDATE_D);
 	EXPECT_NO_THROW(EXPECT_TRUE(odeEquation->getD().isApprox(expectedD)));
-	odeEquation->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_K);
+	odeEquation->updateFMDK(state, OdeEquationUpdate::ODEEQUATIONUPDATE_K);
 	EXPECT_NO_THROW(EXPECT_TRUE(odeEquation->getK().isApprox(expectedK)));
 
 	// Test combo method computeFMDK
 	rep->clearFMDK();
-	odeEquation->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_FMDK);
+	odeEquation->updateFMDK(state, OdeEquationUpdate::ODEEQUATIONUPDATE_FMDK);
 	EXPECT_NO_THROW(EXPECT_TRUE(odeEquation->getF().isApprox(expectedF)));
 	EXPECT_NO_THROW(EXPECT_TRUE(odeEquation->getM().isApprox(expectedM)));
 	EXPECT_NO_THROW(EXPECT_TRUE(odeEquation->getD().isApprox(expectedD)));

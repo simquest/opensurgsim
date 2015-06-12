@@ -488,7 +488,7 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 	}
 }
 
-void FemRepresentation::update(const SurgSim::Math::OdeState& state, int options)
+void FemRepresentation::updateFMDK(const SurgSim::Math::OdeState& state, int options)
 {
 	// This function updates the matrices needed to calculate F, M, D, K for each element.
 	// Note that the relevant matrices are updated only for non-linear elements.
@@ -497,7 +497,7 @@ void FemRepresentation::update(const SurgSim::Math::OdeState& state, int options
 		(*femElement)->update(state, options);
 	}
 
-	OdeEquation::update(state, options);
+	OdeEquation::updateFMDK(state, options);
 }
 
 void FemRepresentation::addRayleighDampingForce(

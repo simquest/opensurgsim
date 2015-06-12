@@ -48,7 +48,7 @@ const SparseMatrix& OdeEquation::getK() const
 	return m_K;
 }
 
-void OdeEquation::update(const OdeState& state, int options)
+void OdeEquation::updateFMDK(const OdeState& state, int options)
 {
 	if (options == ODEEQUATIONUPDATE_FMDK)
 	{

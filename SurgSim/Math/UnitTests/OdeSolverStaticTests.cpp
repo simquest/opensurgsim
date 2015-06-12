@@ -70,7 +70,7 @@ void doSolveTest(bool computeCompliance)
 	// Solve manually K.(x - x0) = Fext
 	Eigen::SparseLU<SparseMatrix> eigenSolver;
 	const Vector& Fext = m.getExternalForces();
-	m.update(currentState, ODEEQUATIONUPDATE_K);
+	m.updateFMDK(currentState, ODEEQUATIONUPDATE_K);
 	eigenSolver.compute(m.getK());
 	Eigen::VectorXd expectedDeltaX = eigenSolver.solve(Fext);
 	Vector expectedX = defaultState.getPositions() + expectedDeltaX;
@@ -110,7 +110,7 @@ void doComputeMatricesTest()
 	MassPointsStateForStatic state;
 	double dt = 1e-3;
 
-	m.update(state, ODEEQUATIONUPDATE_K);
+	m.updateFMDK(state, ODEEQUATIONUPDATE_K);
 	Matrix expectedSystemMatrix = m.getK();
 	EXPECT_NO_THROW(solver->computeMatrices(dt, state));
 	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));

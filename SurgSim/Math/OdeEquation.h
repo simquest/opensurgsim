@@ -72,7 +72,7 @@ public:
 	/// Update the OdeEquation (and support data) based on the given state.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param options Flag to specify which of F, M, D, K needs to be updated.
-	virtual void update(const OdeState& state, int options);
+	virtual void updateFMDK(const OdeState& state, int options);
 
 	/// \return The vector containing f(x, v)
 	const Vector& getF() const;

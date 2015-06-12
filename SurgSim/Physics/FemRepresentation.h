@@ -128,7 +128,7 @@ public:
 
 	const SurgSim::Math::Matrix& getComplianceMatrix() const override;
 
-	void update(const SurgSim::Math::OdeState& state, int options) override;
+	void updateFMDK(const SurgSim::Math::OdeState& state, int options) override;
 
 protected:
 	/// Adds the Rayleigh damping forces

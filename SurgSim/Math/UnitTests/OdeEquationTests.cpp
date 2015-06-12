@@ -60,16 +60,16 @@ TEST(OdeEquationTests, ComputesTest)
 		SurgSim::Math::Matrix33d expectedM = m.m_mass * SurgSim::Math::Matrix33d::Identity();
 		SurgSim::Math::Matrix33d expectedD = SurgSim::Math::Matrix33d::Zero();
 		SurgSim::Math::Matrix33d expectedK = SurgSim::Math::Matrix33d::Zero();
-		m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_F);
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_F);
 		EXPECT_TRUE(m.getF().isApprox(expectedF));
-		m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
 		EXPECT_TRUE(m.getM().isApprox(expectedM));
-		m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_D);
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_D);
 		EXPECT_TRUE(m.getD().isApprox(expectedD));
-		m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_K);
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_K);
 		EXPECT_TRUE(m.getK().isApprox(expectedK));
 		{
-			m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+			m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
 			EXPECT_TRUE(m.getF().isApprox(expectedF));
 			EXPECT_TRUE(m.getM().isApprox(expectedM));
 			EXPECT_TRUE(m.getD().isApprox(expectedD));
@@ -88,16 +88,16 @@ TEST(OdeEquationTests, ComputesTest)
 		SurgSim::Math::Matrix33d expectedM = m.m_mass * SurgSim::Math::Matrix33d::Identity();
 		SurgSim::Math::Matrix33d expectedD = 0.1 * SurgSim::Math::Matrix33d::Identity();
 		SurgSim::Math::Matrix33d expectedK = SurgSim::Math::Matrix33d::Zero();
-		m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_F);
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_F);
 		EXPECT_TRUE(m.getF().isApprox(expectedF));
-		m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
 		EXPECT_TRUE(m.getM().isApprox(expectedM));
-		m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_D);
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_D);
 		EXPECT_TRUE(m.getD().isApprox(expectedD));
-		m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_K);
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_K);
 		EXPECT_TRUE(m.getK().isApprox(expectedK));
 		{
-			m.update(state, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+			m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
 			EXPECT_TRUE(m.getF().isApprox(expectedF));
 			EXPECT_TRUE(m.getM().isApprox(expectedM));
 			EXPECT_TRUE(m.getD().isApprox(expectedD));
