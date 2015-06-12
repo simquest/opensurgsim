@@ -127,7 +127,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
 
 	std::shared_ptr<SurgSim::Framework::Component> physics = std::make_shared<Fem3DRepresentation>("Fem3D");
 	auto fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(physics);
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	fem3d->loadFem(filename);
 
 	std::shared_ptr<SurgSim::Framework::Component> graphics =
