@@ -47,7 +47,7 @@ ConstraintImplementationFactory::~ConstraintImplementationFactory()
 std::shared_ptr<ConstraintImplementation> ConstraintImplementationFactory::getImplementation(
 		std::type_index representationType, ConstraintType constraintType)
 {
-	SURGSIM_ASSERT(constraintType >= 0 && constraintType < SurgSim::Physics::NUM_CONSTRAINT_TYPES) <<
+	SURGSIM_ASSERT(constraintType >= 0 && constraintType < NUM_CONSTRAINT_TYPES) <<
 		"Invalid constraint type " << constraintType;
 
 	auto implementation = m_implementations[representationType][constraintType];

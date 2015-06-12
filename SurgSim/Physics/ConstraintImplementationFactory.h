@@ -63,7 +63,7 @@ private:
 
 	/// Lookup table for constraint implementations
 	std::unordered_map<std::type_index,
-		std::array<std::shared_ptr<ConstraintImplementation>, SurgSim::Physics::NUM_CONSTRAINT_TYPES>>
+		std::array<std::shared_ptr<ConstraintImplementation>, NUM_CONSTRAINT_TYPES>>
 		m_implementations;
 };
 

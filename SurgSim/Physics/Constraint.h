@@ -41,7 +41,7 @@ public:
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	Constraint(
-		SurgSim::Physics::ConstraintType constraintType,
+		ConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
 		std::shared_ptr<Representation> representation0,
 		const SurgSim::DataStructures::Location& location0,
@@ -58,7 +58,7 @@ public:
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	void setInformation(
-		SurgSim::Physics::ConstraintType constraintType,
+		ConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
 		std::shared_ptr<Representation> representation0,
 		const SurgSim::DataStructures::Location& location0,
@@ -85,7 +85,7 @@ public:
 
 	/// Gets the ConstraintType
 	/// \return The type
-	SurgSim::Physics::ConstraintType getType();
+	ConstraintType getType();
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint.
 	/// \param dt The time step.
@@ -117,7 +117,7 @@ private:
 	size_t m_numDof;
 
 	/// The type of this constraint
-	SurgSim::Physics::ConstraintType m_constraintType;
+	ConstraintType m_constraintType;
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step

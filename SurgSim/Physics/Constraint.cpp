@@ -67,6 +67,11 @@ size_t Constraint::getNumDof() const
 	return m_numDof;
 }
 
+ConstraintType Constraint::getType()
+{
+	return m_constraintType;
+}
+
 void Constraint::build(double dt,
 	MlcpPhysicsProblem* mlcp,
 	size_t indexOfRepresentation0,
@@ -112,7 +117,7 @@ void Constraint::doBuild(double dt,
 {
 }
 
-void Constraint::setInformation(SurgSim::Physics::ConstraintType constraintType,
+void Constraint::setInformation(ConstraintType constraintType,
 	std::shared_ptr<ConstraintData> data,
 	std::shared_ptr<Representation> representation0,
 	const SurgSim::DataStructures::Location& location0,
