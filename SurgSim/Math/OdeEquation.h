@@ -33,11 +33,11 @@ class OdeState;
 /// Enum to identify which of the data need to be updated by the OdeEquation::update()
 enum OdeEquationUpdate
 {
-	F = 1<<0,
-	M = 1<<1,
-	D = 1<<2,
-	K = 1<<3,
-	FMDK = F | M | D | K
+	ODEEQUATIONUPDATE_F = 1<<0,
+	ODEEQUATIONUPDATE_M = 1<<1,
+	ODEEQUATIONUPDATE_D = 1<<2,
+	ODEEQUATIONUPDATE_K = 1<<3,
+	ODEEQUATIONUPDATE_FMDK = ODEEQUATIONUPDATE_F | ODEEQUATIONUPDATE_M | ODEEQUATIONUPDATE_D | ODEEQUATIONUPDATE_K
 };
 
 /// Ode equation of 2nd order of the form \f$M(x,v).a = F(x, v)\f$ with \f$(x0, v0)\f$ for initial conditions

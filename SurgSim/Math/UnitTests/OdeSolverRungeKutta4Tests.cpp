@@ -271,7 +271,7 @@ void doComputeMatricesTest()
 	MassPointState state;
 	double dt = 1e-3;
 
-	m.update(state, OdeEquationUpdate::M);
+	m.update(state, ODEEQUATIONUPDATE_M);
 	Matrix expectedSystemMatrix = m.getM() / dt;
 	EXPECT_NO_THROW(solver->computeMatrices(dt, state));
 	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));

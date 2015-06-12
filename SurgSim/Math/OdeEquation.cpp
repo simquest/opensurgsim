@@ -50,28 +50,28 @@ const SparseMatrix& OdeEquation::getK()
 
 void OdeEquation::update(const OdeState& state, int options)
 {
-	if (options == OdeEquationUpdate::FMDK)
+	if (options == ODEEQUATIONUPDATE_FMDK)
 	{
 		computeFMDK(state);
 	}
 	else
 	{
-		if (options & OdeEquationUpdate::F)
+		if (options & ODEEQUATIONUPDATE_F)
 		{
 			computeF(state);
 		}
 
-		if (options & OdeEquationUpdate::M)
+		if (options & ODEEQUATIONUPDATE_M)
 		{
 			computeM(state);
 		}
 
-		if (options & OdeEquationUpdate::D)
+		if (options & ODEEQUATIONUPDATE_D)
 		{
 			computeD(state);
 		}
 
-		if (options & OdeEquationUpdate::K)
+		if (options & ODEEQUATIONUPDATE_K)
 		{
 			computeK(state);
 		}

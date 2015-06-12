@@ -137,7 +137,7 @@ void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& sta
 	// More terms are coming from the Newton-Raphson iterations (see class OdeSolverEulerImplicit doxygen doc for
 	// more details)
 
-	m_equation.update(newState, OdeEquationUpdate::FMDK);
+	m_equation.update(newState, ODEEQUATIONUPDATE_FMDK);
 
 	const SparseMatrix& M = m_equation.getM();
 	const SparseMatrix& D = m_equation.getD();

@@ -23,17 +23,17 @@ void SurgSim::Physics::testOdeEquationUpdate(std::shared_ptr<SurgSim::Math::OdeE
 {
 	using SurgSim::Math::OdeEquationUpdate;
 
-	rep->update(state, OdeEquationUpdate::F);
+	rep->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_F);
 	EXPECT_NO_THROW(EXPECT_TRUE(rep->getF().isApprox(expectedF)));
-	rep->update(state, OdeEquationUpdate::M);
+	rep->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_M);
 	EXPECT_NO_THROW(EXPECT_TRUE(rep->getM().isApprox(expectedM)));
-	rep->update(state, OdeEquationUpdate::D);
+	rep->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_D);
 	EXPECT_NO_THROW(EXPECT_TRUE(rep->getD().isApprox(expectedD)));
-	rep->update(state, OdeEquationUpdate::K);
+	rep->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_K);
 	EXPECT_NO_THROW(EXPECT_TRUE(rep->getK().isApprox(expectedK)));
 
 	// Test combo method computeFMDK
-	rep->update(state, OdeEquationUpdate::FMDK);
+	rep->update(state, OdeEquationUpdate::ODEEQUATIONUPDATE_FMDK);
 	EXPECT_NO_THROW(EXPECT_TRUE(rep->getF().isApprox(expectedF)));
 	EXPECT_NO_THROW(EXPECT_TRUE(rep->getM().isApprox(expectedM)));
 	EXPECT_NO_THROW(EXPECT_TRUE(rep->getD().isApprox(expectedD)));

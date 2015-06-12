@@ -56,28 +56,28 @@ void OdeSolverLinearRungeKutta4::solve(double dt, const OdeState& currentState, 
 		// 1st evaluate k1 (note that y(n) is currentState)
 		m_k1.velocity = currentState.getVelocities();
 		// Reminder: m_complianceMatrix = dt.M^-1 (including 0 compliance for all boundary conditions)
-		m_equation.update(currentState, OdeEquationUpdate::F);
+		m_equation.update(currentState, ODEEQUATIONUPDATE_F);
 		m_k1.acceleration = m_equation.applyCompliance(currentState, m_equation.getF() / dt);
 
 		// 2nd evaluate k2
 		newState->getPositions()  = currentState.getPositions()  + m_k1.velocity * dt / 2.0;
 		newState->getVelocities() = currentState.getVelocities() + m_k1.acceleration * dt / 2.0;
 		m_k2.velocity = newState->getVelocities();
-		m_equation.update(*newState, OdeEquationUpdate::F);
+		m_equation.update(*newState, ODEEQUATIONUPDATE_F);
 		m_k2.acceleration = m_equation.applyCompliance(*newState, m_equation.getF() / dt);
 
 		// 3rd evaluate k3
 		newState->getPositions()  = currentState.getPositions()  + m_k2.velocity * dt / 2.0;
 		newState->getVelocities() = currentState.getVelocities() + m_k2.acceleration * dt / 2.0;
 		m_k3.velocity = newState->getVelocities();
-		m_equation.update(*newState, OdeEquationUpdate::F);
+		m_equation.update(*newState, ODEEQUATIONUPDATE_F);
 		m_k3.acceleration = m_equation.applyCompliance(*newState, m_equation.getF() / dt);
 
 		// 4th evaluate k4
 		newState->getPositions()  = currentState.getPositions()  + m_k3.velocity * dt;
 		newState->getVelocities() = currentState.getVelocities() + m_k3.acceleration * dt;
 		m_k4.velocity = newState->getVelocities();
-		m_equation.update(*newState, OdeEquationUpdate::F);
+		m_equation.update(*newState, ODEEQUATIONUPDATE_F);
 		m_k4.acceleration = m_equation.applyCompliance(*newState, m_equation.getF() / dt);
 
 		// Compute the new state using Runge Kutta 4 integration scheme:
