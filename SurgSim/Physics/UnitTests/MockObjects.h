@@ -235,6 +235,8 @@ public:
 	{
 		return m_externalGeneralizedDamping;
 	}
+	
+	void clearFMDK();
 };
 
 class MockFemElement : public FemElement
@@ -288,6 +290,8 @@ public:
 	std::shared_ptr<OdeSolver> getOdeSolver() const;
 
 	const std::vector<double>& getMassPerNode() const;
+
+	void clearFMDK();
 
 protected:
 	/// Transform a state using a given transformation

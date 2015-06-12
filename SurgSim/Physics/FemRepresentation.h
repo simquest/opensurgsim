@@ -128,16 +128,6 @@ public:
 
 	const SurgSim::Math::Matrix& getComplianceMatrix() const override;
 
-	void computeF(const SurgSim::Math::OdeState& state) override;
-
-	void computeM(const SurgSim::Math::OdeState& state) override;
-
-	void computeD(const SurgSim::Math::OdeState& state) override;
-
-	void computeK(const SurgSim::Math::OdeState& state) override;
-
-	void computeFMDK(const SurgSim::Math::OdeState& state) override;
-
 	void update(const SurgSim::Math::OdeState& state, int options) override;
 
 protected:
@@ -181,6 +171,16 @@ protected:
 	/// \param nodeId The node to update the rotation for
 	/// \return The node transformation. i.e. a numDofPerNode x numDofPerNode matrix
 	virtual SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId);
+
+	void computeF(const SurgSim::Math::OdeState& state) override;
+
+	void computeM(const SurgSim::Math::OdeState& state) override;
+
+	void computeD(const SurgSim::Math::OdeState& state) override;
+
+	void computeK(const SurgSim::Math::OdeState& state) override;
+
+	void computeFMDK(const SurgSim::Math::OdeState& state) override;
 
 	/// Useful information per node
 	std::vector<double> m_massPerNode; ///< Useful in setting up the gravity force F=mg

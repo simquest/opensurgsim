@@ -30,12 +30,15 @@ namespace SurgSim
 namespace Physics
 {
 
-void testOdeEquationUpdate(std::shared_ptr<SurgSim::Math::OdeEquation> rep,
+template <class T>
+void testOdeEquationUpdate(std::shared_ptr<T> rep,
 	const SurgSim::Math::OdeState& state, const SurgSim::Math::Vector& expectedF,
 	const SurgSim::Math::Matrix& expectedM, const SurgSim::Math::Matrix& expectedD,
 	const SurgSim::Math::Matrix& expectedK);
 
 }
 }
+
+#include "SurgSim/Physics/UnitTests/DeformableTestsUtility-inl.h"
 
 #endif // SURGSIM_PHYSICS_UNITTESTS_DEFORMABLETESTSUTILITY_H

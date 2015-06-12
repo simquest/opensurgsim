@@ -318,6 +318,13 @@ const Vector3d& MockMassSpring::getGravityVector() const
 	return getGravity();
 }
 
+void MockMassSpring::clearFMDK()
+{
+	m_f.setZero();
+	SurgSim::Math::clearMatrix(&m_M);
+	SurgSim::Math::clearMatrix(&m_D);
+	SurgSim::Math::clearMatrix(&m_K);
+}
 
 MockFemElement::MockFemElement() : FemElement()
 {
@@ -459,6 +466,14 @@ std::shared_ptr<OdeSolver> MockFemRepresentation::getOdeSolver() const
 const std::vector<double>& MockFemRepresentation::getMassPerNode() const
 {
 	return m_massPerNode;
+}
+
+void MockFemRepresentation::clearFMDK()
+{
+	m_f.setZero();
+	SurgSim::Math::clearMatrix(&m_M);
+	SurgSim::Math::clearMatrix(&m_D);
+	SurgSim::Math::clearMatrix(&m_K);
 }
 
 void MockFemRepresentation::transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform)

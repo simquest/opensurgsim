@@ -28,22 +28,22 @@ const std::shared_ptr<OdeState> OdeEquation::getInitialState() const
 	return m_initialState;
 }
 
-const Vector& OdeEquation::getF()
+const Vector& OdeEquation::getF() const
 {
 	return m_f;
 }
 
-const SparseMatrix& OdeEquation::getM()
+const SparseMatrix& OdeEquation::getM() const
 {
 	return m_M;
 }
 
-const SparseMatrix& OdeEquation::getD()
+const SparseMatrix& OdeEquation::getD() const
 {
 	return m_D;
 }
 
-const SparseMatrix& OdeEquation::getK()
+const SparseMatrix& OdeEquation::getK() const
 {
 	return m_K;
 }

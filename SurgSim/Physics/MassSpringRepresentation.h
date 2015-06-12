@@ -106,16 +106,6 @@ public:
 	/// \param dt The time step (in seconds)
 	void beforeUpdate(double dt) override;
 
-	void computeF(const SurgSim::Math::OdeState& state) override;
-
-	void computeM(const SurgSim::Math::OdeState& state) override;
-
-	void computeD(const SurgSim::Math::OdeState& state) override;
-
-	void computeK(const SurgSim::Math::OdeState& state) override;
-
-	void computeFMDK(const SurgSim::Math::OdeState& state) override;
-
 protected:
 	/// Add the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
@@ -151,6 +141,16 @@ protected:
 						const SurgSim::Math::RigidTransform3d& transform);
 
 	bool doInitialize() override;
+
+	void computeF(const SurgSim::Math::OdeState& state) override;
+
+	void computeM(const SurgSim::Math::OdeState& state) override;
+
+	void computeD(const SurgSim::Math::OdeState& state) override;
+
+	void computeK(const SurgSim::Math::OdeState& state) override;
+
+	void computeFMDK(const SurgSim::Math::OdeState& state) override;
 
 private:
 	/// Masses

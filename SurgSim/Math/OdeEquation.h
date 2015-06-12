@@ -71,20 +71,20 @@ public:
 
 	/// Update the OdeEquation (and support data) based on the given state.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
-	/// \param options Flag to specify which is F, M, D, K needs to be updated.
+	/// \param options Flag to specify which of F, M, D, K needs to be updated.
 	virtual void update(const OdeState& state, int options);
 
-	/// \return The vector containing \f$f(x, v)\f$
-	const Vector& getF();
+	/// \return The vector containing f(x, v)
+	const Vector& getF() const;
 
-	/// \return The matrix \f$M(x,v)\f$
-	const SparseMatrix& getM();
+	/// \return The matrix M(x,v)
+	const SparseMatrix& getM() const;
 
 	/// \return The matrix \f$D = -\frac{\partial f}{\partial v}(x,v)\f$
-	const SparseMatrix& getD();
+	const SparseMatrix& getD() const;
 
 	/// \return The matrix \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
-	const SparseMatrix& getK();
+	const SparseMatrix& getK() const;
 
 protected:
 	/// Evaluation of the RHS function \f$f(x, v)\f$ for a given state
@@ -114,10 +114,10 @@ protected:
 	/// \note MUST be set by the derived classes
 	std::shared_ptr<OdeState> m_initialState;
 
-	/// The vector containing \f$f(x, v)\f$
+	/// The vector containing f(x, v)
 	Vector m_f;
 
-	/// The matrix \f$M(x,v)\f$
+	/// The matrix M(x,v)
 	SparseMatrix m_M;
 
 	/// The The matrix \f$D = -\frac{\partial f}{\partial v}(x,v)\f$

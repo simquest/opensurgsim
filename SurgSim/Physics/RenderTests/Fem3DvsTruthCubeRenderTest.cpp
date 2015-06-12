@@ -415,7 +415,7 @@ void buildConstrainedSystem(std::shared_ptr<TruthCubeRepresentation> truthCubeRe
 
 	A->setZero();
 	// Copy K into A
-	truthCubeRepresentation->update(*truthCubeRepresentation->getInitialState(), Math::ODEEQUATIONUPDATE_M);
+	truthCubeRepresentation->update(*truthCubeRepresentation->getInitialState(), Math::ODEEQUATIONUPDATE_K);
 	A->block(0,0, numDof, numDof) = truthCubeRepresentation->getK();
 	// Copy H into A
 	A->block(numDof,0, numConstraints, numDof) = H;
