@@ -33,7 +33,6 @@ Constraint::Constraint(ConstraintType constraintType,
 	std::shared_ptr<Representation> representation1,
 	const SurgSim::DataStructures::Location& location1)
 {
-	m_mlcpMap[INVALID_CONSTRAINT] = Math::MLCP_INVALID_CONSTRAINT;
 	m_mlcpMap[FIXED_3DPOINT] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
 	m_mlcpMap[FIXED_3DROTATION_VECTOR] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
 	m_mlcpMap[FRICTIONAL_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT;
@@ -94,7 +93,8 @@ void Constraint::build(double dt,
 		indexOfConstraint,
 		CONSTRAINT_NEGATIVE_SIDE);
 
-	mlcp->constraintTypes.push_back(m_mlcpMap[m_constraintType]);
+	mlcp->constraintTypes.push_back(
+				(m_constraintType != INVALID_CONSTRAINT) ? m_mlcpMap[m_constraintType] : Math::MLCP_INVALID_CONSTRAINT);
 }
 
 bool Constraint::isActive()
