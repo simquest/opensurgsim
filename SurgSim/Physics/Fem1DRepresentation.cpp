@@ -15,6 +15,7 @@
 
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
@@ -59,35 +60,72 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem1DRepresent
 
 Fem1DRepresentation::Fem1DRepresentation(const std::string& name) : FemRepresentation(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Fem1DRepresentation, std::shared_ptr<SurgSim::Framework::Asset>, Fem, getFem,
+									  setFem);
+	SURGSIM_ADD_SETTER(Fem1DRepresentation, std::string, FemFileName, loadFem)
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation but needs to be set by all
 	// concrete derived classes
 	m_numDofPerNode = 6;
+	m_fem = std::make_shared<Fem1D>();
 }
 
 Fem1DRepresentation::~Fem1DRepresentation()
 {
 }
 
+void Fem1DRepresentation::loadFem(const std::string& fileName)
+{
+	auto mesh = std::make_shared<Fem1D>();
+	mesh->load(fileName);
+	setFem(mesh);
+}
+
+void Fem1DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
+{
+	SURGSIM_ASSERT(mesh != nullptr) << "Mesh for Fem1DRepresentation cannot be a nullptr";
+	auto femMesh = std::dynamic_pointer_cast<Fem1D>(mesh);
+	SURGSIM_ASSERT(femMesh != nullptr)
+			<< "Mesh for Fem1DRepresentation needs to be a SurgSim::Physics::Fem1D";
+	m_fem = femMesh;
+	auto state = std::make_shared<SurgSim::Math::OdeState>();
+
+	state->setNumDof(getNumDofPerNode(), m_fem->getNumVertices());
+	for (size_t i = 0; i < m_fem->getNumVertices(); i++)
+	{
+		state->getPositions().segment<3>(getNumDofPerNode() * i) = m_fem->getVertexPosition(i);
+	}
+	for (auto boundaryCondition : m_fem->getBoundaryConditions())
+	{
+		state->addBoundaryCondition(boundaryCondition);
+	}
+	FemRepresentation::setInitialState(state);
+}
+
+std::shared_ptr<Fem1D> Fem1DRepresentation::getFem() const
+{
+	return m_fem;
+}
+
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-		const SurgSim::Math::Vector& generalizedForce,
-		const SurgSim::Math::Matrix& K,
-		const SurgSim::Math::Matrix& D)
+													  const SurgSim::Math::Vector& generalizedForce,
+													  const SurgSim::Math::Matrix& K,
+													  const SurgSim::Math::Matrix& D)
 {
 	const size_t dofPerNode = getNumDofPerNode();
 	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
 
 	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
 	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
-			"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
+				"Generalized force has an invalid size of " << generalizedForce.size() << ". Expected " << dofPerNode;
 	SURGSIM_ASSERT(K.size() == 0 || (K.rows() == expectedSize && K.cols() == expectedSize)) <<
-			"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
-			") was expecting a square matrix of size " << dofPerNode;
+				"Stiffness matrix K has an invalid size (" << K.rows() << "," << K.cols() <<
+				") was expecting a square matrix of size " << dofPerNode;
 	SURGSIM_ASSERT(D.size() == 0 || (D.rows() == expectedSize && D.cols() == expectedSize)) <<
-			"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
-			") was expecting a square matrix of size " << dofPerNode;
+				"Damping matrix D has an invalid size (" << D.rows() << "," << D.cols() <<
+				") was expecting a square matrix of size " << dofPerNode;
 
 	std::shared_ptr<Fem1DLocalization> localization1D =
-		std::dynamic_pointer_cast<Fem1DLocalization>(localization);
+			std::dynamic_pointer_cast<Fem1DLocalization>(localization);
 	SURGSIM_ASSERT(localization1D != nullptr) << "Invalid localization type (not a Fem1DLocalization)";
 
 	const size_t elementId = localization1D->getLocalPosition().index;
@@ -132,18 +170,30 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 }
 
 void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-		const SurgSim::Math::RigidTransform3d& transform)
+										 const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
 }
 
-std::shared_ptr<FemPlyReaderDelegate> Fem1DRepresentation::getDelegate()
+bool Fem1DRepresentation::doInitialize()
 {
-	auto thisAsSharedPtr = std::static_pointer_cast<Fem1DRepresentation>(shared_from_this());
-	auto readerDelegate = std::make_shared<Fem1DPlyReaderDelegate>(thisAsSharedPtr);
+	for (auto& element : m_fem->getElements())
+	{
+		std::shared_ptr<FemElement> femElement;
+		if (m_femElementOverrideType.empty())
+		{
+			femElement = FemElement::getFactory().create(element->type, element);
+		}
+		else
+		{
+			femElement = FemElement::getFactory().create(m_femElementOverrideType, element);
+		}
 
-	return readerDelegate;
+		m_femElements.push_back(femElement);
+	}
+
+	return FemRepresentation::doInitialize();
 }
 
 } // namespace Physics

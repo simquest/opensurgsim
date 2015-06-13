@@ -21,6 +21,7 @@
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Physics/Fem2D.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
@@ -29,8 +30,6 @@ namespace SurgSim
 namespace Physics
 {
 SURGSIM_STATIC_REGISTRATION(Fem2DRepresentation);
-
-class Fem2DPlyReaderDelegate;
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
 class Fem2DRepresentation : public FemRepresentation
@@ -45,6 +44,16 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DRepresentation);
 
+	void loadFem(const std::string& fileName) override;
+
+	/// Sets the fem mesh asset
+	/// \param mesh The fem mesh to assign to this representation
+	/// \exception SurgSim::Framework::AssertionFailure if mesh is nullptr or it's actual type is not Fem2D
+	void setFem(std::shared_ptr<SurgSim::Framework::Asset> mesh);
+
+	/// \return The fem mesh asset as a Fem2D
+	std::shared_ptr<Fem2D> getFem() const;
+
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
@@ -54,8 +63,11 @@ protected:
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 			const SurgSim::Math::RigidTransform3d& transform) override;
 
+	bool doInitialize() override;
+
 private:
-	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+	/// The Fem2DRepresentation's asset as a Fem2D
+	std::shared_ptr<Fem2D> m_fem;
 };
 
 } // namespace Physics

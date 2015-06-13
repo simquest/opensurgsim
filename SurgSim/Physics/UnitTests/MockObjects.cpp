@@ -336,10 +336,10 @@ MockFemElement::MockFemElement() : FemElement()
 	initializeMembers();
 }
 
-MockFemElement::MockFemElement(std::vector<size_t> nodeIds) : FemElement()
+MockFemElement::MockFemElement(std::shared_ptr<FemElementStructs::FemElementParameter> elementData) : FemElement()
 {
 	initializeMembers();
-	m_nodeIds.assign(nodeIds.begin(), nodeIds.end());
+	m_nodeIds.assign(elementData->nodeIds.begin(), elementData->nodeIds.end());
 }
 
 void MockFemElement::addNode(size_t nodeId)
@@ -436,6 +436,10 @@ MockFemRepresentation::MockFemRepresentation(const std::string& name) : FemRepre
 }
 
 MockFemRepresentation::~MockFemRepresentation()
+{
+}
+
+void MockFemRepresentation::loadFem(const std::string &filename)
 {
 }
 

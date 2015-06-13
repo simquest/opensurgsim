@@ -22,6 +22,7 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Fem.h"
 
 namespace SurgSim
 {
@@ -54,7 +55,8 @@ public:
 	/// \param state The state to initialize the FemElement with
 	virtual void initialize(const SurgSim::Math::OdeState& state);
 
-	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::vector<size_t>> FactoryType;
+	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::shared_ptr<FemElementStructs::FemElementParameter>>
+		FactoryType;
 
 	static FactoryType& getFactory();
 
