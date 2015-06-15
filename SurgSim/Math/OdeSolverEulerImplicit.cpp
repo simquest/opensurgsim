@@ -137,18 +137,17 @@ void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& sta
 	// More terms are coming from the Newton-Raphson iterations (see class OdeSolverEulerImplicit doxygen doc for
 	// more details)
 
-	SparseMatrix* M;
-	SparseMatrix* D;
-	SparseMatrix* K;
-	Vector* f;
+	m_equation.updateFMDK(newState, ODEEQUATIONUPDATE_FMDK);
 
-	// Computes f, M, D, K all at the same time (on newState)
-	m_equation.computeFMDK(newState, &f, &M, &D, &K);
+	const SparseMatrix& M = m_equation.getM();
+	const SparseMatrix& D = m_equation.getD();
+	const SparseMatrix& K = m_equation.getK();
+	const Vector& f = m_equation.getF();
 
 	// Computes the LHS systemMatrix
-	m_systemMatrix  = (*M) * (1.0 / dt);
-	m_systemMatrix += (*D);
-	m_systemMatrix += (*K) * dt;
+	m_systemMatrix  = M * (1.0 / dt);
+	m_systemMatrix += D;
+	m_systemMatrix += K * dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
@@ -157,8 +156,8 @@ void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& sta
 	// Computes the RHS vector by adding the Euler Implicit/Newton-Raphson terms
 	if (computeRHS)
 	{
-		m_rhs = *f + (*K) * (newState.getPositions() - state.getPositions() - newState.getVelocities() * dt);
-		m_rhs -= ((*M) * (newState.getVelocities() - state.getVelocities())) / dt;
+		m_rhs = f + K * (newState.getPositions() - state.getPositions() - newState.getVelocities() * dt);
+		m_rhs -= (M * (newState.getVelocities() - state.getVelocities())) / dt;
 		state.applyBoundaryConditionsToVector(&m_rhs);
 	}
 }

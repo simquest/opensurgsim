@@ -20,7 +20,10 @@
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Framework/Runtime.h" ///< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Physics/UnitTests/DeformableTestsUtility.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
+
+using SurgSim::Math::OdeEquationUpdate;
 
 namespace SurgSim
 {
@@ -234,9 +237,6 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 {
 	using SurgSim::Math::Vector3d;
 
-	Vector* F;
-	SparseMatrix* M, *D, *K;
-
 	// No gravity, no Rayleigh damping
 	// computeF tests addFemElementsForce
 	m_fem->setIsGravityEnabled(false);
@@ -248,17 +248,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF, m_expectedMass, m_expectedDamping,
+			m_expectedStiffness);
 	}
 
 	{
@@ -279,24 +270,14 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 		Dext.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = DextLocal;
 		m_fem->addExternalGeneralizedForce(localization, FextLocal, KextLocal, DextLocal);
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping + Dext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + Dext));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + Kext));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF + Fext, m_expectedMass, m_expectedDamping + Dext,
+			m_expectedStiffness + Kext);
 	}
 }
 
 TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 {
 	using SurgSim::Math::Vector3d;
-
-	Vector* F;
-	SparseMatrix* M, *D, *K;
 
 	// No gravity, Rayleigh damping
 	// computeF tests addFemElementsForce and addRayleighDampingForce
@@ -311,17 +292,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(
-										m_expectedDamping + m_expectedRayleighDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping, m_expectedStiffness);
 	}
 
 	{
@@ -342,16 +314,8 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 		Dext.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = DextLocal;
 		m_fem->addExternalGeneralizedForce(localization, FextLocal, KextLocal, DextLocal);
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping +
-									m_expectedRayleighDamping + Dext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping + Dext));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + Kext));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF + Fext, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping + Dext, m_expectedStiffness + Kext);
 	}
 }
 
@@ -359,9 +323,6 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::SparseMatrix;
-
-	Vector* F;
-	SparseMatrix* M, *D, *K;
 
 	// Gravity, no Rayleigh damping
 	// computeF tests addFemElementsForce and addGravityForce
@@ -374,16 +335,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF, m_expectedMass, m_expectedDamping,
+			m_expectedStiffness);
 	}
 
 	{
@@ -404,15 +357,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 		Dext.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = DextLocal;
 		m_fem->addExternalGeneralizedForce(localization, FextLocal, KextLocal, DextLocal);
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping + Dext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + Dext));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + Kext));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF + Fext, m_expectedMass,
+			m_expectedDamping + Dext, m_expectedStiffness + Kext);
 	}
 }
 
@@ -420,9 +366,6 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::SparseMatrix;
-
-	Vector* F;
-	SparseMatrix* M, *D, *K;
 
 	// Gravity, Rayleigh damping
 	// computeF tests addFemElementsForce, addRayleighDampingForce and addGravityForce
@@ -438,17 +381,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(
-										m_expectedDamping + m_expectedRayleighDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping, m_expectedStiffness);
 	}
 
 	{
@@ -469,16 +403,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 		Dext.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = DextLocal;
 		m_fem->addExternalGeneralizedForce(localization, FextLocal, KextLocal, DextLocal);
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping +
-									m_expectedRayleighDamping + Dext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping + Dext));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + Kext));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF + Fext, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping + Dext, m_expectedStiffness + Kext);
 	}
 }
 

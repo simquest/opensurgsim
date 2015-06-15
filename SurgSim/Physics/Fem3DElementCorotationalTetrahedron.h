@@ -90,9 +90,20 @@ protected:
 	void computeRotationMassAndStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
 										 Eigen::Matrix<double, 12, 12>* Me, Eigen::Matrix<double, 12, 12>* Ke) const;
 
+	void doUpdateFMDK(const Math::OdeState& state, int options) override;
+
 	/// The constant inverse matrix of the undeformed tetrahedron homogeneous 4 points coordinates.
 	/// This is useful to compute the deformation gradient from which the element rotation is extracted.
 	SurgSim::Math::Matrix44d m_Vinverse;
+
+	// The mass matrix.
+	Eigen::Matrix<double, 12, 12> m_RMRt;
+
+	// The stiffness matrix
+	Eigen::Matrix<double, 12, 12> m_RKRt;
+
+	// The rotation matrix
+	SurgSim::Math::Matrix33d m_R;
 };
 
 } // namespace Physics

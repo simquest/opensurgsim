@@ -212,12 +212,22 @@ public:
 	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
 							  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true);
 
+	/// Update the FemElement based on the given state.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param options Flag to specify which of the F, M, D, K needs to be updated
+	void updateFMDK(const Math::OdeState& state, int options);
+
 protected:
 	/// Sets the number of degrees of freedom per node
 	/// \param numDofPerNode The number of dof per node
 	/// \note Protected to be accessible only to derived classes which should be the only
 	/// \note ones able to set this parameter
 	void setNumDofPerNode(size_t numDofPerNode);
+
+	/// Update the FemElement based on the given state.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param options Flag to specify which of the F, M, D, K needs to be updated
+	virtual void doUpdateFMDK(const Math::OdeState& state, int options);
 
 	/// Number of degree of freedom per node for this element
 	size_t m_numDofPerNode;

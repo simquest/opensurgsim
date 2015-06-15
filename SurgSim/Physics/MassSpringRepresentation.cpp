@@ -189,7 +189,7 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 								"prior to running the simulation";
 }
 
-Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
+void MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
 	m_f.setZero(state.getNumDof());
@@ -211,11 +211,9 @@ Vector& MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	{
 		m_f[*boundaryCondition] = 0.0;
 	}
-
-	return m_f;
 }
 
-const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
+void MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
@@ -238,11 +236,9 @@ const SparseMatrix& MassSpringRepresentation::computeM(const SurgSim::Math::OdeS
 		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
 					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
-
-	return m_M;
 }
 
-const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
+void MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::setSubVector;
@@ -296,11 +292,9 @@ const SparseMatrix& MassSpringRepresentation::computeD(const SurgSim::Math::OdeS
 		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
 					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
-
-	return m_D;
 }
 
-const SparseMatrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
+void MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
 	Math::clearMatrix(&m_K);
@@ -326,12 +320,9 @@ const SparseMatrix& MassSpringRepresentation::computeK(const SurgSim::Math::OdeS
 		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
 					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
-
-	return m_K;
 }
 
-void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
-		Vector** f, SparseMatrix** M, SparseMatrix** D, SparseMatrix** K)
+void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::addSubVector;
 
@@ -406,11 +397,6 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state,
 
 		m_f[*boundaryCondition] = 0.0;
 	}
-
-	*f = &m_f;
-	*M = &m_M;
-	*D = &m_D;
-	*K = &m_K;
 }
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const SurgSim::Math::OdeState& state,

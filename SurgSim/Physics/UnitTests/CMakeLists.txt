@@ -81,6 +81,8 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	CommonTests.h
+	DeformableTestsUtility.h
+	DeformableTestsUtility-inl.h
 	EigenGtestAsserts.h
 	MockObjects.h
 )

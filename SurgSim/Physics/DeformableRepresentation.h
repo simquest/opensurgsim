@@ -163,18 +163,6 @@ protected:
 	SurgSim::Math::SparseMatrix m_externalGeneralizedDamping;
 	/// @}
 
-	/// Force applied on the deformable representation
-	SurgSim::Math::Vector m_f;
-
-	/// Mass matrix
-	SurgSim::Math::SparseMatrix m_M;
-
-	/// Damping matrix
-	SurgSim::Math::SparseMatrix m_D;
-
-	/// Stiffness matrix
-	SurgSim::Math::SparseMatrix m_K;
-
 	/// Number of degrees of freedom per node (varies per deformable model)
 	/// \note MUST be set by the derived classes
 	size_t m_numDofPerNode;

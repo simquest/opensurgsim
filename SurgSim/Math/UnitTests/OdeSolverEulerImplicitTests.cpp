@@ -169,7 +169,8 @@ void doComplexNonLinearOdeTest(size_t numNewtonRaphsonIteration, bool expectExac
 	auto vt = state1.getVelocities();
 	auto xt_plus_dt = state2.getPositions();
 	auto vt_plus_dt = state2.getVelocities();
-	auto ft_plus_dt = odeEquation.computeF(state2);
+	odeEquation.updateFMDK(state2, ODEEQUATIONUPDATE_F);
+	auto ft_plus_dt = odeEquation.getF();
 	Vector expectedVelocity = vt + dt * ft_plus_dt;
 
 	// This is always true by construction
@@ -229,7 +230,8 @@ void doComputeMatricesTest()
 	MassPointState state;
 	double dt = 1e-3;
 
-	Matrix expectedSystemMatrix = m.computeM(state) / dt + m.computeD(state) + dt * m.computeK(state);
+	m.updateFMDK(state, ODEEQUATIONUPDATE_M | ODEEQUATIONUPDATE_D | ODEEQUATIONUPDATE_K);
+	Matrix expectedSystemMatrix = m.getM() / dt + m.getD() + dt * m.getK();
 	EXPECT_NO_THROW(solver->computeMatrices(dt, state));
 	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));
 	EXPECT_TRUE(solver->getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));

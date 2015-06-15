@@ -167,7 +167,8 @@ public:
 	void solve()
 	{
 		m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		Matrix K = m_fem->computeK(*(m_fem->getCurrentState()));
+		m_fem->updateFMDK(*(m_fem->getCurrentState()), Math::ODEEQUATIONUPDATE_K);
+		Matrix K = m_fem->getK();
 		m_fem->getCurrentState()->applyBoundaryConditionsToMatrix(&K);
 		m_fem->getCurrentState()->applyBoundaryConditionsToVector(&m_F);
 		m_U = K.inverse() * m_F;
