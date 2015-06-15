@@ -83,8 +83,18 @@ public:
 					const std::vector<SurgSim::Math::Vector2d>& textures,
 					const std::vector<size_t>& triangles);
 
+	/// Increase the update count, this indicates that the mesh has been changed, if used in a mesh representation
+	/// the mesh representation will still only update the data members that have been marked for updating
+	void dirty();
+
+	/// Return the update count, please note that it will silently roll over when the range of size_t has been exceeded
+	size_t getUpdateCount() const;
+
 protected:
 	bool doLoad(const std::string& fileName) override;
+
+	/// For checking whether the mesh has changed
+	size_t m_updateCount;
 };
 
 

@@ -33,7 +33,8 @@ namespace Graphics
 
 SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Graphics::Mesh, Mesh);
 
-Mesh::Mesh()
+Mesh::Mesh() :
+	m_updateCount(1)
 {
 }
 
@@ -100,7 +101,7 @@ bool Mesh::doLoad(const std::string& fileName)
 	if (! reader.isValid())
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "'" << fileName << "' is an invalid .ply file.";
+				<< "'" << fileName << "' is an invalid .ply file.";
 		return false;
 	}
 
@@ -108,11 +109,21 @@ bool Mesh::doLoad(const std::string& fileName)
 	if (! reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "The input file '" << fileName << "' does not have the property required by triangle mesh.";
+				<< "The input file '" << fileName << "' does not have the property required by triangle mesh.";
 		return false;
 	}
 
 	return true;
+}
+
+void Mesh::dirty()
+{
+	++m_updateCount;
+}
+
+size_t Mesh::getUpdateCount() const
+{
+	return m_updateCount;
 }
 
 }; // Graphics
