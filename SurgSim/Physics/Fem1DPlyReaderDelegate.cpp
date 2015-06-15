@@ -14,9 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/Valid.h"
-#include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
-
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -122,8 +120,6 @@ void Fem1DPlyReaderDelegate::processFemElement(const std::string& elementName)
 		<< m_elementData.vertexCount << " vertices.";
 
 	auto femElement = std::make_shared<FemElementStructs::FemElement1DParameter>();
-	static Fem1DElementBeam beam;
-	femElement->type = beam.getClassName();
 	femElement->nodeIds.resize(m_elementData.vertexCount);
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
 	m_mesh->addElement(femElement);

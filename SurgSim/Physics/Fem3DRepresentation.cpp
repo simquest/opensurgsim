@@ -23,6 +23,8 @@
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -74,7 +76,6 @@ Fem3DRepresentation::Fem3DRepresentation(const std::string& name) :
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation
 	// but needs to be set by all concrete derived classes
 	m_numDofPerNode = 3;
-
 	m_fem = std::make_shared<Fem3D>();
 }
 
@@ -91,6 +92,8 @@ void Fem3DRepresentation::loadFem(const std::string& fileName)
 
 void Fem3DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 {
+	SURGSIM_ASSERT(!isInitialized()) << "The Fem cannot be set after initialization";
+
 	SURGSIM_ASSERT(mesh != nullptr) << "Mesh for Fem3DRepresentation cannot be a nullptr";
 	auto femMesh = std::dynamic_pointer_cast<Fem3D>(mesh);
 	SURGSIM_ASSERT(femMesh != nullptr)
@@ -107,6 +110,37 @@ void Fem3DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 	{
 		state->addBoundaryCondition(boundaryCondition);
 	}
+
+	// If we have elements, ensure that they are all of the same nature
+	if (femMesh->getNumElements() > 0)
+	{
+		auto e0 = femMesh->getElement(0);
+		for (auto const& e : femMesh->getElements())
+		{
+			SURGSIM_ASSERT(e->nodeIds.size() == e0->nodeIds.size()) << "Cannot mismatch element of different nature";
+		}
+
+		// If the FemElement types hasn't been registered yet, let's set a default one
+		if (getFemElementType().empty())
+		{
+			if (e0->nodeIds.size() == 4)
+			{
+				Fem3DElementTetrahedron tetrahdron;
+				setFemElementType(tetrahdron.getClassName());
+			}
+			else if (e0->nodeIds.size() == 8)
+			{
+				Fem3DElementCube cube;
+				setFemElementType(cube.getClassName());
+			}
+			else
+			{
+				SURGSIM_FAILURE() << "Invalid Element size. Expected a tetrahedron or cube, found a size " <<
+					e0->nodeIds.size();
+			}
+		}
+	}
+
 	FemRepresentation::setInitialState(state);
 }
 
@@ -258,15 +292,7 @@ bool Fem3DRepresentation::doInitialize()
 	for (auto& element : m_fem->getElements())
 	{
 		std::shared_ptr<FemElement> femElement;
-		if (m_femElementOverrideType.empty())
-		{
-			femElement = FemElement::getFactory().create(element->type, element);
-		}
-		else
-		{
-			femElement = FemElement::getFactory().create(m_femElementOverrideType, element);
-		}
-
+		femElement = FemElement::getFactory().create(getFemElementType(), element);
 		m_femElements.push_back(femElement);
 	}
 
