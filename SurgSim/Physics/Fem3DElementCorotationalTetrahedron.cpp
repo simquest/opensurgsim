@@ -63,7 +63,7 @@ void Fem3DElementCorotationalTetrahedron::initialize(const SurgSim::Math::OdeSta
 							   "  C = (" << state.getPosition(m_nodeIds[2]).transpose() << ")" << std::endl <<
 							   "  D = (" << state.getPosition(m_nodeIds[3]).transpose() << ")" << std::endl;
 
-	update(state, Math::ODEEQUATIONUPDATE_FMDK);
+	updateFMDK(state, Math::ODEEQUATIONUPDATE_FMDK);
 }
 
 void Fem3DElementCorotationalTetrahedron::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
@@ -147,7 +147,7 @@ void Fem3DElementCorotationalTetrahedron::addMatVec(const SurgSim::Math::OdeStat
 	addSubVector(resultLocal, m_nodeIds, 3, result);
 }
 
-void Fem3DElementCorotationalTetrahedron::doUpdate(const Math::OdeState& state, int options)
+void Fem3DElementCorotationalTetrahedron::doUpdateFMDK(const Math::OdeState& state, int options)
 {
 	SurgSim::Math::Matrix33d* rotation = nullptr;
 	Eigen::Matrix<double, 12, 12>* RMRt = nullptr;

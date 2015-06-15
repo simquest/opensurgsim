@@ -74,10 +74,10 @@ public:
 	/// \param options Flag to specify which of F, M, D, K needs to be updated.
 	virtual void updateFMDK(const OdeState& state, int options);
 
-	/// \return The vector containing f(x, v)
+	/// \return The vector containing \f$f(x, v)\f$
 	const Vector& getF() const;
 
-	/// \return The matrix M(x,v)
+	/// \return The matrix \f$M(x,v)\f$
 	const SparseMatrix& getM() const;
 
 	/// \return The matrix \f$D = -\frac{\partial f}{\partial v}(x,v)\f$
@@ -114,10 +114,10 @@ protected:
 	/// \note MUST be set by the derived classes
 	std::shared_ptr<OdeState> m_initialState;
 
-	/// The vector containing f(x, v)
+	/// The vector containing \f$f(x, v)\f$
 	Vector m_f;
 
-	/// The matrix M(x,v)
+	/// The matrix \f$M(x,v)\f$
 	SparseMatrix m_M;
 
 	/// The The matrix \f$D = -\frac{\partial f}{\partial v}(x,v)\f$

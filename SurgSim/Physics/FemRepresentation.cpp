@@ -488,7 +488,7 @@ void FemRepresentation::updateFMDK(const SurgSim::Math::OdeState& state, int opt
 	// Note that the relevant matrices are updated only for non-linear elements.
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->update(state, options);
+		(*femElement)->updateFMDK(state, options);
 	}
 
 	OdeEquation::updateFMDK(state, options);
