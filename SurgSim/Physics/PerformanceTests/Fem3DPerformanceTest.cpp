@@ -94,11 +94,13 @@ public:
 
 		m_physicsManager->doInitialize();
 		m_physicsManager->doStartUp();
+
+		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	}
 
 	void initializeRepresentation(std::shared_ptr<MockFem3DRepresentation> fem)
 	{
-		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>("config.txt"));
+		fem->initialize(m_runtime);
 		fem->wakeUp();
 		std::shared_ptr<SurgSim::Math::LinearSparseSolveAndInverseCG> solver =
 			std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(
@@ -151,6 +153,7 @@ public:
 
 protected:
 	std::shared_ptr<SurgSim::Testing::MockPhysicsManager> m_physicsManager;
+	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
 };
 
 class IntegrationSchemeParamTest : public Fem3DPerformanceTestBase,
@@ -173,9 +176,8 @@ TEST_P(IntegrationSchemeParamTest, WoundTest)
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
 	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 
-
 	auto fem = std::make_shared<SurgSim::Physics::MockFem3DRepresentation>("wound");
-	fem->setFilename("Geometry/wound_deformable.ply");
+	fem->loadFem("Geometry/wound_deformable.ply");
 	fem->setIntegrationScheme(integrationScheme);
 	fem->setLinearSolver(linearSolver);
 

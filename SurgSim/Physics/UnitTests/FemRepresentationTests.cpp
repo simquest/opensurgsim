@@ -536,11 +536,6 @@ TEST_F(FemRepresentationTests, SerializationTest)
 	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", false));
 	EXPECT_FALSE(fem->getComplianceWarping());
 	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));
-
-	std::string filename("thisIsTheFilename.extension");
-	EXPECT_NO_THROW(fem->setValue("Filename", filename));
-	EXPECT_EQ(filename, fem->getFilename());
-	EXPECT_EQ(filename, fem->getValue<std::string>("Filename"));
 }
 
 } // namespace Physics

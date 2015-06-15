@@ -28,6 +28,7 @@
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
@@ -80,7 +81,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 	auto sceneElement = std::make_shared<BasicSceneElement>("scene element");
 
 	auto physics = std::make_shared<Fem3DRepresentation>("Fem3D");
-	physics->setFilename("Geometry/wound_deformable.ply");
+	physics->loadFem("Geometry/wound_deformable.ply");
 
 	auto graphics = std::make_shared<OsgMeshRepresentation>("GraphicsMesh");
 	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
@@ -126,7 +127,8 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
 
 	std::shared_ptr<SurgSim::Framework::Component> physics = std::make_shared<Fem3DRepresentation>("Fem3D");
 	auto fem3d = std::dynamic_pointer_cast<Fem3DRepresentation>(physics);
-	fem3d->setFilename(filename);
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	fem3d->loadFem(filename);
 
 	std::shared_ptr<SurgSim::Framework::Component> graphics =
 		std::make_shared<OsgMeshRepresentation>("GraphicsMesh");

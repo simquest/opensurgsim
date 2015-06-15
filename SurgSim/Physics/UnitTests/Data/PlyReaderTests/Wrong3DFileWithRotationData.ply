@@ -1,0 +1,26 @@
+ply
+format ascii 1.0
+comment Created by hand
+element vertex 4
+property double x
+property double y
+property double z
+property double thetax
+property double thetay
+property double thetaZ
+element 3d_element 1
+property list uint uint vertex_indices
+element boundary_condition 1
+property uint vertex_index
+element material 1
+property double mass_density
+property double poisson_ratio
+property double young_modulus
+end_header
+1.000000 1.000000 -1.000000 0.0 0.0 0.0
+1.000000 -1.000000 -1.000000 0.0 0.0 0.0
+-1.000000 -1.000000 -1.000000 0.0 0.0 0.0
+1.000000 0.999999 1.000000 0.0 0.0 0.0
+4 0 1 2 3
+0
+0.1432 0.224 0.472

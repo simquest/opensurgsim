@@ -44,8 +44,6 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, Filename,
-									  getFilename, setFilename);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, ComplianceWarping,
 									  getComplianceWarping, setComplianceWarping);
 }
@@ -54,63 +52,14 @@ FemRepresentation::~FemRepresentation()
 {
 }
 
-void FemRepresentation::setFilename(const std::string& filename)
+void FemRepresentation::overrideFemElementType(const std::string& type)
 {
-	m_filename = filename;
-}
-
-const std::string& FemRepresentation::getFilename() const
-{
-	return m_filename;
-}
-
-bool FemRepresentation::loadFile()
-{
-	using SurgSim::Framework::Logger;
-
-	bool result = true;
-	if (m_filename.empty())
-	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Filename is empty";
-		result = false;
-	}
-	else
-	{
-		std::string filePath = getRuntime()->getApplicationData()->findFile(m_filename);
-		if (filePath.empty())
-		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-					"File " << m_filename << " can not be found.";
-			result = false;
-		}
-
-		auto reader = std::make_shared<SurgSim::DataStructures::PlyReader>(filePath);
-		if (result && !reader->isValid())
-		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
-					"File " << m_filename << " is invalid.";
-			result = false;
-		}
-
-		if (result && !reader->parseWithDelegate(getDelegate()))
-		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << "Failed to load file " << m_filename;
-			result = false;
-		}
-	}
-
-	return result;
+	SURGSIM_ASSERT(!isInitialized()) << "You must override the type before initialzing";
+	m_femElementOverrideType = type;
 }
 
 bool FemRepresentation::doInitialize()
 {
-	if (!m_filename.empty() && !loadFile())
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-				"Failed to initialize from file " << m_filename;
-		return false;
-	}
-
 	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
 
 	// Initialize the FemElements
@@ -165,7 +114,7 @@ bool FemRepresentation::doInitialize()
 
 		auto logger = SurgSim::Framework::Logger::getLogger("Physics/FemRepresentation");
 		SURGSIM_LOG_IF(numDofPerNode % 3 != 0, logger, SEVERE) << "Using compliance warping with representation " <<
-				getName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
+						getName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
 
 		// Use a mask of 1 to setup the sparse matrix pattern
 		for (Index nodeId = 0; nodeId < static_cast<Index>(m_initialState->getNumNodes()); ++nodeId)
@@ -175,7 +124,7 @@ bool FemRepresentation::doInitialize()
 				for (Index j = 0; j < numDofPerNode; ++j)
 				{
 					m_complianceWarpingTransformation.insert(nodeId * numDofPerNode + i, nodeId * numDofPerNode + j) =
-						1.0;
+							1.0;
 				}
 			}
 		}
@@ -205,7 +154,7 @@ std::shared_ptr<FemElement> FemRepresentation::getFemElement(size_t femElementId
 bool FemRepresentation::isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const
 {
 	return (coordinate.index < m_femElements.size())
-		   && m_femElements[coordinate.index]->isValidCoordinate(coordinate.coordinate);
+			&& m_femElements[coordinate.index]->isValidCoordinate(coordinate.coordinate);
 }
 
 double FemRepresentation::getTotalMass() const
@@ -256,9 +205,9 @@ void FemRepresentation::update(double dt)
 	}
 
 	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
-										   "Ode solver has not been set yet. Did you call beforeUpdate() ?";
+											  "Ode solver has not been set yet. Did you call beforeUpdate() ?";
 	SURGSIM_ASSERT(m_initialState != nullptr) <<
-			"Initial state has not been set yet. Did you call setInitialState() ?";
+												 "Initial state has not been set yet. Did you call setInitialState() ?";
 
 	// Solve the ode and compute the requested compliance matrix
 	if (m_useComplianceWarping)
@@ -318,7 +267,7 @@ Math::Matrix FemRepresentation::applyCompliance(const Math::OdeState& state, con
 	{
 		// Then, update the compliance matrix using compliance warping
 		return (m_complianceWarpingTransformation * DeformableRepresentation::applyCompliance(state,
-				m_complianceWarpingTransformation.transpose() * b));
+																m_complianceWarpingTransformation.transpose() * b));
 	}
 	return DeformableRepresentation::applyCompliance(state, b);
 }
@@ -337,7 +286,7 @@ const SurgSim::Math::Matrix& FemRepresentation::getComplianceMatrix() const
 SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
 {
 	SURGSIM_FAILURE() << "Any representation using compliance warping should override this method to provide the " <<
-					  "proper nodes transformation";
+						 "proper nodes transformation";
 
 	return SurgSim::Math::Matrix();
 }
@@ -495,8 +444,8 @@ void FemRepresentation::updateFMDK(const SurgSim::Math::OdeState& state, int opt
 }
 
 void FemRepresentation::addRayleighDampingForce(
-	SurgSim::Math::Vector* force, const SurgSim::Math::OdeState& state,
-	bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
+		SurgSim::Math::Vector* force, const SurgSim::Math::OdeState& state,
+		bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	// Temporary variables for convenience
 	double& rayleighMass = m_rayleighDamping.massCoefficient;
@@ -543,8 +492,8 @@ void FemRepresentation::addRayleighDampingForce(
 }
 
 void FemRepresentation::addFemElementsForce(SurgSim::Math::Vector* force,
-		const SurgSim::Math::OdeState& state,
-		double scale)
+											const SurgSim::Math::OdeState& state,
+											double scale)
 {
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -559,7 +508,7 @@ void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,
 	using SurgSim::Math::addSubVector;
 
 	SURGSIM_ASSERT(m_massPerNode.size() == state.getNumNodes()) <<
-			"Mass per node has not been properly allocated. Did you call Initialize() ?";
+					"Mass per node has not been properly allocated. Did you call Initialize() ?";
 
 	// Prepare a gravity vector of the proper size
 	SurgSim::Math::Vector gravitynD = SurgSim::Math::Vector::Zero(getNumDofPerNode());

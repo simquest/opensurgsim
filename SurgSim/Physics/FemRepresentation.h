@@ -23,6 +23,7 @@
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
+#include "SurgSim/Physics/Fem.h"
 
 namespace SurgSim
 {
@@ -52,17 +53,13 @@ public:
 	/// Destructor
 	virtual ~FemRepresentation();
 
-	/// Sets the name of the file to be loaded
-	/// \param filename The name of the file to be loaded
-	void setFilename(const std::string& filename);
+	/// Loads the FEM file into an Fem class data structure
+	/// \param filename The file to load
+	virtual void loadFem(const std::string& filename) = 0;
 
-	/// Gets the name of the file to be loaded
-	/// \return filename The name of the file to be loaded
-	const std::string& getFilename() const;
-
-	/// Loads the file
-	/// \return true if successful
-	bool loadFile();
+	/// Override the FemElement type pulled from the object factory
+	/// \param type A string of the full registered OSS class name in the factory
+	void overrideFemElementType(const std::string& type);
 
 	/// Adds a FemElement
 	/// \param element The FemElement to add to the representation
@@ -185,17 +182,13 @@ protected:
 	/// Useful information per node
 	std::vector<double> m_massPerNode; ///< Useful in setting up the gravity force F=mg
 
-	/// Filename for loading the fem representation.
-	std::string m_filename;
-
-private:
-	/// To be implemented by derived classes.
-	/// \return The delegate to load the corresponding derived class.
-	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() = 0;
-
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
+	/// Override class name passed to FemElement factory if not empty
+	std::string m_femElementOverrideType;
+
+private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K
 	/// Matrices: D = damping, M = mass, K = stiffness

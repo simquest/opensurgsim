@@ -82,7 +82,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 	auto meshRepresentation0 = makeRepresentation("emptymesh");
 	meshRepresentation0->getMesh()->initialize(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles);
 	meshRepresentation0->setUpdateOptions(MeshRepresentation::UPDATE_OPTION_COLORS |
-		MeshRepresentation::UPDATE_OPTION_VERTICES);
+										  MeshRepresentation::UPDATE_OPTION_VERTICES);
 
 	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
 
@@ -169,6 +169,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 				newVertices[index] =  transform * (cubeVertices[index] * scale);
 			}
 			meshes[j]->setVertexPositions(newVertices, true);
+			meshes[j]->dirty();
 		}
 
 		if (i == 500)
@@ -368,6 +369,7 @@ TEST_F(OsgMeshRepresentationRenderTests, TriangleDeletionTest)
 			if (triangle > 0)
 			{
 				meshRepresentation1->getMesh()->removeTriangle(triangle);
+				meshRepresentation1->getMesh()->dirty();
 			}
 		}
 
