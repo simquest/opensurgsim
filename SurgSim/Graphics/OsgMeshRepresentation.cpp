@@ -87,11 +87,9 @@ void OsgMeshRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape
 
 void OsgMeshRepresentation::doUpdate(double dt)
 {
-	size_t count = 0;
-
 	SURGSIM_ASSERT(m_mesh->isValid()) << "The mesh in the OsgMeshRepresentation " << getName() << " is invalid.";
 
-	// Early if there are no vertices
+	// Early exit if there are no vertices
 	if (m_mesh->getNumVertices() == 0)
 	{
 		m_meshSwitch->setAllChildrenOff();
@@ -124,8 +122,6 @@ void OsgMeshRepresentation::doUpdate(double dt)
 		m_geometry->dirtyBound();
 		m_geometry->getBound();
 	}
-
-	++count;
 }
 
 bool OsgMeshRepresentation::doInitialize()
