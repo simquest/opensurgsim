@@ -70,6 +70,19 @@ TEST(LeapDeviceTest, HandType)
 	EXPECT_EQ(SurgSim::Device::HANDTYPE_RIGHT, device->getHandType());
 }
 
+TEST(LeapDeviceTest, TrackingMode)
+{
+	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+
+	EXPECT_EQ(SurgSim::Device::TRACKING_MODE_DESKTOP, device->getTrackingMode());
+
+	device->setTrackingMode(SurgSim::Device::TRACKING_MODE_HMD);
+
+	EXPECT_EQ(SurgSim::Device::TRACKING_MODE_HMD, device->getTrackingMode());
+}
+
+
 TEST(LeapDeviceTest, CreateDevicesWithSameName)
 {
 	std::shared_ptr<LeapDevice> device1 = std::make_shared<LeapDevice>("TestLeap");

@@ -21,7 +21,6 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-#include "SurgSim/Devices/Leap/LeapDevice.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Math/Matrix.h"
@@ -355,6 +354,20 @@ SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 
 
 	return builder.createData();
+}
+
+void LeapScaffold::setTrackingMode(LeapTrackingMode mode) {
+
+	// Sets tracking mode, either desktop or head-mounted display
+	// https://developer.leapmotion.com/vr
+	if (mode == TRACKING_MODE_HMD)
+	{
+		m_state->controller.setPolicyFlags(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
+	}
+	else
+	{
+		m_state->controller.setPolicyFlags(Leap::Controller::PolicyFlag::POLICY_DEFAULT);
+	}
 }
 
 };  // namespace Device
