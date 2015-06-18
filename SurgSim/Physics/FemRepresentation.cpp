@@ -46,16 +46,24 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, ComplianceWarping,
 									  getComplianceWarping, setComplianceWarping);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, FemElementType,
+									  getFemElementType, setFemElementType);
 }
 
 FemRepresentation::~FemRepresentation()
 {
 }
 
-void FemRepresentation::overrideFemElementType(const std::string& type)
+void FemRepresentation::setFemElementType(const std::string& type)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "You must override the type before initialzing";
-	m_femElementOverrideType = type;
+	SURGSIM_ASSERT(!isInitialized()) << "You must set the FemElement type before initializing";
+	m_femElementType = type;
+}
+
+const std::string& FemRepresentation::getFemElementType() const
+{
+	return m_femElementType;
 }
 
 bool FemRepresentation::doInitialize()

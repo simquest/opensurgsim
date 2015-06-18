@@ -20,6 +20,7 @@
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
+#include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/Fem1DLocalization.h"
 #include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
@@ -82,6 +83,8 @@ void Fem1DRepresentation::loadFem(const std::string& fileName)
 
 void Fem1DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 {
+	SURGSIM_ASSERT(!isInitialized()) << "The Fem cannot be set after initialization";
+
 	SURGSIM_ASSERT(mesh != nullptr) << "Mesh for Fem1DRepresentation cannot be a nullptr";
 	auto femMesh = std::dynamic_pointer_cast<Fem1D>(mesh);
 	SURGSIM_ASSERT(femMesh != nullptr)
@@ -98,6 +101,29 @@ void Fem1DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 	{
 		state->addBoundaryCondition(boundaryCondition);
 	}
+
+	// If we have elements, ensure that they are all of the same nature
+	if (femMesh->getNumElements() > 0)
+	{
+		const auto& e0 = femMesh->getElement(0);
+		for (auto const& e : femMesh->getElements())
+		{
+			SURGSIM_ASSERT(e->nodeIds.size() == e0->nodeIds.size()) <<
+				"Cannot mix and match elements of different nature." <<
+				" Found an element with " << e->nodeIds.size() << " nodes but was expecting " << e0->nodeIds.size();
+		}
+
+		// If the FemElement types hasn't been registered yet, let's set a default one
+		if (getFemElementType().empty())
+		{
+			if (e0->nodeIds.size() == 2)
+			{
+				Fem1DElementBeam beam;
+				setFemElementType(beam.getClassName());
+			}
+		}
+	}
+
 	FemRepresentation::setInitialState(state);
 }
 
@@ -181,15 +207,7 @@ bool Fem1DRepresentation::doInitialize()
 	for (auto& element : m_fem->getElements())
 	{
 		std::shared_ptr<FemElement> femElement;
-		if (m_femElementOverrideType.empty())
-		{
-			femElement = FemElement::getFactory().create(element->type, element);
-		}
-		else
-		{
-			femElement = FemElement::getFactory().create(m_femElementOverrideType, element);
-		}
-
+		femElement = FemElement::getFactory().create(getFemElementType(), element);
 		m_femElements.push_back(femElement);
 	}
 

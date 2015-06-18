@@ -14,9 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/Valid.h"
-#include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
-
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -123,8 +121,6 @@ void Fem2DPlyReaderDelegate::processFemElement(const std::string& elementName)
 		<< m_elementData.vertexCount << " vertices.";
 
 	auto femElement = std::make_shared<FemElementStructs::FemElement2DParameter>();
-	static Fem2DElementTriangle triangle;
-	femElement->type = triangle.getClassName();
 	femElement->nodeIds.resize(m_elementData.vertexCount);
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
 	m_mesh->addElement(femElement);
