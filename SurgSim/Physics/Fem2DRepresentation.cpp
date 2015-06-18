@@ -104,7 +104,9 @@ void Fem2DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 		auto e0 = femMesh->getElement(0);
 		for (auto const& e : femMesh->getElements())
 		{
-			SURGSIM_ASSERT(e->nodeIds.size() == e0->nodeIds.size()) << "Cannot mismatch element of different nature";
+			SURGSIM_ASSERT(e->nodeIds.size() == e0->nodeIds.size()) <<
+				"Cannot mix and match elements of different nature." <<
+				" Found an element with " << e->nodeIds.size() << " nodes but was expecting " << e0->nodeIds.size();
 		}
 
 		// If the FemElement types hasn't been registered yet, let's set a default one
