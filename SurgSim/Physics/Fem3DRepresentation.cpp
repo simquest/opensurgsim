@@ -114,7 +114,7 @@ void Fem3DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 	// If we have elements, ensure that they are all of the same nature
 	if (femMesh->getNumElements() > 0)
 	{
-		auto e0 = femMesh->getElement(0);
+		const auto& e0 = femMesh->getElement(0);
 		for (auto const& e : femMesh->getElements())
 		{
 			SURGSIM_ASSERT(e->nodeIds.size() == e0->nodeIds.size()) <<
@@ -134,11 +134,6 @@ void Fem3DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 			{
 				Fem3DElementCube cube;
 				setFemElementType(cube.getClassName());
-			}
-			else
-			{
-				SURGSIM_FAILURE() << "Invalid Element size. Expected a tetrahedron or cube, found a size " <<
-					e0->nodeIds.size();
 			}
 		}
 	}

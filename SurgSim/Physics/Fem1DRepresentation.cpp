@@ -105,7 +105,7 @@ void Fem1DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 	// If we have elements, ensure that they are all of the same nature
 	if (femMesh->getNumElements() > 0)
 	{
-		auto e0 = femMesh->getElement(0);
+		const auto& e0 = femMesh->getElement(0);
 		for (auto const& e : femMesh->getElements())
 		{
 			SURGSIM_ASSERT(e->nodeIds.size() == e0->nodeIds.size()) <<
@@ -116,10 +116,11 @@ void Fem1DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 		// If the FemElement types hasn't been registered yet, let's set a default one
 		if (getFemElementType().empty())
 		{
-			SURGSIM_ASSERT(e0->nodeIds.size() == 2) <<
-				"Invalid Element size. Expected a beam, found a size " << e0->nodeIds.size();
-			Fem1DElementBeam beam;
-			setFemElementType(beam.getClassName());
+			if (e0->nodeIds.size() == 2)
+			{
+				Fem1DElementBeam beam;
+				setFemElementType(beam.getClassName());
+			}
 		}
 	}
 
