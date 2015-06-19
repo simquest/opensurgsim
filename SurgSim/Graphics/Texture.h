@@ -40,6 +40,19 @@ public:
 
 	/// Removes the image from the texture
 	virtual void clearImage() = 0;
+
+	void setIsPointSprite(bool value)
+	{
+		m_isPointSprite = value;
+	}
+
+	bool isPointSprite()
+	{
+		return m_isPointSprite;
+	}
+
+private:
+	bool m_isPointSprite;
 };
 
 };  // namespace Graphics

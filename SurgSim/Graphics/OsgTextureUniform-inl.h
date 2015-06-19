@@ -25,6 +25,8 @@
 #include "SurgSim/Graphics/OsgTextureRectangle.h"
 #include "SurgSim/Graphics/OsgUniformTypes.h"
 
+#include "osg/PointSprite"
+
 namespace SurgSim
 {
 
@@ -91,6 +93,11 @@ void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 	m_unit = availableUnit;
 
 	SURGSIM_ASSERT(m_texture != nullptr) << "Tried to add uniform " << getName() << " without a valid Texture";
+	if(m_texture->isPointSprite())
+	{
+		osg::PointSprite* sprite = new osg::PointSprite();
+		stateSet->setTextureAttributeAndModes(m_unit, sprite, osg::StateAttribute::ON);
+	}
 	stateSet->setTextureAttributeAndModes(m_unit, m_texture->getOsgTexture(),
 										  osg::StateAttribute::ON);
 	SURGSIM_ASSERT(m_uniform->set(static_cast<int>(m_unit))) << "Failed to set OSG texture uniform unit!" <<
