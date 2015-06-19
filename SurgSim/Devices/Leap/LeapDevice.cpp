@@ -26,8 +26,7 @@ namespace Device
 LeapDevice::LeapDevice(const std::string& name) :
 	SurgSim::Input::CommonDevice(name, LeapScaffold::buildDeviceInputData()),
 	m_handType(HANDTYPE_RIGHT),
-	m_trackingMode(LEAP_TRACKING_MODE_DESKTOP),
-	m_requestImagesMode(false)
+	m_trackingMode(LEAP_TRACKING_MODE_DESKTOP)
 {
 }
 
@@ -71,34 +70,12 @@ LeapTrackingMode LeapDevice::getTrackingMode() const
 	}
 }
 
-void LeapDevice::setRequestImagesMode(bool flag)
-{
-	if (isInitialized())
-	{
-		m_scaffold->setRequestImagesMode(flag);
-	}
-	m_requestImagesMode = flag;
-}
-
-bool LeapDevice::getRequestImagesMode() const
-{
-	if (isInitialized())
-	{
-		return(m_scaffold->getRequestImagesMode());
-	}
-	else
-	{
-		return(m_requestImagesMode);
-	}
-}
-
 bool LeapDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized()) << getName() << "is already initialized, cannot initialize again.";
 	m_scaffold = LeapScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(isInitialized()) << getName() << " initialization failed, cannot get scaffold.";
 	m_scaffold->setTrackingMode(m_trackingMode);
-	m_scaffold->setRequestImagesMode(m_requestImagesMode);
 	return m_scaffold->registerDevice(this);
 }
 

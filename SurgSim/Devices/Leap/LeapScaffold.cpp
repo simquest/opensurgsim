@@ -147,7 +147,6 @@ struct LeapScaffold::StateData
 LeapScaffold::LeapScaffold() :
 	m_state(new StateData),
 	m_trackingMode(LEAP_TRACKING_MODE_DESKTOP),
-	m_requestImagesMode(false),
 	m_logger(SurgSim::Framework::Logger::getLogger("Leap"))
 {
 }
@@ -358,42 +357,22 @@ SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 	return builder.createData();
 }
 
-void LeapScaffold::enactPolicyMode() const
-{
-	Leap::Controller::PolicyFlag new_mode = Leap::Controller::PolicyFlag::POLICY_DEFAULT;
-
-	if (m_trackingMode == LEAP_TRACKING_MODE_HMD)
-	{
-		new_mode = static_cast<Leap::Controller::PolicyFlag>(new_mode |
-															 Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
-	}
-	if (m_requestImagesMode)
-	{
-		new_mode = static_cast<Leap::Controller::PolicyFlag>(new_mode | Leap::Controller::PolicyFlag::POLICY_IMAGES);
-	}
-	m_state->controller.setPolicyFlags(new_mode);
-}
-
 void LeapScaffold::setTrackingMode(LeapTrackingMode mode)
 {
 	m_trackingMode = mode;
-	enactPolicyMode();
+	if (mode == LEAP_TRACKING_MODE_HMD)
+	{
+		m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
+	}
+	else
+	{
+		m_state->controller.clearPolicy(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
+	}
 }
 
 LeapTrackingMode LeapScaffold::getTrackingMode() const
 {
 	return(m_trackingMode);
-}
-
-void LeapScaffold::setRequestImagesMode(bool flag)
-{
-	m_requestImagesMode = flag;
-	enactPolicyMode();
-}
-
-bool LeapScaffold::getRequestImagesMode() const
-{
-	return(m_requestImagesMode);
 }
 
 };  // namespace Device

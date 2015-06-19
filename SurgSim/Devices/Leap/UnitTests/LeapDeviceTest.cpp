@@ -91,27 +91,6 @@ TEST(LeapDeviceTest, TrackingMode)
 	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
 }
 
-TEST(LeapDeviceTest, RequestImagesMode)
-{
-	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-
-	// confirm default request camera images mode
-	EXPECT_EQ(false, device->getRequestImagesMode());
-
-	// test setting request camera images mode before initializing
-	device->setRequestImagesMode(true);
-	EXPECT_EQ(true, device->getRequestImagesMode());
-
-	// initializes device (create scaffold)
-	EXPECT_FALSE(device->isInitialized());
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
-	EXPECT_TRUE(device->isInitialized());
-
-	// test if request camera images mode was propogated down to scaffold after initialization
-	EXPECT_EQ(true, device->getRequestImagesMode());
-}
-
 TEST(LeapDeviceTest, CreateDevicesWithSameName)
 {
 	std::shared_ptr<LeapDevice> device1 = std::make_shared<LeapDevice>("TestLeap");

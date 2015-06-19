@@ -91,13 +91,6 @@ public:
 	/// \return current tracking mode
 	LeapTrackingMode getTrackingMode() const;
 
-	/// Requests camera images from Leap
-	void setRequestImagesMode(bool flag);
-
-	/// Returns current Boolean flag if application has requested camera images from Leap.
-	/// \return boolean: True if application has requested camera images, False if not.
-	bool getRequestImagesMode() const;
-
 	bool initialize() override;
 
 	bool finalize() override;
@@ -115,9 +108,6 @@ private:
 
 	/// Tracking mode
 	LeapTrackingMode m_trackingMode;
-
-	/// Request Camera Images mode
-	bool m_requestImagesMode;
 };
 
 };
