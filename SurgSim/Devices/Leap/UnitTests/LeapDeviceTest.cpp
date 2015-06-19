@@ -75,13 +75,42 @@ TEST(LeapDeviceTest, TrackingMode)
 	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 
-	EXPECT_EQ(SurgSim::Device::TRACKING_MODE_DESKTOP, device->getTrackingMode());
+	// confirm default tracking mode
+	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode());
 
-	device->setTrackingMode(SurgSim::Device::TRACKING_MODE_HMD);
+	// test setting tracking mode before initializing
+	device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_HMD);
+	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
 
-	EXPECT_EQ(SurgSim::Device::TRACKING_MODE_HMD, device->getTrackingMode());
+	// initializes device (create scaffold)
+	EXPECT_FALSE(device->isInitialized());
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
+	EXPECT_TRUE(device->isInitialized());
+
+	// test if tracking mode was propogated down to scaffold after initialization
+	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
 }
 
+TEST(LeapDeviceTest, RequestImagesMode)
+{
+	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+
+	// confirm default request camera images mode
+	EXPECT_EQ(false, device->getRequestImagesMode());
+
+	// test setting request camera images mode before initializing
+	device->setRequestImagesMode(true);
+	EXPECT_EQ(true, device->getRequestImagesMode());
+
+	// initializes device (create scaffold)
+	EXPECT_FALSE(device->isInitialized());
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
+	EXPECT_TRUE(device->isInitialized());
+
+	// test if request camera images mode was propogated down to scaffold after initialization
+	EXPECT_EQ(true, device->getRequestImagesMode());
+}
 
 TEST(LeapDeviceTest, CreateDevicesWithSameName)
 {

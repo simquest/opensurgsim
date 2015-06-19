@@ -85,11 +85,30 @@ private:
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 
-	/// Set Leap Tracking Mode
-	void setTrackingMode(LeapTrackingMode mode);
-
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
+
+	/// Enacts Tracking and Request Camera Images modes
+	void enactPolicyMode() const;
+
+	/// Set Leap Tracking Mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
+	void setTrackingMode(LeapTrackingMode mode);
+
+	/// Get Leap Tracking Mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
+	LeapTrackingMode getTrackingMode() const;
+
+	/// Requests camera images from Leap
+	void setRequestImagesMode(bool flag);
+
+	/// Returns current Boolean flag if application has requested camera images from Leap.
+	/// \return boolean: True if application has requested camera images, False if not.
+	bool getRequestImagesMode() const;
+
+	/// Tracking mode
+	LeapTrackingMode m_trackingMode;
+
+	/// Request Camera Images mode
+	bool m_requestImagesMode;
 
 	/// Logger used by the scaffold
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
