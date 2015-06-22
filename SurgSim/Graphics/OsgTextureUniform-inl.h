@@ -16,6 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_OSGTEXTUREUNIFORM_INL_H
 #define SURGSIM_GRAPHICS_OSGTEXTUREUNIFORM_INL_H
 
+#include <osg/PointSprite>
+
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Graphics/OsgTexture.h"
 #include "SurgSim/Graphics/OsgTexture1d.h"
@@ -24,8 +26,6 @@
 #include "SurgSim/Graphics/OsgTextureCubeMap.h"
 #include "SurgSim/Graphics/OsgTextureRectangle.h"
 #include "SurgSim/Graphics/OsgUniformTypes.h"
-
-#include "osg/PointSprite"
 
 namespace SurgSim
 {

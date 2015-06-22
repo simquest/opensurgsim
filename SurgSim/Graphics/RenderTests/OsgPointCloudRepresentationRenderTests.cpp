@@ -206,14 +206,13 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointSizeAndColor)
 TEST_F(OsgPointCloudRepresentationRenderTests, PointSprite)
 {
 	std::vector<Vector3d> vertices = makeCube();
-	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("Cloud");
-	graphics->setPointSize(1.0f);
+	graphics->setPointSize(10.0f);
 
 	graphics->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
-	for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
+	for (auto vertex : vertices)
 	{
-		graphics->getVertices()->addVertex(SurgSim::Graphics::PointCloud::VertexType(*it));
+		graphics->getVertices()->addVertex(SurgSim::Graphics::PointCloud::VertexType(vertex));
 	}
 
 	// Create material to transport the Textures
