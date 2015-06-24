@@ -347,14 +347,6 @@ double MockFemElement::getVolume(const OdeState& state) const
 	return 1;
 }
 
-void MockFemElement::addMatVec(double alphaM, double alphaD, double alphaK, const Vector& x, Vector* F) const
-{
-	Vector xLocal(3 * m_nodeIds.size()), fLocal;
-	SurgSim::Math::getSubVector(x, m_nodeIds, 3, &xLocal);
-	fLocal = (alphaM * m_M + alphaD * m_D + alphaK * m_K) * xLocal;
-	SurgSim::Math::addSubVector(fLocal, m_nodeIds, 3, F);
-}
-
 Vector MockFemElement::computeCartesianCoordinate(const OdeState& state, const Vector& barycentricCoordinate) const
 {
 	return SurgSim::Math::Vector3d::Zero();

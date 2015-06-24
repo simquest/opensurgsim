@@ -248,7 +248,6 @@ public:
 	void addNode(size_t nodeId);
 
 	double getVolume(const OdeState& state) const override;
-	void addMatVec(double alphaM, double alphaD, double alphaK, const Vector& x, Vector* F) const override;
 	Vector computeCartesianCoordinate(const OdeState& state, const Vector& barycentricCoordinate) const override;
 	Vector computeNaturalCoordinate(const SurgSim::Math::OdeState& state, const Vector& globalCoordinate) const
 	override;

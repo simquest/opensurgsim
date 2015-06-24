@@ -173,6 +173,53 @@ void FemElement::addFMDK(SurgSim::Math::Vector* F,
 	assembleMatrixBlocks(m_K, m_nodeIds, static_cast<int>(m_numDofPerNode), K, false);
 }
 
+void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const SurgSim::Math::Vector& x,
+						   SurgSim::Math::Vector* F) const
+{
+	using Math::addSubVector;
+	using Math::getSubVector;
+
+	if (alphaM == 0.0 && (!m_useDamping || alphaD == 0.0) && alphaK == 0.0)
+	{
+		return;
+	}
+
+	size_t size = getNumNodes() * getNumDofPerNode();
+	Math::Vector extractedX(size);
+	getSubVector(x, m_nodeIds, getNumDofPerNode(), &extractedX);
+	
+	// Accumulate the mass/damping/stiffness contribution
+	Math::Vector extractedResult;
+	extractedResult.setZero(size);
+	bool extractedResultUpdated = false;
+
+	// Adds the mass contribution
+	if (alphaM != 0.0)
+	{
+		extractedResultUpdated = true;
+		extractedResult += alphaM * (m_M * extractedX);
+	}
+
+	// Adds the damping contribution
+	if (m_useDamping && alphaD != 0.0)
+	{
+		extractedResultUpdated = true;
+		extractedResult += alphaD * (m_D * extractedX);
+	}
+
+	// Adds the stiffness contribution
+	if (alphaK != 0.0)
+	{
+		extractedResultUpdated = true;
+		extractedResult += alphaK * (m_K * extractedX);
+	}
+
+	if (extractedResultUpdated)
+	{
+		addSubVector(extractedResult, m_nodeIds, m_numDofPerNode, F);
+	}
+}
+
 bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)

@@ -135,35 +135,6 @@ void Fem1DElementBeam::initialize(const SurgSim::Math::OdeState& state)
 	computeStiffness(state);
 }
 
-void Fem1DElementBeam::addMatVec(double alphaM, double alphaD, double alphaK, const SurgSim::Math::Vector& x,
-								 SurgSim::Math::Vector* F) const
-{
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::getSubVector;
-
-	if (alphaM == 0.0 && alphaK == 0.0)
-	{
-		return;
-	}
-
-	Eigen::Matrix<double, 12, 1> extractedX;
-	getSubVector(x, m_nodeIds, 6, &extractedX);
-
-	// Adds the mass contribution
-	if (alphaM != 0.0)
-	{
-		addSubVector(alphaM * (m_M * extractedX), m_nodeIds, 6, F);
-	}
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK != 0.0)
-	{
-		addSubVector(alphaK * (m_K * extractedX), m_nodeIds, 6, F);
-	}
-}
-
 void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state)
 {
 	double& L = m_restLength;

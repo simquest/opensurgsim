@@ -164,7 +164,7 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	virtual void addMatVec(double alphaM, double alphaD, double alphaK,
-						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) const = 0;
+						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) const;
 
 	/// Determines whether a given natural coordinate is valid
 	/// \param naturalCoordinate Coordinate to check

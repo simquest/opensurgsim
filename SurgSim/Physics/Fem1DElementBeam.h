@@ -75,9 +75,6 @@ public:
 	/// \param enabled Boolean determining whether shearing is enabled
 	void setShearingEnabled(bool enabled);
 
-	void addMatVec(double alphaM, double alphaD, double alphaK, const SurgSim::Math::Vector& x,
-				   SurgSim::Math::Vector* F) const override;
-
 	SurgSim::Math::Vector computeCartesianCoordinate(
 			const SurgSim::Math::OdeState& state,
 			const SurgSim::Math::Vector& naturalCoordinate) const override;

@@ -317,37 +317,6 @@ void Fem3DElementCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state
 	*m += (epsilon.weight * eta.weight * mu.weight * detJ * m_rho) * phi.transpose() * phi;
 }
 
-void Fem3DElementCube::addMatVec(double alphaM, double alphaD, double alphaK,
-								 const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) const
-{
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::getSubVector;
-
-	if (alphaM == 0.0 && alphaK == 0.0)
-	{
-		return;
-	}
-
-	Eigen::Matrix<double, 24, 1> xElement, fElement;
-	getSubVector(x, m_nodeIds, 3, &xElement);
-
-	// Adds the mass contribution
-	if (alphaM)
-	{
-		fElement = alphaM * (m_M * xElement);
-		addSubVector(fElement, m_nodeIds, 3, F);
-	}
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK)
-	{
-		fElement = alphaK * (m_K * xElement);
-		addSubVector(fElement, m_nodeIds, 3, F);
-	}
-}
-
 double Fem3DElementCube::getVolume(const SurgSim::Math::OdeState& state) const
 {
 	using SurgSim::Math::gaussQuadrature2Points;

@@ -207,37 +207,6 @@ void Fem3DElementTetrahedron::computeStiffness(const SurgSim::Math::OdeState& st
 	*k = ((*k) + (*k).transpose()) * 0.5;
 }
 
-void Fem3DElementTetrahedron::addMatVec(double alphaM, double alphaD, double alphaK,
-										const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) const
-{
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::getSubVector;
-
-	if (alphaM == 0.0 && alphaK == 0.0)
-	{
-		return;
-	}
-
-	Eigen::Matrix<double, 12, 1> xLoc, resLoc;
-	getSubVector(x, m_nodeIds, 3, &xLoc);
-
-	// Adds the mass contribution
-	if (alphaM)
-	{
-		resLoc = alphaM * (m_M * xLoc);
-		addSubVector(resLoc, m_nodeIds, 3, F);
-	}
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK)
-	{
-		resLoc = alphaK * (m_K * xLoc);
-		addSubVector(resLoc, m_nodeIds, 3, F);
-	}
-}
-
 double Fem3DElementTetrahedron::getVolume(const SurgSim::Math::OdeState& state) const
 {
 	/// Computes the tetrahedron volume 1/6 * | 1 p0x p0y p0z |

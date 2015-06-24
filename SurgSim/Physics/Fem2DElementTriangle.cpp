@@ -120,37 +120,6 @@ void Fem2DElementTriangle::initialize(const SurgSim::Math::OdeState& state)
 	computeStiffness(state, &m_K);
 }
 
-void Fem2DElementTriangle::addMatVec(double alphaM, double alphaD, double alphaK, const SurgSim::Math::Vector& x,
-									 SurgSim::Math::Vector* F) const
-{
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::getSubVector;
-
-	if (alphaM == 0.0 && alphaK == 0.0)
-	{
-		return;
-	}
-
-	Eigen::Matrix<double, 18, 1> extractedX, extractedResult;
-	getSubVector(x, m_nodeIds, 6, &extractedX);
-
-	// Adds the mass contribution
-	if (alphaM != 0.0)
-	{
-		extractedResult = alphaM * (m_M * extractedX);
-		addSubVector(extractedResult, m_nodeIds, 6, F);
-	}
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK != 0.0)
-	{
-		extractedResult = alphaK * (m_K * extractedX);
-		addSubVector(extractedResult, m_nodeIds, 6, F);
-	}
-}
-
 void Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeState& state,
 													Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {

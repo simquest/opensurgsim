@@ -64,9 +64,6 @@ public:
 
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
-	void addMatVec(double alphaM, double alphaD, double alphaK,
-				   const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) const override;
-
 protected:
 	/// Compute the rotation, mass and stiffness matrices of the element from the given state
 	/// \param state The state to compute the rotation and jacobians from

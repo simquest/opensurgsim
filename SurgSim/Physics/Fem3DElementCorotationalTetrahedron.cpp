@@ -75,33 +75,6 @@ void Fem3DElementCorotationalTetrahedron::initialize(const SurgSim::Math::OdeSta
 	updateFMDK(state, Math::ODEEQUATIONUPDATE_FMDK);
 }
 
-void Fem3DElementCorotationalTetrahedron::addMatVec(double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) const
-{
-	if (alphaM == 0.0 && alphaK == 0.0)
-	{
-		return;
-	}
-
-	Eigen::Matrix<double, 12, 1> vectorLocal, resultLocal = Eigen::Matrix<double, 12, 1>::Zero();
-	getSubVector(vector, m_nodeIds, 3, &vectorLocal);
-
-	// Adds the mass contribution
-	if (alphaM != 0.0)
-	{
-		resultLocal += alphaM * (m_M * vectorLocal);
-	}
-
-	// Adds the stiffness contribution
-	if (alphaK != 0.0)
-	{
-		resultLocal += alphaK * (m_K * vectorLocal);
-	}
-
-	// Assembly in the global vector
-	addSubVector(resultLocal, m_nodeIds, 3, result);
-}
-
 void Fem3DElementCorotationalTetrahedron::doUpdateFMDK(const Math::OdeState& state, int options)
 {
 	SurgSim::Math::Matrix33d* rotation = nullptr;
