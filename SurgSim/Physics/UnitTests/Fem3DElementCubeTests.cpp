@@ -20,6 +20,7 @@
 
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
@@ -887,19 +888,22 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 							   static_cast<SparseMatrix::Index>(cube->getNumDofPerNode()), &stiffnessMatrix, true);
 	stiffnessMatrix.makeCompressed();
 
+	// Update the internal f, M, D, K variables.
+	cube->updateFMDK(m_restState, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
-	cube->addForce(m_restState, &forceVector);
+	cube->addForce(&forceVector);
 	EXPECT_TRUE(forceVector.isZero());
 
-	cube->addMass(m_restState, &massMatrix);
+	cube->addMass(&massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix)) <<
 			"Expected mass matrix :" << std::endl << m_expectedMassMatrix  << std::endl << std::endl <<
 			"Mass matrix :"  << std::endl << massMatrix << std::endl;
 
-	cube->addDamping(m_restState, &dampingMatrix);
+	cube->addDamping(&dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
 
-	cube->addStiffness(m_restState, &stiffnessMatrix);
+	cube->addStiffness(&stiffnessMatrix);
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix))  <<
 			"Expected stiffness matrix :" << std::endl << m_expectedStiffnessMatrix  << std::endl << std::endl <<
 			"Stiffness matrix :"  << std::endl << stiffnessMatrix << std::endl;
@@ -909,7 +913,7 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	clearMatrix(&dampingMatrix);
 	clearMatrix(&stiffnessMatrix);
 
-	cube->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
+	cube->addFMDK(&forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());
 	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix));
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
@@ -917,28 +921,28 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
-	cube->addMatVec(m_restState, 1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	cube->addMatVec(m_restState, 0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedDampingMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	cube->addMatVec(m_restState, 0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	cube->addMatVec(m_restState, 1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		double expectedCoef = 1.0 * m_expectedMassMatrix.row(rowId).sum() +
