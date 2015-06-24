@@ -250,7 +250,7 @@ protected:
 
 	/// The damping matrix.
 	SurgSim::Math::Matrix m_D;
-	
+
 	/// Flag to specify of the damping is used.
 	bool m_useDamping;
 

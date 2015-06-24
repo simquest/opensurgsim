@@ -187,7 +187,7 @@ void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const Su
 	size_t size = getNumNodes() * getNumDofPerNode();
 	Math::Vector extractedX(size);
 	getSubVector(x, m_nodeIds, getNumDofPerNode(), &extractedX);
-	
+
 	// Accumulate the mass/damping/stiffness contribution
 	Math::Vector extractedResult;
 	extractedResult.setZero(size);
