@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 
@@ -74,6 +75,20 @@ void Fem3DElementTetrahedron::initializeMembers()
 	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 }
 
+void Fem3DElementTetrahedron::doUpdateFMDK(const Math::OdeState& state, int options)
+{
+	if (options & Math::ODEEQUATIONUPDATE_F)
+	{
+		Eigen::Matrix<double, 12, 1> x;
+
+		// K.U = Fext
+		// K.(x - x0) = Fext
+		// 0 = Fext + Fint     with Fint = -K.(x - x0)
+		getSubVector(state.getPositions(), m_nodeIds, 3, &x);
+		m_f = -m_K * (x - m_x0);
+	}
+}
+
 void Fem3DElementTetrahedron::initialize(const SurgSim::Math::OdeState& state)
 {
 	// Test the validity of the physical parameters
@@ -108,27 +123,8 @@ void Fem3DElementTetrahedron::initialize(const SurgSim::Math::OdeState& state)
 	computeStiffness(state, &m_K);
 }
 
-void Fem3DElementTetrahedron::addForce(const SurgSim::Math::OdeState& state,
-									   const Eigen::Matrix<double, 12, 12>& k, SurgSim::Math::Vector* F, double scale)
-{
-	Eigen::Matrix<double, 12, 1> x, f;
-
-	// K.U = Fext
-	// K.(x - x0) = Fext
-	// 0 = Fext + Fint     with Fint = -K.(x - x0)
-	getSubVector(state.getPositions(), m_nodeIds, 3, &x);
-	f = (- scale) * k * (x - m_x0);
-	addSubVector(f, m_nodeIds, 3, F);
-}
-
-void Fem3DElementTetrahedron::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-									   double scale)
-{
-	addForce(state, m_K, F, scale);
-}
-
 void Fem3DElementTetrahedron::computeMass(const SurgSim::Math::OdeState& state,
-										  Eigen::Matrix<double, 12, 12>* M)
+										  SurgSim::Math::Matrix* M)
 {
 	// From Przemieniecki book
 	// -> section 11 "Inertia properties of structural elements
@@ -172,20 +168,8 @@ void Fem3DElementTetrahedron::computeMass(const SurgSim::Math::OdeState& state,
 	}
 }
 
-
-void Fem3DElementTetrahedron::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
-									  double scale)
-{
-	assembleMatrixBlocks(m_M * scale, m_nodeIds, 3, M, false);
-}
-
-void Fem3DElementTetrahedron::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-										 double scale)
-{
-}
-
 void Fem3DElementTetrahedron::computeStiffness(const SurgSim::Math::OdeState& state,
-											   Eigen::Matrix<double, 12, 12>* k)
+											   SurgSim::Math::Matrix* k)
 {
 	m_Em.setZero();
 	m_strain.setZero();
@@ -223,33 +207,8 @@ void Fem3DElementTetrahedron::computeStiffness(const SurgSim::Math::OdeState& st
 	*k = ((*k) + (*k).transpose()) * 0.5;
 }
 
-void Fem3DElementTetrahedron::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-										   double scale)
-{
-	assembleMatrixBlocks(m_K * scale, getNodeIds(), 3, K, false);
-}
-
-void Fem3DElementTetrahedron::addFMDK(const SurgSim::Math::OdeState& state,
-									  SurgSim::Math::Vector* F,
-									  SurgSim::Math::SparseMatrix* M,
-									  SurgSim::Math::SparseMatrix* D,
-									  SurgSim::Math::SparseMatrix* K)
-{
-	// Assemble the mass matrix
-	addMass(state, M);
-
-	// No damping matrix as we are using linear elasticity (not visco-elasticity)
-
-	// Assemble the stiffness matrix
-	addStiffness(state, K);
-
-	// Assemble the force vector
-	addForce(state, F);
-}
-
-void Fem3DElementTetrahedron::addMatVec(const SurgSim::Math::OdeState& state,
-										double alphaM, double alphaD, double alphaK,
-										const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
+void Fem3DElementTetrahedron::addMatVec(double alphaM, double alphaD, double alphaK,
+										const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) const
 {
 	using SurgSim::Math::addSubVector;
 	using SurgSim::Math::getSubVector;

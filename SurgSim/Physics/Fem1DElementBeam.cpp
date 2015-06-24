@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 
@@ -130,57 +131,12 @@ void Fem1DElementBeam::initialize(const SurgSim::Math::OdeState& state)
 	computeInitialRotation(state);
 
 	// Pre-compute the mass and stiffness matrix
-	computeMass(state, &m_M);
-	computeStiffness(state, &m_K);
+	computeMass(state);
+	computeStiffness(state);
 }
 
-void Fem1DElementBeam::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
-{
-	Eigen::Matrix<double, 12, 1> x, f;
-
-	// K.U = F_ext
-	// K.(x - x0) = F_ext
-	// 0 = F_ext + F_int, with F_int = -K.(x - x0)
-	getSubVector(state.getPositions(), m_nodeIds, 6, &x);
-	f = (-scale) * m_K * (x - m_x0);
-	addSubVector(f, m_nodeIds, 6, F);
-}
-
-void Fem1DElementBeam::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
-							   double scale)
-{
-	assembleMatrixBlocks(m_M * scale, m_nodeIds, 6, M, false);
-}
-
-void Fem1DElementBeam::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-								  double scale)
-{
-}
-
-void Fem1DElementBeam::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-									double scale)
-{
-	assembleMatrixBlocks(m_K * scale, getNodeIds(), 6, K, false);
-}
-
-void Fem1DElementBeam::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-							   SurgSim::Math::SparseMatrix* M, SurgSim::Math::SparseMatrix* D,
-							   SurgSim::Math::SparseMatrix* K)
-{
-	// Assemble the mass matrix
-	addMass(state, M);
-
-	// No damping matrix as we are using linear elasticity (not visco-elasticity)
-
-	// Assemble the stiffness matrix
-	addStiffness(state, K);
-
-	// Assemble the force vector
-	addForce(state, F);
-}
-
-void Fem1DElementBeam::addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD,
-								 double alphaK, const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
+void Fem1DElementBeam::addMatVec(double alphaM, double alphaD, double alphaK, const SurgSim::Math::Vector& x,
+								 SurgSim::Math::Vector* F) const
 {
 	using SurgSim::Math::addSubVector;
 	using SurgSim::Math::getSubVector;
@@ -208,8 +164,7 @@ void Fem1DElementBeam::addMatVec(const SurgSim::Math::OdeState& state, double al
 	}
 }
 
-void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state,
-								   Eigen::Matrix<double, 12, 12>* M)
+void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state)
 {
 	double& L = m_restLength;
 	double L2 = L * L;
@@ -275,8 +230,7 @@ void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state,
 	m_M = m_R0 * m_MLocal * m_R0.transpose();
 }
 
-void Fem1DElementBeam::computeStiffness(const SurgSim::Math::OdeState& state,
-										Eigen::Matrix<double, 12, 12>* k)
+void Fem1DElementBeam::computeStiffness(const SurgSim::Math::OdeState& state)
 {
 	double& L = m_restLength;
 	double L2 = L * L;
@@ -399,6 +353,20 @@ SurgSim::Math::Vector Fem1DElementBeam::computeCartesianCoordinate(
 	}
 
 	return cartesianCoordinate;
+}
+
+void Fem1DElementBeam::doUpdateFMDK(const Math::OdeState& state, int options)
+{
+	if (options & SurgSim::Math::OdeEquationUpdate::ODEEQUATIONUPDATE_F)
+	{
+		Eigen::Matrix<double, 12, 1> x;
+
+		// K.U = F_ext
+		// K.(x - x0) = F_ext
+		// 0 = F_ext + F_int, with F_int = -K.(x - x0)
+		getSubVector(state.getPositions(), m_nodeIds, 6, &x);
+		m_f = -m_K * (x - m_x0);
+	}
 }
 
 SurgSim::Math::Vector Fem1DElementBeam::computeNaturalCoordinate(

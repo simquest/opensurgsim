@@ -334,7 +334,7 @@ void FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addMass(state, &m_M);
+		(*femElement)->addMass(&m_M);
 	}
 }
 
@@ -351,7 +351,7 @@ void FemRepresentation::computeD(const SurgSim::Math::OdeState& state)
 	{
 		for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 		{
-			(*femElement)->addMass(state, &m_D, rayleighMass);
+			(*femElement)->addMass(&m_D, rayleighMass);
 		}
 	}
 
@@ -360,14 +360,14 @@ void FemRepresentation::computeD(const SurgSim::Math::OdeState& state)
 	{
 		for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 		{
-			(*femElement)->addStiffness(state, &m_D, rayleighStiffness);
+			(*femElement)->addStiffness(&m_D, rayleighStiffness);
 		}
 	}
 
 	// D += FemElements damping matrix
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addDamping(state, &m_D);
+		(*femElement)->addDamping(&m_D);
 	}
 
 	// Add external generalized damping
@@ -384,7 +384,7 @@ void FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addStiffness(state, &m_K);
+		(*femElement)->addStiffness(&m_K);
 	}
 
 	// Add external generalized stiffness
@@ -411,7 +411,7 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 	// Add all the FemElement contribution to f, M, D, K
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addFMDK(state, &m_f, &m_M, &m_D, &m_K);
+		(*femElement)->addFMDK(&m_f, &m_M, &m_D, &m_K);
 	}
 
 	// Add the Rayleigh damping matrix
@@ -474,7 +474,7 @@ void FemRepresentation::addRayleighDampingForce(
 			// Otherwise, we loop through each fem element to compute its contribution
 			for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 			{
-				(*femElement)->addMatVec(state, - scale * rayleighMass, 0.0, 0.0, v, force);
+				(*femElement)->addMatVec(- scale * rayleighMass, 0.0, 0.0, v, force);
 			}
 		}
 	}
@@ -493,7 +493,7 @@ void FemRepresentation::addRayleighDampingForce(
 			// Otherwise, we loop through each fem element to compute its contribution
 			for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 			{
-				(*femElement)->addMatVec(state, 0.0, 0.0, - scale * rayleighStiffness, v, force);
+				(*femElement)->addMatVec(0.0, 0.0, - scale * rayleighStiffness, v, force);
 			}
 		}
 	}
@@ -505,7 +505,7 @@ void FemRepresentation::addFemElementsForce(SurgSim::Math::Vector* force,
 {
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addForce(state, force, scale);
+		(*femElement)->addForce(force, scale);
 	}
 }
 
