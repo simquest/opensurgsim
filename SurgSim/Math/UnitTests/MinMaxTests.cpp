@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the LinearSparseSolveAndInverse.cpp functions.
+/// Tests for the MinMax functions.
 
 #include <gtest/gtest.h>
 
@@ -42,19 +42,19 @@ TEST_F(MinMaxTests, TwoEntriesTests)
 	double doubleMin;
 	double doubleMax;
 
-	MinMax(minFloatVal, maxFloatVal, floatMin, floatMax);
+	minMax(minFloatVal, maxFloatVal, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	MinMax(maxFloatVal, minFloatVal, floatMin, floatMax);
+	minMax(maxFloatVal, minFloatVal, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	MinMax(minDoubleVal, maxDoubleVal, doubleMin, doubleMax);
+	minMax(minDoubleVal, maxDoubleVal, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 
-	MinMax(maxDoubleVal, minDoubleVal, doubleMin, doubleMax);
+	minMax(maxDoubleVal, minDoubleVal, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 };
@@ -73,51 +73,51 @@ TEST_F(MinMaxTests, ThreeEntriesTests)
 	double doubleMin;
 	double doubleMax;
 
-	MinMax(minFloatVal, maxFloatVal, midFloatVal, floatMin, floatMax);
+	minMax(minFloatVal, maxFloatVal, midFloatVal, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	MinMax(maxFloatVal, minFloatVal, midFloatVal, floatMin, floatMax);
+	minMax(maxFloatVal, minFloatVal, midFloatVal, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	MinMax(maxFloatVal, midFloatVal, minFloatVal, floatMin, floatMax);
+	minMax(maxFloatVal, midFloatVal, minFloatVal, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	MinMax(minFloatVal, midFloatVal, maxFloatVal, floatMin, floatMax);
+	minMax(minFloatVal, midFloatVal, maxFloatVal, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	MinMax(midFloatVal, maxFloatVal, minFloatVal, floatMin, floatMax);
+	minMax(midFloatVal, maxFloatVal, minFloatVal, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	MinMax(midFloatVal, minFloatVal, maxFloatVal, floatMin, floatMax);
+	minMax(midFloatVal, minFloatVal, maxFloatVal, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	MinMax(minDoubleVal, maxDoubleVal, midDoubleVal, doubleMin, doubleMax);
+	minMax(minDoubleVal, maxDoubleVal, midDoubleVal, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 
-	MinMax(maxDoubleVal, minDoubleVal, midDoubleVal, doubleMin, doubleMax);
+	minMax(maxDoubleVal, minDoubleVal, midDoubleVal, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 
-	MinMax(maxDoubleVal, midDoubleVal, minDoubleVal, doubleMin, doubleMax);
+	minMax(maxDoubleVal, midDoubleVal, minDoubleVal, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 
-	MinMax(minDoubleVal, midDoubleVal, maxDoubleVal, doubleMin, doubleMax);
+	minMax(minDoubleVal, midDoubleVal, maxDoubleVal, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 
-	MinMax(midDoubleVal, maxDoubleVal, minDoubleVal, doubleMin, doubleMax);
+	minMax(midDoubleVal, maxDoubleVal, minDoubleVal, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 
-	MinMax(midDoubleVal, minDoubleVal, maxDoubleVal, doubleMin, doubleMax);
+	minMax(midDoubleVal, minDoubleVal, maxDoubleVal, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 };
@@ -152,13 +152,13 @@ TEST_F(MinMaxTests, FourEntriesTests)
 						{
 							if ((i4 != i1) && (i4 != i2) && (i4 != i3))
 							{
-								MinMax(floatValues[i1], floatValues[i2], floatValues[i3],
-									   floatValues[i4], floatMin, floatMax);
+								minMax(floatValues[i1], floatValues[i2], floatValues[i3],
+									   floatValues[i4], &floatMin, &floatMax);
 								EXPECT_EQ(minFloatVal, floatMin);
 								EXPECT_EQ(maxFloatVal, floatMax);
 
-								MinMax(doubleValues[i1], doubleValues[i2], doubleValues[i3],
-									   doubleValues[i4], doubleMin, doubleMax);
+								minMax(doubleValues[i1], doubleValues[i2], doubleValues[i3],
+									   doubleValues[i4], &doubleMin, &doubleMax);
 								EXPECT_EQ(minDoubleVal, doubleMin);
 								EXPECT_EQ(maxDoubleVal, doubleMax);
 							}
@@ -204,13 +204,13 @@ TEST_F(MinMaxTests, FiveEntriesTests)
 								{
 									if ((i5 != i1) && (i5 != i2) && (i5 != i3) && (i5 != i4))
 									{
-										MinMax(floatValues[i1], floatValues[i2], floatValues[i3],
-											   floatValues[i4], floatValues[i5], floatMin, floatMax);
+										minMax(floatValues[i1], floatValues[i2], floatValues[i3],
+											   floatValues[i4], floatValues[i5], &floatMin, &floatMax);
 										EXPECT_EQ(minFloatVal, floatMin);
 										EXPECT_EQ(maxFloatVal, floatMax);
 
-										MinMax(doubleValues[i1], doubleValues[i2], doubleValues[i3],
-											   doubleValues[i4], doubleValues[i5], doubleMin, doubleMax);
+										minMax(doubleValues[i1], doubleValues[i2], doubleValues[i3],
+											   doubleValues[i4], doubleValues[i5], &doubleMin, &doubleMax);
 										EXPECT_EQ(minDoubleVal, doubleMin);
 										EXPECT_EQ(maxDoubleVal, doubleMax);
 									}
@@ -240,17 +240,17 @@ TEST_F(MinMaxTests, AribtraryEntriesTests)
 	double doubleMin;
 	double doubleMax;
 
-	ASSERT_ANY_THROW(MinMax(floatValues, 0, floatMin, floatMax));
-	ASSERT_ANY_THROW(MinMax(floatValues, -1, floatMin, floatMax));
+	ASSERT_THROW(minMax(floatValues, 0, &floatMin, &floatMax), SurgSim::Framework::AssertionFailure);
+	ASSERT_THROW(minMax(floatValues, -1, &floatMin, &floatMax), SurgSim::Framework::AssertionFailure);
 
-	MinMax(floatValues, numValues, floatMin, floatMax);
+	minMax(floatValues, numValues, &floatMin, &floatMax);
 	EXPECT_EQ(minFloatVal, floatMin);
 	EXPECT_EQ(maxFloatVal, floatMax);
 
-	ASSERT_ANY_THROW(MinMax(doubleValues, 0, doubleMin, doubleMax));
-	ASSERT_ANY_THROW(MinMax(doubleValues, -1, doubleMin, doubleMax));
+	ASSERT_THROW(minMax(doubleValues, 0, &doubleMin, &doubleMax), SurgSim::Framework::AssertionFailure);
+	ASSERT_THROW(minMax(doubleValues, -1, &doubleMin, &doubleMax), SurgSim::Framework::AssertionFailure);
 
-	MinMax(doubleValues, numValues, doubleMin, doubleMax);
+	minMax(doubleValues, numValues, &doubleMin, &doubleMax);
 	EXPECT_EQ(minDoubleVal, doubleMin);
 	EXPECT_EQ(maxDoubleVal, doubleMax);
 };

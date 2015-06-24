@@ -21,7 +21,6 @@ set(SURGSIM_MATH_SOURCES
 	CylinderShape.cpp
 	DoubleSidedPlaneShape.cpp
 	GaussLegendreQuadrature.cpp
-	IntervalArithmetic.cpp
 	LinearSolveAndInverse.cpp
 	LinearSparseSolveAndInverse.cpp
 	MathConvert.cpp

@@ -14,7 +14,9 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the LinearSparseSolveAndInverse.cpp functions.
+/// Tests for the IntervalArithmetic functions.
+
+#include <array>
 
 #include <gtest/gtest.h>
 
@@ -26,11 +28,37 @@ namespace SurgSim
 namespace Math
 {
 
+namespace
+{
+double epsilon = 1.0e-10;
+}
+
 class IntervalArithmeticTests : public ::testing::Test
 {
 public:
 	typedef Interval_nD<double, 2> IntervalDouble2;
 	typedef Interval_nD<double, 3> IntervalDouble3;
+
+	Interval<double> testIntervalMoveConstructor(Interval<double> dummy)
+	{
+		Interval<double> ret;
+		ret = dummy;
+		return ret;
+	}
+
+	Interval_nD<double, 2> testIntervalnDMoveConstructor(Interval_nD<double, 2> dummy)
+	{
+		Interval_nD<double, 2> ret;
+		ret = dummy;
+		return ret;
+	}
+
+	Interval_nD<double, 3> testInterval3DMoveConstructor(Interval_nD<double, 3> dummy)
+	{
+		Interval_nD<double, 3> ret;
+		ret = dummy;
+		return ret;
+	}
 };
 
 TEST_F(IntervalArithmeticTests, IntervalInitializationTests)
@@ -43,6 +71,9 @@ TEST_F(IntervalArithmeticTests, IntervalInitializationTests)
 	EXPECT_NO_THROW(Interval<double> a(b));
 	Interval<double> a(b);
 	EXPECT_TRUE(a == b);
+	EXPECT_NO_THROW(testIntervalMoveConstructor(b));
+	Interval<double> f = testIntervalMoveConstructor(b);
+	EXPECT_TRUE(f == b);
 
 	// Assignment and equal/not equal tests
 	Interval<double> c;
@@ -51,6 +82,9 @@ TEST_F(IntervalArithmeticTests, IntervalInitializationTests)
 	c = a;
 	EXPECT_FALSE(c != b);
 	EXPECT_TRUE(c == b);
+	Interval<double> e;
+	e = (b * 1);
+	EXPECT_TRUE(e == b);
 
 	// Reordering initializers
 	EXPECT_TRUE(b == SurgSim::Math::Interval<double>::minToMax(100, 9.8));
@@ -65,8 +99,8 @@ TEST_F(IntervalArithmeticTests, IntervalInitializationTests)
 TEST_F(IntervalArithmeticTests, RangeTests)
 {
 	Interval<double> middle(10.0, 20.0);
-	Interval<double> low(5.0, 9.999999999);
-	Interval<double> high(20.00000001, 40.0);
+	Interval<double> low(5.0, 10 - epsilon);
+	Interval<double> high(20 + epsilon, 40.0);
 	Interval<double> lowOverlap(5.0, 10.0);
 	Interval<double> highOverlap(20.0, 40.0);
 	Interval<double> contained(12.0, 15.0);
@@ -81,8 +115,8 @@ TEST_F(IntervalArithmeticTests, RangeTests)
 	EXPECT_TRUE(middle.overlapsWith(contains));
 
 	// Contains value ...
-	EXPECT_FALSE(middle.contains(9.999999999));
-	EXPECT_FALSE(middle.contains(20.00000001));
+	EXPECT_FALSE(middle.contains(10 - epsilon));
+	EXPECT_FALSE(middle.contains(20 + epsilon));
 	EXPECT_TRUE(middle.contains(10.0));
 	EXPECT_TRUE(middle.contains(20.0));
 	EXPECT_TRUE(middle.contains(15.0));
@@ -90,8 +124,8 @@ TEST_F(IntervalArithmeticTests, RangeTests)
 	Interval<double> aroundZero(-5.0, 13.0);
 	Interval<double> zeroLow(-5.0, 0.0);
 	Interval<double> zeroHigh(0.0, 13.0);
-	Interval<double> almostZeroLow(-5.0, -0.000000001);
-	Interval<double> almostZeroHigh(0.00000001, 13.0);
+	Interval<double> almostZeroLow(-5.0, -epsilon);
+	Interval<double> almostZeroHigh(epsilon, 13.0);
 
 	// Contains zero ...
 	EXPECT_FALSE(middle.containsZero());
@@ -240,10 +274,10 @@ TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
 {
 	// Constructor tests
 	Interval<double> testInterval(3.7, 3.8);
-	double minimums[2] = {1.1, 4.4};
-	double maximums[2] = {4.1, 3.2};
+	std::array<double, 2> minimums = {1.1, 4.4};
+	std::array<double, 2> maximums = {4.1, 3.2};
 
-	Interval<double> testIntervalArray[2];
+	std::array<Interval<double>, 2> testIntervalArray;
 	testIntervalArray[0] = Interval<double> (1.0, 2.0);
 	testIntervalArray[1] = Interval<double> (2.0, 3.0);
 
@@ -255,6 +289,9 @@ TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
 	IntervalDouble2 b(minimums, maximums);
 	IntervalDouble2 a(b);
 	EXPECT_TRUE(a == b);
+	EXPECT_NO_THROW(testIntervalnDMoveConstructor(b));
+	IntervalDouble2 f = testIntervalnDMoveConstructor(b);
+	EXPECT_TRUE(f == b);
 
 	// Assignment and equal/not equal tests
 	IntervalDouble2 c;
@@ -263,6 +300,9 @@ TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
 	c = a;
 	EXPECT_FALSE(c != b);
 	EXPECT_TRUE(c == b);
+	IntervalDouble2 e;
+	e = (b * c);
+	EXPECT_TRUE(e == (b * c));
 
 	// Getting components and the reordering initializer
 	Interval<double> axis0(b.getAxis(0));
@@ -274,14 +314,14 @@ TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
 
 TEST_F(IntervalArithmeticTests, IntervalnDRangeTests)
 {
-	double minimumsShape[2] = {1.1, 3.2};
-	double maximumsShape[2] = {4.1, 4.4};
+	std::array<double, 2> minimumsShape = {1.1, 3.2};
+	std::array<double, 2> maximumsShape = {4.1, 4.4};
 
-	double noOverlapMin[2] = {1.1, 4.5};
-	double noOverlapMax[2] = {4.5, 4.8};
+	std::array<double, 2> noOverlapMin = {1.1, 4.5};
+	std::array<double, 2> noOverlapMax = {4.5, 4.8};
 
-	double overlapMin[2] = {1.7, 2.0};
-	double overlapMax[2] = {4.3, 4.7};
+	std::array<double, 2> overlapMin = {1.7, 2.0};
+	std::array<double, 2> overlapMax = {4.3, 4.7};
 
 	IntervalDouble2 shape(minimumsShape, maximumsShape);
 
@@ -291,11 +331,11 @@ TEST_F(IntervalArithmeticTests, IntervalnDRangeTests)
 
 TEST_F(IntervalArithmeticTests, IntervalnDExtendRangeTests)
 {
-	double minimumsShape[2] = {1.1, 3.2};
-	double maximumsShape[2] = {4.1, 4.4};
+	std::array<double, 2> minimumsShape = {1.1, 3.2};
+	std::array<double, 2> maximumsShape = {4.1, 4.4};
 
-	double finalMin[2] = { -5.9, -3.8};
-	double finalMax[2] = {11.1, 11.4};
+	std::array<double, 2> finalMin = { -5.9, -3.8};
+	std::array<double, 2> finalMax = {11.1, 11.4};
 
 	IntervalDouble2 shape(minimumsShape, maximumsShape);
 	shape.addThickness(7.0);
@@ -304,14 +344,14 @@ TEST_F(IntervalArithmeticTests, IntervalnDExtendRangeTests)
 
 TEST_F(IntervalArithmeticTests, IntervalnDOperatorTests)
 {
-	double minimumsShape[2] = {1.1, 3.2};
-	double maximumsShape[2] = {4.1, 4.4};
+	std::array<double, 2> minimumsShape = {1.1, 3.2};
+	std::array<double, 2> maximumsShape = {4.1, 4.4};
 
-	double deltaMin[2] = { -1.0, -2.0};
-	double deltaMax[2] = {3.0, 4.0};
+	std::array<double, 2> deltaMin = { -1.0, -2.0};
+	std::array<double, 2> deltaMax = {3.0, 4.0};
 
-	double nonZeroDeltaMin[2] = { -3.0, 2.0};
-	double nonZeroDeltaMax[2] = { -1.0, 4.0};
+	std::array<double, 2> nonZeroDeltaMin = { -3.0, 2.0};
+	std::array<double, 2> nonZeroDeltaMax = { -1.0, 4.0};
 
 	IntervalDouble2 initial(minimumsShape, maximumsShape);
 	IntervalDouble2 delta(deltaMin, deltaMax);
@@ -380,10 +420,10 @@ TEST_F(IntervalArithmeticTests, Interval3DInitializationTests)
 {
 	// Constructor tests
 	Interval<double> testInterval(3.7, 3.8);
-	double minimums[3] = {1.1, 4.4, -7.2};
-	double maximums[3] = {4.1, 3.2, -1.0};
+	std::array<double, 3> minimums = {1.1, 4.4, -7.2};
+	std::array<double, 3> maximums = {4.1, 3.2, -1.0};
 
-	Interval<double> testIntervalArray[3];
+	std::array<Interval<double>, 3> testIntervalArray;
 	testIntervalArray[0] = Interval<double> (1.0, 2.0);
 	testIntervalArray[1] = Interval<double> (2.0, 3.0);
 	testIntervalArray[2] = Interval<double> (3.0, 4.0);
@@ -399,14 +439,20 @@ TEST_F(IntervalArithmeticTests, Interval3DInitializationTests)
 	IntervalDouble3 b(minimums, maximums);
 	IntervalDouble3 a(b);
 	EXPECT_TRUE(a == b);
+	EXPECT_NO_THROW(testInterval3DMoveConstructor(b));
+	IntervalDouble3 f = testInterval3DMoveConstructor(b);
+	EXPECT_TRUE(f == b);
 
-// Assignment and equal/not equal tests
+	// Assignment and equal/not equal tests
 	IntervalDouble3 c;
 	EXPECT_TRUE(c != b);
 	EXPECT_FALSE(c == b);
 	c = a;
 	EXPECT_FALSE(c != b);
 	EXPECT_TRUE(c == b);
+	IntervalDouble3 e;
+	e = (b * c);
+	EXPECT_TRUE(e == (b * c));
 
 // Getting components and the reordering initializer
 	Interval<double> axis0 = b.getAxis(0);
@@ -420,14 +466,14 @@ TEST_F(IntervalArithmeticTests, Interval3DInitializationTests)
 
 TEST_F(IntervalArithmeticTests, Interval3DRangeTests)
 {
-	double minimumsShape[3] = {1.1, 3.2, -7.2};
-	double maximumsShape[3] = {4.1, 4.4, -1.0};
+	std::array<double, 3> minimumsShape = {1.1, 3.2, -7.2};
+	std::array<double, 3> maximumsShape = {4.1, 4.4, -1.0};
 
-	double noOverlapMin[3] = {1.1, 4.5, -8.0};
-	double noOverlapMax[3] = {4.5, 4.8, -3.0};
+	std::array<double, 3> noOverlapMin = {1.1, 4.5, -8.0};
+	std::array<double, 3> noOverlapMax = {4.5, 4.8, -3.0};
 
-	double overlapMin[3] = {1.7, 2.0, -8.0};
-	double overlapMax[3] = {4.3, 4.7, -3.0};
+	std::array<double, 3> overlapMin = {1.7, 2.0, -8.0};
+	std::array<double, 3> overlapMax = {4.3, 4.7, -3.0};
 
 	IntervalDouble3 shape(minimumsShape, maximumsShape);
 
@@ -437,11 +483,11 @@ TEST_F(IntervalArithmeticTests, Interval3DRangeTests)
 
 TEST_F(IntervalArithmeticTests, Interval3DExtendRangeTests)
 {
-	double minimumsShape[3] = {1.1, 3.2, -7.2};
-	double maximumsShape[3] = {4.1, 4.4, -1.0};
+	std::array<double, 3> minimumsShape = {1.1, 3.2, -7.2};
+	std::array<double, 3> maximumsShape = {4.1, 4.4, -1.0};
 
-	double finalMin[3] = { -5.9, -3.8, -14.2};
-	double finalMax[3] = {11.1, 11.4, 6.0};
+	std::array<double, 3> finalMin = { -5.9, -3.8, -14.2};
+	std::array<double, 3> finalMax = {11.1, 11.4, 6.0};
 
 	IntervalDouble3 shape(minimumsShape, maximumsShape);
 	shape.addThickness(7.0);
@@ -450,14 +496,14 @@ TEST_F(IntervalArithmeticTests, Interval3DExtendRangeTests)
 
 TEST_F(IntervalArithmeticTests, Interval3DOperatorTests)
 {
-	double minimumsShape[3] = {1.1, 3.2, -7.2};
-	double maximumsShape[3] = {4.1, 4.4, -1.0};
+	std::array<double, 3> minimumsShape = {1.1, 3.2, -7.2};
+	std::array<double, 3> maximumsShape = {4.1, 4.4, -1.0};
 
-	double deltaMin[3] = { -1.0, -2.0, -3.0};
-	double deltaMax[3] = {3.0, 4.0, 5.0};
+	std::array<double, 3> deltaMin = { -1.0, -2.0, -3.0};
+	std::array<double, 3> deltaMax = {3.0, 4.0, 5.0};
 
-	double nonZeroDeltaMin[3] = { -3.0, 2.0, 3.0};
-	double nonZeroDeltaMax[3] = { -1.0, 4.0, 5.0};
+	std::array<double, 3> nonZeroDeltaMin = { -3.0, 2.0, 3.0};
+	std::array<double, 3> nonZeroDeltaMax = { -1.0, 4.0, 5.0};
 
 	IntervalDouble3 initial(minimumsShape, maximumsShape);
 	IntervalDouble3 delta(deltaMin, deltaMax);
@@ -555,61 +601,61 @@ TEST_F(IntervalArithmeticTests, IntervalUtilityTests)
 	// Output
 	std::ostringstream intervalOutput;
 	intervalOutput << initial;
-	EXPECT_TRUE(intervalOutput.str() == "[10,20]");
+	EXPECT_EQ("[10,20]", intervalOutput.str());
 
 	// +
-	IntervalArithmetic_add(initial, delta, result);
+	IntervalArithmetic_add(initial, delta, &result);
 	EXPECT_EQ(initial + delta, result);
 
 	// +=( + )
 	result = resultLoad;
-	IntervalArithmetic_addadd(initial, delta, result);
+	IntervalArithmetic_addadd(initial, delta, &result);
 	EXPECT_EQ(resultLoad + initial + delta, result);
 
 	// -
-	IntervalArithmetic_sub(initial, delta, result);
+	IntervalArithmetic_sub(initial, delta, &result);
 	EXPECT_EQ(initial - delta, result);
 
 	// +=( - )
 	result = resultLoad;
-	IntervalArithmetic_addsub(initial, delta, result);
+	IntervalArithmetic_addsub(initial, delta, &result);
 	EXPECT_EQ(resultLoad + (initial - delta), result);
 
 	// *
-	IntervalArithmetic_mul(initial, delta, result);
+	IntervalArithmetic_mul(initial, delta, &result);
 	EXPECT_EQ(initial * delta, result);
 
 	// += ( * )
 	result = resultLoad;
-	IntervalArithmetic_addmul(initial, delta, result);
+	IntervalArithmetic_addmul(initial, delta, &result);
 	EXPECT_EQ(resultLoad + (initial * delta), result);
 
 	// -= ( * )
 	result = resultLoad;
-	IntervalArithmetic_submul(initial, delta, result);
+	IntervalArithmetic_submul(initial, delta, &result);
 	EXPECT_EQ(resultLoad - (initial * delta), result);
 };
 
 TEST_F(IntervalArithmeticTests, IntervalnDUtilityTests)
 {
-	double minimumsShape[2] = {1.1, 3.2};
-	double maximumsShape[2] = {4.1, 4.4};
+	std::array<double, 2> minimumsShape = {1.1, 3.2};
+	std::array<double, 2> maximumsShape = {4.1, 4.4};
 
 	IntervalDouble2 shape(minimumsShape, maximumsShape);
 
 	// Output
 	std::ostringstream intervalOutput;
 	intervalOutput << shape;
-	EXPECT_TRUE(intervalOutput.str() == "([1.1,4.1];[3.2,4.4])");
+	EXPECT_EQ("([1.1,4.1];[3.2,4.4])", intervalOutput.str());
 };
 
 TEST_F(IntervalArithmeticTests, Interval3DUtilityTests)
 {
-	double minimumsShape[3] = {1.1, 3.2, -7.2};
-	double maximumsShape[3] = {4.1, 4.4, -1.0};
+	std::array<double, 3> minimumsShape = {1.1, 3.2, -7.2};
+	std::array<double, 3> maximumsShape = {4.1, 4.4, -1.0};
 
-	double deltaMin[3] = { -1.0, -2.0, -3.0};
-	double deltaMax[3] = {3.0, 4.0, 5.0};
+	std::array<double, 3> deltaMin = { -1.0, -2.0, -3.0};
+	std::array<double, 3> deltaMax = {3.0, 4.0, 5.0};
 
 	IntervalDouble3 initial(minimumsShape, maximumsShape);
 	IntervalDouble3 delta(deltaMin, deltaMax);
@@ -617,19 +663,19 @@ TEST_F(IntervalArithmeticTests, Interval3DUtilityTests)
 	Interval<double> intervalResult;
 
 	// +
-	IntervalArithmetic_add(initial, delta, result);
+	IntervalArithmetic_add(initial, delta, &result);
 	EXPECT_EQ(initial + delta, result);
 
 	// -
-	IntervalArithmetic_sub(initial, delta, result);
+	IntervalArithmetic_sub(initial, delta, &result);
 	EXPECT_EQ(initial - delta, result);
 
 	// dot product
-	IntervalArithmetic_dotProduct(initial, delta, intervalResult);
+	IntervalArithmetic_dotProduct(initial, delta, &intervalResult);
 	EXPECT_EQ(initial.dotProduct(delta), intervalResult);
 
 	// Cross product
-	IntervalArithmetic_crossProduct(initial, delta, result);
+	IntervalArithmetic_crossProduct(initial, delta, &result);
 	EXPECT_EQ(initial.crossProduct(delta), result);
 };
 

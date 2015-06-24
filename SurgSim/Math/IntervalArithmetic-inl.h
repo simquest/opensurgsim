@@ -26,7 +26,7 @@ namespace Math
 {
 
 template <class T>
-Interval<T>::Interval(): m_min((T)0), m_max((T)0) {}
+Interval<T>::Interval(): m_min(static_cast<T>(0)), m_max(static_cast<T>(0)) {}
 
 template <class T>
 Interval<T>::Interval(T min, T max): m_min(min), m_max(max)
@@ -38,7 +38,17 @@ template <class T>
 Interval<T>::Interval(const Interval<T>& i): m_min(i.m_min), m_max(i.m_max) {}
 
 template <class T>
-Interval<T>& Interval<T>::operator =(const Interval<T>& i)
+Interval<T>::Interval(Interval<T>&& i): m_min(static_cast<T>(0)), m_max(static_cast<T>(0))
+{
+	m_min = i.m_min;
+	m_max = i.m_max;
+
+	i.m_min = static_cast<T>(0);
+	i.m_max = static_cast<T>(0);
+}
+
+template <class T>
+Interval<T>& Interval<T>::operator=(const Interval<T>& i)
 {
 	m_min = i.m_min;
 	m_max = i.m_max;
@@ -46,10 +56,25 @@ Interval<T>& Interval<T>::operator =(const Interval<T>& i)
 }
 
 template <class T>
+Interval<T>& Interval<T>::operator=(Interval<T>&& i)
+{
+	if (this != &i)
+	{
+		m_min = i.m_min;
+		m_max = i.m_max;
+
+		i.m_min = static_cast<T>(0);
+		i.m_max = static_cast<T>(0);
+	}
+
+	return *this;
+}
+
+template <class T>
 Interval<T> Interval<T>::minToMax(T a1, T a2)
 {
 	T min, max;
-	MinMax(a1, a2, min, max);
+	minMax(a1, a2, &min, &max);
 	return Interval<T>(min, max);
 }
 
@@ -57,7 +82,7 @@ template <class T>
 Interval<T> Interval<T>::minToMax(T a1, T a2, T a3)
 {
 	T min, max;
-	MinMax(a1, a2, a3, min, max);
+	minMax(a1, a2, a3, &min, &max);
 	return Interval<T>(min, max);
 }
 
@@ -65,7 +90,7 @@ template <class T>
 Interval<T> Interval<T>::minToMax(T a1, T a2, T a3, T a4)
 {
 	T min, max;
-	MinMax(a1, a2, a3, a4, min, max);
+	minMax(a1, a2, a3, a4, &min, &max);
 	return Interval<T>(min, max);
 }
 
@@ -84,7 +109,7 @@ bool Interval<T>::contains(T val) const
 template <class T>
 bool Interval<T>::containsZero() const
 {
-	return (m_min <= (T)0 && m_max >= (T)0);
+	return contains(static_cast<T>(0));
 }
 
 template <class T>
@@ -100,11 +125,7 @@ bool Interval<T>::operator ==(const Interval<T>& i) const
 template <class T>
 bool Interval<T>::operator !=(const Interval<T>& i) const
 {
-	if (m_min != i.m_min || m_max != i.m_max)
-	{
-		return true;
-	}
-	return false;
+	return !(this->operator==(i));
 }
 
 template <class T>
@@ -234,18 +255,7 @@ Interval<T>& Interval<T>::operator *=(const Interval<T>& i)
 template <class T>
 Interval<T>& Interval<T>::operator *=(T v)
 {
-	if (v >= 0)
-	{
-		m_min *= v;
-		m_max *= v;
-	}
-	else
-	{
-		T tmp = m_min;
-		m_min = m_max * v;
-		m_max = tmp * v;
-	}
-
+	*this = minToMax(v * m_min, v * m_max);
 	return *this;
 }
 
@@ -253,7 +263,7 @@ template <class T>
 Interval<T> Interval<T>::inverse() const
 {
 	SURGSIM_ASSERT(!containsZero()) << "Interval: [" << getMin() << "," << getMax() << "]" << std::endl;
-	return Interval<T>(((T)1) / m_max , ((T)1) / m_min);
+	return Interval<T>(static_cast<T>(1) / m_max , static_cast<T>(1) / m_min);
 }
 
 template <class T>
@@ -265,10 +275,7 @@ Interval<T> Interval<T>::operator /(const Interval<T>& i) const
 template <class T>
 Interval<T>& Interval<T>::operator /=(const Interval<T>& i)
 {
-	Interval<T> tmp = (*this) * i.inverse();
-	m_min = tmp.m_min;
-	m_max = tmp.m_max;
-	return *this;
+	return (*this) = (*this) * i.inverse();
 }
 
 template <class T>
@@ -277,7 +284,7 @@ Interval<T> Interval<T>::square() const
 	T lowerBoundSquared = m_min * m_min;
 	T upperBoundSquared = m_max * m_max;
 	T minSquare, maxSquare;
-	MinMax(lowerBoundSquared, upperBoundSquared, minSquare, maxSquare);
+	minMax(lowerBoundSquared, upperBoundSquared, &minSquare, &maxSquare);
 	return Interval<T>((m_min < 0 && m_max > 0) ? 0 : minSquare, maxSquare);
 }
 
@@ -296,69 +303,94 @@ T Interval<T>::getMax() const
 template <class T>
 Interval<T> Interval<T>::lowerHalf() const
 {
-	return Interval<T>(m_min, (m_min + m_max) * (T)0.5);
+	return Interval<T>(m_min, (m_min + m_max) * static_cast<T>(0.5));
 }
 
 template <class T>
 Interval<T> Interval<T>::upperHalf() const
 {
-	return Interval<T>((m_min + m_max) * (T)0.5, m_max);
+	return Interval<T>((m_min + m_max) * static_cast<T>(0.5), m_max);
 }
 
 // Class nD
-template <class T, int n>
-Interval_nD<T, n>::Interval_nD()
+template <class T, int N>
+Interval_nD<T, N>::Interval_nD()
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
 		m_interval[i] = Interval<T>();
 	}
 }
 
-template <class T, int n>
-Interval_nD<T, n>::Interval_nD(const Interval<T>* _x)
+template <class T, int N>
+Interval_nD<T, N>::Interval_nD(const std::array<Interval<T>, N> x)
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
-		m_interval[i] = _x[i];
+		m_interval[i] = x[i];
 	}
 }
 
-template <class T, int n>
-Interval_nD<T, n>::Interval_nD(const Interval_nD<T, n>& interval)
+template <class T, int N>
+Interval_nD<T, N>::Interval_nD(const Interval_nD<T, N>& interval)
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
 		m_interval[i] = interval.m_interval[i];
 	}
 }
 
-template <class T, int n>
-Interval_nD<T, n>::Interval_nD(const T* a, const T* b)
+template <class T, int N>
+Interval_nD<T, N>::Interval_nD(Interval_nD<T, N>&& i)
 {
-	for (int i = 0;  i < n;  ++i)
+	for (int j = 0; j < N; j++)
+	{
+		m_interval[j] = i.m_interval[j];
+		i.m_interval[j] = Interval<T>();
+	}
+}
+
+template <class T, int N>
+Interval_nD<T, N>::Interval_nD(const std::array<T, N> a, const std::array<T, N> b)
+{
+	for (int i = 0; i < N; ++i)
 	{
 		m_interval[i] = Interval<T>::minToMax(a[i], b[i]);
 	}
 }
 
-template <class T, int n>
-Interval_nD<T, n>& Interval_nD<T, n>::operator =(const Interval_nD<T, n>& interval)
+template <class T, int N>
+Interval_nD<T, N>& Interval_nD<T, N>::operator =(const Interval_nD<T, N>& interval)
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
 		m_interval[i] = interval.m_interval[i];
 	}
 	return *this;
 }
 
-template <class T, int n>
-bool Interval_nD<T, n>::overlapsWith(const Interval_nD<T, n>& interval) const
+template <class T, int N>
+Interval_nD<T, N>& Interval_nD<T, N>::operator=(Interval_nD<T, N>&& i)
+{
+	if (this != &i)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			m_interval[j] = i.m_interval[j];
+			i.m_interval[j] = Interval<T>();
+		}
+	}
+
+	return *this;
+}
+
+template <class T, int N>
+bool Interval_nD<T, N>::overlapsWith(const Interval_nD<T, N>& interval) const
 {
 	// For the rectangular [hyper]prisms to overlap, they must overlap in all axes.
-	for (int i = 0;  i < n;  ++i)
+	for (int i = 0; i < N; ++i)
 	{
-		if (! m_interval[i].overlapsWith(interval.m_interval[i]))
+		if (!m_interval[i].overlapsWith(interval.m_interval[i]))
 		{
 			return false;
 		}
@@ -366,163 +398,162 @@ bool Interval_nD<T, n>::overlapsWith(const Interval_nD<T, n>& interval) const
 	return true;
 }
 
-template <class T, int n>
-bool Interval_nD<T, n>::operator ==(const Interval_nD<T, n>& interval) const
+template <class T, int N>
+bool Interval_nD<T, N>::operator ==(const Interval_nD<T, N>& interval) const
 {
-	for (int i = 0 ; i < n ; i++) if (m_interval[i] != interval.m_interval[i])
+	for (int i = 0; i < N; i++)
+	{
+		if (m_interval[i] != interval.m_interval[i])
 		{
 			return false;
 		}
+	}
 	return true;
 }
 
-template <class T, int n>
-bool Interval_nD<T, n>::operator !=(const Interval_nD<T, n>& interval) const
+template <class T, int N>
+bool Interval_nD<T, N>::operator !=(const Interval_nD<T, N>& interval) const
 {
-	for (int i = 0 ; i < n ; i++) if (m_interval[i] != interval.m_interval[i])
-		{
-			return true;
-		}
-	return false;
+	return !(this->operator==(interval));
 }
 
-template <class T, int n>
-Interval_nD<T, n>& Interval_nD<T, n>::addThickness(const double thickness)
+template <class T, int N>
+Interval_nD<T, N>& Interval_nD<T, N>::addThickness(const double thickness)
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
 		m_interval[i].addThickness(thickness);
 	}
 	return *this;
 }
 
-template <class T, int n>
-Interval_nD<T, n> Interval_nD<T, n>::operator +(const Interval_nD<T, n>& interval) const
+template <class T, int N>
+Interval_nD<T, N> Interval_nD<T, N>::operator +(const Interval_nD<T, N>& interval) const
 {
-	Interval_nD<T, n> ret;
-	for (int i = 0 ; i < n ; i++)
+	Interval_nD<T, N> ret;
+	for (int i = 0; i < N; i++)
 	{
 		ret.m_interval[i] = m_interval[i] + interval.m_interval[i];
 	}
 	return ret;
 }
 
-template <class T, int n>
-Interval_nD<T, n>& Interval_nD<T, n>::operator +=(const Interval_nD<T, n>& interval)
+template <class T, int N>
+Interval_nD<T, N>& Interval_nD<T, N>::operator +=(const Interval_nD<T, N>& interval)
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
 		m_interval[i] += interval.m_interval[i];
 	}
 	return *this;
 }
 
-template <class T, int n>
-Interval_nD<T, n> Interval_nD<T, n>::operator -(const Interval_nD<T, n>& interval) const
+template <class T, int N>
+Interval_nD<T, N> Interval_nD<T, N>::operator -(const Interval_nD<T, N>& interval) const
 {
-	Interval_nD<T, n> ret;
-	for (int i = 0 ; i < n ; i++)
+	Interval_nD<T, N> ret;
+	for (int i = 0; i < N; i++)
 	{
 		ret.m_interval[i] = m_interval[i] - interval.m_interval[i];
 	}
 	return ret;
 }
 
-template <class T, int n>
-Interval_nD<T, n>& Interval_nD<T, n>::operator -=(const Interval_nD<T, n>& interval)
+template <class T, int N>
+Interval_nD<T, N>& Interval_nD<T, N>::operator -=(const Interval_nD<T, N>& interval)
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
 		m_interval[i] -= interval.m_interval[i];
 	}
 	return *this;
 }
 
-template <class T, int n>
-Interval_nD<T, n> Interval_nD<T, n>::operator *(const Interval_nD<T, n>& interval) const
+template <class T, int N>
+Interval_nD<T, N> Interval_nD<T, N>::operator *(const Interval_nD<T, N>& interval) const
 {
-	Interval_nD<T, n> ret;
-	for (int i = 0 ; i < n ; i++)
+	Interval_nD<T, N> ret;
+	for (int i = 0; i < N; i++)
 	{
 		ret.m_interval[i] = m_interval[i] * interval.m_interval[i];
 	}
 	return ret;
 }
 
-template <class T, int n>
-Interval_nD<T, n>& Interval_nD<T, n>::operator *=(const Interval_nD<T, n>& interval)
+template <class T, int N>
+Interval_nD<T, N>& Interval_nD<T, N>::operator *=(const Interval_nD<T, N>& interval)
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
 		m_interval[i] *= interval.m_interval[i];
 	}
 	return *this;
 }
 
-template <class T, int n>
-Interval_nD<T, n> Interval_nD<T, n>::inverse(void) const
+template <class T, int N>
+Interval_nD<T, N> Interval_nD<T, N>::inverse(void) const
 {
-	Interval_nD<T, n> ret;
-	for (int i = 0 ; i < n ; i++)
+	Interval_nD<T, N> ret;
+	for (int i = 0; i < N; i++)
 	{
 		ret.m_interval[i] = m_interval[i].inverse();
 	}
 	return ret;
 }
 
-template <class T, int n>
-Interval_nD<T, n> Interval_nD<T, n>::operator /(const Interval_nD<T, n>& interval) const
+template <class T, int N>
+Interval_nD<T, N> Interval_nD<T, N>::operator /(const Interval_nD<T, N>& interval) const
 {
-	Interval_nD<T, n> ret;
-	for (int i = 0 ; i < n ; i++)
+	Interval_nD<T, N> ret;
+	for (int i = 0; i < N; i++)
 	{
 		ret.m_interval[i] = m_interval[i] / interval.m_interval[i];
 	}
 	return ret;
 }
 
-template <class T, int n>
-Interval_nD<T, n>& Interval_nD<T, n>::operator /=(const Interval_nD<T, n>& interval)
+template <class T, int N>
+Interval_nD<T, N>& Interval_nD<T, N>::operator /=(const Interval_nD<T, N>& interval)
 {
-	for (int i = 0 ; i < n ; i++)
+	for (int i = 0; i < N; i++)
 	{
 		m_interval[i] /= interval.m_interval[i];
 	}
 	return *this;
 }
 
-template <class T, int n>
-Interval<T> Interval_nD<T, n>::dotProduct(const Interval_nD<T, n>& interval) const
+template <class T, int N>
+Interval<T> Interval_nD<T, N>::dotProduct(const Interval_nD<T, N>& interval) const
 {
-	Interval<T> ret((T)0, (T)0);
-	for (int i = 0 ; i < n ; i++)
+	Interval<T> ret(static_cast<T>(0), static_cast<T>(0));
+	for (int i = 0; i < N; i++)
 	{
 		ret += m_interval[i] * interval.m_interval[i];
 	}
 	return ret;
 }
 
-template <class T, int n>
-Interval<T> Interval_nD<T, n>::magnitudeSquared() const
+template <class T, int N>
+Interval<T> Interval_nD<T, N>::magnitudeSquared() const
 {
 	Interval<T> result = m_interval[0].square();
-	for (int i = 1;  i < n;  ++i)
+	for (int i = 1; i < N; ++i)
 	{
 		result += m_interval[i].square();
 	}
 	return result;
 }
 
-template <class T, int n>
-Interval<T> Interval_nD<T, n>::magnitude() const
+template <class T, int N>
+Interval<T> Interval_nD<T, N>::magnitude() const
 {
 	Interval<T> magnitudeSq = magnitudeSquared();
 	// Both minimum and maximum are guaranteed to be non-negative.
 	return Interval<T>(sqrt(magnitudeSq.getMin()), sqrt(magnitudeSq.getMax()));
 }
 
-template <class T, int n>
-const Interval<T>& Interval_nD<T, n>::getAxis(size_t i) const
+template <class T, int N>
+const Interval<T>& Interval_nD<T, N>::getAxis(size_t i) const
 {
 	return m_interval[i];
 }
@@ -536,19 +567,19 @@ Interval_nD<T, 3>::Interval_nD()
 }
 
 template <class T>
-Interval_nD<T, 3>::Interval_nD(const Interval<T>* _x)
+Interval_nD<T, 3>::Interval_nD(const std::array<Interval<T>, 3> x)
 {
-	m_interval[0] = _x[0];
-	m_interval[1] = _x[1];
-	m_interval[2] = _x[2];
+	m_interval[0] = x[0];
+	m_interval[1] = x[1];
+	m_interval[2] = x[2];
 }
 
 template <class T>
-Interval_nD<T, 3>::Interval_nD(Interval<T> _x, Interval<T> _y, Interval<T> _z)
+Interval_nD<T, 3>::Interval_nD(Interval<T> x, Interval<T> y, Interval<T> z)
 {
-	m_interval[0] = _x;
-	m_interval[1] = _y;
-	m_interval[2] = _z;
+	m_interval[0] = x;
+	m_interval[1] = y;
+	m_interval[2] = z;
 }
 
 template <class T>
@@ -560,7 +591,19 @@ Interval_nD<T, 3>::Interval_nD(const Interval_nD<T, 3>& i)
 }
 
 template <class T>
-Interval_nD<T, 3>::Interval_nD(const T* a, const T* b)
+Interval_nD<T, 3>::Interval_nD(Interval_nD<T, 3>&& i)
+{
+	m_interval[0] = i.m_interval[0];
+	m_interval[1] = i.m_interval[1];
+	m_interval[2] = i.m_interval[2];
+
+	i.m_interval[0] = Interval<T>();
+	i.m_interval[1] = Interval<T>();
+	i.m_interval[2] = Interval<T>();
+}
+
+template <class T>
+Interval_nD<T, 3>::Interval_nD(const std::array<T, 3> a, const std::array<T, 3> b)
 {
 	m_interval[0] = Interval<T>::minToMax(a[0], b[0]);
 	m_interval[1] = Interval<T>::minToMax(a[1], b[1]);
@@ -573,6 +616,23 @@ Interval_nD<T, 3>& Interval_nD<T, 3>::operator =(const Interval_nD<T, 3>& i)
 	m_interval[0] = i.m_interval[0];
 	m_interval[1] = i.m_interval[1];
 	m_interval[2] = i.m_interval[2];
+	return *this;
+}
+
+template <class T>
+Interval_nD<T, 3>& Interval_nD<T, 3>::operator=(Interval_nD<T, 3>&& i)
+{
+	if (this != &i)
+	{
+		m_interval[0] = i.m_interval[0];
+		m_interval[1] = i.m_interval[1];
+		m_interval[2] = i.m_interval[2];
+
+		i.m_interval[0] = Interval<T>();
+		i.m_interval[1] = Interval<T>();
+		i.m_interval[2] = Interval<T>();
+	}
+
 	return *this;
 }
 
@@ -593,7 +653,7 @@ bool Interval_nD<T, 3>::operator ==(const Interval_nD<T, 3>& i) const
 template <class T>
 bool Interval_nD<T, 3>::operator !=(const Interval_nD<T, 3>& i) const
 {
-	return (m_interval[0] != i.m_interval[0] || m_interval[1] != i.m_interval[1] || m_interval[2] != i.m_interval[2]);
+	return !(this->operator==(i));
 }
 
 template <class T>
@@ -710,9 +770,6 @@ const Interval<T>& Interval_nD<T, 3>::getAxis(size_t i) const
 }
 
 // Utility functions not part of any class
-
-// Interval functions
-
 template <typename T>
 Interval<T> operator+ (T v, const Interval<T>& i)
 {
@@ -725,68 +782,75 @@ Interval<T> operator* (T v, const Interval<T>& i)
 	return i * v;
 }
 
-template <class T> void IntervalArithmetic_add(const Interval<T>& a, const Interval<T>& b, Interval<T>& res)
+template <class T>
+void IntervalArithmetic_add(const Interval<T>& a, const Interval<T>& b, Interval<T>* res)
 {
-	res.m_min = a.m_min + b.m_min;
-	res.m_max = a.m_max + b.m_max;
+	res->m_min = a.m_min + b.m_min;
+	res->m_max = a.m_max + b.m_max;
 }
 
-template <class T> void IntervalArithmetic_addadd(const Interval<T>& a, const Interval<T>& b, Interval<T>& res)
+template <class T>
+void IntervalArithmetic_addadd(const Interval<T>& a, const Interval<T>& b, Interval<T>* res)
 {
-	res.m_min += a.m_min + b.m_min;
-	res.m_max += a.m_max + b.m_max;
+	res->m_min += a.m_min + b.m_min;
+	res->m_max += a.m_max + b.m_max;
 }
 
-template <class T> void IntervalArithmetic_sub(const Interval<T>& a, const Interval<T>& b, Interval<T>& res)
+template <class T>
+void IntervalArithmetic_sub(const Interval<T>& a, const Interval<T>& b, Interval<T>* res)
 {
-	res.m_min = a.m_min - b.m_max;
-	res.m_max = a.m_max - b.m_min;
+	res->m_min = a.m_min - b.m_max;
+	res->m_max = a.m_max - b.m_min;
 }
 
-template <class T> void IntervalArithmetic_addsub(const Interval<T>& a, const Interval<T>& b, Interval<T>& res)
+template <class T>
+void IntervalArithmetic_addsub(const Interval<T>& a, const Interval<T>& b, Interval<T>* res)
 {
-	res.m_min += a.m_min - b.m_max;
-	res.m_max += a.m_max - b.m_min;
+	res->m_min += a.m_min - b.m_max;
+	res->m_max += a.m_max - b.m_min;
 }
 
-template <class T> void IntervalArithmetic_mul(const Interval<T>& a, const Interval<T>& b, Interval<T>& res)
+template <class T>
+void IntervalArithmetic_mul(const Interval<T>& a, const Interval<T>& b, Interval<T>* res)
 {
 	T min, max;
-	MinMax(a.m_min * b.m_min, a.m_min * b.m_max, a.m_max * b.m_min, a.m_max * b.m_max, min, max);
-	res.m_min = min;
-	res.m_max = max;
+	minMax(a.m_min * b.m_min, a.m_min * b.m_max, a.m_max * b.m_min, a.m_max * b.m_max, &min, &max);
+	res->m_min = min;
+	res->m_max = max;
 }
 
-template <class T> void IntervalArithmetic_addmul(const Interval<T>& a, const Interval<T>& b, Interval<T>& res)
+template <class T>
+void IntervalArithmetic_addmul(const Interval<T>& a, const Interval<T>& b, Interval<T>* res)
 {
 	T min, max;
-	MinMax(a.m_min * b.m_min, a.m_min * b.m_max, a.m_max * b.m_min, a.m_max * b.m_max, min, max);
-	res.m_min += min;
-	res.m_max += max;
+	minMax(a.m_min * b.m_min, a.m_min * b.m_max, a.m_max * b.m_min, a.m_max * b.m_max, &min, &max);
+	res->m_min += min;
+	res->m_max += max;
 }
 
-template <class T> void IntervalArithmetic_submul(const Interval<T>& a, const Interval<T>& b, Interval<T>& res)
+template <class T>
+void IntervalArithmetic_submul(const Interval<T>& a, const Interval<T>& b, Interval<T>* res)
 {
 	T min, max;
-	MinMax(a.m_min * b.m_min, a.m_min * b.m_max, a.m_max * b.m_min, a.m_max * b.m_max, min, max);
-	res.m_min -= max;
-	res.m_max -= min;
+	minMax(a.m_min * b.m_min, a.m_min * b.m_max, a.m_max * b.m_min, a.m_max * b.m_max, &min, &max);
+	res->m_min -= max;
+	res->m_max -= min;
 }
 
 // Interval nD functions
 template <typename T>
-inline std::ostream& operator<< (std::ostream& o, const Interval<T>& interval)
+std::ostream& operator<< (std::ostream& o, const Interval<T>& interval)
 {
 	o << "[" << interval.getMin() << "," << interval.getMax() << "]";
 	return o;
 }
 
 // Interval nD functions
-template <typename T, int n>
-std::ostream& operator<< (std::ostream& o, const Interval_nD<T, n>& interval)
+template <typename T, int N>
+std::ostream& operator<< (std::ostream& o, const Interval_nD<T, N>& interval)
 {
 	o << "(" << interval.getAxis(0);
-	for (int i = 1;  i < n;  ++i)
+	for (int i = 1; i < N; ++i)
 	{
 		o << ";" << interval.getAxis(i);
 	}
@@ -795,41 +859,41 @@ std::ostream& operator<< (std::ostream& o, const Interval_nD<T, n>& interval)
 }
 
 // Interval 3D functions
-template <class T> void IntervalArithmetic_add(const Interval_nD<T, 3>& a, const Interval_nD<T, 3>& b,
-		Interval_nD<T, 3>& res)
+template <class T>
+void IntervalArithmetic_add(const Interval_nD<T, 3>& a, const Interval_nD<T, 3>& b, Interval_nD<T, 3>* res)
 {
-	IntervalArithmetic_add(a.m_interval[0] , b.m_interval[0] , res.m_interval[0]);
-	IntervalArithmetic_add(a.m_interval[1] , b.m_interval[1] , res.m_interval[1]);
-	IntervalArithmetic_add(a.m_interval[2] , b.m_interval[2] , res.m_interval[2]);
+	IntervalArithmetic_add(a.m_interval[0] , b.m_interval[0] , &(res->m_interval[0]));
+	IntervalArithmetic_add(a.m_interval[1] , b.m_interval[1] , &(res->m_interval[1]));
+	IntervalArithmetic_add(a.m_interval[2] , b.m_interval[2] , &(res->m_interval[2]));
 }
 
-template <class T> void IntervalArithmetic_sub(const Interval_nD<T, 3>& a, const Interval_nD<T, 3>& b,
-		Interval_nD<T, 3>& res)
+template <class T>
+void IntervalArithmetic_sub(const Interval_nD<T, 3>& a, const Interval_nD<T, 3>& b, Interval_nD<T, 3>* res)
 {
-	IntervalArithmetic_sub(a.m_interval[0] , b.m_interval[0] , res.m_interval[0]);
-	IntervalArithmetic_sub(a.m_interval[1] , b.m_interval[1] , res.m_interval[1]);
-	IntervalArithmetic_sub(a.m_interval[2] , b.m_interval[2] , res.m_interval[2]);
+	IntervalArithmetic_sub(a.m_interval[0] , b.m_interval[0] , &(res->m_interval[0]));
+	IntervalArithmetic_sub(a.m_interval[1] , b.m_interval[1] , &(res->m_interval[1]));
+	IntervalArithmetic_sub(a.m_interval[2] , b.m_interval[2] , &(res->m_interval[2]));
 }
 
-template <class T> void IntervalArithmetic_dotProduct(const Interval_nD<T, 3>& a, const Interval_nD<T, 3>& b,
-		Interval<T>& res)
+template <class T>
+void IntervalArithmetic_crossProduct(const Interval_nD<T, 3>& a, const Interval_nD<T, 3>& b, Interval_nD<T, 3>* res)
+{
+	IntervalArithmetic_mul(a.m_interval[1] , b.m_interval[2] , &(res->m_interval[0]));
+	IntervalArithmetic_submul(a.m_interval[2] , b.m_interval[1] , &(res->m_interval[0]));
+
+	IntervalArithmetic_mul(a.m_interval[2] , b.m_interval[0] , &(res->m_interval[1]));
+	IntervalArithmetic_submul(a.m_interval[0] , b.m_interval[2] , &(res->m_interval[1]));
+
+	IntervalArithmetic_mul(a.m_interval[0] , b.m_interval[1] , &(res->m_interval[2]));
+	IntervalArithmetic_submul(a.m_interval[1] , b.m_interval[0] , &(res->m_interval[2]));
+}
+
+template <class T>
+void IntervalArithmetic_dotProduct(const Interval_nD<T, 3>& a, const Interval_nD<T, 3>& b, Interval<T>* res)
 {
 	IntervalArithmetic_mul(a.m_interval[0] , b.m_interval[0] , res);
 	IntervalArithmetic_addmul(a.m_interval[1] , b.m_interval[1] , res);
 	IntervalArithmetic_addmul(a.m_interval[2] , b.m_interval[2] , res);
-}
-
-template <class T> void IntervalArithmetic_crossProduct(const Interval_nD<T, 3>& a, const Interval_nD<T, 3>& b,
-		Interval_nD<T, 3>& res)
-{
-	IntervalArithmetic_mul(a.m_interval[1] , b.m_interval[2] , res.m_interval[0]);
-	IntervalArithmetic_submul(a.m_interval[2] , b.m_interval[1] , res.m_interval[0]);
-
-	IntervalArithmetic_mul(a.m_interval[2] , b.m_interval[0] , res.m_interval[1]);
-	IntervalArithmetic_submul(a.m_interval[0] , b.m_interval[2] , res.m_interval[1]);
-
-	IntervalArithmetic_mul(a.m_interval[0] , b.m_interval[1] , res.m_interval[2]);
-	IntervalArithmetic_submul(a.m_interval[1] , b.m_interval[0] , res.m_interval[2]);
 }
 
 }; // Math

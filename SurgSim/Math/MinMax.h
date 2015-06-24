@@ -26,7 +26,8 @@ namespace Math
 /// \param a2 the second value
 /// \param min [out] the minimum of a1 and a2
 /// \param max [out] the maximum of a1 and a2
-template <class T> void MinMax(const T a1, const  T a2, T& min, T& max);
+template <class T>
+void minMax(const T a1, const T a2, T* min, T* max);
 
 /// Calculate the minimum and maximum of three values
 /// \tparam T underlying type
@@ -35,7 +36,8 @@ template <class T> void MinMax(const T a1, const  T a2, T& min, T& max);
 /// \param a3 the third value
 /// \param minVal [out] the minimum of a1, a2 and a3
 /// \param maxVal [out] the maximum of a1, a2 and a3
-template <class T> void MinMax(const T a1, const  T a2, const  T a3, T& minVal, T& maxVal);
+template <class T>
+void minMax(const T a1, const T a2, const T a3, T* minVal, T* maxVal);
 
 /// Calculate the minimum and maximum of four values
 /// \tparam T underlying type
@@ -45,7 +47,8 @@ template <class T> void MinMax(const T a1, const  T a2, const  T a3, T& minVal, 
 /// \param a4 the fourth value
 /// \param minVal [out] the minimum of a1, a2, a3 and a4
 /// \param maxVal [out] the maximum of a1, a2, a3 and a4
-template <class T> void MinMax(const T a1, const T a2, const T a3, const T a4, T& minVal, T& maxVal);
+template <class T>
+void minMax(const T a1, const T a2, const T a3, const T a4, T* minVal, T* maxVal);
 
 /// Calculate the minimum and maximum of five values
 /// \tparam T underlying type
@@ -53,18 +56,20 @@ template <class T> void MinMax(const T a1, const T a2, const T a3, const T a4, T
 /// \param a2 the second value
 /// \param a3 the third value
 /// \param a4 the fourth value
-/// \param a4 the fifth value
+/// \param a5 the fifth value
 /// \param minVal [out] the minimum of a1, a2, a3, a4 and a5
 /// \param maxVal [out] the maximum of a1, a2, a3, a4 and a5
-template <class T> void MinMax(const T a1, const T a2, const T a3, const T a4, const T a5, T& minVal, T& maxVal);
+template <class T>
+void minMax(const T a1, const T a2, const T a3, const T a4, const T a5, T* minVal, T* maxVal);
 
 /// Calculate the minimum and maximum of numValues values
 /// \tparam T underlying type
 /// \param values a series of numValues values
 /// \param numValues the number of values in the series
 /// \param minVal [out] the minimum value in values
-/// \param minVal [out] the maximum value in values
-template <class T> void MinMax(const T* values, int numValues, T& minVal, T& maxVal);
+/// \param maxVal [out] the maximum value in values
+template <class T>
+void minMax(const T* values, int numValues, T* minVal, T* maxVal);
 };
 };
 

@@ -24,24 +24,23 @@ namespace Math
 {
 
 template <class T>
-void MinMax(const T a1, const  T a2, T& min, T& max)
+void minMax(const T a1, const T a2, T* min, T* max)
 {
 	if (a1 < a2)
 	{
-		min = a1;
-		max = a2;
+		*min = a1;
+		*max = a2;
 	}
 	else
 	{
-		min = a2;
-		max = a1;
+		*min = a2;
+		*max = a1;
 	}
 }
 
 template <class T>
-void MinMax(const T a1, const  T a2, const  T a3, T& minVal, T& maxVal)
+void minMax(const T a1, const T a2, const T a3, T* minVal, T* maxVal)
 {
-	// TO DO: check how the "else"s affect performance? --bert
 	T min = a1;
 	T max = a1;
 	if (a2 < min)
@@ -61,14 +60,13 @@ void MinMax(const T a1, const  T a2, const  T a3, T& minVal, T& maxVal)
 		max = a3;
 	}
 
-	minVal = min;
-	maxVal = max;
+	*minVal = min;
+	*maxVal = max;
 }
 
 template <class T>
-void MinMax(const T a1, const T a2, const T a3, const T a4, T& minVal, T& maxVal)
+void minMax(const T a1, const T a2, const T a3, const T a4, T* minVal, T* maxVal)
 {
-	// TO DO: check how the "else"s affect performance? --bert
 	T min = a1;
 	T max = a1;
 	if (a2 < min)
@@ -96,14 +94,13 @@ void MinMax(const T a1, const T a2, const T a3, const T a4, T& minVal, T& maxVal
 		max = a4;
 	}
 
-	minVal = min;
-	maxVal = max;
+	*minVal = min;
+	*maxVal = max;
 }
 
 template <class T>
-void MinMax(const T a1, const T a2, const T a3, const T a4, const T a5, T& minVal, T& maxVal)
+void minMax(const T a1, const T a2, const T a3, const T a4, const T a5, T* minVal, T* maxVal)
 {
-	// TO DO: check how the "else"s affect performance? --bert
 	T min = a1;
 	T max = a1;
 	if (a2 < min)
@@ -139,19 +136,18 @@ void MinMax(const T a1, const T a2, const T a3, const T a4, const T a5, T& minVa
 		max = a5;
 	}
 
-	minVal = min;
-	maxVal = max;
+	*minVal = min;
+	*maxVal = max;
 }
 
 template <class T>
-void MinMax(const T* values, int numValues, T& minVal, T& maxVal)
+void minMax(const T* values, int numValues, T* minVal, T* maxVal)
 {
 	SURGSIM_ASSERT(numValues > 0) << "MinMax was called with <=0 values; the result is indeterminate";
 	T min = values[0];
 	T max = values[0];
-	for (int i = 1;  i < numValues;  ++i)
+	for (int i = 1; i < numValues; ++i)
 	{
-		// TO DO: check how the "else" affects performance? --bert
 		if (values[i] < min)
 		{
 			min = values[i];
@@ -161,8 +157,8 @@ void MinMax(const T* values, int numValues, T& minVal, T& maxVal)
 			max = values[i];
 		}
 	}
-	minVal = min;
-	maxVal = max;
+	*minVal = min;
+	*maxVal = max;
 }
 
 };
