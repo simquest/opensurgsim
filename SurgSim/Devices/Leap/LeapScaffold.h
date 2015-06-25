@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Devices/Leap/LeapDevice.h"
 
 
 namespace SurgSim
@@ -86,6 +87,15 @@ private:
 
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
+
+	/// Set Leap Tracking Mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
+	void setTrackingMode(LeapTrackingMode mode);
+
+	/// Get Leap Tracking Mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
+	LeapTrackingMode getTrackingMode() const;
+
+	/// Tracking mode
+	LeapTrackingMode m_trackingMode;
 
 	/// Logger used by the scaffold
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;

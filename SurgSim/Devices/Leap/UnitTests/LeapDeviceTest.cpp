@@ -70,6 +70,31 @@ TEST(LeapDeviceTest, HandType)
 	EXPECT_EQ(SurgSim::Device::HANDTYPE_RIGHT, device->getHandType());
 }
 
+TEST(LeapDeviceTest, TrackingMode)
+{
+	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+
+	// confirm default tracking mode
+	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode());
+
+	// test setting tracking mode before initializing
+	device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_HMD);
+	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
+
+	// initializes device (create scaffold)
+	EXPECT_FALSE(device->isInitialized());
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
+	EXPECT_TRUE(device->isInitialized());
+
+	// test if tracking mode was propagated down to scaffold after initialization
+	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
+
+	// test if we can change tracking mode after initialization
+	device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP);
+	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode());
+}
+
 TEST(LeapDeviceTest, CreateDevicesWithSameName)
 {
 	std::shared_ptr<LeapDevice> device1 = std::make_shared<LeapDevice>("TestLeap");

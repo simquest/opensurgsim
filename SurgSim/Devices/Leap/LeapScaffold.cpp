@@ -21,7 +21,6 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-#include "SurgSim/Devices/Leap/LeapDevice.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Math/Matrix.h"
@@ -147,6 +146,7 @@ struct LeapScaffold::StateData
 
 LeapScaffold::LeapScaffold() :
 	m_state(new StateData),
+	m_trackingMode(LEAP_TRACKING_MODE_DESKTOP),
 	m_logger(SurgSim::Framework::Logger::getLogger("Leap"))
 {
 }
@@ -355,6 +355,24 @@ SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 
 
 	return builder.createData();
+}
+
+void LeapScaffold::setTrackingMode(LeapTrackingMode mode)
+{
+	m_trackingMode = mode;
+	if (mode == LEAP_TRACKING_MODE_HMD)
+	{
+		m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
+	}
+	else
+	{
+		m_state->controller.clearPolicy(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
+	}
+}
+
+LeapTrackingMode LeapScaffold::getTrackingMode() const
+{
+	return(m_trackingMode);
 }
 
 };  // namespace Device
