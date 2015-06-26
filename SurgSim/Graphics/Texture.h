@@ -28,6 +28,8 @@ namespace Graphics
 class Texture
 {
 public:
+	Texture();
+
 	/// Destructor
 	virtual ~Texture()
 	{
@@ -41,15 +43,11 @@ public:
 	/// Removes the image from the texture
 	virtual void clearImage() = 0;
 
-	void setIsPointSprite(bool value)
-	{
-		m_isPointSprite = value;
-	}
+	/// Set point sprite flag on/off
+	void setIsPointSprite(bool value);
 
-	bool isPointSprite()
-	{
-		return m_isPointSprite;
-	}
+	/// Get point sprite flag state
+	bool isPointSprite() const;
 
 private:
 	bool m_isPointSprite;
