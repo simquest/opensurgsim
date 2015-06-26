@@ -24,6 +24,7 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/PointCloudRepresentation.h"
@@ -201,5 +202,43 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointSizeAndColor)
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }
+
+TEST_F(OsgPointCloudRepresentationRenderTests, PointSprite)
+{
+	std::vector<Vector3d> vertices = makeCube();
+	auto graphics = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("Cloud");
+	graphics->setPointSize(10.0f);
+
+	graphics->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
+	for (auto vertex : vertices)
+	{
+		graphics->getVertices()->addVertex(SurgSim::Graphics::PointCloud::VertexType(vertex));
+	}
+
+	// Create material to transport the Textures
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
+	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+	texture->setIsPointSprite(true);
+
+	std::string textureFilename;
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png", &textureFilename));
+	texture->loadImage(textureFilename);
+	auto diffuseMapUniform =
+		std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("diffuseMap");
+	diffuseMapUniform->set(texture);
+	material->addUniform(diffuseMapUniform);
+	graphics->setMaterial(material);
+
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Blood");
+	sceneElement->addComponent(graphics);
+	sceneElement->addComponent(material);
+
+	scene->addSceneElement(sceneElement);
+
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	runtime->stop();
+}
+
 }; // namespace Graphics
 }; // namespace SurgSim
