@@ -88,7 +88,12 @@ TEST(LeapDeviceTest, TrackingMode)
 	EXPECT_TRUE(device->isInitialized());
 
 	// test if tracking mode was propagated down to scaffold after initialization
-	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
+	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
+
+	// test if tracking mode was propogated down to scaffold after initialization
+	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode())
+		<< "HMD Tracking Mode not set. This could be do to user settings in the LeapControlPanel." << std::endl
+		<< "Disable 'Auto-orient Tracking' in Settings>>Tracking.";
 
 	// test if we can change tracking mode after initialization
 	device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP);
