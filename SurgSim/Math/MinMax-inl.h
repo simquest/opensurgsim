@@ -24,22 +24,22 @@ namespace Math
 {
 
 template <class T>
-void minMax(const T a1, const T a2, T* min, T* max)
+void minMax(const T& a1, const T& a2, T* minVal, T* maxVal)
 {
 	if (a1 < a2)
 	{
-		*min = a1;
-		*max = a2;
+		*minVal = a1;
+		*maxVal = a2;
 	}
 	else
 	{
-		*min = a2;
-		*max = a1;
+		*minVal = a2;
+		*maxVal = a1;
 	}
 }
 
 template <class T>
-void minMax(const T a1, const T a2, const T a3, T* minVal, T* maxVal)
+void minMax(const T& a1, const T& a2, const T& a3, T* minVal, T* maxVal)
 {
 	T min = a1;
 	T max = a1;
@@ -65,7 +65,7 @@ void minMax(const T a1, const T a2, const T a3, T* minVal, T* maxVal)
 }
 
 template <class T>
-void minMax(const T a1, const T a2, const T a3, const T a4, T* minVal, T* maxVal)
+void minMax(const T& a1, const T& a2, const T& a3, const T& a4, T* minVal, T* maxVal)
 {
 	T min = a1;
 	T max = a1;
@@ -99,7 +99,7 @@ void minMax(const T a1, const T a2, const T a3, const T a4, T* minVal, T* maxVal
 }
 
 template <class T>
-void minMax(const T a1, const T a2, const T a3, const T a4, const T a5, T* minVal, T* maxVal)
+void minMax(const T& a1, const T& a2, const T& a3, const T& a4, const T& a5, T* minVal, T* maxVal)
 {
 	T min = a1;
 	T max = a1;

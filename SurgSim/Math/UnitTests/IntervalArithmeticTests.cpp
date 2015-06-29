@@ -454,7 +454,7 @@ TEST_F(IntervalArithmeticTests, Interval3DInitializationTests)
 	e = (b * c);
 	EXPECT_TRUE(e == (b * c));
 
-// Getting components and the reordering initializer
+	// Getting components and the reordering initializer
 	Interval<double> axis0 = b.getAxis(0);
 	Interval<double> axis1 = b.getAxis(1);
 	Interval<double> axis2 = b.getAxis(2);

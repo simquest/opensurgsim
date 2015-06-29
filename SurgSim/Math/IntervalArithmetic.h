@@ -30,7 +30,8 @@ namespace Math
 /// \tparam T underlying data type over which the interval is defined.
 ///
 /// \sa Interval_nD<T, N> and Interval_nD<T, 3>
-template <class T> class Interval
+template <class T>
+class Interval
 {
 	template <class P>
 	friend void IntervalArithmetic_add(const Interval<P>& a, const Interval<P>& b, Interval<P>* res); // +
@@ -77,14 +78,14 @@ public:
 	/// \param a1 first input value
 	/// \param a2 second input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(T a1, T a2);
+	static Interval<T> minToMax(const T a1, const T a2);
 
 	/// Generate an interval from min to max based on the inputs
 	/// \param a1 first input value
 	/// \param a2 second input value
 	/// \param a3 third input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(T a1, T a2, T a3);
+	static Interval<T> minToMax(const T a1, const T a2, const T a3);
 
 	/// Generate an interval from min to max based on the inputs
 	/// \param a1 first input value
@@ -92,7 +93,7 @@ public:
 	/// \param a3 third input value
 	/// \param a4 fourth input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(T a1, T a2, T a3, T a4);
+	static Interval<T> minToMax(const T a1, const T a2, const T a3, const T a4);
 
 	/// \param i the interval the current interval will be tested against
 	/// \return true if the input interval overlaps the current interval
@@ -189,7 +190,8 @@ private:
 /// \tparam N number of intervals in the group.
 ///
 /// \sa Interval<T> and Interval_nD<T, 3>
-template <class T, int N> class Interval_nD
+template <class T, int N>
+class Interval_nD
 {
 public:
 	static_assert(N >= 1, "Interval_nD<T, N> cannot be instantiated with N=0.");
@@ -199,7 +201,7 @@ public:
 
 	/// Constructor
 	/// \param x array of N intervals to be copied into the group
-	explicit Interval_nD<T, N>(const std::array<Interval<T>, N> x);
+	explicit Interval_nD<T, N>(const std::array<Interval<T>, N>& x);
 
 	/// Constructor
 	/// \param interval interval group to copied
@@ -212,7 +214,7 @@ public:
 	/// Constructor
 	/// \param a array of N values to be used as the respective minimums for the interval entries.
 	/// \param b array of N values to be used as the respective maximums for the interval entries.
-	Interval_nD<T, N>(const std::array<T, N> a, const std::array<T, N> b);
+	Interval_nD<T, N>(const std::array<T, N>& a, const std::array<T, N>& b);
 
 	/// Assignment operator
 	/// \param interval Interval group to be copied
@@ -291,7 +293,8 @@ private:
 /// \tparam T underlying data type over which the interval is defined.
 ///
 /// \sa Interval<T> and Interval_nD<T, N>
-template <class T> class Interval_nD<T, 3>
+template <class T>
+class Interval_nD<T, 3>
 {
 	template <class P>
 	friend void IntervalArithmetic_add(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b, Interval_nD<P, 3>* res);
@@ -310,7 +313,7 @@ public:
 
 	/// Constructor
 	/// \param x array of 3 intervals to be copied into the group
-	explicit Interval_nD<T, 3>(const std::array<Interval<T> , 3> x);
+	explicit Interval_nD<T, 3>(const std::array<Interval<T>, 3>& x);
 
 	/// Constructor
 	/// \param x first interval to be added to the 3 group
@@ -329,7 +332,7 @@ public:
 	/// Constructor
 	/// \param a array of 3 values to be used as the respective minimums for the interval entries.
 	/// \param b array of 3 values to be used as the respective maximums for the interval entries.
-	Interval_nD<T, 3>(const std::array<T, 3> a, const std::array<T, 3> b);
+	Interval_nD<T, 3>(const std::array<T, 3>& a, const std::array<T, 3>& b);
 
 	/// Assignment operator
 	/// \param i Interval 3 group to be copied
@@ -412,76 +415,86 @@ private:
 /// \param v the scalar
 /// \param i the interval
 /// \return the sum of the scalar v and the interval i
-template <typename T> Interval<T> operator+ (T v, const Interval<T>& i);
+template <typename T>
+Interval<T> operator+ (T v, const Interval<T>& i);
 
 /// \tparam T underlying type of the interval
 /// \param v the scalar
 /// \param i the interval
 /// \return the product of the scalar v and the interval i
-template <typename T> Interval<T> operator* (T v, const Interval<T>& i);
+template <typename T>
+Interval<T> operator* (T v, const Interval<T>& i);
 
 /// Write a textual version of the interval to an output stream
 /// \tparam T underlying type of the interval
 /// \param o the ostream to be written to
 /// \param interval the interval to write
 /// \return the active ostream
-template <typename T> std::ostream& operator<< (std::ostream& o, const Interval<T>& interval);
+template <typename T>
+std::ostream& operator<< (std::ostream& o, const Interval<T>& interval);
 
 /// Calculate the sum of two intervals
 /// \tparam P underlying type of the interval
 /// \param a the first interval
 /// \param b the second interval
 /// \param res [out] the result of a + b
-template <class P> void IntervalArithmetic_add(const Interval<P>& a, const Interval<P>& b,
-		Interval<P>* res); // +
+template <class P>
+void IntervalArithmetic_add(const Interval<P>& a, const Interval<P>& b,
+							Interval<P>* res); // +
 
 /// Calculate the sum of three intervals res + a + b
 /// \tparam P underlying type of the interval
 /// \param a the first interval
 /// \param b the second interval
 /// \param res [in/out] the result of res + a + b
-template <class P> void IntervalArithmetic_addadd(const Interval<P>& a, const Interval<P>& b,
-		Interval<P>* res); // +=( + )
+template <class P>
+void IntervalArithmetic_addadd(const Interval<P>& a, const Interval<P>& b,
+							   Interval<P>* res); // +=( + )
 
 /// Calculate the difference of two intervals
 /// \tparam P underlying type of the interval
 /// \param a the first interval
 /// \param b the second interval
 /// \param res [out] the result of a - b
-template <class P> void IntervalArithmetic_sub(const Interval<P>& a, const Interval<P>& b,
-		Interval<P>* res); // -
+template <class P>
+void IntervalArithmetic_sub(const Interval<P>& a, const Interval<P>& b,
+							Interval<P>* res); // -
 
 /// Add the difference of two intervals to an existing value
 /// \tparam P underlying type of the interval
 /// \param a the first interval
 /// \param b the second interval
 /// \param res [in/out] the result of res + (a - b)
-template <class P> void IntervalArithmetic_addsub(const Interval<P>& a, const Interval<P>& b,
-		Interval<P>* res); // +=( - )
+template <class P>
+void IntervalArithmetic_addsub(const Interval<P>& a, const Interval<P>& b,
+							   Interval<P>* res); // +=( - )
 
 /// Calculate the product of two intervals
 /// \tparam P underlying type of the interval
 /// \param a the first interval
 /// \param b the second interval
 /// \param res [out] the result of a * b
-template <class P> void IntervalArithmetic_mul(const Interval<P>& a, const Interval<P>& b,
-		Interval<P>* res); // *
+template <class P>
+void IntervalArithmetic_mul(const Interval<P>& a, const Interval<P>& b,
+							Interval<P>* res); // *
 
 /// Add the product of two intervals to an existing value
 /// \tparam P underlying type of the interval
 /// \param a the first interval
 /// \param b the second interval
 /// \param res [in/out] the result of res + (a * b)
-template <class P> void IntervalArithmetic_addmul(const Interval<P>& a, const Interval<P>& b,
-		Interval<P>* res); // += ( * )
+template <class P>
+void IntervalArithmetic_addmul(const Interval<P>& a, const Interval<P>& b,
+							   Interval<P>* res); // += ( * )
 
 /// Subtract the product of two intervals from an existing value
 /// \tparam P underlying type of the interval
 /// \param a the first interval
 /// \param b the second interval
 /// \param res [in/out] the result of res - (a * b)
-template <class P> void IntervalArithmetic_submul(const Interval<P>& a, const Interval<P>& b,
-		Interval<P>* res); // -= ( * )
+template <class P>
+void IntervalArithmetic_submul(const Interval<P>& a, const Interval<P>& b,
+							   Interval<P>* res); // -= ( * )
 
 // Interval nD utilities
 
@@ -491,7 +504,8 @@ template <class P> void IntervalArithmetic_submul(const Interval<P>& a, const In
 /// \param o the ostream to be written to
 /// \param interval the interval group to write
 /// \return the active ostream
-template <typename T, int N> std::ostream& operator<< (std::ostream& o, const Interval_nD<T, N>& interval);
+template <typename T, int N>
+std::ostream& operator<< (std::ostream& o, const Interval_nD<T, N>& interval);
 
 // Interval 3D utilities
 
@@ -500,32 +514,36 @@ template <typename T, int N> std::ostream& operator<< (std::ostream& o, const In
 /// \param a the first interval group
 /// \param b the second interval group
 /// \param res [out] the result of a + b
-template <class P> void IntervalArithmetic_add(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b,
-		Interval_nD<P, 3>* res);
+template <class P>
+void IntervalArithmetic_add(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b,
+							Interval_nD<P, 3>* res);
 
 /// Calculate the difference of two interval groups
 /// \tparam P underlying type of the interval
 /// \param a the first interval group
 /// \param b the second interval group
 /// \param res [out] the result of a - b
-template <class P> void IntervalArithmetic_sub(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b,
-		Interval_nD<P, 3>* res);
+template <class P>
+void IntervalArithmetic_sub(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b,
+							Interval_nD<P, 3>* res);
 
 /// Calculate the dot product of two interval groups
 /// \tparam P underlying type of the interval
 /// \param a the first interval group
 /// \param b the second interval group
 /// \param res [out] the dot product of a and b
-template <class P> void IntervalArithmetic_dotProduct(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b,
-		Interval<P>* res);
+template <class P>
+void IntervalArithmetic_dotProduct(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b,
+								   Interval<P>* res);
 
 /// Calculate the cross product of two interval groups
 /// \tparam P underlying type of the interval
 /// \param a the first interval group
 /// \param b the second interval group
 /// \param res [out] the cross product of a and b
-template <class P> void IntervalArithmetic_crossProduct(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b,
-		Interval_nD<P, 3>* res);
+template <class P>
+void IntervalArithmetic_crossProduct(const Interval_nD<P, 3>& a, const Interval_nD<P, 3>& b,
+									 Interval_nD<P, 3>* res);
 
 }; // Math
 }; // SurgSim

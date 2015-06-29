@@ -27,7 +27,7 @@ namespace Math
 /// \param min [out] the minimum of a1 and a2
 /// \param max [out] the maximum of a1 and a2
 template <class T>
-void minMax(const T a1, const T a2, T* min, T* max);
+void minMax(const T& a1, const T& a2, T* minVal, T* maxVal);
 
 /// Calculate the minimum and maximum of three values
 /// \tparam T underlying type
@@ -37,7 +37,7 @@ void minMax(const T a1, const T a2, T* min, T* max);
 /// \param minVal [out] the minimum of a1, a2 and a3
 /// \param maxVal [out] the maximum of a1, a2 and a3
 template <class T>
-void minMax(const T a1, const T a2, const T a3, T* minVal, T* maxVal);
+void minMax(const T& a1, const T& a2, const T& a3, T* minVal, T* maxVal);
 
 /// Calculate the minimum and maximum of four values
 /// \tparam T underlying type
@@ -48,7 +48,7 @@ void minMax(const T a1, const T a2, const T a3, T* minVal, T* maxVal);
 /// \param minVal [out] the minimum of a1, a2, a3 and a4
 /// \param maxVal [out] the maximum of a1, a2, a3 and a4
 template <class T>
-void minMax(const T a1, const T a2, const T a3, const T a4, T* minVal, T* maxVal);
+void minMax(const T& a1, const T& a2, const T& a3, const T& a4, T* minVal, T* maxVal);
 
 /// Calculate the minimum and maximum of five values
 /// \tparam T underlying type
@@ -60,7 +60,7 @@ void minMax(const T a1, const T a2, const T a3, const T a4, T* minVal, T* maxVal
 /// \param minVal [out] the minimum of a1, a2, a3, a4 and a5
 /// \param maxVal [out] the maximum of a1, a2, a3, a4 and a5
 template <class T>
-void minMax(const T a1, const T a2, const T a3, const T a4, const T a5, T* minVal, T* maxVal);
+void minMax(const T& a1, const T& a2, const T& a3, const T& a4, const T& a5, T* minVal, T* maxVal);
 
 /// Calculate the minimum and maximum of numValues values
 /// \tparam T underlying type

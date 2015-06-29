@@ -31,95 +31,72 @@ class MinMaxTests : public ::testing::Test {};
 
 TEST_F(MinMaxTests, TwoEntriesTests)
 {
+	const int numValues = 2;
+
+	float floatValues[numValues] = { 7, 52};
 	float minFloatVal = 7;
 	float maxFloatVal = 52;
-
 	float floatMin;
 	float floatMax;
 
+	double doubleValues[numValues] = { -47, -2};
 	double minDoubleVal = -47;
 	double maxDoubleVal = -2;
 	double doubleMin;
 	double doubleMax;
 
-	minMax(minFloatVal, maxFloatVal, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
+	std::sort(floatValues, floatValues + numValues);
+	do
+	{
+		minMax(floatValues[0], floatValues[1], &floatMin, &floatMax);
+		EXPECT_EQ(minFloatVal, floatMin);
+		EXPECT_EQ(maxFloatVal, floatMax);
+	}
+	while (std::next_permutation(floatValues, floatValues + numValues));
 
-	minMax(maxFloatVal, minFloatVal, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
-
-	minMax(minDoubleVal, maxDoubleVal, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
-
-	minMax(maxDoubleVal, minDoubleVal, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
+	std::sort(doubleValues, doubleValues + numValues);
+	do
+	{
+		minMax(doubleValues[0], doubleValues[1], &doubleMin, &doubleMax);
+		EXPECT_EQ(minDoubleVal, doubleMin);
+		EXPECT_EQ(maxDoubleVal, doubleMax);
+	}
+	while (std::next_permutation(doubleValues, doubleValues + numValues));
 };
 
 TEST_F(MinMaxTests, ThreeEntriesTests)
 {
+	const int numValues = 3;
+
+	float floatValues[numValues] = { 22, 7, 52};
 	float minFloatVal = 7;
 	float maxFloatVal = 52;
-	float midFloatVal = 22;
 	float floatMin;
 	float floatMax;
 
+	double doubleValues[numValues] = { -47, -2, -7};
 	double minDoubleVal = -47;
 	double maxDoubleVal = -2;
-	double midDoubleVal = -7;
 	double doubleMin;
 	double doubleMax;
 
-	minMax(minFloatVal, maxFloatVal, midFloatVal, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
+	std::sort(floatValues, floatValues + numValues);
+	do
+	{
+		minMax(floatValues[0], floatValues[1], floatValues[2], &floatMin, &floatMax);
+		EXPECT_EQ(minFloatVal, floatMin);
+		EXPECT_EQ(maxFloatVal, floatMax);
+	}
+	while (std::next_permutation(floatValues, floatValues + numValues));
 
-	minMax(maxFloatVal, minFloatVal, midFloatVal, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
-
-	minMax(maxFloatVal, midFloatVal, minFloatVal, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
-
-	minMax(minFloatVal, midFloatVal, maxFloatVal, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
-
-	minMax(midFloatVal, maxFloatVal, minFloatVal, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
-
-	minMax(midFloatVal, minFloatVal, maxFloatVal, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
-
-	minMax(minDoubleVal, maxDoubleVal, midDoubleVal, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
-
-	minMax(maxDoubleVal, minDoubleVal, midDoubleVal, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
-
-	minMax(maxDoubleVal, midDoubleVal, minDoubleVal, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
-
-	minMax(minDoubleVal, midDoubleVal, maxDoubleVal, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
-
-	minMax(midDoubleVal, maxDoubleVal, minDoubleVal, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
-
-	minMax(midDoubleVal, minDoubleVal, maxDoubleVal, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
+	std::sort(doubleValues, doubleValues + numValues);
+	do
+	{
+		minMax(doubleValues[0], doubleValues[1], doubleValues[2], &doubleMin, &doubleMax);
+		EXPECT_EQ(minDoubleVal, doubleMin);
+		EXPECT_EQ(maxDoubleVal, doubleMax);
+	}
+	while (std::next_permutation(doubleValues, doubleValues + numValues));
 };
 
 TEST_F(MinMaxTests, FourEntriesTests)
@@ -138,36 +115,23 @@ TEST_F(MinMaxTests, FourEntriesTests)
 	double doubleMin;
 	double doubleMax;
 
-	for (int i1 = 0; i1 < numValues; ++i1)
+	std::sort(floatValues, floatValues + numValues);
+	do
 	{
-		for (int i2 = 0; i2 < numValues; ++i2)
-		{
-			if (i2 != i1)
-			{
-				for (int i3 = 0; i3 < numValues; ++i3)
-				{
-					if ((i3 != i1) && (i3 != i2))
-					{
-						for (int i4 = 0; i4 < numValues; ++i4)
-						{
-							if ((i4 != i1) && (i4 != i2) && (i4 != i3))
-							{
-								minMax(floatValues[i1], floatValues[i2], floatValues[i3],
-									   floatValues[i4], &floatMin, &floatMax);
-								EXPECT_EQ(minFloatVal, floatMin);
-								EXPECT_EQ(maxFloatVal, floatMax);
-
-								minMax(doubleValues[i1], doubleValues[i2], doubleValues[i3],
-									   doubleValues[i4], &doubleMin, &doubleMax);
-								EXPECT_EQ(minDoubleVal, doubleMin);
-								EXPECT_EQ(maxDoubleVal, doubleMax);
-							}
-						}
-					}
-				}
-			}
-		}
+		minMax(floatValues[0], floatValues[1], floatValues[2], floatValues[3], &floatMin, &floatMax);
+		EXPECT_EQ(minFloatVal, floatMin);
+		EXPECT_EQ(maxFloatVal, floatMax);
 	}
+	while (std::next_permutation(floatValues, floatValues + numValues));
+
+	std::sort(doubleValues, doubleValues + numValues);
+	do
+	{
+		minMax(doubleValues[0], doubleValues[1], doubleValues[2], doubleValues[3], &doubleMin, &doubleMax);
+		EXPECT_EQ(minDoubleVal, doubleMin);
+		EXPECT_EQ(maxDoubleVal, doubleMax);
+	}
+	while (std::next_permutation(doubleValues, doubleValues + numValues));
 };
 
 TEST_F(MinMaxTests, FiveEntriesTests)
@@ -186,42 +150,25 @@ TEST_F(MinMaxTests, FiveEntriesTests)
 	double doubleMin;
 	double doubleMax;
 
-	for (int i1 = 0; i1 < numValues; ++i1)
+	std::sort(floatValues, floatValues + numValues);
+	do
 	{
-		for (int i2 = 0; i2 < numValues; ++i2)
-		{
-			if (i2 != i1)
-			{
-				for (int i3 = 0; i3 < numValues; ++i3)
-				{
-					if ((i3 != i1) && (i3 != i2))
-					{
-						for (int i4 = 0; i4 < numValues; ++i4)
-						{
-							if ((i4 != i1) && (i4 != i2) && (i4 != i3))
-							{
-								for (int i5 = 0; i5 < numValues; ++i5)
-								{
-									if ((i5 != i1) && (i5 != i2) && (i5 != i3) && (i5 != i4))
-									{
-										minMax(floatValues[i1], floatValues[i2], floatValues[i3],
-											   floatValues[i4], floatValues[i5], &floatMin, &floatMax);
-										EXPECT_EQ(minFloatVal, floatMin);
-										EXPECT_EQ(maxFloatVal, floatMax);
-
-										minMax(doubleValues[i1], doubleValues[i2], doubleValues[i3],
-											   doubleValues[i4], doubleValues[i5], &doubleMin, &doubleMax);
-										EXPECT_EQ(minDoubleVal, doubleMin);
-										EXPECT_EQ(maxDoubleVal, doubleMax);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		minMax(floatValues[0], floatValues[1], floatValues[2],
+			   floatValues[3], floatValues[4], &floatMin, &floatMax);
+		EXPECT_EQ(minFloatVal, floatMin);
+		EXPECT_EQ(maxFloatVal, floatMax);
 	}
+	while (std::next_permutation(floatValues, floatValues + numValues));
+
+	std::sort(doubleValues, doubleValues + numValues);
+	do
+	{
+		minMax(doubleValues[0], doubleValues[1], doubleValues[2],
+			   doubleValues[3], doubleValues[4], &doubleMin, &doubleMax);
+		EXPECT_EQ(minDoubleVal, doubleMin);
+		EXPECT_EQ(maxDoubleVal, doubleMax);
+	}
+	while (std::next_permutation(doubleValues, doubleValues + numValues));
 };
 
 TEST_F(MinMaxTests, AribtraryEntriesTests)
@@ -243,16 +190,26 @@ TEST_F(MinMaxTests, AribtraryEntriesTests)
 	ASSERT_THROW(minMax(floatValues, 0, &floatMin, &floatMax), SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(minMax(floatValues, -1, &floatMin, &floatMax), SurgSim::Framework::AssertionFailure);
 
-	minMax(floatValues, numValues, &floatMin, &floatMax);
-	EXPECT_EQ(minFloatVal, floatMin);
-	EXPECT_EQ(maxFloatVal, floatMax);
+	std::sort(floatValues, floatValues + numValues);
+	do
+	{
+		minMax(floatValues, numValues, &floatMin, &floatMax);
+		EXPECT_EQ(minFloatVal, floatMin);
+		EXPECT_EQ(maxFloatVal, floatMax);
+	}
+	while (std::next_permutation(floatValues, floatValues + numValues));
 
 	ASSERT_THROW(minMax(doubleValues, 0, &doubleMin, &doubleMax), SurgSim::Framework::AssertionFailure);
 	ASSERT_THROW(minMax(doubleValues, -1, &doubleMin, &doubleMax), SurgSim::Framework::AssertionFailure);
 
-	minMax(doubleValues, numValues, &doubleMin, &doubleMax);
-	EXPECT_EQ(minDoubleVal, doubleMin);
-	EXPECT_EQ(maxDoubleVal, doubleMax);
+	std::sort(doubleValues, doubleValues + numValues);
+	do
+	{
+		minMax(doubleValues, numValues, &doubleMin, &doubleMax);
+		EXPECT_EQ(minDoubleVal, doubleMin);
+		EXPECT_EQ(maxDoubleVal, doubleMax);
+	}
+	while (std::next_permutation(doubleValues, doubleValues + numValues));
 };
 
 }; // namespace Math
