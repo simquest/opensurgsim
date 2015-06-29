@@ -91,6 +91,23 @@ TEST(LeapDeviceTest, TrackingMode)
 	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
 }
 
+TEST(LeapDeviceTest, ProvidingImages)
+{
+	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+
+	EXPECT_FALSE(device->isProvidingImages());
+
+	device->setProvideImages(true);
+	EXPECT_TRUE(device->isProvidingImages());
+
+	EXPECT_FALSE(device->isInitialized());
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
+	EXPECT_TRUE(device->isInitialized());
+
+	EXPECT_THROW(device->setProvideImages(true), SurgSim::Framework::AssertionFailure);
+}
+
 TEST(LeapDeviceTest, CreateDevicesWithSameName)
 {
 	std::shared_ptr<LeapDevice> device1 = std::make_shared<LeapDevice>("TestLeap");
@@ -133,6 +150,8 @@ TEST(LeapDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 5);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 120);
 
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("left"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("right"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("pose"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("ThumbProximal"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("ThumbIntermediate"));

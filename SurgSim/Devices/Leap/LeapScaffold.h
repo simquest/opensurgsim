@@ -82,6 +82,12 @@ private:
 	/// Handle a new frame of data
 	void handleFrame();
 
+	/// Update the hand data
+	void updateHandData();
+
+	/// Update the image data
+	void updateImageData();
+
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 
