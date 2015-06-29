@@ -79,16 +79,13 @@ public:
 		}
 
 		SurgSim::DataStructures::DataGroup::ImageType data;
-		for (size_t i = 0; i < inputData.images().size(); i++)
+		if (inputData.images().get("left", &data))
 		{
-			if (inputData.images().get("left", &data))
-			{
-				m_leftView->image.set(std::move(data));
-			}
-			if (inputData.images().get("right", &data))
-			{
-				m_rightView->image.set(std::move(data));
-			}
+			m_leftView->image.set(std::move(data));
+		}
+		if (inputData.images().get("right", &data))
+		{
+			m_rightView->image.set(std::move(data));
 		}
 	}
 
