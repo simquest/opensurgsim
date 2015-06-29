@@ -24,8 +24,8 @@ namespace Math
 /// \tparam T underlying type
 /// \param a1 the first value
 /// \param a2 the second value
-/// \param min [out] the minimum of a1 and a2
-/// \param max [out] the maximum of a1 and a2
+/// \param minVal [out] the minimum of a1 and a2
+/// \param maxVal [out] the maximum of a1 and a2
 template <class T>
 void minMax(const T& a1, const T& a2, T* minVal, T* maxVal);
 
