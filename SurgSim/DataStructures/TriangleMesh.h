@@ -179,6 +179,10 @@ public:
 	/// \return True if the TriangleMesh is valid, False otherwise (the topology is then broken)
 	bool isValid() const;
 
+	/// Save the triangle mesh in the ply format
+	/// \param path the filename and path where to save
+	void save(const std::string path);
+
 protected:
 	/// Remove all edges from the mesh.
 	virtual void doClearEdges();
