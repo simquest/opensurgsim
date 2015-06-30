@@ -26,6 +26,7 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgRenderTarget.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -71,7 +72,7 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 	auto renderPass = std::make_shared<OsgCamera>("RenderPass");
 
 	renderPass->setProjectionMatrix(defaultCamera->getProjectionMatrix());
-	renderPass->setRenderGroupReference("RenderPass");
+	renderPass->setRenderGroupReference("DepthPass");
 	renderPass->setGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
 	std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
@@ -101,10 +102,13 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 		graphics->getVertices()->addVertex(SurgSim::Graphics::PointCloud::VertexType(vertex));
 	}
 
-	graphics->addGroupReference("RenderPass");
+	graphics->addGroupReference("DepthPass");
 
 	// Create material to transport the Textures for the point sprite
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
+	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/fluid_pointsprite");
+	ASSERT_TRUE(program != nullptr);
+	material->setProgram(program);
 	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
 	texture->setIsPointSprite(true);
 
