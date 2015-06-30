@@ -107,6 +107,12 @@ bool Interval<T>::containsZero() const
 }
 
 template <class T>
+bool Interval<T>::isApprox(const Interval<T>& i, const T& epsilon) const
+{
+	return (std::abs(m_min - i.m_min) <= epsilon) && (std::abs(m_max - i.m_max) <= epsilon);
+}
+
+template <class T>
 bool Interval<T>::operator ==(const Interval<T>& i) const
 {
 	return (m_min == i.m_min && m_max == i.m_max);
@@ -388,6 +394,19 @@ bool Interval_nD<T, N>::overlapsWith(const Interval_nD<T, N>& interval) const
 }
 
 template <class T, int N>
+bool Interval_nD<T, N>::isApprox(const Interval_nD<T, N>& interval, const T& epsilon) const
+{
+	for (int i = 0; i < N; i++)
+	{
+		if (!m_interval[i].isApprox(interval.m_interval[i], epsilon))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+template <class T, int N>
 bool Interval_nD<T, N>::operator ==(const Interval_nD<T, N>& interval) const
 {
 	for (int i = 0; i < N; i++)
@@ -623,6 +642,13 @@ bool Interval_nD<T, 3>::overlapsWith(const Interval_nD<T, 3>& interval) const
 	// For the rectangular prisms to overlap, they must overlap in all axes.
 	return (m_interval[0].overlapsWith(interval.m_interval[0]) && m_interval[1].overlapsWith(interval.m_interval[1])
 			&& m_interval[2].overlapsWith(interval.m_interval[2]));
+}
+
+template <class T>
+bool Interval_nD<T, 3>::isApprox(const Interval_nD<T, 3>& i, const T& epsilon) const
+{
+	return (m_interval[0].isApprox(i.m_interval[0], epsilon) && m_interval[1].isApprox(i.m_interval[1], epsilon) &&
+			m_interval[2].isApprox(i.m_interval[2], epsilon));
 }
 
 template <class T>

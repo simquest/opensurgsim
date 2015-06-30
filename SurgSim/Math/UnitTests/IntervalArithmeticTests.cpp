@@ -31,6 +31,7 @@ namespace Math
 namespace
 {
 double epsilon = 1.0e-10;
+double delta = 1.0e-11;
 }
 
 class IntervalArithmeticTests : public ::testing::Test
@@ -85,6 +86,12 @@ TEST_F(IntervalArithmeticTests, IntervalInitializationTests)
 	Interval<double> e;
 	e = (b * 1);
 	EXPECT_TRUE(e == b);
+	Interval<double> ePlusEpsilon = e + delta;
+	Interval<double> ePlus2Epsilon = e + (2 * epsilon);
+	EXPECT_TRUE(e.isApprox(ePlusEpsilon, epsilon));
+	EXPECT_TRUE(ePlusEpsilon.isApprox(e, epsilon));
+	EXPECT_FALSE(e.isApprox(ePlus2Epsilon, epsilon));
+	EXPECT_FALSE(ePlus2Epsilon.isApprox(e, epsilon));
 
 	// Reordering initializers
 	EXPECT_TRUE(b == SurgSim::Math::Interval<double>::minToMax(100, 9.8));
@@ -136,8 +143,8 @@ TEST_F(IntervalArithmeticTests, RangeTests)
 	EXPECT_TRUE(zeroHigh.containsZero());
 
 	// Subrange tests
-	EXPECT_EQ(Interval<double> (10.0, 15.0), middle.lowerHalf());
-	EXPECT_EQ(Interval<double> (15.0, 20.0), middle.upperHalf());
+	EXPECT_TRUE(middle.lowerHalf().isApprox(Interval<double> (10.0, 15.0), epsilon));
+	EXPECT_TRUE(middle.upperHalf().isApprox(Interval<double> (15.0, 20.0), epsilon));
 };
 
 TEST_F(IntervalArithmeticTests, ExtendRangeTests)
@@ -200,73 +207,73 @@ TEST_F(IntervalArithmeticTests, OperatorTests)
 	Interval<double> initial(10.0, 20.0);
 
 	// +
-	EXPECT_EQ(Interval<double>(12, 30), initial + Interval<double>(2.0, 10.0));
-	EXPECT_EQ(Interval<double>(20, 30), initial + 10);
+	EXPECT_TRUE(Interval<double>(12, 30).isApprox((initial + Interval<double>(2.0, 10.0)), epsilon));
+	EXPECT_TRUE(Interval<double>(20, 30).isApprox((initial + 10), epsilon));
 
 	// +=
 	Interval<double> dummy(initial);
 	dummy += Interval<double>(2.0, 10.0);
-	EXPECT_EQ(Interval<double>(12, 30), dummy);
+	EXPECT_TRUE(dummy.isApprox(Interval<double>(12, 30), epsilon));
 	dummy = initial;
 	dummy += 10.0;
-	EXPECT_EQ(Interval<double>(20, 30), dummy);
+	EXPECT_TRUE(dummy.isApprox(Interval<double>(20, 30), epsilon));
 
 	// -
-	EXPECT_EQ(Interval<double>(0.0, 18.0), initial - Interval<double>(2.0, 10.0));
-	EXPECT_EQ(Interval<double>(0, 10), initial - 10);
+	EXPECT_TRUE(Interval<double>(0.0, 18.0).isApprox((initial - Interval<double>(2.0, 10.0)), epsilon));
+	EXPECT_TRUE(Interval<double>(0, 10).isApprox((initial - 10), epsilon));
 
 	// -=
 	dummy = initial;
 	dummy -= Interval<double>(2.0, 10.0);
-	EXPECT_EQ(Interval<double>(0.0, 18.0), dummy);
+	EXPECT_TRUE(Interval<double>(0.0, 18.0).isApprox(dummy, epsilon));
 	dummy = initial;
 	dummy -= 10.0;
-	EXPECT_EQ(Interval<double>(0.0, 10.0), dummy);
+	EXPECT_TRUE(Interval<double>(0.0, 10.0).isApprox(dummy, epsilon));
 
 	// Negation
-	EXPECT_EQ(Interval<double>(-20.0, -10.0), -initial);
+	EXPECT_TRUE(Interval<double>(-20.0, -10.0).isApprox(-initial, epsilon));
 
 	// *
-	EXPECT_EQ(Interval<double>(20.0, 200.0), initial * Interval<double>(2.0, 10.0));
-	EXPECT_EQ(Interval<double>(-200.0, 40.0), -initial * Interval<double>(-2.0, 10.0));
-	EXPECT_EQ(Interval<double>(100.0, 200.0), initial * 10);
-	EXPECT_EQ(Interval<double>(100.0, 200.0), -initial * -10);
+	EXPECT_TRUE(Interval<double>(20.0, 200.0).isApprox((initial * Interval<double>(2.0, 10.0)), epsilon));
+	EXPECT_TRUE(Interval<double>(-200.0, 40.0).isApprox((-initial * Interval<double>(-2.0, 10.0)), epsilon));
+	EXPECT_TRUE(Interval<double>(100.0, 200.0).isApprox((initial * 10), epsilon));
+	EXPECT_TRUE(Interval<double>(100.0, 200.0).isApprox((-initial * -10), epsilon));
 
 	// *=
 	dummy = initial;
 	dummy *= Interval<double>(2.0, 10.0);
-	EXPECT_EQ(Interval<double>(20.0, 200.0), dummy);
+	EXPECT_TRUE(Interval<double>(20.0, 200.0).isApprox(dummy, epsilon));
 	dummy = -initial;
 	dummy *= Interval<double>(-2.0, 10.0);
-	EXPECT_EQ(Interval<double>(-200.0, 40.0), dummy);
+	EXPECT_TRUE(Interval<double>(-200.0, 40.0).isApprox(dummy, epsilon));
 	dummy = initial;
 	dummy *= 10.0;
-	EXPECT_EQ(Interval<double>(100.0, 200.0), initial * 10);
+	EXPECT_TRUE(Interval<double>(100.0, 200.0).isApprox((initial * 10), epsilon));
 	dummy = -initial;
 	dummy *= -10.0;
-	EXPECT_EQ(Interval<double>(100.0, 200.0), -initial * -10);
+	EXPECT_TRUE(Interval<double>(100.0, 200.0).isApprox((-initial * -10), epsilon));
 
 	// /
 	Interval<double> zeroInterval(-5.0, 5.0);
 	EXPECT_THROW(initial / zeroInterval, SurgSim::Framework::AssertionFailure);
-	EXPECT_EQ(Interval<double>(20.0, 200.0), initial / Interval<double>(0.1, 0.5));
+	EXPECT_TRUE(Interval<double>(20.0, 200.0).isApprox((initial / Interval<double>(0.1, 0.5)), epsilon));
 
 	// /=
 	dummy = zeroInterval;
 	EXPECT_THROW(dummy /= zeroInterval, SurgSim::Framework::AssertionFailure);
 	dummy = initial;
 	dummy /= Interval<double>(0.1, 0.5);
-	EXPECT_EQ(Interval<double>(20.0, 200.0), dummy);
+	EXPECT_TRUE(Interval<double>(20.0, 200.0).isApprox(dummy, epsilon));
 
 	// Inverse
 	EXPECT_THROW(zeroInterval.inverse(), SurgSim::Framework::AssertionFailure);
-	EXPECT_EQ(Interval<double> (2, 10), Interval<double>(0.1, 0.5).inverse());
+	EXPECT_TRUE(Interval<double> (2, 10).isApprox(Interval<double>(0.1, 0.5).inverse(), epsilon));
 
 	// Square
-	EXPECT_EQ(Interval<double> (0, 25), zeroInterval.square());
-	EXPECT_EQ(Interval<double> (0, 25), (-zeroInterval).square());
-	EXPECT_EQ(Interval<double> (100, 400), initial.square());
-	EXPECT_EQ(Interval<double> (100, 400), (-initial).square());
+	EXPECT_TRUE(Interval<double> (0, 25).isApprox(zeroInterval.square(), epsilon));
+	EXPECT_TRUE(Interval<double> (0, 25).isApprox((-zeroInterval).square(), epsilon));
+	EXPECT_TRUE(Interval<double> (100, 400).isApprox(initial.square(), epsilon));
+	EXPECT_TRUE(Interval<double> (100, 400).isApprox((-initial).square(), epsilon));
 };
 
 // Interval nD tests
@@ -276,6 +283,9 @@ TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
 	Interval<double> testInterval(3.7, 3.8);
 	std::array<double, 2> minimums = {1.1, 4.4};
 	std::array<double, 2> maximums = {4.1, 3.2};
+	std::array<double, 2> minimumsPlusEpsilon = {1.1 + delta, 4.4 + delta};
+	std::array<double, 2> maximumsPlusEpsilon = {4.1 + delta, 3.2 + delta};
+	std::array<double, 2> maximumsPlus2Epsilon = {4.1 + (2 * epsilon), 3.2 + delta};
 
 	std::array<Interval<double>, 2> testIntervalArray;
 	testIntervalArray[0] = Interval<double> (1.0, 2.0);
@@ -303,6 +313,13 @@ TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
 	IntervalDouble2 e;
 	e = (b * c);
 	EXPECT_TRUE(e == (b * c));
+
+	IntervalDouble2 bPlusEpsilon(minimumsPlusEpsilon, maximumsPlusEpsilon);
+	IntervalDouble2 bPlus2Epsilon(minimumsPlusEpsilon, maximumsPlus2Epsilon);
+	EXPECT_TRUE(b.isApprox(bPlusEpsilon, epsilon));
+	EXPECT_TRUE(bPlusEpsilon.isApprox(b, epsilon));
+	EXPECT_FALSE(b.isApprox(bPlus2Epsilon, epsilon));
+	EXPECT_FALSE(bPlus2Epsilon.isApprox(b, epsilon));
 
 	// Getting components and the reordering initializer
 	Interval<double> axis0(b.getAxis(0));
@@ -354,65 +371,74 @@ TEST_F(IntervalArithmeticTests, IntervalnDOperatorTests)
 	std::array<double, 2> nonZeroDeltaMax = { -1.0, 4.0};
 
 	IntervalDouble2 initial(minimumsShape, maximumsShape);
-	IntervalDouble2 delta(deltaMin, deltaMax);
+	IntervalDouble2 deltaInterval(deltaMin, deltaMax);
 	IntervalDouble2 nonZeroDelta(nonZeroDeltaMin, nonZeroDeltaMax);
 	IntervalDouble2 dummy;
 
 	// +
-	EXPECT_EQ((Interval<double>(1.1, 4.1) + Interval<double>(-1.0, 3.0)), (initial + delta).getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) + Interval<double>(-2.0, 4.0)), (initial + delta).getAxis(1));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) + Interval<double>(-1.0, 3.0)).isApprox(
+					(initial + deltaInterval).getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) + Interval<double>(-2.0, 4.0)).isApprox(
+					(initial + deltaInterval).getAxis(1), epsilon));
 
 	// +=
 	dummy = initial;
-	dummy += delta;
-	EXPECT_EQ((Interval<double>(1.1, 4.1) + Interval<double>(-1.0, 3.0)), dummy.getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) + Interval<double>(-2.0, 4.0)), dummy.getAxis(1));
+	dummy += deltaInterval;
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) + Interval<double>(-1.0, 3.0)).isApprox(dummy.getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) + Interval<double>(-2.0, 4.0)).isApprox(dummy.getAxis(1), epsilon));
 
 	// -
-	EXPECT_EQ((Interval<double>(1.1, 4.1) - Interval<double>(-1.0, 3.0)), (initial - delta).getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) - Interval<double>(-2.0, 4.0)), (initial - delta).getAxis(1));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) - Interval<double>(-1.0, 3.0)).isApprox(
+					(initial - deltaInterval).getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) - Interval<double>(-2.0, 4.0)).isApprox(
+					(initial - deltaInterval).getAxis(1), epsilon));
 
 	// -=
 	dummy = initial;
-	dummy -= delta;
-	EXPECT_EQ((Interval<double>(1.1, 4.1) - Interval<double>(-1.0, 3.0)), dummy.getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) - Interval<double>(-2.0, 4.0)), dummy.getAxis(1));
+	dummy -= deltaInterval;
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) - Interval<double>(-1.0, 3.0)).isApprox(dummy.getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) - Interval<double>(-2.0, 4.0)).isApprox(dummy.getAxis(1), epsilon));
 
 	// *
-	EXPECT_EQ((Interval<double>(1.1, 4.1) * Interval<double>(-1.0, 3.0)), (initial * delta).getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) * Interval<double>(-2.0, 4.0)), (initial * delta).getAxis(1));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) * Interval<double>(-1.0, 3.0)).isApprox(
+					(initial * deltaInterval).getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) * Interval<double>(-2.0, 4.0)).isApprox(
+					(initial * deltaInterval).getAxis(1), epsilon));
 
 	// *=
 	dummy = initial;
-	dummy *= delta;
-	EXPECT_EQ((Interval<double>(1.1, 4.1) * Interval<double>(-1.0, 3.0)), dummy.getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) * Interval<double>(-2.0, 4.0)), dummy.getAxis(1));
+	dummy *= deltaInterval;
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) * Interval<double>(-1.0, 3.0)).isApprox(dummy.getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) * Interval<double>(-2.0, 4.0)).isApprox(dummy.getAxis(1), epsilon));
 
 	// /
-	EXPECT_EQ((Interval<double>(1.1, 4.1) / Interval<double>(-3.0, -1.0)), (initial / nonZeroDelta).getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) / Interval<double>(2.0, 4.0)), (initial / nonZeroDelta).getAxis(1));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) / Interval<double>(-3.0, -1.0)).isApprox(
+					(initial / nonZeroDelta).getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) / Interval<double>(2.0, 4.0)).isApprox(
+					(initial / nonZeroDelta).getAxis(1), epsilon));
 
 	// /=
 	dummy = initial;
 	dummy /= nonZeroDelta;
-	EXPECT_EQ((Interval<double>(1.1, 4.1) / Interval<double>(-3.0, -1.0)), dummy.getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) / Interval<double>(2.0, 4.0)), dummy.getAxis(1));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) / Interval<double>(-3.0, -1.0)).isApprox(dummy.getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) / Interval<double>(2.0, 4.0)).isApprox(dummy.getAxis(1), epsilon));
 
 	// Inverse
-	EXPECT_EQ(Interval<double>(1.1, 4.1).inverse(), initial.inverse().getAxis(0));
-	EXPECT_EQ(Interval<double>(3.2, 4.4).inverse(), initial.inverse().getAxis(1));
+	EXPECT_TRUE(Interval<double>(1.1, 4.1).inverse().isApprox(initial.inverse().getAxis(0), epsilon));
+	EXPECT_TRUE(Interval<double>(3.2, 4.4).inverse().isApprox(initial.inverse().getAxis(1), epsilon));
 
 	// Dot product
-	Interval<double> dotValue(initial.dotProduct(delta));
-	EXPECT_EQ((initial.getAxis(0) * delta.getAxis(0)) + (initial.getAxis(1) * delta.getAxis(1)), dotValue);
+	Interval<double> dotValue(initial.dotProduct(deltaInterval));
+	EXPECT_TRUE(dotValue.isApprox((initial.getAxis(0) * deltaInterval.getAxis(0)) +
+								  (initial.getAxis(1) * deltaInterval.getAxis(1)), epsilon));
 
 	// Magnitude and magnitude squared
 	Interval<double> magnitudeSquaredValue(initial.magnitudeSquared());
-	EXPECT_EQ((initial.getAxis(0).square() + initial.getAxis(1).square()), magnitudeSquaredValue);
+	EXPECT_TRUE(magnitudeSquaredValue.isApprox((initial.getAxis(0).square() + initial.getAxis(1).square()), epsilon));
 
 	Interval<double> magnitudeValue(initial.magnitude());
-	EXPECT_EQ(std::sqrt(magnitudeSquaredValue.getMin()), magnitudeValue.getMin());
-	EXPECT_EQ(std::sqrt(magnitudeSquaredValue.getMax()), magnitudeValue.getMax());
+	EXPECT_NEAR(std::sqrt(magnitudeSquaredValue.getMin()), magnitudeValue.getMin(), epsilon);
+	EXPECT_NEAR(std::sqrt(magnitudeSquaredValue.getMax()), magnitudeValue.getMax(), epsilon);
 };
 
 // Interval nD tests
@@ -422,6 +448,9 @@ TEST_F(IntervalArithmeticTests, Interval3DInitializationTests)
 	Interval<double> testInterval(3.7, 3.8);
 	std::array<double, 3> minimums = {1.1, 4.4, -7.2};
 	std::array<double, 3> maximums = {4.1, 3.2, -1.0};
+	std::array<double, 3> minimumsPlusEpsilon = {1.1 + delta, 4.4 + delta, -7.2 + delta};
+	std::array<double, 3> maximumsPlusEpsilon = {4.1 + delta, 3.2 + delta, -1.0 + delta};
+	std::array<double, 3> maximumsPlus2Epsilon = {4.1 + (2 * epsilon), 3.2 + delta, -1.0 + delta};
 
 	std::array<Interval<double>, 3> testIntervalArray;
 	testIntervalArray[0] = Interval<double> (1.0, 2.0);
@@ -454,6 +483,12 @@ TEST_F(IntervalArithmeticTests, Interval3DInitializationTests)
 	e = (b * c);
 	EXPECT_TRUE(e == (b * c));
 
+	IntervalDouble3 bPlusEpsilon(minimumsPlusEpsilon, maximumsPlusEpsilon);
+	IntervalDouble3 bPlus2Epsilon(minimumsPlusEpsilon, maximumsPlus2Epsilon);
+	EXPECT_TRUE(b.isApprox(bPlusEpsilon, epsilon));
+	EXPECT_TRUE(bPlusEpsilon.isApprox(b, epsilon));
+	EXPECT_FALSE(b.isApprox(bPlus2Epsilon, epsilon));
+	EXPECT_FALSE(bPlus2Epsilon.isApprox(b, epsilon));
 	// Getting components and the reordering initializer
 	Interval<double> axis0 = b.getAxis(0);
 	Interval<double> axis1 = b.getAxis(1);
@@ -511,92 +546,107 @@ TEST_F(IntervalArithmeticTests, Interval3DOperatorTests)
 	IntervalDouble3 dummy;
 
 	// +
-	EXPECT_EQ((Interval<double>(1.1, 4.1) + Interval<double>(-1.0, 3.0)), (initial + delta).getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) + Interval<double>(-2.0, 4.0)), (initial + delta).getAxis(1));
-	EXPECT_EQ((Interval<double>(-7.2, -1.0) + Interval<double>(-3.0, 5.0)), (initial + delta).getAxis(2));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) + Interval<double>(-1.0, 3.0)).isApprox(
+					(initial + delta).getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) + Interval<double>(-2.0, 4.0)).isApprox(
+					(initial + delta).getAxis(1), epsilon));
+	EXPECT_TRUE((Interval<double>(-7.2, -1.0) + Interval<double>(-3.0, 5.0)).isApprox(
+					(initial + delta).getAxis(2), epsilon));
 
 	// +=
 	dummy = initial;
 	dummy += delta;
-	EXPECT_EQ((Interval<double>(1.1, 4.1) + Interval<double>(-1.0, 3.0)), dummy.getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) + Interval<double>(-2.0, 4.0)), dummy.getAxis(1));
-	EXPECT_EQ((Interval<double>(-7.2, -1.0) + Interval<double>(-3.0, 5.0)), dummy.getAxis(2));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) + Interval<double>(-1.0, 3.0)).isApprox(dummy.getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) + Interval<double>(-2.0, 4.0)).isApprox(dummy.getAxis(1), epsilon));
+	EXPECT_TRUE((Interval<double>(-7.2, -1.0) + Interval<double>(-3.0, 5.0)).isApprox(dummy.getAxis(2), epsilon));
 
 	// -
-	EXPECT_EQ((Interval<double>(1.1, 4.1) - Interval<double>(-1.0, 3.0)), (initial - delta).getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) - Interval<double>(-2.0, 4.0)), (initial - delta).getAxis(1));
-	EXPECT_EQ((Interval<double>(-7.2, -1.0) - Interval<double>(-3.0, 5.0)), (initial - delta).getAxis(2));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) - Interval<double>(-1.0, 3.0)).isApprox(
+					(initial - delta).getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) - Interval<double>(-2.0, 4.0)).isApprox(
+					(initial - delta).getAxis(1), epsilon));
+	EXPECT_TRUE((Interval<double>(-7.2, -1.0) - Interval<double>(-3.0, 5.0)).isApprox(
+					(initial - delta).getAxis(2), epsilon));
 
 	// -=
 	dummy = initial;
 	dummy -= delta;
-	EXPECT_EQ((Interval<double>(1.1, 4.1) - Interval<double>(-1.0, 3.0)), dummy.getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) - Interval<double>(-2.0, 4.0)), dummy.getAxis(1));
-	EXPECT_EQ((Interval<double>(-7.2, -1.0) - Interval<double>(-3.0, 5.0)), dummy.getAxis(2));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) - Interval<double>(-1.0, 3.0)).isApprox(dummy.getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) - Interval<double>(-2.0, 4.0)).isApprox(dummy.getAxis(1), epsilon));
+	EXPECT_TRUE((Interval<double>(-7.2, -1.0) - Interval<double>(-3.0, 5.0)).isApprox(dummy.getAxis(2), epsilon));
 
 	// *
-	EXPECT_EQ((Interval<double>(1.1, 4.1) * Interval<double>(-1.0, 3.0)), (initial * delta).getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) * Interval<double>(-2.0, 4.0)), (initial * delta).getAxis(1));
-	EXPECT_EQ((Interval<double>(-7.2, -1.0) * Interval<double>(-3.0, 5.0)), (initial * delta).getAxis(2));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) * Interval<double>(-1.0, 3.0)).isApprox(
+					(initial * delta).getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) * Interval<double>(-2.0, 4.0)).isApprox(
+					(initial * delta).getAxis(1), epsilon));
+	EXPECT_TRUE((Interval<double>(-7.2, -1.0) * Interval<double>(-3.0, 5.0)).isApprox(
+					(initial * delta).getAxis(2), epsilon));
 
 	// *=
 	dummy = initial;
 	dummy *= delta;
-	EXPECT_EQ((Interval<double>(1.1, 4.1) * Interval<double>(-1.0, 3.0)), dummy.getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) * Interval<double>(-2.0, 4.0)), dummy.getAxis(1));
-	EXPECT_EQ((Interval<double>(-7.2, -1.0) * Interval<double>(-3.0, 5.0)), dummy.getAxis(2));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) * Interval<double>(-1.0, 3.0)).isApprox(dummy.getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) * Interval<double>(-2.0, 4.0)).isApprox(dummy.getAxis(1), epsilon));
+	EXPECT_TRUE((Interval<double>(-7.2, -1.0) * Interval<double>(-3.0, 5.0)).isApprox(dummy.getAxis(2), epsilon));
 
 	// /
-	EXPECT_EQ((Interval<double>(1.1, 4.1) / Interval<double>(-3.0, -1.0)), (initial / nonZeroDelta).getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) / Interval<double>(2.0, 4.0)), (initial / nonZeroDelta).getAxis(1));
-	EXPECT_EQ((Interval<double>(-7.2, -1.0) / Interval<double>(3.0, 5.0)), (initial / nonZeroDelta).getAxis(2));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) / Interval<double>(-3.0, -1.0)).isApprox(
+					(initial / nonZeroDelta).getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) / Interval<double>(2.0, 4.0)).isApprox(
+					(initial / nonZeroDelta).getAxis(1), epsilon));
+	EXPECT_TRUE((Interval<double>(-7.2, -1.0) / Interval<double>(3.0, 5.0)).isApprox(
+					(initial / nonZeroDelta).getAxis(2), epsilon));
 
 	// /=
 	dummy = initial;
 	dummy /= nonZeroDelta;
-	EXPECT_EQ((Interval<double>(1.1, 4.1) / Interval<double>(-3.0, -1.0)), dummy.getAxis(0));
-	EXPECT_EQ((Interval<double>(3.2, 4.4) / Interval<double>(2.0, 4.0)), dummy.getAxis(1));
-	EXPECT_EQ((Interval<double>(-7.2, -1.0) / Interval<double>(3.0, 5.0)), dummy.getAxis(2));
+	EXPECT_TRUE((Interval<double>(1.1, 4.1) / Interval<double>(-3.0, -1.0)).isApprox(dummy.getAxis(0), epsilon));
+	EXPECT_TRUE((Interval<double>(3.2, 4.4) / Interval<double>(2.0, 4.0)).isApprox(dummy.getAxis(1), epsilon));
+	EXPECT_TRUE((Interval<double>(-7.2, -1.0) / Interval<double>(3.0, 5.0)).isApprox(dummy.getAxis(2), epsilon));
 
 	// Inverse
-	EXPECT_EQ(Interval<double>(1.1, 4.1).inverse(), initial.inverse().getAxis(0));
-	EXPECT_EQ(Interval<double>(3.2, 4.4).inverse(), initial.inverse().getAxis(1));
-	EXPECT_EQ(Interval<double>(-7.2, -1.0).inverse(), initial.inverse().getAxis(2));
+	EXPECT_TRUE(Interval<double>(1.1, 4.1).inverse().isApprox(initial.inverse().getAxis(0), epsilon));
+	EXPECT_TRUE(Interval<double>(3.2, 4.4).inverse().isApprox(initial.inverse().getAxis(1), epsilon));
+	EXPECT_TRUE(Interval<double>(-7.2, -1.0).inverse().isApprox(initial.inverse().getAxis(2), epsilon));
 
 	// Dot product
 	Interval<double> dotValue = initial.dotProduct(delta);
-	EXPECT_EQ((initial.getAxis(0) * delta.getAxis(0)) +
-			  (initial.getAxis(1) * delta.getAxis(1)) +
-			  (initial.getAxis(2) * delta.getAxis(2)), dotValue);
+	EXPECT_TRUE(dotValue.isApprox((initial.getAxis(0) * delta.getAxis(0)) +
+								  (initial.getAxis(1) * delta.getAxis(1)) +
+								  (initial.getAxis(2) * delta.getAxis(2)), epsilon));
 
 	// Cross product
 	IntervalDouble3 crossValue = initial.crossProduct(delta);
-	EXPECT_EQ((initial.getAxis(1) * delta.getAxis(2) - initial.getAxis(2) * delta.getAxis(1)), crossValue.getAxis(0));
-	EXPECT_EQ((initial.getAxis(2) * delta.getAxis(0) - initial.getAxis(0) * delta.getAxis(2)), crossValue.getAxis(1));
-	EXPECT_EQ((initial.getAxis(0) * delta.getAxis(1) - initial.getAxis(1) * delta.getAxis(0)), crossValue.getAxis(2));
+	EXPECT_TRUE(crossValue.getAxis(0).isApprox((initial.getAxis(1) * delta.getAxis(2) -
+				initial.getAxis(2) * delta.getAxis(1)), epsilon));
+	EXPECT_TRUE(crossValue.getAxis(1).isApprox((initial.getAxis(2) * delta.getAxis(0) -
+				initial.getAxis(0) * delta.getAxis(2)), epsilon));
+	EXPECT_TRUE(crossValue.getAxis(2).isApprox((initial.getAxis(0) * delta.getAxis(1) -
+				initial.getAxis(1) * delta.getAxis(0)), epsilon));
 
 	// Magnitude and magnitude squared
 	Interval<double> magnitudeSquaredValue = initial.magnitudeSquared();
-	EXPECT_EQ((initial.getAxis(0).square() + initial.getAxis(1).square() + initial.getAxis(2).square()),
-			  magnitudeSquaredValue);
+	EXPECT_TRUE(magnitudeSquaredValue.isApprox((initial.getAxis(0).square() +
+				initial.getAxis(1).square() + initial.getAxis(2).square()), epsilon));
 
 	Interval<double> magnitudeValue = initial.magnitude();
-	EXPECT_EQ(std::sqrt(magnitudeSquaredValue.getMin()), magnitudeValue.getMin());
-	EXPECT_EQ(std::sqrt(magnitudeSquaredValue.getMax()), magnitudeValue.getMax());
+	EXPECT_NEAR(std::sqrt(magnitudeSquaredValue.getMin()), magnitudeValue.getMin(), epsilon);
+	EXPECT_NEAR(std::sqrt(magnitudeSquaredValue.getMax()), magnitudeValue.getMax(), epsilon);
 };
 
 TEST_F(IntervalArithmeticTests, IntervalUtilityTests)
 {
 	Interval<double> initial(10.0, 20.0);
-	Interval<double> delta(3.0, 4.0);
+	Interval<double> deltaInterval(3.0, 4.0);
 	Interval<double> resultLoad(-2.0, -1.0);
 	Interval<double> result;
 
 	// Constant + interval
-	EXPECT_EQ(initial + 11.5, 11.5 + initial);
+	EXPECT_TRUE((initial + 11.5).isApprox(11.5 + initial, epsilon));
 
 	// Constant * interval
-	EXPECT_EQ(initial * 11.5, 11.5 * initial);
+	EXPECT_TRUE((initial * 11.5).isApprox(11.5 * initial, epsilon));
 
 	// Output
 	std::ostringstream intervalOutput;
@@ -604,36 +654,36 @@ TEST_F(IntervalArithmeticTests, IntervalUtilityTests)
 	EXPECT_EQ("[10,20]", intervalOutput.str());
 
 	// +
-	IntervalArithmetic_add(initial, delta, &result);
-	EXPECT_EQ(initial + delta, result);
+	IntervalArithmetic_add(initial, deltaInterval, &result);
+	EXPECT_TRUE((initial + deltaInterval).isApprox(result, epsilon));
 
 	// +=( + )
 	result = resultLoad;
-	IntervalArithmetic_addadd(initial, delta, &result);
-	EXPECT_EQ(resultLoad + initial + delta, result);
+	IntervalArithmetic_addadd(initial, deltaInterval, &result);
+	EXPECT_TRUE((resultLoad + initial + deltaInterval).isApprox(result, epsilon));
 
 	// -
-	IntervalArithmetic_sub(initial, delta, &result);
-	EXPECT_EQ(initial - delta, result);
+	IntervalArithmetic_sub(initial, deltaInterval, &result);
+	EXPECT_TRUE((initial - deltaInterval).isApprox(result, epsilon));
 
 	// +=( - )
 	result = resultLoad;
-	IntervalArithmetic_addsub(initial, delta, &result);
-	EXPECT_EQ(resultLoad + (initial - delta), result);
+	IntervalArithmetic_addsub(initial, deltaInterval, &result);
+	EXPECT_TRUE((resultLoad + (initial - deltaInterval)).isApprox(result, epsilon));
 
 	// *
-	IntervalArithmetic_mul(initial, delta, &result);
-	EXPECT_EQ(initial * delta, result);
+	IntervalArithmetic_mul(initial, deltaInterval, &result);
+	EXPECT_TRUE((initial * deltaInterval).isApprox(result, epsilon));
 
 	// += ( * )
 	result = resultLoad;
-	IntervalArithmetic_addmul(initial, delta, &result);
-	EXPECT_EQ(resultLoad + (initial * delta), result);
+	IntervalArithmetic_addmul(initial, deltaInterval, &result);
+	EXPECT_TRUE((resultLoad + (initial * deltaInterval)).isApprox(result, epsilon));
 
 	// -= ( * )
 	result = resultLoad;
-	IntervalArithmetic_submul(initial, delta, &result);
-	EXPECT_EQ(resultLoad - (initial * delta), result);
+	IntervalArithmetic_submul(initial, deltaInterval, &result);
+	EXPECT_TRUE((resultLoad - (initial * deltaInterval)).isApprox(result, epsilon));
 };
 
 TEST_F(IntervalArithmeticTests, IntervalnDUtilityTests)
@@ -658,25 +708,25 @@ TEST_F(IntervalArithmeticTests, Interval3DUtilityTests)
 	std::array<double, 3> deltaMax = {3.0, 4.0, 5.0};
 
 	IntervalDouble3 initial(minimumsShape, maximumsShape);
-	IntervalDouble3 delta(deltaMin, deltaMax);
+	IntervalDouble3 deltaInterval(deltaMin, deltaMax);
 	IntervalDouble3 result;
 	Interval<double> intervalResult;
 
 	// +
-	IntervalArithmetic_add(initial, delta, &result);
-	EXPECT_EQ(initial + delta, result);
+	IntervalArithmetic_add(initial, deltaInterval, &result);
+	EXPECT_TRUE((initial + deltaInterval).isApprox(result, epsilon));
 
 	// -
-	IntervalArithmetic_sub(initial, delta, &result);
-	EXPECT_EQ(initial - delta, result);
+	IntervalArithmetic_sub(initial, deltaInterval, &result);
+	EXPECT_TRUE((initial - deltaInterval).isApprox(result, epsilon));
 
 	// dot product
-	IntervalArithmetic_dotProduct(initial, delta, &intervalResult);
-	EXPECT_EQ(initial.dotProduct(delta), intervalResult);
+	IntervalArithmetic_dotProduct(initial, deltaInterval, &intervalResult);
+	EXPECT_TRUE(initial.dotProduct(deltaInterval).isApprox(intervalResult, epsilon));
 
 	// Cross product
-	IntervalArithmetic_crossProduct(initial, delta, &result);
-	EXPECT_EQ(initial.crossProduct(delta), result);
+	IntervalArithmetic_crossProduct(initial, deltaInterval, &result);
+	EXPECT_TRUE(initial.crossProduct(deltaInterval).isApprox(result, epsilon));
 };
 
 }; // namespace Math

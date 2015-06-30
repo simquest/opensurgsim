@@ -107,6 +107,11 @@ public:
 	bool containsZero() const;
 
 	/// \param i the interval to be tested
+	/// \param epsilon the nearness parameter
+	/// \return true if the current interval is within epsilon of the input interval
+	bool isApprox(const Interval<T>& i, const T& epsilon) const;
+
+	/// \param i the interval to be tested
 	/// \return true if the current interval is identical to the input interval
 	bool operator ==(const Interval<T>& i) const;
 
@@ -228,6 +233,11 @@ public:
 	/// \return true if the input group interval overlaps the current group
 	bool overlapsWith(const Interval_nD<T, N>& interval) const;
 
+	/// \param interval the interval group to be tested
+	/// \param epsilon the nearness parameter
+	/// \return true if each interval in the input group is approximately equal to its correspondent
+	/// element in interval.
+	bool isApprox(const Interval_nD<T, N>& interval, const T& epsilon) const;
 
 	/// \param interval the interval group to be tested
 	/// \return true if the current interval group is identical to the input group
@@ -345,6 +355,12 @@ public:
 	/// \param interval the interval group the current group will be tested against
 	/// \return true if the input 3 group interval overlaps the current 3 group
 	bool overlapsWith(const Interval_nD<T, 3>& interval) const;
+
+	/// \param interval the interval group to be tested
+	/// \param epsilon the nearness parameter
+	/// \return true if each interval in the input group is approximately equal to its correspondent
+	/// element in interval.
+	bool isApprox(const Interval_nD<T, 3>& interval, const T& epsilon) const;
 
 	/// \param i the interval group to be tested
 	/// \return true if the current interval 3 group is identical to the input 3 group i
