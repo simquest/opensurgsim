@@ -110,19 +110,12 @@ double FemElement::getMass(const SurgSim::Math::OdeState& state) const
 
 void FemElement::addForce(SurgSim::Math::Vector* F, double scale) const
 {
-	if (std::abs(scale - 1.0) < 1e-10)
-	{
-		Math::addSubVector(m_f, m_nodeIds, m_numDofPerNode, F);
-	}
-	else
-	{
-		Math::addSubVector(m_f * scale, m_nodeIds, m_numDofPerNode, F);
-	}
+	Math::addSubVector(m_f * scale, m_nodeIds, m_numDofPerNode, F);
 }
 
 void FemElement::addMass(SurgSim::Math::SparseMatrix* M, double scale) const
 {
-	if (std::abs(scale - 1.0) < 1e-10)
+	if (scale == 1.0)
 	{
 		assembleMatrixBlocks(m_M, m_nodeIds, static_cast<int>(m_numDofPerNode), M, false);
 	}
@@ -136,7 +129,7 @@ void FemElement::addDamping(SurgSim::Math::SparseMatrix* D, double scale) const
 {
 	if (m_useDamping)
 	{
-		if (std::abs(scale - 1.0) < 1e-10)
+		if (scale == 1.0)
 		{
 			assembleMatrixBlocks(m_D, m_nodeIds, static_cast<int>(m_numDofPerNode), D, false);
 		}
@@ -149,7 +142,7 @@ void FemElement::addDamping(SurgSim::Math::SparseMatrix* D, double scale) const
 
 void FemElement::addStiffness(SurgSim::Math::SparseMatrix* K, double scale) const
 {
-	if (std::abs(scale - 1.0) < 1e-10)
+	if (scale == 1.0)
 	{
 		assembleMatrixBlocks(m_K, m_nodeIds, static_cast<int>(m_numDofPerNode), K, false);
 	}
@@ -164,13 +157,10 @@ void FemElement::addFMDK(SurgSim::Math::Vector* F,
 					 SurgSim::Math::SparseMatrix* D,
 					 SurgSim::Math::SparseMatrix* K) const
 {
-	Math::addSubVector(m_f, m_nodeIds, m_numDofPerNode, F);
-	assembleMatrixBlocks(m_M, m_nodeIds, static_cast<int>(m_numDofPerNode), M, false);
-	if (m_useDamping)
-	{
-		assembleMatrixBlocks(m_D, m_nodeIds, static_cast<int>(m_numDofPerNode), D, false);
-	}
-	assembleMatrixBlocks(m_K, m_nodeIds, static_cast<int>(m_numDofPerNode), K, false);
+	addForce(F);
+	addMass(M);
+	addDamping(D);
+	addStiffness(K);
 }
 
 void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const SurgSim::Math::Vector& x,

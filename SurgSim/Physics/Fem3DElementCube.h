@@ -38,6 +38,7 @@ SURGSIM_STATIC_REGISTRATION(Fem3DElementCube);
 /// \note Note that this technique is accurate for any polynomial evaluation up to degree 3.
 /// \note In our case, the shape functions \f$N_i\f$ are linear (of degree 1). So for exmaple,
 /// \note in the mass matrix we have integral terms like \f$\int_V N_i.N_j dV\f$, which are of degree 2.
+/// \note Fem3DElementCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
 class Fem3DElementCube : public FemElement
 {
 public:
@@ -67,6 +68,16 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementCube)
 
+	/// Initializes the element once everything has been set
+	/// \param state The state to initialize the FemElement with
+	/// \note We use the theory of linear elasticity, so this method precomputes the stiffness and mass matrices
+	/// \note The 8 node ids must be valid in the given state, if they aren't an ASSERT will be raised
+	/// \note The 8 node ids must define a cube with positive volume, if they don't an ASSERT will be raised
+	/// \note In order to do so (looking at the cube from the exterior, face normal 'n' pointing outward),
+	/// \note   the 1st  4 nodeIds (ABCD) should define any face CW            i.e. (AB^AC or AB^AD or AC^AD).n < 0
+	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
+	/// \note A warning will be logged in if this condition is not met, but the simulation will keep running.
+	/// \note Behavior will be undefined because of possible negative volume terms.
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
 	double getVolume(const SurgSim::Math::OdeState& state) const override;

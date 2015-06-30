@@ -37,6 +37,7 @@ SURGSIM_STATIC_REGISTRATION(Fem3DElementTetrahedron);
 /// \note    http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf
 /// \note The deformation is based on the linear elasticity theory and not on the visco-elasticity theory.
 /// \note Therefore the element does not have any damping component.
+/// \note Fem3DElementTetrahedron uses linear elasticity (not visco-elasticity), so it does not give any damping.
 class Fem3DElementTetrahedron : public FemElement
 {
 public:

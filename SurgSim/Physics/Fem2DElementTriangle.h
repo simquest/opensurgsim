@@ -47,6 +47,7 @@ SURGSIM_STATIC_REGISTRATION(Fem2DElementTriangle);
 /// "Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza.
 ///
 /// \note The element is considered to have a constant thickness.
+/// \note The element uses linear elasticity (not visco-elasticity), so it does not have any damping.
 class Fem2DElementTriangle : public FemElement
 {
 	typedef Eigen::Matrix<double, 3, 3> Matrix33Type;
