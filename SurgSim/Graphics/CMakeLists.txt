@@ -67,6 +67,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	SceneryRepresentation.cpp
 	TangentSpaceGenerator.cpp
 	TextRepresentation.cpp
+	Texture.cpp
 	TriangleNormalGenerator.cpp
 	View.cpp
 	ViewElement.cpp

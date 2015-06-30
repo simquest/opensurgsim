@@ -34,6 +34,12 @@ enum HandType
 	HANDTYPE_RIGHT
 };
 
+enum LeapTrackingMode
+{
+	LEAP_TRACKING_MODE_DESKTOP,
+	LEAP_TRACKING_MODE_HMD
+};
+
 /// A class implementing the communication with one hand tracked by Leap Motion camera
 ///
 /// \par Application input provided by the device:
@@ -77,6 +83,14 @@ public:
 	/// \return The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
 	HandType getHandType() const;
 
+	/// Set tracking mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
+	/// \param mode tracking mode
+	void setTrackingMode(LeapTrackingMode mode);
+
+	/// Get tracking mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
+	/// \return current tracking mode
+	LeapTrackingMode getTrackingMode() const;
+
 	bool initialize() override;
 
 	bool finalize() override;
@@ -91,6 +105,9 @@ private:
 	std::shared_ptr<LeapScaffold> m_scaffold;
 
 	HandType m_handType;
+
+	/// Tracking mode
+	LeapTrackingMode m_trackingMode;
 };
 
 };
