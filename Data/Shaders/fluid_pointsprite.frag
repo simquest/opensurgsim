@@ -18,9 +18,17 @@
 
 #version 120
 
-uniform sampler2d diffuseMap
-
 void main(void)
 {
-	gl_FragColor = texture(diffseMap, gl_PointCoord);
+    // calculate normal from texture coordinates
+    vec3 N;
+    N.xy = gl_PointCoord* 2.0 - vec2(1.0);
+    float mag = dot(N.xy, N.xy);
+    if (mag > 1.0) discard;   // kill pixels outside circle
+    N.z = sqrt(1.0-mag);
+
+    // calculate lighting
+    float diffuse = max(0.0, dot(vec3(0.5, 0.5, 0.5), N));
+
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0) * diffuse;
 }
