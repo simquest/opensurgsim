@@ -112,9 +112,6 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
 	texture->setIsPointSprite(true);
 
-//	std::string textureFilename;
-//	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png", &textureFilename));
-//	texture->loadImage(textureFilename);
 	auto pointSpriteUniform =
 		std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("pointsprite");
 	pointSpriteUniform->set(texture);
