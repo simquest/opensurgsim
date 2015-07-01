@@ -69,7 +69,7 @@ protected:
 TEST_F(FluidRenderTests, PointSpriteDepth)
 {
 	auto defaultCamera = viewElement->getCamera();
-	auto renderPass = std::make_shared<OsgCamera>("RenderPass");
+	auto renderPass = std::make_shared<OsgCamera>("DepthPass");
 
 	renderPass->setProjectionMatrix(defaultCamera->getProjectionMatrix());
 	renderPass->setRenderGroupReference("DepthPass");
@@ -105,20 +105,20 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 	graphics->addGroupReference("DepthPass");
 
 	// Create material to transport the Textures for the point sprite
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("psMaterial");
 	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/fluid_pointsprite");
 	ASSERT_TRUE(program != nullptr);
 	material->setProgram(program);
 	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
 	texture->setIsPointSprite(true);
 
-	std::string textureFilename;
-	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png", &textureFilename));
-	texture->loadImage(textureFilename);
-	auto diffuseMapUniform =
-		std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("diffuseMap");
-	diffuseMapUniform->set(texture);
-	material->addUniform(diffuseMapUniform);
+//	std::string textureFilename;
+//	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png", &textureFilename));
+//	texture->loadImage(textureFilename);
+	auto pointSpriteUniform =
+		std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("pointsprite");
+	pointSpriteUniform->set(texture);
+	material->addUniform(pointSpriteUniform);
 	graphics->setMaterial(material);
 
 	renderPass->setMaterial(material);
