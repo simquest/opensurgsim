@@ -25,6 +25,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/MeshRepresentation.h"
+#include "SurgSim/Framework/LockedContainer.h"
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -72,11 +73,15 @@ public:
 
 	osg::ref_ptr<osg::Geometry> getOsgGeometry() const;
 
+	void updateMesh(const SurgSim::Graphics::Mesh& mesh) override;
+
 protected:
 	void doUpdate(double dt) override;
 
 	/// \note If m_filename is set, m_mesh will be overwritten with the mesh loaded from the external file.
 	bool doInitialize() override;
+
+	void privateUpdateMesh(const SurgSim::Graphics::Mesh& mesh);
 
 private:
 	/// Indicates which elements of the mesh should be updated on every frame
@@ -98,13 +103,13 @@ private:
 	/// \param geometry [out] The geometry that carries the data
 	/// \return updateOptions value that indicates which of the structures where updated in size and
 	/// 		will have to be updated independent of the value set in setUpdateOptions()
-	int updateOsgArrays(osg::Geometry* geometry);
+	int updateOsgArrays(const Mesh& mesh, osg::Geometry* geometry);
 
 	/// Copies the attributes for each mesh vertex in the appropriate osg structure, this will only be done
 	/// for the data as is indicated by updateOptions
 	/// \param geometry [out] The geometry that carries the data
 	/// \param updateOptions Set of flags indicating whether a specific vertex attribute should be updated
-	void updateVertices(osg::Geometry* geometry, int updateOptions);
+	void updateVertices(const Mesh& mesh, osg::Geometry* geometry, int updateOptions);
 
 	/// Updates the normals.
 	/// \param geometry [out] The geometry that carries the data
@@ -112,7 +117,7 @@ private:
 
 	/// Updates the triangles.
 	/// \param geometry [out] The geometry that carries the data
-	void updateTriangles(osg::Geometry* geometry);
+	void updateTriangles(const Mesh& mesh, osg::Geometry* geometry);
 
 	/// Gets data variance for a given update option.
 	/// \param	updateOption	The update option.
@@ -124,6 +129,8 @@ private:
 
 	/// Cache for the update count pull from the mesh
 	size_t m_updateCount;
+
+	Framework::LockedContainer<Mesh> m_writeBuffer;
 
 };
 
