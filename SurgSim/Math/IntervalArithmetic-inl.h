@@ -31,7 +31,7 @@ Interval<T>::Interval(): m_min(static_cast<T>(0)), m_max(static_cast<T>(0)) {}
 template <class T>
 Interval<T>::Interval(T min, T max): m_min(min), m_max(max)
 {
-	SURGSIM_ASSERT(min <= max) << "order of interval bounds";
+	SURGSIM_ASSERT(min <= max) << "Incorrect order of interval bounds";
 }
 
 template <class T>

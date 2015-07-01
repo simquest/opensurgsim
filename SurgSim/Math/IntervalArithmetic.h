@@ -50,7 +50,7 @@ class Interval
 
 public:
 	/// Constructor
-	Interval<T>();
+	Interval();
 
 	/// Constructor
 	/// \param min Lower bound of the constructed interval
@@ -58,7 +58,7 @@ public:
 	/// \exception if max is less than min
 	Interval<T>(T min, T max);
 
-	/// Constructor
+	/// Copy Constructor
 	/// \param i Interval to be copied
 	Interval<T>(const Interval<T>& i);
 
@@ -199,16 +199,16 @@ template <class T, int N>
 class Interval_nD
 {
 public:
-	static_assert(N >= 1, "Interval_nD<T, N> cannot be instantiated with N=0.");
+	static_assert(N >= 1, "Interval_nD<T, N> cannot be instantiated with N<=0.");
 
 	/// Constructor
-	Interval_nD<T, N>();
+	Interval_nD();
 
 	/// Constructor
 	/// \param x array of N intervals to be copied into the group
 	explicit Interval_nD<T, N>(const std::array<Interval<T>, N>& x);
 
-	/// Constructor
+	/// Copy Constructor
 	/// \param interval interval group to copied
 	Interval_nD<T, N>(const Interval_nD<T, N>& interval);
 
@@ -319,7 +319,7 @@ class Interval_nD<T, 3>
 
 public:
 	/// Constructor
-	Interval_nD<T, 3>();
+	Interval_nD();
 
 	/// Constructor
 	/// \param x array of 3 intervals to be copied into the group
@@ -331,7 +331,7 @@ public:
 	/// \param z third interval to be added to the 3 group
 	Interval_nD<T, 3>(Interval<T> x, Interval<T> y, Interval<T> z);
 
-	/// Constructor
+	/// Copy Constructor
 	/// \param i interval 3 group to copied
 	Interval_nD<T, 3>(const Interval_nD<T, 3>& i);
 
@@ -421,7 +421,6 @@ public:
 
 private:
 	/// The 3 dimensional group of intervals
-	/// The N dimensional group of intervals
 	std::array<Interval<T>, 3> m_interval;
 };
 
