@@ -43,7 +43,7 @@ struct RotationVectorData
 };
 
 /// FemElementParameter is a structure containing the parameters of an fem element following
-/// the Hooke's law of deformation (linear deformation) either locally (corotational model) or globally (linear model).
+/// the Hooke's law of deformation (linear deformation).
 struct FemElementParameter
 {
 	FemElementParameter() : youngModulus(0.0), poissonRatio(0.0), massDensity(0.0)
@@ -51,8 +51,6 @@ struct FemElementParameter
 	}
 
 	virtual ~FemElementParameter(){}
-
-	std::string type;   // “LinearBeam”, “CorotationalTetrahedron”…
 
 	std::vector<size_t> nodeIds;
 	double youngModulus;

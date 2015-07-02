@@ -57,9 +57,13 @@ public:
 	/// \param filename The file to load
 	virtual void loadFem(const std::string& filename) = 0;
 
-	/// Override the FemElement type pulled from the object factory
+	/// Sets the FemElement type pulled from the object factory
 	/// \param type A string of the full registered OSS class name in the factory
-	void overrideFemElementType(const std::string& type);
+	virtual void setFemElementType(const std::string& type);
+
+	/// Gets the FemElement type pulled from the object factory
+	/// \return A string of the full registered OSS class name in the factory
+	const std::string& getFemElementType() const;
 
 	/// Adds a FemElement
 	/// \param element The FemElement to add to the representation
@@ -185,8 +189,11 @@ protected:
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
-	/// Override class name passed to FemElement factory if not empty
-	std::string m_femElementOverrideType;
+	/// The FemElement factory parameter invoked in doInitialize() when using a MeshAsset
+	/// either with LoadFem(const std::stirng& filename) or setFem(std::shared_ptr<Asset> mesh)
+	/// This ensures that when using a mesh Asset, a single FemElement type is used. Therefore we do
+	/// not need to define this type in the ply file, but rather is part of the Representation properties (YAML).
+	std::string m_femElementType;
 
 private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)

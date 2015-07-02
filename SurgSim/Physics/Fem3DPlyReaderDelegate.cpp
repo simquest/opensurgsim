@@ -14,10 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/Valid.h"
-#include "SurgSim/Physics/Fem3DElementCube.h"
-#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
-
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -95,17 +92,6 @@ void Fem3DPlyReaderDelegate::processFemElement(const std::string& elementName)
 			"Cannot process 3D Element with " << m_elementData.vertexCount << " vertices.";
 
 	auto femElement = std::make_shared<FemElementStructs::FemElement3DParameter>();
-	if (m_elementData.vertexCount == 8)
-	{
-		static Fem3DElementCube cube;
-		femElement->type = cube.getClassName();
-	}
-	else
-	{
-		static Fem3DElementTetrahedron tetrahedron;
-		femElement->type = tetrahedron.getClassName();
-	}
-
 	femElement->nodeIds.resize(m_elementData.vertexCount);
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
 	m_mesh->addElement(femElement);

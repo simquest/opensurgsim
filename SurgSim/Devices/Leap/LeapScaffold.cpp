@@ -146,7 +146,6 @@ struct LeapScaffold::StateData
 
 LeapScaffold::LeapScaffold() :
 	m_state(new StateData),
-	m_trackingMode(LEAP_TRACKING_MODE_DESKTOP),
 	m_logger(SurgSim::Framework::Logger::getLogger("Leap"))
 {
 }
@@ -423,7 +422,6 @@ SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 
 void LeapScaffold::setTrackingMode(LeapTrackingMode mode)
 {
-	m_trackingMode = mode;
 	if (mode == LEAP_TRACKING_MODE_HMD)
 	{
 		m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
@@ -436,7 +434,12 @@ void LeapScaffold::setTrackingMode(LeapTrackingMode mode)
 
 LeapTrackingMode LeapScaffold::getTrackingMode() const
 {
-	return(m_trackingMode);
+	LeapTrackingMode result = LEAP_TRACKING_MODE_DESKTOP;
+	if (m_state->controller.isPolicySet(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD))
+	{
+		result = LEAP_TRACKING_MODE_HMD;
+	}
+	return result;
 }
 
 };  // namespace Device
