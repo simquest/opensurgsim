@@ -32,6 +32,8 @@ ComponentManager::ComponentManager(const std::string& name /*= "Unknown Componen
 
 ComponentManager::~ComponentManager()
 {
+	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/ComponentManager"))
+		<< getName() << " destructed";
 }
 
 void ComponentManager::setRuntime(std::shared_ptr<Runtime> val)
