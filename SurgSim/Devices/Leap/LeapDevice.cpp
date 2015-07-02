@@ -24,7 +24,8 @@ namespace Device
 
 LeapDevice::LeapDevice(const std::string& name) :
 	SurgSim::Input::CommonDevice(name, LeapScaffold::buildDeviceInputData()),
-	m_handType(HANDTYPE_RIGHT)
+	m_handType(HANDTYPE_RIGHT),
+	m_isProvidingImages(false)
 {
 }
 
@@ -66,6 +67,17 @@ LeapTrackingMode LeapDevice::getTrackingMode() const
 	{
 		return m_requestedTrackingMode.getValue();
 	}
+}
+
+void LeapDevice::setProvideImages(bool produceImages)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot call setProvideImages after LeapDevice is initialized";
+	m_isProvidingImages = produceImages;
+}
+
+bool LeapDevice::isProvidingImages() const
+{
+	return m_isProvidingImages;
 }
 
 bool LeapDevice::initialize()

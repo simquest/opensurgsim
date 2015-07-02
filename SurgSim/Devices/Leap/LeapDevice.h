@@ -46,6 +46,8 @@ enum LeapTrackingMode
 /// \par Application input provided by the device:
 ///   | type       | name              			|                                                                   |
 ///   | ----       | ----              			| ---                                                               |
+///   | image      | "left"						| Left infrared image, each pixel value is between 0 and 1.			|
+///   | image      | "right"					| Right infrared image, each pixel value is between 0 and 1.		|
 ///   | pose       | "pose"						| %Hand pose 														|
 ///   | pose       | "ThumbProximal"			| %Pose of thumb proximal joint										|
 ///   | pose       | "ThumbIntermediate"		| %Pose of thumb intermediate joint									|
@@ -96,6 +98,14 @@ public:
 	/// \return The current tracking mode, either LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
 	LeapTrackingMode getTrackingMode() const;
 
+	/// Set if the device should provide the stereo infrared images
+	/// \param provideImages True if providing images
+	void setProvideImages(bool provideImages);
+
+	/// Get if the device should provide the stereo infrared images
+	/// \return True if providing images
+	bool isProvidingImages() const;
+
 	bool initialize() override;
 
 	bool finalize() override;
@@ -113,6 +123,9 @@ private:
 
 	/// Tracking mode
 	DataStructures::OptionalValue<LeapTrackingMode> m_requestedTrackingMode;
+
+	/// Request Camera Images mode
+	bool m_isProvidingImages;
 };
 
 };
