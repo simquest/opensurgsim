@@ -115,41 +115,20 @@ void FemElement::addForce(SurgSim::Math::Vector* F, double scale) const
 
 void FemElement::addMass(SurgSim::Math::SparseMatrix* M, double scale) const
 {
-	if (scale == 1.0)
-	{
-		assembleMatrixBlocks(m_M, m_nodeIds, static_cast<int>(m_numDofPerNode), M, false);
-	}
-	else
-	{
-		assembleMatrixBlocks(m_M * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), M, false);
-	}
+	assembleMatrixBlocks(m_M * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), M, false);
 }
 
 void FemElement::addDamping(SurgSim::Math::SparseMatrix* D, double scale) const
 {
 	if (m_useDamping)
 	{
-		if (scale == 1.0)
-		{
-			assembleMatrixBlocks(m_D, m_nodeIds, static_cast<int>(m_numDofPerNode), D, false);
-		}
-		else
-		{
-			assembleMatrixBlocks(m_D * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), D, false);
-		}
+		assembleMatrixBlocks(m_D * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), D, false);
 	}
 }
 
 void FemElement::addStiffness(SurgSim::Math::SparseMatrix* K, double scale) const
 {
-	if (scale == 1.0)
-	{
-		assembleMatrixBlocks(m_K, m_nodeIds, static_cast<int>(m_numDofPerNode), K, false);
-	}
-	else
-	{
-		assembleMatrixBlocks(m_K * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), K, false);
-	}
+	assembleMatrixBlocks(m_K * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), K, false);
 }
 
 void FemElement::addFMDK(SurgSim::Math::Vector* F,
@@ -181,33 +160,26 @@ void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const Su
 	// Accumulate the mass/damping/stiffness contribution
 	Math::Vector extractedResult;
 	extractedResult.setZero(size);
-	bool extractedResultUpdated = false;
-
+	
 	// Adds the mass contribution
 	if (alphaM != 0.0)
 	{
-		extractedResultUpdated = true;
 		extractedResult += alphaM * (m_M * extractedX);
 	}
 
 	// Adds the damping contribution
 	if (m_useDamping && alphaD != 0.0)
 	{
-		extractedResultUpdated = true;
 		extractedResult += alphaD * (m_D * extractedX);
 	}
 
 	// Adds the stiffness contribution
 	if (alphaK != 0.0)
 	{
-		extractedResultUpdated = true;
 		extractedResult += alphaK * (m_K * extractedX);
 	}
 
-	if (extractedResultUpdated)
-	{
-		addSubVector(extractedResult, m_nodeIds, m_numDofPerNode, F);
-	}
+	addSubVector(extractedResult, m_nodeIds, m_numDofPerNode, F);
 }
 
 bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
