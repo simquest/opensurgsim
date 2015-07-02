@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Input/CommonDevice.h"
 
 
@@ -83,12 +84,16 @@ public:
 	/// \return The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
 	HandType getHandType() const;
 
-	/// Set tracking mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
-	/// \param mode tracking mode
+	/// Set the hand tracking mode
+	/// This is a global setting that optimizes hand tracking based on the Leap camera
+	/// placement. The default is LEAP_TRACKING_MODE_DESKTOP, where the camera is placed
+	/// face up on a desktop. Use LEAP_TRACKING_MODE_HMD when the camera is attached to
+	/// the front of a head mounted display.
+	/// \param mode The tracking mode, either LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
 	void setTrackingMode(LeapTrackingMode mode);
 
-	/// Get tracking mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
-	/// \return current tracking mode
+	/// Get the hand tracking mode
+	/// \return The current tracking mode, either LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
 	LeapTrackingMode getTrackingMode() const;
 
 	bool initialize() override;
@@ -107,7 +112,7 @@ private:
 	HandType m_handType;
 
 	/// Tracking mode
-	LeapTrackingMode m_trackingMode;
+	DataStructures::OptionalValue<LeapTrackingMode> m_requestedTrackingMode;
 };
 
 };
