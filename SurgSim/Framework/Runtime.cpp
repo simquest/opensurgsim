@@ -355,6 +355,7 @@ void Runtime::loadScene(const std::string& fileName)
 
 void Runtime::addSceneElements(const std::string& fileName)
 {
+	SURGSIM_LOG_INFO(Logger::getLogger("Runtime")) << "Adding scene elements from " << fileName;
 	YAML::Node node;
 	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
 
@@ -370,6 +371,7 @@ void Runtime::addSceneElements(const std::string& fileName)
 	{
 		SURGSIM_FAILURE() << "Could not add scene elements from the YAML file: " << fileName;
 	}
+	SURGSIM_LOG_INFO(Logger::getLogger("Runtime")) << "Done adding scene elements from " << fileName;
 }
 
 std::vector<std::shared_ptr<SceneElement>> Runtime::duplicateSceneElements(const std::string& fileName)
