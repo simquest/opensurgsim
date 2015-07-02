@@ -56,15 +56,15 @@ public:
 	/// \param min Lower bound of the constructed interval
 	/// \param max Upper bound of the constructed interval
 	/// \exception if max is less than min
-	Interval<T>(T min, T max);
+	Interval(T min, T max);
 
-	/// Copy Constructor
+	/// Copy constructor
 	/// \param i Interval to be copied
-	Interval<T>(const Interval<T>& i);
+	Interval(const Interval<T>& i);
 
 	/// Move constructor
 	/// \param i Interval to be copied
-	Interval<T>(Interval<T>&& i);
+	Interval(Interval<T>&& i);
 
 	/// Assignment operator
 	/// \param i Interval to be copied
@@ -78,14 +78,14 @@ public:
 	/// \param a1 first input value
 	/// \param a2 second input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(const T a1, const T a2);
+	static Interval<T> minToMax(const T& a1, const T& a2);
 
 	/// Generate an interval from min to max based on the inputs
 	/// \param a1 first input value
 	/// \param a2 second input value
 	/// \param a3 third input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(const T a1, const T a2, const T a3);
+	static Interval<T> minToMax(const T& a1, const T& a2, const T& a3);
 
 	/// Generate an interval from min to max based on the inputs
 	/// \param a1 first input value
@@ -93,7 +93,7 @@ public:
 	/// \param a3 third input value
 	/// \param a4 fourth input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(const T a1, const T a2, const T a3, const T a4);
+	static Interval<T> minToMax(const T& a1, const T& a2, const T& a3, const T& a4);
 
 	/// \param i the interval the current interval will be tested against
 	/// \return true if the input interval overlaps the current interval
@@ -101,7 +101,7 @@ public:
 
 	/// \param val the value to test for inclusion in the interval
 	/// \return true if the current interval contains val
-	bool contains(T val) const;
+	bool contains(const T& val) const;
 
 	/// \return true if the current interval contains 0
 	bool containsZero() const;
@@ -122,12 +122,12 @@ public:
 	/// Widens the current interval by thickness on both sides
 	/// \param thickness the amount to widen the current interval on both sides
 	/// \return the current interval after modification
-	Interval<T>& addThickness(const T thickness);
+	Interval<T>& addThickness(const T& thickness);
 
 	/// Widens the current interval on one end to include x
 	/// \param x the value to be included in the interval
 	/// \return the current interval extended to include x
-	Interval<T>& extendToInclude(T x);
+	Interval<T>& extendToInclude(const T& x);
 
 	/// Widens the current interval on both ends to include i
 	/// \param i the interval to be wholly contained in the current interval
@@ -137,18 +137,18 @@ public:
 	/// @{
 	/// Standard arithmetic operators extended to intervals
 	Interval<T> operator +(const Interval<T>& i) const;
-	Interval<T> operator +(T v) const;
+	Interval<T> operator +(const T& v) const;
 	Interval<T>& operator +=(const Interval<T>& i);
-	Interval<T>& operator +=(T v);
+	Interval<T>& operator +=(const T& v);
 	Interval<T> operator -() const;
 	Interval<T> operator -(const Interval<T>& i) const;
-	Interval<T> operator -(T v) const;
+	Interval<T> operator -(const T& v) const;
 	Interval<T>& operator -=(const Interval<T>& i);
-	Interval<T>& operator -=(T v);
+	Interval<T>& operator -=(const T& v);
 	Interval<T> operator *(const Interval<T>& i) const;
-	Interval<T> operator *(T v) const;
+	Interval<T> operator *(const T& v) const;
 	Interval<T>& operator *=(const Interval<T>& i);
-	Interval<T>& operator *=(T v);
+	Interval<T>& operator *=(const T& v);
 	/// @}
 
 	/// \return the inverse of the current interval
@@ -206,20 +206,20 @@ public:
 
 	/// Constructor
 	/// \param x array of N intervals to be copied into the group
-	explicit Interval_nD<T, N>(const std::array<Interval<T>, N>& x);
+	explicit Interval_nD(const std::array<Interval<T>, N>& x);
 
-	/// Copy Constructor
+	/// Copy constructor
 	/// \param interval interval group to copied
-	Interval_nD<T, N>(const Interval_nD<T, N>& interval);
+	Interval_nD(const Interval_nD<T, N>& interval);
 
 	/// Move constructor
 	/// \param i Interval to be copied
-	Interval_nD<T, N>(Interval_nD<T, N>&& i);
+	Interval_nD(Interval_nD<T, N>&& i);
 
 	/// Constructor
 	/// \param a array of N values to be used as the respective minimums for the interval entries.
 	/// \param b array of N values to be used as the respective maximums for the interval entries.
-	Interval_nD<T, N>(const std::array<T, N>& a, const std::array<T, N>& b);
+	Interval_nD(const std::array<T, N>& a, const std::array<T, N>& b);
 
 	/// Assignment operator
 	/// \param interval Interval group to be copied
@@ -250,7 +250,7 @@ public:
 	/// Widens every interval in the current interval group by thickness on both sides
 	/// \param thickness the amount to widen on both sides
 	/// \return the current interval group after modification
-	Interval_nD<T, N>& addThickness(const double thickness);
+	Interval_nD<T, N>& addThickness(const T& thickness);
 
 	/// @{
 	/// Standard arithmetic operators extended to interval groups
@@ -264,7 +264,7 @@ public:
 
 	/// \return the inverse of each interval in the interval group
 	/// \exception if any interval includes 0
-	Interval_nD<T, N> inverse(void) const;
+	Interval_nD<T, N> inverse() const;
 
 	/// \param interval the interval to be divided by
 	/// \return the product of each interval in the group multiplied by the inverse of
@@ -323,26 +323,26 @@ public:
 
 	/// Constructor
 	/// \param x array of 3 intervals to be copied into the group
-	explicit Interval_nD<T, 3>(const std::array<Interval<T>, 3>& x);
+	explicit Interval_nD(const std::array<Interval<T>, 3>& x);
 
 	/// Constructor
 	/// \param x first interval to be added to the 3 group
 	/// \param y second interval to be added to the 3 group
 	/// \param z third interval to be added to the 3 group
-	Interval_nD<T, 3>(Interval<T> x, Interval<T> y, Interval<T> z);
+	Interval_nD(Interval<T> x, Interval<T> y, Interval<T> z);
 
-	/// Copy Constructor
+	/// Copy constructor
 	/// \param i interval 3 group to copied
-	Interval_nD<T, 3>(const Interval_nD<T, 3>& i);
+	Interval_nD(const Interval_nD<T, 3>& i);
 
 	/// Move constructor
 	/// \param i Interval to be copied
-	Interval_nD<T, 3>(Interval_nD<T, 3>&& i);
+	Interval_nD(Interval_nD<T, 3>&& i);
 
 	/// Constructor
 	/// \param a array of 3 values to be used as the respective minimums for the interval entries.
 	/// \param b array of 3 values to be used as the respective maximums for the interval entries.
-	Interval_nD<T, 3>(const std::array<T, 3>& a, const std::array<T, 3>& b);
+	Interval_nD(const std::array<T, 3>& a, const std::array<T, 3>& b);
 
 	/// Assignment operator
 	/// \param i Interval 3 group to be copied
@@ -373,7 +373,7 @@ public:
 	/// Widens every interval in the current interval group by thickness on both sides
 	/// \param thickness the amount to widen on both sides
 	/// \return the current interval group after modification
-	Interval_nD<T, 3>& addThickness(const double thickness);
+	Interval_nD<T, 3>& addThickness(const T& thickness);
 
 	/// @{
 	/// Standard arithmetic operators extended to 3 interval groups
@@ -387,7 +387,7 @@ public:
 
 	/// \return the inverse of each interval in the 3 interval group
 	/// \exception if any interval includes 0
-	Interval_nD<T, 3> inverse(void) const;
+	Interval_nD<T, 3> inverse() const;
 
 	/// \param i the interval to be divided by
 	/// \return the product of each interval in the 3 group multiplied by the inverse of

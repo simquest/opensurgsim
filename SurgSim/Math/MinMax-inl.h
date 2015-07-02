@@ -143,7 +143,8 @@ void minMax(const T& a1, const T& a2, const T& a3, const T& a4, const T& a5, T* 
 template <class T>
 void minMax(const T* values, int numValues, T* minVal, T* maxVal)
 {
-	SURGSIM_ASSERT(numValues > 0) << "MinMax was called with <=0 values; the result is indeterminate";
+	SURGSIM_ASSERT(numValues > 0) << "MinMax was called with a negative or null" <<
+								  " number of values; the result is indeterminate.";
 	T min = values[0];
 	T max = values[0];
 	for (int i = 1; i < numValues; ++i)
