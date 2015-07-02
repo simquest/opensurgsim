@@ -16,8 +16,6 @@
 #ifndef SURGSIM_MATH_INTERVALARITHMETIC_INL_H
 #define SURGSIM_MATH_INTERVALARITHMETIC_INL_H
 
-#include <ostream>
-
 #include "SurgSim/Math/MinMax.h"
 
 namespace SurgSim
@@ -55,17 +53,13 @@ Interval<T>& Interval<T>::operator=(const Interval<T>& i)
 template <class T>
 Interval<T>& Interval<T>::operator=(Interval<T>&& i)
 {
-	if (this != &i)
-	{
-		m_min = i.m_min;
-		m_max = i.m_max;
-	}
-
+	m_min = i.m_min;
+	m_max = i.m_max;
 	return *this;
 }
 
 template <class T>
-Interval<T> Interval<T>::minToMax(const T a1, const T a2)
+Interval<T> Interval<T>::minToMax(const T& a1, const T& a2)
 {
 	T min, max;
 	minMax(a1, a2, &min, &max);
@@ -73,7 +67,7 @@ Interval<T> Interval<T>::minToMax(const T a1, const T a2)
 }
 
 template <class T>
-Interval<T> Interval<T>::minToMax(const T a1, const T a2, const T a3)
+Interval<T> Interval<T>::minToMax(const T& a1, const T& a2, const T& a3)
 {
 	T min, max;
 	minMax(a1, a2, a3, &min, &max);
@@ -81,7 +75,7 @@ Interval<T> Interval<T>::minToMax(const T a1, const T a2, const T a3)
 }
 
 template <class T>
-Interval<T> Interval<T>::minToMax(const T a1, const T a2, const T a3, const T a4)
+Interval<T> Interval<T>::minToMax(const T& a1, const T& a2, const T& a3, const T& a4)
 {
 	T min, max;
 	minMax(a1, a2, a3, a4, &min, &max);
@@ -95,7 +89,7 @@ bool Interval<T>::overlapsWith(const Interval<T>& i) const
 }
 
 template <class T>
-bool Interval<T>::contains(T val) const
+bool Interval<T>::contains(const T& val) const
 {
 	return (m_min <= val && m_max >= val);
 }
@@ -125,7 +119,7 @@ bool Interval<T>::operator !=(const Interval<T>& i) const
 }
 
 template <class T>
-Interval<T>& Interval<T>::addThickness(const T thickness)
+Interval<T>& Interval<T>::addThickness(const T& thickness)
 {
 	m_min -= thickness;
 	m_max += thickness;
@@ -133,7 +127,7 @@ Interval<T>& Interval<T>::addThickness(const T thickness)
 }
 
 template <class T>
-Interval<T>& Interval<T>::extendToInclude(T x)
+Interval<T>& Interval<T>::extendToInclude(const T& x)
 {
 	if (x < m_min)
 	{
@@ -167,7 +161,7 @@ Interval<T> Interval<T>::operator +(const Interval<T>& i) const
 }
 
 template <class T>
-Interval<T> Interval<T>::operator +(T v) const
+Interval<T> Interval<T>::operator +(const T& v) const
 {
 	return Interval<T>(m_min + v, m_max + v);
 }
@@ -181,7 +175,7 @@ Interval<T>& Interval<T>::operator +=(const Interval<T>& i)
 }
 
 template <class T>
-Interval<T>& Interval<T>::operator +=(T v)
+Interval<T>& Interval<T>::operator +=(const T& v)
 {
 	m_min += v;
 	m_max += v;
@@ -201,7 +195,7 @@ Interval<T> Interval<T>::operator -(const Interval<T>& i) const
 }
 
 template <class T>
-Interval<T> Interval<T>::operator -(T v) const
+Interval<T> Interval<T>::operator -(const T& v) const
 {
 	return Interval<T>(m_min - v, m_max - v);
 }
@@ -215,7 +209,7 @@ Interval<T>& Interval<T>::operator -=(const Interval<T>& i)
 }
 
 template <class T>
-Interval<T>& Interval<T>::operator -=(T v)
+Interval<T>& Interval<T>::operator -=(const T& v)
 {
 	m_min -= v;
 	m_max -= v;
@@ -229,7 +223,7 @@ Interval<T> Interval<T>::operator *(const Interval<T>& i) const
 }
 
 template <class T>
-Interval<T> Interval<T>::operator *(T v) const
+Interval<T> Interval<T>::operator *(const T& v) const
 {
 	if (v >= 0)
 	{
@@ -249,7 +243,7 @@ Interval<T>& Interval<T>::operator *=(const Interval<T>& i)
 }
 
 template <class T>
-Interval<T>& Interval<T>::operator *=(T v)
+Interval<T>& Interval<T>::operator *=(const T& v)
 {
 	*this = minToMax(v * m_min, v * m_max);
 	return *this;
@@ -426,7 +420,7 @@ bool Interval_nD<T, N>::operator !=(const Interval_nD<T, N>& interval) const
 }
 
 template <class T, int N>
-Interval_nD<T, N>& Interval_nD<T, N>::addThickness(const double thickness)
+Interval_nD<T, N>& Interval_nD<T, N>::addThickness(const T& thickness)
 {
 	for (int i = 0; i < N; i++)
 	{
@@ -499,7 +493,7 @@ Interval_nD<T, N>& Interval_nD<T, N>::operator *=(const Interval_nD<T, N>& inter
 }
 
 template <class T, int N>
-Interval_nD<T, N> Interval_nD<T, N>::inverse(void) const
+Interval_nD<T, N> Interval_nD<T, N>::inverse() const
 {
 	Interval_nD<T, N> ret;
 	for (int i = 0; i < N; i++)
@@ -626,13 +620,9 @@ Interval_nD<T, 3>& Interval_nD<T, 3>::operator =(const Interval_nD<T, 3>& i)
 template <class T>
 Interval_nD<T, 3>& Interval_nD<T, 3>::operator=(Interval_nD<T, 3>&& i)
 {
-	if (this != &i)
-	{
-		m_interval[0] = i.m_interval[0];
-		m_interval[1] = i.m_interval[1];
-		m_interval[2] = i.m_interval[2];
-	}
-
+	m_interval[0] = i.m_interval[0];
+	m_interval[1] = i.m_interval[1];
+	m_interval[2] = i.m_interval[2];
 	return *this;
 }
 
@@ -664,7 +654,7 @@ bool Interval_nD<T, 3>::operator !=(const Interval_nD<T, 3>& i) const
 }
 
 template <class T>
-Interval_nD<T, 3>& Interval_nD<T, 3>::addThickness(const double thickness)
+Interval_nD<T, 3>& Interval_nD<T, 3>::addThickness(const T& thickness)
 {
 	m_interval[0].addThickness(thickness);
 	m_interval[1].addThickness(thickness);
@@ -721,7 +711,7 @@ Interval_nD<T, 3>& Interval_nD<T, 3>::operator *=(const Interval_nD<T, 3>& i)
 }
 
 template <class T>
-Interval_nD<T, 3> Interval_nD<T, 3>::inverse(void) const
+Interval_nD<T, 3> Interval_nD<T, 3>::inverse() const
 {
 	return Interval_nD<T, 3>(m_interval[0].inverse(), m_interval[1].inverse(), m_interval[2].inverse());
 }

@@ -78,14 +78,14 @@ public:
 	/// \param a1 first input value
 	/// \param a2 second input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(const T a1, const T a2);
+	static Interval<T> minToMax(const T& a1, const T& a2);
 
 	/// Generate an interval from min to max based on the inputs
 	/// \param a1 first input value
 	/// \param a2 second input value
 	/// \param a3 third input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(const T a1, const T a2, const T a3);
+	static Interval<T> minToMax(const T& a1, const T& a2, const T& a3);
 
 	/// Generate an interval from min to max based on the inputs
 	/// \param a1 first input value
@@ -93,7 +93,7 @@ public:
 	/// \param a3 third input value
 	/// \param a4 fourth input value
 	/// \return an interval spanning the minimum input to the maximum input.
-	static Interval<T> minToMax(const T a1, const T a2, const T a3, const T a4);
+	static Interval<T> minToMax(const T& a1, const T& a2, const T& a3, const T& a4);
 
 	/// \param i the interval the current interval will be tested against
 	/// \return true if the input interval overlaps the current interval
@@ -101,7 +101,7 @@ public:
 
 	/// \param val the value to test for inclusion in the interval
 	/// \return true if the current interval contains val
-	bool contains(T val) const;
+	bool contains(const T& val) const;
 
 	/// \return true if the current interval contains 0
 	bool containsZero() const;
@@ -122,12 +122,12 @@ public:
 	/// Widens the current interval by thickness on both sides
 	/// \param thickness the amount to widen the current interval on both sides
 	/// \return the current interval after modification
-	Interval<T>& addThickness(const T thickness);
+	Interval<T>& addThickness(const T& thickness);
 
 	/// Widens the current interval on one end to include x
 	/// \param x the value to be included in the interval
 	/// \return the current interval extended to include x
-	Interval<T>& extendToInclude(T x);
+	Interval<T>& extendToInclude(const T& x);
 
 	/// Widens the current interval on both ends to include i
 	/// \param i the interval to be wholly contained in the current interval
@@ -137,18 +137,18 @@ public:
 	/// @{
 	/// Standard arithmetic operators extended to intervals
 	Interval<T> operator +(const Interval<T>& i) const;
-	Interval<T> operator +(T v) const;
+	Interval<T> operator +(const T& v) const;
 	Interval<T>& operator +=(const Interval<T>& i);
-	Interval<T>& operator +=(T v);
+	Interval<T>& operator +=(const T& v);
 	Interval<T> operator -() const;
 	Interval<T> operator -(const Interval<T>& i) const;
-	Interval<T> operator -(T v) const;
+	Interval<T> operator -(const T& v) const;
 	Interval<T>& operator -=(const Interval<T>& i);
-	Interval<T>& operator -=(T v);
+	Interval<T>& operator -=(const T& v);
 	Interval<T> operator *(const Interval<T>& i) const;
-	Interval<T> operator *(T v) const;
+	Interval<T> operator *(const T& v) const;
 	Interval<T>& operator *=(const Interval<T>& i);
-	Interval<T>& operator *=(T v);
+	Interval<T>& operator *=(const T& v);
 	/// @}
 
 	/// \return the inverse of the current interval
@@ -250,7 +250,7 @@ public:
 	/// Widens every interval in the current interval group by thickness on both sides
 	/// \param thickness the amount to widen on both sides
 	/// \return the current interval group after modification
-	Interval_nD<T, N>& addThickness(const double thickness);
+	Interval_nD<T, N>& addThickness(const T& thickness);
 
 	/// @{
 	/// Standard arithmetic operators extended to interval groups
@@ -264,7 +264,7 @@ public:
 
 	/// \return the inverse of each interval in the interval group
 	/// \exception if any interval includes 0
-	Interval_nD<T, N> inverse(void) const;
+	Interval_nD<T, N> inverse() const;
 
 	/// \param interval the interval to be divided by
 	/// \return the product of each interval in the group multiplied by the inverse of
@@ -373,7 +373,7 @@ public:
 	/// Widens every interval in the current interval group by thickness on both sides
 	/// \param thickness the amount to widen on both sides
 	/// \return the current interval group after modification
-	Interval_nD<T, 3>& addThickness(const double thickness);
+	Interval_nD<T, 3>& addThickness(const T& thickness);
 
 	/// @{
 	/// Standard arithmetic operators extended to 3 interval groups
@@ -387,7 +387,7 @@ public:
 
 	/// \return the inverse of each interval in the 3 interval group
 	/// \exception if any interval includes 0
-	Interval_nD<T, 3> inverse(void) const;
+	Interval_nD<T, 3> inverse() const;
 
 	/// \param i the interval to be divided by
 	/// \return the product of each interval in the 3 group multiplied by the inverse of
