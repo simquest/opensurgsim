@@ -219,7 +219,7 @@ bool LeapScaffold::unregisterDevice(const LeapDevice* device)
 	auto& devices = m_state->activeDevices;
 	if (device->isProvidingImages())
 	{
-		auto providingImages = [device](const std::unique_ptr<DeviceData>& info)
+		auto providingImages = [](const std::unique_ptr<DeviceData>& info)
 		{
 			return info->deviceObject->isProvidingImages();
 		};
