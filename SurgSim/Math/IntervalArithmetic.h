@@ -56,7 +56,7 @@ public:
 	/// \param min Lower bound of the constructed interval
 	/// \param max Upper bound of the constructed interval
 	/// \exception if max is less than min
-	Interval(T min, T max);
+	Interval(const T& min, const T& max);
 
 	/// Copy constructor
 	/// \param i Interval to be copied
