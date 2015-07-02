@@ -181,7 +181,7 @@ public:
 
 	/// Save the triangle mesh in the ply format
 	/// \param path the filename and path where to save
-	void save(const std::string path);
+	void save(const std::string& fileName);
 
 protected:
 	/// Remove all edges from the mesh.

@@ -294,9 +294,9 @@ void TriangleMesh<VertexData, EdgeData, TriangleData>::doClear()
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::save(const std::string path)
+void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::save(const std::string& fileName)
 {
-	auto out = std::fstream(path, std::ios::out);
+	auto out = std::fstream(fileName, std::ios::out);
 
 	if (out.is_open())
 	{
@@ -314,7 +314,7 @@ void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::
 			out << vertex.position[0] << " " << vertex.position[1] << " " << vertex.position[2] << std::endl;
 		}
 
-		for (const auto tri : getTriangles())
+		for (const auto& tri : getTriangles())
 		{
 			out << "3 " << tri.verticesId[0] << " " << tri.verticesId[1] << " " << tri.verticesId[2] << std::endl;
 		}
@@ -322,7 +322,7 @@ void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::
 		if (out.bad())
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
-					<< "There was a problem writing " << path;
+					<< "There was a problem writing " << fileName;
 		}
 
 		out.close();
@@ -330,7 +330,7 @@ void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::
 	else
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
-				<< "Could not open " << path << " for writing.";
+				<< "Could not open " << fileName << " for writing.";
 	}
 
 }
