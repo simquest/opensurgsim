@@ -160,8 +160,7 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Framework/Accessible"))
 					<< "Can't find property with name " << name << " in the accessible, while trying to set " <<
-					((data->second.Type() == YAML::NodeType::Scalar) ?
-					"value: " + data->second.as<std::string>() : "a non-Scalar node.");
+					data->second;
 		}
 		else
 		{
