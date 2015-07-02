@@ -112,7 +112,7 @@ private:
 	HandType m_handType;
 
 	/// Tracking mode
-	DataStructures::OptionalValue<LeapTrackingMode> m_trackingMode;
+	DataStructures::OptionalValue<LeapTrackingMode> m_requestedTrackingMode;
 };
 
 };

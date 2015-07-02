@@ -53,7 +53,7 @@ void LeapDevice::setTrackingMode(LeapTrackingMode mode)
 	{
 		m_scaffold->setTrackingMode(mode);
 	}
-	m_trackingMode.setValue(mode);
+	m_requestedTrackingMode = mode;
 }
 
 LeapTrackingMode LeapDevice::getTrackingMode() const
@@ -64,7 +64,7 @@ LeapTrackingMode LeapDevice::getTrackingMode() const
 	}
 	else
 	{
-		return m_trackingMode.getValue();
+		return m_requestedTrackingMode.getValue();
 	}
 }
 
@@ -74,9 +74,9 @@ bool LeapDevice::initialize()
 	m_scaffold = LeapScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(isInitialized()) << getName() << " initialization failed, cannot get scaffold.";
 
-	if (m_trackingMode.hasValue())
+	if (m_requestedTrackingMode.hasValue())
 	{
-		m_scaffold->setTrackingMode(m_trackingMode.getValue());
+		m_scaffold->setTrackingMode(m_requestedTrackingMode.getValue());
 	}
 
 	return m_scaffold->registerDevice(this);
