@@ -16,6 +16,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/GaussLegendreQuadrature.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
@@ -119,82 +120,6 @@ void Fem2DElementTriangle::initialize(const SurgSim::Math::OdeState& state)
 	computeStiffness(state, &m_K);
 }
 
-void Fem2DElementTriangle::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
-{
-	Eigen::Matrix<double, 18, 1> x, f;
-
-	// K.U = F_ext
-	// K.(x - x0) = F_ext
-	// 0 = F_ext + F_int, with F_int = -K.(x - x0)
-	getSubVector(state.getPositions(), m_nodeIds, 6, &x);
-	f = -scale * (m_K * (x - m_x0));
-	addSubVector(f, m_nodeIds, 6, F);
-}
-
-void Fem2DElementTriangle::addMass(const Math::OdeState& state, Math::SparseMatrix* M,
-								   double scale)
-{
-	assembleMatrixBlocks(scale * m_M, m_nodeIds, 6, M, false);
-}
-
-void Fem2DElementTriangle::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-									  double scale)
-{
-}
-
-void Fem2DElementTriangle::addStiffness(const Math::OdeState& state, Math::SparseMatrix* K,
-										double scale)
-{
-	assembleMatrixBlocks(scale * m_K, getNodeIds(), 6, K, false);
-}
-
-void Fem2DElementTriangle::addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F,
-								   SurgSim::Math::SparseMatrix* M, SurgSim::Math::SparseMatrix* D,
-								   SurgSim::Math::SparseMatrix* K)
-{
-	// Assemble the mass matrix
-	addMass(state, M);
-
-	// No damping matrix as we are using linear elasticity (not visco-elasticity)
-
-	// Assemble the stiffness matrix
-	addStiffness(state, K);
-
-	// Assemble the force vector
-	addForce(state, F);
-}
-
-void Fem2DElementTriangle::addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD,
-									 double alphaK, const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
-{
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::getSubVector;
-
-	if (alphaM == 0.0 && alphaK == 0.0)
-	{
-		return;
-	}
-
-	Eigen::Matrix<double, 18, 1> extractedX, extractedResult;
-	getSubVector(x, m_nodeIds, 6, &extractedX);
-
-	// Adds the mass contribution
-	if (alphaM != 0.0)
-	{
-		extractedResult = alphaM * (m_M * extractedX);
-		addSubVector(extractedResult, m_nodeIds, 6, F);
-	}
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK != 0.0)
-	{
-		extractedResult = alphaK * (m_K * extractedX);
-		addSubVector(extractedResult, m_nodeIds, 6, F);
-	}
-}
-
 void Fem2DElementTriangle::computeLocalMembraneMass(const SurgSim::Math::OdeState& state,
 													Eigen::Matrix<double, 18, 18>* localMassMatrix)
 {
@@ -238,7 +163,7 @@ void Fem2DElementTriangle::computeLocalMass(const SurgSim::Math::OdeState& state
 }
 
 void Fem2DElementTriangle::computeMass(const SurgSim::Math::OdeState& state,
-									   Eigen::Matrix<double, 18, 18>* massMatrix)
+									   SurgSim::Math::Matrix* massMatrix)
 {
 	computeLocalMass(state, &m_MLocal);
 
@@ -326,7 +251,7 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 }
 
 void Fem2DElementTriangle::computeStiffness(const SurgSim::Math::OdeState& state,
-											Eigen::Matrix<double, 18, 18>* stiffnessMatrix)
+											SurgSim::Math::Matrix* stiffnessMatrix)
 {
 	computeLocalStiffness(state, &m_KLocal);
 
@@ -403,6 +328,20 @@ SurgSim::Math::Vector Fem2DElementTriangle::computeNaturalCoordinate(
 {
 	SURGSIM_FAILURE() << "Function " << __FUNCTION__ << " not yet implemented.";
 	return SurgSim::Math::Vector3d::Zero();
+}
+
+void Fem2DElementTriangle::doUpdateFMDK(const Math::OdeState& state, int options)
+{
+	if (options & Math::ODEEQUATIONUPDATE_F)
+	{
+		Eigen::Matrix<double, 18, 1> x;
+
+		// K.U = F_ext
+		// K.(x - x0) = F_ext
+		// 0 = F_ext + F_int, with F_int = -K.(x - x0)
+		getSubVector(state.getPositions(), m_nodeIds, 6, &x);
+		m_f = -m_K * (x - m_x0);
+	}
 }
 
 void Fem2DElementTriangle::computeIntegral_dTd()

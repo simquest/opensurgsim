@@ -347,44 +347,6 @@ double MockFemElement::getVolume(const OdeState& state) const
 	return 1;
 }
 
-void MockFemElement::addForce(const OdeState& state, Vector* F,    double scale)
-{
-	SurgSim::Math::addSubVector(scale * m_F, m_nodeIds, 3, F);
-}
-
-void MockFemElement::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
-							 double scale)
-{
-	assembleMatrixBlocks(scale * m_M, m_nodeIds, 3, M, false);
-}
-
-void MockFemElement::addDamping(const OdeState& state, SparseMatrix* D, double scale)
-{
-	assembleMatrixBlocks(scale * m_D, m_nodeIds, 3, D, false);
-}
-
-void MockFemElement::addStiffness(const OdeState& state, SparseMatrix* K, double scale)
-{
-	assembleMatrixBlocks(scale * m_K, m_nodeIds, 3, K, false);
-}
-
-void MockFemElement::addFMDK(const OdeState& state, Vector* f, SparseMatrix* M, SparseMatrix* D, SparseMatrix* K)
-{
-	addForce(state, f);
-	addMass(state, M);
-	addDamping(state, D);
-	addStiffness(state, K);
-}
-
-void MockFemElement::addMatVec(const OdeState& state, double alphaM, double alphaD, double alphaK,
-							   const Vector& x, Vector* F)
-{
-	Vector xLocal(3 * m_nodeIds.size()), fLocal;
-	SurgSim::Math::getSubVector(x, m_nodeIds, 3, &xLocal);
-	fLocal = (alphaM * m_M + alphaD * m_D + alphaK * m_K) * xLocal;
-	SurgSim::Math::addSubVector(fLocal, m_nodeIds, 3, F);
-}
-
 Vector MockFemElement::computeCartesianCoordinate(const OdeState& state, const Vector& barycentricCoordinate) const
 {
 	return SurgSim::Math::Vector3d::Zero();
@@ -398,22 +360,24 @@ Vector MockFemElement::computeNaturalCoordinate(const OdeState& state, const Vec
 void MockFemElement::initializeMembers()
 {
 	m_isInitialized = false;
+	m_useDamping = true;
 	setNumDofPerNode(3);
+}
+
+void MockFemElement::doUpdateFMDK(const Math::OdeState& state, int options)
+{
 }
 
 void MockFemElement::initialize(const OdeState& state)
 {
 	FemElement::initialize(state);
 	const size_t numDof = 3 * m_nodeIds.size();
-	m_F = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));
-	m_M.resize(static_cast<SparseMatrix::Index>(numDof), static_cast<SparseMatrix::Index>(numDof));
+	m_f = Vector::LinSpaced(numDof, 1.0, static_cast<double>(numDof));
 	m_M.setIdentity();
 
-	m_D.resize(static_cast<SparseMatrix::Index>(numDof), static_cast<SparseMatrix::Index>(numDof));
 	m_D.setIdentity();
 	m_D *= 2.0;
 
-	m_K.resize(static_cast<SparseMatrix::Index>(numDof), static_cast<SparseMatrix::Index>(numDof));
 	m_K.setIdentity();
 	m_K *= 3.0;
 
