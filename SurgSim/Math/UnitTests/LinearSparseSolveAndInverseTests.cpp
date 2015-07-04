@@ -182,7 +182,7 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseCGMatrixComponentsTest)
 			inverseMatrix << std::endl;
 
 	solveAndInverse.setTolerance(highPrecision);
-	solveAndInverse.setMaxIterations(20);
+	solveAndInverse.setMaxIterations(18);
 	x = solveAndInverse.solve(b);
 	EXPECT_TRUE(x.isApprox(expectedX, lowPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
 			"Expected: " << expectedX.transpose() << std::endl;

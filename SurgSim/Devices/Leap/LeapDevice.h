@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Input/CommonDevice.h"
 
 
@@ -45,6 +46,8 @@ enum LeapTrackingMode
 /// \par Application input provided by the device:
 ///   | type       | name              			|                                                                   |
 ///   | ----       | ----              			| ---                                                               |
+///   | image      | "left"						| Left infrared image, each pixel value is between 0 and 1.			|
+///   | image      | "right"					| Right infrared image, each pixel value is between 0 and 1.		|
 ///   | pose       | "pose"						| %Hand pose 														|
 ///   | pose       | "ThumbProximal"			| %Pose of thumb proximal joint										|
 ///   | pose       | "ThumbIntermediate"		| %Pose of thumb intermediate joint									|
@@ -83,13 +86,25 @@ public:
 	/// \return The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
 	HandType getHandType() const;
 
-	/// Set tracking mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
-	/// \param mode tracking mode
+	/// Set the hand tracking mode
+	/// This is a global setting that optimizes hand tracking based on the Leap camera
+	/// placement. The default is LEAP_TRACKING_MODE_DESKTOP, where the camera is placed
+	/// face up on a desktop. Use LEAP_TRACKING_MODE_HMD when the camera is attached to
+	/// the front of a head mounted display.
+	/// \param mode The tracking mode, either LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
 	void setTrackingMode(LeapTrackingMode mode);
 
-	/// Get tracking mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
-	/// \return current tracking mode
+	/// Get the hand tracking mode
+	/// \return The current tracking mode, either LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
 	LeapTrackingMode getTrackingMode() const;
+
+	/// Set if the device should provide the stereo infrared images
+	/// \param provideImages True if providing images
+	void setProvideImages(bool provideImages);
+
+	/// Get if the device should provide the stereo infrared images
+	/// \return True if providing images
+	bool isProvidingImages() const;
 
 	bool initialize() override;
 
@@ -107,7 +122,10 @@ private:
 	HandType m_handType;
 
 	/// Tracking mode
-	LeapTrackingMode m_trackingMode;
+	DataStructures::OptionalValue<LeapTrackingMode> m_requestedTrackingMode;
+
+	/// Request Camera Images mode
+	bool m_isProvidingImages;
 };
 
 };
