@@ -166,12 +166,12 @@ void GlutImage::draw()
 		switch (imageData.getNumChannels())
 		{
 		case 1:
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageData.getWidth(), imageData.getHeight(), 0, GL_LUMINANCE,
-					GL_FLOAT, imageData.getData());
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, static_cast<GLsizei>(imageData.getWidth()),
+					static_cast<GLsizei>(imageData.getHeight()), 0, GL_LUMINANCE, GL_FLOAT, imageData.getData());
 			break;
 		case 3:
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageData.getWidth(), imageData.getHeight(), 0, GL_RGB, GL_FLOAT,
-					imageData.getData());
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, static_cast<GLsizei>(imageData.getWidth()),
+					static_cast<GLsizei>(imageData.getHeight()), 0, GL_RGB, GL_FLOAT, imageData.getData());
 			break;
 		}
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -247,7 +247,7 @@ void GlutRenderer::initialize()
 
 void GlutRenderer::display()
 {
-	glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
+	glViewport(0, 0, static_cast<GLsizei>(m_width), static_cast<GLsizei>(m_height));
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	if (m_camera)

@@ -41,7 +41,7 @@ public:
 		SurgSim::Math::Vector2d xRange;
 		for (size_t i = 0; i < numImages; i++)
 		{
-			xRange = SurgSim::Math::Vector2d(-numImages + i, -numImages + i + 1) / numImages;
+			xRange = SurgSim::Math::Vector2d(i - numImages, i - numImages + 1) / numImages;
 			auto view = std::make_shared<GlutImage>(Eigen::AlignedBox<double, 2>(xRange, yRange));
 			GlutRenderer::addObject(view);
 			m_views.insert(std::make_pair(imageNames[i], view));
