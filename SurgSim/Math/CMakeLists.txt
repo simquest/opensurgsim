@@ -56,6 +56,8 @@ set(SURGSIM_MATH_HEADERS
 	DoubleSidedPlaneShape.h
 	GaussLegendreQuadrature.h
 	Geometry.h
+	IntervalArithmetic.h
+	IntervalArithmetic-inl.h
 	KalmanFilter.h
 	KalmanFilter-inl.h
 	LinearSolveAndInverse.h
@@ -66,6 +68,8 @@ set(SURGSIM_MATH_HEADERS
 	Matrix.h
 	MeshShape.h
 	MeshShape-inl.h
+	MinMax.h
+	MinMax-inl.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h
 	MlcpGaussSeidelSolver.h
