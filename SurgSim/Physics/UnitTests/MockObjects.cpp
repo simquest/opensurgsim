@@ -401,7 +401,7 @@ MockFemRepresentation::~MockFemRepresentation()
 
 void MockFemRepresentation::setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState)
 {
-	setInitialState(initialState);
+	FemRepresentation::setInitialState(initialState);
 	m_setInitialStateCalled = true;
 }
 

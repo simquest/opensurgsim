@@ -542,24 +542,6 @@ TEST_F(FemRepresentationTests, SetInitialStateTest)
 {
 	auto fem = std::make_shared<MockFemRepresentation>("Test-Fem");
 	
-	// Setup the initial state
-	auto initialState = std::make_shared<SurgSim::Math::OdeState>();
-	initialState->setNumDof(fem->getNumDofPerNode(), 3);
-	fem->setInitialState(initialState);
-
-	// Add one element
-	std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
-	element->setMassDensity(m_rho);
-	element->setPoissonRatio(m_nu);
-	element->setYoungModulus(m_E);
-	element->addNode(0);
-	element->addNode(1);
-	element->addNode(2);
-	fem->addFemElement(element);
-
-	fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-	fem->wakeUp();
-
 	EXPECT_FALSE(fem->hasSetInitialStateBeenCalled());
 	fem->setInitialState(m_initialState);
 	EXPECT_TRUE(fem->hasSetInitialStateBeenCalled());
