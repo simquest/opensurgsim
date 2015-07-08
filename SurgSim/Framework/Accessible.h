@@ -158,8 +158,8 @@ private:
 
 	/// @{
 	/// Prevent default copy construction and default assignment
-// 	Accessible(const Accessible& other) /*= delete*/;
-// 	Accessible& operator=(const Accessible& other) /*= delete*/;
+	Accessible(const Accessible& other) /*= delete*/;
+	Accessible& operator=(const Accessible& other) /*= delete*/;
 	/// @}
 
 	/// Private struct to keep the map under control

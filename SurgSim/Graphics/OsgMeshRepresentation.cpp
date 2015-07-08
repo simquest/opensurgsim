@@ -69,6 +69,8 @@ void OsgMeshRepresentation::setMesh(std::shared_ptr<SurgSim::Framework::Asset> m
 	auto graphicsMesh = std::dynamic_pointer_cast<Mesh>(mesh);
 	SURGSIM_ASSERT(graphicsMesh != nullptr) << "Mesh for OsgMeshRepresentation needs to be a SurgSim::Graphics::Mesh";
 	m_mesh = graphicsMesh;
+	m_updateCount = m_mesh->getUpdateCount();
+	m_mesh->dirty();
 	buildGeometry();
 }
 

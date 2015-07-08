@@ -87,6 +87,21 @@ public:
 	/// Destructor
 	virtual ~TriangleMesh();
 
+	/// Move Constructor
+	/// \param other Constructor source
+	TriangleMesh(TriangleMesh&& other);
+
+	/// Copy Assignment
+	/// \param other Assignment source
+	TriangleMesh<VertexData, EdgeData, TriangleData>& operator=(
+		const TriangleMesh<VertexData, EdgeData, TriangleData>& other);
+
+	/// Move Assignment
+	/// \param other Assignment source
+	TriangleMesh<VertexData, EdgeData, TriangleData>& operator=(
+		TriangleMesh<VertexData, EdgeData, TriangleData>&& other);
+
+
 	std::string getClassName() const override;
 
 	/// Adds an edge to the mesh.
