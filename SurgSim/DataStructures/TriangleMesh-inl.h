@@ -296,7 +296,7 @@ void TriangleMesh<VertexData, EdgeData, TriangleData>::doClear()
 template <class VertexData, class EdgeData, class TriangleData>
 void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::save(const std::string& fileName)
 {
-	auto out = std::fstream(fileName, std::ios::out);
+	std::fstream out(fileName, std::ios::out);
 
 	if (out.is_open())
 	{

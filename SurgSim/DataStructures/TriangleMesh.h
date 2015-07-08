@@ -221,6 +221,9 @@ public:
 	// Dependent name resolution for inherited functions and typenames from templates
 	using typename Vertices<VertexData>::VertexType;
 	using Vertices<VertexData>::addVertex;
+	using Vertices<VertexData>::getNumVertices;
+	using Vertices<VertexData>::getVertices;
+
 };
 
 typedef TriangleMesh<EmptyData, EmptyData, EmptyData> TriangleMeshPlain;
