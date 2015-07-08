@@ -389,13 +389,20 @@ bool MockFemElement::isInitialized() const
 	return m_isInitialized;
 }
 
-MockFemRepresentation::MockFemRepresentation(const std::string& name) : FemRepresentation(name)
+MockFemRepresentation::MockFemRepresentation(const std::string& name)
+	: FemRepresentation(name), m_setInitialStateCalled(false)
 {
 	this->m_numDofPerNode = 3;
 }
 
 MockFemRepresentation::~MockFemRepresentation()
 {
+}
+
+void MockFemRepresentation::setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState)
+{
+	FemRepresentation::setInitialState(initialState);
+	m_setInitialStateCalled = true;
 }
 
 void MockFemRepresentation::loadFem(const std::string &filename)
@@ -446,6 +453,11 @@ void MockFemRepresentation::clearFMDK()
 
 void MockFemRepresentation::transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform)
 {
+}
+
+bool MockFemRepresentation::hasSetInitialStateBeenCalled()
+{
+	return m_setInitialStateCalled;
 }
 
 SurgSim::Math::Matrix

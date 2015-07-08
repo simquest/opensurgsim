@@ -124,7 +124,7 @@ void Fem1DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 		}
 	}
 
-	FemRepresentation::setInitialState(state);
+	setInitialState(state);
 }
 
 std::shared_ptr<Fem1D> Fem1DRepresentation::getFem() const

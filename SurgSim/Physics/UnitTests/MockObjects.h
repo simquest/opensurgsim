@@ -273,6 +273,8 @@ public:
 	/// Destructor
 	virtual ~MockFemRepresentation();
 
+	void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState) override;
+
 	void loadFem(const std::string& filename) override;
 
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
@@ -287,11 +289,16 @@ public:
 
 	void clearFMDK();
 
+	bool hasSetInitialStateBeenCalled();
+
 protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
 	void transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform) override;
+
+	// Flag to be set when setInitialState of this class is called.
+	bool m_setInitialStateCalled;
 };
 
 class MockFemRepresentationValidComplianceWarping : public MockFemRepresentation
