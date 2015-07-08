@@ -541,7 +541,7 @@ TEST_F(FemRepresentationTests, SerializationTest)
 TEST_F(FemRepresentationTests, SetInitialStateTest)
 {
 	auto fem = std::make_shared<MockFemRepresentation>("Test-Fem");
-	
+
 	EXPECT_FALSE(fem->hasSetInitialStateBeenCalled());
 	fem->setInitialState(m_initialState);
 	EXPECT_TRUE(fem->hasSetInitialStateBeenCalled());
