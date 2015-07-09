@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
@@ -36,17 +36,23 @@ public:
 
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
-	explicit FreeMotion(bool doCopyState = false);
+	/// \param parallelExecution Specify a parallel (multi-threaded) execution or sequential (single threaded)
+	explicit FreeMotion(bool doCopyState = false, bool parallelExecution = false);
 
 	/// Destructor
 	~FreeMotion();
 
 protected:
-
 	/// Override doUpdate from superclass
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 		override;
 
+private:
+	/// Variable indicating if the free motions are computed in parallel or not
+	bool m_parallelExecution;
+
+	/// Thread pool to execute the free motions in parallel if m_parallelExecution is true
+	SurgSim::Framework::ThreadPool m_threadPool;
 };
 
 }; // Physics
