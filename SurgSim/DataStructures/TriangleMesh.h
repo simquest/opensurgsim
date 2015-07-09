@@ -180,7 +180,7 @@ public:
 	bool isValid() const;
 
 	/// Save the triangle mesh in the ply format
-	/// \param path the filename and path where to save
+	/// \param fileName the filename where to save
 	void save(const std::string& fileName);
 
 protected:
