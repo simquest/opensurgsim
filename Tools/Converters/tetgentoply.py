@@ -31,9 +31,9 @@ if __name__ == '__main__':
 	parser.add_argument('elements', help='Filename for the tetrahedrons input.')
 	parser.add_argument('--faces', help='Filename for the faces input.')
 	parser.add_argument('--fixedNodes', help='Filename for the fixed node indices.')
-	parser.add_argument('--MassDensity', help='Mass density, default.', default='2000.0')
-	parser.add_argument('--YoungModulus', help='Young modulus.', default='1e7')
-	parser.add_argument('--PoissonRatio', help='Poisson ratio.', default='0.45')
+	parser.add_argument('--massDensity', help='Mass density.', default='2000.0')
+	parser.add_argument('--youngModulus', help='Young modulus.', default='1e7')
+	parser.add_argument('--poissonRatio', help='Poisson ratio.', default='0.45')
 	parser.add_argument('output', help='Filename for the PLY output.')
 	args = parser.parse_args()
 
@@ -164,4 +164,4 @@ if __name__ == '__main__':
 			writer.writerow(['0.01'])
 
 		# Write the material (default parameters)
-		writer.writerow([args.MassDensity, args.PoissonRatio, args.YoungModulus])
+		writer.writerow([args.massDensity, args.poissonRatio, args.youngModulus])
