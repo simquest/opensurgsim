@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
 		writer.writerow(['ply'])
 		writer.writerow(['format', 'ascii', '1.0'])
-		writer.writerow(['comment', 'Created', 'by', 'hand'])
+		writer.writerow(['comment', 'Created', 'by', 'tetgen2ply'])
 
 		with open(args.nodes, 'rb') as csvNodeFile:
 			reader = csv.reader(csvNodeFile, delimiter = ' ', skipinitialspace = True)
