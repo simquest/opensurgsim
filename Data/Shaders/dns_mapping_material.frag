@@ -35,7 +35,7 @@ struct LightSource {
 
 uniform LightSource lightSource;
 
-uniform vec3 ambientColor;
+uniform vec4 ambientColor;
 
 
 /// Fragment shader supplied values
