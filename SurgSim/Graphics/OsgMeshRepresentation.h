@@ -100,6 +100,7 @@ private:
 	///@}
 
 	/// Updates the internal arrays in accordance to the sizes given in the mesh
+	/// \param mesh The mesh used to update
 	/// \param geometry [out] The geometry that carries the data
 	/// \return updateOptions value that indicates which of the structures where updated in size and
 	/// 		will have to be updated independent of the value set in setUpdateOptions()
@@ -107,6 +108,7 @@ private:
 
 	/// Copies the attributes for each mesh vertex in the appropriate osg structure, this will only be done
 	/// for the data as is indicated by updateOptions
+	/// \param mesh The mesh used to update
 	/// \param geometry [out] The geometry that carries the data
 	/// \param updateOptions Set of flags indicating whether a specific vertex attribute should be updated
 	void updateVertices(const Mesh& mesh, osg::Geometry* geometry, int updateOptions);
@@ -116,6 +118,7 @@ private:
 	void updateNormals(osg::Geometry* geometry);
 
 	/// Updates the triangles.
+	/// \param mesh The mesh used to update
 	/// \param geometry [out] The geometry that carries the data
 	void updateTriangles(const Mesh& mesh, osg::Geometry* geometry);
 
