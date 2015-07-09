@@ -29,7 +29,7 @@ namespace Physics
 
 class Representation;
 
-/// Apply the Freemotion calcluation to all physics representations
+/// Apply the FreeMotion calculation to all physics representations
 class FreeMotion  : public Computation
 {
 public:
