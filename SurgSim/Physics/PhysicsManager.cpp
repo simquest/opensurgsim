@@ -55,7 +55,7 @@ bool PhysicsManager::doInitialize()
 {
 	bool copyState = false;
 	addComputation(std::make_shared<PreUpdate>(copyState));
-	addComputation(std::make_shared<FreeMotion>(copyState));
+	addComputation(std::make_shared<FreeMotion>(copyState, true));
 	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
 	addComputation(std::make_shared<DcdCollision>(copyState));
 	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
