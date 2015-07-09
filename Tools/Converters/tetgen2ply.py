@@ -66,14 +66,14 @@ if __name__ == '__main__':
 			reader = csv.reader(csvElementFile, delimiter = ' ', skipinitialspace = True)
 			row = reader.next()
 			numElements = row[0]
-			if not row[1] == '4' and not row[1] == '3':
-				raise Exception('Invalid triangle/tetrahedron information in ' + args.ele + '. Element dimension (expecting 3 or 4) was ' + row[1])
 		if row[1] == '4':
 			writer.writerow(['element', '3d_element', numElements])
 			elementSize = 4
-		if row[1] == '3':
+		elif row[1] == '3':
 			writer.writerow(['element', '2d_element', numElements])
 			elementSize = 3
+		else :
+			raise Exception('Invalid triangle/tetrahedron information in ' + args.ele + '. Element dimension (expecting 3 or 4) was ' + row[1])
 		writer.writerow(['property', 'list', 'uint', 'uint', 'vertex_indices'])
 
 		if args.faces:
