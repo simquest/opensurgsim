@@ -56,7 +56,7 @@ void main(void)
 	vec3 normalDir = texture2D(normalMap, texCoord0).rgb * 2.0 - 1.0;
 	normalDir.g = -normalDir.g;
 
-	vec3 vAmbient = ambientColor;
+	vec3 vAmbient = vec3(ambientColor);
     
 	vec3 lightDirNorm = normalize(lightDir);
 	vec3 eyeDirNorm = normalize(eyeDir);
