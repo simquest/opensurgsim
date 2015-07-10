@@ -36,8 +36,8 @@ public:
 
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
-	/// \param parallelExecution Specify a parallel (multi-threaded) execution or sequential (single threaded)
-	explicit FreeMotion(bool doCopyState = false, bool parallelExecution = false);
+	/// \param numThreads The number of threads to run in parallel to execute this computation
+	explicit FreeMotion(bool doCopyState = false, size_t numThreads = boost::thread::hardware_concurrency() * 3 / 4);
 
 	/// Destructor
 	~FreeMotion();
