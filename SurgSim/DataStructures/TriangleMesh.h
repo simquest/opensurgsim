@@ -179,6 +179,10 @@ public:
 	/// \return True if the TriangleMesh is valid, False otherwise (the topology is then broken)
 	bool isValid() const;
 
+	/// Save the triangle mesh in the ply format
+	/// \param fileName the filename where to save
+	void save(const std::string& fileName);
+
 protected:
 	/// Remove all edges from the mesh.
 	virtual void doClearEdges();
@@ -217,6 +221,9 @@ public:
 	// Dependent name resolution for inherited functions and typenames from templates
 	using typename Vertices<VertexData>::VertexType;
 	using Vertices<VertexData>::addVertex;
+	using Vertices<VertexData>::getNumVertices;
+	using Vertices<VertexData>::getVertices;
+
 };
 
 typedef TriangleMesh<EmptyData, EmptyData, EmptyData> TriangleMeshPlain;

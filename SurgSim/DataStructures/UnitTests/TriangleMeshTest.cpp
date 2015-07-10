@@ -25,6 +25,7 @@
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ApplicationData.h"
 
 
 using SurgSim::DataStructures::EmptyData;
@@ -747,4 +748,30 @@ TEST_F(TriangleMeshTest, TriangleDeletionTest)
 	EXPECT_EQ(0u, mesh.addTriangle(TriangleType(ids)));
 	EXPECT_EQ(1u, mesh.addTriangle(TriangleType(ids)));
 
+}
+
+TEST_F(TriangleMeshTest, Save)
+{
+	std::vector<std::string> paths;
+	paths.push_back(".");
+	SurgSim::Framework::ApplicationData data(paths);
+	/// Create mesh using test data
+	TriangleMeshPlain mesh;
+	for (size_t i = 0; i < testPositions.size(); ++i)
+	{
+		mesh.addVertex(TriangleMeshPlain::VertexType(testPositions[i]));
+	}
+	for (size_t i = 0; i < testTriangleVertices.size(); ++i)
+	{
+		mesh.addTriangle(TriangleMeshPlain::TriangleType(testTriangleVertices[i]));
+	}
+
+	ASSERT_NO_THROW(mesh.save("test.ply"));
+
+	auto loadedMesh = std::make_shared<TriangleMeshPlain>();
+
+	ASSERT_NO_THROW(loadedMesh->load("test.ply", data));
+
+	EXPECT_EQ(testPositions.size(), loadedMesh->getNumVertices());
+	EXPECT_EQ(testTriangleVertices.size(), loadedMesh->getNumTriangles());
 }
