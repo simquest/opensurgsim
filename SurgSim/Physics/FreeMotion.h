@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
@@ -29,24 +29,30 @@ namespace Physics
 
 class Representation;
 
-/// Apply the Freemotion calcluation to all physics representations
+/// Apply the FreeMotion calculation to all physics representations
 class FreeMotion  : public Computation
 {
 public:
 
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
-	explicit FreeMotion(bool doCopyState = false);
+	/// \param numThreads The number of threads to run in parallel to execute this computation
+	explicit FreeMotion(bool doCopyState = false, size_t numThreads = boost::thread::hardware_concurrency() * 3 / 4);
 
 	/// Destructor
 	~FreeMotion();
 
 protected:
-
 	/// Override doUpdate from superclass
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 		override;
 
+private:
+	/// Variable indicating if the free motions are computed in parallel or not
+	bool m_parallelExecution;
+
+	/// Thread pool to execute the free motions in parallel if m_parallelExecution is true
+	SurgSim::Framework::ThreadPool m_threadPool;
 };
 
 }; // Physics
