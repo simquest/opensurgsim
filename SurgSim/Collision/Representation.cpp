@@ -60,6 +60,12 @@ SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getColli
 	return m_collisions;
 }
 
+void Representation::addContactWith(const std::shared_ptr<Representation>& other, std::shared_ptr<SurgSim::Collision::Contact> contact)
+{
+	boost::lock_guard<boost::mutex> lock(m_mutexCollisions);
+
+	m_collisions.unsafeGet()[other].push_back(contact);
+}
 
 bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 {

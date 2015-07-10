@@ -20,6 +20,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include <boost/thread/mutex.hpp>
+
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Representation.h"
 
@@ -76,6 +78,11 @@ public:
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
 	SurgSim::DataStructures::BufferedValue<ContactMapType>& getCollisions();
 
+	/// Add a contact with another representation
+	/// \param other The other collision representation
+	/// \param contact The contact to be added
+	void addContactWith(const std::shared_ptr<Representation>& other, std::shared_ptr<SurgSim::Collision::Contact> contact);
+
 	/// Check whether this collision representation collided with another during the last update
 	/// \param other other collision representation to check against
 	/// \return true if there were contacts recorded, false otherwise
@@ -94,6 +101,7 @@ private:
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
 	SurgSim::DataStructures::BufferedValue<ContactMapType> m_collisions;
+	boost::mutex m_mutexCollisions;
 
 	/// Cached posed shape
 	std::shared_ptr<Math::Shape> m_posedShape;
