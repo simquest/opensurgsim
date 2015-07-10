@@ -15,11 +15,12 @@
 
 #include <vector>
 
-#include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/ThreadPool.h"
+#include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
 using SurgSim::Collision::CollisionPair;
@@ -38,10 +39,23 @@ DcdCollision::~DcdCollision()
 {
 }
 
+namespace
+{
+void execute(
+	std::shared_ptr<SurgSim::Collision::ContactCalculation> contactCalculation,
+	std::shared_ptr<SurgSim::Collision::CollisionPair> pair)
+{
+	contactCalculation->calculateContact(pair);
+}
+};
+
 std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
+	static SurgSim::Framework::ThreadPool pool;
+	std::vector<std::future<void>> tasks;
+
 	std::shared_ptr<PhysicsManagerState> result = state;
 
 	auto& representations = state->getActiveCollisionRepresentations();
@@ -57,9 +71,18 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	auto itEnd = pairs.cend();
 	while (it != itEnd)
 	{
-		m_contactCalculations[(*it)->getFirst()->getShapeType()][(*it)->getSecond()->getShapeType()]->
-			calculateContact(*it);
-		++it;
+		int shapeTypeFirst = (*it)->getFirst()->getShapeType();
+		int shapeTypeSecond = (*it)->getSecond()->getShapeType();
+		auto contactCalculation = m_contactCalculations[shapeTypeFirst][shapeTypeSecond];
+		auto pair = *it;
+		it++;
+
+		tasks.push_back(pool.enqueue<void>(std::bind(&execute, contactCalculation, pair)));
+	}
+
+	for (auto& task : tasks)
+	{
+		task.wait();
 	}
 
 	for (auto& representation : representations)
