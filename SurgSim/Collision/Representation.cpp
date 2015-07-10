@@ -35,6 +35,8 @@ Representation::~Representation()
 
 const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
 {
+	boost::lock_guard<boost::mutex> lock(m_mutexPosedShape);
+
 	Math::RigidTransform3d pose = getPose();
 	if (pose.isApprox(Math::RigidTransform3d::Identity()))
 	{
@@ -52,6 +54,8 @@ const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
 
 void Representation::invalidatePosedShape()
 {
+	boost::lock_guard<boost::mutex> lock(m_mutexPosedShape);
+
 	m_posedShape = nullptr;
 }
 

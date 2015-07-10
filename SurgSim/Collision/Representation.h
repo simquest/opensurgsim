@@ -101,10 +101,15 @@ private:
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
 	SurgSim::DataStructures::BufferedValue<ContactMapType> m_collisions;
+
+	/// Mutex to lock write access to m_collisions
 	boost::mutex m_mutexCollisions;
 
 	/// Cached posed shape
 	std::shared_ptr<Math::Shape> m_posedShape;
+
+	/// Mutex to lock write access to m_posedShape
+	boost::mutex m_mutexPosedShape;
 
 	/// Pose of m_posedShape
 	Math::RigidTransform3d m_posedShapePose;
