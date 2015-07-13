@@ -18,17 +18,16 @@
 
 #version 120
 
-// view matrix from the rendering camera
-varying vec4 inverseViewMatrix;
-varying float sphereRadius;
+uniform float sphereRadius;
 
 varying mat4 projectionMatrix;
 varying vec3 eyeSpacePos;
 
 void main(void)
 {
-	sphereRadius = 20.0f;
 	projectionMatrix = gl_ProjectionMatrix;
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-	eyeSpacePos = vec3(inverseViewMatrix * gl_ModelViewMatrix * gl_Vertex);
+	vec3 eyeSpacePos = vec3(gl_ModelViewMatrix * vec4(gl_Vertex.xyz, 1.0));
+	float dist = length(eyeSpacePos);
+	gl_PointSize = sphereRadius * (0.25 / dist);
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xyz, 1.0);
 }

@@ -18,14 +18,12 @@
 
 #version 120
 
-uniform vec2 screenSize;
 uniform float sphereRadius;
 
 void main(void)
 {
-	vec4 eyePos = gl_ModelViewMatrix * gl_Vertex;
-	vec4 projVoxel = gl_ProjectionMatrix * vec4(sphereRadius, sphereRadius, eyePos.z, eyePos.w);
-	vec2 projSize = screenSize * projVoxel.xy / projVoxel.w;
-	gl_PointSize = 0.25 * (projSize.x + projSize.y);
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	vec3 eyeSpacePos = vec3(gl_ModelViewMatrix * vec4(gl_Vertex.xyz, 1.0));
+	float dist = length(eyeSpacePos);
+	gl_PointSize = sphereRadius * (0.25 / dist);
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xyz, 1.0);
 }
