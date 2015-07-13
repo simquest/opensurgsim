@@ -22,23 +22,20 @@
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgRenderTarget.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/RenderPass.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/MathUtilities.h"
 
-using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTranslation;
 
 namespace SurgSim
@@ -49,66 +46,58 @@ namespace Graphics
 struct FluidRenderTests : public RenderTest
 {
 protected:
-	std::vector<Vector3d> makeCube()
-	{
-		std::vector<Vector3d> result;
-		result.push_back(Vector3d(0.01, -0.01, 0.01));
-		result.push_back(Vector3d(0.01, -0.01, 0.01));
-		result.push_back(Vector3d(-0.01, -0.01, 0.01));
-		result.push_back(Vector3d(-0.01, -0.01, -0.01));
-		result.push_back(Vector3d(0.01, -0.01, -0.01));
-
-		result.push_back(Vector3d(0.01, 0.01, 0.01));
-		result.push_back(Vector3d(-0.01, 0.01, 0.01));
-		result.push_back(Vector3d(-0.01, 0.01, -0.01));
-		result.push_back(Vector3d(0.01, 0.01, -0.01));
-		return result;
-	}
-
-	void createPointSpriteSpherePass(const float& sphereRadius)
+	void createPointSpriteSpherePass(const float& sphereRadius, const Math::Vector4f& color)
 	{
 		// Create material to transport the Textures for the point sprite
 		auto material = std::make_shared<Graphics::OsgMaterial>("psMaterial");
 		auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/pointsplat/sphere");
 		ASSERT_TRUE(program != nullptr);
 		material->setProgram(program);
+
 		auto texture = std::make_shared<Graphics::OsgTexture2d>();
 		texture->setIsPointSprite(true);
-
-		material->addUniform("float", "sphereRadius");
-		material->setValue("sphereRadius", sphereRadius);
-
 		auto pointSpriteUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("pointsprite");
 		pointSpriteUniform->set(texture);
 		material->addUniform(pointSpriteUniform);
+
+		material->addUniform("float", "sphereRadius");
+		material->setValue("sphereRadius", sphereRadius);
+		material->addUniform("vec4", "color");
+		material->setValue("color", color);
+
 		viewElement->getCamera()->setMaterial(material);
 		viewElement->addComponent(material);
 	}
 
 	void createPointSpriteSphereDepthPass(const float& sphereRadius)
 	{
-		auto renderPass = std::make_shared<OsgCamera>("DepthPass");
-		renderPass->setRenderGroupReference("DepthPass");
+		auto renderPass = std::make_shared<RenderPass>("DepthPass");
+		renderPass->getCamera()->setProjectionMatrix(viewElement->getCamera()->getProjectionMatrix());
+		renderPass->getCamera()->setRenderGroupReference("DepthPass");
 
 		std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
 
 		auto renderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, true);
 		renderPass->setRenderTarget(renderTarget);
-		renderPass->setRenderOrder(Camera::RENDER_ORDER_PRE_RENDER, 0);
 
-		auto material = std::make_shared<Graphics::OsgMaterial>("psMaterial");
+		auto material = std::make_shared<Graphics::OsgMaterial>("depthPassMaterial");
 		auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(),
 													  "Shaders/pointsplat/sphere_depth");
 		ASSERT_TRUE(program != nullptr);
 		material->setProgram(program);
+
 		auto texture = std::make_shared<Graphics::OsgTexture2d>();
 		texture->setIsPointSprite(true);
+		auto pointSpriteUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("psDepth");
+		pointSpriteUniform->set(texture);
+		material->addUniform(pointSpriteUniform);
 
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
 
 		renderPass->setMaterial(material);
-		viewElement->addComponent(renderPass);
+		viewElement->addComponent(renderPass->getCamera());
+		viewElement->addComponent(material);
 
 		int screenHeight = dimensions[1];
 
@@ -125,17 +114,19 @@ protected:
 TEST_F(FluidRenderTests, PointSpriteDepth)
 {
 	// Create the point cloud
-	std::vector<Vector3d> vertices = makeCube();
-	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
-	graphics->setPointSize(5.0f);
+	auto bunny = std::make_shared<Graphics::OsgMeshRepresentation>("Bunny");
+	bunny->loadMesh("Geometry/stanford_bunny.ply");
 
-	graphics->setLocalPose(makeRigidTranslation(Vector3d(0.0, 0.0, -0.1)));
-	for (const auto& vertex : vertices)
+	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
+	graphics->setPointSize(3.0f);
+
+	graphics->setLocalPose(makeRigidTranslation(Math::Vector3d(0.01, -0.1, -0.25)));
+	for (const auto& vertex : bunny->getMesh()->getVertices())
 	{
 		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));
 	}
 
-	createPointSpriteSpherePass(graphics->getPointSize());
+	createPointSpriteSpherePass(graphics->getPointSize(), Math::Vector4f(1.0, 0.0, 0.0, 1.0));
 	createPointSpriteSphereDepthPass(graphics->getPointSize());
 
 	graphics->addGroupReference("DepthPass");
