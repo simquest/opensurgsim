@@ -33,6 +33,6 @@ void main(void)
 
 	// calculate depth
 	vec4 pixelPos = vec4(eyeSpacePos + N*sphereRadius, 1.0);
-	vec4 clipSpacePos = mul(pixelPos, projectionMatrix);
+	vec4 clipSpacePos = gl_ProjectionMatrix * pixelPos;
 	gl_FragDepth = clipSpacePos.z / clipSpacePos.w;
 }

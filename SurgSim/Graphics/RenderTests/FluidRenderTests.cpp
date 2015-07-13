@@ -75,9 +75,6 @@ protected:
 		auto texture = std::make_shared<Graphics::OsgTexture2d>();
 		texture->setIsPointSprite(true);
 
-		std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
-		material->addUniform("vec2", "screenSize");
-		material->setValue("screenSize", SurgSim::Math::Vector2f(dimensions[0], dimensions[1]));
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
 
@@ -88,7 +85,7 @@ protected:
 		viewElement->addComponent(material);
 	}
 
-	void createPointSpriteSphereDepthPass()
+	void createPointSpriteSphereDepthPass(const float& sphereRadius)
 	{
 		auto renderPass = std::make_shared<OsgCamera>("DepthPass");
 		renderPass->setRenderGroupReference("DepthPass");
@@ -106,6 +103,9 @@ protected:
 		material->setProgram(program);
 		auto texture = std::make_shared<Graphics::OsgTexture2d>();
 		texture->setIsPointSprite(true);
+
+		material->addUniform("float", "sphereRadius");
+		material->setValue("sphereRadius", sphereRadius);
 
 		renderPass->setMaterial(material);
 		viewElement->addComponent(renderPass);
@@ -127,7 +127,7 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 	// Create the point cloud
 	std::vector<Vector3d> vertices = makeCube();
 	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
-	graphics->setPointSize(20.0f);
+	graphics->setPointSize(5.0f);
 
 	graphics->setLocalPose(makeRigidTranslation(Vector3d(0.0, 0.0, -0.1)));
 	for (const auto& vertex : vertices)
@@ -136,7 +136,7 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 	}
 
 	createPointSpriteSpherePass(graphics->getPointSize());
-	createPointSpriteSphereDepthPass();
+	createPointSpriteSphereDepthPass(graphics->getPointSize());
 
 	graphics->addGroupReference("DepthPass");
 
