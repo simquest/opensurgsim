@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file fluid_pointsprite.frag
-/// Fragment Shader to do simple point sprite spheres
+/// \file sphere.vert
+/// Vertex Shader to do simple point sprite spheres
 
 #version 120
 
+uniform vec2 screenSize;
+uniform float sphereRadius;
+
 void main(void)
 {
-	// calculate normal from texture coordinates provided by gl_PointCoord
-	vec3 N;
-	N.xy = gl_PointCoord * 2.0 - vec2(1.0);
-	float mag = dot(N.xy, N.xy);
-	if (mag > 1.0) discard;   // kill pixels outside circle
-	N.z = sqrt(1.0-mag);
-
-	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0) * N.z;
+	vec4 eyePos = gl_ModelViewMatrix * gl_Vertex;
+	vec4 projVoxel = gl_ProjectionMatrix * vec4(sphereRadius, sphereRadius, eyePos.z, eyePos.w);
+	vec2 projSize = screenSize * projVoxel.xy / projVoxel.w;
+	gl_PointSize = 0.25 * (projSize.x + projSize.y);
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
