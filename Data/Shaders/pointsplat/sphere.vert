@@ -24,6 +24,6 @@ void main(void)
 {
 	vec3 eyeSpacePos = vec3(gl_ModelViewMatrix * vec4(gl_Vertex.xyz, 1.0));
 	float dist = length(eyeSpacePos);
-	gl_PointSize = sphereRadius * (0.25 / dist);
+	gl_PointSize = sphereRadius * (1.0 / dist);
 	gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xyz, 1.0);
 }

@@ -18,21 +18,20 @@
 
 #version 120
 
+uniform float sphereRadius;
 varying vec3 eyeSpacePos;
-varying mat4 projectionMatrix;
-varying float sphereRadius;
 
 void main(void)
 {
 	// calculate normal from texture coordinates provided by gl_PointCoord
-	vec3 N;
-	N.xy = gl_PointCoord * 2.0 - vec2(1.0);
-	float mag = dot(N.xy, N.xy);
+	vec3 normal;
+	normal.xy = gl_PointCoord * 2.0 - vec2(1.0);
+	float mag = dot(normal.xy, normal.xy);
 	if (mag > 1.0) discard;   // kill pixels outside circle
-	N.z = sqrt(1.0-mag);
+	normal.z = sqrt(1.0-mag);
 
 	// calculate depth
-	vec4 pixelPos = vec4(eyeSpacePos + N*sphereRadius, 1.0);
+	vec4 pixelPos = vec4(eyeSpacePos + normal*sphereRadius, 1.0);
 	vec4 clipSpacePos = gl_ProjectionMatrix * pixelPos;
 	gl_FragDepth = clipSpacePos.z / clipSpacePos.w;
 }
