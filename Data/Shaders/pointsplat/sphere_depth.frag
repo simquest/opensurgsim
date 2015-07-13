@@ -13,12 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file fluid_pointsprite.vert
-/// Vertex Shader to do simple point sprite spheres
+/// \file sphere.frag
+/// Fragment Shader to do simple point sprite spheres
 
 #version 120
 
-void main(void) 
+varying vec3 eyeSpacePos;
+varying mat4 projectionMatrix;
+varying float sphereRadius;
+
+void main(void)
 {
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-} 
+	// calculate normal from texture coordinates provided by gl_PointCoord
+	vec3 N;
+	N.xy = gl_PointCoord * 2.0 - vec2(1.0);
+	float mag = dot(N.xy, N.xy);
+	if (mag > 1.0) discard;   // kill pixels outside circle
+	N.z = sqrt(1.0-mag);
+
+	// calculate depth
+	vec4 pixelPos = vec4(eyeSpacePos + N*sphereRadius, 1.0);
+	vec4 clipSpacePos = mul(pixelPos, projectionMatrix);
+	gl_FragDepth = clipSpacePos.z / clipSpacePos.w;
+}
