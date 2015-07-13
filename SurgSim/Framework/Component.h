@@ -57,7 +57,7 @@ public:
 
 	/// Gets a string containing the name of the Component and (if it has one) its SceneElement.
 	/// \return Name of Component and SceneElement.
-	std::string Component::getFullName() const;
+	std::string getFullName() const;
 
 	/// Sets the name of component.
 	/// \param	name	The name of this component.
