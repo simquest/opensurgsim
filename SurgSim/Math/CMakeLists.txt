@@ -94,6 +94,12 @@ set(SURGSIM_MATH_HEADERS
 	ParticlesShape.h
 	ParticlesShape-inl.h
 	PlaneShape.h
+	Polynomial.h
+	Polynomial-inl.h
+	PolynomialRoots.h
+	PolynomialRoots-inl.h
+	PolynomialValues.h
+	PolynomialValues-inl.h
 	Quaternion.h
 	RigidTransform.h
 	Shape.h
