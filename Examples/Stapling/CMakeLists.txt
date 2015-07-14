@@ -28,6 +28,7 @@ set(STAPLING_HEADERS
 	StaplerBehavior.h
 )
 surgsim_add_executable(Stapling "${STAPLING_SOURCES}" "${STAPLING_HEADERS}")
+install(TARGETS Stapling RUNTIME DESTINATION bin COMPONENT Stapling)
 
 set(SERIALIZEDSTAPLING_SOURCES
 	SerializedStapling.cpp
@@ -52,12 +53,14 @@ target_link_libraries(Stapling ${LIBS})
 target_link_libraries(SerializedStapling ${LIBS})
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION . COMPONENT Stapling)
 
 # Configure the path for the data files
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/config.txt" PERMISSIONS OWNER_EXECUTE OWNER_WRITE WORLD_READ DESTINATION bin COMPONENT Stapling)
 
 set_target_properties(Stapling PROPERTIES FOLDER "Examples") 
 set_target_properties(SerializedStapling PROPERTIES FOLDER "Examples") 

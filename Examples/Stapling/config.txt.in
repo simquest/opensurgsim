@@ -1,2 +1,3 @@
+../Data/
 ${CMAKE_CURRENT_BINARY_DIR}/Data/
 ${SURGSIM_SOURCE_DIR}/Data/
