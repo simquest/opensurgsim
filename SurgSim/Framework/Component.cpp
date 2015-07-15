@@ -59,7 +59,7 @@ std::string Component::getFullName() const
 	const auto& sceneElement = getSceneElement();
 	if (sceneElement != nullptr)
 	{
-		name = sceneElement->getName() + "-";
+		name = sceneElement->getName() + "/";
 	}
 	return name + m_name;
 }
