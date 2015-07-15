@@ -121,7 +121,7 @@ TEST_F(OsgSceneryRepresentationTest, GenerateTangents)
 		auto object = std::make_shared<OsgSceneryRepresentation>("representation");
 
 		object->setGenerateTangents(true);
-		object->loadModel("Geometry/Cube.osgt");
+		object->loadModel("Geometry/cube.osgt");
 
 		// Structure from the osgt file, we need to get to the geometry to make sure the tangents where generated
 		auto group = object->getModelNode()->asGroup();
@@ -139,7 +139,7 @@ TEST_F(OsgSceneryRepresentationTest, GenerateTangents)
 	{
 		auto object = std::make_shared<OsgSceneryRepresentation>("representation");
 
-		object->loadModel("Geometry/Cube.osgt");
+		object->loadModel("Geometry/cube.osgt");
 		object->setGenerateTangents(true);
 
 		// Structure from the osgt file, we need to get to the geometry to make sure the tangents where generated
