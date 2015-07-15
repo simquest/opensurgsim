@@ -90,9 +90,10 @@ void OsgMeshRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape
 void OsgMeshRepresentation::doUpdate(double dt)
 {
 	size_t updateCount = m_mesh->getUpdateCount();
-	if (m_updateCount < updateCount)
+	if (m_updateCount != updateCount)
 	{
 		// The update was done through shared data (might not be threadsafe)
+		// #threadsafety
 		m_updateCount = updateCount;
 		privateUpdateMesh(*m_mesh);
 	}
