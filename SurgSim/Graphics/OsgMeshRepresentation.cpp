@@ -69,6 +69,8 @@ void OsgMeshRepresentation::setMesh(std::shared_ptr<SurgSim::Framework::Asset> m
 	auto graphicsMesh = std::dynamic_pointer_cast<Mesh>(mesh);
 	SURGSIM_ASSERT(graphicsMesh != nullptr) << "Mesh for OsgMeshRepresentation needs to be a SurgSim::Graphics::Mesh";
 	m_mesh = graphicsMesh;
+	m_updateCount = m_mesh->getUpdateCount();
+	m_mesh->dirty();
 	buildGeometry();
 }
 
@@ -87,10 +89,31 @@ void OsgMeshRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape
 
 void OsgMeshRepresentation::doUpdate(double dt)
 {
-	SURGSIM_ASSERT(m_mesh->isValid()) << "The mesh in the OsgMeshRepresentation " << getName() << " is invalid.";
+	size_t updateCount = m_mesh->getUpdateCount();
+	if (m_updateCount != updateCount)
+	{
+		// The update was done through shared data (might not be threadsafe)
+		// #threadsafety
+		m_updateCount = updateCount;
+		privateUpdateMesh(*m_mesh);
+	}
+	else
+	{
+		// The update was done through the threadsafe Locked container
+		Mesh tempMesh;
+		if (m_writeBuffer.tryTakeChanged(&tempMesh))
+		{
+			privateUpdateMesh(tempMesh);
+		}
+	}
+}
+
+void OsgMeshRepresentation::privateUpdateMesh(const Mesh& mesh)
+{
+	SURGSIM_ASSERT(mesh.isValid()) << "The mesh in the OsgMeshRepresentation " << getName() << " is invalid.";
 
 	// Early exit if there are no vertices
-	if (m_mesh->getNumVertices() == 0)
+	if (mesh.getNumVertices() == 0)
 	{
 		m_meshSwitch->setAllChildrenOff();
 		return;
@@ -98,25 +121,18 @@ void OsgMeshRepresentation::doUpdate(double dt)
 
 	m_meshSwitch->setSingleChildOn(0);
 
-	// Early exit if the mesh was not updated, no need to update the osg data
-	size_t updateCount = m_mesh->getUpdateCount();
-	if (m_updateCount == updateCount)
-	{
-		return;
-	}
-	m_updateCount = updateCount;
 
-	int updateOptions = updateOsgArrays(m_geometry);
+	int updateOptions = updateOsgArrays(mesh, m_geometry);
 	updateOptions |= m_updateOptions;
 
 	if ((updateOptions & UPDATE_OPTION_TRIANGLES) != 0)
 	{
-		updateTriangles(m_geometry);
+		updateTriangles(mesh, m_geometry);
 	}
 
 	if ((updateOptions & (UPDATE_OPTION_VERTICES | UPDATE_OPTION_TEXTURES | UPDATE_OPTION_COLORS)) != 0)
 	{
-		updateVertices(m_geometry, updateOptions);
+		updateVertices(mesh, m_geometry, updateOptions);
 		updateTangents();
 		m_geometry->dirtyDisplayList();
 		m_geometry->dirtyBound();
@@ -129,7 +145,7 @@ bool OsgMeshRepresentation::doInitialize()
 	return true;
 }
 
-void OsgMeshRepresentation::updateVertices(osg::Geometry* geometry, int updateOptions)
+void OsgMeshRepresentation::updateVertices(const Mesh& mesh, osg::Geometry* geometry, int updateOptions)
 {
 	static osg::Vec4d defaultColor(0.8, 0.2, 0.2, 1.0);
 	static osg::Vec2d defaultTextureCoord(0.0, 0.0);
@@ -143,7 +159,7 @@ void OsgMeshRepresentation::updateVertices(osg::Geometry* geometry, int updateOp
 	auto textureCoords = static_cast<osg::Vec2Array*>(geometry->getTexCoordArray(0));
 
 	size_t index = 0;
-	for (const auto& vertex : m_mesh->getVertices())
+	for (const auto& vertex : mesh.getVertices())
 	{
 		if (updateVertices)
 		{
@@ -179,14 +195,14 @@ void OsgMeshRepresentation::updateNormals(osg::Geometry* geometry)
 	normals->dirty();
 }
 
-void OsgMeshRepresentation::updateTriangles(osg::Geometry* geometry)
+void OsgMeshRepresentation::updateTriangles(const Mesh& mesh, osg::Geometry* geometry)
 {
 	osg::Geometry::DrawElementsList drawElements;
 	geometry->getDrawElementsList(drawElements);
 	auto triangles = static_cast<osg::DrawElementsUInt*>(drawElements[0]);
 
 	size_t i = 0;
-	for (auto const& triangle : m_mesh->getTriangles())
+	for (auto const& triangle : mesh.getTriangles())
 	{
 		if (triangle.isValid)
 		{
@@ -198,11 +214,11 @@ void OsgMeshRepresentation::updateTriangles(osg::Geometry* geometry)
 	triangles->dirty();
 }
 
-int OsgMeshRepresentation::updateOsgArrays(osg::Geometry* geometry)
+int OsgMeshRepresentation::updateOsgArrays(const Mesh& mesh, osg::Geometry* geometry)
 {
 	int result = 0;
 
-	size_t numVertices = m_mesh->getNumVertices();
+	size_t numVertices = mesh.getNumVertices();
 
 	auto vertices = static_cast<osg::Vec3Array*>(geometry->getVertexArray());
 	auto normals = static_cast<osg::Vec3Array*>(geometry->getNormalArray());
@@ -217,7 +233,7 @@ int OsgMeshRepresentation::updateOsgArrays(osg::Geometry* geometry)
 	normals->setDataVariance(getDataVariance(UPDATE_OPTION_VERTICES));
 
 	// The first vertex determines what values the mesh should have ...
-	Mesh::VertexType vertex = m_mesh->getVertex(0);
+	Mesh::VertexType vertex = mesh.getVertex(0);
 
 	auto colors = static_cast<osg::Vec4Array*>(geometry->getColorArray());
 	if (vertex.data.color.hasValue() && numVertices > colors->size())
@@ -251,9 +267,9 @@ int OsgMeshRepresentation::updateOsgArrays(osg::Geometry* geometry)
 	geometry->getDrawElementsList(drawElements);
 	auto triangles = static_cast<osg::DrawElementsUInt*>(drawElements[0]);
 
-	if (m_mesh->getNumTriangles() * 3 != triangles->size())
+	if (mesh.getNumTriangles() * 3 != triangles->size())
 	{
-		triangles->resize(m_mesh->getNumTriangles() * 3);
+		triangles->resize(mesh.getNumTriangles() * 3);
 		result |= UPDATE_OPTION_TRIANGLES;
 	}
 	triangles->setDataVariance(getDataVariance(UPDATE_OPTION_TRIANGLES));
@@ -277,6 +293,11 @@ int OsgMeshRepresentation::getUpdateOptions() const
 osg::ref_ptr<osg::Geometry> OsgMeshRepresentation::getOsgGeometry() const
 {
 	return m_geometry;
+}
+
+void OsgMeshRepresentation::updateMesh(const SurgSim::Graphics::Mesh& mesh)
+{
+	m_writeBuffer.set(mesh);
 }
 
 osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOption)
@@ -315,6 +336,7 @@ void OsgMeshRepresentation::buildGeometry()
 
 	auto geode = new osg::Geode;
 	geode->addDrawable(m_geometry);
+	m_meshSwitch->setAllChildrenOff();
 	m_meshSwitch->addChild(geode);
 }
 

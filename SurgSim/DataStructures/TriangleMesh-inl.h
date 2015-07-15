@@ -294,6 +294,40 @@ void TriangleMesh<VertexData, EdgeData, TriangleData>::doClear()
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
+TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(TriangleMesh&& other) : Vertices<VertexData>::Vertices(std::move(other))
+{
+	doClearTriangles();
+	doClearEdges();
+	std::swap(m_triangles, other.m_triangles);
+	std::swap(m_edges, other.m_edges);
+	std::swap(m_freeTriangles, other.m_freeTriangles);
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+TriangleMesh<VertexData, EdgeData, TriangleData>& TriangleMesh<VertexData, EdgeData, TriangleData>::operator=(const
+		TriangleMesh<VertexData, EdgeData, TriangleData>& other)
+{
+	Vertices<VertexData>::operator=(other);
+	m_triangles = other.m_triangles;
+	m_edges = other.m_edges;
+	m_freeTriangles = other.m_freeTriangles;
+	return *this;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+TriangleMesh<VertexData, EdgeData, TriangleData>& TriangleMesh<VertexData, EdgeData, TriangleData>::operator=
+(TriangleMesh<VertexData, EdgeData, TriangleData>&& other)
+{
+	Vertices<VertexData>::operator=(std::move(other));
+	doClearTriangles();
+	doClearEdges();
+	std::swap(m_triangles, other.m_triangles);
+	std::swap(m_edges, other.m_edges);
+	std::swap(m_freeTriangles, other.m_freeTriangles);
+	return *this;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
 void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::save(const std::string& fileName)
 {
 	std::fstream out(fileName, std::ios::out);
