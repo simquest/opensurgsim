@@ -108,63 +108,54 @@ public:
 	virtual double getVolume(const SurgSim::Math::OdeState& state) const = 0;
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
-	/// \param state The state to compute the force with
 	/// \param[in,out] F The complete system force vector to add the element force into
 	/// \param scale A factor to scale the added force with
 	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) = 0;
+	virtual void addForce(SurgSim::Math::Vector* F, double scale = 1.0) const;
 
 	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
-	/// \param state The state to compute the mass matrix with
 	/// \param[in,out] M The complete system mass matrix to add the element mass-matrix into
 	/// \param scale A factor to scale the added mass matrix with
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) = 0;
+	virtual void addMass(SurgSim::Math::SparseMatrix* M, double scale = 1.0) const;
 
 	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
 	/// to a complete system damping matrix D (assembly)
-	/// \param state The state to compute the damping matrix with
 	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
 	/// \param scale A factor to scale the added damping matrix with
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-							double scale = 1.0) = 0;
+	virtual void addDamping(SurgSim::Math::SparseMatrix* D, double scale = 1.0) const;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
 	/// to a complete system stiffness matrix K (assembly)
-	/// \param state The state to compute the stiffness matrix with
 	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
 	/// \param scale A factor to scale the added stiffness matrix with
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-							  double scale = 1.0) = 0;
+	virtual void addStiffness(SurgSim::Math::SparseMatrix* K, double scale = 1.0) const;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
 	/// into a complete system data structure F, M, D, K (assembly)
-	/// \param state The state to compute everything with
 	/// \param[in,out] F The complete system force vector to add the element force into
 	/// \param[in,out] M The complete system mass matrix to add the element mass matrix into
 	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
 	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addFMDK(const SurgSim::Math::OdeState& state,
-						 SurgSim::Math::Vector* F,
+	virtual void addFMDK(SurgSim::Math::Vector* F,
 						 SurgSim::Math::SparseMatrix* M,
 						 SurgSim::Math::SparseMatrix* D,
-						 SurgSim::Math::SparseMatrix* K) = 0;
+						 SurgSim::Math::SparseMatrix* K) const;
 
 	/// Adds the element matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given state)
 	/// into a complete system data structure F (assembly)
-	/// \param state The state to compute everything with
 	/// \param alphaM The scaling factor for the mass contribution
 	/// \param alphaD The scaling factor for the damping contribution
 	/// \param alphaK The scaling factor for the stiffness contribution
@@ -172,8 +163,8 @@ public:
 	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
-						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
+	virtual void addMatVec(double alphaM, double alphaD, double alphaK,
+						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) const;
 
 	/// Determines whether a given natural coordinate is valid
 	/// \param naturalCoordinate Coordinate to check
@@ -210,7 +201,8 @@ public:
 	/// initialized when necessary. If false, the matrix form is assumed to be previously defined.
 	template <typename DerivedSub, typename T, int Opt, typename Index>
 	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
-							  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true);
+							  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
+							  bool initialize = true) const;
 
 	/// Update the FemElement based on the given state.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
@@ -227,7 +219,13 @@ protected:
 	/// Update the FemElement based on the given state.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param options Flag to specify which of the F, M, D, K needs to be updated
-	virtual void doUpdateFMDK(const Math::OdeState& state, int options);
+	virtual void doUpdateFMDK(const Math::OdeState& state, int options) = 0;
+
+	/// Initialize f, M, D, K variables.
+	void initializeFMDK();
+
+	/// Function to be overridden by the derived classes to initialize the f, M, D, K variables.
+	virtual void doInitializeFMDK();
 
 	/// Number of degree of freedom per node for this element
 	size_t m_numDofPerNode;
@@ -243,6 +241,25 @@ protected:
 
 	/// Poisson ratio (unitless)
 	double m_nu;
+
+	/// The force vector.
+	SurgSim::Math::Vector m_f;
+
+	/// The mass matrix.
+	SurgSim::Math::Matrix m_M;
+
+	/// The damping matrix.
+	SurgSim::Math::Matrix m_D;
+
+	/// Flag to specify of the damping is used.
+	bool m_useDamping;
+
+	/// The stiffness matrix.
+	SurgSim::Math::Matrix m_K;
+
+private:
+	/// Flag to check in the f, M, D, K variables have been initialized.
+	bool m_initializedFMDK;
 };
 
 } // namespace Physics

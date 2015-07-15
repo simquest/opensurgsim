@@ -327,6 +327,47 @@ TriangleMesh<VertexData, EdgeData, TriangleData>& TriangleMesh<VertexData, EdgeD
 	return *this;
 }
 
+template <class VertexData, class EdgeData, class TriangleData>
+void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::save(const std::string& fileName)
+{
+	std::fstream out(fileName, std::ios::out);
+
+	if (out.is_open())
+	{
+		out << "ply" << std::endl;
+		out << "format ascii 1.0" << std::endl;
+		out << "comment Created by OpenSurgSim, www.opensurgsim.org" << std::endl;
+		out << "element vertex " << getNumVertices() << std::endl;
+		out << "property float x\nproperty float y\nproperty float z" << std::endl;
+		out << "element face " << getNumTriangles() << std::endl;
+		out << "property list uchar uint vertex_indices" << std::endl;
+		out << "end_header" << std::endl;
+
+		for (const auto& vertex : getVertices())
+		{
+			out << vertex.position[0] << " " << vertex.position[1] << " " << vertex.position[2] << std::endl;
+		}
+
+		for (const auto& tri : getTriangles())
+		{
+			out << "3 " << tri.verticesId[0] << " " << tri.verticesId[1] << " " << tri.verticesId[2] << std::endl;
+		}
+
+		if (out.bad())
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
+					<< "There was a problem writing " << fileName;
+		}
+
+		out.close();
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
+				<< "Could not open " << fileName << " for writing.";
+	}
+
+}
 
 
 

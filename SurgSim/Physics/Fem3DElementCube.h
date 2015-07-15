@@ -38,6 +38,7 @@ SURGSIM_STATIC_REGISTRATION(Fem3DElementCube);
 /// \note Note that this technique is accurate for any polynomial evaluation up to degree 3.
 /// \note In our case, the shape functions \f$N_i\f$ are linear (of degree 1). So for exmaple,
 /// \note in the mass matrix we have integral terms like \f$\int_V N_i.N_j dV\f$, which are of degree 2.
+/// \note Fem3DElementCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
 class Fem3DElementCube : public FemElement
 {
 public:
@@ -79,74 +80,7 @@ public:
 	/// \note Behavior will be undefined because of possible negative volume terms.
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
-	/// Gets the element volume based on the input state
-	/// \param state The state to compute the volume with
 	double getVolume(const SurgSim::Math::OdeState& state) const override;
-
-	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
-	/// \param state The state to compute the force with
-	/// \param[in,out] F The complete system force vector to add the element force into
-	/// \param scale A factor to scale the added force with
-	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
-	/// \note This method supposes that the incoming state contains information with the same number of dof
-	/// \note per node as getNumDofPerNode()
-	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
-
-	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
-	/// \param state The state to compute the mass matrix with
-	/// \param[in,out] M The complete system mass matrix to add the element mass-matrix into
-	/// \param scale A factor to scale the added mass matrix with
-	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
-	/// \note This method supposes that the incoming state contains information with the same number of
-	/// \note dof per node as getNumDofPerNode()
-	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) override;
-
-	/// Adds the element damping matrix D (= -df/dv) (computed for a given state)
-	/// to a complete system damping matrix D (assembly)
-	/// \param state The state to compute the damping matrix with
-	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
-	/// \param scale A factor to scale the added damping matrix with
-	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
-	/// \note This method supposes that the incoming state contains information with the same number of
-	/// \note dof per node as getNumDofPerNode()
-	/// \note Fem3DElementCube uses linear elasticity (not visco-elasticity), so it does not give any damping.
-	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D, double scale = 1.0) override;
-
-	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
-	/// to a complete system stiffness matrix K (assembly)
-	/// \param state The state to compute the stiffness matrix with
-	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
-	/// \param scale A factor to scale the added stiffness matrix with
-	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
-	/// \note This method supposes that the incoming state contains information with the same number of
-	/// \note dof per node as getNumDofPerNode()
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-					  double scale = 1.0) override;
-
-	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
-	/// into a complete system data structure F, M, D, K (assembly)
-	/// \param state The state to compute everything with
-	/// \param[in,out] F The complete system force vector to add the element force into
-	/// \param[in,out] M The complete system mass matrix to add the element mass matrix into
-	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
-	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
-	/// \note This method supposes that the incoming state contains information with the same number of dof
-	/// \note per node as getNumDofPerNode()
-	void addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, SurgSim::Math::SparseMatrix* M,
-				 SurgSim::Math::SparseMatrix* D, SurgSim::Math::SparseMatrix* K) override;
-
-	/// Adds the element matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given state)
-	/// into a complete system data structure F (assembly)
-	/// \param state The state to compute everything with
-	/// \param alphaM The scaling factor for the mass contribution
-	/// \param alphaD The scaling factor for the damping contribution
-	/// \param alphaK The scaling factor for the stiffness contribution
-	/// \param x A complete system vector to use as the vector in the matrix-vector multiplication
-	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
-	/// \note This method supposes that the incoming state contains information with the same number of dof
-	/// \note per node as getNumDofPerNode()
-	void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
-				   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
 	SurgSim::Math::Vector computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
 			const SurgSim::Math::Vector& naturalCoordinate) const override;
@@ -168,24 +102,14 @@ protected:
 	void computeStiffness(const SurgSim::Math::OdeState& state,
 						  Eigen::Matrix<double, 6, 24>* strain,
 						  Eigen::Matrix<double, 6, 24>* stress,
-						  Eigen::Matrix<double, 24, 24>* k);
+						  SurgSim::Math::Matrix* k);
 
 	/// Computes the cube mass matrix
 	/// \param state The state to compute the mass matrix from
 	/// \param[out] m The mass matrix to store the result into
-	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 24, 24>* m);
+	void computeMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* m);
 
-	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
-	/// This method relies on a given stiffness matrix and does not evaluate it from the state
-	/// \param state The state to compute the force with
-	/// \param k The given element stiffness matrix
-	/// \param[in,out] F The complete system force vector to add the element force into
-	/// \param scale A factor to scale the added force with
-	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
-	/// \note This method supposes that the incoming state contains information with the same number of dof
-	/// \note per node as getNumDofPerNode()
-	void addForce(const SurgSim::Math::OdeState& state, const Eigen::Matrix<double, 24, 24>& k,
-				  SurgSim::Math::Vector* F, double scale = 1.0);
+	void doUpdateFMDK(const Math::OdeState& state, int options) override;
 
 	/// Helper method to evaluate strain-stress and stiffness integral terms with a discrete sum using
 	/// a Gauss quadrature rule
@@ -198,7 +122,7 @@ protected:
 										 const SurgSim::Math::gaussQuadraturePoint& mu,
 										 Eigen::Matrix<double, 6, 24>* strain,
 										 Eigen::Matrix<double, 6, 24>* stress,
-										 Eigen::Matrix<double, 24, 24>* k);
+										 SurgSim::Math::Matrix* k);
 
 	/// Helper method to evaluate mass integral terms with a discrete sum using a Gauss quadrature rule
 	/// \param state The state to compute the evaluation with
@@ -208,7 +132,7 @@ protected:
 							  const SurgSim::Math::gaussQuadraturePoint& epsilon,
 							  const SurgSim::Math::gaussQuadraturePoint& eta,
 							  const SurgSim::Math::gaussQuadraturePoint& mu,
-							  Eigen::Matrix<double, 24, 24>* m);
+							  SurgSim::Math::Matrix* m);
 
 	/// Helper method to evaluate matrix J = d(x,y,z)/d(epsilon,eta,mu) at a given 3D parametric location
 	/// J expresses the 3D space coordinate frames variation w.r.t. parametric coordinates
@@ -305,11 +229,6 @@ protected:
 	Eigen::Matrix<double, 6, 24> m_stress;
 	/// Constitutive material matrix (Hooke's law in this case) defines the relationship between stress and strain
 	Eigen::Matrix<double, 6, 6> m_constitutiveMaterial;
-
-	/// %Mass matrix (usually noted \f$M\f$)
-	Eigen::Matrix<double, 24, 24> m_mass;
-	/// Stiffness matrix (usually noted \f$K\f$)
-	Eigen::Matrix<double, 24, 24> m_stiffness;
 };
 
 } // namespace Physics

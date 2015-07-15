@@ -60,5 +60,5 @@ void main()
     normalDir = gl_NormalMatrix * gl_Normal;
 
     // normalDir needs to be normalized for reflect to work
-    reflectDir = reflect(eyeDir4, normalize(normalDir));
+    reflectDir = reflect(eyeDir, normalize(normalDir));
 }

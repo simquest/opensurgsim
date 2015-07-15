@@ -124,6 +124,86 @@ void GlutSphere::draw()
 	glPopMatrix();
 }
 
+void GlutImage::draw()
+{
+	if (m_firstRun)
+	{
+	   glGenTextures(1, &m_texture);
+	   m_firstRun = false;
+	}
+
+	glDisable(GL_LIGHTING);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+
+	ImageType imageData;
+	if(image.tryTakeChanged(&imageData))
+	{
+		float maxPixel = imageData.getAsVector().maxCoeff();
+		if (maxPixel > 1.0)
+		{
+		   float scaleFactor = 1.0 / maxPixel;
+		   glPixelTransferf(GL_RED_SCALE, scaleFactor);
+		   glPixelTransferf(GL_BLUE_SCALE, scaleFactor);
+		   glPixelTransferf(GL_GREEN_SCALE, scaleFactor);
+		}
+		else
+		{
+		   glPixelTransferf(GL_RED_SCALE, 1.0);
+		   glPixelTransferf(GL_BLUE_SCALE, 1.0);
+		   glPixelTransferf(GL_GREEN_SCALE, 1.0);
+		}
+
+		switch (imageData.getNumChannels())
+		{
+		case 1:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, static_cast<GLsizei>(imageData.getWidth()),
+					static_cast<GLsizei>(imageData.getHeight()), 0, GL_LUMINANCE, GL_FLOAT, imageData.getData());
+			break;
+		case 3:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, static_cast<GLsizei>(imageData.getWidth()),
+					static_cast<GLsizei>(imageData.getHeight()), 0, GL_RGB, GL_FLOAT, imageData.getData());
+			break;
+		}
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	}
+
+	glColor3d(1, 1, 1);
+	glBegin(GL_QUADS);
+
+	glTexCoord2f(1, 1);
+	glVertex2f(m_bounds.min()(0), m_bounds.min()(1));
+
+	glTexCoord2f(0, 1);
+	glVertex2f(m_bounds.max()(0), m_bounds.min()(1));
+
+	glTexCoord2f(0, 0);
+	glVertex2f(m_bounds.max()(0), m_bounds.max()(1));
+
+	glTexCoord2f(1, 0);
+	glVertex2f(m_bounds.min()(0), m_bounds.max()(1));
+
+	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
+
 void GlutGroup::draw()
 {
 	glPushMatrix();
@@ -164,9 +244,10 @@ void GlutRenderer::initialize()
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 }
+
 void GlutRenderer::display()
 {
-	glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
+	glViewport(0, 0, static_cast<GLsizei>(m_width), static_cast<GLsizei>(m_height));
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	if (m_camera)

@@ -120,7 +120,7 @@ void Fem2DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 		}
 	}
 
-	FemRepresentation::setInitialState(state);
+	setInitialState(state);
 }
 
 std::shared_ptr<Fem2D> Fem2DRepresentation::getFem() const

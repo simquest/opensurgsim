@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 
@@ -88,30 +89,12 @@ void Fem3DElementCube::initialize(const SurgSim::Math::OdeState& state)
 	m_restVolume = getVolume(state);
 
 	// Pre-compute the mass and stiffness matrix
-	computeMass(state, &m_mass);
-	computeStiffness(state, &m_strain, &m_stress, &m_stiffness);
-}
-
-void Fem3DElementCube::addForce(const SurgSim::Math::OdeState& state,
-								const Eigen::Matrix<double, 24, 24>& k, SurgSim::Math::Vector* F, double scale)
-{
-	Eigen::Matrix<double, 24, 1> x, f;
-
-	// K.U = Fext
-	// K.(x - x0) = Fext
-	// 0 = Fext + Fint     with Fint = -K.(x - x0)
-	getSubVector(state.getPositions(), m_nodeIds, 3, &x);
-	f = (- scale) * k * (x - m_elementRestPosition);
-	addSubVector(f, m_nodeIds, 3, F);
-}
-
-void Fem3DElementCube::addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale)
-{
-	addForce(state, m_stiffness, F, scale);
+	computeMass(state, &m_M);
+	computeStiffness(state, &m_strain, &m_stress, &m_K);
 }
 
 void Fem3DElementCube::computeMass(const SurgSim::Math::OdeState& state,
-								   Eigen::Matrix<double, 24, 24>* M)
+								   SurgSim::Math::Matrix* M)
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
@@ -142,21 +125,24 @@ void Fem3DElementCube::computeMass(const SurgSim::Math::OdeState& state,
 	}
 }
 
-void Fem3DElementCube::addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M,
-							   double scale)
+void Fem3DElementCube::doUpdateFMDK(const Math::OdeState& state, int options)
 {
-	assembleMatrixBlocks(m_mass * scale, m_nodeIds, 3, M, false);
-}
+	if (options & Math::ODEEQUATIONUPDATE_F)
+	{
+		Eigen::Matrix<double, 24, 1> x;
 
-void Fem3DElementCube::addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* D,
-								  double scale)
-{
+		// K.U = Fext
+		// K.(x - x0) = Fext
+		// 0 = Fext + Fint     with Fint = -K.(x - x0)
+		getSubVector(state.getPositions(), m_nodeIds, 3, &x);
+		m_f = -m_K * (x - m_elementRestPosition);
+	}
 }
 
 void Fem3DElementCube::computeStiffness(const SurgSim::Math::OdeState& state,
 										Eigen::Matrix<double, 6, 24>* strain,
 										Eigen::Matrix<double, 6, 24>* stress,
-										Eigen::Matrix<double, 24, 24>* stiffness)
+										SurgSim::Math::Matrix* stiffness)
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
@@ -283,7 +269,7 @@ void Fem3DElementCube::addStrainStressStiffnessAtPoint(const SurgSim::Math::OdeS
 													   const SurgSim::Math::gaussQuadraturePoint& mu,
 													   Eigen::Matrix<double, 6, 24>* strain,
 													   Eigen::Matrix<double, 6, 24>* stress,
-													   Eigen::Matrix<double, 24, 24>* k)
+													   SurgSim::Math::Matrix* k)
 {
 	SurgSim::Math::Matrix33d J, Jinv;
 	double detJ;
@@ -304,7 +290,7 @@ void Fem3DElementCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state
 											const SurgSim::Math::gaussQuadraturePoint& epsilon,
 											const SurgSim::Math::gaussQuadraturePoint& eta,
 											const SurgSim::Math::gaussQuadraturePoint& mu,
-											Eigen::Matrix<double, 24, 24>* m)
+											SurgSim::Math::Matrix* m)
 {
 	// This helper method hels to compute:
 	// M = rho * integration{over volume} {phi^T.phi} dV
@@ -329,62 +315,6 @@ void Fem3DElementCube::addMassMatrixAtPoint(const SurgSim::Math::OdeState& state
 	}
 
 	*m += (epsilon.weight * eta.weight * mu.weight * detJ * m_rho) * phi.transpose() * phi;
-}
-
-void Fem3DElementCube::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-									double scale)
-{
-	assembleMatrixBlocks(m_stiffness * scale, getNodeIds(), 3, K, false);
-}
-
-void Fem3DElementCube::addFMDK(const SurgSim::Math::OdeState& state,
-							   SurgSim::Math::Vector* F,
-							   SurgSim::Math::SparseMatrix* M,
-							   SurgSim::Math::SparseMatrix* D,
-							   SurgSim::Math::SparseMatrix* K)
-{
-	// Assemble the mass matrix
-	addMass(state, M);
-
-	// No damping matrix as we are using linear elasticity (not visco-elasticity)
-
-	// Assemble the stiffness matrix
-	addStiffness(state, K);
-
-	// Assemble the force vector
-	addForce(state, F);
-}
-
-void Fem3DElementCube::addMatVec(const SurgSim::Math::OdeState& state,
-								 double alphaM, double alphaD, double alphaK,
-								 const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
-{
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::getSubVector;
-
-	if (alphaM == 0.0 && alphaK == 0.0)
-	{
-		return;
-	}
-
-	Eigen::Matrix<double, 24, 1> xElement, fElement;
-	getSubVector(x, m_nodeIds, 3, &xElement);
-
-	// Adds the mass contribution
-	if (alphaM)
-	{
-		fElement = alphaM * (m_mass * xElement);
-		addSubVector(fElement, m_nodeIds, 3, F);
-	}
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK)
-	{
-		fElement = alphaK * (m_stiffness * xElement);
-		addSubVector(fElement, m_nodeIds, 3, F);
-	}
 }
 
 double Fem3DElementCube::getVolume(const SurgSim::Math::OdeState& state) const

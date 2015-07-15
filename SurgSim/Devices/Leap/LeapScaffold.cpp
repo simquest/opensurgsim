@@ -21,7 +21,6 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-#include "SurgSim/Devices/Leap/LeapDevice.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Math/Matrix.h"
@@ -202,6 +201,12 @@ bool LeapScaffold::doRegisterDevice(DeviceData* info)
 		m_state->listener = std::unique_ptr<Listener>(new Listener);
 		m_state->controller.addListener(*m_state->listener);
 	}
+
+	if (info->deviceObject->isProvidingImages())
+	{
+		m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_IMAGES);
+	}
+
 	return true;
 }
 
@@ -210,14 +215,27 @@ bool LeapScaffold::unregisterDevice(const LeapDevice* device)
 	bool success = true;
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
+	auto& devices = m_state->activeDevices;
+	if (device->isProvidingImages())
+	{
+		auto providingImages = [](const std::unique_ptr<DeviceData>& info)
+		{
+			return info->deviceObject->isProvidingImages();
+		};
+		if (std::find_if(devices.begin(), devices.end(), providingImages) == devices.end())
+		{
+			m_state->controller.clearPolicy(Leap::Controller::PolicyFlag::POLICY_IMAGES);
+		}
+	}
+
 	auto sameDevice = [device](const std::unique_ptr<DeviceData>& info)
 	{
 		return info->deviceObject == device;
 	};
-	auto info = std::find_if(m_state->activeDevices.begin(), m_state->activeDevices.end(), sameDevice);
-	if (info != m_state->activeDevices.end())
+	auto info = std::find_if(devices.begin(), devices.end(), sameDevice);
+	if (info != devices.end())
 	{
-		m_state->activeDevices.erase(info);
+		devices.erase(info);
 		SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": Unregistered";
 	}
 	else
@@ -232,6 +250,17 @@ bool LeapScaffold::unregisterDevice(const LeapDevice* device)
 
 void LeapScaffold::handleFrame()
 {
+	updateHandData();
+	updateImageData();
+
+	for (auto& device : m_state->activeDevices)
+	{
+		device->deviceObject->pushInput();
+	}
+}
+
+void LeapScaffold::updateHandData()
+{
 	std::list<DeviceData*> unassignedDevices;
 	for (auto& device : m_state->activeDevices)
 	{
@@ -239,8 +268,7 @@ void LeapScaffold::handleFrame()
 	}
 
 	std::list<Leap::HandList::const_iterator> newHands;
-	const Leap::Frame frame = m_state->controller.frame();
-	Leap::HandList hands = frame.hands();
+	Leap::HandList hands = m_state->controller.frame().hands();
 	for (auto hand = hands.begin(); hand != hands.end(); ++hand)
 	{
 		auto sameHandId = [hand](const std::unique_ptr<DeviceData>& info)
@@ -252,7 +280,6 @@ void LeapScaffold::handleFrame()
 		if (assignedDevice != m_state->activeDevices.end())
 		{
 			updateDataGroup(*hand, &(*assignedDevice)->deviceObject->getInputData());
-			(*assignedDevice)->deviceObject->pushInput();
 			unassignedDevices.remove(assignedDevice->get());
 		}
 		else
@@ -279,15 +306,48 @@ void LeapScaffold::handleFrame()
 		{
 			(*unassignedDevice)->handId = (*newHand).id();
 			updateDataGroup(*newHand, &(*unassignedDevice)->deviceObject->getInputData());
-			(*unassignedDevice)->deviceObject->pushInput();
 			unassignedDevices.remove(*unassignedDevice);
 		}
 	}
 
 	for(auto& unassignedDevice : unassignedDevices)
 	{
-		unassignedDevice->deviceObject->getInputData().resetAll();
-		unassignedDevice->deviceObject->pushInput();
+		unassignedDevice->deviceObject->getInputData().poses().resetAll();
+	}
+}
+
+void LeapScaffold::updateImageData()
+{
+	Leap::ImageList images = m_state->controller.frame().images();
+	if (!images.isEmpty())
+	{
+		typedef SurgSim::DataStructures::DataGroup::ImageType ImageType;
+		ImageType leftImage(images[0].width(), images[0].height(), 1, images[0].data());
+		ImageType rightImage(images[1].width(), images[1].height(), 1, images[1].data());
+
+		// scale values to 0..1
+		leftImage.getAsVector() *= (1.0f / 255.0f);
+		rightImage.getAsVector() *= (1.0f / 255.0f);
+
+		for (auto& device : m_state->activeDevices)
+		{
+			if (device->deviceObject->isProvidingImages())
+			{
+				device->deviceObject->getInputData().images().set("left", leftImage);
+				device->deviceObject->getInputData().images().set("right", rightImage);
+			}
+			else
+			{
+				device->deviceObject->getInputData().images().resetAll();
+			}
+		}
+	}
+	else
+	{
+		for (auto& device : m_state->activeDevices)
+		{
+			device->deviceObject->getInputData().images().resetAll();
+		}
 	}
 }
 
@@ -304,6 +364,10 @@ std::shared_ptr<LeapScaffold> LeapScaffold::getOrCreateSharedInstance()
 SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
+
+	builder.addImage("left");
+	builder.addImage("right");
+
 	builder.addPose("pose");
 	builder.addPose("ThumbProximal");
 	builder.addPose("ThumbIntermediate");
@@ -353,8 +417,29 @@ SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 	builder.addScalar("SmallFingerIntermediateLength");
 	builder.addScalar("SmallFingerDistalLength");
 
-
 	return builder.createData();
+}
+
+void LeapScaffold::setTrackingMode(LeapTrackingMode mode)
+{
+	if (mode == LEAP_TRACKING_MODE_HMD)
+	{
+		m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
+	}
+	else
+	{
+		m_state->controller.clearPolicy(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
+	}
+}
+
+LeapTrackingMode LeapScaffold::getTrackingMode() const
+{
+	LeapTrackingMode result = LEAP_TRACKING_MODE_DESKTOP;
+	if (m_state->controller.isPolicySet(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD))
+	{
+		result = LEAP_TRACKING_MODE_HMD;
+	}
+	return result;
 }
 
 };  // namespace Device

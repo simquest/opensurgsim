@@ -64,23 +64,6 @@ public:
 
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
-	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
-
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* K,
-					  double scale = 1.0) override;
-
-	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) override;
-
-	void addFMDK(const SurgSim::Math::OdeState& state,
-				 SurgSim::Math::Vector* F,
-				 SurgSim::Math::SparseMatrix* M,
-				 SurgSim::Math::SparseMatrix* D,
-				 SurgSim::Math::SparseMatrix* K) override;
-
-	void addMatVec(const SurgSim::Math::OdeState& state,
-				   double alphaM, double alphaD, double alphaK,
-				   const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) override;
-
 protected:
 	/// Compute the rotation, mass and stiffness matrices of the element from the given state
 	/// \param state The state to compute the rotation and jacobians from
@@ -88,7 +71,7 @@ protected:
 	/// \param [out] Me, Ke Respectively the mass and stiffness matrices (Me and/or Ke be nullptr if not needed)
 	/// \note The model is not viscoelastic but purely elastic, so there is no damping matrix here.
 	void computeRotationMassAndStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
-										 Eigen::Matrix<double, 12, 12>* Me, Eigen::Matrix<double, 12, 12>* Ke) const;
+										 Math::Matrix* Me, Math::Matrix* Ke) const;
 
 	void doUpdateFMDK(const Math::OdeState& state, int options) override;
 
@@ -96,11 +79,11 @@ protected:
 	/// This is useful to compute the deformation gradient from which the element rotation is extracted.
 	SurgSim::Math::Matrix44d m_Vinverse;
 
-	// The mass matrix.
-	Eigen::Matrix<double, 12, 12> m_RMRt;
+	// The mass matrix of the linear tetrahedron
+	Eigen::Matrix<double, 12, 12> m_MLinear;
 
-	// The stiffness matrix
-	Eigen::Matrix<double, 12, 12> m_RKRt;
+	// The stiffness matrix of the linear tetrahedron
+	Eigen::Matrix<double, 12, 12> m_KLinear;
 
 	// The rotation matrix
 	SurgSim::Math::Matrix33d m_R;

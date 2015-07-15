@@ -27,7 +27,9 @@ namespace Physics
 {
 
 
-FreeMotion::FreeMotion(bool doCopyState) : Computation(doCopyState)
+FreeMotion::FreeMotion(bool doCopyState, size_t numThreads) :
+	Computation(doCopyState),
+	m_threadPool(numThreads)
 {
 
 }
@@ -44,16 +46,25 @@ std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
 	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
 
+	// Vector keeping track of all the tasks running in parallel
+	std::vector<std::future<void>> tasks;
+
 	auto& representations = result->getActiveRepresentations();
 	for (auto& representation : representations)
 	{
-		representation->update(dt);
+		tasks.push_back(m_threadPool.enqueue<void>([&]() { representation->update(dt); }));
 	}
 
 	auto& particleRepresentations = result->getActiveParticleRepresentations();
 	for (auto& representation : particleRepresentations)
 	{
-		representation->update(dt);
+		tasks.push_back(m_threadPool.enqueue<void>([&](){ representation->update(dt); }));
+	}
+
+	// Making sure this method returns when all calculation are done by waiting for all thread.
+	for (auto& task : tasks)
+	{
+		task.wait();
 	}
 
 	return result;

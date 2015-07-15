@@ -20,6 +20,7 @@
 
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
@@ -499,21 +500,23 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &stiffnessMatrix, true);
 	stiffnessMatrix.makeCompressed();
 
-
 	// Make sure that the 2 ways of computing the expected stiffness matrix gives the same result
 	EXPECT_TRUE(m_expectedStiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
 
+	// Update the internal f, M, D, K variables.
+	tet.updateFMDK(m_restState, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
-	tet.addForce(m_restState, &forceVector);
+	tet.addForce(&forceVector);
 	EXPECT_TRUE(forceVector.isZero());
 
-	tet.addMass(m_restState, &massMatrix);
+	tet.addMass(&massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix));
 
-	tet.addDamping(m_restState, &dampingMatrix);
+	tet.addDamping(&dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
 
-	tet.addStiffness(m_restState, &stiffnessMatrix);
+	tet.addStiffness(&stiffnessMatrix);
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
 
@@ -522,7 +525,7 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 	clearMatrix(&dampingMatrix);
 	clearMatrix(&stiffnessMatrix);
 
-	tet.addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
+	tet.addFMDK(&forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());
 	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix));
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
@@ -531,28 +534,28 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
-	tet.addMatVec(m_restState, 1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
+	tet.addMatVec(1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 15; rowId++)
 	{
 		EXPECT_NEAR(m_expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	tet.addMatVec(m_restState, 0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
+	tet.addMatVec(0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 15; rowId++)
 	{
 		EXPECT_NEAR(m_expectedDampingMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	tet.addMatVec(m_restState, 0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
+	tet.addMatVec(0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 15; rowId++)
 	{
 		EXPECT_NEAR(m_expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	tet.addMatVec(m_restState, 1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
+	tet.addMatVec(1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 3 * 15; rowId++)
 	{
 		double expectedCoef = 1.0 * m_expectedMassMatrix.row(rowId).sum() +
