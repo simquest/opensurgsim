@@ -26,6 +26,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
@@ -312,6 +313,12 @@ std::shared_ptr<const ApplicationData> Runtime::getApplicationData()
 	SURGSIM_ASSERT(nullptr != m_applicationData) <<
 			"Runtime::getApplicationData() should be called after the Runtime is created.";
 	return m_applicationData;
+}
+
+std::shared_ptr<ThreadPool> Runtime::getThreadPool()
+{
+	static auto threadPool = std::make_shared<ThreadPool>();
+	return threadPool;
 }
 
 void Runtime::addComponent(const std::shared_ptr<Component>& component)

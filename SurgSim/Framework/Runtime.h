@@ -40,6 +40,7 @@ class Component;
 class Logger;
 class Scene;
 class SceneElement;
+class ThreadPool;
 
 /// This class contains all the information about the runtime environment of
 /// the simulation, all the running threads, the state, while it is de facto a
@@ -115,6 +116,10 @@ public:
 	/// Gets application data for the runtime.
 	/// \return	The application data.
 	static std::shared_ptr<const ApplicationData> getApplicationData();
+
+	/// Gets the thread pool for the runtime.
+	/// \return	The thread pool.
+	static std::shared_ptr<ThreadPool> getThreadPool();
 
 	/// Adds a component.
 	/// \param	component	The component.
