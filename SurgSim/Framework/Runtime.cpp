@@ -68,6 +68,17 @@ void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 	}
 }
 
+
+std::vector<std::weak_ptr<ComponentManager>> Runtime::getManagers() const
+{
+	std::vector<std::weak_ptr<ComponentManager>> result(m_managers.size());
+
+	std::copy(m_managers.begin(), m_managers.end(), result.begin());
+
+	return result;
+}
+
+
 std::shared_ptr<Scene> Runtime::getScene()
 {
 	if (m_scene == nullptr)
