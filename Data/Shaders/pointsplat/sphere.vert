@@ -15,6 +15,9 @@
 
 /// \file sphere.vert
 /// Vertex Shader to do simple point sprite spheres
+/// Most of the equations and concepts come from the nVidia
+/// Screen Space Fluid Rendering paper and presentation from GDC '10
+/// found here: http://developer.download.nvidia.com/presentations/2010/gdc/Direct3D_Effects.pdf
 
 #version 120
 
@@ -22,8 +25,8 @@ uniform float sphereRadius;
 
 void main(void)
 {
-	vec3 eyeSpacePos = vec3(gl_ModelViewMatrix * vec4(gl_Vertex.xyz, 1.0));
+	vec3 eyeSpacePos = vec3(gl_ModelViewMatrix * gl_Vertex);
 	float dist = length(eyeSpacePos);
 	gl_PointSize = sphereRadius * (1.0 / dist);
-	gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xyz, 1.0);
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }

@@ -15,6 +15,9 @@
 
 /// \file sphere.frag
 /// Fragment Shader to do simple point sprite spheres
+/// Most of the equations and concepts come from the nVidia
+/// Screen Space Fluid Rendering paper and presentation from GDC '10
+/// found here: http://developer.download.nvidia.com/presentations/2010/gdc/Direct3D_Effects.pdf
 
 #version 120
 
@@ -26,7 +29,10 @@ void main(void)
 	vec3 normal;
 	normal.xy = gl_PointCoord * 2.0 - vec2(1.0);
 	float mag = dot(normal.xy, normal.xy);
-	if (mag > 1.0) discard;   // kill pixels outside circle
+	if (mag > 1.0)
+	{
+		discard; // kill pixels outside circle
+	}
 	normal.z = sqrt(1.0-mag);
 
 	gl_FragColor = color * normal.z;
