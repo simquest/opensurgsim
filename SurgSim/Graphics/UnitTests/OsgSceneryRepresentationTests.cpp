@@ -118,6 +118,7 @@ TEST_F(OsgSceneryRepresentationTest, SerializationTests)
 TEST_F(OsgSceneryRepresentationTest, GenerateTangents)
 {
 	{
+		SCOPED_TRACE("setGenerateTangents before loadModel");
 		auto object = std::make_shared<OsgSceneryRepresentation>("representation");
 
 		object->setGenerateTangents(true);
@@ -137,6 +138,7 @@ TEST_F(OsgSceneryRepresentationTest, GenerateTangents)
 
 
 	{
+		SCOPED_TRACE("setGenerateTangents after loadModel");
 		auto object = std::make_shared<OsgSceneryRepresentation>("representation");
 
 		object->loadModel("Geometry/cube.osgt");
