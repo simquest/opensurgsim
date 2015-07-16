@@ -22,13 +22,15 @@
 #version 120
 
 uniform float sphereRadius;
+uniform float sphereScale;
 
 varying vec3 eyeSpacePos;
 
 void main(void)
 {
-	eyeSpacePos = vec3(gl_ModelViewMatrix * gl_Vertex);
+	eyeSpacePos = vec3(gl_ModelViewMatrix * vec4(gl_Vertex.xyz, 1.0));
 	float dist = length(eyeSpacePos);
-	gl_PointSize = sphereRadius * (1.0 / dist);
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_PointSize = sphereRadius * (sphereScale / dist);
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xyz, 1.0);
+	gl_FrontColor =gl_Color;
 }

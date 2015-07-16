@@ -77,7 +77,7 @@ protected:
 
 		std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
 
-		auto renderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, true);
+		auto renderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 2, true);
 		renderPass->setRenderTarget(renderTarget);
 
 		auto material = std::make_shared<Graphics::OsgMaterial>("depthPassMaterial");
@@ -94,6 +94,12 @@ protected:
 
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
+		material->addUniform("float", "sphereScale");
+		material->setValue("sphereScale", 1.0f);
+		material->addUniform("float", "near");
+		material->setValue("near", 0.01f);
+		material->addUniform("float", "far");
+		material->setValue("far", 10.0f);
 
 		renderPass->setMaterial(material);
 		viewElement->addComponent(renderPass->getCamera());
@@ -103,6 +109,11 @@ protected:
 
 		int width = dimensions[0] / 3;
 		int height = dimensions[1] / 3;
+
+//		std::shared_ptr<ScreenSpaceQuadRepresentation> color;
+//		color = makeQuad("Depth", dimensions[0], dimensions[1], 0.0, 0.0);
+//		color->setTexture(renderTarget->getColorTarget(1));
+//		viewElement->addComponent(color);
 
 		std::shared_ptr<ScreenSpaceQuadRepresentation> quad;
 		quad = makeQuad("Depth", width, height, 0.0, screenHeight - height);

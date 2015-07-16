@@ -22,13 +22,15 @@
 #version 120
 
 uniform float sphereRadius;
+uniform float near;
+uniform float far;
 varying vec3 eyeSpacePos;
 
 void main(void)
 {
 	// calculate normal from texture coordinates provided by gl_PointCoord
 	vec3 normal;
-	normal.xy = gl_PointCoord * 2.0 - vec2(1.0);
+	normal.xy = gl_PointCoord.st * vec2(2.0, -2.0) + vec2(-1.0, 1.0);
 	float mag = dot(normal.xy, normal.xy);
 	if (mag > 1.0)
 	{
@@ -38,7 +40,8 @@ void main(void)
 
 	// calculate depth
 	vec4 pixelPos = vec4(eyeSpacePos + normal*sphereRadius, 1.0);
-	vec4 clipSpacePos = pixelPos * gl_ProjectionMatrix;
+	vec4 clipSpacePos = gl_ProjectionMatrix * pixelPos;
 	float normDepth = clipSpacePos.z / clipSpacePos.w;
-	gl_FragDepth = (((10.0 - 0.01)/2.0) * normDepth) + ((10.0 + 0.01)/2.0);
+	gl_FragDepth = (((far - near)/2.0) * normDepth) + ((far + near)/2.0);
+	gl_FragColor = vec4(normal, 1.0);
 }
