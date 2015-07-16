@@ -304,10 +304,10 @@ TEST(RuntimeTest, DuplicateBadYaml)
 TEST(RuntimeTest, ManagerAccess)
 {
 	auto runtime = std::make_shared<Runtime>();
-	
+
 	auto managers = runtime->getManagers();
 	EXPECT_EQ(0L, managers.size());
-	
+
 	auto manager1 = std::make_shared<MockManager>();
 	auto manager2 = std::make_shared<MockManager>();
 
