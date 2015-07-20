@@ -24,6 +24,7 @@ LabJackThread::LabJackThread(LabJackScaffold* scaffold, LabJackScaffold::DeviceD
 	m_scaffold(scaffold),
 	m_deviceData(deviceData)
 {
+	m_scaffold->configureDevice(m_deviceData);
 }
 
 LabJackThread::~LabJackThread()
@@ -32,7 +33,7 @@ LabJackThread::~LabJackThread()
 
 bool LabJackThread::doInitialize()
 {
-	return m_scaffold->configureDevice(m_deviceData);
+	return true;
 }
 
 bool LabJackThread::doStartUp()

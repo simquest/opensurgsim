@@ -183,7 +183,8 @@ public:
 		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
 		analogInputs(device->getAnalogInputs()),
 		analogOutputChannels(device->getAnalogOutputs()),
-		cachedOutputIndices(false)
+		cachedOutputIndices(false),
+		configured(false)
 	{
 	}
 
@@ -224,6 +225,8 @@ public:
 	std::unordered_map<int, int> analogInputIndices;
 	/// True if the output indices have been cached.
 	bool cachedOutputIndices;
+	/// True if the device has been successfully configured.
+	bool configured;
 
 private:
 	/// Given all the timers, return just the ones that provide inputs.
@@ -481,11 +484,18 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 			}
 
 			std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
-			thread->setRate(device->getMaximumUpdateRate());
-			thread->start();
-
-			info.get()->thread = std::move(thread);
-			m_state->activeDeviceList.emplace_back(std::move(info));
+			result = info->configured;
+			if (result)
+			{
+				thread->setRate(device->getMaximumUpdateRate());
+				thread->start();
+				info.get()->thread = std::move(thread);
+				m_state->activeDeviceList.emplace_back(std::move(info));
+			}
+			else
+			{
+				info->deviceHandle->destroy();
+			}
 		}
 	}
 
@@ -814,7 +824,7 @@ std::shared_ptr<LabJackScaffold> LabJackScaffold::getOrCreateSharedInstance()
 	return sharedInstance.get();
 }
 
-bool LabJackScaffold::configureDevice(DeviceData* deviceData)
+void LabJackScaffold::configureDevice(DeviceData* deviceData)
 {
 	LJ_HANDLE rawHandle = deviceData->deviceHandle->get();
 
@@ -825,7 +835,8 @@ bool LabJackScaffold::configureDevice(DeviceData* deviceData)
 		"Failed to reset configuration for a device named '" << deviceData->deviceObject->getName() << "." <<
 		std::endl << formatErrorMessage(error);
 
-	return result && configureClockAndTimers(deviceData) && configureDigital(deviceData) && configureAnalog(deviceData);
+	deviceData->configured = result &&
+		configureClockAndTimers(deviceData) && configureDigital(deviceData) && configureAnalog(deviceData);
 }
 
 bool LabJackScaffold::configureClockAndTimers(DeviceData* deviceData)
