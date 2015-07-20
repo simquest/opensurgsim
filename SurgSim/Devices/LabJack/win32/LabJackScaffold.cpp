@@ -16,8 +16,8 @@
 #include "SurgSim/Devices/LabJack/LabJackScaffold.h"
 
 #include <algorithm>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
 #include <iostream>
 #include <LabJackUD.h> // the high-level LabJack library.
 #include <list>
@@ -118,7 +118,16 @@ public:
 			firstFound = 1;  // If no address is specified, grab the first device found of this model and connection.
 		}
 
-		const LJ_ERROR error = OpenLabJack(m_model, m_connection, m_address.c_str(), firstFound, &m_deviceHandle);
+		int tries = 3;
+		LJ_ERROR error = -1;
+		while (!isOk(error) && (--tries >= 0))
+		{
+			error = OpenLabJack(m_model, m_connection, m_address.c_str(), firstFound, &m_deviceHandle);
+			if (!isOk(error))
+			{
+				boost::this_thread::sleep_until(boost::chrono::system_clock::now() + boost::chrono::milliseconds(1000));
+			}
+		}
 		SURGSIM_LOG_IF(!isOk(error), m_scaffold->getLogger(), SEVERE) <<
 			"Failed to initialize a device. Model: " << m_model << ". Connection: " << m_connection << ". Address: '" <<
 			m_address << "'." << std::endl << formatErrorMessage(error);

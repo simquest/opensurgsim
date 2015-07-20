@@ -17,8 +17,8 @@
 
 #include <algorithm>
 #include <array>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
 #include <errno.h>
 #include <labjackusb.h> // the low-level LabJack library (aka exodriver)
 #include <list>
@@ -261,7 +261,17 @@ public:
 		if (result)
 		{
 			const unsigned int dwReserved = 0; // Not used, set to 0.
-			m_deviceHandle = LJUSB_OpenDevice(deviceNumber, dwReserved, m_model);
+			int tries = 3;
+			m_deviceHandle = LABJACK_INVALID_HANDLE;
+			while ((m_deviceHandle == LABJACK_INVALID_HANDLE) && (--tries >= 0))
+			{
+				m_deviceHandle = LJUSB_OpenDevice(deviceNumber, dwReserved, m_model);
+				if (m_deviceHandle == LABJACK_INVALID_HANDLE)
+				{
+					boost::this_thread::sleep_until(boost::chrono::system_clock::now() +
+						boost::chrono::milliseconds(1000));
+				}
+			}
 			if (m_deviceHandle == LABJACK_INVALID_HANDLE)
 			{
 				SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to open a device." <<
