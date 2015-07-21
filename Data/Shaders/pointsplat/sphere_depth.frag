@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file sphere.frag
-/// Fragment Shader to do simple point sprite spheres
+/// \file sphere_depth.frag
+/// Fragment Shader to calculate depth of point sprite spheres
 /// Most of the equations and concepts come from the nVidia
 /// Screen Space Fluid Rendering paper and presentation from GDC '10
 /// found here: http://developer.download.nvidia.com/presentations/2010/gdc/Direct3D_Effects.pdf
@@ -22,15 +22,13 @@
 #version 120
 
 uniform float sphereRadius;
-uniform float near;
-uniform float far;
 varying vec3 eyeSpacePos;
 
 void main(void)
 {
 	// calculate normal from texture coordinates provided by gl_PointCoord
 	vec3 normal;
-	normal.xy = gl_PointCoord.st * vec2(2.0, -2.0) + vec2(-1.0, 1.0);
+	normal.xy = gl_PointCoord.st * 2.0 - vec2(1.0);
 	float mag = dot(normal.xy, normal.xy);
 	if (mag > 1.0)
 	{
@@ -42,6 +40,5 @@ void main(void)
 	vec4 pixelPos = vec4(eyeSpacePos + normal*sphereRadius, 1.0);
 	vec4 clipSpacePos = gl_ProjectionMatrix * pixelPos;
 	float normDepth = clipSpacePos.z / clipSpacePos.w;
-	gl_FragDepth = (((far - near)/2.0) * normDepth) + ((far + near)/2.0);
-	gl_FragColor = vec4(normal, 1.0);
+	gl_FragDepth = 0.5 * normDepth + 0.5;
 }
