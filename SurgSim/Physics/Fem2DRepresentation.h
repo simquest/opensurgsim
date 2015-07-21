@@ -26,9 +26,16 @@
 
 namespace SurgSim
 {
+namespace DataStructures
+{
+struct IndexedLocalCoordinate;
+struct Location;
+}
 
 namespace Physics
 {
+class Localization;
+
 SURGSIM_STATIC_REGISTRATION(Fem2DRepresentation);
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
@@ -59,6 +66,8 @@ public:
 		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 		const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
+
 protected:
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 			const SurgSim::Math::RigidTransform3d& transform) override;
@@ -66,6 +75,18 @@ protected:
 	bool doInitialize() override;
 
 private:
+	/// Helper method: create a localization for a node-based IndexedLocalCoordinate
+	/// \param location The IndexedLocalCoordinate pointing to the node index
+	/// \return Localization of the node for this representation
+	std::shared_ptr<Localization> createNodeLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	/// Helper method: create a localization for an element-based IndexedLocalCoordinate (triangle)
+	/// \param location The IndexedLocalCoordinate defining a point on the element mesh
+	/// \return Localization of the point for this representation
+	std::shared_ptr<Localization> createElementLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
 	/// The Fem2DRepresentation's asset as a Fem2D
 	std::shared_ptr<Fem2D> m_fem;
 };

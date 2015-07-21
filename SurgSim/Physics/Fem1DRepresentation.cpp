@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
@@ -27,6 +29,7 @@
 #include "SurgSim/Physics/FemElement.h"
 
 using SurgSim::Math::SparseMatrix;
+#include "SurgSim/Physics/Localization.h"
 
 namespace
 {
@@ -192,11 +195,72 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			index1++;
 		}
 	}
+	m_externalGeneralizedStiffness.makeCompressed();
+	m_externalGeneralizedDamping.makeCompressed();
 	m_hasExternalGeneralizedForce = true;
 }
 
-void Fem1DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-										 const SurgSim::Math::RigidTransform3d& transform)
+
+std::shared_ptr<Localization> Fem1DRepresentation::createNodeLocalization(
+	const DataStructures::IndexedLocalCoordinate& location)
+{
+	DataStructures::IndexedLocalCoordinate coordinate;
+	size_t nodeId = location.index;
+
+	SURGSIM_ASSERT(nodeId >= 0 && nodeId < getCurrentState()->getNumNodes()) << "Invalid node id";
+
+	// Look for any element that contains this node
+	bool foundNodeId = false;
+	for (size_t elementId = 0; elementId < getNumFemElements(); elementId++)
+	{
+		auto element = getFemElement(elementId);
+		auto found = std::find(element->getNodeIds().begin(), element->getNodeIds().end(), nodeId);
+		if (found != element->getNodeIds().end())
+		{
+			coordinate.index = elementId;
+			coordinate.coordinate.setZero(element->getNumNodes());
+			coordinate.coordinate[found - element->getNodeIds().begin()] = 1.0;
+			foundNodeId = true;
+			break;
+		}
+	}
+	SURGSIM_ASSERT(foundNodeId) << "Could not find any element containing the node " << nodeId;
+
+	// Fem1DLocalization will verify the coordinate (2nd parameter) based on
+	// the Fem1DRepresentation passed as 1st parameter.
+	return std::make_shared<Fem1DLocalization>(
+		std::static_pointer_cast<Physics::Representation>(getSharedPtr()), coordinate);
+}
+
+std::shared_ptr<Localization> Fem1DRepresentation::createElementLocalization(
+	const DataStructures::IndexedLocalCoordinate& location)
+{
+	return std::make_shared<Fem1DLocalization>(
+		std::static_pointer_cast<Physics::Representation>(getSharedPtr()), location);
+}
+
+std::shared_ptr<Localization> Fem1DRepresentation::createLocalization(const DataStructures::Location& location)
+{
+	if (location.nodeMeshLocalCoordinate.hasValue())
+	{
+		return createNodeLocalization(location.nodeMeshLocalCoordinate.getValue());
+	}
+	else if (location.triangleMeshLocalCoordinate.hasValue())
+	{
+		SURGSIM_FAILURE() << "Fem1DRepresentation supports only node and element-based location (not triangle-based)";
+	}
+	else if (location.elementMeshLocalCoordinate.hasValue())
+	{
+		return createElementLocalization(location.elementMeshLocalCoordinate.getValue());
+	}
+
+	SURGSIM_FAILURE() << "Localization cannot be created without a mesh-based location (node, triangle or element).";
+
+	return nullptr;
+}
+
+void Fem1DRepresentation::transformState(std::shared_ptr<Math::OdeState> state,
+										 const Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
