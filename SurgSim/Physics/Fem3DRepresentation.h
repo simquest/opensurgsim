@@ -22,19 +22,32 @@
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3D.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
 {
-
+namespace DataStructures
+{
+struct IndexedLocalCoordinate;
+struct Location;
+}
+namespace Framework
+{
+class Asset;
+}
 namespace Math
 {
 class MeshShape;
+class OdeState;
 }
 
 namespace Physics
 {
+class Localization;
+
 SURGSIM_STATIC_REGISTRATION(Fem3DRepresentation);
 
 /// Finite Element Model 3D is a fem built with 3D FemElement
@@ -48,6 +61,8 @@ public:
 	/// Destructor
 	virtual ~Fem3DRepresentation();
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
+
 	void loadFem(const std::string& fileName) override;
 
 	/// Sets the fem mesh asset
@@ -58,14 +73,12 @@ public:
 	/// \return The fem mesh asset as a Fem3D
 	std::shared_ptr<Fem3D> getFem() const;
 
-	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DRepresentation);
-
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 			const SurgSim::Math::Vector& generalizedForce,
 			const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 			const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
-	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location&) override;
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
 
 protected:
 	bool doWakeUp() override;
@@ -83,12 +96,21 @@ private:
 	std::unordered_map<size_t, size_t> createTriangleIdToElementIdMap(
 			std::shared_ptr<const SurgSim::Math::MeshShape> mesh);
 
+	/// Helper method: create a localization for a node-based IndexedLocalCoordinate
+	/// \param location The IndexedLocalCoordinate pointing to the node index
+	/// \return Localization of the node for this representation
 	std::shared_ptr<Localization> createNodeLocalization(
 		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
 
+	/// Helper method: create a localization for an triangle-based IndexedLocalCoordinate
+	/// \param location The IndexedLocalCoordinate defining a point on the triangle mesh
+	/// \return Localization of the point for this representation
 	std::shared_ptr<Localization> createTriangleLocalization(
 		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
 
+	/// Helper method: create a localization for an element-based IndexedLocalCoordinate (tetrahedron or cube)
+	/// \param location The IndexedLocalCoordinate defining a point on the element mesh
+	/// \return Localization of the point for this representation
 	std::shared_ptr<Localization> createElementLocalization(
 		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
 

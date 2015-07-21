@@ -19,7 +19,10 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem1D.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
@@ -29,6 +32,14 @@ namespace DataStructures
 {
 struct IndexedLocalCoordinate;
 struct Location;
+}
+namespace Framework
+{
+class Asset;
+}
+namespace Math
+{
+class OdeState;
 }
 
 namespace Physics
