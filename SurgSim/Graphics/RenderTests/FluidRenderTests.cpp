@@ -62,6 +62,8 @@ protected:
 
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
+		material->addUniform("float", "sphereScale");
+		material->setValue("sphereScale", 100.0f);
 		material->addUniform("vec4", "color");
 		material->setValue("color", color);
 
@@ -69,7 +71,7 @@ protected:
 		viewElement->addComponent(material);
 	}
 
-	void createPointSpriteSphereDepthPass(const float& sphereRadius)
+	void createPointSpriteSphereFluidPass(const float& sphereRadius)
 	{
 		auto renderPass = std::make_shared<RenderPass>("DepthPass");
 		renderPass->getCamera()->setProjectionMatrix(viewElement->getCamera()->getProjectionMatrix());
@@ -77,11 +79,11 @@ protected:
 
 		std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
 
-		auto renderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 2, true);
+		auto renderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, true);
 		renderPass->setRenderTarget(renderTarget);
 
 		auto material = std::make_shared<Graphics::OsgMaterial>("depthPassMaterial");
-		auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(),
+		auto program = Graphics::loadProgram(*runtime->getApplicationData(),
 													  "Shaders/pointsplat/sphere_depth");
 		ASSERT_TRUE(program != nullptr);
 		material->setProgram(program);
@@ -95,35 +97,68 @@ protected:
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
 		material->addUniform("float", "sphereScale");
-		material->setValue("sphereScale", 1.0f);
-		material->addUniform("float", "near");
-		material->setValue("near", 0.01f);
-		material->addUniform("float", "far");
-		material->setValue("far", 10.0f);
+		material->setValue("sphereScale", 100.0f);
 
 		renderPass->setMaterial(material);
 		viewElement->addComponent(renderPass->getCamera());
 		viewElement->addComponent(material);
 
+		int screenWidth = dimensions[0];
 		int screenHeight = dimensions[1];
 
 		int width = dimensions[0] / 3;
 		int height = dimensions[1] / 3;
 
-//		std::shared_ptr<ScreenSpaceQuadRepresentation> color;
-//		color = makeQuad("Depth", dimensions[0], dimensions[1], 0.0, 0.0);
-//		color->setTexture(renderTarget->getColorTarget(1));
-//		viewElement->addComponent(color);
-
-		std::shared_ptr<ScreenSpaceQuadRepresentation> quad;
-		quad = makeQuad("Depth", width, height, 0.0, screenHeight - height);
+		auto element = std::make_shared<Framework::BasicSceneElement>("debug");
+		scene->addSceneElement(element);
+		auto quad = makeQuad("Depth", width, height, 0.0, screenHeight - height);
 		quad->setTexture(renderTarget->getDepthTarget());
-		viewElement->addComponent(quad);
+		element->addComponent(quad);
+
+		// Normal Pass
+		auto normalPass = std::make_shared<RenderPass>("NormalPass");
+		normalPass->getCamera()->setProjectionMatrix(viewElement->getCamera()->getProjectionMatrix());
+		normalPass->getCamera()->setRenderGroupReference("NormalPass");
+
+		auto nRenderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, false);
+		normalPass->setRenderTarget(nRenderTarget);
+		// set clear color
+
+		auto normalMat = std::make_shared<Graphics::OsgMaterial>("NormalPassMaterial");
+		auto normalProg = Graphics::loadProgram(*runtime->getApplicationData(),
+												"Shaders/pointsplat/sphere_normal");
+		SURGSIM_ASSERT(normalProg != nullptr);
+		normalProg->setGlobalScope(true);
+		normalMat->setProgram(normalProg);
+
+		normalMat->addUniform("sampler2D", "depthMap");
+		normalMat->setValue("depthMap", renderTarget->getDepthTarget());
+		normalMat->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
+		normalMat->addUniform("float", "texelSize");
+		normalMat->setValue("texelSize", 0.01f);
+
+		normalPass->setMaterial(normalMat);
+		scene->addSceneElement(normalPass);
+
+		auto normalElement = std::make_shared<Framework::BasicSceneElement>("normal");
+		scene->addSceneElement(normalElement);
+		auto ssQuad = makeQuad("screenspace", dimensions[0], dimensions[1], 0.0, 0.0);
+		ssQuad->setTexture(renderTarget->getDepthTarget());
+		ssQuad->setGroupReference("NormalPass");
+		normalPass->addComponent(ssQuad);
+
+		auto normQuad = makeQuad("Normal", width, height, screenWidth - width, screenHeight - height);
+		normQuad->setTexture(nRenderTarget->getColorTarget(0));
+		element->addComponent(normQuad);
 	}
 };
 
-TEST_F(FluidRenderTests, PointSpriteDepth)
+TEST_F(FluidRenderTests, PointSpriteFluid)
 {
+	viewElement->enableManipulator(true);
+	createPointSpriteSpherePass(0.01f, Math::Vector4f(1.0, 0.0, 0.0, 1.0));
+	createPointSpriteSphereFluidPass(0.01f);
+
 	// Create the point cloud
 	auto bunny = std::make_shared<Graphics::OsgMeshRepresentation>("Bunny");
 	bunny->loadMesh("Geometry/stanford_bunny.ply");
@@ -137,9 +172,6 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));
 	}
 
-	createPointSpriteSpherePass(graphics->getPointSize(), Math::Vector4f(1.0, 0.0, 0.0, 1.0));
-	createPointSpriteSphereDepthPass(graphics->getPointSize());
-
 	graphics->addGroupReference("DepthPass");
 
 	auto sceneElement = std::make_shared<Framework::BasicSceneElement>("PointSprites");
@@ -148,7 +180,7 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 	scene->addSceneElement(sceneElement);
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
 	runtime->stop();
 }
 

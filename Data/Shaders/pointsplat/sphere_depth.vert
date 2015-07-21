@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file sphere.vert
-/// Vertex Shader to do simple point sprite spheres
+/// \file sphere_depth.vert
+/// Vertex Shader to calculate depth of point sprite spheres
 /// Most of the equations and concepts come from the nVidia
 /// Screen Space Fluid Rendering paper and presentation from GDC '10
 /// found here: http://developer.download.nvidia.com/presentations/2010/gdc/Direct3D_Effects.pdf
@@ -32,5 +32,4 @@ void main(void)
 	float dist = length(eyeSpacePos);
 	gl_PointSize = sphereRadius * (sphereScale / dist);
 	gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xyz, 1.0);
-	gl_FrontColor =gl_Color;
 }
