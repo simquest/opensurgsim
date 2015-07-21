@@ -13,27 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
+#include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/Fem1DLocalization.h"
-#include "SurgSim/Physics/Fem1DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
-
-using SurgSim::Math::SparseMatrix;
 #include "SurgSim/Physics/Localization.h"
 
 namespace
 {
-
 void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform, SurgSim::Math::Vector* x,
 							   bool rotationOnly = false)
 {
@@ -48,16 +41,13 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 	{
 		// Only the translational dof are transformed, rotational dof remains unchanged
 		SurgSim::Math::Vector3d xi = x->segment<3>(6 * nodeId);
-
 		x->segment<3>(6 * nodeId) = (rotationOnly) ? transform.linear() * xi : transform * xi;
 	}
 }
-
 }
 
 namespace SurgSim
 {
-
 namespace Physics
 {
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem1DRepresentation, Fem1DRepresentation);
@@ -93,7 +83,7 @@ void Fem1DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 	SURGSIM_ASSERT(femMesh != nullptr)
 			<< "Mesh for Fem1DRepresentation needs to be a SurgSim::Physics::Fem1D";
 	m_fem = femMesh;
-	auto state = std::make_shared<SurgSim::Math::OdeState>();
+	auto state = std::make_shared<Math::OdeState>();
 
 	state->setNumDof(getNumDofPerNode(), m_fem->getNumVertices());
 	for (size_t i = 0; i < m_fem->getNumVertices(); i++)
@@ -136,12 +126,14 @@ std::shared_ptr<Fem1D> Fem1DRepresentation::getFem() const
 }
 
 void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-													  const SurgSim::Math::Vector& generalizedForce,
-													  const SurgSim::Math::Matrix& K,
-													  const SurgSim::Math::Matrix& D)
+													  const Math::Vector& generalizedForce,
+													  const Math::Matrix& K,
+													  const Math::Matrix& D)
 {
+	using Math::SparseMatrix;
+
 	const size_t dofPerNode = getNumDofPerNode();
-	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
+	const Math::Matrix::Index expectedSize = static_cast<const Math::Matrix::Index>(dofPerNode);
 
 	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
 	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
@@ -158,7 +150,7 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	SURGSIM_ASSERT(localization1D != nullptr) << "Invalid localization type (not a Fem1DLocalization)";
 
 	const size_t elementId = localization1D->getLocalPosition().index;
-	const SurgSim::Math::Vector& coordinate = localization1D->getLocalPosition().coordinate;
+	const Math::Vector& coordinate = localization1D->getLocalPosition().coordinate;
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
 
 	size_t index = 0;
@@ -167,6 +159,7 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce * coordinate[index];
 		index++;
 	}
+
 	if (K.size() != 0 || D.size() != 0)
 	{
 		size_t index1 = 0;
@@ -279,5 +272,4 @@ bool Fem1DRepresentation::doInitialize()
 }
 
 } // namespace Physics
-
 } // namespace SurgSim
