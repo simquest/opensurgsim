@@ -95,6 +95,14 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	return result;
 }
 
+std::shared_ptr<SurgSim::Collision::ContactCalculation> DcdCollision::getContactCalculation(
+	const std::shared_ptr<CollisionPair>& pair) const
+{
+	int shapeTypeFirst = pair->getFirst()->getShapeType();
+	int shapeTypeSecond = pair->getSecond()->getShapeType();
+	return m_contactCalculations[shapeTypeFirst][shapeTypeSecond];
+}
+
 void DcdCollision::populateCalculationTable()
 {
 	for (int i = 0; i < SurgSim::Math::SHAPE_TYPE_COUNT; ++i)

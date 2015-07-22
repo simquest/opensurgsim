@@ -27,6 +27,7 @@ namespace SurgSim
 
 namespace Collision
 {
+class CollisionPair;
 class ContactCalculation;
 }
 
@@ -60,6 +61,12 @@ protected:
 	/// \param state The PhysicsManagerState from previous computation.
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 		override;
+
+	/// Helper method to retrieve a ContactCalculation from a CollisionPair
+	/// \param pair The collision pair triggering the contact calculation
+	/// \return The ContactCalculation corresponding to the CollisionPair pair
+	std::shared_ptr<Collision::ContactCalculation> getContactCalculation(
+		const std::shared_ptr<Collision::CollisionPair>& pair) const;
 
 private:
 
