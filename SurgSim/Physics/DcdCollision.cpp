@@ -44,8 +44,8 @@ DcdCollision::~DcdCollision()
 namespace
 {
 void execute(
-	std::shared_ptr<SurgSim::Collision::ContactCalculation> contactCalculation,
-	std::shared_ptr<SurgSim::Collision::CollisionPair> pair)
+	std::shared_ptr<SurgSim::Collision::ContactCalculation>& contactCalculation,
+	std::shared_ptr<CollisionPair>& pair)
 {
 	contactCalculation->calculateContact(pair);
 }

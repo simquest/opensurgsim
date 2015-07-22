@@ -77,12 +77,12 @@ private:
 	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
 
 	/// Function to populate the m_contactCalculations table for each DcdContact class.
-	void setDcdContactInTable(std::shared_ptr<SurgSim::Collision::ContactCalculation> dcdContact);
+	void setDcdContactInTable(std::shared_ptr<Collision::ContactCalculation> dcdContact);
 
 	/// Table containing contact calculation, the indices indicate the type of
 	/// the first pair object and the second pair object in order
-	std::shared_ptr<SurgSim::Collision::ContactCalculation> m_contactCalculations[SurgSim::Math::SHAPE_TYPE_COUNT]
-																				 [SurgSim::Math::SHAPE_TYPE_COUNT];
+	std::shared_ptr<Collision::ContactCalculation> m_contactCalculations[Math::SHAPE_TYPE_COUNT]
+																		[Math::SHAPE_TYPE_COUNT];
 };
 
 }; // Physics
