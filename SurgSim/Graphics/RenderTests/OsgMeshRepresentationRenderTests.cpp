@@ -141,7 +141,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	meshes.push_back(meshRepresentation1->getMesh());
-	meshes.push_back(meshRepresentation2->getMesh());
+	meshes.push_back(std::make_shared<Graphics::Mesh>(*meshRepresentation2->getMesh()));
 
 	/// Run the thread
 	runtime->start();
@@ -169,7 +169,16 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 				newVertices[index] =  transform * (cubeVertices[index] * scale);
 			}
 			meshes[j]->setVertexPositions(newVertices, true);
-			meshes[j]->dirty();
+			if (j == 0)
+			{
+				// Not threadsafe update
+				meshes[0]->dirty();
+			}
+			else
+			{
+				// threadsafe update
+				meshRepresentation2->updateMesh(*meshes[1]);
+			}
 		}
 
 		if (i == 500)

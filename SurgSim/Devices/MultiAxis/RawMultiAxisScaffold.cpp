@@ -173,15 +173,10 @@ private:
 };
 
 
-RawMultiAxisScaffold::RawMultiAxisScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+RawMultiAxisScaffold::RawMultiAxisScaffold() :
+	m_logger(Framework::Logger::getLogger("Devices/RawMultiAxis")), m_state(new StateData)
 {
-	if (! m_logger)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("RawMultiAxis device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
-	SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Shared scaffold created.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.";
 }
 
 
@@ -210,6 +205,11 @@ RawMultiAxisScaffold::~RawMultiAxisScaffold()
 		}
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Shared scaffold destroyed.";
+}
+
+std::shared_ptr<SurgSim::Framework::Logger> RawMultiAxisScaffold::getLogger() const
+{
+	return m_logger;
 }
 
 
@@ -609,13 +609,6 @@ std::shared_ptr<RawMultiAxisScaffold> RawMultiAxisScaffold::getOrCreateSharedIns
 	static SurgSim::Framework::SharedInstance<RawMultiAxisScaffold> sharedInstance;
 	return sharedInstance.get();
 }
-
-void RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
-}
-
-SurgSim::Framework::LogLevel RawMultiAxisScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 
 };  // namespace Device

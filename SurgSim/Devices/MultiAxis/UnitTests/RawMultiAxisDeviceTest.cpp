@@ -22,7 +22,6 @@
 #include <boost/chrono.hpp>
 #include <gtest/gtest.h>
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
-//#include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"  // only needed if calling setDefaultLogLevel()
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
@@ -37,14 +36,12 @@ using SurgSim::Testing::MockInputOutput;
 
 TEST(RawMultiAxisDeviceTest, CreateUninitializedDevice)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 }
 
 TEST(RawMultiAxisDeviceTest, CreateAndInitializeDevice)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_FALSE(device->isInitialized());
@@ -54,7 +51,6 @@ TEST(RawMultiAxisDeviceTest, CreateAndInitializeDevice)
 
 TEST(RawMultiAxisDeviceTest, Name)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_EQ("TestRawMultiAxis", device->getName());
@@ -88,13 +84,11 @@ static void testCreateDeviceSeveralTimes(bool doSleep)
 
 TEST(RawMultiAxisDeviceTest, CreateDeviceSeveralTimes)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	testCreateDeviceSeveralTimes(true);
 }
 
 TEST(RawMultiAxisDeviceTest, CreateSeveralDevices)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisDevice> device1 = std::make_shared<RawMultiAxisDevice>("RawMultiAxis1");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
@@ -111,7 +105,6 @@ TEST(RawMultiAxisDeviceTest, CreateSeveralDevices)
 
 TEST(RawMultiAxisDeviceTest, CreateDevicesWithSameName)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisDevice> device1 = std::make_shared<RawMultiAxisDevice>("RawMultiAxis");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
@@ -133,7 +126,6 @@ inline std::string makeString(T value)
 
 TEST(RawMultiAxisDeviceTest, CreateAllDevices)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::vector<std::shared_ptr<RawMultiAxisDevice>> devices;
 
 	for (int i = 1;  ;  ++i)
@@ -154,7 +146,6 @@ TEST(RawMultiAxisDeviceTest, CreateAllDevices)
 
 TEST(RawMultiAxisDeviceTest, InputConsumer)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
@@ -195,7 +186,6 @@ TEST(RawMultiAxisDeviceTest, InputConsumer)
 
 TEST(RawMultiAxisDeviceTest, OutputProducer)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
