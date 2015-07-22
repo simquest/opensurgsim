@@ -104,13 +104,13 @@ private:
 	SurgSim::DataStructures::BufferedValue<ContactMapType> m_collisions;
 
 	/// Mutex to lock write access to m_collisions
-	boost::mutex m_mutexCollisions;
+	boost::mutex m_collisionsMutex;
 
 	/// Cached posed shape
 	std::shared_ptr<Math::Shape> m_posedShape;
 
 	/// Mutex to lock write access to m_posedShape
-	boost::mutex m_mutexPosedShape;
+	boost::mutex m_posedShapeMutex;
 
 	/// Pose of m_posedShape
 	Math::RigidTransform3d m_posedShapePose;
