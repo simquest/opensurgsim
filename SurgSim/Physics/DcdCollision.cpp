@@ -19,6 +19,8 @@
 #include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
@@ -29,9 +31,8 @@ namespace SurgSim
 namespace Physics
 {
 
-DcdCollision::DcdCollision(bool doCopyState, size_t numThread) :
-	Computation(doCopyState),
-	m_threadPool(numThread)
+DcdCollision::DcdCollision(bool doCopyState) :
+	Computation(doCopyState)
 {
 	populateCalculationTable();
 }
@@ -56,6 +57,8 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 
+	auto threadPool = Framework::Runtime::getThreadPool();
+
 	auto& representations = state->getActiveCollisionRepresentations();
 	for (auto& representation : representations)
 	{
@@ -76,7 +79,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 		auto pair = *it;
 		it++;
 
-		tasks.push_back(m_threadPool.enqueue<void>(std::bind(&execute, contactCalculation, pair)));
+		tasks.push_back(threadPool->enqueue<void>(std::bind(&execute, contactCalculation, pair)));
 	}
 
 	for (auto& task : tasks)

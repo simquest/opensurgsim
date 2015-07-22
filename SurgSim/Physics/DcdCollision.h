@@ -48,7 +48,7 @@ public:
 
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
-	explicit DcdCollision(bool doCopyState = false, size_t numThread = boost::thread::hardware_concurrency() * 3 / 4);
+	explicit DcdCollision(bool doCopyState = false);
 
 	/// Destructor
 	virtual ~DcdCollision();
@@ -76,9 +76,6 @@ private:
 	/// the first pair object and the second pair object in order
 	std::shared_ptr<SurgSim::Collision::ContactCalculation> m_contactCalculations[SurgSim::Math::SHAPE_TYPE_COUNT]
 																				 [SurgSim::Math::SHAPE_TYPE_COUNT];
-
-	/// Thread pool to execute the collision pairs in parallel
-	SurgSim::Framework::ThreadPool m_threadPool;
 };
 
 }; // Physics
