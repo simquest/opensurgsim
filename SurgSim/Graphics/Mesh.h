@@ -75,15 +75,15 @@ public:
 	/// Copy Constructor
 	/// \param other Constructor source
 	Mesh(const Mesh& other);
-	
+
 	/// Move Constructor
 	/// \param other Constructor source
 	Mesh(Mesh&& other);
-	
+
 	/// Copy Assignment
 	/// \param other Assignment source
 	Mesh& operator=(const Mesh& other);
-	
+
 	/// Move Assignment
 	/// \param other Assignment source
 	Mesh& operator=(Mesh&& other);
