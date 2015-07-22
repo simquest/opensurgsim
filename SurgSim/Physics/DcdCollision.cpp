@@ -68,18 +68,9 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	updatePairs(result);
 
 	std::vector<std::future<void>> tasks;
-	auto& pairs = result->getCollisionPairs();
-	auto it = pairs.cbegin();
-	auto itEnd = pairs.cend();
-	while (it != itEnd)
+	for (auto& pair : result->getCollisionPairs())
 	{
-		int shapeTypeFirst = (*it)->getFirst()->getShapeType();
-		int shapeTypeSecond = (*it)->getSecond()->getShapeType();
-		auto contactCalculation = m_contactCalculations[shapeTypeFirst][shapeTypeSecond];
-		auto pair = *it;
-		it++;
-
-		tasks.push_back(threadPool->enqueue<void>(std::bind(&execute, contactCalculation, pair)));
+		tasks.push_back(threadPool->enqueue<void>(std::bind(&execute, getContactCalculation(pair), pair)));
 	}
 
 	for (auto& task : tasks)
