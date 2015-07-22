@@ -81,7 +81,8 @@ public:
 	/// Add a contact with another representation
 	/// \param other The other collision representation
 	/// \param contact The contact to be added
-	void addContactWith(const std::shared_ptr<Representation>& other, std::shared_ptr<SurgSim::Collision::Contact> contact);
+	void addContactWith(const std::shared_ptr<Representation>& other,
+		std::shared_ptr<SurgSim::Collision::Contact> contact);
 
 	/// Check whether this collision representation collided with another during the last update
 	/// \param other other collision representation to check against
