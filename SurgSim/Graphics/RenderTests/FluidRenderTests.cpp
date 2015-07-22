@@ -116,21 +116,15 @@ protected:
 		element->addComponent(quad);
 
 		// Normal Pass
-		auto normalElement = std::make_shared<Framework::BasicSceneElement>("normal");
-		scene->addSceneElement(normalElement);
-		auto ssQuad = makeQuad("screenspace", dimensions[0], dimensions[1], 0.0, 0-screenHeight);
-		ssQuad->setTexture(renderTarget->getDepthTarget());
-		ssQuad->setGroupReference("NormalPass");
-		element->addComponent(ssQuad);
-
-		auto nRenderPass = std::make_shared<RenderPass>("NormalPass");
-		nRenderPass->getCamera()->setProjectionMatrix(viewElement->getCamera()->getProjectionMatrix());
-		nRenderPass->getCamera()->setRenderGroupReference("NormalPass");
+		auto normalPass = std::make_shared<RenderPass>("NormalPass");
+		normalPass->getCamera()->setProjectionMatrix(viewElement->getCamera()->getProjectionMatrix());
+		normalPass->getCamera()->setRenderGroupReference("NormalPass");
 
 		auto nRenderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, false);
-		nRenderPass->setRenderTarget(nRenderTarget);
+		normalPass->setRenderTarget(nRenderTarget);
+		// set clear color
 
-		auto normalMat = std::make_shared<Graphics::OsgMaterial>("normalPassMaterial");
+		auto normalMat = std::make_shared<Graphics::OsgMaterial>("NormalPassMaterial");
 		auto normalProg = Graphics::loadProgram(*runtime->getApplicationData(),
 												"Shaders/pointsplat/sphere_normal");
 		SURGSIM_ASSERT(normalProg != nullptr);
@@ -143,9 +137,15 @@ protected:
 		normalMat->addUniform("float", "texelSize");
 		normalMat->setValue("texelSize", 0.01f);
 
-		nRenderPass->setMaterial(normalMat);
-		viewElement->addComponent(nRenderPass->getCamera());
-		viewElement->addComponent(normalMat);
+		normalPass->setMaterial(normalMat);
+		scene->addSceneElement(normalPass);
+
+		auto normalElement = std::make_shared<Framework::BasicSceneElement>("normal");
+		scene->addSceneElement(normalElement);
+		auto ssQuad = makeQuad("screenspace", dimensions[0], dimensions[1], 0.0, 0.0);
+		ssQuad->setTexture(renderTarget->getDepthTarget());
+		ssQuad->setGroupReference("NormalPass");
+		normalPass->addComponent(ssQuad);
 
 		auto normQuad = makeQuad("Normal", width, height, screenWidth - width, screenHeight - height);
 		normQuad->setTexture(nRenderTarget->getColorTarget(0));
