@@ -73,10 +73,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 		tasks.push_back(threadPool->enqueue<void>(std::bind(&execute, getContactCalculation(pair), pair)));
 	}
 
-	for (auto& task : tasks)
-	{
-		task.wait();
-	}
+	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.wait();});
 
 	for (auto& representation : representations)
 	{
