@@ -23,7 +23,7 @@
 
 uniform sampler2D depthMap;
 uniform float texelSize;
-uniform float maxFloat = 0.999999f;
+uniform float maxDepth = 0.999999f;
 
 vec3 getEyeSpacePos(vec2 texCoord, float z)
 {
@@ -35,15 +35,15 @@ vec3 getEyeSpacePos(vec2 texCoord, float z)
 
 void main(void)
 {
-	float depth = texture2D(depthMap, gl_TexCoord[0]).x;
+	float depth = texture2D(depthMap, gl_TexCoord[0].xy).x;
 	if(depth > maxDepth)
 	{
 		discard;
 	}
 
-	vec3 eyePos = getEyeSpacePos(gl_TexCoord[0], depth);
-	vec2 texCoordX1 = gl_TexCoord[0] + vec2(texelSize, 0);
-	vec2 texCoordX2 = gl_TexCoord[0] - vec2(texelSize, 0);
+	vec3 eyePos = getEyeSpacePos(gl_TexCoord[0].xy, depth);
+	vec2 texCoordX1 = gl_TexCoord[0].xy + vec2(texelSize, 0);
+	vec2 texCoordX2 = gl_TexCoord[0].xy - vec2(texelSize, 0);
 
 	vec3 ddx = getEyeSpacePos(texCoordX1, texture2D(depthMap, texCoordX1).x) - eyePos;
 	vec3 ddx2 = eyePos - getEyeSpacePos(texCoordX2, texture2D(depthMap, texCoordX2).x);
@@ -52,8 +52,8 @@ void main(void)
 		ddx = ddx2;
 	}
 
-	vec2 texCoordY1 = gl_TexCoord[0] + vec2(0, texelSize);
-	vec2 texCoordY2 = gl_TexCoord[0] - vec2(0, texelSize);
+	vec2 texCoordY1 = gl_TexCoord[0].xy + vec2(0, texelSize);
+	vec2 texCoordY2 = gl_TexCoord[0].xy - vec2(0, texelSize);
 
 	vec3 ddy = getEyeSpacePos(texCoordY1, texture2D(depthMap, texCoordY1).x) - eyePos;
 	vec3 ddy2 = eyePos - getEyeSpacePos(texCoordY2, texture2D(depthMap, texCoordY2).x);
