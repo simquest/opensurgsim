@@ -83,7 +83,7 @@ public:
 	/// \param contact The contact to be added
 	/// \note This method is thread-safe
 	void addContact(const std::shared_ptr<Representation>& other,
-		std::shared_ptr<SurgSim::Collision::Contact> contact);
+		const std::shared_ptr<SurgSim::Collision::Contact>& contact);
 
 	/// Check whether this collision representation collided with another during the last update
 	/// \param other other collision representation to check against
