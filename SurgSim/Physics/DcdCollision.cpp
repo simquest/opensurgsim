@@ -55,10 +55,10 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
-
-	auto threadPool = Framework::Runtime::getThreadPool();
-
+	auto& threadPool = Framework::Runtime::getThreadPool();
 	auto& representations = state->getActiveCollisionRepresentations();
+	std::vector<std::future<void>> tasks;
+
 	for (auto& representation : representations)
 	{
 		representation->getCollisions().unsafeGet().clear();
@@ -66,7 +66,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 
 	updatePairs(result);
 
-	std::vector<std::future<void>> tasks;
 	for (auto& pair : result->getCollisionPairs())
 	{
 		tasks.push_back(threadPool->enqueue<void>(std::bind(&execute, getContactCalculation(pair), pair)));
