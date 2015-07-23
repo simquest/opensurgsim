@@ -20,8 +20,7 @@
 #include <vector>
 
 #include "SurgSim/DataStructures/Vertices.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/Framework.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
@@ -73,14 +72,25 @@ protected:
 
 	void createPointSpriteSphereFluidPass(const float& sphereRadius)
 	{
-		auto renderPass = std::make_shared<RenderPass>("DepthPass");
-		renderPass->getCamera()->setProjectionMatrix(viewElement->getCamera()->getProjectionMatrix());
-		renderPass->getCamera()->setRenderGroupReference("DepthPass");
+		auto copier =  std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
+		copier->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_GRAPHICS);
+		viewElement->addComponent(copier);
 
 		std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
+		int screenWidth = dimensions[0];
+		int screenHeight = dimensions[1];
+		int width = dimensions[0] / 3;
+		int height = dimensions[1] / 3;
+
+		// Depth Pass //
+		auto depthPass = std::make_shared<RenderPass>("DepthPass");
+		depthPass->getCamera()->setRenderGroupReference("DepthPass");
+
+		copier->connect(viewElement->getPoseComponent(), "Pose", depthPass->getPoseComponent(), "Pose");
+		copier->connect(viewElement->getCamera(), "ProjectionMatrix", depthPass->getCamera() , "ProjectionMatrix");
 
 		auto renderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, true);
-		renderPass->setRenderTarget(renderTarget);
+		depthPass->setRenderTarget(renderTarget);
 
 		auto material = std::make_shared<Graphics::OsgMaterial>("depthPassMaterial");
 		auto program = Graphics::loadProgram(*runtime->getApplicationData(),
@@ -99,23 +109,12 @@ protected:
 		material->addUniform("float", "sphereScale");
 		material->setValue("sphereScale", 100.0f);
 
-		renderPass->setMaterial(material);
-		viewElement->addComponent(renderPass->getCamera());
-		viewElement->addComponent(material);
+		depthPass->setMaterial(material);
+		scene->addSceneElement(depthPass);
 
-		int screenWidth = dimensions[0];
-		int screenHeight = dimensions[1];
+		depthPass->showDepthTarget(0.0, screenHeight - height, width, height);
 
-		int width = dimensions[0] / 3;
-		int height = dimensions[1] / 3;
-
-		auto element = std::make_shared<Framework::BasicSceneElement>("debug");
-		scene->addSceneElement(element);
-		auto quad = makeQuad("Depth", width, height, 0.0, screenHeight - height);
-		quad->setTexture(renderTarget->getDepthTarget());
-		element->addComponent(quad);
-
-		// Normal Pass
+		// Normal Pass //
 		auto normalPass = std::make_shared<RenderPass>("NormalPass");
 		normalPass->getCamera()->setProjectionMatrix(viewElement->getCamera()->getProjectionMatrix());
 		normalPass->getCamera()->setRenderGroupReference("NormalPass");
@@ -140,16 +139,12 @@ protected:
 		normalPass->setMaterial(normalMat);
 		scene->addSceneElement(normalPass);
 
-		auto normalElement = std::make_shared<Framework::BasicSceneElement>("normal");
-		scene->addSceneElement(normalElement);
 		auto ssQuad = makeQuad("screenspace", dimensions[0], dimensions[1], 0.0, 0.0);
-		ssQuad->setTexture(renderTarget->getDepthTarget());
+		ssQuad->setTexture(renderTarget->getColorTarget(0));
 		ssQuad->setGroupReference("NormalPass");
 		normalPass->addComponent(ssQuad);
 
-		auto normQuad = makeQuad("Normal", width, height, screenWidth - width, screenHeight - height);
-		normQuad->setTexture(nRenderTarget->getColorTarget(0));
-		element->addComponent(normQuad);
+		normalPass->showColorTarget(screenWidth - width, screenHeight - height, width, height);
 	}
 };
 
