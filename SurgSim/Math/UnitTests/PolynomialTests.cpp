@@ -31,7 +31,6 @@ namespace Math
 namespace
 {
 double epsilon = 1.0e-10;
-double delta = 1.0e-11;
 }
 
 class PolynomialTests : public ::testing::Test

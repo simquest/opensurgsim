@@ -40,10 +40,11 @@ int PolynomialRootsCommon<N, T>::getNumRoots() const
 }
 
 template <int N, typename T>
-T PolynomialRootsCommon<N, T>::operator[](const size_t i) const
+T PolynomialRootsCommon<N, T>::operator[](const int i) const
 {
-	SURGSIM_ASSERT((m_numData >= 0) && (i < m_numData)) <<
-			"Requesting a root beyond the number of roots available for this polynomial";
+	SURGSIM_ASSERT((m_numData > i) && (i >= 0)) <<
+			"Requesting a root beyond the number of roots available for this polynomial, " <<
+			"or a root with a negative index.";
 	return m_data[i];
 }
 
@@ -51,15 +52,18 @@ T PolynomialRootsCommon<N, T>::operator[](const size_t i) const
 template <typename T>
 PolynomialRoots<1, T>::PolynomialRoots(const Polynomial<1, T>& p, const T& epsilon)
 {
-	solve(p.getCoefficient(1), p.getCoefficient(0), static_cast<T>(epsilon), &m_numData, &m_data);
+	solve<1, T>(p.getCoefficient(1), p.getCoefficient(0), static_cast<T>(epsilon),
+				&(this->m_numData), &(this->m_data));
 }
 
 // roots of an order-1 polynomial (linear)
 template <typename T>
 PolynomialRoots<2, T>::PolynomialRoots(const Polynomial<2, T>& p, const T& epsilon)
 {
-	solve(p.getCoefficient(2), p.getCoefficient(1), p.getCoefficient(0), static_cast<T>(epsilon), &m_numData, &m_data);
+	solve<2, T>(p.getCoefficient(2), p.getCoefficient(1), p.getCoefficient(0), static_cast<T>(epsilon),
+				&(this->m_numData), &(this->m_data));
 }
+
 // Utilities: Solve for roots.
 template <int N, typename T>
 void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T, N>* roots)
@@ -92,7 +96,7 @@ void solve(const T& a, const T& b, const T& c, const T& epsilon, int* numRoots, 
 	{
 		// The "2nd degree polynomial" is really (close to) 1st degree or less.
 		// We can delegate the solution in this case.
-		solve(b, c, epsilon, numRoots, roots);
+		solve<N, T>(b, c, epsilon, numRoots, roots);
 		return;
 	}
 

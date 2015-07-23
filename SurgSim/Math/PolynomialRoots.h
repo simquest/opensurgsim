@@ -55,7 +55,7 @@ public:
 	/// \param i is the number of the root to return
 	/// \return the value of the ith root
 	/// \exception if there is no root of rank i
-	T operator[](const size_t i) const;
+	T operator[](const int i) const;
 
 private:
 	/// @{
