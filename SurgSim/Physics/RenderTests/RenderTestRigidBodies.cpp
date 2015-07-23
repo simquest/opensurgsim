@@ -400,9 +400,6 @@ TEST_F(RenderTests, VisualTestFallingRigidShapesOnPlane)
 {
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRigidTranslation;
-	using SurgSim::Framework::LOG_LEVEL_DEBUG;
-
-	SurgSim::Framework::Logger::getLogger(physicsManager->getName())->setThreshold(LOG_LEVEL_DEBUG);
 
 	const size_t numSphere = 10;
 	const double radius = 0.05;
@@ -431,9 +428,6 @@ TEST_F(RenderTests, VisualTestFallingRigidMeshesOnPlane)
 {
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRigidTranslation;
-	using SurgSim::Framework::LOG_LEVEL_DEBUG;
-
-	SurgSim::Framework::Logger::getLogger(physicsManager->getName())->setThreshold(LOG_LEVEL_DEBUG);
 
 	const size_t numSphere = 10;
 	const double radius = 0.05;
