@@ -294,7 +294,8 @@ void TriangleMesh<VertexData, EdgeData, TriangleData>::doClear()
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(TriangleMesh&& other) : Vertices<VertexData>::Vertices(std::move(other))
+TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(TriangleMesh&& other) :
+	Vertices<VertexData>::Vertices(std::move(other))
 {
 	doClearTriangles();
 	doClearEdges();
