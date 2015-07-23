@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/Computation.h"
 
