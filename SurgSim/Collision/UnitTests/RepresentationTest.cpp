@@ -154,6 +154,9 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_EQ(unsafePlaneCollisions, *planeRep->getCollisions().safeGet());
 }
 
+// addContact method thread-safety test case.
+// WARNING: Due to the nature of multi-threaded environment, a successful test does not imply thread-safety
+//          also note the lack of reproducibility.
 TEST_F(RepresentationTest, AddContactsInParallelTest)
 {
 	auto rep = std::make_shared<ShapeCollisionRepresentation>("collisionRepReference");
