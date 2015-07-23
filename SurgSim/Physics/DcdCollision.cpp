@@ -42,14 +42,6 @@ DcdCollision::~DcdCollision()
 {
 }
 
-namespace
-{
-void execute(std::shared_ptr<ContactCalculation>& contactCalculation, std::shared_ptr<CollisionPair>& pair)
-{
-	contactCalculation->calculateContact(pair);
-}
-};
-
 std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
@@ -68,7 +60,11 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 
 	for (auto& pair : result->getCollisionPairs())
 	{
-		tasks.push_back(threadPool->enqueue<void>(std::bind(&execute, getContactCalculation(pair), pair)));
+		tasks.push_back(threadPool->enqueue<void>([&] ()
+		{
+			m_contactCalculations[pair->getFirst()->getShapeType()]
+								 [pair->getSecond()->getShapeType()]->calculateContact(pair);
+		}));
 	}
 
 	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.wait();});
@@ -79,14 +75,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	}
 
 	return result;
-}
-
-std::shared_ptr<ContactCalculation> DcdCollision::getContactCalculation(
-	const std::shared_ptr<CollisionPair>& pair) const
-{
-	int shapeTypeFirst = pair->getFirst()->getShapeType();
-	int shapeTypeSecond = pair->getSecond()->getShapeType();
-	return m_contactCalculations[shapeTypeFirst][shapeTypeSecond];
 }
 
 void DcdCollision::populateCalculationTable()
