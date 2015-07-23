@@ -253,11 +253,11 @@ public:
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
-	Polynomial operator- () const;
-	Polynomial operator+ (const Polynomial& rhs) const;
-	Polynomial& operator+= (const Polynomial& rhs);
-	Polynomial operator- (const Polynomial& rhs) const;
-	Polynomial& operator-= (const Polynomial& rhs);
+	Polynomial<3, T> operator- () const;
+	Polynomial<3, T> operator+ (const Polynomial<3, T>& rhs) const;
+	Polynomial<3, T>& operator+= (const Polynomial<3, T>& rhs);
+	Polynomial<3, T> operator- (const Polynomial<3, T>& rhs) const;
+	Polynomial<3, T>& operator-= (const Polynomial<3, T>& rhs);
 	/// @}
 
 	/// \return the derivative of the polynomial
@@ -346,7 +346,7 @@ Polynomial<2, T> square(const Polynomial<1, T>& p);
 /// Write a textual version of a Polynomial to an output stream
 /// \tparam N degree of the polynomial
 /// \tparam T underlying type of the polynomial coefficients
-/// \param o the ostream to be written to
+/// \param stream the ostream to be written to
 /// \param p the polynomial to write
 /// \return the active ostream
 template <int N, typename T>

@@ -109,8 +109,8 @@ public:
 /// \param a coefficient of the linear term
 /// \param b coefficient of the constant term
 /// \param epsilon tolerance parameter for determining the number of valid, unique roots
-/// \param numRoots[out] number of roots calculated, or DEGENERATE if there are infinitely many
-/// \param roots[out] array containing the calculated roots
+/// \param numRoots [out] number of roots calculated, or DEGENERATE if there are infinitely many
+/// \param roots [out] array containing the calculated roots
 /// \exception if there are more than N roots
 template <int N, typename T>
 void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T, N>* roots);
@@ -122,8 +122,8 @@ void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T
 /// \param b coefficient of the linear term
 /// \param c coefficient of the constant term
 /// \param epsilon tolerance parameter for determining the number of valid, unique roots
-/// \param numRoots[out] number of roots calculated, or DEGENERATE if there are infinitely many
-/// \param roots[out] array containing the calculated roots
+/// \param numRoots [out] number of roots calculated, or DEGENERATE if there are infinitely many
+/// \param roots [out] array containing the calculated roots
 /// \exception if there are more than N roots
 template <int N, typename T>
 void solve(const T& a, const T& b, const T& c, const T& epsilon, int* numRoots, std::array<T, N>* roots);
