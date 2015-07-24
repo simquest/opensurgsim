@@ -174,7 +174,7 @@ macro(surgsim_add_unit_tests TEST_NAME)
 endmacro()
 
 # This function will create a new header file (LIBRARY_HEADER) that includes
-# all the headers in HEADER_FILES.
+# all the headers (except all "-inl.h") in HEADER_FILES.
 function(surgsim_create_library_header LIBRARY_HEADER HEADER_FILES)
 	if(";${HEADER_FILES};" MATCHES ";${LIBRARY_HEADER};")
 		message(FATAL_ERROR
@@ -183,7 +183,13 @@ function(surgsim_create_library_header LIBRARY_HEADER HEADER_FILES)
 
 	file(RELATIVE_PATH HEADER_DIRECTORY ${SURGSIM_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 	foreach(HEADER ${HEADER_FILES})
-		set(HEADER_FILES_INCLUDES "${HEADER_FILES_INCLUDES}#include \"${HEADER_DIRECTORY}/${HEADER}\"\n")
+		# Filters "-inl.h" files as they are not intended to be included directly but through a 'normal' header .h
+		# Example: Fem-inl.h is included only in Fem.h
+		# So only the 'normal' header files are exposed here in the library header file.
+		string(FIND ${HEADER} "-inl.h" result)
+		if(result STREQUAL -1)
+			set(HEADER_FILES_INCLUDES "${HEADER_FILES_INCLUDES}#include \"${HEADER_DIRECTORY}/${HEADER}\"\n")
+		endif()
 	endforeach()
 
 	string(REPLACE "/" "_" HEADER_GUARD "${HEADER_DIRECTORY}/${LIBRARY_HEADER}")
