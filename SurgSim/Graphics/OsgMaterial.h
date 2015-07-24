@@ -48,6 +48,8 @@ public:
 	/// \post	The material has no uniforms and no shader.
 	explicit OsgMaterial(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgMaterial);
+
 	/// Adds a uniform to this material
 	/// \param	uniform	Uniform to add
 	/// \return	True if uniform was added successfully, otherwise false

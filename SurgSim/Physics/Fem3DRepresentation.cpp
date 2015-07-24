@@ -13,50 +13,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/Location.h"
-#include "SurgSim/DataStructures/PlyReader.h"
-#include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
-#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
-#include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
-
-using SurgSim::Framework::Logger;
-using SurgSim::Math::SparseMatrix;
+#include "SurgSim/Physics/Localization.h"
 
 namespace
 {
-void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
-							   SurgSim::Math::Vector* x, bool rotationOnly = false)
+void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform, SurgSim::Math::Vector* x,
+							   bool rotationOnly = false)
 {
 	typedef SurgSim::Math::Vector::Index IndexType;
 
 	IndexType numNodes = x->size() / 3;
-	SURGSIM_ASSERT(numNodes * 3 == x->size()) <<
-											"Unexpected number of dof in a Fem3D state vector (not a multiple of 3)";
+	SURGSIM_ASSERT(numNodes * 3 == x->size())
+			<< "Unexpected number of dof in a Fem3D state vector (not a multiple of 3)";
 
 	for (IndexType nodeId = 0; nodeId < numNodes; nodeId++)
 	{
-		SurgSim::Math::Vector3d xi = SurgSim::Math::getSubVector(*x, nodeId, 3);
-		SurgSim::Math::Vector3d xiTransformed;
-		if (rotationOnly)
-		{
-			xiTransformed = transform.linear() * xi;
-		}
-		else
-		{
-			xiTransformed = transform * xi;
-		}
-		SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
+		SurgSim::Math::Vector3d xi = x->segment<3>(3 * nodeId);
+		x->segment<3>(3 * nodeId) = (rotationOnly) ? transform.linear() * xi : transform * xi;
 	}
 }
 }
@@ -99,7 +85,7 @@ void Fem3DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 	SURGSIM_ASSERT(femMesh != nullptr)
 			<< "Mesh for Fem3DRepresentation needs to be a SurgSim::Physics::Fem3D";
 	m_fem = femMesh;
-	auto state = std::make_shared<SurgSim::Math::OdeState>();
+	auto state = std::make_shared<Math::OdeState>();
 
 	state->setNumDof(getNumDofPerNode(), m_fem->getNumVertices());
 	for (size_t i = 0; i < m_fem->getNumVertices(); i++)
@@ -138,7 +124,7 @@ void Fem3DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 		}
 	}
 
-	FemRepresentation::setInitialState(state);
+	setInitialState(state);
 }
 
 std::shared_ptr<Fem3D> Fem3DRepresentation::getFem() const
@@ -147,12 +133,14 @@ std::shared_ptr<Fem3D> Fem3DRepresentation::getFem() const
 }
 
 void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-													  const SurgSim::Math::Vector& generalizedForce,
-													  const SurgSim::Math::Matrix& K,
-													  const SurgSim::Math::Matrix& D)
+													  const Math::Vector& generalizedForce,
+													  const Math::Matrix& K,
+													  const Math::Matrix& D)
 {
+	using Math::SparseMatrix;
+
 	const size_t dofPerNode = getNumDofPerNode();
-	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
+	const Math::Matrix::Index expectedSize = static_cast<const Math::Matrix::Index>(dofPerNode);
 
 	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
 	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
@@ -169,7 +157,7 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	SURGSIM_ASSERT(localization3D != nullptr) << "Invalid localization type (not a Fem3DLocalization)";
 
 	const size_t elementId = localization3D->getLocalPosition().index;
-	const SurgSim::Math::Vector& coordinate = localization3D->getLocalPosition().coordinate;
+	const Math::Vector& coordinate = localization3D->getLocalPosition().coordinate;
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
 
 	size_t index = 0;
@@ -207,11 +195,13 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			index1++;
 		}
 	}
+	m_externalGeneralizedStiffness.makeCompressed();
+	m_externalGeneralizedDamping.makeCompressed();
 	m_hasExternalGeneralizedForce = true;
 }
 
 std::unordered_map<size_t, size_t> Fem3DRepresentation::createTriangleIdToElementIdMap(
-		std::shared_ptr<const SurgSim::Math::MeshShape> mesh)
+		std::shared_ptr<const Math::MeshShape> mesh)
 {
 	std::unordered_map<size_t, size_t> result;
 
@@ -277,7 +267,7 @@ bool Fem3DRepresentation::doWakeUp()
 	auto deformableCollision = std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
 	if (deformableCollision != nullptr)
 	{
-		auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(deformableCollision->getShape());
+		auto mesh = std::dynamic_pointer_cast<Math::MeshShape>(deformableCollision->getShape());
 		m_triangleIdToElementIdMap = createTriangleIdToElementIdMap(mesh);
 	}
 
@@ -297,9 +287,9 @@ bool Fem3DRepresentation::doInitialize()
 }
 
 std::shared_ptr<Localization> Fem3DRepresentation::createNodeLocalization(
-		const SurgSim::DataStructures::IndexedLocalCoordinate& location)
+		const DataStructures::IndexedLocalCoordinate& location)
 {
-	SurgSim::DataStructures::IndexedLocalCoordinate coordinate;
+	DataStructures::IndexedLocalCoordinate coordinate;
 	size_t nodeId = location.index;
 
 	SURGSIM_ASSERT(nodeId >= 0 && nodeId < getCurrentState()->getNumNodes()) << "Invalid node id";
@@ -324,15 +314,15 @@ std::shared_ptr<Localization> Fem3DRepresentation::createNodeLocalization(
 	// Fem3DLocalization will verify the coordinate (2nd parameter) based on
 	// the Fem3DRepresentation passed as 1st parameter.
 	return std::make_shared<Fem3DLocalization>(
-				std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()), coordinate);
+				std::static_pointer_cast<Physics::Representation>(getSharedPtr()), coordinate);
 }
 
 std::shared_ptr<Localization> Fem3DRepresentation::createTriangleLocalization(
-		const SurgSim::DataStructures::IndexedLocalCoordinate& location)
+		const DataStructures::IndexedLocalCoordinate& location)
 {
-	SurgSim::DataStructures::IndexedLocalCoordinate coordinate;
+	DataStructures::IndexedLocalCoordinate coordinate;
 	size_t triangleId = location.index;
-	const SurgSim::Math::Vector& triangleCoord = location.coordinate;
+	const Math::Vector& triangleCoord = location.coordinate;
 
 	auto deformableCollision =
 			std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
@@ -340,7 +330,7 @@ std::shared_ptr<Localization> Fem3DRepresentation::createTriangleLocalization(
 			<< "Triangle localization cannot be created if the DeformableCollisionRepresentation is not correctly set.";
 
 	// Find the vertex ids of the triangle.
-	auto mesh = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(deformableCollision->getShape());
+	auto mesh = std::dynamic_pointer_cast<Math::MeshShape>(deformableCollision->getShape());
 	auto triangleVertices = mesh->getTriangle(triangleId).verticesId;
 
 	// Find the vertex ids of the corresponding FemNode.
@@ -370,7 +360,7 @@ std::shared_ptr<Localization> Fem3DRepresentation::createTriangleLocalization(
 	}
 
 	// Create the natural coordinate.
-	SurgSim::Math::Vector4d barycentricCoordinate(triangleCoord[0], triangleCoord[1], triangleCoord[2], 0.0);
+	Math::Vector4d barycentricCoordinate(triangleCoord[0], triangleCoord[1], triangleCoord[2], 0.0);
 	coordinate.index = elementId;
 	coordinate.coordinate.resize(elementVertices.size());
 	for (size_t i = 0; i < elementVertices.size(); ++i)
@@ -381,17 +371,17 @@ std::shared_ptr<Localization> Fem3DRepresentation::createTriangleLocalization(
 	// Fem3DLocalization will verify the coordinate (2nd parameter) based on
 	// the Fem3DRepresentation passed as 1st parameter.
 	return std::make_shared<Fem3DLocalization>(
-				std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()), coordinate);
+				std::static_pointer_cast<Physics::Representation>(getSharedPtr()), coordinate);
 }
 
 std::shared_ptr<Localization> Fem3DRepresentation::createElementLocalization(
-		const SurgSim::DataStructures::IndexedLocalCoordinate& location)
+		const DataStructures::IndexedLocalCoordinate& location)
 {
 	return std::make_shared<Fem3DLocalization>(
-				std::static_pointer_cast<SurgSim::Physics::Representation>(getSharedPtr()), location);
+				std::static_pointer_cast<Physics::Representation>(getSharedPtr()), location);
 }
 
-std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const SurgSim::DataStructures::Location& location)
+std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const DataStructures::Location& location)
 {
 	if (location.nodeMeshLocalCoordinate.hasValue())
 	{
@@ -411,8 +401,8 @@ std::shared_ptr<Localization> Fem3DRepresentation::createLocalization(const Surg
 	return nullptr;
 }
 
-void Fem3DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-										 const SurgSim::Math::RigidTransform3d& transform)
+void Fem3DRepresentation::transformState(std::shared_ptr<Math::OdeState> state,
+										 const Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);

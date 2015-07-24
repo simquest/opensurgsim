@@ -1,6 +1,7 @@
 SurgSim::Framework::Scene:
   SceneElements:
     - SurgSim::Framework::BasicSceneElement:
+        Name: StaplingDemoView
         IsActive: true
         Components:
           - SurgSim::Graphics::OsgCamera:
@@ -52,7 +53,6 @@ SurgSim::Framework::Scene:
               Id: 4740c5c9-a638-4eec-b9ad-b6117733ec7a
               MouseDeviceEnabled: false
               Name: StaplingDemoView View
-        Name: StaplingDemoView
     - SurgSim::Framework::BasicSceneElement:
         Name: arm
         IsActive: true
@@ -125,8 +125,8 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               NumDof: 0
               Density: 0
-              RigidRepresentationState:
-                SurgSim::Physics::RigidRepresentationState:
+              RigidState:
+                SurgSim::Physics::RigidState:
                   Pose:
                     Quaternion: [0, 0, 0, 1]
                     Translation: [0, 0, 0]
@@ -191,8 +191,8 @@ SurgSim::Framework::Scene:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
               IsGravityEnabled: false
-              RigidRepresentationState:
-                SurgSim::Physics::RigidRepresentationState:
+              RigidState:
+                SurgSim::Physics::RigidState:
                   LinearVelocity: [0, 0, 0]
                   AngularVelocity: [0, 0, 0]
                   Pose:
@@ -369,7 +369,7 @@ SurgSim::Framework::Scene:
                 SurgSim::Physics::DeformableCollisionRepresentation:
                   Id: 2cb010a8-8ac3-4735-9551-1a1c17388e27
                   Name: Collision
-              Filename: Geometry/wound_deformable.ply
+              FemFileName: Geometry/wound_deformable.ply
               Id: 7d447c80-d8c0-4213-a46f-164a800f6d1c
               Name: Physics
               IntegrationScheme:

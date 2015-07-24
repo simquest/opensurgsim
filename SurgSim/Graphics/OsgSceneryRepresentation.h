@@ -56,6 +56,9 @@ public:
 
 	std::shared_ptr<Model> getModel() const override;
 
+	/// \return the osg node that carries the information of the loaded model
+	osg::ref_ptr<osg::Node> getModelNode() const;
+
 private:
 	bool doInitialize() override;
 	/// A osg::Node to hold the objet loaded from file

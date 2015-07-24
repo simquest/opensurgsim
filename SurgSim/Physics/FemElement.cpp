@@ -160,7 +160,7 @@ void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const Su
 	// Accumulate the mass/damping/stiffness contribution
 	Math::Vector extractedResult;
 	extractedResult.setZero(size);
-	
+
 	// Adds the mass contribution
 	if (alphaM != 0.0)
 	{

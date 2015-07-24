@@ -279,6 +279,116 @@ TEST(Fem1DRepresentationTests, LoadMeshTest)
 	}
 }
 
+TEST(Fem1DRepresentationTests, CreateLocalizationTest)
+{
+	auto fem = std::make_shared<Fem1DRepresentation>("Representation");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	ASSERT_NO_THROW(fem->loadFem("PlyReaderTests/Fem1D.ply"));
+	ASSERT_NO_THROW(ASSERT_TRUE(fem->initialize(runtime)));
+
+	// Localization on an invalid node
+	{
+		SCOPED_TRACE("Invalid node");
+
+		SurgSim::DataStructures::Location location(
+			SurgSim::DataStructures::IndexedLocalCoordinate(1000, Vector()),
+			SurgSim::DataStructures::Location::NODE);
+		std::shared_ptr<SurgSim::Physics::Fem1DLocalization> localization;
+		EXPECT_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(
+			fem->createLocalization(location)), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on a valid node
+	{
+		SCOPED_TRACE("Valid node");
+
+		SurgSim::DataStructures::Location location(
+			SurgSim::DataStructures::IndexedLocalCoordinate(0, Vector()),
+			SurgSim::DataStructures::Location::NODE);
+		std::shared_ptr<SurgSim::Physics::Fem1DLocalization> localization;
+		EXPECT_NO_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(fem->createLocalization(location)););
+		EXPECT_TRUE(localization != nullptr);
+		EXPECT_TRUE(localization->getRepresentation() == fem);
+
+		SurgSim::Math::Vector3d globalPosition;
+		SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();
+		EXPECT_NO_THROW(globalPosition = fem->getCurrentState()->getPosition(coordinate.index););
+		EXPECT_TRUE(globalPosition.isApprox(localization->calculatePosition()));
+	}
+
+	// In the 1d case, location of type triangle do not make sense and should raise an exception
+	// Localization on invalid triangle (no triangle exist, so any triangle id would be invalid)
+	{
+		SCOPED_TRACE("Triangle => all invalid");
+
+		Vector barycentricCoordinate = Vector::Zero(3);
+		barycentricCoordinate[0] = 1.0;
+		SurgSim::DataStructures::IndexedLocalCoordinate coord(0, barycentricCoordinate);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::TRIANGLE);
+		std::shared_ptr<SurgSim::Physics::Localization> localization;
+		EXPECT_THROW(localization = fem->createLocalization(location), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on an invalid element
+	{
+		SCOPED_TRACE("Invalid element index");
+
+		Vector barycentricCoordinate = Vector::Zero(2);
+		barycentricCoordinate[0] = 1.0;
+		SurgSim::DataStructures::IndexedLocalCoordinate coord(10000, barycentricCoordinate);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
+		std::shared_ptr<SurgSim::Physics::Localization> localization;
+		EXPECT_THROW(localization = fem->createLocalization(location), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on an valid element but invalid barycentric coordinate size
+	{
+		SCOPED_TRACE("Invalid element barycentric coordinate size");
+
+		Vector barycentricCoordinate = Vector::Zero(3);
+		barycentricCoordinate[0] = 1.0;
+		SurgSim::DataStructures::IndexedLocalCoordinate coord(0, barycentricCoordinate);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
+		std::shared_ptr<SurgSim::Physics::Localization> localization;
+		EXPECT_THROW(localization = fem->createLocalization(location), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on an valid element but invalid barycentric coordinate
+	{
+		SCOPED_TRACE("Invalid element barycentric coordinate");
+
+		Vector barycentricCoordinate = Vector::Zero(2);
+		SurgSim::DataStructures::IndexedLocalCoordinate coord(0, barycentricCoordinate);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
+		std::shared_ptr<SurgSim::Physics::Localization> localization;
+		EXPECT_THROW(localization = fem->createLocalization(location), SurgSim::Framework::AssertionFailure);
+	}
+
+	// Localization on a valid element
+	{
+		SCOPED_TRACE("Valid element");
+
+		Vector barycentricCoordinate = Vector::Zero(2);
+		barycentricCoordinate.setConstant(1.0 / 2.0);
+		SurgSim::DataStructures::IndexedLocalCoordinate coord(0, barycentricCoordinate);
+		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
+		std::shared_ptr<SurgSim::Physics::Fem1DLocalization> localization;
+		EXPECT_NO_THROW(localization =
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(fem->createLocalization(location)));
+		EXPECT_TRUE(localization != nullptr);
+		EXPECT_TRUE(localization->getRepresentation() == fem);
+
+		SurgSim::DataStructures::IndexedLocalCoordinate coordinate = localization->getLocalPosition();
+		auto element = fem->getFemElement(coordinate.index);
+		SurgSim::Math::Vector3d globalPosition =
+			1.0 / 2.0 * fem->getCurrentState()->getPosition(element->getNodeId(0)) +
+			1.0 / 2.0 * fem->getCurrentState()->getPosition(element->getNodeId(1));
+		EXPECT_TRUE(globalPosition.isApprox(localization->calculatePosition()));
+	}
+}
+
 TEST(Fem1DRepresentationTests, SerializationTest)
 {
 	auto fem1DRepresentation = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Test-Fem1D");

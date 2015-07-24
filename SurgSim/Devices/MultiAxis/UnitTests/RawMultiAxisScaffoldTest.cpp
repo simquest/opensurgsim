@@ -32,7 +32,6 @@ using SurgSim::Device::RawMultiAxisScaffold;
 
 TEST(RawMultiAxisScaffoldTest, CreateAndDestroyScaffold)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisScaffold> scaffold = RawMultiAxisScaffold::getOrCreateSharedInstance();
 	ASSERT_NE(nullptr, scaffold) << "The scaffold was not created!";
 	std::weak_ptr<RawMultiAxisScaffold> scaffold1 = scaffold;
@@ -65,7 +64,6 @@ TEST(RawMultiAxisScaffoldTest, CreateAndDestroyScaffold)
 
 TEST(RawMultiAxisScaffoldTest, ScaffoldLifeCycle)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::weak_ptr<RawMultiAxisScaffold> lastScaffold;
 	{
 		std::shared_ptr<RawMultiAxisScaffold> scaffold = RawMultiAxisScaffold::getOrCreateSharedInstance();
@@ -144,7 +142,6 @@ TEST(RawMultiAxisScaffoldTest, ScaffoldLifeCycle)
 
 TEST(RawMultiAxisScaffoldTest, CreateDeviceSeveralTimes)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::weak_ptr<RawMultiAxisScaffold> lastScaffold;
 
 	for (int i = 0;  i < 6;  ++i)
@@ -164,7 +161,6 @@ TEST(RawMultiAxisScaffoldTest, CreateDeviceSeveralTimes)
 
 TEST(RawMultiAxisScaffoldTest, CreateDeviceSeveralTimesWithScaffoldRef)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<RawMultiAxisScaffold> lastScaffold;
 
 	for (int i = 0;  i < 6;  ++i)

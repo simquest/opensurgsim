@@ -85,6 +85,8 @@ public:
 	/// Gets update options for this mesh.
 	/// \return	The update options.
 	virtual int getUpdateOptions() const = 0;
+
+	virtual void updateMesh(const Mesh& mesh) = 0;
 };
 
 }; // Graphics

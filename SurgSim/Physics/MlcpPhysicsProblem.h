@@ -65,7 +65,7 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// \param indexSubC Index of the Representation's compliance matrix
 	/// \param indexNewSubH Index of the new constraint within H
 	void updateConstraint(
-		const Eigen::SparseVector<double>& newSubH,
+		const Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>& newSubH,
 		const Vector& newCHt,
 		size_t indexSubC,
 		size_t indexNewSubH);
