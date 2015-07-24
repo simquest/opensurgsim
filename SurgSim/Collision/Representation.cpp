@@ -35,6 +35,8 @@ Representation::~Representation()
 
 const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
 {
+	boost::lock_guard<boost::mutex> lock(m_posedShapeMutex);
+
 	Math::RigidTransform3d pose = getPose();
 	if (pose.isApprox(Math::RigidTransform3d::Identity()))
 	{
@@ -52,6 +54,8 @@ const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
 
 void Representation::invalidatePosedShape()
 {
+	boost::lock_guard<boost::mutex> lock(m_posedShapeMutex);
+
 	m_posedShape = nullptr;
 }
 
@@ -60,6 +64,13 @@ SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getColli
 	return m_collisions;
 }
 
+void Representation::addContact(const std::shared_ptr<Representation>& other,
+								const std::shared_ptr<SurgSim::Collision::Contact>& contact)
+{
+	boost::lock_guard<boost::mutex> lock(m_collisionsMutex);
+
+	m_collisions.unsafeGet()[other].push_back(contact);
+}
 
 bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 {

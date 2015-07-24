@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H
-#define SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H
+#ifndef SURGSIM_PHYSICS_FEM2DCONSTRAINTFIXEDPOINT_H
+#define SURGSIM_PHYSICS_FEM2DCONSTRAINTFIXEDPOINT_H
 
 #include "SurgSim/Physics/ConstraintImplementation.h"
 
@@ -24,17 +24,17 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Fem3DRepresentation bilateral 3d constraint implementation.
+/// Fem2DRepresentation bilateral 3d constraint implementation.
 ///
 /// The family of FixedPoint constraints enforce equality between two points.
-class Fem3DConstraintFixedPoint : public ConstraintImplementation
+class Fem2DConstraintFixedPoint : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	Fem3DConstraintFixedPoint();
+	Fem2DConstraintFixedPoint();
 
 	/// Destructor
-	virtual ~Fem3DConstraintFixedPoint();
+	virtual ~Fem2DConstraintFixedPoint();
 
 	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
@@ -54,4 +54,4 @@ private:
 
 }; // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H
+#endif // SURGSIM_PHYSICS_FEM2DCONSTRAINTFIXEDPOINT_H
