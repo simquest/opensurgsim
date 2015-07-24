@@ -119,11 +119,11 @@ public:
 		}
 
 		int tries = 3;
-		LJ_ERROR error = -1;
+		LJ_ERROR error = LJE_MIN_USER_ERROR;
 		while (!isOk(error) && (--tries >= 0))
 		{
 			error = OpenLabJack(m_model, m_connection, m_address.c_str(), firstFound, &m_deviceHandle);
-			if (!isOk(error))
+			if (!isOk(error) && (tries >= 0))
 			{
 				boost::this_thread::sleep_until(boost::chrono::system_clock::now() + boost::chrono::milliseconds(1000));
 			}

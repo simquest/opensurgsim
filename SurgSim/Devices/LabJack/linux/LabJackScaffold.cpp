@@ -266,7 +266,7 @@ public:
 			while ((m_deviceHandle == LABJACK_INVALID_HANDLE) && (--tries >= 0))
 			{
 				m_deviceHandle = LJUSB_OpenDevice(deviceNumber, dwReserved, m_model);
-				if (m_deviceHandle == LABJACK_INVALID_HANDLE)
+				if ((m_deviceHandle == LABJACK_INVALID_HANDLE) && (tries >= 0))
 				{
 					boost::this_thread::sleep_until(boost::chrono::system_clock::now() +
 						boost::chrono::milliseconds(1000));
