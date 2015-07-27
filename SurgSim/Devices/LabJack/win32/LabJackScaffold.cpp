@@ -125,7 +125,7 @@ public:
 			error = OpenLabJack(m_model, m_connection, m_address.c_str(), firstFound, &m_deviceHandle);
 			if (!isOk(error) && (tries >= 0))
 			{
-				boost::this_thread::sleep_until(boost::chrono::system_clock::now() + boost::chrono::milliseconds(1000));
+				boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 			}
 		}
 		SURGSIM_LOG_IF(!isOk(error), m_scaffold->getLogger(), SEVERE) <<
