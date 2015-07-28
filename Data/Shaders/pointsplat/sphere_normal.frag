@@ -22,20 +22,22 @@
 #version 120
 
 uniform sampler2D depthMap;
-uniform float texelSize;
 uniform float maxDepth = 0.999999f;
+uniform mat4 inverseProjectionMatrix;
 
 vec3 getEyeSpacePos(vec2 texCoord, float z)
 {
-	vec2 homogenous = texCoord * 2.0 + 1.0;
+	vec2 homogenous = texCoord * 2.0 - 1.0;
 	vec4 clipSpacePos = vec4(homogenous, z, 1.0);
-	vec4 eyeSpacePos = gl_ProjectionMatrixInverse * clipSpacePos;
+	vec4 eyeSpacePos = inverseProjectionMatrix * clipSpacePos;
 	return eyeSpacePos.xyz/eyeSpacePos.w;
 }
 
 void main(void)
 {
+	float texelSize = 1.0/1024.0;
 	float depth = texture2D(depthMap, gl_TexCoord[0].xy).x;
+	
 	if(depth > maxDepth)
 	{
 		discard;
@@ -64,6 +66,6 @@ void main(void)
 
 	vec3 normal = cross(ddx, ddy);
 	normal = normalize(normal);
-
-	gl_FragColor.xyz = vec3(depth);
+	// normal = 0.5f*(normal+1.0f);
+	gl_FragColor = vec4(normal,1.0);
 }

@@ -34,6 +34,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/MathUtilities.h"
+#include "SurgSim/Blocks/GraphicsUtilities.h"
 
 using SurgSim::Math::makeRigidTranslation;
 
@@ -62,12 +63,12 @@ protected:
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
 		material->addUniform("float", "sphereScale");
-		material->setValue("sphereScale", 100.0f);
+		material->setValue("sphereScale", 200.0f);
 		material->addUniform("vec4", "color");
 		material->setValue("color", color);
 
-		viewElement->getCamera()->setMaterial(material);
-		viewElement->addComponent(material);
+// 		viewElement->getCamera()->setMaterial(material);
+// 		viewElement->addComponent(material);
 	}
 
 	void createPointSpriteSphereFluidPass(const float& sphereRadius)
@@ -86,15 +87,14 @@ protected:
 		auto depthPass = std::make_shared<RenderPass>("DepthPass");
 		depthPass->getCamera()->setRenderGroupReference("DepthPass");
 
-		copier->connect(viewElement->getPoseComponent(), "Pose", depthPass->getPoseComponent(), "Pose");
+		copier->connect(viewElement->getPoseComponent(), "Pose", depthPass->getCamera(), "LocalPose");
 		copier->connect(viewElement->getCamera(), "ProjectionMatrix", depthPass->getCamera() , "ProjectionMatrix");
 
-		auto renderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, true);
+		auto renderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 0, true);
 		depthPass->setRenderTarget(renderTarget);
 
 		auto material = std::make_shared<Graphics::OsgMaterial>("depthPassMaterial");
-		auto program = Graphics::loadProgram(*runtime->getApplicationData(),
-													  "Shaders/pointsplat/sphere_depth");
+		auto program = Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/pointsplat/sphere_depth");
 		ASSERT_TRUE(program != nullptr);
 		material->setProgram(program);
 
@@ -107,44 +107,64 @@ protected:
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
 		material->addUniform("float", "sphereScale");
-		material->setValue("sphereScale", 100.0f);
-
+		material->setValue("sphereScale", 200.0f);
 		depthPass->setMaterial(material);
-		scene->addSceneElement(depthPass);
 
 		depthPass->showDepthTarget(0.0, screenHeight - height, width, height);
 
+		scene->addSceneElement(depthPass);
+
+
 		// Normal Pass //
 		auto normalPass = std::make_shared<RenderPass>("NormalPass");
-		normalPass->getCamera()->setProjectionMatrix(viewElement->getCamera()->getProjectionMatrix());
-		normalPass->getCamera()->setRenderGroupReference("NormalPass");
+		normalPass->getCamera()->setGroupReference(Graphics::Representation::DefaultGroupName);
 
-		auto nRenderTarget = std::make_shared<OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, false);
+		auto camera = std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(normalPass->getCamera());
+		auto osgCamera = camera->getOsgCamera();
+		osgCamera->setViewport(0, 0, 1024, 1024);
+		camera->setOrthogonalProjection(0, 1024, 0, 1024, -1.0, 1.0);
+
+		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 3);
+
+		auto nRenderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
 		normalPass->setRenderTarget(nRenderTarget);
-		// set clear color
 
-		auto normalMat = std::make_shared<Graphics::OsgMaterial>("NormalPassMaterial");
-		auto normalProg = Graphics::loadProgram(*runtime->getApplicationData(),
-												"Shaders/pointsplat/sphere_normal");
-		SURGSIM_ASSERT(normalProg != nullptr);
-		normalProg->setGlobalScope(true);
-		normalMat->setProgram(normalProg);
+		material = std::make_shared<Graphics::OsgMaterial>("NormalPassMaterial");
+		program = Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/pointsplat/sphere_normal");
+		SURGSIM_ASSERT(program != nullptr);
+		program->setGlobalScope(true);
+		material->setProgram(program);
 
-		normalMat->addUniform("sampler2D", "depthMap");
-		normalMat->setValue("depthMap", renderTarget->getDepthTarget());
-		normalMat->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
-		normalMat->addUniform("float", "texelSize");
-		normalMat->setValue("texelSize", 0.01f);
+		material->addUniform("sampler2D", "depthMap");
+		material->setValue("depthMap", renderTarget->getDepthTarget());
+		material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
+		material->addUniform("float", "texelSize");
+		material->setValue("texelSize", static_cast<float>(1.0 / 1024.0));
+		material->addUniform("mat4", "inverseProjectionMatrix");
 
-		normalPass->setMaterial(normalMat);
-		scene->addSceneElement(normalPass);
+// 		SurgSim::Math::Matrix44f inverse = viewElement->getCamera()->getProjectionMatrix().cast<float>();
+// 		material->setValue("inverseProjectionMatrix", inverse);
 
-		auto ssQuad = makeQuad("screenspace", dimensions[0], dimensions[1], 0.0, 0.0);
-		ssQuad->setTexture(renderTarget->getColorTarget(0));
-		ssQuad->setGroupReference("NormalPass");
-		normalPass->addComponent(ssQuad);
+		copier->connect(viewElement->getCamera(), "FloatInverseProjectionMatrix", material, "inverseProjectionMatrix");
+
+		normalPass->setMaterial(material);
+
+		texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+		texture->loadImage("Textures/checkered.png");
+
+		// Quad
+		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad`");
+		graphics->setSize(1024, 1024);
+		graphics->setLocation(0, 0);
+		graphics->setGroupReference("NormalPass");
+		normalPass->addComponent(graphics);
 
 		normalPass->showColorTarget(screenWidth - width, screenHeight - height, width, height);
+
+		camera->getOsgCamera()->setClearColor(osg::Vec4(0.8, 0.0, 0.0, 1.0));
+
+
+		scene->addSceneElement(normalPass);
 	}
 };
 
