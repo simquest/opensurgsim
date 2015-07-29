@@ -33,189 +33,109 @@ namespace
 double epsilon = 1.0e-10;
 }
 
+class PolynomialUtilityTests : public ::testing::Test
+{
+};
+
+template <typename T>
 class PolynomialTests : public ::testing::Test
 {
 public:
-	template <int order>
-	void testConstructor()
+
+	void initializeConstructor(Polynomial<double, 0>* poly)
 	{
-		switch (order)
+		typedef Polynomial<double, 0> PolynomialType;
+		EXPECT_NO_THROW(PolynomialType polyNew);
+		EXPECT_NO_THROW(PolynomialType polyNew(7.0));
+		PolynomialType polyNew(1.0);
+		*poly = polyNew;
+	}
+
+	void initializeConstructor(Polynomial<double, 1>* poly)
+	{
+		typedef Polynomial<double, 1> PolynomialType;
+		EXPECT_NO_THROW(PolynomialType polyNew);
+		EXPECT_NO_THROW(PolynomialType polyNew(7.0, 8));
+		PolynomialType polyNew(1.0, 2.0);
+		*poly = polyNew;
+	}
+
+	void initializeConstructor(Polynomial<double, 2>* poly)
+	{
+		typedef Polynomial<double, 2> PolynomialType;
+		EXPECT_NO_THROW(PolynomialType polyNew);
+		EXPECT_NO_THROW(PolynomialType polyNew(7.0, 8.0, 9.0));
+		PolynomialType polyNew(1.0, 2.0, 3.0);
+		*poly = polyNew;
+	}
+
+	void initializeConstructor(Polynomial<double, 3>* poly)
+	{
+		typedef Polynomial<double, 3> PolynomialType;
+		EXPECT_NO_THROW(PolynomialType polyNew);
+		EXPECT_NO_THROW(PolynomialType polyNew(7.0, 8.0, 9.0, 10.0));
+		PolynomialType polyNew(1.0, 2.0, 3.0, 4.0);
+		*poly = polyNew;
+	}
+
+	template <int degree>
+	void setPolynomialFromOffset(int offset, Polynomial<double, degree>* poly)
+	{
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
-			case 0:
-			{
-				// Basic construction tests
-				typedef Polynomial<0, double> PolynomialType;
-				EXPECT_NO_THROW(PolynomialType poly);
-				EXPECT_NO_THROW(PolynomialType poly(7.0));
-				Polynomial<0, double> poly(1.0);
-				checkPolynomialConstructor(&poly);
-				break;
-			}
-			case 1:
-			{
-				typedef Polynomial<1, double> PolynomialType;
-				EXPECT_NO_THROW(PolynomialType poly);
-				EXPECT_NO_THROW(PolynomialType poly(7.0, 8.0));
-				Polynomial<1, double> poly(1.0, 2.0);
-				checkPolynomialConstructor(&poly);
-				break;
-			}
-			case 2:
-			{
-				typedef Polynomial<2, double> PolynomialType;
-				EXPECT_NO_THROW(PolynomialType poly);
-				EXPECT_NO_THROW(PolynomialType poly(7.0, 8.0, 9.0));
-				Polynomial<2, double> poly(1.0, 2.0, 3.0);
-				checkPolynomialConstructor(&poly);
-				break;
-			}
-			case 3:
-			{
-				typedef Polynomial<3, double> PolynomialType;
-				EXPECT_NO_THROW(PolynomialType poly);
-				EXPECT_NO_THROW(PolynomialType poly(7.0, 8.0, 9.0, 10.0));
-				Polynomial<3, double> poly(1.0, 2.0, 3.0, 4.0);
-				checkPolynomialConstructor(&poly);
-				break;
-			}
+			(*poly)[counter] = static_cast<double>(counter + offset);
 		}
 	}
 
-	template <int order>
-	void testArithmetic()
+	template <int degree>
+	void setPolynomialToSmallValue(Polynomial<double, degree>* poly)
 	{
-		switch (order)
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
-			case 0:
-			{
-				Polynomial<0, double> poly1(1.0);
-				Polynomial<0, double> poly2(2.0);
-				checkPolynomialArithmetic(poly1, poly2);
-				break;
-			}
-			case 1:
-			{
-				Polynomial<1, double> poly1(1.0, 2.0);
-				Polynomial<1, double> poly2(2.0, 3.0);
-				checkPolynomialArithmetic(poly1, poly2);
-				break;
-			}
-			case 2:
-			{
-				Polynomial<2, double> poly1(1.0, 2.0, 3.0);
-				Polynomial<2, double> poly2(2.0, 3.0, 4.0);
-				checkPolynomialArithmetic(poly1, poly2);
-				break;
-			}
-			case 3:
-			{
-				Polynomial<3, double> poly1(1.0, 2.0, 3.0, 4.0);
-				Polynomial<3, double> poly2(2.0, 3.0, 4.0, 5.0);
-				checkPolynomialArithmetic(poly1, poly2);
-				break;
-			}
+			(*poly)[counter] = epsilon / 2.0;
 		}
 	}
 
-	template <int order>
-	void testDerivative()
+	template <int degree>
+	void checkPolynomialConstructor(Polynomial<double, degree>* poly)
 	{
-		switch (order)
+		// Check get ... up to degree
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
-			case 0:
-			{
-				Polynomial<0, double> poly1(1.0);
-				checkPolynomialDerivative(poly1);
-				break;
-			}
-			case 1:
-			{
-				Polynomial<1, double> poly1(1.0, 2.0);
-				checkPolynomialDerivative(poly1);
-				break;
-			}
-			case 2:
-			{
-				Polynomial<2, double> poly1(1.0, 2.0, 3.0);
-				checkPolynomialDerivative(poly1);
-				break;
-			}
-			case 3:
-			{
-				Polynomial<3, double> poly1(1.0, 2.0, 3.0, 4.0);
-				checkPolynomialDerivative(poly1);
-				break;
-			}
-		}
-	}
-
-	template <int order>
-	void testNearZero()
-	{
-		switch (order)
-		{
-			case 0:
-			{
-				Polynomial<0, double> poly1(epsilon / 2.0);
-				checkIsNearZero(&poly1);
-				break;
-			}
-			case 1:
-			{
-				Polynomial<1, double> poly1(epsilon / 2.0, epsilon / 2.0);
-				checkIsNearZero(&poly1);
-				break;
-			}
-			case 2:
-			{
-				Polynomial<2, double> poly1(epsilon / 2.0, epsilon / 2.0, epsilon / 2.0);
-				checkIsNearZero(&poly1);
-				break;
-			}
-			case 3:
-			{
-				Polynomial<3, double> poly1(epsilon / 2.0, epsilon / 2.0, epsilon / 2.0, epsilon / 2.0);
-				checkIsNearZero(&poly1);
-				break;
-			}
-		}
-	}
-
-	template <int order>
-	void checkPolynomialConstructor(Polynomial<order, double>* poly)
-	{
-		// Check get ... up to order
-		for (size_t counter = 0; counter <= order; ++counter)
-		{
-			EXPECT_EQ(counter + 1.0, poly->getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(counter + 1.0, poly->getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(counter + 1.0, (*poly)[counter]);
 		}
 
-		// Check get ... beyond order
-		for (size_t counter = order + 1; counter < 5; ++counter)
+		// Check get ... beyond degree
+		for (size_t counter = degree + 1; counter < 5; ++counter)
 		{
-			EXPECT_EQ(0.0, poly->getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(0.0, poly->getCoefficient(counter));
+			EXPECT_THROW((*poly)[counter], SurgSim::Framework::AssertionFailure);
 		}
 
-		// Check set up to order
-		for (size_t counter = 0; counter <= order; ++counter)
+		// Check set up to degree
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
 			poly->setCoefficient(counter, static_cast<double>(counter));
-			EXPECT_EQ(counter, poly->getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(static_cast<double>(counter), poly->getCoefficient(counter));
+			(*poly)[counter] = static_cast<double>(counter + 1);
+			EXPECT_DOUBLE_EQ(static_cast<double>(counter + 1), poly->getCoefficient(counter));
 		}
 
-		// Check set beyond order
-		EXPECT_THROW(poly->setCoefficient(order + 1, 12.0), SurgSim::Framework::AssertionFailure);
+		// Check set beyond degree
+		EXPECT_THROW(poly->setCoefficient(degree + 1, 12.0), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW((*poly)[degree + 1] = 12, SurgSim::Framework::AssertionFailure);
 	}
 
-	template <int order>
-	void checkPolynomialArithmetic(const Polynomial<order, double>& poly1,
-								   const Polynomial<order, double>& poly2)
+	template <int degree>
+	void checkPolynomialArithmetic(const Polynomial<double, degree>& poly1,
+								   const Polynomial<double, degree>& poly2)
 	{
-		Polynomial<order, double> scratch;
+		Polynomial<double, degree> scratch;
 
 		// Check evaluate ...
-		double evaluate = static_cast<double>(order + 1);
-		for (int counter = order - 1; counter >= 0; --counter)
+		double evaluate = static_cast<double>(degree + 1);
+		for (int counter = degree - 1; counter >= 0; --counter)
 		{
 			evaluate = (0.5 * evaluate) + counter + 1;
 		}
@@ -223,157 +143,192 @@ public:
 
 		// Check negation ...
 		scratch = -poly1;
-		for (size_t counter = 0; counter <= order; ++counter)
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
-			EXPECT_EQ(-1 * (static_cast<double>(counter) + 1.0), scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(-1 * (static_cast<double>(counter) + 1.0), scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(-1 * (static_cast<double>(counter) + 1.0), scratch[counter]);
 		}
 
 		// Check add ...
 		scratch = poly1 + poly2;
-		for (size_t counter = 0; counter <= order; ++counter)
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
-			EXPECT_EQ(2 * static_cast<double>(counter) + 3.0, scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(2 * static_cast<double>(counter) + 3.0, scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(2 * static_cast<double>(counter) + 3.0, scratch[counter]);
 		}
 
 		scratch = poly1;
 		scratch += poly2;
-		for (size_t counter = 0; counter <= order; ++counter)
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
-			EXPECT_EQ(2 * static_cast<double>(counter) + 3.0, scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(2 * static_cast<double>(counter) + 3.0, scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(2 * static_cast<double>(counter) + 3.0, scratch[counter]);
 		}
 
 		// Check subtract ...
 		scratch = poly1 - poly2;
-		for (size_t counter = 0; counter <= order; ++counter)
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
-			EXPECT_EQ(-1.0, scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(-1.0, scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(-1.0, scratch[counter]);
 		}
 
 		scratch = poly1;
 		scratch -= poly2;
-		for (size_t counter = 0; counter <= order; ++counter)
+		for (size_t counter = 0; counter <= degree; ++counter)
 		{
-			EXPECT_EQ(-1.0, scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(-1.0, scratch.getCoefficient(counter));
+			EXPECT_DOUBLE_EQ(-1.0, scratch[counter]);
 		}
+
+		// Check isApprox ...
+		scratch = poly1;
+		for (size_t counter = 0; counter <= degree; ++counter)
+		{
+			scratch[counter] += epsilon / 2.0;
+		}
+		EXPECT_TRUE(scratch.isApprox(poly1, epsilon));
+		scratch[0] = poly1[0] + 2.0 * epsilon;
+		for (size_t counter = 0; counter < degree; ++counter)
+		{
+			EXPECT_FALSE(scratch.isApprox(poly1, epsilon));
+			scratch[counter] = poly1[counter] + epsilon / 2.0;
+			scratch[counter + 1] = poly1[counter + 1] + 2.0 * epsilon;
+		}
+		EXPECT_FALSE(scratch.isApprox(poly1, epsilon));
 	}
 
-	template <int order>
-	void checkPolynomialDerivative(const Polynomial<order, double>& poly1)
+	template <int degree>
+	void checkPolynomialDerivative(const Polynomial<double, degree>& poly1)
 	{
-		// Check derivative ...
-		auto smallScratch = poly1.derivative();
-		for (size_t counter = 0; counter < order; ++counter)
+		if (degree != 0)
 		{
-			EXPECT_EQ((counter + 2.0) * (counter + 1.0), smallScratch.getCoefficient(counter));
+			// Check derivative ...
+			auto smallScratch = poly1.derivative();
+			for (size_t counter = 0; counter < degree; ++counter)
+			{
+				EXPECT_DOUBLE_EQ((counter + 2.0) * (counter + 1.0), smallScratch.getCoefficient(counter));
+				EXPECT_DOUBLE_EQ((counter + 2.0) * (counter + 1.0), smallScratch[counter]);
+			}
+			EXPECT_DOUBLE_EQ(0.0, smallScratch.getCoefficient(degree));
+			EXPECT_THROW(smallScratch[degree], SurgSim::Framework::AssertionFailure);
 		}
-		EXPECT_EQ(0.0, smallScratch.getCoefficient(order));
 	}
 
-	template <int order>
-	void checkIsNearZero(Polynomial<order, double>* poly1)
+	template <int degree>
+	void checkIsNearZero(Polynomial<double, degree>* poly1)
 	{
 		EXPECT_TRUE(poly1->isNearZero(epsilon));
-		for (size_t counter = 0; counter <= order; counter++)
+		for (size_t counter = 0; counter <= degree; counter++)
 		{
 			poly1->setCoefficient(counter, 2 * epsilon);
 			EXPECT_FALSE(poly1->isNearZero(epsilon));
 			poly1->setCoefficient(counter, epsilon / 2.0);
+			EXPECT_TRUE(poly1->isNearZero(epsilon));
+			(*poly1)[counter] = 2 * epsilon;
+			EXPECT_FALSE(poly1->isNearZero(epsilon));
+			(*poly1)[counter] = epsilon / 2.0;
+			EXPECT_TRUE(poly1->isNearZero(epsilon));
 		}
 	}
 };
 
-TEST_F(PolynomialTests, InitializationTests)
+template <typename T>
+class PolynomialDerivativeTests : public PolynomialTests<T>
 {
-	testConstructor<0>();
-	testConstructor<1>();
-	testConstructor<2>();
-	testConstructor<3>();
 };
 
-TEST_F(PolynomialTests, ArithmeticTests)
+typedef ::testing::Types<Polynomial<double, 0>,
+		Polynomial<double, 1>,
+		Polynomial<double, 2>,
+		Polynomial<double, 3>> PolynomialTypes;
+
+typedef ::testing::Types <
+Polynomial<double, 1>,
+		   Polynomial<double, 2>,
+		   Polynomial<double, 3 >> PolynomialDerivativeTypes;
+
+TYPED_TEST_CASE(PolynomialTests, PolynomialTypes);
+TYPED_TEST_CASE(PolynomialDerivativeTests, PolynomialDerivativeTypes);
+
+TYPED_TEST(PolynomialTests, InitializationTests)
 {
-	testArithmetic<0>();
-	testArithmetic<1>();
-	testArithmetic<2>();
-	testArithmetic<3>();
+	EXPECT_NO_THROW(TypeParam poly);
+	TypeParam poly;
+	initializeConstructor(&poly);
+	checkPolynomialConstructor(&poly);
 };
 
-TEST_F(PolynomialTests, DerivativeTests)
+TYPED_TEST(PolynomialTests, ArithmeticTests)
 {
-	testDerivative<0>();
-	testDerivative<1>();
-	testDerivative<2>();
-	testDerivative<3>();
+	TypeParam poly1;
+	setPolynomialFromOffset(1, &poly1);
+	TypeParam poly2;
+	setPolynomialFromOffset(2, &poly2);
+	checkPolynomialArithmetic(poly1, poly2);
 };
 
-TEST_F(PolynomialTests, NearZeroTests)
+TYPED_TEST(PolynomialDerivativeTests, DerivativeTests)
 {
-	testNearZero<0>();
-	testNearZero<1>();
-	testNearZero<2>();
-	testNearZero<3>();
+	TypeParam poly1;
+	setPolynomialFromOffset(1, &poly1);
+	checkPolynomialDerivative(poly1);
 };
 
-TEST_F(PolynomialTests, UtilityTests)
+TYPED_TEST(PolynomialTests, NearZeroTests)
 {
-	Polynomial<0, double> p0_1(1.0);
-	Polynomial<0, double> p0_2(2.0);
-	Polynomial<1, double> p1_1(1.0, 2.0);
-	Polynomial<1, double> p1_2(2.0, 3.0);
-	Polynomial<2, double> p2_1(1.0, 2.0, 3.0);
-	Polynomial<2, double> p2_2(2.0, 3.0, 4.0);
-	Polynomial<3, double> p3_1(1.0, 2.0, 3.0, 4.0);
-	Polynomial<3, double> p3_2(2.0, 3.0, 4.0, 5.0);
+	TypeParam poly1;
+	setPolynomialToSmallValue(&poly1);
+	checkIsNearZero(&poly1);
+};
 
-	// order n * order m
+TEST_F(PolynomialUtilityTests, UtilityTests)
+{
+	Polynomial<double, 0> p0_1(1.0);
+	Polynomial<double, 0> p0_2(2.0);
+	Polynomial<double, 1> p1_1(1.0, 2.0);
+	Polynomial<double, 1> p1_2(2.0, 3.0);
+	Polynomial<double, 2> p2_1(1.0, 2.0, 3.0);
+	Polynomial<double, 2> p2_2(2.0, 3.0, 4.0);
+	Polynomial<double, 3> p3_1(1.0, 2.0, 3.0, 4.0);
+	Polynomial<double, 3> p3_2(2.0, 3.0, 4.0, 5.0);
+
+	// degree n * degree m
 	{
 		auto result = p0_2 * p3_2;
-		EXPECT_EQ(4.0, result.getCoefficient(0));
-		EXPECT_EQ(6.0, result.getCoefficient(1));
-		EXPECT_EQ(8.0, result.getCoefficient(2));
-		EXPECT_EQ(10.0, result.getCoefficient(3));
+		EXPECT_TRUE(result.isApprox(Polynomial<double, 3>(4.0, 6.0, 8.0, 10.0), epsilon));
 	}
 
-	// order 1 * order 1
+	// degree 1 * degree 1
 	{
 		auto result = p1_1 * p1_2;
-		EXPECT_EQ(2.0, result.getCoefficient(0));
-		EXPECT_EQ(7.0, result.getCoefficient(1));
-		EXPECT_EQ(6.0, result.getCoefficient(2));
+		EXPECT_TRUE(result.isApprox(Polynomial<double, 2>(2.0, 7.0, 6.0), epsilon));
 	}
 
-	// order 2 * order 1
+	// degree 2 * degree 1
 	{
 		auto result = p2_1 * p1_2;
-		EXPECT_EQ(2.0, result.getCoefficient(0));
-		EXPECT_EQ(7.0, result.getCoefficient(1));
-		EXPECT_EQ(12.0, result.getCoefficient(2));
-		EXPECT_EQ(9.0, result.getCoefficient(3));
+		EXPECT_TRUE(result.isApprox(Polynomial<double, 3>(2.0, 7.0, 12.0, 9.0), epsilon));
 	}
 
-	// order 1 * order 2
+	// degree 1 * degree 2
 	{
 		auto result = p1_1 * p2_2;
-		EXPECT_EQ(2.0, result.getCoefficient(0));
-		EXPECT_EQ(7.0, result.getCoefficient(1));
-		EXPECT_EQ(10.0, result.getCoefficient(2));
-		EXPECT_EQ(8.0, result.getCoefficient(3));
+		EXPECT_TRUE(result.isApprox(Polynomial<double, 3>(2.0, 7.0, 10.0, 8.0), epsilon));
 	}
 
-	// order 0^2
+	// degree 0^2
 	{
 		auto result_p0_1 = square(p0_1);
-		EXPECT_EQ(1.0, result_p0_1.getCoefficient(0));
+		EXPECT_TRUE(result_p0_1.isApprox(Polynomial<double, 0>(1.0), epsilon));
 		auto result_p0_2 = square(p0_2);
-		EXPECT_EQ(4.0, result_p0_2.getCoefficient(0));
+		EXPECT_TRUE(result_p0_2.isApprox(Polynomial<double, 0>(4.0), epsilon));
 	}
 
-	// order 1^2
+	// degree 1^2
 	{
 		auto result = square(p1_2);
-		EXPECT_EQ(4.0, result.getCoefficient(0));
-		EXPECT_EQ(12.0, result.getCoefficient(1));
-		EXPECT_EQ(9.0, result.getCoefficient(2));
+		EXPECT_TRUE(result.isApprox(Polynomial<double, 2>(4.0, 12.0, 9.0), epsilon));
 	}
 
 	// Output
@@ -381,7 +336,7 @@ TEST_F(PolynomialTests, UtilityTests)
 		// Output
 		std::ostringstream intervalOutput;
 		intervalOutput << p3_1;
-		EXPECT_EQ("(4*x^3 + 3*x^2 + 2*x + 1*1)", intervalOutput.str());
+		EXPECT_EQ("(4*x^3 + 3*x^2 + 2*x + 1)", intervalOutput.str());
 	}
 };
 

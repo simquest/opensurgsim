@@ -30,15 +30,17 @@ namespace Math
 /// If all coefficients of a polynomial are 0, the roots are degenerate: the polynomial equals 0 for any x.
 /// Otherwise, there may be anywhere between 0 and N roots.
 ///
-/// \tparam N degree of the polynomial for which roots are being calculated
 /// \tparam T type of the coefficients and computations
-template <int N, typename T = double> class PolynomialRoots;
+/// \tparam N degree of the polynomial for which roots are being calculated
+/// \sa PolynomialRootsCommon<T, N>
+template <typename T, int N> class PolynomialRoots;
 
 /// The common base class for PolynomialRoots specializations for various N.
 ///
-/// \tparam N degree of the polynomial for which roots are being calculated
 /// \tparam T type of the coefficients and computations
-template <int N, typename T = double>
+/// \tparam N degree of the polynomial for which roots are being calculated
+/// \sa PolynomialRoots<T, N>
+template <typename T, int N>
 class PolynomialRootsCommon
 {
 public:
@@ -48,14 +50,14 @@ public:
 	/// \return true in the polynomial is degenerate
 	bool isDegenerate() const;
 
-	/// \return the number of available roots ot DEGENERATE if there are infinitely many
+	/// \return the number of available roots or DEGENERATE if there are infinitely many
 	int getNumRoots() const;
 
 	/// Read only access to the roots of the polynomial
 	/// \param i is the number of the root to return
 	/// \return the value of the ith root
 	/// \exception if there is no root of rank i
-	T operator[](const int i) const;
+	T operator[](int i) const;
 
 private:
 	/// @{
@@ -69,38 +71,34 @@ protected:
 	PolynomialRootsCommon() {}
 
 	/// The number of roots available for the polynomial, or DEGENERATE if there are infinite roots
-	int m_numData;
+	int m_numRoots;
 
 	/// An array of up to N roots for a degree N polynomial
-	std::array<T, N> m_data;
+	std::array<T, N> m_roots;
 };
 
-// ======================================================================
-
-/// Specialization for the roots of an order-1 polynomial (linear)
-/// \tparam T type of the coefficients and computations
+/// PolynomialRoots<T, 1> specializes the PolynomialRoots class for degree 1 (linear polynomials)
+/// \sa PolynomialRoots<T, N>
 template <typename T>
-class PolynomialRoots<1, T> : public PolynomialRootsCommon<1, T>
+class PolynomialRoots<T, 1> : public PolynomialRootsCommon<T, 1>
 {
 public:
 	/// Constructor
 	/// \param p the degree 1 polynomial for which the roots are to be calculated
 	/// \param epsilon tolerance parameter for determining the number of valid, unique roots
-	explicit PolynomialRoots(const Polynomial<1, T>& p, const T& epsilon = 1.0e-09);
+	explicit PolynomialRoots(const Polynomial<T, 1>& p, const T& epsilon = 1.0e-09);
 };
 
-// ======================================================================
-
-/// Specialization for the roots of an order-2 polynomial (quadratic)
-/// \tparam T type of the coefficients and computations
+/// PolynomialRoots<T, 2> specializes the PolynomialRoots class for degree 2 (quadratic polynomials)
+/// \sa PolynomialRoots<T, N>
 template <typename T>
-class PolynomialRoots<2, T> : public PolynomialRootsCommon<2, T>
+class PolynomialRoots<T, 2> : public PolynomialRootsCommon<T, 2>
 {
 public:
 	/// Constructor
 	/// \param p the degree 2 polynomial for which the roots are to be calculated
 	/// \param epsilon tolerance parameter for determining the number of valid, unique roots
-	explicit PolynomialRoots(const Polynomial<2, T>& p, const T& epsilon = 1.0e-09);
+	explicit PolynomialRoots(const Polynomial<T, 2>& p, const T& epsilon = 1.0e-09);
 };
 
 /// Specialized solve routine for linear polynomials (2 coefficients)
@@ -112,7 +110,7 @@ public:
 /// \param numRoots [out] number of roots calculated, or DEGENERATE if there are infinitely many
 /// \param roots [out] array containing the calculated roots
 /// \exception if there are more than N roots
-template <int N, typename T>
+template <typename T, int N>
 void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T, N>* roots);
 
 /// Specialized solve routine for quadratic polynomials (3 coefficients)
@@ -125,7 +123,7 @@ void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T
 /// \param numRoots [out] number of roots calculated, or DEGENERATE if there are infinitely many
 /// \param roots [out] array containing the calculated roots
 /// \exception if there are more than N roots
-template <int N, typename T>
+template <typename T, int N>
 void solve(const T& a, const T& b, const T& c, const T& epsilon, int* numRoots, std::array<T, N>* roots);
 
 }; // Math

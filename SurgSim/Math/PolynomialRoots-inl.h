@@ -16,65 +16,61 @@
 #ifndef SURGSIM_MATH_POLYNOMIALROOTS_INL_H
 #define SURGSIM_MATH_POLYNOMIALROOTS_INL_H
 
-#include <iostream>
-#include <algorithm>
-
-#include "SurgSim/Math/Polynomial.h"
-
 namespace SurgSim
 {
 namespace Math
 {
 
 // PolynomialRootsCommon
-template <int N, typename T>
-bool PolynomialRootsCommon<N, T>::isDegenerate() const
+template <typename T, int N>
+bool PolynomialRootsCommon<T, N>::isDegenerate() const
 {
-	return m_numData == DEGENERATE;
+	return m_numRoots == DEGENERATE;
 }
 
-template <int N, typename T>
-int PolynomialRootsCommon<N, T>::getNumRoots() const
+template <typename T, int N>
+int PolynomialRootsCommon<T, N>::getNumRoots() const
 {
-	return m_numData;
+	return m_numRoots;
 }
 
-template <int N, typename T>
-T PolynomialRootsCommon<N, T>::operator[](const int i) const
+template <typename T, int N>
+T PolynomialRootsCommon<T, N>::operator[](const int i) const
 {
-	SURGSIM_ASSERT((m_numData > i) && (i >= 0)) <<
+	SURGSIM_ASSERT((m_numRoots > i) && (i >= 0)) <<
 			"Requesting a root beyond the number of roots available for this polynomial, " <<
 			"or a root with a negative index.";
-	return m_data[i];
+	return m_roots[i];
 }
 
-// roots of an order-1 polynomial (linear)
+// roots of an degree-1 polynomial (linear)
 template <typename T>
-PolynomialRoots<1, T>::PolynomialRoots(const Polynomial<1, T>& p, const T& epsilon)
+PolynomialRoots<T, 1>::PolynomialRoots(const Polynomial<T, 1>& p, const T& epsilon)
 {
-	solve<1, T>(p.getCoefficient(1), p.getCoefficient(0), static_cast<T>(epsilon),
-				&(this->m_numData), &(this->m_data));
+	solve<T, 1>(p.getCoefficient(1), p.getCoefficient(0), static_cast<T>(epsilon),
+				&(this->m_numRoots), &(this->m_roots));
 }
 
-// roots of an order-1 polynomial (linear)
+// roots of an degree-2 polynomial (quadratic)
 template <typename T>
-PolynomialRoots<2, T>::PolynomialRoots(const Polynomial<2, T>& p, const T& epsilon)
+PolynomialRoots<T, 2>::PolynomialRoots(const Polynomial<T, 2>& p, const T& epsilon)
 {
-	solve<2, T>(p.getCoefficient(2), p.getCoefficient(1), p.getCoefficient(0), static_cast<T>(epsilon),
-				&(this->m_numData), &(this->m_data));
+	solve<T, 2>(p.getCoefficient(2), p.getCoefficient(1), p.getCoefficient(0), static_cast<T>(epsilon),
+				&(this->m_numRoots), &(this->m_roots));
 }
 
-// Utilities: Solve for roots.
-template <int N, typename T>
+// Utilities: Solve for roots of linear equation a * x + b = y
+template <typename T, int N>
 void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T, N>* roots)
 {
+	static_assert(N >= 1, "Root array is not large enough to hold the roots of the polynomial");
 	if (isNearZero(a, epsilon))
 	{
 		// The "1-st degree polynomial" is really close to a constant.
 		// If the constant is zero, there are infinitely many solutions; otherwise there are zero.
 		if (isNearZero(b, epsilon))
 		{
-			*numRoots = PolynomialRootsCommon<N, T>::DEGENERATE;  // infinitely many solutions
+			*numRoots = PolynomialRootsCommon<T, N>::DEGENERATE; // infinitely many solutions
 		}
 		else
 		{
@@ -83,27 +79,28 @@ void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T
 	}
 	else
 	{
-		SURGSIM_ASSERT(N >= 1) << "Root array is not large enough to hold the roots of the polynomial";
 		*numRoots = 1;
 		(*roots)[0] = -b / a;
 	}
 }
 
-template <int N, typename T>
+// Utilities: Solve for roots of quadratic equation a * x^2 + b * x + c = y
+template <typename T, int N>
 void solve(const T& a, const T& b, const T& c, const T& epsilon, int* numRoots, std::array<T, N>* roots)
 {
+	static_assert(N >= 2, "Root array is not large enough to hold the roots of the polynomial");
+
 	if (isNearZero(a, epsilon))
 	{
 		// The "2nd degree polynomial" is really (close to) 1st degree or less.
 		// We can delegate the solution in this case.
-		solve<N, T>(b, c, epsilon, numRoots, roots);
+		solve<T, N>(b, c, epsilon, numRoots, roots);
 		return;
 	}
 
-	T discriminant = b * b - 4.*a * c;
+	T discriminant = b * b - 4.0 * a * c;
 	if (discriminant > epsilon)
 	{
-		SURGSIM_ASSERT(N >= 2) << "Root array is not large enough to hold the roots of the polynomial";
 		*numRoots = 2;
 		T sqrtDiscriminant = sqrt(discriminant);
 		(*roots)[0] = (-b - sqrtDiscriminant) / (2 * a);
@@ -111,7 +108,6 @@ void solve(const T& a, const T& b, const T& c, const T& epsilon, int* numRoots, 
 	}
 	else if (discriminant > -epsilon)
 	{
-		SURGSIM_ASSERT(N >= 1) << "Root array is not large enough to hold the roots of the polynomial";
 		*numRoots = 1;
 		(*roots)[0] = -b / (2 * a);
 	}

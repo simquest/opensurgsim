@@ -21,72 +21,66 @@ namespace SurgSim
 namespace Math
 {
 
-// ----------------------------------------------------------------------
-
 template <class T>
-PolynomialValues<0, T>::PolynomialValues(const Polynomial<0, T>& p) : m_polynomial(p)
+PolynomialValues<T, 0>::PolynomialValues(const Polynomial<T, 0>& p) : m_polynomial(p)
 {
 }
 
 template <class T>
-const Polynomial<0, T>& PolynomialValues<0, T>::getPolynomial() const
+const Polynomial<T, 0>& PolynomialValues<T, 0>::getPolynomial() const
 {
 	return m_polynomial;
 }
 
 template <class T>
-Interval<T> PolynomialValues<0, T>::valuesOverInterval(const Interval<T>& interval) const
+Interval<T> PolynomialValues<T, 0>::valuesOverInterval(const Interval<T>&) const
 {
-	return Interval<T>::minToMax(m_polynomial.evaluate(0), m_polynomial.evaluate(0));
+	return Interval<T>(m_polynomial.evaluate(0), m_polynomial.evaluate(0));
 }
 
-// ----------------------------------------------------------------------
+template <class T>
+PolynomialValues<T, 1>::PolynomialValues(const Polynomial<T, 1>& p) : m_polynomial(p) {}
 
 template <class T>
-PolynomialValues<1, T>::PolynomialValues(const Polynomial<1, T>& p) : m_polynomial(p) {}
-
-template <class T>
-const Polynomial<1, T>& PolynomialValues<1, T>::getPolynomial() const
+const Polynomial<T, 1>& PolynomialValues<T, 1>::getPolynomial() const
 {
 	return m_polynomial;
 }
 
 template <class T>
-Interval<T> PolynomialValues<1, T>::valuesOverInterval(const Interval<T>& interval) const
+Interval<T> PolynomialValues<T, 1>::valuesOverInterval(const Interval<T>& interval) const
 {
 	return Interval<T>::minToMax(m_polynomial.evaluate(interval.getMin()),
 								 m_polynomial.evaluate(interval.getMax()));
 }
 
-// ----------------------------------------------------------------------
-
 template <class T>
-PolynomialValues<2, T>::PolynomialValues(const Polynomial<2, T>& p) : m_polynomial(p),
+PolynomialValues<T, 2>::PolynomialValues(const Polynomial<T, 2>& p) : m_polynomial(p),
 	m_derivative(m_polynomial.derivative()),
 	m_locationOfExtremum(m_derivative)
 {
 }
 
 template <class T>
-const Polynomial<2, T>& PolynomialValues<2, T>::getPolynomial() const
+const Polynomial<T, 2>& PolynomialValues<T, 2>::getPolynomial() const
 {
 	return m_polynomial;
 }
 
 template <class T>
-const Polynomial<1, T>& PolynomialValues<2, T>::getDerivative() const
+const Polynomial<T, 1>& PolynomialValues<T, 2>::getDerivative() const
 {
 	return m_derivative;
 }
 
 template <class T>
-const PolynomialRoots<1, T>& PolynomialValues<2, T>::getLocationsOfExtrema() const
+const PolynomialRoots<T, 1>& PolynomialValues<T, 2>::getLocationsOfExtrema() const
 {
 	return m_locationOfExtremum;
 }
 
 template <class T>
-Interval<T> PolynomialValues<2, T>::valuesOverInterval(const Interval<T>& interval) const
+Interval<T> PolynomialValues<T, 2>::valuesOverInterval(const Interval<T>& interval) const
 {
 	// Always consider the endpoints.
 	Interval<T> result = Interval<T>::minToMax(m_polynomial.evaluate(interval.getMin()),
@@ -105,12 +99,10 @@ Interval<T> PolynomialValues<2, T>::valuesOverInterval(const Interval<T>& interv
 	return result;
 }
 
-// ----------------------------------------------------------------------
-
 template <int N, class T>
-Interval<T> valuesOverInterval(const Polynomial<N, T>& p, const Interval<T>& interval)
+Interval<T> valuesOverInterval(const Polynomial<T, N>& p, const Interval<T>& interval)
 {
-	return PolynomialValues<N, T>(p).valuesOverInterval(interval);
+	return PolynomialValues<T, N>(p).valuesOverInterval(interval);
 }
 
 }; // Math

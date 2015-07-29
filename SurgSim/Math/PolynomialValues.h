@@ -28,24 +28,22 @@ namespace Math
 
 /// Class to manage polynomial based calculations of interval boundaries.
 ///
+/// \tparam T type of the coefficients and computations
 /// \tparam N degree of the polynomial being managed
-/// \tparam T type of the coefficients and computations
-template <int N, class T> class PolynomialValues;
+template <typename T, int N> class PolynomialValues;
 
-// ----------------------------------------------------------------------
-
-/// Specialization for polynomials of degree 0 (constant)
-/// \tparam T type of the coefficients and computations
+/// PolynomialValues<T, 0> specializes the PolynomialValues class for degree 0 (constant polynomials)
+/// \sa PolynomialValues<T, N>
 template <class T>
-class PolynomialValues<0, T>
+class PolynomialValues<T, 0>
 {
 public:
 	/// Constructor. Initialize based on the polynomial p
 	/// \param p polynomial on which the value calculations are based
-	explicit PolynomialValues(const Polynomial<0, T>& p);
+	explicit PolynomialValues(const Polynomial<T, 0>& p);
 
 	/// \return the polynomial basis of this calculation
-	const Polynomial<0, T>& getPolynomial() const;
+	const Polynomial<T, 0>& getPolynomial() const;
 
 	/// \param interval an interval on the independent variable over which the
 	/// values are to be calculated
@@ -54,23 +52,21 @@ public:
 
 private:
 	/// The polynomial under consideration
-	Polynomial<0, T> m_polynomial;
+	Polynomial<T, 0> m_polynomial;
 };
 
-// ----------------------------------------------------------------------
-
-/// Specialization for polynomials of degree 1 (linear)
-/// \tparam T type of the coefficients and computations
+/// PolynomialValues<T, 1> specializes the PolynomialValues class for degree 1 (linear polynomials)
+/// \sa PolynomialValues<T, N>
 template <class T>
-class PolynomialValues<1, T>
+class PolynomialValues<T, 1>
 {
 public:
 	/// Constructor. Initialize based on the polynomial p
 	/// \param p polynomial on which the value calculations are based
-	explicit PolynomialValues(const Polynomial<1, T>& p);
+	explicit PolynomialValues(const Polynomial<T, 1>& p);
 
 	/// \return the polynomial basis of this calculation
-	const Polynomial<1, T>& getPolynomial() const;
+	const Polynomial<T, 1>& getPolynomial() const;
 
 	/// \param interval an interval on the independent variable over which the
 	/// values are to be calculated
@@ -79,29 +75,27 @@ public:
 
 private:
 	/// The polynomial under consideration
-	Polynomial<1, T> m_polynomial;
+	Polynomial<T, 1> m_polynomial;
 };
 
-// ----------------------------------------------------------------------
-
-/// Specialization for polynomials of degree 2 (quadratic)
-/// \tparam T type of the coefficients and computations
+/// PolynomialValues<T, 2> specializes the PolynomialValues class for degree 2 (quadratic polynomials)
+/// \sa PolynomialValues<T, N>
 template <class T>
-class PolynomialValues<2, T>
+class PolynomialValues<T, 2>
 {
 public:
 	/// Constructor. Initialize based on the polynomial p
 	/// \param p polynomial on which the value calculations are based
-	explicit PolynomialValues(const Polynomial<2, T>& p);
+	explicit PolynomialValues(const Polynomial<T, 2>& p);
 
 	/// \return the polynomial basis of this calculation
-	const Polynomial<2, T>& getPolynomial() const;
+	const Polynomial<T, 2>& getPolynomial() const;
 
 	/// \return the derivative of the polynomial basis for this calculation
-	const Polynomial<1, T>& getDerivative() const;
+	const Polynomial<T, 1>& getDerivative() const;
 
 	/// \return the locations of the extrema for the polynomial
-	const PolynomialRoots<1, T>& getLocationsOfExtrema() const;
+	const PolynomialRoots<T, 1>& getLocationsOfExtrema() const;
 
 	/// \param interval an interval on the independent variable over which the
 	/// values are to be calculated
@@ -110,16 +104,14 @@ public:
 
 private:
 	/// The polynomial under consideration
-	Polynomial<2, T> m_polynomial;
+	Polynomial<T, 2> m_polynomial;
 
 	/// Cached version of the derivative of the polynomial
-	Polynomial<1, T> m_derivative;
+	Polynomial<T, 1> m_derivative;
 
 	/// Cached version of the locations of the extrema
-	PolynomialRoots<1, T> m_locationOfExtremum;
+	PolynomialRoots<T, 1> m_locationOfExtremum;
 };
-
-// ----------------------------------------------------------------------
 
 /// Calculate the minimum and maximum values of the dependent variable over a specified
 /// range of the independent variable
@@ -130,7 +122,7 @@ private:
 /// values are to be calculated
 /// \return the minimum and maximum polynomial values over interval
 template <int N, class T>
-Interval<T> valuesOverInterval(const Polynomial<N, T>& p, const Interval<T>& interval);
+Interval<T> valuesOverInterval(const Polynomial<T, N>& p, const Interval<T>& interval);
 
 }; // Math
 }; // SurgSim

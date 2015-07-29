@@ -16,7 +16,6 @@
 #ifndef SURGSIM_MATH_POLYNOMIAL_H
 #define SURGSIM_MATH_POLYNOMIAL_H
 
-#include <ostream>
 #include <iostream>
 
 namespace SurgSim
@@ -24,7 +23,10 @@ namespace SurgSim
 namespace Math
 {
 
-template <typename T> class Interval;
+namespace
+{
+double polynomial_epsilon = 1.0e-09;
+}
 
 /// Define an utility function for comparing individual coefficients to 0.
 ///
@@ -34,36 +36,31 @@ template <typename T> class Interval;
 /// \param epsilon the tolerance
 /// \return true if the value is within epsilon of 0
 template <typename T>
-bool isNearZero(const T& value, const T& epsilon = static_cast<T>(1.0e-09));
+bool isNearZero(const T& value, const T& epsilon = static_cast<T>(polynomial_epsilon));
 
-// ======================================================================
-
-/// Polynomial<N, T> defines the concept of an N degree polynomial with type T
-/// coefficients and provides operations on them including arithmetic operations,
-/// construction, and IO.
-///
-/// \tparam N order of the Polynomial
-/// \tparam T underlying data type over which the interval is defined.
-///
-/// \sa Polynomial<0, T>, Polynomial<1, T>, Polynomial<2, T> and Polynomial<3, T>
-template <int N, typename T = double> class Polynomial;
-
-/// Polynomial<0, T> defines the concept of a 0 degree polynomial with type T
+/// Polynomial<T, N> defines the concept of an N degree polynomial with type T
 /// coefficients and provides operations on them including arithmetic operations,
 /// construction, and IO.
 ///
 /// \tparam T underlying data type over which the interval is defined.
-///
-/// \sa Polynomial<1, T>, Polynomial<2, T>, Polynomial<3, T> and Polynomial<N, T>
+/// \tparam N degree of the Polynomial
+template <typename T, int N> class Polynomial
+{
+	static_assert(N >= 0, "Polynomials must have degree >= 0.");
+	static_assert(N <= 3, "Polynomials of degree > 3 are not yet supported.");
+};
+
+/// Polynomial<T, 0> specializes the Polynomial class for degree 0 (constant polynomials)
+/// \sa Polynomial<T, N>
 template <typename T>
-class Polynomial<0, T>
+class Polynomial<T, 0>
 {
 public:
 	/// Constructor
 	Polynomial();
 
 	/// Constructor
-	/// \param a0 coefficient of the 0 order term
+	/// \param a0 coefficient of the 0 degree term
 	explicit Polynomial(const T& a0);
 
 	/// Evaluate the polynomial at a point
@@ -73,28 +70,34 @@ public:
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
-	Polynomial<0, T> operator- () const;
-	Polynomial<0, T> operator+ (const Polynomial<0, T>& rhs) const;
-	Polynomial<0, T>& operator+= (const Polynomial<0, T>& rhs);
-	Polynomial<0, T> operator- (const Polynomial<0, T>& rhs) const;
-	Polynomial<0, T>& operator-= (const Polynomial<0, T>& rhs);
+	T& operator[](const size_t i);
+	const T& operator[](const size_t i) const;
+	Polynomial<T, 0> operator- () const;
+	Polynomial<T, 0> operator+ (const Polynomial<T, 0>& rhs) const;
+	Polynomial<T, 0>& operator+= (const Polynomial<T, 0>& rhs);
+	Polynomial<T, 0> operator- (const Polynomial<T, 0>& rhs) const;
+	Polynomial<T, 0>& operator-= (const Polynomial<T, 0>& rhs);
 	/// @}
 
-	/// \return the derivative of the polynomial
-	Polynomial<0, T> derivative() const;
+	/// \param epsilon the closeness parameter
+	/// \return true if all coefficients of the polynomial are within an epsilon of 0
+	bool isNearZero(const T& epsilon = static_cast<T>(polynomial_epsilon)) const;
 
-	/// \return true if all coefficients of the polynomial are with epsilon of 0
-	bool isNearZero(const T& epsilon = static_cast<T>(1.0e-09)) const;
+	/// \param p the test polynomial
+	/// \param epsilon the closeness parameter
+	/// \return true if all the coefficients of the current polynomial are within an epsilon of
+	/// the corresponding coefficient in p
+	bool isApprox(const Polynomial<T, 0>& p, const T& epsilon) const;
 
 	/// \param i index of the desired coefficient
 	/// \return the value of coefficient i
-	T getCoefficient(const size_t i) const;
+	T getCoefficient(size_t i) const;
 
 	/// Set a specified coefficient to a desired value
 	/// \param i index of the desired coefficient
 	/// \param value the value to be set in the coefficient
-	/// \exception if i is greater than the polynomial order
-	void setCoefficient(const size_t i, const T& value);
+	/// \exception if i is greater than the polynomial degree
+	void setCoefficient(size_t i, const T& value);
 
 private:
 	/// @{
@@ -103,25 +106,18 @@ private:
 	/// @}
 };
 
-// ======================================================================
-
-/// Polynomial<1, T> defines the concept of a 1 degree polynomial with type T
-/// coefficients and provides operations on them including arithmetic operations,
-/// construction, and IO.
-///
-/// \tparam T underlying data type over which the interval is defined.
-///
-/// \sa Polynomial<0, T>, Polynomial<2, T>, Polynomial<3, T> and Polynomial<N, T>
+/// Polynomial<T, 1> specializes the Polynomial class for degree 1 (linear polynomials)
+/// \sa Polynomial<T, N>
 template <typename T>
-class Polynomial<1, T>
+class Polynomial<T, 1>
 {
 public:
 	/// Constructor
 	Polynomial();
 
 	/// Constructor
-	/// \param a0 coefficient of the 0 order term
-	/// \param a1 coefficient of the 1 order term
+	/// \param a0 coefficient of the 0 degree term
+	/// \param a1 coefficient of the 1 degree term
 	Polynomial(const T& a0, const T& a1);
 
 	/// Evaluate the polynomial at a point
@@ -131,28 +127,37 @@ public:
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
-	Polynomial<1, T> operator- () const;
-	Polynomial<1, T> operator+ (const Polynomial<1, T>& rhs) const;
-	Polynomial<1, T>& operator+= (const Polynomial<1, T>& rhs);
-	Polynomial<1, T> operator- (const Polynomial<1, T>& rhs) const;
-	Polynomial<1, T>& operator-= (const Polynomial<1, T>& rhs);
+	T& operator[](const size_t i);
+	const T& operator[](const size_t i) const;
+	Polynomial<T, 1> operator- () const;
+	Polynomial<T, 1> operator+ (const Polynomial<T, 1>& rhs) const;
+	Polynomial<T, 1>& operator+= (const Polynomial<T, 1>& rhs);
+	Polynomial<T, 1> operator- (const Polynomial<T, 1>& rhs) const;
+	Polynomial<T, 1>& operator-= (const Polynomial<T, 1>& rhs);
 	/// @}
 
 	/// \return the derivative of the polynomial
-	Polynomial<0, T> derivative() const;
+	Polynomial<T, 0> derivative() const;
 
-	/// \return true if all coefficients of the polynomial are with epsilon of 0
-	bool isNearZero(const T& epsilon = static_cast<T>(1.0e-09)) const;
+	/// \param epsilon the closeness parameter
+	/// \return true if all coefficients of the polynomial are within an epsilon of 0
+	bool isNearZero(const T& epsilon = static_cast<T>(polynomial_epsilon)) const;
+
+	/// \param p the test polynomial
+	/// \param epsilon the closeness parameter
+	/// \return true if all the coefficients of the current polynomial are within an epsilon of
+	/// the corresponding coefficient in p
+	bool isApprox(const Polynomial<T, 1>& p, const T& epsilon) const;
 
 	/// \param i index of the desired coefficient
 	/// \return the value of coefficient i
-	T getCoefficient(const size_t i) const;
+	T getCoefficient(size_t i) const;
 
 	/// Set a specified coefficient to a desired value
 	/// \param i index of the desired coefficient
 	/// \param value the value to be set in the coefficient
-	/// \exception if i is greater than the polynomial order
-	void setCoefficient(const size_t i, const T& value);
+	/// \exception if i is greater than the polynomial degree
+	void setCoefficient(size_t i, const T& value);
 
 private:
 	/// @{
@@ -162,26 +167,19 @@ private:
 	/// @}
 };
 
-// ======================================================================
-
-/// Polynomial<2, T> defines the concept of a 2 degree polynomial with type T
-/// coefficients and provides operations on them including arithmetic operations,
-/// construction, and IO.
-///
-/// \tparam T underlying data type over which the interval is defined.
-///
-/// \sa Polynomial<0, T>, Polynomial<1, T>, Polynomial<3, T> and Polynomial<N, T>
+/// Polynomial<T, 2> specializes the Polynomial class for degree 1 (quadratic polynomials)
+/// \sa Polynomial<T, N>
 template <typename T>
-class Polynomial<2, T>
+class Polynomial<T, 2>
 {
 public:
 	/// Constructor
 	Polynomial();
 
 	/// Constructor
-	/// \param a0 coefficient of the 0 order term
-	/// \param a1 coefficient of the 1 order term
-	/// \param a2 coefficient of the 2 order term
+	/// \param a0 coefficient of the 0 degree term
+	/// \param a1 coefficient of the 1 degree term
+	/// \param a2 coefficient of the 2 degree term
 	Polynomial(const T& a0, const T& a1, const T& a2);
 
 	/// Evaluate the polynomial at a point
@@ -191,28 +189,37 @@ public:
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
-	Polynomial<2, T> operator- () const;
-	Polynomial<2, T> operator+ (const Polynomial<2, T>& rhs) const;
-	Polynomial<2, T>& operator+= (const Polynomial<2, T>& rhs);
-	Polynomial<2, T> operator- (const Polynomial<2, T>& rhs) const;
-	Polynomial<2, T>& operator-= (const Polynomial<2, T>& rhs);
+	T& operator[](const size_t i);
+	const T& operator[](const size_t i) const;
+	Polynomial<T, 2> operator- () const;
+	Polynomial<T, 2> operator+ (const Polynomial<T, 2>& rhs) const;
+	Polynomial<T, 2>& operator+= (const Polynomial<T, 2>& rhs);
+	Polynomial<T, 2> operator- (const Polynomial<T, 2>& rhs) const;
+	Polynomial<T, 2>& operator-= (const Polynomial<T, 2>& rhs);
 	/// @}
 
 	/// \return the derivative of the polynomial
-	Polynomial<1, T> derivative() const;
+	Polynomial<T, 1> derivative() const;
 
-	/// \return true if all coefficients of the polynomial are with epsilon of 0
-	bool isNearZero(const T& epsilon = static_cast<T>(1.0e-09)) const;
+	/// \param epsilon the closeness parameter
+	/// \return true if all coefficients of the polynomial are within an epsilon of 0
+	bool isNearZero(const T& epsilon = static_cast<T>(polynomial_epsilon)) const;
+
+	/// \param p the test polynomial
+	/// \param epsilon the closeness parameter
+	/// \return true if all the coefficients of the current polynomial are within an epsilon of
+	/// the corresponding coefficient in p
+	bool isApprox(const Polynomial<T, 2>& p, const T& epsilon) const;
 
 	/// \param i index of the desired coefficient
-	/// \return the value of coeficient i
-	T getCoefficient(const size_t i) const;
+	/// \return the value of coefficient i
+	T getCoefficient(size_t i) const;
 
 	/// Set a specified coefficient to a desired value
 	/// \param i index of the desired coefficient
 	/// \param value the value to be set in the coefficient
-	/// \exception if i is greater than the polynomial order
-	void setCoefficient(const size_t i, const T& value);
+	/// \exception if i is greater than the polynomial degree
+	void setCoefficient(size_t i, const T& value);
 
 private:
 	/// @{
@@ -223,27 +230,20 @@ private:
 	/// @}
 };
 
-// ======================================================================
-
-/// Polynomial<3, T> defines the concept of a 3 degree polynomial with type T
-/// coefficients and provides operations on them including arithmetic operations,
-/// construction, and IO.
-///
-/// \tparam T underlying data type over which the interval is defined.
-///
-/// \sa Polynomial<0, T>, Polynomial<1, T>, Polynomial<2, T> and Polynomial<N, T>
+/// Polynomial<T, 3> specializes the Polynomial class for degree 3 (cubic polynomials)
+/// \sa Polynomial<T, N>
 template <typename T>
-class Polynomial<3, T>
+class Polynomial<T, 3>
 {
 public:
 	/// Constructor
 	Polynomial();
 
 	/// Constructor
-	/// \param a0 coefficient of the 0 order term
-	/// \param a1 coefficient of the 1 order term
-	/// \param a2 coefficient of the 2 order term
-	/// \param a3 coefficient of the 3 order term
+	/// \param a0 coefficient of the 0 degree term
+	/// \param a1 coefficient of the 1 degree term
+	/// \param a2 coefficient of the 2 degree term
+	/// \param a3 coefficient of the 3 degree term
 	Polynomial(const T& a0, const T& a1, const T& a2, const T& a3);
 
 	/// Evaluate the polynomial at a point
@@ -253,28 +253,37 @@ public:
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
-	Polynomial<3, T> operator- () const;
-	Polynomial<3, T> operator+ (const Polynomial<3, T>& rhs) const;
-	Polynomial<3, T>& operator+= (const Polynomial<3, T>& rhs);
-	Polynomial<3, T> operator- (const Polynomial<3, T>& rhs) const;
-	Polynomial<3, T>& operator-= (const Polynomial<3, T>& rhs);
+	T& operator[](const size_t i);
+	const T& operator[](const size_t i) const;
+	Polynomial<T, 3> operator- () const;
+	Polynomial<T, 3> operator+ (const Polynomial<T, 3>& rhs) const;
+	Polynomial<T, 3>& operator+= (const Polynomial<T, 3>& rhs);
+	Polynomial<T, 3> operator- (const Polynomial<T, 3>& rhs) const;
+	Polynomial<T, 3>& operator-= (const Polynomial<T, 3>& rhs);
 	/// @}
 
 	/// \return the derivative of the polynomial
-	Polynomial<2, T> derivative() const;
+	Polynomial<T, 2> derivative() const;
 
-	/// \return true if all coefficients of the polynomial are with epsilon of 0
-	bool isNearZero(const T& epsilon = static_cast<T>(1.0e-09)) const;
+	/// \param epsilon the closeness parameter
+	/// \return true if all coefficients of the polynomial are within an epsilon of 0
+	bool isNearZero(const T& epsilon = static_cast<T>(polynomial_epsilon)) const;
+
+	/// \param p the test polynomial
+	/// \param epsilon the closeness parameter
+	/// \return true if all the coefficients of the current polynomial are within an epsilon of
+	/// the corresponding coefficient in p
+	bool isApprox(const Polynomial<T, 3>& p, const T& epsilon) const;
 
 	/// \param i index of the desired coefficient
 	/// \return the value of coefficient i
-	T getCoefficient(const size_t i) const;
+	T getCoefficient(size_t i) const;
 
 	/// Set a specified coefficient to a desired value
 	/// \param i index of the desired coefficient
 	/// \param value the value to be set in the coefficient
-	/// \exception if i is greater than the polynomial order
-	void setCoefficient(const size_t i, const T& value);
+	/// \exception if i is greater than the polynomial degree
+	void setCoefficient(size_t i, const T& value);
 
 private:
 	/// @{
@@ -297,9 +306,8 @@ private:
 /// \param p first polynomial of degree N
 /// \param q second polynomial of degree M
 /// \return p * q as a polynomial of degree N + M
-/// \exception if N + M > 3
-template <int N, int M, typename T>
-Polynomial < N + M, T > operator*(const Polynomial<N, T>& p, const Polynomial<M, T>& q);
+template <typename T, int N, int M>
+Polynomial < T, N + M > operator*(const Polynomial<T, N>& p, const Polynomial<T, M>& q);
 
 /// Multiply two polynomials of degree 1.
 /// \tparam T underlying data type over which the interval is defined.
@@ -307,7 +315,7 @@ Polynomial < N + M, T > operator*(const Polynomial<N, T>& p, const Polynomial<M,
 /// \param q second polynomial of degree 1
 /// \return p * q as a polynomial of degree 2
 template <typename T>
-Polynomial<2, T> operator*(const Polynomial<1, T>& p, const Polynomial<1, T>& q);
+Polynomial<T, 2> operator*(const Polynomial<T, 1>& p, const Polynomial<T, 1>& q);
 
 /// Multiply two polynomials of degree 2 and 1 respectively.
 /// \tparam T underlying data type over which the interval is defined.
@@ -315,7 +323,7 @@ Polynomial<2, T> operator*(const Polynomial<1, T>& p, const Polynomial<1, T>& q)
 /// \param q second polynomial of degree 1
 /// \return p * q as a polynomial of degree 3
 template <typename T>
-Polynomial<3, T> operator*(const Polynomial<2, T>& p, const Polynomial<1, T>& q);
+Polynomial<T, 3> operator*(const Polynomial<T, 2>& p, const Polynomial<T, 1>& q);
 
 /// Multiply two polynomials of degree 1 and 2 respectively.
 /// \tparam T underlying data type over which the interval is defined.
@@ -323,34 +331,30 @@ Polynomial<3, T> operator*(const Polynomial<2, T>& p, const Polynomial<1, T>& q)
 /// \param q second polynomial of degree 2
 /// \return p * q as a polynomial of degree 3
 template <typename T>
-Polynomial<3, T> operator*(const Polynomial<1, T>& p, const Polynomial<2, T>& q);
-
-// ======================================================================
+Polynomial<T, 3> operator*(const Polynomial<T, 1>& p, const Polynomial<T, 2>& q);
 
 /// Square a degree 0 polynomial
 /// \tparam T underlying data type over which the interval is defined.
 /// \param p polynomial of degree 0
 /// \return p^2 as a polynomial of degree 0
 template <typename T>
-Polynomial<0, T> square(const Polynomial<0, T>& p);
+Polynomial<T, 0> square(const Polynomial<T, 0>& p);
 
 /// Square a degree 1 polynomial
 /// \tparam T underlying data type over which the interval is defined.
 /// \param p polynomial of degree 1
 /// \return p^2 as a polynomial of degree 2
 template <typename T>
-Polynomial<2, T> square(const Polynomial<1, T>& p);
-
-// ======================================================================
+Polynomial<T, 2> square(const Polynomial<T, 1>& p);
 
 /// Write a textual version of a Polynomial to an output stream
-/// \tparam N degree of the polynomial
 /// \tparam T underlying type of the polynomial coefficients
+/// \tparam N degree of the polynomial
 /// \param stream the ostream to be written to
 /// \param p the polynomial to write
-/// \return the active ostream
-template <int N, typename T>
-std::ostream& operator<<(std::ostream& stream, const Polynomial<N, T>& p);
+/// \return the active stream
+template <typename T, int N>
+std::ostream& operator<<(std::ostream& stream, const Polynomial<T, N>& p);
 
 }; // Math
 }; // SurgSim

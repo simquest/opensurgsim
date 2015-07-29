@@ -35,67 +35,81 @@ bool isNearZero(const T& value, const T& epsilon)
 // Polynomial of degree 0
 
 template <class T>
-Polynomial<0, T>::Polynomial() : m_a0(static_cast<T>(0))
+Polynomial<T, 0>::Polynomial() : m_a0(static_cast<T>(0))
 {
 }
 
 template <class T>
-Polynomial<0, T>::Polynomial(const T& a0) : m_a0(a0)
+Polynomial<T, 0>::Polynomial(const T& a0) : m_a0(a0)
 {
 }
 
 template <class T>
-T Polynomial<0, T>::evaluate(const T& x) const
+T Polynomial<T, 0>::evaluate(const T& x) const
 {
 	return m_a0;
 }
 
 template <class T>
-Polynomial<0, T> Polynomial<0, T>::operator- () const
+T& Polynomial<T, 0>::operator[](const size_t i)
+{
+	SURGSIM_ASSERT(i <= 0) << "Attempting to set a coefficient greater than the polynomial degree";
+	return m_a0;
+}
+
+template <class T>
+const T& Polynomial<T, 0>::operator[](const size_t i) const
+{
+	SURGSIM_ASSERT(i <= 0) << "Attempting to set a coefficient greater than the polynomial degree";
+	return m_a0;
+}
+
+template <class T>
+Polynomial<T, 0> Polynomial<T, 0>::operator- () const
 {
 	return Polynomial(-m_a0);
 }
 
 template <class T>
-Polynomial<0, T> Polynomial<0, T>::operator+ (const Polynomial<0, T>& rhs) const
+Polynomial<T, 0> Polynomial<T, 0>::operator+ (const Polynomial<T, 0>& rhs) const
 {
 	return Polynomial(m_a0 + rhs.m_a0);
 }
 
 template <class T>
-Polynomial<0, T>& Polynomial<0, T>::operator+= (const Polynomial<0, T>& rhs)
+Polynomial<T, 0>& Polynomial<T, 0>::operator+= (const Polynomial<T, 0>& rhs)
 {
 	m_a0 += rhs.m_a0;
 	return *this;
 }
 
 template <class T>
-Polynomial<0, T> Polynomial<0, T>::operator- (const Polynomial<0, T>& rhs) const
+Polynomial<T, 0> Polynomial<T, 0>::operator- (const Polynomial<T, 0>& rhs) const
 {
 	return Polynomial(m_a0 - rhs.m_a0);
 }
 
 template <class T>
-Polynomial<0, T>& Polynomial<0, T>::operator-= (const Polynomial<0, T>& rhs)
+Polynomial<T, 0>& Polynomial<T, 0>::operator-= (const Polynomial<T, 0>& rhs)
 {
 	m_a0 -= rhs.m_a0;
 	return *this;
 }
 
 template <class T>
-Polynomial<0, T> Polynomial<0, T>::derivative() const
-{
-	return Polynomial<0, T>(0);
-}
-
-template <class T>
-bool Polynomial<0, T>::isNearZero(const T& epsilon) const
+bool Polynomial<T, 0>::isNearZero(const T& epsilon) const
 {
 	return SurgSim::Math::isNearZero(m_a0, epsilon);
 }
 
 template <class T>
-T Polynomial<0, T>::getCoefficient(const size_t i) const
+bool Polynomial<T, 0>::isApprox(const Polynomial<T, 0>& p, const T& epsilon) const
+{
+	return ((*this) - p).isNearZero(epsilon);
+}
+
+template <class T>
+T Polynomial<T, 0>::getCoefficient(size_t i) const
 {
 	switch (i)
 	{
@@ -107,9 +121,9 @@ T Polynomial<0, T>::getCoefficient(const size_t i) const
 }
 
 template <class T>
-void Polynomial<0, T>::setCoefficient(const size_t i, const T& value)
+void Polynomial<T, 0>::setCoefficient(size_t i, const T& value)
 {
-	SURGSIM_ASSERT(i <= 0) << "Attempting to set a coefficient greater than the polynomial order";
+	SURGSIM_ASSERT(i <= 0) << "Attempting to set a coefficient greater than the polynomial degree";
 	switch (i)
 	{
 		case 0:
@@ -123,35 +137,69 @@ void Polynomial<0, T>::setCoefficient(const size_t i, const T& value)
 // Polynomial of degree 1
 
 template <class T>
-Polynomial<1, T>::Polynomial() : m_a0(static_cast<T>(0)), m_a1(static_cast<T>(0))
+Polynomial<T, 1>::Polynomial() : m_a0(static_cast<T>(0)), m_a1(static_cast<T>(0))
 {
 }
 
 template <class T>
-Polynomial<1, T>::Polynomial(const T& a0, const T& a1) : m_a0(a0), m_a1(a1)
+Polynomial<T, 1>::Polynomial(const T& a0, const T& a1) : m_a0(a0), m_a1(a1)
 {
 }
 
 template <class T>
-T Polynomial<1, T>::evaluate(const T& x) const
+T Polynomial<T, 1>::evaluate(const T& x) const
 {
 	return m_a1 * x + m_a0;
 }
 
 template <class T>
-Polynomial<1, T> Polynomial<1, T>::operator- () const
+T& Polynomial<T, 1>::operator[](const size_t i)
+{
+	SURGSIM_ASSERT(i <= 1) << "Attempting to set a coefficient greater than the polynomial degree";
+	switch (i)
+	{
+		case 0:
+		{
+			return m_a0;
+		}
+		default:
+		{
+			return m_a1;
+		}
+	}
+}
+
+template <class T>
+const T& Polynomial<T, 1>::operator[](const size_t i) const
+{
+	SURGSIM_ASSERT(i <= 1) << "Attempting to set a coefficient greater than the polynomial degree";
+	switch (i)
+	{
+		case 0:
+		{
+			return m_a0;
+		}
+		default:
+		{
+			return m_a1;
+		}
+	}
+}
+
+template <class T>
+Polynomial<T, 1> Polynomial<T, 1>::operator- () const
 {
 	return Polynomial(-m_a0, -m_a1);
 }
 
 template <class T>
-Polynomial<1, T> Polynomial<1, T>::operator+ (const Polynomial<1, T>& rhs) const
+Polynomial<T, 1> Polynomial<T, 1>::operator+ (const Polynomial<T, 1>& rhs) const
 {
 	return Polynomial(m_a0 + rhs.m_a0, m_a1 + rhs.m_a1);
 }
 
 template <class T>
-Polynomial<1, T>& Polynomial<1, T>::operator+= (const Polynomial<1, T>& rhs)
+Polynomial<T, 1>& Polynomial<T, 1>::operator+= (const Polynomial<T, 1>& rhs)
 {
 	m_a0 += rhs.m_a0;
 	m_a1 += rhs.m_a1;
@@ -159,13 +207,13 @@ Polynomial<1, T>& Polynomial<1, T>::operator+= (const Polynomial<1, T>& rhs)
 }
 
 template <class T>
-Polynomial<1, T> Polynomial<1, T>::operator- (const Polynomial<1, T>& rhs) const
+Polynomial<T, 1> Polynomial<T, 1>::operator- (const Polynomial<T, 1>& rhs) const
 {
 	return Polynomial(m_a0 - rhs.m_a0, m_a1 - rhs.m_a1);
 }
 
 template <class T>
-Polynomial<1, T>& Polynomial<1, T>::operator-= (const Polynomial<1, T>& rhs)
+Polynomial<T, 1>& Polynomial<T, 1>::operator-= (const Polynomial<T, 1>& rhs)
 {
 	m_a0 -= rhs.m_a0;
 	m_a1 -= rhs.m_a1;
@@ -173,19 +221,25 @@ Polynomial<1, T>& Polynomial<1, T>::operator-= (const Polynomial<1, T>& rhs)
 }
 
 template <class T>
-Polynomial<0, T> Polynomial<1, T>::derivative() const
+Polynomial<T, 0> Polynomial<T, 1>::derivative() const
 {
-	return Polynomial<0, T>(m_a1);
+	return Polynomial<T, 0>(m_a1);
 }
 
 template <class T>
-bool Polynomial<1, T>::isNearZero(const T& epsilon) const
+bool Polynomial<T, 1>::isNearZero(const T& epsilon) const
 {
 	return SurgSim::Math::isNearZero(m_a0, epsilon) && SurgSim::Math::isNearZero(m_a1, epsilon);
 }
 
 template <class T>
-T Polynomial<1, T>::getCoefficient(const size_t i) const
+bool Polynomial<T, 1>::isApprox(const Polynomial<T, 1>& p, const T& epsilon) const
+{
+	return ((*this) - p).isNearZero(epsilon);
+}
+
+template <class T>
+T Polynomial<T, 1>::getCoefficient(size_t i) const
 {
 	switch (i)
 	{
@@ -205,9 +259,9 @@ T Polynomial<1, T>::getCoefficient(const size_t i) const
 }
 
 template <class T>
-void Polynomial<1, T>::setCoefficient(const size_t i, const T& value)
+void Polynomial<T, 1>::setCoefficient(size_t i, const T& value)
 {
-	SURGSIM_ASSERT(i <= 1) << "Attempting to set a coefficient greater than the polynomial order";
+	SURGSIM_ASSERT(i <= 1) << "Attempting to set a coefficient greater than the polynomial degree";
 	switch (i)
 	{
 		case 0:
@@ -226,35 +280,77 @@ void Polynomial<1, T>::setCoefficient(const size_t i, const T& value)
 // Polynomial of degree 2
 
 template <class T>
-Polynomial<2, T>::Polynomial() : m_a0(static_cast<T>(0)), m_a1(static_cast<T>(0)), m_a2(static_cast<T>(0))
+Polynomial<T, 2>::Polynomial() : m_a0(static_cast<T>(0)), m_a1(static_cast<T>(0)), m_a2(static_cast<T>(0))
 {
 }
 
 template <class T>
-Polynomial<2, T>::Polynomial(const T& a0, const T& a1, const T& a2) : m_a0(a0), m_a1(a1), m_a2(a2)
+Polynomial<T, 2>::Polynomial(const T& a0, const T& a1, const T& a2) : m_a0(a0), m_a1(a1), m_a2(a2)
 {
 }
 
 template <class T>
-T Polynomial<2, T>::evaluate(const T& x) const
+T Polynomial<T, 2>::evaluate(const T& x) const
 {
 	return (m_a2 * x + m_a1) * x + m_a0;
 }
 
 template <class T>
-Polynomial<2, T> Polynomial<2, T>::operator- () const
+T& Polynomial<T, 2>::operator[](const size_t i)
+{
+	SURGSIM_ASSERT(i <= 2) << "Attempting to set a coefficient greater than the polynomial degree";
+	switch (i)
+	{
+		case 0:
+		{
+			return m_a0;
+		}
+		case 1:
+		{
+			return m_a1;
+		}
+		default:
+		{
+			return m_a2;
+		}
+	}
+}
+
+template <class T>
+const T& Polynomial<T, 2>::operator[](const size_t i) const
+{
+	SURGSIM_ASSERT(i <= 2) << "Attempting to set a coefficient greater than the polynomial degree";
+	switch (i)
+	{
+		case 0:
+		{
+			return m_a0;
+		}
+		case 1:
+		{
+			return m_a1;
+		}
+		default:
+		{
+			return m_a2;
+		}
+	}
+}
+
+template <class T>
+Polynomial<T, 2> Polynomial<T, 2>::operator- () const
 {
 	return Polynomial(-m_a0, -m_a1, -m_a2);
 }
 
 template <class T>
-Polynomial<2, T> Polynomial<2, T>::operator+ (const Polynomial<2, T>& rhs) const
+Polynomial<T, 2> Polynomial<T, 2>::operator+ (const Polynomial<T, 2>& rhs) const
 {
 	return Polynomial(m_a0 + rhs.m_a0, m_a1 + rhs.m_a1, m_a2 + rhs.m_a2);
 }
 
 template <class T>
-Polynomial<2, T>& Polynomial<2, T>::operator+= (const Polynomial<2, T>& rhs)
+Polynomial<T, 2>& Polynomial<T, 2>::operator+= (const Polynomial<T, 2>& rhs)
 {
 	m_a0 += rhs.m_a0;
 	m_a1 += rhs.m_a1;
@@ -263,13 +359,13 @@ Polynomial<2, T>& Polynomial<2, T>::operator+= (const Polynomial<2, T>& rhs)
 }
 
 template <class T>
-Polynomial<2, T> Polynomial<2, T>::operator- (const Polynomial<2, T>& rhs) const
+Polynomial<T, 2> Polynomial<T, 2>::operator- (const Polynomial<T, 2>& rhs) const
 {
 	return Polynomial(m_a0 - rhs.m_a0, m_a1 - rhs.m_a1, m_a2 - rhs.m_a2);
 }
 
 template <class T>
-Polynomial<2, T>& Polynomial<2, T>::operator-= (const Polynomial<2, T>& rhs)
+Polynomial<T, 2>& Polynomial<T, 2>::operator-= (const Polynomial<T, 2>& rhs)
 {
 	m_a0 -= rhs.m_a0;
 	m_a1 -= rhs.m_a1;
@@ -278,13 +374,13 @@ Polynomial<2, T>& Polynomial<2, T>::operator-= (const Polynomial<2, T>& rhs)
 }
 
 template <class T>
-Polynomial<1, T> Polynomial<2, T>::derivative() const
+Polynomial<T, 1> Polynomial<T, 2>::derivative() const
 {
-	return Polynomial<1, T>(m_a1, 2 * m_a2);
+	return Polynomial<T, 1>(m_a1, 2 * m_a2);
 }
 
 template <class T>
-bool Polynomial<2, T>::isNearZero(const T& epsilon) const
+bool Polynomial<T, 2>::isNearZero(const T& epsilon) const
 {
 	return SurgSim::Math::isNearZero(m_a0, epsilon) &&
 		   SurgSim::Math::isNearZero(m_a1, epsilon) &&
@@ -292,7 +388,13 @@ bool Polynomial<2, T>::isNearZero(const T& epsilon) const
 }
 
 template <class T>
-T Polynomial<2, T>::getCoefficient(const size_t i) const
+bool Polynomial<T, 2>::isApprox(const Polynomial<T, 2>& p, const T& epsilon) const
+{
+	return ((*this) - p).isNearZero(epsilon);
+}
+
+template <class T>
+T Polynomial<T, 2>::getCoefficient(size_t i) const
 {
 	switch (i)
 	{
@@ -316,9 +418,9 @@ T Polynomial<2, T>::getCoefficient(const size_t i) const
 }
 
 template <class T>
-void Polynomial<2, T>::setCoefficient(const size_t i, const T& value)
+void Polynomial<T, 2>::setCoefficient(size_t i, const T& value)
 {
-	SURGSIM_ASSERT(i <= 2) << "Attempting to set a coefficient greater than the polynomial order";
+	SURGSIM_ASSERT(i <= 2) << "Attempting to set a coefficient greater than the polynomial degree";
 	switch (i)
 	{
 		case 0:
@@ -342,7 +444,7 @@ void Polynomial<2, T>::setCoefficient(const size_t i, const T& value)
 // Polynomial of degree 3
 
 template <class T>
-Polynomial<3, T>::Polynomial() :
+Polynomial<T, 3>::Polynomial() :
 	m_a0(static_cast<T>(0)),
 	m_a1(static_cast<T>(0)),
 	m_a2(static_cast<T>(0)),
@@ -351,7 +453,7 @@ Polynomial<3, T>::Polynomial() :
 }
 
 template <class T>
-Polynomial<3, T>::Polynomial(const T& a0, const T& a1, const T& a2, const T& a3) :
+Polynomial<T, 3>::Polynomial(const T& a0, const T& a1, const T& a2, const T& a3) :
 	m_a0(a0),
 	m_a1(a1),
 	m_a2(a2),
@@ -360,25 +462,75 @@ Polynomial<3, T>::Polynomial(const T& a0, const T& a1, const T& a2, const T& a3)
 }
 
 template <class T>
-T Polynomial<3, T>::evaluate(const T& x) const
+T Polynomial<T, 3>::evaluate(const T& x) const
 {
 	return ((m_a3 * x + m_a2) * x + m_a1) * x + m_a0;
 }
 
 template <class T>
-Polynomial<3, T> Polynomial<3, T>::operator- () const
+T& Polynomial<T, 3>::operator[](const size_t i)
+{
+	SURGSIM_ASSERT(i <= 3) << "Attempting to set or access a coefficient greater than the polynomial degree";
+	switch (i)
+	{
+		case 0:
+		{
+			return m_a0;
+		}
+		case 1:
+		{
+			return m_a1;
+		}
+		case 2:
+		{
+			return m_a2;
+		}
+		default:
+		{
+			return m_a3;
+		}
+	}
+}
+
+template <class T>
+const T& Polynomial<T, 3>::operator[](const size_t i) const
+{
+	SURGSIM_ASSERT(i <= 3) << "Attempting to set or access a coefficient greater than the polynomial degree";
+	switch (i)
+	{
+		case 0:
+		{
+			return m_a0;
+		}
+		case 1:
+		{
+			return m_a1;
+		}
+		case 2:
+		{
+			return m_a2;
+		}
+		default:
+		{
+			return m_a3;
+		}
+	}
+}
+
+template <class T>
+Polynomial<T, 3> Polynomial<T, 3>::operator- () const
 {
 	return Polynomial(-m_a0, -m_a1, -m_a2, -m_a3);
 }
 
 template <class T>
-Polynomial<3, T> Polynomial<3, T>::operator+ (const Polynomial<3, T>& rhs) const
+Polynomial<T, 3> Polynomial<T, 3>::operator+ (const Polynomial<T, 3>& rhs) const
 {
 	return Polynomial(m_a0 + rhs.m_a0, m_a1 + rhs.m_a1, m_a2 + rhs.m_a2, m_a3 + rhs.m_a3);
 }
 
 template <class T>
-Polynomial<3, T>& Polynomial<3, T>::operator+= (const Polynomial<3, T>& rhs)
+Polynomial<T, 3>& Polynomial<T, 3>::operator+= (const Polynomial<T, 3>& rhs)
 {
 	m_a0 += rhs.m_a0;
 	m_a1 += rhs.m_a1;
@@ -388,13 +540,13 @@ Polynomial<3, T>& Polynomial<3, T>::operator+= (const Polynomial<3, T>& rhs)
 }
 
 template <class T>
-Polynomial<3, T> Polynomial<3, T>::operator- (const Polynomial<3, T>& rhs) const
+Polynomial<T, 3> Polynomial<T, 3>::operator- (const Polynomial<T, 3>& rhs) const
 {
 	return Polynomial(m_a0 - rhs.m_a0, m_a1 - rhs.m_a1, m_a2 - rhs.m_a2, m_a3 - rhs.m_a3);
 }
 
 template <class T>
-Polynomial<3, T>& Polynomial<3, T>::operator-= (const Polynomial<3, T>& rhs)
+Polynomial<T, 3>& Polynomial<T, 3>::operator-= (const Polynomial<T, 3>& rhs)
 {
 	m_a0 -= rhs.m_a0;
 	m_a1 -= rhs.m_a1;
@@ -404,13 +556,13 @@ Polynomial<3, T>& Polynomial<3, T>::operator-= (const Polynomial<3, T>& rhs)
 }
 
 template <class T>
-Polynomial<2, T> Polynomial<3, T>::derivative() const
+Polynomial<T, 2> Polynomial<T, 3>::derivative() const
 {
-	return Polynomial<2, T>(m_a1, 2 * m_a2, 3 * m_a3);
+	return Polynomial<T, 2>(m_a1, 2 * m_a2, 3 * m_a3);
 }
 
 template <class T>
-bool Polynomial<3, T>::isNearZero(const T& epsilon) const
+bool Polynomial<T, 3>::isNearZero(const T& epsilon) const
 {
 	return SurgSim::Math::isNearZero(m_a0, epsilon) &&
 		   SurgSim::Math::isNearZero(m_a1, epsilon) &&
@@ -419,7 +571,13 @@ bool Polynomial<3, T>::isNearZero(const T& epsilon) const
 }
 
 template <class T>
-T Polynomial<3, T>::getCoefficient(const size_t i) const
+bool Polynomial<T, 3>::isApprox(const Polynomial<T, 3>& p, const T& epsilon) const
+{
+	return ((*this) - p).isNearZero(epsilon);
+}
+
+template <class T>
+T Polynomial<T, 3>::getCoefficient(size_t i) const
 {
 	switch (i)
 	{
@@ -447,9 +605,9 @@ T Polynomial<3, T>::getCoefficient(const size_t i) const
 }
 
 template <class T>
-void Polynomial<3, T>::setCoefficient(const size_t i, const T& value)
+void Polynomial<T, 3>::setCoefficient(size_t i, const T& value)
 {
-	SURGSIM_ASSERT(i <= 3) << "Attempting to set a coefficient greater than the polynomial order";
+	SURGSIM_ASSERT(i <= 3) << "Attempting to set a coefficient greater than the polynomial degree";
 	switch (i)
 	{
 		case 0:
@@ -475,20 +633,18 @@ void Polynomial<3, T>::setCoefficient(const size_t i, const T& value)
 	}
 }
 
-// ======================================================================
-
 // Operators
 
-template <int N, int M, typename T>
-Polynomial < N + M, T > operator*(const Polynomial<N, T>& p, const Polynomial<M, T>& q)
+template <typename T, int N, int M>
+Polynomial < T, N + M > operator*(const Polynomial<T, N>& p, const Polynomial<T, M>& q)
 {
-	Polynomial < N + M, T > result;
+	Polynomial < T, N + M > result;
 	for (int i = 0;  i <= N + M;  ++i)
 	{
 		T coeff = 0;
 		int jMin = std::max(0, i - M);
 		int jMax = std::min(i, N);
-		for (int j = jMin;  j <= jMax;  ++j)
+		for (int j = jMin;  j <= jMax; ++j)
 		{
 			coeff += p.getCoefficient(j) * q.getCoefficient(i - j);
 		}
@@ -498,61 +654,57 @@ Polynomial < N + M, T > operator*(const Polynomial<N, T>& p, const Polynomial<M,
 }
 
 template <typename T>
-Polynomial<2, T> operator*(const Polynomial<1, T>& p, const Polynomial<1, T>& q)
+Polynomial<T, 2> operator*(const Polynomial<T, 1>& p, const Polynomial<T, 1>& q)
 {
-	const T pb = p.getCoefficient(0);
-	const T pa = p.getCoefficient(1);
-	const T qb = q.getCoefficient(0);
-	const T qa = q.getCoefficient(1);
-	return Polynomial<2, T>(pb * qb, pb * qa + pa * qb, pa * qa);
+	const T p0 = p.getCoefficient(0);
+	const T p1 = p.getCoefficient(1);
+	const T q0 = q.getCoefficient(0);
+	const T q1 = q.getCoefficient(1);
+	return Polynomial<T, 2>(p0 * q0, p0 * q1 + p1 * q0, p1 * q1);
 }
 
 template <typename T>
-Polynomial<3, T> operator*(const Polynomial<2, T>& p, const Polynomial<1, T>& q)
+Polynomial<T, 3> operator*(const Polynomial<T, 2>& p, const Polynomial<T, 1>& q)
 {
 	const T p0 = p.getCoefficient(0);
 	const T p1 = p.getCoefficient(1);
 	const T p2 = p.getCoefficient(2);
 	const T q0 = q.getCoefficient(0);
 	const T q1 = q.getCoefficient(1);
-	return Polynomial<3, T>(p0 * q0, p0 * q1 + p1 * q0, p1 * q1 + p2 * q0, p2 * q1);
+	return Polynomial<T, 3>(p0 * q0, p0 * q1 + p1 * q0, p1 * q1 + p2 * q0, p2 * q1);
 }
 
 template <typename T>
-Polynomial<3, T> operator*(const Polynomial<1, T>& p, const Polynomial<2, T>& q)
+Polynomial<T, 3> operator*(const Polynomial<T, 1>& p, const Polynomial<T, 2>& q)
 {
 	const T p0 = p.getCoefficient(0);
 	const T p1 = p.getCoefficient(1);
 	const T q0 = q.getCoefficient(0);
 	const T q1 = q.getCoefficient(1);
 	const T q2 = q.getCoefficient(2);
-	return Polynomial<3, T>(p0 * q0, p0 * q1 + p1 * q0, p0 * q2 + p1 * q1, p1 * q2);
+	return Polynomial<T, 3>(p0 * q0, p0 * q1 + p1 * q0, p0 * q2 + p1 * q1, p1 * q2);
 }
 
-// ======================================================================
-
 template <typename T>
-Polynomial<0, T> square(const Polynomial<0, T>& p)
+Polynomial<T, 0> square(const Polynomial<T, 0>& p)
 {
 	const T c = p.getCoefficient(0);
-	return Polynomial<0, T>(c * c);
+	return Polynomial<T, 0>(c * c);
 }
 
 template <typename T>
-Polynomial<2, T> square(const Polynomial<1, T>& p)
+Polynomial<T, 2> square(const Polynomial<T, 1>& p)
 {
-	const T pb = p.getCoefficient(0);
-	const T pa = p.getCoefficient(1);
-	return Polynomial<2, T>(pb * pb, 2 * pa * pb, pa * pa);
+	const T p0 = p.getCoefficient(0);
+	const T p1 = p.getCoefficient(1);
+	return Polynomial<T, 2>(p0 * p0, 2 * p1 * p0, p1 * p1);
 }
 
-// ======================================================================
-
-template <int N, typename T>
-inline std::ostream& operator<<(std::ostream& stream, const Polynomial<N, T>& p)
+template <typename T, int N>
+inline std::ostream& operator<<(std::ostream& stream, const Polynomial<T, N>& p)
 {
 	stream << "(";
-	for (int i = N;  i > 1;  --i)
+	for (int i = N; i > 1; --i)
 	{
 		stream << p.getCoefficient(i) << "*x^" << i << " + ";
 	}
@@ -560,7 +712,7 @@ inline std::ostream& operator<<(std::ostream& stream, const Polynomial<N, T>& p)
 	{
 		stream << p.getCoefficient(1) << "*x + ";
 	}
-	stream << p.getCoefficient(0) << "*1)";
+	stream << p.getCoefficient(0) << ")";
 	return stream;
 }
 
