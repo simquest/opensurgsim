@@ -19,7 +19,7 @@
 
 #include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgCurveRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -30,7 +30,7 @@
 
 using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Graphics::OsgPointCloudRepresentation;
+using SurgSim::Graphics::OsgCurveRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem1DRepresentation;
 using SurgSim::Physics::Fem1DElementBeam;
@@ -74,6 +74,52 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	}
 }
 
+#include "SurgSim/Math/OdeState.h"
+
+class StateToCurveBehavior : public SurgSim::Framework::Behavior
+{
+public:
+	StateToCurveBehavior() : SurgSim::Framework::Behavior("Copier")
+	{
+
+	}
+
+	virtual void update(double dt) override
+	{
+		auto state = source->getFinalState();
+		for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
+		{
+			vertices.setVertexPosition(nodeId, state->getPosition(nodeId));
+		}
+		target->updateControlPoints(vertices);
+	}
+
+	virtual bool doInitialize() override
+	{
+		return true;
+	}
+
+	virtual bool doWakeUp() override
+	{
+		auto state = source->getFinalState();
+
+		if (vertices.getNumVertices() == 0)
+		{
+			for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
+			{
+				SurgSim::Graphics::CurveRepresentation::ControlPointType::VertexType vertex(state->getPosition(nodeId));
+				vertices.addVertex(vertex);
+			}
+		}
+		return true;
+	}
+
+	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> source;
+	std::shared_ptr<SurgSim::Graphics::CurveRepresentation> target;
+
+	SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData> vertices;
+};
+
 // Generates a 1d fem comprised of adjacent elements along a straight line.  The number of fem elements is determined
 // by loadModelFem1D.
 std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string& name,
@@ -81,8 +127,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 		const SurgSim::Math::Vector4d& color,
 		SurgSim::Math::IntegrationScheme integrationScheme)
 {
-	std::shared_ptr<Fem1DRepresentation> physicsRepresentation
-		= std::make_shared<Fem1DRepresentation>("Physics Representation: " + name);
+	auto physicsRepresentation = std::make_shared<Fem1DRepresentation>("Physics Representation: " + name);
 
 	// In this test, the physics representations are not transformed, only the graphics will be transformed
 	loadModelFem1D(physicsRepresentation, 10);
@@ -91,23 +136,21 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 	physicsRepresentation->setRayleighDampingMass(5e-2);
 	physicsRepresentation->setRayleighDampingStiffness(5e-3);
 
-	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
+	auto femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 
-	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> graphicsRepresentation
-			= std::make_shared<OsgPointCloudRepresentation>("Graphics Representation: " + name);
+	auto graphicsRepresentation = std::make_shared<OsgCurveRepresentation>("Graphics Representation: " + name);
 	graphicsRepresentation->setLocalPose(gfxPose);
-	graphicsRepresentation->setColor(color);
-	graphicsRepresentation->setPointSize(3.0f);
+// 	graphicsRepresentation->setColor(color);
+// 	graphicsRepresentation->setPointSize(3.0f);
 	graphicsRepresentation->setLocalActive(true);
 
 	femSceneElement->addComponent(graphicsRepresentation);
 
-	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToPointCloudBehavior>("Transfer from Physics to Graphics");
-	physicsToGraphics->setSource(physicsRepresentation);
-	physicsToGraphics->setTarget(graphicsRepresentation);
-	femSceneElement->addComponent(physicsToGraphics);
+	auto copier = std::make_shared<StateToCurveBehavior>();
+	copier->source = physicsRepresentation;
+	copier->target = graphicsRepresentation;
+	femSceneElement->addComponent(copier);
 
 	return femSceneElement;
 }
@@ -155,7 +198,7 @@ TEST_F(RenderTests, VisualTestFem1D)
 					Vector4d(1, 1, 1, 1),
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC));
 
-	runTest(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero(), 5000.0);
+	runTest(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero(), 50000.0);
 }
 
 }; // namespace Physics

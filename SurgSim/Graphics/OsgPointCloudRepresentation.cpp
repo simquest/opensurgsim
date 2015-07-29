@@ -47,7 +47,7 @@ OsgPointCloudRepresentation::OsgPointCloudRepresentation(const std::string& name
 	setColor(m_color);
 
 	// At this stage there are no vertices in there
-	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,m_vertexData->size());
+	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, m_vertexData->size());
 	m_geometry->addPrimitiveSet(m_drawArrays);
 	m_geometry->setUseDisplayList(false);
 	// m_geometry->setUseVertexBufferObjects(true);
@@ -55,7 +55,7 @@ OsgPointCloudRepresentation::OsgPointCloudRepresentation(const std::string& name
 	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
 	m_point = new osg::Point(1.0f);
-	m_geometry->getOrCreateStateSet()->setAttribute( m_point, osg::StateAttribute::ON );
+	m_geometry->getOrCreateStateSet()->setAttribute(m_point, osg::StateAttribute::ON);
 
 	geode->addDrawable(m_geometry);
 	m_transform->addChild(geode);
@@ -80,7 +80,7 @@ void OsgPointCloudRepresentation::doUpdate(double dt)
 			m_vertexData->resize(count);
 		}
 
-		m_drawArrays->set(osg::PrimitiveSet::POINTS,0,count);
+		m_drawArrays->set(osg::PrimitiveSet::POINTS, 0, count);
 		m_drawArrays->dirty();
 	}
 
