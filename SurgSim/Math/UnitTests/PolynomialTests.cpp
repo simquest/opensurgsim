@@ -255,31 +255,31 @@ TYPED_TEST(PolynomialTests, InitializationTests)
 {
 	EXPECT_NO_THROW(TypeParam poly);
 	TypeParam poly;
-	initializeConstructor(&poly);
-	checkPolynomialConstructor(&poly);
+	this->initializeConstructor(&poly);
+	this->checkPolynomialConstructor(&poly);
 };
 
 TYPED_TEST(PolynomialTests, ArithmeticTests)
 {
 	TypeParam poly1;
-	setPolynomialFromOffset(1, &poly1);
+	this->setPolynomialFromOffset(1, &poly1);
 	TypeParam poly2;
-	setPolynomialFromOffset(2, &poly2);
-	checkPolynomialArithmetic(poly1, poly2);
+	this->setPolynomialFromOffset(2, &poly2);
+	this->checkPolynomialArithmetic(poly1, poly2);
 };
 
 TYPED_TEST(PolynomialDerivativeTests, DerivativeTests)
 {
 	TypeParam poly1;
-	setPolynomialFromOffset(1, &poly1);
-	checkPolynomialDerivative(poly1);
+	this->setPolynomialFromOffset(1, &poly1);
+	this->checkPolynomialDerivative(poly1);
 };
 
 TYPED_TEST(PolynomialTests, NearZeroTests)
 {
 	TypeParam poly1;
-	setPolynomialToSmallValue(&poly1);
-	checkIsNearZero(&poly1);
+	this->setPolynomialToSmallValue(&poly1);
+	this->checkIsNearZero(&poly1);
 };
 
 TEST_F(PolynomialUtilityTests, UtilityTests)
