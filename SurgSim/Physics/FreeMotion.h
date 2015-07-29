@@ -19,7 +19,6 @@
 #include <memory>
 #include <vector>
 
-
 #include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
@@ -29,7 +28,7 @@ namespace Physics
 
 class Representation;
 
-/// Apply the Freemotion calcluation to all physics representations
+/// Apply the FreeMotion calculation to all physics representations
 class FreeMotion  : public Computation
 {
 public:
@@ -42,11 +41,9 @@ public:
 	~FreeMotion();
 
 protected:
-
 	/// Override doUpdate from superclass
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 		override;
-
 };
 
 }; // Physics

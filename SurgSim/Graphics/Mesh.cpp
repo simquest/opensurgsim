@@ -38,6 +38,16 @@ Mesh::Mesh() :
 {
 }
 
+Mesh::Mesh( const Mesh& other ) : BaseType(other)
+{
+
+}
+
+Mesh::Mesh( Mesh&& other ) : BaseType(std::move(other))
+{
+
+}
+
 void Mesh::initialize(
 	const std::vector<SurgSim::Math::Vector3d>& vertices,
 	const std::vector<SurgSim::Math::Vector4d>& colors,
@@ -124,6 +134,18 @@ void Mesh::dirty()
 size_t Mesh::getUpdateCount() const
 {
 	return m_updateCount;
+}
+
+Mesh& Mesh::operator=( const Mesh& other )
+{
+	BaseType::operator=(other);
+	return *this;
+}
+
+Mesh& Mesh::operator=( Mesh&& other )
+{
+	BaseType::operator=(std::move(other));
+	return *this;
 }
 
 }; // Graphics

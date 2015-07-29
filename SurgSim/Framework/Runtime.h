@@ -40,6 +40,7 @@ class Component;
 class Logger;
 class Scene;
 class SceneElement;
+class ThreadPool;
 
 /// This class contains all the information about the runtime environment of
 /// the simulation, all the running threads, the state, while it is de facto a
@@ -63,6 +64,9 @@ public:
 
 	/// Add a worker thread, this should probably only be possible if the system is not running
 	void addManager(std::shared_ptr<ComponentManager> thread);
+
+	/// \return All the managers from the runtime
+	std::vector<std::weak_ptr<ComponentManager>> getManagers() const;
 
 	/// \return The scene to be used for this runtime. Use this for any kind of scene manipulation.
 	std::shared_ptr<Scene> getScene();
@@ -115,6 +119,10 @@ public:
 	/// Gets application data for the runtime.
 	/// \return	The application data.
 	static std::shared_ptr<const ApplicationData> getApplicationData();
+
+	/// Gets the thread pool for the runtime.
+	/// \return	The thread pool.
+	static std::shared_ptr<ThreadPool> getThreadPool();
 
 	/// Adds a component.
 	/// \param	component	The component.

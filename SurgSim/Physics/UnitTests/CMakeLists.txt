@@ -30,11 +30,13 @@ set(UNIT_TEST_SOURCES
 	DeformableCollisionRepresentationTest.cpp
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
+	Fem1DConstraintFixedPointTests.cpp
 	Fem1DElementBeamTests.cpp
 	Fem1DLocalizationTest.cpp
 	Fem1DMechanicalValidationTests.cpp
 	Fem1DPlyReaderDelegateTests.cpp
 	Fem1DRepresentationTests.cpp
+	Fem2DConstraintFixedPointTests.cpp
 	Fem2DElementTriangleTests.cpp
 	Fem2DLocalizationTest.cpp
 	Fem2DMechanicalValidationTests.cpp

@@ -61,6 +61,8 @@ public:
 	/// Default constructor
 	Mesh();
 
+	typedef TriangleMesh<VertexData, DataStructures::EmptyData, DataStructures::EmptyData> BaseType;
+
 	/// Copy constructor when the template data is a different type
 	/// \tparam	V Type of extra data stored in each vertex
 	/// \tparam	E Type of extra data stored in each edge
@@ -69,6 +71,22 @@ public:
 	/// \note: Data of the input mesh, i.e. VertexDataSource, EdgeDataSource and TrianleDataSource will not be copied.
 	template <class V, class E, class T>
 	explicit Mesh(const TriangleMesh<V, E, T>& other);
+
+	/// Copy Constructor
+	/// \param other Constructor source
+	Mesh(const Mesh& other);
+
+	/// Move Constructor
+	/// \param other Constructor source
+	Mesh(Mesh&& other);
+
+	/// Copy Assignment
+	/// \param other Assignment source
+	Mesh& operator=(const Mesh& other);
+
+	/// Move Assignment
+	/// \param other Assignment source
+	Mesh& operator=(Mesh&& other);
 
 	/// Utility function to initialize a mesh with plain data,
 	/// \param	vertices 	An array of vertex coordinates.
@@ -89,6 +107,7 @@ public:
 
 	/// Return the update count, please note that it will silently roll over when the range of size_t has been exceeded
 	size_t getUpdateCount() const;
+
 
 protected:
 	bool doLoad(const std::string& fileName) override;

@@ -26,6 +26,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
@@ -67,6 +68,17 @@ void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 		m_managers.push_back(manager);
 	}
 }
+
+
+std::vector<std::weak_ptr<ComponentManager>> Runtime::getManagers() const
+{
+	std::vector<std::weak_ptr<ComponentManager>> result(m_managers.size());
+
+	std::copy(m_managers.begin(), m_managers.end(), result.begin());
+
+	return result;
+}
+
 
 std::shared_ptr<Scene> Runtime::getScene()
 {
@@ -312,6 +324,12 @@ std::shared_ptr<const ApplicationData> Runtime::getApplicationData()
 	SURGSIM_ASSERT(nullptr != m_applicationData) <<
 			"Runtime::getApplicationData() should be called after the Runtime is created.";
 	return m_applicationData;
+}
+
+std::shared_ptr<ThreadPool> Runtime::getThreadPool()
+{
+	static auto threadPool = std::make_shared<ThreadPool>();
+	return threadPool;
 }
 
 void Runtime::addComponent(const std::shared_ptr<Component>& component)

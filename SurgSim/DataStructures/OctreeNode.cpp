@@ -210,7 +210,7 @@ SurgSim::DataStructures::OctreePath getNeighbor(const OctreePath& origin, const 
 		result.clear();
 	}
 
-	return std::move(result);
+	return result;
 }
 
 std::vector<OctreePath> getNeighbors(const OctreePath& origin, int type)
@@ -243,7 +243,7 @@ std::vector<OctreePath> getNeighbors(const OctreePath& origin, int type)
 	{
 		std::for_each(VertexNeighbors.begin(), VertexNeighbors.end(), f);
 	}
-	return std::move(result);
+	return result;
 }
 
 

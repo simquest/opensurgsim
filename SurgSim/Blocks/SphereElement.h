@@ -16,8 +16,9 @@
 #ifndef SURGSIM_BLOCKS_SPHEREELEMENT_H
 #define SURGSIM_BLOCKS_SPHEREELEMENT_H
 
-#include "SurgSim/Framework/SceneElement.h"
+#include <string>
 
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
 
 
@@ -30,21 +31,12 @@ namespace Blocks
 class SphereElement : public SurgSim::Framework::SceneElement
 {
 public:
-
+	/// Constructor
+	/// \param	name	Name of the sphere
 	explicit SphereElement(const std::string& name);
 
-	~SphereElement();
-
-
 protected:
-	virtual bool doInitialize();
-
-	virtual bool doWakeUp();
-
-
-private:
-	std::string m_name;
-
+	bool doInitialize() override;
 };
 
 

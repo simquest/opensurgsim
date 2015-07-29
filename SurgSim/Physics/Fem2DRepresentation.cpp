@@ -13,18 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/Fem2DLocalization.h"
-#include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
-
-using SurgSim::Math::SparseMatrix;
+#include "SurgSim/Physics/Localization.h"
 
 namespace
 {
@@ -42,7 +41,6 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 	{
 		// Only the translational dof are transformed, rotational dof remains unchanged
 		SurgSim::Math::Vector3d xi = x->segment<3>(6 * nodeId);
-
 		x->segment<3>(6 * nodeId) = (rotationOnly) ? transform.linear() * xi : transform * xi;
 	}
 }
@@ -50,7 +48,6 @@ void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
 
 namespace SurgSim
 {
-
 namespace Physics
 {
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::Fem2DRepresentation, Fem2DRepresentation);
@@ -86,7 +83,7 @@ void Fem2DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 	SURGSIM_ASSERT(femMesh != nullptr)
 			<< "Mesh for Fem2DRepresentation needs to be a SurgSim::Physics::Fem2D";
 	m_fem = femMesh;
-	auto state = std::make_shared<SurgSim::Math::OdeState>();
+	auto state = std::make_shared<Math::OdeState>();
 
 	state->setNumDof(getNumDofPerNode(), m_fem->getNumVertices());
 	for (size_t i = 0; i < m_fem->getNumVertices(); i++)
@@ -120,7 +117,7 @@ void Fem2DRepresentation::setFem(std::shared_ptr<Framework::Asset> mesh)
 		}
 	}
 
-	FemRepresentation::setInitialState(state);
+	setInitialState(state);
 }
 
 std::shared_ptr<Fem2D> Fem2DRepresentation::getFem() const
@@ -129,12 +126,14 @@ std::shared_ptr<Fem2D> Fem2DRepresentation::getFem() const
 }
 
 void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-													  const SurgSim::Math::Vector& generalizedForce,
-													  const SurgSim::Math::Matrix& K,
-													  const SurgSim::Math::Matrix& D)
+													  const Math::Vector& generalizedForce,
+													  const Math::Matrix& K,
+													  const Math::Matrix& D)
 {
+	using SurgSim::Math::SparseMatrix;
+
 	const size_t dofPerNode = getNumDofPerNode();
-	const SurgSim::Math::Matrix::Index expectedSize = static_cast<const SurgSim::Math::Matrix::Index>(dofPerNode);
+	const Math::Matrix::Index expectedSize = static_cast<const Math::Matrix::Index>(dofPerNode);
 
 	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
 	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
@@ -151,7 +150,7 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	SURGSIM_ASSERT(localization2D != nullptr) << "Invalid localization type (not a Fem2DLocalization)";
 
 	const size_t elementId = localization2D->getLocalPosition().index;
-	const SurgSim::Math::Vector& coordinate = localization2D->getLocalPosition().coordinate;
+	const Math::Vector& coordinate = localization2D->getLocalPosition().coordinate;
 	std::shared_ptr<FemElement> element = getFemElement(elementId);
 
 	size_t index = 0;
@@ -194,8 +193,70 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	m_hasExternalGeneralizedForce = true;
 }
 
-void Fem2DRepresentation::transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-										 const SurgSim::Math::RigidTransform3d& transform)
+
+std::shared_ptr<Localization> Fem2DRepresentation::createNodeLocalization(
+	const DataStructures::IndexedLocalCoordinate& location)
+{
+	DataStructures::IndexedLocalCoordinate coordinate;
+	size_t nodeId = location.index;
+
+	SURGSIM_ASSERT(nodeId >= 0 && nodeId < getCurrentState()->getNumNodes()) << "Invalid node id";
+
+	// Look for any element that contains this node
+	bool foundNodeId = false;
+	for (size_t elementId = 0; elementId < getNumFemElements(); elementId++)
+	{
+		auto element = getFemElement(elementId);
+		auto found = std::find(element->getNodeIds().begin(), element->getNodeIds().end(), nodeId);
+		if (found != element->getNodeIds().end())
+		{
+			coordinate.index = elementId;
+			coordinate.coordinate.setZero(element->getNumNodes());
+			coordinate.coordinate[found - element->getNodeIds().begin()] = 1.0;
+			foundNodeId = true;
+			break;
+		}
+	}
+	SURGSIM_ASSERT(foundNodeId) << "Could not find any element containing the node " << nodeId;
+
+	// Fem2DLocalization will verify the coordinate (2nd parameter) based on
+	// the Fem2DRepresentation passed as 1st parameter.
+	return std::make_shared<Fem2DLocalization>(
+		std::static_pointer_cast<Physics::Representation>(getSharedPtr()), coordinate);
+}
+
+std::shared_ptr<Localization> Fem2DRepresentation::createElementLocalization(
+	const DataStructures::IndexedLocalCoordinate& location)
+{
+	return std::make_shared<Fem2DLocalization>(
+		std::static_pointer_cast<Physics::Representation>(getSharedPtr()), location);
+}
+
+std::shared_ptr<Localization> Fem2DRepresentation::createLocalization(const DataStructures::Location& location)
+{
+	if (location.nodeMeshLocalCoordinate.hasValue())
+	{
+		return createNodeLocalization(location.nodeMeshLocalCoordinate.getValue());
+	}
+	else if (location.triangleMeshLocalCoordinate.hasValue())
+	{
+		// In the 2d case, elements are triangles, so Locations of type triangleMesh and elementMesh refer to the same
+		// mesh. The distinction between an element and a triangle is mostly useful in the 3d case to separate the
+		// surface from the volume.
+		return createElementLocalization(location.triangleMeshLocalCoordinate.getValue());
+	}
+	else if (location.elementMeshLocalCoordinate.hasValue())
+	{
+		return createElementLocalization(location.elementMeshLocalCoordinate.getValue());
+	}
+
+	SURGSIM_FAILURE() << "Localization cannot be created without a mesh-based location (node, triangle or element).";
+
+	return nullptr;
+}
+
+void Fem2DRepresentation::transformState(std::shared_ptr<Math::OdeState> state,
+										 const Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
@@ -214,5 +275,4 @@ bool Fem2DRepresentation::doInitialize()
 }
 
 } // namespace Physics
-
 } // namespace SurgSim

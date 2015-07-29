@@ -17,9 +17,11 @@
 #include <memory>
 #include <vector>
 
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Physics/FreeMotion.h"
-#include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
@@ -27,7 +29,8 @@ namespace Physics
 {
 
 
-FreeMotion::FreeMotion(bool doCopyState) : Computation(doCopyState)
+FreeMotion::FreeMotion(bool doCopyState) :
+	Computation(doCopyState)
 {
 
 }
@@ -37,23 +40,30 @@ FreeMotion::~FreeMotion()
 
 }
 
-std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
-	const double& dt,
-	const std::shared_ptr<PhysicsManagerState>& state)
+std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(const double& dt,
+		const std::shared_ptr<PhysicsManagerState>& state)
 {
 	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
 
+	auto threadPool = Framework::Runtime::getThreadPool();
+	std::vector<std::future<void>> tasks;
+
 	auto& representations = result->getActiveRepresentations();
 	for (auto& representation : representations)
 	{
-		representation->update(dt);
+		tasks.push_back(threadPool->enqueue<void>([&]() { representation->update(dt); }));
 	}
 
 	auto& particleRepresentations = result->getActiveParticleRepresentations();
 	for (auto& representation : particleRepresentations)
 	{
-		representation->update(dt);
+		tasks.push_back(threadPool->enqueue<void>([&](){ representation->update(dt); }));
+	}
+
+	for (auto& task : tasks)
+	{
+		task.wait();
 	}
 
 	return result;
