@@ -53,8 +53,7 @@ T Polynomial<T, 0>::evaluate(const T& x) const
 template <class T>
 T& Polynomial<T, 0>::operator[](const size_t i)
 {
-	SURGSIM_ASSERT(i <= 0) << "Attempting to set a coefficient greater than the polynomial degree";
-	return m_a0;
+	return const_cast<T&>(const_cast<const Polynomial<T, 0>*>(this)->operator[](i));
 }
 
 template <class T>
@@ -124,14 +123,7 @@ template <class T>
 void Polynomial<T, 0>::setCoefficient(size_t i, const T& value)
 {
 	SURGSIM_ASSERT(i <= 0) << "Attempting to set a coefficient greater than the polynomial degree";
-	switch (i)
-	{
-		case 0:
-		{
-			m_a0 = value;
-			break;
-		}
-	}
+	m_a0 = value;
 }
 
 // Polynomial of degree 1
@@ -155,18 +147,7 @@ T Polynomial<T, 1>::evaluate(const T& x) const
 template <class T>
 T& Polynomial<T, 1>::operator[](const size_t i)
 {
-	SURGSIM_ASSERT(i <= 1) << "Attempting to set a coefficient greater than the polynomial degree";
-	switch (i)
-	{
-		case 0:
-		{
-			return m_a0;
-		}
-		default:
-		{
-			return m_a1;
-		}
-	}
+	return const_cast<T&>(const_cast<const Polynomial<T, 1>*>(this)->operator[](i));
 }
 
 template <class T>
@@ -298,22 +279,7 @@ T Polynomial<T, 2>::evaluate(const T& x) const
 template <class T>
 T& Polynomial<T, 2>::operator[](const size_t i)
 {
-	SURGSIM_ASSERT(i <= 2) << "Attempting to set a coefficient greater than the polynomial degree";
-	switch (i)
-	{
-		case 0:
-		{
-			return m_a0;
-		}
-		case 1:
-		{
-			return m_a1;
-		}
-		default:
-		{
-			return m_a2;
-		}
-	}
+	return const_cast<T&>(const_cast<const Polynomial<T, 2>*>(this)->operator[](i));
 }
 
 template <class T>
@@ -470,26 +436,7 @@ T Polynomial<T, 3>::evaluate(const T& x) const
 template <class T>
 T& Polynomial<T, 3>::operator[](const size_t i)
 {
-	SURGSIM_ASSERT(i <= 3) << "Attempting to set or access a coefficient greater than the polynomial degree";
-	switch (i)
-	{
-		case 0:
-		{
-			return m_a0;
-		}
-		case 1:
-		{
-			return m_a1;
-		}
-		case 2:
-		{
-			return m_a2;
-		}
-		default:
-		{
-			return m_a3;
-		}
-	}
+	return const_cast<T&>(const_cast<const Polynomial<T, 3>*>(this)->operator[](i));
 }
 
 template <class T>

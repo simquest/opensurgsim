@@ -32,11 +32,7 @@ namespace
 double epsilon = 1.0e-9;
 }
 
-class PolynomialValuesTest : public ::testing::Test
-{
-};
-
-TEST_F(PolynomialValuesTest, PolnomialDegree0Values)
+TEST(PolynomialValuesTest, PolnomialDegree0Values)
 {
 	SurgSim::Math::Polynomial<double, 0> constantPoly(-24.0);
 	SurgSim::Math::Interval<double> interval(-1.0, 10.0);
@@ -45,7 +41,7 @@ TEST_F(PolynomialValuesTest, PolnomialDegree0Values)
 	EXPECT_TRUE(Interval<double>(-24.0, -24.0).isApprox(constantValues.valuesOverInterval(interval), epsilon));
 };
 
-TEST_F(PolynomialValuesTest, PolnomialDegree1Values)
+TEST(PolynomialValuesTest, PolnomialDegree1Values)
 {
 	SurgSim::Math::Polynomial<double, 1> linearPoly(-24.0, 2.0);
 	SurgSim::Math::Interval<double> interval(-1.0, 10.0);
@@ -55,7 +51,7 @@ TEST_F(PolynomialValuesTest, PolnomialDegree1Values)
 	EXPECT_TRUE(Interval<double>(-26.0, -4.0).isApprox(linearValues.valuesOverInterval(interval), epsilon));
 };
 
-TEST_F(PolynomialValuesTest, PolnomialDegree2Values)
+TEST(PolynomialValuesTest, PolnomialDegree2Values)
 {
 	SurgSim::Math::Polynomial<double, 2> quadraticPoly(-8.0, 6.0, 2.0);
 	SurgSim::Math::Interval<double> interval1(-1.0, 10.0);
@@ -72,7 +68,7 @@ TEST_F(PolynomialValuesTest, PolnomialDegree2Values)
 	EXPECT_TRUE(Interval<double>(-12.5, 252.0).isApprox(quadraticValues.valuesOverInterval(interval2), epsilon));
 };
 
-TEST_F(PolynomialValuesTest, ValuesOverIntervalTests)
+TEST(PolynomialValuesTest, ValuesOverIntervalTests)
 {
 	SurgSim::Math::Polynomial<double, 0> constantPoly(-24.0);
 	SurgSim::Math::Polynomial<double, 1> linearPoly(-24.0, 2.0);

@@ -32,11 +32,7 @@ namespace
 double epsilon = 1.0e-9;
 }
 
-class PolynomialRootsTest : public ::testing::Test
-{
-};
-
-TEST_F(PolynomialRootsTest, PolynomialDegree1Roots)
+TEST(PolynomialRootsTest, PolynomialDegree1Roots)
 {
 	// Degenerate Linear, infinite roots
 	SurgSim::Math::Polynomial<double, 1> degenerate(epsilon / 2.0, epsilon / 2.0);
@@ -61,7 +57,7 @@ TEST_F(PolynomialRootsTest, PolynomialDegree1Roots)
 	EXPECT_THROW(linearPolyRoots[1], SurgSim::Framework::AssertionFailure);
 };
 
-TEST_F(PolynomialRootsTest, PolynomialDegree2Roots)
+TEST(PolynomialRootsTest, PolynomialDegree2Roots)
 {
 	// Degenerate Linear, infinite roots
 	SurgSim::Math::Polynomial<double, 2> degenerate(epsilon / 2.0, epsilon / 2.0, epsilon / 2.0);

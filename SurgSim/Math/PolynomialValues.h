@@ -121,7 +121,7 @@ private:
 /// \param interval an interval on the independent variable over which the
 /// values are to be calculated
 /// \return the minimum and maximum polynomial values over interval
-template <int N, class T>
+template <class T, int N>
 Interval<T> valuesOverInterval(const Polynomial<T, N>& p, const Interval<T>& interval);
 
 }; // Math

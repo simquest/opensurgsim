@@ -167,7 +167,7 @@ private:
 	/// @}
 };
 
-/// Polynomial<T, 2> specializes the Polynomial class for degree 1 (quadratic polynomials)
+/// Polynomial<T, 2> specializes the Polynomial class for degree 2 (quadratic polynomials)
 /// \sa Polynomial<T, N>
 template <typename T>
 class Polynomial<T, 2>

@@ -99,7 +99,7 @@ Interval<T> PolynomialValues<T, 2>::valuesOverInterval(const Interval<T>& interv
 	return result;
 }
 
-template <int N, class T>
+template <class T, int N>
 Interval<T> valuesOverInterval(const Polynomial<T, N>& p, const Interval<T>& interval)
 {
 	return PolynomialValues<T, N>(p).valuesOverInterval(interval);
