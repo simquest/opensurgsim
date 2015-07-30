@@ -49,7 +49,6 @@ set(NOVINT_DEVICE_HEADERS
 
 set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
 	Novint/Novint7DofDevice.h
-	Novint/NovintCommonDevice.h
 	Novint/NovintDevice.h
 	PARENT_SCOPE)
 
