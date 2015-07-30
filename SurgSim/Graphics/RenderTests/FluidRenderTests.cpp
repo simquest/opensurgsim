@@ -107,7 +107,7 @@ protected:
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
 		material->addUniform("float", "sphereScale");
-		material->setValue("sphereScale", 200.0f);
+        material->setValue("sphereScale", 800.0f);
 		depthPass->setMaterial(material);
 
 		depthPass->showDepthTarget(0.0, screenHeight - height, width, height);
