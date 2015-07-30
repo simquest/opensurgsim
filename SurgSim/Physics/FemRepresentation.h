@@ -165,7 +165,7 @@ protected:
 	/// Updates the compliance matrix using nodes transformation (useful for compliance warping)
 	/// \param state The state to compute the nodes transformation from
 	/// \note This computes the diagonal block matrix m_complianceWarpingTransformation and
-	///       transform the initial compliance matrix with it.
+	///       transforms the initial compliance matrix with it.
 	void updateComplianceMatrix(const SurgSim::Math::OdeState& state);
 
 	/// Retrieves a specific node transformation (useful for compliance warping)
