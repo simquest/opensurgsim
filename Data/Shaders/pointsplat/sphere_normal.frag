@@ -37,7 +37,7 @@ void main(void)
 {
 	float texelSize = 1.0/1024.0;
 	float depth = texture2D(depthMap, gl_TexCoord[0].xy).x;
-	
+
 	if(depth > maxDepth)
 	{
 		discard;
@@ -66,6 +66,6 @@ void main(void)
 
 	vec3 normal = cross(ddx, ddy);
 	normal = normalize(normal);
-	// normal = 0.5f*(normal+1.0f);
+	normal = 0.5f*(normal+1.0f);
 	gl_FragColor = vec4(normal,1.0);
 }
