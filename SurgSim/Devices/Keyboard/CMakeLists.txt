@@ -32,8 +32,8 @@ set(KEYBOARD_DEVICE_HEADERS
 )
 
 set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
-	Keyboard/KeyboardDevice.h
-	Keyboard/KeyCode.h
+	Keyboard/KeyboardDevice.h #NOLINT
+	Keyboard/KeyCode.h #NOLINT
 	PARENT_SCOPE)
 
 surgsim_add_library(
