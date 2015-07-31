@@ -27,3 +27,5 @@ add_subdirectory(Math)
 add_subdirectory(Particles)
 add_subdirectory(Physics)
 add_subdirectory(Testing)
+
+set(SURGSIM_DEVICES_LIBS ${SURGSIM_DEVICES_LIBS} PARENT_SCOPE)

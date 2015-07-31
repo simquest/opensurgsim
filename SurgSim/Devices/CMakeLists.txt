@@ -35,14 +35,19 @@ set(SURGSIM_DEVICES_DOCUMENTATION
 	devices.dox
 )
 
+set(SURGSIM_DEVICES_LIBS "SurgSimDeviceFilters;IdentityPoseDevice;KeyboardDevice;MouseDevice")
+
 foreach(DEVICE ${DEVICES})
 	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
 	option(BUILD_DEVICE_${DEVICE_UPPER_CASE} "Build ${DEVICE} device." OFF)
 	if(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 		add_subdirectory(${DEVICE})
 		list(APPEND SURGSIM_DEVICES_DOCUMENTATION ${DEVICE}/${DEVICE}.dox)
+		set(SURGSIM_DEVICES_LIBS "${SURGSIM_DEVICES_LIBS};${DEVICE}Device")
 	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 endforeach(DEVICE)
+
+set(SURGSIM_DEVICES_LIBS ${SURGSIM_DEVICES_LIBS} PARENT_SCOPE)
 
 surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS}")
 

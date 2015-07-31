@@ -37,28 +37,10 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
 	SurgSimMath
+	${SURGSIM_DEVICES_LIBS}
 	${YAML_CPP_LIBRARIES}
 )
 
-if(BUILD_DEVICE_MULTIAXIS)
-	list(APPEND LIBS MultiAxisDevice)
-endif(BUILD_DEVICE_MULTIAXIS)
-
-if(BUILD_DEVICE_NOVINT)
-	list(APPEND LIBS NovintDevice)
-endif(BUILD_DEVICE_NOVINT)
-
-if(BUILD_DEVICE_PHANTOM)
-	list(APPEND LIBS PhantomDevice)
-endif(BUILD_DEVICE_PHANTOM)
-
-if(BUILD_DEVICE_MULTIAXIS)
-	list(APPEND LIBS MultiAxisDevice)
-endif(BUILD_DEVICE_MULTIAXIS)
-
-if(BUILD_DEVICE_LEAP)
-	list(APPEND LIBS LeapDevice)
-endif(BUILD_DEVICE_LEAP)
 
 target_link_libraries(InputVtc ${LIBS})
 
