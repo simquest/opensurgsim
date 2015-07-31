@@ -23,6 +23,8 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::TrackIRDevice, TrackIRDevice);
+
 TrackIRDevice::TrackIRDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, TrackIRScaffold::buildDeviceInputData()),
 	m_positionScale(1.0),

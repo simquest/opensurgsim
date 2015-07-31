@@ -23,6 +23,7 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::PhantomDevice, PhantomDevice);
 
 PhantomDevice::PhantomDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, PhantomScaffold::buildDeviceInputData())

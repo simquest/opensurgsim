@@ -27,6 +27,7 @@ namespace Device
 {
 class PhantomScaffold;
 
+SURGSIM_STATIC_REGISTRATION(PhantomDevice);
 
 /// A class implementing the communication with a SensAble/Geomagic PHANTOM device.
 ///
@@ -61,6 +62,8 @@ public:
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit PhantomDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::PhantomDevice);
 
 	/// Destructor.
 	virtual ~PhantomDevice();

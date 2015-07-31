@@ -23,6 +23,8 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::LabJackDevice, LabJackDevice);
+
 LabJackDevice::LabJackDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, LabJackScaffold::buildDeviceInputData()),
 	m_model(LabJack::MODEL_SEARCH),
