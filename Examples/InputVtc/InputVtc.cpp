@@ -16,14 +16,12 @@
 #include <memory>
 
 #include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
-#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Devices/Devices.h"
 #include "SurgSim/Framework/Framework.h"
 #include "SurgSim/Graphics/Graphics.h"
 #include "SurgSim/Input/Input.h"
 #include "SurgSim/Math/Math.h"
 #include "SurgSim/Physics/Physics.h"
-
-#include "Examples/InputVtc/DeviceFactory.h"
 
 using SurgSim::Blocks::DriveElementFromInputBehavior;
 using SurgSim::Framework::BasicSceneElement;
@@ -175,19 +173,53 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 	return element;
 }
 
+std::shared_ptr<SurgSim::Input::DeviceInterface> createDevice(const std::string& toolDeviceName)
+{
+	std::vector<std::string> types =
+		{"PhantomDevice", "NovintDevice", "MultiAxisDevice", "SixenseDevice", "LeapDevice"};
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	auto& factory = SurgSim::Input::DeviceInterface::getFactory();
+	for (const auto& type : types)
+	{
+		std::string qualifiedType = "SurgSim::Device::" + type;
+		if (factory.isRegistered(qualifiedType))
+		{
+			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << "Trying to use a " << type;
+			device = factory.create(qualifiedType, toolDeviceName);
+			if (device->initialize())
+			{
+				break;
+			}
+			else
+			{
+				device = nullptr;
+			}
+		}
+		else
+		{
+			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << "Cannot use a " << type <<
+				" because the executable was built without support for that device.  To use such a device, enable " <<
+				"the BUILD_DEVICE_* setting in cmake.";
+		}
+	}
+	if (device == nullptr)
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"The InputVtc example was unable to initialize an input device that provides poses, " <<
+			"so it will use a constant pose.";
+		device = std::make_shared<SurgSim::Device::IdentityPoseDevice>(toolDeviceName);
+		device->initialize();
+	}
+	return device;
+}
+
 int main(int argc, char* argv[])
 {
-	static const char* const toolDeviceName = "Tool Device";
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
-
-	DeviceFactory deviceFactory;
-	std::shared_ptr<SurgSim::Input::DeviceInterface> device = deviceFactory.getDevice(toolDeviceName);
-	SURGSIM_ASSERT(device != nullptr) << "Unable to get a device, is one connected?";
-	inputManager->addDevice(device);
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 	runtime->addManager(physicsManager);
@@ -195,6 +227,10 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 	runtime->addManager(inputManager);
 
+	static const char* const toolDeviceName = "Tool Device";
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device = createDevice(toolDeviceName);
+	inputManager->addDevice(device); 
+	
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("VTC Box", toolDeviceName));
 	scene->addSceneElement(createBoxForRawInput("Raw Input", toolDeviceName));
