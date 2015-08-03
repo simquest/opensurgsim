@@ -38,20 +38,21 @@ vec3 getEyeSpacePos(vec2 texCoord, float z)
 
 void main(void)
 {
-    float depth =texture2D(depthMap, gl_TexCoord[0].xy).x;
+    float depth = texture2D(depthMap, gl_TexCoord[0].xy).x;
     if (depth > maxDepth)
     {
         discard;
     }
     vec3 eyePos = getEyeSpacePos(gl_TexCoord[0].xy, depth);
 
-    vec3 normal = normalize(2.0 * (texture2D(normalMap, gl_TexCoord[0].xy).xyz - 1.0));
-	const float shininess = 100.0;
-	float diffuse = max(0.0,dot(lightDir,normal));
+    vec3 normal = normalize(texture2D(normalMap, gl_TexCoord[0].xy).xyz);
 
-    vec3 ref = normalize(reflect(-lightDir,normal));
-    float specularity = max(0.0,dot(normal, ref));
-    float specular = pow(specularity, shininess);
+	float diffuse = max(0.0,dot(normalize(lightDir),normal));
+
+    const float shininess = 100.0;
+    vec3 v = normalize(-eyePos);
+    vec3 h = normalize(lightDir + v);
+    float specular = pow(max(0.0, dot(normal, h)), shininess);;
 
 	gl_FragColor = color * diffuse + specular;
 }

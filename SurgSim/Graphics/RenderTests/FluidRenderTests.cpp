@@ -111,8 +111,6 @@ protected:
 		material->setValue("sphereScale", 800.0f);
 		depthPass->setMaterial(material);
 
-		depthPass->showDepthTarget(0.0, screenHeight - height, width, height);
-
 		scene->addSceneElement(depthPass);
 
 
@@ -128,8 +126,8 @@ protected:
 
 		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 1);
 
-		auto nRenderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
-		normalPass->setRenderTarget(nRenderTarget);
+		renderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+		normalPass->setRenderTarget(renderTarget);
 
 		material = std::make_shared<Graphics::OsgMaterial>("NormalPassMaterial");
 		program = Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/pointsplat/sphere_normal");
@@ -138,7 +136,7 @@ protected:
 		material->setProgram(program);
 
 		material->addUniform("sampler2D", "depthMap");
-		material->setValue("depthMap", renderTarget->getDepthTarget());
+		material->setValue("depthMap", depthPass->getRenderTarget()->getDepthTarget());
 		material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
 		material->addUniform("float", "texelSize");
 		material->setValue("texelSize", static_cast<float>(1.0 / 1024.0));
@@ -155,22 +153,22 @@ protected:
 		graphics->setGroupReference("NormalPass");
 		normalPass->addComponent(graphics);
 
-		//normalPass->showColorTarget(screenWidth - width, screenHeight - height, width, height);
-
-		//camera->getOsgCamera()->setClearColor(osg::Vec4(0.8, 0.0, 0.0, 1.0));
-
 		scene->addSceneElement(normalPass);
 
 
 		// Shading Pass //
 		auto shadingPass = std::make_shared<RenderPass>("ShadingPass");
-		shadingPass->getCamera()->setRenderGroupReference("ShadingPass");
-		shadingPass->getCamera()->setGroupReference(Graphics::Representation::DefaultGroupName);
-		shadingPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 2);
-		copier->connect(viewElement->getCamera(), "ProjectionMatrix", shadingPass->getCamera(), "ProjectionMatrix");
 
-		auto sRenderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
-		shadingPass->setRenderTarget(sRenderTarget);
+		camera = std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(shadingPass->getCamera());
+		osgCamera = camera->getOsgCamera();
+		osgCamera->setViewport(0, 0, 1024, 1024);
+		camera->setOrthogonalProjection(0, 1024, 0, 1024, -1.0, 1.0);
+		camera->setRenderGroupReference("ShadingPass");
+		camera->setGroupReference(Graphics::Representation::DefaultGroupName);
+		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 2);
+
+		renderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+		shadingPass->setRenderTarget(renderTarget);
 
 		material = std::make_shared<Graphics::OsgMaterial>("ShadingPassMaterial");
 		program = Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/pointsplat/surface");
@@ -179,10 +177,10 @@ protected:
 		material->setProgram(program);
 
 		material->addUniform("sampler2D", "depthMap");
-		material->setValue("depthMap", renderTarget->getDepthTarget());
+		material->setValue("depthMap", depthPass->getRenderTarget()->getDepthTarget());
 		material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
 		material->addUniform("sampler2D", "normalMap");
-		material->setValue("normalMap", nRenderTarget->getColorTarget(0));
+		material->setValue("normalMap", normalPass->getRenderTarget()->getColorTarget(0));
 		material->getUniform("normalMap")->setValue("MinimumTextureUnit", static_cast<size_t>(9));
 		material->addUniform("vec4", "color");
 		material->setValue("color", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
