@@ -24,6 +24,7 @@
 uniform sampler2D depthMap;
 uniform float maxDepth = 0.999999f;
 uniform mat4 inverseProjectionMatrix;
+uniform float texelSize = 1.0/1024.0;
 
 vec3 getEyeSpacePos(vec2 texCoord, float z)
 {
@@ -35,7 +36,6 @@ vec3 getEyeSpacePos(vec2 texCoord, float z)
 
 void main(void)
 {
-	float texelSize = 1.0/1024.0;
 	float depth = texture2D(depthMap, gl_TexCoord[0].xy).x;
 
 	if(depth > maxDepth)
@@ -67,5 +67,6 @@ void main(void)
 	vec3 normal = cross(ddx, ddy);
 	normal = normalize(normal);
 	normal = 0.5f*(normal+1.0f);
-	gl_FragColor = vec4(normal,1.0);
+
+	gl_FragColor = vec4(normal, 1.0);
 }
