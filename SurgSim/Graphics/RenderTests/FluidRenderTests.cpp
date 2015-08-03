@@ -67,8 +67,8 @@ protected:
 		material->addUniform("vec4", "color");
 		material->setValue("color", color);
 
-// 		viewElement->getCamera()->setMaterial(material);
-// 		viewElement->addComponent(material);
+		viewElement->getCamera()->setMaterial(material);
+		viewElement->addComponent(material);
 	}
 
 	void createPointSpriteSphereFluidPass(const float& sphereRadius)
@@ -86,6 +86,7 @@ protected:
 		// Depth Pass //
 		auto depthPass = std::make_shared<RenderPass>("DepthPass");
 		depthPass->getCamera()->setRenderGroupReference("DepthPass");
+		depthPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
 
 		copier->connect(viewElement->getPoseComponent(), "Pose", depthPass->getCamera(), "LocalPose");
 		copier->connect(viewElement->getCamera(), "ProjectionMatrix", depthPass->getCamera() , "ProjectionMatrix");
@@ -107,16 +108,15 @@ protected:
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
 		material->addUniform("float", "sphereScale");
-        material->setValue("sphereScale", 800.0f);
+		material->setValue("sphereScale", 800.0f);
 		depthPass->setMaterial(material);
-
-		depthPass->showDepthTarget(0.0, screenHeight - height, width, height);
 
 		scene->addSceneElement(depthPass);
 
 
 		// Normal Pass //
 		auto normalPass = std::make_shared<RenderPass>("NormalPass");
+		normalPass->getCamera()->setRenderGroupReference("NormalPass");
 		normalPass->getCamera()->setGroupReference(Graphics::Representation::DefaultGroupName);
 
 		auto camera = std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(normalPass->getCamera());
@@ -124,10 +124,10 @@ protected:
 		osgCamera->setViewport(0, 0, 1024, 1024);
 		camera->setOrthogonalProjection(0, 1024, 0, 1024, -1.0, 1.0);
 
-		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 3);
+		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 1);
 
-		auto nRenderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
-		normalPass->setRenderTarget(nRenderTarget);
+		renderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+		normalPass->setRenderTarget(renderTarget);
 
 		material = std::make_shared<Graphics::OsgMaterial>("NormalPassMaterial");
 		program = Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/pointsplat/sphere_normal");
@@ -136,42 +136,77 @@ protected:
 		material->setProgram(program);
 
 		material->addUniform("sampler2D", "depthMap");
-		material->setValue("depthMap", renderTarget->getDepthTarget());
+		material->setValue("depthMap", depthPass->getRenderTarget()->getDepthTarget());
 		material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
 		material->addUniform("float", "texelSize");
 		material->setValue("texelSize", static_cast<float>(1.0 / 1024.0));
 		material->addUniform("mat4", "inverseProjectionMatrix");
 
-// 		SurgSim::Math::Matrix44f inverse = viewElement->getCamera()->getProjectionMatrix().cast<float>();
-// 		material->setValue("inverseProjectionMatrix", inverse);
-
 		copier->connect(viewElement->getCamera(), "FloatInverseProjectionMatrix", material, "inverseProjectionMatrix");
 
 		normalPass->setMaterial(material);
 
-		texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
-		texture->loadImage("Textures/checkered.png");
-
 		// Quad
-		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad`");
+		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
 		graphics->setSize(1024, 1024);
 		graphics->setLocation(0, 0);
 		graphics->setGroupReference("NormalPass");
 		normalPass->addComponent(graphics);
 
-		normalPass->showColorTarget(screenWidth - width, screenHeight - height, width, height);
-
-		camera->getOsgCamera()->setClearColor(osg::Vec4(0.8, 0.0, 0.0, 1.0));
-
-
 		scene->addSceneElement(normalPass);
+
+
+		// Shading Pass //
+		auto shadingPass = std::make_shared<RenderPass>("ShadingPass");
+
+		camera = std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(shadingPass->getCamera());
+		osgCamera = camera->getOsgCamera();
+		osgCamera->setViewport(0, 0, 1024, 1024);
+		camera->setOrthogonalProjection(0, 1024, 0, 1024, -1.0, 1.0);
+		camera->setRenderGroupReference("ShadingPass");
+		camera->setGroupReference(Graphics::Representation::DefaultGroupName);
+		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 2);
+
+		renderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+		shadingPass->setRenderTarget(renderTarget);
+
+		material = std::make_shared<Graphics::OsgMaterial>("ShadingPassMaterial");
+		program = Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/pointsplat/surface");
+		SURGSIM_ASSERT(program != nullptr);
+		program->setGlobalScope(true);
+		material->setProgram(program);
+
+		material->addUniform("sampler2D", "depthMap");
+		material->setValue("depthMap", depthPass->getRenderTarget()->getDepthTarget());
+		material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
+		material->addUniform("sampler2D", "normalMap");
+		material->setValue("normalMap", normalPass->getRenderTarget()->getColorTarget(0));
+		material->getUniform("normalMap")->setValue("MinimumTextureUnit", static_cast<size_t>(9));
+		material->addUniform("vec4", "color");
+		material->setValue("color", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
+		material->addUniform("mat4", "inverseProjectionMatrix");
+
+		copier->connect(viewElement->getCamera(), "FloatInverseProjectionMatrix", material, "inverseProjectionMatrix");
+
+		shadingPass->setMaterial(material);
+
+		// Quad
+		graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("ShadingQuad");
+		graphics->setSize(1024, 1024);
+		graphics->setLocation(0, 0);
+		graphics->setGroupReference("ShadingPass");
+		shadingPass->addComponent(graphics);
+
+		shadingPass->showColorTarget(0, 0, screenWidth, screenHeight);
+
+		scene->addSceneElement(shadingPass);
 	}
 };
 
 TEST_F(FluidRenderTests, PointSpriteFluid)
 {
 	viewElement->enableManipulator(true);
-	createPointSpriteSpherePass(0.01f, Math::Vector4f(1.0, 0.0, 0.0, 1.0));
+	//createPointSpriteSpherePass(0.01f, Math::Vector4f(1.0, 0.0, 0.0, 1.0));
 	createPointSpriteSphereFluidPass(0.01f);
 
 	// Create the point cloud
@@ -179,7 +214,7 @@ TEST_F(FluidRenderTests, PointSpriteFluid)
 	bunny->loadMesh("Geometry/stanford_bunny.ply");
 
 	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
-	graphics->setPointSize(3.0f);
+	//graphics->setPointSize(3.0f);
 
 	graphics->setLocalPose(makeRigidTranslation(Math::Vector3d(0.01, -0.1, -0.25)));
 	for (const auto& vertex : bunny->getMesh()->getVertices())
