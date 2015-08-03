@@ -199,9 +199,6 @@ protected:
 
 		shadingPass->showColorTarget(0, 0, screenWidth, screenHeight);
 
-		camera = std::dynamic_pointer_cast<Graphics::OsgCamera>(shadingPass->getCamera());
-		camera->getOsgCamera()->setClearColor(osg::Vec4(0.0, 0.0, 0.0, 0.0));
-
 		scene->addSceneElement(shadingPass);
 	}
 };
