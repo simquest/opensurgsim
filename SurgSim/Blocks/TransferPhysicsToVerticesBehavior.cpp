@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Blocks/TransferPhysicsToCurveBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToVerticesBehavior.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
@@ -25,20 +25,20 @@ namespace Blocks
 {
 
 
-TransferPhysicsToCurveBehavior::TransferPhysicsToCurveBehavior(const std::string& name) :
+TransferPhysicsToVerticesBehavior::TransferPhysicsToVerticesBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name)
 {
 
 }
 
-void TransferPhysicsToCurveBehavior::setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
+void TransferPhysicsToVerticesBehavior::setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
 {
 	SURGSIM_ASSERT(nullptr != source) << "'source' can not be nullptr.";
 	m_source = Framework::checkAndConvert<SurgSim::Physics::DeformableRepresentation>(
 				   source, "SurgSim::Physics::DeformableRepresentation");
 }
 
-void TransferPhysicsToCurveBehavior::setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
+void TransferPhysicsToVerticesBehavior::setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
 {
 	SURGSIM_ASSERT(nullptr != target) << "'target' can not be nullptr.";
 	SURGSIM_ASSERT(target->isWriteable("Vertices")) << "'target'" << target->getFullName()
@@ -46,17 +46,17 @@ void TransferPhysicsToCurveBehavior::setTarget(const std::shared_ptr<SurgSim::Fr
 	m_target = target;
 }
 
-std::shared_ptr<SurgSim::Physics::DeformableRepresentation> TransferPhysicsToCurveBehavior::getSource() const
+std::shared_ptr<SurgSim::Physics::DeformableRepresentation> TransferPhysicsToVerticesBehavior::getSource() const
 {
 	return m_source;
 }
 
-std::shared_ptr<SurgSim::Framework::Component> TransferPhysicsToCurveBehavior::getTarget() const
+std::shared_ptr<SurgSim::Framework::Component> TransferPhysicsToVerticesBehavior::getTarget() const
 {
 	return m_target;
 }
 
-void TransferPhysicsToCurveBehavior::update(double dt)
+void TransferPhysicsToVerticesBehavior::update(double dt)
 {
 	auto state = m_source->getFinalState();
 	for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
@@ -66,12 +66,12 @@ void TransferPhysicsToCurveBehavior::update(double dt)
 	m_target->setValue("Vertices", m_vertices);
 }
 
-bool TransferPhysicsToCurveBehavior::doInitialize()
+bool TransferPhysicsToVerticesBehavior::doInitialize()
 {
 	return true;
 }
 
-bool TransferPhysicsToCurveBehavior::doWakeUp()
+bool TransferPhysicsToVerticesBehavior::doWakeUp()
 {
 	auto state = m_source->getFinalState();
 

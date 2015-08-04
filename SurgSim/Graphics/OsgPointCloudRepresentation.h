@@ -82,6 +82,7 @@ public:
 	SurgSim::Math::Vector4d getColor() const override;
 
 private:
+
 	/// Local pointer to vertices with data
 	std::shared_ptr<PointCloud> m_vertices;
 
@@ -99,6 +100,8 @@ private:
 
 	/// Color backing variable
 	SurgSim::Math::Vector4d m_color;
+
+	void updateGeometry(const DataStructures::VerticesPlain& vertices);
 };
 
 #if defined(_MSC_VER)

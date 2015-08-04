@@ -68,7 +68,20 @@ OsgPointCloudRepresentation::~OsgPointCloudRepresentation()
 
 void OsgPointCloudRepresentation::doUpdate(double dt)
 {
-	auto& vertices = m_vertices->getVertices();
+	DataStructures::VerticesPlain vertices;
+	if (m_locker.tryTakeChanged(&vertices))
+	{
+		updateGeometry(vertices);
+	}
+	else
+	{
+		updateGeometry(*m_vertices);
+	}
+}
+
+void OsgPointCloudRepresentation::updateGeometry(const DataStructures::VerticesPlain& vertexData)
+{
+	auto& vertices = vertexData.getVertices();
 	size_t count = vertices.size();
 
 	// Check for size change in number of vertices

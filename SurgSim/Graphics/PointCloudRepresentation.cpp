@@ -32,5 +32,15 @@ PointCloudRepresentation::~PointCloudRepresentation()
 {
 }
 
+void PointCloudRepresentation::updateVertices(const DataStructures::VerticesPlain& vertices)
+{
+	m_locker.set(vertices);
+}
+
+void PointCloudRepresentation::updateVertices(DataStructures::VerticesPlain&& vertices)
+{
+	m_locker.set(std::move(vertices));
+}
+
 }; // Graphics
 }; // SurgSim

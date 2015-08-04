@@ -36,10 +36,10 @@ class CurveRepresentation;
 namespace Blocks
 {
 
-class TransferPhysicsToCurveBehavior : public SurgSim::Framework::Behavior
+class TransferPhysicsToVerticesBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	TransferPhysicsToCurveBehavior(const std::string& name);
+	TransferPhysicsToVerticesBehavior(const std::string& name);
 
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getSource() const;
 	void setSource(const std::shared_ptr<SurgSim::Framework::Component>& source);

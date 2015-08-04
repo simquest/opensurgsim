@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgCurveRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
@@ -27,9 +27,9 @@
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
-#include "SurgSim/Blocks/TransferPhysicsToCurveBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToVerticesBehavior.h"
 
-using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
+using SurgSim::Blocks::TransferPhysicsToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgCurveRepresentation;
 using SurgSim::Math::Vector3d;
@@ -102,7 +102,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 
 	femSceneElement->addComponent(graphicsRepresentation);
 
-	auto copier = std::make_shared<SurgSim::Blocks::TransferPhysicsToCurveBehavior>("Copier");
+	auto copier = std::make_shared<SurgSim::Blocks::TransferPhysicsToVerticesBehavior>("Copier");
 	copier->setSource(physicsRepresentation);
 	copier->setTarget(graphicsRepresentation);
 	femSceneElement->addComponent(copier);
