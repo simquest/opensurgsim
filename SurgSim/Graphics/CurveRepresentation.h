@@ -19,7 +19,6 @@
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/DataStructures/Vertices.h"
-#include "SurgSim/DataStructures/EmptyData.h"
 
 namespace SurgSim
 {
@@ -34,15 +33,25 @@ public:
 	/// Constructor
 	CurveRepresentation(const std::string& name);
 
-	typedef DataStructures::Vertices<DataStructures::EmptyData> ControlPointType;
+	virtual void setSubdivisions(size_t num) = 0;
 
-	void updateControlPoints(const ControlPointType& vertices);
+	virtual size_t getSubdivisions() const = 0;
 
-	void updateControlPoints(ControlPointType&& vertices);
+	virtual void setTension(double tension) = 0;
+
+	virtual double getTension() const = 0;
+
+	virtual void setColor(const SurgSim::Math::Vector4d& color)  = 0;
+
+	virtual Math::Vector4d getColor() const = 0;
+
+	void updateControlPoints(const DataStructures::VerticesPlain& vertices);
+
+	void updateControlPoints(DataStructures::VerticesPlain&& vertices);
 
 protected:
 
-	Framework::LockedContainer<ControlPointType> m_locker;
+	Framework::LockedContainer<DataStructures::VerticesPlain> m_locker;
 
 };
 

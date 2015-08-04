@@ -27,6 +27,7 @@
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
+#include "SurgSim/Blocks/TransferPhysicsToCurveBehavior.h"
 
 using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
 using SurgSim::Framework::BasicSceneElement;
@@ -74,52 +75,6 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	}
 }
 
-#include "SurgSim/Math/OdeState.h"
-
-class StateToCurveBehavior : public SurgSim::Framework::Behavior
-{
-public:
-	StateToCurveBehavior() : SurgSim::Framework::Behavior("Copier")
-	{
-
-	}
-
-	virtual void update(double dt) override
-	{
-		auto state = source->getFinalState();
-		for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
-		{
-			vertices.setVertexPosition(nodeId, state->getPosition(nodeId));
-		}
-		target->updateControlPoints(vertices);
-	}
-
-	virtual bool doInitialize() override
-	{
-		return true;
-	}
-
-	virtual bool doWakeUp() override
-	{
-		auto state = source->getFinalState();
-
-		if (vertices.getNumVertices() == 0)
-		{
-			for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
-			{
-				SurgSim::Graphics::CurveRepresentation::ControlPointType::VertexType vertex(state->getPosition(nodeId));
-				vertices.addVertex(vertex);
-			}
-		}
-		return true;
-	}
-
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> source;
-	std::shared_ptr<SurgSim::Graphics::CurveRepresentation> target;
-
-	SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData> vertices;
-};
-
 // Generates a 1d fem comprised of adjacent elements along a straight line.  The number of fem elements is determined
 // by loadModelFem1D.
 std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string& name,
@@ -147,9 +102,9 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 
 	femSceneElement->addComponent(graphicsRepresentation);
 
-	auto copier = std::make_shared<StateToCurveBehavior>();
-	copier->source = physicsRepresentation;
-	copier->target = graphicsRepresentation;
+	auto copier = std::make_shared<SurgSim::Blocks::TransferPhysicsToCurveBehavior>("Copier");
+	copier->setSource(physicsRepresentation);
+	copier->setTarget(graphicsRepresentation);
 	femSceneElement->addComponent(copier);
 
 	return femSceneElement;

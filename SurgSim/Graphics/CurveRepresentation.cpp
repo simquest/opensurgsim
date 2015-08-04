@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/CurveRepresentation.h"
+#include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 namespace SurgSim
 {
@@ -23,15 +25,23 @@ namespace Graphics
 
 CurveRepresentation::CurveRepresentation(const std::string& name) : Representation(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, size_t, Subdivisions, getSubdivisions, setSubdivisions);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, double, Tension, getTension, setTension);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, Math::Vector4d, Color, getColor, setColor);
 
+	auto converter = std::bind(SurgSim::Framework::convert<DataStructures::VerticesPlain>, std::placeholders::_1);
+	auto functor = std::bind((void(CurveRepresentation::*)(const DataStructures::VerticesPlain&))
+							 &CurveRepresentation::updateControlPoints, this, converter);
+
+	setSetter("Vertices", functor);
 }
 
-void CurveRepresentation::updateControlPoints(const ControlPointType& vertices)
+void CurveRepresentation::updateControlPoints(const DataStructures::VerticesPlain& vertices)
 {
 	m_locker.set(vertices);
 }
 
-void CurveRepresentation::updateControlPoints(ControlPointType&& vertices)
+void CurveRepresentation::updateControlPoints(DataStructures::VerticesPlain&& vertices)
 {
 	m_locker.set(std::move(vertices));
 }

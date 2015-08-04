@@ -50,17 +50,29 @@ public:
 
 	virtual void doUpdate(double dt) override;
 
-	void setColor(const SurgSim::Math::Vector4d& color);
+	void setSubdivisions(size_t num) override;
 
-	Math::Vector4d getColor() const;
+	size_t getSubdivisions() const override;
+
+	void setTension(double tension) override;
+
+	double getTension() const override;
+
+	void setColor(const SurgSim::Math::Vector4d& color) override;
+
+	Math::Vector4d getColor() const override;
 
 private:
-	void updateGraphics(const ControlPointType& controlPoints);
+	void updateGraphics(const DataStructures::VerticesPlain& controlPoints);
+
 	osg::ref_ptr<osg::Geometry> m_geometry;
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
 	osg::ref_ptr<osg::DrawArrays> m_drawArrays;
 
 	Math::Vector4d m_color;
+
+	size_t m_subdivision;
+	double m_tension;
 };
 
 #if defined(_MSC_VER)

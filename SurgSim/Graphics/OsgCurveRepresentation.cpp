@@ -15,6 +15,7 @@
 
 #include "SurgSim/Graphics/OsgCurveRepresentation.h"
 #include "SurgSim/Graphics/OsgConversions.h"
+#include "SurgSim/DataStructures/Vertices.h"
 
 #include <osg/Geode>
 #include <osg/Geometry>
@@ -25,7 +26,7 @@ namespace
 {
 
 std::vector<SurgSim::Math::Vector3d> retrievePoints(
-	const SurgSim::Graphics::OsgCurveRepresentation::ControlPointType& points)
+	const SurgSim::DataStructures::VerticesPlain& points)
 {
 	SURGSIM_ASSERT(points.getNumVertices() >= 2) << "Cannot apply CatmullRom with less than 2 points";
 
@@ -86,7 +87,9 @@ namespace Graphics
 OsgCurveRepresentation::OsgCurveRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
-	CurveRepresentation(name)
+	CurveRepresentation(name),
+	m_subdivision(100),
+	m_tension(0.4)
 {
 	osg::Geode* geode = new osg::Geode();
 	m_geometry = new osg::Geometry();
@@ -124,16 +127,36 @@ bool OsgCurveRepresentation::doWakeUp()
 
 void OsgCurveRepresentation::doUpdate(double dt)
 {
-	ControlPointType controlPoints;
+	DataStructures::VerticesPlain controlPoints;
 	if (m_locker.tryTakeChanged(&controlPoints))
 	{
 		updateGraphics(controlPoints);
 	}
 }
 
-void OsgCurveRepresentation::updateGraphics(const ControlPointType& controlPoints)
+void OsgCurveRepresentation::setSubdivisions(size_t num)
 {
-	const static double stepsize = 0.01;
+	m_subdivision = num;
+}
+
+size_t OsgCurveRepresentation::getSubdivisions() const
+{
+	return m_subdivision;
+}
+
+void OsgCurveRepresentation::setTension(double tension)
+{
+	m_tension = tension;
+}
+
+double OsgCurveRepresentation::getTension() const
+{
+	return m_tension;
+}
+
+void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain& controlPoints)
+{
+	const double stepsize = 1.0 / m_subdivision;
 
 	auto points = retrievePoints(controlPoints);
 
@@ -145,7 +168,7 @@ void OsgCurveRepresentation::updateGraphics(const ControlPointType& controlPoint
 	double s = 0.0;
 	while (s <= static_cast<double>(points.size() - 3))
 	{
-		interpolated.push_back(computePoint(s, points));
+		interpolated.push_back(computePoint(s, points, m_tension));
 		s += stepsize;
 	}
 
