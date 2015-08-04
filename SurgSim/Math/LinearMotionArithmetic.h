@@ -21,9 +21,9 @@
 
 #include <Eigen/Core>
 
-#include "Surgsim/Math/IntervalArithmetic.h"
-#include "Surgsim/Math/PolynomialValues.h"
-#include "Surgsim/Math/Vector.h"
+#include "SurgSim/Math/IntervalArithmetic.h"
+#include "SurgSim/Math/PolynomialValues.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

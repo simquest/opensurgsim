@@ -402,8 +402,6 @@ TEST(LinearMotionUtilities, LinearMotionUtilities)
 
 TEST(LinearMotionUtilities, LinearMotion3DUtilities)
 {
-	typedef Polynomial<double, 2> Polynomial2Type;
-
 	std::array<double, 3> high;
 	high[0] = 3.0;
 	high[1] = 4.0;
