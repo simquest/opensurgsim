@@ -288,6 +288,28 @@ void DeformableRepresentation::setCollisionRepresentation(
 	}
 }
 
+bool DeformableRepresentation::doInitialize()
+{
+	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
+
+	// Transform the state with the initial pose
+	transformState(m_initialState, getPose());
+	*m_previousState = *m_initialState;
+	*m_currentState = *m_initialState;
+	*m_newState = *m_initialState;
+	*m_finalState = *m_initialState;
+
+	// Since the pose is now embedded in the state, reset element and local pose to identity.
+	setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
+	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement = getSceneElement();
+	if (sceneElement != nullptr)
+	{
+		sceneElement->setPose(SurgSim::Math::RigidTransform3d::Identity());
+	}
+
+	return true;
+}
+
 bool DeformableRepresentation::doWakeUp()
 {
 	using SurgSim::Math::OdeSolverEulerExplicit;
