@@ -153,7 +153,7 @@ TEST_F(RenderTests, VisualTestFem1D)
 					Vector4d(1, 1, 1, 1),
 					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC));
 
-	runTest(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero(), 50000.0);
+	runTest(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero(), 5000.0);
 }
 
 }; // namespace Physics
