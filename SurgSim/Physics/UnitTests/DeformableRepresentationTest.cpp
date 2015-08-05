@@ -420,6 +420,12 @@ TEST_F(DeformableRepresentationTest, SetCollisionRepresentationTest)
 	EXPECT_EQ(nullptr, object->getCollisionRepresentation());
 }
 
+TEST_F(DeformableRepresentationTest, DoInitializeFailTest)
+{
+	// The initial state needs to be set prior to calling initialize
+	EXPECT_THROW(initialize(std::make_shared<SurgSim::Framework::Runtime>()), SurgSim::Framework::AssertionFailure);
+}
+
 TEST_F(DeformableRepresentationTest, DoInitializeTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)
