@@ -429,10 +429,12 @@ TEST_F(DeformableRepresentationTest, DoInitializeFailTest)
 TEST_F(DeformableRepresentationTest, DoInitializeTest)
 {
 	// setInitialState sets all 4 states (tested in method above !)
-	setLocalPose(m_nonIdentityTransform);
+	EXPECT_NO_THROW(setLocalPose(m_nonIdentityTransform));
 	setInitialState(m_localInitialState);
 
 	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
+
+	EXPECT_THROW(setLocalPose(m_nonIdentityTransform), SurgSim::Framework::AssertionFailure);
 
 	// Test the initial transformation applied to all the states
 	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)

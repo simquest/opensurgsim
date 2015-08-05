@@ -132,6 +132,8 @@ public:
 	/// \param representation The collision representation to be used.
 	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
+	void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
 protected:
 	bool doWakeUp() override;
 
