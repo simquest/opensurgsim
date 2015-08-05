@@ -21,6 +21,8 @@
 #include <osg/Geometry>
 #include <osg/Array>
 #include <osg/PositionAttitudeTransform>
+#include <osg/LineWidth>
+#include <osg/Hint>
 
 namespace
 {
@@ -95,6 +97,8 @@ OsgCurveRepresentation::OsgCurveRepresentation(const std::string& name) :
 	m_geometry = new osg::Geometry();
 	m_vertexData = new osg::Vec3Array;
 
+	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
 	m_geometry->setVertexArray(m_vertexData);
 
 	// Normals
@@ -105,9 +109,12 @@ OsgCurveRepresentation::OsgCurveRepresentation(const std::string& name) :
 	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, m_vertexData->size());
 	m_geometry->addPrimitiveSet(m_drawArrays);
 	m_geometry->setUseDisplayList(false);
+	m_geometry->setUseVertexBufferObjects(true);
 	m_geometry->setDataVariance(osg::Object::DYNAMIC);
 
 	setColor(Math::Vector4d(1.0, 1.0, 1.0, 1.0));
+	setWidth(1.5);
+	setAntiAliasing(true);
 
 	geode->addDrawable(m_geometry);
 	m_transform->addChild(geode);
@@ -206,6 +213,37 @@ void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain&
 
 	m_vertexData->dirty();
 	m_normalData->dirty();
+}
+
+void OsgCurveRepresentation::setWidth(double width)
+{
+	auto lineWidth = new osg::LineWidth(width);
+	m_geometry->getOrCreateStateSet()->setAttribute(lineWidth, osg::StateAttribute::ON);
+}
+
+double OsgCurveRepresentation::getWidth() const
+{
+	throw std::logic_error("The method or operation is not implemented.");
+}
+
+void OsgCurveRepresentation::setAntiAliasing(bool val)
+{
+	auto state = m_geometry->getOrCreateStateSet();
+	if (val && state->getMode(GL_BLEND) == osg::StateAttribute::INHERIT)
+	{
+		state->setMode(GL_BLEND, osg::StateAttribute::ON);
+		state->setMode(GL_LINE_SMOOTH, osg::StateAttribute::ON);
+	}
+	else
+	{
+		state->setMode(GL_BLEND, osg::StateAttribute::INHERIT);
+		state->setMode(GL_LINE_SMOOTH, osg::StateAttribute::INHERIT);
+	}
+}
+
+bool OsgCurveRepresentation::isAntiAliasing() const
+{
+	throw std::logic_error("The method or operation is not implemented.");
 }
 
 void OsgCurveRepresentation::setColor(const SurgSim::Math::Vector4d& color)

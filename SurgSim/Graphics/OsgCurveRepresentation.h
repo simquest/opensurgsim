@@ -62,6 +62,15 @@ public:
 
 	Math::Vector4d getColor() const override;
 
+	void setWidth(double width) override;
+
+	double getWidth() const override;
+
+	void setAntiAliasing(bool val) override;
+
+	bool isAntiAliasing() const override;
+
+
 private:
 	void updateGraphics(const DataStructures::VerticesPlain& controlPoints);
 
@@ -74,6 +83,9 @@ private:
 
 	size_t m_subdivision;
 	double m_tension;
+
+	std::vector<Math::Vector3d> m_controlPointsCache;
+	std::vector<Math::Vector3d> m_verticesCache;
 };
 
 #if defined(_MSC_VER)

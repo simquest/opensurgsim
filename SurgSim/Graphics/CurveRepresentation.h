@@ -45,6 +45,14 @@ public:
 
 	virtual Math::Vector4d getColor() const = 0;
 
+	virtual void setWidth(double width) = 0;
+
+	virtual double getWidth() const = 0;
+
+	virtual void setAntiAliasing(bool val) = 0;
+
+	virtual bool isAntiAliasing() const = 0;
+
 	void updateControlPoints(const DataStructures::VerticesPlain& vertices);
 
 	void updateControlPoints(DataStructures::VerticesPlain&& vertices);
