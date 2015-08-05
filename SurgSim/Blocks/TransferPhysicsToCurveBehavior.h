@@ -39,14 +39,13 @@ namespace Blocks
 class TransferPhysicsToCurveBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	TransferPhysicsToCurveBehavior(const std::string& name);
+	explicit TransferPhysicsToCurveBehavior(const std::string& name);
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
-	virtual bool doWakeUp() override;
-
+	bool doWakeUp() override;
 
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;
 	std::shared_ptr<SurgSim::Graphics::CurveRepresentation> m_target;

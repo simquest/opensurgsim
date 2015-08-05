@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGCURVE_H
-#define SURGSIM_GRAPHICS_OSGCURVE_H
+#ifndef SURGSIM_GRAPHICS_OSGCURVEREPRESENTATION_H
+#define SURGSIM_GRAPHICS_OSGCURVEREPRESENTATION_H
 
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/CurveRepresentation.h"
@@ -42,13 +42,13 @@ class OsgCurveRepresentation : public OsgRepresentation, public CurveRepresentat
 {
 public:
 	/// Constructor
-	OsgCurveRepresentation(const std::string& name);
+	explicit OsgCurveRepresentation(const std::string& name);
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
-	virtual void doUpdate(double dt) override;
+	void doUpdate(double dt) override;
 
 	void setSubdivision(size_t num);
 
@@ -81,4 +81,4 @@ private:
 }
 }
 
-#endif
+#endif // SURGSIM_GRAPHICS_OSGCURVEREPRESENTATION_H

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_CURVE_H
-#define SURGSIM_GRAPHICS_CURVE_H
+#ifndef SURGSIM_GRAPHICS_CURVEREPRESENTATION_H
+#define SURGSIM_GRAPHICS_CURVEREPRESENTATION_H
 
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Framework/LockedContainer.h"
@@ -32,7 +32,7 @@ class CurveRepresentation : public virtual Representation
 {
 public:
 	/// Constructor
-	CurveRepresentation(const std::string& name);
+	explicit CurveRepresentation(const std::string& name);
 
 	typedef DataStructures::Vertices<DataStructures::EmptyData> ControlPointType;
 
@@ -49,4 +49,4 @@ protected:
 }
 }
 
-#endif
+#endif // SURGSIM_GRAPHICS_CURVEREPRESENTATION_H
