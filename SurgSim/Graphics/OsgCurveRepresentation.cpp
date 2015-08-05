@@ -24,58 +24,67 @@
 #include <osg/LineWidth>
 #include <osg/Hint>
 
+#include <array>
+
 namespace
 {
 
-std::vector<SurgSim::Math::Vector3d> retrievePoints(
-	const SurgSim::DataStructures::VerticesPlain& points)
+void retrievePoints(
+	const SurgSim::DataStructures::VerticesPlain& points,
+	std::vector<SurgSim::Math::Vector3d>* result)
 {
 	SURGSIM_ASSERT(points.getNumVertices() >= 2) << "Cannot apply CatmullRom with less than 2 points";
-
-	std::vector<SurgSim::Math::Vector3d> result;
-	result.reserve(points.getNumVertices() + 2);
+	result->clear();
+	result->reserve(points.getNumVertices() + 2);
 
 	// Interpolate the 1st point (ghost) as the symmetric of P1 from P0: P-1 = P0 + P1P0
-	result.push_back(2.0 * points.getVertexPosition(0) - points.getVertexPosition(1));
+	result->push_back(2.0 * points.getVertexPosition(0) - points.getVertexPosition(1));
 	for (size_t i = 0; i < points.getNumVertices(); ++i)
 	{
-		result.push_back(points.getVertexPosition(i));
+		result->push_back(points.getVertexPosition(i));
 	}
 	// Interpolate the last point (ghost) as the symmetric of Pn-1 from Pn: Pn+1 = Pn + Pn-1Pn
-	result.push_back(2.0 * points.getVertexPosition(points.getNumVertices() - 1) -
-					 points.getVertexPosition(points.getNumVertices() - 2));
+	result->push_back(2.0 * points.getVertexPosition(points.getNumVertices() - 1) -
+					  points.getVertexPosition(points.getNumVertices() - 2));
 
-	return result;
 }
 
-SurgSim::Math::Vector3d computePoint(double s, const std::vector<SurgSim::Math::Vector3d>& x, double tau = 0.4)
+void computePoints(int subdivisions,
+				   const std::vector<SurgSim::Math::Vector3d>& controlPoints,
+				   std::vector<SurgSim::Math::Vector3d>* points,
+				   double tau = 0.4)
 {
-	size_t numPoints = x.size();
-	SURGSIM_ASSERT(s >= 0.0 && s <= static_cast<double>(numPoints - 3)) << "Out of range abscissa s=" << s <<
-			" expected in [0.." << numPoints - 3 << "]";
-
-	// We look for the 4 points corresponding to the requested segment
-	// Keeping in mind that any upper bound (1.0 2.0...) should be considered the upper bound of the lower segment
-	// and not the lower bound of the upper segment, with a special care to the abscissa s=0.0.
-	size_t firstPointIndex = static_cast<size_t>(s);
-	if (static_cast<double>(firstPointIndex) == s && s != 0.0)
+	size_t numPoints = controlPoints.size();
+	double stepsize = 1.0 / static_cast<double>(subdivisions);
+	size_t pointIndex = 0;
+	while (pointIndex < numPoints - 3)
 	{
-		firstPointIndex--;
+		std::array<SurgSim::Math::Vector3d, 4> p =
+		{
+			controlPoints[pointIndex] ,
+			controlPoints[pointIndex + 1],
+			controlPoints[pointIndex + 2],
+			controlPoints[pointIndex + 3]
+		};
+
+		double abscissa = 0.0;
+		while (abscissa < 1.0)
+		{
+			double abcissaSquared = abscissa * abscissa;
+			double abcissaCubed = abcissaSquared * abscissa;
+
+			SurgSim::Math::Vector3d result =
+				p[1] +
+				abscissa * (tau * (p[2] - p[0])) +
+				abcissaSquared * (2.0 * tau * p[0] + (tau - 3.0) * p[1] + (3.0 - 2.0 * tau) * p[2] - tau * p[3]) +
+				abcissaCubed * (-tau * p[0] + (2.0 - tau) * p[1] + (tau - 2.0) * p[2] + tau * p[3]);
+
+			points->push_back(std::move(result));
+
+			abscissa += stepsize;
+		}
+		++pointIndex;
 	}
-	SURGSIM_ASSERT(firstPointIndex < numPoints - 3);
-	// We compute the local abscissa in the requested segment within [0..1].
-	double localAbscissa = s - static_cast<double>(firstPointIndex);
-	double SQlocalAbscissa = localAbscissa * localAbscissa;
-	double CUlocalAbscissa = SQlocalAbscissa * localAbscissa;
-
-	// 1st) Retrieve the 4 points on which the interpolation will happen
-	const SurgSim::Math::Vector3d p[4] =
-	{x[firstPointIndex] , x[firstPointIndex + 1], x[firstPointIndex + 2], x[firstPointIndex + 3]};
-
-	return p[1] +
-		   localAbscissa * (tau * (p[2] - p[0])) +
-		   SQlocalAbscissa * (2.0 * tau * p[0] + (tau - 3.0) * p[1] + (3.0 - 2.0 * tau) * p[2] - tau * p[3]) +
-		   CUlocalAbscissa * (-tau * p[0] + (2.0 - tau) * p[1] + (tau - 2.0) * p[2] + tau * p[3]);
 }
 
 }
@@ -95,22 +104,20 @@ OsgCurveRepresentation::OsgCurveRepresentation(const std::string& name) :
 {
 	osg::Geode* geode = new osg::Geode();
 	m_geometry = new osg::Geometry();
-	m_vertexData = new osg::Vec3Array;
-
 	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-	m_geometry->setVertexArray(m_vertexData);
-
-	// Normals
-	m_normalData = new osg::Vec3Array;
-	m_geometry->setNormalArray(m_normalData, osg::Array::BIND_PER_VERTEX);
-
 	// At this stage there are no vertices in there
-	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, m_vertexData->size());
+	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, 0);
 	m_geometry->addPrimitiveSet(m_drawArrays);
 	m_geometry->setUseDisplayList(false);
 	m_geometry->setUseVertexBufferObjects(true);
 	m_geometry->setDataVariance(osg::Object::DYNAMIC);
+
+	m_vertexData = new osg::Vec3Array;
+	m_geometry->setVertexArray(m_vertexData);
+
+	m_normalData = new osg::Vec3Array;
+	m_geometry->setNormalArray(m_normalData, osg::Array::BIND_PER_VERTEX);
 
 	setColor(Math::Vector4d(1.0, 1.0, 1.0, 1.0));
 	setWidth(1.5);
@@ -163,21 +170,16 @@ void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain&
 {
 	const double stepsize = 1.0 / m_subdivision;
 
-	auto points = retrievePoints(controlPoints);
+	retrievePoints(controlPoints, &m_controlPoints);
 
-	size_t numPoints = static_cast<size_t>(static_cast<double>(points.size() - 3) / stepsize);
+	size_t numPoints = static_cast<size_t>(static_cast<double>(m_controlPoints.size() - 3) / stepsize);
 
-	std::vector<SurgSim::Math::Vector3d> interpolated;
-	interpolated.reserve(numPoints);
+	m_vertices.clear();
+	m_vertices.reserve(numPoints);
 
-	double s = 0.0;
-	while (s <= static_cast<double>(points.size() - 3))
-	{
-		interpolated.push_back(computePoint(s, points, m_tension));
-		s += stepsize;
-	}
+	computePoints(getSubdivisions(), m_controlPoints, &m_vertices, getTension());
 
-	size_t vertexCount = interpolated.size();
+	size_t vertexCount = m_vertices.size();
 	if (m_vertexData->size() != vertexCount)
 	{
 		m_vertexData->resize(vertexCount);
@@ -187,43 +189,40 @@ void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain&
 		m_drawArrays->dirty();
 	}
 
-	size_t count = interpolated.size();
-
-	Math::Vector3d vertex0;
-	Math::Vector3d vertex1;
-	Math::Vector3d normal;
-
-	for (size_t i = 0; i < count; ++i)
+	// #performance
+	// Calculate the bounding box while iterating over the vertices, this will safe osg time in the update traversal
+	for (size_t i = 0; i < vertexCount; ++i)
 	{
-		vertex0 = interpolated[i];
-		vertex1 = (i < count - 1) ? interpolated[i + 1] : points.back();
+		const auto& vertex0 = m_vertices[i];
+		const auto& vertex1 = (i < vertexCount - 1) ? m_vertices[i + 1] : m_controlPoints.back();
 
-		// The normal carries the info about the segment vector
-		// This should be a vertex attribute, rather than hidden
-		normal = vertex1 - vertex0;
+		// Assign the segment into the normal for use in the shader
+		const auto& normal = vertex1 - vertex0;
 
-		(*m_normalData)[i][0] = normal[0];
-		(*m_normalData)[i][1] = normal[1];
-		(*m_normalData)[i][2] = normal[2];
+		(*m_normalData)[i][0] = static_cast<float>(normal[0]);
+		(*m_normalData)[i][1] = static_cast<float>(normal[1]);
+		(*m_normalData)[i][2] = static_cast<float>(normal[2]);
 
-		(*m_vertexData)[i][0] = vertex0[0];
-		(*m_vertexData)[i][1] = vertex0[1];
-		(*m_vertexData)[i][2] = vertex0[2];
+		(*m_vertexData)[i][0] = static_cast<float>(vertex0[0]);
+		(*m_vertexData)[i][1] = static_cast<float>(vertex0[1]);
+		(*m_vertexData)[i][2] = static_cast<float>(vertex0[2]);
 	}
 
 	m_vertexData->dirty();
 	m_normalData->dirty();
+	m_geometry->dirtyBound();
 }
 
 void OsgCurveRepresentation::setWidth(double width)
 {
 	auto lineWidth = new osg::LineWidth(width);
 	m_geometry->getOrCreateStateSet()->setAttribute(lineWidth, osg::StateAttribute::ON);
+	m_width = width;
 }
 
 double OsgCurveRepresentation::getWidth() const
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	return m_width;
 }
 
 void OsgCurveRepresentation::setAntiAliasing(bool val)
@@ -243,12 +242,11 @@ void OsgCurveRepresentation::setAntiAliasing(bool val)
 
 bool OsgCurveRepresentation::isAntiAliasing() const
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	return m_geometry->getOrCreateStateSet()->getMode(GL_BLEND) == osg::StateAttribute::ON;
 }
 
 void OsgCurveRepresentation::setColor(const SurgSim::Math::Vector4d& color)
 {
-	// Set the color of the particles to one single color by default
 	osg::Vec4Array* colors = dynamic_cast<osg::Vec4Array*>(m_geometry->getColorArray());
 	if (colors == nullptr)
 	{
