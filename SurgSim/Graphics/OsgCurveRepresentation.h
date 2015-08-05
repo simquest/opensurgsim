@@ -67,6 +67,7 @@ private:
 
 	osg::ref_ptr<osg::Geometry> m_geometry;
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
+	osg::ref_ptr<osg::Vec3Array> m_normalData;
 	osg::ref_ptr<osg::DrawArrays> m_drawArrays;
 
 	Math::Vector4d m_color;

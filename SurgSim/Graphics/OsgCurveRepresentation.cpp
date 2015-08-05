@@ -97,19 +97,17 @@ OsgCurveRepresentation::OsgCurveRepresentation(const std::string& name) :
 
 	m_geometry->setVertexArray(m_vertexData);
 
+	// Normals
+	m_normalData = new osg::Vec3Array;
+	m_geometry->setNormalArray(m_normalData, osg::Array::BIND_PER_VERTEX);
+
 	// At this stage there are no vertices in there
 	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, m_vertexData->size());
 	m_geometry->addPrimitiveSet(m_drawArrays);
 	m_geometry->setUseDisplayList(false);
 	m_geometry->setDataVariance(osg::Object::DYNAMIC);
-	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-	setColor(Math::Vector4d(0.2, 0.2, 0.8, 1.0));
-
-	// _A_ normal
-	osg::Vec3Array* normals = new osg::Vec3Array;
-	normals->push_back(osg::Vec3(0.0f, -1.0f, 0.0f));
-	m_geometry->setNormalArray(normals, osg::Array::BIND_OVERALL);
+	setColor(Math::Vector4d(1.0, 1.0, 1.0, 1.0));
 
 	geode->addDrawable(m_geometry);
 	m_transform->addChild(geode);
@@ -176,21 +174,38 @@ void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain&
 	if (m_vertexData->size() != vertexCount)
 	{
 		m_vertexData->resize(vertexCount);
+		m_normalData->resize(vertexCount);
 
 		m_drawArrays->set(osg::PrimitiveSet::LINE_STRIP, 0, vertexCount);
 		m_drawArrays->dirty();
 	}
 
-	size_t i = 0;
-	for (const auto& vertex : interpolated)
+	size_t count = interpolated.size();
+
+	Math::Vector3d vertex0;
+	Math::Vector3d vertex1;
+	Math::Vector3d normal;
+
+	for (size_t i = 0; i < count; ++i)
 	{
-		(*m_vertexData)[i][0] = vertex[0];
-		(*m_vertexData)[i][1] = vertex[1];
-		(*m_vertexData)[i][2] = vertex[2];
-		++i;
+		vertex0 = interpolated[i];
+		vertex1 = (i < count - 1) ? interpolated[i + 1] : points.back();
+
+		// The normal carries the info about the segment vector
+		// This should be a vertex attribute, rather than hidden
+		normal = vertex1 - vertex0;
+
+		(*m_normalData)[i][0] = normal[0];
+		(*m_normalData)[i][1] = normal[1];
+		(*m_normalData)[i][2] = normal[2];
+
+		(*m_vertexData)[i][0] = vertex0[0];
+		(*m_vertexData)[i][1] = vertex0[1];
+		(*m_vertexData)[i][2] = vertex0[2];
 	}
 
 	m_vertexData->dirty();
+	m_normalData->dirty();
 }
 
 void OsgCurveRepresentation::setColor(const SurgSim::Math::Vector4d& color)

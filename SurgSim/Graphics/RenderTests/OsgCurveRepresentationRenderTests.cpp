@@ -25,6 +25,7 @@
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgCurveRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -35,6 +36,7 @@
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
+using SurgSim::Math::Vector4f;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
@@ -78,11 +80,28 @@ TEST_F(OsgCurveRepresentationRenderTests, DynamicRotate)
 	auto representation = std::make_shared<OsgCurveRepresentation>("Curve");
 	element->addComponent(representation);
 	scene->addSceneElement(element);
-	// viewElement->enableManipulator(true);
+	viewElement->enableManipulator(true);
 	viewElement->setPose(makeRigidTransform(
 							 Math::Vector3d(0.0, 0.0, -2.0),
 							 Math::Vector3d(0.0, 0.0, 0.0),
 							 Math::Vector3d(0.0, 1.0, 0.0)));
+
+	auto material = buildMaterial("Shaders/material_curve.vert", "Shaders/material.frag");
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", Vector4f(0.2, 0.2, 0.9, 1.0));
+
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", Vector4f(0.4, 0.4, 0.4, 1.0));
+
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 64.0f);
+
+	representation->setMaterial(material);
+	element->addComponent(material);
+
+	auto light = std::make_shared<Graphics::OsgLight>("Light");
+	light->setLocalPose(Math::makeRigidTranslation(Math::Vector3d(0.5, 0.5, 0.5)));
+	element->addComponent(light);
 
 	/// Run the thread
 	runtime->start();
