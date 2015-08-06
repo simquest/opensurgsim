@@ -26,6 +26,13 @@ PointCloudRepresentation::PointCloudRepresentation(const std::string& name) : Re
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PointCloudRepresentation, double, PointSize, getPointSize, setPointSize);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PointCloudRepresentation, SurgSim::Math::Vector4d, Color, getColor, setColor);
+
+	// Provides a common entry point for representations taking DataStructure::VerticesPlain
+	auto converter = std::bind(SurgSim::Framework::convert<DataStructures::VerticesPlain>, std::placeholders::_1);
+	auto functor = std::bind((void(PointCloudRepresentation::*)(const DataStructures::VerticesPlain&))
+							 &PointCloudRepresentation::updateVertices, this, converter);
+
+	setSetter("Vertices", functor);
 }
 
 PointCloudRepresentation::~PointCloudRepresentation()

@@ -28,7 +28,11 @@ CurveRepresentation::CurveRepresentation(const std::string& name) : Representati
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, size_t, Subdivisions, getSubdivisions, setSubdivisions);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, double, Tension, getTension, setTension);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, Math::Vector4d, Color, getColor, setColor);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, double, Width, getWidth, setWidth);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, bool, AntiAliasing, isAntiAliasing, setAntiAliasing);
 
+	// Provide a common entry point accepting VerticesPlain under the label "Vertices"
+	// this can be used by behaviors to address this structure and the point cloud the same way
 	auto converter = std::bind(SurgSim::Framework::convert<DataStructures::VerticesPlain>, std::placeholders::_1);
 	auto functor = std::bind((void(CurveRepresentation::*)(const DataStructures::VerticesPlain&))
 							 &CurveRepresentation::updateControlPoints, this, converter);
@@ -38,11 +42,13 @@ CurveRepresentation::CurveRepresentation(const std::string& name) : Representati
 
 void CurveRepresentation::updateControlPoints(const DataStructures::VerticesPlain& vertices)
 {
+	SURGSIM_ASSERT(vertices.getNumVertices() > 1) << "Need at least 2 control points.";
 	m_locker.set(vertices);
 }
 
 void CurveRepresentation::updateControlPoints(DataStructures::VerticesPlain&& vertices)
 {
+	SURGSIM_ASSERT(vertices.getNumVertices() > 1) << "Need at least 2 control points.";
 	m_locker.set(std::move(vertices));
 }
 

@@ -69,6 +69,12 @@ OsgPointCloudRepresentation::~OsgPointCloudRepresentation()
 void OsgPointCloudRepresentation::doUpdate(double dt)
 {
 	DataStructures::VerticesPlain vertices;
+
+	// #performance
+	// This is an intermediary step, it keeps the old non-threadsafe interface intact but also supports the
+	// threadsafe update (btw, this is not any worse than what we did before) once we deprecate the non-threadsafe
+	// access to the shared pointer we can remove the else branch
+	// HS-2015-08-11
 	if (m_locker.tryTakeChanged(&vertices))
 	{
 		updateGeometry(vertices);
@@ -87,8 +93,7 @@ void OsgPointCloudRepresentation::updateGeometry(const DataStructures::VerticesP
 	// Check for size change in number of vertices
 	if (count != static_cast<size_t>(m_drawArrays->getCount()))
 	{
-		m_drawArrays->setCount(count);
-		if (count > m_vertexData->size())
+		if (count != m_vertexData->size())
 		{
 			m_vertexData->resize(count);
 		}
@@ -97,11 +102,14 @@ void OsgPointCloudRepresentation::updateGeometry(const DataStructures::VerticesP
 		m_drawArrays->dirty();
 	}
 
+	// #performance
+	// Calculate the bounding box while iterating over the vertices, this will safe osg time in the update traversal
 	for (size_t i = 0; i < count; ++i)
 	{
-		(*m_vertexData)[i][0] = static_cast<float>(vertices[i].position[0]);
-		(*m_vertexData)[i][1] = static_cast<float>(vertices[i].position[1]);
-		(*m_vertexData)[i][2] = static_cast<float>(vertices[i].position[2]);
+		const auto& vertex = vertices[i];
+		(*m_vertexData)[i][0] = static_cast<float>(vertex.position[0]);
+		(*m_vertexData)[i][1] = static_cast<float>(vertex.position[1]);
+		(*m_vertexData)[i][2] = static_cast<float>(vertex.position[2]);
 	}
 
 	m_geometry->dirtyBound();

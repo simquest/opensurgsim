@@ -34,6 +34,9 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/MathUtilities.h"
 
+#include <osg/LineWidth>
+#include <osg/Hint>
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 using SurgSim::Math::Vector4f;
@@ -100,20 +103,40 @@ TEST_F(OsgCurveRepresentationRenderTests, DynamicRotate)
 	element->addComponent(material);
 
 	auto light = std::make_shared<Graphics::OsgLight>("Light");
-	light->setLocalPose(Math::makeRigidTranslation(Math::Vector3d(0.5, 0.5, 0.5)));
-	element->addComponent(light);
+	// light->setLocalPose(Math::makeRigidTranslation(Math::Vector3d(0.5, 0.5, 0.5)));
+	viewElement->addComponent(light);
 
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	int numSteps = 100;
+	int numSteps = 10 * 60;
+
+	auto widths = std::make_pair(0.1, 5.0);
+	auto tensions = std::make_pair(0.1, 0.9);
 
 	RigidTransform3d transform = makeRigidTransform(makeRotationQuaternion(0.02, Vector3d(0.0, 1.0, 1.0)),
 								 Vector3d(0.0, -0.0, 0.0));
 
 	for (int i = 0; i < numSteps; ++i)
 	{
+
+		double t = static_cast<double>(i) / numSteps;
+		for (size_t i = 0; i < vertices.getNumVertices(); ++i)
+		{
+			vertices.setVertexPosition(i, transform * vertices.getVertexPosition(i));
+		}
+
+
+		representation->setWidth(interpolate(widths.first, widths.second, t));
+		representation->setTension(interpolate(tensions.first, tensions.second, t));
+		representation->updateControlPoints(vertices);
+
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000.0 / 30.0));
+	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+
+}
 
 		for (size_t i = 0; i < vertices.getNumVertices(); ++i)
 		{

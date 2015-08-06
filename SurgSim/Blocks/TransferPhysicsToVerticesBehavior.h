@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOCURVEBEHAVIOR_H
-#define SURGSIM_BLOCKS_TRANSFERPHYSICSTOCURVEBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESEHAVIOR_H
+#define SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESEHAVIOR_H
 
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -39,7 +39,7 @@ namespace Blocks
 class TransferPhysicsToVerticesBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	TransferPhysicsToVerticesBehavior(const std::string& name);
+	explicit TransferPhysicsToVerticesBehavior(const std::string& name);
 
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getSource() const;
 	void setSource(const std::shared_ptr<SurgSim::Framework::Component>& source);
@@ -47,11 +47,11 @@ public:
 	std::shared_ptr<SurgSim::Framework::Component> getTarget() const;
 	void setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target);
 
-	virtual void update(double dt) override;
+	void update(double dt) override;
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
 private:
 
