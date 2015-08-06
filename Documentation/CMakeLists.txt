@@ -78,8 +78,8 @@ source_group("" FILES "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in")
 
 if(UNIX)
 	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ 
-		DESTINATION share/doc/${CMAKE_PROJECT_NAME}) 
+		COMPONENT Documentation DESTINATION share/doc/${CMAKE_PROJECT_NAME}) 
 else(UNIX)
 	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ 
-		DESTINATION documentation) 
+		COMPONENT Documentation DESTINATION documentation) 
 endif(UNIX)
