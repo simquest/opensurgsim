@@ -244,6 +244,8 @@ void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int te
 		return;
 	}
 
+	bool didUpdateGeom = false;
+
 	osg::Vec4Array* tangentArray =
 		dynamic_cast<osg::Vec4Array*>(geometry->getVertexAttribArray(tangentAttribIndex));
 	if (tangentArray == nullptr || tangentArray->size() != vertexArray->size())
@@ -251,6 +253,7 @@ void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int te
 		tangentArray = new osg::Vec4Array(vertexArray->size());
 		geometry->setVertexAttribArray(tangentAttribIndex, tangentArray);
 		geometry->setVertexAttribBinding(tangentAttribIndex, osg::Geometry::BIND_PER_VERTEX);
+		didUpdateGeom = true;
 	}
 
 	osg::Vec4Array* bitangentArray =
@@ -260,6 +263,7 @@ void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int te
 		bitangentArray = new osg::Vec4Array(vertexArray->size());
 		geometry->setVertexAttribArray(bitangentAttribIndex, bitangentArray);
 		geometry->setVertexAttribBinding(bitangentAttribIndex, osg::Geometry::BIND_PER_VERTEX);
+		didUpdateGeom = true;
 	}
 
 	osg::TriangleIndexFunctor<GenerateTangentSpaceTriangleIndexFunctor> tangentSpaceGenerator;
@@ -268,6 +272,14 @@ void TangentSpaceGenerator::generateTangentSpace(osg::Geometry* geometry, int te
 	tangentSpaceGenerator.reset();
 	geometry->accept(tangentSpaceGenerator);
 	tangentSpaceGenerator.orthogonalize();
+
+	if (didUpdateGeom)
+	{
+		// geometry->dirtyDisplayList();
+		geometry->setUseDisplayList(false);
+		geometry->dirtyBound();
+		geometry->setDataVariance(osg::Object::DYNAMIC);
+	}
 }
 
 

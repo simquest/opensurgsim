@@ -44,7 +44,7 @@ MlcpPhysicsProblem MlcpPhysicsProblem::Zero(size_t numDof, size_t numConstraintD
 }
 
 void MlcpPhysicsProblem::updateConstraint(
-	const Eigen::SparseVector<double>& newSubH,
+	const Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>& newSubH,
 	const Vector& newCHt,
 	size_t indexSubC,
 	size_t indexNewSubH)
@@ -61,17 +61,16 @@ void MlcpPhysicsProblem::updateConstraint(
 	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
 	// => HCHt += H(CH't) + H'[C(H+H')t];
 
-	// Vector newCHt = subC * newSubH;
 	A.col(indexNewSubH) += H.middleCols(indexSubC, newCHt.rows()) * newCHt;
 
-	// Calculate: H.block(indexNewSubH, indexSubC, 1, newCHt.rows()) += newSubH.transpose();
-	for (Eigen::SparseVector<double>::InnerIterator it(newSubH); it; ++it)
+	// Calculate: H.block(indexNewSubH, indexSubC, 1, newCHt.rows()) += newSubH;
+	for (Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>::InnerIterator it(newSubH); it; ++it)
 	{
 		H.coeffRef(indexNewSubH, indexSubC + it.index()) += it.value();
 	}
 
 	CHt.block(indexSubC, indexNewSubH, newCHt.rows(), 1) += newCHt;
-	A.row(indexNewSubH) += newSubH.transpose() * CHt.middleRows(indexSubC, newCHt.rows());
+	A.row(indexNewSubH) += newSubH * CHt.middleRows(indexSubC, newCHt.rows());
 }
 
 }; // namespace Physics

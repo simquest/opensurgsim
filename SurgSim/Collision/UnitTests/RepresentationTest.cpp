@@ -22,6 +22,7 @@
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -153,6 +154,26 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_EQ(unsafePlaneCollisions, *planeRep->getCollisions().safeGet());
 }
 
+// addContact method thread-safety test case.
+// WARNING: Due to the nature of multi-threaded environment, a successful test does not imply thread-safety
+//          also note the lack of reproducibility.
+TEST_F(RepresentationTest, AddContactsInParallelTest)
+{
+	auto rep = std::make_shared<ShapeCollisionRepresentation>("collisionRepReference");
+	auto contact = std::make_shared<Contact>(0.1, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
+		std::make_pair(DataStructures::Location(), DataStructures::Location()));
+	auto threadPool = Framework::Runtime::getThreadPool();
+	std::vector<std::future<void>> tasks;
+	const size_t numContacts = 500;
+
+	for (size_t i = 0; i < numContacts; i++)
+	{
+		tasks.push_back(threadPool->enqueue<void>([&rep, &contact](){ rep->addContact(rep, contact); }));
+	}
+
+	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.wait();});
+	ASSERT_EQ(numContacts, rep->getCollisions().unsafeGet()[rep].size());
+}
 
 }; // namespace Collision
 }; // namespace SurgSim

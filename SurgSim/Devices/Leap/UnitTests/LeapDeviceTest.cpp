@@ -72,27 +72,44 @@ TEST(LeapDeviceTest, HandType)
 
 TEST(LeapDeviceTest, TrackingMode)
 {
+	{
+		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
+		EXPECT_THROW(device->getTrackingMode(), SurgSim::Framework::AssertionFailure)
+			<< "TrackingMode not previously set, nor device initialized, should not be able to determine tracking mode";
+	}
+	{
+		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
+		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode())
+			<< "Default tracking mode should be LEAP_TRACKING_MODE_DESKTOP.";
+	}
+	{
+		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
+		device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_HMD);
+		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
+		boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
+		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode())
+			<< "HMD Tracking Mode not set. This could be do to user settings in the LeapControlPanel." << std::endl
+			<< "Disable 'Auto-orient Tracking' in Settings>>Tracking.";
+	}
+}
+
+TEST(LeapDeviceTest, ProvidingImages)
+{
 	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 
-	// confirm default tracking mode
-	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode());
+	EXPECT_FALSE(device->isProvidingImages());
 
-	// test setting tracking mode before initializing
-	device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_HMD);
-	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
+	device->setProvideImages(true);
+	EXPECT_TRUE(device->isProvidingImages());
 
-	// initializes device (create scaffold)
 	EXPECT_FALSE(device->isInitialized());
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
 	EXPECT_TRUE(device->isInitialized());
 
-	// test if tracking mode was propagated down to scaffold after initialization
-	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
-
-	// test if we can change tracking mode after initialization
-	device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP);
-	EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode());
+	EXPECT_THROW(device->setProvideImages(true), SurgSim::Framework::AssertionFailure);
 }
 
 TEST(LeapDeviceTest, CreateDevicesWithSameName)
@@ -137,6 +154,8 @@ TEST(LeapDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 5);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 120);
 
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("left"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("right"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("pose"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("ThumbProximal"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("ThumbIntermediate"));

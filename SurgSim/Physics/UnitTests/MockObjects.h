@@ -248,13 +248,6 @@ public:
 	void addNode(size_t nodeId);
 
 	double getVolume(const OdeState& state) const override;
-	void addForce(const OdeState& state, Vector* F, double scale = 1.0) override;
-	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::SparseMatrix* M, double scale = 1.0) override;
-	void addDamping(const OdeState& state, SparseMatrix* D, double scale = 1.0) override;
-	void addStiffness(const OdeState& state, SparseMatrix* K, double scale = 1.0) override;
-	void addFMDK(const OdeState& state, Vector* f, SparseMatrix* M, SparseMatrix* D, SparseMatrix* K) override;
-	void addMatVec(const OdeState& state, double alphaM, double alphaD, double alphaK, const Vector& x, Vector* F)
-	override;
 	Vector computeCartesianCoordinate(const OdeState& state, const Vector& barycentricCoordinate) const override;
 	Vector computeNaturalCoordinate(const SurgSim::Math::OdeState& state, const Vector& globalCoordinate) const
 	override;
@@ -265,8 +258,7 @@ public:
 
 private:
 	void initializeMembers();
-	Vector m_F;
-	Matrix m_M, m_D, m_K;
+	void doUpdateFMDK(const Math::OdeState& state, int options) override;
 	bool m_isInitialized;
 };
 
@@ -280,6 +272,8 @@ public:
 
 	/// Destructor
 	virtual ~MockFemRepresentation();
+
+	void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState) override;
 
 	void loadFem(const std::string& filename) override;
 
@@ -295,11 +289,16 @@ public:
 
 	void clearFMDK();
 
+	bool hasSetInitialStateBeenCalled();
+
 protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
 	void transformState(std::shared_ptr<OdeState> state, const RigidTransform3d& transform) override;
+
+	// Flag to be set when setInitialState of this class is called.
+	bool m_setInitialStateCalled;
 };
 
 class MockFemRepresentationValidComplianceWarping : public MockFemRepresentation

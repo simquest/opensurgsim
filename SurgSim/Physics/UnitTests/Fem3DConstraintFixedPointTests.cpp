@@ -44,38 +44,28 @@ namespace SurgSim
 namespace Physics
 {
 
-static std::shared_ptr<Fem3DElementTetrahedron> makeTetrahedron(size_t node0,
-																size_t node1,
-																size_t node2,
-																size_t node3,
-																double massDensity,
-																double poissonRatio,
-																double youngModulus)
+static std::shared_ptr<Fem3DElementTetrahedron> getTetrahedron(size_t nodeId0, size_t nodeId1,
+															   size_t nodeId2, size_t nodeId3,
+															   double massDensity,
+															   double poissonRatio,
+															   double youngModulus)
 {
-	std::array<size_t, 4> nodes = {node0, node1, node2, node3};
-	auto element = std::make_shared<Fem3DElementTetrahedron>(nodes);
+	std::array<size_t, 4> nodeIds = {{nodeId0, nodeId1, nodeId2, nodeId3}};
+	auto element = std::make_shared<Fem3DElementTetrahedron>(nodeIds);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
 	return element;
 }
 
-static std::shared_ptr<Fem3DRepresentation> getTestingFem3d(const std::string &name,
-															double massDensity = 1.0,
-															double poissonRatio = 0.1,
-															double youngModulus = 1.0)
+static std::shared_ptr<Fem3DRepresentation> getFem3d(const std::string &name,
+													 double massDensity = 1.0,
+													 double poissonRatio = 0.1,
+													 double youngModulus = 1.0)
 {
 	auto fem = std::make_shared<Fem3DRepresentation>(name);
 	auto state = std::make_shared<SurgSim::Math::OdeState>();
 	state->setNumDof(3, 6);
-
-	// Place coordinates at
-	// ( 0.00, 0.00,  0.00) + (0.24, -0.43, 0.55) + ( 0.06, -0.14, -0.15) = ( 0.30, -0.57,  0.40)
-	// ( 0.00, 1.00, -1.00) + (0.24, -0.43, 0.55) + (-0.18,  0.06,  0.13) = ( 0.06,  0.63, -0.32)
-	// (-1.00, 1.00,  0.00) + (0.24, -0.43, 0.55) + (-0.15,  0.15,  0.17) = (-0.91,  0.72,  0.72)
-	// ( 0.00, 1.00,  0.00) + (0.24, -0.43, 0.55) + ( 0.11, -0.05, -0.05) = ( 0.35,  0.52,  0.50)
-	// ( 1.00, 1.00,  0.00) + (0.24, -0.43, 0.55) + (-0.10,  0.09,  0.16) = ( 1.14,  0.66,  0.71)
-	// ( 1.00, 0.00, -1.00) + (0.24, -0.43, 0.55) + (-0.22,  0.12, -0.09) = ( 1.02, -0.31, -0.54)
 
 	state->getPositions().segment<3>(0 * 3) = Vector3d( 0.30, -0.57,  0.40);
 	state->getPositions().segment<3>(1 * 3) = Vector3d( 0.06,  0.63, -0.32);
@@ -84,9 +74,9 @@ static std::shared_ptr<Fem3DRepresentation> getTestingFem3d(const std::string &n
 	state->getPositions().segment<3>(4 * 3) = Vector3d( 1.14,  0.66,  0.71);
 	state->getPositions().segment<3>(5 * 3) = Vector3d( 1.02, -0.31, -0.54);
 
-	fem->addFemElement(makeTetrahedron(0, 1, 2, 3, massDensity, poissonRatio, youngModulus));
-	fem->addFemElement(makeTetrahedron(0, 1, 3, 4, massDensity, poissonRatio, youngModulus));
-	fem->addFemElement(makeTetrahedron(0, 1, 4, 5, massDensity, poissonRatio, youngModulus));
+	fem->addFemElement(getTetrahedron(0, 1, 2, 3, massDensity, poissonRatio, youngModulus));
+	fem->addFemElement(getTetrahedron(0, 1, 3, 4, massDensity, poissonRatio, youngModulus));
+	fem->addFemElement(getTetrahedron(0, 1, 4, 5, massDensity, poissonRatio, youngModulus));
 
 	fem->setInitialState(state);
 	fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
@@ -116,7 +106,7 @@ TEST(Fem3DConstraintFixedPointTests, Constants)
 
 TEST(Fem3DConstraintFixedPointTests, BuildMlcpBasic)
 {
-	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
+	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem. It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
 	Fem3DConstraintFixedPoint constraint;
@@ -124,8 +114,7 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcpBasic)
 	Vector3d actual;
 
 	// Setup parameters for Fem3DConstraintFixedPoint::build
-	auto localization = std::make_shared<Fem3DLocalization>(
-		getTestingFem3d("representation"),
+	auto localization = std::make_shared<Fem3DLocalization>(getFem3d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.0, 0.0, 1.0, 0.0)));
 
 	actual = localization->calculatePosition();
@@ -143,7 +132,7 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcpBasic)
 
 	Eigen::Matrix<double, 3, 18> H = Eigen::Matrix<double, 3, 18>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
-	SurgSim::Math::setSubMatrix(1.0 * dt * identity, 0, 4, 3, 3, &H);
+	SurgSim::Math::setSubMatrix(1.0 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 4 (tetId 2, nodeId 2)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
@@ -151,7 +140,7 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcpBasic)
 
 TEST(Fem3DConstraintFixedPointTests, BuildMlcp)
 {
-	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
+	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem. It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
 	Fem3DConstraintFixedPoint constraint;
@@ -159,8 +148,7 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcp)
 	Vector3d actual;
 
 	// Setup parameters for Fem3DConstraintFixedPoint::build
-	auto localization = std::make_shared<Fem3DLocalization>(
-		getTestingFem3d("representation"),
+	auto localization = std::make_shared<Fem3DLocalization>(getFem3d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
 
 	actual = localization->calculatePosition();
@@ -178,10 +166,10 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcp)
 
 	Eigen::Matrix<double, 3, 18> H = Eigen::Matrix<double, 3, 18>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
-	SurgSim::Math::setSubMatrix(0.11 * dt * identity, 0, 0, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(0.02 * dt * identity, 0, 1, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(0.33 * dt * identity, 0, 4, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(0.54 * dt * identity, 0, 5, 3, 3, &H);
+	SurgSim::Math::setSubMatrix(0.11 * dt * identity, 0, 0, 3, 3, &H); // This weight is on node 0 (tetId 2, nodeId 0)
+	SurgSim::Math::setSubMatrix(0.02 * dt * identity, 0, 1, 3, 3, &H); // This weight is on node 1 (tetId 2, nodeId 1)
+	SurgSim::Math::setSubMatrix(0.33 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 4 (tetId 2, nodeId 2)
+	SurgSim::Math::setSubMatrix(0.54 * dt * identity, 0, 5, 3, 3, &H); // This weight is on node 5 (tetId 2, nodeId 3)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
@@ -189,9 +177,9 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcp)
 
 TEST(Fem3DConstraintFixedPointTests, BuildMlcpTwoStep)
 {
-	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
-	// CHt and HCHt can be correctly built given H, so it does not neccessarily construct the physical parameters
-	// neccessary to supply a realistic C.  It only checks H and b.
+	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem. It assumes
+	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
+	// necessary to supply a realistic C.  It only checks H and b.
 	Fem3DConstraintFixedPoint constraint;
 
 	Vector3d actual;
@@ -202,8 +190,7 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcpTwoStep)
 
 	ConstraintData emptyConstraint;
 
-	auto localization = std::make_shared<Fem3DLocalization>(
-		getTestingFem3d("representation"),
+	auto localization = std::make_shared<Fem3DLocalization>(getFem3d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector4d(0.11, 0.02, 0.33, 0.54)));
 	actual = localization->calculatePosition();
 	ASSERT_NO_THROW(constraint.build(
@@ -221,14 +208,14 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcpTwoStep)
 
 	Eigen::Matrix<double, 3, 18> H = Eigen::Matrix<double, 3, 18>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
-	SurgSim::Math::addSubMatrix( 0.11 * dt * identity, 0, 0, 3, 3, &H);
-	SurgSim::Math::addSubMatrix( 0.02 * dt * identity, 0, 1, 3, 3, &H);
-	SurgSim::Math::addSubMatrix( 0.33 * dt * identity, 0, 4, 3, 3, &H);
-	SurgSim::Math::addSubMatrix( 0.54 * dt * identity, 0, 5, 3, 3, &H);
-	SurgSim::Math::addSubMatrix(-0.32 * dt * identity, 0, 0, 3, 3, &H);
-	SurgSim::Math::addSubMatrix(-0.05 * dt * identity, 0, 1, 3, 3, &H);
-	SurgSim::Math::addSubMatrix(-0.14 * dt * identity, 0, 3, 3, 3, &H);
-	SurgSim::Math::addSubMatrix(-0.49 * dt * identity, 0, 4, 3, 3, &H);
+	SurgSim::Math::addSubMatrix( 0.11 * dt * identity, 0, 0, 3, 3, &H); // This weight is on node 0 (tetId 2, nodeId 0)
+	SurgSim::Math::addSubMatrix( 0.02 * dt * identity, 0, 1, 3, 3, &H); // This weight is on node 1 (tetId 2, nodeId 1)
+	SurgSim::Math::addSubMatrix( 0.33 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 4 (tetId 2, nodeId 2)
+	SurgSim::Math::addSubMatrix( 0.54 * dt * identity, 0, 5, 3, 3, &H); // This weight is on node 5 (tetId 2, nodeId 3)
+	SurgSim::Math::addSubMatrix(-0.32 * dt * identity, 0, 0, 3, 3, &H); // This weight is on node 0 (tetId 1, nodeId 0)
+	SurgSim::Math::addSubMatrix(-0.05 * dt * identity, 0, 1, 3, 3, &H); // This weight is on node 1 (tetId 1, nodeId 1)
+	SurgSim::Math::addSubMatrix(-0.14 * dt * identity, 0, 3, 3, 3, &H); // This weight is on node 3 (tetId 1, nodeId 2)
+	SurgSim::Math::addSubMatrix(-0.49 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 4 (tetId 1, nodeId 3)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 }
 

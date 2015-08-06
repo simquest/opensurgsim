@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/GaussLegendreQuadrature.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -624,20 +625,23 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 	getExpectedMassMatrix2(expectedMass2);
 	getExpectedStiffnessMatrix(expectedStiffness);
 
+	// Update the internal f, M, D, K variables.
+	beam->updateFMDK(m_restState, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
-	beam->addForce(m_restState, &forceVector);
+	beam->addForce(&forceVector);
 	EXPECT_TRUE(forceVector.isZero());
 
-	beam->addMass(m_restState, &massMatrix);
+	beam->addMass(&massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(expectedMass)) << "Expected Mass:" << std::endl << expectedMass << std::endl <<
 			"Mass Matrix:" << std::endl << massMatrix << std::endl;
 	EXPECT_TRUE(massMatrix.isApprox(expectedMass2, 1e-6)) << "Expected Mass 2:" << std::endl << expectedMass <<
 			std::endl << "Mass Matrix:" << std::endl << massMatrix << std::endl;
 
-	beam->addDamping(m_restState, &dampingMatrix);
+	beam->addDamping(&dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(expectedDamping));
 
-	beam->addStiffness(m_restState, &stiffnessMatrix);
+	beam->addStiffness(&stiffnessMatrix);
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffness));
 
 	forceVector.setZero();
@@ -645,7 +649,7 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 	SurgSim::Math::clearMatrix(&dampingMatrix);
 	SurgSim::Math::clearMatrix(&stiffnessMatrix);
 
-	beam->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
+	beam->addFMDK(&forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());
 	EXPECT_TRUE(massMatrix.isApprox(expectedMass));
 	EXPECT_TRUE(massMatrix.isApprox(expectedMass2, 1e-6));
@@ -654,7 +658,7 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
-	beam->addMatVec(m_restState, 1.0, 0.0, 0.0, vectorOnes, &forceVector);
+	beam->addMatVec(1.0, 0.0, 0.0, vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 6 * m_numberNodes; rowId++)
 	{
 		EXPECT_NEAR(expectedMass.row(rowId).sum(), forceVector[rowId], epsilon);
@@ -662,21 +666,21 @@ TEST_F(Fem1DElementBeamTests, ForceAndMatricesTest)
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	beam->addMatVec(m_restState, 0.0, 1.0, 0.0, vectorOnes, &forceVector);
+	beam->addMatVec(0.0, 1.0, 0.0, vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 6 * m_numberNodes; rowId++)
 	{
 		EXPECT_NEAR(expectedDamping.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	beam->addMatVec(m_restState, 0.0, 0.0, 1.0, vectorOnes, &forceVector);
+	beam->addMatVec(0.0, 0.0, 1.0, vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 6 * m_numberNodes; rowId++)
 	{
 		EXPECT_NEAR(expectedStiffness.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	beam->addMatVec(m_restState, 1.0, 2.0, 3.0, vectorOnes, &forceVector);
+	beam->addMatVec(1.0, 2.0, 3.0, vectorOnes, &forceVector);
 	for (int rowId = 0; rowId < 6 * m_numberNodes; rowId++)
 	{
 		double expectedCoef = 1.0 * expectedMass.row(rowId).sum()

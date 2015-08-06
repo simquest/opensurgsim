@@ -43,10 +43,10 @@ void Fem3DConstraintFixedPoint::doBuild(double dt,
 										size_t indexOfConstraint,
 										ConstraintSideSign sign)
 {
-	std::shared_ptr<Fem3DRepresentation> fem3d
+	std::shared_ptr<Fem3DRepresentation> fem
 		= std::static_pointer_cast<Fem3DRepresentation>(localization->getRepresentation());
 
-	if (!fem3d->isActive())
+	if (!fem->isActive())
 	{
 		return;
 	}
@@ -86,12 +86,12 @@ void Fem3DConstraintFixedPoint::doBuild(double dt,
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
 
 	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
-	m_newH.resize(fem3d->getNumDof());
+	m_newH.resize(fem->getNumDof());
 	// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
 	size_t numNodeToConstrain = (coord.coordinate.array() != 0.0).count();
 	m_newH.reserve(3 * numNodeToConstrain);
 
-	std::shared_ptr<FemElement> femElement = fem3d->getFemElement(coord.index);
+	std::shared_ptr<FemElement> femElement = fem->getFemElement(coord.index);
 	size_t numNodes = femElement->getNumNodes();
 	for (size_t axis = 0; axis < 3; axis++)
 	{
@@ -104,7 +104,7 @@ void Fem3DConstraintFixedPoint::doBuild(double dt,
 				m_newH.insert(3 * nodeIndex + axis) = coord.coordinate[index] * (dt * scale);
 			}
 		}
-		mlcp->updateConstraint(m_newH, fem3d->getComplianceMatrix() * m_newH.transpose(),
+		mlcp->updateConstraint(m_newH, fem->getComplianceMatrix() * m_newH.transpose(),
 							   indexOfRepresentation, indexOfConstraint + axis);
 	}
 }

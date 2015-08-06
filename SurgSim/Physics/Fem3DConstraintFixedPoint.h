@@ -36,24 +36,11 @@ public:
 	/// Destructor
 	virtual ~Fem3DConstraintFixedPoint();
 
-	/// Gets the constraint type for this ConstraintImplementation
-	/// \return The constraint type corresponding to this constraint implementation
 	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
 private:
-	/// Gets the number of degree of freedom.
-	/// \return 3 A bilateral 3d constraint enforces equality in the x, y, and z dimensions between 2 points.
 	size_t doGetNumDof() const override;
 
-	/// Builds the subset of an Mlcp physics problem associated to this implementation.
-	/// \param dt The time step.
-	/// \param data The data associated to the constraint.
-	/// \param localization The localization for the representation.
-	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up.
-	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp.
-	/// \param indexOfConstraint The index of the constraint in the mlcp.
-	/// \param sign The sign of this implementation in the constraint (positive or negative side).
-	/// \note Empty for a Fixed Representation
 	void doBuild(double dt,
 				 const ConstraintData& data,
 				 const std::shared_ptr<Localization>& localization,

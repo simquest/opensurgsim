@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/GaussLegendreQuadrature.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -91,7 +92,7 @@ public:
 		return m_KLocal;
 	}
 
-	const Eigen::Matrix<double, 18, 18>& getGlobalStiffnessMatrix() const
+	const SurgSim::Math::Matrix& getGlobalStiffnessMatrix() const
 	{
 		return m_K;
 	}
@@ -101,7 +102,7 @@ public:
 		return m_MLocal;
 	}
 
-	const Eigen::Matrix<double, 18, 18>& getGlobalMassMatrix() const
+	const SurgSim::Math::Matrix& getGlobalMassMatrix() const
 	{
 		return m_M;
 	}
@@ -1369,18 +1370,21 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	stiffnessMatrix.makeCompressed();
 	zeroMatrix.setZero();
 
+	// Update the internal f, M, D, K variables.
+	tri->updateFMDK(m_restState, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
-	tri->addForce(m_restState, &forceVector);
+	tri->addForce(&forceVector);
 	EXPECT_TRUE(forceVector.isZero());
 
-	tri->addMass(m_restState, &massMatrix);
+	tri->addMass(&massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix)) << "MassMatrix = " << std::endl << massMatrix << std::endl <<
 			"ExpectedMassMatrix = " << std::endl << expectedMassMatrix << std::endl;
 
-	tri->addDamping(m_restState, &dampingMatrix);
+	tri->addDamping(&dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(zeroMatrix));
 
-	tri->addStiffness(m_restState, &stiffnessMatrix);
+	tri->addStiffness(&stiffnessMatrix);
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffnessMatrix));
 
 	forceVector.setZero();
@@ -1388,7 +1392,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	clearMatrix(&dampingMatrix);
 	clearMatrix(&stiffnessMatrix);
 
-	tri->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
+	tri->addFMDK(&forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());
 	EXPECT_TRUE(massMatrix.isApprox(expectedMassMatrix)) << "MassMatrix = " << std::endl << massMatrix << std::endl <<
 			"ExpectedMassMatrix = " << std::endl << expectedMassMatrix << std::endl;
@@ -1398,7 +1402,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
 	ones.setOnes();
-	tri->addMatVec(m_restState, 1.0, 0.0, 0.0, ones, &forceVector);
+	tri->addMatVec(1.0, 0.0, 0.0, ones, &forceVector);
 	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Mass component only");
@@ -1406,7 +1410,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	tri->addMatVec(m_restState, 0.0, 1.0, 0.0, ones, &forceVector);
+	tri->addMatVec(0.0, 1.0, 0.0, ones, &forceVector);
 	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Damping component only");
@@ -1414,7 +1418,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	tri->addMatVec(m_restState, 0.0, 0.0, 1.0, ones, &forceVector);
+	tri->addMatVec(0.0, 0.0, 1.0, ones, &forceVector);
 	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Stiffness component only");
@@ -1422,7 +1426,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	tri->addMatVec(m_restState, 1.0, 2.0, 3.0, ones, &forceVector);
+	tri->addMatVec(1.0, 2.0, 3.0, ones, &forceVector);
 	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with mix Mass/Damping/Stiffness components");

@@ -21,9 +21,11 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	AabbTests.cpp
 	GeometryTests.cpp
+	IntervalArithmeticTests.cpp
 	KalmanFilterTests.cpp
 	MakeRigidTransformTests.cpp
 	MeshShapeTests.cpp
+	MinMaxTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
 	OdeEquationTests.cpp
 	OdeSolverEulerExplicitModifiedTests.cpp
@@ -34,6 +36,9 @@ set(UNIT_TEST_SOURCES
 	OdeSolverTests.cpp
 	OdeStateTests.cpp
 	ParticlesShapeTests.cpp
+	PolynomialRootTests.cpp
+	PolynomialTests.cpp
+	PolynomialValuesTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
 	TriangleTriangleContactCalculationTests.cpp

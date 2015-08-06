@@ -396,6 +396,62 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
 }
 
+TEST_F(RenderTests, VisualTestFallingRigidShapesOnPlane)
+{
+	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRigidTranslation;
+
+	const size_t numSphere = 10;
+	const double radius = 0.05;
+	const double distanceBetweenSphere = radius / 2.0;
+
+	// Shape-base objects
+	for (size_t sphere = 0; sphere < numSphere; ++sphere)
+	{
+		std::stringstream ss;
+		ss << "sphereShape " << sphere;
+		std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
+			createRigidSphereSceneElement(ss.str(), radius);
+		scene->addSceneElement(sphereShape);
+		sphereShape->setPose(makeRigidTranslation(Vector3d(0.0, (2.0 * radius + distanceBetweenSphere) * sphere, 0.0)));
+	}
+
+	// Floor on which the objects are falling
+	std::shared_ptr<SurgSim::Framework::SceneElement> floor = createFixedPlaneSceneElement("floor");
+	scene->addSceneElement(floor);
+	floor->setPose(makeRigidTranslation(Vector3d(0.0, -radius - distanceBetweenSphere, 0.0)));
+
+	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
+}
+
+TEST_F(RenderTests, VisualTestFallingRigidMeshesOnPlane)
+{
+	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRigidTranslation;
+
+	const size_t numSphere = 10;
+	const double radius = 0.05;
+	const double distanceBetweenSphere = radius / 2.0;
+
+	// Mesh-base objects
+	for (size_t sphere = 0; sphere < numSphere; ++sphere)
+	{
+		std::stringstream ss;
+		ss << "sphereShape " << sphere;
+		std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
+			createRigidMeshSceneElement(ss.str(), "Geometry/sphere.ply", 10.0 * radius);
+		scene->addSceneElement(sphereShape);
+		sphereShape->setPose(makeRigidTranslation(Vector3d(0.0, (2.0 * radius + distanceBetweenSphere) * sphere, 0.0)));
+	}
+
+	// Floor on which the objects are falling
+	std::shared_ptr<SurgSim::Framework::SceneElement> floor = createFixedPlaneSceneElement("floor");
+	scene->addSceneElement(floor);
+	floor->setPose(makeRigidTranslation(Vector3d(0.0, -radius - distanceBetweenSphere, 0.0)));
+
+	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
+}
+
 }; // namespace Physics
 
 }; // namespace SurgSim
