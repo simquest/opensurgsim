@@ -27,9 +27,9 @@ ThreadPool::ThreadPool(size_t numThreads) :
 	// Main loop for each worker thread.
 	auto threadLoop = [this] ()
 	{
-		std::unique_ptr<TaskBase> task;
 		while (true)
 		{
+			std::unique_ptr<TaskBase> task;
 			{
 				boost::unique_lock<boost::mutex> lock(m_mutex);
 				m_threadSignaler.wait(lock, [this] { return m_destructing || !m_tasks.empty(); });
@@ -42,7 +42,6 @@ ThreadPool::ThreadPool(size_t numThreads) :
 				m_tasks.pop();
 			}
 			task->execute();
-			task.release();
 		}
 	};
 

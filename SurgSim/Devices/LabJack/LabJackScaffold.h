@@ -62,8 +62,7 @@ public:
 	/// Does one-time configuration of the LabJack for timers, counters, and analog inputs.
 	/// Must be called by the LabJackThread because the LabJack separates all commands by the calling thread.
 	/// \param device The internal device data.
-	/// \return False if any errors.
-	bool configureDevice(DeviceData* device);
+	void configureDevice(DeviceData* device);
 
 private:
 	/// Internal shared state data type.

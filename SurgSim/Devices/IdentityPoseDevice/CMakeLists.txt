@@ -27,7 +27,7 @@ set(IDENTITY_POSE_DEVICE_HEADERS
 	IdentityPoseDevice.h
 )
 
-set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} IdentityPoseDevice.h PARENT_SCOPE)
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} IdentityPoseDevice/IdentityPoseDevice.h PARENT_SCOPE)
 
 surgsim_add_library(
 	IdentityPoseDevice

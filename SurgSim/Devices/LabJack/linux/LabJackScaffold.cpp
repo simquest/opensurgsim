@@ -17,8 +17,8 @@
 
 #include <algorithm>
 #include <array>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
 #include <errno.h>
 #include <labjackusb.h> // the low-level LabJack library (aka exodriver)
 #include <list>
@@ -261,7 +261,16 @@ public:
 		if (result)
 		{
 			const unsigned int dwReserved = 0; // Not used, set to 0.
-			m_deviceHandle = LJUSB_OpenDevice(deviceNumber, dwReserved, m_model);
+			int tries = 3;
+			m_deviceHandle = LABJACK_INVALID_HANDLE;
+			while ((m_deviceHandle == LABJACK_INVALID_HANDLE) && (--tries >= 0))
+			{
+				m_deviceHandle = LJUSB_OpenDevice(deviceNumber, dwReserved, m_model);
+				if ((m_deviceHandle == LABJACK_INVALID_HANDLE) && (tries >= 0))
+				{
+					boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+				}
+			}
 			if (m_deviceHandle == LABJACK_INVALID_HANDLE)
 			{
 				SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Failed to open a device." <<
@@ -383,7 +392,8 @@ public:
 		timerOutputChannels(getTimerOutputChannels(device->getTimers())),
 		analogInputs(device->getAnalogInputs()),
 		analogOutputChannels(device->getAnalogOutputs()),
-		cachedOutputIndices(false)
+		cachedOutputIndices(false),
+		configured(false)
 	{
 	}
 
@@ -424,8 +434,10 @@ public:
 	std::unordered_map<int, int> analogInputIndices;
 	/// True if the output indices have been cached.
 	bool cachedOutputIndices;
-	// Calibration constants.  The meaning of each entry is specific to the model (i.e., LabJack::Model).
+	/// Calibration constants.  The meaning of each entry is specific to the model (i.e., LabJack::Model).
 	double calibration[40];
+	/// True if the device has been successfully configured.
+	bool configured;
 
 private:
 	/// Given all the timers, return just the ones that provide inputs.
@@ -674,11 +686,18 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 			}
 
 			std::unique_ptr<LabJackThread> thread(new LabJackThread(this, info.get()));
-			thread->setRate(device->getMaximumUpdateRate());
-			thread->start();
-
-			info.get()->thread = std::move(thread);
-			m_state->activeDeviceList.emplace_back(std::move(info));
+			result = info->configured;
+			if (result)
+			{
+				thread->setRate(device->getMaximumUpdateRate());
+				thread->start();
+				info.get()->thread = std::move(thread);
+				m_state->activeDeviceList.emplace_back(std::move(info));
+			}
+			else
+			{
+				info->deviceHandle->destroy();
+			}
 		}
 	}
 
@@ -1106,9 +1125,10 @@ std::shared_ptr<LabJackScaffold> LabJackScaffold::getOrCreateSharedInstance()
 	return sharedInstance.get();
 }
 
-bool LabJackScaffold::configureDevice(DeviceData* deviceData)
+void LabJackScaffold::configureDevice(DeviceData* deviceData)
 {
-	return configureClockAndTimers(deviceData) && configureDigital(deviceData) && configureAnalog(deviceData);
+	deviceData->configured =
+		configureClockAndTimers(deviceData) && configureDigital(deviceData) && configureAnalog(deviceData);
 }
 
 bool LabJackScaffold::configureClockAndTimers(DeviceData* deviceData)

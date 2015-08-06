@@ -36,6 +36,9 @@ set(UNIT_TEST_SOURCES
 	OdeSolverTests.cpp
 	OdeStateTests.cpp
 	ParticlesShapeTests.cpp
+	PolynomialRootTests.cpp
+	PolynomialTests.cpp
+	PolynomialValuesTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
 	TriangleTriangleContactCalculationTests.cpp
