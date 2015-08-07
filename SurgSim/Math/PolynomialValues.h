@@ -113,7 +113,7 @@ private:
 	PolynomialRoots<T, 1> m_locationOfExtremum;
 };
 
-/// PolynomialValues<T, 2> specializes the PolynomialValues class for degree 3 (cubic polynomials)
+/// PolynomialValues<T, 3> specializes the PolynomialValues class for degree 3 (cubic polynomials)
 /// \sa PolynomialValues<T, N>
 template <class T>
 class PolynomialValues<T, 3>

@@ -69,7 +69,7 @@ public:
 
 	/// Assignment operator
 	/// \param m Interval to be copied
-	LinearMotion<T>& operator= (const LinearMotion<T>& m);
+	LinearMotion<T>& operator=(const LinearMotion<T>& m);
 
 	/// Move assignment operator
 	/// \param m Interval to be moved
@@ -94,32 +94,32 @@ public:
 
 	/// \param m the linear motion to be tested
 	/// \return true if the current linear motion is identical to the input linear motion
-	bool operator== (const LinearMotion<T>& m) const;
+	bool operator==(const LinearMotion<T>& m) const;
 
 	/// \param m the linear motion to be tested
 	/// \return true if the current linear motion is not identical to the input linear motion
-	bool operator!= (const LinearMotion<T>& m) const;
+	bool operator!=(const LinearMotion<T>& m) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to linear motions
-	LinearMotion<T> operator+ (const LinearMotion<T>& m) const;
-	LinearMotion<T>& operator+= (const LinearMotion<T>& m);
-	LinearMotion<T> operator- (const LinearMotion<T>& m) const;
-	LinearMotion<T>& operator-= (const LinearMotion<T>& m);
+	LinearMotion<T> operator+(const LinearMotion<T>& m) const;
+	LinearMotion<T>& operator+=(const LinearMotion<T>& m);
+	LinearMotion<T> operator-(const LinearMotion<T>& m) const;
+	LinearMotion<T>& operator-=(const LinearMotion<T>& m);
 	/// @}
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
 	/// preserve time ordering and so the return value is an Interval_nD instead
 	/// of a LinearMotion_nD
-	Interval<T> operator* (const LinearMotion<T>& m) const;
+	Interval<T> operator*(const LinearMotion<T>& m) const;
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
 	/// preserve time ordering and so the return value is an Interval_nD instead
 	/// of a LinearMotion_nD
 	/// \exception if any component of interval includes 0
-	Interval<T> operator/ (const LinearMotion<T>& m) const;
+	Interval<T> operator/(const LinearMotion<T>& m) const;
 
 	/// \return the initial value of the linear motion
 	T getStart() const;
@@ -155,6 +155,8 @@ private:
 template <class T, int N>
 class LinearMotion_nD
 {
+	static_assert(N > 0, "LinearMotion must have dimensionality > 0.");
+
 public:
 	/// Constructor
 	LinearMotion_nD();
@@ -178,7 +180,7 @@ public:
 
 	/// Assignment operator
 	/// \param motion Linear motion group to be copied
-	LinearMotion_nD<T, N>& operator= (const LinearMotion_nD<T, N>& motion);
+	LinearMotion_nD<T, N>& operator=(const LinearMotion_nD<T, N>& motion);
 
 	/// Move assignment operator
 	/// \param motion Linear motion group to be moved
@@ -196,32 +198,32 @@ public:
 
 	/// \param motion the linear motion group to be tested
 	/// \return true if the current linear motion group is identical to the input group
-	bool operator== (const LinearMotion_nD<T, N>& motion) const;
+	bool operator==(const LinearMotion_nD<T, N>& motion) const;
 
 	/// \param motion the linear motion group to be tested
 	/// \return true if the current linear motion group is not identical to the input group
-	bool operator!= (const LinearMotion_nD<T, N>& motion) const;
+	bool operator!=(const LinearMotion_nD<T, N>& motion) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to interval groups
-	LinearMotion_nD<T, N> operator+ (const LinearMotion_nD<T, N>& m) const;
-	LinearMotion_nD<T, N>& operator+= (const LinearMotion_nD<T, N>& m);
-	LinearMotion_nD<T, N> operator- (const LinearMotion_nD<T, N>& m) const;
-	LinearMotion_nD<T, N>& operator-= (const LinearMotion_nD<T, N>& m);
+	LinearMotion_nD<T, N> operator+(const LinearMotion_nD<T, N>& m) const;
+	LinearMotion_nD<T, N>& operator+=(const LinearMotion_nD<T, N>& m);
+	LinearMotion_nD<T, N> operator-(const LinearMotion_nD<T, N>& m) const;
+	LinearMotion_nD<T, N>& operator-=(const LinearMotion_nD<T, N>& m);
 	/// @}
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
 	/// preserve time ordering and so the return value is an Interval_nD instead
 	/// of a LinearMotion_nD
-	Interval_nD<T, N> operator* (const LinearMotion_nD<T, N>& m) const;
+	Interval_nD<T, N> operator*(const LinearMotion_nD<T, N>& m) const;
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
 	/// preserve time ordering and so the return value is an Interval_nD instead
 	/// of a LinearMotion_nD
 	/// \exception if any component of interval includes 0
-	Interval_nD<T, N> operator/ (const LinearMotion_nD<T, N>& m) const;
+	Interval_nD<T, N> operator/(const LinearMotion_nD<T, N>& m) const;
 
 	/// \param motion the input linear motion group
 	/// \return the interval dot product of the current group and interval
@@ -229,13 +231,14 @@ public:
 
 	/// \param i the selector for the linear motion to be returned
 	/// \return the ith interval in the current group
-	const LinearMotion<T>& getAxis(size_t i) const;
+	/// \exception thrown if the requested axis is < 0 or greater than N - 1
+	const LinearMotion<T>& getAxis(int i) const;
 
 	/// \param start [out] the starting points of the linear motion group as an N dimension array.
-	void getStart(std::array<T, N>& start) const;
+	void getStart(std::array<T, N>* start) const;
 
 	/// \param end [out] the ending points of the linear motion group as an N dimension array.
-	void getEnd(std::array<T, N>& end) const;
+	void getEnd(std::array<T, N>* end) const;
 
 	/// \return the linear motion from the starting point to the midpoint
 	LinearMotion_nD<T, N> firstHalf() const;
@@ -286,7 +289,7 @@ public:
 
 	/// Assignment operator
 	/// \param motion Linear motion 3 group to be copied
-	LinearMotion_nD<T, 3>& operator= (const LinearMotion_nD<T, 3>& motion);
+	LinearMotion_nD<T, 3>& operator=(const LinearMotion_nD<T, 3>& motion);
 
 	/// Move assignment operator
 	/// \param motion Linear motion 3 group to be moved
@@ -304,32 +307,32 @@ public:
 
 	/// \param motion the linear motion group to be tested
 	/// \return true if the current linear motion 3 group is identical to the input 3 group motion
-	bool operator== (const LinearMotion_nD<T, 3>& motion) const;
+	bool operator==(const LinearMotion_nD<T, 3>& motion) const;
 
 	/// \param motion the linear motion group to be tested
 	/// \return true if the current linear motion 3 group is not identical to the input 3 group motion.
-	bool operator!= (const LinearMotion_nD<T, 3>& motion) const;
+	bool operator!=(const LinearMotion_nD<T, 3>& motion) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to 3 interval groups
-	LinearMotion_nD<T, 3> operator+ (const LinearMotion_nD<T, 3>& m) const;
-	LinearMotion_nD<T, 3>& operator+= (const LinearMotion_nD<T, 3>& m);
-	LinearMotion_nD<T, 3> operator- (const LinearMotion_nD<T, 3>& m) const;
-	LinearMotion_nD<T, 3>& operator-= (const LinearMotion_nD<T, 3>& m);
+	LinearMotion_nD<T, 3> operator+(const LinearMotion_nD<T, 3>& m) const;
+	LinearMotion_nD<T, 3>& operator+=(const LinearMotion_nD<T, 3>& m);
+	LinearMotion_nD<T, 3> operator-(const LinearMotion_nD<T, 3>& m) const;
+	LinearMotion_nD<T, 3>& operator-=(const LinearMotion_nD<T, 3>& m);
 	/// @}
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
 	/// preserve time ordering and so the return value is an Interval_nD instead
 	/// of a LinearMotion_nD
-	Interval_nD<T, 3> operator* (const LinearMotion_nD<T, 3>& m) const;
+	Interval_nD<T, 3> operator*(const LinearMotion_nD<T, 3>& m) const;
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
 	/// preserve time ordering and so the return value is an Interval_nD instead
 	/// of a LinearMotion_nD
 	/// \exception if any component of interval includes 0
-	Interval_nD<T, 3> operator/ (const LinearMotion_nD<T, 3>& m) const;
+	Interval_nD<T, 3> operator/(const LinearMotion_nD<T, 3>& m) const;
 
 	/// \param motion the input linear motion 3 group
 	/// \param range the range over which the dot product is to be evaluated.
@@ -349,13 +352,14 @@ public:
 
 	/// \param i the selector for the linear motion to be returned
 	/// \return the ith linear motion in the current 3 group
-	const LinearMotion<T>& getAxis(size_t i) const;
+	/// \exception thrown if the requested axis is < 0 or greater than 2
+	const LinearMotion<T>& getAxis(int i) const;
 
 	/// \param start [out] the start of the linear motion 3D as a 3 value array
-	void getStart(std::array<T, 3>& start) const;
+	void getStart(std::array<T, 3>* start) const;
 
 	/// \param end [out] the end of the linear motion 3D as a 3 value array
-	void getEnd(std::array<T, 3>& end) const;
+	void getEnd(std::array<T, 3>* end) const;
 
 	/// \return the start of the linear motion 3D as a 3 Vector
 	Vector3 getStart() const;
@@ -386,7 +390,7 @@ private:
 /// \param motion the motion to write
 /// \return the active ostream
 template <typename T>
-std::ostream& operator<< (std::ostream& o, const LinearMotion<T>& motion);
+std::ostream& operator<<(std::ostream& o, const LinearMotion<T>& motion);
 
 // Linear motion nD utilities
 
@@ -397,7 +401,7 @@ std::ostream& operator<< (std::ostream& o, const LinearMotion<T>& motion);
 /// \param motion the motion group to write
 /// \return the active ostream
 template <typename T, int N>
-std::ostream& operator<< (std::ostream& o, const LinearMotion_nD<T, N>& motion);
+std::ostream& operator<<(std::ostream& o, const LinearMotion_nD<T, N>& motion);
 
 // Linear motion 3D utilities
 

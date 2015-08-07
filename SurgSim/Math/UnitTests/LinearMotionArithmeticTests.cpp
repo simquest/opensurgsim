@@ -33,14 +33,6 @@ namespace
 double epsilon = 1.0e-10;
 }
 
-#if 0
-class LinearMotionBasicTests : public ::testing::Test
-{
-public:
-
-};
-#endif
-
 template <typename T>
 class LinearMotionArithmeticTests : public ::testing::Test
 {
@@ -120,11 +112,13 @@ public:
 	void checkLinearMotionConstructor(LinearMotion_nD<double, dimension>* motion)
 	{
 		// Check get ... up to numb
-		for (size_t counter = 0; counter < dimension; ++counter)
+		for (int counter = 0; counter < dimension; ++counter)
 		{
 			EXPECT_DOUBLE_EQ(counter + 2.0, motion->getAxis(counter).getStart());
 			EXPECT_DOUBLE_EQ(counter + 1.0, motion->getAxis(counter).getEnd());
 		}
+		EXPECT_THROW(motion->getAxis(-1), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(motion->getAxis(dimension), SurgSim::Framework::AssertionFailure);
 	}
 
 	void setLinearMotionFromOffset(double offsetStart, double offsetEnd, LinearMotion<double>* motion)
