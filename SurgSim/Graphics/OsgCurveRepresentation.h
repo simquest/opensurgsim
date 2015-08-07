@@ -20,6 +20,7 @@
 #include "SurgSim/Graphics/CurveRepresentation.h"
 
 #include <osg/Array>
+#include <osg/ref_ptr>
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -43,6 +44,8 @@ class OsgCurveRepresentation : public OsgRepresentation, public CurveRepresentat
 public:
 	/// Constructor
 	explicit OsgCurveRepresentation(const std::string& name);
+	
+	~OsgCurveRepresentation();
 
 	bool doInitialize() override;
 

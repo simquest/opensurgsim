@@ -138,19 +138,6 @@ TEST_F(OsgCurveRepresentationRenderTests, DynamicRotate)
 
 }
 
-		for (size_t i = 0; i < vertices.getNumVertices(); ++i)
-		{
-			vertices.setVertexPosition(i, transform * vertices.getVertexPosition(i));
-		}
-
-		representation->updateControlPoints(vertices);
-
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10000 / numSteps));
-	}
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
-
-}
-
 
 }; // namespace Graphics
 }; // namespace SurgSim

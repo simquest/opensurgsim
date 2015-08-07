@@ -127,6 +127,10 @@ OsgCurveRepresentation::OsgCurveRepresentation(const std::string& name) :
 	m_transform->addChild(geode);
 }
 
+OsgCurveRepresentation::~OsgCurveRepresentation()
+{
+}
+
 bool OsgCurveRepresentation::doInitialize()
 {
 	return true;
