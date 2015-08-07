@@ -75,6 +75,8 @@ public:
 
 	const SurgSim::Math::Matrix44d& getProjectionMatrix() const override;
 
+	SurgSim::Math::Matrix44d getInverseProjectionMatrix() const override;
+
 	void update(double dt) override;
 
 	/// \return the OSG camera node
