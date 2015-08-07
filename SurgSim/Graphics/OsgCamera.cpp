@@ -155,8 +155,6 @@ SurgSim::Math::Matrix44d OsgCamera::getInverseProjectionMatrix() const
 	return m_projectionMatrix.inverse();
 }
 
-
-
 void OsgCamera::update(double dt)
 {
 	setVisible(isActive());
