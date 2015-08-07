@@ -14,17 +14,18 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/OsgCurveRepresentation.h"
-#include "SurgSim/Graphics/OsgConversions.h"
-#include "SurgSim/DataStructures/Vertices.h"
-
-#include <osg/Geode>
-#include <osg/Geometry>
-#include <osg/Array>
-#include <osg/PositionAttitudeTransform>
-#include <osg/LineWidth>
-#include <osg/Hint>
 
 #include <array>
+
+#include <osg/Array>
+#include <osg/Geode>
+#include <osg/Geometry>
+#include <osg/Hint>
+#include <osg/LineWidth>
+#include <osg/PositionAttitudeTransform>
+
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Graphics/OsgConversions.h"
 
 namespace
 {

@@ -16,10 +16,9 @@
 #ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESEHAVIOR_H
 #define SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESEHAVIOR_H
 
-#include "SurgSim/Math/OdeState.h"
-#include "SurgSim/Framework/Behavior.h"
-#include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
 {
@@ -36,17 +35,35 @@ class CurveRepresentation;
 namespace Blocks
 {
 
-class TransferPhysicsToVerticesBehavior : public SurgSim::Framework::Behavior
+/// Transfer Physics State to any representation that has a Vertices property, the "Vertices" property on the targets
+/// side needs to accept DataStructures::VerticesPlain for the type.
+class TransferPhysicsToVerticesBehavior : public Framework::Behavior
 {
 public:
+
+	/// Constructor
+	/// \param name Name of the behavior
 	explicit TransferPhysicsToVerticesBehavior(const std::string& name);
 
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getSource() const;
-	void setSource(const std::shared_ptr<SurgSim::Framework::Component>& source);
+	/// \return the source representation of this behavior
+	std::shared_ptr<Physics::DeformableRepresentation> getSource() const;
 
-	std::shared_ptr<SurgSim::Framework::Component> getTarget() const;
-	void setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target);
+	/// Sets the source for this behavior, all the positions from the state of the source
+	/// will be copied into a Vertices object and set in the target, using setValue("Vertices")
+	/// \param source the component that is the source
+	void setSource(const std::shared_ptr<Framework::Component>& source);
 
+	/// \return the target representation of this behavior
+	std::shared_ptr<Framework::Component> getTarget() const;
+
+	/// Sets the target for this behavior, it needs to have a "Vertices" property that takes
+	/// DataStructures::VerticesPlain as a parameter
+	/// \throws if target does not have a "Vertices" property
+	/// \param target the representation to be used as a target
+	void setTarget(const std::shared_ptr<Framework::Component>& target);
+
+	/// override update
+	/// \throws if the type of the "Vertices" property on the target is not DataStructures::VerticesPlain
 	void update(double dt) override;
 
 	bool doInitialize() override;
@@ -55,10 +72,11 @@ public:
 
 private:
 
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;
-	std::shared_ptr<SurgSim::Framework::Component> m_target;
+	std::shared_ptr<Physics::DeformableRepresentation> m_source; ///@< Source representation
+	std::shared_ptr<Framework::Component> m_target; ///@< Target representation
 
-	SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData> m_vertices;
+	/// vertices structure that is used for the update
+	DataStructures::VerticesPlain m_vertices;
 };
 }
 }

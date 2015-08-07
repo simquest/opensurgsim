@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_CURVE_H
-#define SURGSIM_GRAPHICS_CURVE_H
+#ifndef SURGSIM_GRAPHICS_CURVEREPRESENTATION_H
+#define SURGSIM_GRAPHICS_CURVEREPRESENTATION_H
 
-#include "SurgSim/Graphics/Representation.h"
-#include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Framework/LockedContainer.h"
+#include "SurgSim/Graphics/Representation.h"
 
 namespace SurgSim
 {
@@ -26,17 +26,16 @@ namespace SurgSim
 namespace Graphics
 {
 
-/// This implements an interpolated curve, given a set of control points the object will interpolate the control points
-/// the line drawn is made up of a number of segments depending on the number of controlpoints and the number returned
-/// by getSubdivisions().
+/// This implements a graphical object to draw an interpolated curve, it accepts a series of control points, the
+/// number of segments in the curve will depend on the number of control points and the value returned from
+/// getSubdivisions().
 /// This class also provides the ad-hoc "Vertices" property, this means it can receive a
 /// \sa DataStructures::VerticesPlain structure as a property via setValue()
 class CurveRepresentation : public virtual Representation
-
 {
 public:
 	/// Constructor
-	CurveRepresentation(const std::string& name);
+	explicit CurveRepresentation(const std::string& name);
 
 	/// Sets the number of intermediate points the get generated between each two control points
 	/// \param num number of interpolated points

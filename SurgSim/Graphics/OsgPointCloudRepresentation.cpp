@@ -50,7 +50,6 @@ OsgPointCloudRepresentation::OsgPointCloudRepresentation(const std::string& name
 	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, m_vertexData->size());
 	m_geometry->addPrimitiveSet(m_drawArrays);
 	m_geometry->setUseDisplayList(false);
-	// m_geometry->setUseVertexBufferObjects(true);
 	m_geometry->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
@@ -103,7 +102,7 @@ void OsgPointCloudRepresentation::updateGeometry(const DataStructures::VerticesP
 	}
 
 	// #performance
-	// Calculate the bounding box while iterating over the vertices, this will safe osg time in the update traversal
+	// Calculate the bounding box while iterating over the vertices, this will save osg time in the update traversal
 	for (size_t i = 0; i < count; ++i)
 	{
 		const auto& vertex = vertices[i];

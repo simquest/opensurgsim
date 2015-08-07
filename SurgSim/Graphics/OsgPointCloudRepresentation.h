@@ -101,6 +101,8 @@ private:
 	/// Color backing variable
 	SurgSim::Math::Vector4d m_color;
 
+	/// Update the geometry
+	/// \param vertices new vertices
 	void updateGeometry(const DataStructures::VerticesPlain& vertices);
 };
 

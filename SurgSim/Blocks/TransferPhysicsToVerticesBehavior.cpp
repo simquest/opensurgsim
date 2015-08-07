@@ -26,19 +26,19 @@ namespace Blocks
 
 
 TransferPhysicsToVerticesBehavior::TransferPhysicsToVerticesBehavior(const std::string& name) :
-	SurgSim::Framework::Behavior(name)
+	Framework::Behavior(name)
 {
 
 }
 
-void TransferPhysicsToVerticesBehavior::setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
+void TransferPhysicsToVerticesBehavior::setSource(const std::shared_ptr<Framework::Component>& source)
 {
 	SURGSIM_ASSERT(nullptr != source) << "'source' can not be nullptr.";
-	m_source = Framework::checkAndConvert<SurgSim::Physics::DeformableRepresentation>(
+	m_source = Framework::checkAndConvert<Physics::DeformableRepresentation>(
 				   source, "SurgSim::Physics::DeformableRepresentation");
 }
 
-void TransferPhysicsToVerticesBehavior::setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
+void TransferPhysicsToVerticesBehavior::setTarget(const std::shared_ptr<Framework::Component>& target)
 {
 	SURGSIM_ASSERT(nullptr != target) << "'target' can not be nullptr.";
 	SURGSIM_ASSERT(target->isWriteable("Vertices")) << "'target'" << target->getFullName()
@@ -46,12 +46,12 @@ void TransferPhysicsToVerticesBehavior::setTarget(const std::shared_ptr<SurgSim:
 	m_target = target;
 }
 
-std::shared_ptr<SurgSim::Physics::DeformableRepresentation> TransferPhysicsToVerticesBehavior::getSource() const
+std::shared_ptr<Physics::DeformableRepresentation> TransferPhysicsToVerticesBehavior::getSource() const
 {
 	return m_source;
 }
 
-std::shared_ptr<SurgSim::Framework::Component> TransferPhysicsToVerticesBehavior::getTarget() const
+std::shared_ptr<Framework::Component> TransferPhysicsToVerticesBehavior::getTarget() const
 {
 	return m_target;
 }

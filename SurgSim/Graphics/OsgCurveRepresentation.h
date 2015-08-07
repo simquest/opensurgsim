@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_OSGCURVEREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGCURVEREPRESENTATION_H
 
-#include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/CurveRepresentation.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
 
 #include <osg/Array>
 #include <osg/ref_ptr>
@@ -39,12 +39,15 @@ namespace SurgSim
 namespace Graphics
 {
 
+/// Implements the CurveRepresentation for OpenSceneGraph, it uses Catmull Rom interpolation, to draw the line
+/// as a GL_LINESTRIP. use the material_curve.vert shader for rendering. This class will also deposit the information
+/// of the segment in the normal information for the vertex.
 class OsgCurveRepresentation : public OsgRepresentation, public CurveRepresentation
 {
 public:
 	/// Constructor
 	explicit OsgCurveRepresentation(const std::string& name);
-	
+
 	~OsgCurveRepresentation();
 
 	bool doInitialize() override;
@@ -73,23 +76,34 @@ public:
 
 	bool isAntiAliasing() const override;
 
-
 private:
+
+	/// Update the OSG structure with the information of the control points
+	/// \param controlPoints to use
 	void updateGraphics(const DataStructures::VerticesPlain& controlPoints);
 
+	///@{
+	/// OSG handles for updating
 	osg::ref_ptr<osg::Geometry> m_geometry;
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
 	osg::ref_ptr<osg::Vec3Array> m_normalData;
 	osg::ref_ptr<osg::DrawArrays> m_drawArrays;
+	///@}
 
+	/// @{
+	/// Members for the CurveRepresentation properties
 	Math::Vector4d m_color;
-
 	size_t m_subdivision;
 	double m_tension;
+	double m_width;
+	///@}
 
+	///@{
+	/// Local structures to keep allocations to a minimum
 	std::vector<Math::Vector3d> m_controlPoints;
 	std::vector<Math::Vector3d> m_vertices;
-	double m_width;
+	///@}
+
 };
 
 #if defined(_MSC_VER)
