@@ -43,6 +43,7 @@ set(SURGSIM_COLLISION_HEADERS
 	BoxPlaneDcdContact.h
 	BoxSphereDcdContact.h
 	CapsuleSphereDcdContact.h
+	CollisionDetectionAlgorithmType.h
 	CollisionPair.h
 	ContactCalculation.h
 	DcdCollision.h

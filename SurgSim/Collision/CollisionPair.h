@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <list>
+#include "SurgSim/Collision/CollisionDetectionAlgorithmType.h"
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -33,20 +34,26 @@ class Representation;
 /// a distance depth (or equivalently if body 2 is moved the same distance
 /// in the opposite direction) then the penetration depth will be reduced to
 /// zero. This means that the normal vector points "in" to body 1
-struct Contact {
-	Contact(const double& newDepth,
+struct Contact
+{
+	Contact(const CollisionDetectionAlgorithmType& newCollisionType,
+			const double& newDepth,
+			const double& newTime,
 			const SurgSim::Math::Vector3d& newContact,
 			const SurgSim::Math::Vector3d& newNormal,
 			const std::pair<SurgSim::DataStructures::Location,
-							SurgSim::DataStructures::Location>& newPenetrationPoints) :
-		depth(newDepth), contact(newContact), normal(newNormal), penetrationPoints(newPenetrationPoints)
-		{
-		};
+			SurgSim::DataStructures::Location>& newPenetrationPoints) :
+		collisionType(newCollisionType), depth(newDepth), time(newTime), contact(newContact),
+		normal(newNormal), penetrationPoints(newPenetrationPoints)
+	{
+	};
+	CollisionDetectionAlgorithmType collisionType;		///< What collision algorithm class was used to get the contact
 	double depth;										///< What is the penetration depth for the representation
+	double time;										///< What is the time of the collision, CCD only
 	SurgSim::Math::Vector3d contact;					///< The actual contact point, only used for CCD
 	SurgSim::Math::Vector3d normal;						///< The normal on the contact point (normalized)
 	std::pair<SurgSim::DataStructures::Location,
-			  SurgSim::DataStructures::Location> penetrationPoints;	///< The deepest point inside the opposing object
+		SurgSim::DataStructures::Location> penetrationPoints;	///< The deepest point inside the opposing object
 };
 
 /// Collision Pair class, it signifies a pair of items that should be checked with the
@@ -74,7 +81,7 @@ public:
 	/// Function that returns the pair of representations of the objects that are colliding.
 	/// \return The pair of representations that are colliding.
 	const std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>>&
-	getRepresentations() const;
+			getRepresentations() const;
 
 	/// \return The representation considered to be the first
 	std::shared_ptr<Representation> getFirst() const;
@@ -86,24 +93,28 @@ public:
 	bool hasContacts() const;
 
 	/// Adds a contact to the collision pair.
+	/// \param	collisionType	The type of collision detected (CCD/DCD)
 	/// \param	depth			The depth of the intersection.
+	/// \param	time			The time of the current intersection
 	/// \param	contactPoint	The contact point, between the two bodies.
 	/// \param	normal			The normal of the contact pointing into the first representation.
 	/// \param	penetrationPoints The points furthest into the opposing object
-	void addContact(const double& depth,
-						   const SurgSim::Math::Vector3d& contactPoint,
-						   const SurgSim::Math::Vector3d& normal,
-						   const std::pair<SurgSim::DataStructures::Location,
-										   SurgSim::DataStructures::Location>& penetrationPoints);
+	void addContact(const CollisionDetectionAlgorithmType& collisionType,
+					const double& depth,
+					const double& time,
+					const SurgSim::Math::Vector3d& contactPoint,
+					const SurgSim::Math::Vector3d& normal,
+					const std::pair<SurgSim::DataStructures::Location,
+					SurgSim::DataStructures::Location>& penetrationPoints);
 
 	/// Adds a contact to the collision pair.
 	/// \param	depth			The depth of the intersection.
 	/// \param	normal			The normal of the contact pointing into the first representation.
 	/// \param	penetrationPoints The points furthest into the opposing object
 	void addContact(const double& depth,
-						   const SurgSim::Math::Vector3d& normal,
-						   const std::pair<SurgSim::DataStructures::Location,
-										   SurgSim::DataStructures::Location>& penetrationPoints);
+					const SurgSim::Math::Vector3d& normal,
+					const std::pair<SurgSim::DataStructures::Location,
+					SurgSim::DataStructures::Location>& penetrationPoints);
 
 	/// Adds a contact.
 	/// \param	contact	The contact between the first and the second representation.
@@ -126,7 +137,7 @@ private:
 
 	/// Pair of objects that are colliding
 	std::pair<std::shared_ptr<Representation>,
-			  std::shared_ptr<Representation>> m_representations;
+		std::shared_ptr<Representation>> m_representations;
 
 	/// List of current contacts
 	std::list<std::shared_ptr<Contact>> m_contacts;

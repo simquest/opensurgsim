@@ -95,7 +95,7 @@ struct VirtualToolCouplerTest : public ::testing::Test
 protected:
 	void runSystem(const int numSteps, const double dt = 0.001)
 	{
-		for(int step=0; step<numSteps; step++)
+		for (int step = 0; step < numSteps; step++)
 		{
 			virtualToolCoupler->update(dt);
 			rigidBody->beforeUpdate(dt);
@@ -130,7 +130,7 @@ protected:
 		double dt = expectedSettlingTime / NUM_STEPS;
 		Vector3d previousPosition = initialPose.translation();
 		Vector3d currentPosition;
-		for(int step=0; step<NUM_STEPS; step++)
+		for (int step = 0; step < NUM_STEPS; step++)
 		{
 			virtualToolCoupler->update(dt);
 			rigidBody->beforeUpdate(dt);
@@ -164,7 +164,7 @@ protected:
 		//      t = 4.744 * naturalFrequency;
 		// we will run the system to this point, and then check that the
 		// final position is 5.1% of its initial position
-		double inertia = rigidBody->getLocalInertia()(1,1);
+		double inertia = rigidBody->getLocalInertia()(1, 1);
 		double stiffness = virtualToolCoupler->getAngularStiffness();
 		double naturalFrequency = sqrt(stiffness / inertia);
 		double expectedSettlingTime = 4.744 / naturalFrequency;
@@ -172,7 +172,7 @@ protected:
 		double dt = expectedSettlingTime / NUM_STEPS;
 		double previousAngle = initialAngle;
 		double currentAngle;
-		for(int step=0; step<NUM_STEPS; step++)
+		for (int step = 0; step < NUM_STEPS; step++)
 		{
 			virtualToolCoupler->update(dt);
 			rigidBody->beforeUpdate(dt);
@@ -261,9 +261,9 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacementWithOffset)
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getPose().translation().isApprox(inputOffset.translation(), epsilon))
-		<< "Rigid Body Position is incorrect" << std::endl
-		<< "  Actual: " << state.getPose().translation().transpose() << std::endl
-		<< "Expected: " << inputOffset.translation().transpose() << std::endl;
+			<< "Rigid Body Position is incorrect" << std::endl
+			<< "  Actual: " << state.getPose().translation().transpose() << std::endl
+			<< "Expected: " << inputOffset.translation().transpose() << std::endl;
 }
 
 TEST_F(VirtualToolCouplerTest, LinearDisplacementWithInertialTorques)
@@ -319,7 +319,7 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 	virtualToolCoupler->overrideLinearStiffness(mass * 200);
 
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
-	initialPose.linear() = Matrix33d(Eigen::AngleAxisd(M_PI/4.0, Vector3d::UnitY()));
+	initialPose.linear() = Matrix33d(Eigen::AngleAxisd(M_PI / 4.0, Vector3d::UnitY()));
 	rigidBody->setLocalPose(initialPose);
 	rigidBody->setIsGravityEnabled(false);
 
@@ -352,7 +352,7 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 TEST_F(VirtualToolCouplerTest, WithGravity)
 {
 	const double mass = rigidBody->getMass();
-	virtualToolCoupler->overrideAngularDamping(mass * 1.0 );
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
 	virtualToolCoupler->overrideAngularStiffness(mass * 200);
 	virtualToolCoupler->overrideLinearDamping(mass * 50);
 	virtualToolCoupler->overrideLinearStiffness(mass * 200);
@@ -509,8 +509,10 @@ TEST_F(VirtualToolCouplerTest, SetHapticOutputOnlyWhenColliding)
 	virtualToolCoupler->setHapticOutputOnlyWhenColliding(true);
 	auto& collisions = collision->getCollisions().unsafeGet();
 	collisions[std::make_shared<RigidCollisionRepresentation>("collision2")].push_back(
-		std::make_shared<Collision::Contact>(0.1, Vector3d::UnitX().eval(), Vector3d::UnitY().eval(),
-		std::make_pair(DataStructures::Location(), DataStructures::Location())));
+		std::make_shared<Collision::Contact>(
+			Collision::CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, 0.1, 0.0,
+			Vector3d::UnitX().eval(), Vector3d::UnitY().eval(),
+			std::make_pair(DataStructures::Location(), DataStructures::Location())));
 	virtualToolCoupler->update(0.1);
 	data = virtualToolCoupler->getOutputData();
 	ASSERT_TRUE(data.vectors().get(DataStructures::Names::FORCE, &force));
@@ -644,7 +646,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	// Decode
 	std::shared_ptr<SurgSim::Physics::VirtualToolCoupler> newVirtualToolCoupler;
 	EXPECT_NO_THROW(newVirtualToolCoupler = std::dynamic_pointer_cast<VirtualToolCoupler>(
-		node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+			node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	// Verify
 	newVirtualToolCoupler->initialize(std::make_shared<SurgSim::Framework::Runtime>());
@@ -669,7 +671,8 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_NO_THROW(representationNode = YAML::convert<SurgSim::Framework::Component>::encode(*rigidBody););
 
 	EXPECT_EQ(inputNode[input->getClassName()]["Id"].as<std::string>(),
-		node[virtualToolCoupler->getClassName()][input->getName()][input->getClassName()]["Id"].as<std::string>());
+			  node[virtualToolCoupler->getClassName()]
+			  [input->getName()][input->getClassName()]["Id"].as<std::string>());
 }
 
 TEST_F(VirtualToolCouplerTest, OutputDataEntries)

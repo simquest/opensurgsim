@@ -317,8 +317,9 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 				expectedPenetrationPoints.first.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
 				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
-				auto contact = std::make_shared<TriangleContact>(expectedDepth, expectedContact, expectedNormal,
-																 expectedPenetrationPoints);
+				auto contact = std::make_shared<TriangleContact>(
+								   CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, expectedDepth,
+								   0.0, expectedContact, expectedNormal, expectedPenetrationPoints);
 				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
 				for (size_t i = 0; i < 3; ++i)
@@ -403,6 +404,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 
 		std::list<std::shared_ptr<Contact>> expectedContacts;
 		double expectedDepth;
+		double expectedTime;
 		double interval = 1.0 / static_cast<double>(numTriangles + 1);
 		double coordinate;
 		std::pair<Location, Location> expectedPenetrationPoints;
@@ -417,6 +419,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 						   Vector3d(0.5, 1.0 - coordinate, coordinate),
 						   Vector3d(-e, 1.0 - coordinate, coordinate));
 			expectedDepth = coordinate;
+			expectedTime = 0.0;
 			{
 				expectedPenetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0, 0, coordinate));
 				expectedPenetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0, 0, 0));
@@ -424,9 +427,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 				expectedPenetrationPoints.first.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
 				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
-				auto contact = std::make_shared<TriangleContact>(expectedDepth, expectedContact,
-																 pose.linear() * Vector3d(0, 0, -1),
-																 expectedPenetrationPoints);
+				auto contact = std::make_shared<TriangleContact>(
+								   CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION,
+								   expectedDepth, expectedTime, expectedContact,
+								   pose.linear() * Vector3d(0, 0, -1),
+								   expectedPenetrationPoints);
 				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
 				for (size_t i = 0; i < 3; ++i)
@@ -443,9 +448,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 				expectedPenetrationPoints.first.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
 				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
-				auto contact = std::make_shared<TriangleContact>(expectedDepth, expectedContact,
-																 pose.linear() * Vector3d(0, 1, 0),
-																 expectedPenetrationPoints);
+				auto contact = std::make_shared<TriangleContact>(
+								   CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION,
+								   expectedDepth, expectedTime, expectedContact,
+								   pose.linear() * Vector3d(0, 1, 0),
+								   expectedPenetrationPoints);
 				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
 				for (size_t i = 0; i < 3; ++i)

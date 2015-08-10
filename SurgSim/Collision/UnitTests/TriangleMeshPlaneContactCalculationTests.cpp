@@ -104,15 +104,16 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expec
 		depth = -planeNormalGlobal.dot(vertex - pointOnPlane);
 
 		boxLocalVertex = calculateTriangleMeshVertex(expectedMeshIndicesInContacts[i],
-													 Quaterniond::Identity(), Vector3d::Zero());
+						 Quaterniond::Identity(), Vector3d::Zero());
 		planeLocalVertex = vertex + planeNormalGlobal * depth;
 		planeLocalVertex = planeQuat.inverse() * (planeLocalVertex - planeTrans);
 
 		std::pair<Location, Location> penetrationPoint;
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
-		expectedContacts->push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
-									collisionNormal, penetrationPoint));
+		expectedContacts->push_back(std::make_shared<Contact>(
+										CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, depth, 0.0,
+										Vector3d::Zero(), collisionNormal, penetrationPoint));
 	}
 }
 
@@ -140,7 +141,8 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 	if (expectedNumberOfContacts > 0)
 	{
 		generateTriangleMeshPlaneContact(&expectedContacts, expectedNumberOfContacts, expectedMeshIndicesInContacts,
-										 meshTrans, meshQuat, plane->getNormal(), plane->getD(), planeTrans, planeQuat);
+										 meshTrans, meshQuat, plane->getNormal(), plane->getD(),
+										 planeTrans, planeQuat);
 	}
 
 	// Perform collision detection.
@@ -155,7 +157,7 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 	const Vector3d planeToMesh = mesh->getCenter() - planeTrans;
 	Vector3d nearestPointOnPlane;
 	const double distanceMeshPlane = SurgSim::Math::distancePointPlane(planeToMesh, globalPlaneNormal,
-		plane->getD(), &nearestPointOnPlane);
+									 plane->getD(), &nearestPointOnPlane);
 
 	const double minDepth = -distanceMeshPlane - maxRadius;
 	const double maxDepth = -distanceMeshPlane + maxRadius;

@@ -36,9 +36,9 @@ BoxDoubleSidedPlaneDcdContact::BoxDoubleSidedPlaneDcdContact()
 {
 }
 
-std::pair<int,int> BoxDoubleSidedPlaneDcdContact::getShapeTypes()
+std::pair<int, int> BoxDoubleSidedPlaneDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);
 }
 
 void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
@@ -58,8 +58,10 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 
 
 std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateContact(
-		const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
-		const SurgSim::Math::DoubleSidedPlaneShape& planeShape, const SurgSim::Math::RigidTransform3d& planePose)
+									 const SurgSim::Math::BoxShape& boxShape,
+									 const SurgSim::Math::RigidTransform3d& boxPose,
+									 const SurgSim::Math::DoubleSidedPlaneShape& planeShape,
+									 const SurgSim::Math::RigidTransform3d& planePose)
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -140,23 +142,25 @@ std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateCont
 		{
 			switch (boxPlaneIntersectionType)
 			{
-			case BoxPlaneIntersectionTypeEqualsZero:
-				generateContact = std::abs(d[i]) < DistanceEpsilon;
-				break;
-			case BoxPlaneIntersectionTypeLessThanZero:
-				generateContact = d[i] < -DistanceEpsilon;
-				break;
-			case BoxPlaneIntersectionTypeGreaterThanZero:
-				generateContact = d[i] > DistanceEpsilon;
-				break;
+				case BoxPlaneIntersectionTypeEqualsZero:
+					generateContact = std::abs(d[i]) < DistanceEpsilon;
+					break;
+				case BoxPlaneIntersectionTypeLessThanZero:
+					generateContact = d[i] < -DistanceEpsilon;
+					break;
+				case BoxPlaneIntersectionTypeGreaterThanZero:
+					generateContact = d[i] > DistanceEpsilon;
+					break;
 			}
 
 			if (generateContact)
 			{
 				std::pair<Location, Location> penetrationPoints = std::make_pair(Location(boxVertices[i]),
 						Location(planePose.inverse() * (boxPose * boxVertices[i] + normal * std::abs(d[i]))));
-				contacts.push_back(std::make_shared<Contact>(std::abs(d[i]), Vector3d::Zero(), normal,
-						penetrationPoints));
+				contacts.push_back(std::make_shared<Contact>(
+									   CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION,
+									   std::abs(d[i]), 0.0, Vector3d::Zero(), normal,
+									   penetrationPoints));
 
 				generateContact = false;
 			}

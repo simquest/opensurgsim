@@ -33,11 +33,13 @@ using SurgSim::Math::intersectionsSegmentBox;
 using SurgSim::Math::Geometry::DistanceEpsilon;
 
 
-namespace {
+namespace
+{
 
 typedef Eigen::AlignedBox<double, 3>::CornerType CornerType;
 
-const std::array<std::pair<CornerType, CornerType>, 12> edges = {
+const std::array<std::pair<CornerType, CornerType>, 12> edges =
+{
 	std::make_pair(CornerType::BottomLeftFloor, CornerType::TopLeftFloor),
 	std::make_pair(CornerType::BottomRightFloor, CornerType::TopRightFloor),
 	std::make_pair(CornerType::BottomLeftCeil, CornerType::TopLeftCeil),
@@ -64,9 +66,9 @@ BoxCapsuleDcdContact::BoxCapsuleDcdContact()
 {
 }
 
-std::pair<int,int> BoxCapsuleDcdContact::getShapeTypes()
+std::pair<int, int> BoxCapsuleDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_CAPSULE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_CAPSULE);
 }
 
 void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
@@ -85,8 +87,10 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 }
 
 std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateContact(
-		const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
-		const SurgSim::Math::CapsuleShape& capsuleShape, const SurgSim::Math::RigidTransform3d& capsulePose)
+									 const SurgSim::Math::BoxShape& boxShape,
+									 const SurgSim::Math::RigidTransform3d& boxPose,
+									 const SurgSim::Math::CapsuleShape& capsuleShape,
+									 const SurgSim::Math::RigidTransform3d& capsulePose)
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -131,8 +135,8 @@ std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateContact(
 						Vector3d tempSegmentPoint;
 						Vector3d tempBoxPoint;
 						double tempDistance = SurgSim::Math::distanceSegmentSegment(capsuleBottom, capsuleTop,
-							box.corner(edge.first), box.corner(edge.second),
-							&tempSegmentPoint, &tempBoxPoint);
+											  box.corner(edge.first), box.corner(edge.second),
+											  &tempSegmentPoint, &tempBoxPoint);
 						if (tempDistance < minDistance)
 						{
 							minDistance = tempDistance;
@@ -194,7 +198,9 @@ std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateContact(
 		normal = boxPose.linear() * normal;
 		std::pair<Location, Location> penetrationPoints = std::make_pair(Location(deepestBoxPoint),
 				Location(capsulePose.inverse() * boxPose * deepestCapsulePoint));
-		contacts.push_back(std::make_shared<Contact>(distance, Vector3d::Zero(), normal, penetrationPoints));
+		contacts.push_back(std::make_shared<Contact>(
+							   CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, distance, 0.0,
+							   Vector3d::Zero(), normal, penetrationPoints));
 	}
 	return std::move(contacts);
 }
