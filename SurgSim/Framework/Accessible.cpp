@@ -145,6 +145,8 @@ YAML::Node Accessible::encode() const
 
 void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& ignoredProperties)
 {
+	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Framework/Accessible")) <<
+		"Decoding node: \n" << node;
 	SURGSIM_ASSERT(node.IsMap()) << "Node to be decoded has to be map.";
 
 	for (auto data = node.begin(); data != node.end(); ++data)
@@ -159,8 +161,8 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 		if (functors == std::end(m_functors) || !functors->second.decoder)
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Framework/Accessible"))
-					<< "Can't find property with name " << name << " in the accessible, "
-					<< "trying to set value: " << data->second.as<std::string>();
+					<< "Can't find property with name " << name << " in the accessible, while trying to set " <<
+					data->second;
 		}
 		else
 		{

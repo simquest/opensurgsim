@@ -69,15 +69,17 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
 	SurgSim::Math::IntegrationScheme integrationScheme,
+	SurgSim::Math::LinearSolver linearSolver,
 	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
 
-	// Set the file name which contains the tetrahedral mesh. File will be loaded by 'doInitialize()' call.
+	// Load the tetrahedral mesh.
 	std::shared_ptr<Fem3DRepresentation> physicsRepresentation = std::make_shared<Fem3DRepresentation>("Physics");
-	physicsRepresentation->setFilename(filename);
+	physicsRepresentation->loadFem(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
+	physicsRepresentation->setLinearSolver(linearSolver);
 	sceneElement->addComponent(physicsRepresentation);
 
 	// Load the surface triangle mesh of the finite element model
@@ -409,6 +411,7 @@ int main(int argc, char* argv[])
 		createFemSceneElement("wound",
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
+							  SurgSim::Math::LINEARSOLVER_LU,
 							  material);
 	wound->setPose(armPose);
 

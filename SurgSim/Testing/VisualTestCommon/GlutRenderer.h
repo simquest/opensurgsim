@@ -16,8 +16,9 @@
 #ifndef SURGSIM_TESTING_VISUALTESTCOMMON_GLUTRENDERER_H
 #define SURGSIM_TESTING_VISUALTESTCOMMON_GLUTRENDERER_H
 
-#include <vector>
+#include <Eigen/Geometry>
 #include <memory>
+#include <vector>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -26,6 +27,8 @@
 #include <GL/glut.h>
 #endif
 
+#include "SurgSim/DataStructures/Image.h"
+#include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
 
@@ -117,6 +120,36 @@ struct GlutSphere : GlutRenderObject
 private:
 	/// GLU quadric object for the quadric operations required to build the sphere.
 	GLUquadric* quadratic;
+};
+
+/// An Image drawn to the screen
+struct GlutImage : GlutRenderObject
+{
+	typedef SurgSim::DataStructures::Image<float> ImageType;
+
+	/// The image to draw
+	SurgSim::Framework::LockedContainer<ImageType> image;
+
+	/// Constuctor
+	/// \param bounds The bounds, in window coordinates ([-1..1], [-1..1]), to draw the image.
+	explicit GlutImage(const Eigen::AlignedBox<double, 2>& bounds) :
+		m_bounds(bounds),
+		m_firstRun(true)
+	{
+	}
+
+	/// Draws the image with Glut
+	virtual void draw();
+
+private:
+	/// Window coordinates to draw the image
+	Eigen::AlignedBox<double, 2> m_bounds;
+
+	/// Texture used for holding the image
+	unsigned int m_texture;
+
+	/// Is this the fist run of draw
+	bool m_firstRun;
 };
 
 /// Group of objects which provides a transform hierarchy.

@@ -21,6 +21,7 @@
 
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -36,7 +37,7 @@ namespace Input
 ///
 /// Derived classes will likely want to hide their constructor and only
 /// allow creation through a manager object for that type of device.
-class DeviceInterface
+class DeviceInterface : public Framework::FactoryBase1<DeviceInterface, std::string>
 {
 public:
 	/// Virtual destructor (empty).

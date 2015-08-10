@@ -67,8 +67,11 @@ void OdeSolverEulerExplicit::assembleLinearSystem(double dt, const OdeState& sta
 	//   systemMatrix . solution = rhs
 	// Therefore, systemMatrix = M/dt, solution = deltaV and rhs = f
 
+	// Update the stiffness matrix
+	m_equation.updateFMDK(state, ODEEQUATIONUPDATE_F | ODEEQUATIONUPDATE_M);
+
 	// Computes the LHS systemMatrix
-	m_systemMatrix = m_equation.computeM(state) / dt;
+	m_systemMatrix = m_equation.getM() / dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
@@ -77,7 +80,7 @@ void OdeSolverEulerExplicit::assembleLinearSystem(double dt, const OdeState& sta
 	// Computes the RHS vector
 	if (computeRHS)
 	{
-		m_rhs = m_equation.computeF(state);
+		m_rhs = m_equation.getF();
 		state.applyBoundaryConditionsToVector(&m_rhs);
 	}
 }

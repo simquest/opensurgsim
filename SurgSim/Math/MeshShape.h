@@ -58,13 +58,17 @@ public:
 	/// Constructor
 	MeshShape();
 
+	/// Copy constructor
+	/// \param other The MeshShape to be copied from
+	explicit MeshShape(const MeshShape& other);
+
 	/// Copy constructor when the template data is a different type
 	/// \tparam	VertexData Type of extra data stored in each vertex
 	/// \tparam	EdgeData Type of extra data stored in each edge
 	/// \tparam	TriangleData Type of extra data stored in each triangle
 	/// \param other The mesh to be copied from. Vertex, edge and triangle data will not be copied
-	template <class VertexData, class EdgeData, class TriangleData>
-	explicit MeshShape(const SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>& other);
+	template <class V, class E, class T>
+	explicit MeshShape(const SurgSim::DataStructures::TriangleMesh<V, E, T>& other);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::MeshShape);
 
@@ -75,26 +79,13 @@ public:
 	/// \return The normal for the triangle with given ID.
 	const SurgSim::Math::Vector3d& getNormal(size_t triangleId) const;
 
-	/// Get the volume of the shape
-	/// \note this parameter is valid with respect to the initial mesh
-	/// \return The volume of the shape (in m-3)
 	double getVolume() const override;
 
-	/// Get the volumetric center of the shape
-	/// \note this parameter is valid with respect to the initial mesh
-	/// \return The center of the shape
 	Vector3d getCenter() const override;
 
-	/// Get the second central moment of the volume, commonly used
-	/// to calculate the moment of inertia matrix
-	/// \note this parameter is valid with respect to the initial mesh
-	/// \return The 3x3 symmetric second moment matrix
 	Matrix33d getSecondMomentOfVolume() const override;
 
-	/// Set the object's global pose, then update the shape.
-	/// \param pose the rigid transform to apply
-	/// \return true if the update succeeds.
-	bool setPose(const SurgSim::Math::RigidTransform3d& pose);
+	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
 
 	/// Get the AabbTree
 	/// \return The object's associated AabbTree
@@ -128,17 +119,8 @@ protected:
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
 
 private:
-	/// The initial triangle mesh contained by this shape.
-	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlain> m_initialMesh;
-
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
-
-	/// The pose.
-	SurgSim::Math::RigidTransform3d m_pose;
-
-	/// true if the pose is valid.
-	bool m_validPose;
 };
 
 }; // Math

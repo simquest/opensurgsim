@@ -22,6 +22,9 @@
 #endif
 
 #include <Eigen/SparseCore>
+#include <unordered_map>
+
+#include <boost/assign/list_of.hpp> // for 'map_list_of()'
 
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/SparseMatrix.h"
@@ -32,6 +35,19 @@ namespace SurgSim
 
 namespace Math
 {
+
+/// The linear numerical integration scheme supported
+/// Each Linear Solver should have its own entry in this enum
+enum LinearSolver
+{
+	LINEARSOLVER_LU = 0,
+	LINEARSOLVER_CONJUGATEGRADIENT
+};
+
+const std::unordered_map<LinearSolver, std::string, std::hash<int>> LinearSolverNames =
+			boost::assign::map_list_of
+			(LINEARSOLVER_LU, "LINEARSOLVER_LU")
+			(LINEARSOLVER_CONJUGATEGRADIENT, "LINEARSOLVER_CONJUGATEGRADIENT");
 
 /// LinearSparseSolveAndInverse aims at performing an efficient linear system resolution and
 /// calculating its inverse matrix at the same time.
@@ -53,14 +69,12 @@ public:
 	/// \return The solution matrix
 	virtual Matrix solve(const Matrix& b) const = 0;
 
-	/// Solve the linear system (matrix.x=b) using the matrix provided by the latest setMatrix call
-	/// for the single vector b
-	/// \param b The rhs vector
-	/// \return The solution vector
-	virtual Vector solve(const Vector& b) const = 0;
-
 	/// \return The linear system's inverse matrix, i.e. the inverse of the matrix provided on the last setMatrix call
-	virtual Matrix getInverse() const = 0;
+	virtual Matrix getInverse() const;
+
+protected:
+	/// A copy of the system matrix for use when an inverse is necessary.
+	SparseMatrix m_matrix;
 };
 
 /// Derivation for sparse LU solver
@@ -70,12 +84,37 @@ public:
 	void setMatrix(const SparseMatrix& matrix) override;
 
 	Matrix solve(const Matrix& b) const override;
-	Vector solve(const Vector& b) const override;
-
-	Matrix getInverse() const override;
 
 private:
-	Eigen::SparseLU<SparseMatrix> m_lu;
+	Eigen::SparseLU<SparseMatrix> m_solver;
+};
+
+/// Derivation for sparse CG solver
+class LinearSparseSolveAndInverseCG : public LinearSparseSolveAndInverse
+{
+public:
+	/// Set the conjugate gradient convergence tolerance
+	/// \param tolerance the new convergence tolerance
+	void setTolerance(double tolerance);
+
+	/// Get the conjugate gradient convergence tolerance
+	/// \return the convergence tolerance
+	double getTolerance();
+
+	/// Set the maximum number of iterations for conjugate gradient
+	/// \param iterations the new maximum number of iterations
+	void setMaxIterations(SparseMatrix::Index iterations);
+
+	/// Get the conjugate gradient maximum iterations
+	/// \return the maximum number of iterations allowed
+	SparseMatrix::Index getMaxIterations();
+
+	void setMatrix(const SparseMatrix& matrix) override;
+
+	Matrix solve(const Matrix& b) const override;
+
+private:
+	Eigen::ConjugateGradient<SparseMatrix> m_solver;
 };
 
 }; // namespace Math

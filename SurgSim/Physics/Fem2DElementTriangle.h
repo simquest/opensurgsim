@@ -18,6 +18,7 @@
 
 #include <array>
 
+#include "SurgSim/Physics/Fem.h"
 #include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
@@ -25,6 +26,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem2DElementTriangle);
 
 /// 2D FemElement based on a triangle with a constant thickness
 ///
@@ -45,6 +47,7 @@ namespace Physics
 /// "Shell elements: modelizations DKT, DST, DKTG and Q4g", Code_Aster, 2013, Thomas De Soza.
 ///
 /// \note The element is considered to have a constant thickness.
+/// \note The element uses linear elasticity (not visco-elasticity), so it does not have any damping.
 class Fem2DElementTriangle : public FemElement
 {
 	typedef Eigen::Matrix<double, 3, 3> Matrix33Type;
@@ -57,9 +60,20 @@ class Fem2DElementTriangle : public FemElement
 
 public:
 	/// Constructor
-	/// \param nodeIds An array of 3 node ids (A, B, C) defining this triangle element with respect to a
-	/// DeformableRepresentaitonState which is passed to the initialize method.
+	Fem2DElementTriangle();
+
+	/// Constructor
+	/// \param nodeIds An array of 3 node ids defining this triangle element with respect to a
+	/// DeformableRepresentationState which is passed to the initialize method.
 	explicit Fem2DElementTriangle(std::array<size_t, 3> nodeIds);
+
+	/// Constructor for FemElement object factory
+	/// \param elementData A FemElement struct defining this triangle element with respect to a
+	/// DeformableRepresentationState which is passed to the initialize method.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 3
+	explicit Fem2DElementTriangle(std::shared_ptr<FemElementStructs::FemElementParameter> elementData);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DElementTriangle)
 
 	/// Sets the triangle's thickness
 	/// \param thickness The thickness of the triangle
@@ -69,87 +83,20 @@ public:
 	/// \return The thickness of the triangle
 	double getThickness() const;
 
-	/// Initializes the FemElement once everything has been set
-	/// \param state The state to initialize the FemElement with
-	/// \note We use the theory of linear elasticity, so this method pre-computes the stiffness and mass matrices
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
-	/// Gets the element's volume based on the input state
-	/// \param state The state to compute the volume with
-	/// \return The element's volume
 	double getVolume(const SurgSim::Math::OdeState& state) const override;
 
-	/// Adds the element's force (computed for a given state) to a complete system force vector F (assembly)
-	/// \param state The state to compute the force with
-	/// \param[in,out] F The complete system force vector to add the element's force into
-	/// \param scale A factor to scale the added force with
-	/// \note The element's force is of size (getNumDofPerNode() x getNumNodes()).
-	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
-	/// getNumDofPerNode().
-	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
-
-	/// Adds the element's mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
-	/// \param state The state to compute the mass matrix with
-	/// \param[in,out] M The complete system mass matrix to add the element's mass-matrix into
-	/// \param scale A factor to scale the added mass matrix with
-	/// \note The element's mass matrix is a square matrix of size getNumDofPerNode() x getNumNodes().
-	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
-	/// getNumDofPerNode()
-	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) override;
-
-	/// Adds the element's damping matrix D (= -df/dv) (computed for a given state) to a complete system damping matrix
-	/// D (assembly)
-	/// \param state The state to compute the damping matrix with
-	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
-	/// \param scale A factor to scale the added damping matrix with
-	/// \note The element's damping matrix is a square matrix of size getNumDofPerNode() x getNumNodes().
-	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
-	/// getNumDofPerNode().
-	/// \note The beam uses linear elasticity (not visco-elasticity), so it does not have any damping.
-	void addDamping(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* D, double scale = 1.0) override;
-
-	/// Adds the element's stiffness matrix K (= -df/dx) (computed for a given state) to a complete system stiffness
-	/// matrix K (assembly)
-	/// \param state The state to compute the stiffness matrix with
-	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
-	/// \param scale A factor to scale the added stiffness matrix with
-	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes().
-	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
-	/// getNumDofPerNode()
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
-
-	/// Adds the element's force vector, mass, stiffness and damping matrices (computed for a given state) into a
-	/// complete system data structure F, M, D, K (assembly)
-	/// \param state The state to compute everything with
-	/// \param[in,out] F The complete system force vector to add the element force into
-	/// \param[in,out] M The complete system mass matrix to add the element mass matrix into
-	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
-	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
-	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
-	/// getNumDofPerNode().
-	void addFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, SurgSim::Math::Matrix* M,
-			SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override;
-
-	/// Adds the element's matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given
-	/// state) into a complete system data structure F (assembly)
-	/// \param state The state to compute everything with
-	/// \param alphaM The scaling factor for the mass contribution
-	/// \param alphaD The scaling factor for the damping contribution
-	/// \param alphaK The scaling factor for the stiffness contribution
-	/// \param x A complete system vector to use as the vector in the matrix-vector multiplication
-	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
-	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
-	/// getNumDofPerNode().
-	virtual void addMatVec(const SurgSim::Math::OdeState& state, double alphaM, double alphaD, double alphaK,
-			const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
-
-	virtual SurgSim::Math::Vector computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
-			const SurgSim::Math::Vector& naturalCoordinate) const;
+	SurgSim::Math::Vector computeCartesianCoordinate(const SurgSim::Math::OdeState& state,
+			const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 	SurgSim::Math::Vector computeNaturalCoordinate(const SurgSim::Math::OdeState& state,
 			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 protected:
+	/// Initializes variables needed before Initialize() is called
+	void initializeMembers();
+
 	/// Computes the triangle element's rotation given a state
 	/// \param state The state to compute the rotation from
 	/// \return The rotation matrix of the element in the given state
@@ -164,7 +111,7 @@ protected:
 	/// Computes the triangle's stiffness matrix
 	/// \param state The state to compute the stiffness matrix from
 	/// \param[out] stiffnessMatrix The stiffness matrix to store the result into
-	void computeStiffness(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18>* stiffnessMatrix);
+	void computeStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* stiffnessMatrix);
 
 	/// Computes the triangle's local mass matrix
 	/// \param state The state to compute the local mass matrix from
@@ -175,7 +122,9 @@ protected:
 	/// Computes the triangle's mass matrix
 	/// \param state The state to compute the mass matrix from
 	/// \param[out] massMatrix The mass matrix to store the result into
-	void computeMass(const SurgSim::Math::OdeState& state, Eigen::Matrix<double, 18, 18>* massMatrix);
+	void computeMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* massMatrix);
+
+	void doUpdateFMDK(const Math::OdeState& state, int options) override;
 
 	/// The element's rest state
 	Eigen::Matrix<double, 18, 1> m_x0;
@@ -183,12 +132,8 @@ protected:
 	/// Initial rotation matrix for the element
 	SurgSim::Math::Matrix33d m_initialRotation;
 
-	/// Mass matrix (in global coordinate frame)
-	Eigen::Matrix<double, 18, 18> m_M;
 	/// Stiffness matrix (in local coordinate frame)
 	Eigen::Matrix<double, 18, 18> m_MLocal;
-	/// Stiffness matrix (in global coordinate frame)
-	Eigen::Matrix<double, 18, 18> m_K;
 	/// Stiffness matrix (in local coordinate frame)
 	Eigen::Matrix<double, 18, 18> m_KLocal;
 

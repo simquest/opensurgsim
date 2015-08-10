@@ -61,14 +61,32 @@ public:
 	/// Default constructor
 	Mesh();
 
+	typedef TriangleMesh<VertexData, DataStructures::EmptyData, DataStructures::EmptyData> BaseType;
+
 	/// Copy constructor when the template data is a different type
-	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
-	/// \tparam	EdgeDataSource	Type of extra data stored in each edge
-	/// \tparam	TriangleDataSource	Type of extra data stored in each triangle
+	/// \tparam	V Type of extra data stored in each vertex
+	/// \tparam	E Type of extra data stored in each edge
+	/// \tparam	T Type of extra data stored in each triangle
 	/// \param other The mesh to be copied from. Vertex, edge and triangle data will not be copied
 	/// \note: Data of the input mesh, i.e. VertexDataSource, EdgeDataSource and TrianleDataSource will not be copied.
-	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-	explicit Mesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& other);
+	template <class V, class E, class T>
+	explicit Mesh(const TriangleMesh<V, E, T>& other);
+
+	/// Copy Constructor
+	/// \param other Constructor source
+	Mesh(const Mesh& other);
+
+	/// Move Constructor
+	/// \param other Constructor source
+	Mesh(Mesh&& other);
+
+	/// Copy Assignment
+	/// \param other Assignment source
+	Mesh& operator=(const Mesh& other);
+
+	/// Move Assignment
+	/// \param other Assignment source
+	Mesh& operator=(Mesh&& other);
 
 	/// Utility function to initialize a mesh with plain data,
 	/// \param	vertices 	An array of vertex coordinates.
@@ -83,8 +101,19 @@ public:
 					const std::vector<SurgSim::Math::Vector2d>& textures,
 					const std::vector<size_t>& triangles);
 
+	/// Increase the update count, this indicates that the mesh has been changed, if used in a mesh representation
+	/// the mesh representation will still only update the data members that have been marked for updating
+	void dirty();
+
+	/// Return the update count, please note that it will silently roll over when the range of size_t has been exceeded
+	size_t getUpdateCount() const;
+
+
 protected:
 	bool doLoad(const std::string& fileName) override;
+
+	/// For checking whether the mesh has changed
+	size_t m_updateCount;
 };
 
 

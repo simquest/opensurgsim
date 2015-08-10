@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2015, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ set(DEVICES
 	MultiAxis
 	Nimble
 	Novint
+	Oculus
 	OpenNI
 	Phantom
 	Sixense
@@ -42,6 +43,8 @@ foreach(DEVICE ${DEVICES})
 		list(APPEND SURGSIM_DEVICES_DOCUMENTATION ${DEVICE}/${DEVICE}.dox)
 	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 endforeach(DEVICE)
+
+surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS}")
 
 add_custom_target(SurgSimDevicesDocumentation SOURCES ${SURGSIM_DEVICES_DOCUMENTATION})
 set_target_properties(SurgSimDevicesDocumentation PROPERTIES FOLDER "Devices")

@@ -76,16 +76,31 @@ public:
 	TriangleMesh(const TriangleMesh<VertexData, EdgeData, TriangleData>& other);
 
 	/// Copy constructor when the template data is a different type
-	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
-	/// \tparam	EdgeDataSource	Type of extra data stored in each edge
-	/// \tparam	TriangleDataSource	Type of extra data stored in each triangle
+	/// \tparam	V Type of extra data stored in each vertex
+	/// \tparam	E Type of extra data stored in each edge
+	/// \tparam	T Type of extra data stored in each triangle
 	/// \param other The mesh to be copied from. Vertex, edge and triangle data will not be copied
 	/// \note: Data of the input mesh, i.e. VertexDataSource, EdgeDataSource and TrianleDataSource will not be copied.
-	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-	explicit TriangleMesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& other);
+	template <class V, class E, class T>
+	explicit TriangleMesh(const TriangleMesh<V, E, T>& other);
 
 	/// Destructor
 	virtual ~TriangleMesh();
+
+	/// Move Constructor
+	/// \param other Constructor source
+	TriangleMesh(TriangleMesh&& other);
+
+	/// Copy Assignment
+	/// \param other Assignment source
+	TriangleMesh<VertexData, EdgeData, TriangleData>& operator=(
+		const TriangleMesh<VertexData, EdgeData, TriangleData>& other);
+
+	/// Move Assignment
+	/// \param other Assignment source
+	TriangleMesh<VertexData, EdgeData, TriangleData>& operator=(
+		TriangleMesh<VertexData, EdgeData, TriangleData>&& other);
+
 
 	std::string getClassName() const override;
 
@@ -179,6 +194,10 @@ public:
 	/// \return True if the TriangleMesh is valid, False otherwise (the topology is then broken)
 	bool isValid() const;
 
+	/// Save the triangle mesh in the ply format
+	/// \param fileName the filename where to save
+	void save(const std::string& fileName);
+
 protected:
 	/// Remove all edges from the mesh.
 	virtual void doClearEdges();
@@ -217,6 +236,9 @@ public:
 	// Dependent name resolution for inherited functions and typenames from templates
 	using typename Vertices<VertexData>::VertexType;
 	using Vertices<VertexData>::addVertex;
+	using Vertices<VertexData>::getNumVertices;
+	using Vertices<VertexData>::getVertices;
+
 };
 
 typedef TriangleMesh<EmptyData, EmptyData, EmptyData> TriangleMeshPlain;

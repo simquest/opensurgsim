@@ -32,42 +32,32 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh()
 template <class VertexData, class EdgeData, class TriangleData>
 TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
 	const TriangleMesh<VertexData, EdgeData, TriangleData>& other) :
+	Vertices<VertexData>::Vertices(other),
 	SurgSim::Framework::Asset(),
 	m_edges(other.getEdges()),
 	m_triangles(other.getTriangles()),
 	m_freeTriangles(other.m_freeTriangles)
 {
-	for (auto& vertex : other.getVertices())
-	{
-		addVertex(vertex);
-	}
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
-	const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& other) :
+template <class V, class E, class T>
+TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(const TriangleMesh<V, E, T>& other) :
+	Vertices<VertexData>::Vertices(other),
 	SurgSim::Framework::Asset()
 {
-	for (size_t iVertex = 0; iVertex < other.getNumVertices(); ++iVertex)
+	m_edges.reserve(other.getEdges().size());
+	for (auto& edge : other.getEdges())
 	{
-		VertexType vertexData(other.getVertexPosition(iVertex));
-		addVertex(vertexData);
-	}
-	for (size_t iEdge = 0; iEdge < other.getNumEdges(); ++iEdge)
-	{
-		EdgeType edgeData((other.getEdge(iEdge)).verticesId, EdgeData());
-		addEdge(edgeData);
+		addEdge(EdgeType(edge));
 	}
 
-	auto& sourceTriangles = other.getTriangles();
 	size_t index = 0;
-	m_triangles.reserve(sourceTriangles.size());
-	for (auto sourceTriangle : sourceTriangles)
+	m_triangles.reserve(other.getTriangles().size());
+	for (auto& triangle : other.getTriangles())
 	{
-		TriangleType triangleData(sourceTriangle.verticesId, TriangleData());
-		addTriangle(triangleData);
-		if (!sourceTriangle.isValid)
+		addTriangle(TriangleType(triangle));
+		if (!triangle.isValid)
 		{
 			m_freeTriangles.push_back(index);
 		}
@@ -279,7 +269,7 @@ bool TriangleMesh<VertexData, EdgeData, TriangleData>::doLoad(const std::string&
 	if (! reader.isValid())
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "'" << fileName << "' is an invalid .ply file.";
+				<< "'" << fileName << "' is an invalid .ply file.";
 		return false;
 	}
 
@@ -288,7 +278,7 @@ bool TriangleMesh<VertexData, EdgeData, TriangleData>::doLoad(const std::string&
 	if (! reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "The input file '" << fileName << "' does not have the property required by triangle mesh.";
+				<< "The input file '" << fileName << "' does not have the property required by triangle mesh.";
 		return false;
 	}
 
@@ -301,6 +291,83 @@ void TriangleMesh<VertexData, EdgeData, TriangleData>::doClear()
 	doClearTriangles();
 	doClearEdges();
 	doClearVertices();
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(TriangleMesh&& other) :
+	Vertices<VertexData>::Vertices(std::move(other))
+{
+	doClearTriangles();
+	doClearEdges();
+	std::swap(m_triangles, other.m_triangles);
+	std::swap(m_edges, other.m_edges);
+	std::swap(m_freeTriangles, other.m_freeTriangles);
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+TriangleMesh<VertexData, EdgeData, TriangleData>& TriangleMesh<VertexData, EdgeData, TriangleData>::operator=(const
+		TriangleMesh<VertexData, EdgeData, TriangleData>& other)
+{
+	Vertices<VertexData>::operator=(other);
+	m_triangles = other.m_triangles;
+	m_edges = other.m_edges;
+	m_freeTriangles = other.m_freeTriangles;
+	return *this;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+TriangleMesh<VertexData, EdgeData, TriangleData>& TriangleMesh<VertexData, EdgeData, TriangleData>::operator=
+(TriangleMesh<VertexData, EdgeData, TriangleData>&& other)
+{
+	Vertices<VertexData>::operator=(std::move(other));
+	doClearTriangles();
+	doClearEdges();
+	std::swap(m_triangles, other.m_triangles);
+	std::swap(m_edges, other.m_edges);
+	std::swap(m_freeTriangles, other.m_freeTriangles);
+	return *this;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+void SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>::save(const std::string& fileName)
+{
+	std::fstream out(fileName, std::ios::out);
+
+	if (out.is_open())
+	{
+		out << "ply" << std::endl;
+		out << "format ascii 1.0" << std::endl;
+		out << "comment Created by OpenSurgSim, www.opensurgsim.org" << std::endl;
+		out << "element vertex " << getNumVertices() << std::endl;
+		out << "property float x\nproperty float y\nproperty float z" << std::endl;
+		out << "element face " << getNumTriangles() << std::endl;
+		out << "property list uchar uint vertex_indices" << std::endl;
+		out << "end_header" << std::endl;
+
+		for (const auto& vertex : getVertices())
+		{
+			out << vertex.position[0] << " " << vertex.position[1] << " " << vertex.position[2] << std::endl;
+		}
+
+		for (const auto& tri : getTriangles())
+		{
+			out << "3 " << tri.verticesId[0] << " " << tri.verticesId[1] << " " << tri.verticesId[2] << std::endl;
+		}
+
+		if (out.bad())
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
+					<< "There was a problem writing " << fileName;
+		}
+
+		out.close();
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
+				<< "Could not open " << fileName << " for writing.";
+	}
+
 }
 
 

@@ -20,8 +20,8 @@
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
@@ -79,7 +79,7 @@ TEST(ComputationTests, PreparePhysicsState)
 	// Add a constraint.
 	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
 	// Constraint type.
-	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	{
 		// Create first representation.

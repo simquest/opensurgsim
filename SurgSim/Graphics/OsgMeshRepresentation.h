@@ -25,6 +25,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/MeshRepresentation.h"
+#include "SurgSim/Framework/LockedContainer.h"
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -70,13 +71,17 @@ public:
 	void setUpdateOptions(int val) override;
 	int getUpdateOptions() const override;
 
-	osg::ref_ptr<osg::Geometry> getOsgGeometry();
+	osg::ref_ptr<osg::Geometry> getOsgGeometry() const;
+
+	void updateMesh(const SurgSim::Graphics::Mesh& mesh) override;
 
 protected:
 	void doUpdate(double dt) override;
 
 	/// \note If m_filename is set, m_mesh will be overwritten with the mesh loaded from the external file.
 	bool doInitialize() override;
+
+	void privateUpdateMesh(const SurgSim::Graphics::Mesh& mesh);
 
 private:
 	/// Indicates which elements of the mesh should be updated on every frame
@@ -90,35 +95,46 @@ private:
 
 	///@{
 	/// Osg structures
+	osg::ref_ptr<osg::Switch> m_meshSwitch;
 	osg::ref_ptr<osg::Geometry> m_geometry;
-	osg::ref_ptr<osg::Geode> m_geode;
-	osg::ref_ptr<osg::Vec3Array> m_vertices;
-	osg::ref_ptr<osg::Vec4Array> m_colors;
-	osg::ref_ptr<osg::Vec3Array> m_normals;
-	osg::ref_ptr<osg::Vec2Array> m_textureCoordinates;
-	osg::ref_ptr<osg::DrawElementsUInt> m_triangles;
 	///@}
 
 	/// Updates the internal arrays in accordance to the sizes given in the mesh
+	/// \param mesh The mesh used to update
+	/// \param geometry [out] The geometry that carries the data
 	/// \return updateOptions value that indicates which of the structures where updated in size and
 	/// 		will have to be updated independent of the value set in setUpdateOptions()
-	int updateOsgArrays();
+	int updateOsgArrays(const Mesh& mesh, osg::Geometry* geometry);
 
 	/// Copies the attributes for each mesh vertex in the appropriate osg structure, this will only be done
 	/// for the data as is indicated by updateOptions
+	/// \param mesh The mesh used to update
+	/// \param geometry [out] The geometry that carries the data
 	/// \param updateOptions Set of flags indicating whether a specific vertex attribute should be updated
-	void updateVertices(int updateOptions);
+	void updateVertices(const Mesh& mesh, osg::Geometry* geometry, int updateOptions);
 
 	/// Updates the normals.
-	void updateNormals();
+	/// \param geometry [out] The geometry that carries the data
+	void updateNormals(osg::Geometry* geometry);
 
 	/// Updates the triangles.
-	void updateTriangles();
+	/// \param mesh The mesh used to update
+	/// \param geometry [out] The geometry that carries the data
+	void updateTriangles(const Mesh& mesh, osg::Geometry* geometry);
 
 	/// Gets data variance for a given update option.
 	/// \param	updateOption	The update option.
 	/// \return	The data variance.
 	osg::Object::DataVariance getDataVariance(int updateOption);
+
+	/// Create the appropriate geometry nodes
+	void buildGeometry();
+
+	/// Cache for the update count pull from the mesh
+	size_t m_updateCount;
+
+	Framework::LockedContainer<Mesh> m_writeBuffer;
+
 };
 
 #if defined(_MSC_VER)

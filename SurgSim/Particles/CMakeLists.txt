@@ -15,31 +15,26 @@
 
 set(SURGSIM_PARTICLES_SOURCES
 	DefaultPointGenerator.cpp
-	EmitterRepresentation.cpp
-	Particle.cpp
-	ParticleManager.cpp
-	ParticleReference.cpp
-	ParticlesState.cpp
-	ParticleSystemRepresentation.cpp
+	Emitter.cpp
+	ParticlesCollisionRepresentation.cpp
 	PointGenerator.cpp
 	RandomBoxPointGenerator.cpp
 	RandomPointGenerator.cpp
 	RandomSpherePointGenerator.cpp
+	Representation.cpp
 	SphRepresentation.cpp
 )
 
 set(SURGSIM_PARTICLES_HEADERS
 	DefaultPointGenerator.h
-	EmitterRepresentation.h
-	Particle.h
-	ParticleManager.h
-	ParticleReference.h
-	ParticlesState.h
-	ParticleSystemRepresentation.h
+	Emitter.h
+	Particles.h
+	ParticlesCollisionRepresentation.h
 	PointGenerator.h
 	RandomBoxPointGenerator.h
 	RandomPointGenerator.h
 	RandomSpherePointGenerator.h
+	Representation.h
 	SphRepresentation.h
 )
 

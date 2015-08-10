@@ -60,25 +60,20 @@ TEST(OdeEquationTests, ComputesTest)
 		SurgSim::Math::Matrix33d expectedM = m.m_mass * SurgSim::Math::Matrix33d::Identity();
 		SurgSim::Math::Matrix33d expectedD = SurgSim::Math::Matrix33d::Zero();
 		SurgSim::Math::Matrix33d expectedK = SurgSim::Math::Matrix33d::Zero();
-		EXPECT_TRUE(m.computeF(state).isApprox(expectedF));
-		EXPECT_TRUE(m.computeM(state).isApprox(expectedM));
-		EXPECT_TRUE(m.computeD(state).isApprox(expectedD));
-		EXPECT_TRUE(m.computeK(state).isApprox(expectedK));
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_F);
+		EXPECT_TRUE(m.getF().isApprox(expectedF));
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
+		EXPECT_TRUE(m.getM().isApprox(expectedM));
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_D);
+		EXPECT_TRUE(m.getD().isApprox(expectedD));
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_K);
+		EXPECT_TRUE(m.getK().isApprox(expectedK));
 		{
-			SurgSim::Math::Vector* F = nullptr;
-			SurgSim::Math::Matrix* M = nullptr;
-			SurgSim::Math::Matrix* D = nullptr;
-			SurgSim::Math::Matrix* K = nullptr;
-
-			m.computeFMDK(state, &F, &M, &D, &K);
-			ASSERT_NE(nullptr, F);
-			EXPECT_TRUE(F->isApprox(expectedF));
-			ASSERT_NE(nullptr, M);
-			EXPECT_TRUE(M->isApprox(expectedM));
-			ASSERT_NE(nullptr, D);
-			EXPECT_TRUE(D->isApprox(expectedD));
-			ASSERT_NE(nullptr, K);
-			EXPECT_TRUE(K->isApprox(expectedK));
+			m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+			EXPECT_TRUE(m.getF().isApprox(expectedF));
+			EXPECT_TRUE(m.getM().isApprox(expectedM));
+			EXPECT_TRUE(m.getD().isApprox(expectedD));
+			EXPECT_TRUE(m.getK().isApprox(expectedK));
 		}
 	}
 
@@ -93,25 +88,20 @@ TEST(OdeEquationTests, ComputesTest)
 		SurgSim::Math::Matrix33d expectedM = m.m_mass * SurgSim::Math::Matrix33d::Identity();
 		SurgSim::Math::Matrix33d expectedD = 0.1 * SurgSim::Math::Matrix33d::Identity();
 		SurgSim::Math::Matrix33d expectedK = SurgSim::Math::Matrix33d::Zero();
-		EXPECT_TRUE(m.computeF(state).isApprox(expectedF));
-		EXPECT_TRUE(m.computeM(state).isApprox(expectedM));
-		EXPECT_TRUE(m.computeD(state).isApprox(expectedD));
-		EXPECT_TRUE(m.computeK(state).isApprox(expectedK));
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_F);
+		EXPECT_TRUE(m.getF().isApprox(expectedF));
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
+		EXPECT_TRUE(m.getM().isApprox(expectedM));
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_D);
+		EXPECT_TRUE(m.getD().isApprox(expectedD));
+		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_K);
+		EXPECT_TRUE(m.getK().isApprox(expectedK));
 		{
-			SurgSim::Math::Vector* F = nullptr;
-			SurgSim::Math::Matrix* M = nullptr;
-			SurgSim::Math::Matrix* D = nullptr;
-			SurgSim::Math::Matrix* K = nullptr;
-
-			m.computeFMDK(state, &F, &M, &D, &K);
-			ASSERT_NE(nullptr, F);
-			EXPECT_TRUE(F->isApprox(expectedF));
-			ASSERT_NE(nullptr, M);
-			EXPECT_TRUE(M->isApprox(expectedM));
-			ASSERT_NE(nullptr, D);
-			EXPECT_TRUE(D->isApprox(expectedD));
-			ASSERT_NE(nullptr, K);
-			EXPECT_TRUE(K->isApprox(expectedK));
+			m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+			EXPECT_TRUE(m.getF().isApprox(expectedF));
+			EXPECT_TRUE(m.getM().isApprox(expectedM));
+			EXPECT_TRUE(m.getD().isApprox(expectedD));
+			EXPECT_TRUE(m.getK().isApprox(expectedK));
 		}
 	}
 }

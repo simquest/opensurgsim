@@ -100,7 +100,7 @@ public:
 
 	/// Add a scene element (name) for which stapling is enabled within this behaviour.
 	/// \param sceneElementName The name of the scene element that this behaviour can staple.
-	void enableStaplingForSceneElement(std::string sceneElementName);
+	void enableStaplingForSceneElement(const std::string& sceneElementName);
 
 	/// Sets the list of scene element names that this behaviour can staple
 	/// \param stapleEnabledSceneElements List of scene element names that this behaviour can staple.

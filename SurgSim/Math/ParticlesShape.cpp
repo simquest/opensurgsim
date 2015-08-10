@@ -33,6 +33,16 @@ ParticlesShape::ParticlesShape(double radius) :
 	update();
 }
 
+ParticlesShape::ParticlesShape(const ParticlesShape& other) :
+	DataStructures::Vertices<DataStructures::EmptyData>(other),
+	m_aabbTree(other.m_aabbTree),
+	m_radius(other.getRadius()),
+	m_center(other.getCenter()),
+	m_volume(other.getVolume()),
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
+{
+}
+
 int ParticlesShape::getType() const
 {
 	return SHAPE_TYPE_PARTICLES;
@@ -103,6 +113,14 @@ bool ParticlesShape::doUpdate()
 	m_aabbTree->set(std::move(items));
 
 	return true;
+}
+
+std::shared_ptr<Shape> ParticlesShape::getTransformed(const RigidTransform3d& pose)
+{
+	auto transformed = std::make_shared<ParticlesShape>(*this);
+	transformed->transform(pose);
+	transformed->update();
+	return transformed;
 }
 
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::getAabbTree() const

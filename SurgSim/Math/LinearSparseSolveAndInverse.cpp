@@ -22,25 +22,55 @@ namespace SurgSim
 namespace Math
 {
 
+
+Matrix LinearSparseSolveAndInverse::getInverse() const
+{
+	return m_matrix.toDense().inverse();
+}
+
 void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 {
 	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
-	m_lu.compute(matrix);
+	m_solver.compute(matrix);
+	SURGSIM_ASSERT(m_solver.info() == Eigen::Success) << m_solver.lastErrorMessage();
+	m_matrix = matrix;
 }
 
 Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
 {
-	return m_lu.solve(b);
+	return m_solver.solve(b);
 }
 
-Vector LinearSparseSolveAndInverseLU::solve(const Vector& b) const
+void LinearSparseSolveAndInverseCG::setTolerance(double tolerance)
 {
-	return m_lu.solve(b);
+	m_solver.setTolerance(tolerance);
 }
 
-Matrix LinearSparseSolveAndInverseLU::getInverse() const
+double LinearSparseSolveAndInverseCG::getTolerance()
 {
-	return (m_lu.solve(Matrix::Identity(m_lu.rows(), m_lu.cols())));
+	return m_solver.tolerance();
+}
+
+void LinearSparseSolveAndInverseCG::setMaxIterations(SparseMatrix::Index iterations)
+{
+	m_solver.setMaxIterations(iterations);
+}
+
+SparseMatrix::Index LinearSparseSolveAndInverseCG::getMaxIterations()
+{
+	return m_solver.maxIterations();
+}
+
+void LinearSparseSolveAndInverseCG::setMatrix(const SparseMatrix& matrix)
+{
+	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
+	m_solver.compute(matrix);
+	m_matrix = matrix;
+}
+
+Matrix LinearSparseSolveAndInverseCG::solve(const Matrix& b) const
+{
+	return m_solver.solve(b);
 }
 
 }; // namespace Math

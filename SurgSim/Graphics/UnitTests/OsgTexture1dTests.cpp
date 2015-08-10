@@ -54,13 +54,9 @@ TEST(OsgTexture1dTests, SetSizeTest)
 
 TEST(OsgTexture1dTests, LoadAndClearImageTest)
 {
-	ASSERT_TRUE(boost::filesystem::exists("Data"));
+	SurgSim::Framework::ApplicationData data("config.txt");
 
-	std::vector<std::string> paths;
-	paths.push_back("Data/OsgTextureTests");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	std::string imagePath = data.findFile("Gradient.png");
+	std::string imagePath = data.findFile("Textures/Gradient.png");
 
 	ASSERT_NE("", imagePath) << "Could not find image file!";
 

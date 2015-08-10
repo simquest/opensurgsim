@@ -42,6 +42,7 @@ namespace Graphics
 OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
 	m_viewer(new osgViewer::CompositeViewer())
 {
+	setMultiThreading(true);
 }
 
 OsgManager::~OsgManager()
@@ -52,7 +53,7 @@ void OsgManager::setMultiThreading(bool val)
 {
 	if (val == true)
 	{
-		m_viewer->setThreadingModel(osgViewer::ViewerBase::ThreadPerContext);
+		m_viewer->setThreadingModel(osgViewer::ViewerBase::DrawThreadPerContext);
 	}
 	else
 	{

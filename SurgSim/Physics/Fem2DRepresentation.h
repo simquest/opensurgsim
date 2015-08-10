@@ -20,18 +20,33 @@
 #include <string>
 
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Fem2D.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
 {
+namespace DataStructures
+{
+struct IndexedLocalCoordinate;
+struct Location;
+}
+namespace Framework
+{
+class Asset;
+}
+namespace Math
+{
+class OdeState;
+}
 
 namespace Physics
 {
-SURGSIM_STATIC_REGISTRATION(Fem2DRepresentation);
+class Localization;
 
-class Fem2DPlyReaderDelegate;
+SURGSIM_STATIC_REGISTRATION(Fem2DRepresentation);
 
 /// Finite Element Model 2D is a fem built with 2D FemElement
 class Fem2DRepresentation : public FemRepresentation
@@ -46,17 +61,44 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem2DRepresentation);
 
+	void loadFem(const std::string& fileName) override;
+
+	/// Sets the fem mesh asset
+	/// \param mesh The fem mesh to assign to this representation
+	/// \exception SurgSim::Framework::AssertionFailure if mesh is nullptr or it's actual type is not Fem2D
+	void setFem(std::shared_ptr<SurgSim::Framework::Asset> mesh);
+
+	/// \return The fem mesh asset as a Fem2D
+	std::shared_ptr<Fem2D> getFem() const;
+
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
 		const SurgSim::Math::Vector& generalizedForce,
 		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
 		const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
 
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
+
 protected:
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 			const SurgSim::Math::RigidTransform3d& transform) override;
 
+	bool doInitialize() override;
+
 private:
-	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+	/// Helper method: create a localization for a node-based IndexedLocalCoordinate
+	/// \param location The IndexedLocalCoordinate pointing to the node index
+	/// \return Localization of the node for this representation
+	std::shared_ptr<Localization> createNodeLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	/// Helper method: create a localization for an element-based IndexedLocalCoordinate (triangle)
+	/// \param location The IndexedLocalCoordinate defining a point on the element mesh
+	/// \return Localization of the point for this representation
+	std::shared_ptr<Localization> createElementLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	/// The Fem2DRepresentation's asset as a Fem2D
+	std::shared_ptr<Fem2D> m_fem;
 };
 
 } // namespace Physics

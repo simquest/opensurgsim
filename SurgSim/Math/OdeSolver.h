@@ -21,7 +21,7 @@
 
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
 
-#include "SurgSim/Math/LinearSolveAndInverse.h"
+#include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeEquation.h"
 
@@ -33,7 +33,8 @@ namespace Math
 
 /// The diverse numerical integration scheme supported
 /// Each Ode Solver should have its own entry in this enum
-enum IntegrationScheme {
+enum IntegrationScheme
+{
 	INTEGRATIONSCHEME_STATIC = 0,
 	INTEGRATIONSCHEME_LINEAR_STATIC,
 	INTEGRATIONSCHEME_EXPLICIT_EULER,
@@ -47,17 +48,17 @@ enum IntegrationScheme {
 };
 
 const std::unordered_map<IntegrationScheme, std::string, std::hash<int>> IntegrationSchemeNames =
-	boost::assign::map_list_of
-	(INTEGRATIONSCHEME_STATIC, "INTEGRATIONSCHEME_STATIC")
-	(INTEGRATIONSCHEME_LINEAR_STATIC, "INTEGRATIONSCHEME_LINEAR_STATIC")
-	(INTEGRATIONSCHEME_EXPLICIT_EULER, "INTEGRATIONSCHEME_EXPLICIT_EULER")
-	(INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER")
-	(INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, "INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER")
-	(INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER")
-	(INTEGRATIONSCHEME_IMPLICIT_EULER, "INTEGRATIONSCHEME_IMPLICIT_EULER")
-	(INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER")
-	(INTEGRATIONSCHEME_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_RUNGE_KUTTA_4")
-	(INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4");
+			boost::assign::map_list_of
+			(INTEGRATIONSCHEME_STATIC, "INTEGRATIONSCHEME_STATIC")
+			(INTEGRATIONSCHEME_LINEAR_STATIC, "INTEGRATIONSCHEME_LINEAR_STATIC")
+			(INTEGRATIONSCHEME_EXPLICIT_EULER, "INTEGRATIONSCHEME_EXPLICIT_EULER")
+			(INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER")
+			(INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, "INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER")
+			(INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER")
+			(INTEGRATIONSCHEME_IMPLICIT_EULER, "INTEGRATIONSCHEME_IMPLICIT_EULER")
+			(INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER, "INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER")
+			(INTEGRATIONSCHEME_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_RUNGE_KUTTA_4")
+			(INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4, "INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4");
 
 /// Base class for all solvers of ode equation of order 2 of the form \f$M(x(t), v(t)).a(t) = f(t, x(t), v(t))\f$. <br>
 /// This ode equation is solved as an ode of order 1 by defining the state vector
@@ -90,27 +91,28 @@ public:
 
 	/// Sets the specialized linear solver to use with this Ode solver
 	/// \param linearSolver the linear solver to use when solving the ode equation
-	void setLinearSolver(std::shared_ptr<LinearSolveAndInverse> linearSolver);
+	void setLinearSolver(std::shared_ptr<LinearSparseSolveAndInverse> linearSolver);
 
 	/// Gets the specialized linear solver used with this Ode solver
 	/// \return The linear solver used when solving the ode equation
-	std::shared_ptr<LinearSolveAndInverse> getLinearSolver() const;
+	std::shared_ptr<LinearSparseSolveAndInverse> getLinearSolver() const;
 
 	/// Solves the equation
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	/// \param computeCompliance True if the compliance matrix needs to be computed, False otherwise
-	/// \note Regardless of 'computeCompliance', the system matrix will be computed by this method.
+	/// \param computeCompliance True to explicitly compute the compliance matrix, False otherwise
 	virtual void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) = 0;
 
 	/// Computes the system and compliance matrices for a given state
 	/// \param dt The time step
 	/// \param state The state to compute the system and compliance matrices for
-	void computeMatrices(double dt, const OdeState& state);
+	/// \param computeCompliance True to explicitly compute the compliance matrix, False otherwise
+	void computeMatrices(double dt, const OdeState& state, bool computeCompliance = true);
 
-	/// \return The latest system matrix computed (either by calling solve or computeMatrices)
-	const Matrix& getSystemMatrix() const;
+	/// Queries the current system matrix
+	/// \return The latest system matrix calculated
+	const SparseMatrix& getSystemMatrix() const;
 
 	/// \return The latest compliance matrix computed (either by calling solve or computeMatrices)
 	const Matrix& getComplianceMatrix() const;
@@ -128,7 +130,7 @@ protected:
 	/// \note The method should take care of the boundary conditions properly on both the matrix and the vector.
 	/// \note The method should prepare the linear solver m_linearSolver to be used with the m_systemMatrix
 	virtual void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
-		bool computeRHS = true) = 0;
+									  bool computeRHS = true) = 0;
 
 	/// Helper method computing the compliance matrix from the system matrix and setting the boundary conditions
 	/// \param state The state describing the boundary conditions
@@ -144,13 +146,13 @@ protected:
 	OdeEquation& m_equation;
 
 	/// The specialized linear solver to use when solving the ode equation
-	std::shared_ptr<LinearSolveAndInverse> m_linearSolver;
+	std::shared_ptr<LinearSparseSolveAndInverse> m_linearSolver;
 
 	/// Linear system matrix (can be M, K, combination of MDK depending on the solver), including boundary conditions
 	/// \note A static solver will have K for system matrix
 	/// \note A dynamic explicit solver will have M for system matrix
 	/// \note A dynamic implicit solver will have a combination of M, D and K for system matrix
-	Matrix m_systemMatrix;
+	SparseMatrix m_systemMatrix;
 
 	/// Linear system solution and rhs vectors (including boundary conditions)
 	Vector m_solution, m_rhs;

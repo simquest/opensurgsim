@@ -26,6 +26,7 @@
 
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Device::LeapDevice;
+using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
 
 
@@ -33,10 +34,19 @@ class GlutWindow : public SurgSim::Input::InputConsumerInterface
 {
 public:
 	GlutWindow()
+		: m_numHands(0)
 	{
 		m_camera = std::make_shared<GlutCamera>(Vector3d(0.0, -1.0, 0.0), Vector3d(0.0, 0.0, 0.0),
 											Vector3d(0.0, 0.0, -1.0), 45.0, 0.001, 2.0);
 		GlutRenderer::setCamera(m_camera);
+
+		m_leftView = std::make_shared<GlutImage>(
+				Eigen::AlignedBox<double, 2>(Vector2d(-0.7, -0.9), Vector2d(-0.3, -0.5)));
+		m_rightView = std::make_shared<GlutImage>(
+				Eigen::AlignedBox<double, 2>(Vector2d(0.3, -0.9), Vector2d(0.7, -0.5)));
+		GlutRenderer::addObject(m_leftView);
+		GlutRenderer::addObject(m_rightView);
+
 		m_renderThread = boost::thread(boost::ref(GlutRenderer::run));
 	}
 
@@ -51,7 +61,7 @@ public:
 	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
 		m_numHands++;
-		for (int i = 0; i < inputData.poses().getNumEntries(); i++)
+		for (size_t i = 0; i < inputData.poses().size(); i++)
 		{
 			auto sphere = std::make_shared<GlutSphere>(0.010, Vector3d::Unit(m_numHands % 3));
 			GlutRenderer::addObject(sphere);
@@ -62,10 +72,20 @@ public:
 	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
 		SurgSim::Math::RigidTransform3d pose;
-		for (int i = 0; i < inputData.poses().getNumEntries(); i++)
+		for (size_t i = 0; i < inputData.poses().size(); i++)
 		{
 			inputData.poses().get(i, &pose);
 			m_spheres[device + inputData.poses().getName(i)]->pose = pose;
+		}
+
+		SurgSim::DataStructures::DataGroup::ImageType data;
+		if (inputData.images().get("left", &data))
+		{
+			m_leftView->image.set(std::move(data));
+		}
+		if (inputData.images().get("right", &data))
+		{
+			m_rightView->image.set(std::move(data));
 		}
 	}
 
@@ -74,12 +94,15 @@ private:
 	std::shared_ptr<GlutCamera> m_camera;
 	size_t m_numHands;
 	std::unordered_map<std::string, std::shared_ptr<GlutSphere>> m_spheres;
+	std::shared_ptr<GlutImage> m_leftView;
+	std::shared_ptr<GlutImage> m_rightView;
 };
 
 int main(int argc, char** argv)
 {
 	auto leftHand = std::make_shared<LeapDevice>("Left Hand");
 	leftHand->setHandType(SurgSim::Device::HANDTYPE_LEFT);
+	leftHand->setProvideImages(true);
 	leftHand->initialize();
 
 	auto rightHand = std::make_shared<LeapDevice>("Right Hand");
@@ -90,7 +113,8 @@ int main(int argc, char** argv)
 	leftHand->addInputConsumer(window);
 	rightHand->addInputConsumer(window);
 
-	std::cout << std::endl << "**********************************************************************" << std::endl
+	std::cout << std::endl
+		<< "**********************************************************************" << std::endl
 		<< "Leap Visual Test" << std::endl << std::endl
 		<< "When done, press Enter to quit the application." << std::endl
 		<< "**********************************************************************" << std::endl;

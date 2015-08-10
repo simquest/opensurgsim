@@ -37,9 +37,10 @@ void OdeSolverLinearStatic::solve(double dt, const OdeState& currentState, OdeSt
 	}
 	else
 	{
-		Vector& f = m_equation.computeF(currentState);
-		currentState.applyBoundaryConditionsToVector(&f);
-		Vector deltaX = m_complianceMatrix * f;
+		m_equation.updateFMDK(currentState, ODEEQUATIONUPDATE_F);
+
+		const Vector& f = m_equation.getF();
+		Vector deltaX = m_equation.applyCompliance(currentState, f);
 
 		// Compute the new state using the static scheme:
 		newState->getPositions() = currentState.getPositions()  + deltaX;

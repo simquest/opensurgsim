@@ -122,7 +122,10 @@ protected:
 	/// \param actionAdapter Action adapter
 	/// \return true if the mouse wheel was handled, false otherwise
 	virtual bool handleMouseWheel(const osgGA::GUIEventAdapter& eventAdapter,
-			osgGA::GUIActionAdapter& actionAdapter); //NOLINT
+								  osgGA::GUIActionAdapter& actionAdapter); //NOLINT
+
+	virtual void updateCamera(osg::Camera& camera) override;
+
 };
 
 }; // namespace Graphics

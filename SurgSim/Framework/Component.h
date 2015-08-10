@@ -39,7 +39,10 @@ class SceneElement;
 /// whether to handle a component of a given type or not. Components will get initialized by having
 /// doInit(), and doWakeUp() called in succession, all components together will have doInit() called before
 /// any component will recieve doWakeUp()
-class Component : public Accessible, public std::enable_shared_from_this<Component>
+class Component :
+	public Accessible,
+	public std::enable_shared_from_this<Component>,
+	public FactoryBase1<Component, std::string>
 {
 public:
 	/// Constructor
@@ -51,6 +54,10 @@ public:
 	/// Gets component name.
 	/// \return	Name of this component.
 	std::string getName() const;
+
+	/// Gets a string containing the name of the Component and (if it has one) its SceneElement.
+	/// \return Name of Component and SceneElement.
+	std::string getFullName() const;
 
 	/// Sets the name of component.
 	/// \param	name	The name of this component.
@@ -108,11 +115,6 @@ public:
 	/// \note Use the SURGSIM_CLASSNAME macro in derived classes.
 	/// \return The fully namespace qualified name of this class.
 	virtual std::string getClassName() const;
-
-	typedef SurgSim::Framework::ObjectFactory1<SurgSim::Framework::Component, std::string> FactoryType;
-
-	/// \return The static class factory that is being used in the conversion.
-	static FactoryType& getFactory();
 
 	/// Gets a shared pointer to this component.
 	/// \return	The shared pointer.

@@ -29,7 +29,7 @@ OdeSolverLinearEulerExplicit::OdeSolverLinearEulerExplicit(OdeEquation* equation
 }
 
 void OdeSolverLinearEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState,
-										 bool computeCompliance)
+		bool computeCompliance)
 {
 	if (!m_initialized)
 	{
@@ -39,9 +39,10 @@ void OdeSolverLinearEulerExplicit::solve(double dt, const OdeState& currentState
 	}
 	else
 	{
-		Vector& f = m_equation.computeF(currentState);
-		currentState.applyBoundaryConditionsToVector(&f);
-		Vector deltaV = m_complianceMatrix * f;
+		m_equation.updateFMDK(currentState, ODEEQUATIONUPDATE_F);
+
+		const Vector& f = m_equation.getF();
+		Vector deltaV = m_equation.applyCompliance(currentState, f);
 
 		newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
 		newState->getVelocities() = currentState.getVelocities() + deltaV;

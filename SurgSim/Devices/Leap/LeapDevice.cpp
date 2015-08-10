@@ -22,10 +22,10 @@ namespace SurgSim
 namespace Device
 {
 
-
 LeapDevice::LeapDevice(const std::string& name) :
 	SurgSim::Input::CommonDevice(name, LeapScaffold::buildDeviceInputData()),
-	m_handType(HANDTYPE_RIGHT)
+	m_handType(HANDTYPE_RIGHT),
+	m_isProvidingImages(false)
 {
 }
 
@@ -48,11 +48,49 @@ HandType LeapDevice::getHandType() const
 	return m_handType;
 }
 
+void LeapDevice::setTrackingMode(LeapTrackingMode mode)
+{
+	if (isInitialized())
+	{
+		m_scaffold->setTrackingMode(mode);
+	}
+	m_requestedTrackingMode = mode;
+}
+
+LeapTrackingMode LeapDevice::getTrackingMode() const
+{
+	if (isInitialized())
+	{
+		return m_scaffold->getTrackingMode();
+	}
+	else
+	{
+		return m_requestedTrackingMode.getValue();
+	}
+}
+
+void LeapDevice::setProvideImages(bool produceImages)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot call setProvideImages after LeapDevice is initialized";
+	m_isProvidingImages = produceImages;
+}
+
+bool LeapDevice::isProvidingImages() const
+{
+	return m_isProvidingImages;
+}
+
 bool LeapDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized()) << getName() << "is already initialized, cannot initialize again.";
 	m_scaffold = LeapScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(isInitialized()) << getName() << " initialization failed, cannot get scaffold.";
+
+	if (m_requestedTrackingMode.hasValue())
+	{
+		m_scaffold->setTrackingMode(m_requestedTrackingMode.getValue());
+	}
+
 	return m_scaffold->registerDevice(this);
 }
 

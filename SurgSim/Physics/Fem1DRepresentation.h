@@ -19,17 +19,34 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Fem1D.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
 {
+namespace DataStructures
+{
+struct IndexedLocalCoordinate;
+struct Location;
+}
+namespace Framework
+{
+class Asset;
+}
+namespace Math
+{
+class OdeState;
+}
 
 namespace Physics
 {
-SURGSIM_STATIC_REGISTRATION(Fem1DRepresentation);
+class Localization;
 
-class FemPlyReaderDelegate;
+SURGSIM_STATIC_REGISTRATION(Fem1DRepresentation);
 
 /// Finite Element Model 1D is a fem built with 1D FemElement
 ///
@@ -46,22 +63,44 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::Fem1DRepresentation);
 
+	void loadFem(const std::string& fileName) override;
+
+	/// Sets the fem mesh asset
+	/// \param mesh The fem mesh to assign to this representation
+	/// \exception SurgSim::Framework::AssertionFailure if mesh is nullptr or it's actual type is not Fem1D
+	void setFem(std::shared_ptr<SurgSim::Framework::Asset> mesh);
+
+	/// \return The fem mesh asset as a Fem1D
+	std::shared_ptr<Fem1D> getFem() const;
+
 	void addExternalGeneralizedForce(std::shared_ptr<Localization> localization,
-		const SurgSim::Math::Vector& generalizedForce,
-		const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
-		const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+									 const SurgSim::Math::Vector& generalizedForce,
+									 const SurgSim::Math::Matrix& K = SurgSim::Math::Matrix(),
+									 const SurgSim::Math::Matrix& D = SurgSim::Math::Matrix()) override;
+
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
 
 protected:
-	bool doWakeUp() override;
-
-	/// Transform a state using a given transformation
-	/// \param[in,out] state The state to be transformed
-	/// \param transform The transformation to apply
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
-			const SurgSim::Math::RigidTransform3d& transform) override;
+						const SurgSim::Math::RigidTransform3d& transform) override;
+
+	bool doInitialize() override;
 
 private:
-	std::shared_ptr<FemPlyReaderDelegate> getDelegate() override;
+	/// Helper method: create a localization for a node-based IndexedLocalCoordinate
+	/// \param location The IndexedLocalCoordinate pointing to the node index
+	/// \return Localization of the node for this representation
+	std::shared_ptr<Localization> createNodeLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	/// Helper method: create a localization for an element-based IndexedLocalCoordinate (beam)
+	/// \param location The IndexedLocalCoordinate defining a point on the element mesh
+	/// \return Localization of the point for this representation
+	std::shared_ptr<Localization> createElementLocalization(
+		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+
+	/// The Fem1DRepresentation's asset as a Fem1D
+	std::shared_ptr<Fem1D> m_fem;
 };
 
 } // namespace Physics

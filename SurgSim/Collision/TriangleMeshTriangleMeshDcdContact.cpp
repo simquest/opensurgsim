@@ -138,8 +138,8 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	auto meshA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getShape());
-	auto meshB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getShape());
+	auto meshA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getPosedShape());
+	auto meshB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getPosedShape());
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
 		= meshA->getAabbTree()->spatialJoin(*meshB->getAabbTree());

@@ -99,7 +99,7 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 {
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	std::shared_ptr<SurgSim::Framework::Component> osgMesh = std::make_shared<OsgMeshRepresentation>("TestMesh");
-	std::string filename = "OsgMeshRepresentationTests/Cube.ply";
+	std::string filename = "Geometry/Cube_with_texture.ply";
 
 	osgMesh->setValue("MeshFileName", filename);
 	osgMesh->setValue("UpdateOptions", 2);
@@ -126,7 +126,7 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 TEST(OsgMeshRepresentationTests, MeshDelegateTest)
 {
 	SurgSim::Framework::ApplicationData data("config.txt");
-	SurgSim::DataStructures::PlyReader reader(data.findFile("OsgMeshRepresentationTests/Cube.ply"));
+	SurgSim::DataStructures::PlyReader reader(data.findFile("Geometry/Cube_with_texture.ply"));
 	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
 
 	EXPECT_NO_THROW(EXPECT_TRUE(reader.parseWithDelegate(delegate)));

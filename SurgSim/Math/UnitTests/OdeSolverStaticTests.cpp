@@ -60,14 +60,19 @@ void doSolveTest(bool computeCompliance)
 	MassPointsForStatic m;
 	MassPointsStateForStatic defaultState, currentState, newState;
 
-	T solver(&m);
-	ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState, computeCompliance);});
+	auto solver = std::make_shared<T>(&m);
+	EXPECT_NO_THROW(m.setOdeSolver(solver));
+
+	ASSERT_NO_THROW({solver->solve(1e-3, currentState, &newState, computeCompliance);});
 	EXPECT_EQ(defaultState, currentState);
 	EXPECT_NE(defaultState, newState);
 
 	// Solve manually K.(x - x0) = Fext
-	const Vector &Fext = m.getExternalForces();
-	Vector expectedDeltaX = m.computeK(currentState).inverse() * Fext;
+	Eigen::SparseLU<SparseMatrix> eigenSolver;
+	const Vector& Fext = m.getExternalForces();
+	m.updateFMDK(currentState, ODEEQUATIONUPDATE_K);
+	eigenSolver.compute(m.getK());
+	Eigen::VectorXd expectedDeltaX = eigenSolver.solve(Fext);
 	Vector expectedX = defaultState.getPositions() + expectedDeltaX;
 	EXPECT_TRUE(newState.getPositions().isApprox(expectedX));
 }
@@ -100,14 +105,17 @@ template <class T>
 void doComputeMatricesTest()
 {
 	MassPointsForStatic m;
-	T solver(&m);
+	auto solver = std::make_shared<T>(&m);
+	EXPECT_NO_THROW(m.setOdeSolver(solver));
 	MassPointsStateForStatic state;
 	double dt = 1e-3;
 
-	Matrix expectedSystemMatrix = m.computeK(state);
-	EXPECT_NO_THROW(solver.computeMatrices(dt, state));
-	EXPECT_TRUE(solver.getSystemMatrix().isApprox(expectedSystemMatrix));
-	EXPECT_TRUE(solver.getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
+	m.updateFMDK(state, ODEEQUATIONUPDATE_K);
+	Matrix expectedSystemMatrix = m.getK();
+	EXPECT_NO_THROW(solver->computeMatrices(dt, state));
+	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));
+	EXPECT_TRUE(m.applyCompliance(state, Matrix::Identity(state.getNumDof(),
+								  state.getNumDof())).isApprox(expectedSystemMatrix.inverse()));
 }
 };
 

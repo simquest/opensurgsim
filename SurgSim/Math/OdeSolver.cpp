@@ -27,7 +27,7 @@ OdeSolver::OdeSolver(OdeEquation* equation) : m_equation(*equation)
 	allocate(m_equation.getInitialState()->getPositions().size());
 
 	// Default linear solver
-	setLinearSolver(std::make_shared<LinearSolveAndInverseDenseMatrix>());
+	setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
 }
 
 const std::string OdeSolver::getName() const
@@ -35,17 +35,17 @@ const std::string OdeSolver::getName() const
 	return m_name;
 }
 
-void OdeSolver::setLinearSolver(std::shared_ptr<LinearSolveAndInverse> linearSolver)
+void OdeSolver::setLinearSolver(std::shared_ptr<LinearSparseSolveAndInverse> linearSolver)
 {
 	m_linearSolver = linearSolver;
 }
 
-std::shared_ptr<LinearSolveAndInverse> OdeSolver::getLinearSolver() const
+std::shared_ptr<LinearSparseSolveAndInverse> OdeSolver::getLinearSolver() const
 {
 	return m_linearSolver;
 }
 
-const Matrix& OdeSolver::getSystemMatrix() const
+const SparseMatrix& OdeSolver::getSystemMatrix() const
 {
 	return m_systemMatrix;
 }
@@ -57,26 +57,28 @@ const Matrix& OdeSolver::getComplianceMatrix() const
 
 void OdeSolver::allocate(size_t size)
 {
-	m_systemMatrix.resize(size, size);
+	m_systemMatrix.resize(static_cast<SparseMatrix::Index>(size), static_cast<SparseMatrix::Index>(size));
 	m_complianceMatrix.resize(size, size);
 	m_solution.resize(size);
 	m_rhs.resize(size);
 }
 
-void OdeSolver::computeMatrices(double dt, const OdeState& state)
+void OdeSolver::computeMatrices(double dt, const OdeState& state, bool computeCompliance)
 {
 	/// Compute the system matrix (and discard the RHS calculation)
 	assembleLinearSystem(dt, state, state, false);
 
 	/// Compute the compliance matrix
-	computeComplianceMatrixFromSystemMatrix(state);
+	if (computeCompliance)
+	{
+		computeComplianceMatrixFromSystemMatrix(state);
+	}
 }
 
 void OdeSolver::computeComplianceMatrixFromSystemMatrix(const OdeState& state)
 {
 	// The compliance matrix is the inverse of the system matrix
 	m_complianceMatrix = m_linearSolver->getInverse();
-
 	// The boundary conditions needs to be set on the compliance matrix and no compliance should be used for the nodes
 	// Which means that the compliance matrix has entire rows and columns of zeros for the boundary conditions.
 	state.applyBoundaryConditionsToMatrix(&m_complianceMatrix, false);

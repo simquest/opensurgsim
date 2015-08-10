@@ -45,11 +45,21 @@ public:
 	/// \param radius The particles' radius (in m)
 	explicit ParticlesShape(double radius = 0.0);
 
-	/// Copy constructor when the template data is a different type
-	/// \tparam	VertexData Type of extra data stored in each vertex
+	/// Copy constructor
+	/// \param other The ParticleShape to be copied from
+	explicit ParticlesShape(const ParticlesShape& other);
+
+	/// Copy constructor from another Vertices type
+	/// \tparam V type of data stored in the other vertices
 	/// \param other The vertices to be copied from. Vertex data will not be copied
-	template <class VertexData>
-	explicit ParticlesShape(const SurgSim::DataStructures::Vertices<VertexData>& other);
+	template <class V>
+	explicit ParticlesShape(const SurgSim::DataStructures::Vertices<V>& other);
+
+	/// Assignment when the template data is a different type
+	/// \tparam V type of data stored in the other Vertices
+	/// \param other the Vertices to copy from
+	template <class V>
+	ParticlesShape& operator=(const Vertices<V>& other);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::ParticlesShape);
 
@@ -72,6 +82,8 @@ public:
 	Vector3d getCenter() const override;
 
 	Matrix33d getSecondMomentOfVolume() const override;
+
+	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
 
 	bool isValid() const override;
 

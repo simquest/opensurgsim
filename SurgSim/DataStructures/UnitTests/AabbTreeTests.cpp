@@ -218,7 +218,7 @@ static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const s
 TEST(AabbTreeTests, SpatialJoinTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	const std::string fileName = "Geometry/staple_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
 	ASSERT_NO_THROW(meshA->load(fileName));
@@ -227,7 +227,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	ASSERT_NO_THROW(meshB->load(fileName));
 
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
-	meshB->setPose(rhsPose);
+	meshB->transform(rhsPose);
 
 	// update the AABB trees
 	meshA->update();

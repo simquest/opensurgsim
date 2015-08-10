@@ -36,26 +36,27 @@ void OdeSolverLinearEulerImplicit::setNewtonRaphsonMaximumIteration(size_t maxim
 {
 	OdeSolverEulerImplicit::setNewtonRaphsonMaximumIteration(maximumIteration);
 	SURGSIM_LOG_IF(maximumIteration != 1, SurgSim::Framework::Logger::getLogger("OdeSolver"), WARNING) <<
-		"OdeSolverLinearEulerImplicit should have a maximum number of iteration of 1 for the Newton-Raphson. " <<
-		"As the model is (supposed to be) linear, a single iteration will find the exact solution.";
+			"OdeSolverLinearEulerImplicit should have a maximum number of iteration of 1 for the Newton-Raphson. " <<
+			"As the model is (supposed to be) linear, a single iteration will find the exact solution.";
 }
 
 void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState, OdeState* newState,
-										 bool computeCompliance)
+		bool computeCompliance)
 {
 	if (!m_initialized)
 	{
 		// The compliance matrix is constant and used in all following calls, so we force its calculation on 1st pass.
 		OdeSolverEulerImplicit::solve(dt, currentState, newState, true);
-		m_constantK = m_equation.computeK(currentState);
+		m_constantK = m_equation.getK();
 		m_initialized = true;
 	}
 	else
 	{
-		Vector& f = m_equation.computeF(currentState);
+		m_equation.updateFMDK(currentState, ODEEQUATIONUPDATE_F);
+
+		Vector f = m_equation.getF();
 		f -= m_constantK * currentState.getVelocities() * dt;
-		currentState.applyBoundaryConditionsToVector(&f);
-		Vector deltaV = m_complianceMatrix * f;
+		Vector deltaV = m_equation.applyCompliance(currentState, f);
 
 		newState->getVelocities() = currentState.getVelocities() + deltaV;
 		newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();

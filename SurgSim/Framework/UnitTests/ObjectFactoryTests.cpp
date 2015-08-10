@@ -33,7 +33,7 @@ public:
 
 	}
 
-	explicit TestClass(std::string val) : stringValue(val)
+	explicit TestClass(const std::string& val) : stringValue(val)
 	{
 
 	}

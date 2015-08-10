@@ -56,16 +56,16 @@ namespace
 {
 struct RungeKuttaState
 {
-	RungeKuttaState(){}
-	RungeKuttaState(const Vector& p, const Vector& v) : position(p), velocity(v){}
+	RungeKuttaState() {}
+	RungeKuttaState(const Vector& p, const Vector& v) : position(p), velocity(v) {}
 	Vector position;
 	Vector velocity;
 };
 
 struct RungeKuttaDerivedState
 {
-	RungeKuttaDerivedState(){}
-	RungeKuttaDerivedState(const Vector& v, const Vector& a) : velocity(v), acceleration(a){}
+	RungeKuttaDerivedState() {}
+	RungeKuttaDerivedState(const Vector& v, const Vector& a) : velocity(v), acceleration(a) {}
 	Vector velocity;
 	Vector acceleration;
 };
@@ -104,9 +104,9 @@ void integrateRK4(double dt, const MassPoint& m, const RungeKuttaState& yn, Rung
 	k4.acceleration = m.m_gravity - m.m_viscosity * (yn.velocity + k3.acceleration * dt) / m.m_mass;
 
 	yn_plus_1->position = yn.position + dt / 6.0 *
-		(k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
+						  (k1.velocity + k4.velocity + 2.0 * (k2.velocity + k3.velocity));
 	yn_plus_1->velocity = yn.velocity + dt / 6.0 *
-		(k1.acceleration + k4.acceleration + 2.0 * (k2.acceleration + k3.acceleration));
+						  (k1.acceleration + k4.acceleration + 2.0 * (k2.acceleration + k3.acceleration));
 }
 
 template<class T>
@@ -182,7 +182,8 @@ void doSolveTest(bool computeCompliance)
 		currentState.getPositions().setLinSpaced(1.0, 3.0);
 		currentState.getVelocities().setConstant(1.0);
 
-		T solver(&m);
+		auto solver = std::make_shared<T>(&m);
+		m.setOdeSolver(solver);
 
 		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
 		RungeKuttaState yn_plus_1, yn_plus_2;
@@ -192,14 +193,14 @@ void doSolveTest(bool computeCompliance)
 
 		// 1st time step
 		integrateRK4(dt, m, yn, &yn_plus_1);
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(dt, currentState, &newState, computeCompliance);});
 
 		EXPECT_TRUE(newState.getPositions().isApprox(yn_plus_1.position));
 		EXPECT_TRUE(newState.getVelocities().isApprox(yn_plus_1.velocity));
 
 		// 2nd time step
 		integrateRK4(dt, m, yn_plus_1, &yn_plus_2);
-		ASSERT_NO_THROW({solver.solve(dt, newState, &newState2, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(dt, newState, &newState2, computeCompliance);});
 
 		EXPECT_TRUE(newState2.getPositions().isApprox(yn_plus_2.position));
 		EXPECT_TRUE(newState2.getVelocities().isApprox(yn_plus_2.velocity));
@@ -215,8 +216,8 @@ void doSolveTest(bool computeCompliance)
 		currentState.getPositions().setLinSpaced(1.0, 3.0);
 		currentState.getVelocities().setConstant(1.0);
 
-		T solver(&m);
-
+		auto solver = std::make_shared<T>(&m);
+		m.setOdeSolver(solver);
 		RungeKuttaState yn(currentState.getPositions(), currentState.getVelocities());
 		RungeKuttaState yn_plus_1, yn_plus_2;
 
@@ -225,13 +226,13 @@ void doSolveTest(bool computeCompliance)
 
 		// 1st time step
 		integrateRK4(dt, m, yn, &yn_plus_1);
-		ASSERT_NO_THROW({solver.solve(dt, currentState, &newState, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(dt, currentState, &newState, computeCompliance);});
 		EXPECT_TRUE(newState.getPositions().isApprox(yn_plus_1.position));
 		EXPECT_TRUE(newState.getVelocities().isApprox(yn_plus_1.velocity));
 
 		// 2nd time step
 		integrateRK4(dt, m, yn_plus_1, &yn_plus_2);
-		ASSERT_NO_THROW({solver.solve(dt, newState, &newState2, computeCompliance);});
+		ASSERT_NO_THROW({solver->solve(dt, newState, &newState2, computeCompliance);});
 		EXPECT_TRUE(newState2.getPositions().isApprox(yn_plus_2.position));
 		EXPECT_TRUE(newState2.getVelocities().isApprox(yn_plus_2.velocity));
 	}
@@ -265,14 +266,16 @@ template <class T>
 void doComputeMatricesTest()
 {
 	MassPoint m;
-	T solver(&m);
+	auto solver = std::make_shared<T>(&m);
+	m.setOdeSolver(solver);
 	MassPointState state;
 	double dt = 1e-3;
 
-	Matrix expectedSystemMatrix = m.computeM(state) / dt;
-	EXPECT_NO_THROW(solver.computeMatrices(dt, state));
-	EXPECT_TRUE(solver.getSystemMatrix().isApprox(expectedSystemMatrix));
-	EXPECT_TRUE(solver.getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
+	m.updateFMDK(state, ODEEQUATIONUPDATE_M);
+	Matrix expectedSystemMatrix = m.getM() / dt;
+	EXPECT_NO_THROW(solver->computeMatrices(dt, state));
+	EXPECT_TRUE(solver->getSystemMatrix().isApprox(expectedSystemMatrix));
+	EXPECT_TRUE(solver->getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
 }
 };
 

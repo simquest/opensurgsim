@@ -17,10 +17,9 @@
 
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
 
-#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 namespace SurgSim
@@ -30,46 +29,42 @@ namespace Physics
 
 TEST(ConstraintImplementationFactoryTest, GetImplementationTest)
 {
-	using SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
-	using SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
-
 	ConstraintImplementationFactory factory;
-	EXPECT_TRUE(factory.getImplementation(typeid(FixedRepresentation), MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(FixedRepresentation), FRICTIONLESS_3DCONTACT)
 		!= nullptr);
-	EXPECT_TRUE(factory.getImplementation(typeid(RigidRepresentation), MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(RigidRepresentation), FRICTIONLESS_3DCONTACT)
 		!= nullptr);
-	EXPECT_TRUE(factory.getImplementation(typeid(Fem3DRepresentation), MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(Fem3DRepresentation), FRICTIONLESS_3DCONTACT)
 		!= nullptr);
-	EXPECT_TRUE(factory.getImplementation(typeid(FixedRepresentation), MLCP_BILATERAL_3D_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(FixedRepresentation), FIXED_3DPOINT)
 		!= nullptr);
-	EXPECT_TRUE(factory.getImplementation(typeid(RigidRepresentation), MLCP_BILATERAL_3D_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(RigidRepresentation), FIXED_3DPOINT)
 		!= nullptr);
-	EXPECT_TRUE(factory.getImplementation(typeid(Fem3DRepresentation), MLCP_BILATERAL_3D_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(Fem3DRepresentation), FIXED_3DPOINT)
 		!= nullptr);
 }
 
 TEST(ConstraintImplementationFactoryTest, AddImplementationTest)
 {
-	using SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 
 	class TestRepresentation {};
 	ConstraintImplementationFactory factory;
 
-	EXPECT_TRUE(factory.getImplementation(typeid(TestRepresentation), MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(TestRepresentation), FRICTIONLESS_3DCONTACT)
 		== nullptr);
 
 	// Add implementation for TestRepresentation.
 	EXPECT_NO_THROW(
-		factory.addImplementation(typeid(TestRepresentation), std::make_shared<FixedRepresentationContact>()));
+		factory.addImplementation(typeid(TestRepresentation), std::make_shared<FixedConstraintFrictionlessContact>()));
 
-	EXPECT_TRUE(factory.getImplementation(typeid(TestRepresentation), MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(TestRepresentation), FRICTIONLESS_3DCONTACT)
 		!= nullptr);
 
 	// Adding it again to make sure everything works, even if duplicate implementations are added.
 	EXPECT_NO_THROW(
-		factory.addImplementation(typeid(TestRepresentation), std::make_shared<FixedRepresentationContact>()));
+		factory.addImplementation(typeid(TestRepresentation), std::make_shared<FixedConstraintFrictionlessContact>()));
 
-	EXPECT_TRUE(factory.getImplementation(typeid(TestRepresentation), MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+	EXPECT_TRUE(factory.getImplementation(typeid(TestRepresentation), FRICTIONLESS_3DCONTACT)
 		!= nullptr);
 }
 

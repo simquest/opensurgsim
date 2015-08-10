@@ -179,12 +179,13 @@ bool Manager::doStartUp()
 bool Manager::doUpdate(double dt)
 {
 	processComponents();
-	processBehaviors(dt);
 
 	for (auto& view : m_views)
 	{
 		view->update(dt);
 	}
+
+	processBehaviors(dt);
 
 	for (auto& representation : m_representations)
 	{

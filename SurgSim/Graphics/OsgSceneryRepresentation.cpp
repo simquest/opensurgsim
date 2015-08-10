@@ -69,12 +69,17 @@ void OsgSceneryRepresentation::setModel(std::shared_ptr<SurgSim::Framework::Asse
 	}
 
 	m_model = osgModel;
-
+	updateTangents();
 }
 
 std::shared_ptr<Model> OsgSceneryRepresentation::getModel() const
 {
 	return m_model;
+}
+
+osg::ref_ptr<osg::Node> OsgSceneryRepresentation::getModelNode() const
+{
+	return m_osgNode;
 }
 
 };	// namespace Graphics

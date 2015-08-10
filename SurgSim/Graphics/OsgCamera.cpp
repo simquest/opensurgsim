@@ -150,6 +150,11 @@ const SurgSim::Math::Matrix44d& OsgCamera::getProjectionMatrix() const
 	return m_projectionMatrix;
 }
 
+SurgSim::Math::Matrix44d OsgCamera::getInverseProjectionMatrix() const
+{
+	return m_projectionMatrix.inverse();
+}
+
 void OsgCamera::update(double dt)
 {
 	setVisible(isActive());
@@ -200,7 +205,6 @@ bool OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
 		m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT, osg::Camera::PIXEL_BUFFER);
 		m_camera->setRenderOrder(osg::Camera::PRE_RENDER);
 		m_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-		m_camera->setClearColor(osg::Vec4f(0.0, 0.0, 0.0, 1.0));
 		m_renderTarget = renderTarget;
 		result = true;
 	}

@@ -35,19 +35,19 @@
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentationBilateral3D.h"
-#include "SurgSim/Physics/Fem3DRepresentationBilateral3D.h"
+#include "SurgSim/Physics/Fem3DConstraintFixedPoint.h"
+#include "SurgSim/Physics/FixedConstraintFixedPoint.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidConstraintFixedPoint.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationBilateral3D.h"
 
 using SurgSim::Collision::ContactMapType;
 using SurgSim::Physics::ConstraintImplementation;
-using SurgSim::Physics::FixedRepresentationBilateral3D;
-using SurgSim::Physics::RigidRepresentationBilateral3D;
-using SurgSim::Physics::Fem3DRepresentationBilateral3D;
+using SurgSim::Physics::Fem3DConstraintFixedPoint;
+using SurgSim::Physics::FixedConstraintFixedPoint;
 using SurgSim::Physics::Localization;
+using SurgSim::Physics::RigidConstraintFixedPoint;
 using SurgSim::Framework::checkAndConvert;
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, StaplerBehavior, StaplerBehavior);
@@ -104,7 +104,7 @@ const std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2>& Staple
 	return m_virtualTeeth;
 }
 
-void StaplerBehavior::enableStaplingForSceneElement(std::string sceneElementName)
+void StaplerBehavior::enableStaplingForSceneElement(const std::string& sceneElementName)
 {
 	m_stapleEnabledSceneElements.push_back(sceneElementName);
 }
@@ -265,14 +265,14 @@ void StaplerBehavior::createStaple()
 					targetContact->penetrationPoints.second.rigidLocalPosition.getValue()));
 
 		// Create a bilateral constraint between the targetPhysicsRepresentation and the staple.
-		auto constraint = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT,
+		auto constraint = std::make_shared<SurgSim::Physics::Constraint>(SurgSim::Physics::FIXED_3DPOINT,
 			std::make_shared<SurgSim::Physics::ConstraintData>(), stapleRepresentation,
 			stapleConstraintLocation, targetPhysicsRepresentation, targetContact->penetrationPoints.second);
 
 		// Create a component to store this constraint.
 		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
 			std::make_shared<SurgSim::Physics::ConstraintComponent>(
-				"Bilateral3DConstraint" + boost::to_string(toothId++));
+				"FixedPointConstraint" + boost::to_string(toothId++));
 
 		constraintComponent->setConstraint(constraint);
 		staple->addComponent(constraintComponent);

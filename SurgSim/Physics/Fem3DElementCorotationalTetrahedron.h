@@ -24,6 +24,7 @@ namespace SurgSim
 
 namespace Physics
 {
+SURGSIM_STATIC_REGISTRATION(Fem3DElementCorotationalTetrahedron);
 
 /// Fem Element 3D co-rotational based on a tetrahedron volume discretization
 /// \note This class derives from the linear version of the FEM 3D element tetrahedron, adding a rigid frame
@@ -40,30 +41,28 @@ class Fem3DElementCorotationalTetrahedron : public Fem3DElementTetrahedron
 {
 public:
 	/// Constructor
-	/// \param nodeIds An array of 4 node (A, B, C, D) ids defining this tetrahedron element in a overall mesh
+	Fem3DElementCorotationalTetrahedron();
+
+	/// Constructor
+	/// \param nodeIds A vector of node ids defining this tetrahedron element in a overall mesh
 	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
 	/// \note This is required from the signed volume calculation method getVolume()
 	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
 	/// simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
 	explicit Fem3DElementCorotationalTetrahedron(std::array<size_t, 4> nodeIds);
 
+	/// Constructor for FemElement object factory
+	/// \param elementData A FemElement3D struct defining this tetrahedron element in a overall mesh
+	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
+	/// \note This is required from the signed volume calculation method getVolume()
+	/// \note A warning will be logged when the initialize function is called if this condition is not met, but the
+	/// simulation will keep running.  Behavior will be undefined because of possible negative volume terms.
+	/// \exception SurgSim::Framework::AssertionFailure if nodeIds has a size different than 4
+	explicit Fem3DElementCorotationalTetrahedron(std::shared_ptr<FemElementStructs::FemElementParameter> elementData);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DElementCorotationalTetrahedron);
+
 	void initialize(const SurgSim::Math::OdeState& state) override;
-
-	void addForce(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector* F, double scale = 1.0) override;
-
-	void addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* K, double scale = 1.0) override;
-
-	void addMass(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix* M, double scale = 1.0) override;
-
-	void addFMDK(const SurgSim::Math::OdeState& state,
-		SurgSim::Math::Vector* F,
-		SurgSim::Math::Matrix* M,
-		SurgSim::Math::Matrix* D,
-		SurgSim::Math::Matrix* K) override;
-
-	void addMatVec(const SurgSim::Math::OdeState& state,
-		double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* result) override;
 
 protected:
 	/// Compute the rotation, mass and stiffness matrices of the element from the given state
@@ -72,11 +71,22 @@ protected:
 	/// \param [out] Me, Ke Respectively the mass and stiffness matrices (Me and/or Ke be nullptr if not needed)
 	/// \note The model is not viscoelastic but purely elastic, so there is no damping matrix here.
 	void computeRotationMassAndStiffness(const SurgSim::Math::OdeState& state, SurgSim::Math::Matrix33d* R,
-		Eigen::Matrix<double, 12, 12>* Me, Eigen::Matrix<double, 12, 12>* Ke) const;
+										 Math::Matrix* Me, Math::Matrix* Ke) const;
+
+	void doUpdateFMDK(const Math::OdeState& state, int options) override;
 
 	/// The constant inverse matrix of the undeformed tetrahedron homogeneous 4 points coordinates.
 	/// This is useful to compute the deformation gradient from which the element rotation is extracted.
 	SurgSim::Math::Matrix44d m_Vinverse;
+
+	// The mass matrix of the linear tetrahedron
+	Eigen::Matrix<double, 12, 12> m_MLinear;
+
+	// The stiffness matrix of the linear tetrahedron
+	Eigen::Matrix<double, 12, 12> m_KLinear;
+
+	// The rotation matrix
+	SurgSim::Math::Matrix33d m_R;
 };
 
 } // namespace Physics

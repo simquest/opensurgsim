@@ -102,11 +102,10 @@ TEST(OdeSolver, GetTest)
 	EXPECT_EQ(name, solver.getName());
 
 	EXPECT_NE(nullptr, solver.getLinearSolver());
-	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>(solver.getLinearSolver()));
-	EXPECT_NO_THROW(solver.setLinearSolver(std::make_shared<LinearSolveAndInverseDiagonalMatrix>()));
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(solver.getLinearSolver()));
+	EXPECT_NO_THROW(solver.setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>()));
 	EXPECT_NE(nullptr, solver.getLinearSolver());
-	EXPECT_EQ(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDenseMatrix>(solver.getLinearSolver()));
-	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSolveAndInverseDiagonalMatrix>(solver.getLinearSolver()));
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(solver.getLinearSolver()));
 }
 
 }; // namespace Math

@@ -26,6 +26,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Framework/Timer.h"
 
 namespace SurgSim
@@ -67,6 +68,17 @@ void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 		m_managers.push_back(manager);
 	}
 }
+
+
+std::vector<std::weak_ptr<ComponentManager>> Runtime::getManagers() const
+{
+	std::vector<std::weak_ptr<ComponentManager>> result(m_managers.size());
+
+	std::copy(m_managers.begin(), m_managers.end(), result.begin());
+
+	return result;
+}
+
 
 std::shared_ptr<Scene> Runtime::getScene()
 {
@@ -314,6 +326,12 @@ std::shared_ptr<const ApplicationData> Runtime::getApplicationData()
 	return m_applicationData;
 }
 
+std::shared_ptr<ThreadPool> Runtime::getThreadPool()
+{
+	static auto threadPool = std::make_shared<ThreadPool>();
+	return threadPool;
+}
+
 void Runtime::addComponent(const std::shared_ptr<Component>& component)
 {
 	if (m_isRunning)
@@ -355,6 +373,7 @@ void Runtime::loadScene(const std::string& fileName)
 
 void Runtime::addSceneElements(const std::string& fileName)
 {
+	SURGSIM_LOG_DEBUG(Logger::getLogger("Runtime")) << "Adding scene elements from " << fileName;
 	YAML::Node node;
 	boost::lock_guard<boost::mutex> lock(m_sceneHandling);
 
@@ -370,6 +389,7 @@ void Runtime::addSceneElements(const std::string& fileName)
 	{
 		SURGSIM_FAILURE() << "Could not add scene elements from the YAML file: " << fileName;
 	}
+	SURGSIM_LOG_DEBUG(Logger::getLogger("Runtime")) << "Done adding scene elements from " << fileName;
 }
 
 std::vector<std::shared_ptr<SceneElement>> Runtime::duplicateSceneElements(const std::string& fileName)

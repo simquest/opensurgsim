@@ -30,109 +30,19 @@ using SurgSim::Device::OpenNIDevice;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Math::Vector3d;
 
-typedef SurgSim::DataStructures::DataGroup::ImageType ImageType;
-
-struct GlutImage : GlutRenderObject
-{
-	SurgSim::Framework::LockedContainer<ImageType> image;
-
-	GlutImage(int imageNum, int numImages) :
-		m_imageNum(imageNum),
-		m_numImages(numImages),
-		m_firstRun(true)
-	{
-	}
-
-	virtual void draw()
-	{
-		if (m_firstRun)
-		{
-		   glGenTextures(1, &m_texture);
-		   m_firstRun = false;
-		}
-
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		glOrtho(-m_numImages, m_numImages, -1, 1, -1.0, 1.0);
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity();
-
-		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_BLEND);
-		glBindTexture(GL_TEXTURE_2D, m_texture);
-
-		ImageType imageData;
-		if(image.tryTakeChanged(&imageData))
-		{
-			float maxPixel = imageData.getAsVector().maxCoeff();
-			if (maxPixel > 1.0)
-			{
-			   float scaleFactor = 1.0 / maxPixel;
-			   glPixelTransferf(GL_RED_SCALE, scaleFactor);
-			   glPixelTransferf(GL_BLUE_SCALE, scaleFactor);
-			   glPixelTransferf(GL_GREEN_SCALE, scaleFactor);
-			}
-			else
-			{
-			   glPixelTransferf(GL_RED_SCALE, 1.0);
-			   glPixelTransferf(GL_BLUE_SCALE, 1.0);
-			   glPixelTransferf(GL_GREEN_SCALE, 1.0);
-			}
-
-			switch (imageData.getNumChannels())
-			{
-			case 1:
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageData.getWidth(), imageData.getHeight(), 0, GL_LUMINANCE,
-						GL_FLOAT, imageData.getData());
-				break;
-			case 3:
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageData.getWidth(), imageData.getHeight(), 0, GL_RGB, GL_FLOAT,
-						imageData.getData());
-				break;
-			}
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		}
-
-		int xMin = -m_numImages + m_imageNum * 2;
-		glColor4f(1,1,1,1);
-		glBegin(GL_QUADS);
-
-		glTexCoord2f(1, 1);
-		glVertex2f(xMin, -1.0);
-
-		glTexCoord2f(0, 1);
-		glVertex2f(xMin+2, -1.0);
-
-		glTexCoord2f(0, 0);
-		glVertex2f(xMin+2, 1.0);
-
-		glTexCoord2f(1, 0);
-		glVertex2f(xMin, 1.0);
-
-		glEnd();
-		glPopMatrix();
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-	}
-
-private:
-	int m_imageNum;
-	int m_numImages;
-	unsigned int m_texture;
-	bool m_firstRun;
-};
 
 class ImageGlutWindow : public SurgSim::Input::InputConsumerInterface
 {
 public:
 	explicit ImageGlutWindow(const std::vector<std::string>& imageNames)
 	{
-		for (size_t i = 0; i < imageNames.size(); i++)
+		const size_t numImages = imageNames.size();
+		const SurgSim::Math::Vector2d yRange(-1.0, 1.0);
+		SurgSim::Math::Vector2d xRange;
+		for (size_t i = 0; i < numImages; i++)
 		{
-			auto view = std::make_shared<GlutImage>(i, imageNames.size());
+			xRange = SurgSim::Math::Vector2d(i - numImages, i - numImages + 1) / numImages;
+			auto view = std::make_shared<GlutImage>(Eigen::AlignedBox<double, 2>(xRange, yRange));
 			GlutRenderer::addObject(view);
 			m_views.insert(std::make_pair(imageNames[i], view));
 		}
@@ -158,7 +68,7 @@ public:
 
 	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
-		ImageType data;
+		SurgSim::DataStructures::DataGroup::ImageType data;
 		for (auto view : m_views)
 		{
 			if(inputData.images().get(view.first, &data))

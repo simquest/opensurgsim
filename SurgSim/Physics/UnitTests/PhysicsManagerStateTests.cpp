@@ -30,8 +30,8 @@
 #include "SurgSim/Physics/MlcpMapping.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
 
 using SurgSim::Physics::Constraint;
 using SurgSim::Physics::ContactConstraintData;
@@ -40,9 +40,9 @@ using SurgSim::Physics::MlcpMapping;
 using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidCollisionRepresentation;
+using SurgSim::Physics::RigidConstraintFrictionlessContact;
+using SurgSim::Physics::RigidLocalization;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationContact;
-using SurgSim::Physics::RigidRepresentationLocalization;
 
 TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 {
@@ -213,7 +213,7 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
 	std::vector<std::shared_ptr<Constraint>> actualConstraints;
 
-	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	// We need a populated constraint to check the constraintsIndexMapping.
 	// Create the representations for the constraint.
@@ -254,7 +254,7 @@ TEST(PhysicsManagerStateTest, SetGetConstraintsMapping)
 	MlcpMapping<Constraint> expectedConstraintsIndexMapping;
 	MlcpMapping<Constraint> actualConstraintsIndexMapping;
 
-	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	// We need a populated constraint to check the constraintsIndexMapping.
 	// Create the representations for the constraint.
@@ -283,7 +283,7 @@ TEST(PhysicsManagerStateTest, SetGetActiveConstraints)
 	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
 	std::vector<std::shared_ptr<Constraint>> actualConstraints;
 
-	auto constraintType = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	// Create first side of a constraint.
 	// Create the representations for the constraint.
