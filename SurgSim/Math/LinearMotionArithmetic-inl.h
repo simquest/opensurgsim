@@ -33,8 +33,7 @@ LinearMotion<T>::LinearMotion(const LinearMotion<T>& m) : m_start(m.m_start), m_
 template <typename T>
 LinearMotion<T>::LinearMotion(LinearMotion<T>&& m)
 {
-	m_start = m.m_start;
-	m_end = m.m_end;
+	*this = std::move(m);
 }
 
 template <typename T>
@@ -48,8 +47,8 @@ LinearMotion<T>& LinearMotion<T>::operator=(const LinearMotion<T>& m)
 template <typename T>
 LinearMotion<T>& LinearMotion<T>::operator=(LinearMotion<T>&& m)
 {
-	m_start = m.m_start;
-	m_end = m.m_end;
+	m_start = std::move(m.m_start);
+	m_end = std::move(m.m_end);
 	return *this;
 }
 
@@ -180,7 +179,7 @@ LinearMotion_nD<T, N>::LinearMotion_nD(const LinearMotion_nD<T, N>& motion)
 template <typename T, int N>
 LinearMotion_nD<T, N>::LinearMotion_nD(LinearMotion_nD<T, N>&& motion)
 {
-	m_motion = motion.m_motion;
+	*this = std::move(motion);
 }
 
 template <typename T, int N>
@@ -204,7 +203,7 @@ LinearMotion_nD<T, N>& LinearMotion_nD<T, N>::operator=(LinearMotion_nD<T, N>&& 
 {
 	if (this != &motion)
 	{
-		m_motion = motion.m_motion;
+		m_motion = std::move(motion.m_motion);
 	}
 
 	return *this;
@@ -386,9 +385,7 @@ LinearMotion_nD<T, 3>::LinearMotion_nD(const LinearMotion_nD<T, 3>& motion)
 template <typename T>
 LinearMotion_nD<T, 3>::LinearMotion_nD(LinearMotion_nD<T, 3>&& motion)
 {
-	m_motion[0] = motion.m_motion[0];
-	m_motion[1] = motion.m_motion[1];
-	m_motion[2] = motion.m_motion[2];
+	*this = std::move(motion);
 }
 
 template <typename T>
@@ -411,9 +408,9 @@ LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator=(const LinearMotion_nD<T,
 template <typename T>
 LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator=(LinearMotion_nD<T, 3>&& motion)
 {
-	m_motion[0] = motion.m_motion[0];
-	m_motion[1] = motion.m_motion[1];
-	m_motion[2] = motion.m_motion[2];
+	m_motion[0] = std::move(motion.m_motion[0]);
+	m_motion[1] = std::move(motion.m_motion[1]);
+	m_motion[2] = std::move(motion.m_motion[2]);
 	return *this;
 }
 
