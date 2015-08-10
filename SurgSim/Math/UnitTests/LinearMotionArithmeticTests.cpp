@@ -37,8 +37,8 @@ template <typename T>
 class LinearMotionArithmeticTests : public ::testing::Test
 {
 public:
-	typedef LinearMotion_nD<double, 2> LinearMotionDouble2;
-	typedef LinearMotion_nD<double, 3> LinearMotionDouble3;
+	typedef LinearMotionND<double, 2> LinearMotionDouble2;
+	typedef LinearMotionND<double, 3> LinearMotionDouble3;
 
 	LinearMotion<double> testLinearMotionMoveConstructor(LinearMotion<double> dummy)
 	{
@@ -48,9 +48,9 @@ public:
 	}
 
 	template <int dimension>
-	LinearMotion_nD<double, dimension> testLinearMotionnDMoveConstructor(LinearMotion_nD<double, dimension> dummy)
+	LinearMotionND<double, dimension> testLinearMotionNDMoveConstructor(LinearMotionND<double, dimension> dummy)
 	{
-		LinearMotion_nD<double, dimension> ret;
+		LinearMotionND<double, dimension> ret;
 		ret = dummy;
 		return ret;
 	}
@@ -72,9 +72,9 @@ public:
 	}
 
 	template <int dimension>
-	void initializeConstructor(LinearMotion_nD<double, dimension>* motion)
+	void initializeConstructor(LinearMotionND<double, dimension>* motion)
 	{
-		typedef LinearMotion_nD<double, dimension> LinearMotionDoubleType;
+		typedef LinearMotionND<double, dimension> LinearMotionDoubleType;
 
 		// Constructor tests
 		LinearMotion<double> testLinearMotion(3.8, 3.7);
@@ -96,8 +96,8 @@ public:
 		LinearMotionDoubleType b(testLinearMotionArray);
 		LinearMotionDoubleType a(b);
 		EXPECT_TRUE(a == b);
-		EXPECT_NO_THROW(testLinearMotionnDMoveConstructor(b));
-		LinearMotionDoubleType f = testLinearMotionnDMoveConstructor(b);
+		EXPECT_NO_THROW(testLinearMotionNDMoveConstructor(b));
+		LinearMotionDoubleType f = testLinearMotionNDMoveConstructor(b);
 		EXPECT_TRUE(f == b);
 		*motion = a;
 	}
@@ -109,7 +109,7 @@ public:
 	}
 
 	template <int dimension>
-	void checkLinearMotionConstructor(LinearMotion_nD<double, dimension>* motion)
+	void checkLinearMotionConstructor(LinearMotionND<double, dimension>* motion)
 	{
 		// Check get ... up to numb
 		for (int counter = 0; counter < dimension; ++counter)
@@ -127,14 +127,14 @@ public:
 	}
 
 	template <int dimension>
-	void setLinearMotionFromOffset(double offsetStart, double offsetEnd, LinearMotion_nD<double, dimension>* motion)
+	void setLinearMotionFromOffset(double offsetStart, double offsetEnd, LinearMotionND<double, dimension>* motion)
 	{
 		std::array<LinearMotion<double>, dimension> values;
 		for (size_t counter = 0; counter < dimension; ++counter)
 		{
 			values[counter] = LinearMotion<double>(counter + offsetStart, counter + offsetEnd);
 		}
-		(*motion) = LinearMotion_nD<double, dimension>(values);
+		(*motion) = LinearMotionND<double, dimension>(values);
 	}
 
 	void checkLinearMotionOperators(LinearMotion<double>* motion1, LinearMotion<double>* motion2)
@@ -192,11 +192,11 @@ public:
 	}
 
 	template <int dimension>
-	void checkLinearMotionOperators(LinearMotion_nD<double, dimension>* motion1,
-									LinearMotion_nD<double, dimension>* motion2)
+	void checkLinearMotionOperators(LinearMotionND<double, dimension>* motion1,
+									LinearMotionND<double, dimension>* motion2)
 	{
-		typedef LinearMotion_nD<double, dimension> LinearMotionDoubleType;
-		typedef Interval_nD<double, dimension> IntervalDoubleType;
+		typedef LinearMotionND<double, dimension> LinearMotionDoubleType;
+		typedef IntervalND<double, dimension> IntervalDoubleType;
 
 		// Assignment and equal/not equal tests
 		LinearMotionDoubleType c;
@@ -296,8 +296,8 @@ public:
 };
 
 typedef ::testing::Types <LinearMotion<double>,
-		LinearMotion_nD<double, 2>,
-		LinearMotion_nD<double, 3>> LinearMotionArithmeticTypes;
+		LinearMotionND<double, 2>,
+		LinearMotionND<double, 3>> LinearMotionArithmeticTypes;
 
 TYPED_TEST_CASE(LinearMotionArithmeticTests, LinearMotionArithmeticTypes);
 
@@ -328,8 +328,8 @@ TEST(LinearMotionSpecializations, LinearMotionNDExtras)
 	std::array<double, 2> low;
 	low[0] = 1.0;
 	low[1] = 2.0;
-	LinearMotion_nD<double, 2> motion1(high, low);
-	LinearMotion_nD<double, 2> motion2(low, high);
+	LinearMotionND<double, 2> motion1(high, low);
+	LinearMotionND<double, 2> motion2(low, high);
 
 	double lower = 0;
 	double upper = 0;
@@ -352,8 +352,8 @@ TEST(LinearMotionSpecializations, LinearMotion3DExtras)
 	low[0] = 1.0;
 	low[1] = 2.0;
 	low[2] = 3.0;
-	LinearMotion_nD<double, 3> motion1(high, low);
-	LinearMotion_nD<double, 3> motion2(low, high);
+	LinearMotionND<double, 3> motion1(high, low);
+	LinearMotionND<double, 3> motion2(low, high);
 	Interval<double> range(0.0, 1.0);
 
 	// Dot product
@@ -365,7 +365,7 @@ TEST(LinearMotionSpecializations, LinearMotion3DExtras)
 	EXPECT_TRUE(motion1.dotProduct(motion2, range).isApprox(Interval<double>(20.0, 20.75), epsilon));
 
 	// Cross product
-	Interval_nD<double, 3> cross = motion1.crossProduct(motion2, range);
+	IntervalND<double, 3> cross = motion1.crossProduct(motion2, range);
 	EXPECT_TRUE(cross.getAxis(0).isApprox(Interval<double>(-1.0, 1.0), epsilon));
 	EXPECT_TRUE(cross.getAxis(1).isApprox(Interval<double>(-2.0, 2.0), epsilon));
 	EXPECT_TRUE(cross.getAxis(2).isApprox(Interval<double>(-1.0, 1.0), epsilon));
@@ -408,9 +408,9 @@ TEST(LinearMotionUtilities, LinearMotion3DUtilities)
 	medium[0] = 2.0;
 	medium[1] = 3.0;
 	medium[2] = 4.0;
-	LinearMotion_nD<double, 3> motion1(medium, low);
-	LinearMotion_nD<double, 3> motion2(low, medium);
-	LinearMotion_nD<double, 3> motion3(high, low);
+	LinearMotionND<double, 3> motion1(medium, low);
+	LinearMotionND<double, 3> motion2(low, medium);
+	LinearMotionND<double, 3> motion3(high, low);
 	Interval<double> range(0.0, 1.0);
 
 	// Output
