@@ -99,6 +99,51 @@ Interval<T> PolynomialValues<T, 2>::valuesOverInterval(const Interval<T>& interv
 	return result;
 }
 
+template <class T>
+PolynomialValues<T, 3>::PolynomialValues(const Polynomial<T, 3>& p) : m_polynomial(p),
+	m_derivative(m_polynomial.derivative()),
+	m_locationOfExtremum(m_derivative)
+{
+}
+
+template <class T>
+const Polynomial<T, 3>& PolynomialValues<T, 3>::getPolynomial() const
+{
+	return m_polynomial;
+}
+
+template <class T>
+const Polynomial<T, 2>& PolynomialValues<T, 3>::getDerivative() const
+{
+	return m_derivative;
+}
+
+template <class T>
+const PolynomialRoots<T, 2>& PolynomialValues<T, 3>::getLocationsOfExtrema() const
+{
+	return m_locationOfExtremum;
+}
+
+template <class T>
+Interval<T> PolynomialValues<T, 3>::valuesOverInterval(const Interval<T>& interval) const
+{
+	// Always consider the endpoints.
+	Interval<T> result = Interval<T>::minToMax(m_polynomial.evaluate(interval.getMin()),
+						 m_polynomial.evaluate(interval.getMax()));
+
+	for (int i = 0;  i < m_locationOfExtremum.getNumRoots();  ++i)
+	{
+		// There is an extremum (min or max)...
+		if (interval.contains(m_locationOfExtremum[i]))
+		{
+			//...and it occurs somewhere in the middle of the interval.
+			// The value at the extremum needs to be made a part of the result interval.
+			result.extendToInclude(m_polynomial.evaluate(m_locationOfExtremum[i]));
+		}
+	}
+	return result;
+}
+
 template <class T, int N>
 Interval<T> valuesOverInterval(const Polynomial<T, N>& p, const Interval<T>& interval)
 {

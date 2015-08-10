@@ -60,6 +60,8 @@ set(SURGSIM_MATH_HEADERS
 	IntervalArithmetic-inl.h
 	KalmanFilter.h
 	KalmanFilter-inl.h
+	LinearMotionArithmetic.h
+	LinearMotionArithmetic-inl.h
 	LinearSolveAndInverse.h
 	LinearSolveAndInverse-inl.h
 	LinearSparseSolveAndInverse.h
