@@ -229,8 +229,8 @@ int main(int argc, char* argv[])
 
 	static const char* const toolDeviceName = "Tool Device";
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device = createDevice(toolDeviceName);
-	inputManager->addDevice(device); 
-	
+	inputManager->addDevice(device);
+
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("VTC Box", toolDeviceName));
 	scene->addSceneElement(createBoxForRawInput("Raw Input", toolDeviceName));

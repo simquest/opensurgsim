@@ -37,7 +37,7 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
 	SurgSimMath
-	${SURGSIM_DEVICES_LIBS}
+	${SURGSIM_DEVICES_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
 )
 
