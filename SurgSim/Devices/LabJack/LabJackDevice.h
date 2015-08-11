@@ -30,6 +30,8 @@ namespace Device
 {
 class LabJackScaffold;
 
+SURGSIM_STATIC_REGISTRATION(LabJackDevice);
+
 namespace LabJack
 {
 ///@{
@@ -275,6 +277,8 @@ public:
 	/// Constructor.
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit LabJackDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::LabJackDevice);
 
 	/// Destructor.
 	virtual ~LabJackDevice();

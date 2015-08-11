@@ -23,6 +23,8 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::MouseDevice, MouseDevice);
+
 MouseDevice::MouseDevice(const std::string& deviceName) :
 	SurgSim::Input::CommonDevice(deviceName, MouseScaffold::buildDeviceInputData())
 {

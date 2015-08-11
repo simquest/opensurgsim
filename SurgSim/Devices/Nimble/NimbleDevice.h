@@ -25,8 +25,9 @@ namespace SurgSim
 {
 namespace Device
 {
-
 class NimbleScaffold;
+
+SURGSIM_STATIC_REGISTRATION(NimbleDevice);
 
 /// A class implementing the communication with the Nimble server.
 ///
@@ -60,6 +61,8 @@ public:
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit NimbleDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::NimbleDevice);
 
 	/// Destructor.
 	virtual ~NimbleDevice();

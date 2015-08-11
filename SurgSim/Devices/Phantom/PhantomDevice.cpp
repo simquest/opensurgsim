@@ -23,10 +23,10 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::PhantomDevice, PhantomDevice);
 
-PhantomDevice::PhantomDevice(const std::string& uniqueName, const std::string& initializationName) :
-	SurgSim::Input::CommonDevice(uniqueName, PhantomScaffold::buildDeviceInputData()),
-	m_initializationName(initializationName)
+PhantomDevice::PhantomDevice(const std::string& uniqueName) :
+	SurgSim::Input::CommonDevice(uniqueName, PhantomScaffold::buildDeviceInputData())
 {
 }
 
@@ -39,6 +39,10 @@ PhantomDevice::~PhantomDevice()
 	}
 }
 
+void PhantomDevice::setInitializationName(const std::string& initializationName)
+{
+	m_initializationName = initializationName;
+}
 
 std::string PhantomDevice::getInitializationName() const
 {
