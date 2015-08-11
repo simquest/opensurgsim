@@ -44,6 +44,7 @@ set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} PhantomDevice.h PARENT_SC
 
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
+	OSS
 	PhantomDevice
 	"${PHANTOM_DEVICE_SOURCES}"
 	"${PHANTOM_DEVICE_HEADERS}"

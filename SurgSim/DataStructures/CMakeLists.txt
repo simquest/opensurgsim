@@ -85,9 +85,10 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	Vertices.h
 	Vertices-inl.h
 )
-surgsim_create_library_header(DataStructures.h "${SURGSIM_DATA_STRUCTURES_HEADERS}")
+surgsim_create_library_header(OSS DataStructures.h "${SURGSIM_DATA_STRUCTURES_HEADERS}")
 
 surgsim_add_library(
+	OSS
 	SurgSimDataStructures
 	"${SURGSIM_DATA_STRUCTURES_SOURCES}"
 	"${SURGSIM_DATA_STRUCTURES_HEADERS}"

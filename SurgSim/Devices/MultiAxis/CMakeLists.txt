@@ -98,6 +98,7 @@ endif()
 
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
+	OSS
 	MultiAxisDevice
 	"${MULTIAXIS_DEVICE_SOURCES}"
 	"${MULTIAXIS_DEVICE_HEADERS}"

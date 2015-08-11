@@ -30,9 +30,10 @@ set(SURGSIM_INPUT_HEADERS
 	OutputComponent.h
 	OutputProducerInterface.h
 )
-surgsim_create_library_header(Input.h "${SURGSIM_INPUT_HEADERS}")
+surgsim_create_library_header(OSS Input.h "${SURGSIM_INPUT_HEADERS}")
 
 surgsim_add_library(
+	OSS
 	SurgSimInput
 	"${SURGSIM_INPUT_SOURCES}"
 	"${SURGSIM_INPUT_HEADERS}"

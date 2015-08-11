@@ -157,9 +157,10 @@ set(SURGSIM_PHYSICS_HEADERS
 	UpdateCollisionRepresentations.h
 	VirtualToolCoupler.h
 )
-surgsim_create_library_header(Physics.h "${SURGSIM_PHYSICS_HEADERS}")
+surgsim_create_library_header(OSS Physics.h "${SURGSIM_PHYSICS_HEADERS}")
 
 surgsim_add_library(
+	OSS
 	SurgSimPhysics
 	"${SURGSIM_PHYSICS_SOURCES}"
 	"${SURGSIM_PHYSICS_HEADERS}"

@@ -175,7 +175,7 @@ endmacro()
 
 # This function will create a new header file (LIBRARY_HEADER) that includes
 # all the headers (except all "-inl.h") in HEADER_FILES.
-function(surgsim_create_library_header LIBRARY_HEADER HEADER_FILES)
+function(surgsim_create_library_header GROUP_NAME LIBRARY_HEADER HEADER_FILES)
 	if(";${HEADER_FILES};" MATCHES ";${LIBRARY_HEADER};")
 		message(FATAL_ERROR
 			"Cannot create library header named '${LIBRARY_HEADER}' because there is already a header with that name")
@@ -197,7 +197,7 @@ function(surgsim_create_library_header LIBRARY_HEADER HEADER_FILES)
 	string(TOUPPER ${HEADER_GUARD} HEADER_GUARD)
 	configure_file(${SURGSIM_SOURCE_DIR}/CMake/Library.h.in "${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_HEADER}" @ONLY)
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_HEADER}"
-		COMPONENT Development
+		COMPONENT ${GROUP_NAME}Development
 		DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
 endfunction()
 
@@ -207,7 +207,7 @@ endfunction()
 # the appropriate directory. 
 # Note that when calling this the parameters  should be quoted to separate lists
 unset(SURGSIM_EXPORT_TARGETS CACHE)
-function(surgsim_add_library LIBRARY_NAME SOURCES HEADERS)
+function(surgsim_add_library GROUP_NAME LIBRARY_NAME SOURCES HEADERS)
 	file(RELATIVE_PATH HEADER_DIRECTORY ${SURGSIM_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 	if (SOURCES)
 		add_library(${LIBRARY_NAME} ${SOURCES} ${HEADERS})
@@ -215,7 +215,7 @@ function(surgsim_add_library LIBRARY_NAME SOURCES HEADERS)
 		set_target_properties(${LIBRARY_NAME} PROPERTIES PUBLIC_HEADER "${HEADERS}")
 		install(TARGETS ${LIBRARY_NAME}
 			EXPORT ${PROJECT_NAME}Targets
-			COMPONENT Development
+			COMPONENT ${GROUP_NAME}Development
 			RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
 			LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
 			ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
@@ -224,7 +224,9 @@ function(surgsim_add_library LIBRARY_NAME SOURCES HEADERS)
 		set(SURGSIM_EXPORT_TARGETS ${LIBRARY_NAME} ${SURGSIM_EXPORT_TARGETS} CACHE INTERNAL "export targets")
 		surgsim_show_ide_folders("${SOURCES}" "${HEADERS}")
 	else()
-		install(FILES ${HEADERS} COMPONENT Development DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
+		install(FILES ${HEADERS} 
+			COMPONENT ${GROUP_NAME}Development 
+			DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
 		surgsim_show_ide_folders("" "${HEADERS}")
 	endif()
 endfunction()

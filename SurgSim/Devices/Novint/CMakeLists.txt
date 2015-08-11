@@ -55,6 +55,7 @@ set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
 
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
+	OSS
 	NovintDevice
 	"${NOVINT_DEVICE_SOURCES}"
 	"${NOVINT_DEVICE_HEADERS}"

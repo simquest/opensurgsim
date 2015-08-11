@@ -86,9 +86,10 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Timer.h
 	TransferPropertiesBehavior.h
 )
-surgsim_create_library_header(Framework.h "${SURGSIM_FRAMEWORK_HEADERS}")
+surgsim_create_library_header(OSS Framework.h "${SURGSIM_FRAMEWORK_HEADERS}")
 
 surgsim_add_library(
+	OSS
 	SurgSimFramework
 	"${SURGSIM_FRAMEWORK_SOURCES}"
 	"${SURGSIM_FRAMEWORK_HEADERS}"

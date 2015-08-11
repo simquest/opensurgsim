@@ -53,6 +53,7 @@ else()
 endif()
 
 surgsim_add_library(
+	OSS
 	TrackIRDevice
 	"${TRACKIR_DEVICE_SOURCES}"
 	"${TRACKIR_DEVICE_HEADERS}"

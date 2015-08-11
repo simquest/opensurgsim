@@ -108,9 +108,10 @@ set(SURGSIM_MATH_HEADERS
 	Valid-inl.h
 	Vector.h
 )
-surgsim_create_library_header(Math.h "${SURGSIM_MATH_HEADERS}")
+surgsim_create_library_header(OSS Math.h "${SURGSIM_MATH_HEADERS}")
 
 surgsim_add_library(
+	OSS
 	SurgSimMath
 	"${SURGSIM_MATH_SOURCES}"
 	"${SURGSIM_MATH_HEADERS}"

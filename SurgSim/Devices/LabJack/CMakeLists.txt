@@ -67,6 +67,7 @@ endif()
 
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
+	OSS
 	LabJackDevice
 	"${LABJACK_DEVICE_SOURCES}"
 	"${LABJACK_DEVICE_HEADERS}"

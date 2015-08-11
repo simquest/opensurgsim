@@ -36,9 +36,10 @@ set(SURGSIM_TESTING_HEADERS
 	TestCube.h
 	Utilities.h
 )
-surgsim_create_library_header(Testing.h "${SURGSIM_TESTING_HEADERS}")
+surgsim_create_library_header(OSS Testing.h "${SURGSIM_TESTING_HEADERS}")
 
 surgsim_add_library(
+	OSS
 	SurgSimTesting
 	"${SURGSIM_TESTING_SOURCES}"
 	"${SURGSIM_TESTING_HEADERS}"

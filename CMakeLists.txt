@@ -180,9 +180,9 @@ set(CPACK_PACKAGE_OSS OFF CACHE BOOL "Should the OSS Libraries be included in an
 
 set(CPACK_GENERATOR NSIS)
 set(CPACK_NSIS_MODIFY_PATH ON)
+set(CPACK_PACKAGE_NAME ${CMAKE_PROJECT_NAME} CACHE STRING "Optional name for the install package.")
 if (${CPACK_PACKAGE_OSS})
-	set(CPACK_PACKAGE_NAME "${CPACK_PACKAGE_NAME}OSS")
-	set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} Data Development Documentation)
+	set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} Data OSSDevelopment Documentation)
 endif (${CPACK_PACKAGE_OSS})
 include(CPack)
 

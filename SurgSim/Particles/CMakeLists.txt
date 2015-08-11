@@ -39,6 +39,7 @@ set(SURGSIM_PARTICLES_HEADERS
 )
 
 surgsim_add_library(
+	OSS
 	SurgSimParticles
 	"${SURGSIM_PARTICLES_SOURCES}"
 	"${SURGSIM_PARTICLES_HEADERS}"

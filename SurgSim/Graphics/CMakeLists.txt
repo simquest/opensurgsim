@@ -169,9 +169,10 @@ set(SURGSIM_GRAPHICS_HEADERS
 	View.h
 	ViewElement.h
 )
-surgsim_create_library_header(Graphics.h "${SURGSIM_GRAPHICS_HEADERS}")
+surgsim_create_library_header(OSS Graphics.h "${SURGSIM_GRAPHICS_HEADERS}")
 
 surgsim_add_library(
+	OSS
 	SurgSimGraphics
 	"${SURGSIM_GRAPHICS_SOURCES}"
 	"${SURGSIM_GRAPHICS_HEADERS}"
