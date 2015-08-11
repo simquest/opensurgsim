@@ -175,7 +175,7 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 
 std::shared_ptr<SurgSim::Input::DeviceInterface> createDevice(const std::string& toolDeviceName)
 {
-	std::vector<std::string> types =
+	std::array<std::string, 5> types =
 		{"PhantomDevice", "NovintDevice", "MultiAxisDevice", "SixenseDevice", "LeapDevice"};
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
 	auto& factory = SurgSim::Input::DeviceInterface::getFactory();
