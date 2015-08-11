@@ -113,6 +113,41 @@ private:
 	PolynomialRoots<T, 1> m_locationOfExtremum;
 };
 
+/// PolynomialValues<T, 3> specializes the PolynomialValues class for degree 3 (cubic polynomials)
+/// \sa PolynomialValues<T, N>
+template <class T>
+class PolynomialValues<T, 3>
+{
+public:
+	/// Constructor. Initialize based on the polynomial p
+	/// \param p polynomial on which the value calculations are based
+	explicit PolynomialValues(const Polynomial<T, 3>& p);
+
+	/// \return the polynomial basis of this calculation
+	const Polynomial<T, 3>& getPolynomial() const;
+
+	/// \return the derivative of the polynomial basis for this calculation
+	const Polynomial<T, 2>& getDerivative() const;
+
+	/// \return the locations of the extrema for the polynomial
+	const PolynomialRoots<T, 2>& getLocationsOfExtrema() const;
+
+	/// \param interval an interval on the independent variable over which the
+	/// values are to be calculated
+	/// \return the minimum and maximum polynomial values over interval
+	Interval<T> valuesOverInterval(const Interval<T>& interval) const;
+
+private:
+	/// The polynomial under consideration
+	Polynomial<T, 3> m_polynomial;
+
+	/// Cached version of the derivative of the polynomial
+	Polynomial<T, 2> m_derivative;
+
+	/// Cached version of the locations of the extrema
+	PolynomialRoots<T, 2> m_locationOfExtremum;
+};
+
 /// Calculate the minimum and maximum values of the dependent variable over a specified
 /// range of the independent variable
 /// \tparam N degree of the polynomial being managed

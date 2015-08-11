@@ -68,16 +68,37 @@ TEST(PolynomialValuesTest, PolnomialDegree2Values)
 	EXPECT_TRUE(Interval<double>(-12.5, 252.0).isApprox(quadraticValues.valuesOverInterval(interval2), epsilon));
 };
 
+TEST(PolynomialValuesTest, PolnomialDegree3Values)
+{
+	SurgSim::Math::Polynomial<double, 3> cubicPoly(7.0, -63.0, -6.0, 1.0);
+	SurgSim::Math::Interval<double> interval1(-10.0, 20.0);
+	SurgSim::Math::Interval<double> interval2(-4.0, 10.0);
+	PolynomialValues<double, 3> cubicValues(cubicPoly);
+	EXPECT_DOUBLE_EQ(cubicPoly.getCoefficient(0), cubicValues.getPolynomial().getCoefficient(0));
+	EXPECT_DOUBLE_EQ(cubicPoly.getCoefficient(1), cubicValues.getPolynomial().getCoefficient(1));
+	EXPECT_DOUBLE_EQ(cubicPoly.getCoefficient(2), cubicValues.getPolynomial().getCoefficient(2));
+	EXPECT_DOUBLE_EQ(cubicPoly.getCoefficient(3), cubicValues.getPolynomial().getCoefficient(3));
+	EXPECT_NEAR(-63.0, cubicValues.getDerivative().getCoefficient(0), epsilon);
+	EXPECT_NEAR(-12.0, cubicValues.getDerivative().getCoefficient(1), epsilon);
+	EXPECT_NEAR(3.0, cubicValues.getDerivative().getCoefficient(2), epsilon);
+	EXPECT_EQ(2, cubicValues.getLocationsOfExtrema().getNumRoots());
+	EXPECT_NEAR(-3.0, cubicValues.getLocationsOfExtrema()[0], epsilon);
+	EXPECT_NEAR(7.0, cubicValues.getLocationsOfExtrema()[1], epsilon);
+	EXPECT_TRUE(Interval<double>(-963.0, 4347.0).isApprox(cubicValues.valuesOverInterval(interval1), epsilon));
+	EXPECT_TRUE(Interval<double>(-385.0, 115.0).isApprox(cubicValues.valuesOverInterval(interval2), epsilon));
+};
+
 TEST(PolynomialValuesTest, ValuesOverIntervalTests)
 {
 	SurgSim::Math::Polynomial<double, 0> constantPoly(-24.0);
 	SurgSim::Math::Polynomial<double, 1> linearPoly(-24.0, 2.0);
 	SurgSim::Math::Polynomial<double, 2> quadraticPoly(-8.0, 6.0, 2.0);
-	SurgSim::Math::Polynomial<double, 3> cubicPoly(7.0, -8.0, 6.0, 2.0);
+	SurgSim::Math::Polynomial<double, 3> cubicPoly(7.0, -63.0, -6.0, 1.0);
 	SurgSim::Math::Interval<double> interval(-1.0, 10.0);
 	EXPECT_TRUE(Interval<double>(-24.0, -24.0).isApprox(valuesOverInterval(constantPoly, interval), epsilon));
 	EXPECT_TRUE(Interval<double>(-26.0, -4.0).isApprox(valuesOverInterval(linearPoly, interval), epsilon));
 	EXPECT_TRUE(Interval<double>(-12.0, 252.0).isApprox(valuesOverInterval(quadraticPoly, interval), epsilon));
+	EXPECT_TRUE(Interval<double>(-385.0, 63.0).isApprox(valuesOverInterval(cubicPoly, interval), epsilon));
 };
 
 }; // namespace Math
