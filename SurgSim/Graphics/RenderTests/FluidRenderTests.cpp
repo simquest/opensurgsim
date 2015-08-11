@@ -46,6 +46,38 @@ namespace Graphics
 struct FluidRenderTests : public RenderTest
 {
 protected:
+	void createSceneDepth()
+	{
+		// Scene Depth Map //
+		auto camera = std::make_shared<Graphics::OsgCamera>("SceneDepth");
+		camera->setRenderGroupReference("SceneDepth");
+		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
+		camera->setViewport(0, 0, 1024, 1024);
+		camera->setOrthogonalProjection(0, 1024, 0, 1024, 0, 1.0);
+
+		auto material = Graphics::buildMaterial("Shaders/depth_passthru.vert", "Shaders/depth_passthru.frag");
+		//viewElement->getCamera()->setMaterial(material);
+
+		auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, true);
+		viewElement->getCamera()->setRenderTarget(renderTarget);
+
+		auto element = std::make_shared<Framework::BasicSceneElement>("dbug");
+		auto quad = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("debug");
+		quad->setGroupReference("SceneDepth");
+		quad->setSize(256, 256);
+		quad->setLocation(256, 374);
+		quad->setTexture(viewElement->getCamera()->getRenderTarget()->getDepthTarget());
+		element->addComponent(quad);
+		quad = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("color");
+		quad->setGroupReference("SceneDepth");
+		quad->setSize(256, 256);
+		quad->setLocation(512, 374);
+		quad->setTexture(viewElement->getCamera()->getRenderTarget()->getColorTarget(0));
+		element->addComponent(camera);
+		element->addComponent(quad);
+		scene->addSceneElement(element);
+	}
+
 	void createPointSpriteSpherePass(const float& sphereRadius, const Math::Vector4f& color)
 	{
 		// Create material to transport the Textures for the point sprite
@@ -83,6 +115,7 @@ protected:
 		int width = dimensions[0] / 3;
 		int height = dimensions[1] / 3;
 
+
 		// Depth Pass //
 		auto depthPass = std::make_shared<RenderPass>("DepthPass");
 		depthPass->getCamera()->setRenderGroupReference("DepthPass");
@@ -105,6 +138,8 @@ protected:
 		pointSpriteUniform->set(texture);
 		material->addUniform(pointSpriteUniform);
 
+		//material->addUniform("sampler2D", "sceneDepth");
+		//material->setValue("sceneDepth", camera->getRenderTarget()->getDepthTarget());
 		material->addUniform("float", "sphereRadius");
 		material->setValue("sphereRadius", sphereRadius);
 		material->addUniform("float", "sphereScale");
@@ -123,7 +158,6 @@ protected:
 		auto osgCamera = camera->getOsgCamera();
 		osgCamera->setViewport(0, 0, 1024, 1024);
 		camera->setOrthogonalProjection(0, 1024, 0, 1024, -1.0, 1.0);
-
 		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 1);
 
 		renderTarget = std::make_shared<OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
@@ -162,6 +196,7 @@ protected:
 		camera = std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(shadingPass->getCamera());
 		osgCamera = camera->getOsgCamera();
 		osgCamera->setViewport(0, 0, 1024, 1024);
+		osgCamera->setClearColor(osg::Vec4(0, 0, 0, 0));
 		camera->setOrthogonalProjection(0, 1024, 0, 1024, -1.0, 1.0);
 		camera->setRenderGroupReference("ShadingPass");
 		camera->setGroupReference(Graphics::Representation::DefaultGroupName);
@@ -206,8 +241,17 @@ protected:
 TEST_F(FluidRenderTests, PointSpriteFluid)
 {
 	viewElement->enableManipulator(true);
+	createSceneDepth();
 	//createPointSpriteSpherePass(0.01f, Math::Vector4f(1.0, 0.0, 0.0, 1.0));
-	createPointSpriteSphereFluidPass(0.01f);
+	//createPointSpriteSphereFluidPass(0.01f);
+
+	// Create cube
+	auto cube = std::make_shared<Graphics::OsgMeshRepresentation>("Cube");
+	cube->loadMesh("Geometry/Cube.ply");
+	//cube->addGroupReference("SceneDepth");
+	auto element = std::make_shared<Framework::BasicSceneElement>("CubeElement");
+	element->addComponent(cube);
+	scene->addSceneElement(element);
 
 	// Create the point cloud
 	auto bunny = std::make_shared<Graphics::OsgMeshRepresentation>("Bunny");
@@ -222,7 +266,7 @@ TEST_F(FluidRenderTests, PointSpriteFluid)
 		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));
 	}
 
-	graphics->addGroupReference("DepthPass");
+	graphics->setGroupReference("DepthPass");
 
 	auto sceneElement = std::make_shared<Framework::BasicSceneElement>("PointSprites");
 	sceneElement->addComponent(graphics);
