@@ -71,10 +71,9 @@ void main(void)
 
     // Calculate the normal of the segment that is in the plane spanned between
     // lightDir and segmentDir, i.e. the normal that is closest to the light direction
-    // still need to deal with the light and the segment dir being coincident
-    if (abs(dot(lightDir, segmentDir)) < 0.0000001)
+    if (abs(dot(lightDir, segmentDir)) > 1 - 0.0001)
     {
-	    normalDir = cross(vec3(1.0,1.0,1.0), segmentDir);
+	    normalDir = lightDir;
     }
     else
     {

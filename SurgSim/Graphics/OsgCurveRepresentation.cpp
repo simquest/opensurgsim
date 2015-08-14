@@ -173,7 +173,7 @@ double OsgCurveRepresentation::getTension() const
 
 void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain& controlPoints)
 {
-	const double stepsize = 1.0 / m_subdivision;
+	const double stepsize = 1.0 / (m_subdivision + 1);
 
 	retrievePoints(controlPoints, &m_controlPoints);
 
@@ -195,7 +195,7 @@ void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain&
 	}
 
 	// #performance
-	// Calculate the bounding box while iterating over the vertices, this will safe osg time in the update traversal
+	// Calculate the bounding box while iterating over the vertices, this will save osg time in the update traversal
 	for (size_t i = 0; i < vertexCount; ++i)
 	{
 		const auto& vertex0 = m_vertices[i];

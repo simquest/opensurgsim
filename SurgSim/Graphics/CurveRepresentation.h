@@ -35,6 +35,7 @@ class CurveRepresentation : public virtual Representation
 {
 public:
 	/// Constructor
+	/// \param name the name of the representation
 	explicit CurveRepresentation(const std::string& name);
 
 	/// Sets the number of intermediate points the get generated between each two control points
@@ -44,7 +45,7 @@ public:
 	/// \return the number of interpolated points between control points
 	virtual size_t getSubdivisions() const = 0;
 
-	/// Sets the tension (tau) parameter of the Catmull Rom interpolation
+	/// Sets the tension (tau) parameter of the Catmull Rom interpolation, needs to be between 0.0 and 1.0
 	/// \param tension the tension
 	virtual void setTension(double tension) = 0;
 

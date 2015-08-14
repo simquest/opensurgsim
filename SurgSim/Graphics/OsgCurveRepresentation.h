@@ -46,6 +46,7 @@ class OsgCurveRepresentation : public OsgRepresentation, public CurveRepresentat
 {
 public:
 	/// Constructor
+	/// \param name Name of the representation
 	explicit OsgCurveRepresentation(const std::string& name);
 
 	~OsgCurveRepresentation();

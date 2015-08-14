@@ -73,13 +73,13 @@ bool TransferPhysicsToVerticesBehavior::doInitialize()
 
 bool TransferPhysicsToVerticesBehavior::doWakeUp()
 {
-	auto state = m_source->getFinalState();
 
 	if (m_vertices.getNumVertices() == 0)
 	{
+		auto state = m_source->getFinalState();
 		for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
 		{
-			DataStructures::Vertices<DataStructures::EmptyData>::VertexType vertex(state->getPosition(nodeId));
+			DataStructures::VerticesPlain::VertexType vertex(state->getPosition(nodeId));
 			m_vertices.addVertex(std::move(vertex));
 		}
 	}

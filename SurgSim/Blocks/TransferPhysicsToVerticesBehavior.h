@@ -17,6 +17,7 @@
 #define SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESEHAVIOR_H
 
 #include "SurgSim/DataStructures/EmptyData.h"
+
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/Behavior.h"
 

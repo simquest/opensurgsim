@@ -14,8 +14,9 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/CurveRepresentation.h"
-#include "SurgSim/Math/MathConvert.h"
+
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Math/MathConvert.h"
 
 namespace SurgSim
 {
