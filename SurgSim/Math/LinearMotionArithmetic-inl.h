@@ -638,28 +638,28 @@ Polynomial<T, 2> analyticCrossProductAxis(const LinearMotion_nD<T, 3>& a, const 
 template <typename T>
 Polynomial<T, 2> analyticCrossProductXAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b)
 {
-	return analyticCrossProductAxis<0>(a, b);
+	return analyticCrossProductAxis<double, 0>(a, b);
 }
 
 template <typename T>
 Polynomial<T, 2> analyticCrossProductYAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b)
 {
-	return analyticCrossProductAxis<1>(a, b);
+	return analyticCrossProductAxis<double, 1>(a, b);
 }
 
 template <typename T>
 Polynomial<T, 2> analyticCrossProductZAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b)
 {
-	return analyticCrossProductAxis<2>(a, b);
+	return analyticCrossProductAxis<double, 2>(a, b);
 }
 
 template <typename T>
 void analyticCrossProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b,
-						  Polynomial<T, 2>& resultXAxis, Polynomial<T, 2>& resultYAxis, Polynomial<T, 2>& resultZAxis)
+						  Polynomial<T, 2>* resultXAxis, Polynomial<T, 2>* resultYAxis, Polynomial<T, 2>* resultZAxis)
 {
-	resultXAxis = analyticCrossProductXAxis(a, b);
-	resultYAxis = analyticCrossProductYAxis(a, b);
-	resultZAxis = analyticCrossProductZAxis(a, b);
+	(*resultXAxis) = analyticCrossProductXAxis(a, b);
+	(*resultYAxis) = analyticCrossProductYAxis(a, b);
+	(*resultZAxis) = analyticCrossProductZAxis(a, b);
 }
 
 template <typename T>
