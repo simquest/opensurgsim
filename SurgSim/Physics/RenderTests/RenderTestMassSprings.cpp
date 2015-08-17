@@ -339,7 +339,7 @@ TEST_F(RenderTests, VisualTestMassSprings)
 							   SurgSim::Math::INTEGRATIONSCHEME_STATIC));
 	}
 
-	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 15000.0);
+	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 5000.0);
 }
 
 }; // namespace Physics
