@@ -410,7 +410,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SceneElement> wound =
 		createFemSceneElement("wound",
 							  woundFilename,
-							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
+							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
 							  SurgSim::Math::LINEARSOLVER_LU,
 							  material);
 	wound->setPose(armPose);

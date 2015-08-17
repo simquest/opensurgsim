@@ -274,11 +274,11 @@ TEST_F(RenderTests, VisualTestMassSprings)
 	{
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Explicit",
 							   makeRigidTranslation(Vector3d(-3.0, 3.0, 0.0)), Vector4d(1, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT));
 
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Modified Euler Explicit",
 							   makeRigidTranslation(Vector3d(-1.25, 3.0, 0.0)), Vector4d(0.5, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED));
 
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Runge Kutta 4",
 							   makeRigidTranslation(Vector3d(0.5, 3.0, 0.0)), Vector4d(0, 1, 0, 1),
@@ -286,7 +286,7 @@ TEST_F(RenderTests, VisualTestMassSprings)
 
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Implicit",
 							   makeRigidTranslation(Vector3d(2.25, 3.0, 0.0)), Vector4d(0, 0, 1, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT));
 
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Static",
 							   makeRigidTranslation(Vector3d(4.0, 3.0, 0.0)), Vector4d(1, 1, 1, 1),
@@ -297,11 +297,11 @@ TEST_F(RenderTests, VisualTestMassSprings)
 	{
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Explicit",
 							   makeRigidTranslation(Vector3d(-3.0, 0.5, 0.0)), Vector4d(1, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT));
 
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Modified Euler Explicit",
 							   makeRigidTranslation(Vector3d(-1.25, 0.5, 0.0)), Vector4d(0.5, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED));
 
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Runge Kutta 4",
 							   makeRigidTranslation(Vector3d(0.5, 0.5, 0.0)), Vector4d(0, 1, 0, 1),
@@ -309,7 +309,7 @@ TEST_F(RenderTests, VisualTestMassSprings)
 
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Implicit",
 							   makeRigidTranslation(Vector3d(2.25, 0.5, 0.0)), Vector4d(0, 0, 1, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT));
 
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Static",
 							   makeRigidTranslation(Vector3d(4.0, 0.5, 0.0)), Vector4d(1, 1, 1, 1),
@@ -320,11 +320,11 @@ TEST_F(RenderTests, VisualTestMassSprings)
 	{
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Explicit",
 							   makeRigidTranslation(Vector3d(-3.0, -1.5, 0.0)), Vector4d(1, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT));
 
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Modified Euler Explicit",
 							   makeRigidTranslation(Vector3d(-1.25, -1.5, 0.0)), Vector4d(0.5, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED));
 
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Runge Kutta 4",
 							   makeRigidTranslation(Vector3d(0.5, -1.5, 0.0)), Vector4d(0, 1, 0, 1),
@@ -332,7 +332,7 @@ TEST_F(RenderTests, VisualTestMassSprings)
 
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Implicit",
 							   makeRigidTranslation(Vector3d(2.25, -1.5, 0.0)), Vector4d(0, 0, 1, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT));
 
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Static",
 							   makeRigidTranslation(Vector3d(4.0, -1.5, 0.0)), Vector4d(1, 1, 1, 1),

@@ -158,7 +158,7 @@ TEST_F(MassSpringMechanicalValidationTests, NoGravityTest)
 	// Note the use of identity pose to avoid small variation between the spring rest length and current length
 	MockMassSpring m("MassSpring", m_poseIdentity, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
+		SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
 
 	m.setIsGravityEnabled(false);
 
@@ -189,7 +189,7 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 	// (explicit adds energy to the system, implicit removes energy to the system)
 	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
+		SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED);
 
 	// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
 	std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
@@ -265,7 +265,7 @@ TEST_F(MassSpringMechanicalValidationTests, FallingTest)
 
 	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
+		SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
 
 	m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	m.wakeUp();
@@ -299,20 +299,20 @@ TEST_F(MassSpringMechanicalValidationTests, EnergyTest)
 		SCOPED_TRACE("Testing energy increase for Euler explicit");
 
 		// For Euler explicit, the energy should increase
-		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER, 1);
+		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT, 1);
 	}
 
 	{
 		SCOPED_TRACE("Testing energy decrease for Euler implicit");
 
 		// For Euler implicit, the energy should decrease
-		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, -1);
+		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT, -1);
 	}
 
 	{
 		SCOPED_TRACE("Testing energy stability for Modified Euler explicit");
 
 		// For modified Euler explicit , the energy should be stable
-		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, 0);
+		runEnergyTest(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED, 0);
 	}
 }

@@ -125,13 +125,13 @@ TEST_F(RenderTests, VisualTestFem1D)
 		createFem1D("Euler Explicit",                                           // name
 					makeRigidTranslation(Vector3d(0.0, 0.5, 0.0)),              // graphics pose
 					Vector4d(1, 0, 0, 1),                                       // color (r, g, b, a)
-					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER));   // technique to update object
+					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT));   // technique to update object
 
 	scene->addSceneElement(
 		createFem1D("Modified Euler Explicit",
 					makeRigidTranslation(Vector3d(0.0, 0.25, 0.0)),
 					Vector4d(0.5, 0, 0, 1),
-					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER));
+					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT));
 
 	scene->addSceneElement(
 		createFem1D("Runge Kutta 4",
@@ -143,7 +143,7 @@ TEST_F(RenderTests, VisualTestFem1D)
 		createFem1D("Euler Implicit",
 					makeRigidTranslation(Vector3d(0.0, -0.25, 0.0)),
 					Vector4d(0, 0, 1, 1),
-					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
+					SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT));
 
 	scene->addSceneElement(
 		createFem1D("Static",
