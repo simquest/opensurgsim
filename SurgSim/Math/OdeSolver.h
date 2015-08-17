@@ -119,10 +119,6 @@ public:
 	const Matrix& getComplianceMatrix() const;
 
 protected:
-	/// Allocates the system and compliance matrices
-	/// \param size The size to account for in the data structure
-	void allocate(size_t size);
-
 	/// Assemble the linear system (A.x=b) to be solved for the state and new states (useful for certain ode solver).
 	/// \param dt The time step used in the system
 	/// \param state, newState The state and newState to be used to evaluate the system
