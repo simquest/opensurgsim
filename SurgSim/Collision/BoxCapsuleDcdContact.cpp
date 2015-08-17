@@ -198,9 +198,8 @@ std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateContact(
 		normal = boxPose.linear() * normal;
 		std::pair<Location, Location> penetrationPoints = std::make_pair(Location(deepestBoxPoint),
 				Location(capsulePose.inverse() * boxPose * deepestCapsulePoint));
-		contacts.push_back(std::make_shared<Contact>(
-							   CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, distance, 0.0,
-							   Vector3d::Zero(), normal, penetrationPoints));
+		contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, distance, 1.0,
+						   Vector3d::Zero(), normal, penetrationPoints));
 	}
 	return std::move(contacts);
 }

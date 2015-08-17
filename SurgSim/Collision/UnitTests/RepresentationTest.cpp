@@ -135,8 +135,8 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_TRUE(safePlaneCollisions->empty());
 
 	std::shared_ptr<Contact> dummyContact =
-		std::make_shared<Contact>(CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION,
-								  0.0, 0.0, Vector3d::Zero(), Vector3d::Zero(),
+		std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE,
+								  0.0, 1.0, Vector3d::Zero(), Vector3d::Zero(),
 								  std::make_pair(Location(), Location()));
 	unsafeSphereCollisions[planeRep].push_back(dummyContact);
 
@@ -163,7 +163,7 @@ TEST_F(RepresentationTest, AddContactsInParallelTest)
 {
 	auto rep = std::make_shared<ShapeCollisionRepresentation>("collisionRepReference");
 	auto contact = std::make_shared<Contact>(
-					   CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, 0.1, 0.0,
+					   COLLISION_DETECTION_TYPE_DISCRETE, 0.1, 1.0,
 					   Math::Vector3d::Zero(), Math::Vector3d::Zero(),
 					   std::make_pair(DataStructures::Location(), DataStructures::Location()));
 	auto threadPool = Framework::Runtime::getThreadPool();

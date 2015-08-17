@@ -78,7 +78,7 @@ bool CollisionPair::hasContacts() const
 	return !m_contacts.empty();
 }
 
-void CollisionPair::addContact(const CollisionDetectionAlgorithmType& collisionType,
+void CollisionPair::addContact(const CollisionDetectionType& collisionType,
 							   const double& depth,
 							   const double& time,
 							   const SurgSim::Math::Vector3d& contactPoint,
@@ -88,11 +88,21 @@ void CollisionPair::addContact(const CollisionDetectionAlgorithmType& collisionT
 	addContact(std::make_shared<Contact>(collisionType, depth, time, contactPoint, normal, penetrationPoints));
 }
 
-void CollisionPair::addContact(const double& depth,
-							   const SurgSim::Math::Vector3d& normal,
-							   const std::pair<Location, Location>& penetrationPoints)
+void CollisionPair::addCcdContact(const double& depth,
+								  const double& time,
+								  const SurgSim::Math::Vector3d& contactPoint,
+								  const SurgSim::Math::Vector3d& normal,
+								  const std::pair<Location, Location>& penetrationPoints)
 {
-	addContact(std::make_shared<Contact>(CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, depth, 0.0,
+	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_CONTINUOUS, depth, time,
+										 contactPoint, normal, penetrationPoints));
+}
+
+void CollisionPair::addDcdContact(const double& depth,
+								  const SurgSim::Math::Vector3d& normal,
+								  const std::pair<Location, Location>& penetrationPoints)
+{
+	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
 										 SurgSim::Math::Vector3d::Zero(), normal, penetrationPoints));
 }
 

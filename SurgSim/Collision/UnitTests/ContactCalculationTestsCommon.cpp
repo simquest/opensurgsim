@@ -36,7 +36,7 @@ namespace Collision
 	}
 }
 
-void checkContactInfo(std::shared_ptr<Contact> contact, CollisionDetectionAlgorithmType expectedType,
+void checkContactInfo(std::shared_ptr<Contact> contact, CollisionDetectionType expectedType,
 					  double expectedDepth, double expectedTime,
 					  const Vector3d& expectedNormal, const Vector3d& expectedPenetrationPointFirst,
 					  const Vector3d& expectedPenetrationPointSecond)
@@ -177,7 +177,7 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContac
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(
-										CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, depth, 0.0,
+										COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
 										Vector3d::Zero(), collisionNormal, penetrationPoint));
 	}
 }
@@ -208,8 +208,8 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>* exp
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(
-										CollisionDetectionAlgorithmType::DISCRETE_COLLISION_DETECTION, std::abs(depth),
-										0.0, Vector3d::Zero(), collisionNormal, penetrationPoint));
+										COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth),
+										1.0, Vector3d::Zero(), collisionNormal, penetrationPoint));
 	}
 }
 
