@@ -118,7 +118,8 @@ size_t DeformableRepresentation::getNumDofPerNode() const
 
 void DeformableRepresentation::setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme)
 {
-	SURGSIM_ASSERT(!isAwake()) << "You cannot set the integration scheme after the component has been awoken";
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"You cannot set the integration scheme after the component has been initialized";
 	m_integrationScheme = integrationScheme;
 }
 
@@ -127,9 +128,15 @@ SurgSim::Math::IntegrationScheme DeformableRepresentation::getIntegrationScheme(
 	return m_integrationScheme;
 }
 
+std::shared_ptr<SurgSim::Math::OdeSolver> DeformableRepresentation::getOdeSolver() const
+{
+	return m_odeSolver;
+}
+
 void DeformableRepresentation::setLinearSolver(SurgSim::Math::LinearSolver linearSolver)
 {
-	SURGSIM_ASSERT(!isAwake()) << "You cannot set the linear solver after the component has been awoken";
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"You cannot set the linear solver after the component has been initialized";
 	m_linearSolver = linearSolver;
 }
 
@@ -289,6 +296,65 @@ void DeformableRepresentation::setCollisionRepresentation(
 	}
 }
 
+bool DeformableRepresentation::doInitialize()
+{
+	// Set the ode solver using the chosen integration scheme
+	switch (m_integrationScheme)
+	{
+	case SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverEulerExplicit>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverEulerExplicitModified>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverEulerImplicit>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_STATIC:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverStatic>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverRungeKutta4>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearEulerExplicit>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearEulerExplicitModified>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearEulerImplicit>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearStatic>(this);
+		break;
+	case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4:
+		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearRungeKutta4>(this);
+		break;
+	default:
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Ode solver (integration scheme) not initialized, the integration scheme is invalid";
+		return false;
+	}
+
+	// Set the linear solver with initial settings on the ode solver
+	switch (m_linearSolver)
+	{
+	case SurgSim::Math::LINEARSOLVER_LU:
+		m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSparseSolveAndInverseLU>());
+		break;
+	case SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT:
+		m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSparseSolveAndInverseCG>());
+		break;
+	default:
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Linear solver not initialized, the linear solver is invalid";
+		return false;
+	}
+
+	return true;
+}
+
 bool DeformableRepresentation::doWakeUp()
 {
 	// Transform the state with the initial pose
@@ -304,61 +370,6 @@ bool DeformableRepresentation::doWakeUp()
 	if (sceneElement != nullptr)
 	{
 		sceneElement->setPose(SurgSim::Math::RigidTransform3d::Identity());
-	}
-
-	// Set the ode solver using the chosen integration scheme
-	switch (m_integrationScheme)
-	{
-		case SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverEulerExplicit>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverEulerExplicitModified>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverEulerImplicit>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_STATIC:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverStatic>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverRungeKutta4>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearEulerExplicit>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearEulerExplicitModified>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearEulerImplicit>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearStatic>(this);
-			break;
-		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4:
-			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearRungeKutta4>(this);
-			break;
-		default:
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-					<< "Ode solver (integration scheme) not initialized, the integration scheme is invalid";
-			return false;
-	}
-
-
-	// Set the linear solver with initial settings on the ode solver
-	switch (m_linearSolver)
-	{
-		case SurgSim::Math::LINEARSOLVER_LU:
-			m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSparseSolveAndInverseLU>());
-			break;
-		case SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT:
-			m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSparseSolveAndInverseCG>());
-			break;
-		default:
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-					<< "Linear solver not initialized, the linear solver is invalid";
-			return false;
 	}
 
 	return true;

@@ -68,6 +68,11 @@ const std::string& FemRepresentation::getFemElementType() const
 
 bool FemRepresentation::doInitialize()
 {
+	if (!DeformableRepresentation::doInitialize())
+	{
+		return false;
+	}
+
 	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
 
 	// Initialize the FemElements

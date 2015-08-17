@@ -144,7 +144,36 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(zeroMatrix));
 
-	doWakeUp();
+	/// Set/Get the numerical integration scheme
+	for (int integerScheme = 0; integerScheme < SurgSim::Math::MAX_INTEGRATIONSCHEMES; integerScheme++)
+	{
+		auto integrationScheme = static_cast<SurgSim::Math::IntegrationScheme>(integerScheme);
+		EXPECT_NO_THROW(setIntegrationScheme(integrationScheme));
+		EXPECT_EQ(integrationScheme, getIntegrationScheme());
+	}
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
+	EXPECT_EQ(nullptr, getOdeSolver());
+
+	/// Set/Get the linear solver
+	for (int integerLinearSolver = 0; integerLinearSolver < SurgSim::Math::MAX_LINEARSOLVER; integerLinearSolver++)
+	{
+		auto linearSolver = static_cast<SurgSim::Math::LinearSolver>(integerLinearSolver);
+		EXPECT_NO_THROW(setLinearSolver(linearSolver));
+		EXPECT_EQ(linearSolver, getLinearSolver());
+	}
+	setLinearSolver(SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT);
+
+	initialize(std::make_shared<SurgSim::Framework::Runtime>());
+
+	EXPECT_NE(nullptr, getOdeSolver());
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<SurgSim::Math::OdeSolverEulerExplicit>(getOdeSolver()));
+	EXPECT_NE(nullptr,
+		std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(getOdeSolver()->getLinearSolver()));
+	EXPECT_THROW(setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT),
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(setLinearSolver(SurgSim::Math::LINEARSOLVER_LU), SurgSim::Framework::AssertionFailure);
+
+	wakeUp();
 
 	EXPECT_TRUE(*m_initialState     == *m_localInitialState);
 	EXPECT_TRUE(*m_currentState     == *m_localInitialState);
@@ -160,14 +189,6 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 
 	// Test getNumDof (needs to be tested after setInitialState has been called)
 	EXPECT_EQ(getNumDofPerNode() * numNodes, getNumDof());
-
-	/// Set/Get the numerical integration scheme
-	for (int integerScheme = 0; integerScheme < SurgSim::Math::MAX_INTEGRATIONSCHEMES; integerScheme++)
-	{
-		auto integrationScheme = static_cast<SurgSim::Math::IntegrationScheme>(integerScheme);
-		setIntegrationScheme(integrationScheme);
-		EXPECT_EQ(integrationScheme, getIntegrationScheme());
-	}
 }
 
 TEST_F(DeformableRepresentationTest, GetComplianceMatrix)
