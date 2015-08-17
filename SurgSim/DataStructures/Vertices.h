@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -156,6 +157,8 @@ private:
 	/// Vertices
 	std::vector<VertexType> m_vertices;
 };
+
+typedef Vertices<EmptyData> VerticesPlain;
 
 };  // namespace DataStructures
 };  // namespace SurgSim
