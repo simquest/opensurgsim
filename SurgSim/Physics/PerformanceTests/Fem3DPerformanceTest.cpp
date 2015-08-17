@@ -29,7 +29,6 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/PerformanceTests/DivisibleCubeRepresentation.h"
-#include "SurgSim/Physics/PerformanceTests/MockFem3DRepresentation.h"
 #include "SurgSim/Testing/MockPhysicsManager.h"
 
 using SurgSim::Math::Vector3d;
@@ -98,7 +97,7 @@ public:
 		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	}
 
-	void initializeRepresentation(std::shared_ptr<MockFem3DRepresentation> fem)
+	void initializeRepresentation(std::shared_ptr<Fem3DRepresentation> fem)
 	{
 		fem->initialize(m_runtime);
 		fem->wakeUp();
@@ -176,7 +175,7 @@ TEST_P(IntegrationSchemeParamTest, WoundTest)
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
 	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 
-	auto fem = std::make_shared<SurgSim::Physics::MockFem3DRepresentation>("wound");
+	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("wound");
 	fem->loadFem("Geometry/wound_deformable.ply");
 	fem->setIntegrationScheme(integrationScheme);
 	fem->setLinearSolver(linearSolver);
