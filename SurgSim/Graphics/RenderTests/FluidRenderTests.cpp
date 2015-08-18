@@ -69,13 +69,16 @@ protected:
 TEST_F(FluidRenderTests, PointSpriteFluid)
 {
 	viewElement->enableManipulator(true);
+	viewElement->getView()->setTargetScreen(1);
+// 	viewElement->setPose(SurgSim::Math::makeRigidTransform(Math::Vector3d(1.0, 1.0, 1.0), Math::Vector3d(0.0, 0.0, 0.0),
+// 						 Math::Vector3d(0.0, 1.0, 0.0)));
 	//createPointSpriteSpherePass(0.01f, Math::Vector4f(1.0, 0.0, 0.0, 1.0));
 	Blocks::creatFluidRenderingPass(0.01f, viewElement, scene);
 
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
 
-	element = std::make_shared<Framework::BasicSceneElement>("box");
+	auto element = std::make_shared<Framework::BasicSceneElement>("box");
 	element->addComponent(cube);
 
 	scene->addSceneElement(element);
@@ -100,6 +103,8 @@ TEST_F(FluidRenderTests, PointSpriteFluid)
 	scene->addSceneElement(sceneElement);
 
 	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	graphicsManager->dumpDebugInfo();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
 	runtime->stop();
 }

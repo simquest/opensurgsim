@@ -23,8 +23,8 @@ int main(int argc, char** argv)
 	//Disable logging during tests
 	std::shared_ptr<SurgSim::Framework::LoggerManager> loggerManager;
 	loggerManager = SurgSim::Framework::Logger::getLoggerManager();
-	loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
-
+	//loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
+	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_SEVERE);
 	testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();
 }

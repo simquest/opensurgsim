@@ -48,12 +48,14 @@ void main(void)
     vec3 normal = normalize(texture2D(normalMap, gl_TexCoord[0].xy).xyz);
 
     // Need to use the vector from the vertex to the light, which is the negative of lightDir
-	float diffuse = max(0.0,dot(normalize(-lightDir),normal));
+    float diffuse = max(0.0,dot(normalize(-lightDir),normal));
 
     const float shininess = 100.0;
     float temp = max(dot(normalize(reflect(lightDir, normal)), normalize(-eyePos)), 0.0);
     float specular = temp / (shininess - temp * shininess + temp);
 
-	gl_FragColor = color * diffuse + specular;
+    // gl_FragColor = color * diffuse + specular;
+	gl_FragColor.xyz = vec3(0.5,0.5, 0.0);
     gl_FragColor.a = 1.0;
+    gl_FragDepth = depth;
 }
