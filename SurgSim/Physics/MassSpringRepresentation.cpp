@@ -17,9 +17,11 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::SparseMatrix;
@@ -499,6 +501,26 @@ void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::Ode
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
+}
+
+std::shared_ptr<Localization> MassSpringRepresentation::createLocalization(const SurgSim::DataStructures::Location& location)
+{
+	auto result = std::make_shared<MassSpringLocalization>(std::static_pointer_cast<Physics::Representation>(getSharedPtr()));
+
+	if (location.index.hasValue())
+	{
+		result->setLocalNode(location.index.getValue());
+	}
+	else if (location.nodeMeshLocalCoordinate.hasValue())
+	{
+		result->setLocalNode(location.nodeMeshLocalCoordinate.getValue().index);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Invalid location to create a MassSpringLocalization" << std::endl;
+	}
+
+	return result;
 }
 
 } // namespace Physics
