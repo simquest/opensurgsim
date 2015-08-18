@@ -17,9 +17,15 @@
 
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
 
+#include "SurgSim/Blocks/MassSpring1DRepresentation.h"
+#include "SurgSim/Blocks/MassSpring2DRepresentation.h"
+#include "SurgSim/Blocks/MassSpring3DRepresentation.h"
+#include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 namespace SurgSim
@@ -40,7 +46,28 @@ TEST(ConstraintImplementationFactoryTest, GetImplementationTest)
 		!= nullptr);
 	EXPECT_TRUE(factory.getImplementation(typeid(RigidRepresentation), FIXED_3DPOINT)
 		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(Fem1DRepresentation), FIXED_3DPOINT)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(Fem2DRepresentation), FIXED_3DPOINT)
+		!= nullptr);
 	EXPECT_TRUE(factory.getImplementation(typeid(Fem3DRepresentation), FIXED_3DPOINT)
+		!= nullptr);
+
+	EXPECT_TRUE(factory.getImplementation(typeid(MassSpringRepresentation), FRICTIONLESS_3DCONTACT)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(SurgSim::Blocks::MassSpring1DRepresentation), FRICTIONLESS_3DCONTACT)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(SurgSim::Blocks::MassSpring2DRepresentation), FRICTIONLESS_3DCONTACT)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(SurgSim::Blocks::MassSpring3DRepresentation), FRICTIONLESS_3DCONTACT)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(MassSpringRepresentation), FIXED_3DPOINT)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(SurgSim::Blocks::MassSpring1DRepresentation), FIXED_3DPOINT)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(SurgSim::Blocks::MassSpring2DRepresentation), FIXED_3DPOINT)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(SurgSim::Blocks::MassSpring3DRepresentation), FIXED_3DPOINT)
 		!= nullptr);
 }
 
