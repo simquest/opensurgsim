@@ -370,6 +370,15 @@ TEST(LinearMotionSpecializations, LinearMotion3DExtras)
 	EXPECT_TRUE(cross.getAxis(1).isApprox(Interval<double>(-2.0, 2.0), epsilon));
 	EXPECT_TRUE(cross.getAxis(2).isApprox(Interval<double>(-1.0, 1.0), epsilon));
 
+	// Analytic cross product (polynomials)
+	Polynomial<double, 2> xPoly;
+	Polynomial<double, 2> yPoly;
+	Polynomial<double, 2> zPoly;
+	analyticCrossProduct(motion1, motion2, &xPoly, &yPoly, &zPoly);
+	EXPECT_TRUE(valuesOverInterval(xPoly, range).isApprox(Interval<double>(-1.0, 1.0), epsilon));
+	EXPECT_TRUE(valuesOverInterval(yPoly, range).isApprox(Interval<double>(-2.0, 2.0), epsilon));
+	EXPECT_TRUE(valuesOverInterval(zPoly, range).isApprox(Interval<double>(-1.0, 1.0), epsilon));
+
 	/// Magnitudes
 	EXPECT_TRUE(motion1.magnitudeSquared(range).isApprox(motion1.dotProduct(motion1, range), epsilon));
 	Interval<double> magnitude = motion1.magnitude(range);

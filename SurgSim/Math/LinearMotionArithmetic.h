@@ -455,7 +455,7 @@ Polynomial<T, 2> analyticCrossProductZAxis(const LinearMotionND<T, 3>& a, const 
 /// \param [out] resultZAxis the Z axis in a polynomial representation
 template <class T>
 void analyticCrossProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
-						  Polynomial<T, 2>& resultXAxis, Polynomial<T, 2>& resultYAxis, Polynomial<T, 2>& resultZAxis);
+						  Polynomial<T, 2>* resultXAxis, Polynomial<T, 2>* resultYAxis, Polynomial<T, 2>* resultZAxis);
 
 /// Calculate an analytic cross product as a Polynomial, as a polynomial whose value for t=0..1 is
 /// the value of the triple product.

@@ -24,6 +24,8 @@ namespace Device
 {
 class OpenNIScaffold;
 
+SURGSIM_STATIC_REGISTRATION(OpenNIDevice);
+
 /// A class implementing the communication with one OpenNI compatible depth camera
 ///
 /// \par Application input provided by the device:
@@ -42,6 +44,8 @@ public:
 	/// Constructor.
 	/// \param name A unique name for the device that will be used by the application.
 	explicit OpenNIDevice(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::OpenNIDevice);
 
 	/// Destructor.
 	virtual ~OpenNIDevice();

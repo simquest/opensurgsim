@@ -25,6 +25,7 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_STATIC_REGISTRATION(Novint7DofDevice);
 
 /// A class implementing the communication with a Novint Falcon with the Open Surgery Grip 7-DoF device.
 ///
@@ -55,6 +56,8 @@ public:
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit Novint7DofDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::Novint7DofDevice);
 
 	/// Destructor.
 	virtual ~Novint7DofDevice();

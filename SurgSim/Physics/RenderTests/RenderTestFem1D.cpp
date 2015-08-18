@@ -17,9 +17,9 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/TransferPhysicsToPointCloudBehavior.h"
+#include "SurgSim/Blocks/TransferPhysicsToVerticesBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgCurveRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -27,10 +27,11 @@
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
+#include "SurgSim/Blocks/TransferPhysicsToVerticesBehavior.h"
 
-using SurgSim::Blocks::TransferPhysicsToPointCloudBehavior;
+using SurgSim::Blocks::TransferPhysicsToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Graphics::OsgPointCloudRepresentation;
+using SurgSim::Graphics::OsgCurveRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem1DRepresentation;
 using SurgSim::Physics::Fem1DElementBeam;
@@ -81,8 +82,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 		const SurgSim::Math::Vector4d& color,
 		SurgSim::Math::IntegrationScheme integrationScheme)
 {
-	std::shared_ptr<Fem1DRepresentation> physicsRepresentation
-		= std::make_shared<Fem1DRepresentation>("Physics Representation: " + name);
+	auto physicsRepresentation = std::make_shared<Fem1DRepresentation>("Physics Representation: " + name);
 
 	// In this test, the physics representations are not transformed, only the graphics will be transformed
 	loadModelFem1D(physicsRepresentation, 10);
@@ -91,23 +91,19 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 	physicsRepresentation->setRayleighDampingMass(5e-2);
 	physicsRepresentation->setRayleighDampingStiffness(5e-3);
 
-	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
+	auto femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 
-	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation> graphicsRepresentation
-			= std::make_shared<OsgPointCloudRepresentation>("Graphics Representation: " + name);
+	auto graphicsRepresentation = std::make_shared<OsgCurveRepresentation>("Graphics Representation: " + name);
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
-	graphicsRepresentation->setPointSize(3.0f);
-	graphicsRepresentation->setLocalActive(true);
 
 	femSceneElement->addComponent(graphicsRepresentation);
 
-	auto physicsToGraphics =
-		std::make_shared<TransferPhysicsToPointCloudBehavior>("Transfer from Physics to Graphics");
-	physicsToGraphics->setSource(physicsRepresentation);
-	physicsToGraphics->setTarget(graphicsRepresentation);
-	femSceneElement->addComponent(physicsToGraphics);
+	auto copier = std::make_shared<SurgSim::Blocks::TransferPhysicsToVerticesBehavior>("Copier");
+	copier->setSource(physicsRepresentation);
+	copier->setTarget(graphicsRepresentation);
+	femSceneElement->addComponent(copier);
 
 	return femSceneElement;
 }
