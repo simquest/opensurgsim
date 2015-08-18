@@ -205,14 +205,6 @@ void MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	{
 		m_f += m_externalGeneralizedForce;
 	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_f[*boundaryCondition] = 0.0;
-	}
 }
 
 void MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
@@ -228,15 +220,6 @@ void MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
 		m_M.coeffRef(3 * massId, 3 * massId) = getMass(massId)->getMass();
 		m_M.coeffRef(3 * massId + 1, 3 * massId + 1) = getMass(massId)->getMass();
 		m_M.coeffRef(3 * massId + 2, 3 * massId + 2) = getMass(massId)->getMass();
-	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 }
 
@@ -283,17 +266,6 @@ void MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
 	{
 		m_D += m_externalGeneralizedDamping;
 	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
-		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
-	}
 }
 
 void MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
@@ -310,17 +282,6 @@ void MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 	if (m_hasExternalGeneralizedForce)
 	{
 		m_K += m_externalGeneralizedStiffness;
-	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
-		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 }
 
@@ -377,27 +338,6 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 		m_f += m_externalGeneralizedForce;
 		m_K += m_externalGeneralizedStiffness;
 		m_D += m_externalGeneralizedDamping;
-	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
-
-		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
-		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
-
-		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
-		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
-
-		m_f[*boundaryCondition] = 0.0;
 	}
 }
 
