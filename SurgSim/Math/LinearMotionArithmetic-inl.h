@@ -158,32 +158,32 @@ LinearMotion<T> LinearMotion<T>::secondHalf() const
 	return LinearMotion<T>((m_start + m_end) * static_cast<T>(0.5), m_end);
 }
 
-// Class nD
+// Class ND
 template <typename T, int N>
-LinearMotion_nD<T, N>::LinearMotion_nD()
+LinearMotionND<T, N>::LinearMotionND()
 {
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N>::LinearMotion_nD(const std::array<LinearMotion<T>, N>& x)
+LinearMotionND<T, N>::LinearMotionND(const std::array<LinearMotion<T>, N>& x)
 {
 	m_motion = x;
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N>::LinearMotion_nD(const LinearMotion_nD<T, N>& motion)
+LinearMotionND<T, N>::LinearMotionND(const LinearMotionND<T, N>& motion)
 {
 	m_motion = motion.m_motion;
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N>::LinearMotion_nD(LinearMotion_nD<T, N>&& motion)
+LinearMotionND<T, N>::LinearMotionND(LinearMotionND<T, N>&& motion)
 {
 	*this = std::move(motion);
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N>::LinearMotion_nD(const std::array<T, N>& a, const std::array<T, N>& b)
+LinearMotionND<T, N>::LinearMotionND(const std::array<T, N>& a, const std::array<T, N>& b)
 {
 	for (int i = 0; i < N; ++i)
 	{
@@ -192,14 +192,14 @@ LinearMotion_nD<T, N>::LinearMotion_nD(const std::array<T, N>& a, const std::arr
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N>& LinearMotion_nD<T, N>::operator=(const LinearMotion_nD<T, N>& motion)
+LinearMotionND<T, N>& LinearMotionND<T, N>::operator=(const LinearMotionND<T, N>& motion)
 {
 	m_motion = motion.m_motion;
 	return *this;
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N>& LinearMotion_nD<T, N>::operator=(LinearMotion_nD<T, N>&& motion)
+LinearMotionND<T, N>& LinearMotionND<T, N>::operator=(LinearMotionND<T, N>&& motion)
 {
 	if (this != &motion)
 	{
@@ -210,7 +210,7 @@ LinearMotion_nD<T, N>& LinearMotion_nD<T, N>::operator=(LinearMotion_nD<T, N>&& 
 }
 
 template <typename T, int N>
-Interval_nD<T, N> LinearMotion_nD<T, N>::toInterval() const
+IntervalND<T, N> LinearMotionND<T, N>::toInterval() const
 {
 	std::array<Interval<T>, N> motions;
 	for (int i = 0; i < N; ++i)
@@ -218,11 +218,11 @@ Interval_nD<T, N> LinearMotion_nD<T, N>::toInterval() const
 		motions[i] = m_motion[i].toInterval();
 	}
 
-	return Interval_nD<T, N>(motions);
+	return IntervalND<T, N>(motions);
 }
 
 template <typename T, int N>
-bool LinearMotion_nD<T, N>::isApprox(const LinearMotion_nD<T, N>& motion, const T& epsilon) const
+bool LinearMotionND<T, N>::isApprox(const LinearMotionND<T, N>& motion, const T& epsilon) const
 {
 	for (int i = 0; i < N; i++)
 	{
@@ -235,27 +235,27 @@ bool LinearMotion_nD<T, N>::isApprox(const LinearMotion_nD<T, N>& motion, const 
 }
 
 template <typename T, int N>
-bool LinearMotion_nD<T, N>::operator==(const LinearMotion_nD<T, N>& motion) const
+bool LinearMotionND<T, N>::operator==(const LinearMotionND<T, N>& motion) const
 {
 	return (m_motion == motion.m_motion);
 }
 
 template <typename T, int N>
-bool LinearMotion_nD<T, N>::operator!=(const LinearMotion_nD<T, N>& motion) const
+bool LinearMotionND<T, N>::operator!=(const LinearMotionND<T, N>& motion) const
 {
 	return !(this->operator==(motion));
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N> LinearMotion_nD<T, N>::operator+(const LinearMotion_nD<T, N>& m) const
+LinearMotionND<T, N> LinearMotionND<T, N>::operator+(const LinearMotionND<T, N>& m) const
 {
-	LinearMotion_nD<T, N> ret(*this);
+	LinearMotionND<T, N> ret(*this);
 	ret += m;
 	return ret;
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N>& LinearMotion_nD<T, N>::operator+=(const LinearMotion_nD<T, N>& m)
+LinearMotionND<T, N>& LinearMotionND<T, N>::operator+=(const LinearMotionND<T, N>& m)
 {
 	for (int i = 0; i < N; ++i)
 	{
@@ -265,15 +265,15 @@ LinearMotion_nD<T, N>& LinearMotion_nD<T, N>::operator+=(const LinearMotion_nD<T
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N> LinearMotion_nD<T, N>::operator-(const LinearMotion_nD<T, N>& m) const
+LinearMotionND<T, N> LinearMotionND<T, N>::operator-(const LinearMotionND<T, N>& m) const
 {
-	LinearMotion_nD<T, N> ret(*this);
+	LinearMotionND<T, N> ret(*this);
 	ret -= m;
 	return ret;
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N>& LinearMotion_nD<T, N>::operator-=(const LinearMotion_nD<T, N>& m)
+LinearMotionND<T, N>& LinearMotionND<T, N>::operator-=(const LinearMotionND<T, N>& m)
 {
 	for (int i = 0; i < N; ++i)
 	{
@@ -283,19 +283,19 @@ LinearMotion_nD<T, N>& LinearMotion_nD<T, N>::operator-=(const LinearMotion_nD<T
 }
 
 template <typename T, int N>
-Interval_nD<T, N> LinearMotion_nD<T, N>::operator*(const LinearMotion_nD<T, N>& m) const
+IntervalND<T, N> LinearMotionND<T, N>::operator*(const LinearMotionND<T, N>& m) const
 {
 	return this->toInterval() * m.toInterval();
 }
 
 template <typename T, int N>
-Interval_nD<T, N> LinearMotion_nD<T, N>::operator/(const LinearMotion_nD<T, N>& m) const
+IntervalND<T, N> LinearMotionND<T, N>::operator/(const LinearMotionND<T, N>& m) const
 {
 	return this->toInterval() / m.toInterval();
 }
 
 template <typename T, int N>
-Interval<T> LinearMotion_nD<T, N>::dotProduct(const LinearMotion_nD<T, N>& motion) const
+Interval<T> LinearMotionND<T, N>::dotProduct(const LinearMotionND<T, N>& motion) const
 {
 	Interval<T> ret(static_cast<T>(0), static_cast<T>(0));
 	for (int i = 0 ; i < N ; i++)
@@ -306,14 +306,14 @@ Interval<T> LinearMotion_nD<T, N>::dotProduct(const LinearMotion_nD<T, N>& motio
 }
 
 template <typename T, int N>
-const LinearMotion<T>& LinearMotion_nD<T, N>::getAxis(int i) const
+const LinearMotion<T>& LinearMotionND<T, N>::getAxis(int i) const
 {
 	SURGSIM_ASSERT((i >= 0) && (i < N)) << "Asking for an axis greater than the dimensionality of the linear motion";
 	return m_motion[i];
 }
 
 template <typename T, int N>
-void LinearMotion_nD<T, N>::getStart(std::array<T, N>* start) const
+void LinearMotionND<T, N>::getStart(std::array<T, N>* start) const
 {
 	for (int i = 0; i < N; ++i)
 	{
@@ -322,7 +322,7 @@ void LinearMotion_nD<T, N>::getStart(std::array<T, N>* start) const
 }
 
 template <typename T, int N>
-void LinearMotion_nD<T, N>::getEnd(std::array<T, N>* end) const
+void LinearMotionND<T, N>::getEnd(std::array<T, N>* end) const
 {
 	for (int i = 0; i < N; ++i)
 	{
@@ -331,9 +331,9 @@ void LinearMotion_nD<T, N>::getEnd(std::array<T, N>* end) const
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N> LinearMotion_nD<T, N>::firstHalf() const
+LinearMotionND<T, N> LinearMotionND<T, N>::firstHalf() const
 {
-	LinearMotion_nD<T, N> ret;
+	LinearMotionND<T, N> ret;
 	for (int i = 0; i < N; ++i)
 	{
 		ret.m_motion[i] = m_motion[i].firstHalf();
@@ -342,9 +342,9 @@ LinearMotion_nD<T, N> LinearMotion_nD<T, N>::firstHalf() const
 }
 
 template <typename T, int N>
-LinearMotion_nD<T, N> LinearMotion_nD<T, N>::secondHalf() const
+LinearMotionND<T, N> LinearMotionND<T, N>::secondHalf() const
 {
-	LinearMotion_nD<T, N> ret;
+	LinearMotionND<T, N> ret;
 	for (int i = 0; i < N; ++i)
 	{
 		ret.m_motion[i] = m_motion[i].secondHalf();
@@ -354,12 +354,12 @@ LinearMotion_nD<T, N> LinearMotion_nD<T, N>::secondHalf() const
 
 // Special case for dimension 3
 template <typename T>
-LinearMotion_nD<T, 3>::LinearMotion_nD()
+LinearMotionND<T, 3>::LinearMotionND()
 {
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>::LinearMotion_nD(const std::array<LinearMotion<T>, 3>& x)
+LinearMotionND<T, 3>::LinearMotionND(const std::array<LinearMotion<T>, 3>& x)
 {
 	m_motion[0] = x[0];
 	m_motion[1] = x[1];
@@ -367,7 +367,7 @@ LinearMotion_nD<T, 3>::LinearMotion_nD(const std::array<LinearMotion<T>, 3>& x)
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>::LinearMotion_nD(const LinearMotion<T>& a, const LinearMotion<T>& b, const LinearMotion<T>& c)
+LinearMotionND<T, 3>::LinearMotionND(const LinearMotion<T>& a, const LinearMotion<T>& b, const LinearMotion<T>& c)
 {
 	m_motion[0] = a;
 	m_motion[1] = b;
@@ -375,7 +375,7 @@ LinearMotion_nD<T, 3>::LinearMotion_nD(const LinearMotion<T>& a, const LinearMot
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>::LinearMotion_nD(const LinearMotion_nD<T, 3>& motion)
+LinearMotionND<T, 3>::LinearMotionND(const LinearMotionND<T, 3>& motion)
 {
 	m_motion[0] = motion.m_motion[0];
 	m_motion[1] = motion.m_motion[1];
@@ -383,13 +383,13 @@ LinearMotion_nD<T, 3>::LinearMotion_nD(const LinearMotion_nD<T, 3>& motion)
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>::LinearMotion_nD(LinearMotion_nD<T, 3>&& motion)
+LinearMotionND<T, 3>::LinearMotionND(LinearMotionND<T, 3>&& motion)
 {
 	*this = std::move(motion);
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>::LinearMotion_nD(const std::array<T, 3>& a, const std::array<T, 3>& b)
+LinearMotionND<T, 3>::LinearMotionND(const std::array<T, 3>& a, const std::array<T, 3>& b)
 {
 	m_motion[0] = LinearMotion<T>(a[0], b[0]);
 	m_motion[1] = LinearMotion<T>(a[1], b[1]);
@@ -397,7 +397,7 @@ LinearMotion_nD<T, 3>::LinearMotion_nD(const std::array<T, 3>& a, const std::arr
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator=(const LinearMotion_nD<T, 3>& motion)
+LinearMotionND<T, 3>& LinearMotionND<T, 3>::operator=(const LinearMotionND<T, 3>& motion)
 {
 	m_motion[0] = motion.m_motion[0];
 	m_motion[1] = motion.m_motion[1];
@@ -406,7 +406,7 @@ LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator=(const LinearMotion_nD<T,
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator=(LinearMotion_nD<T, 3>&& motion)
+LinearMotionND<T, 3>& LinearMotionND<T, 3>::operator=(LinearMotionND<T, 3>&& motion)
 {
 	m_motion[0] = std::move(motion.m_motion[0]);
 	m_motion[1] = std::move(motion.m_motion[1]);
@@ -415,17 +415,17 @@ LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator=(LinearMotion_nD<T, 3>&& 
 }
 
 template <typename T>
-Interval_nD<T, 3> LinearMotion_nD<T, 3>::toInterval() const
+IntervalND<T, 3> LinearMotionND<T, 3>::toInterval() const
 {
 	std::array<Interval<T>, 3> intervals;
 	intervals[0] = m_motion[0].toInterval();
 	intervals[1] = m_motion[1].toInterval();
 	intervals[2] = m_motion[2].toInterval();
-	return Interval_nD<T, 3>(intervals);
+	return IntervalND<T, 3>(intervals);
 }
 
 template <typename T>
-bool LinearMotion_nD<T, 3>::isApprox(const LinearMotion_nD<T, 3>& motion, const T& epsilon) const
+bool LinearMotionND<T, 3>::isApprox(const LinearMotionND<T, 3>& motion, const T& epsilon) const
 {
 	return (m_motion[0].isApprox(motion.m_motion[0], epsilon) &&
 			m_motion[1].isApprox(motion.m_motion[1], epsilon) &&
@@ -433,7 +433,7 @@ bool LinearMotion_nD<T, 3>::isApprox(const LinearMotion_nD<T, 3>& motion, const 
 }
 
 template <typename T>
-bool LinearMotion_nD<T, 3>::operator==(const LinearMotion_nD<T, 3>& motion) const
+bool LinearMotionND<T, 3>::operator==(const LinearMotionND<T, 3>& motion) const
 {
 	return (m_motion[0] == motion.m_motion[0] &&
 			m_motion[1] == motion.m_motion[1] &&
@@ -441,21 +441,21 @@ bool LinearMotion_nD<T, 3>::operator==(const LinearMotion_nD<T, 3>& motion) cons
 }
 
 template <typename T>
-bool LinearMotion_nD<T, 3>::operator!=(const LinearMotion_nD<T, 3>& motion) const
+bool LinearMotionND<T, 3>::operator!=(const LinearMotionND<T, 3>& motion) const
 {
 	return !(this->operator==(motion));
 }
 
 template <typename T>
-LinearMotion_nD<T, 3> LinearMotion_nD<T, 3>::operator+(const LinearMotion_nD<T, 3>& m) const
+LinearMotionND<T, 3> LinearMotionND<T, 3>::operator+(const LinearMotionND<T, 3>& m) const
 {
-	LinearMotion_nD<T, 3> ret(*this);
+	LinearMotionND<T, 3> ret(*this);
 	ret += m;
 	return ret;
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator+=(const LinearMotion_nD<T, 3>& m)
+LinearMotionND<T, 3>& LinearMotionND<T, 3>::operator+=(const LinearMotionND<T, 3>& m)
 {
 	m_motion[0] += m.m_motion[0];
 	m_motion[1] += m.m_motion[1];
@@ -464,15 +464,15 @@ LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator+=(const LinearMotion_nD<T
 }
 
 template <typename T>
-LinearMotion_nD<T, 3> LinearMotion_nD<T, 3>::operator-(const LinearMotion_nD<T, 3>& m) const
+LinearMotionND<T, 3> LinearMotionND<T, 3>::operator-(const LinearMotionND<T, 3>& m) const
 {
-	LinearMotion_nD<T, 3> ret(*this);
+	LinearMotionND<T, 3> ret(*this);
 	ret -= m;
 	return ret;
 }
 
 template <typename T>
-LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator-=(const LinearMotion_nD<T, 3>& m)
+LinearMotionND<T, 3>& LinearMotionND<T, 3>::operator-=(const LinearMotionND<T, 3>& m)
 {
 	m_motion[0] -= m.m_motion[0];
 	m_motion[1] -= m.m_motion[1];
@@ -481,42 +481,42 @@ LinearMotion_nD<T, 3>& LinearMotion_nD<T, 3>::operator-=(const LinearMotion_nD<T
 }
 
 template <typename T>
-Interval_nD<T, 3> LinearMotion_nD<T, 3>::operator*(const LinearMotion_nD<T, 3>& m) const
+IntervalND<T, 3> LinearMotionND<T, 3>::operator*(const LinearMotionND<T, 3>& m) const
 {
 	return this->toInterval() * m.toInterval();
 }
 
 template <typename T>
-Interval_nD<T, 3> LinearMotion_nD<T, 3>::operator/(const LinearMotion_nD<T, 3>& m) const
+IntervalND<T, 3> LinearMotionND<T, 3>::operator/(const LinearMotionND<T, 3>& m) const
 {
 	return this->toInterval() / m.toInterval();
 }
 
 template <typename T>
-Interval<T> LinearMotion_nD<T, 3>::dotProduct(const LinearMotion_nD<T, 3>& motion, const Interval<T>& range) const
+Interval<T> LinearMotionND<T, 3>::dotProduct(const LinearMotionND<T, 3>& motion, const Interval<T>& range) const
 {
 	return valuesOverInterval(analyticDotProduct(*this, motion), range);
 }
 
 template <typename T>
-Interval_nD<T, 3> LinearMotion_nD<T, 3>::crossProduct(const LinearMotion_nD<T, 3>& motion,
+IntervalND<T, 3> LinearMotionND<T, 3>::crossProduct(const LinearMotionND<T, 3>& motion,
 		const Interval<T>& range) const
 {
 	// toInterval().crossProduct(motion.toInterval())
 	// results in intervals that are too broad.
-	return Interval_nD<T, 3>(valuesOverInterval(analyticCrossProductAxis<double, 0>(*this, motion), range),
-							 valuesOverInterval(analyticCrossProductAxis<double, 1>(*this, motion), range),
-							 valuesOverInterval(analyticCrossProductAxis<double, 2>(*this, motion), range));
+	return IntervalND<T, 3>(valuesOverInterval(analyticCrossProductAxis<double, 0>(*this, motion), range),
+							valuesOverInterval(analyticCrossProductAxis<double, 1>(*this, motion), range),
+							valuesOverInterval(analyticCrossProductAxis<double, 2>(*this, motion), range));
 }
 
 template <typename T>
-Interval<T> LinearMotion_nD<T, 3>::magnitudeSquared(const Interval<T>& range) const
+Interval<T> LinearMotionND<T, 3>::magnitudeSquared(const Interval<T>& range) const
 {
 	return valuesOverInterval(analyticMagnitudeSquared(*this), range);
 }
 
 template <typename T>
-Interval<T> LinearMotion_nD<T, 3>::magnitude(const Interval<T>& range) const
+Interval<T> LinearMotionND<T, 3>::magnitude(const Interval<T>& range) const
 {
 	Interval<T> magnitudeSq = magnitudeSquared(range);
 	// Both minimum and maximum are guaranteed to be non-negative.
@@ -524,14 +524,14 @@ Interval<T> LinearMotion_nD<T, 3>::magnitude(const Interval<T>& range) const
 }
 
 template <typename T>
-const LinearMotion<T>& LinearMotion_nD<T, 3>::getAxis(int i) const
+const LinearMotion<T>& LinearMotionND<T, 3>::getAxis(int i) const
 {
 	SURGSIM_ASSERT((i >= 0) && (i < 3)) << "Asking for an axis greater than the dimensionality of the linear motion";
 	return m_motion[i];
 }
 
 template <typename T>
-void LinearMotion_nD<T, 3>::getStart(std::array<T, 3>* start) const
+void LinearMotionND<T, 3>::getStart(std::array<T, 3>* start) const
 {
 	(*start)[0] = m_motion[0].getStart();
 	(*start)[1] = m_motion[1].getStart();
@@ -539,7 +539,7 @@ void LinearMotion_nD<T, 3>::getStart(std::array<T, 3>* start) const
 }
 
 template <typename T>
-void LinearMotion_nD<T, 3>::getEnd(std::array<T, 3>* end) const
+void LinearMotionND<T, 3>::getEnd(std::array<T, 3>* end) const
 {
 	(*end)[0] = m_motion[0].getEnd();
 	(*end)[1] = m_motion[1].getEnd();
@@ -547,27 +547,27 @@ void LinearMotion_nD<T, 3>::getEnd(std::array<T, 3>* end) const
 }
 
 template <typename T>
-typename LinearMotion_nD<T, 3>::Vector3 LinearMotion_nD<T, 3>::getStart() const
+typename LinearMotionND<T, 3>::Vector3 LinearMotionND<T, 3>::getStart() const
 {
-	return LinearMotion_nD<T, 3>::Vector3(m_motion[0].getStart(), m_motion[1].getStart(), m_motion[2].getStart());
+	return LinearMotionND<T, 3>::Vector3(m_motion[0].getStart(), m_motion[1].getStart(), m_motion[2].getStart());
 }
 
 template <typename T>
-typename LinearMotion_nD<T, 3>::Vector3 LinearMotion_nD<T, 3>::getEnd() const
+typename LinearMotionND<T, 3>::Vector3 LinearMotionND<T, 3>::getEnd() const
 {
 	return Vector3(m_motion[0].getEnd(), m_motion[1].getEnd(), m_motion[2].getEnd());
 }
 
 template <typename T>
-typename LinearMotion_nD<T, 3>::Vector3 LinearMotion_nD<T, 3>::atTime(const T& t) const
+typename LinearMotionND<T, 3>::Vector3 LinearMotionND<T, 3>::atTime(const T& t) const
 {
 	return Vector3(m_motion[0].atTime(t), m_motion[1].atTime(t), m_motion[2].atTime(t));
 }
 
 template <typename T>
-LinearMotion_nD<T, 3> LinearMotion_nD<T, 3>::firstHalf() const
+LinearMotionND<T, 3> LinearMotionND<T, 3>::firstHalf() const
 {
-	LinearMotion_nD<T, 3> ret;
+	LinearMotionND<T, 3> ret;
 	ret.m_motion[0] = m_motion[0].firstHalf();
 	ret.m_motion[1] = m_motion[1].firstHalf();
 	ret.m_motion[2] = m_motion[2].firstHalf();
@@ -575,9 +575,9 @@ LinearMotion_nD<T, 3> LinearMotion_nD<T, 3>::firstHalf() const
 }
 
 template <typename T>
-LinearMotion_nD<T, 3> LinearMotion_nD<T, 3>::secondHalf() const
+LinearMotionND<T, 3> LinearMotionND<T, 3>::secondHalf() const
 {
-	LinearMotion_nD<T, 3> ret;
+	LinearMotionND<T, 3> ret;
 	ret.m_motion[0] = m_motion[0].secondHalf();
 	ret.m_motion[1] = m_motion[1].secondHalf();
 	ret.m_motion[2] = m_motion[2].secondHalf();
@@ -594,9 +594,9 @@ std::ostream& operator<<(std::ostream& o, const LinearMotion<T>& motion)
 	return o;
 }
 
-// Interval nD functions
+// Interval ND functions
 template <typename T, int N>
-std::ostream& operator<<(std::ostream& o, const LinearMotion_nD<T, N>& motion)
+std::ostream& operator<<(std::ostream& o, const LinearMotionND<T, N>& motion)
 {
 	o << "([" << motion.getAxis(0).getStart();
 	for (int i = 1; i < N; ++i)
@@ -614,7 +614,7 @@ std::ostream& operator<<(std::ostream& o, const LinearMotion_nD<T, N>& motion)
 
 // Interval 3D functions
 template <typename T>
-Polynomial<T, 2> analyticDotProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b)
+Polynomial<T, 2> analyticDotProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b)
 {
 	return a.getAxis(0).toPolynomial() * b.getAxis(0).toPolynomial() +
 		   a.getAxis(1).toPolynomial() * b.getAxis(1).toPolynomial() +
@@ -622,7 +622,7 @@ Polynomial<T, 2> analyticDotProduct(const LinearMotion_nD<T, 3>& a, const Linear
 }
 
 template <typename T, int A>
-Polynomial<T, 2> analyticCrossProductAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b)
+Polynomial<T, 2> analyticCrossProductAxis(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b)
 {
 	// The labels here are probably a bit confusing for anyone else, but at least this makes sense.
 	// For A == 0, the "Y" and "Z" mean what they say, and the output is the X component.
@@ -636,25 +636,25 @@ Polynomial<T, 2> analyticCrossProductAxis(const LinearMotion_nD<T, 3>& a, const 
 }
 
 template <typename T>
-Polynomial<T, 2> analyticCrossProductXAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b)
+Polynomial<T, 2> analyticCrossProductXAxis(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b)
 {
 	return analyticCrossProductAxis<double, 0>(a, b);
 }
 
 template <typename T>
-Polynomial<T, 2> analyticCrossProductYAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b)
+Polynomial<T, 2> analyticCrossProductYAxis(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b)
 {
 	return analyticCrossProductAxis<double, 1>(a, b);
 }
 
 template <typename T>
-Polynomial<T, 2> analyticCrossProductZAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b)
+Polynomial<T, 2> analyticCrossProductZAxis(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b)
 {
 	return analyticCrossProductAxis<double, 2>(a, b);
 }
 
 template <typename T>
-void analyticCrossProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b,
+void analyticCrossProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
 						  Polynomial<T, 2>* resultXAxis, Polynomial<T, 2>* resultYAxis, Polynomial<T, 2>* resultZAxis)
 {
 	(*resultXAxis) = analyticCrossProductXAxis(a, b);
@@ -663,8 +663,8 @@ void analyticCrossProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<
 }
 
 template <typename T>
-Polynomial <T, 3> analyticTripleProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b,
-										const LinearMotion_nD<T, 3>& c)
+Polynomial <T, 3> analyticTripleProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
+										const LinearMotionND<T, 3>& c)
 {
 	const Polynomial<T, 1> aX = a.getAxis(0).toPolynomial();
 	const Polynomial<T, 1> aY = a.getAxis(1).toPolynomial();
@@ -679,14 +679,14 @@ Polynomial <T, 3> analyticTripleProduct(const LinearMotion_nD<T, 3>& a, const Li
 }
 
 template <typename T>
-static Interval<T> tripleProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b,
-								 const LinearMotion_nD<T, 3>& c, const Interval<T>& range)
+static Interval<T> tripleProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
+								 const LinearMotionND<T, 3>& c, const Interval<T>& range)
 {
 	return valuesOverInterval(analyticTripleProduct(a, b, c), range);
 }
 
 template <typename T>
-Polynomial<T, 2> analyticMagnitudeSquared(const LinearMotion_nD<T, 3>& motion)
+Polynomial<T, 2> analyticMagnitudeSquared(const LinearMotionND<T, 3>& motion)
 {
 	return analyticDotProduct(motion, motion);
 }
