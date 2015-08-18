@@ -92,45 +92,65 @@ namespace Blocks
 
 
 		// Shading Pass //
-		auto shadingPass = std::make_shared<Graphics::RenderPass>("ShadingPass");
+//		auto shadingPass = std::make_shared<Graphics::RenderPass>("ShadingPass");
 
-		camera = std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(shadingPass->getCamera());
-		osgCamera = camera->getOsgCamera();
-		osgCamera->setViewport(0, 0, 1024, 1024);
-		camera->setOrthogonalProjection(0, 1024, 0, 1024, -1.0, 1.0);
-		camera->setRenderGroupReference("ShadingPass");
-		camera->setGroupReference(Graphics::Representation::DefaultGroupName);
-		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 2);
+//		camera = std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(shadingPass->getCamera());
+//		osgCamera = camera->getOsgCamera();
+//		osgCamera->setViewport(0, 0, 1024, 1024);
+//		camera->setOrthogonalProjection(0, 1024, 0, 1024, -1.0, 1.0);
+//		camera->setRenderGroupReference("ShadingPass");
+//		camera->setGroupReference(Graphics::Representation::DefaultGroupName);
+//		camera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 2);
 
-		renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
-		shadingPass->setRenderTarget(renderTarget);
+//		renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+//		shadingPass->setRenderTarget(renderTarget);
 
-		material = Graphics::buildMaterial("Shaders/pointsplat/surface.vert", "Shaders/pointsplat/surface.frag");
+//		material = Graphics::buildMaterial("Shaders/pointsplat/surface.vert", "Shaders/pointsplat/surface.frag");
 
-		material->addUniform("sampler2D", "depthMap");
-		material->setValue("depthMap", depthPass->getRenderTarget()->getDepthTarget());
-		material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
-		material->addUniform("sampler2D", "normalMap");
-		material->setValue("normalMap", normalPass->getRenderTarget()->getColorTarget(0));
-		material->getUniform("normalMap")->setValue("MinimumTextureUnit", static_cast<size_t>(9));
-		material->addUniform("vec4", "color");
-		material->setValue("color", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
-		material->addUniform("mat4", "inverseProjectionMatrix");
+//		material->addUniform("sampler2D", "depthMap");
+//		material->setValue("depthMap", depthPass->getRenderTarget()->getDepthTarget());
+//		material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
+//		material->addUniform("sampler2D", "normalMap");
+//		material->setValue("normalMap", normalPass->getRenderTarget()->getColorTarget(0));
+//		material->getUniform("normalMap")->setValue("MinimumTextureUnit", static_cast<size_t>(9));
+//		material->addUniform("vec4", "color");
+//		material->setValue("color", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
+//		material->addUniform("mat4", "inverseProjectionMatrix");
 
-		copier->connect(viewElement->getCamera(), "FloatInverseProjectionMatrix", material, "inverseProjectionMatrix");
+//		copier->connect(viewElement->getCamera(), "FloatInverseProjectionMatrix", material, "inverseProjectionMatrix");
 
-		shadingPass->setMaterial(material);
+//		shadingPass->setMaterial(material);
 
-		// Quad
-		graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("ShadingQuad");
-		graphics->setSize(1024, 1024);
+//		// Quad
+//		graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("ShadingQuad");
+//		graphics->setSize(1024, 1024);
+//		graphics->setLocation(0, 0);
+//		graphics->setGroupReference("ShadingPass");
+//		shadingPass->addComponent(graphics);
+
+//		shadingPass->showColorTarget(0, 0, screenWidth, screenHeight);
+
+//		scene->addSceneElement(shadingPass);
+
+		//auto material = Graphics::buildMaterial("Shaders/pointsplat/surface.vert", "Shaders/pointsplat/surface.frag");
+
+		texture = std::make_shared<Graphics::OsgTexture2d>();
+		texture->loadImage("Textures/checkered.png");
+		//auto textureUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("testMap");
+		//textureUniform->set(texture);
+		//material->addUniform(textureUniform);
+		//material->getOsgStateSet()->setMode(GL_BLEND, osg::StateAttribute::ON);
+
+		graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("shadingQuad");
+		graphics->setSize(screenWidth/2, screenHeight/2);
 		graphics->setLocation(0, 0);
-		graphics->setGroupReference("ShadingPass");
-		shadingPass->addComponent(graphics);
+		//graphics->setMaterial(material);
+		graphics->setTexture(texture);
 
-		shadingPass->showColorTarget(0, 0, screenWidth, screenHeight);
+		auto element = std::make_shared<Framework::BasicSceneElement>("debug");
+		element->addComponent(graphics);
 
-		scene->addSceneElement(shadingPass);
+		scene->addSceneElement(element);
 	}
 } // Blocks
 } // SurgSim

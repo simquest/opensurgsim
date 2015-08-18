@@ -21,6 +21,7 @@
 
 #include "SurgSim/Blocks/ImplicitFluidRendering.h"
 #include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -70,6 +71,14 @@ TEST_F(FluidRenderTests, PointSpriteFluid)
 	viewElement->enableManipulator(true);
 	//createPointSpriteSpherePass(0.01f, Math::Vector4f(1.0, 0.0, 0.0, 1.0));
 	Blocks::creatFluidRenderingPass(0.01f, viewElement, scene);
+
+	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
+	cube->setSizeXYZ(0.1, 0.1, 0.1);
+
+	element = std::make_shared<Framework::BasicSceneElement>("box");
+	element->addComponent(cube);
+
+	scene->addSceneElement(element);
 
 	// Create the point cloud
 	auto bunny = std::make_shared<Graphics::OsgMeshRepresentation>("Bunny");
