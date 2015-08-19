@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file verticalBlurPass.vert
-/// Vertex Shader, for a simple 2-pass Blur vertical pass
+/// Vertex Shader, for a simple 2-pass gaussian blur, vertical pass 
 
 /// Height of the Texture that is incoming
 uniform float height;

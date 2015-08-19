@@ -13,8 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file verticalBlurPass.frag
-/// Fragment Shader, for a simple 2-pass Blur vertical pass
+/// \file gauss_blur.frag
+/// Fragment Shader, for a simple 2-pass gaussian blur, used in both the
+/// vertical and horizontal pass
 
 /// Use version 120 for const array capability
 #version 120
@@ -34,7 +35,6 @@ const float weights[7] = float[](
     0.21078608625031,
     0.11086490165864,
     0.04779035227281);
-
 
 void main(void) 
 {	

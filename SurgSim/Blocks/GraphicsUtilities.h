@@ -120,8 +120,7 @@ void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene,
 					std::string materialFilename,
 					const Materials& materials);
 
-void setupShadowMapping(std::unordered_map<std::string, std::shared_ptr<Graphics::OsgMaterial>>materials,
-						std::shared_ptr<Framework::Scene> scene);
+
 }
 }
 #endif

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file horizontalBlurPass.vert
-/// Vertex Shader, for a simple 2-pass Blur horizontal pass
+/// \file gauss_blur_horizontal.vert
+/// Vertex Shader, for a simple 2-pass gaussian blur, horizontal pass
 
 /// Width of the Texture that is incoming
 uniform float width;
