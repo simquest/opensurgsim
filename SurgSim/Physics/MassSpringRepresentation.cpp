@@ -443,9 +443,11 @@ void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::Ode
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
 }
 
-std::shared_ptr<Localization> MassSpringRepresentation::createLocalization(const SurgSim::DataStructures::Location& location)
+std::shared_ptr<Localization> MassSpringRepresentation::createLocalization(
+	const SurgSim::DataStructures::Location& location)
 {
-	auto result = std::make_shared<MassSpringLocalization>(std::static_pointer_cast<Physics::Representation>(getSharedPtr()));
+	auto result = std::make_shared<MassSpringLocalization>(
+		std::static_pointer_cast<Physics::Representation>(getSharedPtr()));
 
 	if (location.index.hasValue())
 	{

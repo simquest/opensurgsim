@@ -27,7 +27,6 @@
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
-#include "SurgSim/Blocks/TransferPhysicsToVerticesBehavior.h"
 
 using SurgSim::Blocks::TransferPhysicsToVerticesBehavior;
 using SurgSim::Framework::BasicSceneElement;

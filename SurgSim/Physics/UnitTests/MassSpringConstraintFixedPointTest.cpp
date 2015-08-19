@@ -141,7 +141,7 @@ TEST_F(MassSpringConstraintFixedPointTest, BuildMlcpTest)
 	//      U(t) = p(t) = 0
 	// U(1) = p(1)
 	Vector3d expectedViolation = m_extremities[0] - Vector3d::UnitY() * 9.81 * dt * dt;
-	EXPECT_TRUE(mlcpPhysicsProblem.b.isApprox(expectedViolation)) << 
+	EXPECT_TRUE(mlcpPhysicsProblem.b.isApprox(expectedViolation)) <<
 		"b = " << mlcpPhysicsProblem.b.transpose() <<
 		" expected = " << (-Vector3d::UnitY() * 9.81 * dt * dt).transpose();
 
