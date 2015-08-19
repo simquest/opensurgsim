@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "SurgSim/Blocks/ImplicitFluidRendering.h"
+#include "SurgSim/Blocks/ImplicitSurface.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
@@ -40,40 +40,19 @@ namespace Graphics
 struct FluidRenderTests : public RenderTest
 {
 protected:
-//	void createPointSpriteSpherePass(const float& sphereRadius, const Math::Vector4f& color)
-//	{
-//		// Create material to transport the Textures for the point sprite
-//		auto material = std::make_shared<Graphics::OsgMaterial>("psMaterial");
-//		auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/pointsplat/sphere");
-//		ASSERT_TRUE(program != nullptr);
-//		material->setProgram(program);
 
-//		auto texture = std::make_shared<Graphics::OsgTexture2d>();
-//		texture->setIsPointSprite(true);
-//		auto pointSpriteUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("pointsprite");
-//		pointSpriteUniform->set(texture);
-//		material->addUniform(pointSpriteUniform);
-
-//		material->addUniform("float", "sphereRadius");
-//		material->setValue("sphereRadius", sphereRadius);
-//		material->addUniform("float", "sphereScale");
-//		material->setValue("sphereScale", 200.0f);
-//		material->addUniform("vec4", "color");
-//		material->setValue("color", color);
-
-//		viewElement->getCamera()->setMaterial(material);
-//		viewElement->addComponent(material);
-//	}
 };
 
 TEST_F(FluidRenderTests, PointSpriteFluid)
 {
 	viewElement->enableManipulator(true);
-	viewElement->getView()->setTargetScreen(1);
-// 	viewElement->setPose(SurgSim::Math::makeRigidTransform(Math::Vector3d(1.0, 1.0, 1.0), Math::Vector3d(0.0, 0.0, 0.0),
-// 						 Math::Vector3d(0.0, 1.0, 0.0)));
-	//createPointSpriteSpherePass(0.01f, Math::Vector4f(1.0, 0.0, 0.0, 1.0));
-	Blocks::creatFluidRenderingPass(0.01f, viewElement, scene);
+	std::vector<std::shared_ptr<Framework::SceneElement>> surface = 
+		Blocks::createImplicitSurface(0.01f, 800.0f, 1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0), viewElement, false);
+
+	for (auto element : surface)
+	{
+		scene->addSceneElement(element);
+	}
 
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
@@ -95,7 +74,7 @@ TEST_F(FluidRenderTests, PointSpriteFluid)
 		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));
 	}
 
-	graphics->addGroupReference("DepthPass");
+	graphics->addGroupReference(Blocks::GROUP_IMPLICIT_SURFACE);
 
 	auto sceneElement = std::make_shared<Framework::BasicSceneElement>("PointSprites");
 	sceneElement->addComponent(graphics);

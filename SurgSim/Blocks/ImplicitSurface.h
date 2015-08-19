@@ -13,18 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_IMPLICITFLUIDRENDERING_H
-#define SURGSIM_BLOCKS_IMPLICITFLUIDRENDERING_H
+#ifndef SURGSIM_BLOCKS_IMPLICITSURFACE_H
+#define SURGSIM_BLOCKS_IMPLICITSURFACE_H
 
-#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
 namespace Blocks
 {
-	void creatFluidRenderingPass(const float& sphereRadius, std::shared_ptr<Graphics::OsgViewElement> viewElement, std::shared_ptr<Framework::Scene> scene);
+	///@{
+	/// Names to use as RenderGroupReference
+	static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
+	///@}
+
+	std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(
+				const float& sphereRadius, const float& sphereScale, 
+				const int& textureSize, const Math::Vector4f& color, 
+				std::shared_ptr<Graphics::OsgViewElement> viewElement, bool debug);
 } // Blocks
 } // SurgSim
 
-#endif // SURGSIM_BLOCKS_IMPLICITFLUIDRENDERING_H
+#endif // SURGSIM_BLOCKS_IMPLICITSURFACE_H

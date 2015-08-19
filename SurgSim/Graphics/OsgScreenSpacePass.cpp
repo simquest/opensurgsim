@@ -48,7 +48,7 @@ bool OsgScreenSpacePass::doInitialize()
 	{
 		m_camera = camera->getOsgCamera();
 		m_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-		m_camera->setClearMask(0x0);
+		m_camera->setClearMask(GL_DEPTH_BUFFER_BIT);
 		setRenderOrder(Camera::RENDER_ORDER_POST_RENDER, 0);
 		updateViewport(m_width, m_height);
 		result = true;
