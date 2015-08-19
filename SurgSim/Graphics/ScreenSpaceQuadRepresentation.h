@@ -69,6 +69,12 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	virtual bool setTexture(std::shared_ptr<Texture> texture) = 0;
 
+	/// \return the pose of the quad, this disregards the SceneElement pose
+	SurgSim::Math::RigidTransform3d getPose() const override
+	{
+		return getLocalPose();
+	}
+
 };
 
 }; // Graphics
