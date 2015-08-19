@@ -127,7 +127,7 @@ public:
 	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
 
 	/// Gets the inverse projection matrix of the camera
-    /// \return	Inverse Projection matrix
+	/// \return	Inverse Projection matrix
 	virtual SurgSim::Math::Matrix44d getInverseProjectionMatrix() const = 0;
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.

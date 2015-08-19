@@ -28,19 +28,19 @@ namespace
 class EmptyComponent : public SurgSim::Framework::Component
 {
 public:
-	EmptyComponent(const std::string& name) : SurgSim::Framework::Component(name)
+	explicit EmptyComponent(const std::string& name) : SurgSim::Framework::Component(name)
 	{
 
 	}
 
 	SURGSIM_CLASSNAME(EmptyComponent);
 
-	virtual bool doInitialize() override
+	bool doInitialize() override
 	{
 		return true;
 	}
 
-	virtual bool doWakeUp() override
+	bool doWakeUp() override
 	{
 		return true;
 	}
