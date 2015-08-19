@@ -51,7 +51,7 @@ static const std::string GROUP_SHADOW_RECEIVER = "Shadowed";
 /// All of the elements added are \sa RenderPass elements
 /// \param camera the view camera that is used for this pass
 /// \param light the light that should be used for the shadows
-/// \param texture size the size of the render textures, gets allocated twice without blurring, four times if blurring
+/// \param textureSize the size of the render textures, gets allocated twice without blurring, four times if blurring
 ///        is enabled
 /// \param lightCameraProjection parameters for an orthogonal projection that will be used to render the scene from
 ///        the lights point of view, needs to be set so it encompasses all the shadow casters and receivers
