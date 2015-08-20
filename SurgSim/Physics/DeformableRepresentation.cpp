@@ -389,6 +389,17 @@ bool DeformableRepresentation::doWakeUp()
 			return false;
 	}
 
+	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement = getSceneElement();
+	if (sceneElement != nullptr)
+	{
+		bool isIdentity = sceneElement->getPose().isApprox(SurgSim::Math::RigidTransform3d::Identity());
+		auto logger = SurgSim::Framework::Logger::getLogger("Physics");
+		SURGSIM_LOG_IF(!isIdentity, logger, WARNING) <<
+			"SceneElement '" << sceneElement->getName() << "' pose has been changed in between initialize() " <<
+			"and wakeUp() which can produce unrealistic behavior for the DeformableRepresentation '" <<
+			getName() << "'";
+	}
+
 	return true;
 }
 
