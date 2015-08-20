@@ -41,7 +41,7 @@ std::pair<int, int> TriangleMeshPlaneDcdContact::getShapeTypes()
 }
 
 void TriangleMeshPlaneDcdContact::doCalculateContact
-	(std::shared_ptr<CollisionPair> pair)
+(std::shared_ptr<CollisionPair> pair)
 {
 	std::shared_ptr<Representation> representationTriangleMesh;
 	std::shared_ptr<Representation> representationPlane;
@@ -75,7 +75,7 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 			penetrationPoints.second.rigidLocalPosition.setValue(
 				representationPlane->getPose().inverse() * (vertex.position - normal * d));
 
-			pair->addContact(-d, normal, penetrationPoints);
+			pair->addDcdContact(-d, normal, penetrationPoints);
 		}
 	}
 }

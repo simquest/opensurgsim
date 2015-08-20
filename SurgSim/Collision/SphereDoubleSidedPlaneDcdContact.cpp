@@ -36,9 +36,9 @@ SphereDoubleSidedPlaneDcdContact::SphereDoubleSidedPlaneDcdContact()
 {
 }
 
-std::pair<int,int> SphereDoubleSidedPlaneDcdContact::getShapeTypes()
+std::pair<int, int> SphereDoubleSidedPlaneDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_SPHERE, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_SPHERE, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);
 }
 
 void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
@@ -60,7 +60,7 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 
 	Vector3d result;
 	double dist = SurgSim::Math::distancePointPlane(planeLocalSphereCenter, plane->getNormal(), plane->getD(),
-													&result);
+				  &result);
 	double distAbsolute = std::abs(dist);
 	if (distAbsolute < sphere->getRadius())
 	{
@@ -77,7 +77,7 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 		penetrationPoints.second.rigidLocalPosition.setValue(
 			representationPlane->getPose().inverse() * (sphereCenter - normal * distAbsolute));
 
-		pair->addContact(depth, normal, penetrationPoints);
+		pair->addDcdContact(depth, normal, penetrationPoints);
 	}
 }
 

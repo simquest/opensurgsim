@@ -33,9 +33,9 @@ SphereSphereDcdContact::SphereSphereDcdContact()
 {
 }
 
-std::pair<int,int> SphereSphereDcdContact::getShapeTypes()
+std::pair<int, int> SphereSphereDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_SPHERE, SurgSim::Math::SHAPE_TYPE_SPHERE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_SPHERE, SurgSim::Math::SHAPE_TYPE_SPHERE);
 }
 
 void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
@@ -58,7 +58,7 @@ void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> p
 		penetrationPoints.second.rigidLocalPosition.setValue(
 			(pair->getSecond()->getPose().linear().inverse() * normal) * secondSphere->getRadius());
 
-		pair->addContact(maxDist - dist, normal, penetrationPoints);
+		pair->addDcdContact(maxDist - dist, normal, penetrationPoints);
 	}
 }
 
