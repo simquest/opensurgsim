@@ -57,29 +57,35 @@ void MassSpringConstraintFixedPoint::doBuild(double dt,
 	Vector3d globalPosition = localization->calculatePosition();
 
 	// Fixed point constraint in MCLP
-	//   p(t) is defined as the point before motion
-	//   s is defined as position to be constrained to
-	//   u is defined as the displacement needed to enforce the constraint
+	//   n the number of dof in the Mass-Spring
+	//   p     is the constrained point before free motion
+	//   pfree is the constrained point after free motion
+	//   vfree is the constrained point's velocity after free motion
+	//   v is the velocity in general
+	//   u  is the position variation needed to enforce the constraint from the free motion
+	//   u' is the velocity variation needed to enforce the constraint from the free motion
+	//   target is defined as position to be constrained to (in this method, it corresponds to the other part of the
+	//                                                       constraint that we don't have access to)
 	//
-	// The equation is
-	//   u + (p(t) - s) = 0
+	// The constraint equation is
+	//   C: pfree + u - target = 0 (note that the constraint is defined with 3 equations, each along an axis X-Y-Z)
 	//
-	// Using backward-Euler integration,
-	//   u = dt.v(t + dt)
+	// Using backward-Euler integration, the constraint can be expressed on the velocity level:
+	//   pfree = p + dt.vfree            -> free motion
+	//   pfree + u = p + dt.[vfree + u'] -> free motion + constraint correction
+	//   => u = dt.u'
+	//   C: pfree - target + dt.u' = 0
 	//
-	// The constraint (p(t) - s) exists in 3-space, but we must modify the velocity of coordinates in (n * 3) space. The
-	// transform from (n * 3) velocity space -> 3 translational space is denoted by H, which we construct here.
+	// Noting the system matrix S, the constraint matrix H = dC/dv is expressed on the velocity level as the
+	// general system to solve is on the velocity level:
+	// (S H^T) (   v   ) = (Impulse)
+	// (H 0  ) (-lambda)   (initial constraint violation)
 	//
-	// The constructing principal of FEM is that nodes must be placed close enough such that the value of a function
-	// within an FEM can be linearly interpolated by the values at the nodes of the FEM.  The interpolation weights are
-	// given by barycentric coordinates which linearly transform the nodes from (n * 3) -> 3 space (and vice versa):
-	//    sum(n_i * b_i) = n_1 * b_1 + n_2 * b_i ... n_n * b_n
-	// where v_i are in 3 space.
-	//
-	// So the transform from node-velocity to constraint space is
-	//    dt * sum(v_i * b_i)
-	//
-	// See RigidRepresentationFixedPoint for more implementation details.
+	// H = dC/dv
+	// The matrix H is of size 3xn (3 equations to fix each axis X-Y-Z relating to the n dof of the model)
+	// The constraint only involves the velocity of a single node (the constrained node), so the matrix H
+	// is full of zero except for a 3x3 part corresponding to the constrained node for which we have:
+	// dC/du' = du/du' = dt.Id(3x3)
 
 	// Update b with new violation: P(free motion)
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
