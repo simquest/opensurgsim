@@ -48,9 +48,8 @@ set(NOVINT_DEVICE_HEADERS
 )
 
 set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
-	Novint7DofDevice.h
-	NovintCommonDevice.h
-	NovintDevice.h
+	Novint/Novint7DofDevice.h #NOLINT
+	Novint/NovintDevice.h #NOLINT
 	PARENT_SCOPE)
 
 # TODO(advornik): the installation should NOT copy all the headers...

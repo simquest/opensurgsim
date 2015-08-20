@@ -217,6 +217,7 @@ void DeformableRepresentation::afterUpdate(double dt)
 	driveSceneElementPose(SurgSim::Math::RigidTransform3d::Identity());
 
 	// Back up the current state into the final state
+	// #threadsafety
 	*m_finalState = *m_currentState;
 
 	// Reset the external generalized force, stiffness and damping

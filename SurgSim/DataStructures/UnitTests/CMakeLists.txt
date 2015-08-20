@@ -53,7 +53,6 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimDataStructures
-	SurgSimGraphics
 	SurgSimMath
 )
 

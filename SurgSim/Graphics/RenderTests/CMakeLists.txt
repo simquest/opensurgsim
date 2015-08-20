@@ -21,6 +21,7 @@ set(UNIT_TEST_SOURCES
 	OsgBoxRepresentationRenderTests.cpp
 	OsgCameraRenderTests.cpp
 	OsgCapsuleRepresentationRenderTests.cpp
+	OsgCurveRepresentationRenderTests.cpp
 	OsgCylinderRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
 	OsgMeshRepresentationRenderTests.cpp
