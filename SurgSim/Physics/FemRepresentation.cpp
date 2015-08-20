@@ -19,6 +19,7 @@
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
@@ -68,7 +69,14 @@ const std::string& FemRepresentation::getFemElementType() const
 
 bool FemRepresentation::doInitialize()
 {
-	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
+	// DeformableRepresentation::doInitialize will
+	// 1) assert if initial state is not set
+	// 2) transform m_initialState properly with the initial pose
+	// => FemElement::initialize(m_initialState) is using the correct transformed state
+	if (!DeformableRepresentation::doInitialize())
+	{
+		return false;
+	}
 
 	// Initialize the FemElements
 	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)

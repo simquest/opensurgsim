@@ -74,6 +74,14 @@ void DeformableRepresentation::resetState()
 	*m_finalState    = *m_initialState;
 }
 
+void DeformableRepresentation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Cannot set the local pose of a DeformableRepresentation after it has been initialized";
+
+	Representation::setLocalPose(pose);
+}
+
 void DeformableRepresentation::setInitialState(
 	std::shared_ptr<SurgSim::Math::OdeState> initialState)
 {
@@ -289,21 +297,9 @@ void DeformableRepresentation::setCollisionRepresentation(
 	}
 }
 
-bool DeformableRepresentation::doWakeUp()
+bool DeformableRepresentation::doInitialize()
 {
-	using SurgSim::Math::OdeSolverEulerExplicit;
-	using SurgSim::Math::OdeSolverEulerExplicitModified;
-	using SurgSim::Math::OdeSolverEulerImplicit;
-	using SurgSim::Math::OdeSolverRungeKutta4;
-	using SurgSim::Math::OdeSolverStatic;
-	using SurgSim::Math::OdeSolverLinearEulerExplicit;
-	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
-	using SurgSim::Math::OdeSolverLinearEulerImplicit;
-	using SurgSim::Math::OdeSolverLinearRungeKutta4;
-	using SurgSim::Math::OdeSolverLinearStatic;
-
-	using SurgSim::Math::LinearSparseSolveAndInverseCG;
-	using SurgSim::Math::LinearSparseSolveAndInverseLU;
+	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
 
 	// Transform the state with the initial pose
 	transformState(m_initialState, getPose());
@@ -319,6 +315,25 @@ bool DeformableRepresentation::doWakeUp()
 	{
 		sceneElement->setPose(SurgSim::Math::RigidTransform3d::Identity());
 	}
+
+	return true;
+}
+
+bool DeformableRepresentation::doWakeUp()
+{
+	using SurgSim::Math::OdeSolverEulerExplicit;
+	using SurgSim::Math::OdeSolverEulerExplicitModified;
+	using SurgSim::Math::OdeSolverEulerImplicit;
+	using SurgSim::Math::OdeSolverRungeKutta4;
+	using SurgSim::Math::OdeSolverStatic;
+	using SurgSim::Math::OdeSolverLinearEulerExplicit;
+	using SurgSim::Math::OdeSolverLinearEulerExplicitModified;
+	using SurgSim::Math::OdeSolverLinearEulerImplicit;
+	using SurgSim::Math::OdeSolverLinearRungeKutta4;
+	using SurgSim::Math::OdeSolverLinearStatic;
+
+	using SurgSim::Math::LinearSparseSolveAndInverseCG;
+	using SurgSim::Math::LinearSparseSolveAndInverseLU;
 
 	// Set the ode solver using the chosen integration scheme
 	switch (m_integrationScheme)
@@ -373,6 +388,17 @@ bool DeformableRepresentation::doWakeUp()
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
 					<< "Linear solver not initialized, the linear solver is invalid";
 			return false;
+	}
+
+	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement = getSceneElement();
+	if (sceneElement != nullptr)
+	{
+		bool isIdentity = sceneElement->getPose().isApprox(SurgSim::Math::RigidTransform3d::Identity());
+		auto logger = SurgSim::Framework::Logger::getLogger("Physics");
+		SURGSIM_LOG_IF(!isIdentity, logger, WARNING) <<
+			"SceneElement '" << sceneElement->getName() << "' pose has been changed in between initialize() " <<
+			"and wakeUp() which can produce unrealistic behavior for the DeformableRepresentation '" <<
+			getName() << "'";
 	}
 
 	return true;

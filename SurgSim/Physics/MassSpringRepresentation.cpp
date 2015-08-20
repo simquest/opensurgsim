@@ -49,7 +49,14 @@ MassSpringRepresentation::~MassSpringRepresentation()
 
 bool MassSpringRepresentation::doInitialize()
 {
-	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
+	// DeformableRepresentation::doInitialize will
+	// 1) assert if initial state is not set
+	// 2) transform m_initialState properly with the initial pose
+	// => Spring::initialize(m_initialState) is using the correct transformed state
+	if (!DeformableRepresentation::doInitialize())
+	{
+		return false;
+	}
 
 	// Initialize the Springs
 	for (auto spring : m_springs)

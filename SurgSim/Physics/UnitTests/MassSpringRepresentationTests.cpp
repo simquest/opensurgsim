@@ -264,10 +264,8 @@ TEST_F(MassSpringRepresentationTests, TransformInitialStateTest)
 		expectedV.segment<3>(numDofPerNode * nodeId) = initialPose.linear() * v.segment<3>(numDofPerNode * nodeId);
 	}
 
-	// Initialize the component
+	// Initialize the component => apply the pose to the initial state
 	ASSERT_TRUE(m_massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>()));
-	// Wake-up the component => apply the pose to the initial state
-	ASSERT_TRUE(m_massSpring->wakeUp());
 
 	EXPECT_TRUE(m_massSpring->getInitialState()->getPositions().isApprox(expectedX));
 	EXPECT_TRUE(m_massSpring->getInitialState()->getVelocities().isApprox(expectedV));
