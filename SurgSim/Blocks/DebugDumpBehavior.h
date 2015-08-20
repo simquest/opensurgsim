@@ -33,19 +33,22 @@ class OsgManager;
 
 namespace Blocks
 {
+
+SURGSIM_STATIC_REGISTRATION(DebugDumpBehavior)
+
 /// Provides keyboard access to debugging functionality
 /// F1 - call the graphics manager dumpDebugInfo, this will write the current scenegraph to a file in the working
 ///      directory.
 /// F2 - Display the whole scene and activity status for sceneelements and components
 /// F3 - Display tangent generation status for graphics objects
-class DebugDumpBehavior : public SurgSim::Framework::Behavior
+class DebugDumpBehavior : public Framework::Behavior
 {
 
 public:
 
 	/// Constructor
 	/// \param name
-	DebugDumpBehavior(const std::string& name);
+	explicit DebugDumpBehavior(const std::string& name);
 
 	virtual ~DebugDumpBehavior();
 

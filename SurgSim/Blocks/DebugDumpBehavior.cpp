@@ -32,8 +32,10 @@ namespace SurgSim
 namespace Blocks
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::DebugDumpBehavior, DebugDumpBehavior);
+
 DebugDumpBehavior::DebugDumpBehavior(const std::string& name) :
-	SurgSim::Framework::Behavior(name),
+	Framework::Behavior(name),
 	m_keyPressedLastUpdate(false)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DebugDumpBehavior, std::shared_ptr<SurgSim::Framework::Component>,
@@ -141,7 +143,9 @@ bool DebugDumpBehavior::doInitialize()
 			break;
 		}
 	}
-	SURGSIM_ASSERT(! m_manager.expired()) << "Can't find graphics manager.";
+
+	SURGSIM_LOG_IF(m_manager.expired(), Framework::Logger::getDefaultLogger(), WARNING);
+
 	return true;
 }
 
@@ -150,8 +154,8 @@ bool DebugDumpBehavior::doWakeUp()
 	bool result = true;
 	if (nullptr == m_inputComponent)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-				"KeyboardTogglesComponentBehavior " << getName() << " does not have an Input Component.";
+		SURGSIM_ASSERT(m_inputComponent != nullptr)
+				<< __FUNCTION__ << getFullName() << " does not have an Input Component.";
 		result = false;
 	}
 	return result;
