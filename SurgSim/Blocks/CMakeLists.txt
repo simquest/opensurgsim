@@ -19,6 +19,7 @@ include_directories(
 )
 
 set(SURGSIM_BLOCKS_SOURCES
+	DebugDumpBehavior.cpp
 	DriveElementFromInputBehavior.cpp
 	GraphicsUtilities.cpp
 	KeyboardTogglesComponentBehavior.cpp
@@ -36,6 +37,7 @@ set(SURGSIM_BLOCKS_SOURCES
 )
 
 set(SURGSIM_BLOCKS_HEADERS
+	DebugDumpBehavior.h
 	DriveElementFromInputBehavior.h
 	GraphicsUtilities.h
 	KeyboardTogglesComponentBehavior.h
