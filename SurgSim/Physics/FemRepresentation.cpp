@@ -69,6 +69,10 @@ const std::string& FemRepresentation::getFemElementType() const
 
 bool FemRepresentation::doInitialize()
 {
+	// DeformableRepresentation::doInitialize will
+	// 1) assert if initial state is not set
+	// 2) transform m_initialState properly with the initial pose
+	// => FemElement::initialize(m_initialState) is using the correct transformed state
 	if (!DeformableRepresentation::doInitialize())
 	{
 		return false;

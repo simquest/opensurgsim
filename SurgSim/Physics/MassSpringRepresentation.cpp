@@ -47,6 +47,10 @@ MassSpringRepresentation::~MassSpringRepresentation()
 
 bool MassSpringRepresentation::doInitialize()
 {
+	// DeformableRepresentation::doInitialize will
+	// 1) assert if initial state is not set
+	// 2) transform m_initialState properly with the initial pose
+	// => Spring::initialize(m_initialState) is using the correct transformed state
 	if (!DeformableRepresentation::doInitialize())
 	{
 		return false;
