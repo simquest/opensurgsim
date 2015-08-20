@@ -106,6 +106,8 @@ public:
 	/// \param dt The time step (in seconds)
 	void beforeUpdate(double dt) override;
 
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
+
 protected:
 	/// Add the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
