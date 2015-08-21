@@ -74,6 +74,14 @@ void DeformableRepresentation::resetState()
 	*m_finalState    = *m_initialState;
 }
 
+void DeformableRepresentation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Cannot set the local pose of a DeformableRepresentation after it has been initialized";
+
+	Representation::setLocalPose(pose);
+}
+
 void DeformableRepresentation::setInitialState(
 	std::shared_ptr<SurgSim::Math::OdeState> initialState)
 {
@@ -298,6 +306,23 @@ void DeformableRepresentation::setCollisionRepresentation(
 
 bool DeformableRepresentation::doInitialize()
 {
+	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
+
+	// Transform the state with the initial pose
+	transformState(m_initialState, getPose());
+	*m_previousState = *m_initialState;
+	*m_currentState = *m_initialState;
+	*m_newState = *m_initialState;
+	*m_finalState = *m_initialState;
+
+	// Since the pose is now embedded in the state, reset element and local pose to identity.
+	setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
+	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement = getSceneElement();
+	if (sceneElement != nullptr)
+	{
+		sceneElement->setPose(SurgSim::Math::RigidTransform3d::Identity());
+	}
+
 	// Set the ode solver using the chosen integration scheme
 	switch (m_integrationScheme)
 	{
@@ -357,19 +382,15 @@ bool DeformableRepresentation::doInitialize()
 
 bool DeformableRepresentation::doWakeUp()
 {
-	// Transform the state with the initial pose
-	transformState(m_initialState, getPose());
-	*m_previousState = *m_initialState;
-	*m_currentState = *m_initialState;
-	*m_newState = *m_initialState;
-	*m_finalState = *m_initialState;
-
-	// Since the pose is now embedded in the state, reset element and local pose to identity.
-	setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
 	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement = getSceneElement();
 	if (sceneElement != nullptr)
 	{
-		sceneElement->setPose(SurgSim::Math::RigidTransform3d::Identity());
+		bool isIdentity = sceneElement->getPose().isApprox(SurgSim::Math::RigidTransform3d::Identity());
+		auto logger = SurgSim::Framework::Logger::getLogger("Physics");
+		SURGSIM_LOG_IF(!isIdentity, logger, WARNING) <<
+			"SceneElement '" << sceneElement->getName() << "' pose has been changed in between initialize() " <<
+			"and wakeUp() which can produce unrealistic behavior for the DeformableRepresentation '" <<
+			getName() << "'";
 	}
 
 	return true;

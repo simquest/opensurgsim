@@ -33,7 +33,7 @@ CollisionPair::CollisionPair()
 
 CollisionPair::CollisionPair(const std::shared_ptr<Representation>& first,
 							 const std::shared_ptr<Representation>& second) :
-		m_representations(first, second), m_isSwapped(false)
+	m_representations(first, second), m_isSwapped(false)
 {
 	SURGSIM_ASSERT(first != second) << "Collision Representation cannot collide with itself";
 	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "Collision Representation cannot be null";
@@ -45,7 +45,7 @@ CollisionPair::~CollisionPair()
 }
 
 void CollisionPair::setRepresentations(const std::shared_ptr<Representation>& first,
-							   const std::shared_ptr<Representation>& second)
+									   const std::shared_ptr<Representation>& second)
 {
 	SURGSIM_ASSERT(first != second) << "Should try to collide with self";
 	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "Collision Representation cannot be null";
@@ -58,7 +58,7 @@ void CollisionPair::setRepresentations(const std::shared_ptr<Representation>& fi
 }
 
 const std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>>&
-	CollisionPair::getRepresentations() const
+		CollisionPair::getRepresentations() const
 {
 	return m_representations;
 }
@@ -78,19 +78,32 @@ bool CollisionPair::hasContacts() const
 	return !m_contacts.empty();
 }
 
-void CollisionPair::addContact(const double& depth,
+void CollisionPair::addContact(const CollisionDetectionType& collisionType,
+							   const double& depth,
+							   const double& time,
 							   const SurgSim::Math::Vector3d& contactPoint,
 							   const SurgSim::Math::Vector3d& normal,
 							   const std::pair<Location, Location>& penetrationPoints)
 {
-	addContact(std::make_shared<Contact>(depth, contactPoint, normal, penetrationPoints));
+	addContact(std::make_shared<Contact>(collisionType, depth, time, contactPoint, normal, penetrationPoints));
 }
 
-void CollisionPair::addContact(const double& depth,
-							   const SurgSim::Math::Vector3d& normal,
-							   const std::pair<Location, Location>& penetrationPoints)
+void CollisionPair::addCcdContact(const double& depth,
+								  const double& time,
+								  const SurgSim::Math::Vector3d& contactPoint,
+								  const SurgSim::Math::Vector3d& normal,
+								  const std::pair<Location, Location>& penetrationPoints)
 {
-	addContact(std::make_shared<Contact>(depth, SurgSim::Math::Vector3d::Zero(), normal, penetrationPoints));
+	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_CONTINUOUS, depth, time,
+										 contactPoint, normal, penetrationPoints));
+}
+
+void CollisionPair::addDcdContact(const double& depth,
+								  const SurgSim::Math::Vector3d& normal,
+								  const std::pair<Location, Location>& penetrationPoints)
+{
+	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
+										 SurgSim::Math::Vector3d::Zero(), normal, penetrationPoints));
 }
 
 void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
@@ -98,10 +111,9 @@ void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
 	m_contacts.push_back(contact);
 	m_representations.first->addContact(m_representations.second, contact);
 	std::shared_ptr<Contact> contact2 =
-		std::make_shared<Contact>(contact->depth, contact->contact, -contact->normal,
-								  std::pair<Location, Location>(
-									contact->penetrationPoints.second,
-									contact->penetrationPoints.first));
+		std::make_shared<Contact>(contact->collisionType, contact->depth, contact->time, contact->contact,
+								  -contact->normal, std::pair<Location, Location>(
+									  contact->penetrationPoints.second, contact->penetrationPoints.first));
 	m_representations.second->addContact(m_representations.first, contact2);
 }
 

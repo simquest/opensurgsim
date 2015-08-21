@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESEHAVIOR_H
-#define SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESBEHAVIOR_H
+#define SURGSIM_BLOCKS_TRANSFERPHYSICSTOVERTICESBEHAVIOR_H
 
 #include "SurgSim/DataStructures/EmptyData.h"
 
@@ -81,6 +81,5 @@ private:
 };
 }
 }
-
 
 #endif

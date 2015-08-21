@@ -136,6 +136,8 @@ public:
 	/// \param representation The collision representation to be used.
 	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
+	void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
 protected:
 	bool doInitialize() override;
 	bool doWakeUp() override;
@@ -177,9 +179,6 @@ protected:
 
 	/// Linear algebraic solver used
 	SurgSim::Math::LinearSolver m_linearSolver;
-
-	/// Specify if the Ode Solver needs to be (re)loaded (do not exist yet, or integration scheme has changed)
-	bool m_needToReloadOdeSolver;
 
 	/// Ode solver (its type depends on the numerical integration scheme)
 	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;

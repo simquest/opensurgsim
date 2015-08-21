@@ -45,7 +45,7 @@ namespace Math
 ///
 /// \tparam T underlying data type over which the linear motion is defined.
 ///
-/// \sa Interval<T>, and Interval_nD<T, N>
+/// \sa Interval<T>, and IntervalND<T, N>
 template <typename T>
 class LinearMotion
 {
@@ -110,14 +110,14 @@ public:
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
-	/// preserve time ordering and so the return value is an Interval_nD instead
-	/// of a LinearMotion_nD
+	/// preserve time ordering and so the return value is an IntervalND instead
+	/// of a LinearMotionND
 	Interval<T> operator*(const LinearMotion<T>& m) const;
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
-	/// preserve time ordering and so the return value is an Interval_nD instead
-	/// of a LinearMotion_nD
+	/// preserve time ordering and so the return value is an IntervalND instead
+	/// of a LinearMotionND
 	/// \exception if any component of interval includes 0
 	Interval<T> operator/(const LinearMotion<T>& m) const;
 
@@ -145,89 +145,89 @@ private:
 	T m_end;
 };
 
-/// LinearMotion_nD<T, N> defines the concept of a group of linear motions and provides
+/// LinearMotionND<T, N> defines the concept of a group of linear motions and provides
 /// operations on them including arithmetic operations, construction, and I/O.
 ///
 /// \tparam T underlying data type over which the linear motion is defined.
 /// \tparam N Dimensionality of the interval
 ///
-/// \sa LinearMotion_nD<T> and IntervalArthmetic<T, N>
+/// \sa LinearMotionND<T> and IntervalArthmetic<T, N>
 template <class T, int N>
-class LinearMotion_nD
+class LinearMotionND
 {
 	static_assert(N > 0, "LinearMotion must have dimensionality > 0.");
 
 public:
 	/// Constructor
-	LinearMotion_nD();
+	LinearMotionND();
 
 	/// Constructor
 	/// \param x array of N motions to be copied into the group
-	explicit LinearMotion_nD(const std::array<LinearMotion<T>, N>& x);
+	explicit LinearMotionND(const std::array<LinearMotion<T>, N>& x);
 
 	/// Copy constructor
 	/// \param motion motion group to copied
-	LinearMotion_nD(const LinearMotion_nD<T, N>& motion);
+	LinearMotionND(const LinearMotionND<T, N>& motion);
 
 	/// Move constructor
 	/// \param motion motion to be copied
-	LinearMotion_nD(LinearMotion_nD<T, N>&& motion);
+	LinearMotionND(LinearMotionND<T, N>&& motion);
 
 	/// Constructor
 	/// \param a array of N values to be used as the respective starts for the linear motion entries.
 	/// \param b array of N values to be used as the respective ends for the linear motion entries.
-	LinearMotion_nD(const std::array<T, N>& a, const std::array<T, N>& b);
+	LinearMotionND(const std::array<T, N>& a, const std::array<T, N>& b);
 
 	/// Assignment operator
 	/// \param motion Linear motion group to be copied
-	LinearMotion_nD<T, N>& operator=(const LinearMotion_nD<T, N>& motion);
+	LinearMotionND<T, N>& operator=(const LinearMotionND<T, N>& motion);
 
 	/// Move assignment operator
 	/// \param motion Linear motion group to be moved
-	LinearMotion_nD<T, N>& operator=(LinearMotion_nD<T, N>&& motion);
+	LinearMotionND<T, N>& operator=(LinearMotionND<T, N>&& motion);
 
 	/// Convert from LinearMotion to an Interval
-	/// \return the conversion of the nD LinearMotion to an nD Interval
-	Interval_nD<T, N> toInterval() const;
+	/// \return the conversion of the ND LinearMotion to an ND Interval
+	IntervalND<T, N> toInterval() const;
 
 	/// \param motion the linear motion group to be tested
 	/// \param epsilon the nearness parameter
 	/// \return true if each linear motion in the input group is approximately equal to its correspondent
 	/// element in motion.
-	bool isApprox(const LinearMotion_nD<T, N>& motion, const T& epsilon) const;
+	bool isApprox(const LinearMotionND<T, N>& motion, const T& epsilon) const;
 
 	/// \param motion the linear motion group to be tested
 	/// \return true if the current linear motion group is identical to the input group
-	bool operator==(const LinearMotion_nD<T, N>& motion) const;
+	bool operator==(const LinearMotionND<T, N>& motion) const;
 
 	/// \param motion the linear motion group to be tested
 	/// \return true if the current linear motion group is not identical to the input group
-	bool operator!=(const LinearMotion_nD<T, N>& motion) const;
+	bool operator!=(const LinearMotionND<T, N>& motion) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to interval groups
-	LinearMotion_nD<T, N> operator+(const LinearMotion_nD<T, N>& m) const;
-	LinearMotion_nD<T, N>& operator+=(const LinearMotion_nD<T, N>& m);
-	LinearMotion_nD<T, N> operator-(const LinearMotion_nD<T, N>& m) const;
-	LinearMotion_nD<T, N>& operator-=(const LinearMotion_nD<T, N>& m);
+	LinearMotionND<T, N> operator+(const LinearMotionND<T, N>& m) const;
+	LinearMotionND<T, N>& operator+=(const LinearMotionND<T, N>& m);
+	LinearMotionND<T, N> operator-(const LinearMotionND<T, N>& m) const;
+	LinearMotionND<T, N>& operator-=(const LinearMotionND<T, N>& m);
 	/// @}
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
-	/// preserve time ordering and so the return value is an Interval_nD instead
-	/// of a LinearMotion_nD
-	Interval_nD<T, N> operator*(const LinearMotion_nD<T, N>& m) const;
+	/// preserve time ordering and so the return value is an IntervalND instead
+	/// of a LinearMotionND
+	IntervalND<T, N> operator*(const LinearMotionND<T, N>& m) const;
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
-	/// preserve time ordering and so the return value is an Interval_nD instead
-	/// of a LinearMotion_nD
+	/// preserve time ordering and so the return value is an IntervalND instead
+	/// of a LinearMotionND
 	/// \exception if any component of interval includes 0
-	Interval_nD<T, N> operator/(const LinearMotion_nD<T, N>& m) const;
+	IntervalND<T, N> operator/(const LinearMotionND<T, N>& m) const;
 
 	/// \param motion the input linear motion group
 	/// \return the interval dot product of the current group and interval
-	Interval<T> dotProduct(const LinearMotion_nD<T, N>& motion) const;
+	Interval<T> dotProduct(const LinearMotionND<T, N>& motion) const;
 
 	/// \param i the selector for the linear motion to be returned
 	/// \return the ith interval in the current group
@@ -241,108 +241,108 @@ public:
 	void getEnd(std::array<T, N>* end) const;
 
 	/// \return the linear motion from the starting point to the midpoint
-	LinearMotion_nD<T, N> firstHalf() const;
+	LinearMotionND<T, N> firstHalf() const;
 
 	/// \return the linear motion from the midpoint to the ending point
-	LinearMotion_nD<T, N> secondHalf() const;
+	LinearMotionND<T, N> secondHalf() const;
 
 private:
 	/// The N dimensional group of linear motions
 	std::array<LinearMotion<T>, N> m_motion;
 };
 
-/// LinearMotion_nD<T, 3> specializes the LinearMotion_nD<T, N> class for 3 dimensions
+/// LinearMotionND<T, 3> specializes the LinearMotionND<T, N> class for 3 dimensions
 ///
-/// \sa LinearMotion<T>, LinearMotion_nD<T, N> and IntervalArthmetic<T, 3>
+/// \sa LinearMotion<T>, LinearMotionND<T, N> and IntervalArthmetic<T, 3>
 template <class T>
-class LinearMotion_nD<T, 3>
+class LinearMotionND<T, 3>
 {
 public:
 	/// Typedef for a vector 3 return
 	typedef Eigen::Matrix<T, 3, 1> Vector3;
 
 	/// Constructor
-	LinearMotion_nD();
+	LinearMotionND();
 
 	/// Constructor
 	/// \param x array of 3 linear motions to be copied into the group
-	explicit LinearMotion_nD(const std::array<LinearMotion<T>, 3>& x);
+	explicit LinearMotionND(const std::array<LinearMotion<T>, 3>& x);
 
 	/// Constructor
 	/// \param a first linear motion to be added to the 3 group
 	/// \param b second linear motion to be added to the 3 group
 	/// \param c third linear motion to be added to the 3 group
-	LinearMotion_nD(const LinearMotion<T>& a, const LinearMotion<T>& b, const LinearMotion<T>& c);
+	LinearMotionND(const LinearMotion<T>& a, const LinearMotion<T>& b, const LinearMotion<T>& c);
 
 	/// Copy constructor
 	/// \param motion linear motion 3 group to be copied
-	LinearMotion_nD(const LinearMotion_nD<T, 3>& motion);
+	LinearMotionND(const LinearMotionND<T, 3>& motion);
 
 	/// Move constructor
 	/// \param motion Linear motion to be copied
-	LinearMotion_nD(LinearMotion_nD<T, 3>&& motion);
+	LinearMotionND(LinearMotionND<T, 3>&& motion);
 
 	/// Constructor
 	/// \param a array of 3 values to be used as the respective starts for the linear motion entries.
 	/// \param b array of 3 values to be used as the respective ends for the linear motion entries.
-	LinearMotion_nD(const std::array<T, 3>& a, const std::array<T, 3>& b);
+	LinearMotionND(const std::array<T, 3>& a, const std::array<T, 3>& b);
 
 	/// Assignment operator
 	/// \param motion Linear motion 3 group to be copied
-	LinearMotion_nD<T, 3>& operator=(const LinearMotion_nD<T, 3>& motion);
+	LinearMotionND<T, 3>& operator=(const LinearMotionND<T, 3>& motion);
 
 	/// Move assignment operator
 	/// \param motion Linear motion 3 group to be moved
-	LinearMotion_nD<T, 3>& operator=(LinearMotion_nD<T, 3>&& motion);
+	LinearMotionND<T, 3>& operator=(LinearMotionND<T, 3>&& motion);
 
 	/// Convert from LinearMotion to an Interval
 	/// \return the conversion of the 3D LinearMotion to a 3D Interval
-	Interval_nD<T, 3> toInterval() const;
+	IntervalND<T, 3> toInterval() const;
 
 	/// \param motion the motion group to be tested
 	/// \param epsilon the nearness parameter
 	/// \return true if each linear motion in the input group is approximately equal to its correspondent
 	/// element in motion.
-	bool isApprox(const LinearMotion_nD<T, 3>& motion, const T& epsilon) const;
+	bool isApprox(const LinearMotionND<T, 3>& motion, const T& epsilon) const;
 
 	/// \param motion the linear motion group to be tested
 	/// \return true if the current linear motion 3 group is identical to the input 3 group motion
-	bool operator==(const LinearMotion_nD<T, 3>& motion) const;
+	bool operator==(const LinearMotionND<T, 3>& motion) const;
 
 	/// \param motion the linear motion group to be tested
 	/// \return true if the current linear motion 3 group is not identical to the input 3 group motion.
-	bool operator!=(const LinearMotion_nD<T, 3>& motion) const;
+	bool operator!=(const LinearMotionND<T, 3>& motion) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to 3 interval groups
-	LinearMotion_nD<T, 3> operator+(const LinearMotion_nD<T, 3>& m) const;
-	LinearMotion_nD<T, 3>& operator+=(const LinearMotion_nD<T, 3>& m);
-	LinearMotion_nD<T, 3> operator-(const LinearMotion_nD<T, 3>& m) const;
-	LinearMotion_nD<T, 3>& operator-=(const LinearMotion_nD<T, 3>& m);
+	LinearMotionND<T, 3> operator+(const LinearMotionND<T, 3>& m) const;
+	LinearMotionND<T, 3>& operator+=(const LinearMotionND<T, 3>& m);
+	LinearMotionND<T, 3> operator-(const LinearMotionND<T, 3>& m) const;
+	LinearMotionND<T, 3>& operator-=(const LinearMotionND<T, 3>& m);
 	/// @}
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
-	/// preserve time ordering and so the return value is an Interval_nD instead
-	/// of a LinearMotion_nD
-	Interval_nD<T, 3> operator*(const LinearMotion_nD<T, 3>& m) const;
+	/// preserve time ordering and so the return value is an IntervalND instead
+	/// of a LinearMotionND
+	IntervalND<T, 3> operator*(const LinearMotionND<T, 3>& m) const;
 
 	/// Standard arithmetic operators extended to interval groups
 	/// \note Multiplication and division operators by their nature do not
-	/// preserve time ordering and so the return value is an Interval_nD instead
-	/// of a LinearMotion_nD
+	/// preserve time ordering and so the return value is an IntervalND instead
+	/// of a LinearMotionND
 	/// \exception if any component of interval includes 0
-	Interval_nD<T, 3> operator/(const LinearMotion_nD<T, 3>& m) const;
+	IntervalND<T, 3> operator/(const LinearMotionND<T, 3>& m) const;
 
 	/// \param motion the input linear motion 3 group
 	/// \param range the range over which the dot product is to be evaluated.
 	/// \return the interval dot product of the current 3 group and interval evaluated over the interval range.
-	Interval<T> dotProduct(const LinearMotion_nD<T, 3>& motion, const Interval<T>& range) const;
+	Interval<T> dotProduct(const LinearMotionND<T, 3>& motion, const Interval<T>& range) const;
 
 	/// \param motion the input linear motion 3 group
 	/// \param range the range over which the cross product is to be evaluated.
 	/// \return the interval cross product of the current 3 group and interval evaluated over the interval range.
-	Interval_nD<T, 3> crossProduct(const LinearMotion_nD<T, 3>& motion, const Interval<T>& range) const;
+	IntervalND<T, 3> crossProduct(const LinearMotionND<T, 3>& motion, const Interval<T>& range) const;
 
 	/// \return the square of the linear motion magnitude for the current 3 group
 	Interval<T> magnitudeSquared(const Interval<T>& range) const;
@@ -372,10 +372,10 @@ public:
 	Vector3 atTime(const T& t) const;
 
 	/// \return the linear motion 3D from the start to the midpoint
-	LinearMotion_nD<T, 3> firstHalf() const;
+	LinearMotionND<T, 3> firstHalf() const;
 
 	/// \return the linear motion 3D from the midpoint to the start
-	LinearMotion_nD<T, 3> secondHalf() const;
+	LinearMotionND<T, 3> secondHalf() const;
 
 private:
 	/// The 3 dimensional group of linear motions
@@ -392,7 +392,7 @@ private:
 template <typename T>
 std::ostream& operator<<(std::ostream& o, const LinearMotion<T>& motion);
 
-// Linear motion nD utilities
+// Linear motion ND utilities
 
 /// Write a textual version of a linear motion group to an output stream
 /// \tparam T underlying type of the linear motion
@@ -401,7 +401,7 @@ std::ostream& operator<<(std::ostream& o, const LinearMotion<T>& motion);
 /// \param motion the motion group to write
 /// \return the active ostream
 template <typename T, int N>
-std::ostream& operator<<(std::ostream& o, const LinearMotion_nD<T, N>& motion);
+std::ostream& operator<<(std::ostream& o, const LinearMotionND<T, N>& motion);
 
 // Linear motion 3D utilities
 
@@ -411,7 +411,7 @@ std::ostream& operator<<(std::ostream& o, const LinearMotion_nD<T, N>& motion);
 /// \param b the second linear motion 3 group
 /// \return the dot product in a polynomial representation
 template <class T>
-Polynomial<T, 2> analyticDotProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b);
+Polynomial<T, 2> analyticDotProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b);
 
 /// Calculate a single axis of an analytic cross product as a Polynomial
 /// \tparam T underlying type of the linear motion
@@ -420,7 +420,7 @@ Polynomial<T, 2> analyticDotProduct(const LinearMotion_nD<T, 3>& a, const Linear
 /// \param b the second linear motion 3 group
 /// \return the selected axis in a polynomial representation
 template <class T, int A>
-Polynomial<T, 2> analyticCrossProductAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b);
+Polynomial<T, 2> analyticCrossProductAxis(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b);
 
 /// Calculate the X axis of an analytic cross product as a Polynomial
 /// \tparam T underlying type of the linear motion
@@ -428,7 +428,7 @@ Polynomial<T, 2> analyticCrossProductAxis(const LinearMotion_nD<T, 3>& a, const 
 /// \param b the second linear motion 3 group
 /// \return the X axis in a polynomial representation
 template <class T>
-Polynomial<T, 2> analyticCrossProductXAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b);
+Polynomial<T, 2> analyticCrossProductXAxis(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b);
 
 /// Calculate the Y axis of an analytic cross product as a Polynomial
 /// \tparam T underlying type of the linear motion
@@ -436,7 +436,7 @@ Polynomial<T, 2> analyticCrossProductXAxis(const LinearMotion_nD<T, 3>& a, const
 /// \param b the second linear motion 3 group
 /// \return the Y axis in a polynomial representation
 template <class T>
-Polynomial<T, 2> analyticCrossProductYAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b);
+Polynomial<T, 2> analyticCrossProductYAxis(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b);
 
 /// Calculate the Z axis of an analytic cross product as a Polynomial
 /// \tparam T underlying type of the linear motion
@@ -444,7 +444,7 @@ Polynomial<T, 2> analyticCrossProductYAxis(const LinearMotion_nD<T, 3>& a, const
 /// \param b the second linear motion 3 group
 /// \return the Z axis in a polynomial representation
 template <class T>
-Polynomial<T, 2> analyticCrossProductZAxis(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b);
+Polynomial<T, 2> analyticCrossProductZAxis(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b);
 
 /// Calculate an analytic cross product as a Polynomial
 /// \tparam T underlying type of the linear motion
@@ -454,7 +454,7 @@ Polynomial<T, 2> analyticCrossProductZAxis(const LinearMotion_nD<T, 3>& a, const
 /// \param [out] resultYAxis the Y axis in a polynomial representation
 /// \param [out] resultZAxis the Z axis in a polynomial representation
 template <class T>
-void analyticCrossProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b,
+void analyticCrossProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
 						  Polynomial<T, 2>* resultXAxis, Polynomial<T, 2>* resultYAxis, Polynomial<T, 2>* resultZAxis);
 
 /// Calculate an analytic cross product as a Polynomial, as a polynomial whose value for t=0..1 is
@@ -465,8 +465,8 @@ void analyticCrossProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<
 /// \param c the third linear motion 3 group
 /// \return a 3rd order polynomial representation of the triple product
 template <class T>
-Polynomial<T, 3> analyticTripleProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b,
-									   const LinearMotion_nD<T, 3>& c);
+Polynomial<T, 3> analyticTripleProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
+									   const LinearMotionND<T, 3>& c);
 
 /// Calculate the triple product, as an interval.
 /// \tparam T underlying type of the linear motion
@@ -476,15 +476,15 @@ Polynomial<T, 3> analyticTripleProduct(const LinearMotion_nD<T, 3>& a, const Lin
 /// \param range the range over which the triple product is to be evaluated
 /// \return an interval representation of the triple product
 template <class T>
-Interval<T> tripleProduct(const LinearMotion_nD<T, 3>& a, const LinearMotion_nD<T, 3>& b,
-						  const LinearMotion_nD<T, 3>& c, const Interval<T>& range);
+Interval<T> tripleProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
+						  const LinearMotionND<T, 3>& c, const Interval<T>& range);
 
 /// Calculate the magnitude squared of a linear motion 3 group as a polynomial
 /// \tparam T underlying type of the linear motion
 /// \param motion the linear motion 3 group
 /// \return the magnitude squared of the linear motion as a polynomial
 template <class T>
-Polynomial<T, 2> analyticMagnitudeSquared(const LinearMotion_nD<T, 3>& motion);
+Polynomial<T, 2> analyticMagnitudeSquared(const LinearMotionND<T, 3>& motion);
 
 }; // Math
 }; // SurgSim

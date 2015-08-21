@@ -37,8 +37,8 @@ double delta = 1.0e-11;
 class IntervalArithmeticTests : public ::testing::Test
 {
 public:
-	typedef Interval_nD<double, 2> IntervalDouble2;
-	typedef Interval_nD<double, 3> IntervalDouble3;
+	typedef IntervalND<double, 2> IntervalDouble2;
+	typedef IntervalND<double, 3> IntervalDouble3;
 
 	Interval<double> testIntervalMoveConstructor(Interval<double> dummy)
 	{
@@ -47,16 +47,16 @@ public:
 		return ret;
 	}
 
-	Interval_nD<double, 2> testIntervalnDMoveConstructor(Interval_nD<double, 2> dummy)
+	IntervalND<double, 2> testIntervalNDMoveConstructor(IntervalND<double, 2> dummy)
 	{
-		Interval_nD<double, 2> ret;
+		IntervalND<double, 2> ret;
 		ret = dummy;
 		return ret;
 	}
 
-	Interval_nD<double, 3> testInterval3DMoveConstructor(Interval_nD<double, 3> dummy)
+	IntervalND<double, 3> testInterval3DMoveConstructor(IntervalND<double, 3> dummy)
 	{
-		Interval_nD<double, 3> ret;
+		IntervalND<double, 3> ret;
 		ret = dummy;
 		return ret;
 	}
@@ -276,8 +276,8 @@ TEST_F(IntervalArithmeticTests, OperatorTests)
 	EXPECT_TRUE(Interval<double> (100, 400).isApprox((-initial).square(), epsilon));
 };
 
-// Interval nD tests
-TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
+// Interval ND tests
+TEST_F(IntervalArithmeticTests, IntervalNDInitializationTests)
 {
 	// Constructor tests
 	Interval<double> testInterval(3.7, 3.8);
@@ -299,8 +299,8 @@ TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
 	IntervalDouble2 b(minimums, maximums);
 	IntervalDouble2 a(b);
 	EXPECT_TRUE(a == b);
-	EXPECT_NO_THROW(testIntervalnDMoveConstructor(b));
-	IntervalDouble2 f = testIntervalnDMoveConstructor(b);
+	EXPECT_NO_THROW(testIntervalNDMoveConstructor(b));
+	IntervalDouble2 f = testIntervalNDMoveConstructor(b);
 	EXPECT_TRUE(f == b);
 
 	// Assignment and equal/not equal tests
@@ -329,7 +329,7 @@ TEST_F(IntervalArithmeticTests, IntervalnDInitializationTests)
 	EXPECT_TRUE(axis1 == Interval<double>(3.2, 4.4));
 };
 
-TEST_F(IntervalArithmeticTests, IntervalnDRangeTests)
+TEST_F(IntervalArithmeticTests, IntervalNDRangeTests)
 {
 	std::array<double, 2> minimumsShape = {1.1, 3.2};
 	std::array<double, 2> maximumsShape = {4.1, 4.4};
@@ -346,7 +346,7 @@ TEST_F(IntervalArithmeticTests, IntervalnDRangeTests)
 	EXPECT_TRUE(shape.overlapsWith(IntervalDouble2(overlapMin, overlapMax)));
 };
 
-TEST_F(IntervalArithmeticTests, IntervalnDExtendRangeTests)
+TEST_F(IntervalArithmeticTests, IntervalNDExtendRangeTests)
 {
 	std::array<double, 2> minimumsShape = {1.1, 3.2};
 	std::array<double, 2> maximumsShape = {4.1, 4.4};
@@ -359,7 +359,7 @@ TEST_F(IntervalArithmeticTests, IntervalnDExtendRangeTests)
 	EXPECT_EQ(IntervalDouble2(finalMin, finalMax), shape);
 };
 
-TEST_F(IntervalArithmeticTests, IntervalnDOperatorTests)
+TEST_F(IntervalArithmeticTests, IntervalNDOperatorTests)
 {
 	std::array<double, 2> minimumsShape = {1.1, 3.2};
 	std::array<double, 2> maximumsShape = {4.1, 4.4};
@@ -441,7 +441,7 @@ TEST_F(IntervalArithmeticTests, IntervalnDOperatorTests)
 	EXPECT_NEAR(std::sqrt(magnitudeSquaredValue.getMax()), magnitudeValue.getMax(), epsilon);
 };
 
-// Interval nD tests
+// Interval ND tests
 TEST_F(IntervalArithmeticTests, Interval3DInitializationTests)
 {
 	// Constructor tests
@@ -686,7 +686,7 @@ TEST_F(IntervalArithmeticTests, IntervalUtilityTests)
 	EXPECT_TRUE((resultLoad - (initial * deltaInterval)).isApprox(result, epsilon));
 };
 
-TEST_F(IntervalArithmeticTests, IntervalnDUtilityTests)
+TEST_F(IntervalArithmeticTests, IntervalNDUtilityTests)
 {
 	std::array<double, 2> minimumsShape = {1.1, 3.2};
 	std::array<double, 2> maximumsShape = {4.1, 4.4};

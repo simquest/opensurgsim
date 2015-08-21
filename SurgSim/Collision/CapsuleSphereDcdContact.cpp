@@ -35,9 +35,9 @@ CapsuleSphereDcdContact::CapsuleSphereDcdContact()
 {
 }
 
-std::pair<int,int> CapsuleSphereDcdContact::getShapeTypes()
+std::pair<int, int> CapsuleSphereDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_CAPSULE, SurgSim::Math::SHAPE_TYPE_SPHERE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_CAPSULE, SurgSim::Math::SHAPE_TYPE_SPHERE);
 }
 
 void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
@@ -70,7 +70,7 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 		penetrationPoints.second.rigidLocalPosition.setValue(
 			representationSphere->getPose().inverse() * (sphereCenter + normal * sphere->getRadius()));
 
-		pair->addContact(depth, normal, penetrationPoints);
+		pair->addDcdContact(depth, normal, penetrationPoints);
 	}
 }
 
