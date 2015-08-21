@@ -17,15 +17,7 @@
 /// Encode the z-depth of the fragment into rgba values, see
 /// http://www.ozone3d.net/blogs/lab/20080604/glsl-float-to-rgba8-encoder/
 
-vec4 encodeDepth(float depth)
-{
-	vec4 encoded = vec4(1.0, 256.0, 256.0*256.0, 256.0*256.0*256.0) * depth;
-	encoded = fract(encoded);
-	encoded -= encoded.yzww * vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0);
-	return encoded;
-}
-
 void main(void) 
 {	
-	gl_FragColor.rgba = encodeDepth(gl_FragCoord.z);
+	gl_FragDepth = gl_FragCoord.z;
 }

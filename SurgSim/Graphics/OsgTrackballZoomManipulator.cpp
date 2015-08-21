@@ -210,5 +210,10 @@ bool OsgTrackballZoomManipulator::handleMouseWheel(
 	}
 }
 
+void OsgTrackballZoomManipulator::updateCamera(osg::Camera& camera)
+{
+	return;
+}
+
 }; // namespace Graphics
 }; // namespace SurgSim
