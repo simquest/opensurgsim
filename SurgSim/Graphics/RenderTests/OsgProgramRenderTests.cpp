@@ -403,11 +403,9 @@ TEST_F(OsgProgramRenderTests, BlurShader)
 	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("Textures/checkered.png", &filename));
 	texture2->loadImage(filename);
 
-	auto material = std::make_shared<OsgMaterial>("Material");
-	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/horizontalBlurPass");
-	ASSERT_TRUE(program != nullptr);
-	material->setProgram(program);
-
+	// Material
+	auto material = Graphics::buildMaterial("Shaders/gauss_blur_horizontal.vert",
+											"Shaders/gauss_blur.frag");
 	material->addUniform("float", "width");
 	material->setValue("width", 1024.0f);
 	material->addUniform("float", "blurRadius");

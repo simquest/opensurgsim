@@ -135,7 +135,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createLight()
 
 	result->setPose(from);
 
-	result->addComponent(interpolator);
+	// result->addComponent(interpolator);
 
 	return result;
 }
@@ -309,6 +309,7 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 						1024,
 						lightProjection,
 						true,
+						8.0,
 						false);
 	scene->addSceneElements(elements);
 }

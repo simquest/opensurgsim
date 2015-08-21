@@ -40,12 +40,13 @@ namespace Blocks
 std::shared_ptr<Graphics::Camera> setupBlurPasses(
 	std::shared_ptr<Graphics::RenderPass> previousPass,
 	int textureSize,
+	double blurRadius,
 	bool debug,
 	std::vector<std::shared_ptr<Framework::SceneElement>>* elements)
 {
 	std::vector<std::shared_ptr<Framework::SceneElement>> result;
 	float shadowMapSize = static_cast<float>(textureSize);
-	float blurRadius = 6.0;
+	float floatRadius = static_cast<float>(blurRadius);
 
 	std::shared_ptr<Graphics::Camera> previous = previousPass->getCamera();
 
@@ -65,7 +66,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		material->addUniform("float", "width");
 		material->setValue("width", shadowMapSize);
 		material->addUniform("float", "blurRadius");
-		material->setValue("blurRadius", blurRadius);
+		material->setValue("blurRadius", floatRadius);
 		pass->setMaterial(material);
 
 		// Quad
@@ -100,7 +101,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		material->addUniform("float", "height");
 		material->setValue("height", shadowMapSize);
 		material->addUniform("float", "blurRadius");
-		material->setValue("blurRadius", blurRadius);
+		material->setValue("blurRadius", floatRadius);
 		pass->setMaterial(material);
 
 		// Quad
@@ -124,12 +125,12 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 /// Create the pass that renders the scene from the view of the light source
 /// the identifier GROUP_SHADOW_CASTER is used in all graphic objects to mark them as used
 /// in this pass
-std::shared_ptr<SurgSim::Graphics::RenderPass> createLightMapPass(int textureSize, bool debug)
+std::shared_ptr<Graphics::RenderPass> createLightMapPass(int textureSize, bool debug)
 {
-	auto pass = std::make_shared<SurgSim::Graphics::RenderPass>(GROUP_SHADOW_CASTER);
-	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 0, true);
+	auto pass = std::make_shared<Graphics::RenderPass>(GROUP_SHADOW_CASTER);
+	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 0, true);
 	pass->setRenderTarget(renderTarget);
-	pass->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
+	pass->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
 
 	auto material = Graphics::buildMaterial("Shaders/depth_map.vert", "Shaders/depth_map.frag");
 	material->getProgram()->setGlobalScope(true);
@@ -146,12 +147,12 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> createLightMapPass(int textureSiz
 /// Create the pass that renders shadowed pixels into the scene,
 /// the identifier  GROUPD_SHADOW_RECEIVER is used in all graphics objects to mark them
 /// as used in this pass
-std::shared_ptr<SurgSim::Graphics::RenderPass> createShadowMapPass(int textureSize, bool debug)
+std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, bool debug)
 {
-	auto pass = std::make_shared<SurgSim::Graphics::RenderPass>(GROUP_SHADOW_RECEIVER);
-	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 1, false);
+	auto pass = std::make_shared<Graphics::RenderPass>(GROUP_SHADOW_RECEIVER);
+	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 1, false);
 	pass->setRenderTarget(renderTarget);
-	pass->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
+	pass->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 	auto material = Graphics::buildMaterial("Shaders/shadow_map.vert", "Shaders/shadow_map.frag");
 	material->getProgram()->setGlobalScope(true);
@@ -172,6 +173,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 			int textureSize,
 			std::array<double, 6> lightCameraProjection,
 			bool useBlur,
+			double blurRadius,
 			bool showDebug)
 {
 	SURGSIM_ASSERT(camera != nullptr) << "Camera can't be nullptr.";
@@ -227,14 +229,14 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 	copier->connect(osgCamera, "Pose", shadowMapPass->getPoseComponent(), "Pose");
 
 	// Put the result of the last pass into the main camera to make it accessible
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("camera material");
+	auto material = std::make_shared<Graphics::OsgMaterial>("camera material");
 	material->addUniform("sampler2D", "shadowMap");
 
 	std::shared_ptr<Graphics::Texture> texture;
 
-	if (true)
+	if (useBlur)
 	{
-		auto blurrPass = setupBlurPasses(shadowMapPass, textureSize, showDebug, &result);
+		auto blurrPass = setupBlurPasses(shadowMapPass, textureSize, blurRadius, showDebug, &result);
 		texture = blurrPass->getRenderTarget()->getColorTarget(0);
 	}
 	else

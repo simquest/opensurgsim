@@ -64,6 +64,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 			int textureSize,
 			std::array<double, 6> lightCameraProjection,
 			bool useBlur,
+			double blurRadius,
 			bool showDebug);
 
 }
