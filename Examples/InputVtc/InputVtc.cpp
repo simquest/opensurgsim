@@ -84,7 +84,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 }
 
 
-std::shared_ptr<SceneElement> createBox(const std::string& name, const std::string& toolDeviceName)
+std::shared_ptr<SceneElement> createBox(const std::string& name, const std::string& deviceName)
 {
 	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.8, 2.0, 0.2); // in meter
 
@@ -108,12 +108,12 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	// Input Components
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>(name + " Input");
-	inputComponent->setDeviceName(toolDeviceName);
+	inputComponent->setDeviceName(deviceName);
 
 	// Output Components
 	std::shared_ptr<SurgSim::Input::OutputComponent> outputComponent = nullptr;
 	outputComponent = std::make_shared<SurgSim::Input::OutputComponent>(name + " Output");
-	outputComponent->setDeviceName(toolDeviceName);
+	outputComponent->setDeviceName(deviceName);
 
 	// A virtual tool coupler can be used to connect an input/output device with the physics thread.
 	// The physics representation follows the pose provided by the device, and the representation's collisions
@@ -136,7 +136,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	return boxElement;
 }
 
-std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, const std::string& toolDeviceName)
+std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, const std::string& deviceName)
 {
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation;
 	graphicsRepresentation = std::make_shared<OsgBoxRepresentation>(name + " Graphics");
@@ -158,7 +158,7 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent;
 	inputComponent = std::make_shared<SurgSim::Input::InputComponent>(name + " Input");
-	inputComponent->setDeviceName(toolDeviceName);
+	inputComponent->setDeviceName(deviceName);
 
 	std::shared_ptr<DriveElementFromInputBehavior> driver;
 	driver = std::make_shared<DriveElementFromInputBehavior>(name + " Driver");
@@ -171,46 +171,6 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 	element->addComponent(material);
 
 	return element;
-}
-
-std::shared_ptr<SurgSim::Input::DeviceInterface> createDevice(const std::string& toolDeviceName)
-{
-	std::array<std::string, 5> types =
-		{"PhantomDevice", "NovintDevice", "MultiAxisDevice", "SixenseDevice", "LeapDevice"};
-	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
-	auto& factory = SurgSim::Input::DeviceInterface::getFactory();
-	for (const auto& type : types)
-	{
-		std::string qualifiedType = "SurgSim::Device::" + type;
-		if (factory.isRegistered(qualifiedType))
-		{
-			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << "Trying to use a " << type;
-			device = factory.create(qualifiedType, toolDeviceName);
-			if (device->initialize())
-			{
-				break;
-			}
-			else
-			{
-				device = nullptr;
-			}
-		}
-		else
-		{
-			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << "Cannot use a " << type <<
-				" because the executable was built without support for that device.  To use such a device, enable " <<
-				"the BUILD_DEVICE_* setting in cmake.";
-		}
-	}
-	if (device == nullptr)
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"The InputVtc example was unable to initialize an input device that provides poses, " <<
-			"so it will use a constant pose.";
-		device = std::make_shared<SurgSim::Device::IdentityPoseDevice>(toolDeviceName);
-		device->initialize();
-	}
-	return device;
 }
 
 int main(int argc, char* argv[])
@@ -227,13 +187,28 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 	runtime->addManager(inputManager);
 
-	static const char* const toolDeviceName = "Tool Device";
-	std::shared_ptr<SurgSim::Input::DeviceInterface> device = createDevice(toolDeviceName);
+	const std::string deviceName = "Tool_Device";
+	std::vector<std::string> types;
+	types.push_back("PhantomDevice");
+	types.push_back("NovintDevice");
+	types.push_back("MultiAxisDevice");
+	types.push_back("SixenseDevice");
+	types.push_back("LeapDevice");
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device =
+		SurgSim::Input::DeviceInterface::createDevice(deviceName, types);
+	if (device == nullptr)
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"The InputVtc example was unable to initialize an input device that provides poses, " <<
+			"so it will use a constant pose.";
+		device = std::make_shared<SurgSim::Device::IdentityPoseDevice>(deviceName);
+		SURGSIM_ASSERT(device->initialize()) << "Failed to initialize identity pose device.";
+	}
 	inputManager->addDevice(device);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
-	scene->addSceneElement(createBox("VTC Box", toolDeviceName));
-	scene->addSceneElement(createBoxForRawInput("Raw Input", toolDeviceName));
+	scene->addSceneElement(createBox("VTC Box", deviceName));
+	scene->addSceneElement(createBoxForRawInput("Raw Input", deviceName));
 
 	std::shared_ptr<SceneElement> plane =  createPlane("Plane");
 	plane->setPose(makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));

@@ -19,6 +19,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	CommonDeviceTests.cpp
+	DeviceInterfaceTests.cpp
 	InputComponentTest.cpp
 	InputManagerTest.cpp
 	OutputComponentTest.cpp
@@ -29,8 +30,9 @@ set(UNIT_TEST_HEADERS
 	TestDevice.h
 )
 
-set(LIBS 
-	SurgSimInput 
+set(LIBS
+	IdentityPoseDevice
+	SurgSimInput
 )
 
 surgsim_add_unit_tests(SurgSimInputTest)

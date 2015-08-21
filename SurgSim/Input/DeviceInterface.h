@@ -41,9 +41,7 @@ class DeviceInterface : public Framework::FactoryBase1<DeviceInterface, std::str
 {
 public:
 	/// Virtual destructor (empty).
-	virtual ~DeviceInterface()
-	{
-	}
+	virtual ~DeviceInterface();
 
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
@@ -84,6 +82,13 @@ public:
 
 	/// Removes any OutputProducer
 	virtual void clearOutputProducer() = 0;
+
+	/// Attempts to get a device from the factory, given a list of types that derive from DeviceInterface.
+	/// \param deviceName The name for the device.
+	/// \param types The un-qualified class names to try.  The elements will be tried in order, front to back.
+	/// \return An initialized device or nullptr if no device was available.
+	static std::shared_ptr<SurgSim::Input::DeviceInterface> createDevice(const std::string& deviceName,
+		std::vector<std::string> types);
 
 protected:
 	/// Finalize (de-initialize) the device.
