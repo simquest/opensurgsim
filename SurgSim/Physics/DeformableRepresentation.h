@@ -75,22 +75,26 @@ public:
 
 	/// Sets the numerical integration scheme
 	/// \param integrationScheme The integration scheme to use
-	/// \exception SurgSim::Framework::AssertionFailure raised if setLinearSolver
-	/// is called after the component has been awoken.
+	/// \exception SurgSim::Framework::AssertionFailure raised if called after the component has been initialized.
 	void setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme);
 
 	/// Gets the numerical integration scheme
 	/// \return The integration scheme currently in use
+	/// \note Default is SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT
 	SurgSim::Math::IntegrationScheme getIntegrationScheme() const;
+
+	/// \return The ode solver (dependent on the integration scheme)
+	/// \note Will return nullptr if called before initialization.
+	std::shared_ptr<SurgSim::Math::OdeSolver> getOdeSolver() const;
 
 	/// Sets the linear algebraic solver
 	/// \param linearSolver The linear algebraic solver to use
-	/// \exception SurgSim::Framework::AssertionFailure raised if setLinearSolver
-	/// is called after the component has been awoken.
+	/// \exception SurgSim::Framework::AssertionFailure raised if called after the component has been initialized.
 	void setLinearSolver(SurgSim::Math::LinearSolver linearSolver);
 
 	/// Gets the linear algebraic solver
 	/// \return The linear solver currently in use
+	/// \note Default is SurgSim::Math::LINEARSOLVER_LU
 	SurgSim::Math::LinearSolver getLinearSolver() const;
 
 	/// Add an external generalized force applied on a specific localization
@@ -135,9 +139,8 @@ public:
 	void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 protected:
-	bool doWakeUp() override;
-
 	bool doInitialize() override;
+	bool doWakeUp() override;
 
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
@@ -176,9 +179,6 @@ protected:
 
 	/// Linear algebraic solver used
 	SurgSim::Math::LinearSolver m_linearSolver;
-
-	/// Specify if the Ode Solver needs to be (re)loaded (do not exist yet, or integration scheme has changed)
-	bool m_needToReloadOdeSolver;
 
 	/// Ode solver (its type depends on the numerical integration scheme)
 	std::shared_ptr<SurgSim::Math::OdeSolver> m_odeSolver;

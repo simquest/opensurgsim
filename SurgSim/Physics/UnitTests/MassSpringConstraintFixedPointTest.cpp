@@ -63,7 +63,7 @@ public:
 
 		// Update position in only 1 timestep
 		// Forward Euler for velocity, backward Euler for position
-		m_massSpring->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
+		m_massSpring->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED);
 
 		m_massSpring->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		m_massSpring->wakeUp();

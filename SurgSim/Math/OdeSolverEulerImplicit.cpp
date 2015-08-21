@@ -75,7 +75,7 @@ void OdeSolverEulerImplicit::solve(double dt, const OdeState& currentState, OdeS
 
 	if (m_maximumIteration > 1)
 	{
-		m_previousSolution = Vector::Zero(m_solution.size());
+		m_previousSolution = Vector::Zero(currentState.getNumDof());
 	}
 
 	// Prepare the newState to be used in the loop, it starts as the current state.

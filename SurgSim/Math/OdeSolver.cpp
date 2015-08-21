@@ -24,8 +24,6 @@ namespace Math
 
 OdeSolver::OdeSolver(OdeEquation* equation) : m_equation(*equation)
 {
-	allocate(m_equation.getInitialState()->getPositions().size());
-
 	// Default linear solver
 	setLinearSolver(std::make_shared<LinearSparseSolveAndInverseLU>());
 }
@@ -55,13 +53,6 @@ const Matrix& OdeSolver::getComplianceMatrix() const
 	return m_complianceMatrix;
 }
 
-void OdeSolver::allocate(size_t size)
-{
-	m_systemMatrix.resize(static_cast<SparseMatrix::Index>(size), static_cast<SparseMatrix::Index>(size));
-	m_complianceMatrix.resize(size, size);
-	m_solution.resize(size);
-	m_rhs.resize(size);
-}
 
 void OdeSolver::computeMatrices(double dt, const OdeState& state, bool computeCompliance)
 {

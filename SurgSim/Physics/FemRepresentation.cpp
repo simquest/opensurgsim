@@ -19,7 +19,6 @@
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
