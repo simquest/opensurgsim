@@ -17,7 +17,7 @@
 #define SURGSIM_BLOCKS_IMPLICITSURFACE_H
 
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -29,10 +29,24 @@ namespace Blocks
 	static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 	///@}
 
+	/// Builds a series of SceneElements enabling the rendering of a screen-space surface, all graphics object that
+	/// should be rendered as a surface need to be in the render group GROUP_IMPLICIT_SURFACE.
+	/// The rest is done by the graphics system.
+	/// All of the elements added are \sa RenderPass elements
+	/// \param camera the view camera that is used for this pass
+	/// \param sphereRadius the radius in meters that each point sprite sphere should have
+	/// \param sphereScale the scaling factor for the point sprite sphere based on distance from the camera
+	/// \param textureSize the size of the render textures, not including the final pass that takes the size of the
+	///			screen
+	/// \param color the color to use for the final surface shading
+	/// \param showDebug whether to show debug information
 	std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(
-				const float& sphereRadius, const float& sphereScale, 
-				const int& textureSize, const Math::Vector4f& color, 
-				std::shared_ptr<Graphics::OsgViewElement> viewElement, bool debug);
+				std::shared_ptr<Graphics::Camera> camera,
+				const float& sphereRadius,
+				const float& sphereScale,
+				const int& textureSize,
+				const Math::Vector4f& color,
+				bool showDebug);
 } // Blocks
 } // SurgSim
 

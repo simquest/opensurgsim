@@ -32,7 +32,7 @@ namespace Blocks
 {
 std::shared_ptr<Graphics::RenderPass> createDepthPass(
 	std::shared_ptr<Framework::TransferPropertiesBehavior> copier,
-	std::shared_ptr<Graphics::OsgViewElement> viewElement,
+	std::shared_ptr<Graphics::Camera> camera,
 	const float& sphereRadius,
 	const float& sphereScale,
 	int textureSize, bool debug)
@@ -41,13 +41,14 @@ std::shared_ptr<Graphics::RenderPass> createDepthPass(
 	renderPass->getCamera()->setRenderGroupReference(GROUP_IMPLICIT_SURFACE);
 	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
 
-	copier->connect(viewElement->getPoseComponent(), "Pose", renderPass->getCamera(), "LocalPose");
-	copier->connect(viewElement->getCamera(), "ProjectionMatrix", renderPass->getCamera() , "ProjectionMatrix");
+	copier->connect(camera, "Pose", renderPass->getCamera(), "LocalPose");
+	copier->connect(camera, "ProjectionMatrix", renderPass->getCamera() , "ProjectionMatrix");
 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 0, true);
 	renderPass->setRenderTarget(renderTarget);
 
-	auto material = Graphics::buildMaterial("Shaders/implicit_surface/depth.vert", "Shaders/implicit_surface/depth.frag");
+	auto material = Graphics::buildMaterial("Shaders/implicit_surface/depth.vert",
+											"Shaders/implicit_surface/depth.frag");
 
 	auto texture = std::make_shared<Graphics::OsgTexture2d>();
 	texture->setIsPointSprite(true);
@@ -89,7 +90,8 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 1, false);
 	renderPass->setRenderTarget(renderTarget);
 
-	std::shared_ptr<Graphics::OsgMaterial> material = Graphics::buildMaterial("Shaders/implicit_surface/normal.vert", "Shaders/implicit_surface/normal.frag");
+	auto material = Graphics::buildMaterial("Shaders/implicit_surface/normal.vert",
+											"Shaders/implicit_surface/normal.frag");
 
 	material->addUniform("sampler2D", "depthMap");
 	material->setValue("depthMap", depthMap);
@@ -117,7 +119,7 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 	return renderPass;
 }
 
-std::shared_ptr<Framework::SceneElement> createShadingQuad(
+std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	std::shared_ptr<Framework::TransferPropertiesBehavior> copier,
 	std::shared_ptr<Graphics::Camera> camera,
 	std::shared_ptr<Graphics::Texture> depthMap,
@@ -125,9 +127,18 @@ std::shared_ptr<Framework::SceneElement> createShadingQuad(
 	const Math::Vector4f& color,
 	int width, int height)
 {
-	auto element = std::make_shared<Framework::BasicSceneElement>("ImplicitSurfaceShading");
+	auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceShadingPass");
 
-	auto material = Graphics::buildMaterial("Shaders/implicit_surface/shading.vert", "Shaders/implicit_surface/shading.frag");
+	auto renderCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(renderPass->getCamera());
+	renderCamera->setViewport(0, 0, width, height);
+	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, width, 0, height);
+	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
+	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
+	renderCamera->setRenderGroupReference("ImplicitSurfaceShading");
+
+	auto material = Graphics::buildMaterial("Shaders/implicit_surface/shading.vert",
+											"Shaders/implicit_surface/shading.frag");
 	material->addUniform("sampler2D", "depthMap");
 	material->setValue("depthMap", depthMap);
 	material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
@@ -139,52 +150,46 @@ std::shared_ptr<Framework::SceneElement> createShadingQuad(
 	material->addUniform("mat4", "inverseProjectionMatrix");
 
 	copier->connect(camera, "FloatInverseProjectionMatrix", material, "inverseProjectionMatrix");
-	
-	auto renderCamera = std::make_shared<Graphics::OsgCamera>("Camera");
-	renderCamera->setViewport(0, 0, width, height);
-	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, width, 0, height);
-	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
-	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
-	renderCamera->setRenderGroupReference("ImplicitSurfaceShading");
-	element->addComponent(renderCamera);
-	
+
+	renderPass->setMaterial(material);
+
 	auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics");
 	graphics->setSize(width , height);
 	graphics->setLocation(0, 0);
-	graphics->setMaterial(material);
 	graphics->setGroupReference("ImplicitSurfaceShading");
-	element->addComponent(graphics);
-	element->addComponent(material);
-	return element;
+	renderPass->addComponent(graphics);
+
+	return renderPass;
 }
 
-std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(const float& sphereRadius, const float& sphereScale, const int& textureSize, const Math::Vector4f& color, std::shared_ptr<Graphics::OsgViewElement> viewElement, bool debug)
+std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(std::shared_ptr<Graphics::Camera> camera,
+			const float& sphereRadius,
+			const float& sphereScale, const int& textureSize,
+			const Math::Vector4f& color,
+			bool showDebug)
 {
 	auto copier =  std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
 	copier->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_GRAPHICS);
-	viewElement->addComponent(copier);
 
-	std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
-	int screenWidth = dimensions[0];
-	int screenHeight = dimensions[1];
+	int x, y, width, height;
+	camera->getViewport(&x, &y, &width, &height);
 
-	auto depthPass = createDepthPass(copier, viewElement, sphereRadius, sphereScale, 1024, debug);
+	auto depthPass = createDepthPass(copier, camera, sphereRadius, sphereScale, textureSize, showDebug);
 
-	auto normalPass = createNormalPass(copier, viewElement->getCamera(), depthPass->getRenderTarget()->getDepthTarget(), 1024, debug);
+	auto normalPass = createNormalPass(copier, camera, depthPass->getRenderTarget()->getDepthTarget(),
+									   textureSize, showDebug);
 
-
-	// Shading Pass //
-
-	auto shader = createShadingQuad(copier, viewElement->getCamera(),
+	auto shadingPass = createShadingPass(copier, camera,
 									depthPass->getRenderTarget()->getDepthTarget(),
 									normalPass->getRenderTarget()->getColorTarget(0),
-									color, screenWidth, screenHeight);
+									color, width, height);
+
+	depthPass->addComponent(copier);
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> result;
 	result.push_back(depthPass);
 	result.push_back(normalPass);
-	result.push_back(shader);
+	result.push_back(shadingPass);
 
 	return result;
 }

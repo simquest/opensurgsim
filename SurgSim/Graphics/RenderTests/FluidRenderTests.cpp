@@ -46,8 +46,9 @@ protected:
 TEST_F(FluidRenderTests, PointSpriteFluid)
 {
 	viewElement->enableManipulator(true);
-	std::vector<std::shared_ptr<Framework::SceneElement>> surface = 
-		Blocks::createImplicitSurface(0.01f, 800.0f, 1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0), viewElement, false);
+	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
+		Blocks::createImplicitSurface(viewElement->getCamera(), 0.01f, 800.0f, 1024,
+									  Math::Vector4f(0.3, 0.0, 0.05, 1.0), false);
 
 	for (auto element : surface)
 	{
