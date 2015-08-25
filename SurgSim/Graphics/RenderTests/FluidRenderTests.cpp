@@ -39,7 +39,7 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
-using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::makeRigidTranslation;
 
 namespace SurgSim
 {
@@ -73,7 +73,7 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 
 	renderPass->setProjectionMatrix(defaultCamera->getProjectionMatrix());
 	renderPass->setRenderGroupReference("DepthPass");
-	renderPass->setGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+	renderPass->setGroupReference(Graphics::Representation::DefaultGroupName);
 
 	std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
 
@@ -93,27 +93,26 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 
 	// Create the point cloud
 	std::vector<Vector3d> vertices = makeCube();
-	auto graphics = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation>("Cloud");
+	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
 	graphics->setPointSize(20.0f);
 
-	graphics->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.1)));
-	for (auto vertex : vertices)
+	graphics->setLocalPose(makeRigidTranslation(Vector3d(0.0, 0.0, -0.1)));
+	for (const auto& vertex : vertices)
 	{
-		graphics->getVertices()->addVertex(SurgSim::Graphics::PointCloud::VertexType(vertex));
+		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));
 	}
 
 	graphics->addGroupReference("DepthPass");
 
 	// Create material to transport the Textures for the point sprite
-	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("psMaterial");
+	auto material = std::make_shared<Graphics::OsgMaterial>("psMaterial");
 	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/fluid_pointsprite");
 	ASSERT_TRUE(program != nullptr);
 	material->setProgram(program);
-	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+	auto texture = std::make_shared<Graphics::OsgTexture2d>();
 	texture->setIsPointSprite(true);
 
-	auto pointSpriteUniform =
-		std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("pointsprite");
+	auto pointSpriteUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("pointsprite");
 	pointSpriteUniform->set(texture);
 	material->addUniform(pointSpriteUniform);
 	graphics->setMaterial(material);
@@ -121,7 +120,7 @@ TEST_F(FluidRenderTests, PointSpriteDepth)
 	renderPass->setMaterial(material);
 	viewElement->addComponent(renderPass);
 
-	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("PointSprites");
+	auto sceneElement = std::make_shared<Framework::BasicSceneElement>("PointSprites");
 	sceneElement->addComponent(graphics);
 	sceneElement->addComponent(material);
 
