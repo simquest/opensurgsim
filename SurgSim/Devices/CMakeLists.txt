@@ -18,7 +18,7 @@ add_subdirectory(IdentityPoseDevice)
 add_subdirectory(Keyboard)
 add_subdirectory(Mouse)
 
-set(DEVICES
+set(OPTIONAL_DEVICES
 	LabJack
 	Leap
 	MultiAxis
@@ -31,25 +31,35 @@ set(DEVICES
 	TrackIR
 )
 
-set(SURGSIM_DEVICES_DOCUMENTATION
-	devices.dox
-)
-
-set(SURGSIM_DEVICES_LIBRARIES "SurgSimDeviceFilters;IdentityPoseDevice;KeyboardDevice;MouseDevice")
-
-foreach(DEVICE ${DEVICES})
+set(DEVICE_LIBRARIES "SurgSimDeviceFilters;IdentityPoseDevice;KeyboardDevice;MouseDevice")
+set(DEVICE_DOCUMENTATION devices.dox)
+foreach(DEVICE ${OPTIONAL_DEVICES})
 	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
 	option(BUILD_DEVICE_${DEVICE_UPPER_CASE} "Build ${DEVICE} device." OFF)
 	if(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 		add_subdirectory(${DEVICE})
-		list(APPEND SURGSIM_DEVICES_DOCUMENTATION ${DEVICE}/${DEVICE}.dox)
-		set(SURGSIM_DEVICES_LIBRARIES "${SURGSIM_DEVICES_LIBRARIES};${DEVICE}Device")
+		list(APPEND DEVICE_DOCUMENTATION ${DEVICE}/${DEVICE}.dox)
+		set(DEVICE_LIBRARIES "${DEVICE_LIBRARIES};${DEVICE}Device")
 	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
 endforeach(DEVICE)
 
-set(SURGSIM_DEVICES_LIBRARIES ${SURGSIM_DEVICES_LIBRARIES} PARENT_SCOPE)
+set(SURGSIM_DEVICES_SOURCES
+	DeviceUtilities.cpp
+)
 
-surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS}")
+set(SURGSIM_DEVICES_HEADERS
+	DeviceUtilities.h
+)
 
-add_custom_target(SurgSimDevicesDocumentation SOURCES ${SURGSIM_DEVICES_DOCUMENTATION})
+surgsim_add_library(
+	SurgSimDevices
+	"${SURGSIM_DEVICES_SOURCES}"
+	"${SURGSIM_DEVICES_HEADERS}"
+)
+
+target_link_libraries(SurgSimDevices SurgSimMath ${DEVICE_LIBRARIES})
+
+surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS};${DEVICE_HEADERS}")
+
+add_custom_target(SurgSimDevicesDocumentation SOURCES ${DEVICE_DOCUMENTATION})
 set_target_properties(SurgSimDevicesDocumentation PROPERTIES FOLDER "Devices")

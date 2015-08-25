@@ -33,11 +33,10 @@ set(HEADERS
 surgsim_add_executable(InputVtc "${SOURCES}" "${HEADERS}")
 
 set(LIBS 
-	IdentityPoseDevice
 	SurgSimBlocks
+	SurgSimDevices
 	SurgSimGraphics
 	SurgSimMath
-	${SURGSIM_DEVICES_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
 )
 

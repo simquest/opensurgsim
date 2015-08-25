@@ -16,7 +16,6 @@
 
 set(SURGSIM_INPUT_SOURCES
 	CommonDevice.cpp
-	DeviceInterface.cpp
 	InputComponent.cpp
 	InputManager.cpp
 	OutputComponent.cpp

@@ -13,31 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Input/DeviceInterface.h"
+#include "SurgSim/Devices/DeviceUtilities.h"
 
+#include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Framework/Log.h"
+
 
 namespace SurgSim
 {
-namespace Input
+namespace Device 
 {
 
-DeviceInterface::~DeviceInterface()
+std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::string>& classNames,
+		const std::string& name)
 {
-}
-
-std::shared_ptr<DeviceInterface> DeviceInterface::createDevice(const std::string& deviceName,
-	std::vector<std::string> types)
-{
-	std::shared_ptr<DeviceInterface> device;
-	auto& factory = getFactory();
-	for (const auto& type : types)
+	std::shared_ptr<Input::DeviceInterface> device;
+	auto& factory = Input::DeviceInterface::getFactory();
+	for (const auto& className : classNames)
 	{
-		std::string qualifiedType = "SurgSim::Device::" + type;
+		std::string qualifiedType = "SurgSim::Device::" + className;
 		if (factory.isRegistered(qualifiedType))
 		{
-			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Trying to create a " << type;
-			device = factory.create(qualifiedType, deviceName);
+			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Trying to create a " << className;
+			device = factory.create(qualifiedType, name);
 			if (device->initialize())
 			{
 				break;
@@ -49,7 +47,7 @@ std::shared_ptr<DeviceInterface> DeviceInterface::createDevice(const std::string
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Cannot create a " << type <<
+			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Cannot create a " << className <<
 				" because the executable was built without support for that device.  To use such a device, enable " <<
 				"the BUILD_DEVICE_* setting in cmake.";
 		}
@@ -57,6 +55,6 @@ std::shared_ptr<DeviceInterface> DeviceInterface::createDevice(const std::string
 	return device;
 }
 
-}; // namespace Input
+}; // namespace Device
 }; // namespace SurgSim
 
