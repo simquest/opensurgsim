@@ -61,7 +61,8 @@ static const std::string GROUP_SHADOW_RECEIVER = "Shadowed";
 std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 			std::shared_ptr<Framework::Component> camera,
 			std::shared_ptr<Framework::Component> light,
-			int textureSize,
+			int depthTextureSize,
+			int shadowTextureSize,
 			std::array<double, 6> lightCameraProjection,
 			bool useBlur,
 			double blurRadius,

@@ -36,11 +36,11 @@ OsgRenderTarget<T>::OsgRenderTarget() :
 
 template <class T>
 OsgRenderTarget<T>::OsgRenderTarget(
-		int width,
-		int height,
-		double scale,
-		int colorCount,
-		bool useDepth) :
+	int width,
+	int height,
+	double scale,
+	int colorCount,
+	bool useDepth) :
 	m_width(width * scale),
 	m_height(height * scale),
 	m_colorTargetCount(0),
@@ -73,9 +73,9 @@ int OsgRenderTarget<T>::setColorTargetCount(int count)
 	// Keep the other texture allocated when the count goes down
 	// Rendertargets are probably not going to change that much once set up
 	// #memory
-	for (int i = m_colorTargetCount; i<result; ++i)
+	for (int i = m_colorTargetCount; i < result; ++i)
 	{
-		setupTexture(TARGETTYPE_COLORBASE+i);
+		setupTexture(TARGETTYPE_COLORBASE + i);
 	}
 	m_colorTargetCount = result;
 	return result;
@@ -154,8 +154,8 @@ void OsgRenderTarget<T>::setupTexture(int type)
 		osg::Texture* osgTexture = m_textures[type]->getOsgTexture();
 		// We are not dealing with mipmaps, fix up the filters to enable rendering to FBO
 		// see http://www.opengl.org/wiki/Common_Mistakes#Creating_a_complete_texture
-		osgTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
-		osgTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+		osgTexture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR);
+		osgTexture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
 		osgTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 		osgTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
 		if (type == TARGETTYPE_DEPTH)
@@ -163,8 +163,9 @@ void OsgRenderTarget<T>::setupTexture(int type)
 			osgTexture->setInternalFormat(GL_DEPTH_COMPONENT32F);
 			osgTexture->setSourceFormat(GL_DEPTH_COMPONENT);
 			osgTexture->setSourceType(GL_FLOAT);
-			osgTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::NEAREST);
-			osgTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::NEAREST);
+			osgTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+			osgTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+			osgTexture->setBorderColor(osg::Vec4(1.0, 1.0, 1.0, 1.0));
 		}
 		if (type >= TARGETTYPE_COLORBASE)
 		{

@@ -36,5 +36,5 @@ void main(void)
 
 	float depth = texture2D(depthMap, lightCoord3.xy);
 
-	gl_FragColor = vec4(depth + 0.01 > lightCoord3.z ? 0.0 : 1.0);
+	gl_FragColor = vec4(depth + 0.01 > lightCoord3.z || lightCoord3.z > 1.0 ? 0.0 : 1.0);
 }
