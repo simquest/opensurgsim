@@ -40,6 +40,11 @@ namespace Input
 class DeviceInterface : public Framework::FactoryBase1<DeviceInterface, std::string>
 {
 public:
+	/// Virtual destructor (empty).
+	virtual ~DeviceInterface()
+	{
+	}
+
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
 
