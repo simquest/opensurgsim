@@ -155,7 +155,7 @@ void OsgRenderTarget<T>::setupTexture(int type)
 		// We are not dealing with mipmaps, fix up the filters to enable rendering to FBO
 		// see http://www.opengl.org/wiki/Common_Mistakes#Creating_a_complete_texture
 		osgTexture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR);
-		osgTexture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+		osgTexture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR);
 		osgTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 		osgTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
 		if (type == TARGETTYPE_DEPTH)
