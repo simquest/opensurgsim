@@ -27,7 +27,6 @@
 #include <OVR_CAPI_0_5_0.h>
 #endif
 
-
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Oculus/OculusDevice.h"
@@ -90,7 +89,7 @@ struct OculusScaffold::StateData
 };
 
 OculusScaffold::OculusScaffold() :
-	SurgSim::Framework::BasicThread("OculusScaffold"),
+	Framework::BasicThread("OculusScaffold"),
 	m_logger(Logger::getLogger("Devices/Oculus")),
 	m_state(new StateData)
 {
@@ -100,11 +99,6 @@ OculusScaffold::OculusScaffold() :
 	// positional tracking is done at 60Hz.
 	setRate(1000.0);
 
-#if 6 == OVR_MAJOR_VERSION
-	SURGSIM_ASSERT(ovrSuccess == ovr_Initialize(nullptr)) << "Oculus SDK initialization failed.";
-#elif 5 == OVR_MAJOR_VERSION
-	SURGSIM_ASSERT(ovrTrue == ovr_Initialize(nullptr)) << "Oculus SDK initialization failed.";
-#endif
 }
 
 OculusScaffold::~OculusScaffold()
@@ -119,7 +113,7 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 	int numOfAvailableDevices = ovrHmd_Detect();
 	if (numOfAvailableDevices < 1)
 	{
-		SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "No available Oculus device detected.";
+		SURGSIM_LOG_SEVERE(m_logger) << "No available Oculus device detected.";
 	}
 	else
 	{
@@ -131,7 +125,7 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 
 		if (info->handle == nullptr)
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to obtain a handle to Oculus Device." <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Failed to obtain a handle to Oculus Device." <<
 															"Is an Oculus device plugged in?";
 		}
 		else
@@ -160,10 +154,10 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 				ovrMatrix4f rightProjection = ovrMatrix4f_Projection(defaultRightFov, nearPlane, farPlane,
 																	ovrProjectionModifier::ovrProjection_RightHanded);
 
-				inputData.matrices().set(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX,
+				inputData.matrices().set(DataStructures::Names::LEFT_PROJECTION_MATRIX,
 											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
 												(&leftProjection.M[0][0]).cast<double>());
-				inputData.matrices().set(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX,
+				inputData.matrices().set(DataStructures::Names::RIGHT_PROJECTION_MATRIX,
 											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
 												(&rightProjection.M[0][0]).cast<double>());
 
@@ -174,8 +168,7 @@ bool OculusScaffold::registerDevice(OculusDevice* device)
 			}
 			else
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << __FUNCTION__ << "Failed to configure an Oculus Device." <<
-																" Registration failed";
+				SURGSIM_LOG_SEVERE(m_logger) << "Failed to configure an Oculus Device. Registration failed";
 			}
 		}
 
@@ -214,14 +207,21 @@ bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
 		stop();
 	}
 
-	SURGSIM_LOG_IF(!result, m_logger, SEVERE) << __FUNCTION__ << "Attempted to release a non-registered device.";
+	SURGSIM_LOG_IF(!result, m_logger, SEVERE) << "Attempted to release a non-registered device.";
 
 	return result;
 }
 
 bool OculusScaffold::doInitialize()
 {
-	return true;
+#if 6 == OVR_MAJOR_VERSION
+	bool success = (ovrSuccess == ovr_Initialize(nullptr));
+#elif 5 == OVR_MAJOR_VERSION
+	bool success = (ovrTrue == ovr_Initialize(nullptr));
+#endif
+
+	SURGSIM_LOG_IF(!success, m_logger, SEVERE) << "Oculus SDK initialization failed.";
+	return success;
 }
 
 bool OculusScaffold::doStartUp()
@@ -253,11 +253,11 @@ bool OculusScaffold::doUpdate(double dt)
 									ovrPose.Orientation.y, ovrPose.Orientation.z);
 			RigidTransform3d pose = makeRigidTransform(orientation, position);
 
-			inputData.poses().set(SurgSim::DataStructures::Names::POSE, pose);
+			inputData.poses().set(DataStructures::Names::POSE, pose);
 		}
 		else
 		{
-			inputData.poses().reset(SurgSim::DataStructures::Names::POSE);
+			inputData.poses().reset(DataStructures::Names::POSE);
 		}
 
 		device->deviceObject->pushInput();
@@ -269,9 +269,9 @@ bool OculusScaffold::doUpdate(double dt)
 SurgSim::DataStructures::DataGroup OculusScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
-	builder.addPose(SurgSim::DataStructures::Names::POSE);
-	builder.addMatrix(SurgSim::DataStructures::Names::LEFT_PROJECTION_MATRIX);
-	builder.addMatrix(SurgSim::DataStructures::Names::RIGHT_PROJECTION_MATRIX);
+	builder.addPose(DataStructures::Names::POSE);
+	builder.addMatrix(DataStructures::Names::LEFT_PROJECTION_MATRIX);
+	builder.addMatrix(DataStructures::Names::RIGHT_PROJECTION_MATRIX);
 	return builder.createData();
 }
 
@@ -281,7 +281,7 @@ std::shared_ptr<OculusScaffold> OculusScaffold::getOrCreateSharedInstance()
 	{
 		return std::shared_ptr<OculusScaffold>(new OculusScaffold);
 	};
-	static SurgSim::Framework::SharedInstance<OculusScaffold> sharedInstance(creator);
+	static Framework::SharedInstance<OculusScaffold> sharedInstance(creator);
 	return sharedInstance.get();
 }
 
