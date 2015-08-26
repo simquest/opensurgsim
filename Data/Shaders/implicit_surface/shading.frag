@@ -24,8 +24,7 @@
 uniform sampler2D depthMap;
 uniform sampler2D normalMap;
 uniform mat4 inverseProjectionMatrix;
-uniform float maxDepth = 0.999999f;
-uniform vec3 lightDir = vec3(-0.5, 1.5, -5.);
+uniform vec3 light;
 uniform vec4 color;
 
 vec3 getEyeSpacePos(vec2 texCoord, float z)
@@ -38,6 +37,7 @@ vec3 getEyeSpacePos(vec2 texCoord, float z)
 
 void main(void)
 {
+    float maxDepth = 0.999999f;
     float depth = texture2D(depthMap, gl_TexCoord[0].xy).x;
     if (depth > maxDepth)
     {
@@ -48,10 +48,10 @@ void main(void)
     vec3 normal = normalize(texture2D(normalMap, gl_TexCoord[0].xy).xyz);
 
     // Need to use the vector from the vertex to the light, which is the negative of lightDir
-    float diffuse = max(0.0,dot(normalize(-lightDir),normal));
+    float diffuse = max(0.0,dot(normalize(-light),normal));
 
     const float shininess = 100.0;
-    float temp = max(dot(normalize(reflect(lightDir, normal)), normalize(-eyePos)), 0.0);
+    float temp = max(dot(normalize(reflect(light, normal)), normalize(-eyePos)), 0.0);
     float specular = temp / (shininess - temp * shininess + temp);
 
     gl_FragColor = color * diffuse + specular;

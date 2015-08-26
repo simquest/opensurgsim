@@ -16,8 +16,8 @@
 #ifndef SURGSIM_BLOCKS_IMPLICITSURFACE_H
 #define SURGSIM_BLOCKS_IMPLICITSURFACE_H
 
-#include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Graphics/Uniform.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -41,11 +41,12 @@ namespace Blocks
 	/// \param color the color to use for the final surface shading
 	/// \param showDebug whether to show debug information
 	std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(
-				std::shared_ptr<Graphics::Camera> camera,
-				const float& sphereRadius,
-				const float& sphereScale,
-				const int& textureSize,
-				const Math::Vector4f& color,
+				std::shared_ptr<Framework::Component> camera,
+				std::shared_ptr<Framework::Component> light,
+				std::shared_ptr<Graphics::Uniform<float>> sphereRadius,
+				std::shared_ptr<Graphics::Uniform<float>> sphereScale,
+				std::shared_ptr<Graphics::Uniform<int> > textureSize,
+				std::shared_ptr<Graphics::Uniform<Math::Vector4f>> color,
 				bool showDebug);
 } // Blocks
 } // SurgSim

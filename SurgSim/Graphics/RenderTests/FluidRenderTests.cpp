@@ -22,6 +22,7 @@
 #include "SurgSim/Blocks/ImplicitSurface.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -46,9 +47,28 @@ protected:
 TEST_F(FluidRenderTests, PointSpriteFluid)
 {
 	viewElement->enableManipulator(true);
+
+	auto light = std::make_shared<Graphics::OsgLight>("Light");
+	light->setDiffuseColor(Math::Vector4d(1.0, 1.0, 1.0, 1.0));
+	light->setSpecularColor(Math::Vector4d(0.8, 0.8, 0.8, 1.0));
+	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
+	light->setLocalPose(makeRigidTranslation(Math::Vector3d(-0.5, 1.5, -5.0)));
+
+	auto sphereRadius = std::make_shared<Graphics::OsgUniform<float>>("SphereRadius");
+	sphereRadius->set(0.01f);
+
+	auto sphereScale = std::make_shared<Graphics::OsgUniform<float>>("SphereScale");
+	sphereScale->set(800.0f);
+
+	auto textureSize = std::make_shared<Graphics::OsgUniform<int>>("TextureSize");
+	textureSize->set(1024);
+
+	auto color = std::make_shared<Graphics::OsgUniform<Math::Vector4f>>("Color");
+	color->set(Math::Vector4f(0.3, 0.0, 0.05, 1.0));
+
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
-		Blocks::createImplicitSurface(viewElement->getCamera(), 0.01f, 800.0f, 1024,
-									  Math::Vector4f(0.3, 0.0, 0.05, 1.0), false);
+		Blocks::createImplicitSurface(viewElement->getCamera(), light, sphereRadius, sphereScale, textureSize,
+									  color, false);
 
 	for (auto element : surface)
 	{
