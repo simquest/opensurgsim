@@ -32,7 +32,7 @@ namespace Device
 {
 
 /// Attempts to create and initialize a device from a list of devices to try
-/// \param classNames The un-qualified device class names to try. The elements will be tried in order, front to back.
+/// \param classNames The fully-qualified device class names to try. The elements will be tried in order, front to back.
 /// \param name The name to be given to the created device
 /// \return An initialized device or nullptr if no device was available.
 std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::string>& classNames,

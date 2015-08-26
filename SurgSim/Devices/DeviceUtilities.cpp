@@ -21,7 +21,7 @@
 
 namespace SurgSim
 {
-namespace Device 
+namespace Device
 {
 
 std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::string>& classNames,
@@ -31,25 +31,27 @@ std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::stri
 	auto& factory = Input::DeviceInterface::getFactory();
 	for (const auto& className : classNames)
 	{
-		std::string qualifiedType = "SurgSim::Device::" + className;
-		if (factory.isRegistered(qualifiedType))
+		if (factory.isRegistered(className))
 		{
 			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Trying to create a " << className;
-			device = factory.create(qualifiedType, name);
+			device = factory.create(className, name);
 			if (device->initialize())
 			{
+				SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Successfully created a " << className;
 				break;
 			}
 			else
 			{
 				device = nullptr;
+				SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Failed to initialize a " << className;
 			}
 		}
 		else
 		{
 			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Cannot create a " << className <<
 				" because the executable was built without support for that device.  To use such a device, enable " <<
-				"the BUILD_DEVICE_* setting in cmake.";
+				"the BUILD_DEVICE_* setting in cmake, and #include either the specific device's header or " <<
+				"SurgSim/Devices/Devices.h.";
 		}
 	}
 	return device;
