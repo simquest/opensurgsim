@@ -21,11 +21,15 @@
 
 #include "SurgSim/Blocks/ImplicitSurface.h"
 #include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgLight.h"
+#include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
-#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -38,15 +42,25 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct FluidRenderTests : public RenderTest
+TEST(FluidRenderTests, PointSpriteFluid)
 {
-protected:
+	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
+	auto graphicsManager = std::make_shared<Graphics::OsgManager>();
 
-};
+	runtime->addManager(graphicsManager);
+	runtime->addManager(std::make_shared<Framework::BehaviorManager>());
 
-TEST_F(FluidRenderTests, PointSpriteFluid)
-{
+	auto scene = runtime->getScene();
+
+	auto viewElement = std::make_shared<Graphics::OsgViewElement>("view element");
+	std::array<int, 2> position = {100, 100};
+	viewElement->getView()->setPosition(position);
+	viewElement->getView()->setWindowBorderEnabled(true);
+
+	scene->addSceneElement(viewElement);
+
 	viewElement->enableManipulator(true);
+
 
 	auto light = std::make_shared<Graphics::OsgLight>("Light");
 	light->setDiffuseColor(Math::Vector4d(1.0, 1.0, 1.0, 1.0));
@@ -75,6 +89,7 @@ TEST_F(FluidRenderTests, PointSpriteFluid)
 		scene->addSceneElement(element);
 	}
 
+
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
 
@@ -102,9 +117,8 @@ TEST_F(FluidRenderTests, PointSpriteFluid)
 
 	scene->addSceneElement(sceneElement);
 
+
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	graphicsManager->dumpDebugInfo();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
 	runtime->stop();
 }
