@@ -57,9 +57,18 @@ surgsim_add_library(
 	"${SURGSIM_DEVICES_HEADERS}"
 )
 
-target_link_libraries(SurgSimDevices SurgSimMath ${DEVICE_LIBRARIES})
+target_link_libraries(SurgSimDevices
+	SurgSimFramework
+	SurgSimInput
+	${DEVICE_LIBRARIES}
+)
+set_target_properties(SurgSimDevices PROPERTIES FOLDER "Devices")
 
 surgsim_create_library_header(Devices.h "${SURGSIM_DEVICES_HEADERS};${DEVICE_HEADERS}")
 
 add_custom_target(SurgSimDevicesDocumentation SOURCES ${DEVICE_DOCUMENTATION})
 set_target_properties(SurgSimDevicesDocumentation PROPERTIES FOLDER "Devices")
+
+if(BUILD_TESTING)
+	add_subdirectory(UnitTests)
+endif()

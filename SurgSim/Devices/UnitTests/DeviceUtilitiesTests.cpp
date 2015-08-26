@@ -14,28 +14,27 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the DeviceInterface class.
+/// Tests for the DeviceUtilities.
 
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>
 
+#include "SurgSim/Devices/DeviceUtilities.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Input/DeviceInterface.h"
-
-using SurgSim::Input::DeviceInterface;
 
 TEST(DeviceInterfaceTests, CreateDevice)
 {
 	const std::string name = "name";
 	std::vector<std::string> types;
-	EXPECT_EQ(nullptr, DeviceInterface::createDevice(name, types));
+	EXPECT_EQ(nullptr, SurgSim::Device::createDevice(types, name));
 
 	types.push_back("DoNotHave");
-	EXPECT_EQ(nullptr, DeviceInterface::createDevice(name, types));
+	EXPECT_EQ(nullptr, SurgSim::Device::createDevice(types, name));
 
-	types.push_back("IdentityPoseDevice");
-	auto device = DeviceInterface::createDevice(name, types);
+	types.push_back("SurgSim::Device::IdentityPoseDevice");
+	auto device = SurgSim::Device::createDevice(types, name);
 	ASSERT_NE(nullptr, device);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<SurgSim::Device::IdentityPoseDevice>(device));
 	EXPECT_EQ(name, device->getName());

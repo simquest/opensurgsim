@@ -18,22 +18,18 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	CommonDeviceTests.cpp
-	InputComponentTest.cpp
-	InputManagerTest.cpp
-	OutputComponentTest.cpp
-	TestDevice.cpp
+	DeviceUtilitiesTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
-	TestDevice.h
 )
 
 set(LIBS
 	IdentityPoseDevice
+	SurgSimDevices
 	SurgSimInput
 )
 
-surgsim_add_unit_tests(SurgSimInputTest)
+surgsim_add_unit_tests(SurgSimDevicesTest)
 
-set_target_properties(SurgSimInputTest PROPERTIES FOLDER "Input")
+set_target_properties(SurgSimDevicesTest PROPERTIES FOLDER "Devices")
