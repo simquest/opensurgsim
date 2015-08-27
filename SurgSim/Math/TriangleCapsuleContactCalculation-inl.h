@@ -61,39 +61,40 @@ bool calculateContactTriangleCapsule(
 	}
 	else
 	{
-		// The axis of the capsule intersects with the triangle face.
-		// Contact can be corrected either by moving along the capsule's normal or the triangle's normal. Calculate
-		// both and choose the one with the lower penetration depth. This gives four possible intersection corrections:
-		// - three along the capsule normal (explained below)
-		// - one along the triangle normal
-		// The lowest penetration depth out of these four is chosen as the contact data.
+		/* The axis of the capsule intersects with the triangle face.
+		   Contact can be corrected either by moving along the capsule's normal or the triangle's normal. Calculate
+		   both and choose the one with the lower penetration depth. This gives four possible intersection corrections:
+		   - three along the capsule normal (explained below)
+		   - one along the triangle normal
+		   The lowest penetration depth out of these four is chosen as the contact data.
+		*/
 		Vector3 normal[4];
 		Eigen::Matrix<T, 4, 1, MOpt> depth;
 		Vector3 contactPointOnCapsule[4];
 		Vector3 contactPointOnTriangle[4];
 
-		// Penetration depth along the capsule's normal:
-		// Capsule can be moved in three directions to remove intersection, one for each edge of the triangle. For
-		// each edge of the triangle, find the perpendicular vector for the edge and the capsule axis. This is the
-		// capsule normal. The penetration of the capsule into the triangle along this direction for each edge is found
-		// as follows:
-		// - The closest point to the capsule axis on this edge is P.
-		// - The projection of P on the capsule axis is PC.
-		// - The penetrationPointCapsule (from above) is PPC.
-		// - P, PC and PPC form a triangle.
-		// - Clamp the point PC to be within the capsule axis segment, making the point CPC.
-		// - From CPC, draw a vector along (PC -> P); This intersects the triangle at Q.
-		// - (P, PC, PPC) and (Q, CPC, PPC) are similar triangles.
-		// - Penetration depth is (distance(Q, CPC) + capsule radius), penetration normal is (CPC ->
-		//
-		//                               _,x PC                      tn
-		//                          _,-'    \                        ^
-		//                     _,-'        _,x cv1, CPC              |
-		//          tv0   _,-'        _,-'    \                      |
-		//         P  x-'---------x-'----------x-PPC-------------------------------x tv2
-		//          tv1           Q             \
-		//                                       x cv0
-		
+		/* Penetration depth along the capsule's normal:
+		   Capsule can be moved in three directions to remove intersection, one for each edge of the triangle. For
+		   each edge of the triangle, find the perpendicular vector for the edge and the capsule axis. This is the
+		   capsule normal. The penetration of the capsule into the triangle along this direction for each edge is found
+		   as follows:
+		   - The closest point to the capsule axis on this edge is P.
+		   - The projection of P on the capsule axis is PC.
+		   - The penetrationPointCapsule (from above) is PPC.
+		   - P, PC and PPC form a triangle.
+		   - Clamp the point PC to be within the capsule axis segment, making the point CPC.
+		   - From CPC, draw a vector along (PC -> P); This intersects the triangle at Q.
+		   - (P, PC, PPC) and (Q, CPC, PPC) are similar triangles.
+		   - Penetration depth is (distance(Q, CPC) + capsule radius), penetration normal is (CPC ->
+		  
+		                                 _,x PC                      tn
+		                            _,-'    \                        ^
+		                       _,-'        _,x cv1, CPC              |
+		           tv0   _,-'        _,-'    \                      |
+		           P  x-'---------x-'----------x-PPC-------------------------------x tv2
+		            tv1           Q             \
+		                                         x cv0
+		*/
 		Vector3 v[3] = {tv0, tv1, tv2};
 		
 		// Capsule axis points from above the triangle to below the triangle.
@@ -115,24 +116,25 @@ bool calculateContactTriangleCapsule(
 			contactPointOnCapsule[i] = pointOnCapsuleAxis + normal[i] * cr;
 		}
 
-		// Penetration depth along the triangle's normal:
-		//
-		//                          cv0
-		//                          /
-		//                         /
-		//               tv1      / P
-		//        tv0 x---x------x------x tv2
-		//                      /
-		//                     / Q
-		//                   cv1
-		//
-		// The axis of the capsule passes through the triangle. The line segment (P, cv1) is the part of the capsule
-		// axis which is under the triangle. If the point cv1 is projected onto the plane of the triangle, it may or
-		// may not be inside the triangle. If it is inside, then the deepest penetration point on the capsule axis is
-		// cv1. If the projection of cv1 on the plane of the triangle is outside the triangle, then the line segment
-		// (P, cv1) is clipped, such that the projection of the newly clipped edge (Q) is inside the triangle.
-		// Note: P here is *penetrationPointCapsule and
-		//		 Q is deeperEndOfCapsuleAxis, in the code below.
+		/* Penetration depth along the triangle's normal:
+		  
+		                            cv0
+		                            /
+		                           /
+		                 tv1      / P
+		          tv0 x---x------x------x tv2
+		                        /
+		                       / Q
+		                     cv1
+		  
+		   The axis of the capsule passes through the triangle. The line segment (P, cv1) is the part of the capsule
+		   axis which is under the triangle. If the point cv1 is projected onto the plane of the triangle, it may or
+		   may not be inside the triangle. If it is inside, then the deepest penetration point on the capsule axis is
+		   cv1. If the projection of cv1 on the plane of the triangle is outside the triangle, then the line segment
+		   (P, cv1) is clipped, such that the projection of the newly clipped edge (Q) is inside the triangle.
+		   Note: P here is *penetrationPointCapsule and
+		  		 Q is deeperEndOfCapsuleAxis, in the code below.
+		*/
 		normal[3] = -tn;
 		Vector3 deeperEndOfCapsuleAxis = (cv0.dot(normal[3]) > cv1.dot(normal[3])) ? cv0 : cv1;
 		if (std::abs(capsuleAxisProjectedOnTn) < (1.0 - EPSILON))
@@ -153,43 +155,44 @@ bool calculateContactTriangleCapsule(
 				}
 			}
 
-			// We have found Q (see comment above). Now, the point on the capsule that is deepest inside the triangle
-			// along the triangle normal is to be calculated. A ray starting from Q and going in the direction of the
-			// -tn would intersect the capsule at this deepest point.
-			//
-			//               tv1   P                       P   tv1
-			//      tv0 x-----x----x------x tv2      tv0 x-x---x-----------x tv2
-			//                    /                       /
-			//                   /                     Q x
-			//            ,     x Q              ,      /|
-			//            ,     |     ,          ,       |   ,
-			//             \,   |   ,/            \,     | ,/
-			//               ' -x- '                ' -_-x'
-			//                  R                         R
-			//           case 1: unclipped                   case 2: clipped
-			// 
-			// First, find the depth as if the capsule was a cylinder (see figure below). So, in the cross section, the
-			// shape's profile can be considered as a rectangle. QR' makes an angle theta with PQ. If the shape was a
-			// cylinder, then R' would be on the surface of the cylinder: then the distance of R' from PQ would be the
-			// radius of the cylinder, and S is the closest point on the axis of the cylinder to the point R'. Now, in
-			// triangle (S, Q, R'), |QR'| = |SR'| / sin(theta), and
-			//                         R' = Q + |QR'| * (normalized direction of ray from Q to R)
-			// 
-			//               tv1   P
-			//      tv0 x-----x----x------x tv2
-			//              /     /     /
-			//             /     /     /
-			//            /     x Q   /
-			//           /     /|    /
-			//          /     / |   /
-			//         /     /  |  /
-			//        /     /   | /
-			//       /   S x,_  |/
-			//      /         '-x
-			//                   R'
-			//
-			// Note: Q is deeperEndOfCapsuleAxis,
-			//       R' is pointOnCapsule in the code below.
+			/* We have found Q (see comment above). Now, the point on the capsule that is deepest inside the triangle
+			   along the triangle normal is to be calculated. A ray starting from Q and going in the direction of the
+			   -tn would intersect the capsule at this deepest point.
+			  
+			                 tv1   P                       P   tv1
+			        tv0 x-----x----x------x tv2      tv0 x-x---x-----------x tv2
+			                      /                       /
+			                     /                     Q x
+			              ,     x Q              ,      /|
+			              ,     |     ,          ,       |   ,
+			               \,   |   ,/            \,     | ,/
+			                 ' -x- '                ' -_-x'
+			                    R                         R
+			             case 1: unclipped                   case 2: clipped
+			   
+			   First, find the depth as if the capsule was a cylinder (see figure below). So, in the cross section, the
+			   shape's profile can be considered as a rectangle. QR' makes an angle theta with PQ. If the shape was a
+			   cylinder, then R' would be on the surface of the cylinder: then the distance of R' from PQ would be the
+			   radius of the cylinder, and S is the closest point on the axis of the cylinder to the point R'. Now, in
+			   triangle (S, Q, R'), |QR'| = |SR'| / sin(theta), and
+			                           R' = Q + |QR'| * (normalized direction of ray from Q to R)
+			   
+			                 tv1   P
+			        tv0 x-----x----x------x tv2
+			                /     /     /
+			               /     /     /
+			              /     x Q   /
+			             /     /|    /
+			            /     / |   /
+			           /     /  |  /
+			          /     /   | /
+			         /   S x,_  |/
+			        /         '-x
+			                     R'
+			  
+			   Note: Q is deeperEndOfCapsuleAxis,
+			         R' is pointOnCapsule in the code below.
+			*/
 			depth[3] = cr / std::sin(std::acos(std::abs(capsuleAxisProjectedOnTn)));
 			Vector3 pointOnCylinder = deeperEndOfCapsuleAxis + (normal[3] * depth[3]);
 
