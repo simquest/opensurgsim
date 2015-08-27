@@ -29,11 +29,58 @@
 
 #include <osgViewer/Scene>
 #include <osgDB/WriteFile>
+#include <osg/NodeVisitor>
+#include <osg/NodeCallback>
+#include <osg/Matrixf>
 
 using SurgSim::Graphics::OsgRepresentation;
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgGroup;
 using SurgSim::Graphics::OsgManager;
+
+
+class TransformUpdater : public osg::NodeCallback
+{
+	virtual void operator()(osg::Node* node, osg::NodeVisitor* nodeVisitor)
+	{
+		osgUtil::CullVisitor* cv = dynamic_cast<osgUtil::CullVisitor*>(nodeVisitor);
+		if (cv != nullptr)
+		{
+			auto mat = osg::computeLocalToWorld(nodeVisitor->getNodePath(), true);
+			m_uniform->set(mat);
+		}
+		traverse(node, nodeVisitor);
+	}
+
+public:
+	osg::ref_ptr<osg::Uniform> m_uniform;
+};
+
+class TransformModifier : public osg::NodeVisitor
+{
+public:
+	class TransformModifier() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
+	{
+
+	}
+
+	virtual void apply(osg::Transform& node) override
+	{
+		auto state = node.getOrCreateStateSet();
+		auto uniform = new osg::Uniform();
+		uniform->setName("modelMatrix");
+		uniform->setType(osg::Uniform::FLOAT_MAT4);
+
+		osg::Matrix matrix;
+		uniform->set(matrix);
+
+		state->addUniform(uniform);
+
+		auto callback = new TransformUpdater;
+		callback->m_uniform = uniform;
+		node.addCullCallback(callback);
+	}
+};
 
 namespace SurgSim
 {
@@ -94,6 +141,11 @@ bool OsgManager::addRepresentation(std::shared_ptr<SurgSim::Graphics::Representa
 	if (osgRepresentation)
 	{
 		result = Manager::addRepresentation(osgRepresentation);
+		if (result)
+		{
+			TransformModifier modifier;
+			osgRepresentation->getOsgNode()->accept(modifier);
+		}
 	}
 	else
 	{

@@ -64,7 +64,8 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView()->setDimensions(dimensions);
 
 	viewElement->getCamera()->setPerspectiveProjection(30, 1.0, 0.01, 10.0);
-
+	std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(viewElement->getCamera())->setMainCamera(true);
+	viewElement->getView()->setTargetScreen(1);
 	/// It's an OsgViewElement, we have an OsgView, turn on mapping of uniform and attribute values
 	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);
 

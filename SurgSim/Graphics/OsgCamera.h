@@ -115,6 +115,11 @@ public:
 
 	void getViewport(int* x, int* y, int* width, int* height) const override;
 
+	void setMainCamera(bool val);
+
+	bool isMainCamera();
+
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
@@ -146,6 +151,12 @@ private:
 	SurgSim::Math::Vector4d m_ambientColor;
 
 
+	/// Global uniforms
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_mainViewMatrixUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseMainViewMatrixUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_mainProjectionMatrix;
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseMainProjectionMatrixUniform;
+	bool m_isMainCamera;
 };
 
 };  // namespace Graphics

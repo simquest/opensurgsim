@@ -79,7 +79,12 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_camera(new osg::Camera()),
 	m_viewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("viewMatrix")),
 	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix")),
-	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor"))
+	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor")),
+	m_mainViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("mainViewMatrix")),
+	m_inverseMainViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseMainViewMatrix")),
+	m_mainProjectionMatrix(std::make_shared<OsgUniform<Matrix44f>>("mainProjectionMatrix")),
+	m_inverseMainProjectionMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseMainProjectionMatrix")),
+	m_isMainCamera(false)
 {
 	m_switch->removeChildren(0, m_switch->getNumChildren());
 	m_camera->setName(name + " Camera");
@@ -172,6 +177,15 @@ void OsgCamera::update(double dt)
 		m_camera->setViewMatrix(toOsg(viewMatrix));
 		m_viewMatrixUniform->set(floatMatrix);
 		m_inverseViewMatrixUniform->set(floatMatrix.inverse());
+
+		if (m_isMainCamera == true)
+		{
+			auto floatProjection = m_projectionMatrix.cast<float>();
+			m_mainProjectionMatrix->set(floatProjection);
+			m_inverseMainProjectionMatrixUniform->set(floatProjection.inverse());
+			m_mainViewMatrixUniform->set(floatMatrix);
+			m_inverseMainViewMatrixUniform->set(floatMatrix.inverse());
+		}
 	}
 }
 
@@ -280,6 +294,34 @@ void OsgCamera::getViewport(int* x, int* y, int* width, int* height) const
 	*y = viewPort->y();
 	*width = viewPort->width();
 	*height = viewPort->height();
+}
+
+void OsgCamera::setMainCamera(bool val)
+{
+	if (val != m_isMainCamera)
+	{
+		auto state = m_camera->getOrCreateStateSet();
+		if (val)
+		{
+			m_mainViewMatrixUniform->addToStateSet(state);
+			m_inverseMainViewMatrixUniform->addToStateSet(state);
+			m_mainProjectionMatrix->addToStateSet(state);
+			m_inverseMainProjectionMatrixUniform->addToStateSet(state);
+		}
+		else
+		{
+			m_mainViewMatrixUniform->removeFromStateSet(state);
+			m_inverseMainViewMatrixUniform->removeFromStateSet(state);
+			m_mainProjectionMatrix->removeFromStateSet(state);
+			m_inverseMainProjectionMatrixUniform->removeFromStateSet(state);
+		}
+		m_isMainCamera = val;
+	}
+}
+
+bool OsgCamera::isMainCamera()
+{
+	return m_isMainCamera;
 }
 
 void OsgCamera::setPerspectiveProjection(double fovy, double aspect, double near, double far)
