@@ -43,6 +43,7 @@ set(SURGSIM_MATH_SOURCES
 	OdeState.cpp
 	ParticlesShape.cpp
 	PlaneShape.cpp
+	SegmentMeshShape.cpp
 	Shape.cpp
 	SphereShape.cpp
 	SurfaceMeshShape.cpp
@@ -104,6 +105,7 @@ set(SURGSIM_MATH_HEADERS
 	PolynomialValues-inl.h
 	Quaternion.h
 	RigidTransform.h
+	SegmentMeshShape.h
 	Shape.h
 	Shapes.h
 	SparseMatrix.h

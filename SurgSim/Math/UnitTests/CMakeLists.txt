@@ -40,6 +40,7 @@ set(UNIT_TEST_SOURCES
 	PolynomialRootTests.cpp
 	PolynomialTests.cpp
 	PolynomialValuesTests.cpp
+	SegmentMeshShapeTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
 	TriangleCapsuleContactCalculationTests.cpp
