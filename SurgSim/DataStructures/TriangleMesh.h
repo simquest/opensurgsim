@@ -166,6 +166,11 @@ public:
 	/// \return the specified edge.
 	EdgeType& getEdge(size_t id);
 
+	/// Returns an array of the edge's vertices' positions
+	/// \param id the id of the edge
+	/// \return an array of the edge's vertices' positions
+	std::array<SurgSim::Math::Vector3d, 2> getEdgePositions(size_t id) const;
+
 	/// Retrieve a specific triangle
 	/// \throws SurgSim::Framework::AssertionFailure if the given triangle was deleted
 	/// \param id The id of the triangle to retrieve

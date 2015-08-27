@@ -688,6 +688,34 @@ TEST_F(TriangleMeshTest, GetTrianglePositions)
 	}
 }
 
+TEST_F(TriangleMeshTest, GetEdgePositions)
+{
+	MockTriangleMesh mesh;
+
+	// Initialization
+	auto normal = testNormals.begin();
+	for (auto position = testPositions.begin(); position != testPositions.end(); ++position)
+	{
+		mesh.createVertex(*position, *normal++);
+	}
+
+	for (auto vertices = testEdgeVertices.begin(); vertices != testEdgeVertices.end(); ++vertices)
+	{
+		mesh.createEdge(*vertices);
+	}
+
+	// Testing
+	for (size_t id = 0; id < mesh.getEdges().size(); ++id)
+	{
+		auto verticesPositions = mesh.getEdgePositions(id);
+
+		auto& vertexIds = mesh.getEdge(id).verticesId;
+
+		EXPECT_TRUE(mesh.getVertex(vertexIds[0]).position.isApprox(verticesPositions[0]));
+		EXPECT_TRUE(mesh.getVertex(vertexIds[1]).position.isApprox(verticesPositions[1]));
+	}
+}
+
 TEST_F(TriangleMeshTest, TriangleDeletionTest)
 {
 	typedef TriangleMeshPlain::VertexType VertexType;
