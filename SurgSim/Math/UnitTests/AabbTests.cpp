@@ -68,6 +68,11 @@ TEST(AabbdTests, makeAabb)
 	Aabbd aabb(makeAabb(one, two, three));
 	Aabbd expected(Vector3d(-1.0, -1.0, -1.0), Vector3d(1.0, 1.0, 1.0));
 	EXPECT_TRUE(expected.isApprox(aabb));
+
+	Vector3d four(2.0, 2.0, 2.0);
+	Aabbd aabb2(makeAabb(one, two, three, four));
+	Aabbd expected2(Vector3d(-1.0, -1.0, -1.0), Vector3d(2.0, 2.0, 2.0));
+	EXPECT_TRUE(expected2.isApprox(aabb2));
 }
 
 }
