@@ -110,6 +110,7 @@ set(SURGSIM_MATH_HEADERS
 	SphereShape.h
 	SurfaceMeshShape.h
 	SurfaceMeshShape-inl.h
+	TriangleCapsuleContactCalculation-inl.h
 	TriangleTriangleContactCalculation-inl.h
 	TriangleTriangleIntersection-inl.h
 	Valid.h

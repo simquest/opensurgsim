@@ -42,12 +42,14 @@ set(UNIT_TEST_SOURCES
 	PolynomialValuesTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
+	TriangleCapsuleContactCalculationTests.cpp
 	TriangleTriangleContactCalculationTests.cpp
 	TriangleTriangleIntersectionTests.cpp
 	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	MockCapsule.h
 	MockObject.h
 	MockTriangle.h
 	TriangleTriangleTestParameters.h
