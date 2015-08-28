@@ -52,15 +52,14 @@ struct OculusScaffold::DeviceData
 {
 	/// Constructor
 	/// \param device Device to be wrapped
-	/// \param index Index of Oculus device to be created. If exists, a valid handle will be held in 'handle'.
-	DeviceData(OculusDevice* device, int index) :
+	explicit DeviceData(OculusDevice* device) :
 		deviceObject(device),
 		handle(nullptr)
 	{
 #if 6 == OVR_MAJOR_VERSION
-		ovrHmd_Create(index, &handle);
+		ovrHmd_Create(0, &handle);
 #elif 5 == OVR_MAJOR_VERSION
-		handle = ovrHmd_Create(index);
+		handle = ovrHmd_Create(0);
 #endif
 	}
 
@@ -108,77 +107,104 @@ OculusScaffold::~OculusScaffold()
 
 bool OculusScaffold::registerDevice(OculusDevice* device)
 {
-	bool result = false;
-
-	int numOfAvailableDevices = ovrHmd_Detect();
-	if (numOfAvailableDevices < 1)
+	bool success = true;
+	if (!isRunning())
 	{
-		SURGSIM_LOG_SEVERE(m_logger) << "No available Oculus device detected.";
+		std::shared_ptr<SurgSim::Framework::Barrier> barrier = std::make_shared<SurgSim::Framework::Barrier>(2);
+		start(barrier);
+		barrier->wait(true); // Wait for initialize
+		barrier->wait(true); // Wait for startup
+		success = isInitialized();
 	}
-	else
+
+	if (success)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		SURGSIM_ASSERT(m_state->registeredDevices.size() < 1) << "There is one registered Oculus device already." <<
-																 "OculusScaffold only supports one device right now";
-
-		std::unique_ptr<DeviceData> info(new DeviceData(device, 0));
-
-		if (info->handle == nullptr)
+		const std::string deviceName = device->getName();
+		auto sameName = [&deviceName](const std::unique_ptr<DeviceData>& info)
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Failed to obtain a handle to Oculus Device." <<
-															"Is an Oculus device plugged in?";
+			return info->deviceObject->getName() == deviceName;
+		};
+		auto found = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(), sameName);
+
+		if (found == m_state->registeredDevices.end())
+		{
+			std::unique_ptr<DeviceData> info(new DeviceData(device));
+			success = doRegisterDevice(info.get());
+			if (success)
+			{
+				SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << ": Registered";
+				m_state->registeredDevices.emplace_back(std::move(info));
+			}
 		}
 		else
 		{
-#if 6 == OVR_MAJOR_VERSION
-			if (ovrSuccess == ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
-																	 ovrTrackingCap_MagYawCorrection |
-																	 ovrTrackingCap_Position, 0))
-#elif 5 == OVR_MAJOR_VERSION
-			if (ovrTrue == ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
-																  ovrTrackingCap_MagYawCorrection |
-																  ovrTrackingCap_Position, 0))
-#endif
-			{
-				DataGroup& inputData = info->deviceObject->getInputData();
-
-				// Query the HMD for the left and right projection matrices.
-				ovrFovPort defaultLeftFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
-				ovrFovPort defaultRightFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
-
-				float nearPlane = info->deviceObject->getNearPlane();
-				float farPlane = info->deviceObject->getFarPlane();
-
-				ovrMatrix4f leftProjection = ovrMatrix4f_Projection(defaultLeftFov, nearPlane, farPlane,
-																	ovrProjectionModifier::ovrProjection_RightHanded);
-				ovrMatrix4f rightProjection = ovrMatrix4f_Projection(defaultRightFov, nearPlane, farPlane,
-																	ovrProjectionModifier::ovrProjection_RightHanded);
-
-				inputData.matrices().set(DataStructures::Names::LEFT_PROJECTION_MATRIX,
-											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
-												(&leftProjection.M[0][0]).cast<double>());
-				inputData.matrices().set(DataStructures::Names::RIGHT_PROJECTION_MATRIX,
-											Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
-												(&rightProjection.M[0][0]).cast<double>());
-
-				m_state->registeredDevices.emplace_back(std::move(info));
-				SURGSIM_LOG_INFO(m_logger) << "Device " << getName() << ": registered.";
-
-				result = true;
-			}
-			else
-			{
-				SURGSIM_LOG_SEVERE(m_logger) << "Failed to configure an Oculus Device. Registration failed";
-			}
-		}
-
-		if (result && !isRunning())
-		{
-			start(); // Start the scaffold thread if not running.
+			SURGSIM_LOG_SEVERE(m_logger) << "Tried to register a device when the same name, '" <<
+				device->getName() << "', is already present!";
+			success = false;
 		}
 	}
 
-	return result;
+	return success;
+}
+
+bool OculusScaffold::doRegisterDevice(DeviceData* info)
+{
+	if (ovrHmd_Detect() < 1)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << "No available Oculus device detected.";
+		return false;
+	}
+
+	if (m_state->registeredDevices.size() > 0)
+	{
+		SURGSIM_LOG_SEVERE(m_logger)
+			<< "There is one registered Oculus device already. OculusScaffold only supports one device right now";
+		return false;
+	}
+
+	if (info->handle == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << "Failed to obtain a handle to Oculus Device. Is an Oculus device plugged in?";
+		return false;
+	}
+
+#if 6 == OVR_MAJOR_VERSION
+	if (ovrSuccess != ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
+															 ovrTrackingCap_MagYawCorrection |
+															 ovrTrackingCap_Position, 0))
+#elif 5 == OVR_MAJOR_VERSION
+	if (ovrTrue != ovrHmd_ConfigureTracking(info->handle, ovrTrackingCap_Orientation |
+														  ovrTrackingCap_MagYawCorrection |
+														  ovrTrackingCap_Position, 0))
+#endif
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << "Failed to configure an Oculus Device. Registration failed";
+		return false;
+	}
+
+	// Query the HMD for the left and right projection matrices.
+	ovrFovPort defaultLeftFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Left];
+	ovrFovPort defaultRightFov = info->handle->DefaultEyeFov[ovrEyeType::ovrEye_Right];
+
+	float nearPlane = info->deviceObject->getNearPlane();
+	float farPlane = info->deviceObject->getFarPlane();
+
+	ovrMatrix4f leftProjection = ovrMatrix4f_Projection(defaultLeftFov, nearPlane, farPlane,
+			ovrProjectionModifier::ovrProjection_RightHanded);
+	ovrMatrix4f rightProjection = ovrMatrix4f_Projection(defaultRightFov, nearPlane, farPlane,
+			ovrProjectionModifier::ovrProjection_RightHanded);
+
+	DataGroup& inputData = info->deviceObject->getInputData();
+	inputData.matrices().set(DataStructures::Names::LEFT_PROJECTION_MATRIX,
+			Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
+			(&leftProjection.M[0][0]).cast<double>());
+	inputData.matrices().set(DataStructures::Names::RIGHT_PROJECTION_MATRIX,
+			Eigen::Map<const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>
+			(&rightProjection.M[0][0]).cast<double>());
+	info->deviceObject->pushInput();
+
+	return true;
 }
 
 bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
@@ -215,13 +241,15 @@ bool OculusScaffold::unregisterDevice(const OculusDevice* const device)
 bool OculusScaffold::doInitialize()
 {
 #if 6 == OVR_MAJOR_VERSION
-	bool success = (ovrSuccess == ovr_Initialize(nullptr));
+	if (ovrSuccess != ovr_Initialize(nullptr))
 #elif 5 == OVR_MAJOR_VERSION
-	bool success = (ovrTrue == ovr_Initialize(nullptr));
+	if (ovrTrue != ovr_Initialize(nullptr))
 #endif
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << "Oculus SDK initialization failed.";
+	}
 
-	SURGSIM_LOG_IF(!success, m_logger, SEVERE) << "Oculus SDK initialization failed.";
-	return success;
+	return true;
 }
 
 bool OculusScaffold::doStartUp()
