@@ -34,6 +34,6 @@ void main(void)
 
 	// compute the coordinates of the incoming point in the space of the camera used
 	// to render the depth map
-	lightCoord = lightProjectionMatrix * lightViewMatrix * inverseViewMatrix * gl_ModelViewMatrix *  gl_Vertex;
+	lightCoord = lightProjectionMatrix * lightViewMatrix * inverseViewMatrix * gl_ModelViewMatrix * gl_Vertex;
 } 
  
