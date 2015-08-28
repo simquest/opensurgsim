@@ -48,10 +48,8 @@ std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::stri
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << "Cannot create a " << className <<
-				" because the executable was built without support for that device.  To use such a device, enable " <<
-				"the BUILD_DEVICE_* setting in cmake, and #include either the specific device's header or " <<
-				"SurgSim/Devices/Devices.h.";
+			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << className <<
+				" is not registered in the Devices factory.";
 		}
 	}
 	return device;
