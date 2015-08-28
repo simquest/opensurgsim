@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,10 +25,15 @@ namespace Device
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::LeapDevice, LeapDevice);
 
 LeapDevice::LeapDevice(const std::string& name) :
-	SurgSim::Input::CommonDevice(name, LeapScaffold::buildDeviceInputData()),
-	m_handType(HANDTYPE_RIGHT),
+	Input::CommonDevice(name, LeapScaffold::buildDeviceInputData()),
+	m_trackRightHand(true),
 	m_isProvidingImages(false)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, bool, TrackRightHand, isTrackingRightHand, setTrackRightHand);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, bool, TrackLeftHand, isTrackingLeftHand, setTrackLeftHand);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, bool, UseHmdTrackingMode, isUsingHmdTrackingMode,
+			setUseHmdTrackingMode);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, bool, ProvideImages, isProvidingImages, setProvideImages);
 }
 
 
@@ -40,34 +45,44 @@ LeapDevice::~LeapDevice()
 	}
 }
 
-void LeapDevice::setHandType(HandType type)
+void LeapDevice::setTrackRightHand(bool trackRightHand)
 {
-	m_handType = type;
+	m_trackRightHand = trackRightHand;
 }
 
-HandType LeapDevice::getHandType() const
+void LeapDevice::setTrackLeftHand(bool trackLeftHand)
 {
-	return m_handType;
+	setTrackRightHand(!trackLeftHand);
 }
 
-void LeapDevice::setTrackingMode(LeapTrackingMode mode)
+bool LeapDevice::isTrackingRightHand() const
+{
+	return m_trackRightHand;
+}
+
+bool LeapDevice::isTrackingLeftHand() const
+{
+	return !isTrackingRightHand();
+}
+
+void LeapDevice::setUseHmdTrackingMode(bool useHmdTrackingMode)
 {
 	if (isInitialized())
 	{
-		m_scaffold->setTrackingMode(mode);
+		m_scaffold->setUseHmdTrackingMode(useHmdTrackingMode);
 	}
-	m_requestedTrackingMode = mode;
+	m_requestedHmdTrackingMode = useHmdTrackingMode;
 }
 
-LeapTrackingMode LeapDevice::getTrackingMode() const
+bool LeapDevice::isUsingHmdTrackingMode() const
 {
 	if (isInitialized())
 	{
-		return m_scaffold->getTrackingMode();
+		return m_scaffold->isUsingHmdTrackingMode();
 	}
 	else
 	{
-		return m_requestedTrackingMode.getValue();
+		return m_requestedHmdTrackingMode.getValue();
 	}
 }
 
@@ -88,9 +103,9 @@ bool LeapDevice::initialize()
 	m_scaffold = LeapScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(isInitialized()) << getName() << " initialization failed, cannot get scaffold.";
 
-	if (m_requestedTrackingMode.hasValue())
+	if (m_requestedHmdTrackingMode.hasValue())
 	{
-		m_scaffold->setTrackingMode(m_requestedTrackingMode.getValue());
+		m_scaffold->setUseHmdTrackingMode(m_requestedHmdTrackingMode.getValue());
 	}
 
 	return m_scaffold->registerDevice(this);

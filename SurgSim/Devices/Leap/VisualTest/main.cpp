@@ -101,12 +101,12 @@ private:
 int main(int argc, char** argv)
 {
 	auto leftHand = std::make_shared<LeapDevice>("Left Hand");
-	leftHand->setHandType(SurgSim::Device::HANDTYPE_LEFT);
+	leftHand->setTrackLeftHand(true);
 	leftHand->setProvideImages(true);
 	leftHand->initialize();
 
 	auto rightHand = std::make_shared<LeapDevice>("Right Hand");
-	rightHand->setHandType(SurgSim::Device::HANDTYPE_RIGHT);
+	rightHand->setTrackRightHand(true);
 	rightHand->initialize();
 
 	std::shared_ptr<GlutWindow> window = std::make_shared<GlutWindow>();
