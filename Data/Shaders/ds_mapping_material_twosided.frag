@@ -72,7 +72,7 @@ void main(void)
 	calculateLigthing(lightDirNorm, normalDirNorm, eyeDirNorm, 
 		shininess, shadowAmount, vDiffuse, vSpecular);
 
-	vec3 color = (vAmbient + vDiffuse) * base + vSpecular;
+	vec3 color = vDiffuse * base + vSpecular;
 
 	vDiffuse = vertexDiffuseColor;
 	vSpecular = vertexSpecularColor;
@@ -80,8 +80,10 @@ void main(void)
 	calculateLigthing(lightDirNorm, -normalDirNorm, eyeDirNorm, 
 		shininess, shadowAmount, vDiffuse, vSpecular);
 
-	color += (vAmbient + vDiffuse) * base + vSpecular;
+	color += vDiffuse * base + vSpecular;
 
-	gl_FragColor.rgb = color / 2.0;
+	color += vAmbient * base;
+
+	gl_FragColor.rgb = color ;
 	gl_FragColor.a = 1.0;
 }

@@ -24,19 +24,7 @@ uniform sampler2D shadowMap;
 uniform float shininess;
 
 /// Oss supplied values
-struct LightSource {
-	vec4 diffuse; 
-	vec4 specular; 
-	vec4 position; 
-	float constantAttenuation; 
-	float linearAttenuation; 
-	float quadraticAttenuation;	
-};
-
-uniform LightSource lightSource;
-
 uniform vec4 ambientColor;
-
 
 /// Fragment shader supplied values
 varying vec3 lightDir;
@@ -86,7 +74,7 @@ void main(void)
 	calculateLigthing(lightDirNorm, normalDirNorm, eyeDirNorm, 
 		shininess, shadowAmount, vDiffuse, vSpecular);
 
-	vec3 color = (vAmbient + vDiffuse) * base + vSpecular;
+	vec3 color = vDiffuse * base + vSpecular;
 
 	vDiffuse = vertexDiffuseColor;
 	vSpecular = vertexSpecularColor;
@@ -94,8 +82,10 @@ void main(void)
 	calculateLigthing(lightDirNorm, -normalDirNorm, eyeDirNorm, 
 		shininess, shadowAmount, vDiffuse, vSpecular);
 
-	color += (vAmbient + vDiffuse) * base + vSpecular;
+	color += vDiffuse * base + vSpecular;
 
+	color += vAmbient * base;
+	
 	gl_FragColor.rgb = color;
 	gl_FragColor.a = 1.0;
 }
