@@ -51,12 +51,13 @@ static const std::string GROUP_SHADOW_RECEIVER = "Shadowed";
 /// All of the elements added are \sa RenderPass elements
 /// \param camera the view camera that is used for this pass
 /// \param light the light that should be used for the shadows
-/// \param textureSize the size of the render textures, gets allocated twice without blurring, four times if blurring
-///        is enabled
+/// \param depthTextureSize the size of the texture for the depth map, main determinant for the quality of the shadows
+/// \param shadowTextureSize the size of shadowTexture pass and the blur textures
 /// \param lightCameraProjection parameters for an orthogonal projection that will be used to render the scene from
 ///        the lights point of view, needs to be set so it encompasses all the shadow casters and receivers
 /// \param useBlur whether to blur the output of the light map pass, this will remove some of the blockiness of the
 ///        shadows
+/// \param blurRadius sampling radius for the blur pass
 /// \param showDebug whether to show debug information
 std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 			std::shared_ptr<Framework::Component> camera,
