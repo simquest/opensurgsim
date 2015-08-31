@@ -33,7 +33,7 @@ set(DEVICE_FILTERS_HEADERS
 	PoseTransform.h
 )
 
-set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} 
+set(DEVICE_HEADERS ${DEVICE_HEADERS}
 	DeviceFilters/ForceScale.h #NOLINT
 	DeviceFilters/PoseIntegrator.h #NOLINT
 	DeviceFilters/PoseTransform.h #NOLINT

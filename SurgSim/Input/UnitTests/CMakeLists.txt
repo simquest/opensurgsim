@@ -29,8 +29,9 @@ set(UNIT_TEST_HEADERS
 	TestDevice.h
 )
 
-set(LIBS 
-	SurgSimInput 
+set(LIBS
+	IdentityPoseDevice
+	SurgSimInput
 )
 
 surgsim_add_unit_tests(SurgSimInputTest)

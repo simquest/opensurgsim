@@ -306,10 +306,11 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	auto elements = SurgSim::Blocks::createShadowMapping(
 						viewElement->getCamera(),
 						scene->getComponent("Light", "Light"),
+						4096,
 						1024,
 						lightProjection,
 						true,
-						8.0,
+						6.0,
 						false);
 	scene->addSceneElements(elements);
 }
