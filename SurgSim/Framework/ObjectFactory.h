@@ -105,7 +105,7 @@ public:
 
 private:
 
-	typedef boost::function<std::shared_ptr<Base>(Parameter1)> Constructor;
+	typedef boost::function<std::shared_ptr<Base>(const Parameter1&)> Constructor;
 
 	/// All the constructors.
 	std::map<std::string, Constructor> m_constructors;
@@ -162,8 +162,8 @@ public:
 /// 'DerivedClass' is 'ClassName' with namespace prefixes,
 /// and 'ClassName' is the name of the class without namespace prefix.
 #define SURGSIM_REGISTER(BaseClass, DerivedClass, ClassName) \
-	bool SURGSIM_CONCATENATE(ClassName, Registered) = \
-		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass); \
+	SURGSIM_UNUSED_VARIABLE(bool SURGSIM_CONCATENATE(ClassName, Registered) = \
+		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass));
 
 /// Force compilation of the boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro,
 /// which in turn registers DerivedClass into BaseClass's ObjectFactory.
@@ -179,10 +179,8 @@ public:
 /// This macro should be put in the DerivedClass's header file, under the same namespace in which the DerivedClass is.
 /// 'ClassName' should be the name of the class without any prefix.
 #define SURGSIM_STATIC_REGISTRATION(ClassName) \
-	SURGSIM_DO_PRAGMA (GCC diagnostic push); \
-	SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
 	extern bool SURGSIM_CONCATENATE(ClassName, Registered); \
-	static bool SURGSIM_CONCATENATE(ClassName, IsRegistered) = SURGSIM_CONCATENATE(ClassName, Registered); \
-	SURGSIM_DO_PRAGMA (GCC diagnostic pop)
+	SURGSIM_UNUSED_VARIABLE(static bool SURGSIM_CONCATENATE(ClassName, IsRegistered) = \
+		SURGSIM_CONCATENATE(ClassName, Registered));
 
 #endif // SURGSIM_FRAMEWORK_OBJECTFACTORY_H

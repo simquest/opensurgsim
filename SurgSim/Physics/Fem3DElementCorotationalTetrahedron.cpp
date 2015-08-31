@@ -206,8 +206,8 @@ void Fem3DElementCorotationalTetrahedron::computeRotationMassAndStiffness(const 
 		// Now we compute some useful matrices for the next step
 		double determinant;
 		bool invertible;
-		SurgSim::Math::Matrix33d G, Ginv;
-		G = (scaling.trace() * SurgSim::Math::Matrix33d::Identity() - scaling) * R.transpose();
+		Math::Matrix33d G = (scaling.trace() * Math::Matrix33d::Identity() - scaling) * R.transpose();
+		Math::Matrix33d Ginv = Math::Matrix33d::Zero();
 		G.computeInverseAndDetWithCheck(Ginv, determinant, invertible);
 		if (!invertible)
 		{

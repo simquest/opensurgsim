@@ -284,7 +284,7 @@ TEST(BasicThreadTest, RealTimings)
 
 	// Reset the timer (=> no more frames in the timer queue)
 	m.resetCpuTimeAndUpdateCount();
-	EXPECT_DOUBLE_EQ(0.0, m.getCpuTime());
+	EXPECT_NEAR(0.0, m.getCpuTime(), 1e-9);
 	EXPECT_EQ(m.getUpdateCount(), 0u);
 
 	// Resume the thread loop update.
