@@ -395,13 +395,8 @@ TEST_F(OsgProgramRenderTests, BlurShader)
 
 	auto texture1 = std::make_shared<Graphics::OsgTexture2d>();
 	std::string filename;
-	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("OsgScreenSpaceQuadRenderTests/CheckerBoard.png", &filename));
-	texture1->loadImage(filename);
-
-
-	auto texture2 = std::make_shared<Graphics::OsgTexture2d>();
 	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("Textures/checkered.png", &filename));
-	texture2->loadImage(filename);
+	texture1->loadImage(filename);
 
 	// Material
 	auto material = Graphics::buildMaterial("Shaders/gauss_blur_horizontal.vert",
