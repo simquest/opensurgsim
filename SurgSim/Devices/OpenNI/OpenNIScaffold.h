@@ -29,14 +29,14 @@ namespace Framework
 class Logger;
 };
 
-namespace Device
+namespace Devices
 {
 
 class OpenNIDevice;
 
 /// A class that manages OpenNI devices
 ///
-/// \sa SurgSim::Device::OpenNIDevice
+/// \sa SurgSim::Devices::OpenNIDevice
 class OpenNIScaffold : public SurgSim::Framework::BasicThread
 {
 public:
@@ -97,7 +97,7 @@ private:
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif // SURGSIM_DEVICES_OPENNI_OPENNISCAFFOLD_H

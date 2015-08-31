@@ -26,7 +26,7 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::LeapDevice;
+using SurgSim::Devices::LeapDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Testing::MockInputOutput;
 
@@ -61,13 +61,13 @@ TEST(LeapDeviceTest, HandType)
 	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 
-	EXPECT_EQ(SurgSim::Device::HANDTYPE_RIGHT, device->getHandType());
+	EXPECT_EQ(SurgSim::Devices::HANDTYPE_RIGHT, device->getHandType());
 
-	device->setHandType(SurgSim::Device::HANDTYPE_LEFT);
-	EXPECT_EQ(SurgSim::Device::HANDTYPE_LEFT, device->getHandType());
+	device->setHandType(SurgSim::Devices::HANDTYPE_LEFT);
+	EXPECT_EQ(SurgSim::Devices::HANDTYPE_LEFT, device->getHandType());
 
-	device->setHandType(SurgSim::Device::HANDTYPE_RIGHT);
-	EXPECT_EQ(SurgSim::Device::HANDTYPE_RIGHT, device->getHandType());
+	device->setHandType(SurgSim::Devices::HANDTYPE_RIGHT);
+	EXPECT_EQ(SurgSim::Devices::HANDTYPE_RIGHT, device->getHandType());
 }
 
 TEST(LeapDeviceTest, TrackingMode)
@@ -80,16 +80,16 @@ TEST(LeapDeviceTest, TrackingMode)
 	{
 		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
-		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode())
+		EXPECT_EQ(SurgSim::Devices::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode())
 			<< "Default tracking mode should be LEAP_TRACKING_MODE_DESKTOP.";
 	}
 	{
 		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
-		device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_HMD);
-		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
+		device->setTrackingMode(SurgSim::Devices::LEAP_TRACKING_MODE_HMD);
+		EXPECT_EQ(SurgSim::Devices::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
 		boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
-		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode())
+		EXPECT_EQ(SurgSim::Devices::LEAP_TRACKING_MODE_HMD, device->getTrackingMode())
 			<< "HMD Tracking Mode not set. This could be do to user settings in the LeapControlPanel." << std::endl
 			<< "Disable 'Auto-orient Tracking' in Settings>>Tracking.";
 	}

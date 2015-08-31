@@ -27,8 +27,8 @@
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"
 
-using SurgSim::Device::LabJackDevice;
-using SurgSim::Device::LabJackScaffold;
+using SurgSim::Devices::LabJackDevice;
+using SurgSim::Devices::LabJackScaffold;
 
 TEST(LabJackScaffoldTest, CreateAndDestroyScaffold)
 {

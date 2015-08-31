@@ -25,10 +25,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-using SurgSim::Device::MouseDevice;
+using SurgSim::Devices::MouseDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Testing::MockInputOutput;
 
@@ -84,5 +84,5 @@ TEST_F(MouseDeviceTest, InputConsumer)
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

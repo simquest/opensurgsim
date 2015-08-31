@@ -24,13 +24,13 @@
 #include "SurgSim/Devices/MultiAxis/linux/FileDescriptor.h"
 #include "SurgSim/Framework/Log.h"
 
-using SurgSim::Device::Internal::getSystemErrorCode;
-using SurgSim::Device::Internal::getSystemErrorText;
+using SurgSim::Devices::Internal::getSystemErrorCode;
+using SurgSim::Devices::Internal::getSystemErrorText;
 
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 struct InputDeviceHandle::State
@@ -338,5 +338,5 @@ std::vector<int> InputDeviceHandle::getDeviceButtonsAndKeys()
 	return result;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

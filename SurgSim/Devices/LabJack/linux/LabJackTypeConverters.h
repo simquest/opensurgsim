@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 namespace LabJack
 {
@@ -54,7 +54,7 @@ uint32_t uint32FromChars(const std::array<unsigned char, LabJack::MAXIMUM_BUFFER
 uint16_t uint16FromChars(const std::array<unsigned char, LabJack::MAXIMUM_BUFFER> &bytes, int startIndex, int count);
 
 };  // namespace LabJack
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_LABJACK_LINUX_LABJACKTYPECONVERTERS_H

@@ -43,7 +43,7 @@ using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 struct TrackIRScaffold::DeviceData
@@ -61,7 +61,7 @@ struct TrackIRScaffold::DeviceData
 	/// The corresponding device object.
 	SurgSim::Device::TrackIRDevice* const deviceObject;
 	/// Processing thread.
-	std::unique_ptr<SurgSim::Device::TrackIRThread> thread;
+	std::unique_ptr<SurgSim::Devices::TrackIRThread> thread;
 
 	/// Scale factor for the position axes; stored locally before the device is initialized.
 	double positionScale;
@@ -395,5 +395,5 @@ void TrackIRScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 
 SurgSim::Framework::LogLevel TrackIRScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

@@ -22,16 +22,16 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Input/InputComponent.h"
 
-using SurgSim::Device::OculusView;
+using SurgSim::Devices::OculusView;
 
 TEST(OculusViewTests, InitTest)
 {
-	EXPECT_NO_THROW(SurgSim::Device::OculusView("OculusView"));
+	EXPECT_NO_THROW(SurgSim::Devices::OculusView("OculusView"));
 }
 
 TEST(OculusViewTests, SetAndGetInputComponent)
 {
-	auto view = std::make_shared<SurgSim::Device::OculusView>("OculusView");
+	auto view = std::make_shared<SurgSim::Devices::OculusView>("OculusView");
 	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
 
 	EXPECT_NO_THROW(view->setInputComponent(inputComponent));
@@ -40,7 +40,7 @@ TEST(OculusViewTests, SetAndGetInputComponent)
 
 TEST(OculusViewTests, Serialization)
 {
-	auto view = std::make_shared<SurgSim::Device::OculusView>("test name");
+	auto view = std::make_shared<SurgSim::Devices::OculusView>("test name");
 	std::shared_ptr<SurgSim::Framework::Component> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
 	view->setValue("InputComponent", inputComponent);

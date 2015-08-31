@@ -22,8 +22,8 @@
 #include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
 using SurgSim::Input::DeviceInterface;
-using SurgSim::Device::TrackIRDevice;
-using SurgSim::Device::IdentityPoseDevice;
+using SurgSim::Devices::TrackIRDevice;
+using SurgSim::Devices::IdentityPoseDevice;
 
 
 int main(int argc, char** argv)

@@ -78,7 +78,7 @@ void updateDataGroup(const Leap::Hand& hand, SurgSim::DataStructures::DataGroup*
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class LeapScaffold::Listener : public Leap::Listener
@@ -110,7 +110,7 @@ public:
 	}
 
 private:
-	std::weak_ptr<SurgSim::Device::LeapScaffold> m_scaffold;
+	std::weak_ptr<SurgSim::Devices::LeapScaffold> m_scaffold;
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
@@ -442,5 +442,5 @@ LeapTrackingMode LeapScaffold::getTrackingMode() const
 	return result;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

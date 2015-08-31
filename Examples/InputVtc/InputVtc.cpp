@@ -189,16 +189,16 @@ int main(int argc, char* argv[])
 
 	const std::string deviceName = "Tool_Device";
 	std::vector<std::string> types;
-	types.push_back("SurgSim::Device::PhantomDevice");
-	types.push_back("SurgSim::Device::NovintDevice");
-	types.push_back("SurgSim::Device::MultiAxisDevice");
-	types.push_back("SurgSim::Device::SixenseDevice");
-	types.push_back("SurgSim::Device::LeapDevice");
-	types.push_back("SurgSim::Device::IdentityPoseDevice");
+	types.push_back("SurgSim::Devices::PhantomDevice");
+	types.push_back("SurgSim::Devices::NovintDevice");
+	types.push_back("SurgSim::Devices::MultiAxisDevice");
+	types.push_back("SurgSim::Devices::SixenseDevice");
+	types.push_back("SurgSim::Devices::LeapDevice");
+	types.push_back("SurgSim::Devices::IdentityPoseDevice");
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device =
-		SurgSim::Device::createDevice(types, deviceName);
+		SurgSim::Devices::createDevice(types, deviceName);
 	SURGSIM_ASSERT(device != nullptr) << "Failed to initialize any device.";
-	SURGSIM_LOG_IF(std::dynamic_pointer_cast<SurgSim::Device::IdentityPoseDevice>(device) != nullptr,
+	SURGSIM_LOG_IF(std::dynamic_pointer_cast<SurgSim::Devices::IdentityPoseDevice>(device) != nullptr,
 		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << "The InputVtc example was unable to initialize " <<
 		"an input device that provides poses, so it will use a constant pose.";
 	inputManager->addDevice(device);

@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class SixenseScaffold;
 
@@ -58,7 +58,7 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit SixenseDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::SixenseDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::SixenseDevice);
 
 	/// Destructor.
 	virtual ~SixenseDevice();
@@ -76,7 +76,7 @@ private:
 	std::shared_ptr<SixenseScaffold> m_scaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_SIXENSE_SIXENSEDEVICE_H

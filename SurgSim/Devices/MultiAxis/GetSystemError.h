@@ -21,7 +21,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 namespace Internal
 {
@@ -37,7 +37,7 @@ int64_t getSystemErrorCode();
 std::string getSystemErrorText(int64_t errorCode = getSystemErrorCode());
 
 };  // namespace Internal
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_GETSYSTEMERROR_H

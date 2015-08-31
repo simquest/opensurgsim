@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class NimbleScaffold;
 
@@ -90,7 +90,7 @@ private:
 	size_t m_trackedHandDataIndex;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_NIMBLE_NIMBLEDEVICE_H

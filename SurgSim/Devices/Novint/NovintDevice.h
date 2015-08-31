@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 SURGSIM_STATIC_REGISTRATION(NovintDevice);
@@ -62,13 +62,13 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit NovintDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::NovintDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::NovintDevice);
 
 	/// Destructor.
 	virtual ~NovintDevice();
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_NOVINT_NOVINTDEVICE_H

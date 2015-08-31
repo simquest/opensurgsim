@@ -30,7 +30,7 @@
 namespace SurgSim
 {
 
-namespace Device
+namespace Devices
 {
 /// A device filter that transforms the input pose.  It can scale the translation, and/or apply a constant transform.
 /// Any other data in the DataGroup is passed through.  For an input/output device (e.g., a haptic device), the filter
@@ -154,7 +154,7 @@ private:
 	bool m_cachedOutputIndices;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_DEVICEFILTERS_POSETRANSFORM_H

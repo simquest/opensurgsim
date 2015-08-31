@@ -35,7 +35,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 namespace
@@ -1047,5 +1047,5 @@ std::shared_ptr<SurgSim::Framework::Logger> LabJackScaffold::getLogger() const
 	return m_logger;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

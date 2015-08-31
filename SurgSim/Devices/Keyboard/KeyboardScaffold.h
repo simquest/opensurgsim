@@ -28,13 +28,13 @@ namespace DataStructures
 class DataGroup;
 }
 
-namespace Device
+namespace Devices
 {
 class KeyboardDevice;
 class OsgKeyboardHandler;
 
 /// A class that implements the behavior of KeyboardDevice objects.
-/// \sa SurgSim::Device::KeyboardDevice
+/// \sa SurgSim::Devices::KeyboardDevice
 class KeyboardScaffold
 {
 	friend class KeyboardDevice;
@@ -99,7 +99,7 @@ private:
 	std::unique_ptr<DeviceData> m_device;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_KEYBOARD_KEYBOARDSCAFFOLD_H

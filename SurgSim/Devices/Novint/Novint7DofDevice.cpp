@@ -17,10 +17,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::Novint7DofDevice, Novint7DofDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::Novint7DofDevice, Novint7DofDevice);
 
 Novint7DofDevice::Novint7DofDevice(const std::string& uniqueName) :
 	NovintCommonDevice(uniqueName)
@@ -36,5 +36,5 @@ bool Novint7DofDevice::is7DofDevice() const
 	return true;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

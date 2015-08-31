@@ -24,7 +24,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 namespace Internal
 {
@@ -62,5 +62,5 @@ std::string getSystemErrorText(int64_t errorCode)
 }
 
 };  // namespace Internal
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

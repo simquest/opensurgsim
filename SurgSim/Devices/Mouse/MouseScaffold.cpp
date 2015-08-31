@@ -24,7 +24,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 using SurgSim::DataStructures::DataGroup;
@@ -149,5 +149,5 @@ std::shared_ptr<SurgSim::Framework::Logger> MouseScaffold::getLogger() const
 
 SurgSim::Framework::LogLevel MouseScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

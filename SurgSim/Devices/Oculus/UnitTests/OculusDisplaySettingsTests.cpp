@@ -24,7 +24,7 @@ namespace
 const double epsilon = 1e-10;
 }
 
-using SurgSim::Device::OculusDisplaySettings;
+using SurgSim::Devices::OculusDisplaySettings;
 
 TEST(OculusDisplaySettingsTest, Constructor)
 {

@@ -26,9 +26,9 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Device::OculusView, OculusView);
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Devices::OculusView, OculusView);
 
 OculusView::OculusView(const std::string& name) : OsgView(name)
 {
@@ -67,8 +67,8 @@ osg::ref_ptr<osg::DisplaySettings> OculusView::createDisplaySettings() const
 {
 	SURGSIM_ASSERT(m_inputComponent != nullptr) << "No InputComponent is connected to this view.";
 
-	osg::ref_ptr<SurgSim::Device::OculusDisplaySettings> displaySettings =
-		new SurgSim::Device::OculusDisplaySettings(OsgView::createDisplaySettings());
+	osg::ref_ptr<SurgSim::Devices::OculusDisplaySettings> displaySettings =
+		new SurgSim::Devices::OculusDisplaySettings(OsgView::createDisplaySettings());
 
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_inputComponent->getData(&dataGroup);
@@ -89,5 +89,5 @@ osg::ref_ptr<osg::DisplaySettings> OculusView::createDisplaySettings() const
 	return displaySettings;
 }
 
-}; // namespace Device
+}; // namespace Devices
 }; // namespace SurgSim

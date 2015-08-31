@@ -19,10 +19,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::LeapDevice, LeapDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::LeapDevice, LeapDevice);
 
 LeapDevice::LeapDevice(const std::string& name) :
 	SurgSim::Input::CommonDevice(name, LeapScaffold::buildDeviceInputData()),
@@ -110,5 +110,5 @@ bool LeapDevice::isInitialized() const
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

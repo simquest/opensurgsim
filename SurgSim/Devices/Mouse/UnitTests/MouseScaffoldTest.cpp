@@ -20,7 +20,7 @@
 
 #include "SurgSim/Devices/Mouse/MouseScaffold.h"
 
-using SurgSim::Device::MouseScaffold;
+using SurgSim::Devices::MouseScaffold;
 
 TEST(MouseScaffoldTest, CreateAndDestroyScaffold)
 {

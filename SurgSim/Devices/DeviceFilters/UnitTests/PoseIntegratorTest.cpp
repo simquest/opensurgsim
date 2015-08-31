@@ -31,7 +31,7 @@
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
-using SurgSim::Device::PoseIntegrator;
+using SurgSim::Devices::PoseIntegrator;
 using SurgSim::Input::CommonDevice;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;

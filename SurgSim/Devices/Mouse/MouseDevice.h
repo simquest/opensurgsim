@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class MouseScaffold;
 class OsgMouseHandler;
@@ -84,7 +84,7 @@ private:
 	std::shared_ptr<MouseScaffold> m_scaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif //SURGSIM_DEVICES_MOUSE_MOUSEDEVICE_H
