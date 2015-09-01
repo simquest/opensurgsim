@@ -24,30 +24,31 @@ namespace SurgSim
 {
 namespace Blocks
 {
-	///@{
-	/// Names to use as RenderGroupReference
-	static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
-	///@}
+static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 
-	/// Builds a series of SceneElements enabling the rendering of a screen-space surface, all graphics object that
-	/// should be rendered as a surface need to be in the render group GROUP_IMPLICIT_SURFACE.
-	/// The rest is done by the graphics system.
-	/// All of the elements added are \sa RenderPass elements
-	/// \param camera the view camera that is used for this pass
-	/// \param sphereRadius the radius in meters that each point sprite sphere should have
-	/// \param sphereScale the scaling factor for the point sprite sphere based on distance from the camera
-	/// \param textureSize the size of the render textures, not including the final pass that takes the size of the
-	///			screen
-	/// \param color the color to use for the final surface shading
-	/// \param showDebug whether to show debug information
-	std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(
-				std::shared_ptr<Framework::Component> camera,
-				std::shared_ptr<Framework::Component> light,
-				std::shared_ptr<Graphics::Uniform<float>> sphereRadius,
-				std::shared_ptr<Graphics::Uniform<float>> sphereScale,
-				std::shared_ptr<Graphics::Uniform<int> > textureSize,
-				std::shared_ptr<Graphics::Uniform<Math::Vector4f>> color,
-				bool showDebug);
+/// Builds a series of SceneElements enabling the rendering of a screen-space surface, all graphics objects that
+/// should be rendered as a surface need to be in the render group GROUP_IMPLICIT_SURFACE.
+/// The rest is done by the graphics system.
+/// All of the elements added are \sa RenderPass elements
+/// \param camera the view camera that is used for this pass
+/// \param sphereRadius the radius in meters that each point sprite sphere should have
+/// \param sphereScale the scaling factor for the point sprite sphere based on distance from the camera
+/// \param textureSize the size of the render textures, not including the final pass that takes the size of the
+///			screen
+/// \param diffuseColor the color to use for the final surface shading
+/// \param specularColor the color to use for the specular hightlight on the surface
+/// \param shininess the shiniess factor for the specular highlight
+/// \param showDebug whether to show debug information
+std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(std::shared_ptr<Framework::Component> camera,
+			std::shared_ptr<Framework::Component> light,
+			float sphereRadius,
+			float sphereScale,
+			int textureSize,
+			const Math::Vector4f& diffuseColor,
+			const Math::Vector4f& specularColor,
+			float shininess,
+			bool showDebug);
+
 } // Blocks
 } // SurgSim
 

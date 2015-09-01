@@ -21,39 +21,60 @@
 
 #version 120
 
+uniform sampler2D shadowMap;
 uniform sampler2D depthMap;
 uniform sampler2D normalMap;
-uniform mat4 inverseProjectionMatrix;
-uniform vec3 light;
-uniform vec4 color;
+uniform mat4 mainInverseProjectionMatrix;
+uniform float shininess;
+
+// Oss provided uniforms
+uniform vec4 ambientColor;
+
+// Incoming from the vertex shader
+varying vec3 lightDir;
+
+varying vec2 texCoord0; ///< Texture unit 0 texture coordinates
+varying vec4 clipCoord; ///< Projected and transformed vertex coordinates
+
+varying vec3 vertexDiffuseColor;
+varying vec3 vertexSpecularColor;
 
 vec3 getEyeSpacePos(vec2 texCoord, float z)
 {
     vec2 homogenous = texCoord * 2.0 - 1.0;
 	vec4 clipSpacePos = vec4(homogenous, z, 1.0);
-	vec4 eyeSpacePos = inverseProjectionMatrix * clipSpacePos;
+	vec4 eyeSpacePos = mainInverseProjectionMatrix * clipSpacePos;
 	return eyeSpacePos.xyz/eyeSpacePos.w;
 }
 
 void main(void)
 {
     float maxDepth = 0.999999f;
-    float depth = texture2D(depthMap, gl_TexCoord[0].xy).x;
+    float depth = texture2D(depthMap, texCoord0).x;
     if (depth > maxDepth)
     {
         discard;
     }
-    vec3 eyePos = getEyeSpacePos(gl_TexCoord[0].xy, depth);
+    vec3 eyePos = getEyeSpacePos(texCoord0, depth);
 
-    vec3 normal = normalize(texture2D(normalMap, gl_TexCoord[0].xy).xyz);
+    vec3 normal = normalize(texture2D(normalMap, texCoord0).xyz);
 
-    // Need to use the vector from the vertex to the light, which is the negative of lightDir
-    float diffuse = max(0.0,dot(normalize(-light),normal));
+    vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
+	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
 
-    const float shininess = 100.0;
-    float temp = max(dot(normalize(reflect(light, normal)), normalize(-eyePos)), 0.0);
+    vec3 vAmbient = ambientColor.xyz;
+
+    // Need to use the vector from the vertex to the lightDir, which is the negative of lightDir
+    float diffuse = max(0.0,dot(normalize(-lightDir),normal));
+    vec3 vDiffuse = vertexDiffuseColor * diffuse * shadowAmount;
+
+    float temp = max(dot(normalize(reflect(lightDir, normal)), normalize(-eyePos)), 0.0);
     float specular = temp / (shininess - temp * shininess + temp);
+    vec3 vSpecular = vertexSpecularColor * specular * shadowAmount;
 
-    gl_FragColor = color * diffuse + specular;
+    vec3 color = (vAmbient + vDiffuse) + vSpecular;
+
+	gl_FragColor.rgb = color;
+	gl_FragColor.a = 1.0;
     gl_FragDepth = depth;
 }

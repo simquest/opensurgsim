@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// This test uses the Stanford Bunny from http://graphics.stanford.edu/data/3Dscanrep/
 
 #include <gtest/gtest.h>
 
@@ -22,18 +23,19 @@
 #include "SurgSim/Blocks/ImplicitSurface.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
-#include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Testing/MathUtilities.h"
 
 using SurgSim::Math::makeRigidTranslation;
 
@@ -42,7 +44,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-TEST(FluidRenderTests, PointSpriteFluid)
+TEST(ImplicitSurfaceRenderTests, PointSpriteFluid)
 {
 	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
 	auto graphicsManager = std::make_shared<Graphics::OsgManager>();
@@ -68,27 +70,19 @@ TEST(FluidRenderTests, PointSpriteFluid)
 	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 	light->setLocalPose(makeRigidTranslation(Math::Vector3d(-0.5, 1.5, -5.0)));
 
-	auto sphereRadius = std::make_shared<Graphics::OsgUniform<float>>("SphereRadius");
-	sphereRadius->set(0.01f);
-
-	auto sphereScale = std::make_shared<Graphics::OsgUniform<float>>("SphereScale");
-	sphereScale->set(800.0f);
-
-	auto textureSize = std::make_shared<Graphics::OsgUniform<int>>("TextureSize");
-	textureSize->set(1024);
-
-	auto color = std::make_shared<Graphics::OsgUniform<Math::Vector4f>>("Color");
-	color->set(Math::Vector4f(0.3, 0.0, 0.05, 1.0));
+	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
+	lightElement->addComponent(light);
+	scene->addSceneElement(lightElement);
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
-		Blocks::createImplicitSurface(viewElement->getCamera(), light, sphereRadius, sphereScale, textureSize,
-									  color, false);
+		Blocks::createImplicitSurface(viewElement->getCamera(), light, 0.01f, 800.0f, 1024,
+										Math::Vector4f(0.3, 0.0, 0.05, 1.0), Math::Vector4f(1.0, 1.0, 1.0, 1.0),
+										100, false);
 
 	for (auto element : surface)
 	{
 		scene->addSceneElement(element);
 	}
-
 
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
@@ -119,7 +113,7 @@ TEST(FluidRenderTests, PointSpriteFluid)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(20000));
 	runtime->stop();
 }
 
