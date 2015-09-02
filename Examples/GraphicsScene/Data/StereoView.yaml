@@ -12,8 +12,8 @@
           Id: 9b77c4e2-e9ea-484f-bfca-72121189dcb6
           DeviceName: Oculus
           LocalPose:
-            Quaternion: [0, 0, 0, 1]
-            Translation: [-2.0, 1.0, 2.0]
+            Quaternion: [0, 1, 0, 0]
+            Translation: [2.0, 1.0, 2.0]
       - SurgSim::Device::OculusView:
           InputComponent:
             SurgSim::Input::InputComponent:
@@ -31,5 +31,5 @@
           Id: 9018dd38-c1ae-4e80-a27a-dc24e4b75d35
           Name: Camera
           MainCamera: true
-          ProjectionMatrix: [[0.8390996311772799, 0, 0, 0], [0, 0.8390996311772799, 0, 0], [0, 0, -1.002002002002002, -0.02002002002002002], [0, 0, -1, 0]]
+          PerspectiveProjection: [120, 0.88, 0.1, 10.0]
           RenderGroupReference: __OssDefault__

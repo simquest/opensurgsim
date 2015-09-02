@@ -159,8 +159,6 @@ public:
 
 	virtual bool isMainCamera() = 0;
 
-	virtual void setStereo(bool stereo) = 0;
-
 private:
 
 	void setPerspectiveProjection(const std::array<double, 4>& val);

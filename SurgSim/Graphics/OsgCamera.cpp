@@ -70,10 +70,11 @@ class UniformUpdater : public osg::NodeCallback
 		if (cv != nullptr)
 		{
 			auto camera = cv->getCurrentCamera();
-			m_projectionMatrix->set(camera->getProjectionMatrix());
-			m_inverseProjectionMatrix->set(osg::Matrix::inverse(camera->getProjectionMatrix()));
+			const auto& projection = camera->getProjectionMatrix();
+			m_projectionMatrix->set(projection);
+			m_inverseProjectionMatrix->set(osg::Matrix::inverse(projection));
 			m_viewMatrix->set(camera->getViewMatrix());
-			m_inverseViewMatrix->set(osg::Matrix::inverse(camera->getViewMatrix()));
+			m_inverseViewMatrix->set(camera->getInverseViewMatrix());
 // 			std::cout << "NodeMask  : " << node->getNodeMask() << " Stamp " << cv->getFrameStamp()->getFrameNumber() << std::endl;
 // 			std::cout << "Projection ------------------------------------------" << std::endl;
 // 			std::cout << SurgSim::Graphics::fromOsg(camera->getProjectionMatrix()) <<  std::endl;
@@ -127,7 +128,7 @@ osg::Switch* createStereoNode(long mask)
 
 };
 
-const long cullMask = 0xffffffff;
+const long cullMask = 0xfffffff1;
 const long cullMaskLeft = 0x1;
 const long cullMaskRight = 0x2;
 
@@ -241,7 +242,7 @@ void OsgCamera::update(double dt)
 		// instantiation of the viewer with the view port that may change the matrix inbetween, for now ... update
 		// every frame
 		// #workaround
-		m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+		// m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 
 		auto viewMatrix = getViewMatrix();
 		auto floatMatrix = viewMatrix.cast<float>();
@@ -398,11 +399,6 @@ void OsgCamera::setMainCamera(bool val)
 bool OsgCamera::isMainCamera()
 {
 	return m_isMainCamera;
-}
-
-void OsgCamera::setStereo(bool stereo)
-{
-
 }
 
 void OsgCamera::setPerspectiveProjection(double fovy, double aspect, double near, double far)

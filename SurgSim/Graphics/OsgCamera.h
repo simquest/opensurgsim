@@ -119,8 +119,6 @@ public:
 
 	bool isMainCamera() override;
 
-	void setStereo(bool stereo) override;
-
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;

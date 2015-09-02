@@ -131,6 +131,8 @@ std::shared_ptr<Graphics::RenderPass> createLightMapPass(int textureSize, bool d
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 0, true);
 	pass->setRenderTarget(renderTarget);
 	pass->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
+	std::dynamic_pointer_cast<Graphics::OsgCamera>(pass->getCamera())->getOsgCamera()->setReferenceFrame(
+		osg::Transform::ABSOLUTE_RF);
 
 	auto material = Graphics::buildMaterial("Shaders/depth_map.vert", "Shaders/depth_map.frag");
 	material->getProgram()->setGlobalScope(true);
@@ -153,6 +155,9 @@ std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, bool 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 1, false);
 	pass->setRenderTarget(renderTarget);
 	pass->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
+	std::dynamic_pointer_cast<Graphics::OsgCamera>(pass->getCamera())->getOsgCamera()->setReferenceFrame(
+		osg::Transform::ABSOLUTE_RF);
+
 
 	auto material = Graphics::buildMaterial("Shaders/shadow_map_global.vert", "Shaders/shadow_map.frag");
 	material->getProgram()->setGlobalScope(true);
@@ -228,7 +233,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 	// whole scene
 	auto shadowCamera = shadowMapPass->getCamera();
 	copier->connect(osgCamera, "ProjectionMatrix", shadowCamera , "ProjectionMatrix");
-	copier->connect(osgCamera, "Pose", shadowMapPass->getPoseComponent(), "Pose");
+	copier->connect(osgCamera, "Pose", shadowCamera, "LocalPose");
 
 	// Put the result of the last pass into the main camera to make it accessible
 	auto material = std::make_shared<Graphics::OsgMaterial>("camera material");
