@@ -62,9 +62,74 @@ const osg::Camera::RenderOrder RenderOrderEnums[3] =
 	osg::Camera::POST_RENDER
 };
 
+class UniformUpdater : public osg::NodeCallback
+{
+	virtual void operator()(osg::Node* node, osg::NodeVisitor* nodeVisitor)
+	{
+		osgUtil::CullVisitor* cv = dynamic_cast<osgUtil::CullVisitor*>(nodeVisitor);
+		if (cv != nullptr)
+		{
+			auto camera = cv->getCurrentCamera();
+			m_projectionMatrix->set(camera->getProjectionMatrix());
+			m_inverseProjectionMatrix->set(osg::Matrix::inverse(camera->getProjectionMatrix()));
+			m_viewMatrix->set(camera->getViewMatrix());
+			m_inverseViewMatrix->set(osg::Matrix::inverse(camera->getViewMatrix()));
+// 			std::cout << "NodeMask  : " << node->getNodeMask() << " Stamp " << cv->getFrameStamp()->getFrameNumber() << std::endl;
+// 			std::cout << "Projection ------------------------------------------" << std::endl;
+// 			std::cout << SurgSim::Graphics::fromOsg(camera->getProjectionMatrix()) <<  std::endl;
+// 			std::cout << "ModelView ------------------------------------------" << std::endl;
+// 			std::cout << SurgSim::Graphics::fromOsg(camera->getViewMatrix()) << std::endl;
+		}
+		traverse(node, nodeVisitor);
+	}
+
+public:
+	osg::ref_ptr<osg::Uniform> m_projectionMatrix;
+	osg::ref_ptr<osg::Uniform> m_inverseProjectionMatrix;
+	osg::ref_ptr<osg::Uniform> m_viewMatrix;
+	osg::ref_ptr<osg::Uniform> m_inverseViewMatrix;
+};
+
+osg::Switch* createStereoNode(long mask)
+{
+	auto node = new osg::Switch;
+	auto callback = new UniformUpdater;
+
+	auto uniform = new osg::Uniform();
+	uniform->setName("mainProjectionMatrix");
+	uniform->setType(osg::Uniform::FLOAT_MAT4);
+	node->getOrCreateStateSet()->addUniform(uniform);
+	callback->m_projectionMatrix = uniform;
+
+	uniform = new osg::Uniform();
+	uniform->setName("inverseMainProjectionMatrix");
+	uniform->setType(osg::Uniform::FLOAT_MAT4);
+	node->getOrCreateStateSet()->addUniform(uniform);
+	callback->m_inverseProjectionMatrix = uniform;
+
+	uniform = new osg::Uniform();
+	uniform->setName("mainViewMatrix");
+	uniform->setType(osg::Uniform::FLOAT_MAT4);
+	node->getOrCreateStateSet()->addUniform(uniform);
+	callback->m_viewMatrix = uniform;
+
+	uniform = new osg::Uniform();
+	uniform->setName("inverseMainViewMatrix");
+	uniform->setType(osg::Uniform::FLOAT_MAT4);
+	node->getOrCreateStateSet()->addUniform(uniform);
+	callback->m_inverseViewMatrix = uniform;
+
+	node->addCullCallback(callback);
+	node->setNodeMask(mask);
+
+	return node;
+}
 
 };
 
+const long cullMask = 0xffffffff;
+const long cullMaskLeft = 0x1;
+const long cullMaskRight = 0x2;
 
 namespace SurgSim
 {
@@ -97,6 +162,12 @@ OsgCamera::OsgCamera(const std::string& name) :
 	setPerspectiveProjection(45.0, 1.0, 0.01, 10.0);
 
 	m_camera->setComputeNearFarMode(osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR);
+
+	// Hopefully this will ignore the left and right nodes when rendering mono and
+	// pick the appropriate node when rendering stereo
+	m_camera->setCullMask(cullMask);
+	m_camera->setCullMaskLeft(cullMaskLeft);
+	m_camera->setCullMaskRight(cullMaskRight);
 
 	/// Update storage of view and projection matrices
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
@@ -300,6 +371,7 @@ void OsgCamera::setMainCamera(bool val)
 {
 	if (val != m_isMainCamera)
 	{
+		/*
 		auto state = m_camera->getOrCreateStateSet();
 		if (val)
 		{
@@ -315,6 +387,10 @@ void OsgCamera::setMainCamera(bool val)
 			m_mainProjectionMatrix->removeFromStateSet(state);
 			m_inverseMainProjectionMatrixUniform->removeFromStateSet(state);
 		}
+		*/
+
+		insertUpdaters(m_camera, m_materialProxy);
+
 		m_isMainCamera = val;
 	}
 }
@@ -322,6 +398,11 @@ void OsgCamera::setMainCamera(bool val)
 bool OsgCamera::isMainCamera()
 {
 	return m_isMainCamera;
+}
+
+void OsgCamera::setStereo(bool stereo)
+{
+
 }
 
 void OsgCamera::setPerspectiveProjection(double fovy, double aspect, double near, double far)
@@ -392,6 +473,23 @@ SurgSim::Math::Vector4d OsgCamera::getAmbientColor()
 void OsgCamera::setGenerateTangents(bool value)
 {
 	SURGSIM_ASSERT(value == false) << "Generate Tangents is not supported on Cameras.";
+}
+
+void OsgCamera::insertUpdaters(osg::ref_ptr<osg::Camera> m_camera, osg::ref_ptr<osg::Group> m_materialProxy)
+{
+	m_camera->removeChild(m_materialProxy);
+
+	std::array<long, 3> masks = {cullMaskLeft, cullMaskRight};
+
+	// Insert three nodes into the structure one for mono rendering (cullMask)
+	// and two for stereo rendering (cullMaskLeft, cullMaskRight)
+	// attach the material proxy to each of the nodes,
+	for (auto& mask : masks)
+	{
+		auto node = createStereoNode(mask);
+		m_camera->addChild(node);
+		node->addChild(m_materialProxy);
+	}
 }
 
 }; // namespace Graphics

@@ -38,6 +38,8 @@ namespace Device
 std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::string>& classNames,
 		const std::string& name);
 
+std::shared_ptr<Input::DeviceInterface> createDevice(const std::string& className, const std::string& name);
+
 };
 };
 

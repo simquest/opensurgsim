@@ -58,6 +58,7 @@ View::View(const std::string& name) :
 void View::setCamera(std::shared_ptr<Component> camera)
 {
 	m_camera = checkAndConvert<Camera>(camera, "SurgSim::Graphics::Camera");
+	m_camera->setStereo(isStereo());
 }
 
 std::shared_ptr<Camera> View::getCamera() const
@@ -82,6 +83,10 @@ void View::setStereoMode(int mode)
 	SURGSIM_ASSERT(!isAwake()) << "Can't change the view settings once the view has been woken up.";
 	SURGSIM_ASSERT(mode < STEREO_MODE_COUNT) << "Invalid StereoMode " << mode;
 	m_stereoMode = static_cast<StereoMode>(mode);
+	if (m_camera != nullptr)
+	{
+		m_camera->setStereo(isStereo());
+	}
 }
 
 int View::getStereoMode() const

@@ -155,6 +155,11 @@ public:
 	/// \return the ambient light that gets added to the scene
 	virtual SurgSim::Math::Vector4d getAmbientColor() = 0;
 
+	virtual void setMainCamera(bool val) = 0;
+
+	virtual bool isMainCamera() = 0;
+
+	virtual void setStereo(bool stereo) = 0;
 
 private:
 

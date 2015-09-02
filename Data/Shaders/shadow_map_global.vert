@@ -17,8 +17,13 @@
 /// Calculate a shadow map that can be used for modulating the color of each
 /// fragment by the amount of shadow that should be applied to that color
 
-/// inverse view matrix from the rendering camera
+/// Main Camera Matrices
+uniform mat4 mainViewMatrix;
 uniform mat4 inverseViewMatrix;
+uniform mat4 mainProjectionMatrix;
+uniform mat4 inverseMainProjectionMatrix;
+
+uniform mat4 modelMatrix;
 
 /// view matrix for the camera that rendered the original depth map (see shadow_map.frag)
 uniform mat4 lightViewMatrix;
@@ -30,10 +35,10 @@ varying vec4 lightCoord;
 
 void main(void) 
 {
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_Position = mainProjectionMatrix * mainViewMatrix * modelMatrix * gl_Vertex;
 
 	// compute the coordinates of the incoming point in the space of the camera used
 	// to render the depth map
-	lightCoord = lightProjectionMatrix * lightViewMatrix * inverseViewMatrix * gl_ModelViewMatrix *  gl_Vertex;
+	lightCoord = lightProjectionMatrix * lightViewMatrix * modelMatrix * gl_Vertex;
 } 
  
