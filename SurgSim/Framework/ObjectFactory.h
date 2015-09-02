@@ -162,8 +162,8 @@ public:
 /// 'DerivedClass' is 'ClassName' with namespace prefixes,
 /// and 'ClassName' is the name of the class without namespace prefix.
 #define SURGSIM_REGISTER(BaseClass, DerivedClass, ClassName) \
-	SURGSIM_UNUSED_VARIABLE(bool SURGSIM_CONCATENATE(ClassName, Registered) = \
-		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass));
+	SURGSIM_USED_VARIABLE(bool SURGSIM_CONCATENATE(ClassName, Registered)) = \
+		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass);
 
 /// Force compilation of the boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro,
 /// which in turn registers DerivedClass into BaseClass's ObjectFactory.
@@ -180,7 +180,7 @@ public:
 /// 'ClassName' should be the name of the class without any prefix.
 #define SURGSIM_STATIC_REGISTRATION(ClassName) \
 	extern bool SURGSIM_CONCATENATE(ClassName, Registered); \
-	SURGSIM_UNUSED_VARIABLE(static bool SURGSIM_CONCATENATE(ClassName, IsRegistered) = \
-		SURGSIM_CONCATENATE(ClassName, Registered));
+	SURGSIM_USED_VARIABLE(static bool SURGSIM_CONCATENATE(ClassName, IsRegistered)) = \
+		SURGSIM_CONCATENATE(ClassName, Registered);
 
 #endif // SURGSIM_FRAMEWORK_OBJECTFACTORY_H

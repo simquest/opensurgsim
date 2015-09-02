@@ -21,11 +21,11 @@
 #define SURGSIM_CLASSNAME(ClassName) \
 	virtual std::string getClassName() const {return #ClassName;}
 
-/// GCC macro to suppress unused-variable warnings
+/// Macro to tell GCC this is a used variable, and not to optimize it out
 #ifdef __GNUC__
-#define SURGSIM_UNUSED_VARIABLE(x) __attribute__((unused)) x
+#define SURGSIM_USED_VARIABLE(x) x __attribute__((used))
 #else
-#define SURGSIM_UNUSED_VARIABLE(x) x
+#define SURGSIM_USED_VARIABLE(x) x
 #endif
 
 ///@{
