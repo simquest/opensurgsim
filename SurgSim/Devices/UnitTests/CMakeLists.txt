@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,35 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
 include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${OSG_INCLUDE_DIR}
-	${OPENTHREADS_INCLUDE_DIR}
+	${gtest_SOURCE_DIR}/include
 )
 
-set(SOURCES
-	InputVtc.cpp
+set(UNIT_TEST_SOURCES
+	DeviceUtilitiesTests.cpp
 )
 
-set(HEADERS
+set(UNIT_TEST_HEADERS
 )
 
-surgsim_add_executable(InputVtc "${SOURCES}" "${HEADERS}")
-
-set(LIBS 
-	SurgSimBlocks
+set(LIBS
+	IdentityPoseDevice
 	SurgSimDevices
-	SurgSimGraphics
-	SurgSimMath
-	${YAML_CPP_LIBRARIES}
+	SurgSimInput
 )
 
+surgsim_add_unit_tests(SurgSimDevicesTest)
 
-target_link_libraries(InputVtc ${LIBS})
-
-# Put InputVtc into folder "Examples"
-set_target_properties(InputVtc PROPERTIES FOLDER "Examples") 
+set_target_properties(SurgSimDevicesTest PROPERTIES FOLDER "Devices")

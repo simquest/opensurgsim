@@ -170,7 +170,8 @@ std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, bool 
 std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 			std::shared_ptr<Framework::Component> camera,
 			std::shared_ptr<Framework::Component> light,
-			int textureSize,
+			int depthTextureSize,
+			int shadowTextureSize,
 			std::array<double, 6> lightCameraProjection,
 			bool useBlur,
 			double blurRadius,
@@ -184,10 +185,11 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 	auto osgCamera = Framework::checkAndConvert<Graphics::OsgCamera>(camera, "SurgSim::Graphics::OsgCamera");
 	auto osgLight = Framework::checkAndConvert<Graphics::OsgLight>(light, "SurgSim::Graphics::OsgLight");
 
-	auto lightMapPass = createLightMapPass(textureSize, showDebug);
+	auto lightMapPass = createLightMapPass(depthTextureSize, showDebug);
 	result.push_back(lightMapPass);
 
 	lightMapPass->getCamera()->setValue("OrthogonalProjection", lightCameraProjection);
+
 	auto cameraNode = std::dynamic_pointer_cast<Graphics::OsgCamera>(lightMapPass->getCamera())->getOsgCamera();
 	cameraNode->getOrCreateStateSet()->setAttributeAndModes(
 		new osg::PolygonMode(osg::PolygonMode::BACK, osg::PolygonMode::FILL), osg::StateAttribute::ON);
@@ -201,7 +203,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 	// to the light map pass
 	copier->connect(osgLight, "Pose", lightMapPass->getPoseComponent(), "Pose");
 
-	auto shadowMapPass = createShadowMapPass(textureSize, showDebug);
+	auto shadowMapPass = createShadowMapPass(shadowTextureSize, showDebug);
 	result.push_back(shadowMapPass);
 
 	shadowMapPass->getMaterial()->addUniform("mat4", "lightViewMatrix");
@@ -236,7 +238,12 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 
 	if (useBlur)
 	{
-		auto blurrPass = setupBlurPasses(shadowMapPass, textureSize, blurRadius, showDebug, &result);
+		auto blurrPass = setupBlurPasses(
+							 shadowMapPass,
+							 shadowTextureSize,
+							 static_cast<float>(blurRadius),
+							 showDebug,
+							 &result);
 		texture = blurrPass->getRenderTarget()->getColorTarget(0);
 	}
 	else
