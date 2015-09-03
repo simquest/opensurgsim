@@ -59,7 +59,7 @@ public:
 class TransformModifier : public osg::NodeVisitor
 {
 public:
-	class TransformModifier() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
+	TransformModifier() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
 	{
 
 	}

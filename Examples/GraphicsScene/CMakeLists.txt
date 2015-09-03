@@ -47,6 +47,7 @@ SET(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
 	SurgSimDevices
+	${Boost_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
 )
 
