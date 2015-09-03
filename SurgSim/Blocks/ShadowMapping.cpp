@@ -108,7 +108,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
 		graphics->setSize(textureSize, textureSize);
 		graphics->setLocation(0, 0);
-		graphics->setTexture(previousPass->getRenderTarget()->getColorTarget(0));
+		graphics->setTexture(previous->getRenderTarget()->getColorTarget(0));
 		graphics->setGroupReference("VerticalBlurPass");
 		pass->addComponent(graphics);
 
@@ -116,6 +116,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		{
 			pass->showColorTarget(756, 0, 256, 256);
 		}
+		previous = pass->getCamera();
 		elements->push_back(pass);
 	}
 
