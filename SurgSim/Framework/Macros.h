@@ -21,11 +21,11 @@
 #define SURGSIM_CLASSNAME(ClassName) \
 	virtual std::string getClassName() const {return #ClassName;}
 
-/// GCC macro to write out an _Pragma statement inside a macro, disabled for other platforms
+/// Macro to tell GCC this is a used variable, and not to optimize it out
 #ifdef __GNUC__
-#define SURGSIM_DO_PRAGMA(x) _Pragma (#x)
+#define SURGSIM_USED_VARIABLE(x) x __attribute__((used))
 #else
-#define SURGSIM_DO_PRAGMA(x)
+#define SURGSIM_USED_VARIABLE(x) x
 #endif
 
 ///@{
