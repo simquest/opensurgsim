@@ -59,7 +59,7 @@ public:
 	/// \param deviceName Name for mouse device
 	explicit MouseDevice(const std::string& deviceName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::MouseDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::MouseDevice);
 
 	/// Destructor
 	virtual ~MouseDevice();

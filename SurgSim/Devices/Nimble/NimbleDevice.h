@@ -62,7 +62,7 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit NimbleDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::NimbleDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::NimbleDevice);
 
 	/// Destructor.
 	virtual ~NimbleDevice();

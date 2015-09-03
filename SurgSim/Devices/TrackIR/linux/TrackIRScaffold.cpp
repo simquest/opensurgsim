@@ -59,7 +59,7 @@ struct TrackIRScaffold::DeviceData
 	}
 
 	/// The corresponding device object.
-	SurgSim::Device::TrackIRDevice* const deviceObject;
+	SurgSim::Devices::TrackIRDevice* const deviceObject;
 	/// Processing thread.
 	std::unique_ptr<SurgSim::Devices::TrackIRThread> thread;
 

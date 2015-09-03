@@ -32,7 +32,7 @@ class NimbleThread;
 
 /// A class that manages Nimble devices.
 ///
-/// \sa SurgSim::Device::NimbleDevice
+/// \sa SurgSim::Devices::NimbleDevice
 class NimbleScaffold : public SurgSim::Framework::BasicThread
 {
 public:
