@@ -66,7 +66,7 @@ std::string CommonDevice::getClassName() const
 	SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
 		<< "getClassName() called on CommonDevice base class, this is wrong in almost all cases," <<
 			" this means there is a class that does not have getClassName() defined.";
-	return "SurgSim::Framework::Component";
+	return "SurgSim::Devices::CommonDevice";
 }
 
 

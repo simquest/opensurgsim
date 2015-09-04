@@ -65,24 +65,13 @@ TEST(LeapDeviceTest, HandType)
 	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 
-	EXPECT_TRUE(device->isTrackingRightHand());
-	EXPECT_FALSE(device->isTrackingLeftHand());
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
 
-	device->setTrackLeftHand(true);
-	EXPECT_FALSE(device->isTrackingRightHand());
-	EXPECT_TRUE(device->isTrackingLeftHand());
+	device->setHandType(HANDTYPE_LEFT);
+	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
 
-	device->setTrackLeftHand(false);
-	EXPECT_TRUE(device->isTrackingRightHand());
-	EXPECT_FALSE(device->isTrackingLeftHand());
-
-	device->setTrackRightHand(true);
-	EXPECT_TRUE(device->isTrackingRightHand());
-	EXPECT_FALSE(device->isTrackingLeftHand());
-
-	device->setTrackRightHand(false);
-	EXPECT_FALSE(device->isTrackingRightHand());
-	EXPECT_TRUE(device->isTrackingLeftHand());
+	device->setHandType(HANDTYPE_RIGHT);
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
 }
 
 TEST(LeapDeviceTest, TrackingMode)
@@ -225,17 +214,27 @@ TEST(LeapDeviceTest, AccessibleTest)
 {
 	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 
-	EXPECT_NO_THROW(device->setValue("TrackLeftHand", true));
-	EXPECT_TRUE(device->isTrackingLeftHand());
+	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
 
-	EXPECT_NO_THROW(device->setValue("TrackRightHand", true));
-	EXPECT_TRUE(device->isTrackingRightHand());
+	device->setValue("HandType", "Left");
+	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
 
-	EXPECT_NO_THROW(device->setValue("UseHmdTrackingMode", true));
-	EXPECT_TRUE(device->isUsingHmdTrackingMode());
+	EXPECT_NO_THROW(device->setValue("HandType", "Invalid"));
+	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
 
-	EXPECT_NO_THROW(device->setValue("ProvideImages", true));
-	EXPECT_TRUE(device->isProvidingImages());
+	EXPECT_NO_THROW(device->setValue("HandType", "right"));
+	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
+
+	EXPECT_NO_THROW(device->setValue("HandType", "Invalid"));
+	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
+
+	EXPECT_NO_THROW(device->setValue("HandType", "LEFT"));
+	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
 }
 
 };

@@ -298,7 +298,7 @@ void LeapScaffold::updateHandData()
 	{
 		auto sameHandType = [newHand](DeviceData* info)
 		{
-			return info->deviceObject->isTrackingLeftHand() == (*newHand).isLeft();
+			return (info->deviceObject->getHandType() == HANDTYPE_LEFT) == (*newHand).isLeft();
 		};
 		auto unassignedDevice = std::find_if(unassignedDevices.begin(), unassignedDevices.end(), sameHandType);
 

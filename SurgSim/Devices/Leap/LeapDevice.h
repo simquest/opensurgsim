@@ -30,6 +30,13 @@ class LeapScaffold;
 
 SURGSIM_STATIC_REGISTRATION(LeapDevice);
 
+enum HandType
+{
+	HANDTYPE_LEFT,
+	HANDTYPE_RIGHT
+};
+
+
 /// A class implementing the communication with one hand tracked by Leap Motion camera
 ///
 /// \par Application input provided by the device:
@@ -69,21 +76,21 @@ public:
 	/// Destructor.
 	virtual ~LeapDevice();
 
-	/// Set device to track a right hand, and only one right hand
-	/// \param trackRightHand True if the device should track a right hand, False for a left hand.
-	void setTrackRightHand(bool trackRightHand);
+	/// Set the type of hand
+	/// \param type The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
+	void setHandType(HandType type);
 
-	/// Is the device set to track a right hand
-	/// \return True if set to track a right hand, False is set to track a left hand
-	bool isTrackingRightHand() const;
+	/// Set the type of hand
+	/// \param type The hand type as a string, either "Left" or "Right" (case insensitive)
+	void setHandType(const std::string& type);
 
-	/// Set device to track a left hand, and only one left hand
-	/// \param trackLeftHand True if the device should track a left hand, False for a right hand.
-	void setTrackLeftHand(bool trackLeftHand);
+	/// Get the type of hand
+	/// \return The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
+	HandType getHandType() const;
 
-	/// Is the device set to track a left hand
-	/// \return True if set to track a left hand, False is set to track a right hand
-	bool isTrackingLeftHand() const;
+	/// Get the type of hand as a string
+	/// \return The hand type as a string, either "Left" or "Right"
+	std::string getHandTypeAsString() const;
 
 	/// Set the hand tracking mode to HMD
 	/// This is a global setting that optimizes hand tracking based on the Leap camera
@@ -118,7 +125,7 @@ private:
 
 	std::shared_ptr<LeapScaffold> m_scaffold;
 
-	bool m_trackRightHand;
+	HandType m_handType;
 
 	/// Tracking mode
 	DataStructures::OptionalValue<bool> m_requestedHmdTrackingMode;
