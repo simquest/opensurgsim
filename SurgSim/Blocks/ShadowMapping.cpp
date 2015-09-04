@@ -38,7 +38,7 @@ namespace Blocks
 {
 
 std::shared_ptr<Graphics::Camera> setupBlurPasses(
-	std::shared_ptr<Graphics::RenderPass> previousPass,
+	std::shared_ptr<Graphics::RenderPass> shadowMapPass,
 	int textureSize,
 	double blurRadius,
 	bool debug,
@@ -48,7 +48,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 	float shadowMapSize = static_cast<float>(textureSize);
 	float floatRadius = static_cast<float>(blurRadius);
 
-	std::shared_ptr<Graphics::Camera> previous = previousPass->getCamera();
+	std::shared_ptr<Graphics::Camera> perviousCamera = shadowMapPass->getCamera();
 
 	// Horizontal Pass
 	{
@@ -73,7 +73,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
 		graphics->setSize(textureSize, textureSize);
 		graphics->setLocation(0, 0);
-		graphics->setTexture(previous->getRenderTarget()->getColorTarget(0));
+		graphics->setTexture(perviousCamera->getRenderTarget()->getColorTarget(0));
 		graphics->setGroupReference("HorizontalBlurPass");
 		pass->addComponent(graphics);
 
@@ -81,7 +81,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		{
 			pass->showColorTarget(512, 0, 256, 256);
 		}
-		previous = pass->getCamera();
+		perviousCamera = pass->getCamera();
 		elements->push_back(pass);
 	}
 
@@ -108,7 +108,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
 		graphics->setSize(textureSize, textureSize);
 		graphics->setLocation(0, 0);
-		graphics->setTexture(previous->getRenderTarget()->getColorTarget(0));
+		graphics->setTexture(perviousCamera->getRenderTarget()->getColorTarget(0));
 		graphics->setGroupReference("VerticalBlurPass");
 		pass->addComponent(graphics);
 
@@ -116,11 +116,11 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		{
 			pass->showColorTarget(756, 0, 256, 256);
 		}
-		previous = pass->getCamera();
+		perviousCamera = pass->getCamera();
 		elements->push_back(pass);
 	}
 
-	return previous;
+	return perviousCamera;
 }
 
 /// Create the pass that renders the scene from the view of the light source
