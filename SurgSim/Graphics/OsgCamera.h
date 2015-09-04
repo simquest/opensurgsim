@@ -110,7 +110,6 @@ public:
 		double bottom, double top,
 		double near, double far) override;
 
-
 	void setViewport(int x, int y, int width, int height) override;
 
 	void getViewport(int* x, int* y, int* width, int* height) const override;
@@ -136,7 +135,7 @@ private:
 
 	/// Detach the current render target from the camera.
 	void detachCurrentRenderTarget();
-	void insertUpdaters(osg::ref_ptr<osg::Camera> m_camera, osg::ref_ptr<osg::Group> m_materialProxy);
+
 	/// Uniform to carry the view matrix
 	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_viewMatrixUniform;
 
@@ -149,17 +148,7 @@ private:
 	/// Value for ambient color
 	SurgSim::Math::Vector4d m_ambientColor;
 
-
-	/// Global uniforms
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_mainViewMatrixUniform;
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseMainViewMatrixUniform;
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_mainProjectionMatrix;
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseMainProjectionMatrixUniform;
 	bool m_isMainCamera;
-
-	osg::ref_ptr<osg::Node> m_leftCameraUniformNode;
-	osg::ref_ptr<osg::Node> m_righCameraUniformNode;
-	osg::ref_ptr<osg::Node> m_monoCameraUniformNode;
 };
 
 };  // namespace Graphics

@@ -232,7 +232,6 @@ bool OsgView::doWakeUp()
 		m_view->getCamera()->getGraphicsContext()->getState()->setUseVertexAttributeAliasing(true);
 	}
 
-
 	return true;
 }
 

@@ -69,7 +69,8 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createMonoView(
 	viewElement->getView()->setPosition(position);
 	viewElement->getView()->setDimensions(dimensions);
 
-	viewElement->getCamera()->setPerspectiveProjection(30, 1.0, 0.01, 10.0);
+	double aspectRatio = static_cast<double>(width) / static_cast<double>(height);
+	viewElement->getCamera()->setPerspectiveProjection(60.0, aspectRatio, 0.01, 10.0);
 	std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(viewElement->getCamera())->setMainCamera(true);
 	/// It's an OsgViewElement, we have an OsgView, turn on mapping of uniform and attribute values
 	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);
@@ -369,8 +370,17 @@ int main(int argc, char* argv[])
 	{
 		// Only interested in the oculus
 		auto device = SurgSim::Device::createDevice("SurgSim::Device::OculusDevice", "Oculus");
-		SURGSIM_ASSERT(device != nullptr) << "Could not create Oculus";
-		input->addDevice(device);
+
+		if (device != nullptr)
+		{
+			input->addDevice(device);
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+					<< "Could not initialize Oculus Device, falling back to mono display.";
+			useStereo = false;
+		}
 	}
 
 	auto behaviors = std::make_shared<SurgSim::Framework::BehaviorManager>();

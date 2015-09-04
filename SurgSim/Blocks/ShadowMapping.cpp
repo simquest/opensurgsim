@@ -159,7 +159,7 @@ std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, bool 
 		osg::Transform::ABSOLUTE_RF);
 
 
-	auto material = Graphics::buildMaterial("Shaders/shadow_map_global.vert", "Shaders/shadow_map.frag");
+	auto material = Graphics::buildMaterial("Shaders/shadow_map.vert", "Shaders/shadow_map.frag");
 	material->getProgram()->setGlobalScope(true);
 	pass->setMaterial(material);
 

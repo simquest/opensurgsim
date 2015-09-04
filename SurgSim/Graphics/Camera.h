@@ -155,8 +155,21 @@ public:
 	/// \return the ambient light that gets added to the scene
 	virtual SurgSim::Math::Vector4d getAmbientColor() = 0;
 
+	/// Marks the camera as a main view camera, this means that view dependent passes should follow this camera with
+	/// their appropriate calculations, for this purpose when isMainCamera() is true, the camera provides a uniform
+	/// struct with it's transforms. This function will most likely be called by the view.
+	/// \code
+	/// struct MainCamera {
+	///     mat4 viewMatrix;
+	///     mat4 inverseViewMatrix;
+	///     mat4 projectionMatrix;
+	///     mat4 mainProjectionMatrix;
+	/// };
+	/// uniform MainCamera mainCamera;
+	/// \endcode
 	virtual void setMainCamera(bool val) = 0;
 
+	/// \return whether this is used as a main camera
 	virtual bool isMainCamera() = 0;
 
 private:
