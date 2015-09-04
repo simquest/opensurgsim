@@ -90,7 +90,7 @@ TEST(OculusDeviceTest, RegisterMoreThanOneDevice)
 
 	auto device2 = std::make_shared<OculusDevice>("Oculus2");
 	ASSERT_TRUE(nullptr != device2) << "Device creation failed.";
-	EXPECT_THROW(device2->initialize(), SurgSim::Framework::AssertionFailure);
+	ASSERT_FALSE(device2->initialize()) << "Initialization should not have succeceded, only one device allowed.";
 }
 
 TEST(OculusDeviceTest, RegisterAndUnregisterDevice)
