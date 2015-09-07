@@ -72,7 +72,7 @@ TEST_F(SegmentMeshShapeTest, ValidTest)
 	SegmentMeshPlain emptyMesh;
 	SurgSim::Math::SegmentMeshShape shape(emptyMesh, 1.0);
 	EXPECT_TRUE(shape.isValid());
-	shape.setRadius(1e-6);
+	shape.setRadius(1e-11);
 	EXPECT_FALSE(shape.isValid());
 }
 

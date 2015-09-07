@@ -19,11 +19,8 @@
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeData.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/Geometry.h"
 
-namespace
-{
-	const double epsilon = 1e-10;
-};
 
 namespace SurgSim
 {
@@ -44,32 +41,37 @@ int SegmentMeshShape::getType() const
 
 double SegmentMeshShape::getVolume() const
 {
+	SURGSIM_ASSERT("SegmentMeshShape: Volume calculation not implemented.");
 	return std::numeric_limits<double>::quiet_NaN();
 }
 
 Vector3d SegmentMeshShape::getCenter() const
 {
+	SURGSIM_ASSERT("SegmentMeshShape: Center calculation not implemented.");
 	return Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
 }
 
 Matrix33d SegmentMeshShape::getSecondMomentOfVolume() const
 {
+	SURGSIM_ASSERT("SegmentMeshShape: Second Moment Of Volume calculation not implemented.");
 	return Matrix33d::Constant(std::numeric_limits<double>::quiet_NaN());
 }
 
 bool SegmentMeshShape::isValid() const
 {
-	return (m_radius > 1e-5);
+	// If the radius is less than DistanceEpsilon, the collision detection (which assumes the segments are capsules),
+	/// will not work correctly.
+	return (m_radius >= SurgSim::Math::Geometry::DistanceEpsilon);
 }
 
 void SegmentMeshShape::setRadius(double radius)
 {
 	m_radius = radius;
-	double boxHalfDiagonal = m_radius * std::sqrt(3.0);
-	m_boxHalfDiagonal = Vector3d(-boxHalfDiagonal, -boxHalfDiagonal, -boxHalfDiagonal);
+	double boxHalfExtent = m_radius * std::sqrt(3.0);
+	m_segmentEndBoundingBoxHalfExtent = Vector3d(boxHalfExtent, boxHalfExtent, boxHalfExtent);
 }
 
-double SegmentMeshShape::getRadius()
+double SegmentMeshShape::getRadius() const
 {
 	return m_radius;
 }
@@ -82,11 +84,7 @@ bool SegmentMeshShape::doUpdate()
 
 bool SegmentMeshShape::doLoad(const std::string& fileName)
 {
-	if (!SurgSim::DataStructures::SegmentMeshPlain::doLoad(fileName))
-	{
-		return false;
-	}
-	return update();
+	return SurgSim::DataStructures::SegmentMeshPlain::doLoad(fileName) && update();
 }
 
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> SegmentMeshShape::getAabbTree() const
@@ -107,10 +105,10 @@ void SegmentMeshShape::updateAabbTree()
 		if (edges[id].isValid)
 		{
 			const auto& vertices = getEdgePositions(id);
-			Aabbd aabb((vertices[0] + m_boxHalfDiagonal).eval());
-			aabb.extend((vertices[0] - m_boxHalfDiagonal).eval());
-			aabb.extend((vertices[1] + m_boxHalfDiagonal).eval());
-			aabb.extend((vertices[1] - m_boxHalfDiagonal).eval());
+			Aabbd aabb((vertices[0] - m_segmentEndBoundingBoxHalfExtent).eval());
+			aabb.extend((vertices[0] + m_segmentEndBoundingBoxHalfExtent).eval());
+			aabb.extend((vertices[1] - m_segmentEndBoundingBoxHalfExtent).eval());
+			aabb.extend((vertices[1] + m_segmentEndBoundingBoxHalfExtent).eval());
 			items.emplace_back(std::make_pair(std::move(aabb), id));
 		}
 	}

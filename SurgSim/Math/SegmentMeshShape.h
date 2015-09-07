@@ -57,7 +57,7 @@ public:
 	void setRadius(double radius);
 
 	/// \return The radius of the segments.
-	double getRadius();
+	double getRadius() const;
 
 	/// \return The object's associated AabbTree
 	const std::shared_ptr<const SurgSim::DataStructures::AabbTree> getAabbTree() const;
@@ -76,8 +76,8 @@ private:
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 
-	/// Half diagonal of the AABB of the sphere at one of the segment end.
-	Vector3d m_boxHalfDiagonal;
+	/// Half extent of the AABB of the sphere at one of the segment end.
+	Vector3d m_segmentEndBoundingBoxHalfExtent;
 };
 
 } // Math
