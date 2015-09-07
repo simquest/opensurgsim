@@ -165,8 +165,8 @@ std::array<SurgSim::Math::Vector3d, 2>
 TriangleMesh<VertexData, EdgeData, TriangleData>::getEdgePositions(size_t id) const
 {
 	auto& ids = getEdge(id).verticesId;
-	std::array<SurgSim::Math::Vector3d, 2> result
-	= {{
+	std::array<SurgSim::Math::Vector3d, 2> result =
+	{{
 			Vertices<VertexData>::getVertex(ids[0]).position,
 			Vertices<VertexData>::getVertex(ids[1]).position
 		}
@@ -209,8 +209,8 @@ std::array<SurgSim::Math::Vector3d, 3>
 TriangleMesh<VertexData, EdgeData, TriangleData>::getTrianglePositions(size_t id) const
 {
 	auto& ids = getTriangle(id).verticesId;
-	std::array<SurgSim::Math::Vector3d, 3> result
-	= {{
+	std::array<SurgSim::Math::Vector3d, 3> result =
+	{{
 			Vertices<VertexData>::getVertex(ids[0]).position,
 			Vertices<VertexData>::getVertex(ids[1]).position,
 			Vertices<VertexData>::getVertex(ids[2]).position

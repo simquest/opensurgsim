@@ -500,7 +500,7 @@ public:
 	std::array<int, 2> getPosition() const override
 	{
 		std::array<int, 2> result = {m_x, m_y};
-		return std::move(result);
+		return result;
 	}
 
 	/// Set the dimensions of this view
@@ -516,7 +516,7 @@ public:
 	std::array<int, 2> getDimensions() const override
 	{
 		std::array<int, 2> result = {m_width, m_height};
-		return std::move(result);
+		return result;
 	}
 
 	/// Sets whether the view window has a border

@@ -77,26 +77,7 @@ Eigen::AlignedBox<Scalar, Dim> makeAabb(
 	Eigen::AlignedBox<Scalar, Dim> result(vector0);
 	result.extend(vector1);
 	result.extend(vector2);
-	return std::move(result);
-}
-
-/// Convenience function for creating a bounding box from four vertices
-/// \tparam Scalar numeric type
-/// \tparam Dim dimension of the space to be used
-/// \tparam MType the eigen type of the vectors
-/// \return an AABB containing all the points passed
-template <class Scalar, int Dim, int MType>
-Eigen::AlignedBox<Scalar, Dim> makeAabb(
-	const Eigen::Matrix<Scalar, Dim, 1, MType>& vector0,
-	const Eigen::Matrix<Scalar, Dim, 1, MType>& vector1,
-	const Eigen::Matrix<Scalar, Dim, 1, MType>& vector2,
-	const Eigen::Matrix<Scalar, Dim, 1, MType>& vector3)
-{
-	Eigen::AlignedBox<Scalar, Dim> result(vector0);
-	result.extend(vector1);
-	result.extend(vector2);
-	result.extend(vector3);
-	return std::move(result);
+	return result;
 }
 
 }

@@ -107,9 +107,10 @@ void SegmentMeshShape::updateAabbTree()
 		if (edges[id].isValid)
 		{
 			const auto& vertices = getEdgePositions(id);
-			Aabbd aabb(SurgSim::Math::makeAabb((vertices[0] + m_boxHalfDiagonal).eval(),
-				(vertices[0] - m_boxHalfDiagonal).eval(), (vertices[1] + m_boxHalfDiagonal).eval(),
-				(vertices[1] - m_boxHalfDiagonal).eval()));
+			Aabbd aabb((vertices[0] + m_boxHalfDiagonal).eval());
+			aabb.extend((vertices[0] - m_boxHalfDiagonal).eval());
+			aabb.extend((vertices[1] + m_boxHalfDiagonal).eval());
+			aabb.extend((vertices[1] - m_boxHalfDiagonal).eval());
 			items.emplace_back(std::make_pair(std::move(aabb), id));
 		}
 	}
