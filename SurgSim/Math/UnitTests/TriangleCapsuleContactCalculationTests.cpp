@@ -182,14 +182,7 @@ protected:
 				EXPECT_LE(std::abs(cDistance), Geometry::DistanceEpsilon);
 
 				// Check that tPoint is inside t.
-				Vector3d bary;
-				barycentricCoordinates(tPoint, t.v0, t.v1, t.v2, &bary);
-				bool isBaryWithinTriangle =
-					bary[0] >= -Geometry::DistanceEpsilon && bary[0] <= (1.0 + Geometry::DistanceEpsilon) &&
-					bary[1] >= -Geometry::DistanceEpsilon && bary[1] <= (1.0 + Geometry::DistanceEpsilon) &&
-					bary[2] >= -Geometry::DistanceEpsilon && bary[2] <= (1.0 + Geometry::DistanceEpsilon);
-				EXPECT_TRUE(isBaryWithinTriangle);
-				//EXPECT_TRUE(SurgSim::Math::isPointInsideTriangle(tPoint, t.v0, t.v1, t.v2))
+				EXPECT_TRUE(SurgSim::Math::isPointInsideTriangle(tPoint, t.v0, t.v1, t.v2));
 
 				// Check if the penetration depth when applied as correction, separates the shapes.
 				// First move the shapes apart by just short of the penetration depth, to make sure
