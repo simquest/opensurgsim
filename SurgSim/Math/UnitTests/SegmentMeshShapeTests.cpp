@@ -34,7 +34,8 @@ using SurgSim::Math::Vector3d;
 class SegmentMeshShapeTest : public ::testing::Test
 {
 public:
-	std::shared_ptr<SegmentMeshPlain> build(const Vector3d& start, Vector3d direction, size_t numVertices = 10) const
+	std::shared_ptr<SegmentMeshPlain> build(const Vector3d& start, const Vector3d& direction,
+		size_t numVertices = 10) const
 	{
 		auto mesh = std::make_shared<SegmentMeshPlain>();
 

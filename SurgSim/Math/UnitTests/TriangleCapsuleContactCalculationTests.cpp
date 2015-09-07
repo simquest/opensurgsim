@@ -189,10 +189,11 @@ protected:
 					bary[1] >= -Geometry::DistanceEpsilon && bary[1] <= (1.0 + Geometry::DistanceEpsilon) &&
 					bary[2] >= -Geometry::DistanceEpsilon && bary[2] <= (1.0 + Geometry::DistanceEpsilon);
 				EXPECT_TRUE(isBaryWithinTriangle);
+				//EXPECT_TRUE(SurgSim::Math::isPointInsideTriangle(tPoint, t.v0, t.v1, t.v2))
 
-				// Check if the penetration depth when applied as correction, separates the triangles.
-				// First move the triangles apart by just short of the penetration depth, to make sure
-				// the triangles are still colliding.
+				// Check if the penetration depth when applied as correction, separates the shapes.
+				// First move the shapes apart by just short of the penetration depth, to make sure
+				// the shapes are still colliding.
 				{
 					Vector3d tP, cP;
 					Vector3d correction = normal * (0.5 * penetrationDepth - Geometry::DistanceEpsilon);
@@ -204,8 +205,8 @@ protected:
 						correctedT.v1, correctedT.v2, correctedT.n, &cP, &tP) - c.r;
 					EXPECT_TRUE(correctedDistance <= Geometry::DistanceEpsilon);
 				}
-				// Now move the triangles apart by just a little farther than the penetration depth, to establish
-				// that the triangles are not colliding.
+				// Now move the shapes apart by just a little farther than the penetration depth, to establish
+				// that the shapes are not colliding.
 				{
 					Vector3d tP, cP;
 					Vector3d correction = normal * (0.5 * penetrationDepth + Geometry::DistanceEpsilon);
@@ -228,7 +229,7 @@ protected:
 		MockTriangle t(Vector3d(5, -5, 0), Vector3d(0, 5, 0), Vector3d(-5, -5, 0));
 		MockCapsule c(MockCapsule(cv0, cv1, 0.5));
 
-		for (auto transform : m_transforms)
+		for (const auto& transform : m_transforms)
 		{
 			MockTriangle transformedT(t);
 			transformedT.transform(transform);

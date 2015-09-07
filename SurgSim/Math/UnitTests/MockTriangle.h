@@ -84,7 +84,7 @@ public:
 		n = r * n;
 	}
 
-	// Transform this capsule by the given matrix.
+	// Transform this triangle by the given matrix.
 	void transform(SurgSim::Math::RigidTransform3d transform)
 	{
 		v0  = transform * v0;
