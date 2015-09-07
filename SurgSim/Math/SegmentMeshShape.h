@@ -41,8 +41,9 @@ public:
 	/// Constructor
 	/// \param mesh The segment mesh to build the shape from
 	/// \param radius The radius associated to this surface mesh
-	/// \exception Raise an exception if the mesh is invalid
-	SegmentMeshShape(const SurgSim::DataStructures::SegmentMeshPlain& mesh, double radius = 1e-2);
+	/// \note The default radius is positive EPSILON to be relevant in collision detection calculations.
+	template <class VertexData, class EdgeData>
+	SegmentMeshShape(const SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>& mesh, double radius = 1e-10);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::SegmentMeshShape);
 
@@ -81,5 +82,7 @@ private:
 
 } // Math
 } // SurgSim
+
+#include "SurgSim/Math/SegmentMeshShape-inl.h"
 
 #endif // SURGSIM_MATH_SEGMENTMESHSHAPE_H

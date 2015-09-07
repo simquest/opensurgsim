@@ -33,14 +33,7 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SegmentMeshShape, SegmentM
 
 SegmentMeshShape::SegmentMeshShape()
 {
-	setRadius(1e-2);
-	updateAabbTree();
-}
-
-SegmentMeshShape::SegmentMeshShape(const SurgSim::DataStructures::SegmentMeshPlain& mesh, double radius)
-	: SurgSim::DataStructures::SegmentMeshPlain(mesh)
-{
-	setRadius(radius);
+	setRadius(1e-10);
 	updateAabbTree();
 }
 

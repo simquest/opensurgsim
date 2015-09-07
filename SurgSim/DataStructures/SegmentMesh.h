@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_SEGMENTMESH_H
 #define SURGSIM_DATASTRUCTURES_SEGMENTMESH_H
 
+#include "SurgSim/DataStructures/SegmentEmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 
 namespace SurgSim
@@ -24,15 +25,72 @@ namespace DataStructures
 {
 
 /// Class to hold the type of a SegmentMesh.
+///
+/// \tparam	VertexData	Type of extra data stored in each vertex
+/// \tparam	EdgeData	Type of extra data stored in each edge
+/// \sa TriangleMesh
 template <class VertexData, class EdgeData>
-struct SegmentMesh
+class SegmentMesh : public TriangleMesh<VertexData, EdgeData, SegmentEmptyData>
 {
-	typedef TriangleMesh<VertexData, EdgeData, EmptyData> Type;
+public:
+	/// Constructor. The mesh is initially empty (no vertices, no edges).
+	SegmentMesh();
+
+	/// Copy constructor when the template data is the same type
+	/// \param other the mesh to copy from
+	SegmentMesh(const SegmentMesh<VertexData, EdgeData>& other);
+
+	/// Copy constructor when the template data is a different type
+	/// \tparam	V Type of extra data stored in each vertex
+	/// \tparam	E Type of extra data stored in each edge
+	/// \param other The mesh to be copied from. Vertex and edge data will not be copied
+	/// \note: Data of the input mesh, i.e. VertexDataSource, EdgeDataSource will not be copied.
+	template <class V, class E>
+	explicit SegmentMesh(const SegmentMesh<V, E>& other);
+
+	/// Destructor
+	virtual ~SegmentMesh();
+
+	/// Move Constructor
+	/// \param other Constructor source
+	SegmentMesh(SegmentMesh&& other);
+
+	/// Copy Assignment
+	/// \param other Assignment source
+	SegmentMesh<VertexData, EdgeData>& operator=(
+		const SegmentMesh<VertexData, EdgeData>& other);
+
+	/// Move Assignment
+	/// \param other Assignment source
+	SegmentMesh<VertexData, EdgeData>& operator=(
+		SegmentMesh<VertexData, EdgeData>&& other);
+
+	std::string getClassName() const override;
+
+	///@{
+	/// Functions that need to assert, because they deal with triangles.
+	size_t addTriangle(const TriangleType& triangle);
+	size_t getNumTriangles() const;
+	const std::vector<TriangleType>& getTriangles() const;
+	std::vector<TriangleType>& getTriangles();
+	const TriangleType& getTriangle(size_t id) const;
+	TriangleType& getTriangle(size_t id);
+	void removeTriangle(size_t id);
+	std::array<SurgSim::Math::Vector3d, 3> getTrianglePositions(size_t id) const;
+	void doClearTriangles() override;
+	///@}
+
+private:
+	/// The class name
+	//static std::string m_classNameSegment;
+
 };
 
-typedef SegmentMesh<EmptyData, EmptyData>::Type SegmentMeshPlain;
+typedef SegmentMesh<EmptyData, EmptyData> SegmentMeshPlain;
 
 }  // namespace DataStructures
 }  // namespace SurgSim
+
+#include <SurgSim/DataStructures/SegmentMesh-inl.h>
 
 #endif  // SURGSIM_DATASTRUCTURES_SEGMENTMESH_H

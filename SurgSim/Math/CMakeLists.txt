@@ -106,6 +106,7 @@ set(SURGSIM_MATH_HEADERS
 	Quaternion.h
 	RigidTransform.h
 	SegmentMeshShape.h
+	SegmentMeshShape-inl.h
 	Shape.h
 	Shapes.h
 	SparseMatrix.h
