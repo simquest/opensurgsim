@@ -29,8 +29,8 @@
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
-using SurgSim::Device::IdentityPoseDevice;
-using SurgSim::Device::LabJackDevice;
+using SurgSim::Devices::IdentityPoseDevice;
+using SurgSim::Devices::LabJackDevice;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -255,33 +255,33 @@ int main(int argc, char** argv)
 	std::shared_ptr<LabJackDevice> toolDevice = std::make_shared<LabJackDevice>("LabJackDevice");
 	toolDevice->setAddress(""); // Get the first-found of the specified type and connection.
 
-	const int plusX = SurgSim::Device::LabJack::FIO0;
+	const int plusX = SurgSim::Devices::LabJack::FIO0;
 	toolDevice->enableDigitalInput(plusX);
-	const int minusX = SurgSim::Device::LabJack::FIO1;
+	const int minusX = SurgSim::Devices::LabJack::FIO1;
 	toolDevice->enableDigitalInput(minusX);
 
-	const int loopbackOut = SurgSim::Device::LabJack::FIO2;
+	const int loopbackOut = SurgSim::Devices::LabJack::FIO2;
 	toolDevice->enableDigitalOutput(loopbackOut);
 
 	const int offset = 4;
 	toolDevice->setTimerCounterPinOffset(offset); // the U3 requires the offset to be 4+.
 
-	const int firstTimerForQuadrature = SurgSim::Device::LabJack::TIMER0;
-	toolDevice->enableTimer(firstTimerForQuadrature, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
-	toolDevice->enableTimer(firstTimerForQuadrature + 1, SurgSim::Device::LabJack::TIMERMODE_QUADRATURE);
+	const int firstTimerForQuadrature = SurgSim::Devices::LabJack::TIMER0;
+	toolDevice->enableTimer(firstTimerForQuadrature, SurgSim::Devices::LabJack::TIMERMODE_QUADRATURE);
+	toolDevice->enableTimer(firstTimerForQuadrature + 1, SurgSim::Devices::LabJack::TIMERMODE_QUADRATURE);
 
-	const int resetQuadrature = SurgSim::Device::LabJack::FIO3;
+	const int resetQuadrature = SurgSim::Devices::LabJack::FIO3;
 	toolDevice->enableDigitalInput(resetQuadrature);
 
-	const int singleEndedAnalog = SurgSim::Device::LabJack::AIN1;
-	toolDevice->enableAnalogInput(singleEndedAnalog, SurgSim::Device::LabJack::Range::RANGE_10);
+	const int singleEndedAnalog = SurgSim::Devices::LabJack::AIN1;
+	toolDevice->enableAnalogInput(singleEndedAnalog, SurgSim::Devices::LabJack::Range::RANGE_10);
 
-	const int positiveAnalogDifferential = SurgSim::Device::LabJack::AIN2;
-	const int negativeAnalogDifferential = SurgSim::Device::LabJack::AIN3;
-	toolDevice->enableAnalogInput(positiveAnalogDifferential, SurgSim::Device::LabJack::Range::RANGE_10,
+	const int positiveAnalogDifferential = SurgSim::Devices::LabJack::AIN2;
+	const int negativeAnalogDifferential = SurgSim::Devices::LabJack::AIN3;
+	toolDevice->enableAnalogInput(positiveAnalogDifferential, SurgSim::Devices::LabJack::Range::RANGE_10,
 		negativeAnalogDifferential);
 
-	const int xOut = SurgSim::Device::LabJack::DAC1;
+	const int xOut = SurgSim::Devices::LabJack::DAC1;
 	toolDevice->enableAnalogOutput(xOut);
 
 	const double translationPerUpdate = 0.001; // Millimeter per update.

@@ -45,7 +45,7 @@ using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 struct OculusScaffold::DeviceData
@@ -313,5 +313,5 @@ std::shared_ptr<OculusScaffold> OculusScaffold::getOrCreateSharedInstance()
 	return sharedInstance.get();
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

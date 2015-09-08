@@ -19,7 +19,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 NovintCommonDevice::NovintCommonDevice(const std::string& uniqueName) :
@@ -135,5 +135,5 @@ bool NovintCommonDevice::is7DofDevice() const
 	return false;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

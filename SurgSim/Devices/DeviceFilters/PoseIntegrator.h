@@ -34,7 +34,7 @@ namespace DataStructures
 class DataGroupCopier;
 };
 
-namespace Device
+namespace Devices
 {
 /// A device filter that integrates the pose, turning a relative device into an absolute one.
 /// Also provides the instantaneous linear and angular velocities.
@@ -52,7 +52,7 @@ public:
 	/// \param name	Name of this device filter.
 	explicit PoseIntegrator(const std::string& name);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::PoseIntegrator);
+	SURGSIM_CLASSNAME(SurgSim::Devices::PoseIntegrator);
 
 	/// Integrates the pose.
 	/// \param pose	The latest differential pose.
@@ -108,7 +108,7 @@ private:
 };
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_DEVICEFILTERS_POSEINTEGRATOR_H

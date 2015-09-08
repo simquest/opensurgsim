@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class OculusScaffold;
 
@@ -52,7 +52,7 @@ public:
 	/// \param name A unique name for the device.
 	explicit OculusDevice(const std::string& name);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::OculusDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::OculusDevice);
 
 	/// Destructor.
 	virtual ~OculusDevice();
@@ -91,7 +91,7 @@ private:
 	std::shared_ptr<OculusScaffold> m_scaffold;
 };
 
-}; // namespace Device
+}; // namespace Devices
 }; // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_OCULUS_OCULUSDEVICE_H

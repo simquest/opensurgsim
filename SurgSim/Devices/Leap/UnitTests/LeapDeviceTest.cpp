@@ -26,13 +26,13 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::LeapDevice;
+using SurgSim::Devices::LeapDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Testing::MockInputOutput;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 TEST(LeapDeviceTest, CreateUninitializedDevice)
@@ -84,6 +84,7 @@ TEST(LeapDeviceTest, TrackingMode)
 	{
 		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
+
 		EXPECT_FALSE(device->isUsingHmdTrackingMode()) << "HMD Tracking should be off by default.";
 	}
 	{
@@ -206,8 +207,8 @@ TEST(LeapDeviceTest, OutputProducer)
 TEST(LeapDeviceTest, FactoryCreation)
 {
 	std::shared_ptr<Input::DeviceInterface> device;
-	ASSERT_NO_THROW(device = Input::DeviceInterface::getFactory().create("SurgSim::Device::LeapDevice", "TestLeap"));
-	EXPECT_EQ("SurgSim::Device::LeapDevice", device->getClassName());
+	ASSERT_NO_THROW(device = Input::DeviceInterface::getFactory().create("SurgSim::Devices::LeapDevice", "TestLeap"));
+	EXPECT_EQ("SurgSim::Devices::LeapDevice", device->getClassName());
 }
 
 TEST(LeapDeviceTest, AccessibleTest)

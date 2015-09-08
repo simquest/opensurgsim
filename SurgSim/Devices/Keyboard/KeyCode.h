@@ -18,7 +18,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 	// KeyCode pulled out from osgGA/GUIEventAdapter
 	enum KeyCode
@@ -243,7 +243,7 @@ namespace Device
 		MODKEY_CAPS_ALT_L     = (MODKEY_CAPS_LOCK|MODKEY_LEFT_ALT),
 		MODKEY_CAPS_ALT_R     = (MODKEY_CAPS_LOCK|MODKEY_RIGHT_ALT)
 	};
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_KEYBOARD_KEYCODE_H

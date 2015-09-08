@@ -35,7 +35,7 @@ namespace Framework
 class Logger;
 };  // namespace Framework
 
-namespace Device
+namespace Devices
 {
 
 /// Access to an input/HID device using the HID API from the Windows Driver Kit.
@@ -114,7 +114,7 @@ private:
 	std::unique_ptr<State> m_state;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_WIN32_WDKHIDDEVICEHANDLE_H

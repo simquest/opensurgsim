@@ -79,7 +79,7 @@ struct TestListener : public SurgSim::Input::InputConsumerInterface
 
 int main(int argc, char* argv[])
 {
-	auto toolDevice	 = std::make_shared<SurgSim::Device::MouseDevice>("Mouse");
+	auto toolDevice	 = std::make_shared<SurgSim::Devices::MouseDevice>("Mouse");
 	toolDevice->initialize();
 
 	osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler = toolDevice->getMouseHandler();

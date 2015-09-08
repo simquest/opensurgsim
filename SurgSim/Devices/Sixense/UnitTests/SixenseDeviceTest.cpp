@@ -28,8 +28,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::SixenseDevice;
-using SurgSim::Device::SixenseScaffold;
+using SurgSim::Devices::SixenseDevice;
+using SurgSim::Devices::SixenseScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;

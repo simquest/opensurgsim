@@ -27,8 +27,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::RawMultiAxisDevice;
-using SurgSim::Device::RawMultiAxisScaffold;
+using SurgSim::Devices::RawMultiAxisDevice;
+using SurgSim::Devices::RawMultiAxisScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
@@ -62,7 +62,7 @@ TEST(RawMultiAxisDeviceTest, Factory)
 {
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
 	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create(
-								 "SurgSim::Device::RawMultiAxisDevice", "Device"));
+								 "SurgSim::Devices::RawMultiAxisDevice", "Device"));
 	EXPECT_NE(nullptr, device);
 }
 

@@ -20,7 +20,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class OpenNIScaffold;
 
@@ -37,7 +37,7 @@ SURGSIM_STATIC_REGISTRATION(OpenNIDevice);
 ///
 /// \par Application output used by the device: none.
 ///
-/// \sa SurgSim::Device::OpenNIScaffold
+/// \sa SurgSim::Devices::OpenNIScaffold
 class OpenNIDevice : public SurgSim::Input::CommonDevice
 {
 public:
@@ -45,7 +45,7 @@ public:
 	/// \param name A unique name for the device that will be used by the application.
 	explicit OpenNIDevice(const std::string& name);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::OpenNIDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::OpenNIDevice);
 
 	/// Destructor.
 	virtual ~OpenNIDevice();

@@ -24,7 +24,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class RawMultiAxisScaffold;
 
@@ -61,7 +61,7 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit RawMultiAxisDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::RawMultiAxisDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::RawMultiAxisDevice);
 
 	/// Destructor.
 	virtual ~RawMultiAxisDevice();
@@ -111,7 +111,7 @@ private:
 	}
 
 
-	friend SurgSim::Device::MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName);
+	friend SurgSim::Devices::MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName);
 	friend class RawMultiAxisScaffold;
 
 	std::shared_ptr<RawMultiAxisScaffold> m_scaffold;
@@ -124,7 +124,7 @@ private:
 	bool m_useAxisDominance;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISDEVICE_H

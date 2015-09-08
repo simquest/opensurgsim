@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class SixenseDevice;
@@ -31,7 +31,7 @@ class SixenseThread;
 
 /// A class that manages Sixense devices, such as the Razer Hydra.
 ///
-/// \sa SurgSim::Device::SixenseDevice
+/// \sa SurgSim::Devices::SixenseDevice
 class SixenseScaffold
 {
 public:
@@ -148,7 +148,7 @@ private:
 	static int m_startupRetryIntervalMilliseconds;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_SIXENSE_SIXENSESCAFFOLD_H

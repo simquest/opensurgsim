@@ -25,11 +25,11 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A class implementing the thread context for sampling RawMultiAxis devices.
-/// \sa SurgSim::Device::RawMultiAxisScaffold
+/// \sa SurgSim::Devices::RawMultiAxisScaffold
 class RawMultiAxisThread : public SurgSim::Framework::BasicThread
 {
 public:
@@ -48,7 +48,7 @@ private:
 	RawMultiAxisScaffold::DeviceData* m_deviceData;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISTHREAD_H

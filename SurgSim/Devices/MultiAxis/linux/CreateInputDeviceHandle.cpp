@@ -20,7 +20,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 
@@ -36,5 +36,5 @@ std::vector<std::string> enumerateInputDevicePaths(SurgSim::Framework::Logger* l
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

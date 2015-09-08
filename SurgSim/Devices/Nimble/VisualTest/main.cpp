@@ -22,8 +22,8 @@
 #include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
 using SurgSim::Input::DeviceInterface;
-using SurgSim::Device::PoseTransform;
-using SurgSim::Device::NimbleDevice;
+using SurgSim::Devices::PoseTransform;
+using SurgSim::Devices::NimbleDevice;
 
 int main(int argc, char** argv)
 {

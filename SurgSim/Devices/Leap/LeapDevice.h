@@ -24,7 +24,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class LeapScaffold;
 
@@ -63,7 +63,7 @@ enum HandType
 ///
 /// \par Application output used by the device: none.
 ///
-/// \sa SurgSim::Device::LeapScaffold
+/// \sa SurgSim::Devices::LeapScaffold
 class LeapDevice : public SurgSim::Input::CommonDevice
 {
 public:
@@ -71,7 +71,7 @@ public:
 	/// \param name A unique name for the device that will be used by the application.
 	explicit LeapDevice(const std::string& name);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::LeapDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::LeapDevice);
 
 	/// Destructor.
 	virtual ~LeapDevice();

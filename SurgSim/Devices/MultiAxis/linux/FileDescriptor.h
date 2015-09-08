@@ -21,7 +21,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A wrapper for an UNIX-style integer file descriptor.
@@ -107,7 +107,7 @@ private:
 	bool m_canWrite;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_LINUX_FILEDESCRIPTOR_H

@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class PhantomScaffold;
 
@@ -63,7 +63,7 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit PhantomDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::PhantomDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::PhantomDevice);
 
 	/// Destructor.
 	virtual ~PhantomDevice();
@@ -93,7 +93,7 @@ private:
 	std::string m_initializationName;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_PHANTOM_PHANTOMDEVICE_H

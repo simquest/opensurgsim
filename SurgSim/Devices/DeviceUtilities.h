@@ -28,7 +28,7 @@ namespace Input
 class DeviceInterface;
 }
 
-namespace Device
+namespace Devices
 {
 
 /// Attempts to create and initialize a device from a list of devices to try

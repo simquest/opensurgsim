@@ -26,7 +26,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class LabJackScaffold;
 
@@ -278,7 +278,7 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit LabJackDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::LabJackDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::LabJackDevice);
 
 	/// Destructor.
 	virtual ~LabJackDevice();
@@ -539,7 +539,7 @@ private:
 	int m_analogInputSettling;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_LABJACK_LABJACKDEVICE_H

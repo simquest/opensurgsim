@@ -30,7 +30,7 @@
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
-using SurgSim::Device::PoseTransform;
+using SurgSim::Devices::PoseTransform;
 using SurgSim::Input::CommonDevice;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;

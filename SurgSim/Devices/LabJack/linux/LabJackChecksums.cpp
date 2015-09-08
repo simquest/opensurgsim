@@ -17,7 +17,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 namespace LabJack
 {
@@ -73,5 +73,5 @@ void extendedChecksum(std::array<unsigned char, MAXIMUM_BUFFER>* bytes, int coun
 }
 
 };  // namespace LabJack
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

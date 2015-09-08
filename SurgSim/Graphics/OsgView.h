@@ -34,7 +34,7 @@ namespace Input
 class CommonDevice;
 }
 
-namespace Device
+namespace Devices
 {
 class KeyboardDevice;
 class MouseDevice;
@@ -191,11 +191,11 @@ private:
 
 	/// Indicate if a keyboard device is enabled
 	bool m_keyboardEnabled;
-	std::shared_ptr<SurgSim::Device::KeyboardDevice> m_keyboardDevice;
+	std::shared_ptr<SurgSim::Devices::KeyboardDevice> m_keyboardDevice;
 
 	/// Indicate if a mouse device is enabled
 	bool m_mouseEnabled;
-	std::shared_ptr<SurgSim::Device::MouseDevice> m_mouseDevice;
+	std::shared_ptr<SurgSim::Devices::MouseDevice> m_mouseDevice;
 };
 
 };  // namespace Graphics

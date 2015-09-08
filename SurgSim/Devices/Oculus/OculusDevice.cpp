@@ -20,10 +20,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::OculusDevice, OculusDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::OculusDevice, OculusDevice);
 
 OculusDevice::OculusDevice(const std::string& name) :
 	SurgSim::Input::CommonDevice(name, OculusScaffold::buildDeviceInputData()),
@@ -92,5 +92,5 @@ float OculusDevice::getFarPlane() const
 	return m_farPlane;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
