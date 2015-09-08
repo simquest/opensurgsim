@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,6 +30,10 @@ using SurgSim::Device::LeapDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Testing::MockInputOutput;
 
+namespace SurgSim
+{
+namespace Device
+{
 
 TEST(LeapDeviceTest, CreateUninitializedDevice)
 {
@@ -61,35 +65,34 @@ TEST(LeapDeviceTest, HandType)
 	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 
-	EXPECT_EQ(SurgSim::Device::HANDTYPE_RIGHT, device->getHandType());
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
 
-	device->setHandType(SurgSim::Device::HANDTYPE_LEFT);
-	EXPECT_EQ(SurgSim::Device::HANDTYPE_LEFT, device->getHandType());
+	device->setHandType(HANDTYPE_LEFT);
+	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
 
-	device->setHandType(SurgSim::Device::HANDTYPE_RIGHT);
-	EXPECT_EQ(SurgSim::Device::HANDTYPE_RIGHT, device->getHandType());
+	device->setHandType(HANDTYPE_RIGHT);
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
 }
 
 TEST(LeapDeviceTest, TrackingMode)
 {
 	{
 		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
-		EXPECT_THROW(device->getTrackingMode(), SurgSim::Framework::AssertionFailure)
+		EXPECT_THROW(device->isUsingHmdTrackingMode(), Framework::AssertionFailure)
 			<< "TrackingMode not previously set, nor device initialized, should not be able to determine tracking mode";
 	}
 	{
 		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
-		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_DESKTOP, device->getTrackingMode())
-			<< "Default tracking mode should be LEAP_TRACKING_MODE_DESKTOP.";
+		EXPECT_FALSE(device->isUsingHmdTrackingMode()) << "HMD Tracking should be off by default.";
 	}
 	{
 		std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
-		device->setTrackingMode(SurgSim::Device::LEAP_TRACKING_MODE_HMD);
-		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode());
+		device->setUseHmdTrackingMode(true);
+		EXPECT_TRUE(device->isUsingHmdTrackingMode());
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
 		boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
-		EXPECT_EQ(SurgSim::Device::LEAP_TRACKING_MODE_HMD, device->getTrackingMode())
+		EXPECT_TRUE(device->isUsingHmdTrackingMode())
 			<< "HMD Tracking Mode not set. This could be do to user settings in the LeapControlPanel." << std::endl
 			<< "Disable 'Auto-orient Tracking' in Settings>>Tracking.";
 	}
@@ -109,7 +112,7 @@ TEST(LeapDeviceTest, ProvidingImages)
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Leap device plugged in?";
 	EXPECT_TRUE(device->isInitialized());
 
-	EXPECT_THROW(device->setProvideImages(true), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(device->setProvideImages(true), Framework::AssertionFailure);
 }
 
 TEST(LeapDeviceTest, CreateDevicesWithSameName)
@@ -199,3 +202,40 @@ TEST(LeapDeviceTest, OutputProducer)
 	// Check the number of invocations.
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 }
+
+TEST(LeapDeviceTest, FactoryCreation)
+{
+	std::shared_ptr<Input::DeviceInterface> device;
+	ASSERT_NO_THROW(device = Input::DeviceInterface::getFactory().create("SurgSim::Device::LeapDevice", "TestLeap"));
+	EXPECT_EQ("SurgSim::Device::LeapDevice", device->getClassName());
+}
+
+TEST(LeapDeviceTest, AccessibleTest)
+{
+	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
+
+	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
+
+	device->setValue("HandType", "Left");
+	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
+
+	EXPECT_NO_THROW(device->setValue("HandType", "Invalid"));
+	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
+
+	EXPECT_NO_THROW(device->setValue("HandType", "right"));
+	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
+
+	EXPECT_NO_THROW(device->setValue("HandType", "Invalid"));
+	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
+
+	EXPECT_NO_THROW(device->setValue("HandType", "LEFT"));
+	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
+}
+
+};
+};

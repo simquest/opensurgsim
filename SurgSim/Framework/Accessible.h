@@ -203,6 +203,12 @@ T convert(boost::any val);
 template <>
 SurgSim::Math::Matrix44f convert(boost::any val);
 
+/// Specialization for convert<T>() to correctly cast const char* to std::string
+/// \param val The value to be converted, should be a const char*
+/// \return A std::string
+template <>
+std::string convert(boost::any val);
+
 /// A macro to register getter and setter for a property that is readable and writeable,
 /// order of getter and setter agrees with 'RW'. Note that the property should not be quoted in the original
 /// macro call.

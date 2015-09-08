@@ -52,6 +52,8 @@ public:
 	/// \param name	Name of this device filter.
 	explicit PoseIntegrator(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Device::PoseIntegrator);
+
 	/// Integrates the pose.
 	/// \param pose	The latest differential pose.
 	/// \return	The integrated pose.
