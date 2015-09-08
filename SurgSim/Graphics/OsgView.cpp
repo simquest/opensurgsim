@@ -183,7 +183,7 @@ void OsgView::update(double dt)
 	{
 		auto matrix = m_view->getCameraManipulator()->getMatrix();
 		auto pose = Math::RigidTransform3d(fromOsg(matrix));
-		getSceneElement()->getPoseComponent()->setPose(pose);
+		getSceneElement()->setPose(pose);
 	}
 }
 

@@ -64,34 +64,12 @@ TEST(OdeSolver, ConstructorTest)
 {
 	// OdeEquation is tested separately and is considered valid to use here.
 	MassPoint m;
+	std::shared_ptr<MockOdeSolver> solver;
 
-	ASSERT_NO_THROW({MockOdeSolver solver(&m);});
-	{
-		MockOdeSolver solver(&m);
-		EXPECT_EQ(3, solver.getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver.getComplianceMatrix().cols());
-		EXPECT_EQ(3, solver.getSystemMatrix().rows());
-		EXPECT_EQ(3, solver.getSystemMatrix().cols());
-	}
+	ASSERT_NO_THROW({solver = std::make_shared<MockOdeSolver>(&m); });
+	EXPECT_NE(nullptr, solver->getLinearSolver());
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<LinearSparseSolveAndInverseLU>(solver->getLinearSolver()));
 
-	ASSERT_NO_THROW({MockOdeSolver* solver = new MockOdeSolver(&m); delete solver;});
-	{
-		MockOdeSolver* solver = new MockOdeSolver(&m);
-		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
-		EXPECT_EQ(3, solver->getSystemMatrix().rows());
-		EXPECT_EQ(3, solver->getSystemMatrix().cols());
-		delete solver;
-	}
-
-	ASSERT_NO_THROW({std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m); });
-	{
-		std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m);
-		EXPECT_EQ(3, solver->getComplianceMatrix().rows());
-		EXPECT_EQ(3, solver->getComplianceMatrix().cols());
-		EXPECT_EQ(3, solver->getSystemMatrix().rows());
-		EXPECT_EQ(3, solver->getSystemMatrix().cols());
-	}
 }
 
 TEST(OdeSolver, GetTest)

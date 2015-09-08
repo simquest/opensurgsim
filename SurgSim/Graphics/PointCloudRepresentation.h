@@ -20,6 +20,7 @@
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Vector.h"
@@ -60,6 +61,14 @@ public:
 	/// Gets the color.
 	/// \return The current color.
 	virtual SurgSim::Math::Vector4d getColor() const = 0;
+
+	void updateVertices(const DataStructures::VerticesPlain& vertices);
+
+	void updateVertices(DataStructures::VerticesPlain&& vertices);
+
+protected:
+
+	Framework::LockedContainer<DataStructures::VerticesPlain> m_locker;
 };
 
 }; // Graphics

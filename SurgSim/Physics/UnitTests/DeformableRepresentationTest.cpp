@@ -144,7 +144,36 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(zeroMatrix));
 
-	doWakeUp();
+	/// Set/Get the numerical integration scheme
+	for (int integerScheme = 0; integerScheme < SurgSim::Math::MAX_INTEGRATIONSCHEMES; integerScheme++)
+	{
+		auto integrationScheme = static_cast<SurgSim::Math::IntegrationScheme>(integerScheme);
+		EXPECT_NO_THROW(setIntegrationScheme(integrationScheme));
+		EXPECT_EQ(integrationScheme, getIntegrationScheme());
+	}
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
+	EXPECT_EQ(nullptr, getOdeSolver());
+
+	/// Set/Get the linear solver
+	for (int integerLinearSolver = 0; integerLinearSolver < SurgSim::Math::MAX_LINEARSOLVER; integerLinearSolver++)
+	{
+		auto linearSolver = static_cast<SurgSim::Math::LinearSolver>(integerLinearSolver);
+		EXPECT_NO_THROW(setLinearSolver(linearSolver));
+		EXPECT_EQ(linearSolver, getLinearSolver());
+	}
+	setLinearSolver(SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT);
+
+	initialize(std::make_shared<SurgSim::Framework::Runtime>());
+
+	EXPECT_NE(nullptr, getOdeSolver());
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<SurgSim::Math::OdeSolverEulerExplicit>(getOdeSolver()));
+	EXPECT_NE(nullptr,
+		std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(getOdeSolver()->getLinearSolver()));
+	EXPECT_THROW(setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT),
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(setLinearSolver(SurgSim::Math::LINEARSOLVER_LU), SurgSim::Framework::AssertionFailure);
+
+	wakeUp();
 
 	EXPECT_TRUE(*m_initialState     == *m_localInitialState);
 	EXPECT_TRUE(*m_currentState     == *m_localInitialState);
@@ -160,29 +189,6 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 
 	// Test getNumDof (needs to be tested after setInitialState has been called)
 	EXPECT_EQ(getNumDofPerNode() * numNodes, getNumDof());
-
-	/// Set/Get the numerical integration scheme
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER, getIntegrationScheme());
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, getIntegrationScheme());
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, getIntegrationScheme());
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_STATIC);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_STATIC, getIntegrationScheme());
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4, getIntegrationScheme());
-
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER, getIntegrationScheme());
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER, getIntegrationScheme());
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER, getIntegrationScheme());
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC, getIntegrationScheme());
-	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4);
-	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4, getIntegrationScheme());
 }
 
 TEST_F(DeformableRepresentationTest, GetComplianceMatrix)
@@ -420,6 +426,37 @@ TEST_F(DeformableRepresentationTest, SetCollisionRepresentationTest)
 	EXPECT_EQ(nullptr, object->getCollisionRepresentation());
 }
 
+TEST_F(DeformableRepresentationTest, DoInitializeFailTest)
+{
+	// The initial state needs to be set prior to calling initialize
+	EXPECT_THROW(initialize(std::make_shared<SurgSim::Framework::Runtime>()), SurgSim::Framework::AssertionFailure);
+}
+
+TEST_F(DeformableRepresentationTest, DoInitializeTest)
+{
+	// setInitialState sets all 4 states (tested in method above !)
+	EXPECT_NO_THROW(setLocalPose(m_nonIdentityTransform));
+	setInitialState(m_localInitialState);
+
+	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
+
+	EXPECT_THROW(setLocalPose(m_nonIdentityTransform), SurgSim::Framework::AssertionFailure);
+
+	// Test the initial transformation applied to all the states
+	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
+	{
+		Vector3d expectedPosition
+			= m_nonIdentityTransform
+			* Vector3d::LinSpaced(static_cast<double>(nodeId) * 3, (static_cast<double>(nodeId) + 1) * 3 - 1);
+		Vector3d expectedVelocity = m_nonIdentityTransform.rotation() * Vector3d::Ones();
+		EXPECT_TRUE(getInitialState()->getPosition(nodeId).isApprox(expectedPosition));
+		EXPECT_TRUE(getInitialState()->getVelocity(nodeId).isApprox(expectedVelocity));
+	}
+	EXPECT_EQ(*getPreviousState(), *getInitialState());
+	EXPECT_EQ(*getCurrentState(), *getInitialState());
+	EXPECT_EQ(*getFinalState(), *getInitialState());
+}
+
 TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 {
 	using SurgSim::Math::OdeSolverEulerExplicit;
@@ -438,20 +475,6 @@ TEST_F(DeformableRepresentationTest, DoWakeUpTest)
 
 	EXPECT_NO_THROW(EXPECT_TRUE(initialize(std::make_shared<SurgSim::Framework::Runtime>())));
 	EXPECT_NO_THROW(EXPECT_TRUE(wakeUp()));
-
-	// Test the initial transformation applied to all the states
-	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
-	{
-		Vector3d expectedPosition
-			= m_nonIdentityTransform
-			  * Vector3d::LinSpaced(static_cast<double>(nodeId) * 3, (static_cast<double>(nodeId) + 1) * 3 - 1);
-		Vector3d expectedVelocity = m_nonIdentityTransform.rotation() * Vector3d::Ones();
-		EXPECT_TRUE(getInitialState()->getPosition(nodeId).isApprox(expectedPosition));
-		EXPECT_TRUE(getInitialState()->getVelocity(nodeId).isApprox(expectedVelocity));
-	}
-	EXPECT_EQ(*getPreviousState(), *getInitialState());
-	EXPECT_EQ(*getCurrentState(), *getInitialState());
-	EXPECT_EQ(*getFinalState(), *getInitialState());
 
 	// Test the Ode Solver
 	ASSERT_NE(nullptr, m_odeSolver);

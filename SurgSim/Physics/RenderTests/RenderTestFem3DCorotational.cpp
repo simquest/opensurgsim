@@ -136,12 +136,12 @@ TEST_F(RenderTests, VisualTestFem3DCorotational)
 	scene->addSceneElement(createTetrahedronFem3D("CorotationalTetrahedronElement Euler Explicit",
 						   makeRigidTranslation(Vector3d(-4.0, 1.0, -1.0)),
 						   SurgSim::Math::Vector4d(1, 0, 0, 1),
-						   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+						   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT));
 
 	scene->addSceneElement(createTetrahedronFem3D("CorotatinoalTetrahedronElement Modified Euler Explicit",
 						   makeRigidTranslation(Vector3d(-2.0, 1.0, -1.0)),
 						   SurgSim::Math::Vector4d(0.5, 0, 0, 1),
-						   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+						   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED));
 
 	scene->addSceneElement(createTetrahedronFem3D("CorotatinoalTetrahedronElement Runge Kutta 4",
 						   makeRigidTranslation(Vector3d(0.0, 1.0, -1.0)),
@@ -151,7 +151,7 @@ TEST_F(RenderTests, VisualTestFem3DCorotational)
 	scene->addSceneElement(createTetrahedronFem3D("CorotatinoalTetrahedronElement Fem 3D Euler Implicit",
 						   makeRigidTranslation(Vector3d(2.0, 1.0, -1.0)),
 						   SurgSim::Math::Vector4d(0, 0, 1, 1),
-						   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+						   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT));
 
 	scene->addSceneElement(createTetrahedronFem3D("CorotatinoalTetrahedronElement Fem 3D Static",
 						   makeRigidTranslation(Vector3d(4.0, 1.0, -1.0)),

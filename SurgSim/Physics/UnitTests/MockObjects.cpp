@@ -433,11 +433,6 @@ std::shared_ptr<FemPlyReaderDelegate> MockFemRepresentation::getDelegate()
 	return nullptr;
 }
 
-std::shared_ptr<OdeSolver> MockFemRepresentation::getOdeSolver() const
-{
-	return this->m_odeSolver;
-}
-
 const std::vector<double>& MockFemRepresentation::getMassPerNode() const
 {
 	return m_massPerNode;
@@ -474,12 +469,6 @@ bool MockFem1DRepresentation::doInitialize()
 {
 	return Fem1DRepresentation::doInitialize();
 }
-
-const std::shared_ptr<OdeSolver> MockFem1DRepresentation::getOdeSolver() const
-{
-	return this->m_odeSolver;
-}
-
 
 MockFixedConstraintFixedPoint::MockFixedConstraintFixedPoint() : ConstraintImplementation()
 {

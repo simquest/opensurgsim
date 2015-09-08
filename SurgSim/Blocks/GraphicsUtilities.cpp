@@ -19,14 +19,24 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgProgram.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
-#include "SurgSim/Graphics/OsgUniform.h"
-#include "SurgSim/Graphics/OsgUniformFactory.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 #include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgTextureUniform.h"
+#include "SurgSim/Graphics/OsgProgram.h"
+#include "SurgSim/Graphics/OsgUniformFactory.h"
+#include "SurgSim/Graphics/RenderPass.h"
 
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/TransferPropertiesBehavior.h"
+#include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "osg/PolygonMode"
 namespace SurgSim
 {
 namespace Blocks
@@ -116,7 +126,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
 	return material;
 }
 
-std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
+std::shared_ptr<Graphics::OsgMaterial> createNormalMappedMaterial(
 	const std::string& name,
 	SurgSim::Math::Vector4f diffuseColor,
 	SurgSim::Math::Vector4f specularColor,
@@ -202,6 +212,35 @@ void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene, std::strin
 				<< "Could not find material definitions, visuals are going to be compromised.";
 	}
 }
+
+std::shared_ptr<SurgSim::Graphics::ScreenSpaceQuadRepresentation> makeDebugQuad(
+	const std::string& name,
+	std::shared_ptr<SurgSim::Graphics::Texture> texture,
+	double x, double y, double width, double height)
+{
+	auto result = std::make_shared<SurgSim::Graphics::OsgScreenSpaceQuadRepresentation>(name);
+	result->setTexture(texture);
+	result->setSize(width, height);
+	result->setLocation(x, y);
+	return result;
+}
+
+std::shared_ptr<SurgSim::Graphics::RenderPass> createPass(
+	std::unordered_map<std::string, std::shared_ptr<Graphics::OsgMaterial>> materials,
+	const std::string& passName,
+	const std::string& materialName)
+{
+	auto pass = std::make_shared<SurgSim::Graphics::RenderPass>(passName);
+	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+	pass->setRenderTarget(renderTarget);
+	pass->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
+	SURGSIM_ASSERT(materials[materialName] != nullptr);
+	materials[materialName]->getProgram()->setGlobalScope(true);
+	pass->setMaterial(materials[materialName]);
+	return pass;
+}
+
+
 
 }
 }

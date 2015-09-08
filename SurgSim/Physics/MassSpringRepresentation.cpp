@@ -17,9 +17,11 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::SparseMatrix;
@@ -47,7 +49,14 @@ MassSpringRepresentation::~MassSpringRepresentation()
 
 bool MassSpringRepresentation::doInitialize()
 {
-	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
+	// DeformableRepresentation::doInitialize will
+	// 1) assert if initial state is not set
+	// 2) transform m_initialState properly with the initial pose
+	// => Spring::initialize(m_initialState) is using the correct transformed state
+	if (!DeformableRepresentation::doInitialize())
+	{
+		return false;
+	}
 
 	// Initialize the Springs
 	for (auto spring : m_springs)
@@ -203,14 +212,6 @@ void MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	{
 		m_f += m_externalGeneralizedForce;
 	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_f[*boundaryCondition] = 0.0;
-	}
 }
 
 void MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
@@ -226,15 +227,6 @@ void MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
 		m_M.coeffRef(3 * massId, 3 * massId) = getMass(massId)->getMass();
 		m_M.coeffRef(3 * massId + 1, 3 * massId + 1) = getMass(massId)->getMass();
 		m_M.coeffRef(3 * massId + 2, 3 * massId + 2) = getMass(massId)->getMass();
-	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 }
 
@@ -281,17 +273,6 @@ void MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
 	{
 		m_D += m_externalGeneralizedDamping;
 	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
-		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
-	}
 }
 
 void MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
@@ -308,17 +289,6 @@ void MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 	if (m_hasExternalGeneralizedForce)
 	{
 		m_K += m_externalGeneralizedStiffness;
-	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
-		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
 	}
 }
 
@@ -375,27 +345,6 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 		m_f += m_externalGeneralizedForce;
 		m_K += m_externalGeneralizedStiffness;
 		m_D += m_externalGeneralizedDamping;
-	}
-
-	// Apply boundary conditions globally
-	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
-		 boundaryCondition != std::end(state.getBoundaryConditions());
-		 boundaryCondition++)
-	{
-		m_M.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
-
-		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_D);
-		m_D.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
-
-		Math::zeroRow(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>(*boundaryCondition), &m_K);
-		m_K.coeffRef(static_cast<SparseMatrix::Index>(*boundaryCondition),
-					 static_cast<SparseMatrix::Index>(*boundaryCondition)) = 1e9;
-
-		m_f[*boundaryCondition] = 0.0;
 	}
 }
 
@@ -499,6 +448,28 @@ void MassSpringRepresentation::transformState(std::shared_ptr<SurgSim::Math::Ode
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
+}
+
+std::shared_ptr<Localization> MassSpringRepresentation::createLocalization(
+	const SurgSim::DataStructures::Location& location)
+{
+	auto result = std::make_shared<MassSpringLocalization>(
+		std::static_pointer_cast<Physics::Representation>(getSharedPtr()));
+
+	if (location.index.hasValue())
+	{
+		result->setLocalNode(location.index.getValue());
+	}
+	else if (location.nodeMeshLocalCoordinate.hasValue())
+	{
+		result->setLocalNode(location.nodeMeshLocalCoordinate.getValue().index);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Invalid location to create a MassSpringLocalization" << std::endl;
+	}
+
+	return result;
 }
 
 } // namespace Physics

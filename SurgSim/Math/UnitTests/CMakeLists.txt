@@ -23,6 +23,7 @@ set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	IntervalArithmeticTests.cpp
 	KalmanFilterTests.cpp
+	LinearMotionArithmeticTests.cpp
 	MakeRigidTransformTests.cpp
 	MeshShapeTests.cpp
 	MinMaxTests.cpp

@@ -41,7 +41,8 @@ namespace Math
 enum LinearSolver
 {
 	LINEARSOLVER_LU = 0,
-	LINEARSOLVER_CONJUGATEGRADIENT
+	LINEARSOLVER_CONJUGATEGRADIENT,
+	MAX_LINEARSOLVER
 };
 
 const std::unordered_map<LinearSolver, std::string, std::hash<int>> LinearSolverNames =

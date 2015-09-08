@@ -36,9 +36,9 @@ BoxPlaneDcdContact::BoxPlaneDcdContact()
 {
 }
 
-std::pair<int,int> BoxPlaneDcdContact::getShapeTypes()
+std::pair<int, int> BoxPlaneDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_PLANE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
 void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
@@ -57,8 +57,10 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 }
 
 std::list<std::shared_ptr<Contact>> BoxPlaneDcdContact::calculateContact(
-		const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
-		const SurgSim::Math::PlaneShape& planeShape, const SurgSim::Math::RigidTransform3d& planePose)
+									 const SurgSim::Math::BoxShape& boxShape,
+									 const SurgSim::Math::RigidTransform3d& boxPose,
+									 const SurgSim::Math::PlaneShape& planeShape,
+									 const SurgSim::Math::RigidTransform3d& planePose)
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -81,8 +83,9 @@ std::list<std::shared_ptr<Contact>> BoxPlaneDcdContact::calculateContact(
 		{
 			std::pair<Location, Location> penetrationPoints = std::make_pair(Location(boxVertex),
 					Location(boxLocalToPlaneLocal * (boxVertex - planeNormal * d)));
-			contacts.push_back(std::make_shared<Contact>(-d, Vector3d::Zero(),
-					planePose.linear() * planeShape.getNormal(), penetrationPoints));
+			contacts.push_back(std::make_shared<Contact>(
+								   COLLISION_DETECTION_TYPE_DISCRETE, -d, 1.0,
+								   Vector3d::Zero(), planePose.linear() * planeShape.getNormal(), penetrationPoints));
 		}
 	}
 	return std::move(contacts);

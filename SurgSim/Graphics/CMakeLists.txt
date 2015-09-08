@@ -20,6 +20,7 @@ include_directories(
 
 set(SURGSIM_GRAPHICS_SOURCES
 	Camera.cpp
+	CurveRepresentation.cpp
 	Group.cpp
 	Manager.cpp
 	Mesh.cpp
@@ -28,6 +29,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
 	OsgCapsuleRepresentation.cpp
+	OsgCurveRepresentation.cpp
 	OsgCylinderRepresentation.cpp
 	OsgFont.cpp
 	OsgGroup.cpp
@@ -78,6 +80,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	BoxRepresentation.h
 	Camera.h
 	CapsuleRepresentation.h
+	CurveRepresentation.h
 	CylinderRepresentation.h
 	Font.h
 	Group.h
@@ -95,6 +98,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgCamera.h
 	OsgCapsuleRepresentation.h
 	OsgConversions.h
+	OsgCurveRepresentation.h
 	OsgCylinderRepresentation.h
 	OsgFont.h
 	OsgGroup.h

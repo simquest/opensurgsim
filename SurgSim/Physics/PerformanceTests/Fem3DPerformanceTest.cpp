@@ -29,7 +29,6 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/PerformanceTests/DivisibleCubeRepresentation.h"
-#include "SurgSim/Physics/PerformanceTests/MockFem3DRepresentation.h"
 #include "SurgSim/Testing/MockPhysicsManager.h"
 
 using SurgSim::Math::Vector3d;
@@ -46,12 +45,12 @@ static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::ha
 	std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::hash<int>> result;
 
 #define FEM3DPERFORMANCETEST_MAP_NAME(map, name) (map)[name] = #name
-	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
-	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER);
-	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
-	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER);
-	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
-	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT);
+	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT);
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_STATIC);
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC);
 	FEM3DPERFORMANCETEST_MAP_NAME(result, SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4);
@@ -98,7 +97,7 @@ public:
 		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	}
 
-	void initializeRepresentation(std::shared_ptr<MockFem3DRepresentation> fem)
+	void initializeRepresentation(std::shared_ptr<Fem3DRepresentation> fem)
 	{
 		fem->initialize(m_runtime);
 		fem->wakeUp();
@@ -176,7 +175,7 @@ TEST_P(IntegrationSchemeParamTest, WoundTest)
 	RecordProperty("IntegrationScheme", IntegrationSchemeNames[integrationScheme]);
 	RecordProperty("LinearSolver", LinearSolverNames[linearSolver]);
 
-	auto fem = std::make_shared<SurgSim::Physics::MockFem3DRepresentation>("wound");
+	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("wound");
 	fem->loadFem("Geometry/wound_deformable.ply");
 	fem->setIntegrationScheme(integrationScheme);
 	fem->setLinearSolver(linearSolver);
@@ -211,12 +210,12 @@ TEST_P(IntegrationSchemeAndCountParamTest, CubeTest)
 
 INSTANTIATE_TEST_CASE_P(Fem3DPerformanceTest,
 						IntegrationSchemeParamTest,
-						::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER,
-								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER,
-								SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,
-								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER,
-								SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER,
-								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
+						::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
+								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT,
+								SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
+								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
+								SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT,
+								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
 								SurgSim::Math::INTEGRATIONSCHEME_STATIC,
 								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
 								SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
@@ -227,12 +226,12 @@ INSTANTIATE_TEST_CASE_P(Fem3DPerformanceTest,
 INSTANTIATE_TEST_CASE_P(
 	Fem3DPerformanceTest,
 	IntegrationSchemeAndCountParamTest,
-	::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EXPLICIT_EULER,
-					   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_MODIFIED_EXPLICIT_EULER,
-					   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
+	::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
+					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT,
+					   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
+					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
+					   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT,
+					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
 					   SurgSim::Math::INTEGRATIONSCHEME_STATIC,
 					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
 					   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,

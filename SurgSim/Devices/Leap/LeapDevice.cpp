@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,18 +15,32 @@
 
 #include "SurgSim/Devices/Leap/LeapDevice.h"
 
+#include <algorithm>
+
 #include "SurgSim/Devices/Leap/LeapScaffold.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::LeapDevice, LeapDevice);
+
 LeapDevice::LeapDevice(const std::string& name) :
-	SurgSim::Input::CommonDevice(name, LeapScaffold::buildDeviceInputData()),
+	Input::CommonDevice(name, LeapScaffold::buildDeviceInputData()),
 	m_handType(HANDTYPE_RIGHT),
 	m_isProvidingImages(false)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, bool, UseHmdTrackingMode, isUsingHmdTrackingMode,
+			setUseHmdTrackingMode);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, bool, ProvideImages, isProvidingImages, setProvideImages);
+
+	auto getter = std::bind(&LeapDevice::getHandTypeAsString, this);
+	auto setter = std::bind((void(LeapDevice::*)(const std::string&)) &LeapDevice::setHandType, this,
+			std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
+	setAccessors("HandType", getter, setter);
 }
 
 
@@ -48,24 +62,57 @@ HandType LeapDevice::getHandType() const
 	return m_handType;
 }
 
-void LeapDevice::setTrackingMode(LeapTrackingMode mode)
+void LeapDevice::setHandType(const std::string& type)
 {
-	if (isInitialized())
+	std::string lowerCaseType = type;
+	std::transform(lowerCaseType.begin(), lowerCaseType.end(), lowerCaseType.begin(), ::tolower);
+	if (lowerCaseType == "left")
 	{
-		m_scaffold->setTrackingMode(mode);
+		m_handType = HANDTYPE_LEFT;
 	}
-	m_requestedTrackingMode = mode;
-}
-
-LeapTrackingMode LeapDevice::getTrackingMode() const
-{
-	if (isInitialized())
+	else if (lowerCaseType == "right")
 	{
-		return m_scaffold->getTrackingMode();
+		m_handType = HANDTYPE_RIGHT;
 	}
 	else
 	{
-		return m_requestedTrackingMode.getValue();
+		SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Leap")) << "Cannot set hand type to :" << type
+			<< ". Valid hand types are 'Left' and 'Right'.";
+	}
+}
+
+std::string LeapDevice::getHandTypeAsString() const
+{
+	std::string result;
+	if (m_handType == HANDTYPE_LEFT)
+	{
+		result = "Left";
+	}
+	else
+	{
+		result = "Right";
+	}
+	return result;
+}
+
+void LeapDevice::setUseHmdTrackingMode(bool useHmdTrackingMode)
+{
+	if (isInitialized())
+	{
+		m_scaffold->setUseHmdTrackingMode(useHmdTrackingMode);
+	}
+	m_requestedHmdTrackingMode = useHmdTrackingMode;
+}
+
+bool LeapDevice::isUsingHmdTrackingMode() const
+{
+	if (isInitialized())
+	{
+		return m_scaffold->isUsingHmdTrackingMode();
+	}
+	else
+	{
+		return m_requestedHmdTrackingMode.getValue();
 	}
 }
 
@@ -86,9 +133,9 @@ bool LeapDevice::initialize()
 	m_scaffold = LeapScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(isInitialized()) << getName() << " initialization failed, cannot get scaffold.";
 
-	if (m_requestedTrackingMode.hasValue())
+	if (m_requestedHmdTrackingMode.hasValue())
 	{
-		m_scaffold->setTrackingMode(m_requestedTrackingMode.getValue());
+		m_scaffold->setUseHmdTrackingMode(m_requestedHmdTrackingMode.getValue());
 	}
 
 	return m_scaffold->registerDevice(this);

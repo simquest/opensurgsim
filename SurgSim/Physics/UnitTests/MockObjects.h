@@ -283,8 +283,6 @@ public:
 
 	std::shared_ptr<FemPlyReaderDelegate> getDelegate();
 
-	std::shared_ptr<OdeSolver> getOdeSolver() const;
-
 	const std::vector<double>& getMassPerNode() const;
 
 	void clearFMDK();
@@ -315,8 +313,6 @@ class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation
 {
 public:
 	explicit MockFem1DRepresentation(const std::string& name);
-
-	const std::shared_ptr<OdeSolver> getOdeSolver() const;
 
 	bool doInitialize() override;
 };

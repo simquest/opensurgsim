@@ -329,6 +329,11 @@ public:
 		return m_projectionMatrix;
 	}
 
+	virtual SurgSim::Math::Matrix44d getInverseProjectionMatrix() const
+	{
+		return m_projectionMatrix.inverse();
+	}
+
 	/// Updates the camera.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	/// \post	m_numUpdates is incremented and dt is added to m_sumDt
