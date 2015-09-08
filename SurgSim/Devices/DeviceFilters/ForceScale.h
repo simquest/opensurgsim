@@ -42,6 +42,8 @@ public:
 	/// \param name	Name of this device filter.
 	explicit ForceScale(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Devices::ForceScale);
+
 	/// Destructor.
 	virtual ~ForceScale();
 

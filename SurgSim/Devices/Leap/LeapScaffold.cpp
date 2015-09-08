@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ class LeapScaffold::Listener : public Leap::Listener
 public:
 	Listener() :
 		m_scaffold(LeapScaffold::getOrCreateSharedInstance()),
-		m_logger(SurgSim::Framework::Logger::getLogger("Leap"))
+		m_logger(Framework::Logger::getLogger("Leap"))
 	{
 	}
 
@@ -110,8 +110,8 @@ public:
 	}
 
 private:
-	std::weak_ptr<SurgSim::Devices::LeapScaffold> m_scaffold;
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+	std::weak_ptr<Devices::LeapScaffold> m_scaffold;
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 struct LeapScaffold::DeviceData
@@ -146,7 +146,7 @@ struct LeapScaffold::StateData
 
 LeapScaffold::LeapScaffold() :
 	m_state(new StateData),
-	m_logger(SurgSim::Framework::Logger::getLogger("Leap"))
+	m_logger(Framework::Logger::getLogger("Leap"))
 {
 }
 
@@ -321,7 +321,7 @@ void LeapScaffold::updateImageData()
 	Leap::ImageList images = m_state->controller.frame().images();
 	if (!images.isEmpty())
 	{
-		typedef SurgSim::DataStructures::DataGroup::ImageType ImageType;
+		typedef DataStructures::DataGroup::ImageType ImageType;
 		ImageType leftImage(images[0].width(), images[0].height(), 1, images[0].data());
 		ImageType rightImage(images[1].width(), images[1].height(), 1, images[1].data());
 
@@ -357,13 +357,13 @@ std::shared_ptr<LeapScaffold> LeapScaffold::getOrCreateSharedInstance()
 	{
 		return std::shared_ptr<LeapScaffold>(new LeapScaffold);
 	};
-	static SurgSim::Framework::SharedInstance<LeapScaffold> sharedInstance(creator);
+	static Framework::SharedInstance<LeapScaffold> sharedInstance(creator);
 	return sharedInstance.get();
 }
 
-SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
+DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 {
-	SurgSim::DataStructures::DataGroupBuilder builder;
+	DataStructures::DataGroupBuilder builder;
 
 	builder.addImage("left");
 	builder.addImage("right");
@@ -420,9 +420,9 @@ SurgSim::DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 	return builder.createData();
 }
 
-void LeapScaffold::setTrackingMode(LeapTrackingMode mode)
+void LeapScaffold::setUseHmdTrackingMode(bool useHmdTrackingMode)
 {
-	if (mode == LEAP_TRACKING_MODE_HMD)
+	if (useHmdTrackingMode)
 	{
 		m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
 	}
@@ -432,14 +432,9 @@ void LeapScaffold::setTrackingMode(LeapTrackingMode mode)
 	}
 }
 
-LeapTrackingMode LeapScaffold::getTrackingMode() const
+bool LeapScaffold::isUsingHmdTrackingMode() const
 {
-	LeapTrackingMode result = LEAP_TRACKING_MODE_DESKTOP;
-	if (m_state->controller.isPolicySet(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD))
-	{
-		result = LEAP_TRACKING_MODE_HMD;
-	}
-	return result;
+	return m_state->controller.isPolicySet(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
 }
 
 };  // namespace Devices

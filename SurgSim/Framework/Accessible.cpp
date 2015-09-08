@@ -225,6 +225,20 @@ SurgSim::Math::Matrix44f convert(boost::any val)
 	return floatResult;
 }
 
+template<>
+std::string convert(boost::any val)
+{
+	std::string result;
+	try
+	{
+		result = std::string(boost::any_cast<const char*>(val));
+	}
+	catch (boost::bad_any_cast&)
+	{
+		result = std::string(boost::any_cast<std::string>(val));
+	}
+	return result;
+}
 
 }; // Framework
 }; // SurgSim

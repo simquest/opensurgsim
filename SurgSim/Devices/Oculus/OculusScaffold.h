@@ -72,6 +72,11 @@ private:
 	/// \return True if the initialization succeeds, false if it fails.
 	bool registerDevice(OculusDevice* device);
 
+	/// Do the Oculus SDK specific registration
+	/// \param info The device data
+	/// \return true on success, false on failure.
+	bool doRegisterDevice(DeviceData* info);
+
 	/// Unregisters the specified device object.
 	/// \param device The device object.
 	/// \return true on success, false on failure.

@@ -58,6 +58,8 @@ public:
 	/// \param name	Name of this device filter.
 	explicit PoseTransform(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Devices::PoseTransform);
+
 	/// Destructor.
 	virtual ~PoseTransform();
 
