@@ -91,6 +91,6 @@ typedef SegmentMesh<EmptyData, EmptyData> SegmentMeshPlain;
 }  // namespace DataStructures
 }  // namespace SurgSim
 
-#include <SurgSim/DataStructures/SegmentMesh-inl.h>
+#include "SurgSim/DataStructures/SegmentMesh-inl.h"
 
 #endif  // SURGSIM_DATASTRUCTURES_SEGMENTMESH_H

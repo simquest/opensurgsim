@@ -43,7 +43,8 @@ public:
 	/// \param radius The radius associated to this surface mesh
 	/// \note The default radius is positive EPSILON to be relevant in collision detection calculations.
 	template <class VertexData, class EdgeData>
-	SegmentMeshShape(const SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>& mesh, double radius = 1e-10);
+	explicit SegmentMeshShape(const SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
+		double radius = 1e-10);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::SegmentMeshShape);
 
@@ -65,7 +66,7 @@ public:
 protected:
 	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;
-	
+
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	void updateAabbTree();
 

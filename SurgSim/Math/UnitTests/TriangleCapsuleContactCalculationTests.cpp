@@ -44,7 +44,7 @@ protected:
 		return makeRigidTransform(makeRotationQuaternion(angle, Vector3d(axisX, axisY, axisZ).normalized()),
 									Vector3d(translationX, translationY, translationZ));
 	}
-	
+
 	void SetUp() override
 	{
 		m_transforms.push_back(buildRigidTransform(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0));

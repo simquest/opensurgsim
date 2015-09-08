@@ -86,17 +86,17 @@ bool calculateContactTriangleCapsule(
 		   - From CPC, draw a vector along (PC -> P); This intersects the triangle at Q.
 		   - (P, PC, PPC) and (Q, CPC, PPC) are similar triangles.
 		   - Penetration depth is (distance(Q, CPC) + capsule radius), penetration normal is (CPC ->
-		  
+
 		                                 _,x PC                      tn
 		                            _,-'    \                        ^
 		                       _,-'        _,x cv1, CPC              |
-		           tv0   _,-'        _,-'    \                      |
+		           tv0   _,-'        _,-'    \                       |
 		           P  x-'---------x-'----------x-PPC-------------------------------x tv2
 		            tv1           Q             \
 		                                         x cv0
 		*/
 		Vector3 v[3] = {tv0, tv1, tv2};
-		
+
 		// Capsule axis points from above the triangle to below the triangle.
 		Vector3 capsuleAxis = (cv0 - cv1).normalized();
 		auto capsuleAxisProjectedOnTn = capsuleAxis.dot(tn);
@@ -105,7 +105,7 @@ bool calculateContactTriangleCapsule(
 			capsuleAxis = -capsuleAxis;
 			capsuleAxisProjectedOnTn = -capsuleAxisProjectedOnTn;
 		}
-		
+
 		Vector3 pointOnCapsuleAxis;
 		for (size_t i = 0; i < 3; ++i)
 		{
@@ -117,7 +117,7 @@ bool calculateContactTriangleCapsule(
 		}
 
 		/* Penetration depth along the triangle's normal:
-		  
+
 		                            cv0
 		                            /
 		                           /
@@ -126,7 +126,7 @@ bool calculateContactTriangleCapsule(
 		                        /
 		                       / Q
 		                     cv1
-		  
+
 		   The axis of the capsule passes through the triangle. The line segment (P, cv1) is the part of the capsule
 		   axis which is under the triangle. If the point cv1 is projected onto the plane of the triangle, it may or
 		   may not be inside the triangle. If it is inside, then the deepest penetration point on the capsule axis is
@@ -158,7 +158,7 @@ bool calculateContactTriangleCapsule(
 			/* We have found Q (see comment above). Now, the point on the capsule that is deepest inside the triangle
 			   along the triangle normal is to be calculated. A ray starting from Q and going in the direction of the
 			   -tn would intersect the capsule at this deepest point.
-			  
+
 			                 tv1   P                       P   tv1
 			        tv0 x-----x----x------x tv2      tv0 x-x---x-----------x tv2
 			                      /                       /
