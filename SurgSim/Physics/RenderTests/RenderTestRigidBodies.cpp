@@ -17,8 +17,7 @@
 
 #include <memory>
 
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Graphics/Mesh.h"
@@ -35,7 +34,6 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-using SurgSim::DataStructures::loadTriangleMesh;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgMeshRepresentation;
@@ -139,21 +137,19 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedPlaneSceneElement(c
 std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	const std::string& name, std::string plyFilename, double scale = 1.0)
 {
-	const SurgSim::Framework::ApplicationData data("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	std::string foundFilename = data.findFile(plyFilename);
-	SURGSIM_ASSERT(!foundFilename.empty()) << "Ply file '" << plyFilename << "' could not be located";
-	auto mesh = loadTriangleMesh(foundFilename);
-	for (size_t vertexId = 0; vertexId < mesh->getNumVertices(); ++vertexId)
+	auto mesh = std::make_shared<MeshShape>();
+	mesh->load(plyFilename);
+	for (auto& vertex : mesh->getVertices())
 	{
-		mesh->setVertexPosition(vertexId, mesh->getVertexPosition(vertexId) * scale);
+		vertex.position *= scale;
 	}
 
 	// Physics representation
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>("Physics");
-	std::shared_ptr<MeshShape> shape = std::make_shared<MeshShape>(*mesh);
-	physicsRepresentation->setShape(shape);
+	physicsRepresentation->setShape(mesh);
 	physicsRepresentation->setDensity(750.0); // Average mass density of oak wood
 	physicsRepresentation->setLinearDamping(1e-2);
 	physicsRepresentation->setAngularDamping(1e-4);
@@ -166,7 +162,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	// Graphic representation of the physics model
 	std::shared_ptr<OsgMeshRepresentation> osgRepresentation =
 		std::make_shared<OsgMeshRepresentation>("OsgRepresentation");
-	*osgRepresentation->getMesh() = *(std::make_shared<SurgSim::Graphics::Mesh>(*mesh));
+	osgRepresentation->setShape(mesh);
 	osgRepresentation->setDrawAsWireFrame(true);
 
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
@@ -191,20 +187,20 @@ TEST_F(RenderTests, VisualTestFallingRigidBodies)
 
 	// Mesh-base objects
 	std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
-		createRigidMeshSceneElement("boxMesh1", "box.ply", 1.0);
+		createRigidMeshSceneElement("boxMesh1", "Geometry/box.ply", 1.0);
 	scene->addSceneElement(boxMesh);
 	boxMesh->setPose(makeRigidTranslation(Vector3d(-0.35, 0.3, 0.0)));
 
-	boxMesh = createRigidMeshSceneElement("boxMesh2", "box.ply", 0.5);
+	boxMesh = createRigidMeshSceneElement("boxMesh2", "Geometry/box.ply", 0.5);
 	scene->addSceneElement(boxMesh);
 	boxMesh->setPose(makeRigidTranslation(Vector3d(-0.25, 0.3, 0.0)));
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
-		createRigidMeshSceneElement("sphereMesh1", "sphere.ply", 1.0);
+		createRigidMeshSceneElement("sphereMesh1", "Geometry/sphere.ply", 1.0);
 	scene->addSceneElement(sphereMesh);
 	sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.15, 0.3, 0.0)));
 
-	sphereMesh = createRigidMeshSceneElement("sphereMesh2", "sphere.ply", 0.5);
+	sphereMesh = createRigidMeshSceneElement("sphereMesh2", "Geometry/sphere.ply", 0.5);
 	scene->addSceneElement(sphereMesh);
 	sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.05, 0.3, 0.0)));
 
@@ -240,12 +236,12 @@ TEST_F(RenderTests, VisualTestRigidBodiesSlidingOnPlanes)
 
 	// Mesh-base objects
 	std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
-		createRigidMeshSceneElement("boxMesh", "box.ply");
+		createRigidMeshSceneElement("boxMesh", "Geometry/box.ply");
 	scene->addSceneElement(boxMesh);
 	boxMesh->setPose(makeRigidTranslation(Vector3d(-0.3, 0.3, 0.0)));
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
-		createRigidMeshSceneElement("sphereMesh", "sphere.ply");
+		createRigidMeshSceneElement("sphereMesh", "Geometry/sphere.ply");
 	scene->addSceneElement(sphereMesh);
 	sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.15, 0.3, 0.0)));
 
@@ -286,7 +282,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 		ss << "boxMesh" << i;
 		double scale = 1.0 - static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
-			createRigidMeshSceneElement(ss.str(), "box.ply", scale);
+			createRigidMeshSceneElement(ss.str(), "Geometry/box.ply", scale);
 		scene->addSceneElement(boxMesh);
 		Eigen::AngleAxisd aa(0.15 * i, Vector3d(0.0, 1.0, 0.0));
 		boxMesh->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aa), Vector3d(-0.3, 0.3 + 0.15 * i, 0.0)));
@@ -298,7 +294,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStacking)
 		ss << "sphereMesh" << i;
 		double scale = 1.0 - static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
-			createRigidMeshSceneElement(ss.str(), "sphere.ply", scale);
+			createRigidMeshSceneElement(ss.str(), "Geometry/sphere.ply", scale);
 		scene->addSceneElement(sphereMesh);
 		sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.15, 0.3 + 0.15 * i, 0.0)));
 	}
@@ -349,7 +345,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		double scale = 1.0 / static_cast<double>(numBodiesStacked) +
 			static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> boxMesh =
-			createRigidMeshSceneElement(ss.str(), "box.ply", scale);
+			createRigidMeshSceneElement(ss.str(), "Geometry/box.ply", scale);
 		scene->addSceneElement(boxMesh);
 		Eigen::AngleAxisd aa(0.15 * i, Vector3d(0.0, 1.0, 0.0));
 		boxMesh->setPose(makeRigidTransform(SurgSim::Math::Quaterniond(aa), Vector3d(-0.3, 0.3 + 0.15 * i, 0.0)));
@@ -362,7 +358,7 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 		double scale = 1.0 / static_cast<double>(numBodiesStacked) +
 			static_cast<double>(i) / static_cast<double>(numBodiesStacked);
 		std::shared_ptr<SurgSim::Framework::SceneElement> sphereMesh =
-			createRigidMeshSceneElement(ss.str(), "sphere.ply", scale);
+			createRigidMeshSceneElement(ss.str(), "Geometry/sphere.ply", scale);
 		scene->addSceneElement(sphereMesh);
 		sphereMesh->setPose(makeRigidTranslation(Vector3d(-0.15, 0.3 + 0.15 * i, 0.0)));
 	}
@@ -396,6 +392,62 @@ TEST_F(RenderTests, VisualTestRigidBodiesStackingReversed)
 	std::shared_ptr<SurgSim::Framework::SceneElement> floor = createFixedPlaneSceneElement("floor");
 	scene->addSceneElement(floor);
 	floor->setPose(makeRigidTranslation(Vector3d(0.0, -0.2, 0.0)));
+
+	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
+}
+
+TEST_F(RenderTests, VisualTestFallingRigidShapesOnPlane)
+{
+	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRigidTranslation;
+
+	const size_t numSphere = 10;
+	const double radius = 0.05;
+	const double distanceBetweenSphere = radius / 2.0;
+
+	// Shape-base objects
+	for (size_t sphere = 0; sphere < numSphere; ++sphere)
+	{
+		std::stringstream ss;
+		ss << "sphereShape " << sphere;
+		std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
+			createRigidSphereSceneElement(ss.str(), radius);
+		scene->addSceneElement(sphereShape);
+		sphereShape->setPose(makeRigidTranslation(Vector3d(0.0, (2.0 * radius + distanceBetweenSphere) * sphere, 0.0)));
+	}
+
+	// Floor on which the objects are falling
+	std::shared_ptr<SurgSim::Framework::SceneElement> floor = createFixedPlaneSceneElement("floor");
+	scene->addSceneElement(floor);
+	floor->setPose(makeRigidTranslation(Vector3d(0.0, -radius - distanceBetweenSphere, 0.0)));
+
+	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
+}
+
+TEST_F(RenderTests, VisualTestFallingRigidMeshesOnPlane)
+{
+	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRigidTranslation;
+
+	const size_t numSphere = 10;
+	const double radius = 0.05;
+	const double distanceBetweenSphere = radius / 2.0;
+
+	// Mesh-base objects
+	for (size_t sphere = 0; sphere < numSphere; ++sphere)
+	{
+		std::stringstream ss;
+		ss << "sphereShape " << sphere;
+		std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
+			createRigidMeshSceneElement(ss.str(), "Geometry/sphere.ply", 10.0 * radius);
+		scene->addSceneElement(sphereShape);
+		sphereShape->setPose(makeRigidTranslation(Vector3d(0.0, (2.0 * radius + distanceBetweenSphere) * sphere, 0.0)));
+	}
+
+	// Floor on which the objects are falling
+	std::shared_ptr<SurgSim::Framework::SceneElement> floor = createFixedPlaneSceneElement("floor");
+	scene->addSceneElement(floor);
+	floor->setPose(makeRigidTranslation(Vector3d(0.0, -radius - distanceBetweenSphere, 0.0)));
 
 	runTest(Vector3d(0.0, 0.0, 1.0), Vector3d::Zero(), 10000.0);
 }

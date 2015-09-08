@@ -35,6 +35,7 @@ set(UNIT_TEST_SOURCES
 	SphereDoubleSidedPlaneContactCalculationTests.cpp
 	SpherePlaneContactCalculationTests.cpp
 	SphereSphereContactCalculationTests.cpp
+	TriangleMeshParticlesContactCalculationTests.cpp
 	TriangleMeshPlaneContactCalculationTests.cpp
 	TriangleMeshTriangleMeshContactCalculationTests.cpp
 )
@@ -51,8 +52,6 @@ set(LIBS
 	SurgSimPhysics
 	SurgSimInput
 )
-
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(

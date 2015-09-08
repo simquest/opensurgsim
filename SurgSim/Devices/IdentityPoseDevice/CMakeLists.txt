@@ -27,6 +27,8 @@ set(IDENTITY_POSE_DEVICE_HEADERS
 	IdentityPoseDevice.h
 )
 
+set(DEVICE_HEADERS ${DEVICE_HEADERS} IdentityPoseDevice/IdentityPoseDevice.h PARENT_SCOPE)
+
 surgsim_add_library(
 	IdentityPoseDevice
 	"${IDENTITY_POSE_DEVICE_SOURCES}"

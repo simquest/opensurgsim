@@ -16,10 +16,12 @@
 #ifndef SURGSIM_PHYSICS_CONSTRAINT_H
 #define SURGSIM_PHYSICS_CONSTRAINT_H
 
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
+#include <array>
 #include <memory>
 
 namespace SurgSim
@@ -32,32 +34,36 @@ namespace Physics
 class Constraint
 {
 public:
-	/// Sets all the values for this constraints, does validation on the parameters and will throw it something
+	/// Sets all the values for this constraints, does validation on the parameters and will throw if something
 	/// is wrong with the constraint.
+	/// \param constraintType The constraint type.
 	/// \param data The data for this constraint.
-	/// \param implementation0, implementation1 Both sides implementation of the constraint.
-	/// \param localization0, localization1 Both localizations of the representations involved in this constraint.
+	/// \param representation0, representation1 Both representations in this constraint.
+	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	Constraint(
+		ConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
-		std::shared_ptr<ConstraintImplementation> implementation0,
-		std::shared_ptr<Localization> localization0,
-		std::shared_ptr<ConstraintImplementation> implementation1,
-		std::shared_ptr<Localization> localization1);
+		std::shared_ptr<Representation> representation0,
+		const SurgSim::DataStructures::Location& location0,
+		std::shared_ptr<Representation> representation1,
+		const SurgSim::DataStructures::Location& location1);
 
 	/// Destructor
 	virtual ~Constraint();
 
-	/// Sets all the values for this constraints, does validation on the parameters and will throw it something
+	/// Sets all the values for this constraints, does validation on the parameters and will throw if something
 	/// is wrong with the constraint.
+	/// \param constraintType The constraint type.
 	/// \param data The data for this constraint.
-	/// \param implementation0, implementation1 Both sides implementation of the constraint.
-	/// \param localization0, localization1 Both localizations of the representations involved in this constraint.
+	/// \param representation0, representation1 Both representations in this constraint.
+	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	void setInformation(
+		ConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
-		std::shared_ptr<ConstraintImplementation> implementation0,
-		std::shared_ptr<Localization> localization0,
-		std::shared_ptr<ConstraintImplementation> implementation1,
-		std::shared_ptr<Localization> localization1);
+		std::shared_ptr<Representation> representation0,
+		const SurgSim::DataStructures::Location& location0,
+		std::shared_ptr<Representation> representation1,
+		const SurgSim::DataStructures::Location& location1);
 
 	/// Gets both sides implementation as a pair.
 	/// \return the pair of implementations forming this constraint.
@@ -77,9 +83,9 @@ public:
 	/// \return The number of degree of freedom for this constraint.
 	size_t getNumDof() const;
 
-	/// Gets the ConstraintType for this constraint.
-	/// \return	The type.
-	SurgSim::Math::MlcpConstraintType getType();
+	/// Gets the ConstraintType
+	/// \return The type
+	ConstraintType getType();
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint.
 	/// \param dt The time step.
@@ -97,6 +103,9 @@ public:
 	bool isActive();
 
 private:
+	/// Constraint-MLCP mapping
+	std::array<Math::MlcpConstraintType, NUM_CONSTRAINT_TYPES> m_mlcpMap;
+
 	/// Specific data associated to this constraint
 	std::shared_ptr<ConstraintData> m_data;
 
@@ -108,7 +117,7 @@ private:
 	size_t m_numDof;
 
 	/// The type of this constraint
-	SurgSim::Math::MlcpConstraintType m_constraintType;
+	ConstraintType m_constraintType;
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step

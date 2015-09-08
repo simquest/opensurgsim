@@ -22,6 +22,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/DataStructures/Groups.h"
 
 namespace YAML
 {
@@ -40,6 +41,8 @@ class Scene : public std::enable_shared_from_this<Scene>
 {
 public:
 
+	typedef SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>> GroupsType;
+
 	/// Constructor.
 	/// \param runtime The runtime to be used.
 	explicit Scene(std::weak_ptr<Runtime> runtime);
@@ -51,6 +54,10 @@ public:
 	/// \param	element	The element.
 	void addSceneElement(std::shared_ptr<SceneElement> element);
 
+	/// Invokes addSceneElement() for each element in the list.
+	/// \param elements the list of elements to be added.
+	void addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements);
+
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
 	const std::vector<std::shared_ptr<SceneElement>>& getSceneElements() const;
@@ -58,6 +65,12 @@ public:
 	/// Retrieve a SceneElement for this scene with the given name.
 	/// \return A SceneElement with given name; Empty share_ptr<> will be returned if no such SceneElement found.
 	const std::shared_ptr<SceneElement> getSceneElement(const std::string& name) const;
+
+	/// Look through the scene to find a component of a named element
+	/// \param elementName The name of the element to find
+	/// \param componentName The name of the component to find
+	/// \return the component that was found, nullptr if no component was found
+	std::shared_ptr<Component> getComponent(const std::string& elementName, const std::string& componentName) const;
 
 	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
@@ -72,9 +85,11 @@ public:
 	/// \return true if the decoding succeeded and the node was formatted correctly, false otherwise
 	bool decode(const YAML::Node& node);
 
+	/// \return the groups of the scene
+	std::shared_ptr<GroupsType> getGroups();
+
 private:
 
-	/// Get a shared pointer to Scene.
 	/// \return The shared pointer.
 	std::shared_ptr<Scene> getSharedPtr();
 
@@ -84,6 +99,8 @@ private:
 
 	// Used in a const function, need to declare mutable
 	mutable boost::mutex m_sceneElementsMutex;
+
+	std::shared_ptr<GroupsType> m_groups;
 };
 
 }; // namespace Framework

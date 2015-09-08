@@ -1,6 +1,7 @@
 SurgSim::Framework::Scene:
   SceneElements:
     - SurgSim::Framework::BasicSceneElement:
+        Name: StaplingDemoView
         IsActive: true
         Components:
           - SurgSim::Graphics::OsgCamera:
@@ -52,7 +53,6 @@ SurgSim::Framework::Scene:
               Id: 4740c5c9-a638-4eec-b9ad-b6117733ec7a
               MouseDeviceEnabled: false
               Name: StaplingDemoView View
-        Name: StaplingDemoView
     - SurgSim::Framework::BasicSceneElement:
         Name: arm
         IsActive: true
@@ -68,7 +68,7 @@ SurgSim::Framework::Scene:
               DrawAsWireFrame: true
               Name: Collision Mesh
               Id: 5cd67775-3f9c-40c1-b4ae-4d516272fb9c
-              Filename: Geometry/arm_collision.ply
+              MeshFileName: Geometry/arm_collision.ply
               UpdateOptions: 1
               GroupReferences:
                 - __OssDefault__
@@ -96,7 +96,7 @@ SurgSim::Framework::Scene:
                 Translation: [0, 0, 0]
               Shape:
                 SurgSim::Math::MeshShape:
-                  InitialMeshFileName: Geometry/arm_collision.ply
+                  FileName: Geometry/arm_collision.ply
           - SurgSim::Graphics::OsgSceneryRepresentation:
               IsLocalActive: true
               ModelFileName: Geometry/upperarm.osgb
@@ -119,14 +119,14 @@ SurgSim::Framework::Scene:
               AngularDamping: 0
               Shape:
                 SurgSim::Math::MeshShape:
-                  InitialMeshFileName: Geometry/arm_collision.ply
+                  FileName: Geometry/arm_collision.ply
               Id: 007741f4-d2d7-4f4f-9d2c-505539aa00bf
               Name: Physics
               IsLocalActive: true
               NumDof: 0
               Density: 0
-              RigidRepresentationState:
-                SurgSim::Physics::RigidRepresentationState:
+              RigidState:
+                SurgSim::Physics::RigidState:
                   Pose:
                     Quaternion: [0, 0, 0, 1]
                     Translation: [0, 0, 0]
@@ -191,8 +191,8 @@ SurgSim::Framework::Scene:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
               IsGravityEnabled: false
-              RigidRepresentationState:
-                SurgSim::Physics::RigidRepresentationState:
+              RigidState:
+                SurgSim::Physics::RigidState:
                   LinearVelocity: [0, 0, 0]
                   AngularVelocity: [0, 0, 0]
                   Pose:
@@ -207,7 +207,7 @@ SurgSim::Framework::Scene:
               AngularDamping: 0
               Shape:
                 SurgSim::Math::MeshShape:
-                  InitialMeshFileName: Geometry/stapler_collision.ply
+                  FileName: Geometry/stapler_collision.ply
               Id: 87eefb88-55d8-48c7-81c9-f8cb24aa65fd
               Name: Physics
           - SurgSim::Input::InputComponent:
@@ -219,7 +219,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Shape:
                 SurgSim::Math::MeshShape:
-                  InitialMeshFileName: Geometry/stapler_collision.ply
+                  FileName: Geometry/stapler_collision.ply
               Id: ec7ac2e2-93b5-46e6-9fda-55b125555092
               Name: Collision
               LocalPose:
@@ -231,7 +231,7 @@ SurgSim::Framework::Scene:
               Id: e1d65704-5035-4db0-91b7-a722b28f6b27
               UpdateOptions: 1
               IsLocalActive: false
-              Filename: Geometry/stapler_collision.ply
+              MeshFileName: Geometry/stapler_collision.ply
               GroupReferences:
                 - __OssDefault__
               LocalPose:
@@ -295,7 +295,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Shape:
                 SurgSim::Math::MeshShape:
-                  InitialMeshFileName: Geometry/virtual_staple_1.ply
+                  FileName: Geometry/virtual_staple_1.ply
               Id: b7f70a7d-a6ab-4719-8fcd-698912de1aa6
               Name: VirtualToothCollision0
               LocalPose:
@@ -316,7 +316,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Shape:
                 SurgSim::Math::MeshShape:
-                  InitialMeshFileName: Geometry/virtual_staple_2.ply
+                  FileName: Geometry/virtual_staple_2.ply
               Id: c5fae459-35d8-4ded-b478-d04ed66e8694
               Name: VirtualToothCollision1
               LocalPose:
@@ -335,7 +335,7 @@ SurgSim::Framework::Scene:
                 Translation: [0, -0.2, 0]
           - SurgSim::Graphics::OsgMeshRepresentation:
               IsLocalActive: false
-              Filename: Geometry/wound_deformable.ply
+              MeshFileName: Geometry/wound_deformable.ply
               GroupReferences:
                 - __OssDefault__
               LocalPose:
@@ -369,14 +369,14 @@ SurgSim::Framework::Scene:
                 SurgSim::Physics::DeformableCollisionRepresentation:
                   Id: 2cb010a8-8ac3-4735-9551-1a1c17388e27
                   Name: Collision
-              Filename: Geometry/wound_deformable.ply
+              FemFileName: Geometry/wound_deformable.ply
               Id: 7d447c80-d8c0-4213-a46f-164a800f6d1c
               Name: Physics
               IntegrationScheme:
                 SurgSim::Math::IntegrationScheme: INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER
           - SurgSim::Graphics::OsgMeshRepresentation:
               IsLocalActive: true
-              Filename: Geometry/wound_deformable.ply
+              MeshFileName: Geometry/wound_deformable.ply
               GroupReferences:
                 - __OssDefault__
               DrawAsWireFrame: false
@@ -393,7 +393,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Shape:
                 SurgSim::Math::MeshShape:
-                  InitialMeshFileName: Geometry/wound_deformable.ply
+                  FileName: Geometry/wound_deformable.ply
               Id: 2cb010a8-8ac3-4735-9551-1a1c17388e27
               Name: Collision
           - SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior:

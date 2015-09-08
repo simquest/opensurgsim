@@ -16,14 +16,12 @@
 #include <memory>
 
 #include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
-#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Devices/Devices.h"
 #include "SurgSim/Framework/Framework.h"
 #include "SurgSim/Graphics/Graphics.h"
 #include "SurgSim/Input/Input.h"
 #include "SurgSim/Math/Math.h"
 #include "SurgSim/Physics/Physics.h"
-
-#include "Examples/InputVtc/DeviceFactory.h"
 
 using SurgSim::Blocks::DriveElementFromInputBehavior;
 using SurgSim::Framework::BasicSceneElement;
@@ -31,7 +29,7 @@ using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
-using SurgSim::Graphics::OsgShader;
+using SurgSim::Graphics::OsgProgram;
 using SurgSim::Graphics::OsgUniform;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::ViewElement;
@@ -58,19 +56,19 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	std::shared_ptr<OsgProgram> program = std::make_shared<OsgProgram>();
 
 	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
 	uniform->set(Vector4f(0.0f, 0.6f, 1.0f, 0.0f));
 	material->addUniform(uniform);
 
-	shader->setFragmentShaderSource(
+	program->setFragmentShaderSource(
 		"uniform vec4 color;\n"
 		"void main(void)\n"
 		"{\n"
 		"	gl_FragColor = color;\n"
 		"}");
-	material->setShader(shader);
+	material->setProgram(program);
 	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
@@ -86,7 +84,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 }
 
 
-std::shared_ptr<SceneElement> createBox(const std::string& name, const std::string& toolDeviceName)
+std::shared_ptr<SceneElement> createBox(const std::string& name, const std::string& deviceName)
 {
 	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.8, 2.0, 0.2); // in meter
 
@@ -110,39 +108,21 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	// Input Components
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>(name + " Input");
-	inputComponent->setDeviceName(toolDeviceName);
+	inputComponent->setDeviceName(deviceName);
 
 	// Output Components
 	std::shared_ptr<SurgSim::Input::OutputComponent> outputComponent = nullptr;
 	outputComponent = std::make_shared<SurgSim::Input::OutputComponent>(name + " Output");
-	outputComponent->setDeviceName(toolDeviceName);
+	outputComponent->setDeviceName(deviceName);
 
-	// A VTC (virtual tool coupler, aka "god object") is used to couple an input/output thread and a physics thread,
-	// running at different rates.  Picture a user holding a haptic device (e.g., Falcon or Omni).  The
-	// device's pose is used to position a simulated tool, but that pose may cause collisions and the resulting forces
-	// are to be displayed to the user via the device.  If the collisions and physics response can be determined in the
-	// callback from the device's API, the appropriate forces can be calculated there.  Unfortunately, typically physics
-	// threads update much slower than the ~1000 Hz used for threads controlling haptic devices.  For example, if the
-	// physics thread updates at 100 Hz, there will be ~10 haptic callbacks that each receive the same force, which
-	// tends to create an unstable response in the haptic device (delays in feedback loops often cause limit cycles and
-	// other instabilities), and reduces the fidelity of the haptic "feel".
-	//
-	// Instead, we couple the pose coming from the haptic device to a "virtual tool".  The virtual tool follows the
-	// input pose exactly as long as it is not colliding.  As soon as the virtual tool collides, it interacts with the
-	// scene normally (through collisions and physics), plus the virtual tool and haptic device are connected via spring
-	// & damper forces.
-	//
-	// The spring forces attempt to pull the haptic device and the virtual tool together (pulling against the user on
-	// one side and the physics scene on the other).  The damping forces remove energy from the system to increase
-	// stability.  Note that the forces applied to the haptic device come solely from the spring & damper connected to
-	// the virtual tool, should be zero when the tool is not colliding, and should be calculated in a high update rate
-	// thread.  We pass the device forces&torques and the derivatives (Jacobians) of forces&torques with respect to
-	// position and velocity, so that the device's Scaffold can make those calculations.  The forces on the device can
-	// be scaled up or down from the forces on the virtual tool.
+	// A virtual tool coupler can be used to connect an input/output device with the physics thread.
+	// The physics representation follows the pose provided by the device, and the representation's collisions
+	// generate forces and torques on the device.
 	std::shared_ptr<VirtualToolCoupler> inputCoupler = std::make_shared<VirtualToolCoupler>(name + " Input Coupler");
 	inputCoupler->setInput(inputComponent);
 	inputCoupler->setOutput(outputComponent);
 	inputCoupler->setRepresentation(physicsRepresentation);
+	inputCoupler->setHapticOutputOnlyWhenColliding(true);
 
 	// The SceneElement
 	std::shared_ptr<BasicSceneElement> boxElement = std::make_shared<BasicSceneElement>(name);
@@ -156,29 +136,29 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	return boxElement;
 }
 
-std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, const std::string& toolDeviceName)
+std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, const std::string& deviceName)
 {
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation;
 	graphicsRepresentation = std::make_shared<OsgBoxRepresentation>(name + " Graphics");
 	graphicsRepresentation->setSizeXYZ(0.8, 2.0, 0.2);
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
-	shader->setVertexShaderSource(
+	std::shared_ptr<OsgProgram> program = std::make_shared<OsgProgram>();
+	program->setVertexShaderSource(
 		"void main(void)\n"
 		"{\n"
 		"    gl_Position = ftransform();\n"
 		"}");
-	shader->setFragmentShaderSource(
+	program->setFragmentShaderSource(
 		"void main(void)\n"
 		"{\n"
 		"    gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);\n"
 		"}");
-	material->setShader(shader);
+	material->setProgram(program);
 	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent;
 	inputComponent = std::make_shared<SurgSim::Input::InputComponent>(name + " Input");
-	inputComponent->setDeviceName(toolDeviceName);
+	inputComponent->setDeviceName(deviceName);
 
 	std::shared_ptr<DriveElementFromInputBehavior> driver;
 	driver = std::make_shared<DriveElementFromInputBehavior>(name + " Driver");
@@ -195,17 +175,11 @@ std::shared_ptr<SceneElement> createBoxForRawInput(const std::string& name, cons
 
 int main(int argc, char* argv[])
 {
-	static const char* const toolDeviceName = "Tool Device";
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
-
-	DeviceFactory deviceFactory;
-	std::shared_ptr<SurgSim::Input::DeviceInterface> device = deviceFactory.getDevice(toolDeviceName);
-	SURGSIM_ASSERT(device != nullptr) << "Unable to get a device, is one connected?";
-	inputManager->addDevice(device);
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 	runtime->addManager(physicsManager);
@@ -213,9 +187,25 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 	runtime->addManager(inputManager);
 
+	const std::string deviceName = "Tool_Device";
+	std::vector<std::string> types;
+	types.push_back("SurgSim::Device::PhantomDevice");
+	types.push_back("SurgSim::Device::NovintDevice");
+	types.push_back("SurgSim::Device::MultiAxisDevice");
+	types.push_back("SurgSim::Device::SixenseDevice");
+	types.push_back("SurgSim::Device::LeapDevice");
+	types.push_back("SurgSim::Device::IdentityPoseDevice");
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device =
+		SurgSim::Device::createDevice(types, deviceName);
+	SURGSIM_ASSERT(device != nullptr) << "Failed to initialize any device.";
+	SURGSIM_LOG_IF(std::dynamic_pointer_cast<SurgSim::Device::IdentityPoseDevice>(device) != nullptr,
+		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << "The InputVtc example was unable to initialize " <<
+		"an input device that provides poses, so it will use a constant pose.";
+	inputManager->addDevice(device);
+
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
-	scene->addSceneElement(createBox("VTC Box", toolDeviceName));
-	scene->addSceneElement(createBoxForRawInput("Raw Input", toolDeviceName));
+	scene->addSceneElement(createBox("VTC Box", deviceName));
+	scene->addSceneElement(createBoxForRawInput("Raw Input", deviceName));
 
 	std::shared_ptr<SceneElement> plane =  createPlane("Plane");
 	plane->setPose(makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0)));

@@ -37,7 +37,6 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 
-
 namespace
 {
 
@@ -53,6 +52,10 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 
 	std::vector<size_t> nodeBoundaryConditions;
 	nodeBoundaryConditions.push_back(0);
+	// Adding in this boundary condition is not necessary for the physics of the system, but it allows us
+	// to better control the condition number for the linear system that the OdeStaticSolver
+	// generates. This results in a more stable and more accurate test.
+	nodeBoundaryConditions.push_back(1);
 
 	// MassSpring1D with a straight line would define springs only along 1 direction, which would result in
 	// stiffness matrix of rank n/3. The Z axis can be constrained entirely and the simulation
@@ -91,7 +94,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	massSpringElement->addComponent(physicsRepresentation);
 
 	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
+		std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -161,7 +164,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring2D(const std::
 	massSpringElement->addComponent(physicsRepresentation);
 
 	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
+		std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -189,6 +192,11 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	std::vector<size_t> nodeBoundaryConditions;
 	nodeBoundaryConditions.push_back(0);
 	nodeBoundaryConditions.push_back(1);
+	// Adding in these two boundary conditions is not necessary for the physics of the system, but it allows us
+	// to better control the condition number for the linear system that the OdeStaticSolver
+	// generates. This results in a more stable and more accurate test.
+	nodeBoundaryConditions.push_back(2);
+	nodeBoundaryConditions.push_back(3);
 	std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities =
 	{
 		{
@@ -233,7 +241,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring3D(const std::
 	massSpringElement->addComponent(physicsRepresentation);
 
 	std::shared_ptr<OsgPointCloudRepresentation> graphicsRepresentation =
-				std::make_shared<OsgPointCloudRepresentation>("Graphics object");
+		std::make_shared<OsgPointCloudRepresentation>("Graphics object");
 	graphicsRepresentation->setLocalPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -266,11 +274,11 @@ TEST_F(RenderTests, VisualTestMassSprings)
 	{
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Explicit",
 							   makeRigidTranslation(Vector3d(-3.0, 3.0, 0.0)), Vector4d(1, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT));
 
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Modified Euler Explicit",
 							   makeRigidTranslation(Vector3d(-1.25, 3.0, 0.0)), Vector4d(0.5, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED));
 
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Runge Kutta 4",
 							   makeRigidTranslation(Vector3d(0.5, 3.0, 0.0)), Vector4d(0, 1, 0, 1),
@@ -278,7 +286,7 @@ TEST_F(RenderTests, VisualTestMassSprings)
 
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Implicit",
 							   makeRigidTranslation(Vector3d(2.25, 3.0, 0.0)), Vector4d(0, 0, 1, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT));
 
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Static",
 							   makeRigidTranslation(Vector3d(4.0, 3.0, 0.0)), Vector4d(1, 1, 1, 1),
@@ -289,11 +297,11 @@ TEST_F(RenderTests, VisualTestMassSprings)
 	{
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Explicit",
 							   makeRigidTranslation(Vector3d(-3.0, 0.5, 0.0)), Vector4d(1, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT));
 
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Modified Euler Explicit",
 							   makeRigidTranslation(Vector3d(-1.25, 0.5, 0.0)), Vector4d(0.5, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED));
 
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Runge Kutta 4",
 							   makeRigidTranslation(Vector3d(0.5, 0.5, 0.0)), Vector4d(0, 1, 0, 1),
@@ -301,7 +309,7 @@ TEST_F(RenderTests, VisualTestMassSprings)
 
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Implicit",
 							   makeRigidTranslation(Vector3d(2.25, 0.5, 0.0)), Vector4d(0, 0, 1, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT));
 
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Static",
 							   makeRigidTranslation(Vector3d(4.0, 0.5, 0.0)), Vector4d(1, 1, 1, 1),
@@ -312,11 +320,11 @@ TEST_F(RenderTests, VisualTestMassSprings)
 	{
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Explicit",
 							   makeRigidTranslation(Vector3d(-3.0, -1.5, 0.0)), Vector4d(1, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT));
 
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Modified Euler Explicit",
 							   makeRigidTranslation(Vector3d(-1.25, -1.5, 0.0)), Vector4d(0.5, 0, 0, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED));
 
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Runge Kutta 4",
 							   makeRigidTranslation(Vector3d(0.5, -1.5, 0.0)), Vector4d(0, 1, 0, 1),
@@ -324,14 +332,14 @@ TEST_F(RenderTests, VisualTestMassSprings)
 
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Implicit",
 							   makeRigidTranslation(Vector3d(2.25, -1.5, 0.0)), Vector4d(0, 0, 1, 1),
-							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT));
 
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Static",
 							   makeRigidTranslation(Vector3d(4.0, -1.5, 0.0)), Vector4d(1, 1, 1, 1),
 							   SurgSim::Math::INTEGRATIONSCHEME_STATIC));
 	}
 
-	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 15000.0);
+	runTest(Vector3d(0.0, 0.0, 8.5), Vector3d::Zero(), 5000.0);
 }
 
 }; // namespace Physics

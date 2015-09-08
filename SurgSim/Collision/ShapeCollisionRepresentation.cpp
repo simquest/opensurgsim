@@ -15,6 +15,7 @@
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
@@ -59,17 +60,6 @@ void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math:
 const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getShape() const
 {
 	return m_shape;
-}
-
-void ShapeCollisionRepresentation::update(const double& dt)
-{
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
-	if (nullptr != meshShape)
-	{
-		SURGSIM_LOG_IF(!meshShape->isValid(), SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
-			"Try to update an invalid MeshShape.";
-		meshShape->setPose(getPose());
-	}
 }
 
 bool ShapeCollisionRepresentation::doInitialize()

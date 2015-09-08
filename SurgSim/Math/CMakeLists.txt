@@ -22,6 +22,7 @@ set(SURGSIM_MATH_SOURCES
 	DoubleSidedPlaneShape.cpp
 	GaussLegendreQuadrature.cpp
 	LinearSolveAndInverse.cpp
+	LinearSparseSolveAndInverse.cpp
 	MathConvert.cpp
 	MeshShape.cpp
 	MlcpGaussSeidelSolver.cpp
@@ -40,6 +41,7 @@ set(SURGSIM_MATH_SOURCES
 	OdeSolverRungeKutta4.cpp
 	OdeSolverStatic.cpp
 	OdeState.cpp
+	ParticlesShape.cpp
 	PlaneShape.cpp
 	Shape.cpp
 	SphereShape.cpp
@@ -54,13 +56,22 @@ set(SURGSIM_MATH_HEADERS
 	DoubleSidedPlaneShape.h
 	GaussLegendreQuadrature.h
 	Geometry.h
+	IntervalArithmetic.h
+	IntervalArithmetic-inl.h
+	KalmanFilter.h
+	KalmanFilter-inl.h
+	LinearMotionArithmetic.h
+	LinearMotionArithmetic-inl.h
 	LinearSolveAndInverse.h
 	LinearSolveAndInverse-inl.h
+	LinearSparseSolveAndInverse.h
 	MathConvert.h
 	MathConvert-inl.h
 	Matrix.h
 	MeshShape.h
 	MeshShape-inl.h
+	MinMax.h
+	MinMax-inl.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h
 	MlcpGaussSeidelSolver.h
@@ -82,11 +93,20 @@ set(SURGSIM_MATH_HEADERS
 	OdeSolverRungeKutta4.h
 	OdeSolverStatic.h
 	OdeState.h
+	ParticlesShape.h
+	ParticlesShape-inl.h
 	PlaneShape.h
+	Polynomial.h
+	Polynomial-inl.h
+	PolynomialRoots.h
+	PolynomialRoots-inl.h
+	PolynomialValues.h
+	PolynomialValues-inl.h
 	Quaternion.h
 	RigidTransform.h
 	Shape.h
 	Shapes.h
+	SparseMatrix.h
 	SphereShape.h
 	SurfaceMeshShape.h
 	SurfaceMeshShape-inl.h

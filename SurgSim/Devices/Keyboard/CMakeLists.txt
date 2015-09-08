@@ -31,6 +31,11 @@ set(KEYBOARD_DEVICE_HEADERS
 	OsgKeyboardHandler.h
 )
 
+set(DEVICE_HEADERS ${DEVICE_HEADERS}
+	Keyboard/KeyboardDevice.h #NOLINT
+	Keyboard/KeyCode.h #NOLINT
+	PARENT_SCOPE)
+
 surgsim_add_library(
 	KeyboardDevice
 	"${KEYBOARD_DEVICE_SOURCES}"

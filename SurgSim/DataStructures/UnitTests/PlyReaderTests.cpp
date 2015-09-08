@@ -25,16 +25,16 @@ using SurgSim::Math::Vector3d;
 
 namespace
 {
-std::string findFile(std::string filename)
+std::string findFile(const std::string& filename)
 {
 	std::vector<std::string> paths;
-	paths.push_back("Data/PlyReaderTests");
+	paths.push_back("Data/");
 	SurgSim::Framework::ApplicationData data(paths);
 
 	return data.findFile(filename);
 }
 
-typedef SurgSim::DataStructures::TriangleMesh MeshType;
+typedef SurgSim::DataStructures::TriangleMeshPlain MeshType;
 
 }
 
@@ -50,9 +50,9 @@ class PlyReaderTests : public ::testing::Test
 TEST_F(PlyReaderTests, InitTest)
 {
 	ASSERT_NO_THROW(PlyReader("xxx"));
-	ASSERT_NO_THROW(PlyReader(findFile("Cube.ply")));
+	ASSERT_NO_THROW(PlyReader(findFile("PlyReaderTests/Cube_with_physics.ply")));
 
-	PlyReader reader(findFile("Cube.ply"));
+	PlyReader reader(findFile("PlyReaderTests/Cube_with_physics.ply"));
 	EXPECT_TRUE(reader.isValid());
 
 	PlyReader reader2(findFile("xxx"));
@@ -61,7 +61,7 @@ TEST_F(PlyReaderTests, InitTest)
 
 TEST_F(PlyReaderTests, FindElementsAndProperties)
 {
-	PlyReader reader(findFile("Cube.ply"));
+	PlyReader reader(findFile("PlyReaderTests/Cube_with_physics.ply"));
 
 	EXPECT_TRUE(reader.hasElement("vertex"));
 	EXPECT_TRUE(reader.hasElement("face"));
@@ -69,6 +69,7 @@ TEST_F(PlyReaderTests, FindElementsAndProperties)
 
 	EXPECT_TRUE(reader.hasProperty("vertex", "x"));
 	EXPECT_TRUE(reader.hasProperty("vertex", "y"));
+	EXPECT_TRUE(reader.hasProperty("face", "nature"));
 	EXPECT_TRUE(reader.hasProperty("face", "vertex_indices"));
 	EXPECT_FALSE(reader.hasProperty("xxx", "vertex_indices"));
 	EXPECT_FALSE(reader.hasProperty("vertex", "vertex_indices"));
@@ -76,7 +77,7 @@ TEST_F(PlyReaderTests, FindElementsAndProperties)
 
 TEST_F(PlyReaderTests, IsScalar)
 {
-	PlyReader reader(findFile("Testdata.ply"));
+	PlyReader reader(findFile("PlyReaderTests/Testdata.ply"));
 
 	EXPECT_TRUE(reader.isScalar("vertex", "x"));
 	EXPECT_FALSE(reader.isScalar("face", "vertex_indices"));
@@ -130,6 +131,7 @@ public:
 		}
 		faces.push_back(face);
 		extras.push_back(faceData.extra);
+		natures.push_back(faceData.nature);
 	}
 
 
@@ -146,6 +148,7 @@ public:
 		unsigned int faceCount;
 		unsigned int* faces;
 		int extra;
+		unsigned int nature;
 		int64_t overrun;
 	};
 
@@ -161,13 +164,40 @@ public:
 	std::vector<Vector3d> vertices;
 	std::vector<std::vector<unsigned int>> faces;
 	std::vector<int> extras;
-
+	std::vector<unsigned int> natures;
 };
+
+TEST_F(PlyReaderTests, ElementTwoPropertyTest)
+{
+	TestData testData;
+	PlyReader reader(findFile("PlyReaderTests/Cube_with_physics.ply"));
+
+	EXPECT_TRUE(reader.requestElement("face",
+									  std::bind(&TestData::beginFaces, &testData,
+											  std::placeholders::_1, std::placeholders::_2),
+									  std::bind(&TestData::newFace, &testData, std::placeholders::_1),
+									  nullptr));
+
+	EXPECT_TRUE(reader.requestScalarProperty("face", "nature",
+										   PlyReader::TYPE_UNSIGNED_INT,
+										   offsetof(TestData::FaceData, nature)));
+
+	EXPECT_TRUE(reader.requestListProperty("face", "vertex_indices",
+										   PlyReader::TYPE_UNSIGNED_INT,
+										   offsetof(TestData::FaceData, faces),
+										   PlyReader::TYPE_UNSIGNED_INT,
+										   offsetof(TestData::FaceData, faceCount)));
+
+	ASSERT_NO_THROW(reader.parseFile());
+
+	EXPECT_EQ(11, testData.natures[0]);
+	EXPECT_EQ(0, testData.natures[8]);
+}
 
 TEST_F(PlyReaderTests, ScalarReadTest)
 {
 	TestData testData;
-	PlyReader reader(findFile("Testdata.ply"));
+	PlyReader reader(findFile("PlyReaderTests/Testdata.ply"));
 	EXPECT_TRUE(reader.requestElement("vertex",
 									  std::bind(&TestData::beginVertices, &testData,
 											  std::placeholders::_1, std::placeholders::_2),
@@ -211,7 +241,7 @@ TEST_F(PlyReaderTests, ScalarReadTest)
 TEST_F(PlyReaderTests, ListReadTest)
 {
 	TestData testData;
-	PlyReader reader(findFile("Testdata.ply"));
+	PlyReader reader(findFile("PlyReaderTests/Testdata.ply"));
 	EXPECT_TRUE(reader.requestElement("face",
 									  std::bind(&TestData::beginFaces, &testData,
 											  std::placeholders::_1, std::placeholders::_2),
@@ -250,7 +280,7 @@ TEST_F(PlyReaderTests, ListReadTest)
 
 TEST_F(PlyReaderTests, TriangleMeshDelegateTest)
 {
-	PlyReader reader(findFile("Cube.ply"));
+	PlyReader reader(findFile("PlyReaderTests/Cube_with_physics.ply"));
 	auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate<MeshType>>();
 
 	// parseWithDeletegate() will first call setDelegate(), then parseFile() if previous step successed.

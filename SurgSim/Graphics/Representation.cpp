@@ -30,10 +30,12 @@ const std::string Representation::DefaultHudGroupName = "__OssDefaulHud__";
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>,
-									  GroupReferences, getGroupReferences, setGroupReferences);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, GroupReferences,
+									  getGroupReferences, setGroupReferences);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, DrawAsWireFrame,
 									  getDrawAsWireFrame, setDrawAsWireFrame);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, GenerateTangents,
+									  isGeneratingTangents, setGenerateTangents);
 
 	addGroupReference(DefaultGroupName);
 }
@@ -72,7 +74,7 @@ void Representation::setGroupReferences(const std::vector<std::string>& groups)
 	}
 }
 
-std::vector<std::string> Representation::getGroupReferences()
+std::vector<std::string> Representation::getGroupReferences() const
 {
 	return std::vector<std::string>(std::begin(m_groups), std::end(m_groups));
 }

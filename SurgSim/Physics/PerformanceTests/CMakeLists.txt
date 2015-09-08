@@ -21,18 +21,19 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	DivisibleCubeRepresentation.cpp
 	Fem3DPerformanceTest.cpp
+	Fem3DSolutionComponentsTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	DivisibleCubeRepresentation.h
 )
 
 set(LIBS
 	SurgSimInput
 	SurgSimPhysics
 )
-
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Configure the path for the data files
 configure_file(

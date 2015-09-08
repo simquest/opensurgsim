@@ -27,6 +27,9 @@ namespace Math
 /// Linear Version of the Euler Implicit ode solver
 /// This solver assumes that the system is linear,
 /// ie that Mass, Damping, and Stiffness matrices do not change.
+/// \note If the matrices are all constant, the problem to solve becomes linear,
+/// \note therefore the Newton-Raphson algorithm will be exact in only 1 iteration.
+/// \note Therefore this solver uses a number of maximum iteration of 1 unless overriden.
 class OdeSolverLinearEulerImplicit : public OdeSolverEulerImplicit
 {
 public:
@@ -34,7 +37,11 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverLinearEulerImplicit(OdeEquation* equation);
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void setNewtonRaphsonMaximumIteration(size_t maximumIteration) override;
+
+	/// The parameter computeCompliance is irrelevant for any Linear solver as it is a constant matrix.
+	/// It will be precomputed on the first call and use in the following calls, no matter what the parameter value is.
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
 
 private:
 	/// The constant stiffness matrix

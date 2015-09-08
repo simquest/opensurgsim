@@ -30,13 +30,7 @@ FixedRepresentation::~FixedRepresentation()
 {
 }
 
-
-RepresentationType FixedRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_FIXED;
-}
-
-void FixedRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
+void FixedRepresentation::updateGlobalInertiaMatrices(const RigidState& state)
 {
 	// Do Nothing it is a fixed object
 }

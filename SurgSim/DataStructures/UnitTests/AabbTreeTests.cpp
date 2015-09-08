@@ -20,9 +20,7 @@
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeIntersectionVisitor.h"
 #include "SurgSim/DataStructures/AabbTreeNode.h"
-#include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/DataStructures/TriangleMeshUtilities.h"
-#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/Aabb.h"
@@ -67,14 +65,12 @@ TEST(AabbTreeTests, AddTest)
 
 TEST(AabbTreeTests, BuildTest)
 {
-	SurgSim::Framework::ApplicationData data("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	auto tree = std::make_shared<AabbTree>(3);
 
-	std::string filename = data.findFile("Geometry/arm_collision.ply");
-	ASSERT_FALSE(filename.empty());
-	auto mesh = loadTriangleMesh(filename);
+	auto mesh = std::make_shared<TriangleMeshPlain>();
+	mesh->load("Geometry/arm_collision.ply");
 
-	SurgSim::Framework::Timer timer;
 	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
 	{
 		auto triangle = mesh->getTriangle(i);
@@ -82,9 +78,29 @@ TEST(AabbTreeTests, BuildTest)
 					   mesh->getVertex(triangle.verticesId[0]).position,
 					   mesh->getVertex(triangle.verticesId[1]).position,
 					   mesh->getVertex(triangle.verticesId[2]).position));
-		tree->add(aabb, i);
+		tree->add(std::move(aabb), i);
 	}
-	timer.endFrame();
+}
+
+TEST(AabbTreeTests, BatchBuildTest)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	auto tree = std::make_shared<AabbTree>(3);
+
+	auto mesh = std::make_shared<TriangleMeshPlain>();
+	mesh->load("Geometry/arm_collision.ply");
+
+	std::list<AabbTreeData::Item> items;
+	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
+	{
+		auto triangle = mesh->getTriangle(i);
+		Aabbd aabb(SurgSim::Math::makeAabb(
+					   mesh->getVertex(triangle.verticesId[0]).position,
+					   mesh->getVertex(triangle.verticesId[1]).position,
+					   mesh->getVertex(triangle.verticesId[2]).position));
+		items.emplace_back(std::make_pair(std::move(aabb), i));
+	}
+	tree->set(std::move(items));
 }
 
 TEST(AabbTreeTests, EasyIntersectionTest)
@@ -125,12 +141,11 @@ TEST(AabbTreeTests, EasyIntersectionTest)
 
 TEST(AabbTreeTests, MeshIntersectionTest)
 {
-	SurgSim::Framework::ApplicationData data("config.txt");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	auto tree = std::make_shared<AabbTree>(3);
 
-	std::string filename = data.findFile("Geometry/arm_collision.ply");
-	ASSERT_FALSE(filename.empty());
-	auto mesh = loadTriangleMesh(filename);
+	auto mesh = std::make_shared<TriangleMeshPlain>();
+	mesh->load("Geometry/arm_collision.ply");
 
 	Aabbd expectedBigBox;
 
@@ -202,20 +217,21 @@ static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const s
 
 TEST(AabbTreeTests, SpatialJoinTest)
 {
-	SurgSim::Framework::Runtime runtime("config.txt");
-	const std::string fileName = "MeshShapeData/staple_collision.ply";
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	const std::string fileName = "Geometry/staple_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshA->loadInitialMesh(fileName));
+	ASSERT_NO_THROW(meshA->load(fileName));
 
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
-	EXPECT_NO_THROW(meshB->loadInitialMesh(fileName));
+	ASSERT_NO_THROW(meshB->load(fileName));
 
 	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
-	meshB->getMesh()->copyWithTransform(rhsPose, *meshA->getMesh());
+	meshB->transform(rhsPose);
 
-	meshA->updateAabbTree();
-	meshB->updateAabbTree();
+	// update the AABB trees
+	meshA->update();
+	meshB->update();
 
 	auto aabbA = meshA->getAabbTree();
 	auto aabbB = meshB->getAabbTree();

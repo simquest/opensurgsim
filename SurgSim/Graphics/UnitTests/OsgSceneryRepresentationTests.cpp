@@ -28,6 +28,10 @@
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgModel.h"
 
+#include <osg/Group>
+#include <osg/Geode>
+#include <osg/Geometry>
+
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::SceneryRepresentation;
@@ -63,16 +67,19 @@ public:
 
 TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 {
-	sceneryObject->loadModel("OsgSceneryRepresentationTests/Torus.obj");
-	EXPECT_EQ("OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getModel()->getFileName());
+	sceneryObject->loadModel("Geometry/Torus.obj");
+	EXPECT_EQ("Geometry/Torus.obj", sceneryObject->getModel()->getFileName());
+
 }
 
 TEST_F(OsgSceneryRepresentationTest, InitTest)
 {
-	sceneryObject->loadModel("OsgSceneryRepresentationTests/Torus.obj");
+	EXPECT_EQ(nullptr, sceneryObject->getModelNode());
+	sceneryObject->loadModel("Geometry/Torus.obj");
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject));
+	EXPECT_NE(nullptr, sceneryObject->getModelNode());
 
-	sceneryObject2->loadModel("OsgSceneryRepresentationTests/Torus.osgb");
+	sceneryObject2->loadModel("Geometry/Torus.osgb");
 	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject2));
 }
 
@@ -83,7 +90,7 @@ TEST_F(OsgSceneryRepresentationTest, AccessibleTest)
 									"SurgSim::Graphics::OsgSceneryRepresentation",
 									"scenery"));
 
-	std::string fileName("OsgSceneryRepresentationTests/Torus.obj");
+	std::string fileName("Geometry/Torus.obj");
 	component->setValue("ModelFileName", fileName);
 	auto asset = component->getValue<std::shared_ptr<SurgSim::Graphics::Model>>("Model");
 	EXPECT_EQ(fileName, asset->getFileName());
@@ -93,16 +100,60 @@ TEST_F(OsgSceneryRepresentationTest, SerializationTests)
 {
 	std::shared_ptr<SceneryRepresentation> scenery = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
 
-	std::string fileName("OsgSceneryRepresentationTests/Torus.obj");
+	std::string fileName("Geometry/Torus.obj");
 	scenery->loadModel(fileName);
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = scenery->encode());
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(5u, node.size());
 
 	std::shared_ptr<SceneryRepresentation> result = std::make_shared<OsgSceneryRepresentation>("OsgScenery");
 	ASSERT_NO_THROW(result->decode(node));
 	EXPECT_EQ("SurgSim::Graphics::OsgSceneryRepresentation", result->getClassName());
 	EXPECT_EQ(fileName, result->getModel()->getFileName());
+}
+
+// This checks a fix for an intermittent bug where on deserialization setGenerateTangents would sometimes be called
+// before setModel, in which case no tangents where generated on scenery representations
+TEST_F(OsgSceneryRepresentationTest, GenerateTangents)
+{
+	{
+		SCOPED_TRACE("setGenerateTangents before loadModel");
+		auto object = std::make_shared<OsgSceneryRepresentation>("representation");
+
+		object->setGenerateTangents(true);
+		object->loadModel("Geometry/cube.osgt");
+
+		// Structure from the osgt file, we need to get to the geometry to make sure the tangents where generated
+		auto group = object->getModelNode()->asGroup();
+		ASSERT_NE(nullptr, group);
+		auto geode = group->getChild(0)->asGeode();
+		ASSERT_NE(nullptr, geode);
+		auto geometry = geode->getDrawable(0)->asGeometry();
+		ASSERT_NE(nullptr, geometry);
+
+		ASSERT_NE(nullptr, geometry->getVertexAttribArray(SurgSim::Graphics::TANGENT_VERTEX_ATTRIBUTE_ID));
+		ASSERT_NE(nullptr, geometry->getVertexAttribArray(SurgSim::Graphics::BITANGENT_VERTEX_ATTRIBUTE_ID));
+	}
+
+
+	{
+		SCOPED_TRACE("setGenerateTangents after loadModel");
+		auto object = std::make_shared<OsgSceneryRepresentation>("representation");
+
+		object->loadModel("Geometry/cube.osgt");
+		object->setGenerateTangents(true);
+
+		// Structure from the osgt file, we need to get to the geometry to make sure the tangents where generated
+		auto group = object->getModelNode()->asGroup();
+		ASSERT_NE(nullptr, group);
+		auto geode = group->getChild(0)->asGeode();
+		ASSERT_NE(nullptr, geode);
+		auto geometry = geode->getDrawable(0)->asGeometry();
+		ASSERT_NE(nullptr, geometry);
+
+		ASSERT_NE(nullptr, geometry->getVertexAttribArray(SurgSim::Graphics::TANGENT_VERTEX_ATTRIBUTE_ID));
+		ASSERT_NE(nullptr, geometry->getVertexAttribArray(SurgSim::Graphics::BITANGENT_VERTEX_ATTRIBUTE_ID));
+	}
+
 }

@@ -41,7 +41,7 @@ std::pair<int, int> TriangleMeshPlaneDcdContact::getShapeTypes()
 }
 
 void TriangleMeshPlaneDcdContact::doCalculateContact
-	(std::shared_ptr<CollisionPair> pair)
+(std::shared_ptr<CollisionPair> pair)
 {
 	std::shared_ptr<Representation> representationTriangleMesh;
 	std::shared_ptr<Representation> representationPlane;
@@ -49,8 +49,7 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 	representationTriangleMesh = pair->getFirst();
 	representationPlane = pair->getSecond();
 
-	std::shared_ptr<MeshShape> mesh =
-		std::static_pointer_cast<MeshShape>(representationTriangleMesh->getShape());
+	auto mesh = std::static_pointer_cast<MeshShape>(representationTriangleMesh->getPosedShape());
 
 	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));
 
@@ -61,28 +60,22 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 	Vector3d planePoint = planeLocalToMeshLocal * planeNormalScaled;
 	double planeD = -planeNormal.dot(planePoint);
 
-	// Now loop through all the vertices on the Mesh and check if it below the plane
-	size_t totalMeshVertices = mesh->getMesh()->getNumVertices();
-
 	double d;
 	Vector3d normal;
-	Vector3d meshVertex;
-
-	for (size_t i = 0; i < totalMeshVertices; ++i)
+	for (auto& vertex : mesh->getVertices())
 	{
-		meshVertex = mesh->getMesh()->getVertex(i).position;
-		d = planeNormal.dot(meshVertex) + planeD;
+		d = planeNormal.dot(vertex.position) + planeD;
 		if (d < SurgSim::Math::Geometry::DistanceEpsilon)
 		{
 			// Create the contact
 			normal = representationPlane->getPose().linear() * plane->getNormal();
 			std::pair<Location, Location> penetrationPoints;
 			penetrationPoints.first.rigidLocalPosition.setValue(
-				representationTriangleMesh->getPose().inverse() * meshVertex);
+				representationTriangleMesh->getPose().inverse() * vertex.position);
 			penetrationPoints.second.rigidLocalPosition.setValue(
-				representationPlane->getPose().inverse() * (meshVertex - normal * d));
+				representationPlane->getPose().inverse() * (vertex.position - normal * d));
 
-			pair->addContact(-d, normal, penetrationPoints);
+			pair->addDcdContact(-d, normal, penetrationPoints);
 		}
 	}
 }

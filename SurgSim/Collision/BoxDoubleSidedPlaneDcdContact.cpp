@@ -17,16 +17,15 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::Location;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::Geometry::DistanceEpsilon;
 using SurgSim::Math::Vector3d;
+
 
 namespace SurgSim
 {
@@ -37,30 +36,39 @@ BoxDoubleSidedPlaneDcdContact::BoxDoubleSidedPlaneDcdContact()
 {
 }
 
-std::pair<int,int> BoxDoubleSidedPlaneDcdContact::getShapeTypes()
+std::pair<int, int> BoxDoubleSidedPlaneDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);
 }
 
 void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	using SurgSim::Math::Geometry::DistanceEpsilon;
+	std::shared_ptr<Representation> box = pair->getFirst();
+	std::shared_ptr<Representation> plane = pair->getSecond();
 
-	std::shared_ptr<Representation> representationBox;
-	std::shared_ptr<Representation> representationPlane;
+	auto boxShape = std::static_pointer_cast<BoxShape>(box->getShape());
+	auto planeShape = std::static_pointer_cast<DoubleSidedPlaneShape>(plane->getShape());
 
-	representationBox = pair->getFirst();
-	representationPlane = pair->getSecond();
+	auto contacts = calculateContact(*boxShape, box->getPose(), *planeShape, plane->getPose());
+	for (auto& contact : contacts)
+	{
+		pair->addContact(contact);
+	}
+}
 
-	std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
-	std::shared_ptr<DoubleSidedPlaneShape> plane =
-		std::static_pointer_cast<DoubleSidedPlaneShape>(representationPlane->getShape());
+
+std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateContact(
+									 const SurgSim::Math::BoxShape& boxShape,
+									 const SurgSim::Math::RigidTransform3d& boxPose,
+									 const SurgSim::Math::DoubleSidedPlaneShape& planeShape,
+									 const SurgSim::Math::RigidTransform3d& planePose)
+{
+	std::list<std::shared_ptr<Contact>> contacts;
 
 	// Transform the plane normal to box co-ordinate system.
-	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
-														   representationPlane->getPose();
-	Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
-	Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = boxPose.inverse() * planePose;
+	Vector3d planeNormal = planeLocalToBoxLocal.linear() * planeShape.getNormal();
+	Vector3d planeNormalScaled = planeShape.getNormal() * -planeShape.getD();
 	Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
 	double planeD = -planeNormal.dot(planePoint);
 
@@ -78,7 +86,7 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 	Vector3d boxVertices[8];
 	for (int i = 0; i < 8; ++i)
 	{
-		boxVertices[i] = box->getVertex(i);
+		boxVertices[i] = boxShape.getVertex(i);
 		d[i] = planeNormal.dot(boxVertices[i]) + planeD;
 		maxD = std::max(d[i], maxD);
 		minD = std::min(d[i], minD);
@@ -92,7 +100,6 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 		// - Vertex through plane.
 
 		Vector3d normal;
-		Vector3d boxVertexGlobal;
 
 		enum BoxPlaneIntersectionType
 		{
@@ -104,13 +111,13 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 		if (std::abs(maxD) < DistanceEpsilon)
 		{
 			// Box is touching the "back side" of plane.
-			normal = -(representationPlane->getPose().linear() * plane->getNormal());
+			normal = -(planePose.linear() * planeShape.getNormal());
 			boxPlaneIntersectionType = BoxPlaneIntersectionTypeEqualsZero;
 		}
 		else if (std::abs(minD) < DistanceEpsilon)
 		{
 			// Box is touching the "front side" of plane.
-			normal = representationPlane->getPose().linear() * plane->getNormal();
+			normal = planePose.linear() * planeShape.getNormal();
 			boxPlaneIntersectionType = BoxPlaneIntersectionTypeEqualsZero;
 		}
 		else
@@ -118,13 +125,13 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 			if (std::abs(maxD) >= std::abs(minD))
 			{
 				// Box is penetrating through the "front side" of plane.
-				normal = representationPlane->getPose().linear() * plane->getNormal();
+				normal = planePose.linear() * planeShape.getNormal();
 				boxPlaneIntersectionType = BoxPlaneIntersectionTypeLessThanZero;
 			}
 			else
 			{
 				// Box is penetrating through the "back side" of plane.
-				normal = -(representationPlane->getPose().linear() * plane->getNormal());
+				normal = -(planePose.linear() * planeShape.getNormal());
 				boxPlaneIntersectionType = BoxPlaneIntersectionTypeGreaterThanZero;
 			}
 		}
@@ -135,31 +142,31 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 		{
 			switch (boxPlaneIntersectionType)
 			{
-			case BoxPlaneIntersectionTypeEqualsZero:
-				generateContact = std::abs(d[i]) < DistanceEpsilon;
-				break;
-			case BoxPlaneIntersectionTypeLessThanZero:
-				generateContact = d[i] < -DistanceEpsilon;
-				break;
-			case BoxPlaneIntersectionTypeGreaterThanZero:
-				generateContact = d[i] > DistanceEpsilon;
-				break;
+				case BoxPlaneIntersectionTypeEqualsZero:
+					generateContact = std::abs(d[i]) < DistanceEpsilon;
+					break;
+				case BoxPlaneIntersectionTypeLessThanZero:
+					generateContact = d[i] < -DistanceEpsilon;
+					break;
+				case BoxPlaneIntersectionTypeGreaterThanZero:
+					generateContact = d[i] > DistanceEpsilon;
+					break;
 			}
 
 			if (generateContact)
 			{
-				std::pair<Location, Location> penetrationPoints;
-				boxVertexGlobal = representationBox->getPose() * boxVertices[i];
-				penetrationPoints.first.rigidLocalPosition.setValue(boxVertices[i]);
-				penetrationPoints.second.rigidLocalPosition.setValue(
-					representationPlane->getPose().inverse() * (boxVertexGlobal + normal * std::abs(d[i])));
-
-				pair->addContact(std::abs(d[i]), normal, penetrationPoints);
+				std::pair<Location, Location> penetrationPoints = std::make_pair(Location(boxVertices[i]),
+						Location(planePose.inverse() * (boxPose * boxVertices[i] + normal * std::abs(d[i]))));
+				contacts.push_back(std::make_shared<Contact>(
+									   COLLISION_DETECTION_TYPE_DISCRETE,
+									   std::abs(d[i]), 1.0, Vector3d::Zero(), normal,
+									   penetrationPoints));
 
 				generateContact = false;
 			}
 		}
 	}
+	return std::move(contacts);
 }
 
 }; // namespace Collision

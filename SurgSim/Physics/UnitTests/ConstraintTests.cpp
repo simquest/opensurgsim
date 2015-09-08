@@ -16,26 +16,28 @@
 #include <memory>
 
 #include <gtest/gtest.h>
-#include "SurgSim/Physics/Constraint.h"
-#include "SurgSim/Physics/ConstraintData.h"
-#include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentationContact.h"
-#include "SurgSim/Physics/MlcpPhysicsProblem.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
 
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
+using SurgSim::DataStructures::Location;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 namespace SurgSim
@@ -80,14 +82,10 @@ protected:
 	std::shared_ptr<Constraint> m_constraint;
 	/// Constraint data: frictionless contact
 	std::shared_ptr<ContactConstraintData> m_constraintData;
-	/// Localization on the fixed plane
-	std::shared_ptr<Localization> m_locFixedPlane;
-	/// Localization on the rigid sphere
-	std::shared_ptr<Localization> m_locRigidSphere;
-	/// Constraint implementation for the fixed plane
-	std::shared_ptr<ConstraintImplementation> m_implementationFixedPlane;
-	/// Constraint implementation for the rigid sphere
-	std::shared_ptr<ConstraintImplementation> m_implementationRigidSphere;
+	/// Location on the fixed plane
+	Location m_locFixedPlane;
+	/// Location on the rigid sphere
+	Location m_locRigidSphere;
 
 	/// Total number of degrees of freedom in the system (plane + sphere)
 	size_t m_numDof;
@@ -129,16 +127,8 @@ protected:
 		m_fixed->setLocalPose(m_poseFixed);
 		m_numDof += m_fixed->getNumDof();
 
-		auto locFixedPlane = std::make_shared<FixedRepresentationLocalization>(m_fixed);
-		m_locFixedPlane = locFixedPlane;
-		auto locRigidSphere = std::make_shared<RigidRepresentationLocalization>(m_rigid);
-		m_locRigidSphere = locRigidSphere;
-
-		locFixedPlane->setLocalPosition(m_contactPositionPlane);
-		locRigidSphere->setLocalPosition(m_contactPositionSphere);
-
-		m_implementationFixedPlane = std::make_shared<FixedRepresentationContact>();
-		m_implementationRigidSphere = std::make_shared<RigidRepresentationContact>();
+		m_locFixedPlane.rigidLocalPosition = m_contactPositionPlane;
+		m_locRigidSphere.rigidLocalPosition = m_contactPositionSphere;
 
 		m_constraintData = std::make_shared<ContactConstraintData>();
 
@@ -151,138 +141,75 @@ protected:
 	void clearMlcpPhysicsProblem(size_t numDof, size_t numConstraint)
 	{
 		// Resize and zero all Eigen types
-		m_mlcpPhysicsProblem.A.resize(numConstraint, numConstraint);
-		m_mlcpPhysicsProblem.A.setZero();
-		m_mlcpPhysicsProblem.b.resize(numConstraint);
-		m_mlcpPhysicsProblem.b.setZero();
-		m_mlcpPhysicsProblem.mu.resize(numConstraint);
-		m_mlcpPhysicsProblem.mu.setZero();
-		m_mlcpPhysicsProblem.CHt.resize(numDof, numConstraint);
-		m_mlcpPhysicsProblem.CHt.setZero();
+		m_mlcpPhysicsProblem.A.setZero(numConstraint, numConstraint);
+		m_mlcpPhysicsProblem.b.setZero(numConstraint);
+		m_mlcpPhysicsProblem.mu.setZero(numConstraint);
+		m_mlcpPhysicsProblem.CHt.setZero(numDof, numConstraint);
 		m_mlcpPhysicsProblem.H.resize(numConstraint, numDof);
-		m_mlcpPhysicsProblem.H.setZero();
 
 		// Empty all std::vector types
 		m_mlcpPhysicsProblem.constraintTypes.clear();
 	}
 };
 
-TEST_F (ConstraintTests, TestConstructor)
+TEST_F(ConstraintTests, TestConstructor)
 {
 	auto fixedRep = std::make_shared<FixedRepresentation>("fixed");
 	auto rigidRep = std::make_shared<RigidRepresentation>("rigid");
 
-	std::shared_ptr<Localization> fixedLoc = std::make_shared<FixedRepresentationLocalization>();
-	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationLocalization>();
+	Location fixedLoc(m_contactPositionPlane);
+	Location rigidLoc(m_contactPositionSphere);
 
-	fixedLoc->setRepresentation(fixedRep);
-	rigidLoc->setRepresentation(rigidRep);
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
-	std::shared_ptr<ConstraintImplementation> fixedImp = std::make_shared<FixedRepresentationContact>();
-	std::shared_ptr<ConstraintImplementation> rigidImp = std::make_shared<RigidRepresentationContact>();
+	ASSERT_NO_THROW({Constraint c(type, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);});
 
-	{
-		SCOPED_TRACE("nullptr test");
-		ASSERT_NO_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
+	EXPECT_THROW(
+	{ Constraint c(type, nullptr, nullptr, fixedLoc, nullptr, fixedLoc); },
+	SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(
+	{ Constraint c(type, m_constraintData, nullptr, fixedLoc, nullptr, fixedLoc); },
+	SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(
+	{ Constraint c(type, m_constraintData, fixedRep, fixedLoc, nullptr, fixedLoc); },
+	SurgSim::Framework::AssertionFailure);
 
-		EXPECT_THROW(
-			{ Constraint c(nullptr, nullptr, nullptr, nullptr, nullptr); },
-			SurgSim::Framework::AssertionFailure);
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, nullptr, nullptr, nullptr); },
-			SurgSim::Framework::AssertionFailure);
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, fixedLoc, nullptr, nullptr); },
-			SurgSim::Framework::AssertionFailure);
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, nullptr); },
-			SurgSim::Framework::AssertionFailure);
-	}
-
-	{
-		SCOPED_TRACE("Localization nullptr test");
-
-		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
-		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
-			SurgSim::Framework::AssertionFailure);
-
-		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
-		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
-		fixedLoc->setRepresentation(fixedRep);
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
-			SurgSim::Framework::AssertionFailure);
-
-		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
-		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
-		rigidLoc->setRepresentation(rigidRep);
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
-			SurgSim::Framework::AssertionFailure);
-
-		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
-		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
-		fixedLoc->setRepresentation(fixedRep);
-		rigidLoc->setRepresentation(rigidRep);
-		EXPECT_NO_THROW(
-			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); });
-	}
-
-	{
-		SCOPED_TRACE("Representation mismatch between Implementation and Localization");
-
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, rigidLoc, rigidImp, fixedLoc); },
-			SurgSim::Framework::AssertionFailure);
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, rigidImp, fixedLoc, fixedImp, rigidLoc); },
-			SurgSim::Framework::AssertionFailure);
-	}
-
-	// Need more checks for the other error conditions
-
-	Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);
+	Constraint c(type, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);
 
 	EXPECT_EQ(m_constraintData, c.getData());
-	EXPECT_EQ(fixedImp, c.getImplementations().first);
-	EXPECT_EQ(rigidImp, c.getImplementations().second);
-	EXPECT_EQ(fixedLoc, c.getLocalizations().first);
-	EXPECT_EQ(rigidLoc, c.getLocalizations().second);
+	EXPECT_EQ(type, c.getImplementations().first->getConstraintType());
+	EXPECT_EQ(type, c.getImplementations().second->getConstraintType());
+	EXPECT_EQ(fixedRep, c.getLocalizations().first->getRepresentation());
+	EXPECT_EQ(rigidRep, c.getLocalizations().second->getRepresentation());
 }
 
-TEST_F (ConstraintTests, TestGetNumDof)
+TEST_F(ConstraintTests, TestGetNumDof)
 {
 	auto fixedRep = std::make_shared<FixedRepresentation>("fixed");
 	auto rigidRep = std::make_shared<RigidRepresentation>("rigid");
 
-	std::shared_ptr<Localization> fixedLoc = std::make_shared<FixedRepresentationLocalization>();
-	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationLocalization>();
+	Location fixedLoc(m_contactPositionPlane);
+	Location rigidLoc(m_contactPositionSphere);
 
-	fixedLoc->setRepresentation(fixedRep);
-	rigidLoc->setRepresentation(rigidRep);
-
-	std::shared_ptr<ConstraintImplementation> fixedImp = std::make_shared<FixedRepresentationContact>();
-	std::shared_ptr<ConstraintImplementation> rigidImp = std::make_shared<RigidRepresentationContact>();
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact");
-		Constraint c(m_constraintData,
-			m_implementationFixedPlane, m_locFixedPlane,
-			m_implementationRigidSphere, m_locRigidSphere);
+		Constraint c(type, m_constraintData,
+					 m_fixed, m_locFixedPlane,
+					 m_rigid, m_locRigidSphere);
 		EXPECT_EQ(1u, c.getNumDof());
 	}
 
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact between 2 fixed representations");
-		Constraint c(m_constraintData,fixedImp, fixedLoc, fixedImp, fixedLoc);
+		Constraint c(type, m_constraintData, fixedRep, fixedLoc, fixedRep, fixedLoc);
 		EXPECT_EQ(1u, c.getNumDof());
 	}
 
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact between 1 fixed representation and 1 rigid representation");
-		Constraint c(m_constraintData,fixedImp, fixedLoc, rigidImp, rigidLoc);
+		Constraint c(type, m_constraintData, fixedRep, fixedLoc, rigidRep, rigidLoc);
 		EXPECT_EQ(1u, c.getNumDof());
 	}
 }
@@ -291,14 +218,16 @@ TEST_F (ConstraintTests, TestGetNumDof)
 // Contact location on the rigid sphere is (0 -0.01 0)
 // Contact location on the fixed plane is (0 0 0)
 // Constraint: (Sphere - Plane).n >= 0 with n=(0 1 0) The normal should be the contact normal on the 2nd object
-TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
+TEST_F(ConstraintTests, TestBuildMlcpSpherePlane)
 {
+	auto type =SurgSim::Physics::FRICTIONLESS_3DCONTACT;
+	auto mlcptype = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 	m_n.setZero();
 	m_n[1] = 1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
-	m_constraint = std::make_shared<Constraint>(m_constraintData,
-												m_implementationRigidSphere, m_locRigidSphere,
-												m_implementationFixedPlane, m_locFixedPlane);
+	m_constraint = std::make_shared<Constraint>(type, m_constraintData,
+				   m_rigid, m_locRigidSphere,
+				   m_fixed, m_locFixedPlane);
 
 	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
 	{
@@ -314,7 +243,7 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 
 	// Fill up the Mlcp
 	m_constraint->build(m_dt, &m_mlcpPhysicsProblem, m_indexSphereRepresentation, m_indexPlaneRepresentation,
-		m_indexConstraint);
+						m_indexConstraint);
 
 	// Violation b should be exactly -radius (the sphere center is on the plane)
 	// This should not depend on the ordering of the object...the violation remains the same no matter what
@@ -326,30 +255,33 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 	double sign = 1.0;
 	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
 
-	EXPECT_NEAR(sign * m_dt * m_n[0] , m_mlcpPhysicsProblem.H(0, 0), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[1] , m_mlcpPhysicsProblem.H(0, 1), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[2] , m_mlcpPhysicsProblem.H(0, 2), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[0], m_mlcpPhysicsProblem.H(0, 3), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[1], m_mlcpPhysicsProblem.H(0, 4), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[2], m_mlcpPhysicsProblem.H(0, 5), epsilon);
+	SurgSim::Math::Matrix H = m_mlcpPhysicsProblem.H;
+	EXPECT_NEAR(sign * m_dt * m_n[0] , H(0, 0), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[1] , H(0, 1), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[2] , H(0, 2), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[0], H(0, 3), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[1], H(0, 4), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[2], H(0, 5), epsilon);
 
 	// ConstraintTypes should contain 1 entry SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
 	ASSERT_EQ(1u, m_mlcpPhysicsProblem.constraintTypes.size());
-	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, m_mlcpPhysicsProblem.constraintTypes[0]);
+	EXPECT_EQ(mlcptype, m_mlcpPhysicsProblem.constraintTypes[0]);
 }
 
 // Test case: Rigid sphere at (0 0 0) with radius 0.01 colliding with Fixed plane Y=0
 // Contact location on the rigid sphere is (0 -0.01 0)
 // Contact location on the fixed plane is (0 0 0)
 // Constraint: (Plane - Sphere).n >= 0 with n=(0 -1 0) The normal should be the contact normal on the 2nd object
-TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
+TEST_F(ConstraintTests, TestBuildMlcpPlaneSphere)
 {
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
+	auto mlcptype = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 	m_n.setZero();
 	m_n[1] = -1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
-	m_constraint = std::make_shared<Constraint>(m_constraintData,
-		m_implementationFixedPlane, m_locFixedPlane,
-		m_implementationRigidSphere, m_locRigidSphere);
+	m_constraint = std::make_shared<Constraint>(type, m_constraintData,
+				   m_fixed, m_locFixedPlane,
+				   m_rigid, m_locRigidSphere);
 
 	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
 	{
@@ -365,7 +297,7 @@ TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 
 	// Fill up the Mlcp
 	m_constraint->build(m_dt, &m_mlcpPhysicsProblem, m_indexPlaneRepresentation, m_indexSphereRepresentation,
-		m_indexConstraint);
+						m_indexConstraint);
 
 	// Violation b should be exactly -radius (the sphere center is on the plane)
 	// This should not depend on the ordering of the object...the violation remains the same no matter what
@@ -377,16 +309,17 @@ TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 	double sign = -1.0;
 	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
 
-	EXPECT_NEAR(sign * m_dt * m_n[0] , m_mlcpPhysicsProblem.H(0, 0), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[1] , m_mlcpPhysicsProblem.H(0, 1), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[2] , m_mlcpPhysicsProblem.H(0, 2), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[0], m_mlcpPhysicsProblem.H(0, 3), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[1], m_mlcpPhysicsProblem.H(0, 4), epsilon);
-	EXPECT_NEAR(sign * m_dt * n_GP[2], m_mlcpPhysicsProblem.H(0, 5), epsilon);
+	SurgSim::Math::Matrix h = m_mlcpPhysicsProblem.H;
+	EXPECT_NEAR(sign * m_dt * m_n[0] , h(0, 0), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[1] , h(0, 1), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[2] , h(0, 2), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[0], h(0, 3), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[1], h(0, 4), epsilon);
+	EXPECT_NEAR(sign * m_dt * n_GP[2], h(0, 5), epsilon);
 
 	// ConstraintTypes should contain 1 entry SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
 	ASSERT_EQ(1u, m_mlcpPhysicsProblem.constraintTypes.size());
-	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, m_mlcpPhysicsProblem.constraintTypes[0]);
+	EXPECT_EQ(mlcptype, m_mlcpPhysicsProblem.constraintTypes[0]);
 }
 
 };  //  namespace Physics

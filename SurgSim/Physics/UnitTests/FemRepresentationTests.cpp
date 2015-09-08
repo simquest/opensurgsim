@@ -20,7 +20,10 @@
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Framework/Runtime.h" ///< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Physics/UnitTests/DeformableTestsUtility.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
+
+using SurgSim::Math::OdeEquationUpdate;
 
 namespace SurgSim
 {
@@ -215,63 +218,24 @@ TEST_F(FemRepresentationTests, BeforeUpdateTest)
 
 TEST_F(FemRepresentationTests, AfterUpdateTest)
 {
-	{
-		SCOPED_TRACE("Valid FemElements");
+	m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	m_fem->wakeUp();
 
-		m_fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		m_fem->wakeUp();
-
-		ASSERT_TRUE(m_fem->isActive());
-		ASSERT_NO_THROW(m_fem->beforeUpdate(m_dt));
-		ASSERT_TRUE(m_fem->isActive());
-		ASSERT_NO_THROW(m_fem->update(m_dt));
-		ASSERT_TRUE(m_fem->isActive());
-		// After update should backup the currentState into finalState and update all FemElement
-		ASSERT_NO_THROW(m_fem->afterUpdate(m_dt));
-		ASSERT_FALSE(*m_fem->getFinalState() == *m_fem->getInitialState());
-		ASSERT_TRUE(*m_fem->getFinalState() == *m_fem->getCurrentState());
-		ASSERT_TRUE(m_fem->isActive());
-	}
-	{
-		SCOPED_TRACE("Invalid FemElements");
-		MockFemRepresentation fem("name");
-		std::shared_ptr<InvalidMockFemElement> element = std::make_shared<InvalidMockFemElement>();
-		element->setMassDensity(m_rho);
-		element->setPoissonRatio(m_nu);
-		element->setYoungModulus(m_E);
-		// MockFemRepresentation does not connect any nodeIds by default, we need to provide them manually
-		// to construct a fake element. If none is provided, the element does not have any structure, any support,
-		// it would have no mass, no force and no stiffness/mass/damping matrix.
-		// Therefore the system would be undefined.
-		element->addNode(0);
-		element->addNode(1);
-		element->addNode(2);
-		fem.addFemElement(element);
-
-		std::shared_ptr<SurgSim::Math::OdeState> initialState = std::make_shared<SurgSim::Math::OdeState>();
-		initialState->setNumDof(fem.getNumDofPerNode(), 3);
-		fem.setInitialState(initialState);
-
-		fem.initialize(std::make_shared<SurgSim::Framework::Runtime>());
-		fem.wakeUp();
-
-		ASSERT_TRUE(fem.isActive());
-		ASSERT_NO_THROW(fem.beforeUpdate(m_dt));
-		ASSERT_TRUE(fem.isActive());
-		ASSERT_NO_THROW(fem.update(m_dt));
-		ASSERT_TRUE(fem.isActive());
-		// After update should catch the invalid element update and deactivate the representation
-		ASSERT_NO_THROW(fem.afterUpdate(m_dt));
-		ASSERT_FALSE(fem.isActive());
-	}
+	ASSERT_TRUE(m_fem->isActive());
+	ASSERT_NO_THROW(m_fem->beforeUpdate(m_dt));
+	ASSERT_TRUE(m_fem->isActive());
+	ASSERT_NO_THROW(m_fem->update(m_dt));
+	ASSERT_TRUE(m_fem->isActive());
+	// After update should backup the currentState into finalState and update all FemElement
+	ASSERT_NO_THROW(m_fem->afterUpdate(m_dt));
+	ASSERT_FALSE(*m_fem->getFinalState() == *m_fem->getInitialState());
+	ASSERT_TRUE(*m_fem->getFinalState() == *m_fem->getCurrentState());
+	ASSERT_TRUE(m_fem->isActive());
 }
 
 TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 {
 	using SurgSim::Math::Vector3d;
-
-	Vector *F;
-	Matrix *M, *D, *K;
 
 	// No gravity, no Rayleigh damping
 	// computeF tests addFemElementsForce
@@ -284,23 +248,15 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF, m_expectedMass, m_expectedDamping,
+			m_expectedStiffness);
 	}
 
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -314,24 +270,14 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndNoDampingTest)
 		Dext.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = DextLocal;
 		m_fem->addExternalGeneralizedForce(localization, FextLocal, KextLocal, DextLocal);
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping + Dext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + Dext));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + Kext));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF + Fext, m_expectedMass, m_expectedDamping + Dext,
+			m_expectedStiffness + Kext);
 	}
 }
 
 TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 {
 	using SurgSim::Math::Vector3d;
-
-	Vector *F;
-	Matrix *M, *D, *K;
 
 	// No gravity, Rayleigh damping
 	// computeF tests addFemElementsForce and addRayleighDampingForce
@@ -346,24 +292,15 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(
-			m_expectedDamping + m_expectedRayleighDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping, m_expectedStiffness);
 	}
 
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -377,25 +314,15 @@ TEST_F(FemRepresentationTests, ComputesWithNoGravityAndDampingTest)
 		Dext.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = DextLocal;
 		m_fem->addExternalGeneralizedForce(localization, FextLocal, KextLocal, DextLocal);
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping +
-			m_expectedRayleighDamping + Dext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping + Dext));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + Kext));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF + Fext, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping + Dext, m_expectedStiffness + Kext);
 	}
 }
 
 TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 {
 	using SurgSim::Math::Vector3d;
-
-	Vector *F;
-	Matrix *M, *D, *K;
+	using SurgSim::Math::SparseMatrix;
 
 	// Gravity, no Rayleigh damping
 	// computeF tests addFemElementsForce and addGravityForce
@@ -408,23 +335,15 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF, m_expectedMass, m_expectedDamping,
+			m_expectedStiffness);
 	}
 
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -438,24 +357,15 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndNoDampingTest)
 		Dext.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = DextLocal;
 		m_fem->addExternalGeneralizedForce(localization, FextLocal, KextLocal, DextLocal);
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping + Dext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + Dext));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + Kext));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF + Fext, m_expectedMass,
+			m_expectedDamping + Dext, m_expectedStiffness + Kext);
 	}
 }
 
 TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 {
 	using SurgSim::Math::Vector3d;
-
-	Vector *F;
-	Matrix *M, *D, *K;
+	using SurgSim::Math::SparseMatrix;
 
 	// Gravity, Rayleigh damping
 	// computeF tests addFemElementsForce, addRayleighDampingForce and addGravityForce
@@ -466,29 +376,20 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 	m_fem->wakeUp();
 
 	SurgSim::Math::Vector expectedF = m_expectedFemElementsForce + m_expectedRayleighDampingForce +
-		m_expectedGravityForce;
+									  m_expectedGravityForce;
 
 	{
 		SCOPED_TRACE("Without external force");
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(
-			m_expectedDamping + m_expectedRayleighDamping)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness)));
-		// Test combo method computeFMDK
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping, m_expectedStiffness);
 	}
 
 	{
 		SCOPED_TRACE("With external force");
 
-		std::shared_ptr<MockDeformableRepresentationLocalization> localization =
-			std::make_shared<MockDeformableRepresentationLocalization>();
+		std::shared_ptr<MockDeformableLocalization> localization =
+			std::make_shared<MockDeformableLocalization>();
 		localization->setRepresentation(m_fem);
 		localization->setLocalNode(0);
 		Vector FextLocal = Vector::Ones(m_fem->getNumDofPerNode());
@@ -502,16 +403,8 @@ TEST_F(FemRepresentationTests, ComputesWithGravityAndDampingTest)
 		Dext.block(0, 0, m_fem->getNumDofPerNode(), m_fem->getNumDofPerNode()) = DextLocal;
 		m_fem->addExternalGeneralizedForce(localization, FextLocal, KextLocal, DextLocal);
 
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeF(*m_initialState).isApprox(expectedF + Fext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeM(*m_initialState).isApprox(m_expectedMass)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeD(*m_initialState).isApprox(m_expectedDamping +
-			m_expectedRayleighDamping + Dext)));
-		EXPECT_NO_THROW(EXPECT_TRUE(m_fem->computeK(*m_initialState).isApprox(m_expectedStiffness + Kext)));
-		EXPECT_NO_THROW(m_fem->computeFMDK(*m_initialState, &F, &M, &D, &K));
-		EXPECT_TRUE((*F).isApprox(expectedF + Fext));
-		EXPECT_TRUE((*M).isApprox(m_expectedMass));
-		EXPECT_TRUE((*D).isApprox(m_expectedDamping + m_expectedRayleighDamping + Dext));
-		EXPECT_TRUE((*K).isApprox(m_expectedStiffness + Kext));
+		testOdeEquationUpdate(m_fem, *m_initialState, expectedF + Fext, m_expectedMass,
+			m_expectedDamping + m_expectedRayleighDamping + Dext, m_expectedStiffness + Kext);
 	}
 }
 
@@ -555,6 +448,103 @@ TEST_F(FemRepresentationTests, DoInitializeTest)
 	{
 		ASSERT_EQ(0u, fem.getMassPerNode()[nodeId]);
 	}
+}
+
+TEST_F(FemRepresentationTests, ComplianceWarpingTest)
+{
+	{
+		SCOPED_TRACE("MockFemRepresentation incomplete for compliance warping");
+		auto fem = std::make_shared<MockFemRepresentation>("fem");
+
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(fem->setComplianceWarping(true));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+
+		// Setup the initial state
+		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem->getNumDofPerNode(), 3);
+		fem->setInitialState(initialState);
+
+		// Add one element
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		element->addNode(0);
+		element->addNode(1);
+		element->addNode(2);
+		fem->addFemElement(element);
+
+		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->wakeUp();
+
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
+
+		// update() will call updateNodesRotations() which will raise an exception in this case.
+		// This method has not been overridden.
+		EXPECT_THROW(fem->update(1e-3), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("MockFemRepresentation complete for compliance warping");
+		auto fem = std::make_shared<MockFemRepresentationValidComplianceWarping>("fem");
+
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(fem->setComplianceWarping(true));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+
+		// Setup the initial state
+		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem->getNumDofPerNode(), 3);
+		fem->setInitialState(initialState);
+
+		// Add one element
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		element->addNode(0);
+		element->addNode(1);
+		element->addNode(2);
+		fem->addFemElement(element);
+
+		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->wakeUp();
+
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
+
+		// update() will call updateNodesRotations() which will not raise an exception in this case.
+		// This method has been overridden.
+		EXPECT_NO_THROW(fem->update(1e-3));
+
+		EXPECT_NO_THROW(EXPECT_TRUE((fem->applyCompliance(*initialState, Matrix::Identity(initialState->getNumDof(),
+									 initialState->getNumDof())) / 1e-3).isIdentity()));
+	}
+}
+
+TEST_F(FemRepresentationTests, SerializationTest)
+{
+	auto fem = std::make_shared<MockFemRepresentation>("Test-Fem");
+
+	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", true));
+	EXPECT_TRUE(fem->getComplianceWarping());
+	EXPECT_TRUE(fem->getValue<bool>("ComplianceWarping"));
+	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", false));
+	EXPECT_FALSE(fem->getComplianceWarping());
+	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));
+}
+
+TEST_F(FemRepresentationTests, SetInitialStateTest)
+{
+	auto fem = std::make_shared<MockFemRepresentation>("Test-Fem");
+
+	EXPECT_FALSE(fem->hasSetInitialStateBeenCalled());
+	fem->setInitialState(m_initialState);
+	EXPECT_TRUE(fem->hasSetInitialStateBeenCalled());
 }
 
 } // namespace Physics

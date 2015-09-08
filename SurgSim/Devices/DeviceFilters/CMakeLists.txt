@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS
 	${Boost_LIBRARIES}
 	SurgSimDataStructures
 	SurgSimFramework
 	SurgSimInput
+	SurgSimMath
 )
 
 set(DEVICE_FILTERS_SOURCES
@@ -32,6 +32,12 @@ set(DEVICE_FILTERS_HEADERS
 	PoseIntegrator.h
 	PoseTransform.h
 )
+
+set(DEVICE_HEADERS ${DEVICE_HEADERS}
+	DeviceFilters/ForceScale.h #NOLINT
+	DeviceFilters/PoseIntegrator.h #NOLINT
+	DeviceFilters/PoseTransform.h #NOLINT
+	PARENT_SCOPE)
 
 surgsim_add_library(
 	SurgSimDeviceFilters

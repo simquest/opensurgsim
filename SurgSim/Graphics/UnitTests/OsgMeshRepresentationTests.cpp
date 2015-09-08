@@ -95,21 +95,13 @@ TEST(OsgMeshRepresentationTests, InitialisationTest)
 
 }
 
-TEST(OsgMeshRepresentationTests, FilenameTest)
-{
-	auto meshRepresentation = std::make_shared<OsgMeshRepresentation>("TestMesh");
-	std::string filename = "Geometry/arm_collision.ply";
-
-	meshRepresentation->setFilename(filename);
-	EXPECT_EQ(filename, meshRepresentation->getFilename());
-}
-
 TEST(OsgMeshRepresentationTests, SerializationTest)
 {
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	std::shared_ptr<SurgSim::Framework::Component> osgMesh = std::make_shared<OsgMeshRepresentation>("TestMesh");
-	std::string filename = "Geometry/arm_collision.ply";
+	std::string filename = "Geometry/Cube_with_texture.ply";
 
-	osgMesh->setValue("Filename", filename);
+	osgMesh->setValue("MeshFileName", filename);
 	osgMesh->setValue("UpdateOptions", 2);
 	osgMesh->setValue("DrawAsWireFrame", true);
 
@@ -119,15 +111,14 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 	YAML::Node data;
 	data = node["SurgSim::Graphics::OsgMeshRepresentation"];
-	EXPECT_EQ(8u, data.size());
 
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> newOsgMesh;
 	ASSERT_NO_THROW(newOsgMesh =
-					std::dynamic_pointer_cast<OsgMeshRepresentation>(
-					node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+						std::dynamic_pointer_cast<OsgMeshRepresentation>(
+							node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("SurgSim::Graphics::OsgMeshRepresentation", newOsgMesh->getClassName());
-	EXPECT_EQ(filename, newOsgMesh->getValue<std::string>("Filename"));
+	EXPECT_EQ(filename, newOsgMesh->getMesh()->getFileName());
 	EXPECT_EQ(2u, newOsgMesh->getValue<int>("UpdateOptions"));
 	EXPECT_TRUE(newOsgMesh->getValue<bool>("DrawAsWireFrame"));
 }
@@ -135,7 +126,7 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 TEST(OsgMeshRepresentationTests, MeshDelegateTest)
 {
 	SurgSim::Framework::ApplicationData data("config.txt");
-	SurgSim::DataStructures::PlyReader reader(data.findFile("OsgMeshRepresentationTests/Cube.ply"));
+	SurgSim::DataStructures::PlyReader reader(data.findFile("Geometry/Cube_with_texture.ply"));
 	auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
 
 	EXPECT_NO_THROW(EXPECT_TRUE(reader.parseWithDelegate(delegate)));

@@ -22,6 +22,8 @@
 
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ConstraintImplementationFactory.h"
+#include "SurgSim/Physics/ConstraintType.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
@@ -41,26 +43,21 @@ class ConstraintImplementation
 {
 public:
 	/// Constructor
-	/// \note Localization embbed the representation, so it is fully defined
 	ConstraintImplementation();
 
 	/// Destructor
 	virtual ~ConstraintImplementation();
 
+	/// \return The static class factory that contains the implementations for a given Representation type.
+	static ConstraintImplementationFactory& getFactory();
+
 	/// Gets the number of degree of freedom for this implementation
 	/// \return The number of degree of freedom for this implementation
-	size_t getNumDof() const
-	{
-		return doGetNumDof();
-	}
+	size_t getNumDof() const;
 
-	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return The MLCP constraint type corresponding to this constraint implementation
-	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const = 0;
-
-	/// Gets the Type of representation that this implementation is concerned with
-	/// \return RepresentationType for this implementation
-	virtual RepresentationType getRepresentationType() const = 0;
+	/// Gets the constraint type for this ConstraintImplementation
+	/// \return The constraint type corresponding to this constraint implementation
+	virtual SurgSim::Physics::ConstraintType getConstraintType() const = 0;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
@@ -76,14 +73,11 @@ public:
 		MlcpPhysicsProblem* mlcp,
 		size_t indexOfRepresentation,
 		size_t indexOfConstraint,
-		ConstraintSideSign sign)
-	{
-		doBuild(dt, data, localization, mlcp, indexOfRepresentation, indexOfConstraint, sign);
-	}
+		ConstraintSideSign sign);
 
 protected:
 	/// Preallocated variable for derived implementations of doBuild.
-	Eigen::SparseVector<double, 0, ptrdiff_t> m_newH;
+	Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t> m_newH;
 
 private:
 

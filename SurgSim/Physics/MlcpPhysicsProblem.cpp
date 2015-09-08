@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/SparseMatrix.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
 namespace SurgSim
@@ -30,9 +32,7 @@ void MlcpPhysicsProblem::setZero(size_t numDof, size_t numConstraintDof, size_t 
 	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
 
 	H.resize(numConstraintDof, numDof);
-	H.setZero();
-	CHt.resize(numDof, numConstraintDof);
-	CHt.setZero();
+	CHt.setZero(numDof, numConstraintDof);
 }
 
 MlcpPhysicsProblem MlcpPhysicsProblem::Zero(size_t numDof, size_t numConstraintDof, size_t numConstraints)
@@ -41,6 +41,36 @@ MlcpPhysicsProblem MlcpPhysicsProblem::Zero(size_t numDof, size_t numConstraintD
 	result.setZero(numDof, numConstraintDof, numConstraints);
 
 	return result;
+}
+
+void MlcpPhysicsProblem::updateConstraint(
+	const Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>& newSubH,
+	const Vector& newCHt,
+	size_t indexSubC,
+	size_t indexNewSubH)
+{
+	// Update H, CHt, and HCHt with newSubH, denoted H'.
+	//
+	// Note that updates are linear for H and CHt, but not for HCHt:
+	// (H+H') = H+H'
+	// => H += H';
+	//
+	// C(H+H')t = CHt + CH't
+	// => CHt += CH't;
+	//
+	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
+	// => HCHt += H(CH't) + H'[C(H+H')t];
+
+	A.col(indexNewSubH) += H.middleCols(indexSubC, newCHt.rows()) * newCHt;
+
+	// Calculate: H.block(indexNewSubH, indexSubC, 1, newCHt.rows()) += newSubH;
+	for (Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t>::InnerIterator it(newSubH); it; ++it)
+	{
+		H.coeffRef(indexNewSubH, indexSubC + it.index()) += it.value();
+	}
+
+	CHt.block(indexSubC, indexNewSubH, newCHt.rows(), 1) += newCHt;
+	A.row(indexNewSubH) += newSubH * CHt.middleRows(indexSubC, newCHt.rows());
 }
 
 }; // namespace Physics

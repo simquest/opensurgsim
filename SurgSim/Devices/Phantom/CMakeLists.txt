@@ -40,6 +40,8 @@ set(PHANTOM_DEVICE_HEADERS
 	PhantomScaffold.h
 )
 
+set(DEVICE_HEADERS ${DEVICE_HEADERS} Phantom/PhantomDevice.h PARENT_SCOPE)
+
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
 	PhantomDevice

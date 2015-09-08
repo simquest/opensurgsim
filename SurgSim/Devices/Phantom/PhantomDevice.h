@@ -27,6 +27,7 @@ namespace Device
 {
 class PhantomScaffold;
 
+SURGSIM_STATIC_REGISTRATION(PhantomDevice);
 
 /// A class implementing the communication with a SensAble/Geomagic PHANTOM device.
 ///
@@ -60,12 +61,17 @@ public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	/// \param initializationName The name passed to HDAPI when initializing the device.  This should match a
-	/// 	configured PHANTOM device; alternately, an empty string indicates the default device.
-	PhantomDevice(const std::string& uniqueName, const std::string& initializationName);
+	explicit PhantomDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::PhantomDevice);
 
 	/// Destructor.
 	virtual ~PhantomDevice();
+
+	/// Sets the name used to register this device with the hardware library.
+	/// \param initializationName The name passed to HDAPI when initializing the device.  This should match a
+	/// 	configured PHANTOM device; alternately, an empty string indicates the default device.
+	void setInitializationName(const std::string& initializationName);
 
 	/// Gets the name used by the Phantom device configuration to refer to this device.
 	/// Note that this may or may not be the same as the device name retrieved by getName().

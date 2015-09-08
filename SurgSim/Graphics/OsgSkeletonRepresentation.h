@@ -16,22 +16,13 @@
 #ifndef SURGSIM_GRAPHICS_OSGSKELETONREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGSKELETONREPRESENTATION_H
 
-#include <string>
+#include <boost/thread.hpp>
 #include <map>
-
 #include <osg/MatrixTransform>
-#include <osg/Node>
 #include <osg/ref_ptr>
-#include <osg/Shader>
-
-#include <osgAnimation/Bone>
-#include <osgAnimation/StackedQuaternionElement>
-#include <osgAnimation/StackedTranslateElement>
-
 #include <osgUtil/UpdateVisitor>
+#include <string>
 
-#include "SurgSim/Framework/Macros.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/SkeletonRepresentation.h"
 
@@ -40,20 +31,19 @@
 #pragma warning(disable:4250)
 #endif
 
+namespace osg
+{
+class Node;
+class Shader;
+};
+
 namespace SurgSim
 {
-
 namespace Graphics
 {
 
-/// Local data structure to store the bones and their references to the transforms.
-struct OsgSkeletonBoneData
-{
-	osg::ref_ptr<osgAnimation::Bone> bone;
-	osg::ref_ptr<osgAnimation::StackedQuaternionElement> rotation;
-	osg::ref_ptr<osgAnimation::StackedTranslateElement> translation;
-	SurgSim::Math::RigidTransform3d pose;
-};
+struct BoneData;
+class OsgModel;
 
 /// Skeleton representation is used to move a mesh based on the movements of
 /// pre-selected control points (bones).
@@ -74,30 +64,43 @@ public:
 
 	/// Set the file containing the skinning shader.
 	/// \param fileName The file containing the skinning shader.
-	void setSkinningShaderFileName(std::string fileName);
+	void setSkinningShaderFileName(const std::string& fileName);
 
 	/// \return The file containing the skinning shader.
-	std::string getSkinningShaderFileName();
+	std::string getSkinningShaderFileName() const;
 
 	void setBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
 
+	SurgSim::Math::RigidTransform3d getBonePose(const std::string& name) const override;
+
+	void setNeutralBonePose(const std::string& name, const SurgSim::Math::RigidTransform3d& pose) override;
+
+	SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) const override;
+
 protected:
+	void setNeutralBonePoses(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poses) override;
+
+	std::map<std::string, SurgSim::Math::RigidTransform3d> getNeutralBonePoses() const override;
+
 	void doUpdate(double dt) override;
+
 	bool doInitialize() override;
 
 private:
+	/// Setup the bones with the model and skinning shader
+	bool setupBones();
+
+	/// The logger for this class.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	/// The model containing the bone and mesh information.
-	std::shared_ptr<Model> m_model;
-
-	/// The list of poses for the various rig points on the skeleton.
-	std::unordered_map<std::string, SurgSim::Math::RigidTransform3d> m_bonePoses;
+	std::shared_ptr<OsgModel> m_model;
 
 	/// The named map of the bones in this skeleton.
-	std::map<std::string, OsgSkeletonBoneData> m_boneData;
+	std::shared_ptr<std::map<std::string, BoneData>> m_bones;
 
-	/// Mutex to access m_boneData thread safely.
-	boost::mutex m_boneDataMutex;
+	/// Mutex to access m_bones safely.
+	mutable boost::shared_mutex m_mutex;
 
 	/// The skeleton which is read from the mesh file.
 	osg::ref_ptr<osg::Node> m_skeleton;

@@ -24,7 +24,7 @@
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgGroup.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 
 #include "SurgSim/Math/Quaternion.h"
@@ -85,15 +85,15 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	renderPass->setRenderTarget(renderTargetOsg);
 	renderPass->setRenderOrder(Camera::RENDER_ORDER_PRE_RENDER, 0);
 
-	auto shader = std::make_shared<OsgShader>();
-	shader->setFragmentShaderSource(fragmentShaderSource);
-	shader->setVertexShaderSource(vertexShaderSource);
+	auto program = std::make_shared<OsgProgram>();
+	program->setFragmentShaderSource(fragmentShaderSource);
+	program->setVertexShaderSource(vertexShaderSource);
 
 	auto material1 = std::make_shared<OsgMaterial>("material1");
 	auto material2 = std::make_shared<OsgMaterial>("material2");
 
-	material1->setShader(shader);
-	material2->setShader(shader);
+	material1->setProgram(program);
+	material2->setProgram(program);
 
 	viewElement->addComponent(material1);
 	viewElement->addComponent(material2);

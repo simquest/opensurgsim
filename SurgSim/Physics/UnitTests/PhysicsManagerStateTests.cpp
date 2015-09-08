@@ -30,8 +30,8 @@
 #include "SurgSim/Physics/MlcpMapping.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
 
 using SurgSim::Physics::Constraint;
 using SurgSim::Physics::ContactConstraintData;
@@ -40,9 +40,9 @@ using SurgSim::Physics::MlcpMapping;
 using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidCollisionRepresentation;
+using SurgSim::Physics::RigidConstraintFrictionlessContact;
+using SurgSim::Physics::RigidLocalization;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationContact;
-using SurgSim::Physics::RigidRepresentationLocalization;
 
 TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 {
@@ -158,6 +158,32 @@ TEST(PhysicsManagerStateTest, SetGetCollisionRepresentations)
 	EXPECT_EQ(collision2, actualRepresentations.back());
 }
 
+TEST(PhysicsManagerStateTest, SetGetActiveCollisionRepresentations)
+{
+	auto physicsState = std::make_shared<PhysicsManagerState>();
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> expectedRepresentations;
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> actualRepresentations;
+
+	// Add a collision representation.
+	std::shared_ptr<SurgSim::Collision::Representation> collision1 =
+		std::make_shared<RigidCollisionRepresentation>("collision1");
+
+	expectedRepresentations.push_back(collision1);
+	physicsState->setActiveCollisionRepresentations(expectedRepresentations);
+	actualRepresentations = physicsState->getActiveCollisionRepresentations();
+	ASSERT_EQ(1, actualRepresentations.size());
+	EXPECT_EQ(collision1, actualRepresentations.back());
+
+	// Add a second collision representation.
+	std::shared_ptr<SurgSim::Collision::Representation> collision2 =
+		std::make_shared<RigidCollisionRepresentation>("collision2");
+	expectedRepresentations.push_back(collision2);
+	physicsState->setActiveCollisionRepresentations(expectedRepresentations);
+	actualRepresentations = physicsState->getActiveCollisionRepresentations();
+	ASSERT_EQ(2, actualRepresentations.size());
+	EXPECT_EQ(collision2, actualRepresentations.back());
+}
+
 TEST(PhysicsManagerStateTest, SetGetCollisionPairs)
 {
 	auto physicsState = std::make_shared<PhysicsManagerState>();
@@ -187,27 +213,20 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
 	std::vector<std::shared_ptr<Constraint>> actualConstraints;
 
-	// We need a populated constraint to check the constraintsIndexMapping.
-	// Create first side of a constraint.
-	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
-	auto rigid1LocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-	rigid1LocalizationTyped->setRepresentation(rigid1);
-	std::shared_ptr<Localization> rigid1Localization = rigid1LocalizationTyped;
-	auto rigid1Contact = std::make_shared<RigidRepresentationContact>();
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
-	// Create second side of a constraint.
+	// We need a populated constraint to check the constraintsIndexMapping.
+	// Create the representations for the constraint.
+	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
-	auto rigid2LocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-	rigid2LocalizationTyped->setRepresentation(rigid2);
-	std::shared_ptr<Localization> rigid2Localization = rigid2LocalizationTyped;
-	auto rigid2Contact = std::make_shared<RigidRepresentationContact>();
 
 	// Create the constraint specific data.
 	std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 
 	// Create the constraint.
-	auto constraint1 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
-		rigid2Contact, rigid2Localization);
+	auto constraint1 = std::make_shared<Constraint>(constraintType, data,
+		rigid1, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+		rigid2, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 	// Check the constraintGroup.
 	expectedConstraints.push_back(constraint1);
@@ -217,8 +236,9 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	EXPECT_EQ(constraint1, actualConstraints.back());
 
 	// Create a second constraint.
-	auto constraint2 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
-		rigid2Contact, rigid2Localization);
+	auto constraint2 = std::make_shared<Constraint>(constraintType, data,
+		rigid1, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+		rigid2, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 	// Check the constraintGroup.
 	expectedConstraints.push_back(constraint2);
@@ -234,27 +254,20 @@ TEST(PhysicsManagerStateTest, SetGetConstraintsMapping)
 	MlcpMapping<Constraint> expectedConstraintsIndexMapping;
 	MlcpMapping<Constraint> actualConstraintsIndexMapping;
 
-	// We need a populated constraint to check the constraintsIndexMapping.
-	// Create first side of a constraint.
-	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
-	auto rigid1LocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-	rigid1LocalizationTyped->setRepresentation(rigid1);
-	std::shared_ptr<Localization> rigid1Localization = rigid1LocalizationTyped;
-	auto rigid1Contact = std::make_shared<RigidRepresentationContact>();
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
-	// Create second side of a constraint.
+	// We need a populated constraint to check the constraintsIndexMapping.
+	// Create the representations for the constraint.
+	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
-	auto rigid2LocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-	rigid2LocalizationTyped->setRepresentation(rigid2);
-	std::shared_ptr<Localization> rigid2Localization = rigid2LocalizationTyped;
-	auto rigid2Contact = std::make_shared<RigidRepresentationContact>();
 
 	// Create the constraint specific data.
 	std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 
 	// Create the constraint.
-	auto constraint1 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
-		rigid2Contact, rigid2Localization);
+	auto constraint1 = std::make_shared<Constraint>(constraintType, data,
+		rigid1, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+		rigid2, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 	// Check the constraintGroup.
 	expectedConstraintsIndexMapping.setValue(constraint1.get(), 5);
@@ -270,26 +283,20 @@ TEST(PhysicsManagerStateTest, SetGetActiveConstraints)
 	std::vector<std::shared_ptr<Constraint>> expectedConstraints;
 	std::vector<std::shared_ptr<Constraint>> actualConstraints;
 
-	// Create first side of a constraint.
-	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
-	auto rigid1LocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-	rigid1LocalizationTyped->setRepresentation(rigid1);
-	std::shared_ptr<Localization> rigid1Localization = rigid1LocalizationTyped;
-	auto rigid1Contact = std::make_shared<RigidRepresentationContact>();
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 
-	// Create second side of a constraint.
+	// Create first side of a constraint.
+	// Create the representations for the constraint.
+	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
-	auto rigid2LocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
-	rigid2LocalizationTyped->setRepresentation(rigid2);
-	std::shared_ptr<Localization> rigid2Localization = rigid2LocalizationTyped;
-	auto rigid2Contact = std::make_shared<RigidRepresentationContact>();
 
 	// Create the constraint specific data.
 	std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
 
 	// Create the constraint.
-	auto constraint1 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
-		rigid2Contact, rigid2Localization);
+	auto constraint1 = std::make_shared<Constraint>(constraintType, data,
+		rigid1, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+		rigid2, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 	// Check the active constraints.
 	expectedConstraints.push_back(constraint1);
@@ -299,8 +306,9 @@ TEST(PhysicsManagerStateTest, SetGetActiveConstraints)
 	EXPECT_EQ(constraint1, actualConstraints.back());
 
 	// Create a second constraint.
-	auto constraint2 = std::make_shared<Constraint>(data, rigid1Contact, rigid1Localization,
-		rigid2Contact, rigid2Localization);
+	auto constraint2 = std::make_shared<Constraint>(constraintType, data,
+		rigid1, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+		rigid2, SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 	// Check the active constraints.
 	expectedConstraints.push_back(constraint2);

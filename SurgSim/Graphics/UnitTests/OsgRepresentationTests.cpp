@@ -17,16 +17,20 @@
 /// Tests for the OsgRepresentation class.
 
 #include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
-#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgCamera.h"
-
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 
 #include <random>
+#include <osg/Geode>
+#include <osg/Geometry>
 
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Quaterniond;
@@ -49,6 +53,20 @@ TEST(OsgRepresentationTests, InitTest)
 
 	EXPECT_EQ("test name", representation->getName());
 	EXPECT_TRUE(representation->isActive());
+}
+
+TEST(OsgRepresentationsTests, ParameterTests)
+{
+	auto representation = std::make_shared<MockOsgRepresentation>("name");
+
+	ASSERT_NO_THROW(representation->setValue("GroupReferences", std::vector<std::string>()));
+	ASSERT_NO_THROW(representation->getValue("GroupReferences"));
+
+	ASSERT_NO_THROW(representation->setValue("DrawAsWireFrame", true));
+	ASSERT_NO_THROW(representation->getValue("DrawAsWireFrame"));
+
+	ASSERT_NO_THROW(representation->setValue("GenerateTangents", true));
+	ASSERT_NO_THROW(representation->getValue("GenerateTangents"));
 }
 
 TEST(OsgRepresentationTests, OsgNodeTest)
@@ -99,10 +117,13 @@ TEST(OsgRepresentationTests, WireFrameTest)
 
 TEST(OsgRepresentationTests, PoseTest)
 {
+	auto runtime = std::make_shared<Framework::Runtime>();
+	auto scene = runtime->getScene();
+
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
 	std::shared_ptr<BasicSceneElement> element = std::make_shared<BasicSceneElement>("element");
 	element->addComponent(representation);
-	element->initialize();
+	scene->addSceneElement(element);
 	representation->wakeUp();
 
 	{
@@ -143,19 +164,33 @@ TEST(OsgRepresentationTests, PoseTest)
 
 TEST(OsgRepresentationTests, MaterialTest)
 {
-	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
+	std::shared_ptr<OsgRepresentation> osgRepresentation = std::make_shared<MockOsgRepresentation>("test name");
+	std::shared_ptr<Representation> representation = osgRepresentation;
 
+	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>("material");
+	std::shared_ptr<Material> material = osgMaterial;
 	{
 		SCOPED_TRACE("Set material");
-		std::shared_ptr<Material> material = std::make_shared<OsgMaterial>("material");
 		EXPECT_TRUE(representation->setMaterial(material));
 		EXPECT_EQ(material, representation->getMaterial());
+
+		osg::Switch* switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
+		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
+		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
+		EXPECT_EQ(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
+				"State set should be the material's state set!";
 	}
 
 	{
 		SCOPED_TRACE("Clear material");
 		representation->clearMaterial();
 		EXPECT_EQ(nullptr, representation->getMaterial());
+
+		osg::Switch* switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
+		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
+		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
+		EXPECT_NE(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
+				"State set should have been cleared!";
 	}
 }
 
@@ -247,6 +282,69 @@ TEST(OsgRepresentationTests, SetGroupsTests)
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group1"));
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group2"));
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group3"));
+}
+
+class  CheckTangentsVisitor : public osg::NodeVisitor
+{
+public :
+	CheckTangentsVisitor() :
+		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN)
+	{
+
+	}
+
+	virtual ~CheckTangentsVisitor()
+	{
+
+	}
+
+	void apply(osg::Node& node) // NOLINT
+	{
+		traverse(node);
+	}
+
+	void apply(osg::Geode& geode) // NOLINT
+	{
+		// Test object only has 1 geometry ...
+		if (geode.getNumDrawables() > 0)
+		{
+			osg::Geometry* curGeom = geode.getDrawable(0)->asGeometry();
+			if (curGeom)
+			{
+				osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(curGeom->getVertexArray());
+
+				auto tangents =
+					dynamic_cast<osg::Vec4Array*>(curGeom->getVertexAttribArray(TANGENT_VERTEX_ATTRIBUTE_ID));
+				ASSERT_NE(nullptr, tangents)
+						<< "Looks like no tangents where produced, or they are not of type osg::Vec4Array";
+				ASSERT_EQ(vertices->size(), tangents->size())
+						<< "Looks like number of tangents does not match number of vertices";
+
+				auto bitangents =
+					dynamic_cast<osg::Vec4Array*>(curGeom->getVertexAttribArray(BITANGENT_VERTEX_ATTRIBUTE_ID));
+				ASSERT_NE(nullptr, bitangents)
+						<< "Looks like no bitangents tangents where produced, or they are not of type osg::Vec4Array";
+				ASSERT_EQ(vertices->size(), bitangents->size())
+						<< "Looks like number of bitangents does not match number of vertices";
+
+			}
+		}
+	}
+};
+
+TEST(OsgRepresentationTests, TangentGenerationTest)
+{
+	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
+	auto scenery = std::make_shared<OsgSceneryRepresentation>("scenery");
+	scenery->loadModel("Geometry/sphere0_5.obj");
+
+	EXPECT_FALSE(scenery->isGeneratingTangents());
+	scenery->setGenerateTangents(true);
+	EXPECT_TRUE(scenery->isGeneratingTangents());
+
+	CheckTangentsVisitor visitor;
+
+	scenery->getOsgNode()->accept(visitor);
 }
 
 

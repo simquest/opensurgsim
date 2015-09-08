@@ -20,14 +20,15 @@
 #include <vector>
 #include <unordered_map>
 
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Particles/Representation.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/MlcpMapping.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/MlcpPhysicsSolution.h"
 #include "SurgSim/Physics/Representation.h"
 
-#include "SurgSim/Collision/CollisionPair.h"
-#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {
@@ -76,6 +77,30 @@ public:
 	/// \return The collision representations that are known to the state.
 	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& getCollisionRepresentations();
 
+	/// Sets the active collision representations for the state.
+	/// \param val collection of all active collision representations.
+	void setActiveCollisionRepresentations(const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val);
+
+	/// Gets the list of active collision representations.
+	/// \return The active collision representations that are known to the state.
+	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& getActiveCollisionRepresentations();
+
+	/// Sets the particle representations for the state.
+	/// \param val collection of all particle representations.
+	void setParticleRepresentations(const std::vector<std::shared_ptr<SurgSim::Particles::Representation>>& val);
+
+	/// Gets the particle representations.
+	/// \return The particle representations that are known to the state.
+	const std::vector<std::shared_ptr<SurgSim::Particles::Representation>>& getParticleRepresentations();
+
+	/// Sets the active particle representations for the state.
+	/// \param val collection of all active particle representations.
+	void setActiveParticleRepresentations(const std::vector<std::shared_ptr<SurgSim::Particles::Representation>>& val);
+
+	/// Gets the list of active particle representations.
+	/// \return The active particle representations that are known to the state.
+	const std::vector<std::shared_ptr<SurgSim::Particles::Representation>>& getActiveParticleRepresentations();
+
 	/// Sets the list of constraint components
 	/// \param val collection of all constraint components
 	void setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val);
@@ -92,7 +117,7 @@ public:
 	/// Sets collision pairs that should be considered, while this is not being verified the collision pairs
 	/// should only be from the list of representations that are in this state.
 	/// \param	val	The list of collision pairs.
-	void setCollisionPairs(std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> val);
+	void setCollisionPairs(const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& val);
 
 	/// Gets collision pairs.
 	/// \return	The collision pairs.
@@ -172,6 +197,15 @@ private:
 
 	/// List of all the collision representations know to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
+
+	/// List of all the active collision representations know to the state
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_activeCollisionRepresentations;
+
+	/// List of all the particle representations know to the state
+	std::vector<std::shared_ptr<SurgSim::Particles::Representation>> m_particleRepresentations;
+
+	/// List of all the active particle representations know to the state
+	std::vector<std::shared_ptr<SurgSim::Particles::Representation>> m_activeParticleRepresentations;
 
 	/// List of the constraint components
 	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;

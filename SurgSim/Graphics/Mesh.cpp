@@ -19,16 +19,33 @@
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/MeshPlyReaderDelegate.h"
 
-
 using SurgSim::DataStructures::EmptyData;
+
+
+template<>
+std::string SurgSim::DataStructures::TriangleMesh<SurgSim::Graphics::VertexData, EmptyData, EmptyData>
+::m_className = "SurgSim::Graphics::Mesh";
 
 namespace SurgSim
 {
 namespace Graphics
 {
 
-Mesh::Mesh()
+SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Graphics::Mesh, Mesh);
+
+Mesh::Mesh() :
+	m_updateCount(1)
 {
+}
+
+Mesh::Mesh( const Mesh& other ) : BaseType(other)
+{
+
+}
+
+Mesh::Mesh( Mesh&& other ) : BaseType(std::move(other))
+{
+
 }
 
 void Mesh::initialize(
@@ -86,6 +103,49 @@ void Mesh::initialize(
 					"When building a mesh a vertex was present in a triangle that was not in the list of vertices";
 		}
 	}
+}
+
+bool Mesh::doLoad(const std::string& fileName)
+{
+	SurgSim::DataStructures::PlyReader reader(fileName);
+	if (! reader.isValid())
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "'" << fileName << "' is an invalid .ply file.";
+		return false;
+	}
+
+	auto delegate = std::make_shared<MeshPlyReaderDelegate>(std::dynamic_pointer_cast<Mesh>(shared_from_this()));
+	if (! reader.parseWithDelegate(delegate))
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "The input file '" << fileName << "' does not have the property required by triangle mesh.";
+		return false;
+	}
+
+	return true;
+}
+
+void Mesh::dirty()
+{
+	++m_updateCount;
+}
+
+size_t Mesh::getUpdateCount() const
+{
+	return m_updateCount;
+}
+
+Mesh& Mesh::operator=( const Mesh& other )
+{
+	BaseType::operator=(other);
+	return *this;
+}
+
+Mesh& Mesh::operator=( Mesh&& other )
+{
+	BaseType::operator=(std::move(other));
+	return *this;
 }
 
 }; // Graphics

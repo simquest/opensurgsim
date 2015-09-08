@@ -25,8 +25,8 @@
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgSkeletonRepresentation.h"
-#include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -62,15 +62,14 @@ TEST_F(OsgSkeletonRepresentationRenderTests, BasicTest)
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgSkeletonRepresentation>("Skeleton");
 	graphics->loadModel("OsgSkeletonRepresentationRenderTests/rigged_cylinder.osgt");
 	graphics->setSkinningShaderFileName("Shaders/skinning.vert");
-
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Rigged Cylinder");
 	sceneElement->addComponent(graphics);
 	scene->addSceneElement(sceneElement);
 
 	viewElement->setPose(SurgSim::Math::makeRigidTransform(
-		Vector3d(-0.3, 0.3, -0.3),
-		Vector3d(0.0, 0.0, 0.0),
-		Vector3d(0.0, 0.0, 1.0)));
+							 Vector3d(-0.3, 0.3, -0.3),
+							 Vector3d(0.0, 0.0, 0.0),
+							 Vector3d(0.0, 0.0, 1.0)));
 
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
@@ -125,6 +124,60 @@ TEST_F(OsgSkeletonRepresentationRenderTests, BasicTest)
 
 		pose = interpolate(boneTransform, t / 3.0);
 		graphics->setBonePose("Bone", pose);
+		graphics->setBonePose("Bone_001", pose);
+		graphics->setBonePose("Bone_002", pose);
+		graphics->setBonePose("Bone_003", pose);
+
+		/// The total number of steps should complete in 5 seconds
+		boost::this_thread::sleep(boost::posix_time::milliseconds(5000 / numSteps));
+	}
+
+	runtime->stop();
+}
+
+TEST_F(OsgSkeletonRepresentationRenderTests, WithNeutralPoseTest)
+{
+	auto graphics = std::make_shared<SurgSim::Graphics::OsgSkeletonRepresentation>("Skeleton");
+	graphics->loadModel("OsgSkeletonRepresentationRenderTests/rigged_cylinder.osgt");
+	graphics->setSkinningShaderFileName("Shaders/skinning.vert");
+	graphics->setNeutralBonePose("Bone",
+		makeRigidTransform(makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)), Vector3d::Zero()));
+
+	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Rigged Cylinder");
+	sceneElement->addComponent(graphics);
+	scene->addSceneElement(sceneElement);
+
+	viewElement->setPose(SurgSim::Math::makeRigidTransform(
+		Vector3d(-0.3, 0.3, -0.3),
+		Vector3d(0.0, 0.0, 0.0),
+		Vector3d(0.0, 0.0, 1.0)));
+
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+
+	std::pair<RigidTransform3d, RigidTransform3d> rootTransform;
+	rootTransform.first =
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 1.0, 1.0)), Vector3d::Zero());
+	rootTransform.second =
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 1.0, 1.0)), Vector3d::Zero());
+
+	std::pair<RigidTransform3d, RigidTransform3d> boneTransform;
+	boneTransform.first =
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 0.0, 0.0)), Vector3d::Zero());
+	boneTransform.second =
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 0.0, 0.0)), Vector3d(0.0, 4.0, 0.0));
+
+	int numSteps = 1000;
+
+	for (int i = 0; i < numSteps; ++i)
+	{
+		double t = static_cast<double>(i) / numSteps;
+
+		RigidTransform3d pose = interpolate(rootTransform, t);
+		sceneElement->setPose(pose);
+
+		pose = interpolate(boneTransform, t / 3.0);
+		graphics->setBonePose("Bone", RigidTransform3d::Identity());
 		graphics->setBonePose("Bone_001", pose);
 		graphics->setBonePose("Bone_002", pose);
 		graphics->setBonePose("Bone_003", pose);

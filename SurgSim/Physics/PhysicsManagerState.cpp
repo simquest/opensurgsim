@@ -85,9 +85,42 @@ void PhysicsManagerState::setCollisionRepresentations(
 }
 
 const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
-PhysicsManagerState::getCollisionRepresentations()
+	PhysicsManagerState::getCollisionRepresentations()
 {
 	return m_collisionRepresentations;
+}
+
+void PhysicsManagerState::setActiveCollisionRepresentations(
+	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val)
+{
+	m_activeCollisionRepresentations = val;
+}
+
+const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
+	PhysicsManagerState::getActiveCollisionRepresentations()
+{
+	return m_activeCollisionRepresentations;
+}
+
+void PhysicsManagerState::setParticleRepresentations(const std::vector<std::shared_ptr<Particles::Representation>>& val)
+{
+	m_particleRepresentations = val;
+}
+
+const std::vector<std::shared_ptr<Particles::Representation>>& PhysicsManagerState::getParticleRepresentations()
+{
+	return m_particleRepresentations;
+}
+
+void PhysicsManagerState::setActiveParticleRepresentations(
+	const std::vector<std::shared_ptr<Particles::Representation>>& val)
+{
+	m_activeParticleRepresentations = val;
+}
+
+const std::vector<std::shared_ptr<Particles::Representation>>& PhysicsManagerState::getActiveParticleRepresentations()
+{
+	return m_activeParticleRepresentations;
 }
 
 void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val)
@@ -114,7 +147,7 @@ const std::vector<std::shared_ptr<ConstraintComponent>>& PhysicsManagerState::ge
 	return m_constraintComponents;
 }
 
-void PhysicsManagerState::setCollisionPairs(std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> val)
+void PhysicsManagerState::setCollisionPairs(const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& val)
 {
 	m_collisionPairs = val;
 }

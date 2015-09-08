@@ -25,6 +25,7 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::SixenseDevice, SixenseDevice);
 
 SixenseDevice::SixenseDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, SixenseScaffold::buildDeviceInputData())

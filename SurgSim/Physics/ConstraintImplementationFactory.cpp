@@ -13,11 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Blocks/MassSpring1DRepresentation.h"
+#include "SurgSim/Blocks/MassSpring2DRepresentation.h"
+#include "SurgSim/Blocks/MassSpring3DRepresentation.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
-#include "SurgSim/Physics/FixedRepresentationContact.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
-#include "SurgSim/Physics/Fem3DRepresentationContact.h"
+#include "SurgSim/Physics/Fem1DConstraintFixedPoint.h"
+#include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem2DConstraintFixedPoint.h"
+#include "SurgSim/Physics/Fem2DRepresentation.h"
+#include "SurgSim/Physics/Fem3DConstraintFixedPoint.h"
+#include "SurgSim/Physics/Fem3DConstraintFrictionlessContact.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FixedConstraintFixedPoint.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/MassSpringConstraintFixedPoint.h"
+#include "SurgSim/Physics/MassSpringConstraintFrictionlessContact.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
+#include "SurgSim/Physics/RigidConstraintFixedPoint.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
 namespace SurgSim
 {
@@ -26,9 +42,27 @@ namespace Physics
 
 ConstraintImplementationFactory::ConstraintImplementationFactory()
 {
-	addImplementation(std::make_shared<FixedRepresentationContact>());
-	addImplementation(std::make_shared<RigidRepresentationContact>());
-	addImplementation(std::make_shared<Fem3DRepresentationContact>());
+	using SurgSim::Blocks::MassSpring1DRepresentation;
+	using SurgSim::Blocks::MassSpring2DRepresentation;
+	using SurgSim::Blocks::MassSpring3DRepresentation;
+
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFrictionlessContact>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFrictionlessContact>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DConstraintFrictionlessContact>());
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFixedPoint>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFixedPoint>());
+	addImplementation(typeid(Fem1DRepresentation), std::make_shared<Fem1DConstraintFixedPoint>());
+	addImplementation(typeid(Fem2DRepresentation), std::make_shared<Fem2DConstraintFixedPoint>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DConstraintFixedPoint>());
+
+	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
+	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
+	addImplementation(typeid(MassSpring1DRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
+	addImplementation(typeid(MassSpring1DRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
+	addImplementation(typeid(MassSpring2DRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
+	addImplementation(typeid(MassSpring2DRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
+	addImplementation(typeid(MassSpring3DRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
+	addImplementation(typeid(MassSpring3DRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
 }
 
 ConstraintImplementationFactory::~ConstraintImplementationFactory()
@@ -36,25 +70,23 @@ ConstraintImplementationFactory::~ConstraintImplementationFactory()
 }
 
 std::shared_ptr<ConstraintImplementation> ConstraintImplementationFactory::getImplementation(
-	RepresentationType representationType,
-	SurgSim::Math::MlcpConstraintType constraintType) const
+		std::type_index representationType, ConstraintType constraintType)
 {
-	SURGSIM_ASSERT(representationType >= 0 && representationType < REPRESENTATION_TYPE_COUNT) <<
-		"Invalid representation type " << representationType;
-	SURGSIM_ASSERT(constraintType >= 0 && constraintType < SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES) <<
+	SURGSIM_ASSERT(constraintType >= 0 && constraintType < NUM_CONSTRAINT_TYPES) <<
 		"Invalid constraint type " << constraintType;
 
 	auto implementation = m_implementations[representationType][constraintType];
 	SURGSIM_LOG_IF(implementation == nullptr, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
-		"No constraint implementation for representation type (" << representationType <<
+		"No constraint implementation for representation type (" << representationType.name() <<
 		") and constraint type (" << constraintType << ")";
 
 	return implementation;
 }
 
-void ConstraintImplementationFactory::addImplementation(std::shared_ptr<ConstraintImplementation> implementation)
+void ConstraintImplementationFactory::addImplementation(
+	std::type_index typeIndex, std::shared_ptr<ConstraintImplementation> implementation)
 {
-	m_implementations[implementation->getRepresentationType()][implementation->getMlcpConstraintType()] =
+	m_implementations[typeIndex][implementation->getConstraintType()] =
 		implementation;
 }
 

@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
 	${gtest_SOURCE_DIR}/include
 )
@@ -25,23 +24,23 @@ set(UNIT_TEST_SOURCES
 
 set(LIBS 
 	SixenseDevice
-	SurgSimInput
-	SurgSimFramework
 	SurgSimDataStructures
-	${Boost_LIBRARIES}
-	${SIXENSE_SDK_LIBRARIES}
-)
-
-set(UNIT_TEST_SHARED_RELEASE_LIBS
-	${SIXENSE_SDK_sixense_SHARED_RELEASE}
-	${SIXENSE_SDK_sixense_utils_SHARED_RELEASE}
-)
-set(UNIT_TEST_SHARED_DEBUG_LIBS
-	${SIXENSE_SDK_sixense_SHARED_DEBUG}
-	${SIXENSE_SDK_sixense_utils_SHARED_DEBUG}
-	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
+	SurgSimMath
+	SurgSimTesting
 )
 
 surgsim_add_unit_tests(SixenseDeviceTest)
+
+# Copy the device DLLs into the build directory
+surgsim_copy_to_target_directory_for_release(SixenseDeviceTest
+	${SIXENSESDK_sixense_SHARED_RELEASE}
+	${SIXENSESDK_sixense_utils_SHARED_RELEASE}
+)
+
+surgsim_copy_to_target_directory_for_debug(SixenseDeviceTest
+	${SIXENSESDK_sixense_SHARED_DEBUG}
+	${SIXENSESDK_sixense_utils_SHARED_DEBUG}
+	${SIXENSESDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
+)
 
 set_target_properties(SixenseDeviceTest PROPERTIES FOLDER "Devices")

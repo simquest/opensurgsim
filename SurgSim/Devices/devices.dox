@@ -6,9 +6,11 @@ The 'Devices' namespace contains classes that add physical devices (e.g., mice, 
 
 Devices with Dependencies:
 - \subpage LabJack
+- \subpage Leap 
 - \subpage MultiAxis
 - \subpage Nimble
 - \subpage Novint
+- \subpage Oculus
 - \subpage OpenNI
 - \subpage Phantom
 - \subpage Sixense

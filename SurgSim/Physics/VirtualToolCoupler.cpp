@@ -15,10 +15,11 @@
 
 #include <Eigen/Eigenvalues>
 
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-#include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/OutputComponent.h"
 #include "SurgSim/Math/MathConvert.h"
@@ -55,6 +56,8 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_localAttachmentPoint(Vector3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
 									std::numeric_limits<double>::quiet_NaN())),
 	m_calculateInertialTorques(false),
+	m_logger(SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")),
+	m_hapticOutputOnlyWhenColliding(false),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
 	m_angularVelocityIndex(-1),
@@ -79,6 +82,8 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 									  getOptionalAttachmentPoint, setOptionalAttachmentPoint);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, CalculateInertialTorques,
 									  getCalculateInertialTorques, setCalculateInertialTorques);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, HapticOutputOnlyWhenColliding,
+									  isHapticOutputOnlyWhenColliding, setHapticOutputOnlyWhenColliding);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 									  Input, getInput, setInput);
@@ -154,7 +159,7 @@ void VirtualToolCoupler::update(double dt)
 		inputLinearVelocity = inputAlignment.linear() * inputLinearVelocity;
 		inputAngularVelocity = inputAlignment.rotation() * inputAngularVelocity;
 
-		RigidRepresentationState objectState(m_rigid->getCurrentState());
+		RigidState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
 		Vector3d objectPosition = objectPose * m_rigid->getMassCenter();
 		Vector3d attachmentPoint = objectPose * m_localAttachmentPoint;
@@ -198,16 +203,31 @@ void VirtualToolCoupler::update(double dt)
 			RigidTransform3d outputAlignment = m_output->getLocalPose().inverse();
 			Matrix33d outputAlignmentUnScaled = outputAlignment.rotation();
 
-			m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
-			m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
+			bool output = true;
+			if (m_hapticOutputOnlyWhenColliding)
+			{
+				auto collision = m_rigid->getCollisionRepresentation();
+				output = (collision == nullptr) || (collision->getCollisions().unsafeGet().size() > 0);
+			}
 
-			m_outputData.poses().set(m_inputPoseIndex, outputAlignment * inputPose);
+			if (output)
+			{
+				m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
+				m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
+				m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
+				m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
+			}
+			else
+			{
+				m_outputData.vectors().set(m_forceIndex, Vector3d::Zero());
+				m_outputData.vectors().set(m_torqueIndex, Vector3d::Zero());
+				m_outputData.matrices().reset(m_springJacobianIndex);
+				m_outputData.matrices().reset(m_damperJacobianIndex);
+			}
+
 			m_outputData.vectors().set(m_inputLinearVelocityIndex, outputAlignment.linear() * inputLinearVelocity);
 			m_outputData.vectors().set(m_inputAngularVelocityIndex, outputAlignmentUnScaled * inputAngularVelocity);
-
-			m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
-			m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
-
+			m_outputData.poses().set(m_inputPoseIndex, outputAlignment * inputPose);
 			m_output->setData(m_outputData);
 		}
 	}
@@ -246,14 +266,13 @@ bool VirtualToolCoupler::doWakeUp()
 {
 	if (m_input == nullptr)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
-				getName() << " does not have an Input Component.";
+		SURGSIM_LOG_SEVERE(m_logger) <<
+			"VirtualToolCoupler named " << getName() << " does not have an Input Component.";
 		return false;
 	}
 	if (m_rigid == nullptr)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
-				getName() << " does not have a Representation.";
+		SURGSIM_LOG_SEVERE(m_logger) << "VirtualToolCoupler named " << getName() << " does not have a Representation.";
 		return false;
 	}
 
@@ -328,7 +347,10 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-
+	SURGSIM_LOG_INFO(m_logger) <<
+		"VirtualToolCoupler named '" << getName() << "' has linear stiffness " << m_linearStiffness <<
+		", linear damping " << m_linearDamping << ", angular stiffness " << m_angularStiffness <<
+		", and angular damping " << m_angularDamping << ". Its Physics Representation has mass " << m_rigid->getMass();
 	return true;
 }
 
@@ -479,6 +501,16 @@ void VirtualToolCoupler::setCalculateInertialTorques(bool calculateInertialTorqu
 bool VirtualToolCoupler::getCalculateInertialTorques() const
 {
 	return m_calculateInertialTorques;
+}
+
+bool VirtualToolCoupler::isHapticOutputOnlyWhenColliding() const
+{
+	return m_hapticOutputOnlyWhenColliding;
+}
+
+void VirtualToolCoupler::setHapticOutputOnlyWhenColliding(bool hapticOutputOnlyWhenColliding)
+{
+	m_hapticOutputOnlyWhenColliding = hapticOutputOnlyWhenColliding;
 }
 
 }; /// Physics

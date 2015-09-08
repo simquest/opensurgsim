@@ -20,6 +20,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include <boost/thread/mutex.hpp>
+
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Representation.h"
 
@@ -67,10 +69,21 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
 
+	/// Get the shape, posed
+	/// \return The shape transformed by the pose of this representation
+	virtual const std::shared_ptr<SurgSim::Math::Shape> getPosedShape();
+
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
 	SurgSim::DataStructures::BufferedValue<ContactMapType>& getCollisions();
+
+	/// Add a contact with another representation
+	/// \param other The other collision representation
+	/// \param contact The contact to be added
+	/// \note This method is thread-safe
+	void addContact(const std::shared_ptr<Representation>& other,
+		const std::shared_ptr<SurgSim::Collision::Contact>& contact);
 
 	/// Check whether this collision representation collided with another during the last update
 	/// \param other other collision representation to check against
@@ -82,10 +95,26 @@ public:
 	virtual void update(const double& dt);
 
 protected:
+	/// Invalidate the cached posed shape
+	void invalidatePosedShape();
+
+private:
 	/// A map which associates a list of contacts with each collision representation.
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
 	/// representation. And the first penetration point is on this representation.
 	SurgSim::DataStructures::BufferedValue<ContactMapType> m_collisions;
+
+	/// Mutex to lock write access to m_collisions
+	boost::mutex m_collisionsMutex;
+
+	/// Cached posed shape
+	std::shared_ptr<Math::Shape> m_posedShape;
+
+	/// Mutex to lock write access to m_posedShape
+	boost::mutex m_posedShapeMutex;
+
+	/// Pose of m_posedShape
+	Math::RigidTransform3d m_posedShapePose;
 };
 
 

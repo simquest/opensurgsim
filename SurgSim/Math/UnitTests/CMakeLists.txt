@@ -21,8 +21,12 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	AabbTests.cpp
 	GeometryTests.cpp
+	IntervalArithmeticTests.cpp
+	KalmanFilterTests.cpp
+	LinearMotionArithmeticTests.cpp
 	MakeRigidTransformTests.cpp
 	MeshShapeTests.cpp
+	MinMaxTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
 	OdeEquationTests.cpp
 	OdeSolverEulerExplicitModifiedTests.cpp
@@ -32,6 +36,10 @@ set(UNIT_TEST_SOURCES
 	OdeSolverStaticTests.cpp
 	OdeSolverTests.cpp
 	OdeStateTests.cpp
+	ParticlesShapeTests.cpp
+	PolynomialRootTests.cpp
+	PolynomialTests.cpp
+	PolynomialValuesTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
 	TriangleTriangleContactCalculationTests.cpp
@@ -47,9 +55,11 @@ set(UNIT_TEST_HEADERS
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
 	LinearSolveAndInverseTests.cpp
+	LinearSparseSolveAndInverseTests.cpp
 	MatrixTests.cpp
 	QuaternionTests.cpp
 	RigidTransformTests.cpp
+	SparseMatrixTests.cpp
 	VectorTests.cpp
 )
 
@@ -62,7 +72,6 @@ option(BUILD_TESTING_EIGEN
 if(BUILD_TESTING_EIGEN)
 	set(UNIT_TEST_SOURCES ${UNIT_TEST_SOURCES} ${UNIT_TEST_EIGEN_TYPE_SOURCES})
 	set(UNIT_TEST_HEADERS ${UNIT_TEST_HEADERS} ${UNIT_TEST_EIGEN_TYPE_HEADERS})
-
 	# Fix a problem with 64-bit builds running out of sections.
 	if(MSVC AND CMAKE_CL_64)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
@@ -75,8 +84,6 @@ set(LIBS
 )
 
 file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/MeshShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OctreeShapeData DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 # Configure the path for the data files
 configure_file(

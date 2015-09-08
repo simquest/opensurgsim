@@ -13,39 +13,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
-
 #include "SurgSim/Blocks/SphereElement.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
-
-using SurgSim::Blocks::SphereElement;
 using SurgSim::Graphics::OsgMaterial;
-using SurgSim::Graphics::OsgShader;
+using SurgSim::Graphics::OsgProgram;
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Math::SphereShape;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 
-SphereElement::SphereElement(const std::string& name) :
-	SurgSim::Framework::SceneElement(name), m_name(name)
+
+namespace SurgSim
 {
-}
 
+namespace Blocks
+{
 
-SphereElement::~SphereElement()
+SphereElement::SphereElement(const std::string& name) :
+	SurgSim::Framework::SceneElement(name)
 {
 }
 
 bool SphereElement::doInitialize()
 {
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(m_name + " Physics");
+		std::make_shared<RigidRepresentation>(getName() + " Physics");
 
 	physicsRepresentation->setDensity(700.0); // Wood
 	physicsRepresentation->setLinearDamping(0.1);
@@ -54,13 +52,13 @@ bool SphereElement::doInitialize()
 	physicsRepresentation->setShape(shape);
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSphereRepresentation>(m_name + " Graphics");
+		std::make_shared<OsgSphereRepresentation>(getName() + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	std::shared_ptr<OsgProgram> program = std::make_shared<OsgProgram>();
 
-	shader->setVertexShaderSource(
+	program->setVertexShaderSource(
 		"varying vec4 color;\n"
 		"void main(void)\n"
 		"{\n"
@@ -68,13 +66,13 @@ bool SphereElement::doInitialize()
 		"	color.rgb = gl_Normal;\n"
 		"	color.a = 1.0;\n"
 		"}");
-	shader->setFragmentShaderSource(
+	program->setFragmentShaderSource(
 		"varying vec4 color;\n"
 		"void main(void)\n"
 		"{\n"
 		"	gl_FragColor = color;\n"
 		"}");
-	material->setShader(shader);
+	material->setProgram(program);
 	graphicsRepresentation->setMaterial(material);
 
 	addComponent(physicsRepresentation);
@@ -87,7 +85,5 @@ bool SphereElement::doInitialize()
 	return true;
 }
 
-bool SphereElement::doWakeUp()
-{
-	return true;
-}
+};
+};

@@ -13,11 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 
@@ -37,15 +39,6 @@ RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& na
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()
 {
-}
-
-void RigidCollisionRepresentation::update(const double& dt)
-{
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(getShape());
-	if (nullptr != meshShape && nullptr != meshShape->getMesh() && meshShape->getMesh()->isValid())
-	{
-		meshShape->setPose(getPose());
-	}
 }
 
 void RigidCollisionRepresentation::setRigidRepresentation(

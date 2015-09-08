@@ -69,24 +69,26 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
 	SurgSim::Math::IntegrationScheme integrationScheme,
+	SurgSim::Math::LinearSolver linearSolver,
 	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(name);
 
-	// Set the file name which contains the tetrahedral mesh. File will be loaded by 'doInitialize()' call.
+	// Load the tetrahedral mesh.
 	std::shared_ptr<Fem3DRepresentation> physicsRepresentation = std::make_shared<Fem3DRepresentation>("Physics");
-	physicsRepresentation->setFilename(filename);
+	physicsRepresentation->loadFem(filename);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
+	physicsRepresentation->setLinearSolver(linearSolver);
 	sceneElement->addComponent(physicsRepresentation);
 
 	// Load the surface triangle mesh of the finite element model
 	auto meshShape = std::make_shared<MeshShape>();
-	meshShape->loadInitialMesh(filename);
+	meshShape->load(filename);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphicalFem = std::make_shared<OsgMeshRepresentation>("Graphics");
-	graphicalFem->setFilename(filename);
+	graphicalFem->loadMesh(filename);
 	sceneElement->addComponent(graphicalFem);
 
 	// Create material to transport the Textures
@@ -108,7 +110,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// WireFrame of the finite element model
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> wireFrameFem
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Wire Frame");
-	wireFrameFem->setFilename(filename);
+	wireFrameFem->setShape(meshShape);
 	wireFrameFem->setDrawAsWireFrame(true);
 	wireFrameFem->setLocalActive(false);
 	sceneElement->addComponent(wireFrameFem);
@@ -139,11 +141,11 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	// Stapler collision mesh
 	auto meshShapeForCollision = std::make_shared<MeshShape>();
-	meshShapeForCollision->loadInitialMesh(filename);
+	meshShapeForCollision->load(filename);
 
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
-	meshShapeVisualization->setFilename(filename);
+	meshShapeVisualization->setShape(meshShapeForCollision);
 	meshShapeVisualization->setDrawAsWireFrame(true);
 	meshShapeVisualization->setLocalActive(false);
 
@@ -199,8 +201,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	auto meshShapeForVirtualStaple1 = std::make_shared<MeshShape>();
 	auto meshShapeForVirtualStaple2 = std::make_shared<MeshShape>();
-	meshShapeForVirtualStaple1->loadInitialMesh("Geometry/virtual_staple_1.ply");
-	meshShapeForVirtualStaple2->loadInitialMesh("Geometry/virtual_staple_2.ply");
+	meshShapeForVirtualStaple1->load("Geometry/virtual_staple_1.ply");
+	meshShapeForVirtualStaple2->load("Geometry/virtual_staple_2.ply");
 
 	std::vector<std::shared_ptr<MeshShape>> virtualTeethShapes;
 	virtualTeethShapes.push_back(meshShapeForVirtualStaple1);
@@ -240,12 +242,12 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 
 	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>();
-	meshShape->loadInitialMesh(filename);
+	meshShape->load(filename);
 
 	// Visualization of arm collision mesh
 	std::shared_ptr<MeshRepresentation> meshShapeVisualization =
 		std::make_shared<OsgMeshRepresentation>("Collision Mesh");
-	meshShapeVisualization->setFilename(filename);
+	meshShapeVisualization->setShape(meshShape);
 	meshShapeVisualization->setDrawAsWireFrame(true);
 	meshShapeVisualization->setLocalActive(false);
 
@@ -299,13 +301,13 @@ std::shared_ptr<OsgViewElement> createViewElement()
 
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 	const SurgSim::Framework::ApplicationData& data,
-	std::shared_ptr<SurgSim::Graphics::OsgShader> shader,
+	std::shared_ptr<SurgSim::Graphics::OsgProgram> program,
 	std::string defaultTextureName = "Textures/checkered.png")
 {
 	// Default Material with shader
 	// using scopes to keep from having to introduce new variables with different types
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("shiny");
-	material->setShader(shader);
+	material->setProgram(program);
 
 	{
 		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
@@ -386,7 +388,7 @@ int main(int argc, char* argv[])
 	inputManager->addDevice(view->getKeyboardDevice());
 
 	// Shader should be shared between all materials using the same shader
-	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	auto shader = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	SURGSIM_ASSERT(shader != nullptr) << "Shader could not be loaded.";
 
 	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
@@ -408,7 +410,8 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SceneElement> wound =
 		createFemSceneElement("wound",
 							  woundFilename,
-							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
+							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
+							  SurgSim::Math::LINEARSOLVER_LU,
 							  material);
 	wound->setPose(armPose);
 

@@ -203,6 +203,12 @@ T convert(boost::any val);
 template <>
 SurgSim::Math::Matrix44f convert(boost::any val);
 
+/// Specialization for convert<T>() to correctly cast const char* to std::string
+/// \param val The value to be converted, should be a const char*
+/// \return A std::string
+template <>
+std::string convert(boost::any val);
+
 /// A macro to register getter and setter for a property that is readable and writeable,
 /// order of getter and setter agrees with 'RW'. Note that the property should not be quoted in the original
 /// macro call.
@@ -226,6 +232,16 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 				std::bind(&YAML::convert<type>::encode, std::bind(&class::getter, this)),\
 				std::bind(&class::setter, this, std::bind(&YAML::Node::as<type>,std::placeholders::_1)))
 
+/// A macro to register a setter that can be used from YAML, and as a writeable property
+/// use this to provide alternatives to more complicated values, e.g. setModelFilename() vs generate and set Model
+/// Enables the alternative use of the model file instead of the actual mesh object
+#define SURGSIM_ADD_SETTER(class, type, property, setter) \
+	{\
+		setDecoder(#property, std::bind((void(class::*)(const type&))&class::setter, this,\
+					std::bind(&YAML::Node::as<type>,std::placeholders::_1))); \
+		setSetter(#property, std::bind((void(class::*)(const type&))&class::setter, this,\
+					std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)));\
+	}
 }; // Framework
 }; // SurgSim
 

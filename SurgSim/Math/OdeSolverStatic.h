@@ -24,11 +24,14 @@ namespace SurgSim
 namespace Math
 {
 
-/// Static ode solver
-/// \note M(x(t), v(t)).a(t) = f(t, x(t), v(t))
-/// \note This ode equation is solved w.r.t. x, by discarding all time derived variables (i.e. v, a)
-/// \note reducing the equation to solve to:
-/// \note 0 = f(t, x(t)) = Fext + Fint(t, x(t)) = Fext - K.(x - x0)
+/// Static ode solver solves the following \f$2^{nd}\f$ order ode \f$M(x(t), v(t)).a(t) = f(t, x(t), v(t))\f$. <br>
+/// This ode equation is solved w.r.t. \f$x\f$, by discarding all time derived variables (i.e. \f$v\f$, \f$a\f$)
+/// reducing the equation to solve to:
+/// \f[
+/// 0 = f(t, x(t)) = f_{ext} + f_{int}(t, x(t)) = f_{ext} - K(x).(x - x0)
+/// \f]
+/// \note This solver does not solve the resulting non-linear equations, but their linearization:
+/// \f$f_{ext} - K.(x - x0)=0\f$
 class OdeSolverStatic : public OdeSolver
 {
 public:
@@ -36,7 +39,11 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit OdeSolverStatic(OdeEquation* equation);
 
-	void solve(double dt, const OdeState& currentState, OdeState* newState) override;
+	void solve(double dt, const OdeState& currentState, OdeState* newState, bool computeCompliance = true) override;
+
+protected:
+	void assembleLinearSystem(double dt, const OdeState& state, const OdeState& newState,
+		bool computeRHS = true) override;
 };
 
 }; // namespace Math

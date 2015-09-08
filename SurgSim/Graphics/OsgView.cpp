@@ -28,10 +28,14 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 #include <osgViewer/ViewerEventHandlers>
 #include <osg/DisplaySettings>
+
 
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
@@ -155,6 +159,7 @@ void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 
 	View::setCamera(camera);
 	m_view->setCamera(osgCamera->getOsgCamera());
+	osgCamera->setViewport(0, 0, m_dimensions[0], m_dimensions[1]);
 }
 
 void OsgView::update(double dt)
@@ -174,6 +179,12 @@ void OsgView::update(double dt)
 			}
 		}
 	}
+	if (isManipulatorEnabled())
+	{
+		auto matrix = m_view->getCameraManipulator()->getMatrix();
+		auto pose = Math::RigidTransform3d(fromOsg(matrix));
+		getSceneElement()->setPose(pose);
+	}
 }
 
 bool OsgView::doInitialize()
@@ -183,22 +194,7 @@ bool OsgView::doInitialize()
 
 bool OsgView::doWakeUp()
 {
-	osg::ref_ptr<osg::DisplaySettings> displaySettings = new osg::DisplaySettings;
-	displaySettings->setDefaults();
-
-	if (isStereo())
-	{
-		displaySettings->setStereo(isStereo());
-		displaySettings->setStereoMode(StereoModeEnums[getStereoMode()]);
-		displaySettings->setDisplayType(DisplayTypeEnums[getDisplayType()]);
-		displaySettings->setEyeSeparation(static_cast<float>(getEyeSeparation()));
-		displaySettings->setScreenDistance(static_cast<float>(getScreenDistance()));
-		displaySettings->setScreenWidth(static_cast<float>(getScreenWidth()));
-		displaySettings->setScreenHeight(static_cast<float>(getScreenHeight()));
-	}
-
-
-	m_view->setDisplaySettings(displaySettings);
+	m_view->setDisplaySettings(createDisplaySettings());
 
 	osg::ref_ptr<osgViewer::ViewConfig> viewConfig;
 
@@ -238,6 +234,25 @@ bool OsgView::doWakeUp()
 
 
 	return true;
+}
+
+osg::ref_ptr<osg::DisplaySettings> OsgView::createDisplaySettings() const
+{
+	osg::ref_ptr<osg::DisplaySettings> displaySettings = new osg::DisplaySettings;
+	displaySettings->setDefaults();
+
+	if (isStereo())
+	{
+		displaySettings->setStereo(isStereo());
+		displaySettings->setStereoMode(StereoModeEnums[getStereoMode()]);
+		displaySettings->setDisplayType(DisplayTypeEnums[getDisplayType()]);
+		displaySettings->setEyeSeparation(static_cast<float>(getEyeSeparation()));
+		displaySettings->setScreenDistance(static_cast<float>(getScreenDistance()));
+		displaySettings->setScreenWidth(static_cast<float>(getScreenWidth()));
+		displaySettings->setScreenHeight(static_cast<float>(getScreenHeight()));
+	}
+
+	return displaySettings;
 }
 
 void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
@@ -319,7 +334,7 @@ void SurgSim::Graphics::OsgView::enableManipulator(bool val)
 
 	if (val)
 	{
-		getOsgView()->setCameraManipulator(m_manipulator);
+		getOsgView()->setCameraManipulator(m_manipulator, false);
 	}
 	else
 	{

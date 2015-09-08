@@ -40,10 +40,10 @@ std::shared_ptr<PhysicsManagerState> PostUpdate::doUpdate(
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
-	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
-	for (auto it = representations.begin(); it != representations.end(); ++it)
+	auto& representations = result->getActiveRepresentations();
+	for (auto& representation : representations)
 	{
-		(*it)->afterUpdate(dt);
+		representation->afterUpdate(dt);
 	}
 
 	return result;

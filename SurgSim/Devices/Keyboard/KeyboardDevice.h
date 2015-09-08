@@ -28,6 +28,8 @@ namespace Device
 class KeyboardScaffold;
 class OsgKeyboardHandler;
 
+SURGSIM_STATIC_REGISTRATION(KeyboardDevice);
+
 /// A class implementing the communication with a keyboard
 ///
 /// \par Application input provided from the device:
@@ -50,6 +52,9 @@ public:
 	/// Constructor
 	/// \param deviceName Name for keyboard device
 	explicit KeyboardDevice(const std::string& deviceName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::KeyboardDevice);
+
 	/// Destructor
 	virtual ~KeyboardDevice();
 

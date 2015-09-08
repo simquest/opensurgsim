@@ -51,6 +51,8 @@ void RenderTest::SetUp()
 	viewElement->getView()->setPosition(position);
 	viewElement->getView()->setWindowBorderEnabled(true);
 
+	camera = std::dynamic_pointer_cast<OsgCamera>(viewElement->getCamera());
+
 	scene->addSceneElement(viewElement);
 }
 

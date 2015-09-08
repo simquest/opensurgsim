@@ -38,19 +38,14 @@ class RawMultiAxisScaffold
 {
 public:
 	/// Constructor.
-	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
-	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit RawMultiAxisScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	RawMultiAxisScaffold();
 
 	/// Destructor.
 	~RawMultiAxisScaffold();
 
 	/// Gets the logger used by this object and the devices it manages.
 	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all RawMultiAxisDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
@@ -157,9 +152,6 @@ private:
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
-
-	/// The default logging level.
-	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 };
 
 };  // namespace Device

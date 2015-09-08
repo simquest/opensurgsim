@@ -103,6 +103,7 @@ TEST(OpenNIDeviceTest, InputConsumer)
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasData("color"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasData("depth"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasData("depth_xyz"));
 }
 
 TEST(OpenNIDeviceTest, OutputProducer)

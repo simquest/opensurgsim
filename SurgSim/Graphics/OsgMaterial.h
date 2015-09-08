@@ -30,7 +30,7 @@ namespace Graphics
 {
 
 class MaterialFace;
-class OsgShader;
+class OsgProgram;
 class OsgUniformBase;
 
 /// OSG-based implementation of a graphics material.
@@ -47,6 +47,8 @@ public:
 	/// Constructor
 	/// \post	The material has no uniforms and no shader.
 	explicit OsgMaterial(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgMaterial);
 
 	/// Adds a uniform to this material
 	/// \param	uniform	Uniform to add
@@ -73,14 +75,14 @@ public:
 	bool hasUniform(const std::string& name) const override;
 
 	/// Sets the shader used by this material
-	/// \param	shader	Shader program
-	/// \return	True if shader was set successfully, otherwise false
-	/// \note	OsgMaterial only accepts subclasses of OsgShader
-	bool setShader(std::shared_ptr<Shader> shader) override;
+	/// \param	program	Shader program
+	/// \return	True if program was set successfully, otherwise false
+	/// \note OsgMaterial only accepts subclasses of OsgProgram
+	bool setProgram(std::shared_ptr<Program> program) override;
 
-	std::shared_ptr<Shader> getShader() const override;
+	std::shared_ptr<Program> getProgram() const override;
 
-	void clearShader() override;
+	void clearProgram() override;
 
 	/// \return the OSG state set with the material properties
 	osg::ref_ptr<osg::StateSet> getOsgStateSet() const;
@@ -97,7 +99,7 @@ private:
 	std::vector<std::shared_ptr<OsgUniformBase>> m_uniforms;
 
 	/// Shader used by this material
-	std::shared_ptr<OsgShader> m_shader;
+	std::shared_ptr<OsgProgram> m_program;
 };
 
 /// Utility function to build the material.

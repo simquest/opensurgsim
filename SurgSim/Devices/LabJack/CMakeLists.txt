@@ -40,6 +40,8 @@ set(LABJACK_DEVICE_HEADERS
 	LabJackThread.h
 )
 
+set(DEVICE_HEADERS ${DEVICE_HEADERS} LabJack/LabJackDevice.h PARENT_SCOPE)
+
 set(LABJACK_DEVICE_LINUX_SOURCES
 	linux/LabJackChecksums.cpp
 	linux/LabJackScaffold.cpp

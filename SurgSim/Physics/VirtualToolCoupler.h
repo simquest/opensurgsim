@@ -22,6 +22,7 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
@@ -40,9 +41,20 @@ class RigidRepresentation;
 
 SURGSIM_STATIC_REGISTRATION(VirtualToolCoupler);
 
-/// The VirtualToolCoupler couples a rigid object to an input/output device through a spring and damper.  If the device
-/// will output forces and/or torques, we pass it a force (and/or torque) as well as the derivatives (Jacobians) of
-/// the force with respect to position and velocity, so that the device can recalculate its forces at its update rate.
+/// The VirtualToolCoupler couples a rigid object to an input/output device through a spring and damper.
+/// The object will follow the pose provided by the device. If an Output is connected, it is provided
+/// forces and torques that will push the device towards matching the object's pose and velocity.
+/// This "virtual coupling" or "god-object" paradigm is common for haptic applications utilizing a device that
+/// may update significantly faster than the physics computation thread.
+///
+/// For an overview of haptics see:
+///		Salisbury, Kenneth, Francois Conti, and Federico Barbagli. "Haptic rendering: introductory concepts."
+///		Computer Graphics and Applications, IEEE 24.2 (2004): 24-32.
+///
+/// For an introduction to virtual coupling see:
+///		Colgate, J. Edward, Michael C. Stanley, and J. Michael Brown. "Issues in the haptic display of tool use."
+///		Intelligent Robots and Systems 95.'Human Robot Interaction and Cooperative Robots',
+///		Proceedings. 1995 IEEE/RSJ International Conference on. Vol. 3. IEEE, 1995.
 class VirtualToolCoupler : public SurgSim::Framework::Behavior
 {
 public:
@@ -74,6 +86,16 @@ public:
 	/// Set the Physics Representation which follows the input
 	/// \param rigid Rigid Representation that provides state and receives external forces and torques
 	void setRepresentation(const std::shared_ptr<SurgSim::Framework::Component> rigid);
+
+	/// Get whether or not the haptic forces should be provided only during collisions.
+	/// \return false if the VTC forces and torques are sent to the output device (if any) at all times.  true if
+	///		zeros are sent for the forces and torques unless the tool is colliding.
+	bool isHapticOutputOnlyWhenColliding() const;
+
+	/// Set whether or not the haptic forces should be provided only during collisions.
+	/// \param haptic false to send the VTC forces and torques to the output device (if any) at all times.  true to
+	///		send zeros for the forces and torques unless the tool is colliding.
+	void setHapticOutputOnlyWhenColliding(bool haptic);
 
 	/// \return Name of the pose data in the input to transfer
 	const std::string& getPoseName();
@@ -246,6 +268,12 @@ private:
 	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
 	/// input point is not the mass center.
 	bool m_calculateInertialTorques;
+
+	/// The logger.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// Whether or not the VTC sends forces and torques to the output device (if any) only when the tool is colliding.
+	bool m_hapticOutputOnlyWhenColliding;
 
 	///@{
 	/// Cached DataGroup indices.

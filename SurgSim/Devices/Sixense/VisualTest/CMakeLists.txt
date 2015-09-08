@@ -13,15 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 set(EXAMPLE_SOURCES
 	main.cpp
 )
@@ -30,18 +21,15 @@ set(EXAMPLE_HEADERS
 )
 
 surgsim_add_executable(SixenseVisualTest
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+	"${EXAMPLE_SOURCES}" 
+	"${EXAMPLE_HEADERS}"
+)
 
 set(LIBS
-	SixenseDevice
 	IdentityPoseDevice
-	VisualTestCommon
+	SixenseDevice
 	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	${Boost_LIBRARIES}
-	${SIXENSE_SDK_LIBRARIES}
-	${OPENGL_LIBRARIES}
+	VisualTestCommon
 )
 
 target_link_libraries(SixenseVisualTest ${LIBS})
@@ -49,14 +37,14 @@ target_link_libraries(SixenseVisualTest ${LIBS})
 
 # Copy the device DLLs into the build directory
 surgsim_copy_to_target_directory_for_release(SixenseVisualTest
-	${SIXENSE_SDK_sixense_SHARED_RELEASE}
-	${SIXENSE_SDK_sixense_utils_SHARED_RELEASE}
+	${SIXENSESDK_sixense_SHARED_RELEASE}
+	${SIXENSESDK_sixense_utils_SHARED_RELEASE}
 )
 
 surgsim_copy_to_target_directory_for_debug(SixenseVisualTest
-	${SIXENSE_SDK_sixense_SHARED_DEBUG}
-	${SIXENSE_SDK_sixense_utils_SHARED_DEBUG}
-	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
+	${SIXENSESDK_sixense_SHARED_DEBUG}
+	${SIXENSESDK_sixense_utils_SHARED_DEBUG}
+	${SIXENSESDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
 )
 
 set_target_properties(SixenseVisualTest PROPERTIES FOLDER "Devices")

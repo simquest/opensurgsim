@@ -20,6 +20,11 @@
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Physics/Fem1DElementBeam.h"
+#include "SurgSim/Physics/Fem2DElementTriangle.h"
+#include "SurgSim/Physics/Fem3DElementCorotationalTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementCube.h"
+#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Physics::FemElement;
@@ -133,16 +138,6 @@ TEST(FemElementTests, InitializeMethods)
 	ASSERT_NO_THROW(femElement.initialize(fakeState));
 }
 
-TEST(FemElementTests, UpdateTest)
-{
-	MockFemElement femElement;
-	SurgSim::Math::OdeState state;
-
-	// By default, FemElement are considered elements of linear deformation,
-	// therefore no update is required, they return simply true.
-	EXPECT_TRUE(femElement.update(state));
-}
-
 void checkValidCoordinate(const MockFemElement& femElement, double v0, bool expected)
 {
 	Vector naturalCoordinate(1);
@@ -219,6 +214,91 @@ TEST(FemElementTests, IsValidCoordinate)
 	checkValidCoordinate(femElement, 0.5, 0.0, 0.41, 0.1, false);
 	checkValidCoordinate(femElement, 0.0, 1.0, 0.0, false);
 	checkValidCoordinate(femElement, -0.01, 0.0, 1.01, e, false);
+}
+
+TEST(FemElementTests, FactoryTest)
+{
+	auto mockElement = std::make_shared<FemElementStructs::FemElementParameter>();
+	mockElement->nodeIds.push_back(2);
+	FemElement::getFactory().registerClass<MockFemElement>("MockFemElement");
+
+	// Test with a mock FemElement
+	auto mockFem = FemElement::getFactory().create("MockFemElement", mockElement);
+	EXPECT_NE(nullptr, mockFem);
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<MockFemElement>(mockFem));
+
+	// Test with a 1D beam
+	auto beamElement = std::make_shared<FemElementStructs::FemElement1DParameter>();
+	beamElement->nodeIds.push_back(1);
+	beamElement->nodeIds.push_back(2);
+	beamElement->radius = 0.4;
+	beamElement->enableShear = false;
+	beamElement->massDensity = 0.4;
+	beamElement->poissonRatio = 0.4;
+	beamElement->youngModulus = 0.4;
+	static SurgSim::Physics::Fem1DElementBeam beam;
+	auto beamFem = FemElement::getFactory().create(beam.getClassName(), beamElement);
+	EXPECT_NE(nullptr, beamFem);
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem1DElementBeam>(beamFem));
+	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem1DElementBeam", mockElement));
+
+	// Test with a 2D triangle
+	auto triElement = std::make_shared<FemElementStructs::FemElement2DParameter>();
+	triElement->nodeIds.push_back(1);
+	triElement->nodeIds.push_back(2);
+	triElement->nodeIds.push_back(3);
+	triElement->thickness = 0.4;
+	triElement->massDensity = 0.4;
+	triElement->poissonRatio = 0.4;
+	triElement->youngModulus = 0.4;
+	static SurgSim::Physics::Fem2DElementTriangle triangle;
+	auto triFem = FemElement::getFactory().create(triangle.getClassName(), triElement);
+	EXPECT_NE(nullptr, triFem);
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem2DElementTriangle>(triFem));
+	ASSERT_ANY_THROW(FemElement::getFactory().create("SurgSim::Physics::Fem2DElementTriangle", beamElement));
+
+	// Test with a 3D corotational tetrahedron
+	auto tetElement = std::make_shared<FemElementStructs::FemElement3DParameter>();
+	tetElement->nodeIds.push_back(1);
+	tetElement->nodeIds.push_back(2);
+	tetElement->nodeIds.push_back(3);
+	tetElement->nodeIds.push_back(1);
+	tetElement->massDensity = 0.4;
+	tetElement->poissonRatio = 0.4;
+	tetElement->youngModulus = 0.4;
+	static SurgSim::Physics::Fem3DElementCorotationalTetrahedron corotationalTetrahedron;
+	auto coTetFem = FemElement::getFactory().create(
+		corotationalTetrahedron.getClassName(), tetElement);
+	EXPECT_NE(nullptr, coTetFem);
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCorotationalTetrahedron>(coTetFem));
+	ASSERT_ANY_THROW(FemElement::getFactory().create(
+		"SurgSim::Physics::Fem3DElementCorotationalTetrahedron", triElement));
+
+	// Test with a 3D cube
+	auto cubeElement = std::make_shared<FemElementStructs::FemElement3DParameter>();
+	cubeElement->nodeIds.push_back(1);
+	cubeElement->nodeIds.push_back(2);
+	cubeElement->nodeIds.push_back(3);
+	cubeElement->nodeIds.push_back(4);
+	cubeElement->nodeIds.push_back(5);
+	cubeElement->nodeIds.push_back(6);
+	cubeElement->nodeIds.push_back(7);
+	cubeElement->nodeIds.push_back(8);
+	cubeElement->massDensity = 0.4;
+	cubeElement->poissonRatio = 0.4;
+	cubeElement->youngModulus = 0.4;
+	static SurgSim::Physics::Fem3DElementCube cube;
+	auto cubeFem = FemElement::getFactory().create(cube.getClassName(), cubeElement);
+	EXPECT_NE(nullptr, cubeFem);
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementCube>(cubeFem));
+	ASSERT_ANY_THROW(FemElement::getFactory().create(cube.getClassName(), tetElement));
+
+	// Test with a 3D tetrahedron
+	static SurgSim::Physics::Fem3DElementTetrahedron tetrahedron;
+	auto tetFem = FemElement::getFactory().create(tetrahedron.getClassName(), tetElement);
+	EXPECT_NE(nullptr, tetFem);
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<Fem3DElementTetrahedron>(tetFem));
+	ASSERT_ANY_THROW(FemElement::getFactory().create(tetrahedron.getClassName(), cubeElement));
 }
 
 } // namespace Physics

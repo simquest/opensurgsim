@@ -53,6 +53,17 @@ std::string Component::getName() const
 	return m_name;
 }
 
+std::string Component::getFullName() const
+{
+	std::string name;
+	const auto& sceneElement = getSceneElement();
+	if (sceneElement != nullptr)
+	{
+		name = sceneElement->getName() + "/";
+	}
+	return name + m_name;
+}
+
 void Component::setName(const std::string& name)
 {
 	m_name = name;
@@ -136,12 +147,6 @@ std::shared_ptr<PoseComponent> Component::getPoseComponent()
 boost::uuids::uuid Component::getUuid() const
 {
 	return m_uuid;
-}
-
-Component::FactoryType& Component::getFactory()
-{
-	static FactoryType factory;
-	return factory;
 }
 
 std::string Component::getClassName() const

@@ -99,15 +99,16 @@ Appendix: Dependencies
 To compile OpenSurgSim, you will need the following dependencies. Many GNU/Linux
 distributions already provide this software in their software repositories. If
 not, or using Microsoft Windows, please refer to the installation instructions
-found on each dependency's homepage.
+found on each dependency's homepage. When we know of reliable pre-built Windows packages we will refer to them.
 
 Required Dependencies
 ---------------------
 
 * Boost  
   Homepage: http://www.boost.org/  
-  Modules: chrono, date_time, filesystem, system, thread  
+  Modules: chrono, date_time, filesystem, program_options, system, thread   
   Minimum Version: 1.54  
+  Windows Binaries: http://sourceforge.net/projects/boost/files/boost-binaries/  
 
 * CMake  
   Homepage: http://www.cmake.org/  
@@ -115,7 +116,8 @@ Required Dependencies
 
 * Eigen  
   Homepage: http://eigen.tuxfamily.org/  
-  Minimum Version: 3.2.0  
+  Minimum Version: 3.2.1 (GNU/Linux)  
+  Minimum Version: 3.2.3 (Windows)  
 
 * Git  
   Homepage: http://www.git-scm.com/  
@@ -125,7 +127,7 @@ Required Dependencies
   Homepage: http://www.openscenegraph.org/  
   Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation  
   Minimum Version: 3.2.0  
-
+  
 Optional Dependencies
 ---------------------
 
@@ -143,5 +145,5 @@ Optional Dependencies
 
 * MathJax  
   Homepage: http://www.mathjax.org/  
-  Minimum Version: 2.4
+  Minimum Version: 2.4  
 

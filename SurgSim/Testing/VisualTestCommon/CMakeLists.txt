@@ -14,12 +14,7 @@
 # limitations under the License.
 
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
 include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${GLUT_INCLUDE_DIR}"
 )
 
@@ -38,7 +33,13 @@ set(VISUAL_TEST_COMMON_HEADERS
 )
 
 set(LIBS
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+	SurgSimMath
+	${Boost_LIBRARIES}
 	${GLUT_LIBRARIES}
+	${OPENGL_LIBRARIES}
 )
 
 

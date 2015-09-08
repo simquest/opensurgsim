@@ -40,6 +40,8 @@ set(NIMBLE_DEVICE_HEADERS
 	NimbleScaffold.h
 )
 
+set(DEVICE_HEADERS ${DEVICE_HEADERS} Nimble/NimbleDevice.h PARENT_SCOPE)
+
 surgsim_add_library(
 	NimbleDevice
 	"${NIMBLE_DEVICE_SOURCES}"

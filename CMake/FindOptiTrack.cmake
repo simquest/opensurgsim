@@ -106,7 +106,7 @@ else()
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(OPTITRACK
+find_package_handle_standard_args(OptiTrack
 	DEFAULT_MSG OPTITRACK_ROOT_DIR OPTITRACK_INCLUDE_DIR
 	OPTITRACK_LIBRARY)
 

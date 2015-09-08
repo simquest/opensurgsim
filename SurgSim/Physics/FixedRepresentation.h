@@ -24,9 +24,9 @@ namespace SurgSim
 
 namespace Physics
 {
-class RigidRepresentationState;
+class RigidState;
 
-typedef RigidRepresentationBaseLocalization FixedRepresentationLocalization;
+typedef RigidLocalization FixedLocalization;
 
 SURGSIM_STATIC_REGISTRATION(FixedRepresentation);
 
@@ -44,9 +44,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::FixedRepresentation);
 
-	RepresentationType getType() const override;
-
-	void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
+	void updateGlobalInertiaMatrices(const RigidState& state) override;
 
 	void update(double dt) override;
 };

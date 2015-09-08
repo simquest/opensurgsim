@@ -24,6 +24,8 @@ namespace Device
 {
 class OpenNIScaffold;
 
+SURGSIM_STATIC_REGISTRATION(OpenNIDevice);
+
 /// A class implementing the communication with one OpenNI compatible depth camera
 ///
 /// \par Application input provided by the device:
@@ -31,6 +33,7 @@ class OpenNIScaffold;
 ///   | ----       | ----              | ---                                                                        |
 ///   | image      | "color"           | Color image (RGB) of floats, each pixel value is between 0 and 1.          |
 ///   | image      | "depth"           | Depth image of floats, each pixel value is depth from the camera in meters.|
+///   | image      | "depth_xyz"       | Position of each pixel (x, y, z) in meters with respect to the camera.     |
 ///
 /// \par Application output used by the device: none.
 ///
@@ -41,6 +44,8 @@ public:
 	/// Constructor.
 	/// \param name A unique name for the device that will be used by the application.
 	explicit OpenNIDevice(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::OpenNIDevice);
 
 	/// Destructor.
 	virtual ~OpenNIDevice();

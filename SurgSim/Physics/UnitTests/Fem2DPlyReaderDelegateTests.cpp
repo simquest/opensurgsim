@@ -18,10 +18,8 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/Fem.h"
 #include "SurgSim/Physics/Fem2DPlyReaderDelegate.h"
-#include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/Fem2DElementTriangle.h"
 
 namespace SurgSim
 {
@@ -32,58 +30,42 @@ using SurgSim::DataStructures::PlyReader;
 
 TEST(Fem2DRepresentationReaderTests, DelegateTest)
 {
-	auto femRepresentation = std::make_shared<Fem2DRepresentation>("Representation");
+	auto fem = std::make_shared<Fem2D>();
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	femRepresentation->setFilename("PlyReaderTests/Fem2D.ply");
-	ASSERT_TRUE(femRepresentation->initialize(runtime));
+	fem->load("PlyReaderTests/Fem2D.ply");
 
 	// Vertices
-	ASSERT_EQ(6u, femRepresentation->getNumDofPerNode());
-	ASSERT_EQ(6u * 6u, femRepresentation->getNumDof());
-
 	Vector3d vertex0(1.0, 1.0, -1.0);
 	Vector3d vertex5(0.999999, -1.000001, 1.0);
 
-	EXPECT_TRUE(vertex0.isApprox(femRepresentation->getInitialState()->getPosition(0)));
-	EXPECT_TRUE(vertex5.isApprox(femRepresentation->getInitialState()->getPosition(5)));
+	EXPECT_TRUE(vertex0.isApprox(fem->getVertex(0).position));
+	EXPECT_TRUE(vertex5.isApprox(fem->getVertex(5).position));
 
 	// Number of triangles
-	ASSERT_EQ(3u, femRepresentation->getNumFemElements());
+	ASSERT_EQ(3u, fem->getNumElements());
 
 	std::array<size_t, 3> triangle0 = {0, 1, 2};
 	std::array<size_t, 3> triangle2 = {3, 4, 5};
 
 	EXPECT_TRUE(std::equal(std::begin(triangle0), std::end(triangle0),
-						   std::begin(femRepresentation->getFemElement(0)->getNodeIds())));
+						   std::begin(fem->getElement(0)->nodeIds)));
 	EXPECT_TRUE(std::equal(std::begin(triangle2), std::end(triangle2),
-						   std::begin(femRepresentation->getFemElement(2)->getNodeIds())));
+						   std::begin(fem->getElement(2)->nodeIds)));
 
 	// Boundary conditions
-	ASSERT_EQ(2u * 6u, femRepresentation->getInitialState()->getNumBoundaryConditions());
+	ASSERT_EQ(2u, fem->getBoundaryConditions().size());
 
-	// Boundary condition 0 is on node 8
-	size_t boundaryNode0 = 3;
-	size_t boundaryNode1 = 2;
-
-	EXPECT_EQ(6 * boundaryNode0, femRepresentation->getInitialState()->getBoundaryConditions().at(0));
-	EXPECT_EQ(6 * boundaryNode0 + 1, femRepresentation->getInitialState()->getBoundaryConditions().at(1));
-	EXPECT_EQ(6 * boundaryNode0 + 2, femRepresentation->getInitialState()->getBoundaryConditions().at(2));
-	EXPECT_EQ(6 * boundaryNode1, femRepresentation->getInitialState()->getBoundaryConditions().at(6));
-	EXPECT_EQ(6 * boundaryNode1 + 1, femRepresentation->getInitialState()->getBoundaryConditions().at(7));
-	EXPECT_EQ(6 * boundaryNode1 + 2, femRepresentation->getInitialState()->getBoundaryConditions().at(8));
+	EXPECT_EQ(3, fem->getBoundaryCondition(0));
+	EXPECT_EQ(2, fem->getBoundaryCondition(1));
 
 	// Material
-	for (size_t i = 0; i < femRepresentation->getNumFemElements(); ++i)
+	for (size_t i = 0; i < fem->getNumElements(); ++i)
 	{
-		auto fem = femRepresentation->getFemElement(i);
-		EXPECT_DOUBLE_EQ(0.2, fem->getMassDensity());
-		EXPECT_DOUBLE_EQ(0.3, fem->getPoissonRatio());
-		EXPECT_DOUBLE_EQ(0.4, fem->getYoungModulus());
-
-		auto fem2DTriganle = std::dynamic_pointer_cast<SurgSim::Physics::Fem2DElementTriangle>(fem);
-		ASSERT_NE(nullptr, fem2DTriganle);
-		EXPECT_DOUBLE_EQ(0.1, fem2DTriganle->getThickness());
+		auto element = fem->getElement(i);
+		EXPECT_DOUBLE_EQ(0.2, element->massDensity);
+		EXPECT_DOUBLE_EQ(0.3, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(0.4, element->youngModulus);
 	}
 }
 

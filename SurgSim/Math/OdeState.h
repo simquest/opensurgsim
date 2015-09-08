@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -27,10 +28,13 @@ namespace SurgSim
 namespace Math
 {
 
-/// OdeState defines the state y of an ode of 2nd order of the form M(x,v).a = F(x, v) with boundary conditions
-/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
-/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.F(x, v) )
+/// The state \f$y\f$ of an ode of 2nd order of the form \f$M(x,v).a = F(x, v)\f$ with boundary conditions.
+/// This ode equation is solved as an ode of order 1 by defining the state vector
+/// \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
+/// \f[
+///   y' = \left(\begin{array}{c} x' \\ v' \end{array}\right) =
+///   \left(\begin{array}{c} v \\ M(x, v)^{-1}.F(x, v) \end{array}\right)
+/// \f]
 class OdeState
 {
 public:
@@ -121,16 +125,25 @@ public:
 
 	/// Apply boundary conditions to a given vector
 	/// \param vector The vector to apply the boundary conditions on
-	/// \return vector. This enables chained use like the pseudo-code U = K^1 * applyBoundaryConditionsToVector(x)
+	/// \return The parameter vector. This enables chained use like
+	/// \f$U = K^1 * \text{applyBoundaryConditionsToVector}(x)\f$
 	Vector* applyBoundaryConditionsToVector(Vector* vector) const;
 
 	/// Apply boundary conditions to a given matrix
-	/// \param matrix The matrix to apply the boundary conditions on
+	/// \param matrix The dense matrix to apply the boundary conditions on
 	/// \param hasCompliance True if the fixed dofs should have a compliance of 1 with themselves in the matrix or not.
 	/// \note hasCompliance is practical to remove all compliance, which is helpful when the compliance matrix is used
 	/// \note in an architecture of type LCP. It ensures that a separate constraint resolution will never violates the
 	/// \note boundary conditions.
 	void applyBoundaryConditionsToMatrix(Matrix* matrix, bool hasCompliance = true) const;
+
+	/// Apply boundary conditions to a given matrix
+	/// \param matrix The sparse matrix to apply the boundary conditions on
+	/// \param hasCompliance True if the fixed dofs should have a compliance of 1 with themselves in the matrix or not.
+	/// \note hasCompliance is practical to remove all compliance, which is helpful when the compliance matrix is used
+	/// \note in an architecture of type LCP. It ensures that a separate constraint resolution will never violates the
+	/// \note boundary conditions.
+	void applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCompliance = true) const;
 
 	/// Check if this state is numerically valid
 	/// \return True if all positions and velocities are valid numerical values, False otherwise

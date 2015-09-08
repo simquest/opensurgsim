@@ -25,13 +25,17 @@
 #include "SurgSim/Graphics/OsgCylinderRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 
 #include <random>
+
+#include <osgUtil/SmoothingVisitor>
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
@@ -49,33 +53,8 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgRepresentationRenderTests : public ::testing::Test
+struct OsgRepresentationRenderTests : public RenderTest
 {
-	virtual void SetUp()
-	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
-		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
-
-		runtime->addManager(manager);
-
-		scene = runtime->getScene();
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		scene->addSceneElement(viewElement);
-
-	}
-
-	virtual void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
-
-protected:
 
 };
 
@@ -127,7 +106,6 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 
 	/// Run the thread
 	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
 
 	boxRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), boxPosition));
 	capsuleRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), capsulePosition));
@@ -157,6 +135,140 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1500));
 }
+
+class  LineGeometryVisitor : public osg::NodeVisitor
+{
+public :
+	LineGeometryVisitor() :
+		NodeVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN),
+		m_normalsScale(0.1)
+	{
+	}
+
+	virtual ~LineGeometryVisitor() {}
+
+	void apply(osg::Node& node) // NOLINT
+	{
+		traverse(node);
+	}
+
+	void apply(osg::Geode& geode) // NOLINT
+	{
+		// Only deal with 1 geometry for now ...
+		if (geode.getNumDrawables() > 0)
+		{
+			osg::Geometry* curGeom = geode.getDrawable(0)->asGeometry();
+			if (curGeom)
+			{
+				osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(curGeom->getVertexArray());
+
+				auto normals = curGeom->getNormalArray();
+				geode.addDrawable(buildGeometry(vertices, normals, osg::Vec4(0.0, 0.0, 1.0, 1.0)));
+
+				auto tangents = curGeom->getVertexAttribArray(TANGENT_VERTEX_ATTRIBUTE_ID);
+
+				auto cast = dynamic_cast<osg::Vec4Array*>(tangents);
+				ASSERT_NE(nullptr, cast);
+				ASSERT_EQ(vertices->size(), cast->size());
+				geode.addDrawable(buildGeometry(vertices, tangents, osg::Vec4(1.0, 0.0, 0.0, 1.0)));
+
+				auto bitangents = curGeom->getVertexAttribArray(BITANGENT_VERTEX_ATTRIBUTE_ID);
+				cast = dynamic_cast<osg::Vec4Array*>(bitangents);
+				ASSERT_NE(nullptr, cast);
+				ASSERT_EQ(vertices->size(), cast->size());
+				geode.addDrawable(buildGeometry(vertices, bitangents, osg::Vec4(0.0, 1.0, 0.0, 1.0)));
+
+			}
+		}
+	}
+
+	osg::Geometry* buildGeometry(osg::Vec3Array* geomVertices, osg::Array* directions, osg::Vec4 color)
+	{
+		// create Geometry object to store all the vertices and lines primitive.
+		osg::Geometry* linesGeom = new osg::Geometry();
+
+		osg::Vec3Array* vertices = new osg::Vec3Array(geomVertices->size() * 2);
+		osg::Vec3 direction;
+		for (size_t i = 0; i < geomVertices->size(); ++i)
+		{
+
+			(*vertices)[i * 2] = (*geomVertices)[i];
+			switch (directions->getType())
+			{
+				case osg::Array::Vec3ArrayType:
+					direction = static_cast<const osg::Vec3Array&>(*directions)[i];
+					break;
+				case osg::Array::Vec4ArrayType:
+					for (int j = 0; j < 3; ++j)
+					{
+						direction[j] = static_cast<const osg::Vec4Array&>(*directions)[i].ptr()[j];
+					}
+					break;
+				default:
+					SURGSIM_FAILURE() << "Unhandled Array type.";
+			}
+			(*vertices)[i * 2 + 1] = (*geomVertices)[i] + direction * m_normalsScale;
+		}
+
+		// pass the created vertex array to the points geometry object.
+		linesGeom->setVertexArray(vertices);
+
+		// set the colors as before, plus using the above
+		osg::Vec4Array* colors = new osg::Vec4Array;
+		colors->push_back(color);
+		linesGeom->setColorArray(colors, osg::Array::BIND_OVERALL);
+
+		// 	set the normal in the same way color.
+		osg::Vec3Array* normals = new osg::Vec3Array;
+		normals->push_back(osg::Vec3(0.0f, -1.0f, 0.0f));
+		linesGeom->setNormalArray(normals, osg::Array::BIND_OVERALL);
+
+		linesGeom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, vertices->size()));
+
+		osg::StateSet* state = linesGeom->getOrCreateStateSet();
+		state->setMode(GL_LIGHTING, osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF);
+
+		return linesGeom;
+	}
+
+private:
+	float m_normalsScale;
+};
+
+
+TEST_F(OsgRepresentationRenderTests, TangentTest)
+{
+	auto element = std::make_shared<Framework::BasicSceneElement>("sphere");
+	auto graphics = std::make_shared<OsgSceneryRepresentation>("sphere");
+	graphics->loadModel("Geometry/sphere0_5.obj");
+	//graphics->setDrawAsWireFrame(true);
+
+	viewElement->enableManipulator(true);
+
+	camera->setLocalPose(Math::makeRigidTransform(
+							 Vector3d(0.0, 0.0, -4.0),
+							 Vector3d(0.0, 0.0, 0.0),
+							 Vector3d(0.0, 1.0, 0.0)));
+
+	osg::ref_ptr<osg::Node> node = graphics->getOsgNode();
+	// Generate normals
+	osgUtil::SmoothingVisitor sv;
+	node->accept(sv);
+
+	graphics->setGenerateTangents(true);
+
+	LineGeometryVisitor visitor;
+	node->accept(visitor);
+
+	element->addComponent(graphics);
+	scene->addSceneElement(element);
+
+	runtime->start();
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	runtime->stop();
+}
+
 
 };  // namespace Graphics
 

@@ -34,6 +34,8 @@ set(OPENNI_DEVICE_HEADERS
 	OpenNIScaffold.h
 )
 
+set(DEVICE_HEADERS ${DEVICE_HEADERS} OpenNI/OpenNIDevice.h PARENT_SCOPE)
+
 surgsim_add_library(
 	OpenNIDevice
 	"${OPENNI_DEVICE_SOURCES}"

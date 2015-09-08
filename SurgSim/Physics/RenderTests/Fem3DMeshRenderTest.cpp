@@ -50,13 +50,13 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// Add the Fem3d component
 	// Note that we only specify the filename that contains the full geometrical and physical description.
 	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("fem3d");
-	fem->setFilename(filename);
+	fem->loadFem(filename);
 	fem->setIntegrationScheme(integrationScheme);
 	sceneElement->addComponent(fem);
 
 	// Add the graphics mesh used to display the Fem3d
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("fem graphics");
-	graphics->setFilename(filename);
+	graphics->loadMesh(filename);
 	graphics->setDrawAsWireFrame(true);
 	sceneElement->addComponent(graphics);
 
@@ -87,7 +87,7 @@ TEST_F(RenderTests, SimulatedWoundRenderTest)
 {
 	runtime->getScene()->addSceneElement(createFemSceneElement("Fem",
 										 "Geometry/wound_deformable.ply",
-										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER));
+										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT));
 
 	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 5000.0);
 }

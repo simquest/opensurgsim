@@ -36,6 +36,7 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::IdentityPoseDevice, IdentityPoseDevice);
 
 IdentityPoseDevice::IdentityPoseDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, buildInputData())

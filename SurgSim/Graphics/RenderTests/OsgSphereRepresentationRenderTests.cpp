@@ -19,11 +19,13 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 
 #include <gtest/gtest.h>
 
@@ -43,8 +45,12 @@ namespace SurgSim
 namespace Graphics
 {
 
+struct OsgSphereRepresentationRenderTests : public RenderTest
+{
+};
+
 /// Pops up a window with two spheres that are translating and changing radius
-TEST(OsgSphereRepresentationRenderTests, MovingSpheresTest)
+TEST_F(OsgSphereRepresentationRenderTests, MovingSpheresTest)
 {
 	/// Initial sphere 1 position
 	Vector3d startPosition1(-0.1, 0.0, -0.2);
@@ -67,17 +73,6 @@ TEST(OsgSphereRepresentationRenderTests, MovingSpheresTest)
 	/// This number of steps will be done in 1 second.
 	int numSteps = 100;
 
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
-
-	runtime->addManager(manager);
-
-	std::shared_ptr<Scene> scene = runtime->getScene();
-
-	/// Add a graphics view element to the scene
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view element");
-	scene->addSceneElement(viewElement);
-
 	/// Add the sphere representation to the view element, no need to make another scene element
 	std::shared_ptr<SphereRepresentation> sphereRepresentation1 =
 		std::make_shared<OsgSphereRepresentation>("sphere representation 1");
@@ -88,7 +83,7 @@ TEST(OsgSphereRepresentationRenderTests, MovingSpheresTest)
 
 	/// Run the thread
 	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
+
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	for (int i = 0; i < numSteps; ++i)
@@ -97,10 +92,10 @@ TEST(OsgSphereRepresentationRenderTests, MovingSpheresTest)
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate position and radius
 		sphereRepresentation1->setLocalPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition1 +
-			t * endPosition1));
+											t * endPosition1));
 		sphereRepresentation1->setRadius((1 - t) * startRadius1 + t * endRadius1);
 		sphereRepresentation2->setLocalPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition2 +
-			t * endPosition2));
+											t * endPosition2));
 		sphereRepresentation2->setRadius((1 - t) * startRadius2 + t * endRadius2);
 		/// The total number of steps should complete in 1 second
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));

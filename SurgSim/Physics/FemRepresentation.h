@@ -19,8 +19,11 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
+#include "SurgSim/Physics/Fem.h"
 
 namespace SurgSim
 {
@@ -31,10 +34,15 @@ namespace Physics
 class FemElement;
 class FemPlyReaderDelegate;
 
-/// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
-/// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
-/// \note Therefore, it defines a dynamic system M.a=F(x,v)
-/// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
+/// Finite Element Model (a.k.a FEM) is a deformable model (a set of nodes connected by FemElement).
+/// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation), therefore it defines
+/// a dynamic system \f$M.a=F(x,v)\f$
+/// \note + The model handles damping through the Rayleigh damping (it is a combination of mass and stiffness)
+/// \note + The model handles compliance warping (optional) from the paper:
+/// \note  "Efficient Contact Modeling using Compliance Warping", G Saupin, C Duriez, S Cotin, L Grisoni;
+/// Computer %Graphics International (CGI), Istanbul, Turkey, june 2008.
+/// \note  To use compliance warping, it needs to be turned on by calling setComplianceWarping(true) and the method
+/// updateNodesRotations() needs to be overloaded properly.
 class FemRepresentation : public DeformableRepresentation
 {
 public:
@@ -45,17 +53,17 @@ public:
 	/// Destructor
 	virtual ~FemRepresentation();
 
-	/// Sets the name of the file to be loaded
-	/// \param filename The name of the file to be loaded
-	void setFilename(const std::string& filename);
+	/// Loads the FEM file into an Fem class data structure
+	/// \param filename The file to load
+	virtual void loadFem(const std::string& filename) = 0;
 
-	/// Gets the name of the file to be loaded
-	/// \return filename The name of the file to be loaded
-	const std::string& getFilename() const;
+	/// Sets the FemElement type pulled from the object factory
+	/// \param type A string of the full registered OSS class name in the factory
+	virtual void setFemElementType(const std::string& type);
 
-	/// Loads the file
-	/// \return true if successful
-	bool loadFile();
+	/// Gets the FemElement type pulled from the object factory
+	/// \return A string of the full registered OSS class name in the factory
+	const std::string& getFemElementType() const;
 
 	/// Adds a FemElement
 	/// \param element The FemElement to add to the representation
@@ -95,53 +103,33 @@ public:
 	/// Determines whether the associated coordinate is valid
 	/// \param coordinate Coordinate to check
 	/// \return True if coordinate is valid
-	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate &coordinate) const;
+	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	void beforeUpdate(double dt) override;
 
-	/// Postprocessing done after the update call
-	/// \param dt The time step (in seconds)
-	/// \note This method will update all FemElement with the final state
-	/// \note and potentially deactivate/reset the representation if necessary.
-	void afterUpdate(double dt) override;
+	void update(double dt) override;
 
-	/// Evaluation of the RHS function f(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
-	/// \return The vector containing f(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	SurgSim::Math::Vector& computeF(const SurgSim::Math::OdeState& state) override;
+	/// Set the compliance warping flag
+	/// \param useComplianceWarping True to use compliance warping, False otherwise
+	/// \exception SurgSim::Framework::AssertionFailure If the call is done after initialization
+	/// \note Compliance warping is currently disabled in this version.
+	void setComplianceWarping(bool useComplianceWarping);
 
-	/// Evaluation of the LHS matrix M(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
-	/// \return The matrix M(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	const SurgSim::Math::Matrix& computeM(const SurgSim::Math::OdeState& state) override;
+	/// Get the compliance warping flag (default = false)
+	/// \return True if compliance warping is used, False otherwise
+	bool getComplianceWarping() const;
 
-	/// Evaluation of D = -df/dv (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix D = -df/dv(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	const SurgSim::Math::Matrix& computeD(const SurgSim::Math::OdeState& state) override;
+	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param b The input matrix b
+	/// \return Returns the matrix \f$C.b\f$
+	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
-	/// Evaluation of K = -df/dx (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix K = -df/dx(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	const SurgSim::Math::Matrix& computeK(const SurgSim::Math::OdeState& state) override;
+	const SurgSim::Math::Matrix& getComplianceMatrix() const override;
 
-	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
-	/// When all the terms are needed, this method can perform optimization in evaluating everything together
-	/// \param state (x, v) the current position and velocity to evaluate the various terms with
-	/// \param[out] f The RHS f(x,v)
-	/// \param[out] M The matrix M(x,v)
-	/// \param[out] D The matrix D = -df/dv(x,v)
-	/// \param[out] K The matrix K = -df/dx(x,v)
-	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
-	/// \note computeF(), computeM(), computeD(), computeK()
-	void computeFMDK(const SurgSim::Math::OdeState& state, SurgSim::Math::Vector** f, SurgSim::Math::Matrix** M,
-			SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
+	void updateFMDK(const SurgSim::Math::OdeState& state, int options) override;
 
 protected:
 	/// Adds the Rayleigh damping forces
@@ -156,7 +144,8 @@ protected:
 	/// \note If {useGlobalMassMatrix | useGlobalStiffnessMatrix} is False
 	/// \note    the {mass|stiffness} component will be computed FemElement by FemElement
 	void addRayleighDampingForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state,
-		bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false, double scale = 1.0);
+								 bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false,
+								 double scale = 1.0);
 
 	/// Adds the FemElements forces to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the FemElements forces into
@@ -169,31 +158,70 @@ protected:
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the gravity force with
 	/// \note This method does not do anything if gravity is disabled
-	void addGravityForce(SurgSim::Math::Vector *f, const SurgSim::Math::OdeState& state, double scale = 1.0);
+	void addGravityForce(SurgSim::Math::Vector* f, const SurgSim::Math::OdeState& state, double scale = 1.0);
 
 	bool doInitialize() override;
+
+	/// Updates the compliance matrix using nodes transformation (useful for compliance warping)
+	/// \param state The state to compute the nodes transformation from
+	/// \note This computes the diagonal block matrix m_complianceWarpingTransformation and
+	///       transforms the initial compliance matrix with it.
+	void updateComplianceMatrix(const SurgSim::Math::OdeState& state);
+
+	/// Retrieves a specific node transformation (useful for compliance warping)
+	/// \param state The state to extract the node transformation from
+	/// \param nodeId The node to update the rotation for
+	/// \return The node transformation. i.e. a numDofPerNode x numDofPerNode matrix
+	virtual SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId);
+
+	/// Gets the flag keeping track of the initial compliance matrix calculation (compliance warping case)
+	/// \return True if the initial compliance matrix has been computed, False otherwise
+	bool isInitialComplianceMatrixComputed() const;
+
+	/// Sets the flag keeping track of the initial compliance matrix calculation (compliance warping case)
+	/// \param flag True if the initial compliance matrix is computed, False otherwise
+	void setIsInitialComplianceMatrixComputed(bool flag);
+
+	void computeF(const SurgSim::Math::OdeState& state) override;
+
+	void computeM(const SurgSim::Math::OdeState& state) override;
+
+	void computeD(const SurgSim::Math::OdeState& state) override;
+
+	void computeK(const SurgSim::Math::OdeState& state) override;
+
+	void computeFMDK(const SurgSim::Math::OdeState& state) override;
 
 	/// Useful information per node
 	std::vector<double> m_massPerNode; ///< Useful in setting up the gravity force F=mg
 
-	/// Filename for loading the fem representation.
-	std::string m_filename;
-
-private:
-	/// To be implemented by derived classes.
-	/// \return The delegate to load the corresponding derived class.
-	virtual std::shared_ptr<FemPlyReaderDelegate> getDelegate() = 0;
-
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
+	/// The FemElement factory parameter invoked in doInitialize() when using a MeshAsset
+	/// either with LoadFem(const std::stirng& filename) or setFem(std::shared_ptr<Asset> mesh)
+	/// This ensures that when using a mesh Asset, a single FemElement type is used. Therefore we do
+	/// not need to define this type in the ply file, but rather is part of the Representation properties (YAML).
+	std::string m_femElementType;
+
+private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K
 	/// Matrices: D = damping, M = mass, K = stiffness
-	struct {
+	struct
+	{
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
+
+	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
+
+	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
+
+	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
+
+	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
+	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;
 };
 
 } // namespace Physics

@@ -24,33 +24,22 @@ include_directories(
 )
 
 set(SOURCES
-	DeviceFactory.cpp
 	InputVtc.cpp
 )
 
 set(HEADERS
-	DeviceFactory.h
 )
 
 surgsim_add_executable(InputVtc "${SOURCES}" "${HEADERS}")
 
 set(LIBS 
-	IdentityPoseDevice
 	SurgSimBlocks
+	SurgSimDevices
 	SurgSimGraphics
 	SurgSimMath
 	${YAML_CPP_LIBRARIES}
 )
 
-if(BUILD_DEVICE_MULTIAXIS)
-	list(APPEND LIBS MultiAxisDevice)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMULTIAXISDEVICE_LIBRARY_AVAILABLE")
-endif(BUILD_DEVICE_MULTIAXIS)
-
-if(BUILD_DEVICE_NOVINT)
-	list(APPEND LIBS NovintDevice)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOVINT_LIBRARY_AVAILABLE")
-endif(BUILD_DEVICE_NOVINT)
 
 target_link_libraries(InputVtc ${LIBS})
 

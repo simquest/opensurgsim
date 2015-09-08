@@ -25,7 +25,6 @@
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
-#include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/Representation.h"
 
@@ -48,8 +47,10 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 		const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state)
 {
+	using SurgSim::DataStructures::Location;
+
 	auto result = state;
-	auto pairs = result->getCollisionPairs();
+	auto& pairs = result->getCollisionPairs();
 
 	auto pairsIt = std::begin(pairs);
 	auto pairsEnd = std::end(pairs);
@@ -69,7 +70,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 			auto contactsEnd = std::end((*pairsIt)->getContacts());
 			for (; contactsIt != contactsEnd; ++contactsIt)
 			{
-				std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> localizations;
+				std::pair<std::shared_ptr<Location>, std::shared_ptr<Location>> locations;
 
 				auto collisionRepresentations = (*pairsIt)->getRepresentations();
 
@@ -95,40 +96,21 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 					continue;
 				}
 
-				localizations.first = makeLocalization(physicsRepresentations.first, collisionRepresentations.first,
+				locations.first = makeLocation(physicsRepresentations.first, collisionRepresentations.first,
 						(*contactsIt)->penetrationPoints.first);
-				localizations.second = makeLocalization(physicsRepresentations.second, collisionRepresentations.second,
+				locations.second = makeLocation(physicsRepresentations.second, collisionRepresentations.second,
 						(*contactsIt)->penetrationPoints.second);
-				if (localizations.first != nullptr && localizations.second != nullptr)
-				{
-					std::pair< std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>
-						implementations;
 
-					// HS-2013-jul-12 The type of constraint is fixed here right now, to get to a constraint
-					// that we can change we probably will need to predefine collision pairs and their appropriate
-					// contact constraints so we can look up which constraint to use here
+				// HS-2013-jul-12 The type of constraint is fixed here right now, to get to a constraint
+				// that we can change we probably will need to predefine collision pairs and their appropriate
+				// contact constraints so we can look up which constraint to use here
+				auto data = std::make_shared<ContactConstraintData>();
+				data->setPlaneEquation((*contactsIt)->normal, (*contactsIt)->depth);
 
-					implementations.first = m_factory.getImplementation(
-						localizations.first->getRepresentation()->getType(),
-						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT);
-
-					implementations.second = m_factory.getImplementation(
-						localizations.second->getRepresentation()->getType(),
-						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT);
-
-					if (implementations.first != nullptr && implementations.second != nullptr)
-					{
-						std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
-						data->setPlaneEquation((*contactsIt)->normal, (*contactsIt)->depth);
-
-						constraints.push_back(std::make_shared<Constraint>(
-							data,
-							implementations.first,
-							localizations.first,
-							implementations.second,
-							localizations.second));
-					}
-				}
+				constraints.push_back(std::make_shared<Constraint>(
+					SurgSim::Physics::FRICTIONLESS_3DCONTACT, data,
+					physicsRepresentations.first, *locations.first,
+					physicsRepresentations.second, *locations.second));
 			}
 		}
 	}
@@ -138,49 +120,24 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 	return std::move(result);
 }
 
-std::shared_ptr<Localization> ContactConstraintGeneration::makeLocalization(
+std::shared_ptr<SurgSim::DataStructures::Location> ContactConstraintGeneration::makeLocation(
 	std::shared_ptr<SurgSim::Physics::Representation> physicsRepresentation,
 	std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
 	const SurgSim::DataStructures::Location& location)
 {
-	std::shared_ptr<Localization> result;
-	if (physicsRepresentation != nullptr)
-	{
-		if (location.rigidLocalPosition.hasValue())
-		{
-			// Move the local position from the collision representation that created the location
-			// to local coordinates of the physics representation that is creating a localization
-			SurgSim::DataStructures::Location physicsLocation = location;
-			physicsLocation.rigidLocalPosition.setValue(
-					physicsRepresentation->getLocalPose().inverse() *
-					collisionRepresentation->getLocalPose() *
-					location.rigidLocalPosition.getValue());
-			result = physicsRepresentation->createLocalization(physicsLocation);
-		}
-		else
-		{
-			result = physicsRepresentation->createLocalization(location);
-		}
+	auto physicsLocation = std::make_shared<SurgSim::DataStructures::Location>(location);
+	SURGSIM_ASSERT(physicsLocation != nullptr) << "Cannot create Location object.";
 
-		if (result != nullptr)
-		{
-			// HS 2013-jun-20 this is not quite right, we are passing in the pointer to the representation
-			// that we just asked about, but I don't know if we can use shared_from_this from the inside and
-			// still get the same reference count as with this  shared_ptr
-			result->setRepresentation(physicsRepresentation);
-		}
-		else
-		{
-			SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
-				" Cannot create Localization from " << physicsRepresentation->getName();
-		}
-	}
-	else
+	if (location.rigidLocalPosition.hasValue())
 	{
-		SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
-			" Cannot create Localization from nullptr.";
+		// Move the local position from the collision representation that created the location
+		// to local coordinates of the physics representation that is creating a localization
+		physicsLocation->rigidLocalPosition.setValue(
+				physicsRepresentation->getLocalPose().inverse() *
+				collisionRepresentation->getLocalPose() *
+				location.rigidLocalPosition.getValue());
 	}
-	return result;
+	return physicsLocation;
 }
 
 }; // Physics

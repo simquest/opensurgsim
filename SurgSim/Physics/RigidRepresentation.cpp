@@ -20,7 +20,7 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidState.h"
 
 namespace
 {
@@ -54,11 +54,6 @@ RigidRepresentation::~RigidRepresentation()
 {
 }
 
-SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_RIGID;
-}
-
 void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,
 		const SurgSim::Math::Matrix66d& K,
 		const SurgSim::Math::Matrix66d& D)
@@ -81,7 +76,7 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 
 	SURGSIM_ASSERT(location.rigidLocalPosition.hasValue()) << "Invalid location (no rigid local position)";
 
-	RigidRepresentationLocalization localization;
+	RigidLocalization localization;
 	localization.setRepresentation(std::static_pointer_cast<Representation>(shared_from_this()));
 	localization.setLocalPosition(location.rigidLocalPosition.getValue());
 	const Vector3d point = localization.calculatePosition();
@@ -440,7 +435,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 	m_C.block<3, 3>(3, 3) = systemMatrix.block<3, 3>(3, 3).inverse();
 }
 
-void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
+void RigidRepresentation::updateGlobalInertiaMatrices(const RigidState& state)
 {
 	if (!m_parametersValid)
 	{

@@ -29,22 +29,22 @@ using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
-using SurgSim::Graphics::OsgShader;
+using SurgSim::Graphics::OsgProgram;
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::DoubleSidedPlaneShape;
-using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::SphereShape;
-using SurgSim::Math::Vector4f;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4f;
+using SurgSim::Math::makeRigidTransform;
 using SurgSim::Physics::FixedRepresentation;
+using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::PhysicsManager;
 
 /// \file
 ///      Example of how to put together a very simple demo of balls colliding with each other.
@@ -129,7 +129,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	// and a Shader.  Uniforms represent values that are relatively constant, e.g., textures or position of a light.
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>("material");
 	// An OsgShader is an OSG implementation of a Shader. Shaders are programs that determine how to render a geometry.
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	std::shared_ptr<OsgProgram> program = std::make_shared<OsgProgram>();
 
 	// Create a Uniform for the RGBA color of the plane.
 	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
@@ -137,13 +137,13 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name)
 	material->addUniform(uniform);
 
 	// This Shader sets the fragment's color to the value of the "color" uniform.
-	shader->setFragmentShaderSource(
+	program->setFragmentShaderSource(
 		"uniform vec4 color;\n"
 		"void main(void)\n"
 		"{\n"
 		"	gl_FragColor = color;\n"
 		"}");
-	material->setShader(shader);
+	material->setProgram(program);
 	graphics->setMaterial(material);
 
 	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection

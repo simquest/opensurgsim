@@ -94,7 +94,7 @@ TEST(OsgOctreeRepresentationTests, SerializationTest)
 {
 	Runtime runtime("config.txt");
 	std::shared_ptr<SurgSim::Math::Shape> octreeShape = std::make_shared<SurgSim::Math::OctreeShape>();
-	std::string filename = "OctreeShapeData/staple.ply";
+	std::string filename = "Geometry/staple.ply";
 	std::static_pointer_cast<SurgSim::Math::OctreeShape>(octreeShape)->loadOctree(filename);
 
 	std::shared_ptr<SurgSim::Framework::Component> osgOctree = std::make_shared<OsgOctreeRepresentation>("TestOctree");
@@ -105,7 +105,6 @@ TEST(OsgOctreeRepresentationTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	YAML::Node data = node["SurgSim::Graphics::OsgOctreeRepresentation"];
-	EXPECT_EQ(7u, data.size());
 
 	std::shared_ptr<SurgSim::Graphics::OsgOctreeRepresentation> newOsgOctree;
 	ASSERT_NO_THROW(newOsgOctree = std::dynamic_pointer_cast<OsgOctreeRepresentation>(

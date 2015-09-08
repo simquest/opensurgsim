@@ -1,0 +1,16 @@
+/*!
+
+\page Leap Leap: Leap Motion Hand Tracking Cameras
+
+This adds support for <A HREF=https://www.leapmotion.com/>Leap Motion</A> hand tracking cameras.
+
+Dependencies
+------------
+Leap Motion SDK: The SDK is available for Windows and GNU/Linux on Leap
+Motion's Developer <A HREF="https://developer.leapmotion.com/">website</A>.
+To build OpenSurgSim with Leap Motion support, create a LEAPSDK_DIR environment
+variable that points to the location of the LeapSDK directory. This directory
+should include the 'include' and 'lib' directories. Also, in CMake enable
+BUILD_DEVICE_LEAP.
+
+*/

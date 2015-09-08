@@ -18,15 +18,14 @@
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/PlaneShape.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::Location;
 using SurgSim::Math::BoxShape;
+using SurgSim::Math::Geometry::DistanceEpsilon;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Vector3d;
+
 
 namespace SurgSim
 {
@@ -37,31 +36,39 @@ BoxPlaneDcdContact::BoxPlaneDcdContact()
 {
 }
 
-std::pair<int,int> BoxPlaneDcdContact::getShapeTypes()
+std::pair<int, int> BoxPlaneDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_PLANE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
 void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	using SurgSim::Math::Geometry::DistanceEpsilon;
+	std::shared_ptr<Representation> box = pair->getFirst();
+	std::shared_ptr<Representation> plane = pair->getSecond();
 
-	std::shared_ptr<Representation> representationBox;
-	std::shared_ptr<Representation> representationPlane;
+	auto boxShape = std::static_pointer_cast<BoxShape>(box->getShape());
+	auto planeShape = std::static_pointer_cast<PlaneShape>(plane->getShape());
 
-	representationBox = pair->getFirst();
-	representationPlane = pair->getSecond();
+	auto contacts = calculateContact(*boxShape, box->getPose(), *planeShape, plane->getPose());
+	for (auto& contact : contacts)
+	{
+		pair->addContact(contact);
+	}
+}
 
-	std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
-	std::shared_ptr<PlaneShape> plane = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
+std::list<std::shared_ptr<Contact>> BoxPlaneDcdContact::calculateContact(
+									 const SurgSim::Math::BoxShape& boxShape,
+									 const SurgSim::Math::RigidTransform3d& boxPose,
+									 const SurgSim::Math::PlaneShape& planeShape,
+									 const SurgSim::Math::RigidTransform3d& planePose)
+{
+	std::list<std::shared_ptr<Contact>> contacts;
 
 	// Transform the plane normal to box co-ordinate system.
-	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
-														   representationPlane->getPose();
-	SurgSim::Math::RigidTransform3d boxLocalToPlaneLocal = representationPlane->getPose().inverse() *
-														   representationBox->getPose();
-	Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
-	Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = boxPose.inverse() * planePose;
+	SurgSim::Math::RigidTransform3d boxLocalToPlaneLocal = planeLocalToBoxLocal.inverse();
+	Vector3d planeNormal = planeLocalToBoxLocal.linear() * planeShape.getNormal();
+	Vector3d planeNormalScaled = planeShape.getNormal() * -planeShape.getD();
 	Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
 	double planeD = -planeNormal.dot(planePoint);
 
@@ -70,18 +77,18 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	Vector3d boxVertex;
 	for (int i = 0; i < 8; ++i)
 	{
-		boxVertex = box->getVertex(i);
+		boxVertex = boxShape.getVertex(i);
 		d = planeNormal.dot(boxVertex) + planeD;
 		if (d < DistanceEpsilon)
 		{
-			// Add a contact.
-			std::pair<Location, Location> penetrationPoints;
-			penetrationPoints.first.rigidLocalPosition.setValue(boxVertex);
-			penetrationPoints.second.rigidLocalPosition.setValue(boxLocalToPlaneLocal * (boxVertex - planeNormal * d));
-
-			pair->addContact(-d, representationPlane->getPose().linear() * plane->getNormal(), penetrationPoints);
+			std::pair<Location, Location> penetrationPoints = std::make_pair(Location(boxVertex),
+					Location(boxLocalToPlaneLocal * (boxVertex - planeNormal * d)));
+			contacts.push_back(std::make_shared<Contact>(
+								   COLLISION_DETECTION_TYPE_DISCRETE, -d, 1.0,
+								   Vector3d::Zero(), planePose.linear() * planeShape.getNormal(), penetrationPoints));
 		}
 	}
+	return std::move(contacts);
 }
 
 }; // namespace Collision

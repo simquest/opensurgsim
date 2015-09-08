@@ -77,7 +77,6 @@ OsgCamera::OsgCamera(const std::string& name) :
 	OsgRepresentation(name),
 	Camera(name),
 	m_camera(new osg::Camera()),
-	m_materialProxy(new osg::Group()),
 	m_viewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("viewMatrix")),
 	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix")),
 	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor"))
@@ -90,7 +89,7 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_materialProxy->setName(name + " MaterialProxy");
 
 	m_camera->setViewMatrix(toOsg(getLocalPose().inverse().matrix()));
-	m_camera->setProjectionMatrixAsPerspective(45.0, 1.0, 0.01, 10.0);
+	setPerspectiveProjection(45.0, 1.0, 0.01, 10.0);
 
 	m_camera->setComputeNearFarMode(osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR);
 
@@ -104,6 +103,9 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_ambientColorUniform->addToStateSet(state);
 
 	setAmbientColor(Vector4d(0.0, 0.0, 0.0, 0.0));
+
+	// We will want this in all cases
+	m_camera->getOrCreateStateSet()->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS, osg::StateAttribute::ON);
 }
 
 bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
@@ -146,6 +148,11 @@ void OsgCamera::setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
 const SurgSim::Math::Matrix44d& OsgCamera::getProjectionMatrix() const
 {
 	return m_projectionMatrix;
+}
+
+SurgSim::Math::Matrix44d OsgCamera::getInverseProjectionMatrix() const
+{
+	return m_projectionMatrix.inverse();
 }
 
 void OsgCamera::update(double dt)
@@ -198,7 +205,6 @@ bool OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
 		m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT, osg::Camera::PIXEL_BUFFER);
 		m_camera->setRenderOrder(osg::Camera::PRE_RENDER);
 		m_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-		m_camera->setClearColor(osg::Vec4f(0.0, 0.0, 0.0, 1.0));
 		m_renderTarget = renderTarget;
 		result = true;
 	}
@@ -256,6 +262,39 @@ void OsgCamera::detachCurrentRenderTarget()
 	m_renderTarget = nullptr;
 }
 
+void OsgCamera::setViewport(int x, int y, int width, int height)
+{
+	m_camera->setViewport(x, y, width, height);
+}
+
+void OsgCamera::getViewport(int* x, int* y, int* width, int* height) const
+{
+	SURGSIM_ASSERT(x != nullptr && y != nullptr && width != nullptr && height != nullptr)
+			<< "Parameter can't be nullptr.";
+
+	auto viewPort = m_camera->getViewport();
+
+	SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
+
+	*x = viewPort->x();
+	*y = viewPort->y();
+	*width = viewPort->width();
+	*height = viewPort->height();
+}
+
+void OsgCamera::setPerspectiveProjection(double fovy, double aspect, double near, double far)
+{
+	m_camera->setProjectionMatrixAsPerspective(fovy, aspect, near, far);
+	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+}
+
+
+void OsgCamera::setOrthogonalProjection(double left, double right, double bottom, double top, double near, double far)
+{
+	m_camera->setProjectionMatrixAsOrtho(left, right, bottom, top, near, far);
+	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+}
+
 void OsgCamera::attachRenderTargetTexture(osg::Camera::BufferComponent buffer, std::shared_ptr<Texture> texture)
 {
 	if (texture == nullptr)
@@ -264,8 +303,8 @@ void OsgCamera::attachRenderTargetTexture(osg::Camera::BufferComponent buffer, s
 	}
 
 	std::shared_ptr<OsgTexture> osgTexture = std::dynamic_pointer_cast<OsgTexture>(texture);
-	SURGSIM_ASSERT(osgTexture != nullptr) <<
-										  "RenderTarget used a texture that was not an OsgTexture subclass";
+	SURGSIM_ASSERT(osgTexture != nullptr)
+			<< "RenderTarget used a texture that was not an OsgTexture subclass";
 
 	osg::Texture* actualTexture = osgTexture->getOsgTexture();
 	SURGSIM_ASSERT(actualTexture != nullptr) <<
@@ -308,7 +347,10 @@ SurgSim::Math::Vector4d OsgCamera::getAmbientColor()
 	return m_ambientColor;
 }
 
-
+void OsgCamera::setGenerateTangents(bool value)
+{
+	SURGSIM_ASSERT(value == false) << "Generate Tangents is not supported on Cameras.";
+}
 
 }; // namespace Graphics
 }; // namespace SurgSim

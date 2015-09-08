@@ -76,7 +76,7 @@ public:
 	void setText(const std::string& text) override;
 	std::string getText() const override;
 
-	void loadFont(std::string fileName) override;
+	void loadFont(const std::string& fileName) override;
 	void setFont(std::shared_ptr<SurgSim::Framework::Asset> font) override;
 	std::shared_ptr<Font> getFont() const override;
 
@@ -86,6 +86,26 @@ public:
 	void setFontSize(double size) override;
 	double getFontSize() const override;
 
+	void setUseScreenSpace(bool value) override;
+	bool isUsingScreenSpace() const override;
+
+	enum Anchor
+	{
+		ANCHOR_TOP_LEFT,
+		ANCHOR_CENTER
+	};
+
+	void setAnchor(int anchor);
+	int getAnchor() const;
+
+	void setDrawBackground(bool value) override;
+	bool isDrawingBackground() const override;
+
+	void setBackgroundColor(Math::Vector4d color) override;
+	Math::Vector4d getBackgroundColor() override;
+
+	void setBackgroundMargin(double margin) override;
+	double getBackgroundMargin() const override;
 
 protected:
 	void doUpdate(double dt) override;
@@ -106,7 +126,9 @@ private:
 
 	boost::mutex m_parameterMutex; ///< protect changes of parameters
 	bool m_needUpdate;	///< indicate whether parameters need to be updated
+	int m_anchor;
 
+	SurgSim::Math::Vector3d m_offset;
 };
 
 }; // Graphics

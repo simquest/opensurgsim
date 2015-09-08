@@ -16,13 +16,19 @@
 #ifndef SURGSIM_GRAPHICS_MESHREPRESENTATION_H
 #define SURGSIM_GRAPHICS_MESHREPRESENTATION_H
 
+#include "SurgSim/Framework/Asset.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/Representation.h"
+
 
 namespace SurgSim
 {
+
 namespace Graphics
 {
-class Mesh;
 
 /// Graphics representation of a mesh, can be initialized from a Mesh structure
 class MeshRepresentation : public virtual Representation
@@ -44,27 +50,31 @@ public:
 	/// \param	name	The name of the representation.
 	explicit MeshRepresentation(const std::string& name) : Representation(name)
 	{
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, std::string, Filename, getFilename, setFilename);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, std::shared_ptr<SurgSim::Framework::Asset>, Mesh, getMesh,
+										  setMesh);
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MeshRepresentation, int, UpdateOptions, getUpdateOptions, setUpdateOptions);
+		SURGSIM_ADD_SETTER(MeshRepresentation, std::string, MeshFileName, loadMesh);
 	}
 
+	/// Destructor
 	virtual ~MeshRepresentation() {}
 
 	/// Gets the mesh.
 	/// \return	The mesh.
 	virtual std::shared_ptr<Mesh> getMesh() = 0;
 
-	/// Set loading filename
-	/// \param filename	The filename to load
-	/// \note The mesh will be loaded right after the file name is set,
-	///       if 'filename' indicates a file containing a valid mesh.
-	/// \note If the valid file contains an empty mesh, i.e. no vertex is specified in that file,
-	///       an empty mesh will be held.
-	virtual void setFilename(std::string filename) = 0;
+	/// Sets the mesh.
+	/// \param mesh the graphics mesh to be used
+	virtual void setMesh(std::shared_ptr<SurgSim::Framework::Asset> mesh) = 0;
 
-	/// Get the file name of the external file which contains the triangle mesh.
-	/// \return File name of the external file which contains the triangle mesh.
-	virtual std::string getFilename() const = 0;
+	/// Convenience function to trigger the load of the mesh with the given filename
+	/// \param	fileName name of the file to be loaded
+	virtual void loadMesh(const std::string& fileName) = 0;
+
+	/// Sets the shape of the representation
+	/// param shape the shape of this representation
+	/// \note only shapes of type MeshShape are supported
+	virtual void setShape(std::shared_ptr<SurgSim::Math::Shape> shape) = 0;
 
 	/// Sets the structures that are expected to change during the lifetime of the mesh, these will be updated
 	/// every frame, independent of a structural change in the mesh. UPDATE_OPTION_VERTICES is set in the constructor
@@ -75,6 +85,8 @@ public:
 	/// Gets update options for this mesh.
 	/// \return	The update options.
 	virtual int getUpdateOptions() const = 0;
+
+	virtual void updateMesh(const Mesh& mesh) = 0;
 };
 
 }; // Graphics

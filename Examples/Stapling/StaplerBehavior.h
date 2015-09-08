@@ -100,7 +100,7 @@ public:
 
 	/// Add a scene element (name) for which stapling is enabled within this behaviour.
 	/// \param sceneElementName The name of the scene element that this behaviour can staple.
-	void enableStaplingForSceneElement(std::string sceneElementName);
+	void enableStaplingForSceneElement(const std::string& sceneElementName);
 
 	/// Sets the list of scene element names that this behaviour can staple
 	/// \param stapleEnabledSceneElements List of scene element names that this behaviour can staple.
@@ -135,18 +135,6 @@ private:
 	/// Given a collision map, remove entries whose representations are not supported to be stapled to.
 	/// \param [in,out] collisionsMap The collision map to be filtered.
 	void filterCollisionMapForSupportedRepresentationTypes(SurgSim::Collision::ContactMapType* collisionsMap);
-
-	/// Create a bilateral constraint given two Physics::Representation and a constraint (global) location.
-	/// \param stapleRep The physics representation of the staple element. This is known to be RigidRepresentation.
-	/// \param otherRep The physics representation of the object stapled to. This could be Rigid, Fixed or Fem3D.
-	/// \param stapleConstraintLocation The location where the constraint is created on the staple.
-	/// \param otherConstraintLocation The location where the constraint is created on the object staples to.
-	/// \return The shared_ptr of the constraint created.
-	std::shared_ptr<SurgSim::Physics::Constraint> createBilateral3DConstraint(
-		std::shared_ptr<SurgSim::Physics::Representation> stapleRep,
-		std::shared_ptr<SurgSim::Physics::Representation> otherRep,
-		SurgSim::DataStructures::Location stapleConstraintLocation,
-		SurgSim::DataStructures::Location otherConstraintLocation);
 
 	/// Function to create the staple element.
 	/// \note This function also checks for collision with stapling enabled objects in the scene to create

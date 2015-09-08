@@ -19,8 +19,8 @@
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/RigidRepresentationBaseLocalization.h"
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidLocalization.h"
+#include "SurgSim/Physics/RigidState.h"
 
 namespace SurgSim
 {
@@ -48,21 +48,21 @@ public:
 	/// Set the initial state of the rigid representation
 	/// \param state The initial state (pose + lin/ang velocities)
 	/// This will also set the current/previous states to the initial state
-	void setInitialState(const RigidRepresentationState& state);
-	/// Reset the rigid representation state to its initial state
-	void resetState();
+	void setInitialState(const RigidState& state);
+
+	void resetState() override;
 
 	/// Get the initial state of the rigid representation
 	/// \return The initial state (pose + lin/ang velocities)
-	const RigidRepresentationState& getInitialState() const;
+	const RigidState& getInitialState() const;
 	/// Get the current state of the rigid representation
 	/// \return The current state (pose + lin/ang velocities)
-	const RigidRepresentationState& getCurrentState() const;
+	const RigidState& getCurrentState() const;
 	/// Get the previous state of the rigid representation
 	/// \return The previous state (pose + lin/ang velocities)
-	const RigidRepresentationState& getPreviousState() const;
+	const RigidState& getPreviousState() const;
 
-	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location);
+	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
 
 	/// Set the mass density of the rigid representation
 	/// \param rho The density (in Kg.m-3)
@@ -124,13 +124,13 @@ protected:
 	bool doWakeUp() override;
 
 	/// Initial rigid representation state (useful for reset)
-	RigidRepresentationState m_initialState;
+	RigidState m_initialState;
 	/// Previous rigid representation state
-	RigidRepresentationState m_previousState;
+	RigidState m_previousState;
 	/// Current rigid representation state
-	RigidRepresentationState m_currentState;
+	RigidState m_currentState;
 	/// Last valid/final rigid representation state
-	RigidRepresentationState m_finalState;
+	RigidState m_finalState;
 
 	/// Validity of the parameters
 	bool m_parametersValid;
@@ -167,7 +167,7 @@ private:
 	/// Updates mass, mass center and inertia when density and/or shape used for mass inertia is updated.
 	void updateProperties();
 
-	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) = 0;
+	virtual void updateGlobalInertiaMatrices(const RigidState& state) = 0;
 };
 
 }; // Physics

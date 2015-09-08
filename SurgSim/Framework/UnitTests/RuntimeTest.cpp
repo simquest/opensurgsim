@@ -58,7 +58,7 @@ TEST(RuntimeTest, InitFailureDeathTest)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
 	std::shared_ptr<MockManager> managerSucceeds(new MockManager());
-	std::shared_ptr<MockManager> managerFails(new MockManager(false,true));
+	std::shared_ptr<MockManager> managerFails(new MockManager(false, true));
 
 	runtime->addManager(managerSucceeds);
 	runtime->addManager(managerFails);
@@ -70,7 +70,7 @@ TEST(RuntimeTest, StartupFailureDeathTest)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
 	std::shared_ptr<MockManager> managerSucceeds(new MockManager());
-	std::shared_ptr<MockManager> managerFails(new MockManager(true,false));
+	std::shared_ptr<MockManager> managerFails(new MockManager(true, false));
 
 	runtime->addManager(managerSucceeds);
 	runtime->addManager(managerFails);
@@ -118,7 +118,7 @@ TEST(RuntimeTest, SceneInitialization)
 		EXPECT_TRUE(elements[i]->didInit);
 	}
 
-	for (int i=0; i<4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		EXPECT_TRUE(components[i]->didInit);
 	}
@@ -149,11 +149,11 @@ TEST(RuntimeTest, PausedStep)
 
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(count+1,manager1->count);
+	EXPECT_EQ(count + 1, manager1->count);
 
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(count+2,manager1->count);
+	EXPECT_EQ(count + 2, manager1->count);
 
 	runtime->stop();
 }
@@ -237,4 +237,83 @@ TEST(RuntimeTest, AddComponentAddDuringRuntime)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
 
 	runtime->stop();
+}
+
+TEST(RuntimeTest, LoadAndAddScene)
+{
+	auto runtime = std::make_shared<Runtime>("config.txt");
+
+	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
+
+	auto scene0 = runtime->getScene();
+
+	EXPECT_NE(nullptr, scene0);
+	EXPECT_EQ(2L, scene0->getSceneElements().size());
+
+	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
+
+	auto scene1 = runtime->getScene();
+
+	EXPECT_NE(nullptr, scene1);
+	EXPECT_NE(scene0, scene1);
+
+	EXPECT_NO_THROW(runtime->addSceneElements("SceneTestData/elements.yaml"));
+
+	auto scene2 = runtime->getScene();
+
+	EXPECT_NE(nullptr, scene2);
+	EXPECT_EQ(scene1, scene2);
+
+	EXPECT_EQ(4L, scene2->getSceneElements().size());
+}
+
+TEST(RuntimeTest, LoadAndDuplicate)
+{
+	auto runtime = std::make_shared<Runtime>("config.txt");
+	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
+	auto scene0 = runtime->getScene();
+
+	auto elements0 = runtime->duplicateSceneElements("SceneTestData/element.yaml");
+	auto elements1 = runtime->duplicateSceneElements("SceneTestData/element.yaml");
+
+	EXPECT_EQ(1L, elements0.size());
+	EXPECT_EQ(1L, elements1.size());
+
+	// Without the correct cloning, both of these elements would point to the same instance which would be bad
+
+	auto component0 = elements0[0]->getComponent("clone");
+	auto component1 = elements1[0]->getComponent("clone");
+	ASSERT_NE(nullptr, component0);
+	ASSERT_NE(nullptr, component1);
+
+	EXPECT_NE(component0, component1);
+
+	component0->setLocalActive(false);
+	EXPECT_NE(component0->isLocalActive(), component1->isLocalActive());
+}
+
+TEST(RuntimeTest, DuplicateBadYaml)
+{
+	auto runtime = std::make_shared<Runtime>("config.txt");
+	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
+	auto scene0 = runtime->getScene();
+
+	EXPECT_ANY_THROW(auto elements0 = runtime->duplicateSceneElements("SceneTestData/bad.yaml"););
+}
+
+TEST(RuntimeTest, ManagerAccess)
+{
+	auto runtime = std::make_shared<Runtime>();
+
+	auto managers = runtime->getManagers();
+	EXPECT_EQ(0L, managers.size());
+
+	auto manager1 = std::make_shared<MockManager>();
+	auto manager2 = std::make_shared<MockManager>();
+
+	runtime->addManager(manager1);
+	runtime->addManager(manager2);
+
+	managers = runtime->getManagers();
+	EXPECT_EQ(2L, managers.size());
 }

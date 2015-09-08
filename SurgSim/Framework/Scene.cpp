@@ -34,14 +34,18 @@ namespace Framework
 {
 
 Scene::Scene(std::weak_ptr<Runtime> runtime) :
-	m_runtime(runtime)
+	m_runtime(runtime),
+	m_groups(new GroupsType())
 {
 	SURGSIM_ASSERT(!m_runtime.expired()) << "Can't create scene with empty runtime.";
 }
 
 Scene::~Scene()
 {
-
+	/// Clear out the groups references, this is needed because otherwise there will be circular references
+	/// between the SceneElements and themselves therefore preventing the release of the the sceneelement
+	/// instances, as it is shared with the sceneElements
+	m_groups->clear();
 }
 
 void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
@@ -62,7 +66,14 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 		}
 		runtime->addSceneElement(element);
 	}
+}
 
+void Scene::addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements)
+{
+	for (auto element : elements)
+	{
+		addSceneElement(element);
+	}
 }
 
 std::shared_ptr<Runtime> Scene::getRuntime()
@@ -139,6 +150,33 @@ bool Scene::decode(const YAML::Node& node)
 	}
 	return result;
 }
+
+std::shared_ptr<Scene::GroupsType> Scene::getGroups()
+{
+	return m_groups;
+}
+
+std::shared_ptr<Component> Scene::getComponent(const std::string& elementName, const std::string& componentName) const
+{
+	std::shared_ptr<Component> result;
+	auto element = getSceneElement(elementName);
+	if (element != nullptr)
+	{
+		result = element->getComponent(componentName);
+		if (result == nullptr)
+		{
+			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
+					<< "Could not find component '" << componentName << "' in Element '" << elementName << "'.";
+		}
+	}
+	else
+	{
+		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
+				<< "Could not find element '" << elementName << "'.";
+	}
+	return result;
+}
+
 }; // namespace Framework
 }; // namespace SurgSim
 

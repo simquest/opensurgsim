@@ -16,9 +16,9 @@
 #include <gtest/gtest.h>
 #include <memory>
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Particles/Particle.h"
 #include "SurgSim/Particles/SphRepresentation.h"
 
 using SurgSim::Math::Vector3d;
@@ -71,41 +71,26 @@ TEST(SphRepresentationTest, SetGetTest)
 	sph->setViscosity(0.04);
 	EXPECT_DOUBLE_EQ(0.04, sph->getViscosity());
 
+	EXPECT_DOUBLE_EQ(0.0, sph->getStiffness());
+	EXPECT_NO_THROW(sph->setStiffness(0.0));
+	sph->setStiffness(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getStiffness());
+
+	EXPECT_DOUBLE_EQ(0.0, sph->getDamping());
+	EXPECT_NO_THROW(sph->setDamping(0.0));
+	sph->setDamping(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getDamping());
+
+	EXPECT_DOUBLE_EQ(0.0, sph->getFriction());
+	EXPECT_NO_THROW(sph->setFriction(0.0));
+	sph->setFriction(0.04);
+	EXPECT_DOUBLE_EQ(0.04, sph->getFriction());
+
 	EXPECT_DOUBLE_EQ(0.0, sph->getKernelSupport());
 	EXPECT_THROW(sph->setKernelSupport(0.0), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(sph->setKernelSupport(-1.0), SurgSim::Framework::AssertionFailure);
 	sph->setKernelSupport(0.04);
 	EXPECT_DOUBLE_EQ(0.04, sph->getKernelSupport());
-}
-
-TEST(SphRepresentationTest, AddGetConstraintPlaneTest)
-{
-	auto sph = std::make_shared<SphRepresentation>("representation");
-
-	EXPECT_EQ(0u, sph->getPlaneConstraints().size());
-
-	SphRepresentation::PlaneConstraint p1;
-	p1.damping = 0.5;
-	p1.stiffness = 0.6;
-	p1.planeEquation = SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4);
-	EXPECT_NO_THROW(sph->addPlaneConstraint(p1));
-	EXPECT_EQ(1u, sph->getPlaneConstraints().size());
-	EXPECT_DOUBLE_EQ(0.5, sph->getPlaneConstraints()[0].damping);
-	EXPECT_DOUBLE_EQ(0.6, sph->getPlaneConstraints()[0].stiffness);
-	EXPECT_TRUE(sph->getPlaneConstraints()[0].planeEquation.isApprox(SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4)));
-
-	SphRepresentation::PlaneConstraint p2;
-	p2.damping = 0.55;
-	p2.stiffness = 0.66;
-	p2.planeEquation = SurgSim::Math::Vector4d(0.11, 0.22, 0.33, 0.44);
-	EXPECT_NO_THROW(sph->addPlaneConstraint(p2));
-	EXPECT_EQ(2u, sph->getPlaneConstraints().size());
-	EXPECT_DOUBLE_EQ(0.5, sph->getPlaneConstraints()[0].damping);
-	EXPECT_DOUBLE_EQ(0.6, sph->getPlaneConstraints()[0].stiffness);
-	EXPECT_TRUE(sph->getPlaneConstraints()[0].planeEquation.isApprox(SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4)));
-	EXPECT_DOUBLE_EQ(0.55, sph->getPlaneConstraints()[1].damping);
-	EXPECT_DOUBLE_EQ(0.66, sph->getPlaneConstraints()[1].stiffness);
-	EXPECT_TRUE(sph->getPlaneConstraints()[1].planeEquation.isApprox(SurgSim::Math::Vector4d(0.11, 0.22, 0.33, 0.44)));
 }
 
 TEST(SphRepresentationTest, DoInitializeTest)
@@ -177,22 +162,19 @@ TEST(SphRepresentationTest, DoUpdate1ParticleTest)
 
 	sph->initialize(runtime);
 
-	Particle p;
-	p.setLifetime(10);
-	p.setPosition(SurgSim::Math::Vector3d::Zero());
-	p.setVelocity(SurgSim::Math::Vector3d::Zero());
-	sph->addParticle(p); // Add 1 particle in the sph system
-	EXPECT_EQ(1u, sph->getParticleReferences().size());
+	sph->addParticle(Math::Vector3d::Zero(), Math::Vector3d::Zero(), 10);
+	EXPECT_EQ(1u, sph->getParticles().getNumVertices());
 
 	EXPECT_NO_THROW(sph->update(dt));
-	EXPECT_EQ(1u, sph->getParticleReferences().size());
-	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getPosition()[0]);
-	EXPECT_LT(sph->getParticleReferences().front().getPosition()[1], 0.0);
-	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getPosition()[2]);
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_EQ(1u, particles.size());
+	EXPECT_DOUBLE_EQ(0.0, particles[0].position[0]);
+	EXPECT_GT(0.0, particles[0].position[1]);
+	EXPECT_DOUBLE_EQ(0.0, particles[0].position[2]);
 
-	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getVelocity()[0]);
-	EXPECT_LT(sph->getParticleReferences().front().getVelocity()[1], 0.0);
-	EXPECT_DOUBLE_EQ(0.0, sph->getParticleReferences().front().getVelocity()[2]);
+	EXPECT_DOUBLE_EQ(0.0, particles[0].data.velocity[0]);
+	EXPECT_GT(0.0, particles[0].data.velocity[1]);
+	EXPECT_DOUBLE_EQ(0.0, particles[0].data.velocity[2]);
 }
 
 namespace
@@ -218,27 +200,24 @@ std::shared_ptr<SphRepresentation> set2ParticlesInteracting(double h, double dis
 
 	sph->initialize(runtime);
 
-	Particle p;
-	p.setLifetime(10);
-	p.setPosition(SurgSim::Math::Vector3d::Zero());
-	p.setVelocity(SurgSim::Math::Vector3d::Zero());
-	sph->addParticle(p); // Add 1 particle in the sph system
-	p.setPosition(SurgSim::Math::Vector3d(distance, 0.0, 0.0));
-	sph->addParticle(p); // Add 1 particle in the sph system
-	EXPECT_EQ(2u, sph->getParticleReferences().size());
+	sph->addParticle(Math::Vector3d::Zero(), Math::Vector3d::Zero(), 10);
+	sph->addParticle(Math::Vector3d(distance, 0.0, 0.0), Math::Vector3d::Zero(), 10);
+	EXPECT_EQ(2u, sph->getParticles().getNumVertices());
 
 	EXPECT_NO_THROW(sph->update(dt));
 
-	EXPECT_EQ(2u, sph->getParticleReferences().size());
-	for (auto particle : sph->getParticleReferences())
+	EXPECT_EQ(2u, sph->getParticles().getNumVertices());
+	size_t index = 0;
+	for (auto particle : sph->getParticles().getVertices())
 	{
-		std::string scope = "Particle "+boost::to_string(particle.getIndex());
+		std::string scope = "Particle "+boost::to_string(index);
 		SCOPED_TRACE(scope);
-		EXPECT_LT(particle.getPosition()[1], 0.0);
-		EXPECT_DOUBLE_EQ(0.0, particle.getPosition()[2]);
+		EXPECT_LT(particle.position[1], 0.0);
+		EXPECT_DOUBLE_EQ(0.0, particle.position[2]);
 
-		EXPECT_LT(particle.getVelocity()[1], 0.0);
-		EXPECT_DOUBLE_EQ(0.0, particle.getVelocity()[2]);
+		EXPECT_GT(0.0, particle.data.velocity[1]);
+		EXPECT_DOUBLE_EQ(0.0, particle.data.velocity[2]);
+		index++;
 	}
 
 	return sph;
@@ -254,14 +233,11 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesNotInteractingTest)
 	double distance = 10.0 * h; // Far from their radius of influence
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto x0 = sph->getParticleReferences().front().getPosition();
-	auto x1 = sph->getParticleReferences().back().getPosition();
-	auto v0 = sph->getParticleReferences().front().getPosition();
-	auto v1 = sph->getParticleReferences().back().getPosition();
-	EXPECT_DOUBLE_EQ(x0[1], x1[1]);
-	EXPECT_DOUBLE_EQ(v0[1], v1[1]);
-	double realDistance = (x0 - x1).norm();
-	EXPECT_DOUBLE_EQ(distance, realDistance);
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
+	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
+	double finalDistance = (particles[0].position - particles[1].position).norm();
+	EXPECT_DOUBLE_EQ(distance, finalDistance);
 }
 
 TEST(SphRepresentationTest, DoUpdate2ParticlesAttractingTest)
@@ -273,14 +249,11 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesAttractingTest)
 	double distance = h * 3.0 / 4.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto x0 = sph->getParticleReferences().front().getPosition();
-	auto x1 = sph->getParticleReferences().back().getPosition();
-	auto v0 = sph->getParticleReferences().front().getPosition();
-	auto v1 = sph->getParticleReferences().back().getPosition();
-	EXPECT_DOUBLE_EQ(x0[1], x1[1]);
-	EXPECT_DOUBLE_EQ(v0[1], v1[1]);
-	double finalDistance = (x0 - x1).norm();
-	EXPECT_LT(finalDistance, distance);
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
+	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
+	double finalDistance = (particles[0].position - particles[1].position).norm();
+	EXPECT_GT(distance, finalDistance);
 }
 
 TEST(SphRepresentationTest, DoUpdate2ParticlesRetractingTest)
@@ -292,14 +265,11 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesRetractingTest)
 	double distance = h * 1.0 / 4.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto x0 = sph->getParticleReferences().front().getPosition();
-	auto x1 = sph->getParticleReferences().back().getPosition();
-	auto v0 = sph->getParticleReferences().front().getPosition();
-	auto v1 = sph->getParticleReferences().back().getPosition();
-	EXPECT_DOUBLE_EQ(x0[1], x1[1]);
-	EXPECT_DOUBLE_EQ(v0[1], v1[1]);
-	double finalDistance = (x0 - x1).norm();
-	EXPECT_GT(finalDistance, distance);
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
+	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
+	double finalDistance = (particles[0].position - particles[1].position).norm();
+	EXPECT_LT(distance, finalDistance);
 }
 
 TEST(SphRepresentationTest, DoUpdate2ParticlesInEquilibriumTest)
@@ -311,20 +281,15 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesInEquilibriumTest)
 	double distance = h / 2.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto x0 = sph->getParticleReferences().front().getPosition();
-	auto x1 = sph->getParticleReferences().back().getPosition();
-	auto v0 = sph->getParticleReferences().front().getPosition();
-	auto v1 = sph->getParticleReferences().back().getPosition();
-	EXPECT_DOUBLE_EQ(x0[1], x1[1]);
-	EXPECT_DOUBLE_EQ(v0[1], v1[1]);
-	double finalDistance = (x0 - x1).norm();
-	EXPECT_NEAR(finalDistance, distance, pow(h, 2));
+	auto& particles = sph->getParticles().getVertices();
+	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
+	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
+	double finalDistance = (particles[0].position - particles[1].position).norm();
+	EXPECT_NEAR(distance, finalDistance, pow(h, 2));
 }
 
 TEST(SphRepresentationTest, SerializationTest)
 {
-	typedef SurgSim::Particles::SphRepresentation::PlaneConstraint PlaneConstraint;
-
 	auto sph = std::make_shared<SphRepresentation>("TestSphRepresentation");
 	sph->setDensity(1.1);
 	sph->setGasStiffness(2.2);
@@ -332,13 +297,11 @@ TEST(SphRepresentationTest, SerializationTest)
 	sph->setKernelSupport(3.3);
 	sph->setMassPerParticle(4.4);
 	sph->setMaxParticles(5);
-	SphRepresentation::PlaneConstraint p;
-	p.stiffness = 6.6;
-	p.damping = 7.7;
-	p.planeEquation.setLinSpaced(8.8, 9.9);
-	sph->addPlaneConstraint(p);
 	sph->setSurfaceTension(10.1);
 	sph->setViscosity(11.11);
+	sph->setStiffness(12.12);
+	sph->setDamping(13.13);
+	sph->setFriction(0.14);
 
 	YAML::Node node;
 	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*sph));
@@ -353,15 +316,11 @@ TEST(SphRepresentationTest, SerializationTest)
 	EXPECT_DOUBLE_EQ(sph->getKernelSupport(), newRepresentation->getValue<double>("KernelSupport"));
 	EXPECT_DOUBLE_EQ(sph->getMassPerParticle(), newRepresentation->getValue<double>("MassPerParticle"));
 	EXPECT_EQ(sph->getMaxParticles(), newRepresentation->getValue<size_t>("MaxParticles"));
-	auto planeConstraints = newRepresentation->getValue<std::vector<PlaneConstraint>>("PlaneConstraints");
-	EXPECT_EQ(sph->getPlaneConstraints().size(), planeConstraints.size());
-	EXPECT_EQ(1u, planeConstraints.size());
-	EXPECT_TRUE(sph->getPlaneConstraints()[0].planeEquation.isApprox(planeConstraints[0].planeEquation));
-	EXPECT_DOUBLE_EQ(sph->getPlaneConstraints()[0].stiffness, planeConstraints[0].stiffness);
-	EXPECT_DOUBLE_EQ(sph->getPlaneConstraints()[0].damping, planeConstraints[0].damping);
-	EXPECT_DOUBLE_EQ(sph->getSurfaceTension(),
-		newRepresentation->getValue<double>("SurfaceTension"));
+	EXPECT_DOUBLE_EQ(sph->getSurfaceTension(), newRepresentation->getValue<double>("SurfaceTension"));
 	EXPECT_DOUBLE_EQ(sph->getViscosity(), newRepresentation->getValue<double>("Viscosity"));
+	EXPECT_DOUBLE_EQ(sph->getStiffness(), newRepresentation->getValue<double>("Stiffness"));
+	EXPECT_DOUBLE_EQ(sph->getDamping(), newRepresentation->getValue<double>("Damping"));
+	EXPECT_DOUBLE_EQ(sph->getFriction(), newRepresentation->getValue<double>("Friction"));
 }
 
 }; // namespace Particles

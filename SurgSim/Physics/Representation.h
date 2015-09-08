@@ -17,9 +17,11 @@
 #define SURGSIM_PHYSICS_REPRESENTATION_H
 
 #include <string>
+#include <typeindex>
 
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/ConstraintType.h"
 
 namespace SurgSim
 {
@@ -27,6 +29,11 @@ namespace SurgSim
 namespace DataStructures
 {
 struct Location;
+}
+
+namespace Framework
+{
+class Logger;
 }
 
 namespace Collision
@@ -37,20 +44,10 @@ class Representation;
 namespace Physics
 {
 
+class Constraint;
+class ConstraintData;
+class ConstraintImplementation;
 class Localization;
-
-enum RepresentationType
-{
-	REPRESENTATION_TYPE_INVALID = -1,
-	REPRESENTATION_TYPE_FIXED = 0,
-	REPRESENTATION_TYPE_RIGID,
-	REPRESENTATION_TYPE_VTC_RIGID,
-	REPRESENTATION_TYPE_MASSSPRING,
-	REPRESENTATION_TYPE_FEM1D,
-	REPRESENTATION_TYPE_FEM2D,
-	REPRESENTATION_TYPE_FEM3D,
-	REPRESENTATION_TYPE_COUNT
-};
 
 /// The Representation class defines the base class for all physics objects
 class Representation : public SurgSim::Framework::Representation
@@ -63,15 +60,8 @@ public:
 	/// Destructor
 	virtual ~Representation();
 
-	/// Query the representation type
-	/// \return the RepresentationType for this representation
-	virtual RepresentationType getType() const = 0;
-
 	/// Reset the representation to its initial/default state
 	virtual void resetState();
-
-	/// Reset the representation parameters to their initial/default values
-	virtual void resetParameters();
 
 	/// Query the object number of degrees of freedom
 	/// \return The number of degrees of freedom
@@ -131,6 +121,11 @@ public:
 	/// \param representation The appropriate collision representation for this object.
 	virtual void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
 
+	/// Get a constraint implementation of the given type for this representation.
+	/// \param type The type of constraint.
+	/// \return A contact constraint implementation or nullptr.
+	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Physics::ConstraintType type);
+
 protected:
 	/// Set the number of degrees of freedom
 	/// \param numDof The number of degrees of freedom
@@ -169,6 +164,8 @@ private:
 	/// Is this representation driving the sceneElement pose
 	bool m_isDrivingSceneElementPose;
 
+	/// Logger for this class.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 };  // namespace Physics

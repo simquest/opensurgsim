@@ -37,9 +37,9 @@ public:
 	/// Destructor
 	virtual ~OctreeNodePlyReaderDelegateBase();
 
-	virtual bool registerDelegate(PlyReader* reader) override;
+	bool registerDelegate(PlyReader* reader) override;
 
-	virtual bool fileIsAcceptable(const PlyReader& reader) override;
+	bool fileIsAcceptable(const PlyReader& reader) override;
 
 	/// Callback function, begin the processing of the bounds.
 	/// \param elementName Name of the element.
@@ -148,9 +148,9 @@ public:
 	/// \return the octree
 	std::shared_ptr<OctreeNode<Data>> getOctree();
 
-	virtual void processVoxel(const std::string& elementName) override;
+	void processVoxel(const std::string& elementName) override;
 
-	virtual void initializeOctree() override;
+	void initializeOctree() override;
 
 private:
 

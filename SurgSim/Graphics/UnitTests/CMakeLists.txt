@@ -26,6 +26,7 @@ set(UNIT_TEST_SOURCES
 	OsgBoxRepresentationTests.cpp
 	OsgCameraTests.cpp
 	OsgCapsuleRepresentationTests.cpp
+	OsgCurveRepresentationTests.cpp
 	OsgCylinderRepresentationTests.cpp
 	OsgGroupTests.cpp
 	OsgLightTests.cpp
@@ -38,13 +39,13 @@ set(UNIT_TEST_SOURCES
 	OsgPlaneRepresentationTests.cpp
 	OsgPlaneTests.cpp
 	OsgPointCloudRepresentationTests.cpp
+	OsgProgramTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRenderTargetTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
 	OsgSceneryRepresentationTests.cpp
 	OsgScreenSpaceQuadTests.cpp
-	OsgShaderTests.cpp
 	OsgSkeletonRepresentationTests.cpp
 	OsgSphereRepresentationTests.cpp
 	OsgTextRepresentationTests.cpp
@@ -80,9 +81,6 @@ configure_file(
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-file(COPY ${SURGSIM_SOURCE_DIR}/SurgSim/Testing/Data/Geometry DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
-
 
 set(LIBS 
 	SurgSimGraphics

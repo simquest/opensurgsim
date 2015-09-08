@@ -16,7 +16,6 @@
 #ifndef SURGSIM_DEVICES_NOVINT_NOVINT7DOFDEVICE_H
 #define SURGSIM_DEVICES_NOVINT_NOVINT7DOFDEVICE_H
 
-#include <memory>
 #include <string>
 
 #include "SurgSim/Devices/Novint/NovintCommonDevice.h"
@@ -26,6 +25,7 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_STATIC_REGISTRATION(Novint7DofDevice);
 
 /// A class implementing the communication with a Novint Falcon with the Open Surgery Grip 7-DoF device.
 ///
@@ -55,9 +55,9 @@ public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	/// \param initializationName The name passed to HDAL when initializing the device.  This should match a
-	/// 	configured Novint device; alternately, an empty string indicates the default device.
-	Novint7DofDevice(const std::string& uniqueName, const std::string& initializationName);
+	explicit Novint7DofDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Device::Novint7DofDevice);
 
 	/// Destructor.
 	virtual ~Novint7DofDevice();

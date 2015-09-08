@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Localization.h"
@@ -25,14 +26,18 @@ namespace SurgSim
 namespace Physics
 {
 
-Constraint::Constraint(
+Constraint::Constraint(ConstraintType constraintType,
 	std::shared_ptr<ConstraintData> data,
-	std::shared_ptr<ConstraintImplementation> implementation0,
-	std::shared_ptr<Localization> localization0,
-	std::shared_ptr<ConstraintImplementation> implementation1,
-	std::shared_ptr<Localization> localization1)
+	std::shared_ptr<Representation> representation0,
+	const SurgSim::DataStructures::Location& location0,
+	std::shared_ptr<Representation> representation1,
+	const SurgSim::DataStructures::Location& location1)
 {
-	setInformation(data, implementation0, localization0, implementation1, localization1);
+	m_mlcpMap[FIXED_3DPOINT] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	m_mlcpMap[FIXED_3DROTATION_VECTOR] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	m_mlcpMap[FRICTIONAL_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT;
+	m_mlcpMap[FRICTIONLESS_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	setInformation(constraintType, data, representation0, location0, representation1, location1);
 }
 
 Constraint::~Constraint()
@@ -62,7 +67,7 @@ size_t Constraint::getNumDof() const
 	return m_numDof;
 }
 
-SurgSim::Math::MlcpConstraintType Constraint::getType()
+ConstraintType Constraint::getType()
 {
 	return m_constraintType;
 }
@@ -93,7 +98,8 @@ void Constraint::build(double dt,
 		indexOfConstraint,
 		CONSTRAINT_NEGATIVE_SIDE);
 
-	mlcp->constraintTypes.push_back(m_constraintType);
+	mlcp->constraintTypes.push_back(
+				(m_constraintType != INVALID_CONSTRAINT) ? m_mlcpMap[m_constraintType] : Math::MLCP_INVALID_CONSTRAINT);
 }
 
 bool Constraint::isActive()
@@ -111,48 +117,37 @@ void Constraint::doBuild(double dt,
 {
 }
 
-void Constraint::setInformation(
+void Constraint::setInformation(ConstraintType constraintType,
 	std::shared_ptr<ConstraintData> data,
-	std::shared_ptr<ConstraintImplementation> implementation0,
-	std::shared_ptr<Localization> localization0,
-	std::shared_ptr<ConstraintImplementation> implementation1,
-	std::shared_ptr<Localization> localization1)
+	std::shared_ptr<Representation> representation0,
+	const SurgSim::DataStructures::Location& location0,
+	std::shared_ptr<Representation> representation1,
+	const SurgSim::DataStructures::Location& location1)
 {
+	m_constraintType = constraintType;
 	SURGSIM_ASSERT(data != nullptr) << "ConstraintData can't be nullptr";
-	SURGSIM_ASSERT(implementation0 != nullptr) << "First implementation can't be nullptr";
-	SURGSIM_ASSERT(localization0 != nullptr) << "First localization can't be nullptr";
-	SURGSIM_ASSERT(implementation1 != nullptr) << "Second implementation can't be nullptr";
-	SURGSIM_ASSERT(localization1 != nullptr) << "Second localization can't be nullptr";
+	SURGSIM_ASSERT(representation0 != nullptr) << "First representation can't be nullptr";
+	SURGSIM_ASSERT(representation1 != nullptr) << "Second representation can't be nullptr";
 
-	SURGSIM_ASSERT(localization0->getRepresentation() != nullptr)
-		<< "First localization must have a Representation";
-	SURGSIM_ASSERT(localization1->getRepresentation() != nullptr)
-		<< "Second localization must have a Representation";
+	auto localization0 = representation0->createLocalization(location0);
+	SURGSIM_ASSERT(localization0 != nullptr) << "Could not create localization for " << representation0->getName();
 
-	SURGSIM_ASSERT(implementation0->getRepresentationType() == localization0->getRepresentation()->getType())
-		<< "The representation associated with the first localization must be compatible with the first "
-		   "implementation.";
-	SURGSIM_ASSERT(implementation1->getRepresentationType() == localization1->getRepresentation()->getType())
-		<< "The representation associated with the second localization must be compatible with the second "
-		   "implementation.";
+	auto localization1 = representation1->createLocalization(location1);
+	SURGSIM_ASSERT(localization1 != nullptr) << "Could not create localization for " << representation1->getName();
 
-	SURGSIM_ASSERT(implementation0->getMlcpConstraintType() != SurgSim::Math::MLCP_INVALID_CONSTRAINT) <<
-		"First implementation has an invalid constraint type";
-	SURGSIM_ASSERT(implementation1->getMlcpConstraintType() != SurgSim::Math::MLCP_INVALID_CONSTRAINT) <<
-		"Second implementation has an invalid constraint type";
+	auto implementation0 = representation0->getConstraintImplementation(m_constraintType);
+	SURGSIM_ASSERT(implementation0 != nullptr) << "Could not get implementation for " << representation0->getName();
 
-	SURGSIM_ASSERT(implementation0->getMlcpConstraintType() == implementation1->getMlcpConstraintType()) <<
-		"Implementations have incompatible implementations first( " << implementation0->getMlcpConstraintType() <<
-		" != " << implementation1->getMlcpConstraintType() << " )";
-	SURGSIM_ASSERT(implementation0->getNumDof() == implementation1->getNumDof()) <<
-		"Both sides of the constraint should have the same number of Dof ("<< implementation0->getNumDof() <<
-		" != " << implementation1->getNumDof() <<")";
+	auto implementation1 = representation1->getConstraintImplementation(m_constraintType);
+	SURGSIM_ASSERT(implementation1 != nullptr) << "Could not get implementation for " << representation1->getName();
+
+	SURGSIM_ASSERT(implementation0->getNumDof() == implementation1->getNumDof())
+		<< "The number of DOFs does not match between the two implementations";
 
 	m_data = data;
 	m_implementations = std::make_pair(implementation0, implementation1);
 	m_localizations = std::make_pair(localization0, localization1);
 	m_numDof = implementation0->getNumDof();
-	m_constraintType = implementation0->getMlcpConstraintType();
 }
 
 }; // namespace Physics

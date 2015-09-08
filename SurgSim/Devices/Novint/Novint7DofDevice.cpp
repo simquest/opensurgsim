@@ -15,48 +15,26 @@
 
 #include "SurgSim/Devices/Novint/Novint7DofDevice.h"
 
-#include <iostream>
-#include <iomanip>
-
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Devices/Novint/NovintScaffold.h"
-#include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/DataStructures/DataGroupBuilder.h"
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Matrix44d;
-using SurgSim::Math::Matrix33d;
-using SurgSim::Math::RigidTransform3d;
-
-using SurgSim::DataStructures::DataGroup;
-using SurgSim::DataStructures::DataGroupBuilder;
-
-
 namespace SurgSim
 {
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::Novint7DofDevice, Novint7DofDevice);
 
-Novint7DofDevice::Novint7DofDevice(const std::string& uniqueName, const std::string& initializationName) :
-	NovintCommonDevice(uniqueName, initializationName)
+Novint7DofDevice::Novint7DofDevice(const std::string& uniqueName) :
+	NovintCommonDevice(uniqueName)
 {
 }
-
 
 Novint7DofDevice::~Novint7DofDevice()
 {
 }
 
-
 bool Novint7DofDevice::is7DofDevice() const
 {
 	return true;
 }
-
 
 };  // namespace Device
 };  // namespace SurgSim

@@ -17,13 +17,13 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::Location;
 using SurgSim::Math::BoxShape;
+using SurgSim::Math::Geometry::DistanceEpsilon;
+using SurgSim::Math::Geometry::SquaredDistanceEpsilon;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
 
@@ -36,32 +36,41 @@ BoxSphereDcdContact::BoxSphereDcdContact()
 {
 }
 
-std::pair<int,int> BoxSphereDcdContact::getShapeTypes()
+std::pair<int, int> BoxSphereDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_SPHERE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_SPHERE);
 }
 
 void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	using SurgSim::Math::Geometry::DistanceEpsilon;
-	using SurgSim::Math::Geometry::SquaredDistanceEpsilon;
+	std::shared_ptr<Representation> box = pair->getFirst();
+	std::shared_ptr<Representation> sphere = pair->getSecond();
 
-	std::shared_ptr<Representation> representationBox;
-	std::shared_ptr<Representation> representationSphere;
+	auto boxShape = std::static_pointer_cast<BoxShape>(box->getShape());
+	auto sphereShape = std::static_pointer_cast<SphereShape>(sphere->getShape());
 
-	representationBox = pair->getFirst();
-	representationSphere = pair->getSecond();
+	auto contacts = calculateContact(*boxShape, box->getPose(), *sphereShape, sphere->getPose());
+	for (auto& contact : contacts)
+	{
+		pair->addContact(contact);
+	}
+}
 
-	std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
-	std::shared_ptr<SphereShape> sphere = std::static_pointer_cast<SphereShape>(representationSphere->getShape());
+std::list<std::shared_ptr<Contact>> BoxSphereDcdContact::calculateContact(
+									 const SurgSim::Math::BoxShape& boxShape,
+									 const SurgSim::Math::RigidTransform3d& boxPose,
+									 const SurgSim::Math::SphereShape& sphereShape,
+									 const SurgSim::Math::RigidTransform3d& spherePose)
+{
+	std::list<std::shared_ptr<Contact>> contacts;
 
 	// Sphere center...
-	Vector3d sphereCenter = representationSphere->getPose().translation();
+	Vector3d sphereCenter = spherePose.translation();
 	// ... in Box coordinate system.
-	Vector3d boxLocalSphereCenter =  representationBox->getPose().inverse() * sphereCenter;
+	Vector3d boxLocalSphereCenter =  boxPose.inverse() * sphereCenter;
 
 	// Box half size.
-	Vector3d boxSize(box->getSizeX() * 0.5, box->getSizeY() * 0.5, box->getSizeZ() * 0.5);
+	Vector3d boxSize = boxShape.getSize() * 0.5;
 
 	// Determine the closest point to the sphere center in the box
 	Vector3d closestPoint = boxLocalSphereCenter;
@@ -75,10 +84,10 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	// Distance between the closestPoint and boxLocalSphereCenter.  Normal points into first representation, the box.
 	Vector3d normal = closestPoint - boxLocalSphereCenter;
 	double distanceSquared = normal.squaredNorm();
-	if (distanceSquared - (sphere->getRadius() * sphere->getRadius()) > SquaredDistanceEpsilon)
+	if (distanceSquared - (sphereShape.getRadius() * sphereShape.getRadius()) > SquaredDistanceEpsilon)
 	{
 		// There is no collision.
-		return;
+		return std::move(contacts);
 	}
 
 	double distance = 0.0;
@@ -115,16 +124,16 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 		normal /= distance;
 	}
 
-	// Transform normal into global pose.
-	normal = representationBox->getPose().linear() * normal;
+	double depth = std::abs(distance - sphereShape.getRadius());
+	normal = boxPose.linear() * normal;
+	std::pair<Location, Location> penetrationPoints = std::make_pair(Location(closestPoint),
+			Location(spherePose.inverse() * (sphereCenter + (normal * sphereShape.getRadius()))));
 
 	// Create the contact.
-	std::pair<Location, Location> penetrationPoints;
-	penetrationPoints.first.rigidLocalPosition.setValue(closestPoint);
-	penetrationPoints.second.rigidLocalPosition.setValue(
-		representationSphere->getPose().inverse() * (sphereCenter + (normal * sphere->getRadius())));
-
-	pair->addContact(std::abs(distance - sphere->getRadius()), normal, penetrationPoints);
+	contacts.push_back(std::make_shared<Contact>(
+						   COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
+						   Vector3d::Zero(), normal, penetrationPoints));
+	return std::move(contacts);
 }
 
 }; // namespace Collision

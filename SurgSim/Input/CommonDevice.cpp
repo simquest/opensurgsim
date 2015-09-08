@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,18 +32,18 @@ namespace Input
 CommonDevice::CommonDevice(const std::string& name) :
 	m_name(name),
 	m_nameForCallback(name),
-	m_inputData(SurgSim::DataStructures::DataGroup())
+	m_inputData(DataStructures::DataGroup())
 {
 }
 
-CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
+CommonDevice::CommonDevice(const std::string& name, const DataStructures::DataGroup& inputData) :
 	m_name(name),
 	m_nameForCallback(name),
 	m_inputData(inputData)
 {
 }
 
-CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
+CommonDevice::CommonDevice(const std::string& name, DataStructures::DataGroup&& inputData) :
 	m_name(name),
 	m_nameForCallback(name),
 	m_inputData(std::move(inputData))
@@ -60,6 +60,15 @@ std::string CommonDevice::getName() const
 {
 	return m_name;
 }
+
+std::string CommonDevice::getClassName() const
+{
+	SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
+		<< "getClassName() called on CommonDevice base class, this is wrong in almost all cases," <<
+			" this means there is a class that does not have getClassName() defined.";
+	return "SurgSim::Devices::CommonDevice";
+}
+
 
 void CommonDevice::setNameForCallback(const std::string& name)
 {
@@ -195,12 +204,12 @@ bool CommonDevice::pullOutput()
 	return false;
 }
 
-SurgSim::DataStructures::DataGroup& CommonDevice::getInputData()
+DataStructures::DataGroup& CommonDevice::getInputData()
 {
 	return m_inputData;
 }
 
-const SurgSim::DataStructures::DataGroup& CommonDevice::getOutputData() const
+const DataStructures::DataGroup& CommonDevice::getOutputData() const
 {
 	return m_outputData;
 }

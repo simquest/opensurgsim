@@ -23,6 +23,11 @@
 
 #include <boost/thread/mutex.hpp>
 
+namespace YAML
+{
+class Node;
+}
+
 namespace SurgSim
 {
 namespace Framework
@@ -35,6 +40,7 @@ class Component;
 class Logger;
 class Scene;
 class SceneElement;
+class ThreadPool;
 
 /// This class contains all the information about the runtime environment of
 /// the simulation, all the running threads, the state, while it is de facto a
@@ -58,6 +64,9 @@ public:
 
 	/// Add a worker thread, this should probably only be possible if the system is not running
 	void addManager(std::shared_ptr<ComponentManager> thread);
+
+	/// \return All the managers from the runtime
+	std::vector<std::weak_ptr<ComponentManager>> getManagers() const;
 
 	/// \return The scene to be used for this runtime. Use this for any kind of scene manipulation.
 	std::shared_ptr<Scene> getScene();
@@ -111,6 +120,10 @@ public:
 	/// \return	The application data.
 	static std::shared_ptr<const ApplicationData> getApplicationData();
 
+	/// Gets the thread pool for the runtime.
+	/// \return	The thread pool.
+	static std::shared_ptr<ThreadPool> getThreadPool();
+
 	/// Adds a component.
 	/// \param	component	The component.
 	void addComponent(const std::shared_ptr<Component>& component);
@@ -120,10 +133,41 @@ public:
 	void removeComponent(const std::shared_ptr<Component>& component);
 
 	/// Loads the scene from the given file, clears all the elements in the scene, the old scene will be
-	/// overwritten
+	/// overwritten.
 	/// \param fileName the filename of the scene to be loaded, needs to be found
-	/// \return true if the loading succeeded and the scene was found
-	bool loadScene(const std::string& fileName);
+	/// \throws If the file cannot be found or is an invalid YAML file
+	void loadScene(const std::string& fileName);
+
+	/// Adds the scene elements from the file to the current scene
+	/// The file format should be just a list of sceneElements
+	/// \code
+	/// - SurgSim::Framework::BasicSceneElement:
+	///	    Name: element1
+	///	    IsActive: true
+	///	    Components:
+	///	      - MockComponent:
+	///	          Name: component1
+	///	          Id: 792faa40-459b-40cf-981d-560a8f2bd1801
+	/// - SurgSim::Framework::BasicSceneElement:
+	///	    Name: element2
+	///	    IsActive: true
+	///	    Components:
+	///	      - MockComponent:
+	///	          Name: component2
+	///	          Id: 1de26315-82a7-46b2-ae38-324d25009629
+	/// \endcode
+	/// \param fileName the filename of the scene to be loaded, needs to be found
+	/// \throws If the file cannot be found or is an invalid file
+	void addSceneElements(const std::string& fileName);
+
+	/// Loads and duplicates the scene elements from the file, the elements will not have common ids
+	/// with any other cloned elements, this lets you repeatedly load a set of elements to replicate this
+	/// set. The format is a list of scene elements \sa addSceneElements().
+	/// \param fileName the filename of the scene to be loaded, needs to be found
+	/// \throws if loading failed
+	/// \return a vector of scene elements with the loaded elements
+	std::vector<std::shared_ptr<SceneElement>> duplicateSceneElements(const std::string& fileName);
+
 
 	/// Write out the whole scene as a file
 	/// \param fileName the name of the scene-file if no path is given, uses the current path of the executable
@@ -146,22 +190,36 @@ private:
 	/// 						"." will be used as default path.
 	void initSearchPaths(const std::string& configFilePath);
 
+	/// Convert nodes to vector of elements
+	/// \param fileName the original filename for error reporting
+	/// \param node the node to be converted
+	/// \param [out] elements the pointer for the results
+	/// \return true if the conversion was successful
+	bool tryConvertElements(const std::string& fileName, const YAML::Node& node,
+							std::vector<std::shared_ptr<SceneElement>>* elements);
+
 	/// Gets a shared pointer to the runtime.
 	/// \return	The shared pointer.
 	std::shared_ptr<Runtime> getSharedPtr();
-
 	bool m_isRunning;
 	std::vector< std::shared_ptr<ComponentManager> > m_managers;
 	std::shared_ptr<Scene> m_scene;
 	static std::shared_ptr<ApplicationData> m_applicationData;
 
-	boost::mutex m_mutex;
+	boost::mutex m_sceneHandling;
 
 	std::shared_ptr<Barrier> m_barrier;
 	bool m_isPaused;
 
 	bool m_isStopped;
 };
+
+/// Perform a YAML load operation
+/// \param fileName the filename of the scene to be loaded, needs to be found
+/// \param [out] node pointer to the nodes structure to receive the newly loaded nodes
+/// \return true if the loading succeeded
+bool tryLoadNode(const std::string& fileName, YAML::Node* node);
+
 
 }; // namespace Framework
 }; // namespace SurgSim

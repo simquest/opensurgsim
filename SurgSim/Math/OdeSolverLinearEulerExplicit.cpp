@@ -28,18 +28,21 @@ OdeSolverLinearEulerExplicit::OdeSolverLinearEulerExplicit(OdeEquation* equation
 	m_name = "Ode Solver Linear Euler Explicit";
 }
 
-void OdeSolverLinearEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState)
+void OdeSolverLinearEulerExplicit::solve(double dt, const OdeState& currentState, OdeState* newState,
+		bool computeCompliance)
 {
 	if (!m_initialized)
 	{
-		OdeSolverEulerExplicit::solve(dt, currentState, newState);
+		// The compliance matrix is constant and used in all following calls, so we force its calculation on 1st pass.
+		OdeSolverEulerExplicit::solve(dt, currentState, newState, true);
 		m_initialized = true;
 	}
 	else
 	{
-		Vector& f = m_equation.computeF(currentState);
-		currentState.applyBoundaryConditionsToVector(&f);
-		Vector deltaV = m_compliance * f;
+		m_equation.updateFMDK(currentState, ODEEQUATIONUPDATE_F);
+
+		const Vector& f = m_equation.getF();
+		Vector deltaV = m_equation.applyCompliance(currentState, f);
 
 		newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
 		newState->getVelocities() = currentState.getVelocities() + deltaV;

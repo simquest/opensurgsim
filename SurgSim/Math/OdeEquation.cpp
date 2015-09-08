@@ -15,6 +15,7 @@
 
 #include "SurgSim/Math/OdeEquation.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
@@ -25,6 +26,56 @@ namespace Math
 const std::shared_ptr<OdeState> OdeEquation::getInitialState() const
 {
 	return m_initialState;
+}
+
+const Vector& OdeEquation::getF() const
+{
+	return m_f;
+}
+
+const SparseMatrix& OdeEquation::getM() const
+{
+	return m_M;
+}
+
+const SparseMatrix& OdeEquation::getD() const
+{
+	return m_D;
+}
+
+const SparseMatrix& OdeEquation::getK() const
+{
+	return m_K;
+}
+
+void OdeEquation::updateFMDK(const OdeState& state, int options)
+{
+	if (options == ODEEQUATIONUPDATE_FMDK)
+	{
+		computeFMDK(state);
+	}
+	else
+	{
+		if (options & ODEEQUATIONUPDATE_F)
+		{
+			computeF(state);
+		}
+
+		if (options & ODEEQUATIONUPDATE_M)
+		{
+			computeM(state);
+		}
+
+		if (options & ODEEQUATIONUPDATE_D)
+		{
+			computeD(state);
+		}
+
+		if (options & ODEEQUATIONUPDATE_K)
+		{
+			computeK(state);
+		}
+	}
 }
 
 }; // namespace Math

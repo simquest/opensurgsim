@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -29,63 +30,101 @@ namespace Math
 
 class OdeState;
 
-/// Ode equation of 2nd order of the form M(x,v).a = F(x, v) with (x0, v0) for initial conditions
+/// Enum to identify which of the data need to be updated by the OdeEquation::update()
+enum OdeEquationUpdate
+{
+	ODEEQUATIONUPDATE_F = 1<<0,
+	ODEEQUATIONUPDATE_M = 1<<1,
+	ODEEQUATIONUPDATE_D = 1<<2,
+	ODEEQUATIONUPDATE_K = 1<<3,
+	ODEEQUATIONUPDATE_FMDK = ODEEQUATIONUPDATE_F | ODEEQUATIONUPDATE_M | ODEEQUATIONUPDATE_D | ODEEQUATIONUPDATE_K
+};
+
+/// Ode equation of 2nd order of the form \f$M(x,v).a = F(x, v)\f$ with \f$(x0, v0)\f$ for initial conditions
 /// and a set of boundary conditions. The problem is called a Boundary Value Problem (BVP).
-/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
-/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.F(x, v) )
+/// This ode equation is solved as an ode of order 1 by defining the state vector
+/// \f$y = \left(\begin{array}{c}x\\v\end{array}\right)\f$:
+/// \f[
+///   y' = \left(\begin{array}{c} x' \\ v' \end{array}\right) =
+///   \left(\begin{array}{c} v \\ M(x, v)^{-1}.f(t, x, v) \end{array}\right)
+/// \f]
 /// \note To allow the use of explicit and implicit solver, we need to be able to evaluate
-/// \note M(x,v), F(x,v) but also K = -dF/dx(x,v), D = -dF/dv(x,v)
+/// \note \f$M(x, v)\f$, \f$f(t, x, v)\f$ but also \f$K = -dF/dx(x, v)\f$ and \f$D = -dF/dv(x, v)\f$
 /// \note Models wanting the use of implicit solvers will need to compute these Jacobian matrices.
 class OdeEquation
 {
 public:
 	/// Virtual destructor
-	virtual ~OdeEquation(){}
+	virtual ~OdeEquation() {}
 
-	/// Retrieves the ode initial conditions (x0, v0) (i.e. the initial state)
+	/// Retrieves the ode initial conditions \f$(x0, v0)\f$ (i.e the initial state)
 	/// \return The initial state
 	const std::shared_ptr<OdeState> getInitialState() const;
 
-	/// Evaluation of the RHS function f(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
-	/// \return The vector containing f(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	virtual Vector& computeF(const OdeState& state) = 0;
+	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
+	/// applied. Note that this can be rewritten as (Bt)(M^-1)(B.b) = (Bt)((M^-1)(B.b)) = x,
+	/// where (M^-1)(B.b) = y is simply the solution to M.y = B.b and Bt.y = x.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param b The input matrix
+	/// \return The matrix \f$C.b\f$
+	virtual Matrix applyCompliance(const OdeState& state, const Matrix& b) = 0;
 
-	/// Evaluation of the LHS matrix M(x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
-	/// \return The matrix M(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const Matrix& computeM(const OdeState& state) = 0;
+	/// Update the OdeEquation (and support data) based on the given state.
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \param options Flag to specify which of F, M, D, K needs to be updated.
+	virtual void updateFMDK(const OdeState& state, int options);
 
-	/// Evaluation of D = -df/dv (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix D = -df/dv(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	virtual const Matrix& computeD(const OdeState& state) = 0;
+	/// \return The vector containing \f$f(x, v)\f$
+	const Vector& getF() const;
 
-	/// Evaluation of K = -df/dx (x,v) for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \return The matrix K = -df/dx(x,v)
-	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	virtual const Matrix& computeK(const OdeState& state) = 0;
+	/// \return The matrix \f$M(x,v)\f$
+	const SparseMatrix& getM() const;
 
-	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
-	/// When all the terms are needed, this method can perform optimization in evaluating everything together
-	/// \param state (x, v) the current position and velocity to evaluate the various terms with
-	/// \param[out] f The RHS f(x,v)
-	/// \param[out] M The matrix M(x,v)
-	/// \param[out] D The matrix D = -df/dv(x,v)
-	/// \param[out] K The matrix K = -df/dx(x,v)
-	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
-	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const OdeState& state, Vector** f, Matrix** M, Matrix** D, Matrix** K) = 0;
+	/// \return The matrix \f$D = -\frac{\partial f}{\partial v}(x,v)\f$
+	const SparseMatrix& getD() const;
+
+	/// \return The matrix \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
+	const SparseMatrix& getK() const;
 
 protected:
-	/// The initial state (which defines the ODE initial conditions (x0, v0))
+	/// Evaluation of the RHS function \f$f(x, v)\f$ for a given state
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the function \f$f(x,v)\f$ with
+	virtual void computeF(const OdeState& state) = 0;
+
+	/// Evaluation of the LHS matrix \f$M(x,v)\f$ for a given state
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the matrix \f$M(x,v)\f$ with
+	virtual void computeM(const OdeState& state) = 0;
+
+	/// Evaluation of \f$D = -\frac{\partial f}{\partial v}(x,v)\f$ for a given state
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the Jacobian matrix with
+	virtual void computeD(const OdeState& state) = 0;
+
+	/// Evaluation of \f$K = -\frac{\partial f}{\partial x}(x,v)\f$ for a given state
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the Jacobian matrix with
+	virtual void computeK(const OdeState& state) = 0;
+
+	/// Evaluation of \f$f(x,v)\f$, \f$M(x,v)\f$, \f$D = -\frac{\partial f}{\partial v}(x,v)\f$ and
+	/// \f$K = -\frac{\partial f}{\partial x}(x,v)\f$.
+	/// When all the terms are needed, this method can perform optimization in evaluating everything together
+	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
+	/// \note computeF(), computeM(), computeD(), computeK()
+	virtual void computeFMDK(const OdeState& state) = 0;
+
+	/// The initial state (which defines the ODE initial conditions \f$(x0, v0)\f$)
 	/// \note MUST be set by the derived classes
 	std::shared_ptr<OdeState> m_initialState;
+
+	/// The vector containing \f$f(x, v)\f$
+	Vector m_f;
+
+	/// The matrix \f$M(x,v)\f$
+	SparseMatrix m_M;
+
+	/// The The matrix \f$D = -\frac{\partial f}{\partial v}(x,v)\f$
+	SparseMatrix m_D;
+
+	/// The The matrix \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
+	SparseMatrix m_K;
 };
 
 }; // namespace Math

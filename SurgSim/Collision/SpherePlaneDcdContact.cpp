@@ -36,9 +36,9 @@ SpherePlaneDcdContact::SpherePlaneDcdContact()
 {
 }
 
-std::pair<int,int> SpherePlaneDcdContact::getShapeTypes()
+std::pair<int, int> SpherePlaneDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_SPHERE, SurgSim::Math::SHAPE_TYPE_PLANE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_SPHERE, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
 void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
@@ -59,7 +59,7 @@ void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pa
 
 	Vector3d result;
 	double dist = SurgSim::Math::distancePointPlane(planeLocalSphereCenter, plane->getNormal(), plane->getD(),
-													&result);
+				  &result);
 	if (dist < sphere->getRadius())
 	{
 		double depth = sphere->getRadius() - dist;
@@ -74,7 +74,7 @@ void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pa
 		penetrationPoints.second.rigidLocalPosition.setValue(
 			representationPlane->getPose().inverse() * (sphereCenter - normal * dist));
 
-		pair->addContact(depth, normal, penetrationPoints);
+		pair->addDcdContact(depth, normal, penetrationPoints);
 	}
 }
 

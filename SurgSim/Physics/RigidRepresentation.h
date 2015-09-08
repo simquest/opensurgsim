@@ -28,10 +28,10 @@ namespace SurgSim
 
 namespace Physics
 {
-class RigidRepresentationState;
+class RigidState;
 class Localization;
 
-typedef RigidRepresentationBaseLocalization RigidRepresentationLocalization;
+typedef RigidLocalization RigidLocalization;
 
 SURGSIM_STATIC_REGISTRATION(RigidRepresentation);
 
@@ -50,8 +50,6 @@ public:
 	virtual ~RigidRepresentation();
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidRepresentation);
-
-	RepresentationType getType() const override;
 
 	/// Set the current linear velocity of the rigid representation
 	/// \param linearVelocity The linear velocity
@@ -137,7 +135,7 @@ private:
 
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
-	void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
+	void updateGlobalInertiaMatrices(const RigidState& state) override;
 };
 
 }; // Physics

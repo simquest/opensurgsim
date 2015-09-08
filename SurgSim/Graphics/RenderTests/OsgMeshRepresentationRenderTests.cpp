@@ -29,7 +29,7 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -71,22 +71,18 @@ protected:
 		meshRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0)));
 		return meshRepresentation;
 	}
-
-	std::shared_ptr<SurgSim::Graphics::Mesh> loadGraphicsMesh(const std::string& fileName)
-	{
-		// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
-		SurgSim::DataStructures::PlyReader reader(fileName);
-		auto delegate = std::make_shared<SurgSim::Graphics::MeshPlyReaderDelegate>();
-		SURGSIM_ASSERT(reader.parseWithDelegate(delegate)) << "The input file " << fileName << " is malformed.";
-
-		return delegate->getMesh();
-	}
 };
 
 TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 {
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
 	scene->addSceneElement(element);
+
+	// make an empty mesh
+	auto meshRepresentation0 = makeRepresentation("emptymesh");
+	meshRepresentation0->getMesh()->initialize(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles);
+	meshRepresentation0->setUpdateOptions(MeshRepresentation::UPDATE_OPTION_COLORS |
+										  MeshRepresentation::UPDATE_OPTION_VERTICES);
 
 	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
 
@@ -102,7 +98,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 
 	auto material = std::make_shared<OsgMaterial>("material");
 	auto texture = std::make_shared<OsgTexture2d>();
-	texture->loadImage(applicationData->findFile("OsgMeshRepresentationRenderTests/cube.png"));
+	texture->loadImage(applicationData->findFile("Textures/CubeMap_rgb_rotate.png"));
 
 	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<SurgSim::Graphics::OsgTexture2d>>>("oss_diffuseMap");
 	uniform2d->set(texture);
@@ -110,6 +106,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 	meshRepresentation2->setMaterial(material);
 
 	element->addComponent(material);
+	element->addComponent(meshRepresentation0);
 	element->addComponent(meshRepresentation1);
 	element->addComponent(meshRepresentation2);
 
@@ -144,14 +141,14 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	meshes.push_back(meshRepresentation1->getMesh());
-	meshes.push_back(meshRepresentation2->getMesh());
+	meshes.push_back(std::make_shared<Graphics::Mesh>(*meshRepresentation2->getMesh()));
 
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 
 	int numSteps = 1000;
 
@@ -172,41 +169,43 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 				newVertices[index] =  transform * (cubeVertices[index] * scale);
 			}
 			meshes[j]->setVertexPositions(newVertices, true);
+			if (j == 0)
+			{
+				// Not threadsafe update
+				meshes[0]->dirty();
+			}
+			else
+			{
+				// threadsafe update
+				meshRepresentation2->updateMesh(*meshes[1]);
+			}
 		}
 
 		if (i == 500)
 		{
 			for (size_t v = 0; v < cubeColors.size(); ++v)
 			{
-				//meshes[0]->getVertex(v).data.color.setValue(cubeColors[(v+numSteps)%cubeColors.size()]);
 				meshes[0]->getVertex(v).data.color.setValue(Vector4d(1.0, 0.0, 0.5, 1.0));
 			}
 		}
 
-		/// The total number of steps should complete in 1 second
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps) * 4);
+		/// The total number of steps should complete in 4 seconds
+		boost::this_thread::sleep(boost::posix_time::milliseconds(4000 / numSteps));
 	}
 }
 
 TEST_F(OsgMeshRepresentationRenderTests, TextureTest)
 {
-
-	std::string woundFilename;
-	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("OsgMeshRepresentationRenderTests/wound_deformable.ply",
-				&woundFilename));
-
-	std::string textureFilename;
-	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png",
-				&textureFilename));
-
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Mesh");
-	*graphics->getMesh() = SurgSim::Graphics::Mesh(*loadGraphicsMesh(woundFilename));
-
+	graphics->loadMesh("Geometry/wound_deformable_with_texture.ply");
 
 	// Create material to transport the Textures
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("material");
 	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+
+	std::string textureFilename;
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/checkered.png", &textureFilename));
 	texture->loadImage(textureFilename);
 	auto diffuseMapUniform =
 		std::make_shared<SurgSim::Graphics::OsgTextureUniform<SurgSim::Graphics::OsgTexture2d>>("diffuseMap");
@@ -232,26 +231,20 @@ TEST_F(OsgMeshRepresentationRenderTests, TextureTest)
 
 TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 {
-
-	std::string woundFilename;
-	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("OsgMeshRepresentationRenderTests/wound_deformable.ply",
-				&woundFilename));
-
 	std::string textureFilename;
-	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("OsgMeshRepresentationRenderTests/wound.png",
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("Textures/wound_deformable.png",
 				&textureFilename));
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Mesh");
-	*graphics->getMesh() = SurgSim::Graphics::Mesh(*loadGraphicsMesh(woundFilename));
-
+	graphics->loadMesh("Geometry/wound_deformable_with_texture.ply");
 
 	// Create material to transport the Textures
 
 	auto material = std::make_shared<OsgMaterial>("material");
-	auto shader = SurgSim::Graphics::loadShader(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
-	ASSERT_TRUE(shader != nullptr);
-	material->setShader(shader);
+	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
+	ASSERT_TRUE(program != nullptr);
+	material->setProgram(program);
 	{
 		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
 		material->addUniform(uniform);
@@ -385,6 +378,7 @@ TEST_F(OsgMeshRepresentationRenderTests, TriangleDeletionTest)
 			if (triangle > 0)
 			{
 				meshRepresentation1->getMesh()->removeTriangle(triangle);
+				meshRepresentation1->getMesh()->dirty();
 			}
 		}
 

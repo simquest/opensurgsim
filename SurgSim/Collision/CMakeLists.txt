@@ -22,12 +22,17 @@ set(SURGSIM_COLLISION_SOURCES
 	CollisionPair.cpp
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
+	OctreeCapsuleDcdContact.cpp
 	OctreeDcdContact.cpp
+	OctreeDoubleSidedPlaneDcdContact.cpp
+	OctreePlaneDcdContact.cpp
+	OctreeSphereDcdContact.cpp
 	Representation.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
 	SpherePlaneDcdContact.cpp
 	SphereSphereDcdContact.cpp
+	TriangleMeshParticlesDcdContact.cpp
 	TriangleMeshPlaneDcdContact.cpp
 	TriangleMeshTriangleMeshDcdContact.cpp
 )
@@ -38,16 +43,22 @@ set(SURGSIM_COLLISION_HEADERS
 	BoxPlaneDcdContact.h
 	BoxSphereDcdContact.h
 	CapsuleSphereDcdContact.h
+	CollisionDetectionType.h
 	CollisionPair.h
 	ContactCalculation.h
 	DcdCollision.h
 	DefaultContactCalculation.h
+	OctreeCapsuleDcdContact.h
 	OctreeDcdContact.h
+	OctreeDoubleSidedPlaneDcdContact.h
+	OctreePlaneDcdContact.h
+	OctreeSphereDcdContact.h
 	Representation.h
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h
 	SpherePlaneDcdContact.h
 	SphereSphereDcdContact.h
+	TriangleMeshParticlesDcdContact.h
 	TriangleMeshPlaneDcdContact.h
 	TriangleMeshTriangleMeshDcdContact.h
 )
@@ -70,6 +81,10 @@ target_link_libraries(SurgSimCollision ${LIBS}
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
+
+	if(BUILD_PERFORMANCE_TESTING)
+		add_subdirectory(PerformanceTests)
+	endif()
 endif()
 
 # Put SurgSimCollision into folder "Collision"

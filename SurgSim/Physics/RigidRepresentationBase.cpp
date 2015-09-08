@@ -41,8 +41,8 @@ RigidRepresentationBase::RigidRepresentationBase(const std::string& name) :
 	m_localInertia.setConstant(std::numeric_limits<double>::quiet_NaN());
 	m_massCenter.setConstant(std::numeric_limits<double>::quiet_NaN());
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, RigidRepresentationState,
-									  RigidRepresentationState, getInitialState, setInitialState);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, RigidState,
+									  RigidState, getInitialState, setInitialState);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, std::shared_ptr<SurgSim::Collision::Representation>,
 									  CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, double, Density, getDensity, setDensity);
@@ -81,7 +81,7 @@ bool RigidRepresentationBase::doWakeUp()
 	return true;
 }
 
-void RigidRepresentationBase::setInitialState(const RigidRepresentationState& state)
+void RigidRepresentationBase::setInitialState(const RigidState& state)
 {
 	m_initialState = state;
 	m_currentState = state;
@@ -101,17 +101,17 @@ void RigidRepresentationBase::resetState()
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
-const RigidRepresentationState& RigidRepresentationBase::getInitialState() const
+const RigidState& RigidRepresentationBase::getInitialState() const
 {
 	return m_initialState;
 }
 
-const RigidRepresentationState& RigidRepresentationBase::getCurrentState() const
+const RigidState& RigidRepresentationBase::getCurrentState() const
 {
 	return m_currentState;
 }
 
-const RigidRepresentationState& RigidRepresentationBase::getPreviousState() const
+const RigidState& RigidRepresentationBase::getPreviousState() const
 {
 	return m_previousState;
 }
@@ -119,7 +119,7 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(
 	const SurgSim::DataStructures::Location& location)
 {
-	return std::move(createTypedLocalization<RigidRepresentationBaseLocalization>(location));
+	return std::move(createTypedLocalization<RigidLocalization>(location));
 }
 
 void RigidRepresentationBase::setDensity(double rho)

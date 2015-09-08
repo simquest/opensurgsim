@@ -20,6 +20,7 @@ include_directories(
 
 set(SURGSIM_TESTING_SOURCES
 	MathUtilities.cpp
+	MockInputComponent.cpp
 	MockInputOutput.cpp
 	SerializationMockComponent.cpp
 	TestCube.cpp
@@ -28,10 +29,12 @@ set(SURGSIM_TESTING_SOURCES
 
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
+	MockInputComponent.h
 	MockInputOutput.h
 	MockPhysicsManager.h
 	SerializationMockComponent.h
 	TestCube.h
+	Utilities.h
 )
 surgsim_create_library_header(Testing.h "${SURGSIM_TESTING_HEADERS}")
 
@@ -56,6 +59,7 @@ if(GLUT_FOUND)
 	add_subdirectory(VisualTestCommon)
 endif(GLUT_FOUND)
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# Copy all shared data which can be used by other component's unit tests
+file(COPY Data  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set_target_properties(SurgSimTesting PROPERTIES FOLDER "Testing")

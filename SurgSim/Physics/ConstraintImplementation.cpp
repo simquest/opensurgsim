@@ -31,6 +31,28 @@ ConstraintImplementation::~ConstraintImplementation()
 {
 }
 
+ConstraintImplementationFactory& ConstraintImplementation::getFactory()
+{
+	static ConstraintImplementationFactory factory;
+	return factory;
+}
+
+size_t ConstraintImplementation::getNumDof() const
+{
+	return doGetNumDof();
+}
+
+void ConstraintImplementation::build(double dt,
+	const ConstraintData& data,
+	const std::shared_ptr<Localization>& localization,
+	MlcpPhysicsProblem* mlcp,
+	size_t indexOfRepresentation,
+	size_t indexOfConstraint,
+	ConstraintSideSign sign)
+{
+	doBuild(dt, data, localization, mlcp, indexOfRepresentation, indexOfConstraint, sign);
+}
+
 }; // namespace Physics
 
 }; // namespace SurgSim

@@ -27,13 +27,13 @@
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/MlcpPhysicsSolution.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationContact.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::Shape;
@@ -111,22 +111,15 @@ public:
 	{
 		if (m_physicsManagerState)
 		{
-			m_physicsManagerState->getMlcpProblem().A.resize(nbConstraint, nbConstraint);
-			m_physicsManagerState->getMlcpProblem().A.setZero();
-			m_physicsManagerState->getMlcpProblem().b.resize(nbConstraint);
-			m_physicsManagerState->getMlcpProblem().b.setZero();
-			m_physicsManagerState->getMlcpProblem().CHt.resize(nbDof, nbConstraint);
-			m_physicsManagerState->getMlcpProblem().CHt.setZero();
+			m_physicsManagerState->getMlcpProblem().A.setZero(nbConstraint, nbConstraint);
+			m_physicsManagerState->getMlcpProblem().b.setZero(nbConstraint);
+			m_physicsManagerState->getMlcpProblem().CHt.setZero(nbDof, nbConstraint);
 			m_physicsManagerState->getMlcpProblem().H.resize(nbConstraint, nbDof);
-			m_physicsManagerState->getMlcpProblem().H.setZero();
-			m_physicsManagerState->getMlcpProblem().mu.resize(nbConstraint);
-			m_physicsManagerState->getMlcpProblem().mu.setZero();
+			m_physicsManagerState->getMlcpProblem().mu.setZero(nbConstraint);
 			m_physicsManagerState->getMlcpProblem().constraintTypes.clear();
 
-			m_physicsManagerState->getMlcpSolution().x.resize(nbConstraint);
-			m_physicsManagerState->getMlcpSolution().x.setZero();
-			m_physicsManagerState->getMlcpSolution().dofCorrection.resize(nbDof);
-			m_physicsManagerState->getMlcpSolution().dofCorrection.setZero();
+			m_physicsManagerState->getMlcpSolution().x.setZero(nbConstraint);
+			m_physicsManagerState->getMlcpSolution().dofCorrection.setZero(nbDof);
 		}
 	}
 

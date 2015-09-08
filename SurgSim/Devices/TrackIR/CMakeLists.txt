@@ -21,6 +21,10 @@ include_directories(
 	"${OPTITRACK_INCLUDE_DIR}"
 )
 
+set(LIBS
+	${OPTITRACK_LIBRARY}
+)
+
 set(TRACKIR_DEVICE_SOURCES
 	TrackIRDevice.cpp
 	TrackIRThread.cpp
@@ -31,6 +35,8 @@ set(TRACKIR_DEVICE_HEADERS
 	TrackIRScaffold.h
 	TrackIRThread.h
 )
+
+set(DEVICE_HEADERS ${DEVICE_HEADERS} TrackIR/TrackIRDevice.h PARENT_SCOPE)
 
 set(TRACKIR_DEVICE_LINUX_SOURCES
 	linux/TrackIRScaffold.cpp
@@ -51,6 +57,8 @@ surgsim_add_library(
 	"${TRACKIR_DEVICE_SOURCES}"
 	"${TRACKIR_DEVICE_HEADERS}"
 )
+
+target_link_libraries(TrackIRDevice ${LIBS})
 
 if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.

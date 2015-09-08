@@ -25,7 +25,12 @@ set(UNIT_TEST_SOURCES
 
 set(LIBS
 	IdentityPoseDevice
+	SurgSimDataStructures
 	SurgSimDeviceFilters
+	SurgSimFramework
+	SurgSimInput
+	SurgSimMath
+	${Boost_LIBRARIES}
 )
 
 surgsim_add_unit_tests(SurgSimDeviceFiltersTest)

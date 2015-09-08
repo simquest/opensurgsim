@@ -15,8 +15,12 @@
 
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/Representation.h"
 
@@ -31,7 +35,8 @@ Representation::Representation(const std::string& name) :
 	m_gravity(0.0, -9.81, 0.0),
 	m_numDof(0),
 	m_isGravityEnabled(true),
-	m_isDrivingSceneElementPose(true)
+	m_isDrivingSceneElementPose(true),
+	m_logger(SurgSim::Framework::Logger::getLogger("Physics/Representation"))
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, size_t, NumDof, getNumDof, setNumDof);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsGravityEnabled, isGravityEnabled, setIsGravityEnabled);
@@ -44,10 +49,6 @@ Representation::~Representation()
 }
 
 void Representation::resetState()
-{
-}
-
-void Representation::resetParameters()
 {
 }
 
@@ -115,6 +116,17 @@ std::shared_ptr<SurgSim::Collision::Representation> Representation::getCollision
 void Representation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> val)
 {
 	m_collisionRepresentation = val;
+}
+
+std::shared_ptr<ConstraintImplementation> Representation::getConstraintImplementation(
+	SurgSim::Physics::ConstraintType type)
+{
+	auto implementation = ConstraintImplementation::getFactory().getImplementation(typeid(*this), type);
+	if (implementation == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << getClassName() << ": Does not support constraint type (" << type << ").";
+	}
+	return implementation;
 }
 
 void Representation::driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose)

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2014, SimQuest Solutions Inc.
+// Copyright 2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,32 +16,40 @@
 #ifndef SURGSIM_PHYSICS_FEM1DPLYREADERDELEGATE_H
 #define SURGSIM_PHYSICS_FEM1DPLYREADERDELEGATE_H
 
+#include <array>
 #include <memory>
-#include <string>
 
+#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Physics/Fem1D.h"
 #include "SurgSim/Physics/FemPlyReaderDelegate.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
-class Fem1DRepresentation;
 
-/// Implementation of PlyReaderDelegate for Fem1DRepresentation
-class Fem1DPlyReaderDelegate : public SurgSim::Physics::FemPlyReaderDelegate
+class Fem1DPlyReaderDelegate : public FemPlyReaderDelegate
 {
 public:
-	/// Constructor
-	/// \param fem The object that is updated when PlyReader::parseFile is called.
-	explicit Fem1DPlyReaderDelegate(std::shared_ptr<Fem1DRepresentation> fem);
+	/// Default constructor.
+	Fem1DPlyReaderDelegate();
+
+	/// Constructor.
+	/// \param mesh The mesh to be used, it will be cleared by the constructor.
+	explicit Fem1DPlyReaderDelegate(std::shared_ptr<Fem1D> mesh);
 
 protected:
 	std::string getElementName() const override;
 
-	bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
-	bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
+	bool registerDelegate(PlyReader* reader) override;
+
+	bool fileIsAcceptable(const PlyReader& reader) override;
 
 	void endParseFile() override;
+
+	void processVertex(const std::string& elementName) override;
+
 	void processFemElement(const std::string& elementName) override;
 
 	/// Callback function, begin the processing of radius.
@@ -54,8 +62,19 @@ protected:
 	/// \param elementName Name of the element.
 	void endRadius(const std::string& elementName);
 
+	void processBoundaryCondition(const std::string& elementName) override;
+
 private:
+	/// Flag to notify if the ply file provides rotational data for the vertices or not
+	bool m_hasRotationDOF;
+
+	/// Element's radius information
 	double m_radius;
+	/// Element's shear information
+	bool m_enableShear;
+
+	/// Fem1D mesh asset to contain the ply file information
+	std::shared_ptr<Fem1D> m_mesh;
 };
 
 } // namespace Physics

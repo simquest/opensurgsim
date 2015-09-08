@@ -19,13 +19,18 @@ find_package(NovintHdalSdk REQUIRED)
 link_directories(${Boost_LIBRARY_DIRS})
 
 set(LIBS
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+	SurgSimMath
 	${Boost_LIBRARIES}
-	${NOVINT_HDAL_SDK_LIBRARIES}
+	${NOVINTHDALSDK_LIBRARIES}
+	${YAML_CPP_LIBRARIES}
 )
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${NOVINT_HDAL_SDK_INCLUDE_DIR}"
+	"${NOVINTHDALSDK_INCLUDE_DIR}"
 )
 
 set(NOVINT_DEVICE_SOURCES
@@ -41,6 +46,11 @@ set(NOVINT_DEVICE_HEADERS
 	NovintDevice.h
 	NovintScaffold.h
 )
+
+set(DEVICE_HEADERS ${DEVICE_HEADERS}
+	Novint/Novint7DofDevice.h #NOLINT
+	Novint/NovintDevice.h #NOLINT
+	PARENT_SCOPE)
 
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(

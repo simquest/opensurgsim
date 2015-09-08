@@ -15,6 +15,7 @@
 
 #include "SurgSim/Physics/Computation.h"
 
+#include "SurgSim/Framework/Component.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
 namespace SurgSim
@@ -49,18 +50,30 @@ bool Computation::isCopyingState()
 
 std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std::shared_ptr<PhysicsManagerState>& state)
 {
-	// Compile the list of active representations and set it on the state.
-	std::vector<std::shared_ptr<Representation>> activeRepresentations;
-	auto representations = state->getRepresentations();
-	activeRepresentations.reserve(representations.size());
-	for (auto it = representations.begin(); it != representations.end(); ++it)
+	auto isInactive = [](std::shared_ptr<Framework::Component> component)
 	{
-		if ((*it)->isActive())
-		{
-			activeRepresentations.push_back(*it);
-		}
-	}
-	state->setActiveRepresentations(activeRepresentations);
+		return !component->isActive();
+	};
+
+	// Compile the list of active representations and set it on the state.
+	auto representations = state->getRepresentations();
+	representations.erase(std::remove_if(representations.begin(), representations.end(), isInactive),
+			representations.end());
+	state->setActiveRepresentations(representations);
+
+	// Compile the list of active collision representations and set it on the state.
+	auto collisionRepresentations = state->getCollisionRepresentations();
+	collisionRepresentations.erase(
+			std::remove_if(collisionRepresentations.begin(), collisionRepresentations.end(), isInactive),
+			collisionRepresentations.end());
+	state->setActiveCollisionRepresentations(collisionRepresentations);
+
+	// Compile the list of active particle representations and set it on the state.
+	auto particleRepresentations = state->getParticleRepresentations();
+	particleRepresentations.erase(
+			std::remove_if(particleRepresentations.begin(), particleRepresentations.end(), isInactive),
+			particleRepresentations.end());
+	state->setActiveParticleRepresentations(particleRepresentations);
 
 	// Compile the list of active constraints and set it on the state.
 	std::vector<std::shared_ptr<Constraint>> activeConstraints;

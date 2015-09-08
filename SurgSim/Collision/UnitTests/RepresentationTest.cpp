@@ -20,6 +20,9 @@
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -31,16 +34,16 @@ using SurgSim::Collision::ContactMapType;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::Location;
 using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeRigidTransform;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 namespace SurgSim
@@ -52,6 +55,8 @@ struct RepresentationTest : public ::testing::Test
 {
 	virtual void SetUp()
 	{
+		runtime = std::make_shared<Framework::Runtime>();
+		scene = runtime->getScene();
 		element = std::make_shared<BasicSceneElement>("Element");
 		plane = std::make_shared<PlaneShape>();
 		sphere = std::make_shared<SphereShape>(1.0);
@@ -66,7 +71,7 @@ struct RepresentationTest : public ::testing::Test
 
 		element->addComponent(planeRep);
 		element->addComponent(sphereRep);
-		element->initialize();
+		scene->addSceneElement(element);
 		planeRep->wakeUp();
 		sphereRep->wakeUp();
 	}
@@ -74,6 +79,9 @@ struct RepresentationTest : public ::testing::Test
 	virtual void TearDown()
 	{
 	}
+
+	std::shared_ptr<Framework::Runtime> runtime;
+	std::shared_ptr<Framework::Scene> scene;
 
 	std::shared_ptr<BasicSceneElement> element;
 	std::shared_ptr<PlaneShape> plane;
@@ -127,7 +135,9 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_TRUE(safePlaneCollisions->empty());
 
 	std::shared_ptr<Contact> dummyContact =
-		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
+		std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE,
+								  0.0, 1.0, Vector3d::Zero(), Vector3d::Zero(),
+								  std::make_pair(Location(), Location()));
 	unsafeSphereCollisions[planeRep].push_back(dummyContact);
 
 	auto spherePlanePair = unsafeSphereCollisions.find(planeRep);
@@ -146,6 +156,34 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_EQ(unsafePlaneCollisions, *planeRep->getCollisions().safeGet());
 }
 
+// addContact method thread-safety test case.
+// WARNING: Due to the nature of multi-threaded environment, a successful test does not imply thread-safety
+//          also note the lack of reproducibility.
+TEST_F(RepresentationTest, AddContactsInParallelTest)
+{
+	auto rep = std::make_shared<ShapeCollisionRepresentation>("collisionRepReference");
+	auto contact = std::make_shared<Contact>(
+					   COLLISION_DETECTION_TYPE_DISCRETE, 0.1, 1.0,
+					   Math::Vector3d::Zero(), Math::Vector3d::Zero(),
+					   std::make_pair(DataStructures::Location(), DataStructures::Location()));
+	auto threadPool = Framework::Runtime::getThreadPool();
+	std::vector<std::future<void>> tasks;
+	const size_t numContacts = 500;
+
+	for (size_t i = 0; i < numContacts; i++)
+	{
+		tasks.push_back(threadPool->enqueue<void>([&rep, &contact]()
+		{
+			rep->addContact(rep, contact);
+		}));
+	}
+
+	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p)
+	{
+		p.wait();
+	});
+	ASSERT_EQ(numContacts, rep->getCollisions().unsafeGet()[rep].size());
+}
 
 }; // namespace Collision
 }; // namespace SurgSim

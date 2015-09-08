@@ -58,6 +58,11 @@ set(MULTIAXIS_DEVICE_HEADERS
 	SystemInputDeviceHandle.h
 )
 
+set(DEVICE_HEADERS ${DEVICE_HEADERS}
+	MultiAxis/MultiAxisDevice.h #NOLINT
+	MultiAxis/RawMultiAxisDevice.h #NOLINT
+	PARENT_SCOPE)
+
 set(MULTIAXIS_DEVICE_LINUX_SOURCES
 	linux/CreateInputDeviceHandle.cpp
 	linux/FileDescriptor.cpp

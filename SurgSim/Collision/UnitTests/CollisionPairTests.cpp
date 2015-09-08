@@ -21,7 +21,7 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidState.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ContactCalculation.h"
@@ -63,7 +63,7 @@ TEST(CollisionPairTests, InitTest)
 	std::pair<Location, Location> penetrationPoints;
 	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
 	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
-	pair.addContact(1.0, Vector3d(1.0, 0.0, 0.0), penetrationPoints);
+	pair.addDcdContact(1.0, Vector3d(1.0, 0.0, 0.0), penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
 }
 
@@ -85,7 +85,7 @@ TEST(CollisionPairTests, SwapTest)
 	penetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
 	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 
-	pair.addContact(1.0, Vector3d(1.0, 0.0, 0.0), penetrationPoints);
+	pair.addDcdContact(1.0, Vector3d(1.0, 0.0, 0.0), penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
 
 	EXPECT_ANY_THROW(pair.swapRepresentations());
@@ -126,7 +126,7 @@ TEST(CollisionPairTests, addContactTest)
 	penetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 
 	CollisionPair pair(rep0, rep1);
-	pair.addContact(1.0, Vector3d::UnitY(), penetrationPoints);
+	pair.addDcdContact(1.0, Vector3d::UnitY(), penetrationPoints);
 
 	rep0->update(0.0);
 	rep0->getCollisions().publish();

@@ -316,7 +316,7 @@ TEST(OctreeNodeTests, DoLoadOctree)
 {
 	SurgSim::Framework::ApplicationData appData("config.txt");
 	auto octree = std::make_shared<OctreeNode<SurgSim::DataStructures::EmptyData>>();
-	ASSERT_NO_THROW(octree->load("OctreeShapeData/staple.ply", appData));
+	ASSERT_NO_THROW(octree->load("Geometry/staple.ply", appData));
 
 	ASSERT_TRUE(nullptr != octree);
 	auto boundingBox = octree->getBoundingBox();
@@ -336,6 +336,9 @@ TEST(OctreeNodeTests, DoLoadOctree)
 	EXPECT_TRUE(octree->getChild(0)->getChild(2)->hasChildren());
 
 	EXPECT_TRUE(octree->getChild(0)->getChild(2)->getChild(2)->isActive());
+
+	Vector3d leafSize = octree->getChild(0)->getChild(0)->getChild(0)->getChild(0)->getBoundingBox().sizes();
+	EXPECT_TRUE(leafSize.isApprox(Vector3d(0.001, 0.001, 0.001)));
 }
 
 TEST(OctreeNodeTests, NeighborhoodTestSimple)

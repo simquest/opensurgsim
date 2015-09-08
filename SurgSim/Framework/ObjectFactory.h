@@ -105,13 +105,49 @@ public:
 
 private:
 
-	typedef boost::function<std::shared_ptr<Base>(Parameter1)> Constructor;
+	typedef boost::function<std::shared_ptr<Base>(const Parameter1&)> Constructor;
 
 	/// All the constructors.
 	std::map<std::string, Constructor> m_constructors;
 
 	/// Threadsafety for registration
 	mutable boost::mutex m_mutex;
+};
+
+
+/// CRTP Base class to implement Object Factory functionality on a base class, use this rather than writing
+/// your own functions to return the factory
+/// \tparam T base class of the generated objects
+template <class T>
+class FactoryBase
+{
+public:
+	typedef ObjectFactory<T> FactoryType;
+
+	/// \return a reference to the factory
+	static FactoryType& getFactory()
+	{
+		static FactoryType factory;
+		return factory;
+	}
+};
+
+/// CRTP Base class to implement Object Factory functionality on a base class, use this rather than writing
+/// your own functions to return the factory
+/// \tparam T base class of the generated objects
+/// \tparam P constructor parameter for object generation
+template <class T, class P>
+class FactoryBase1
+{
+public:
+	typedef ObjectFactory1<T, P> FactoryType;
+
+	/// \return a reference to the factory
+	static FactoryType& getFactory()
+	{
+		static FactoryType factory;
+		return factory;
+	}
 };
 
 };
@@ -126,8 +162,8 @@ private:
 /// 'DerivedClass' is 'ClassName' with namespace prefixes,
 /// and 'ClassName' is the name of the class without namespace prefix.
 #define SURGSIM_REGISTER(BaseClass, DerivedClass, ClassName) \
-	bool SURGSIM_CONCATENATE(ClassName, Registered) = \
-		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass); \
+	SURGSIM_USED_VARIABLE(bool SURGSIM_CONCATENATE(ClassName, Registered)) = \
+		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass);
 
 /// Force compilation of the boolean symbol SURGSIM_CONCATENATE(ClassName, Registered) in SURGSIM_REGISTER macro,
 /// which in turn registers DerivedClass into BaseClass's ObjectFactory.
@@ -143,10 +179,8 @@ private:
 /// This macro should be put in the DerivedClass's header file, under the same namespace in which the DerivedClass is.
 /// 'ClassName' should be the name of the class without any prefix.
 #define SURGSIM_STATIC_REGISTRATION(ClassName) \
-	SURGSIM_DO_PRAGMA (GCC diagnostic push); \
-	SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
 	extern bool SURGSIM_CONCATENATE(ClassName, Registered); \
-	static bool SURGSIM_CONCATENATE(ClassName, IsRegistered) = SURGSIM_CONCATENATE(ClassName, Registered); \
-	SURGSIM_DO_PRAGMA (GCC diagnostic pop)
+	SURGSIM_USED_VARIABLE(static bool SURGSIM_CONCATENATE(ClassName, IsRegistered)) = \
+		SURGSIM_CONCATENATE(ClassName, Registered);
 
 #endif // SURGSIM_FRAMEWORK_OBJECTFACTORY_H

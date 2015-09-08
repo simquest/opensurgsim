@@ -32,6 +32,7 @@ ComponentManager::ComponentManager(const std::string& name /*= "Unknown Componen
 
 ComponentManager::~ComponentManager()
 {
+	SURGSIM_LOG_INFO(m_logger) << getName() << " destruction";
 }
 
 void ComponentManager::setRuntime(std::shared_ptr<Runtime> val)
@@ -85,7 +86,7 @@ void ComponentManager::processBehaviors(const double dt)
 {
 	auto it = std::begin(m_behaviors);
 	auto endIt = std::end(m_behaviors);
-	for ( ;  it != endIt;  ++it)
+	for (;  it != endIt;  ++it)
 	{
 		if ((*it)->isActive())
 		{
@@ -101,7 +102,7 @@ bool ComponentManager::executeInitialization()
 
 	// Call BasicThread initialize to do the initialize and startup call
 	bool success = BasicThread::executeInitialization();
-	if (! success )
+	if (! success)
 	{
 		return success;
 	}
@@ -158,7 +159,7 @@ void ComponentManager::copyScheduledComponents(
 void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 										const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
 {
-	for(auto it = beginIt; it != endIt; ++it)
+	for (auto it = beginIt; it != endIt; ++it)
 	{
 		tryRemoveComponent(*it, &m_behaviors);
 		executeRemovals(*it);
@@ -171,7 +172,7 @@ void ComponentManager::addComponents(
 	std::vector<std::shared_ptr<Component>>* actualAdditions)
 {
 	// Add All Components to the internal storage
-	for(auto it = beginIt; it != endIt; ++it)
+	for (auto it = beginIt; it != endIt; ++it)
 	{
 		std::shared_ptr<Behavior> behavior = std::dynamic_pointer_cast<Behavior>(*it);
 		if (behavior != nullptr && behavior->getTargetManagerType() == getType())
@@ -189,16 +190,16 @@ void ComponentManager::addComponents(
 }
 
 void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
-	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
+										const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
 {
-	for(auto it = beginIt; it != endIt; ++it)
+	for (auto it = beginIt; it != endIt; ++it)
 	{
-		if ( (*it)->isInitialized() && !(*it)->isAwake())
+		if ((*it)->isInitialized() && !(*it)->isAwake())
 		{
-			if ( !(*it)->wakeUp())
+			if (!(*it)->wakeUp())
 			{
 				SURGSIM_LOG_WARNING(m_logger) << "Failed to wake up component " << (*it)->getName() << " in manager " <<
-					getName() << ". Component was not added to the manager!";
+											  getName() << ". Component was not added to the manager!";
 				executeRemovals(*it);
 			}
 		}

@@ -16,18 +16,18 @@
 #ifndef SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
 
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/Group.h"
 #include "SurgSim/Graphics/Manager.h"
 #include "SurgSim/Graphics/Material.h"
+#include "SurgSim/Graphics/Program.h"
 #include "SurgSim/Graphics/RenderTarget.h"
 #include "SurgSim/Graphics/Representation.h"
-#include "SurgSim/Graphics/Shader.h"
+#include "SurgSim/Graphics/Texture.h"
 #include "SurgSim/Graphics/UniformBase.h"
 #include "SurgSim/Graphics/View.h"
 #include "SurgSim/Graphics/ViewElement.h"
-#include "SurgSim/Graphics/Texture.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <array>
 
@@ -211,6 +211,17 @@ public:
 		return m_drawAsWireFrame;
 	}
 
+
+	void setGenerateTangents(bool value)
+	{
+
+	}
+
+	bool isGeneratingTangents() const
+	{
+		return false;
+	}
+
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -226,6 +237,7 @@ private:
 		m_isAwoken = true;
 		return true;
 	}
+
 
 	/// Number of times the representation has been updated
 	int m_numUpdates;
@@ -317,6 +329,11 @@ public:
 		return m_projectionMatrix;
 	}
 
+	virtual SurgSim::Math::Matrix44d getInverseProjectionMatrix() const
+	{
+		return m_projectionMatrix.inverse();
+	}
+
 	/// Updates the camera.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	/// \post	m_numUpdates is incremented and dt is added to m_sumDt
@@ -395,6 +412,40 @@ public:
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
+	void setGenerateTangents(bool value)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	bool isGeneratingTangents() const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void setPerspectiveProjection(double fovy, double aspect, double near, double far)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void setOrthogonalProjection(double left, double right, double bottom, double top, double near, double far)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void setViewport(int x, int y, int width, int height)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	std::array<int, 4> getViewport() const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void getViewport(int* x, int* y, int* width, int* height) const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
 
 private:
 	/// Number of times the camera has been updated

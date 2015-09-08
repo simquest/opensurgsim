@@ -31,12 +31,15 @@ namespace SurgSim
 namespace Math
 {
 
+namespace
+{
 template<class T>
 void doConstructorTest()
 {
 	MassPoint m;
 	ASSERT_NO_THROW({T solver(&m);});
 }
+};
 
 TEST(OdeSolverEulerExplicit, ConstructorTest)
 {
@@ -50,20 +53,23 @@ TEST(OdeSolverEulerExplicit, ConstructorTest)
 	}
 }
 
+namespace
+{
 template<class T>
-void doSolveTest()
+void doSolveTest(bool computeCompliance)
 {
 	// Test 2 iterations because Linear solvers have a different algorithm on the 1st pass from the following passes.
 
 	{
 		MassPoint m;
 		MassPointState defaultState, state0, state1, state2;
-		T solver(&m);
+		auto solver = std::make_shared<T>(&m);
+		m.setOdeSolver(solver);
 
 		// ma = mg <=> a = g
 		// v(1) = g.dt + v(0)
 		// x(1) = v(0).dt + x(0)
-		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state0, &state1, computeCompliance);});
 		EXPECT_EQ(defaultState, state0);
 		EXPECT_NE(defaultState, state1);
 		EXPECT_TRUE(state1.getVelocities().isApprox(m.m_gravity * 1e-3 + state0.getVelocities()));
@@ -71,7 +77,7 @@ void doSolveTest()
 
 		// v(2) = g.dt + v(1)
 		// x(2) = v(1).dt + x(1)
-		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state1, &state2, computeCompliance);});
 		EXPECT_NE(defaultState, state1);
 		EXPECT_NE(defaultState, state2);
 		EXPECT_NE(state2, state1);
@@ -82,12 +88,13 @@ void doSolveTest()
 	{
 		MassPoint m(0.1);
 		MassPointState defaultState, state0, state1, state2;
-		T solver(&m);
+		auto solver = std::make_shared<T>(&m);
+		m.setOdeSolver(solver);
 
 		// ma = mg - c.v <=> a = g - c/m.v
 		// v(1) = (g - c/m.v).dt + v(0)
 		// x(1) = v(0).dt + x(0)
-		ASSERT_NO_THROW({solver.solve(1e-3, state0, &state1);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state0, &state1, computeCompliance);});
 		EXPECT_EQ(defaultState, state0);
 		EXPECT_NE(defaultState, state1);
 		Vector3d acceleration0 = m.m_gravity - 0.1 * state0.getVelocities() / m.m_mass;
@@ -96,7 +103,7 @@ void doSolveTest()
 
 		// v(2) = (g - c/m.v).dt + v(1)
 		// x(2) = v(1).dt + x(1)
-		ASSERT_NO_THROW({solver.solve(1e-3, state1, &state2);});
+		ASSERT_NO_THROW({solver->solve(1e-3, state1, &state2, computeCompliance);});
 		EXPECT_NE(defaultState, state1);
 		EXPECT_NE(defaultState, state2);
 		EXPECT_NE(state1, state2);
@@ -105,16 +112,56 @@ void doSolveTest()
 		EXPECT_TRUE(state2.getPositions().isApprox(state1.getVelocities() * 1e-3 + state1.getPositions()));
 	}
 }
+};
 
 TEST(OdeSolverEulerExplicit, SolveTest)
 {
 	{
-		SCOPED_TRACE("EulerExplicit");
-		doSolveTest<OdeSolverEulerExplicit>();
+		SCOPED_TRACE("EulerExplicit computing the compliance matrix");
+		doSolveTest<OdeSolverEulerExplicit>(true);
 	}
 	{
+		SCOPED_TRACE("EulerExplicit not computing the compliance matrix");
+		doSolveTest<OdeSolverEulerExplicit>(false);
+	}
+	{
+		SCOPED_TRACE("LinearEulerExplicit computing the compliance matrix");
+		doSolveTest<OdeSolverLinearEulerExplicit>(true);
+	}
+	{
+		SCOPED_TRACE("LinearEulerExplicit not computing the compliance matrix");
+		doSolveTest<OdeSolverLinearEulerExplicit>(false);
+	}
+}
+
+namespace
+{
+template <class T>
+void doComputeMatricesTest()
+{
+	MassPoint m;
+	T solver(&m);
+	MassPointState state;
+	double dt = 1e-3;
+
+	m.updateFMDK(state, ODEEQUATIONUPDATE_M);
+	Matrix expectedSystemMatrix = m.getM() / dt;
+	EXPECT_NO_THROW(solver.computeMatrices(dt, state));
+	EXPECT_TRUE(solver.getSystemMatrix().isApprox(expectedSystemMatrix));
+	EXPECT_TRUE(solver.getComplianceMatrix().isApprox(expectedSystemMatrix.inverse()));
+}
+};
+
+TEST(OdeSolverEulerExplicit, ComputeMatricesTest)
+{
+	{
+		SCOPED_TRACE("EulerExplicit");
+		doComputeMatricesTest<OdeSolverEulerExplicit>();
+	}
+
+	{
 		SCOPED_TRACE("LinearEulerExplicit");
-		doSolveTest<OdeSolverLinearEulerExplicit>();
+		doComputeMatricesTest<OdeSolverLinearEulerExplicit>();
 	}
 }
 

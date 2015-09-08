@@ -21,6 +21,8 @@
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 
+#include "SurgSim/Testing/Utilities.h"
+
 namespace SurgSim
 {
 namespace Framework
@@ -65,6 +67,33 @@ TEST(SceneTest, AddAndTestScene)
 	EXPECT_EQ(scene, component->getScene());
 	EXPECT_EQ(element, component->getSceneElement());
 	EXPECT_EQ(scene, element->getScene());
+}
+
+
+
+TEST(SceneTest, TryFind)
+{
+	auto runtime = std::make_shared<Runtime>();
+	auto scene = std::make_shared<Scene>(runtime);
+
+	auto element0 = std::make_shared<BasicSceneElement>("element0");
+	auto element1 = std::make_shared<BasicSceneElement>("element1");
+
+	auto component0 = std::make_shared<MockComponent>("component0");
+	auto component1 = std::make_shared<MockComponent>("component1");
+
+	element0->addComponent(component0);
+	element1->addComponent(component1);
+	scene->addSceneElement(element0);
+	scene->addSceneElement(element1);
+
+	std::shared_ptr<Component> result;
+
+	EXPECT_EQ(component0, scene->getComponent("element0", "component0"));
+	EXPECT_EQ(component1, scene->getComponent("element1", "component1"));
+
+	EXPECT_EQ(nullptr, scene->getComponent("element1", "xxx"));
+	EXPECT_EQ(nullptr, scene->getComponent("xxx", "component0"));
 }
 
 TEST(SceneTest, CheckForExpiredRuntime)
@@ -140,6 +169,54 @@ TEST(SceneTest, LoadSceneTest)
 
 	// Another check for fresh components, if they are from the cache, this would be false
 	EXPECT_TRUE(component->isLocalActive());
+}
+
+TEST(SceneTest, SceneElementGroups)
+{
+
+	using SurgSim::Testing::doesContain;
+
+	auto runtime = std::make_shared<Runtime>("config.txt");
+	auto scene = runtime->getScene();
+
+	auto element1 = std::make_shared<BasicSceneElement>("element1");
+	auto element2 = std::make_shared<BasicSceneElement>("element2");
+
+	element1->addToGroup("One");
+
+	auto groups = scene->getGroups();
+
+	EXPECT_TRUE(groups->getGroups().empty());
+
+	scene->addSceneElement(element1);
+
+	EXPECT_EQ(1L, groups->getGroups().size());
+	EXPECT_TRUE(doesContain(groups->getGroups(), "One"));
+	EXPECT_TRUE(doesContain(groups->getMembers("One"), element1));
+
+	scene->addSceneElement(element2);
+	EXPECT_EQ(1L, groups->getGroups().size());
+
+	element2->addToGroup("Two");
+	EXPECT_EQ(2L, groups->getGroups().size());
+	EXPECT_TRUE(doesContain(groups->getGroups(), "Two"));
+	EXPECT_TRUE(doesContain(groups->getMembers("Two"), element2));
+
+	element1->removeFromGroup("One");
+	EXPECT_EQ(1L, groups->getGroups().size());
+	EXPECT_TRUE(doesContain(groups->getGroups(), "Two"));
+	EXPECT_TRUE(doesContain(groups->getMembers("Two"), element2));
+
+	element1->addToGroup("One");
+
+
+	std::vector<std::string> groupNames;
+	groupNames.push_back("Three");
+	groupNames.push_back("Four");
+
+	element1->setGroups(groupNames);
+	EXPECT_EQ(4L, groups->getGroups().size());
+
 }
 
 }

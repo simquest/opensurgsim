@@ -16,12 +16,11 @@
 #ifndef SURGSIM_MATH_LINEARSOLVEANDINVERSE_H
 #define SURGSIM_MATH_LINEARSOLVEANDINVERSE_H
 
-#include "SurgSim/Framework/Assert.h"
+#include <Eigen/Core>
 
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
-
-#include <Eigen/Core>
 
 namespace SurgSim
 {
@@ -38,26 +37,45 @@ class LinearSolveAndInverse
 public:
 	virtual ~LinearSolveAndInverse(){}
 
-	/// Solve a linear system A.x=b and compute the matrix A^-1
-	/// \param A Linear system matrix
-	/// \param b Linear system right-hand-side
-	/// \param[out] x Linear system unknown (if requested)
-	/// \param[out] Ainv Linear system matrix inverse = A^-1 (if requested)
-	virtual void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) = 0;
+	/// Set the linear solver matrix
+	/// \param matrix the new matrix to solve/inverse for
+	virtual void setMatrix(const Matrix& matrix) = 0;
+
+	/// Solve the linear system (matrix.x=b) using the matrix provided by the latest setMatrix call
+	/// \param b The rhs vector
+	/// \return The solution vector
+	virtual Vector solve(const Vector& b) = 0;
+
+	/// \return The linear system's inverse matrix, i.e. the inverse of the matrix provided on the last setMatrix call
+	virtual Matrix getInverse() = 0;
 };
 
 /// Derivation for dense matrix type
 class LinearSolveAndInverseDenseMatrix : public LinearSolveAndInverse
 {
 public:
-	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+	void setMatrix(const Matrix& matrix) override;
+
+	Vector solve(const Vector& b) override;
+
+	Matrix getInverse() override;
+
+private:
+	Eigen::PartialPivLU<typename Eigen::MatrixBase<Matrix>::PlainObject> m_luDecomposition;
 };
 
 /// Derivation for diagonal matrix type
 class LinearSolveAndInverseDiagonalMatrix : public LinearSolveAndInverse
 {
+private:
+	Vector m_inverseDiagonal;
+
 public:
-	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+	void setMatrix(const Matrix& matrix) override;
+
+	Vector solve(const Vector& b) override;
+
+	Matrix getInverse() override;
 };
 
 /// Derivation for tri-diagonal block matrix type
@@ -66,7 +84,11 @@ template <size_t BlockSize>
 class LinearSolveAndInverseTriDiagonalBlockMatrix : public LinearSolveAndInverse
 {
 public:
-	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+	void setMatrix(const Matrix& matrix) override;
+
+	Vector solve(const Vector& b) override;
+
+	Matrix getInverse() override;
 
 protected:
 	/// Computes the inverse matrix
@@ -116,7 +138,7 @@ class LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix :
 	public LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>
 {
 public:
-	void operator ()(const Matrix& A, const Vector& b, Vector* x = nullptr, Matrix* Ainv = nullptr) override;
+	void setMatrix(const Matrix& matrix) override;
 
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::inverseTriDiagonalBlock;
 	using LinearSolveAndInverseTriDiagonalBlockMatrix<BlockSize>::m_inverse;

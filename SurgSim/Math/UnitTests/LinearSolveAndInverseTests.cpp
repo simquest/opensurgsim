@@ -36,7 +36,7 @@ private:
 		v->resize(size);
 		for (size_t row = 0; row < size; row++)
 		{
-			(*v)(row) = fmod(-4.1 * row * row + 3.46, 5.0);
+			(*v)(row) = std::fmod(-4.1 * row * row + 3.46, 5.0);
 		}
 	}
 
@@ -47,9 +47,9 @@ private:
 		{
 			for (size_t col = 0; col < size; col++)
 			{
-				(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+				(*m)(row, col) = std::fmod((10.3 * std::cos(static_cast<double>(row * col)) + 3.24), 10.0);
 			}
-			}
+		}
 	}
 
 	void initializeDiagonalMatrix(Matrix* m)
@@ -58,7 +58,7 @@ private:
 		m->setZero();
 		for (size_t row = 0; row < size; row++)
 		{
-			(*m)(row, row) = fmod((10.3 * cos(static_cast<double>(row * row)) + 3.24), 10.0);
+			(*m)(row, row) = std::fmod((10.3 * std::cos(static_cast<double>(row * row)) + 3.24), 10.0);
 		}
 	}
 
@@ -73,8 +73,8 @@ private:
 		for (size_t rowBlockId = 0; rowBlockId < numBlocks; rowBlockId++)
 		{
 			for (int colBlockId = static_cast<int>(rowBlockId) - 1;
-				colBlockId <= static_cast<int>(rowBlockId) + 1;
-				colBlockId++)
+				 colBlockId <= static_cast<int>(rowBlockId) + 1;
+				 colBlockId++)
 			{
 				if (colBlockId < 0 || colBlockId >= static_cast<int>(numBlocks))
 				{
@@ -87,7 +87,7 @@ private:
 					{
 						size_t row = rowBlockId * BlockSize + rowInBlockId;
 						size_t col = colBlockId * BlockSize + colInBlockId;
-						(*m)(row, col) = fmod((10.3 * cos(static_cast<double>(row * col)) + 3.24), 10.0);
+						(*m)(row, col) = fmod((10.3 * std::cos(static_cast<double>(row * col)) + 3.24), 10.0);
 					}
 				}
 			}
@@ -148,7 +148,9 @@ TEST_F(LinearSolveAndInverseTests, DenseMatrixTests)
 	setupDenseMatrixTest();
 
 	LinearSolveAndInverseDenseMatrix solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -159,7 +161,9 @@ TEST_F(LinearSolveAndInverseTests, DiagonalMatrixTests)
 	setupDiagonalMatrixTest();
 
 	LinearSolveAndInverseDiagonalMatrix solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -170,7 +174,9 @@ TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize2Tests)
 	setupTriDiagonalBlockMatrixTest<2>();
 
 	LinearSolveAndInverseTriDiagonalBlockMatrix<2> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -181,7 +187,9 @@ TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize3Tests)
 	setupTriDiagonalBlockMatrixTest<3>();
 
 	LinearSolveAndInverseTriDiagonalBlockMatrix<3> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -192,7 +200,9 @@ TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize4Tests)
 	setupTriDiagonalBlockMatrixTest<4>();
 
 	LinearSolveAndInverseTriDiagonalBlockMatrix<4> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -203,7 +213,9 @@ TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize5Tests)
 	setupTriDiagonalBlockMatrixTest<5>();
 
 	LinearSolveAndInverseTriDiagonalBlockMatrix<5> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -214,7 +226,9 @@ TEST_F(LinearSolveAndInverseTests, TriDiagonalBlockMatrixBlockSize6Tests)
 	setupTriDiagonalBlockMatrixTest<6>();
 
 	LinearSolveAndInverseTriDiagonalBlockMatrix<6> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -225,7 +239,9 @@ TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize2Test
 	setupTriDiagonalBlockMatrixTest<2>(true);
 
 	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<2> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -236,7 +252,9 @@ TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize3Test
 	setupTriDiagonalBlockMatrixTest<3>(true);
 
 	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<3> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -247,7 +265,9 @@ TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize4Test
 	setupTriDiagonalBlockMatrixTest<4>(true);
 
 	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<4> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -258,7 +278,9 @@ TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize5Test
 	setupTriDiagonalBlockMatrixTest<5>(true);
 
 	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<5> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));
@@ -269,7 +291,9 @@ TEST_F(LinearSolveAndInverseTests, SymmetricTriDiagonalBlockMatrixBlockSize6Test
 	setupTriDiagonalBlockMatrixTest<6>(true);
 
 	LinearSolveAndInverseSymmetricTriDiagonalBlockMatrix<6> solveAndInverse;
-	solveAndInverse(matrix, b, &x, &inverseMatrix);
+	solveAndInverse.setMatrix(matrix);
+	x = solveAndInverse.solve(b);
+	inverseMatrix = solveAndInverse.getInverse();
 
 	EXPECT_TRUE(x.isApprox(expectedX));
 	EXPECT_TRUE(inverseMatrix.isApprox(expectedInverse));

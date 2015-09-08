@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
@@ -31,11 +33,44 @@ Representation::~Representation()
 
 }
 
+const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
+{
+	boost::lock_guard<boost::mutex> lock(m_posedShapeMutex);
+
+	Math::RigidTransform3d pose = getPose();
+	if (pose.isApprox(Math::RigidTransform3d::Identity()))
+	{
+		m_posedShape = getShape();
+		m_posedShapePose = Math::RigidTransform3d::Identity();
+	}
+	else if (m_posedShape == nullptr || !pose.isApprox(m_posedShapePose))
+	{
+		m_posedShape = getShape()->getTransformed(pose);
+		m_posedShapePose = pose;
+	}
+
+	return m_posedShape;
+}
+
+void Representation::invalidatePosedShape()
+{
+	boost::lock_guard<boost::mutex> lock(m_posedShapeMutex);
+
+	m_posedShape = nullptr;
+}
+
 SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()
 {
 	return m_collisions;
 }
 
+void Representation::addContact(const std::shared_ptr<Representation>& other,
+								const std::shared_ptr<SurgSim::Collision::Contact>& contact)
+{
+	boost::lock_guard<boost::mutex> lock(m_collisionsMutex);
+
+	m_collisions.unsafeGet()[other].push_back(contact);
+}
 
 bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 {

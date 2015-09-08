@@ -21,6 +21,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
+#include <array>
+
 namespace SurgSim
 {
 
@@ -95,9 +97,38 @@ public:
 	/// \param	matrix	Projection matrix
 	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) = 0;
 
+	/// Sets the viewport size for this camera
+	/// \param x,y location of the viewport in screen space
+	/// \param width, height size of the viewport in screen space
+	virtual void setViewport(int x, int y, int width, int height) = 0;
+
+	/// collect the viewport values
+	/// \param x,y,width,height [out] non-nullptr parameters to write the viewport parameters
+	virtual void getViewport(int* x, int* y, int* width, int* height) const  = 0;
+
+
+	/// Set the projection matrix with the appropriate  perspective projection parameters
+	/// \param fovy Field of view along the y-axis
+	/// \param aspect Aspect ration between y and x axis in the viewport
+	/// \param near, far near and far clipping planes
+	virtual void setPerspectiveProjection(double fovy, double aspect, double near, double far) = 0;
+
+	/// Set the projection matrix with the appropriate orthogonal projection parameters
+	/// \param left, right left and right bounds of the view volume
+	/// \param bottom, top bottom and top bounds of the view volume
+	/// \param near, far near and far bounds of the view volume
+	virtual void setOrthogonalProjection(
+		double left, double right,
+		double bottom, double top,
+		double near, double far) = 0;
+
 	/// Gets the projection matrix of the camera
 	/// \return	Projection matrix
 	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
+
+	/// Gets the inverse projection matrix of the camera
+	/// \return	Inverse Projection matrix
+	virtual SurgSim::Math::Matrix44d getInverseProjectionMatrix() const = 0;
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
 	/// \param	renderTarget	The render target.
@@ -126,6 +157,15 @@ public:
 
 
 private:
+
+	void setPerspectiveProjection(const std::array<double, 4>& val);
+
+	void setOrthogonalProjection(const std::array<double, 6>& val);
+
+	void setViewport(std::array<int, 4> val);
+
+	std::array<int, 4> getViewport() const;
+
 
 	bool doInitialize() override;
 

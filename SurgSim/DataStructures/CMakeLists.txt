@@ -32,7 +32,6 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	TreeData.cpp
 	TreeNode.cpp
 	TriangleMesh.cpp
-	TriangleMeshUtilities.cpp
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
@@ -50,6 +49,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	EmptyData.h
 	Grid.h
 	Grid-inl.h
+	Groups.h
+	Groups-inl.h
 	Image.h
 	Image-inl.h
 	IndexDirectory.h
@@ -61,6 +62,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	NamedDataBuilder.h
 	NamedVariantData.h
 	NamedVariantData-inl.h
+	NormalData.h
 	OctreeNode.h
 	OctreeNode-inl.h
 	OctreeNodePlyReaderDelegate.h
@@ -77,14 +79,11 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	TreeVisitor.h
 	TriangleMesh.h
 	TriangleMesh-inl.h
-	TriangleMeshBase.h
-	TriangleMeshBase-inl.h
 	TriangleMeshPlyReaderDelegate.h
 	TriangleMeshPlyReaderDelegate-inl.h
-	TriangleMeshUtilities.h
-	TriangleMeshUtilities-inl.h
 	Vertex.h
 	Vertices.h
+	Vertices-inl.h
 )
 surgsim_create_library_header(DataStructures.h "${SURGSIM_DATA_STRUCTURES_HEADERS}")
 
