@@ -89,12 +89,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
-option(USE_SYSTEM_YAMLCPP "Should we use the system yaml-cpp?" OFF)
-if(USE_SYSTEM_YAMLCPP)
-	find_package(yaml-cpp 0.5.1.2 EXACT REQUIRED)
-else(USE_SYSTEM_YAMLCPP)
-	include(External_yamlcpp)
-endif(USE_SYSTEM_YAMLCPP)
+find_package(yaml-cpp 0.5.2 REQUIRED)
 
 include_directories(${SURGSIM_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
