@@ -100,7 +100,8 @@ void RenderPass::showColorTarget(int x, int y, int width, int height)
 	if (m_debugColor != nullptr)
 	{
 		m_debugColor->setLocation(x, y);
-		m_debugColor->setSize(width, height);
+		std::array<int, 2> dimensions = {width, height};
+		m_debugColor->setSize(dimensions);
 		m_debugColor->setLocalActive(true);
 	}
 }
@@ -123,7 +124,8 @@ void RenderPass::showDepthTarget(int x, int y, int width, int height)
 	if (m_debugDepth != nullptr)
 	{
 		m_debugDepth->setLocation(x, y);
-		m_debugDepth->setSize(width, height);
+		std::array<int, 2> dimensions = {width, height};
+		m_debugDepth->setSize(dimensions);
 		m_debugDepth->setLocalActive(true);
 	}
 }

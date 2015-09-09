@@ -22,6 +22,7 @@
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/ScreenSpaceQuadRepresentation.h"
 
+#include <array>
 #include <osg/Vec3>
 
 #if defined(_MSC_VER)
@@ -68,12 +69,15 @@ public:
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
 	/// \param	height	The height of the quad in screen coordinates.
-	void setSize(double width, double height) override;
+	void setSize(double width, double height) ;
 
 	/// Gets the size of the quad.
 	/// \param [out]	width 	If non-null, the width. Throws exception otherwise.
 	/// \param [out]	height	If non-null, the height. Throws exception otherwise.
-	void getSize(double* width, double* height) const override;
+	void getSize(double* width, double* height) const ;
+
+	void setSize(std::array<int, 2> dimensions) override;
+	std::array<int, 2> getSize()const override;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "texture" for the uniform in this operation. This can be accomplished

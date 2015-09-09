@@ -16,7 +16,12 @@
 #ifndef SURGSIM_GRAPHICS_SCREENSPACEQUADREPRESENTATION_H
 #define SURGSIM_GRAPHICS_SCREENSPACEQUADREPRESENTATION_H
 
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/Representation.h"
+
+#include <array>
 
 namespace SurgSim
 {
@@ -36,7 +41,8 @@ public:
 	/// \param	name	The name.
 	explicit ScreenSpaceQuadRepresentation(const std::string name) : Representation(name)
 	{
-
+		typedef std::array<int, 2> ParamType;
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(ScreenSpaceQuadRepresentation, ParamType, Size, getSize, setSize);
 	}
 
 	~ScreenSpaceQuadRepresentation()
@@ -55,12 +61,15 @@ public:
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
 	/// \param	height	The height of the quad in screen coordinates.
-	virtual void setSize(double width, double height) = 0;
+	//virtual void setSize(double width, double height) = 0;
 
 	/// Gets the size of the quad.
 	/// \param [out]	width 	If non-null, the width, may throw if null is passed.
 	/// \param [out]	height	If non-null, the height, may throw if null is passed.
-	virtual void getSize(double* width, double* height) const = 0;
+	//virtual void getSize(double* width, double* height) const = 0;
+
+	virtual void setSize(std::array<int, 2> dimensions) = 0;
+	virtual std::array<int, 2> getSize() const = 0;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished

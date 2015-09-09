@@ -117,20 +117,20 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 
 std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	std::shared_ptr<Framework::TransferPropertiesBehavior> copier,
+	std::shared_ptr<Graphics::View> view,
 	std::shared_ptr<Graphics::Camera> camera,
 	std::shared_ptr<Graphics::Light> light,
 	std::shared_ptr<Graphics::Texture> depthMap,
 	std::shared_ptr<Graphics::Texture> normalMap,
 	const Math::Vector4f& diffuseColor,
 	const Math::Vector4f& specularColor,
-	float shininess,
-	int width, int height)
+	float shininess)
 {
 	auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceShadingPass");
 
 	auto renderCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(renderPass->getCamera());
-	renderCamera->setViewport(0, 0, width, height);
-	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, width, 0, height);
+	renderCamera->setViewport(0, 0, 1024, 1024);
+	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, 1024, 0, 1024);
 	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
 	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
@@ -158,15 +158,16 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	renderPass->setMaterial(material);
 
 	auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics");
-	graphics->setSize(width , height);
 	graphics->setLocation(0, 0);
 	graphics->setGroupReference("ImplicitSurfaceShadingPass");
+	copier->connect(view, "Dimensions", graphics, "Size");
 	renderPass->addComponent(graphics);
 
 	return renderPass;
 }
 
-std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(
+std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffect(
+			std::shared_ptr<Framework::Component> view,
 			std::shared_ptr<Framework::Component> camera,
 			std::shared_ptr<Framework::Component> light,
 			float sphereRadius,
@@ -177,26 +178,25 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurface(
 			float shininess,
 			bool showDebug)
 {
+	SURGSIM_ASSERT(view != nullptr) << "View can't be nullptr.";
 	SURGSIM_ASSERT(camera != nullptr) << "Camera can't be nullptr.";
 	SURGSIM_ASSERT(light != nullptr) << "Light can't be nullptr.";
+	auto graphicsView = Framework::checkAndConvert<Graphics::View>(view, "SurgSim::Graphics::View");
 	auto osgCamera = Framework::checkAndConvert<Graphics::OsgCamera>(camera, "SurgSim::Graphics::OsgCamera");
 	auto osgLight = Framework::checkAndConvert<Graphics::OsgLight>(light, "SurgSim::Graphics::OsgLight");
 
 	auto copier =  std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
 	copier->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_GRAPHICS);
 
-	int x, y, width, height;
-	osgCamera->getViewport(&x, &y, &width, &height);
-
 	auto depthPass = createDepthPass(copier, osgCamera, sphereRadius, sphereScale, textureSize, showDebug);
 
 	auto normalPass = createNormalPass(copier, osgCamera, depthPass->getRenderTarget()->getDepthTarget(),
 									   textureSize, showDebug);
 
-	auto shadingPass = createShadingPass(copier, osgCamera, osgLight,
+	auto shadingPass = createShadingPass(copier, graphicsView, osgCamera, osgLight,
 									depthPass->getRenderTarget()->getDepthTarget(),
 									normalPass->getRenderTarget()->getColorTarget(0),
-									diffuseColor, specularColor, shininess, width, height);
+									diffuseColor, specularColor, shininess);
 
 	depthPass->addComponent(copier);
 

@@ -57,7 +57,7 @@ void main(void)
     }
     vec3 eyePos = getEyeSpacePos(texCoord0, depth);
 
-    vec3 normal = normalize(texture2D(normalMap, texCoord0).xyz);
+    vec3 normal = normalize(texture2D(normalMap, texCoord0).xyz * 2.0 - 1.0);
 
     vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
 	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
@@ -74,7 +74,7 @@ void main(void)
 
     vec3 color = (vAmbient + vDiffuse) + vSpecular;
 
-	gl_FragColor.rgb = color;
-	gl_FragColor.a = 1.0;
+    gl_FragColor.rgb = color;
+    gl_FragColor.a = 1.0;
     gl_FragDepth = depth;
 }

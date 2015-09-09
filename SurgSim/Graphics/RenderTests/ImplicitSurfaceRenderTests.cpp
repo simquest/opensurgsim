@@ -56,8 +56,9 @@ TEST(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	auto viewElement = std::make_shared<Graphics::OsgViewElement>("view element");
 	std::array<int, 2> position = {100, 100};
-	viewElement->getView()->setPosition(position);
-	viewElement->getView()->setWindowBorderEnabled(true);
+	//viewElement->getView()->setPosition(position);
+	//viewElement->getView()->setWindowBorderEnabled(true);
+	viewElement->getView()->setFullScreen(true);
 
 	scene->addSceneElement(viewElement);
 
@@ -75,7 +76,7 @@ TEST(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	scene->addSceneElement(lightElement);
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
-		Blocks::createImplicitSurface(viewElement->getCamera(), light, 0.01f, 800.0f, 1024,
+		Blocks::createImplicitSurfaceEffect(viewElement->getView(), viewElement->getCamera(), light, 0.01f, 800.0f, 1024,
 										Math::Vector4f(0.3, 0.0, 0.05, 1.0), Math::Vector4f(1.0, 1.0, 1.0, 1.0),
 										100, false);
 
