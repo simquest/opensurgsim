@@ -217,8 +217,7 @@ template <typename T, size_t N>
 template <class Derived>
 const std::vector<T>& Grid<T, N>::getNeighbors(const Eigen::MatrixBase<Derived>& position)
 {
-	static std::vector<T> empty;
-	std::vector<T>& result = empty;
+	const static std::vector<T> empty;
 
 	// If outside the bounding box, can't find any neighbors
 	if (m_aabb.contains(position))
@@ -236,7 +235,7 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const Eigen::MatrixBase<Derived>&
 		// If position is in a cell that exists, return that cells neighbors,
 		if (foundCell != m_activeCells.end())
 		{
-			result = (foundCell->second).neighbors;
+			return (foundCell->second).neighbors;
 		}
 		else
 		{
@@ -260,15 +259,15 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const Eigen::MatrixBase<Derived>&
 				}
 				m_positionCache[cellId] = std::move(neigbors);
 			}
-			result = m_positionCache[cellId];
+			return m_positionCache[cellId];
 		}
 	}
-	return result;
+	return empty;
 }
 
 template <typename T, size_t N>
 void Grid<T, N>::getNeighborsCellIds(NDId cellId,
-	std::array<NDId, powerOf3<N>::value>* cellsIds)
+									 std::array<NDId, powerOf3<N>::value>* cellsIds)
 {
 	// Now build up all the 3^N neighbors cell around this n-d cell
 	// It corresponds to all possible permutation in dimension-N of the indices
