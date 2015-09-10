@@ -157,6 +157,8 @@ void Grid<T, N>::update()
 {
 	std::array<NDId, powerOf3<N>::value> cellsIds;
 
+	m_positionCache.clear();
+
 	// Start by clearing up all the neighbor's list
 	for (typename std::unordered_map<NDId, typename Grid<T, N>::CellContent, NDIdHash>::reference cell : m_activeCells)
 	{
@@ -209,6 +211,59 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const T& element)
 	}
 
 	return empty;
+}
+
+template <typename T, size_t N>
+template <class Derived>
+const std::vector<T>& Grid<T, N>::getNeighbors(const Eigen::MatrixBase<Derived>& position)
+{
+	static std::vector<T> empty;
+	std::vector<T>& result = empty;
+
+	// If outside the bounding box, can't find any neighbors
+	if (m_aabb.contains(position))
+	{
+		if (m_neighborsDirtyFlag)
+		{
+			update();
+			m_neighborsDirtyFlag = false;
+		}
+
+		NDId cellId = ((position - m_aabb.min()).cwiseQuotient(m_size)).template cast<int>();
+
+		auto foundCell = m_activeCells.find(cellId);
+
+		// If position is in a cell that exists, return that cells neighbors,
+		if (foundCell != m_activeCells.end())
+		{
+			result = (foundCell->second).neighbors;
+		}
+		else
+		{
+			// If the neighbors are in the cache return them
+			// otherwise calculate all the neighbors
+			auto foundPosition = m_positionCache.find(cellId);
+			if (foundPosition == m_positionCache.end())
+			{
+				std::array<NDId, powerOf3<N>::value> cellsIds;
+				getNeighborsCellIds(cellId, &cellsIds);
+				std::vector<T> neigbors;
+				for (const auto& neighborId : cellsIds)
+				{
+					auto neighborCell = m_activeCells.find(neighborId);
+					if (neighborCell != m_activeCells.end())
+					{
+						neigbors.insert(neigbors.end(),
+										neighborCell->second.elements.cbegin(),
+										neighborCell->second.elements.cend());
+					}
+				}
+				m_positionCache[cellId] = std::move(neigbors);
+			}
+			result = m_positionCache[cellId];
+		}
+	}
+	return result;
 }
 
 template <typename T, size_t N>

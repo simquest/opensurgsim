@@ -70,6 +70,12 @@ public:
 	/// \return The element's neighbors list (including the element itself)
 	const std::vector<T>& getNeighbors(const T& element);
 
+	/// Retrieve the neighbors of a location
+	/// \param position The position for which the neighbors are requested
+	/// \return The neighbors for this position, i.e. all the elements in the positions cell and all surrounding cells
+	template <class Derived>
+	const std::vector<T>& getNeighbors(const Eigen::MatrixBase<Derived>& position);
+
 protected:
 	/// Data structure for a cell's content (the list of elements and the list of all the neighbors)
 	typedef struct
@@ -90,6 +96,9 @@ protected:
 
 	/// Active cells (referenced by their ids (spatial hashing)) with their content
 	std::unordered_map<NDId, CellContent, NDIdHash> m_activeCells;
+
+	/// Positions that have been queried, if there are no active cells
+	std::unordered_map<NDId, std::vector<T>, NDIdHash> m_positionCache;
 
 	/// Mapping from element to cell id containing the element
 	std::unordered_map<T, NDId> m_cellIds;
