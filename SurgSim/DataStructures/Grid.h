@@ -97,9 +97,6 @@ protected:
 	/// Active cells (referenced by their ids (spatial hashing)) with their content
 	std::unordered_map<NDId, CellContent, NDIdHash> m_activeCells;
 
-	/// Positions that have been queried, if there are no active cells
-	std::unordered_map<NDId, std::vector<T>, NDIdHash> m_positionCache;
-
 	/// Mapping from element to cell id containing the element
 	std::unordered_map<T, NDId> m_cellIds;
 

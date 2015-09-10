@@ -157,8 +157,6 @@ void Grid<T, N>::update()
 {
 	std::array<NDId, powerOf3<N>::value> cellsIds;
 
-	m_positionCache.clear();
-
 	// Start by clearing up all the neighbor's list
 	for (typename std::unordered_map<NDId, typename Grid<T, N>::CellContent, NDIdHash>::reference cell : m_activeCells)
 	{
@@ -191,6 +189,7 @@ void Grid<T, N>::update()
 			}
 		}
 	}
+	m_neighborsDirtyFlag = false;
 }
 
 template <typename T, size_t N>
@@ -201,7 +200,6 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const T& element)
 	if (m_neighborsDirtyFlag)
 	{
 		update();
-		m_neighborsDirtyFlag = false;
 	}
 
 	auto const foundCell = m_cellIds.find(element);
@@ -225,42 +223,34 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const Eigen::MatrixBase<Derived>&
 		if (m_neighborsDirtyFlag)
 		{
 			update();
-			m_neighborsDirtyFlag = false;
 		}
 
 		NDId cellId = ((position - m_aabb.min()).cwiseQuotient(m_size)).template cast<int>();
 
 		auto foundCell = m_activeCells.find(cellId);
-
-		// If position is in a cell that exists, return that cells neighbors,
-		if (foundCell != m_activeCells.end())
+		if (foundCell == m_activeCells.end())
 		{
-			return (foundCell->second).neighbors;
-		}
-		else
-		{
-			// If the neighbors are in the cache return them
-			// otherwise calculate all the neighbors
-			auto foundPosition = m_positionCache.find(cellId);
-			if (foundPosition == m_positionCache.end())
+			// If the cell doesn't exist, collect all the neighbors
+			auto foundPosition = m_activeCells.find(cellId);
+			if (foundPosition == m_activeCells.end())
 			{
 				std::array<NDId, powerOf3<N>::value> cellsIds;
 				getNeighborsCellIds(cellId, &cellsIds);
-				std::vector<T> neigbors;
+				std::vector<T> neighbors;
 				for (const auto& neighborId : cellsIds)
 				{
 					auto neighborCell = m_activeCells.find(neighborId);
 					if (neighborCell != m_activeCells.end())
 					{
-						neigbors.insert(neigbors.end(),
-										neighborCell->second.elements.cbegin(),
-										neighborCell->second.elements.cend());
+						neighbors.insert(neighbors.end(),
+										 neighborCell->second.elements.cbegin(),
+										 neighborCell->second.elements.cend());
 					}
 				}
-				m_positionCache[cellId] = std::move(neigbors);
+				m_activeCells[cellId].neighbors = std::move(neighbors);
 			}
-			return m_positionCache[cellId];
 		}
+		return m_activeCells[cellId].neighbors;
 	}
 	return empty;
 }
