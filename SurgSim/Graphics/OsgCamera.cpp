@@ -369,11 +369,10 @@ void OsgCamera::setMainCamera(bool val)
 		{
 			m_camera->removeChild(m_materialProxy);
 
-			std::array<long, 3> masks = {CullMaskLeft, CullMaskRight};
+			std::array<long, 2> masks = {CullMaskLeft, CullMaskRight};
 
 			// Insert two nodes into the camera hierarchy, they will update the global uniforms with the correct
-			// values, in case of stereo only the CullMaskRight is used.
-			// attach the material proxy to each of the nodes,
+			// value. Also attach the material proxy to each of the nodes.
 			for (auto& mask : masks)
 			{
 				auto node = createUniformUpdateNode(mask);

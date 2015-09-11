@@ -299,6 +299,9 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime, bool useS
 	scene->addSceneElement(sphere);
 	if (useStereo == true)
 	{
+		// This will most like have to be edited to conform with the screen configuration
+		// TargetScreen, or Dimensions and Location are candidates for being incorrect depending
+		// on the system
 		runtime->addSceneElements("StereoView.yaml");
 	}
 	else
