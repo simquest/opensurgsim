@@ -100,7 +100,7 @@ void DcdCollision::populateCalculationTable()
 	setDcdContactInTable(std::make_shared<Collision::SpherePlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::TriangleMeshParticlesDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::TriangleMeshPlaneDcdContact>());
-	//setDcdContactInTable(std::make_shared<Collision::TriangleMeshTriangleMeshDcdContact>());
+	setDcdContactInTable(std::make_shared<Collision::TriangleMeshTriangleMeshDcdContact>());
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
