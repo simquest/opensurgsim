@@ -48,7 +48,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 	auto threadPool = Framework::Runtime::getThreadPool();
-	auto const& representations = state->getActiveCollisionRepresentations();
 	std::vector<std::future<void>> tasks;
 
 	updatePairs(result);
