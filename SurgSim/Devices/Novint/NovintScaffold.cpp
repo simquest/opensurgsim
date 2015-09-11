@@ -126,28 +126,36 @@ namespace Devices
 class NovintScaffold::Handle
 {
 public:
-	explicit Handle(const std::string& serial) :
+	Handle(const std::string& info, bool initBySerialNumber = true) :
 		m_deviceHandle(HDL_INVALID_HANDLE)
 	{
 		HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
-		deviceHandle = hdlInitDeviceBySerialNumber(serial.c_str());
+		if (initBySerialNumber)
+		{
+			deviceHandle = hdlInitDeviceBySerialNumber(info.c_str());
+		}
+		else
+		{
+			deviceHandle = hdlInitNamedDevice(info.c_str());
+		}
 
 		if (checkForFatalError("Failed to initialize"))
 		{
-			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) << std::endl <<
-				"  HDAL serial number: '" << serial << "'" << std::endl;
+			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) << std::endl << 
+				(initBySerialNumber ? "HDAL serial number: '" : "device name: ''") << info << "'";
 		}
 		else if (deviceHandle == HDL_INVALID_HANDLE)
 		{
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
-				"No error during initializing device with serial number '" << serial << "'" <<
-				", but an invalid handle returned.";
+				"No error during initializing device " <<
+				(initBySerialNumber ? "with serial number: '" : "named: ''") << info <<
+				"', but an invalid handle returned.";
 		}
 		else
 		{
 			m_deviceHandle = deviceHandle;
 			SURGSIM_LOG_DEBUG(Framework::Logger::getLogger("Devices/Novint")) <<
-				"Handle " << deviceHandle << " created. hdlInitDeviceBySerialNumber called. Serial # " << serial;
+				"Handle " << deviceHandle << " created for device: '" << info << "'.";
 		}
 	}
 
@@ -419,6 +427,8 @@ NovintScaffold::NovintScaffold() :
 	// 2) hdlStart (must be after all hdlInitX and before hdlCreateServoOp), then
 	// 3) hdlCreateServoOp (starts the callback).
 
+	// Load the list of Novint devices user wants to use.
+	m_state->nameToSerial = getNameMap();
 	createAllHandles();
 	hdlStart();
 	if (!checkForFatalError("Couldn't start HDAL scheduler"))
@@ -429,7 +439,6 @@ NovintScaffold::NovintScaffold() :
 		if (callback->isValid())
 		{
 			m_state->callback = std::move(callback);
-			m_state->nameToSerial = getNameMap();
 			m_state->isApiInitialized = true;
 			SURGSIM_LOG_DEBUG(m_logger) << "Callback scheduled; Scaffold created successfully.";
 		}
@@ -959,20 +968,41 @@ void NovintScaffold::setInputData(DeviceData* info)
 
 void NovintScaffold::createAllHandles()
 {
-	// The Scaffold does not know which devices will be initialized, so we use hdlCatalogDevices to get the
-	// serial numbers for every connected device, then initialize all the connected devices, and when
-	// registerDevice is called the name can be matched to a Handle created from a serial number.
+	// The Scaffold does not know which devices will be initialized, so we will try to initialize all the devices
+	// list in device.yaml first. Then use hdlCatalogDevices to get the serial numbers for other connected 
+	// devices not listed in device.yaml, and initialize them.
+	// When registerDevice is called the name can be matched to a Handle created from a serial number.
+	for(const auto& item: m_state->nameToSerial)
+	{
+		// initialize by name
+		auto handle = std::make_shared<NovintScaffold::Handle>(item.first, false);
+		if (handle->isValid())
+		{
+			m_state->serialToHandle[item.second] = handle;
+			hdlMakeCurrent(handle->get());
+			checkForFatalError("Failed to make device current.");
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(m_logger) << "Failed to initialize Novint device :" <<
+				item.first << "(Serial #: " << item.second << ")";
+		}
+	}
 
 	char serials[HDL_MAX_DEVICES * HDL_SERNUM_BUFFSIZE];
 	const int numDevices = hdlCatalogDevices(HDL_NOT_OPEN_BY_ANY_APP, &(serials[0]), NULL);
 	checkForFatalError("Failed to get catalog of devices.");
 
-	SURGSIM_LOG_DEBUG(m_logger) << numDevices << " Novint devices available.";
-
 	for (int i = 0; i < numDevices; ++i)
 	{
 		const std::string serial(&(serials[i * HDL_SERNUM_BUFFSIZE]), HDL_SERNUM_BUFFSIZE - 1);
 		SURGSIM_LOG_DEBUG(m_logger) << "Found serial number " << serial << ".";
+
+		// Device with serial number 'serial' already initialized.
+		if (m_state->serialToHandle.find(serial) != m_state->serialToHandle.end())
+		{
+			continue;
+		}
 
 		auto handle = std::make_shared<NovintScaffold::Handle>(serial);
 		if (handle->isValid())
