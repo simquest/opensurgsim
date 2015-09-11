@@ -68,21 +68,21 @@ OsgLight::OsgLight(const std::string& name) :
 
 	m_switch->addChild(m_lightSource);
 
-	m_uniforms[POSITION] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "position");
+	m_uniforms[POSITION] = new osg::Uniform(osg::Uniform::FLOAT_VEC4, prefix + "position");
 
-	m_uniforms[DIFFUSE_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "diffuse");
+	m_uniforms[DIFFUSE_COLOR] = new osg::Uniform(osg::Uniform::FLOAT_VEC4, prefix + "diffuse");
 	setDiffuseColor(m_diffuseColor);
 
-	m_uniforms[SPECULAR_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "specular");
+	m_uniforms[SPECULAR_COLOR] = new osg::Uniform(osg::Uniform::FLOAT_VEC4, prefix + "specular");
 	setSpecularColor(m_specularColor);
 
-	m_uniforms[CONSTANT_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, prefix + "constantAttenuation");
+	m_uniforms[CONSTANT_ATTENUATION] = new osg::Uniform(osg::Uniform::FLOAT, prefix + "constantAttenuation");
 	setConstantAttenuation(m_constantAttenuation);
 
-	m_uniforms[LINEAR_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, prefix + "linearAttenuation");
+	m_uniforms[LINEAR_ATTENUATION] = new osg::Uniform(osg::Uniform::FLOAT, prefix + "linearAttenuation");
 	setLinearAttenuation(m_linearAttenuation);
 
-	m_uniforms[QUADRATIC_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, prefix + "quadraticAttenuation");
+	m_uniforms[QUADRATIC_ATTENUATION] = new osg::Uniform(osg::Uniform::FLOAT, prefix + "quadraticAttenuation");
 	setQuadraticAttenuation(m_quadraticAttenuation);
 
 	// By default light the main group
