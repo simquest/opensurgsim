@@ -30,14 +30,14 @@ namespace Framework
 class Logger;
 };
 
-namespace Device
+namespace Devices
 {
 
 class LeapDevice;
 
 /// A class that manages Leap devices
 ///
-/// \sa SurgSim::Device::LeapDevice
+/// \sa SurgSim::Devices::LeapDevice
 class LeapScaffold
 {
 public:
@@ -106,7 +106,7 @@ private:
 	std::shared_ptr<Framework::Logger> m_logger;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif // SURGSIM_DEVICES_LEAP_LEAPSCAFFOLD_H

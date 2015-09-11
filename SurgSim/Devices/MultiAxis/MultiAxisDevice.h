@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class RawMultiAxisDevice;
@@ -60,7 +60,7 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit MultiAxisDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::MultiAxisDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::MultiAxisDevice);
 
 	/// Destructor.
 	virtual ~MultiAxisDevice();
@@ -165,7 +165,7 @@ private:
 	std::shared_ptr<PoseIntegrator> m_filter;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_MULTIAXISDEVICE_H

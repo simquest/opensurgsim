@@ -27,8 +27,8 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
 
-using SurgSim::Device::NimbleDevice;
-using SurgSim::Device::NimbleScaffold;
+using SurgSim::Devices::NimbleDevice;
+using SurgSim::Devices::NimbleScaffold;
 
 TEST(NimbleScaffoldTest, CreateAndDestroyScaffold)
 {

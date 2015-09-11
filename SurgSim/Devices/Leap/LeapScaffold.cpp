@@ -78,7 +78,7 @@ void updateDataGroup(const Leap::Hand& hand, SurgSim::DataStructures::DataGroup*
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class LeapScaffold::Listener : public Leap::Listener
@@ -110,7 +110,7 @@ public:
 	}
 
 private:
-	std::weak_ptr<Device::LeapScaffold> m_scaffold;
+	std::weak_ptr<Devices::LeapScaffold> m_scaffold;
 	std::shared_ptr<Framework::Logger> m_logger;
 };
 
@@ -437,5 +437,5 @@ bool LeapScaffold::isUsingHmdTrackingMode() const
 	return m_state->controller.isPolicySet(Leap::Controller::PolicyFlag::POLICY_OPTIMIZE_HMD);
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

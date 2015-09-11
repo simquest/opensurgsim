@@ -29,7 +29,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 struct OpenNIScaffold::DeviceData
@@ -293,5 +293,5 @@ SurgSim::DataStructures::DataGroup OpenNIScaffold::buildDeviceInputData()
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

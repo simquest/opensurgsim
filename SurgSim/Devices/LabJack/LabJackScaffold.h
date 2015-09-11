@@ -30,14 +30,14 @@ namespace Framework
 class Logger;
 }
 
-namespace Device
+namespace Devices
 {
 
 class LabJackDevice;
 class LabJackThread;
 
 /// A class that implements the behavior of LabJackDevice objects.
-/// \sa SurgSim::Device::LabJackDevice
+/// \sa SurgSim::Devices::LabJackDevice
 class LabJackScaffold
 {
 public:
@@ -143,7 +143,7 @@ private:
 	std::unique_ptr<StateData> m_state;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_LABJACK_LABJACKSCAFFOLD_H

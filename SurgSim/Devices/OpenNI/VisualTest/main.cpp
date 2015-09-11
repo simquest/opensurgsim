@@ -26,7 +26,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/VisualTestCommon/GlutRenderer.h"
 
-using SurgSim::Device::OpenNIDevice;
+using SurgSim::Devices::OpenNIDevice;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Math::Vector3d;
 

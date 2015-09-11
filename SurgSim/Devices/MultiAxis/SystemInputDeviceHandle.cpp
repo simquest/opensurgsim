@@ -17,7 +17,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 
@@ -34,5 +34,5 @@ void SystemInputDeviceHandle::prepareForShutdown()
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

@@ -31,7 +31,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
-using SurgSim::Device::IdentityPoseDevice;
+using SurgSim::Devices::IdentityPoseDevice;
 using SurgSim::Input::InputComponent;
 using SurgSim::Input::OutputComponent;
 using SurgSim::Framework::BasicSceneElement;

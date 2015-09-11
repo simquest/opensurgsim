@@ -32,13 +32,13 @@ extern "C" {  // sigh...
 #include "SurgSim/Devices/MultiAxis/win32/FileHandle.h"
 #include "SurgSim/Framework/Log.h"
 
-using SurgSim::Device::Internal::getSystemErrorCode;
-using SurgSim::Device::Internal::getSystemErrorText;
+using SurgSim::Devices::Internal::getSystemErrorCode;
+using SurgSim::Devices::Internal::getSystemErrorText;
 
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 // Usage page and usage IDs for interface devices; see e.g. http://www.usb.org/developers/devclass_docs/Hut1_12v2.pdf
@@ -574,5 +574,5 @@ void WdkHidDeviceHandle::decodeStateUpdates(const unsigned char* rawData, size_t
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

@@ -24,7 +24,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class RawMultiAxisDevice;
@@ -33,7 +33,7 @@ class SystemInputDeviceHandle;
 
 /// A class that implements the behavior of RawMultiAxisDevice objects.
 ///
-/// \sa SurgSim::Device::RawMultiAxisDevice
+/// \sa SurgSim::Devices::RawMultiAxisDevice
 class RawMultiAxisScaffold
 {
 public:
@@ -154,7 +154,7 @@ private:
 	std::unique_ptr<StateData> m_state;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISSCAFFOLD_H
