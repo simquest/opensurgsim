@@ -102,8 +102,8 @@ size_t Grid<T, N>::NDIdHash::operator()(const NDId& nd) const
 template <typename T, size_t N>
 Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds)
 	: m_size(cellSize),
-	m_aabb(bounds),
-	m_neighborsDirtyFlag(false)
+	  m_aabb(bounds),
+	  m_neighborsDirtyFlag(false)
 {
 	static_assert(N >= 1, "A grid must have a positive non null dimension");
 }
@@ -177,18 +177,19 @@ void Grid<T, N>::update()
 				if (neighborCell != m_activeCells.end())
 				{
 					cell.second.neighbors.insert(cell.second.neighbors.end(),
-						neighborCell->second.elements.cbegin(), neighborCell->second.elements.cend());
+												 neighborCell->second.elements.cbegin(), neighborCell->second.elements.cend());
 
 					// Treat symmetry if the cells are different
 					if (cellsIds[index] != cell.first)
 					{
 						neighborCell->second.neighbors.insert(neighborCell->second.neighbors.end(),
-							cell.second.elements.cbegin(), cell.second.elements.cend());
+															  cell.second.elements.cbegin(), cell.second.elements.cend());
 					}
 				}
 			}
 		}
 	}
+	m_neighborsDirtyFlag = false;
 }
 
 template <typename T, size_t N>
@@ -199,7 +200,6 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const T& element)
 	if (m_neighborsDirtyFlag)
 	{
 		update();
-		m_neighborsDirtyFlag = false;
 	}
 
 	auto const foundCell = m_cellIds.find(element);
@@ -212,8 +212,48 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const T& element)
 }
 
 template <typename T, size_t N>
+template <class Derived>
+const std::vector<T>& Grid<T, N>::getNeighbors(const Eigen::MatrixBase<Derived>& position)
+{
+	const static std::vector<T> empty;
+
+	// If outside the bounding box, can't find any neighbors
+	if (m_aabb.contains(position))
+	{
+		if (m_neighborsDirtyFlag)
+		{
+			update();
+		}
+
+		NDId cellId = ((position - m_aabb.min()).cwiseQuotient(m_size)).template cast<int>();
+
+		auto foundCell = m_activeCells.find(cellId);
+		if (foundCell == m_activeCells.end())
+		{
+			// If the cell doesn't exist, collect all the neighbors
+			std::array<NDId, powerOf3<N>::value> cellsIds;
+			getNeighborsCellIds(cellId, &cellsIds);
+			std::vector<T> neighbors;
+			for (const auto& neighborId : cellsIds)
+			{
+				auto neighborCell = m_activeCells.find(neighborId);
+				if (neighborCell != m_activeCells.end())
+				{
+					neighbors.insert(neighbors.end(),
+									 neighborCell->second.elements.cbegin(),
+									 neighborCell->second.elements.cend());
+				}
+			}
+			m_activeCells[cellId].neighbors = std::move(neighbors);
+		}
+		return m_activeCells[cellId].neighbors;
+	}
+	return empty;
+}
+
+template <typename T, size_t N>
 void Grid<T, N>::getNeighborsCellIds(NDId cellId,
-	std::array<NDId, powerOf3<N>::value>* cellsIds)
+									 std::array<NDId, powerOf3<N>::value>* cellsIds)
 {
 	// Now build up all the 3^N neighbors cell around this n-d cell
 	// It corresponds to all possible permutation in dimension-N of the indices

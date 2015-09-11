@@ -18,7 +18,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 namespace LabJack
 {
@@ -67,5 +67,5 @@ uint16_t uint16FromChars(const std::array<unsigned char, LabJack::MAXIMUM_BUFFER
 }
 
 };  // namespace LabJack
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class TrackIRScaffold;
 
@@ -48,7 +48,7 @@ public:
 	/// \param uniqueName A unique name for the device.
 	explicit TrackIRDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::TrackIRDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::TrackIRDevice);
 
 	/// Destructor.
 	virtual ~TrackIRDevice();
@@ -95,7 +95,7 @@ private:
 	std::shared_ptr<TrackIRScaffold> m_scaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_TRACKIR_TRACKIRDEVICE_H

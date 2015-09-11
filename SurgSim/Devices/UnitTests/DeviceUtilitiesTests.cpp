@@ -28,14 +28,14 @@ TEST(DeviceInterfaceTests, CreateDevice)
 {
 	const std::string name = "name";
 	std::vector<std::string> types;
-	EXPECT_EQ(nullptr, SurgSim::Device::createDevice(types, name));
+	EXPECT_EQ(nullptr, SurgSim::Devices::createDevice(types, name));
 
 	types.push_back("DoNotHave");
-	EXPECT_EQ(nullptr, SurgSim::Device::createDevice(types, name));
+	EXPECT_EQ(nullptr, SurgSim::Devices::createDevice(types, name));
 
-	types.push_back("SurgSim::Device::IdentityPoseDevice");
-	auto device = SurgSim::Device::createDevice(types, name);
+	types.push_back("SurgSim::Devices::IdentityPoseDevice");
+	auto device = SurgSim::Devices::createDevice(types, name);
 	ASSERT_NE(nullptr, device);
-	EXPECT_NE(nullptr, std::dynamic_pointer_cast<SurgSim::Device::IdentityPoseDevice>(device));
+	EXPECT_NE(nullptr, std::dynamic_pointer_cast<SurgSim::Devices::IdentityPoseDevice>(device));
 	EXPECT_EQ(name, device->getName());
 }

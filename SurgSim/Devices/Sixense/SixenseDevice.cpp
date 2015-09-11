@@ -22,10 +22,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::SixenseDevice, SixenseDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::SixenseDevice, SixenseDevice);
 
 SixenseDevice::SixenseDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, SixenseScaffold::buildDeviceInputData())
@@ -74,5 +74,5 @@ bool SixenseDevice::isInitialized() const
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

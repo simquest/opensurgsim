@@ -27,8 +27,8 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
 
-using SurgSim::Device::RawMultiAxisDevice;
-using SurgSim::Device::RawMultiAxisScaffold;
+using SurgSim::Devices::RawMultiAxisDevice;
+using SurgSim::Devices::RawMultiAxisScaffold;
 
 TEST(RawMultiAxisScaffoldTest, CreateAndDestroyScaffold)
 {

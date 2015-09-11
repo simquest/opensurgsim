@@ -30,7 +30,7 @@ TEST(TimerTest, Starting)
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 0);
 	EXPECT_EQ(timer->getNumberOfClockFails(), 0);
 	EXPECT_NO_THROW(timer->getCumulativeTime());
-	EXPECT_EQ(0.0, timer->getCumulativeTime());
+	EXPECT_NEAR(0.0, timer->getCumulativeTime(), 1e-9);
 	EXPECT_THROW(timer->getAverageFramePeriod(), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(timer->getAverageFrameRate(), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(timer->getLastFramePeriod(), SurgSim::Framework::AssertionFailure);

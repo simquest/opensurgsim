@@ -71,7 +71,8 @@ void DebugDumpBehavior::update(double dt)
 
 	m_inputComponent->getData(&dataGroup);
 
-	int key = SurgSim::Device::KeyCode::NONE;
+	using SurgSim::Devices::KeyCode;
+	int key = KeyCode::NONE;
 	if (dataGroup.integers().get("key", &key))
 	{
 
@@ -79,7 +80,7 @@ void DebugDumpBehavior::update(double dt)
 		{
 			switch (key)
 			{
-				case SurgSim::Device::KeyCode::KEY_F1:
+				case KeyCode::KEY_F1:
 					{
 						auto manager = m_manager.lock();
 						if (manager != nullptr)
@@ -88,7 +89,7 @@ void DebugDumpBehavior::update(double dt)
 						}
 					}
 					break;
-				case SurgSim::Device::KeyCode::KEY_F2:
+				case KeyCode::KEY_F2:
 					{
 						auto scene = getScene();
 						for (const auto& element : scene->getSceneElements())
@@ -106,7 +107,7 @@ void DebugDumpBehavior::update(double dt)
 						}
 					}
 					break;
-				case SurgSim::Device::KeyCode::KEY_F3:
+				case KeyCode::KEY_F3:
 					{
 						auto scene = getScene();
 						for (const auto& element : scene->getSceneElements())
@@ -126,7 +127,7 @@ void DebugDumpBehavior::update(double dt)
 					break;
 			}
 		}
-		m_keyPressedLastUpdate = (SurgSim::Device::KeyCode::NONE != key);
+		m_keyPressedLastUpdate = (KeyCode::NONE != key);
 	}
 }
 

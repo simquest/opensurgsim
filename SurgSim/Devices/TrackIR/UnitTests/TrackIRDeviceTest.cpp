@@ -29,7 +29,7 @@
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::TrackIRDevice;
+using SurgSim::Devices::TrackIRDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Testing::MockInputOutput;

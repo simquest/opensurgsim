@@ -27,7 +27,7 @@
 namespace SurgSim
 {
 
-namespace Device
+namespace Devices
 {
 /// An output device filter that scales forces and/or torques.  Any other entries in the DataGroup are passed through.
 /// For convenience, it is also an InputConsumerInterface that does no filtering of the input data.  Thus it can be
@@ -41,6 +41,8 @@ public:
 	/// Constructor.
 	/// \param name	Name of this device filter.
 	explicit ForceScale(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Devices::ForceScale);
 
 	/// Destructor.
 	virtual ~ForceScale();
@@ -115,7 +117,7 @@ private:
 	bool m_cachedOutputIndices;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_DEVICEFILTERS_FORCESCALE_H

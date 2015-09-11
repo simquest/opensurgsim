@@ -20,7 +20,7 @@
 
 #include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
 
-using SurgSim::Device::KeyboardScaffold;
+using SurgSim::Devices::KeyboardScaffold;
 
 TEST(KeyboardScaffoldTest, CreateAndDestroyScaffold)
 {

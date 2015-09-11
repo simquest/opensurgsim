@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A bit set corresponding to a contiguous memory buffer.
@@ -127,7 +127,7 @@ private:
 	std::array<value_type, NUM_BYTES> m_bytes;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_BITSETBUFFER_H

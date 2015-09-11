@@ -372,7 +372,7 @@ int main(int argc, char* argv[])
 	if (useStereo)
 	{
 		// Only interested in the oculus
-		auto device = SurgSim::Device::createDevice("SurgSim::Device::OculusDevice", "Oculus");
+		auto device = SurgSim::Devices::createDevice("SurgSim::Device::OculusDevice", "Oculus");
 
 		if (device != nullptr)
 		{

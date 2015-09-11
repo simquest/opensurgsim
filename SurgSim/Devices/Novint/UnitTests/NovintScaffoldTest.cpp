@@ -25,8 +25,8 @@
 #include "SurgSim/Devices/Novint/NovintDevice.h"
 #include "SurgSim/Devices/Novint/NovintScaffold.h"
 
-using SurgSim::Device::NovintDevice;
-using SurgSim::Device::NovintScaffold;
+using SurgSim::Devices::NovintDevice;
+using SurgSim::Devices::NovintScaffold;
 
 TEST(NovintScaffoldTest, CreateAndDestroyScaffold)
 {

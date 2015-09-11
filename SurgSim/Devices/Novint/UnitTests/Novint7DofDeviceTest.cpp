@@ -30,7 +30,7 @@
 #include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::DataStructures::DataGroup;
-using SurgSim::Device::Novint7DofDevice;
+using SurgSim::Devices::Novint7DofDevice;
 using SurgSim::Framework::Clock;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::RigidTransform3d;

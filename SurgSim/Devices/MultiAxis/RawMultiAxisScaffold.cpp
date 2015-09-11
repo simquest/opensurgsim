@@ -46,13 +46,13 @@ using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
-using SurgSim::Device::Internal::getSystemErrorCode;
-using SurgSim::Device::Internal::getSystemErrorText;
+using SurgSim::Devices::Internal::getSystemErrorCode;
+using SurgSim::Devices::Internal::getSystemErrorText;
 
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 
@@ -611,5 +611,5 @@ std::shared_ptr<RawMultiAxisScaffold> RawMultiAxisScaffold::getOrCreateSharedIns
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

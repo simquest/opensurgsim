@@ -22,7 +22,7 @@
 #include "SurgSim/Devices/Oculus/OculusDevice.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::OculusDevice;
+using SurgSim::Devices::OculusDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Testing::MockInputOutput;
@@ -64,7 +64,7 @@ TEST(OculusDeviceTest, Factory)
 {
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
 	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create(
-								 "SurgSim::Device::OculusDevice", "Device"));
+								 "SurgSim::Devices::OculusDevice", "Device"));
 	EXPECT_NE(nullptr, device);
 }
 
@@ -90,7 +90,7 @@ TEST(OculusDeviceTest, RegisterMoreThanOneDevice)
 
 	auto device2 = std::make_shared<OculusDevice>("Oculus2");
 	ASSERT_TRUE(nullptr != device2) << "Device creation failed.";
-	EXPECT_THROW(device2->initialize(), SurgSim::Framework::AssertionFailure);
+	ASSERT_FALSE(device2->initialize()) << "Initialization should not have succeceded, only one device allowed.";
 }
 
 TEST(OculusDeviceTest, RegisterAndUnregisterDevice)

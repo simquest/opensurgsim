@@ -24,7 +24,7 @@ using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 ForceScale::ForceScale(const std::string& name) :
@@ -137,5 +137,5 @@ void ForceScale::setTorqueScale(double torqueScale)
 	m_torqueScale = torqueScale;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

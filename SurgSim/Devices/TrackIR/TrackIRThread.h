@@ -21,11 +21,11 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A class implementing the thread context for sampling TrackIR devices.
-/// \sa SurgSim::Device::TrackIRScaffold
+/// \sa SurgSim::Devices::TrackIRScaffold
 class TrackIRThread : public SurgSim::Framework::BasicThread
 {
 public:
@@ -58,7 +58,7 @@ private:
 	TrackIRScaffold::DeviceData* m_deviceData;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_TRACKIR_TRACKIRTHREAD_H

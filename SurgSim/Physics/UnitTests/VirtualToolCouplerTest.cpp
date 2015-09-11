@@ -37,7 +37,7 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 #include "SurgSim/Testing/MockInputComponent.h"
 
-using SurgSim::Device::IdentityPoseDevice;
+using SurgSim::Devices::IdentityPoseDevice;
 using SurgSim::Input::InputComponent;
 using SurgSim::Framework::Runtime;
 using SurgSim::Math::makeRigidTranslation;

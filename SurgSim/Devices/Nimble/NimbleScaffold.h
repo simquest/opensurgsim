@@ -24,7 +24,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class NimbleDevice;
@@ -32,7 +32,7 @@ class NimbleThread;
 
 /// A class that manages Nimble devices.
 ///
-/// \sa SurgSim::Device::NimbleDevice
+/// \sa SurgSim::Devices::NimbleDevice
 class NimbleScaffold : public SurgSim::Framework::BasicThread
 {
 public:
@@ -102,7 +102,7 @@ private:
 	static std::array<std::pair<std::string, int>, 15> m_jointPoseNames;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_NIMBLE_NIMBLESCAFFOLD_H

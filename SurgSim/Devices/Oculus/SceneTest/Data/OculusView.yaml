@@ -14,7 +14,7 @@
           LocalPose:
             Quaternion: [0, 0, 0, 1]
             Translation: [0, 0.5, 2.0]
-      - SurgSim::Device::OculusView:
+      - SurgSim::Devices::OculusView:
           Name: View
           TargetScreen: 2
           Camera:

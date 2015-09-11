@@ -21,7 +21,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::string>& classNames,
@@ -62,6 +62,6 @@ std::shared_ptr<Input::DeviceInterface> createDevice(const std::string& classNam
 	return createDevice(names, name);
 }
 
-}; // namespace Device
+}; // namespace Devices
 }; // namespace SurgSim
 

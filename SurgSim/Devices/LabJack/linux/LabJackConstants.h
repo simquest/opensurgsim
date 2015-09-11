@@ -20,7 +20,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 namespace LabJack
 {
@@ -29,7 +29,7 @@ namespace LabJack
 static const int MAXIMUM_BUFFER = 64;
 
 };  // namespace LabJack
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_LABJACK_LINUX_LABJACKCONSTANTS_H

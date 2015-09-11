@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A collection of checksum functions specifically tailored for the labjackusb driver.  These functions are based off
@@ -64,7 +64,7 @@ void normalChecksum(std::array<unsigned char, MAXIMUM_BUFFER>* bytes, int count)
 void extendedChecksum(std::array<unsigned char, MAXIMUM_BUFFER>* bytes, int count);
 
 };  // namespace LabJack
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_LABJACK_LINUX_LABJACKCHECKSUMS_H

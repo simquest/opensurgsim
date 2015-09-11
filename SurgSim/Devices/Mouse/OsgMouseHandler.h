@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class MouseScaffold;
@@ -53,7 +53,7 @@ private:
 	int m_lastScrollX, m_lastScrollY;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MOUSE_OSGMOUSEHANDLER_H
