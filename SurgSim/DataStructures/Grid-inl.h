@@ -102,8 +102,8 @@ size_t Grid<T, N>::NDIdHash::operator()(const NDId& nd) const
 template <typename T, size_t N>
 Grid<T, N>::Grid(const Eigen::Matrix<double, N, 1>& cellSize, const Eigen::AlignedBox<double, N>& bounds)
 	: m_size(cellSize),
-	m_aabb(bounds),
-	m_neighborsDirtyFlag(false)
+	  m_aabb(bounds),
+	  m_neighborsDirtyFlag(false)
 {
 	static_assert(N >= 1, "A grid must have a positive non null dimension");
 }
@@ -177,13 +177,13 @@ void Grid<T, N>::update()
 				if (neighborCell != m_activeCells.end())
 				{
 					cell.second.neighbors.insert(cell.second.neighbors.end(),
-						neighborCell->second.elements.cbegin(), neighborCell->second.elements.cend());
+												 neighborCell->second.elements.cbegin(), neighborCell->second.elements.cend());
 
 					// Treat symmetry if the cells are different
 					if (cellsIds[index] != cell.first)
 					{
 						neighborCell->second.neighbors.insert(neighborCell->second.neighbors.end(),
-							cell.second.elements.cbegin(), cell.second.elements.cend());
+															  cell.second.elements.cbegin(), cell.second.elements.cend());
 					}
 				}
 			}
@@ -231,24 +231,20 @@ const std::vector<T>& Grid<T, N>::getNeighbors(const Eigen::MatrixBase<Derived>&
 		if (foundCell == m_activeCells.end())
 		{
 			// If the cell doesn't exist, collect all the neighbors
-			auto foundPosition = m_activeCells.find(cellId);
-			if (foundPosition == m_activeCells.end())
+			std::array<NDId, powerOf3<N>::value> cellsIds;
+			getNeighborsCellIds(cellId, &cellsIds);
+			std::vector<T> neighbors;
+			for (const auto& neighborId : cellsIds)
 			{
-				std::array<NDId, powerOf3<N>::value> cellsIds;
-				getNeighborsCellIds(cellId, &cellsIds);
-				std::vector<T> neighbors;
-				for (const auto& neighborId : cellsIds)
+				auto neighborCell = m_activeCells.find(neighborId);
+				if (neighborCell != m_activeCells.end())
 				{
-					auto neighborCell = m_activeCells.find(neighborId);
-					if (neighborCell != m_activeCells.end())
-					{
-						neighbors.insert(neighbors.end(),
-										 neighborCell->second.elements.cbegin(),
-										 neighborCell->second.elements.cend());
-					}
+					neighbors.insert(neighbors.end(),
+									 neighborCell->second.elements.cbegin(),
+									 neighborCell->second.elements.cend());
 				}
-				m_activeCells[cellId].neighbors = std::move(neighbors);
 			}
+			m_activeCells[cellId].neighbors = std::move(neighbors);
 		}
 		return m_activeCells[cellId].neighbors;
 	}
