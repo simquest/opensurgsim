@@ -39,10 +39,12 @@ namespace Graphics
 
 OsgRepresentation::OsgRepresentation(const std::string& name) :
 	Representation(name),
-	m_drawAsWireFrame(false)
+	m_drawAsWireFrame(false),
+	m_modelMatrixUniform(std::make_shared<OsgUniform<SurgSim::Math::Matrix44f>>("modelMatrix"))
 {
 	m_switch = new osg::Switch;
 	m_switch->setName(name + " Representation Switch");
+	m_modelMatrixUniform->addToStateSet(m_switch->getOrCreateStateSet());
 
 	m_materialProxy = new osg::Group;
 	m_switch->addChild(m_materialProxy);

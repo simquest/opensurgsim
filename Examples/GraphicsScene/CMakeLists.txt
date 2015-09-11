@@ -46,6 +46,8 @@ surgsim_add_executable(GraphicsScene "${SOURCES}" "${HEADERS}")
 SET(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
+	SurgSimDevices
+	${Boost_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
 )
 

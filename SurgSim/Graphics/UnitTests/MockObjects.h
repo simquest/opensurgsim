@@ -396,6 +396,16 @@ public:
 	{
 
 	}
+	
+	void setMainCamera(bool val) override
+	{
+		
+	}
+	
+	bool isMainCamera() override
+	{
+		return false;
+	}
 
 	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const
 	{
