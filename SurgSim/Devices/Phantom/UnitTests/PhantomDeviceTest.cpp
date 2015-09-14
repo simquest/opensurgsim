@@ -38,14 +38,15 @@ using SurgSim::Testing::MockInputOutput;
 TEST(PhantomDeviceTest, CreateUninitializedDevice)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 }
 
 TEST(PhantomDeviceTest, CreateAndInitializeDevice)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+	device->setInitializationName("Default PHANToM");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_FALSE(device->isInitialized());
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
@@ -55,7 +56,7 @@ TEST(PhantomDeviceTest, CreateAndInitializeDevice)
 TEST(PhantomDeviceTest, CreateAndInitializeDefaultDevice)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "");
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_FALSE(device->isInitialized());
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
@@ -65,7 +66,8 @@ TEST(PhantomDeviceTest, CreateAndInitializeDefaultDevice)
 TEST(PhantomDeviceTest, Name)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+	device->setInitializationName("Default PHANToM");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_EQ("TestPhantom", device->getName());
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
@@ -76,7 +78,8 @@ static void testCreateDeviceSeveralTimes(bool doSleep)
 {
 	for (int i = 0;  i < 6;  ++i)
 	{
-		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+		device->setInitializationName("Default PHANToM");
 		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 		if (doSleep)
@@ -96,13 +99,15 @@ TEST(PhantomDeviceTest, CreateDeviceSeveralTimes)
 TEST(PhantomDeviceTest, CreateSeveralDevices)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom1", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom1");
+	device1->setInitializationName("Default PHANToM");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 
 	// We can't check what happens with the scaffolds, since those are no longer a part of the device's API...
 
-	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom2", "Second PHANToM");
+	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom2");
+	device2->setInitializationName("Second PHANToM");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
 	if (! device2->initialize())
 	{
@@ -113,11 +118,13 @@ TEST(PhantomDeviceTest, CreateSeveralDevices)
 TEST(PhantomDeviceTest, CreateDevicesWithSameName)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom");
+	device1->setInitializationName("Default PHANToM");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 
-	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom", "Second PHANToM");
+	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom");
+	device2->setInitializationName("Second PHANToM");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
 	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate name.";
 }
@@ -125,11 +132,13 @@ TEST(PhantomDeviceTest, CreateDevicesWithSameName)
 TEST(PhantomDeviceTest, CreateDevicesWithSameInitializationName)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom1", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom1");
+	device1->setInitializationName("Default PHANToM");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 
-	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom2", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom2");
+	device2->setInitializationName("Default PHANToM");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
 	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate initialization name.";
 }
@@ -137,7 +146,8 @@ TEST(PhantomDeviceTest, CreateDevicesWithSameInitializationName)
 TEST(PhantomDeviceTest, InputConsumer)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+	device->setInitializationName("Default PHANToM");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 
@@ -172,7 +182,8 @@ TEST(PhantomDeviceTest, InputConsumer)
 TEST(PhantomDeviceTest, OutputProducer)
 {
 	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+	device->setInitializationName("Default PHANToM");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 
