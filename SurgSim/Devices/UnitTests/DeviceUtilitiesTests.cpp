@@ -38,7 +38,7 @@ public:
 	{
 		return "MockDeviceNoInitialize";
 	}
-	
+
 	bool initialize() override
 	{
 		return false;
@@ -66,7 +66,7 @@ TEST(DeviceUtilitiesTests, LoadDevice)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
-	
+
 	EXPECT_ANY_THROW(device = SurgSim::Devices::loadDevice("noFile.yaml"));
 	ASSERT_EQ(nullptr, device);
 

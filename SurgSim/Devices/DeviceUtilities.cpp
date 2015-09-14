@@ -83,7 +83,7 @@ namespace SurgSim
 {
 namespace Devices
 {
-	
+
 std::shared_ptr<DeviceInterface> createDevice(const std::vector<std::string>& classNames,
 		const std::string& name)
 {
