@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class NovintCommonDevice;
@@ -35,8 +35,8 @@ class NovintDevice;
 /// This should support any device that can communicate using the Novint HDAL SDK toolkit, such as the
 /// off-the-shelf Novint Falcon gaming controller and the Novint Falcon with the Open Surgery Grip.
 ///
-/// \sa SurgSim::Device::NovintDevice, SurgSim::Device::Novint7DofDevice
-/// \sa SurgSim::Device::NovintCommonDevice
+/// \sa SurgSim::Devices::NovintDevice, SurgSim::Devices::Novint7DofDevice
+/// \sa SurgSim::Devices::NovintCommonDevice
 class NovintScaffold
 {
 public:
@@ -235,7 +235,7 @@ private:
 	std::unique_ptr<StateData> m_state;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_NOVINT_NOVINTSCAFFOLD_H

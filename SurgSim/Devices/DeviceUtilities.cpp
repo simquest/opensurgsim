@@ -21,7 +21,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::string>& classNames,
@@ -49,12 +49,19 @@ std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::stri
 		else
 		{
 			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices")) << className <<
-				" is not registered in the Devices factory.";
+					" is not registered in the Devices factory.";
 		}
 	}
 	return device;
 }
 
-}; // namespace Device
+std::shared_ptr<Input::DeviceInterface> createDevice(const std::string& className, const std::string& name)
+{
+	std::vector<std::string> names;
+	names.push_back(className);
+	return createDevice(names, name);
+}
+
+}; // namespace Devices
 }; // namespace SurgSim
 

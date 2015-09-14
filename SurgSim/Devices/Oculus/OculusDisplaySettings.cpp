@@ -19,7 +19,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 OculusDisplaySettings::OculusDisplaySettings() : m_leftEyeProjectionMatrix(osg::Matrixd()),
@@ -64,5 +64,5 @@ osg::Matrixd OculusDisplaySettings::computeRightEyeProjectionImplementation(cons
 	return m_rightEyeProjectionMatrix;
 }
 
-}; // namespace Device
+}; // namespace Devices
 }; // namespace SurgSim

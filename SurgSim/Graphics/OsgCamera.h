@@ -110,10 +110,13 @@ public:
 		double bottom, double top,
 		double near, double far) override;
 
-
 	void setViewport(int x, int y, int width, int height) override;
 
 	void getViewport(int* x, int* y, int* width, int* height) const override;
+
+	void setMainCamera(bool val) override;
+
+	bool isMainCamera() override;
 
 private:
 
@@ -145,7 +148,7 @@ private:
 	/// Value for ambient color
 	SurgSim::Math::Vector4d m_ambientColor;
 
-
+	bool m_isMainCamera;
 };
 
 };  // namespace Graphics

@@ -54,7 +54,7 @@ using SurgSim::Math::Vector4d;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class NovintScaffold::Handle
@@ -1334,5 +1334,5 @@ std::shared_ptr<SurgSim::Framework::Logger> NovintScaffold::getLogger() const
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

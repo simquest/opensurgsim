@@ -25,7 +25,7 @@
 #include "SurgSim/Testing/VisualTestCommon/GlutRenderer.h"
 
 using SurgSim::Input::DeviceInterface;
-using SurgSim::Device::LeapDevice;
+using SurgSim::Devices::LeapDevice;
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
 
@@ -101,12 +101,12 @@ private:
 int main(int argc, char** argv)
 {
 	auto leftHand = std::make_shared<LeapDevice>("Left Hand");
-	leftHand->setHandType(SurgSim::Device::HANDTYPE_LEFT);
+	leftHand->setHandType(SurgSim::Devices::HANDTYPE_LEFT);
 	leftHand->setProvideImages(true);
 	leftHand->initialize();
 
 	auto rightHand = std::make_shared<LeapDevice>("Right Hand");
-	rightHand->setHandType(SurgSim::Device::HANDTYPE_RIGHT);
+	rightHand->setHandType(SurgSim::Devices::HANDTYPE_RIGHT);
 	rightHand->initialize();
 
 	std::shared_ptr<GlutWindow> window = std::make_shared<GlutWindow>();

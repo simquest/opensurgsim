@@ -43,7 +43,7 @@ using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 
@@ -741,5 +741,5 @@ void PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 SurgSim::Framework::LogLevel PhantomScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

@@ -65,7 +65,7 @@ public:
 	/// \param key A key used to control the component.
 	/// \param component The component being controlled by the key.
 	/// \note A key can be registered several times, so can a component.
-	void registerKey(SurgSim::Device::KeyCode key, std::shared_ptr<SurgSim::Framework::Component> component);
+	void registerKey(SurgSim::Devices::KeyCode key, std::shared_ptr<SurgSim::Framework::Component> component);
 
 	/// Set the register map of this behavior
 	/// \param map The register map.

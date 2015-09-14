@@ -30,6 +30,7 @@ Camera::Camera(const std::string& name) : Representation(name)
 									  getRenderGroupReference, setRenderGroupReference);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::Vector4d, AmbientColor,
 									  getAmbientColor, setAmbientColor);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, bool, MainCamera, isMainCamera, setMainCamera);
 
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44d, ViewMatrix, getViewMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatViewMatrix, getViewMatrix);

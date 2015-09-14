@@ -228,7 +228,7 @@ std::istream& operator>> (std::istream& in, HandTrackingData& handData)
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 std::array<std::pair<std::string, int>, 15> NimbleScaffold::m_jointPoseNames =
@@ -496,7 +496,7 @@ std::shared_ptr<NimbleScaffold> NimbleScaffold::getOrCreateSharedInstance()
 	return sharedInstance.get();
 }
 
-}  // namespace Device
+}  // namespace Devices
 }  // namespace SurgSim
 
 #if defined(_MSC_VER)

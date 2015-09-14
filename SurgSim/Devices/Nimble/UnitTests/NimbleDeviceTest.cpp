@@ -27,8 +27,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::NimbleDevice;
-using SurgSim::Device::NimbleScaffold;
+using SurgSim::Devices::NimbleDevice;
+using SurgSim::Devices::NimbleScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;

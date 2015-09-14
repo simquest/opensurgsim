@@ -27,8 +27,8 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
 
-using SurgSim::Device::PhantomDevice;
-using SurgSim::Device::PhantomScaffold;
+using SurgSim::Devices::PhantomDevice;
+using SurgSim::Devices::PhantomScaffold;
 
 TEST(PhantomScaffoldTest, CreateAndDestroyScaffold)
 {

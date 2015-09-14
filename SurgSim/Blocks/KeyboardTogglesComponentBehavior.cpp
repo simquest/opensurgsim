@@ -52,7 +52,7 @@ std::shared_ptr<SurgSim::Input::InputComponent> KeyboardTogglesComponentBehavior
 	return m_inputComponent;
 }
 
-void KeyboardTogglesComponentBehavior::registerKey(SurgSim::Device::KeyCode key,
+void KeyboardTogglesComponentBehavior::registerKey(SurgSim::Devices::KeyCode key,
 		std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	m_registry[static_cast<int>(key)].insert(component);
@@ -74,7 +74,7 @@ void KeyboardTogglesComponentBehavior::update(double dt)
 				(*it)->setLocalActive(!(*it)->isLocalActive());
 			};
 		}
-		m_keyPressedLastUpdate = (SurgSim::Device::KeyCode::NONE != key);
+		m_keyPressedLastUpdate = (SurgSim::Devices::KeyCode::NONE != key);
 	}
 }
 

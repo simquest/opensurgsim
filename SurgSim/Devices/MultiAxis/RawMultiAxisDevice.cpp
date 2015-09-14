@@ -22,10 +22,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::RawMultiAxisDevice, RawMultiAxisDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::RawMultiAxisDevice, RawMultiAxisDevice);
 
 RawMultiAxisDevice::RawMultiAxisDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, RawMultiAxisScaffold::buildDeviceInputData()),
@@ -129,5 +129,5 @@ bool RawMultiAxisDevice::isUsingAxisDominance() const
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

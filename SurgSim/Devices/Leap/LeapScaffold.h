@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,14 +30,14 @@ namespace Framework
 class Logger;
 };
 
-namespace Device
+namespace Devices
 {
 
 class LeapDevice;
 
 /// A class that manages Leap devices
 ///
-/// \sa SurgSim::Device::LeapDevice
+/// \sa SurgSim::Devices::LeapDevice
 class LeapScaffold
 {
 public:
@@ -89,22 +89,24 @@ private:
 	void updateImageData();
 
 	/// Builds the data layout for the application input (i.e. device output).
-	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
+	static DataStructures::DataGroup buildDeviceInputData();
 
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
 
-	/// Set Leap Tracking Mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
-	void setTrackingMode(LeapTrackingMode mode);
+	/// Set using HMD Tracking Mode
+	/// \param useHmdTrackingMode True if using HMD Tracking Mode
+	void setUseHmdTrackingMode(bool useHmdTrackingMode);
 
-	/// Get Leap Tracking Mode: LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
-	LeapTrackingMode getTrackingMode() const;
+	/// Is Using HMD Tracking Mode
+	/// \return True if using HMD Tracking Mode
+	bool isUsingHmdTrackingMode() const;
 
 	/// Logger used by the scaffold
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif // SURGSIM_DEVICES_LEAP_LEAPSCAFFOLD_H

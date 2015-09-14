@@ -18,7 +18,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 OsgMouseHandler::OsgMouseHandler() : m_mouseScaffold(MouseScaffold::getOrCreateSharedInstance()),
@@ -75,5 +75,5 @@ bool OsgMouseHandler::handle(const osgGA::GUIEventAdapter& eventHandler, osgGA::
 	return true;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

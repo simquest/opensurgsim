@@ -19,6 +19,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
+	ClearCollisionsTests.cpp
 	ComputationTests.cpp
 	ConstraintComponentTests.cpp
 	ConstraintImplementationFactoryTests.cpp
@@ -69,6 +70,7 @@ set(UNIT_TEST_SOURCES
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
+	PublishCollisionsTests.cpp
 	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp

@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class KeyboardScaffold;
@@ -44,7 +44,7 @@ private:
 	std::weak_ptr<KeyboardScaffold> m_keyboardScaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_KEYBOARD_OSGKEYBOARDHANDLER_H

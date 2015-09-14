@@ -29,6 +29,7 @@
 #include "SurgSim/Input/OutputComponent.h"
 
 using SurgSim::Blocks::KeyboardTogglesComponentBehavior;
+using SurgSim::Devices::KeyCode;
 using SurgSim::Framework::Component;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::Representation;
@@ -66,13 +67,13 @@ TEST(KeyboardTogglesComponentBehavior, RegistrationTests)
 		auto graphics2 = std::make_shared<OsgBoxRepresentation>("Graphics2");
 		auto graphics3 = std::make_shared<OsgBoxRepresentation>("Graphics3");
 
-		keyboardTogglesComponentBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, graphics);
-		keyboardTogglesComponentBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, graphics2);
-		keyboardTogglesComponentBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, graphics3);
+		keyboardTogglesComponentBehavior->registerKey(KeyCode::KEY_A, graphics);
+		keyboardTogglesComponentBehavior->registerKey(KeyCode::KEY_A, graphics2);
+		keyboardTogglesComponentBehavior->registerKey(KeyCode::KEY_B, graphics3);
 
 		auto keyMap = keyboardTogglesComponentBehavior->getKeyboardRegistry();
-		auto keyAPair = keyMap.find(SurgSim::Device::KeyCode::KEY_A);
-		auto keyBPair = keyMap.find(SurgSim::Device::KeyCode::KEY_B);
+		auto keyAPair = keyMap.find(KeyCode::KEY_A);
+		auto keyBPair = keyMap.find(KeyCode::KEY_B);
 
 		EXPECT_EQ(2u, keyAPair->second.size());
 		EXPECT_EQ(1u, keyBPair->second.size());
@@ -99,8 +100,8 @@ TEST(KeyboardTogglesComponentBehavior, SetAndGetKeyboardRegisterTypeTest)
 	set2.insert(graphics3);
 
 	KeyboardTogglesComponentBehavior::KeyboardRegistryType keyMap;
-	keyMap[SurgSim::Device::KeyCode::KEY_A] = set1;
-	keyMap[SurgSim::Device::KeyCode::KEY_B] = set2;
+	keyMap[KeyCode::KEY_A] = set1;
+	keyMap[KeyCode::KEY_B] = set2;
 
 	EXPECT_NO_THROW(keyboardTogglesComponentBehavior->setKeyboardRegistry(keyMap));
 
@@ -138,8 +139,8 @@ TEST(KeyboardTogglesComponentBehavior, Serialization)
 	set2.insert(graphics2);
 
 	KeyboardTogglesComponentBehavior::KeyboardRegistryType keyMap;
-	keyMap[SurgSim::Device::KeyCode::KEY_A] = set1;
-	keyMap[SurgSim::Device::KeyCode::KEY_B] = set2;
+	keyMap[KeyCode::KEY_A] = set1;
+	keyMap[KeyCode::KEY_B] = set2;
 
 	keyboardTogglesComponentBehavior->setValue("KeyboardRegistry", keyMap);
 	keyboardTogglesComponentBehavior->setValue("InputComponent", inputComponent);

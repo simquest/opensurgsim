@@ -28,7 +28,7 @@ namespace Input
 class DeviceInterface;
 }
 
-namespace Device
+namespace Devices
 {
 
 /// Attempts to create and initialize a device from a list of devices to try
@@ -37,6 +37,12 @@ namespace Device
 /// \return An initialized device or nullptr if no device was available.
 std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::string>& classNames,
 		const std::string& name);
+
+/// Attempts to create and initialize a device
+/// \param className The fully-qualified device class name to try.
+/// \param name The name to be given to the created device
+/// \return An initialized device or nullptr if no device was available.
+std::shared_ptr<Input::DeviceInterface> createDevice(const std::string& className, const std::string& name);
 
 };
 };

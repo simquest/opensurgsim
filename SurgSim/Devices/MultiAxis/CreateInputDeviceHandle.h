@@ -27,7 +27,7 @@ namespace Framework
 class Logger;
 };  // namespace Framework
 
-namespace Device
+namespace Devices
 {
 class SystemInputDeviceHandle;
 
@@ -45,7 +45,7 @@ std::unique_ptr<SystemInputDeviceHandle> createInputDeviceHandle(const std::stri
 std::vector<std::string> enumerateInputDevicePaths(SurgSim::Framework::Logger* logger);
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_CREATEINPUTDEVICEHANDLE_H

@@ -358,6 +358,25 @@ TEST(AccessibleTest, ConvertDoubleToFloat)
 	EXPECT_TRUE(target.isApprox(sourceFloat));
 }
 
+TEST(AccessibleTest, ConvertConstCharToString)
+{
+	std::string source("Test Value");
+
+	{
+		std::string target;
+		ASSERT_NO_THROW({target = convert<std::string>(source);});
+		EXPECT_EQ(source, target);
+	}
+	{
+		std::string target;
+		ASSERT_NO_THROW({target = convert<std::string>(source.c_str());});
+		EXPECT_EQ(source, target);
+	}
+
+	float notString;
+	ASSERT_THROW({convert<std::string>(notString);}, boost::bad_any_cast);
+}
+
 TEST(AccessibleTests, Serialize)
 {
 	TestClass a;

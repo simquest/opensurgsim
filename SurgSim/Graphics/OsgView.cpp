@@ -232,7 +232,6 @@ bool OsgView::doWakeUp()
 		m_view->getCamera()->getGraphicsContext()->getState()->setUseVertexAttributeAliasing(true);
 	}
 
-
 	return true;
 }
 
@@ -357,7 +356,7 @@ void SurgSim::Graphics::OsgView::enableKeyboardDevice(bool val)
 
 	std::shared_ptr<SurgSim::Input::CommonDevice> keyboardDevice = getKeyboardDevice();
 	osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle =
-		std::static_pointer_cast<SurgSim::Device::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
+		std::static_pointer_cast<SurgSim::Devices::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
 	if (val)
 	{
 		getOsgView()->addEventHandler(keyboardHandle);
@@ -379,7 +378,7 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getKey
 {
 	if (m_keyboardDevice == nullptr)
 	{
-		m_keyboardDevice = std::make_shared<SurgSim::Device::KeyboardDevice>("Keyboard");
+		m_keyboardDevice = std::make_shared<SurgSim::Devices::KeyboardDevice>("Keyboard");
 		if (!m_keyboardDevice->isInitialized())
 		{
 			m_keyboardDevice->initialize();
@@ -398,7 +397,7 @@ void SurgSim::Graphics::OsgView::enableMouseDevice(bool val)
 
 	std::shared_ptr<SurgSim::Input::CommonDevice> mouseDevice = getMouseDevice();
 	osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler =
-		std::static_pointer_cast<SurgSim::Device::MouseDevice>(mouseDevice)->getMouseHandler();
+		std::static_pointer_cast<SurgSim::Devices::MouseDevice>(mouseDevice)->getMouseHandler();
 	if (val)
 	{
 		getOsgView()->addEventHandler(mouseHandler);
@@ -420,7 +419,7 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getMou
 {
 	if (m_mouseDevice == nullptr)
 	{
-		m_mouseDevice = std::make_shared<SurgSim::Device::MouseDevice>("Mouse");
+		m_mouseDevice = std::make_shared<SurgSim::Devices::MouseDevice>("Mouse");
 		if (!m_mouseDevice->isInitialized())
 		{
 			m_mouseDevice->initialize();

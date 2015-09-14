@@ -19,12 +19,16 @@
 #include <osg/Camera>
 
 #include "SurgSim/Blocks/PoseInterpolator.h"
+#include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
 #include "SurgSim/Framework/Framework.h"
 #include "SurgSim/Graphics/Graphics.h"
 #include "SurgSim/Math/Math.h"
+#include "SurgSim/Devices/Devices.h"
 #include "SurgSim/Input/Input.h"
 #include "SurgSim/Blocks/GraphicsUtilities.h"
 #include "SurgSim/Blocks/ShadowMapping.h"
+
+#include <boost/program_options.hpp>
 
 using SurgSim::Framework::Logger;
 using SurgSim::Graphics::OsgTextureUniform;
@@ -53,7 +57,9 @@ namespace
 
 std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> materials;
 
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
+std::shared_ptr<SurgSim::Graphics::ViewElement> createMonoView(
+	const std::string& name,
+	int x, int y, int width, int height)
 {
 	using SurgSim::Graphics::OsgViewElement;
 
@@ -63,8 +69,9 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView()->setPosition(position);
 	viewElement->getView()->setDimensions(dimensions);
 
-	viewElement->getCamera()->setPerspectiveProjection(30, 1.0, 0.01, 10.0);
-
+	double aspectRatio = static_cast<double>(width) / static_cast<double>(height);
+	viewElement->getCamera()->setPerspectiveProjection(60.0, aspectRatio, 0.01, 10.0);
+	std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(viewElement->getCamera())->setMainCamera(true);
 	/// It's an OsgViewElement, we have an OsgView, turn on mapping of uniform and attribute values
 	std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);
 
@@ -86,8 +93,8 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 
 	viewElement->setPose(from);
 
-	// viewElement->enableManipulator(true);
-	viewElement->addComponent(interpolator);
+	viewElement->enableManipulator(true);
+	// viewElement->addComponent(interpolator);
 
 	return viewElement;
 }
@@ -269,7 +276,7 @@ void addSpheres(std::shared_ptr<SurgSim::Framework::Scene> scene)
 
 }
 
-void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
+void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime, bool useStereo = false)
 {
 	auto scene = runtime->getScene();
 	auto box = std::make_shared<SimpleBox>("Plane");
@@ -290,27 +297,35 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	sphere->setMaterial(materials["basicShadowed"]);
 
 	scene->addSceneElement(sphere);
+	if (useStereo == true)
+	{
+		// This will most like have to be edited to conform with the screen configuration
+		// TargetScreen, or Dimensions and Location are candidates for being incorrect depending
+		// on the system
+		runtime->addSceneElements("StereoView.yaml");
+	}
+	else
+	{
+		scene->addSceneElement(createMonoView("View", 40, 40, 1024, 768));
+	}
 
-	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 40, 40, 1024, 768);
-	scene->addSceneElement(viewElement);
-	auto mainCamera = viewElement->getCamera();
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Materials");
+	element->addComponent(materials["shiny"]);
+	element->addComponent(materials["texturedShadowed"]);
+	element->addComponent(materials["basicShadowed"]);
+	scene->addSceneElement(element);
 
-	viewElement->addComponent(materials["shiny"]);
-	viewElement->addComponent(materials["texturedShadowed"]);
-	viewElement->addComponent(materials["basicShadowed"]);
-
-	auto lightElement = createLight();
-	scene->addSceneElement(lightElement);
+	scene->addSceneElement(createLight());
 
 	std::array<double, 6> lightProjection = { -2.6, 2.6, -2.6, 2.6, 4, 10};
 	auto elements = SurgSim::Blocks::createShadowMapping(
-						viewElement->getCamera(),
+						scene->getComponent("View", "Camera"),
 						scene->getComponent("Light", "Light"),
 						4096,
 						1024,
 						lightProjection,
 						true,
-						6.0,
+						8.0,
 						false);
 	scene->addSceneElements(elements);
 }
@@ -318,6 +333,25 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 
 int main(int argc, char* argv[])
 {
+	using boost::program_options::value;
+
+	bool useStereo = false;
+
+	boost::program_options::options_description visible("Allowed options");
+	visible.add_options()("help", "produce help message")
+	("useStereo", value<bool>(&useStereo)->default_value(false), "Show scene via stereo");
+
+	boost::program_options::variables_map variables;
+	boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(visible).run(),
+								  variables);
+	boost::program_options::notify(variables);
+
+	if (variables.count("help"))
+	{
+		std::cout << visible << "\n";
+		return 1;
+	}
+
 	auto runtime(std::make_shared<SurgSim::Framework::Runtime>("config.txt"));
 	auto data = runtime->getApplicationData();
 
@@ -331,17 +365,37 @@ int main(int argc, char* argv[])
 
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgManager>();
 	graphics->setRate(60);
+	graphics->setMultiThreading(true);
 
 	auto input = std::make_shared<SurgSim::Input::InputManager>();
 
+	if (useStereo)
+	{
+		// Only interested in the oculus
+		auto device = SurgSim::Devices::createDevice("SurgSim::Device::OculusDevice", "Oculus");
+
+		if (device != nullptr)
+		{
+			input->addDevice(device);
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+					<< "Could not initialize Oculus Device, falling back to mono display.";
+			useStereo = false;
+		}
+	}
+
+	auto behaviors = std::make_shared<SurgSim::Framework::BehaviorManager>();
+
 	runtime->addManager(graphics);
-	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
+	runtime->addManager(behaviors);
 	runtime->addManager(input);
 
 	configureShinyMaterial();
 	configureTexturedMaterial(runtime->getApplicationData()->findFile("Textures/CheckerBoard.png"));
 
-	createScene(runtime);
+	createScene(runtime, useStereo);
 
 	runtime->execute();
 

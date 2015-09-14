@@ -21,6 +21,7 @@
 
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
@@ -37,7 +38,7 @@ namespace Input
 ///
 /// Derived classes will likely want to hide their constructor and only
 /// allow creation through a manager object for that type of device.
-class DeviceInterface : public Framework::FactoryBase1<DeviceInterface, std::string>
+class DeviceInterface : public Framework::Accessible, public Framework::FactoryBase1<DeviceInterface, std::string>
 {
 public:
 	/// Virtual destructor (empty).
@@ -47,6 +48,11 @@ public:
 
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
+
+	/// The class name for this class
+	/// \note Use the SURGSIM_CLASSNAME macro in derived classes.
+	/// \return The fully namespace qualified name of this class.
+	virtual std::string getClassName() const = 0;
 
 	/// Fully initialize the device.
 	///

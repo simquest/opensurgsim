@@ -40,7 +40,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 namespace
@@ -187,7 +187,7 @@ public:
 	/// \param model The model of LabJack device to open (see strings in LabJackUD.h).
 	/// \param connection How to connect to the device (e.g., USB) (see strings in LabJackUD.h).
 	/// \param address Either the ID or serial number (if USB), or the IP address.
-	Handle(SurgSim::Device::LabJack::Model model, SurgSim::Device::LabJack::Connection connection,
+	Handle(SurgSim::Devices::LabJack::Model model, SurgSim::Devices::LabJack::Connection connection,
 		const std::string& address) :
 		m_deviceHandle(LABJACK_INVALID_HANDLE),
 		m_address(address),
@@ -370,9 +370,9 @@ private:
 	/// The address used to open the device.  Can be the empty string if the first-found device was opened.
 	std::string m_address;
 	/// The model of the device.
-	SurgSim::Device::LabJack::Model m_model;
+	SurgSim::Devices::LabJack::Model m_model;
 	/// The connection to the device.
-	SurgSim::Device::LabJack::Connection m_connection;
+	SurgSim::Devices::LabJack::Connection m_connection;
 	/// The scaffold.
 	std::shared_ptr<LabJackScaffold> m_scaffold;
 };
@@ -570,8 +570,8 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 
 	if (result && (address.length() > 0))
 	{
-		const SurgSim::Device::LabJack::Model model = device->getModel();
-		const SurgSim::Device::LabJack::Connection connection = device->getConnection();
+		const SurgSim::Devices::LabJack::Model model = device->getModel();
+		const SurgSim::Devices::LabJack::Connection connection = device->getConnection();
 
 		auto const sameInitialization = std::find_if(m_state->activeDeviceList.cbegin(),
 			m_state->activeDeviceList.cend(),
@@ -1587,5 +1587,5 @@ std::shared_ptr<SurgSim::Framework::Logger> LabJackScaffold::getLogger() const
 
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

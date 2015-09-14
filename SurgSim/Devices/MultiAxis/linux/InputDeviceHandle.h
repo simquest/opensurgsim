@@ -31,7 +31,7 @@ namespace Framework
 class Logger;
 };  // namespace Framework
 
-namespace Device
+namespace Devices
 {
 
 /// Access to an input/HID device using the Input API in Linux.
@@ -87,7 +87,7 @@ private:
 	std::unique_ptr<State> m_state;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_LINUX_INPUTDEVICEHANDLE_H

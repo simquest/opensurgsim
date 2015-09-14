@@ -20,10 +20,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::LabJackDevice, LabJackDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::LabJackDevice, LabJackDevice);
 
 LabJackDevice::LabJackDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, LabJackScaffold::buildDeviceInputData()),
@@ -315,5 +315,5 @@ int LabJackDevice::getAnalogInputSettling() const
 	return m_analogInputSettling;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

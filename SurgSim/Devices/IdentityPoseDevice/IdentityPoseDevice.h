@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 SURGSIM_STATIC_REGISTRATION(IdentityPoseDevice);
 
@@ -42,7 +42,7 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit IdentityPoseDevice(const std::string& uniqueName);
 
-	SURGSIM_CLASSNAME(SurgSim::Device::IdentityPoseDevice);
+	SURGSIM_CLASSNAME(SurgSim::Devices::IdentityPoseDevice);
 
 	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer);
 
@@ -56,7 +56,7 @@ protected:
 };
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_IDENTITYPOSEDEVICE_IDENTITYPOSEDEVICE_H
