@@ -67,8 +67,7 @@ bool SegmentMeshShape::isValid() const
 void SegmentMeshShape::setRadius(double radius)
 {
 	m_radius = radius;
-	double boxHalfExtent = m_radius * std::sqrt(3.0);
-	m_segmentEndBoundingBoxHalfExtent = Vector3d(boxHalfExtent, boxHalfExtent, boxHalfExtent);
+	m_segmentEndBoundingBoxHalfExtent = Vector3d(m_radius, m_radius, m_radius);
 }
 
 double SegmentMeshShape::getRadius() const
