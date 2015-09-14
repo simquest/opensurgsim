@@ -41,7 +41,7 @@ public:
 	/// \param	name	The name.
 	explicit ScreenSpaceQuadRepresentation(const std::string name) : Representation(name)
 	{
-		typedef std::array<int, 2> ParamType;
+		typedef std::array<double, 2> ParamType;
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(ScreenSpaceQuadRepresentation, ParamType, Size, getSize, setSize);
 	}
 
@@ -68,8 +68,8 @@ public:
 	/// \param [out]	height	If non-null, the height, may throw if null is passed.
 	//virtual void getSize(double* width, double* height) const = 0;
 
-	virtual void setSize(std::array<int, 2> dimensions) = 0;
-	virtual std::array<int, 2> getSize() const = 0;
+	virtual void setSize(std::array<double, 2> dimensions) = 0;
+	virtual std::array<double, 2> getSize() const = 0;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished

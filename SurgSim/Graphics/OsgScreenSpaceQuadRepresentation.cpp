@@ -115,16 +115,16 @@ void OsgScreenSpaceQuadRepresentation::getSize(double* width, double* height) co
 	*height = m_scale.y();
 }
 
-void OsgScreenSpaceQuadRepresentation::setSize(std::array<int, 2> dimensions)
+void OsgScreenSpaceQuadRepresentation::setSize(std::array<double, 2> dimensions)
 {
 	m_scale.x() = dimensions[0];
 	m_scale.y() = dimensions[1];
 	m_transform->setScale(m_scale);
 }
 
-std::array<int, 2> OsgScreenSpaceQuadRepresentation::getSize() const
+std::array<double, 2> OsgScreenSpaceQuadRepresentation::getSize() const
 {
-	std::array<int, 2> dimensions;
+	std::array<double, 2> dimensions;
 	dimensions[0] = m_scale.x();
 	dimensions[1] = m_scale.y();
 

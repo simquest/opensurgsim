@@ -82,6 +82,14 @@ public:
 	/// \return Dimensions on the screen (in pixels)
 	virtual std::array<int, 2> getDimensions() const = 0;
 
+	/// Set the dimensions of this view in doubles
+	/// \param	dimensions Dimensions on the screen (in pixels)
+	virtual void setDimensionsDouble(const std::array<double, 2>& dimensions) = 0;
+
+	/// Get the dimensions of this view in doubles
+	/// \return Dimensions on the screen (in pixels)
+	virtual std::array<double, 2> getDimensionsDouble() const = 0;
+
 	/// Sets whether the view window has a border
 	/// \param	enabled	True to enable the border around the window; false for no border
 	virtual void setWindowBorderEnabled(bool enabled) = 0;

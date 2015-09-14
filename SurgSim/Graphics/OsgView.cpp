@@ -142,6 +142,27 @@ std::array<int, 2> OsgView::getDimensions() const
 	return m_dimensions;
 }
 
+void OsgView::setDimensionsDouble(const std::array<double, 2>& dimensions)
+{
+	if (m_dimensions[0] != static_cast<int>(dimensions[0]) && m_dimensions[1] != static_cast<int>(dimensions[1]))
+	{
+		m_areWindowSettingsDirty = true;
+		m_dimensions[0] = dimensions[0];
+		m_dimensions[1] = dimensions[1];
+	}
+}
+
+std::array<double, 2> OsgView::getDimensionsDouble() const
+{
+	double x, y;
+	std::array<int, 2> m_d = getDimensions();
+	x = static_cast<double>(m_d[0]);
+	y = static_cast<double>(m_d[1]);
+
+	std::array<double, 2> dimensions = {x, y};
+	return dimensions;
+}
+
 void OsgView::setWindowBorderEnabled(bool enabled)
 {
 	m_isWindowBorderEnabled = enabled;

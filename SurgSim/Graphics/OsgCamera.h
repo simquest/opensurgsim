@@ -115,9 +115,9 @@ public:
 
 	void getViewport(int* x, int* y, int* width, int* height) const override;
 
-	void setViewportSize(std::array<int, 2> dimensions) override;
+	void setViewportSize(std::array<double, 2> dimensions) override;
 
-	std::array<int, 2> getViewportSize() const override;
+	std::array<double, 2> getViewportSize() const override;
 
 private:
 

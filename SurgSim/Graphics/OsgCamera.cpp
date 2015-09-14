@@ -282,22 +282,33 @@ void OsgCamera::getViewport(int* x, int* y, int* width, int* height) const
 	*height = viewPort->height();
 }
 
-void OsgCamera::setViewportSize(std::array<int, 2> dimensions)
+void OsgCamera::setViewportSize(std::array<double, 2> dimensions)
 {
 	auto viewPort = m_camera->getViewport();
 
-	SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
+	//SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
 
-	m_camera->setViewport(viewPort->x(), viewPort->y(), dimensions[0], dimensions[1]);
+	double aspectRatioChange = (dimensions[0] / viewPort->x()) / (dimensions[1] / viewPort->y());
+
+	if (viewPort != nullptr)
+	{
+		double aspectRatioChange = (dimensions[0] / viewPort->x()) / (dimensions[1] / viewPort->y());
+		m_camera->setViewport(viewPort->x(), viewPort->y(), dimensions[0], dimensions[1]);
+		m_camera->getProjectionMatrix() *= osg::Matrix::scale(1.0/aspectRatioChange,1.0,1.0);
+	}
+	else
+	{
+		m_camera->setViewport(0, 0, dimensions[0], dimensions[1]);
+	}
 }
 
-std::array<int, 2> OsgCamera::getViewportSize() const
+std::array<double, 2> OsgCamera::getViewportSize() const
 {
 	auto viewPort = m_camera->getViewport();
 
 	SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
 
-	std::array<int, 2> dimensions = {viewPort->width(), viewPort->height()};
+	std::array<double, 2> dimensions = {viewPort->width(), viewPort->height()};
 
 	return dimensions;
 }

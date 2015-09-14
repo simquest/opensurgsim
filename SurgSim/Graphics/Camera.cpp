@@ -24,7 +24,7 @@ namespace Graphics
 
 Camera::Camera(const std::string& name) : Representation(name)
 {
-	typedef std::array<int, 2> ParamType;
+	typedef std::array<double, 2> ParamType;
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::Matrix44d, ProjectionMatrix,
 									  getProjectionMatrix, setProjectionMatrix);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, std::string, RenderGroupReference,

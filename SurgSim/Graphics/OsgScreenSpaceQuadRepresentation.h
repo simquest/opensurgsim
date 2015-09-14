@@ -76,8 +76,8 @@ public:
 	/// \param [out]	height	If non-null, the height. Throws exception otherwise.
 	void getSize(double* width, double* height) const ;
 
-	void setSize(std::array<int, 2> dimensions) override;
-	std::array<int, 2> getSize()const override;
+	void setSize(std::array<double, 2> dimensions) override;
+	std::array<double, 2> getSize()const override;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "texture" for the uniform in this operation. This can be accomplished
