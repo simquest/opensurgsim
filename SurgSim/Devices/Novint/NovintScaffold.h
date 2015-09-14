@@ -135,6 +135,10 @@ private:
 	/// Destroys all the initialized handles.
 	void destroyAllHandles();
 
+	/// Store the handle if it is valid.
+	/// \return true If handle is valid and stored; false, otherwise.
+	bool storeHandleIfValid(const std::shared_ptr<Handle>& handle, const std::string& serial);
+
 	/// Executes the operations for a single haptic frame.
 	/// Should only be called from the context of a HDAL callback.
 	void runHapticFrame();

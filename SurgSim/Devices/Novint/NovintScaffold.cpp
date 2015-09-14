@@ -567,7 +567,7 @@ std::shared_ptr<NovintScaffold::Handle>
 	NovintScaffold::findHandleByInitializationName(const std::string& initializationName)
 {
 	std::shared_ptr<Handle> handle;
-	if (initializationName == "")
+	if (initializationName.empty())
 	{
 		// get the first available
 		for (auto& it : m_state->serialToHandle)
@@ -968,21 +968,16 @@ void NovintScaffold::setInputData(DeviceData* info)
 
 void NovintScaffold::createAllHandles()
 {
-	// The Scaffold does not know which devices will be initialized, so we will try to initialize all the devices
-	// list in device.yaml first. Then use hdlCatalogDevices to get the serial numbers for other connected 
-	// devices not listed in device.yaml, and initialize them.
+	// The Scaffold does not know which devices will be initialized, so we will try to initialize all the
+	// devices (by name) listed in device.yaml first.
+	// Then use hdlCatalogDevices to get the serial numbers for other connected devices not listed in device.yaml,
+	// and initialize them (by serial number).
 	// When registerDevice is called the name can be matched to a Handle created from a serial number.
 	for(const auto& item: m_state->nameToSerial)
 	{
 		// initialize by name
 		auto handle = std::make_shared<NovintScaffold::Handle>(item.first, false);
-		if (handle->isValid())
-		{
-			m_state->serialToHandle[item.second] = handle;
-			hdlMakeCurrent(handle->get());
-			checkForFatalError("Failed to make device current.");
-		}
-		else
+		if (!storeHandleIfValid(handle, item.second))
 		{
 			SURGSIM_LOG_WARNING(m_logger) << "Failed to initialize Novint device :" <<
 				item.first << "(Serial #: " << item.second << ")";
@@ -1005,13 +1000,7 @@ void NovintScaffold::createAllHandles()
 		}
 
 		auto handle = std::make_shared<NovintScaffold::Handle>(serial);
-		if (handle->isValid())
-		{
-			m_state->serialToHandle[serial] = handle;
-			hdlMakeCurrent(handle->get());
-			checkForFatalError("Failed to make device current.");
-		}
-		else
+		if (!storeHandleIfValid(handle, serial))
 		{
 			SURGSIM_LOG_WARNING(m_logger) << "Failed to initialize Falcon with serial " << serial << ".";
 		}
@@ -1027,6 +1016,19 @@ void NovintScaffold::destroyAllHandles()
 	m_state->unregisteredHandles.clear();
 	m_state->serialToHandle.clear();
 	SURGSIM_LOG_DEBUG(m_logger) << "Handles destroyed.";
+}
+
+bool NovintScaffold::storeHandleIfValid(const std::shared_ptr<Handle>& handle, const std::string& serial)
+{
+	bool result = false;
+	if (handle->isValid())
+	{
+		m_state->serialToHandle[serial] = handle;
+		hdlMakeCurrent(handle->get());
+		checkForFatalError("Failed to make device current.");
+		result = true;
+	}
+	return result;
 }
 
 std::map<std::string, std::string> NovintScaffold::getNameMap()
