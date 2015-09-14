@@ -208,3 +208,21 @@ TEST(PhantomDeviceTest, OutputProducer)
 	EXPECT_GE(producer->m_numTimesRequestedOutput, 700);
 	EXPECT_LE(producer->m_numTimesRequestedOutput, 1300);
 }
+
+
+TEST(PhantomDeviceTest, FactoryCreation)
+{
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create("SurgSim::Device::PhantomDevice",
+		"TestPhantom"));
+	EXPECT_EQ("SurgSim::Device::PhantomDevice", device->getClassName());
+}
+
+TEST(PhantomDeviceTest, AccessibleTest)
+{
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestFalcon");
+
+	std::string name = "initName";
+	EXPECT_NO_THROW(device->setValue("InitializationName", name));
+	EXPECT_EQ(name, device->getInitializationName());
+}
