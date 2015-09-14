@@ -22,9 +22,31 @@
 
 #include "SurgSim/Devices/DeviceUtilities.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Input/DeviceInterface.h"
 
-TEST(DeviceInterfaceTests, CreateDevice)
+namespace
+{
+class MockDeviceNoInitialize : public SurgSim::Devices::IdentityPoseDevice
+{
+public:
+	explicit MockDeviceNoInitialize(const std::string& name) : SurgSim::Devices::IdentityPoseDevice(name)
+	{
+	}
+
+	std::string getClassName() const override
+	{
+		return "MockDeviceNoInitialize";
+	}
+	
+	bool initialize() override
+	{
+		return false;
+	}
+};
+}
+
+TEST(DeviceUtilitiesTests, CreateDevice)
 {
 	const std::string name = "name";
 	std::vector<std::string> types;
@@ -38,4 +60,33 @@ TEST(DeviceInterfaceTests, CreateDevice)
 	ASSERT_NE(nullptr, device);
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<SurgSim::Devices::IdentityPoseDevice>(device));
 	EXPECT_EQ(name, device->getName());
+}
+
+TEST(DeviceUtilitiesTests, LoadDevice)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	
+	EXPECT_ANY_THROW(device = SurgSim::Devices::loadDevice("noFile.yaml"));
+	ASSERT_EQ(nullptr, device);
+
+	EXPECT_NO_THROW(device = SurgSim::Devices::loadDevice("notSequence.yaml"));
+	ASSERT_EQ(nullptr, device);
+
+	EXPECT_NO_THROW(device = SurgSim::Devices::loadDevice("notMap.yaml"));
+	ASSERT_EQ(nullptr, device);
+
+	EXPECT_NO_THROW(device = SurgSim::Devices::loadDevice("notRegistered.yaml"));
+	ASSERT_EQ(nullptr, device);
+
+	EXPECT_NO_THROW(device = SurgSim::Devices::loadDevice("noName.yaml"));
+	ASSERT_EQ(nullptr, device);
+
+	SurgSim::Input::DeviceInterface::getFactory().registerClass<MockDeviceNoInitialize>("MockDeviceNoInitialize");
+	EXPECT_NO_THROW(device = SurgSim::Devices::loadDevice("noInitialize.yaml"));
+	ASSERT_EQ(nullptr, device);
+
+	EXPECT_NO_THROW(device = SurgSim::Devices::loadDevice("success.yaml"));
+	ASSERT_NE(nullptr, device);
+	EXPECT_EQ("Device1", device->getName());
 }
