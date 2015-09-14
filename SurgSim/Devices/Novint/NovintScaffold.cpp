@@ -142,14 +142,14 @@ public:
 		if (checkForFatalError("Failed to initialize"))
 		{
 			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) << std::endl << 
-				(initBySerialNumber ? "HDAL serial number: '" : "device name: ''") << info << "'";
+				(initBySerialNumber ? "HDAL serial number: '" : "device name: '") << info << "'";
 		}
 		else if (deviceHandle == HDL_INVALID_HANDLE)
 		{
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 				"No error during initializing device " <<
-				(initBySerialNumber ? "with serial number: '" : "named: ''") << info <<
-				"', but an invalid handle returned.";
+				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
+				"', but an invalid handle returned.\nIs a Novint device plugged in?";
 		}
 		else
 		{
@@ -979,8 +979,8 @@ void NovintScaffold::createAllHandles()
 		auto handle = std::make_shared<NovintScaffold::Handle>(item.first, false);
 		if (!storeHandleIfValid(handle, item.second))
 		{
-			SURGSIM_LOG_WARNING(m_logger) << "Failed to initialize Novint device :" <<
-				item.first << "(Serial #: " << item.second << ")";
+			SURGSIM_LOG_WARNING(m_logger) << "Failed to initialize Novint device: " <<
+				item.first << " (Serial #: " << item.second << ")";
 		}
 	}
 
