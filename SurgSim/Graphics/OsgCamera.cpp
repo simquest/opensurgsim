@@ -282,6 +282,26 @@ void OsgCamera::getViewport(int* x, int* y, int* width, int* height) const
 	*height = viewPort->height();
 }
 
+void OsgCamera::setViewportSize(std::array<int, 2> dimensions)
+{
+	auto viewPort = m_camera->getViewport();
+
+	SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
+
+	m_camera->setViewport(viewPort->x(), viewPort->y(), dimensions[0], dimensions[1]);
+}
+
+std::array<int, 2> OsgCamera::getViewportSize() const
+{
+	auto viewPort = m_camera->getViewport();
+
+	SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
+
+	std::array<int, 2> dimensions = {viewPort->width(), viewPort->height()};
+
+	return dimensions;
+}
+
 void OsgCamera::setPerspectiveProjection(double fovy, double aspect, double near, double far)
 {
 	m_camera->setProjectionMatrixAsPerspective(fovy, aspect, near, far);

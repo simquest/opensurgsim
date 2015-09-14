@@ -106,6 +106,12 @@ public:
 	/// \param x,y,width,height [out] non-nullptr parameters to write the viewport parameters
 	virtual void getViewport(int* x, int* y, int* width, int* height) const  = 0;
 
+	/// Sets the width and height of the viewport
+	/// \param dimensions size of the viewport in screen sapce
+	virtual void setViewportSize(std::array<int, 2> dimensions) = 0;
+
+	/// Gets the dimensions of the viewport
+	virtual std::array<int, 2> getViewportSize() const = 0;
 
 	/// Set the projection matrix with the appropriate  perspective projection parameters
 	/// \param fovy Field of view along the y-axis

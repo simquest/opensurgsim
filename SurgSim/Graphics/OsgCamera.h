@@ -115,6 +115,10 @@ public:
 
 	void getViewport(int* x, int* y, int* width, int* height) const override;
 
+	void setViewportSize(std::array<int, 2> dimensions) override;
+
+	std::array<int, 2> getViewportSize() const override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;

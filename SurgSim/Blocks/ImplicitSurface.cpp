@@ -129,8 +129,9 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceShadingPass");
 
 	auto renderCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(renderPass->getCamera());
-	renderCamera->setViewport(0, 0, 1024, 1024);
-	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, 1024, 0, 1024);
+	copier->connect(view, "Dimensions", renderCamera, "ViewportSize");
+	//renderCamera->setViewport(0, 0, 1024, 1024);
+	//renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, 1024, 0, 1024);
 	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
 	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);

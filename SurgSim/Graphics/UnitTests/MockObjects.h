@@ -447,6 +447,16 @@ public:
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
+	void setViewportSize(std::array<int, 2> dimensions)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	std::array<int, 2> getViewportSize() const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
 private:
 	/// Number of times the camera has been updated
 	int m_numUpdates;
