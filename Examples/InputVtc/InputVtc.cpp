@@ -181,22 +181,15 @@ int main(int argc, char* argv[])
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
 
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	runtime->addManager(physicsManager);
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);
 	runtime->addManager(inputManager);
 
 	const std::string deviceName = "Tool_Device";
-	std::vector<std::string> types;
-	types.push_back("SurgSim::Devices::PhantomDevice");
-	types.push_back("SurgSim::Devices::NovintDevice");
-	types.push_back("SurgSim::Devices::MultiAxisDevice");
-	types.push_back("SurgSim::Devices::SixenseDevice");
-	types.push_back("SurgSim::Devices::LeapDevice");
-	types.push_back("SurgSim::Devices::IdentityPoseDevice");
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device =
-		SurgSim::Devices::createDevice(types, deviceName);
+		SurgSim::Devices::loadDevice("device.yaml");
 	SURGSIM_ASSERT(device != nullptr) << "Failed to initialize any device.";
 	SURGSIM_LOG_IF(std::dynamic_pointer_cast<SurgSim::Devices::IdentityPoseDevice>(device) != nullptr,
 		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << "The InputVtc example was unable to initialize " <<

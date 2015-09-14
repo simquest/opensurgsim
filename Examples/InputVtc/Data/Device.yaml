@@ -1,0 +1,12 @@
+- SurgSim::Devices::NovintDevice:
+    Name: Tool_Device
+    InitializationName: 7DofFalcon
+    7DofDevice: true
+- SurgSim::Devices::PhantomDevice:
+    Name: Tool_Device
+- SurgSim::Devices::NovintDevice:
+    Name: Tool_Device
+- SurgSim::Devices::MultiAxisDevice:
+    Name: Tool_Device
+- SurgSim::Devices::IdentityPoseDevice:
+    Name: Tool_Device
