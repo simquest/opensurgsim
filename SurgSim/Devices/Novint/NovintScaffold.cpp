@@ -975,6 +975,14 @@ void NovintScaffold::createAllHandles()
 	// When registerDevice is called the name can be matched to a Handle created from a serial number.
 	for(const auto& item: m_state->nameToSerial)
 	{
+		std::string deviceName = item.first;
+		std::transform(deviceName.begin(), deviceName.end(), deviceName.begin(), tolower);
+		if (deviceName == "default")
+		{
+			SURGSIM_LOG_INFO(m_logger) << "'Default' is system reserved. No Novint device should be named 'Default'.";
+			continue;
+		}
+
 		// initialize by name
 		auto handle = std::make_shared<NovintScaffold::Handle>(item.first, false);
 		if (!storeHandleIfValid(handle, item.second))

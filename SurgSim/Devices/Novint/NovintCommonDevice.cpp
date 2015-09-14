@@ -61,6 +61,13 @@ void NovintCommonDevice::setInitializationName(const std::string& initialization
 		getName() << ", which already has a serialNumber.";
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Cannot setInitializationName after the device named " << getName() << " has been initialized.";
+	
+	std::string deviceName = initializationName;
+	std::transform(deviceName.begin(), deviceName.end(), deviceName.begin(), tolower);
+	SURGSIM_ASSERT(deviceName != "default") <<
+		"Initialization name can not be set to 'default'. 'Default' is system reserved.\n" <<
+		"If want a default device, set device name to empty.";
+	
 	m_initializationName.setValue(initializationName);
 }
 
