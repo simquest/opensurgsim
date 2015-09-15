@@ -495,10 +495,11 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	std::string serialNumber = "";
 	if ((device->getSerialNumber(&serialNumber)) && (serialNumber != ""))
 	{
-		auto& sameSerialNumber = std::find_if(m_state->registeredDevices.cbegin(),
-			m_state->registeredDevices.cend(),
-			[&serialNumber](const std::unique_ptr<DeviceData>& info)
-		{ return info->serialNumber == serialNumber; });
+		auto& sameSerialNumber = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
+											  [&serialNumber](const std::unique_ptr<DeviceData>& info)
+								{ 
+									return info->serialNumber == serialNumber;
+								});
 		if (sameSerialNumber != m_state->registeredDevices.end())
 		{
 			SURGSIM_LOG_CRITICAL(m_logger) << "Tried to register a device when the same serial number " <<
@@ -512,9 +513,11 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	if ((device->getInitializationName(&initializationName)) && (initializationName != ""))
 	{
 		auto& sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(),
-			m_state->registeredDevices.cend(),
-			[&initializationName](const std::unique_ptr<DeviceData>& info)
-		{ return info->initializationName == initializationName; });
+													m_state->registeredDevices.cend(),
+													[&initializationName](const std::unique_ptr<DeviceData>& info)
+										{ 
+											return info->initializationName == initializationName;
+										});
 		if (sameInitializationName != m_state->registeredDevices.end())
 		{
 			SURGSIM_LOG_CRITICAL(m_logger) << "Tried to register a device when the same initialization (HDAL) name " <<
@@ -662,7 +665,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		bool leftHanded = ((gripStatus[1] & 0x01) != 0);
 		if (leftHanded)
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << "'" << info->initializationName << "' is LEFT-handed.";
+			SURGSIM_LOG_DEBUG(m_logger) << "'" << info->initializationName << "' is Left-handed.";
 			info->isDeviceRollAxisReversed = true;
 			info->eulerAngleOffsetRoll = 0;
 			info->eulerAngleOffsetYaw = -75. * M_PI / 180.;
@@ -985,11 +988,8 @@ void NovintScaffold::createAllHandles()
 
 		// initialize by name
 		auto handle = std::make_shared<NovintScaffold::Handle>(item.first, false);
-		if (!storeHandleIfValid(handle, item.second))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Failed to initialize Novint device: " <<
-				item.first << " (Serial #: " << item.second << ")";
-		}
+		SURGSIM_LOG_IF(!storeHandleIfValid(handle, item.second), m_logger, WARNING) <<
+			"Failed to initialize Novint device: " << item.first << " (Serial #: " << item.second << ")";
 	}
 
 	char serials[HDL_MAX_DEVICES * HDL_SERNUM_BUFFSIZE];
@@ -1004,14 +1004,13 @@ void NovintScaffold::createAllHandles()
 		// Device with serial number 'serial' already initialized.
 		if (m_state->serialToHandle.find(serial) != m_state->serialToHandle.end())
 		{
+			SURGSIM_LOG_DEBUG(m_logger) << "Device with serial number " << serial << " already created.";
 			continue;
 		}
 
 		auto handle = std::make_shared<NovintScaffold::Handle>(serial);
-		if (!storeHandleIfValid(handle, serial))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Failed to initialize Falcon with serial " << serial << ".";
-		}
+		SURGSIM_LOG_IF(!storeHandleIfValid(handle, serial), m_logger, WARNING) <<
+			"Failed to initialize Falcon with serial " << serial << ".";
 	}
 	m_state->initializationTime = Framework::Clock::now();
 	SURGSIM_LOG_DEBUG(m_logger) << "All device handles created.";
