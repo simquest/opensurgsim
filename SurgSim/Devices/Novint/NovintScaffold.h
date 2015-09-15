@@ -130,7 +130,8 @@ private:
 	std::map<std::string, std::string> getNameMap();
 
 	/// Creates a NovintScaffold::Handle for each device connected when the first registerDevice is called.
-	void createAllHandles();
+	/// \return True if there are device handles created; false otherwise.
+	bool createAllHandles();
 
 	/// Destroys all the initialized handles.
 	void destroyAllHandles();

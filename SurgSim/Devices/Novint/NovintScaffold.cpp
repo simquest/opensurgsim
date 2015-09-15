@@ -412,6 +412,7 @@ static inline T clampToRange(T value, T rangeMin, T rangeMax)
 NovintScaffold::NovintScaffold() :
 	m_logger(Framework::Logger::getLogger("Devices/Novint")), m_state(new StateData)
 {
+	m_logger->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	{
 		// Drain the HDAL error stack
 		HDLError errorCode = hdlGetError();
@@ -427,69 +428,68 @@ NovintScaffold::NovintScaffold() :
 	// 2) hdlStart (must be after all hdlInitX and before hdlCreateServoOp), then
 	// 3) hdlCreateServoOp (starts the callback).
 
-	// Load the list of Novint devices user wants to use.
+	// Load the list of Novint devices (devices.yaml) user wants to use.
 	m_state->nameToSerial = getNameMap();
-	createAllHandles();
-	hdlStart();
-	if (!checkForFatalError("Couldn't start HDAL scheduler"))
+	if (createAllHandles())
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Scheduler started, hdlStart called.";
+		hdlStart();
+		if (!checkForFatalError("Couldn't start HDAL scheduler"))
+		{
+			SURGSIM_LOG_DEBUG(m_logger) << "Scheduler started, hdlStart called.";
 
-		std::unique_ptr<Callback> callback(new Callback(this));
-		if (callback->isValid())
-		{
-			m_state->callback = std::move(callback);
-			m_state->isApiInitialized = true;
-			SURGSIM_LOG_DEBUG(m_logger) << "Callback scheduled; Scaffold created successfully.";
-		}
-		else
-		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Failed to create a callback.";
-			hdlStop();
-			checkForFatalError("Couldn't stop HDAL scheduler");
+			std::unique_ptr<Callback> callback(new Callback(this));
+			if (callback->isValid())
+			{
+				m_state->callback = std::move(callback);
+				m_state->isApiInitialized = true;
+				SURGSIM_LOG_DEBUG(m_logger) << "Callback scheduled; Scaffold created successfully.";
+			}
+			else
+			{
+				SURGSIM_LOG_SEVERE(m_logger) << "Failed to create a callback.";
+				hdlStop();
+				checkForFatalError("Couldn't stop HDAL scheduler");
+			}
 		}
 	}
 }
 
 NovintScaffold::~NovintScaffold()
 {
-	// The HDAL seems to do bad things (and the CRT complains) if we uninitialize the device too soon.
-	const int MINIMUM_LIFETIME_MILLISECONDS = 500;
-	Framework::Clock::time_point earliestEndTime =
-		m_state->initializationTime + boost::chrono::milliseconds(MINIMUM_LIFETIME_MILLISECONDS);
-	boost::this_thread::sleep_until(earliestEndTime);
-
-	if (m_state->callback != nullptr)
+	if (m_state->isApiInitialized)
 	{
-		m_state->callback = nullptr;
-		SURGSIM_LOG_DEBUG(m_logger) << "Callback reset.";
+		// The HDAL seems to do bad things (and the CRT complains) if we uninitialize the device too soon.
+		const int MINIMUM_LIFETIME_MILLISECONDS = 500;
+		Framework::Clock::time_point earliestEndTime =
+			m_state->initializationTime + boost::chrono::milliseconds(MINIMUM_LIFETIME_MILLISECONDS);
+		boost::this_thread::sleep_until(earliestEndTime);
+
+		if (m_state->callback != nullptr)
+		{
+			m_state->callback = nullptr;
+			SURGSIM_LOG_DEBUG(m_logger) << "Callback reset.";
+		}
+
+		SURGSIM_LOG_DEBUG(m_logger) << "Stopping HDAL scheduler...";
+		hdlStop();
+		SURGSIM_LOG_IF(!checkForFatalError("Couldn't stop HDAL scheduler"), m_logger, DEBUG) <<
+			"HDAL scheduler stopped, hdlStop called.";
+
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
+		if (!m_state->registeredDevices.empty())
+		{
+			SURGSIM_LOG_SEVERE(m_logger) << "Destroying scaffold while there are still registered devices!?!";
+			m_state->registeredDevices.clear();
+		}
+
+		destroyAllHandles();
+		SURGSIM_LOG_DEBUG(m_logger) << "Scaffold destroyed.";
 	}
-
-	SURGSIM_LOG_DEBUG(m_logger) << "Stopping HDAL scheduler...";
-	hdlStop();
-	SURGSIM_LOG_IF(!checkForFatalError("Couldn't stop HDAL scheduler"), m_logger, DEBUG) <<
-		"HDAL scheduler stopped, hdlStop called.";
-
-	boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
-	if (!m_state->registeredDevices.empty())
-	{
-		SURGSIM_LOG_SEVERE(m_logger) << "Destroying scaffold while there are still registered devices!?!";
-		m_state->registeredDevices.clear();
-	}
-
-	destroyAllHandles();
-	SURGSIM_LOG_DEBUG(m_logger) << "Scaffold destroyed.";
 }
 
 bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
-	if (!m_state->isApiInitialized)
-	{
-		SURGSIM_LOG_WARNING(m_logger) << "The HDAL did not initialize correctly so no NovintDevice can be registered.";
-		return false;
-	}
 
 	// Make sure the serial number is unique.
 	std::string serialNumber = "";
@@ -969,7 +969,7 @@ void NovintScaffold::setInputData(DeviceData* info)
 	inputData.booleans().set(DataStructures::Names::IS_ORIENTATION_HOMED, info->isOrientationHomed);
 }
 
-void NovintScaffold::createAllHandles()
+bool NovintScaffold::createAllHandles()
 {
 	// The Scaffold does not know which devices will be initialized, so we will try to initialize all the
 	// devices (by name) listed in device.yaml first.
@@ -1014,6 +1014,8 @@ void NovintScaffold::createAllHandles()
 	}
 	m_state->initializationTime = Framework::Clock::now();
 	SURGSIM_LOG_DEBUG(m_logger) << "All device handles created.";
+
+	return !m_state->serialToHandle.empty();
 }
 
 void NovintScaffold::destroyAllHandles()
