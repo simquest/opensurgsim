@@ -114,7 +114,7 @@ TEST(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(20000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
 	runtime->stop();
 }
 

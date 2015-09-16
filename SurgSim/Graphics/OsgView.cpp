@@ -154,12 +154,9 @@ void OsgView::setDimensionsDouble(const std::array<double, 2>& dimensions)
 
 std::array<double, 2> OsgView::getDimensionsDouble() const
 {
-	double x, y;
 	std::array<int, 2> m_d = getDimensions();
-	x = static_cast<double>(m_d[0]);
-	y = static_cast<double>(m_d[1]);
 
-	std::array<double, 2> dimensions = {x, y};
+	std::array<double, 2> dimensions = {static_cast<double>(m_d[0]), static_cast<double>(m_d[1])};
 	return dimensions;
 }
 
@@ -198,6 +195,7 @@ void OsgView::update(double dt)
 				window->setWindowRectangle(m_position[0], m_position[1], m_dimensions[0], m_dimensions[1]);
 				m_areWindowSettingsDirty = false;
 			}
+
 		}
 	}
 	if (isManipulatorEnabled())
@@ -235,6 +233,11 @@ bool OsgView::doWakeUp()
 	if (isFullScreen())
 	{
 		m_view->setUpViewOnSingleScreen(getTargetScreen());
+		std::array<int, 2> newDimensions;
+		newDimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
+		newDimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
+		setDimensions(newDimensions);
+		setWindowBorderEnabled(false);
 	}
 	else
 	{

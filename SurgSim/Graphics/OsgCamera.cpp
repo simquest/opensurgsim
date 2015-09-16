@@ -286,15 +286,12 @@ void OsgCamera::setViewportSize(std::array<double, 2> dimensions)
 {
 	auto viewPort = m_camera->getViewport();
 
-	//SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
-
-	double aspectRatioChange = (dimensions[0] / viewPort->x()) / (dimensions[1] / viewPort->y());
-
 	if (viewPort != nullptr)
 	{
-		double aspectRatioChange = (dimensions[0] / viewPort->x()) / (dimensions[1] / viewPort->y());
+		double aspectRatioChange = (dimensions[0] / viewPort->width()) / (dimensions[1] / viewPort->height());
 		m_camera->setViewport(viewPort->x(), viewPort->y(), dimensions[0], dimensions[1]);
-		m_camera->getProjectionMatrix() *= osg::Matrix::scale(1.0/aspectRatioChange,1.0,1.0);
+		m_camera->getProjectionMatrix() *= osg::Matrix::scale(1.0 / aspectRatioChange, aspectRatioChange,1.0);
+		m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 	}
 	else
 	{

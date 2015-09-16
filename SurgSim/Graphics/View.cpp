@@ -43,7 +43,7 @@ View::View(const std::string& name) :
 	typedef std::array<double, 2> DoubleType;
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, CoordinateType, Position, getPosition, setPosition);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, CoordinateType, Dimensions, getDimensions, setDimensions);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, DoubleType, DimensionsDouble, getDimensionsD, setDimensionsD);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, DoubleType, DimensionsDouble, getDimensionsDouble, setDimensionsDouble);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, std::shared_ptr<SurgSim::Framework::Component>, Camera,
 									  getCamera, setCamera);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, bool, WindowBorder, isWindowBorderEnabled, setWindowBorderEnabled);
