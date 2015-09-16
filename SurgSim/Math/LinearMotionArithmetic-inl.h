@@ -397,6 +397,14 @@ LinearMotionND<T, 3>::LinearMotionND(const std::array<T, 3>& a, const std::array
 }
 
 template <typename T>
+LinearMotionND<T, 3>::LinearMotionND(const Vector3& a, const Vector3& b)
+{
+	m_motion[0] = LinearMotion<T>(a[0], b[0]);
+	m_motion[1] = LinearMotion<T>(a[1], b[1]);
+	m_motion[2] = LinearMotion<T>(a[2], b[2]);
+}
+
+template <typename T>
 LinearMotionND<T, 3>& LinearMotionND<T, 3>::operator=(const LinearMotionND<T, 3>& motion)
 {
 	m_motion[0] = motion.m_motion[0];
