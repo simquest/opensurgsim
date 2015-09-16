@@ -18,6 +18,7 @@
 
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 
 namespace SurgSim
 {
@@ -25,6 +26,7 @@ namespace SurgSim
 namespace Framework
 {
 class Component;
+class Asset;
 }
 
 namespace Graphics
@@ -42,6 +44,10 @@ namespace Blocks
 SURGSIM_STATIC_REGISTRATION(TransferPhysicsToGraphicsMeshBehavior);
 
 /// Behavior to copy positions of a PhysicsRepresentation to a GraphicsMesh.
+/// By default the behavior will take each node and copy the position of that node to the vertex with the corresponding
+/// index. If an index map is available, for each pair in the index map it will take the nodeId from the first
+/// member of the pair and copy it to the vertex with the id of the second member of the pair.
+/// The index map can be computed from meshes given to this behavior or precomputed via other means.
 class TransferPhysicsToGraphicsMeshBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -67,18 +73,51 @@ public:
 	/// \return The Graphics Mesh representation which receives positions.
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> getTarget() const;
 
+	void TransferPhysicsToGraphicsMeshBehavior::setIndexMap(
+		const std::shared_ptr<DataStructures::TriangleMeshPlain>& source,
+		const std::shared_ptr<DataStructures::TriangleMeshPlain>& target);
+
+
+	void setIndexMap(const std::string& sourceFile, const std::string& targetFile);
+
+
+
+	/// Set the mapping to be used if not empty. first index is the node, second index is the vertex.
+	/// for all pairs copy node position to given vertex index.
+	void setIndexMap(const std::vector<std::pair<size_t, size_t>>& indexMap)
+	{
+		m_indexMap = indexMap;
+	}
+
+	const std::vector<std::pair<size_t, size_t>> getIndexMap()
+	{
+		return m_indexMap;
+	}
+
 	void update(double dt) override;
 
 private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
+
+	void setIndexMap(const std::pair<std::string, std::string>& fileName);
+
+	void setIndexMap(const std::pair<std::shared_ptr<Framework::Asset>, std::shared_ptr<Framework::Asset>>& meshes);
+
 	/// The DeformableRepresentation from which the Ode state comes.
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;
 
 	/// The Graphics Mesh Representation to which the vertices' positions are set.
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> m_target;
+
+	/// The mapping to be used if not empty.
+	std::vector<std::pair<size_t, size_t>> m_indexMap;
 };
+
+std::vector<std::pair<size_t, size_t>> generateIndexMap(
+										const std::shared_ptr<DataStructures::TriangleMeshPlain>& source,
+										const std::shared_ptr<DataStructures::TriangleMeshPlain>& target);
 
 };  // namespace Blocks
 };  // namespace SurgSim
