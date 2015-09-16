@@ -191,4 +191,54 @@ bool YAML::convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>::decod
 	return result;
 }
 
+SURGSIM_DOUBLE_SPECIALIZATION
+template <class Type>
+YAML::Node YAML::convert<typename Eigen::AngleAxis<Type>>::encode(
+	const typename Eigen::AngleAxis<Type>& rhs)
+{
+	YAML::Node node;
+	node.SetStyle(YAML::FlowStyle);
+	node.push_back(rhs.angle());
+	node.push_back(rhs.axis()[0]);
+	node.push_back(rhs.axis()[1]);
+	node.push_back(rhs.axis()[2]);
+	return node;
+}
+
+SURGSIM_DOUBLE_SPECIALIZATION
+template <class Type>
+bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
+	const Node& node,
+	typename Eigen::AngleAxis<Type>& rhs) //NOLINT
+{
+	if (node.size() != 4)
+	{
+		return false;
+	}
+	try
+	{
+		rhs.angle() = node[0].as<Type>();
+	}
+	catch (YAML::RepresentationException)
+	{
+		rhs.angle() = std::numeric_limits<Type>::quiet_NaN();
+		auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+		SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
+	}
+	for (size_t i = 0; i < 3; ++i)
+	{
+		try
+		{
+			rhs.axis()[i] = node[i + 1].as<Type>();
+		}
+		catch (YAML::RepresentationException)
+		{
+			rhs.axis()[i] = std::numeric_limits<Type>::quiet_NaN();
+			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+			SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
+		}
+	}
+	return true;
+}
+
 #endif // SURGSIM_MATH_MATHCONVERT_INL_H

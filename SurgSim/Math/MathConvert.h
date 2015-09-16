@@ -80,6 +80,15 @@ struct convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>
 	static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs); //NOLINT
 };
 
+/// Specialization of convert for Eigen::AngleAxis
+SURGSIM_DOUBLE_SPECIALIZATION
+template <typename Type>
+struct convert<typename Eigen::AngleAxis<Type>>
+{
+	static Node encode(const typename Eigen::AngleAxis<Type>& rhs);
+	static bool decode(const Node& node, typename Eigen::AngleAxis<Type>& rhs); //NOLINT
+};
+
 template <>
 struct convert<std::shared_ptr<SurgSim::Math::Shape>>
 {
