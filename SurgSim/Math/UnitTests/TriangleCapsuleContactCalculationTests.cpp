@@ -68,8 +68,6 @@ protected:
 
 	void testTriangleCapsuleContactCalculation(const TriangleCapsuleTestCase& data)
 	{
-		//SCOPED_TRACE(std::get<0>(data));
-
 		MockTriangle t = std::get<1>(data);
 		MockCapsule c = std::get<2>(data);
 		bool contactExpected = std::get<3>(data);
@@ -132,32 +130,32 @@ protected:
 				break;
 			case 6:
 				EXPECT_NO_THROW(
-					contactFound = calculateContactTriangleCapsule(t.v2, t.v1, t.v0, (-t.n).eval(), c.v0, c.v1, c.r,
+					contactFound = calculateContactTriangleCapsule(t.v2, t.v1, t.v0, c.v0, c.v1, c.r,
 					&penetrationDepth, &tPoint, &cPoint, &normal));
 				break;
 			case 7:
 				EXPECT_NO_THROW(
-					contactFound = calculateContactTriangleCapsule(t.v1, t.v0, t.v2, (-t.n).eval(), c.v0, c.v1, c.r,
+					contactFound = calculateContactTriangleCapsule(t.v1, t.v0, t.v2, c.v0, c.v1, c.r,
 					&penetrationDepth, &tPoint, &cPoint, &normal));
 				break;
 			case 8:
 				EXPECT_NO_THROW(
-					contactFound = calculateContactTriangleCapsule(t.v0, t.v2, t.v1, (-t.n).eval(), c.v0, c.v1, c.r,
+					contactFound = calculateContactTriangleCapsule(t.v0, t.v2, t.v1, c.v0, c.v1, c.r,
 					&penetrationDepth, &tPoint, &cPoint, &normal));
 				break;
 			case 9:
 				EXPECT_NO_THROW(
-					contactFound = calculateContactTriangleCapsule(t.v2, t.v1, t.v0, (-t.n).eval(), c.v1, c.v0, c.r,
+					contactFound = calculateContactTriangleCapsule(t.v2, t.v1, t.v0, c.v1, c.v0, c.r,
 					&penetrationDepth, &tPoint, &cPoint, &normal));
 				break;
 			case 10:
 				EXPECT_NO_THROW(
-					contactFound = calculateContactTriangleCapsule(t.v1, t.v0, t.v2, (-t.n).eval(), c.v1, c.v0, c.r,
+					contactFound = calculateContactTriangleCapsule(t.v1, t.v0, t.v2, c.v1, c.v0, c.r,
 					&penetrationDepth, &tPoint, &cPoint, &normal));
 				break;
-			case 12:
+			case 11:
 				EXPECT_NO_THROW(
-					contactFound = calculateContactTriangleCapsule(t.v0, t.v2, t.v1, (-t.n).eval(), c.v1, c.v0, c.r,
+					contactFound = calculateContactTriangleCapsule(t.v0, t.v2, t.v1, c.v1, c.v0, c.r,
 					&penetrationDepth, &tPoint, &cPoint, &normal));
 				break;
 			}
@@ -196,7 +194,8 @@ protected:
 					correctedC.translate(-correction);
 					auto correctedDistance = distanceSegmentTriangle(correctedC.v0, correctedC.v1, correctedT.v0,
 						correctedT.v1, correctedT.v2, correctedT.n, &cP, &tP) - c.r;
-					EXPECT_TRUE(correctedDistance <= Geometry::DistanceEpsilon);
+					EXPECT_TRUE(correctedDistance >= -4.0 * Geometry::DistanceEpsilon) << "correctedDistance = " << correctedDistance;
+					EXPECT_TRUE(correctedDistance <= Geometry::DistanceEpsilon) << "correctedDistance = " << correctedDistance;
 				}
 				// Now move the shapes apart by just a little farther than the penetration depth, to establish
 				// that the shapes are not colliding.
@@ -209,7 +208,8 @@ protected:
 					correctedC.translate(-correction);
 					auto correctedDistance = distanceSegmentTriangle(correctedC.v0, correctedC.v1, correctedT.v0,
 						correctedT.v1, correctedT.v2, correctedT.n, &cP, &tP) - c.r;
-					EXPECT_TRUE(correctedDistance > 0.0);
+					EXPECT_TRUE(correctedDistance <= 4.0 * Geometry::DistanceEpsilon) << "correctedDistance = " << correctedDistance;
+					EXPECT_TRUE(correctedDistance >= -Geometry::DistanceEpsilon) << "correctedDistance = " << correctedDistance;
 				}
 			}
 		}
@@ -239,71 +239,191 @@ private:
 	std::vector<SurgSim::Math::RigidTransform3d> m_transforms;
 };
 
-TEST_F(TriangleCapsuleContactCalculationTest, TestCases)
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase1)
 {
 	testTriangleCapsuleContactCalculation("(Perpendicular) Capsule far away from triangle",
 		Vector3d(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, 5.0), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase2)
+{
+	testTriangleCapsuleContactCalculation("(Perpendicular) Capsule far away from triangle",
+		Vector3d(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, 5.0), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase3)
+{
 	testTriangleCapsuleContactCalculation("(Perpendicular) Capsule just away triangle",
 		Vector3d(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, 0.500001), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase4)
+{
 	testTriangleCapsuleContactCalculation("(Perpendicular) Capsule just touching triangle",
 		Vector3d(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, 0.49999), true, true, Vector3d::Zero(), Vector3d(0, 0, -0.00001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase5)
+{
 	testTriangleCapsuleContactCalculation("(Perpendicular) Capsule axis just away from triangle",
 		Vector3d(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, 0.0001), true, true, Vector3d::Zero(), Vector3d(0, 0, -0.4999));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase6)
+{
 	testTriangleCapsuleContactCalculation("(Perpendicular) Capsule axis just touching triangle",
 		Vector3d(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, -0.0001), true, true, Vector3d::Zero(), Vector3d(0, 0, -0.5001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase7)
+{
 	testTriangleCapsuleContactCalculation("(Angled) Capsule far away from triangle",
 		Vector3d(1.0, 1.0, 10.0), Vector3d(0.0, 0.0, 5.0), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase8)
+{
 	testTriangleCapsuleContactCalculation("(Angled) Capsule just away triangle",
 		Vector3d(1.0, 1.0, 10.0), Vector3d(0.0, 0.0, 0.500001), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase9)
+{
 	testTriangleCapsuleContactCalculation("(Angled) Capsule just touching triangle",
 		Vector3d(1.0, 1.0, 10.0), Vector3d(0.0, 0.0, 0.49999), true, true, Vector3d::Zero(), Vector3d(0, 0, -0.00001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase10)
+{
 	testTriangleCapsuleContactCalculation("(Angled) Capsule axis just away from triangle",
 		Vector3d(1.0, 1.0, 10.0), Vector3d(0.0, 0.0, 0.0001), true, true, Vector3d::Zero(), Vector3d(0, 0, -0.4999));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase11)
+{
 	testTriangleCapsuleContactCalculation("(Angled) Capsule axis just touching triangle",
 		Vector3d(1.0, 1.0, 10.0), Vector3d(0.0, 0.0, -0.0001), true, true, Vector3d::Zero(), Vector3d(0, 0, -0.5001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase12)
+{
+	testTriangleCapsuleContactCalculation("Capsule axis through triangle",
+		Vector3d(0.0, 6.0, 1.0), Vector3d(0.0, -6.0, -1.0), true, false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase13)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 1) Capsule far away from triangle",
 		Vector3d(4.0, 0.0, 5.0), Vector3d(2.4, 0.0, 2.0), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase14)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 1) Capsule just away triangle",
 		Vector3d(4.0, 0.0, 5.0), Vector3d(2.4, 0.0, 0.500001), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase15)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 1) Capsule just touching triangle",
 		Vector3d(4.0, 0.0, 5.0), Vector3d(2.4, 0.0, 0.49999), true,
 		true, Vector3d(2.4, 0.0, 0.0), Vector3d(2.4, 0.0,-0.00001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase16)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 1) Capsule axis just away from triangle",
 		Vector3d(4.0, 0.0, 5.0), Vector3d(2.4, 0.0, 0.0001), true,
 		true, Vector3d(2.4, 0.0, 0.0), Vector3d(2.4, 0.0, -0.4999));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase17)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 1) Capsule axis just touching triangle",
 		Vector3d(4.0, 0.0, 5.0), Vector3d(2.4, 0.0, -0.0001), true,
 		true, Vector3d(2.4, 0.0, 0.0), Vector3d(2.4, 0.0, -0.5001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase18)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 1) Capsule axis inside triangle",
 		Vector3d(4.0, 0.0, 5.0), Vector3d(2.4, 0.0, -0.5), true);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase19)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 2) Capsule far away from triangle",
 		Vector3d(-4.0, 0.0, 5.0), Vector3d(-2.4, 0.0, 2.0), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase20)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 2) Capsule just away triangle",
 		Vector3d(-4.0, 0.0, 5.0), Vector3d(-2.4, 0.0, 0.500001), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase21)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 2) Capsule just touching triangle",
 		Vector3d(-4.0, 0.0, 5.0), Vector3d(-2.4, 0.0, 0.49999), true,
 		true, Vector3d(-2.4, 0.0, 0.0), Vector3d(-2.4, 0.0, -0.00001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase22)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 2) Capsule axis just away from triangle",
 		Vector3d(-4.0, 0.0, 5.0), Vector3d(-2.4, 0.0, 0.0001), true,
 		true, Vector3d(-2.4, 0.0, 0.0), Vector3d(-2.4, 0.0, -0.4999));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase23)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 2) Capsule axis just touching triangle",
 		Vector3d(-4.0, 0.0, 5.0), Vector3d(-2.4, 0.0, -0.0001), true,
 		true, Vector3d(-2.4, 0.0, 0.0), Vector3d(-2.4, 0.0, -0.5001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase24)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 2) Capsule axis inside triangle",
 		Vector3d(-4.0, 0.0, 5.0), Vector3d(-2.4, 0.0, -0.5), true);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase25)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 3) Capsule far away from triangle",
 		Vector3d(0.0, -6.0, 5.0), Vector3d(0.0, -4.8, 2.0), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase26)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 3) Capsule just away triangle",
 		Vector3d(0.0, -6.0, 5.0), Vector3d(0.0, -4.8, 0.500001), false);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase27)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 3) Capsule just touching triangle",
 		Vector3d(0.0, -6.0, 5.0), Vector3d(0.0, -4.8, 0.49999), true,
 		true, Vector3d(0,-4.8,0), Vector3d(0,-4.8,-0.00001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase28)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 3) Capsule axis just away from triangle",
 		Vector3d(0.0, -6.0, 5.0), Vector3d(0.0, -4.8, 0.0001), true,
 		true, Vector3d(0.0, -4.8, 0.0), Vector3d(0.0, -4.8, -0.4999));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase29)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 3) Capsule axis just touching triangle",
 		Vector3d(0.0, -6.0, 5.0), Vector3d(0.0, -4.8, -0.0001), true,
 		true, Vector3d(0.0 ,-4.8, 0.0), Vector3d(0.0, -4.8, -0.5001));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase30)
+{
 	testTriangleCapsuleContactCalculation("(Angled, near edge 3) Capsule axis inside triangle",
 		Vector3d(0.0, -6.0, 5.0), Vector3d(0.0, -4.8, -0.5), true);
 }
