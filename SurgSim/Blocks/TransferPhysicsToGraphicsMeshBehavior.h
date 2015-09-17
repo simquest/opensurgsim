@@ -73,26 +73,27 @@ public:
 	/// \return The Graphics Mesh representation which receives positions.
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> getTarget() const;
 
-	void TransferPhysicsToGraphicsMeshBehavior::setIndexMap(
+	/// Generate a mapping, for each point in source find the points target that coincide
+	/// \param source Source of search
+	/// \param target Target of search
+	/// \note source and target need to be triangle meshes
+	void setIndexMap(
 		const std::shared_ptr<DataStructures::TriangleMeshPlain>& source,
 		const std::shared_ptr<DataStructures::TriangleMeshPlain>& target);
 
-
+	/// Generate a mapping, for each point in source find the points target that coincide
+	/// \param sourceFile filename for source mesh
+	/// \param targetFile filename for target mesh
+	/// \note sourceFile and targetFile need to be valid ply files
 	void setIndexMap(const std::string& sourceFile, const std::string& targetFile);
-
-
 
 	/// Set the mapping to be used if not empty. first index is the node, second index is the vertex.
 	/// for all pairs copy node position to given vertex index.
-	void setIndexMap(const std::vector<std::pair<size_t, size_t>>& indexMap)
-	{
-		m_indexMap = indexMap;
-	}
+	/// \param indexMap mapping to be used for this mesh
+	void setIndexMap(const std::vector<std::pair<size_t, size_t>>& indexMap);
 
-	const std::vector<std::pair<size_t, size_t>> getIndexMap()
-	{
-		return m_indexMap;
-	}
+	/// \return the current mapping
+	const std::vector<std::pair<size_t, size_t>> getIndexMap() const;
 
 	void update(double dt) override;
 
@@ -115,6 +116,11 @@ private:
 	std::vector<std::pair<size_t, size_t>> m_indexMap;
 };
 
+/// Generate a mapping, for each point in source find the points target that coincide
+/// \param source Source of search
+/// \param target Target of search
+/// \note source and target need to be triangle meshes
+/// \return the map of matching points, pair.first are all points from source, pair.second will be points in target
 std::vector<std::pair<size_t, size_t>> generateIndexMap(
 										const std::shared_ptr<DataStructures::TriangleMeshPlain>& source,
 										const std::shared_ptr<DataStructures::TriangleMeshPlain>& target);

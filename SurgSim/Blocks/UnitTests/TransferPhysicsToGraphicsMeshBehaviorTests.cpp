@@ -226,7 +226,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, Mapping)
 	EXPECT_EQ(9u, indices.size());
 
 	std::array<size_t, 4> counts = {0, 0, 0, 0};
-	size_t total = 0;
+
 	for (const auto& pair : indices)
 	{
 		++counts[pair.first];

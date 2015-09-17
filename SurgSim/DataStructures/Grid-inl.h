@@ -177,13 +177,15 @@ void Grid<T, N>::update()
 				if (neighborCell != m_activeCells.end())
 				{
 					cell.second.neighbors.insert(cell.second.neighbors.end(),
-												 neighborCell->second.elements.cbegin(), neighborCell->second.elements.cend());
+												 neighborCell->second.elements.cbegin(),
+												 neighborCell->second.elements.cend());
 
 					// Treat symmetry if the cells are different
 					if (cellsIds[index] != cell.first)
 					{
 						neighborCell->second.neighbors.insert(neighborCell->second.neighbors.end(),
-															  cell.second.elements.cbegin(), cell.second.elements.cend());
+															  cell.second.elements.cbegin(),
+															  cell.second.elements.cend());
 					}
 				}
 			}

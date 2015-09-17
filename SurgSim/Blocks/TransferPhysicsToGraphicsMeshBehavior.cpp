@@ -198,6 +198,16 @@ void TransferPhysicsToGraphicsMeshBehavior::setIndexMap(
 	setIndexMap(first, second);
 }
 
+void TransferPhysicsToGraphicsMeshBehavior::setIndexMap(const std::vector<std::pair<size_t, size_t>>& indexMap)
+{
+	m_indexMap = indexMap;
+}
+
+const std::vector<std::pair<size_t, size_t>> TransferPhysicsToGraphicsMeshBehavior::getIndexMap() const
+{
+	return m_indexMap;
+}
+
 std::vector<std::pair<size_t, size_t>> generateIndexMap(
 										const std::shared_ptr<DataStructures::TriangleMeshPlain>& source,
 										const std::shared_ptr<DataStructures::TriangleMeshPlain>& target)
