@@ -221,6 +221,8 @@ protected:
 
 	using Vertices<VertexData>::doClearVertices;
 
+	static std::string m_className;
+
 private:
 
 	/// Clear mesh to return to an empty state (no vertices, no edges, no triangles).
@@ -234,8 +236,6 @@ private:
 
 	/// List of indices of deleted triangles, to be reused when another triangle is added
 	std::vector<size_t> m_freeTriangles;
-
-	static std::string m_className;
 
 public:
 	// Dependent name resolution for inherited functions and typenames from templates
