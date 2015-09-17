@@ -240,8 +240,8 @@ template <class T, int MOpt> inline
 	const Eigen::Matrix<T, 3, 1, MOpt>& cv1,
 	double cr,
 	T* penetrationDepth,
-	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
-	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointTriangle,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsule,
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
 {
 	Eigen::Matrix<T, 3, 1, MOpt> tn = (tv1 - tv0).cross(tv2 - tv0);
@@ -252,8 +252,8 @@ template <class T, int MOpt> inline
 		return false;
 	}
 	tn.normalize();
-	return calculateContactTriangleTriangle(tv0, tv1, tv2, tn, cv0, cv1, cr, penetrationDepth,
-		penetrationPoint0, penetrationPoint1, contactNormal);
+	return calculateContactTriangleCapsule(tv0, tv1, tv2, tn, cv0, cv1, cr, penetrationDepth,
+		penetrationPointTriangle, penetrationPointCapsule, contactNormal);
 }
 
 } // namespace Math

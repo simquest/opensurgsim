@@ -1661,8 +1661,8 @@ bool calculateContactTriangleCapsule(
 	const Eigen::Matrix<T, 3, 1, MOpt>& cv1,
 	double cr,
 	T* penetrationDepth,
-	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
-	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointTriangle,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsule,
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
 
 }; // namespace Math
