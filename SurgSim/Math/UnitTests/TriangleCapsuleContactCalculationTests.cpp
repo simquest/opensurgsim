@@ -194,8 +194,10 @@ protected:
 					correctedC.translate(-correction);
 					auto correctedDistance = distanceSegmentTriangle(correctedC.v0, correctedC.v1, correctedT.v0,
 						correctedT.v1, correctedT.v2, correctedT.n, &cP, &tP) - c.r;
-					EXPECT_TRUE(correctedDistance >= -4.0 * Geometry::DistanceEpsilon) << "correctedDistance = " << correctedDistance;
-					EXPECT_TRUE(correctedDistance <= Geometry::DistanceEpsilon) << "correctedDistance = " << correctedDistance;
+					EXPECT_TRUE(correctedDistance >= -4.0 * Geometry::DistanceEpsilon)
+						<< "correctedDistance = " << correctedDistance;
+					EXPECT_TRUE(correctedDistance <= Geometry::DistanceEpsilon)
+						<< "correctedDistance = " << correctedDistance;
 				}
 				// Now move the shapes apart by just a little farther than the penetration depth, to establish
 				// that the shapes are not colliding.
@@ -208,8 +210,10 @@ protected:
 					correctedC.translate(-correction);
 					auto correctedDistance = distanceSegmentTriangle(correctedC.v0, correctedC.v1, correctedT.v0,
 						correctedT.v1, correctedT.v2, correctedT.n, &cP, &tP) - c.r;
-					EXPECT_TRUE(correctedDistance <= 4.0 * Geometry::DistanceEpsilon) << "correctedDistance = " << correctedDistance;
-					EXPECT_TRUE(correctedDistance >= -Geometry::DistanceEpsilon) << "correctedDistance = " << correctedDistance;
+					EXPECT_TRUE(correctedDistance <= 4.0 * Geometry::DistanceEpsilon)
+						<< "correctedDistance = " << correctedDistance;
+					EXPECT_TRUE(correctedDistance >= -Geometry::DistanceEpsilon)
+						<< "correctedDistance = " << correctedDistance;
 				}
 			}
 		}

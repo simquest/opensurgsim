@@ -86,7 +86,7 @@ bool calculateContactTriangleCapsule(
 		*penetrationPointCapsule = capsuleBottom - tn * cr;
 		return true;
 	}
-		
+
 	// At this point, the capsule axis intersects with one of the planes at the triangle edges (containing the
 	// triangle normal). This point of intersection is the deepestPoint on the capsule axis.
 	Vector3 deepestPoint;
@@ -111,7 +111,7 @@ bool calculateContactTriangleCapsule(
 			double capsuleTopD = capsuleTop.dot(planeNormal) - planeD;
 			SURGSIM_ASSERT(capsuleTopD > 0.0);
 			double ratio = capsuleTopD / (capsuleTopD + std::abs(capsuleBottomD));
-				
+
 			deepestPoint = capsuleTop + (capsuleBottom - capsuleTop) * ratio;
 
 			edgeVertices[0] = v[i];
@@ -168,7 +168,7 @@ bool calculateContactTriangleCapsule(
 		// minorApex on the circumference of the ellipse, and the tangent at that point is parallel to the triangleEdge.
 		auto minorAxis = planeNormal.cross(majorAxis);
 		auto const D = capsuleTransformation.linear().inverse() * minorAxis;
-		
+
 		double a = D[1] * D[1] + D[2] * D[2];
 		double minorRadius = std::abs(sqrt(-4.0 * a * c) / (2.0 * a));
 		Vector3 minorApex = center + minorRadius * minorAxis;
@@ -233,7 +233,7 @@ bool calculateContactTriangleCapsule(
 		Vector3d direction = (deepestPoint - center).normalized();
 		deepestPoint = center + direction * cr;
 	}
-	
+
 	*contactNormal = -tn;
 	*penetrationPointCapsule = deepestPoint;
 	*penetrationDepth = -tn.dot(deepestPoint - tv0);
