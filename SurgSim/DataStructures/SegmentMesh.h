@@ -33,6 +33,11 @@ template <class VertexData, class EdgeData>
 class SegmentMesh : public TriangleMesh<VertexData, EdgeData, SegmentEmptyData>
 {
 public:
+	/// Edge type for convenience  (Ids of the 2 vertices)
+	typedef typename TriangleMesh::EdgeType EdgeType;
+	/// Triangle type for convenience  (Ids of the 3 vertices)
+	typedef typename TriangleMesh::TriangleType TriangleType;
+
 	/// Constructor. The mesh is initially empty (no vertices, no edges).
 	SegmentMesh();
 
@@ -79,10 +84,6 @@ public:
 	std::array<SurgSim::Math::Vector3d, 3> getTrianglePositions(size_t id) const;
 	void doClearTriangles() override;
 	///@}
-
-private:
-	/// The class name
-	//static std::string m_classNameSegment;
 
 };
 

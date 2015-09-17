@@ -514,3 +514,33 @@ TEST_F(SegmentMeshTest, GetEdgePositions)
 		EXPECT_TRUE(mesh.getVertex(vertexIds[1]).position.isApprox(verticesPositions[1]));
 	}
 }
+
+
+TEST_F(SegmentMeshTest, AssertingFunctions)
+{
+	MockSegmentMesh mesh;
+
+	// Initialization
+	auto normal = testNormals.begin();
+	for (auto position = testPositions.begin(); position != testPositions.end(); ++position)
+	{
+		mesh.createVertex(*position, *normal++);
+	}
+
+	for (auto vertices = testEdgeVertices.begin(); vertices != testEdgeVertices.end(); ++vertices)
+	{
+		mesh.createEdge(*vertices);
+	}
+
+	// Testing
+	std::array<size_t, 3> triangleIds = {{0, 1, 2}};
+	MockSegmentMesh::TriangleType triangle(triangleIds);
+	EXPECT_THROW(mesh.addTriangle(triangle), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(mesh.getNumTriangles(), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(mesh.getTriangles(), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(mesh.getTriangle(0), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(mesh.removeTriangle(0), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(mesh.getTrianglePositions(0), SurgSim::Framework::AssertionFailure);
+	// This function does not assert, because it is called in doClear, which is used to clear edges as well.
+	EXPECT_NO_THROW(mesh.doClearTriangles());
+}

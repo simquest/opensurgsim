@@ -56,16 +56,16 @@ SegmentMesh<VertexData, EdgeData>::SegmentMesh(SegmentMesh<VertexData, EdgeData>
 
 template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>& SegmentMesh<VertexData, EdgeData>::operator=(
-	const SegmentMesh<VertexData, EdgeData>& other) :
-	TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::operator=(other)
+	const SegmentMesh<VertexData, EdgeData>& other)
 {
+	TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::operator=(other);
 }
 
 template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>& SegmentMesh<VertexData, EdgeData>::operator=(
-	SegmentMesh<VertexData, EdgeData>&& other) :
-	TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::operator=(other)
+	SegmentMesh<VertexData, EdgeData>&& other)
 {
+	TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::operator=(other);
 }
 
 template <class VertexData, class EdgeData>
@@ -77,14 +77,14 @@ std::string SegmentMesh<VertexData, EdgeData>::getClassName() const
 template <class VertexData, class EdgeData>
 size_t SegmentMesh<VertexData, EdgeData>::addTriangle(const TriangleType& triangle)
 {
-	SURGSIM_ASSERT("Cannot insert triangle into segment mesh.");
+	SURGSIM_FAILURE() << "Cannot insert triangle into segment mesh.";
 	return static_cast<size_t>(0);
 }
 
 template <class VertexData, class EdgeData>
 size_t SegmentMesh<VertexData, EdgeData>::getNumTriangles() const
 {
-	SURGSIM_ASSERT("No triangles present in segment mesh.");
+	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return static_cast<size_t>(0);
 }
 
@@ -92,7 +92,7 @@ template <class VertexData, class EdgeData>
 const std::vector<typename SegmentMesh<VertexData, EdgeData>::TriangleType>&
 	SegmentMesh<VertexData, EdgeData>::getTriangles() const
 {
-	SURGSIM_ASSERT("No triangles present in segment mesh.");
+	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::getTriangles();
 }
 
@@ -100,7 +100,7 @@ template <class VertexData, class EdgeData>
 std::vector<typename SegmentMesh<VertexData, EdgeData>::TriangleType>&
 	SegmentMesh<VertexData, EdgeData>::getTriangles()
 {
-	SURGSIM_ASSERT("No triangles present in segment mesh.");
+	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::getTriangles();
 }
 
@@ -108,7 +108,7 @@ template <class VertexData, class EdgeData>
 const typename SegmentMesh<VertexData, EdgeData>::TriangleType&
 	SegmentMesh<VertexData, EdgeData>::getTriangle(size_t id) const
 {
-	SURGSIM_ASSERT("No triangles present in segment mesh.");
+	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::getTriangle(id);
 }
 
@@ -116,21 +116,21 @@ template <class VertexData, class EdgeData>
 typename SegmentMesh<VertexData, EdgeData>::TriangleType&
 	SegmentMesh<VertexData, EdgeData>::getTriangle(size_t id)
 {
-	SURGSIM_ASSERT("No triangles present in segment mesh.");
+	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::getTriangle(id);
 }
 
 template <class VertexData, class EdgeData>
 void SegmentMesh<VertexData, EdgeData>::removeTriangle(size_t id)
 {
-	SURGSIM_ASSERT("No triangles present in segment mesh.");
+	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 }
 
 template <class VertexData, class EdgeData>
 std::array<SurgSim::Math::Vector3d, 3>
 	SegmentMesh<VertexData, EdgeData>::getTrianglePositions(size_t id) const
 {
-	SURGSIM_ASSERT("No triangles present in segment mesh.");
+	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	std::array<SurgSim::Math::Vector3d, 3> result =
 	{{
 		Vector3d::Zero(),
@@ -144,7 +144,8 @@ std::array<SurgSim::Math::Vector3d, 3>
 template <class VertexData, class EdgeData>
 void SegmentMesh<VertexData, EdgeData>::doClearTriangles()
 {
-	SURGSIM_ASSERT("No triangles present in segment mesh.");
+	SURGSIM_LOG_CRITICAL(Framework::Logger::getLogger("DataStructures/SegmentMesh"))
+		<< "No triangles present in segment mesh.";
 }
 
 }  // namespace DataStructures
