@@ -80,7 +80,7 @@ TEST_F(SegmentMeshShapeTest, ValidTest)
 TEST_F(SegmentMeshShapeTest, AabbTest)
 {
 	std::shared_ptr<SegmentMeshPlain> mesh = build(Vector3d(-10.0, -10.0, -10.0), Vector3d(10.0, 10.0, 10.0), 3);
-	std::shared_ptr<SegmentMeshShape> shape = std::make_shared<SegmentMeshShape>(*mesh, std::sqrt(3.0));
+	std::shared_ptr<SegmentMeshShape> shape = std::make_shared<SegmentMeshShape>(*mesh, 3.0);
 
 	SurgSim::Math::Aabbd expected(Vector3d(-13.0, -13.0, -13.0), Vector3d(13.0, 13.0, 13.0));
 
