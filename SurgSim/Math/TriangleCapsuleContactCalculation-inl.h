@@ -217,7 +217,7 @@ bool calculateContactTriangleCapsule(
 	double planeD;
 	Vector3 edgeVertices[2];
 
-	bool axisIntersectsPlane = false;
+	bool axisClippedByPlane = false;
 	for (size_t i = 0; i < 3; ++i)
 	{
 		triangleEdge = v[(i + 1) % 3] - v[i];
@@ -237,12 +237,12 @@ bool calculateContactTriangleCapsule(
 			edgeVertices[0] = v[i];
 			edgeVertices[1] = v[(i + 1) % 3];
 
-			axisIntersectsPlane = true;
+			axisClippedByPlane = true;
 			break;
 		}
 	}
 
-	if (!axisIntersectsPlane)
+	if (!axisClippedByPlane)
 	{
 		*contactNormal = -tn;
 		*penetrationDepth = cr + (*penetrationPointCapsule - capsuleBottom).dot(tn);
