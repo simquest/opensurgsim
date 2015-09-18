@@ -187,6 +187,15 @@ TYPED_TEST(QuaternionTests, YamlConvert)
 
 	ASSERT_NO_THROW({Quaternion expected = node.as<Quaternion>();});
 	EXPECT_TRUE(quaternion.isApprox(node.as<Quaternion>()));
+
+	// test decoding from AngleAxis
+	AngleAxis angleAxis;
+	angleAxis.angle() = T(0.1);
+	angleAxis.axis()[0] = T(0.1);
+	angleAxis.axis()[1] = T(1.2);
+	angleAxis.axis()[2] = T(2.3);
+	YAML::Node angleAxisNode = YAML::convert<AngleAxis>::encode(angleAxis);
+	EXPECT_TRUE(Quaternion(angleAxis).isApprox(angleAxisNode.as<Quaternion>()));
 }
 
 

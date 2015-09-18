@@ -142,6 +142,15 @@ bool YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::decode(
 	{
 		result = convert<typename Eigen::Matrix<Type, 4, 1, QOpt>>::decode(node, rhs.coeffs());
 	}
+	else if (node.IsSequence() && (node.size() == 2) && (node[1].IsSequence()) && (node[1].size() == 3))
+	{
+		Eigen::AngleAxis<Type> angleAxis;
+		result = convert<typename Eigen::AngleAxis<Type>>::decode(node, angleAxis);
+		if (result)
+		{
+			rhs = angleAxis;
+		}
+	}
 	return result;
 }
 
