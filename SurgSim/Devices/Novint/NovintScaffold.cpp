@@ -220,7 +220,7 @@ private:
 struct NovintScaffold::DeviceData
 {
 	/// Initialize the state.
-	explicit DeviceData(NovintCommonDevice* device) :
+	explicit DeviceData(NovintDevice* device) :
 		initializationName(""),
 		serialNumber(""),
 		deviceObject(device),
@@ -258,7 +258,7 @@ struct NovintScaffold::DeviceData
 	/// The HDAL device serial number.
 	std::string serialNumber;
 	/// The corresponding device object.
-	NovintCommonDevice* const deviceObject;
+	NovintDevice* const deviceObject;
 
 	/// The device handle wrapper.
 	std::shared_ptr<NovintScaffold::Handle> deviceHandle;
@@ -421,7 +421,7 @@ NovintScaffold::~NovintScaffold()
 }
 
 
-bool NovintScaffold::registerDevice(NovintCommonDevice* device)
+bool NovintScaffold::registerDevice(NovintDevice* device)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -482,7 +482,7 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 }
 
 
-bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
+bool NovintScaffold::unregisterDevice(const NovintDevice* const device)
 {
 	bool result = false;
 	std::unique_ptr<DeviceData> savedInfo;
@@ -1297,7 +1297,7 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 	return builder.createData();
 }
 
-void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double scale)
+void NovintScaffold::setPositionScale(const NovintDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
@@ -1309,7 +1309,7 @@ void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double s
 	}
 }
 
-void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, double scale)
+void NovintScaffold::setOrientationScale(const NovintDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
