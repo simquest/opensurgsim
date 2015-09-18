@@ -206,9 +206,8 @@ YAML::Node YAML::convert<typename Eigen::AngleAxis<Type>>::encode(
 	const typename Eigen::AngleAxis<Type>& rhs)
 {
 	Node node;
-	node.SetStyle(EmitterStyle::Flow);
-	node.push_back(rhs.angle());
-	node.push_back(convert<typename Eigen::Matrix<Type, 3, 1>>::encode(rhs.axis()));
+	node["Angle"] = rhs.angle();
+	node["Axis"] = convert<typename Eigen::Matrix<Type, 3, 1>>::encode(rhs.axis());
 	return node;
 }
 
@@ -219,11 +218,11 @@ bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
 	typename Eigen::AngleAxis<Type>& rhs) //NOLINT
 {
 	bool result = false;
-	if (node.IsSequence() && (node.size() == 2) && node[0].IsScalar())
+	if (node.IsMap() && node["Angle"].IsDefined() && node["Axis"].IsDefined())
 	{
 		try
 		{
-			rhs.angle() = node[0].as<Type>();
+			rhs.angle() = node["Angle"].as<Type>();
 		}
 		catch (RepresentationException)
 		{
@@ -231,7 +230,7 @@ bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
 			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
 			SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
 		}
-		result = convert<typename Eigen::Matrix<Type, 3, 1>>::decode(node[1], rhs.axis());
+		result = convert<typename Eigen::Matrix<Type, 3, 1>>::decode(node["Axis"], rhs.axis());
 	}
 	return result;
 }
