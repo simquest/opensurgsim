@@ -52,7 +52,7 @@ std::shared_ptr<Input::DeviceInterface> createDevice(const std::string& classNam
 /// - SurgSim::Device::IdentityPoseDevice:
 ///        Name: element1
 /// \endcode
-/// \param fileName the filename of the scene to be loaded, needs to be found
+/// \param fileName the filename of the devices to be loaded, needs to be found
 /// \return an initialized device, or nullptr if no device could be created and initialized
 /// \throws If the file cannot be found or is an invalid file
 std::shared_ptr<Input::DeviceInterface> loadDevice(const std::string& fileName);

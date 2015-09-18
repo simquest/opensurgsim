@@ -6,6 +6,7 @@
     Name: Tool_Device
 - SurgSim::Devices::NovintDevice:
     Name: Tool_Device
+    7DofDevice: false
 - SurgSim::Devices::MultiAxisDevice:
     Name: Tool_Device
 - SurgSim::Devices::IdentityPoseDevice:

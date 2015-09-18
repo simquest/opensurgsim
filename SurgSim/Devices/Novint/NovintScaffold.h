@@ -27,7 +27,6 @@ namespace Devices
 {
 
 class NovintDevice;
-class NovintDevice;
 
 
 /// A class that manages Novint Falcon devices.
@@ -67,7 +66,6 @@ private:
 	/// Wrapper for the HDAL device handle.
 	class Handle;
 
-	friend class NovintDevice;
 	friend class NovintDevice;
 
 	/// Registers the specified device object.
