@@ -158,7 +158,7 @@ bool calculateContactTriangleCapsule(
 	// Py, Pz are zero, as P is on the axis of the capsule, which is the x-axis of capsuleTransformation.
 	const double a = D[1] * D[1] + D[2] * D[2];
 	const double c = -cr * cr;
-	double majorRadius = std::abs(sqrt(-4.0 * a * c) / (2.0 * a));
+	double majorRadius = std::abs(std::sqrt(-4.0 * a * c) / (2.0 * a));
 	Vector3 majorApex = center + majorRadius * (majorAxis);
 
 	deepestPoint = majorApex;
@@ -170,7 +170,7 @@ bool calculateContactTriangleCapsule(
 		auto const D = capsuleTransformation.linear().inverse() * minorAxis;
 
 		double a = D[1] * D[1] + D[2] * D[2];
-		double minorRadius = std::abs(sqrt(-4.0 * a * c) / (2.0 * a));
+		double minorRadius = std::abs(std::sqrt(-4.0 * a * c) / (2.0 * a));
 		Vector3 minorApex = center + minorRadius * minorAxis;
 
 		// ellipse equation
