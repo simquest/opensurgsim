@@ -173,6 +173,7 @@ TYPED_TEST(QuaternionTests, SetToZero)
 // Test conversion to and from yaml node
 TYPED_TEST(QuaternionTests, YamlConvert)
 {
+	typedef typename TestFixture::AngleAxis AngleAxis;
 	typedef typename TestFixture::Quaternion Quaternion;
 	typedef typename TestFixture::Scalar T;
 
