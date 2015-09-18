@@ -21,7 +21,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
-std::string SegmentMeshPlain::TriangleMesh::m_className = "SurgSim::DataStructures::SegmentMeshPlain";
+std::string SegmentMesh<EmptyData, EmptyData>::TriangleMesh::m_className = "SurgSim::DataStructures::SegmentMeshPlain";
 
 }  // namespace DataStructures
 }  // namespace SurgSim

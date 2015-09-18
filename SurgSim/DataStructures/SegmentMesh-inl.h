@@ -50,7 +50,7 @@ SegmentMesh<VertexData, EdgeData>::~SegmentMesh()
 
 template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>::SegmentMesh(SegmentMesh<VertexData, EdgeData>&& other) :
-	TriangleMesh(other)
+	TriangleMesh(std::move(other))
 {
 }
 
@@ -58,14 +58,14 @@ template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>& SegmentMesh<VertexData, EdgeData>::operator=(
 	const SegmentMesh<VertexData, EdgeData>& other)
 {
-	TriangleMesh::operator=(other);
+	return TriangleMesh::operator=(other);
 }
 
 template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>& SegmentMesh<VertexData, EdgeData>::operator=(
 	SegmentMesh<VertexData, EdgeData>&& other)
 {
-	TriangleMesh::operator=(other);
+	return TriangleMesh::operator=(std::move(other));
 }
 
 template <class VertexData, class EdgeData>
@@ -138,8 +138,14 @@ std::array<SurgSim::Math::Vector3d, 3>
 template <class VertexData, class EdgeData>
 void SegmentMesh<VertexData, EdgeData>::doClearTriangles()
 {
-	SURGSIM_LOG_CRITICAL(Framework::Logger::getLogger("DataStructures/SegmentMesh"))
-		<< "No triangles present in segment mesh.";
+	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
+}
+
+template <class VertexData, class EdgeData>
+void SegmentMesh<VertexData, EdgeData>::doClear()
+{
+	doClearEdges();
+	doClearVertices();
 }
 
 }  // namespace DataStructures

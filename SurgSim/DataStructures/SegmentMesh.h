@@ -85,6 +85,9 @@ public:
 	void doClearTriangles() override;
 	///@}
 
+private:
+	/// Clear mesh to return to an empty state (no vertices, no edges).
+	void doClear() override;
 };
 
 typedef SegmentMesh<EmptyData, EmptyData> SegmentMeshPlain;

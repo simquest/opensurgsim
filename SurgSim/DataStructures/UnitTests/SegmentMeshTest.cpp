@@ -541,6 +541,5 @@ TEST_F(SegmentMeshTest, AssertingFunctions)
 	EXPECT_THROW(mesh.getTriangle(0), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(mesh.removeTriangle(0), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(mesh.getTrianglePositions(0), SurgSim::Framework::AssertionFailure);
-	// This function does not assert, because it is called in doClear, which is used to clear edges as well.
-	EXPECT_NO_THROW(mesh.doClearTriangles());
+	EXPECT_THROW(mesh.doClearTriangles(), SurgSim::Framework::AssertionFailure);
 }
