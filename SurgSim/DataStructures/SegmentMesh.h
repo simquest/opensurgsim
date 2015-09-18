@@ -34,11 +34,11 @@ class SegmentMesh : public TriangleMesh<VertexData, EdgeData, SegmentEmptyData>
 {
 public:
 	/// TriangleMesh type for convenience
-	typedef TriangleMesh<VertexData, EdgeData, SegmentEmptyData> TriangleMesh;
+	typedef TriangleMesh<VertexData, EdgeData, SegmentEmptyData> TriangleMeshType;
 	/// Edge type for convenience  (Ids of the 2 vertices)
-	typedef typename TriangleMesh::EdgeType EdgeType;
+	typedef typename TriangleMeshType::EdgeType EdgeType;
 	/// Triangle type for convenience  (Ids of the 3 vertices)
-	typedef typename TriangleMesh::TriangleType TriangleType;
+	typedef typename TriangleMeshType::TriangleType TriangleType;
 
 	/// Constructor. The mesh is initially empty (no vertices, no edges).
 	SegmentMesh();

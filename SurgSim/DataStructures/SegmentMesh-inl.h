@@ -32,14 +32,14 @@ SegmentMesh<VertexData, EdgeData>::SegmentMesh()
 template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>::SegmentMesh(
 const SegmentMesh<VertexData, EdgeData>& other) :
-	TriangleMesh(other)
+	TriangleMeshType(other)
 {
 }
 
 template <class VertexData, class EdgeData>
 template <class V, class E>
 SegmentMesh<VertexData, EdgeData>::SegmentMesh(const SegmentMesh<V, E>& other) :
-	TriangleMesh(other)
+	TriangleMeshType(other)
 {
 }
 
@@ -50,7 +50,7 @@ SegmentMesh<VertexData, EdgeData>::~SegmentMesh()
 
 template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>::SegmentMesh(SegmentMesh<VertexData, EdgeData>&& other) :
-	TriangleMesh(std::move(other))
+	TriangleMeshType(std::move(other))
 {
 }
 
@@ -58,14 +58,14 @@ template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>& SegmentMesh<VertexData, EdgeData>::operator=(
 	const SegmentMesh<VertexData, EdgeData>& other)
 {
-	return TriangleMesh::operator=(other);
+	return TriangleMeshType::operator=(other);
 }
 
 template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>& SegmentMesh<VertexData, EdgeData>::operator=(
 	SegmentMesh<VertexData, EdgeData>&& other)
 {
-	return TriangleMesh::operator=(std::move(other));
+	return TriangleMeshType::operator=(std::move(other));
 }
 
 template <class VertexData, class EdgeData>
@@ -87,7 +87,7 @@ const std::vector<typename SegmentMesh<VertexData, EdgeData>::TriangleType>&
 	SegmentMesh<VertexData, EdgeData>::getTriangles() const
 {
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
-	return TriangleMesh::getTriangles();
+	return TriangleMeshType::getTriangles();
 }
 
 template <class VertexData, class EdgeData>
@@ -95,7 +95,7 @@ std::vector<typename SegmentMesh<VertexData, EdgeData>::TriangleType>&
 	SegmentMesh<VertexData, EdgeData>::getTriangles()
 {
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
-	return TriangleMesh::getTriangles();
+	return TriangleMeshType::getTriangles();
 }
 
 template <class VertexData, class EdgeData>
@@ -103,7 +103,7 @@ const typename SegmentMesh<VertexData, EdgeData>::TriangleType&
 	SegmentMesh<VertexData, EdgeData>::getTriangle(size_t id) const
 {
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
-	return TriangleMesh::getTriangle(id);
+	return TriangleMeshType::getTriangle(id);
 }
 
 template <class VertexData, class EdgeData>
@@ -111,7 +111,7 @@ typename SegmentMesh<VertexData, EdgeData>::TriangleType&
 	SegmentMesh<VertexData, EdgeData>::getTriangle(size_t id)
 {
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
-	return TriangleMesh::getTriangle(id);
+	return TriangleMeshType::getTriangle(id);
 }
 
 template <class VertexData, class EdgeData>
@@ -144,8 +144,8 @@ void SegmentMesh<VertexData, EdgeData>::doClearTriangles()
 template <class VertexData, class EdgeData>
 void SegmentMesh<VertexData, EdgeData>::doClear()
 {
-	doClearEdges();
-	doClearVertices();
+	TriangleMeshType::doClearEdges();
+	TriangleMeshType::doClearVertices();
 }
 
 }  // namespace DataStructures
