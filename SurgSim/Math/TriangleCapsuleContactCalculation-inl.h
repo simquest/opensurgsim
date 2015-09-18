@@ -156,7 +156,6 @@ bool calculateContactTriangleCapsule(
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
 {
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
-	typedef Eigen::Transform<T, 3, Eigen::Isometry> RigidTransform3;
 	static const T EPSILON = static_cast<T>(Geometry::DistanceEpsilon);
 
 	double distance =
