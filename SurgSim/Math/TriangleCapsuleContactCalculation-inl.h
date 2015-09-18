@@ -37,6 +37,7 @@ bool calculateContactTriangleCapsule(
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
 {
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+	typedef Eigen::Transform<T, 3, Eigen::Isometry> RigidTransform3;
 	static const T EPSILON = static_cast<T>(Geometry::DistanceEpsilon);
 
 	double distance =
@@ -140,7 +141,7 @@ bool calculateContactTriangleCapsule(
 	majorAxis.normalize();
 
 	// Transform to the local cylinder frame.
-	RigidTransform3d capsuleTransformation;
+	RigidTransform3 capsuleTransformation;
 	capsuleTransformation.translation() = capsuleTop;
 	capsuleTransformation.linear().col(0) = capsuleAxis;
 	capsuleTransformation.linear().col(2) = (capsuleAxis).cross(-tn).normalized();
@@ -177,7 +178,7 @@ bool calculateContactTriangleCapsule(
 		const double A = majorRadius;
 		const double B = minorRadius;
 
-		RigidTransform3d ellipseTransformation; // transform to the local cylinder frame (A; dir, normal, binormal)
+		RigidTransform3 ellipseTransformation; // transform to the local cylinder frame (A; dir, normal, binormal)
 		ellipseTransformation.translation() = center;
 		ellipseTransformation.linear().col(0) = majorAxis;
 		ellipseTransformation.linear().col(1) = minorAxis;

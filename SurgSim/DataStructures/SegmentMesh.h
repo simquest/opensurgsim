@@ -33,6 +33,8 @@ template <class VertexData, class EdgeData>
 class SegmentMesh : public TriangleMesh<VertexData, EdgeData, SegmentEmptyData>
 {
 public:
+	/// TriangleMesh type for convenience
+	typedef TriangleMesh<VertexData, EdgeData, SegmentEmptyData> TriangleMesh;
 	/// Edge type for convenience  (Ids of the 2 vertices)
 	typedef typename TriangleMesh::EdgeType EdgeType;
 	/// Triangle type for convenience  (Ids of the 3 vertices)
@@ -69,8 +71,6 @@ public:
 	/// \param other Assignment source
 	SegmentMesh<VertexData, EdgeData>& operator=(
 		SegmentMesh<VertexData, EdgeData>&& other);
-
-	std::string getClassName() const override;
 
 	///@{
 	/// Functions that need to assert, because they deal with triangles.
