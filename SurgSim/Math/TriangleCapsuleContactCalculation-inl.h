@@ -22,6 +22,125 @@ namespace SurgSim
 namespace Math
 {
 
+namespace TriangleCapsuleHelper
+{
+
+/// Class used to find the intersection between a parametric line and this cylinder.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+template <class T, int MOpt>
+class CylinderHelper
+{
+	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+	typedef Eigen::Transform<T, 3, Eigen::Isometry> RigidTransform3;
+
+public:
+	/// \param point Any point on the cylinder axis.
+	/// \param axis The axis of the cylinder of unit length
+	/// \param nonAxis An unit vector that is not parallel to the axis, to build the cylinder coordinate axis.
+	/// \param radius Radius of the cylinder
+	CylinderHelper(const Vector3& point, const Vector3& axis, const Vector3& nonAxis, const double radius)
+		: m_point(point), m_axis(axis), m_radius(radius)
+	{
+		RigidTransform3 transform;
+		transform.translation() = m_point;
+		transform.linear().col(0) = m_axis;
+		transform.linear().col(2) = m_axis.cross(nonAxis).normalized();
+		transform.linear().col(1) = transform.linear().col(2).cross(m_axis).normalized();
+		m_inverseTransform = transform.inverse();
+	}
+
+	/// \param lineStart The origin of the line
+	/// \param lineDir Unit directional vector of the line
+	/// \return Parameter t of (lineStart + t*lineDir) which intersects this cylinder furthest along this line.
+	double solveFarthestIntersectionWithLine(const Vector3& lineStart, const Vector& lineDir)
+	{
+		// Transform the problem in the cylinder space to solve the local cylinder equation y^2 + z^2 = r^2
+		// Point on ellipse should be on the line, P + t.(D)
+		// => Py^2 + t^2.Dy^2 + 2.Py.t.Dy + Pz^2 + t^2.Dz^2 + 2.Pz.t.Dz = r^2
+		// => t^2.(Dy^2 + Dz^2) + t.(2.Py.Dy + 2.Pz.Dz) + (Py^2 + Pz^2 - r^2) = 0
+		// Let a = (Dy^2 + Dz^2), b = (2.Py.Dy + 2.Pz.Dz), c = (Py^2 + Pz^2 - r^2):
+		// => t^2.a + t.b + c = 0, whose solution is:
+		// (-b +/- sqrt(b^2 - 4*a*c))/2*a
+		auto const P = m_inverseTransform * lineStart;
+		auto const D = m_inverseTransform.linear() * lineDir;
+
+		T a = D[1] * D[1] + D[2] * D[2];
+		T b = static_cast<T>(2) * (P[1] * D[1] + P[2] * D[2]);
+		T c = (P[1] * P[1] + P[2] * P[2] - m_radius * m_radius);
+
+		// We have two solutions. We want the larger value.
+		return (-b / (static_cast<T>(2) * a))
+			+ std::abs(std::sqrt(b * b - static_cast<T>(4) * a * c) / (static_cast<T>(2) * a));
+	}
+
+private:
+	/// A point on the cylinder
+	Vector3 m_point;
+	/// Axis of the cylinder
+	Vector3 m_axis;
+	/// Radius of the cylinder
+	double m_radius;
+	/// Transform from world coordinates to cylinder local coordinates
+	RigidTransform3 m_inverseTransform;
+};
+
+/// Class used to find the point on (positive X side of) ellipse with the given slope.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+template <class T, int MOpt>
+class EllipseHelper
+{
+	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+	typedef Eigen::Transform<T, 3, Eigen::Isometry> RigidTransform3;
+
+public:
+	/// \param center Center of the ellipsis.
+	/// \param majorAxis, minorAxis The major/minor axes of the ellipse, both of unit length
+	/// \param majorRadius, minorRadius Major/minor radii of the ellipse
+	EllipseHelper(const Vector3& center, const Vector3& majorAxis, const Vector3& minorAxis, const double majorRadius,
+		const double minorRadius) : a(majorRadius), b(minorRadius)
+	{
+		m_transform.translation() = center;
+		m_transform.linear().col(0) = majorAxis;
+		m_transform.linear().col(1) = minorAxis;
+		m_transform.linear().col(2) = majorAxis.cross(minorAxis);
+		m_inverseTransform = m_transform.inverse();
+	}
+
+	/// \param tangent The given tangent to this ellipse, whose correcponding point is to be found
+	/// \return The point on the ellipse (in positive x direction) which has the given tangent.
+	Vector3 pointWithTangent(const Vector3& tangent)
+	{
+		// tangent in local coordinates.
+		Vector localTangent = m_inverseTransform.linear() * tangent;
+
+		// Slope of this tangent
+		T m = localTangent[1] / localTangent[0];
+
+		// Ellipse equation: x*x/a*a + y*y/b*b = 1
+		// Rewriting ellipse equation in the form, y = f(x): y = sqrt(a*a - x*x) * b / a
+		// Slope of ellipse: y' = -x*b*b/a*a*y
+		// This slope is equal to the slope of the localTriangleEdge. So, we can solve for x and y.
+		T x = std::sqrt((m * m * a * a * a * a) / (b * b + m * m * a * a));
+		T y = (b / a) * std::sqrt(a * a - x * x) * ((m > 0.0) ? -1.0 : 1.0);
+
+		// Transforming this point into world coordinates.
+		return m_transform * Vector3(x, y, static_cast<T>(0));
+	}
+
+private:
+	/// Major radius of the ellipse
+	double a;
+	/// Minor radius of the ellipse
+	double b;
+	/// Transform local ellipse coordinates to world coordinates
+	RigidTransform3 m_transform;
+	/// Transform world coordinates to local coordinates
+	RigidTransform3 m_inverseTransform;
+};
+}
+
 template <class T, int MOpt> inline
 bool calculateContactTriangleCapsule(
 	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
@@ -140,63 +259,22 @@ bool calculateContactTriangleCapsule(
 	Vector3 majorAxis = triangleEdge * (triangleEdge.dot(capsuleAxis)) + (-tn) * ((-tn).dot(capsuleAxis));
 	majorAxis.normalize();
 
-	// Transform to the local cylinder frame.
-	RigidTransform3 capsuleTransformation;
-	capsuleTransformation.translation() = capsuleTop;
-	capsuleTransformation.linear().col(0) = capsuleAxis;
-	capsuleTransformation.linear().col(2) = (capsuleAxis).cross(-tn).normalized();
-	capsuleTransformation.linear().col(1) = capsuleTransformation.linear().col(2).cross(capsuleAxis).normalized();
+	// CylinderHelper used to find the point of (farthest) intersection along the line and the cylinder.
+	TriangleCapsuleHelper::CylinderHelper<T, MOpt> cylinderHelper(capsuleTop, capsuleAxis, -tn, cr);
 
-	// Transform the problem in the cylinder space to solve the local cylinder equation y^2 + z^2 = cr^2
-	// Point on ellipse should be on the line, P + t.(D)
-	// => Py^2 + t^2.Dy^2 + 2.Py.t.Dy + Pz^2 + t^2.Dz^2 + 2.Pz.t.Dz = cr^2
-	// => t^2.(Dy^2 + Dz^2) + t.(2.Py.Dy + 2.Pz.Dz) + (Py^2 + Pz^2 - cr^2) = 0
-	// Let a = (Dy^2 + Dz^2), b = (2.Py.Dy + 2.Pz.Dz), c = (Py^2 + Pz^2 - cr^2):
-	// => t^2.a + t.b + c = 0, whose solution is:
-	// (-b +/- sqrt(b^2 - 4*a*c))/2*a
-	const auto D = capsuleTransformation.linear().inverse() * majorAxis;
-
-	// Py, Pz are zero, as P is on the axis of the capsule, which is the x-axis of capsuleTransformation.
-	const double a = D[1] * D[1] + D[2] * D[2];
-	const double c = -cr * cr;
-	double majorRadius = std::abs(std::sqrt(-4.0 * a * c) / (2.0 * a));
-	Vector3 majorApex = center + majorRadius * (majorAxis);
-
-	deepestPoint = majorApex;
+	double majorRadius = cylinderHelper.solveFarthestIntersectionWithLine(center, majorAxis);
+	deepestPoint = center + majorAxis * majorRadius;
+	
 	if (std::abs(majorAxis.dot(triangleEdge)) > EPSILON)
 	{
 		// majorApex is not the deepest point because the ellipse is angled. The deepest point is between majorApex and
 		// minorApex on the circumference of the ellipse, and the tangent at that point is parallel to the triangleEdge.
 		auto minorAxis = planeNormal.cross(majorAxis);
-		auto const D = capsuleTransformation.linear().inverse() * minorAxis;
-
-		double a = D[1] * D[1] + D[2] * D[2];
-		double minorRadius = std::abs(std::sqrt(-4.0 * a * c) / (2.0 * a));
-		Vector3 minorApex = center + minorRadius * minorAxis;
-
-		// ellipse equation
-		const double A = majorRadius;
-		const double B = minorRadius;
-
-		RigidTransform3 ellipseTransformation; // transform to the local cylinder frame (A; dir, normal, binormal)
-		ellipseTransformation.translation() = center;
-		ellipseTransformation.linear().col(0) = majorAxis;
-		ellipseTransformation.linear().col(1) = minorAxis;
-		ellipseTransformation.linear().col(2) = planeNormal;
-
-		// triangleEdge in local coordinates.
-		Vector localTriangleEdge = ellipseTransformation.inverse().linear() * triangleEdge;
-		double slope = localTriangleEdge[1] / localTriangleEdge[0];
-
-		// Ellipse equation: x*x/A*A + y*y/B*B = 1
-		// Rewriting ellipse equation in the form, y = f(x): y = sqrt(A*A - x*x) * B / A
-		// Slope of ellipse: y' = -x*B*B/A*A*y
-		// This slope is equal to the slope of the localTriangleEdge. So, we can solve for x and y.
-		double x = std::sqrt((slope * slope * A * A * A * A) / (B * B + slope * slope * A * A));
-		double y = (B / A) * std::sqrt(A * A - x * x) * ((slope > 0.0) ? -1.0 : 1.0);
-
-		// Transforming this point into world coordinates.
-		deepestPoint = ellipseTransformation * Vector3(x, y, 0.0);
+		double minorRadius = cylinderHelper.solveFarthestIntersectionWithLine(center, minorAxis);
+		
+		TriangleCapsuleHelper::EllipseHelper<T, MOpt>
+			ellipseHelper(center, majorAxis, minorAxis, majorRadius, minorRadius);
+		deepestPoint = ellipseHelper.pointWithTangent(triangleEdge);
 	}
 
 	// Project deepestPoint on the triangle edge to make sure it is within the edge.
@@ -213,16 +291,7 @@ bool calculateContactTriangleCapsule(
 
 		// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
 		Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
-
-		auto const P = capsuleTransformation.inverse() * edgeVertex;
-		auto const D = capsuleTransformation.linear().inverse() * (-tn);
-
-		double a = D[1] * D[1] + D[2] * D[2];
-		double b = 2 * (P[1] * D[1] + P[2] * D[2]);
-		double c = (P[1] * P[1] + P[2] * P[2] - cr * cr);
-
-		// We have 2 solutions We want the larger value.
-		double t = (-b / (2.0 * a)) + std::abs(std::sqrt(b * b - 4.0 * a * c) / (2.0 * a));
+		double t = cylinderHelper.solveFarthestIntersectionWithLine(edgeVertex, -tn);
 		deepestPoint = edgeVertex + t * (-tn);
 	}
 
