@@ -283,13 +283,13 @@ public:
 	LinearMotionND(LinearMotionND<T, 3>&& motion);
 
 	/// Constructor
-	/// \param a array of 3 values to be used as the respective starts for the linear motion entries.
-	/// \param b array of 3 values to be used as the respective ends for the linear motion entries.
+	/// \param start array of 3 values to be used as the respective starts for the linear motion entries.
+	/// \param end array of 3 values to be used as the respective ends for the linear motion entries.
 	LinearMotionND(const std::array<T, 3>& start, const std::array<T, 3>& end);
 
 	/// Constructor
-	/// \param a array of 3 values to be used as the respective starts for the linear motion entries.
-	/// \param b array of 3 values to be used as the respective ends for the linear motion entries.
+	/// \param start array of 3 values to be used as the respective starts for the linear motion entries.
+	/// \param end array of 3 values to be used as the respective ends for the linear motion entries.
 	LinearMotionND(const Vector3& start, const Vector3& end);
 
 	/// Assignment operator
