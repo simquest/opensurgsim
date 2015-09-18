@@ -263,14 +263,14 @@ bool calculateContactTriangleCapsule(
 
 	double majorRadius = cylinderHelper.solveFarthestIntersectionWithLine(center, majorAxis);
 	deepestPoint = center + majorAxis * majorRadius;
-	
+
 	if (std::abs(majorAxis.dot(triangleEdge)) > EPSILON)
 	{
 		// majorApex is not the deepest point because the ellipse is angled. The deepest point is between majorApex and
 		// minorApex on the circumference of the ellipse, and the tangent at that point is parallel to the triangleEdge.
 		auto minorAxis = planeNormal.cross(majorAxis);
 		double minorRadius = cylinderHelper.solveFarthestIntersectionWithLine(center, minorAxis);
-		
+
 		TriangleCapsuleHelper::EllipseHelper<T, MOpt>
 			ellipseHelper(center, majorAxis, minorAxis, majorRadius, minorRadius);
 		deepestPoint = ellipseHelper.pointWithTangent(triangleEdge);
