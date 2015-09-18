@@ -19,6 +19,7 @@
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Aabb.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/SegmentMeshShape.h"
@@ -73,7 +74,7 @@ TEST_F(SegmentMeshShapeTest, ValidTest)
 	SegmentMeshPlain emptyMesh;
 	SurgSim::Math::SegmentMeshShape shape(emptyMesh, 1.0);
 	EXPECT_TRUE(shape.isValid());
-	shape.setRadius(1e-11);
+	shape.setRadius(SurgSim::Math::Geometry::DistanceEpsilon / 2.0);
 	EXPECT_FALSE(shape.isValid());
 }
 

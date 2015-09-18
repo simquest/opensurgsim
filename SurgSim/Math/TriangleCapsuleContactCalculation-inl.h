@@ -223,12 +223,12 @@ bool calculateContactTriangleCapsule(
 		triangleEdge = v[(i + 1) % 3] - v[i];
 		planeNormal = tn.cross(triangleEdge);
 		planeNormal.normalize();
-		planeD = v[i].dot(planeNormal);
+		planeD = -v[i].dot(planeNormal);
 
-		double capsuleBottomD = capsuleBottom.dot(planeNormal) - planeD;
+		double capsuleBottomD = capsuleBottom.dot(planeNormal) + planeD;
 		if (capsuleBottomD < 0.0)
 		{
-			double capsuleTopD = capsuleTop.dot(planeNormal) - planeD;
+			double capsuleTopD = capsuleTop.dot(planeNormal) + planeD;
 			SURGSIM_ASSERT(capsuleTopD > 0.0);
 			double ratio = capsuleTopD / (capsuleTopD + std::abs(capsuleBottomD));
 
@@ -256,7 +256,7 @@ bool calculateContactTriangleCapsule(
 	// by vectors (edge[0] -> edge[0] - tn) and (edge[1] -> edge[1] - tn) is found.
 	Vector3 center = deepestPoint;
 	triangleEdge.normalize();
-	Vector3 majorAxis = triangleEdge * (triangleEdge.dot(capsuleAxis)) + (-tn) * ((-tn).dot(capsuleAxis));
+	Vector3 majorAxis = triangleEdge * (triangleEdge.dot(capsuleAxis)) + tn * (tn.dot(capsuleAxis));
 	majorAxis.normalize();
 
 	// CylinderHelper used to find the point of (farthest) intersection along the line and the cylinder.
