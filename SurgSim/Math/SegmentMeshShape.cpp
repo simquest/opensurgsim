@@ -29,8 +29,8 @@ namespace Math
 SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SegmentMeshShape, SegmentMeshShape);
 
 SegmentMeshShape::SegmentMeshShape()
+	: m_radius(0.0)
 {
-	setRadius(1e-10);
 	updateAabbTree();
 }
 
