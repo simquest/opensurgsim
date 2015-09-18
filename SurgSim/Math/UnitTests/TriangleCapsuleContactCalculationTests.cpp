@@ -432,5 +432,11 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase30)
 		Vector3d(0.0, -6.0, 5.0), Vector3d(0.0, -4.8, -0.5), true);
 }
 
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase31)
+{
+	testTriangleCapsuleContactCalculation("(Angled, at center) Capsule axis inside triangle",
+		Vector3d(0.0, 0.0, -0.01), Vector3d(0.0, -0.1, 3.0), true);
+}
+
 }
 }

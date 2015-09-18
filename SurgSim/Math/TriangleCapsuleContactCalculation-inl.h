@@ -199,7 +199,7 @@ bool calculateContactTriangleCapsule(
 
 	// If the capsule axis is perpendicular to the triangle, then the deepest penetration point on the capsule axis
 	// is capsuleBottom
-	if (std::abs(std::abs(capsuleAxis.dot(tn)) - 1.0) < EPSILON)
+	if (std::abs(capsuleAxis.dot(tn) + 1.0) < EPSILON)
 	{
 		*contactNormal = -tn;
 		*penetrationDepth = cr + (*penetrationPointCapsule - capsuleBottom).dot(tn);
