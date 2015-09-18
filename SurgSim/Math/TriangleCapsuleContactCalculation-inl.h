@@ -108,7 +108,7 @@ public:
 		m_inverseTransform = m_transform.inverse();
 	}
 
-	/// \param tangent The given tangent to this ellipse, whose correcponding point is to be found
+	/// \param tangent The given tangent to this ellipse, whose corresponding point is to be found
 	/// \return The point on the ellipse (in positive x direction) which has the given tangent.
 	Vector3 pointWithTangent(const Vector3& tangent)
 	{

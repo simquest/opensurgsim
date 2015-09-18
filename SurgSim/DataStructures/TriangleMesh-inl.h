@@ -167,10 +167,9 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::getEdgePositions(size_t id) co
 	auto& ids = getEdge(id).verticesId;
 	std::array<SurgSim::Math::Vector3d, 2> result =
 	{{
-			Vertices<VertexData>::getVertex(ids[0]).position,
-			Vertices<VertexData>::getVertex(ids[1]).position
-		}
-	};
+		Vertices<VertexData>::getVertex(ids[0]).position,
+		Vertices<VertexData>::getVertex(ids[1]).position
+	}};
 
 	return result;
 }
@@ -211,11 +210,10 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::getTrianglePositions(size_t id
 	auto& ids = getTriangle(id).verticesId;
 	std::array<SurgSim::Math::Vector3d, 3> result =
 	{{
-			Vertices<VertexData>::getVertex(ids[0]).position,
-			Vertices<VertexData>::getVertex(ids[1]).position,
-			Vertices<VertexData>::getVertex(ids[2]).position
-		}
-	};
+		Vertices<VertexData>::getVertex(ids[0]).position,
+		Vertices<VertexData>::getVertex(ids[1]).position,
+		Vertices<VertexData>::getVertex(ids[2]).position
+	}};
 
 	return result;
 }
