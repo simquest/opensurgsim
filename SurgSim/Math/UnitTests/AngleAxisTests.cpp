@@ -53,9 +53,10 @@ TYPED_TEST(AngleAxisTests, YamlConvert)
 
 	ASSERT_NO_THROW(node = angleAxis);
 
-	EXPECT_TRUE(node.IsSequence());
-	EXPECT_EQ(2u, node.size());
-	YAML::Node axisNode = node[1];
+	EXPECT_TRUE(node.IsMap());
+	YAML::Node angleNode = node["Angle"];
+	EXPECT_TRUE(angleNode.IsScalar());
+	YAML::Node axisNode = node["Axis"];
 	EXPECT_TRUE(axisNode.IsSequence());
 	EXPECT_EQ(3u, axisNode.size());
 
