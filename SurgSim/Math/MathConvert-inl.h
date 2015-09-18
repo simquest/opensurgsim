@@ -33,7 +33,7 @@ YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, 1, MOpt>>::encode(
 	const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs)
 {
 	Node node;
-	node.SetStyle(YAML::FlowStyle);
+	node.SetStyle(YAML::EmitterStyle::Flow);
 	for (int i = 0; i < rhs.size(); ++i)
 	{
 		node.push_back(rhs[i]);
@@ -75,7 +75,7 @@ YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode
 	const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs)
 {
 	YAML::Node node;
-	node.SetStyle(YAML::FlowStyle);
+	node.SetStyle(YAML::EmitterStyle::Flow);
 	for (int row = 0; row < Rows; ++row)
 	{
 		YAML::Node rowNode;

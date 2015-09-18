@@ -23,8 +23,8 @@ if(DEFINED CMAKE_BUILD_TYPE)
 endif(DEFINED CMAKE_BUILD_TYPE)
 
 ExternalProject_Add(yaml-cpp
-	URL "https://github.com/simquest/yaml-cpp/archive/v0.5.1.2.tar.gz"
-	URL_MD5 "15c88ddb1a4607ed1df44a036c6feb76"
+	URL "https://github.com/jbeder/yaml-cpp/archive/release-0.5.2.tar.gz"
+	URL_MD5 "2728af8a15e2b2c407730c45b99b274b"
 	PREFIX yaml-cpp
 	CMAKE_ARGS ${CMAKE_ARGS}
 )
