@@ -405,15 +405,15 @@ TEST(LinearMotionUtilities, LinearMotionUtilities)
 
 TEST(LinearMotionUtilities, LinearMotion3DUtilities)
 {
-	std::array<double, 3> high;
+	Math::Vector3d high;
 	high[0] = 3.0;
 	high[1] = 4.0;
 	high[2] = 5.0;
-	std::array<double, 3> low;
+	Math::Vector3d low;
 	low[0] = 1.0;
 	low[1] = 2.0;
 	low[2] = 3.0;
-	std::array<double, 3> medium;
+	Math::Vector3d medium;
 	medium[0] = 2.0;
 	medium[1] = 3.0;
 	medium[2] = 4.0;
