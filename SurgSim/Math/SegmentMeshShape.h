@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/SegmentMesh.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
 
@@ -44,7 +45,7 @@ public:
 	/// \note The default radius is positive EPSILON to be relevant in collision detection calculations.
 	template <class VertexData, class EdgeData>
 	explicit SegmentMeshShape(const DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
-		double radius = 1e-10);
+		double radius = Geometry::DistanceEpsilon);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::SegmentMeshShape);
 
