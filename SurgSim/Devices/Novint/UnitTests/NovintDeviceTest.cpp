@@ -23,6 +23,7 @@
 #include <string>
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Devices/Novint/NovintDevice.h"
 #include "SurgSim/Framework/Clock.h"
 #include "SurgSim/Math/Matrix.h"
@@ -51,7 +52,7 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 
 	std::string initializationName = "";
 	EXPECT_FALSE(device->getInitializationName(&initializationName));
-	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);
+	EXPECT_NO_THROW(device->setInitializationName(NOVINT_TEST_DEVICE_NAME));
 	ASSERT_TRUE(device->getInitializationName(&initializationName));
 	EXPECT_EQ(NOVINT_TEST_DEVICE_NAME, initializationName);
 
@@ -65,6 +66,7 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 	ASSERT_TRUE(device->isInitialized());
 	ASSERT_ANY_THROW(device->initialize()) << "Initialized the same device twice.";
+	ASSERT_ANY_THROW(device->setInitializationName("OtherName"));
 	EXPECT_EQ("TestFalcon", device->getName());
 
 	const double positionScale = 2.0;
@@ -77,6 +79,7 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 
 	EXPECT_TRUE(device->finalize());
 }
+
 TEST(NovintDeviceTest, CreateAndInitializeDeviceBySerialNumber)
 {
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
@@ -262,4 +265,35 @@ TEST(NovintDeviceTest, OutputProducer)
 	// Check the number of invocations.
 	EXPECT_GE(producer->m_numTimesRequestedOutput, 700);
 	EXPECT_LE(producer->m_numTimesRequestedOutput, 1300);
+}
+
+TEST(NovintDeviceTest, FactoryCreation)
+{
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create("SurgSim::Devices::NovintDevice",
+		"TestFalcon"));
+	EXPECT_EQ("SurgSim::Devices::NovintDevice", device->getClassName());
+}
+
+TEST(NovintDeviceTest, AccessibleTest)
+{
+	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon");
+
+	std::string name = "initName";
+	SurgSim::DataStructures::OptionalValue<std::string> optionalName(name);
+	EXPECT_NO_THROW(device->setValue("InitializationName", optionalName));
+	std::string actualName;
+	ASSERT_TRUE(device->getInitializationName(&actualName));
+	EXPECT_EQ(name, actualName);
+
+	std::string number = "serialNumber";
+	SurgSim::DataStructures::OptionalValue<std::string> optionalNumber(number);
+	EXPECT_NO_THROW(device->setValue("SerialNumber", optionalNumber));
+	std::string actualNumber;
+	ASSERT_TRUE(device->getSerialNumber(&actualNumber));
+	EXPECT_EQ(number, actualNumber);
+
+	ASSERT_FALSE(device->is7DofDevice());
+	EXPECT_NO_THROW(device->setValue("7DofDevice", true));
+	EXPECT_TRUE(device->is7DofDevice());
 }

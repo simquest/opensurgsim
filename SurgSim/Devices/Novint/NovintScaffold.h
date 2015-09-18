@@ -26,7 +26,6 @@ namespace SurgSim
 namespace Devices
 {
 
-class NovintCommonDevice;
 class NovintDevice;
 
 
@@ -35,8 +34,7 @@ class NovintDevice;
 /// This should support any device that can communicate using the Novint HDAL SDK toolkit, such as the
 /// off-the-shelf Novint Falcon gaming controller and the Novint Falcon with the Open Surgery Grip.
 ///
-/// \sa SurgSim::Devices::NovintDevice, SurgSim::Devices::Novint7DofDevice
-/// \sa SurgSim::Devices::NovintCommonDevice
+/// \sa SurgSim::Devices::NovintDevice
 class NovintScaffold
 {
 public:
@@ -68,7 +66,6 @@ private:
 	/// Wrapper for the HDAL device handle.
 	class Handle;
 
-	friend class NovintCommonDevice;
 	friend class NovintDevice;
 
 	/// Registers the specified device object.
@@ -76,14 +73,14 @@ private:
 	///
 	/// \param device The device object to be used, which should have a unique name.
 	/// \return True if the initialization succeeds, false if it fails.
-	bool registerDevice(NovintCommonDevice* device);
+	bool registerDevice(NovintDevice* device);
 
 	/// Unregisters the specified device object.
 	/// The corresponding controller will become unused, and can be re-registered later.
 	///
 	/// \param device The device object.
 	/// \return true on success, false on failure.
-	bool unregisterDevice(const NovintCommonDevice* device);
+	bool unregisterDevice(const NovintDevice* device);
 
 	/// Initializes a single device, creating the necessary HDAL resources.
 	/// \param [in,out] info	The device data.
@@ -221,12 +218,12 @@ private:
 	/// Sets the position scale for this device.
 	/// \param device A pointer to the device.
 	/// \param scale The multiplicative factor to apply to the position.
-	void setPositionScale(const NovintCommonDevice* device, double scale);
+	void setPositionScale(const NovintDevice* device, double scale);
 
 	/// Sets the orientation scale for this device.
 	/// \param device A pointer to the device.
 	/// \param scale The multiplicative factor to apply to the rotation angles.
-	void setOrientationScale(const NovintCommonDevice* device, double scale);
+	void setOrientationScale(const NovintDevice* device, double scale);
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;

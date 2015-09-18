@@ -28,6 +28,8 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::PhantomDevic
 PhantomDevice::PhantomDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, PhantomScaffold::buildDeviceInputData())
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PhantomDevice, std::string, InitializationName,
+		getInitializationName, setInitializationName);
 }
 
 
