@@ -241,7 +241,7 @@ YAML::Node SceneElement::encode(bool standalone) const
 	if (groups.size() > 0)
 	{
 		data["Groups"] = groups;
-		data["Groups"].SetStyle(YAML::FlowStyle);
+		data["Groups"].SetStyle(YAML::EmitterStyle::Flow);
 	}
 
 	for (auto component = std::begin(m_components); component != std::end(m_components); ++component)
