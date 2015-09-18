@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 
 	const std::string deviceName = "Tool_Device";
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device =
-		SurgSim::Devices::loadDevice("device.yaml");
+		SurgSim::Devices::loadDevice("Device.yaml");
 	SURGSIM_ASSERT(device != nullptr) << "Failed to initialize any device.";
 	SURGSIM_LOG_IF(std::dynamic_pointer_cast<SurgSim::Devices::IdentityPoseDevice>(device) != nullptr,
 		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << "The InputVtc example was unable to initialize " <<
