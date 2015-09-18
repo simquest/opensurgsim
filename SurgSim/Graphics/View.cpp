@@ -57,7 +57,12 @@ View::View(const std::string& name) :
 
 void View::setCamera(std::shared_ptr<Component> camera)
 {
+	if (m_camera != nullptr)
+	{
+		m_camera->setMainCamera(false);
+	}
 	m_camera = checkAndConvert<Camera>(camera, "SurgSim::Graphics::Camera");
+	m_camera->setMainCamera(true);
 }
 
 std::shared_ptr<Camera> View::getCamera() const
