@@ -61,7 +61,7 @@ bool SegmentMeshShape::isValid() const
 {
 	// If the radius is less than DistanceEpsilon, the collision detection (which assumes the segments are capsules),
 	/// will not work correctly.
-	return (m_radius >= SurgSim::Math::Geometry::DistanceEpsilon);
+	return (m_radius >= Geometry::DistanceEpsilon);
 }
 
 void SegmentMeshShape::setRadius(double radius)
@@ -83,17 +83,17 @@ bool SegmentMeshShape::doUpdate()
 
 bool SegmentMeshShape::doLoad(const std::string& fileName)
 {
-	return SurgSim::DataStructures::SegmentMeshPlain::doLoad(fileName) && update();
+	return DataStructures::SegmentMeshPlain::doLoad(fileName) && update();
 }
 
-const std::shared_ptr<const SurgSim::DataStructures::AabbTree> SegmentMeshShape::getAabbTree() const
+std::shared_ptr<const DataStructures::AabbTree> SegmentMeshShape::getAabbTree() const
 {
 	return m_aabbTree;
 }
 
 void SegmentMeshShape::updateAabbTree()
 {
-	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
+	m_aabbTree = std::make_shared<DataStructures::AabbTree>();
 
 	std::list<DataStructures::AabbTreeData::Item> items;
 

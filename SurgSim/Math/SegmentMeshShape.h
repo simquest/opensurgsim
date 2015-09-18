@@ -32,7 +32,7 @@ SURGSIM_STATIC_REGISTRATION(SegmentMeshShape);
 /// But, unlike MeshShape, the mesh does not have any triangle topology. It only consists of edges.
 ///
 /// \sa MeshShape
-class SegmentMeshShape : public Shape, public SurgSim::DataStructures::SegmentMeshPlain
+class SegmentMeshShape : public Shape, public DataStructures::SegmentMeshPlain
 {
 public:
 	/// Constructor
@@ -43,7 +43,7 @@ public:
 	/// \param radius The radius associated to this surface mesh
 	/// \note The default radius is positive EPSILON to be relevant in collision detection calculations.
 	template <class VertexData, class EdgeData>
-	explicit SegmentMeshShape(const SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
+	explicit SegmentMeshShape(const DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
 		double radius = 1e-10);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::SegmentMeshShape);
@@ -61,7 +61,7 @@ public:
 	double getRadius() const;
 
 	/// \return The object's associated AabbTree
-	const std::shared_ptr<const SurgSim::DataStructures::AabbTree> getAabbTree() const;
+	std::shared_ptr<const DataStructures::AabbTree> getAabbTree() const;
 
 protected:
 	bool doUpdate() override;
@@ -75,7 +75,7 @@ private:
 	double m_radius;
 
 	/// The aabb tree used to accelerate collision detection against the mesh
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
+	std::shared_ptr<DataStructures::AabbTree> m_aabbTree;
 
 	/// Half extent of the AABB of the sphere at one of the segment end.
 	Vector3d m_segmentEndBoundingBoxHalfExtent;
