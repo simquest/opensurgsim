@@ -29,7 +29,7 @@ template <class T>
 class AngleAxisTests : public testing::Test
 {
 public:
-	typedef typename T AngleAxis;
+	typedef T AngleAxis;
 	typedef typename T::Scalar Scalar;
 };
 typedef ::testing::Types<Eigen::AngleAxisd, Eigen::AngleAxisf> AngleAxisVariants;
