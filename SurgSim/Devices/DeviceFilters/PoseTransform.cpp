@@ -17,6 +17,7 @@
 
 #include "SurgSim/Devices/DeviceFilters/PoseTransform.h"
 
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Matrix.h"
 
 using SurgSim::DataStructures::DataGroup;
@@ -27,6 +28,8 @@ namespace SurgSim
 {
 namespace Devices
 {
+
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::PoseTransform, PoseTransform);
 
 PoseTransform::PoseTransform(const std::string& name) :
 	CommonDevice(name),
@@ -45,6 +48,9 @@ PoseTransform::PoseTransform(const std::string& name) :
 	m_inputAngularVelocityIndex(-1),
 	m_cachedOutputIndices(false)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseTransform, double, TranslationScale,
+		getTranslationScale, setTranslationScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseTransform, RigidTransform3d, Transform, getTransform, setTransform);
 }
 
 PoseTransform::~PoseTransform()
@@ -64,9 +70,9 @@ bool PoseTransform::finalize()
 
 void PoseTransform::initializeInput(const std::string& device, const DataGroup& inputData)
 {
-	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
-	m_linearVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
-	m_angularVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
+	m_poseIndex = inputData.poses().getIndex(DataStructures::Names::POSE);
+	m_linearVelocityIndex = inputData.vectors().getIndex(DataStructures::Names::LINEAR_VELOCITY);
+	m_angularVelocityIndex = inputData.vectors().getIndex(DataStructures::Names::ANGULAR_VELOCITY);
 
 	inputFilter(inputData, &getInputData());
 }
@@ -85,17 +91,17 @@ bool PoseTransform::requestOutput(const std::string& device, DataGroup* outputDa
 		if (!m_cachedOutputIndices)
 		{
 			const DataGroup& initialOutputData = getOutputData();
-			m_forceIndex = initialOutputData.vectors().getIndex(SurgSim::DataStructures::Names::FORCE);
-			m_torqueIndex = initialOutputData.vectors().getIndex(SurgSim::DataStructures::Names::TORQUE);
+			m_forceIndex = initialOutputData.vectors().getIndex(DataStructures::Names::FORCE);
+			m_torqueIndex = initialOutputData.vectors().getIndex(DataStructures::Names::TORQUE);
 			m_springJacobianIndex =
-				initialOutputData.matrices().getIndex(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
-			m_inputPoseIndex = initialOutputData.poses().getIndex(SurgSim::DataStructures::Names::INPUT_POSE);
+				initialOutputData.matrices().getIndex(DataStructures::Names::SPRING_JACOBIAN);
+			m_inputPoseIndex = initialOutputData.poses().getIndex(DataStructures::Names::INPUT_POSE);
 			m_damperJacobianIndex =
-				initialOutputData.matrices().getIndex(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
+				initialOutputData.matrices().getIndex(DataStructures::Names::DAMPER_JACOBIAN);
 			m_inputLinearVelocityIndex =
-				initialOutputData.vectors().getIndex(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
+				initialOutputData.vectors().getIndex(DataStructures::Names::INPUT_LINEAR_VELOCITY);
 			m_inputAngularVelocityIndex =
-				initialOutputData.vectors().getIndex(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
+				initialOutputData.vectors().getIndex(DataStructures::Names::INPUT_ANGULAR_VELOCITY);
 			m_cachedOutputIndices = true;
 		}
 		outputFilter(getOutputData(), outputData);
@@ -193,7 +199,7 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 	// (not delta-translation) and so should not be scaled.
 	if (m_springJacobianIndex >= 0)
 	{
-		SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
+		DataStructures::DataGroup::DynamicMatrixType springJacobian;
 		if (dataToFilter.matrices().get(m_springJacobianIndex, &springJacobian))
 		{
 			springJacobian.block<3,3>(0, 0).applyOnTheLeft(m_transformInverse.linear());
@@ -223,7 +229,7 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 
 	if (m_damperJacobianIndex >= 0)
 	{
-		SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
+		DataStructures::DataGroup::DynamicMatrixType damperJacobian;
 		if (dataToFilter.matrices().get(m_damperJacobianIndex, &damperJacobian))
 		{
 			damperJacobian.block<3,3>(0, 0).applyOnTheLeft(m_transformInverse.linear());
@@ -262,10 +268,20 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 	}
 }
 
+double PoseTransform::getTranslationScale() const
+{
+	return m_translationScale;
+}
+
 void PoseTransform::setTranslationScale(double translationScale)
 {
 	boost::lock_guard<boost::mutex> lock(m_mutex);
 	m_translationScale = translationScale;
+}
+
+const RigidTransform3d& PoseTransform::getTransform() const
+{
+	return m_transform;
 }
 
 void PoseTransform::setTransform(const RigidTransform3d& transform)

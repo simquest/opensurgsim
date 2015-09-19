@@ -50,8 +50,8 @@ namespace Devices
 /// \sa	SurgSim::Input::CommonDevice
 /// \sa	SurgSim::Input::InputConsumerInterface
 /// \sa	SurgSim::Input::OutputProducerInterface
-class PoseTransform : public SurgSim::Input::CommonDevice,
-	public SurgSim::Input::InputConsumerInterface, public SurgSim::Input::OutputProducerInterface
+class PoseTransform : public Input::CommonDevice,
+	public Input::InputConsumerInterface, public Input::OutputProducerInterface
 {
 public:
 	/// Constructor.
@@ -73,14 +73,14 @@ public:
 	/// \param device The name of the device that is producing the input.  This should only be used to identify
 	/// 	the device (e.g. if the consumer is listening to several devices at once).
 	/// \param inputData The application input state coming from the device.
-	void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
+	void initializeInput(const std::string& device, const DataStructures::DataGroup& inputData) override;
 
 	/// Notifies the consumer that the application input coming from the device has been updated.
 	/// Used when transforming the pose coming from an input device.
 	/// \param device The name of the device that is producing the input.  This should only be used to identify
 	/// 	the device (e.g. if the consumer is listening to several devices at once).
 	/// \param inputData The application input state coming from the device.
-	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
+	void handleInput(const std::string& device, const DataStructures::DataGroup& inputData) override;
 
 	/// Asks the producer to provide output state to the device.  Passes through all data, modifying the data entries
 	/// used by haptic devices.  Note that devices may never call this method, e.g. because the device doesn't actually
@@ -90,7 +90,10 @@ public:
 	/// \param [out] outputData The data being sent to the device.
 	/// \return True if the producer has provided output data.  A producer that returns false should leave outputData
 	///		unmodified.
-	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
+	bool requestOutput(const std::string& device, DataStructures::DataGroup* outputData) override;
+
+	/// \return Get the translation scale factor.
+	double getTranslationScale() const;
 
 	/// Set the translation scale factor so that each direction has the same scale.
 	/// \param translationScale The scalar scaling factor.
@@ -98,11 +101,14 @@ public:
 	///		transform even if the following output data is based off input data that used the old transform.
 	void setTranslationScale(double translationScale);
 
+	/// \return The current transform.
+	const Math::RigidTransform3d& getTransform() const;
+
 	/// Set the constant transform.  The transform is pre-applied to the input pose.
 	/// \param transform The transform, which must be invertible.
 	/// \warning This setter is thread-safe, but after calling this function the output filter will use the new
 	///		transform even if the following output data is based off input data that used the old transform.
-	void setTransform(const SurgSim::Math::RigidTransform3d& transform);
+	void setTransform(const Math::RigidTransform3d& transform);
 
 private:
 	/// Finalize (de-initialize) the device.
@@ -113,8 +119,7 @@ private:
 	/// \param dataToFilter The data that will be filtered.
 	/// \param [in,out] result A pointer to a DataGroup object that must be assignable to by the dataToFilter object.
 	///		Will contain the filtered data.
-	void inputFilter(const SurgSim::DataStructures::DataGroup& dataToFilter,
-		SurgSim::DataStructures::DataGroup* result);
+	void inputFilter(const DataStructures::DataGroup& dataToFilter, DataStructures::DataGroup* result);
 
 	/// Filter the output data.
 	/// If this device filter offsets/scales input data from a haptic device, then when output data (forces, torques,
@@ -123,17 +128,16 @@ private:
 	/// \param dataToFilter The data that will be filtered.
 	/// \param [in,out] result A pointer to a DataGroup object that must be assignable to by the dataToFilter object.
 	///		Will contain the filtered data.
-	void outputFilter(const SurgSim::DataStructures::DataGroup& dataToFilter,
-		SurgSim::DataStructures::DataGroup* result);
+	void outputFilter(const DataStructures::DataGroup& dataToFilter, DataStructures::DataGroup* result);
 
 	/// The mutex that protects the transform and scaling factor.
 	boost::mutex m_mutex;
 
 	/// The constant pre-transform.
-	SurgSim::Math::RigidTransform3d m_transform;
+	Math::RigidTransform3d m_transform;
 
 	/// The inverse of the pre-transform.
-	SurgSim::Math::RigidTransform3d m_transformInverse;
+	Math::RigidTransform3d m_transformInverse;
 
 	/// The scaling factor applied to each direction of the translation.
 	double m_translationScale;
