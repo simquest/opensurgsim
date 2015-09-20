@@ -121,9 +121,7 @@ public:
 		bool printEdges = false;
 		// Set the number of test vertices
 		size_t numVertices = 10;
-		// Set the number of test edges
-		size_t numEdges = 9;
-
+		
 		std::default_random_engine generator;
 		std::uniform_real_distribution<double> positionDistribution(-10.0, 10.0);
 		std::uniform_real_distribution<double> normalDistribution(-1.0, 1.0);
