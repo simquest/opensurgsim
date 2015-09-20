@@ -69,9 +69,23 @@ public:
 		T b = static_cast<T>(2) * (P[1] * D[1] + P[2] * D[2]);
 		T c = (P[1] * P[1] + P[2] * P[2] - m_radius * m_radius);
 
+		T bb4ac = b * b - static_cast<T>(4) * a * c;
+
+		if (bb4ac < 0.0)
+		{
+			// Cannot use a sqrt on a negative number. Push it to zero if it is small.
+			if (bb4ac >= -Geometry::ScalarEpsilon)
+			{
+				bb4ac = 0.0;
+			}
+			else
+			{
+				return std::numeric_limits<T>::quiet_NaN();
+			}
+		}
+
 		// We have two solutions. We want the larger value.
-		return (-b / (static_cast<T>(2) * a))
-			+ std::abs(std::sqrt(b * b - static_cast<T>(4) * a * c) / (static_cast<T>(2) * a));
+		return (-b / (static_cast<T>(2) * a)) + std::abs(std::sqrt(bb4ac) / (static_cast<T>(2) * a));
 	}
 
 private:
@@ -262,6 +276,7 @@ bool calculateContactTriangleCapsule(
 	TriangleCapsuleHelper::CylinderHelper<T, MOpt> cylinderHelper(capsuleTop, capsuleAxis, -tn, cr);
 
 	double majorRadius = cylinderHelper.solveFarthestIntersectionWithLine(center, majorAxis);
+	SURGSIM_ASSERT(majorRadius != std::numeric_limits<T>::quiet_NaN());
 	deepestPoint = center + majorAxis * majorRadius;
 
 	if (std::abs(majorAxis.dot(triangleEdge)) > EPSILON)
@@ -270,6 +285,7 @@ bool calculateContactTriangleCapsule(
 		// minorApex on the circumference of the ellipse, and the tangent at that point is parallel to the triangleEdge.
 		auto minorAxis = planeNormal.cross(majorAxis);
 		double minorRadius = cylinderHelper.solveFarthestIntersectionWithLine(center, minorAxis);
+		SURGSIM_ASSERT(minorRadius != std::numeric_limits<T>::quiet_NaN());
 
 		TriangleCapsuleHelper::EllipseHelper<T, MOpt>
 			ellipseHelper(center, majorAxis, minorAxis, majorRadius, minorRadius);
@@ -291,6 +307,7 @@ bool calculateContactTriangleCapsule(
 		// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
 		Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
 		double t = cylinderHelper.solveFarthestIntersectionWithLine(edgeVertex, -tn);
+		SURGSIM_ASSERT(t != std::numeric_limits<T>::quiet_NaN());
 		deepestPoint = edgeVertex + t * (-tn);
 	}
 
