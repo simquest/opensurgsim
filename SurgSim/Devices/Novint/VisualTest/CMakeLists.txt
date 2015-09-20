@@ -21,13 +21,6 @@ set(EXAMPLE_SOURCES
 set(EXAMPLE_HEADERS
 )
 
-set(SEVEN_DOF_EXAMPLE_SOURCES
-	falcon_7dof_main.cpp
-)
-
-set(SEVEN_DOF_EXAMPLE_HEADERS
-)
-
 set(LIBS
 	IdentityPoseDevice
 	NovintDevice
@@ -38,13 +31,4 @@ set(LIBS
 surgsim_add_executable(NovintVisualTest
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 target_link_libraries(NovintVisualTest ${LIBS})
-
-surgsim_add_executable(Novint7DofVisualTest
-	"${SEVEN_DOF_EXAMPLE_SOURCES}" "${SEVEN_DOF_EXAMPLE_HEADERS}")
-target_link_libraries(Novint7DofVisualTest ${LIBS})
-
-# Put Novint7DofVisualTest into folder "Devices"
-set_target_properties(Novint7DofVisualTest PROPERTIES FOLDER "Devices")
-
-# Put NovintVisualTest into folder "Devices"
 set_target_properties(NovintVisualTest PROPERTIES FOLDER "Devices")

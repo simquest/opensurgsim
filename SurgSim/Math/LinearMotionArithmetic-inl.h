@@ -389,11 +389,19 @@ LinearMotionND<T, 3>::LinearMotionND(LinearMotionND<T, 3>&& motion)
 }
 
 template <typename T>
-LinearMotionND<T, 3>::LinearMotionND(const std::array<T, 3>& a, const std::array<T, 3>& b)
+LinearMotionND<T, 3>::LinearMotionND(const std::array<T, 3>& start, const std::array<T, 3>& end)
 {
-	m_motion[0] = LinearMotion<T>(a[0], b[0]);
-	m_motion[1] = LinearMotion<T>(a[1], b[1]);
-	m_motion[2] = LinearMotion<T>(a[2], b[2]);
+	m_motion[0] = LinearMotion<T>(start[0], end[0]);
+	m_motion[1] = LinearMotion<T>(start[1], end[1]);
+	m_motion[2] = LinearMotion<T>(start[2], end[2]);
+}
+
+template <typename T>
+LinearMotionND<T, 3>::LinearMotionND(const Vector3& start, const Vector3& end)
+{
+	m_motion[0] = LinearMotion<T>(start[0], end[0]);
+	m_motion[1] = LinearMotion<T>(start[1], end[1]);
+	m_motion[2] = LinearMotion<T>(start[2], end[2]);
 }
 
 template <typename T>

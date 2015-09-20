@@ -79,7 +79,8 @@ TEST(PhantomScaffoldTest, ScaffoldLifeCycle)
 	}
 
 	{
-		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+		device->setInitializationName("Default PHANToM");
 		ASSERT_NE(nullptr, device) << "Creation failed.  Is a Phantom device plugged in?";
 		// note: the device is NOT initialized!
 		{
@@ -100,7 +101,8 @@ TEST(PhantomScaffoldTest, ScaffoldLifeCycle)
 	}
 
 	{
-		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+		device->setInitializationName("Default PHANToM");
 		ASSERT_NE(nullptr, device) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 		{
@@ -130,7 +132,8 @@ TEST(PhantomScaffoldTest, ScaffoldLifeCycle)
 	}
 
 	{
-		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+		device->setInitializationName("Default PHANToM");
 		ASSERT_NE(nullptr, device) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Didn't this work a moment ago?";
 		std::shared_ptr<PhantomScaffold> scaffold = PhantomScaffold::getOrCreateSharedInstance();
@@ -151,7 +154,8 @@ TEST(PhantomScaffoldTest, CreateDeviceSeveralTimes)
 	{
 		SCOPED_TRACE(i);
 		EXPECT_EQ(nullptr, lastScaffold.lock());
-		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+		device->setInitializationName("Default PHANToM");
 		ASSERT_NE(nullptr, device) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 		std::shared_ptr<PhantomScaffold> scaffold = PhantomScaffold::getOrCreateSharedInstance();
@@ -170,7 +174,8 @@ TEST(PhantomScaffoldTest, CreateDeviceSeveralTimesWithScaffoldRef)
 	for (int i = 0;  i < 6;  ++i)
 	{
 		SCOPED_TRACE(i);
-		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom");
+		device->setInitializationName("Default PHANToM");
 		ASSERT_NE(nullptr, device) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 		std::shared_ptr<PhantomScaffold> scaffold = PhantomScaffold::getOrCreateSharedInstance();

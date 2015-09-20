@@ -1,0 +1,4 @@
+- SurgSim::Devices::IdentityPoseDevice:
+    Name: Device1
+- SurgSim::Devices::IdentityPoseDevice:
+    Name: Device2
