@@ -89,7 +89,7 @@ public:
 	}
 
 private:
-	/// A point on the cylinder
+	/// A point on the axis of the cylinder
 	Vector3 m_point;
 	/// Axis of the cylinder
 	Vector3 m_axis;
@@ -109,7 +109,7 @@ class EllipseHelper
 	typedef Eigen::Transform<T, 3, Eigen::Isometry> RigidTransform3;
 
 public:
-	/// \param center Center of the ellipsis.
+	/// \param center Center of the ellipse.
 	/// \param majorAxis, minorAxis The major/minor axes of the ellipse, both of unit length
 	/// \param majorRadius, minorRadius Major/minor radii of the ellipse
 	EllipseHelper(const Vector3& center, const Vector3& majorAxis, const Vector3& minorAxis, const double majorRadius,
@@ -135,7 +135,7 @@ public:
 		// Ellipse equation: x*x/a*a + y*y/b*b = 1
 		// Rewriting ellipse equation in the form, y = f(x): y = sqrt(a*a - x*x) * b / a
 		// Slope of ellipse: y' = -x*b*b/a*a*y
-		// This slope is equal to the slope of the localTriangleEdge. So, we can solve for x and y.
+		// This slope is equal to the slope of the localTangent. So, we can solve for x and y.
 		T x = std::sqrt((m * m * a * a * a * a) / (b * b + m * m * a * a));
 		T y = (b / a) * std::sqrt(a * a - x * x) * ((m > 0.0) ? -1.0 : 1.0);
 
@@ -170,13 +170,13 @@ bool calculateContactTriangleCapsule(
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
 {
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
-	static const T EPSILON = static_cast<T>(Geometry::DistanceEpsilon);
+	static const T epsilon = static_cast<T>(Geometry::DistanceEpsilon);
 
 	double distance =
 		distanceSegmentTriangle(cv0, cv1, tv0, tv1, tv2, tn, penetrationPointCapsule, penetrationPointTriangle);
 
 	// Check if the triangle and capsule intersect.
-	if (distance >= (cr - EPSILON))
+	if (distance >= (cr - epsilon))
 	{
 		// Distance between the triangle and the capsule's axis is greater than the radius of the capsule.
 		// Therefore, there is no intersection.
@@ -184,7 +184,7 @@ bool calculateContactTriangleCapsule(
 	}
 
 	// Rest of the below cases have an intersection.
-	if (distance > EPSILON)
+	if (distance > epsilon)
 	{
 		// The axis of the capsule does not intersect with the triangle, so a correction of (cr - distance) along the
 		// closest points between the two, is the shortest contact correction possible.
@@ -212,7 +212,7 @@ bool calculateContactTriangleCapsule(
 
 	// If the capsule axis is perpendicular to the triangle, then the deepest penetration point on the capsule axis
 	// is capsuleBottom
-	if (std::abs(capsuleAxis.dot(tn) + 1.0) < EPSILON)
+	if (std::abs(capsuleAxis.dot(tn) + 1.0) < epsilon)
 	{
 		*contactNormal = -tn;
 		*penetrationDepth = cr + (*penetrationPointCapsule - capsuleBottom).dot(tn);
@@ -279,7 +279,7 @@ bool calculateContactTriangleCapsule(
 	SURGSIM_ASSERT(majorRadius != std::numeric_limits<T>::quiet_NaN());
 	deepestPoint = center + majorAxis * majorRadius;
 
-	if (std::abs(majorAxis.dot(triangleEdge)) > EPSILON)
+	if (std::abs(majorAxis.dot(triangleEdge)) > epsilon)
 	{
 		// majorApex is not the deepest point because the ellipse is angled. The deepest point is between majorApex and
 		// minorApex on the circumference of the ellipse, and the tangent at that point is parallel to the triangleEdge.
@@ -295,7 +295,7 @@ bool calculateContactTriangleCapsule(
 	// Project deepestPoint on the triangle edge to make sure it is within the edge.
 	auto edgeLength = (edgeVertices[1] - edgeVertices[0]).norm();
 	double deepestPointDotEdge = triangleEdge.dot(deepestPoint - edgeVertices[0]);
-	if (deepestPointDotEdge <= -EPSILON || deepestPointDotEdge >= edgeLength + EPSILON)
+	if (deepestPointDotEdge <= -epsilon || deepestPointDotEdge >= edgeLength + epsilon)
 	{
 		// In this case, the intersection of the cylinder with the triangle edge plane gives an ellipse
 		// that is close to a triangle corner and the deepest penetration point on the ellipse is
@@ -314,7 +314,7 @@ bool calculateContactTriangleCapsule(
 	Vector3 pointOnCapsuleAxis;
 	// Now, clip (center -> deepestPoint) to be on the surface of the capsule. This is done by finding its length.
 	double distanceFromCapsule = SurgSim::Math::distancePointSegment(deepestPoint, cv0, cv1, &pointOnCapsuleAxis);
-	if (std::abs(distanceFromCapsule - cr) > EPSILON)
+	if (std::abs(distanceFromCapsule - cr) > epsilon)
 	{
 		Vector3d direction = (deepestPoint - center).normalized();
 		deepestPoint = center + direction * cr;
