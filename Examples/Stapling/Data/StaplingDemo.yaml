@@ -373,7 +373,7 @@ SurgSim::Framework::Scene:
               Id: 7d447c80-d8c0-4213-a46f-164a800f6d1c
               Name: Physics
               IntegrationScheme:
-                SurgSim::Math::IntegrationScheme: INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER
+                SurgSim::Math::IntegrationScheme: INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT
           - SurgSim::Graphics::OsgMeshRepresentation:
               IsLocalActive: true
               MeshFileName: Geometry/wound_deformable.ply
