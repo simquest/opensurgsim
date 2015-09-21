@@ -206,6 +206,7 @@ YAML::Node YAML::convert<typename Eigen::AngleAxis<Type>>::encode(
 	const typename Eigen::AngleAxis<Type>& rhs)
 {
 	Node node;
+	node.SetStyle(EmitterStyle::Flow);
 	node["Angle"] = rhs.angle();
 	node["Axis"] = convert<typename Eigen::Matrix<Type, 3, 1>>::encode(rhs.axis());
 	return node;
