@@ -97,7 +97,7 @@ std::vector<T> Groups<Key, T>::getMembers(const Key& group) const
 	{
 		result.assign(found->second.cbegin(), found->second.cend());
 	}
-	return std::move(result);
+	return result;
 }
 
 template <typename Key, typename T>
@@ -110,7 +110,7 @@ std::vector<Key> Groups<Key, T>::getGroups(const T& element) const
 	{
 		result.assign(found->second.cbegin(), found->second.cend());
 	}
-	return std::move(result);
+	return result;
 }
 
 template <typename Key, typename T>
@@ -125,7 +125,7 @@ std::vector<Key> Groups<Key, T>::getGroups() const
 			result.emplace(result.end(), value.first);
 		});
 	}
-	return std::move(result);
+	return result;
 }
 
 template <typename Key, typename T>
