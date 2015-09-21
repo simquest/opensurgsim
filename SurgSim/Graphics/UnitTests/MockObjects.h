@@ -394,14 +394,12 @@ public:
 
 	void setRenderOrder(RenderOrder bin, int value) override
 	{
-
 	}
-	
+
 	void setMainCamera(bool val) override
 	{
-		
 	}
-	
+
 	bool isMainCamera() override
 	{
 		return false;

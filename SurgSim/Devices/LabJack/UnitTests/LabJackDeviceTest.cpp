@@ -321,7 +321,8 @@ TEST(LabJackDeviceTest, NoSettingAfterInitialization)
 
 	EXPECT_THROW(device->setModel(SurgSim::Devices::LabJack::MODEL_U6), SurgSim::Framework::AssertionFailure);
 
-	EXPECT_THROW(device->setConnection(SurgSim::Devices::LabJack::CONNECTION_USB), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(device->setConnection(SurgSim::Devices::LabJack::CONNECTION_USB),
+		SurgSim::Framework::AssertionFailure);
 
 	EXPECT_THROW(device->setAddress("14"), SurgSim::Framework::AssertionFailure);
 

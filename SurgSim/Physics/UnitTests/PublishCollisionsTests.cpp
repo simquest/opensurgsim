@@ -69,7 +69,7 @@ public:
 		for (const auto& rep : m_state->getActiveCollisionRepresentations())
 		{
 			const SurgSim::Collision::ContactMapType& contactMap = rep->getCollisions().unsafeGet();
-			for (auto const & contactAgainstOneRep: contactMap)
+			for (auto const& contactAgainstOneRep : contactMap)
 			{
 				numCollisions += contactAgainstOneRep.second.size();
 			}
@@ -85,7 +85,7 @@ public:
 		for (const auto& rep : m_state->getActiveCollisionRepresentations())
 		{
 			const SurgSim::Collision::ContactMapType& contactMap = *rep->getCollisions().safeGet();
-			for (auto const & contactAgainstOneRep: contactMap)
+			for (auto const& contactAgainstOneRep : contactMap)
 			{
 				numCollisions += contactAgainstOneRep.second.size();
 			}
