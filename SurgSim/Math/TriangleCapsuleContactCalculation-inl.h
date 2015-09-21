@@ -112,6 +112,7 @@ public:
 	/// \param center Center of the ellipse.
 	/// \param majorAxis, minorAxis The major/minor axes of the ellipse, both of unit length
 	/// \param majorRadius, minorRadius Major/minor radii of the ellipse
+	/// \note majorAxis and minorAxis should be orthogonal to each other.
 	EllipseHelper(const Vector3& center, const Vector3& majorAxis, const Vector3& minorAxis, const double majorRadius,
 		const double minorRadius) : a(majorRadius), b(minorRadius)
 	{
