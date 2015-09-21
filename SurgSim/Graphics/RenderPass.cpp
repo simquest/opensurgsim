@@ -100,8 +100,7 @@ void RenderPass::showColorTarget(int x, int y, int width, int height)
 	if (m_debugColor != nullptr)
 	{
 		m_debugColor->setLocation(x, y);
-		std::array<double, 2> dimensions = {static_cast<double>(width), static_cast<double>(height)};
-		m_debugColor->setSize(dimensions);
+		m_debugColor->setSize(width, height);
 		m_debugColor->setLocalActive(true);
 	}
 }
@@ -124,8 +123,7 @@ void RenderPass::showDepthTarget(int x, int y, int width, int height)
 	if (m_debugDepth != nullptr)
 	{
 		m_debugDepth->setLocation(x, y);
-		std::array<double, 2> dimensions = {static_cast<double>(width), static_cast<double>(height)};
-		m_debugDepth->setSize(dimensions);
+		m_debugDepth->setSize(width, height);
 		m_debugDepth->setLocalActive(true);
 	}
 }
@@ -139,7 +137,7 @@ void RenderPass::hideDepthTarget()
 }
 
 std::shared_ptr<ScreenSpaceQuadRepresentation> RenderPass::buildDebugQuad(const std::string& name,
-		std::shared_ptr<Texture> texture)
+																		  std::shared_ptr<Texture> texture)
 {
 	auto result = std::make_shared<OsgScreenSpaceQuadRepresentation>(name);
 	result->setTexture(texture);

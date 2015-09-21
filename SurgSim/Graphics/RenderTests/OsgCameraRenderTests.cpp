@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include "SurgSim/Blocks/SphereElement.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/TransferPropertiesBehavior.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
@@ -169,6 +170,35 @@ TEST_F(OsgCameraRenderTests, PassTest)
 		boxElement1->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(endPose, startPose, t));
 		boxElement2->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(startPose, endPose, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 100));
+	}
+}
+
+TEST_F(OsgCameraRenderTests, Resize)
+{
+	int width = 1024;
+	int height = 768;
+
+	auto copier = std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
+	copier->connect(viewElement->getView(), "DimensionsDouble", viewElement->getCamera(), "ViewportSize");
+
+	auto graphics = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
+	graphics->setSizeXYZ(0.1, 0.1, 0.1);
+
+	auto element = std::make_shared<Framework::BasicSceneElement>("Cube");
+	element->addComponent(graphics);
+	element->setPose(Math::makeRigidTranslation(Vector3d(0.0, 0.0, -0.3)));
+
+	scene->addSceneElement(element);
+
+	runtime->start();
+	for (int i = 0; i < 10; i++)
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+		viewElement->getView()->setDimensions(std::array<int, 2> {width + (i * 50), height + (i % 2 * 35)});
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+		std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
+		std::array<int, 2> swapped {dimensions[1], dimensions[0]};
+		viewElement->getView()->setDimensions(swapped);
 	}
 }
 

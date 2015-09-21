@@ -537,7 +537,7 @@ public:
 
 	std::array<double, 2> getDimensionsDouble() const
 	{
-		std::array<double, 2> result = {m_width, m_height};
+		std::array<double, 2> result = {static_cast<double>(m_width), static_cast<double>(m_height)};
 		return std::move(result);
 	}
 

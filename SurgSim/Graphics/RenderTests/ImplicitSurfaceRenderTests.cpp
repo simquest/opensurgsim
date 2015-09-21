@@ -34,6 +34,7 @@
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -44,24 +45,13 @@ namespace SurgSim
 namespace Graphics
 {
 
-TEST(ImplicitSurfaceRenderTests, PointSpriteFluid)
+class ImplicitSurfaceRenderTests : public RenderTest
 {
-	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
-	auto graphicsManager = std::make_shared<Graphics::OsgManager>();
 
-	runtime->addManager(graphicsManager);
-	runtime->addManager(std::make_shared<Framework::BehaviorManager>());
+};
 
-	auto scene = runtime->getScene();
-
-	auto viewElement = std::make_shared<Graphics::OsgViewElement>("view element");
-	std::array<int, 2> position = {100, 100};
-	//viewElement->getView()->setPosition(position);
-	//viewElement->getView()->setWindowBorderEnabled(true);
-	viewElement->getView()->setFullScreen(true);
-
-	scene->addSceneElement(viewElement);
-
+TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
+{
 	viewElement->enableManipulator(true);
 
 
@@ -76,9 +66,9 @@ TEST(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	scene->addSceneElement(lightElement);
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
-		Blocks::createImplicitSurfaceEffect(viewElement->getView(), viewElement->getCamera(), light, 0.01f, 800.0f, 1024,
-										Math::Vector4f(0.3, 0.0, 0.05, 1.0), Math::Vector4f(1.0, 1.0, 1.0, 1.0),
-										100, false);
+			Blocks::createImplicitSurfaceEffect(viewElement->getView(), viewElement->getCamera(), light, 0.01f, 800.0f,
+												1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0),
+												Math::Vector4f(1.0, 1.0, 1.0, 1.0), 100, false);
 
 	for (auto element : surface)
 	{
@@ -114,7 +104,7 @@ TEST(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
 	runtime->stop();
 }
 

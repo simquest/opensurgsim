@@ -395,7 +395,8 @@ TEST_F(OsgProgramRenderTests, BlurShader)
 
 	auto texture1 = std::make_shared<Graphics::OsgTexture2d>();
 	std::string filename;
-	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("OsgScreenSpaceQuadRenderTests/CheckerBoard.png", &filename));
+	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("OsgScreenSpaceQuadRenderTests/CheckerBoard.png",
+														   &filename));
 	texture1->loadImage(filename);
 
 

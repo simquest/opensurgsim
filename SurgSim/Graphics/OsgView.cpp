@@ -189,7 +189,7 @@ void OsgView::update(double dt)
 		{
 			osgViewer::GraphicsWindow* window =
 				dynamic_cast<osgViewer::GraphicsWindow*>(viewCamera->getGraphicsContext());
-			if (window)
+			if (window && !isFullScreen())
 			{
 				window->setWindowDecoration(m_isWindowBorderEnabled);
 				window->setWindowRectangle(m_position[0], m_position[1], m_dimensions[0], m_dimensions[1]);
@@ -197,6 +197,11 @@ void OsgView::update(double dt)
 			}
 
 		}
+	}
+	else if (isActive())
+	{
+		m_dimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
+		m_dimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
 	}
 	if (isManipulatorEnabled())
 	{
@@ -233,11 +238,9 @@ bool OsgView::doWakeUp()
 	if (isFullScreen())
 	{
 		m_view->setUpViewOnSingleScreen(getTargetScreen());
-		std::array<int, 2> newDimensions;
-		newDimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
-		newDimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
-		setDimensions(newDimensions);
-		setWindowBorderEnabled(false);
+		m_dimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
+		m_dimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
+		m_isWindowBorderEnabled = false;
 	}
 	else
 	{

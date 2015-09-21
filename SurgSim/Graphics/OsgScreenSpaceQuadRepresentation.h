@@ -69,15 +69,12 @@ public:
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
 	/// \param	height	The height of the quad in screen coordinates.
-	void setSize(double width, double height) ;
+	void setSize(double width, double height) override;
 
 	/// Gets the size of the quad.
 	/// \param [out]	width 	If non-null, the width. Throws exception otherwise.
 	/// \param [out]	height	If non-null, the height. Throws exception otherwise.
-	void getSize(double* width, double* height) const ;
-
-	void setSize(std::array<double, 2> dimensions) override;
-	std::array<double, 2> getSize()const override;
+	void getSize(double* width, double* height) const override;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "texture" for the uniform in this operation. This can be accomplished
