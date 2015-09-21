@@ -57,6 +57,7 @@ set(UNIT_TEST_HEADERS
 )
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
+	AngleAxisTests.cpp
 	LinearSolveAndInverseTests.cpp
 	LinearSparseSolveAndInverseTests.cpp
 	MatrixTests.cpp
