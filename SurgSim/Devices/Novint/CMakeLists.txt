@@ -34,21 +34,16 @@ include_directories(
 )
 
 set(NOVINT_DEVICE_SOURCES
-	Novint7DofDevice.cpp
-	NovintCommonDevice.cpp
 	NovintDevice.cpp
 	NovintScaffold.cpp
 )
 
 set(NOVINT_DEVICE_HEADERS
-	Novint7DofDevice.h
-	NovintCommonDevice.h
 	NovintDevice.h
 	NovintScaffold.h
 )
 
-set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
-	Novint/Novint7DofDevice.h #NOLINT
+set(DEVICE_HEADERS ${DEVICE_HEADERS}
 	Novint/NovintDevice.h #NOLINT
 	PARENT_SCOPE)
 

@@ -28,13 +28,13 @@ namespace DataStructures
 class DataGroup;
 }
 
-namespace Device
+namespace Devices
 {
 class MouseDevice;
 class OsgMouseHandler;
 
 /// A class that implements the behavior of MouseDevice objects.
-/// \sa SurgSim::Device::MouseDevice
+/// \sa SurgSim::Devices::MouseDevice
 class MouseScaffold
 {
 	friend class MouseDevice;
@@ -102,7 +102,7 @@ private:
 	std::unique_ptr<DeviceData> m_device;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MOUSE_MOUSESCAFFOLD_H

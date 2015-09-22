@@ -23,11 +23,11 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A class implementing the thread context for communicating with LabJack devices.
-/// \sa SurgSim::Device::LabJackScaffold
+/// \sa SurgSim::Devices::LabJackScaffold
 class LabJackThread : public SurgSim::Framework::BasicThread
 {
 public:
@@ -45,7 +45,7 @@ private:
 	LabJackScaffold::DeviceData* m_deviceData;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_LABJACK_LABJACKTHREAD_H

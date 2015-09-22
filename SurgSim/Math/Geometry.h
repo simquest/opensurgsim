@@ -1607,11 +1607,69 @@ bool calculateContactTriangleTriangle(
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
 
+/// Calculate the contact between a capsule and a triangle.
+/// If the shapes intersect, the deepest penetration of the capsule along the triangle normal is calculated.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param tv0,tv1,tv2 Vertices of the triangle.
+/// \param tn Normal of the triangle, should be normalized.
+/// \param cv0,cv1 Ends of the capsule axis.
+/// \param cr Capsule radius.
+/// \param [out] penetrationDepth The depth of penetration.
+/// \param [out] penetrationPointTriangle The contact point on triangle.
+/// \param [out] penetrationPointCapsule The contact point on capsule.
+/// \param [out] contactNormal The contact normal that points from capsule to triangle.
+/// \return True, if intersection is detected.
+/// \note The [out] params are not modified if there is no intersection.
+/// \note If penetrationPointTriangle is moved by (contactNormal*penetrationDepth*0.5) and penetrationPointCapsule
+/// is moved by -(contactNormal*penetrationDepth*0.5), the shapes will no longer be intersecting.
+template <class T, int MOpt> inline
+bool calculateContactTriangleCapsule(
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tn,
+	const Eigen::Matrix<T, 3, 1, MOpt>& cv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& cv1,
+	double cr,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointTriangle,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsule,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
+
+/// Calculate the contact between a capsule and a triangle.
+/// If the shapes intersect, the deepest penetration of the capsule along the triangle normal is calculated.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param tv0,tv1,tv2 Vertices of the triangle.
+/// \param cv0,cv1 Ends of the capsule axis.
+/// \param cr Capsule radius.
+/// \param [out] penetrationDepth The depth of penetration.
+/// \param [out] penetrationPointTriangle The contact point on triangle.
+/// \param [out] penetrationPointCapsule The contact point on capsule.
+/// \param [out] contactNormal The contact normal that points from capsule to triangle.
+/// \return True, if intersection is detected.
+/// \note The [out] params are not modified if there is no intersection.
+/// \note If penetrationPointTriangle is moved by (contactNormal*penetrationDepth*0.5) and penetrationPointCapsule
+/// is moved by -(contactNormal*penetrationDepth*0.5), the shapes will no longer be intersecting.
+template <class T, int MOpt> inline
+bool calculateContactTriangleCapsule(
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& cv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& cv1,
+	double cr,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointTriangle,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsule,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
 
 }; // namespace Math
 }; // namespace SurgSim
 
 
+#include "SurgSim/Math/TriangleCapsuleContactCalculation-inl.h"
 #include "SurgSim/Math/TriangleTriangleIntersection-inl.h"
 #include "SurgSim/Math/TriangleTriangleContactCalculation-inl.h"
 

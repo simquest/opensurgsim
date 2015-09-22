@@ -28,7 +28,7 @@
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
-using SurgSim::Device::ForceScale;
+using SurgSim::Devices::ForceScale;
 using SurgSim::Input::CommonDevice;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::Vector3d;

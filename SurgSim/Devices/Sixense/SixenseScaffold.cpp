@@ -45,7 +45,7 @@ using SurgSim::Math::RigidTransform3d;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 
@@ -492,5 +492,5 @@ int SixenseScaffold::m_startupRetryIntervalMilliseconds = 100;
 
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

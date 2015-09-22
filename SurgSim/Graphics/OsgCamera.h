@@ -119,6 +119,10 @@ public:
 
 	std::array<double, 2> getViewportSize() const override;
 
+	void setMainCamera(bool val) override;
+
+	bool isMainCamera() override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
@@ -149,7 +153,7 @@ private:
 	/// Value for ambient color
 	SurgSim::Math::Vector4d m_ambientColor;
 
-
+	bool m_isMainCamera;
 };
 
 };  // namespace Graphics

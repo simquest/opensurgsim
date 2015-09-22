@@ -33,16 +33,23 @@ set(HEADERS
 surgsim_add_executable(InputVtc "${SOURCES}" "${HEADERS}")
 
 set(LIBS 
-	IdentityPoseDevice
 	SurgSimBlocks
+	SurgSimDevices
 	SurgSimGraphics
 	SurgSimMath
-	${SURGSIM_DEVICES_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
 )
 
 
 target_link_libraries(InputVtc ${LIBS})
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
 
 # Put InputVtc into folder "Examples"
 set_target_properties(InputVtc PROPERTIES FOLDER "Examples") 

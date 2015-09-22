@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A customized osg::DisplaySettings, to be used with Oculus device.
@@ -71,7 +71,7 @@ private:
 	osg::Matrixd m_rightEyeProjectionMatrix;
 };
 
-}; // namespace Device
+}; // namespace Devices
 }; // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_OCULUS_OCULUSDISPLAYSETTINGS_H

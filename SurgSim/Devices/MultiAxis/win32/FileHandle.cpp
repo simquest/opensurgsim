@@ -28,7 +28,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 // TODO(advornik): This would be a perfect use for "constexpr", but VS 2012 doesn't support it...
@@ -182,5 +182,5 @@ bool FileHandle::readBytes(void* dataBuffer, unsigned int bytesToRead, unsigned 
 	}
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

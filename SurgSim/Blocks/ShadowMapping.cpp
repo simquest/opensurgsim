@@ -38,7 +38,7 @@ namespace Blocks
 {
 
 std::shared_ptr<Graphics::Camera> setupBlurPasses(
-	std::shared_ptr<Graphics::RenderPass> previousPass,
+	std::shared_ptr<Graphics::RenderPass> shadowMapPass,
 	int textureSize,
 	double blurRadius,
 	bool debug,
@@ -48,7 +48,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 	float shadowMapSize = static_cast<float>(textureSize);
 	float floatRadius = static_cast<float>(blurRadius);
 
-	std::shared_ptr<Graphics::Camera> previous = previousPass->getCamera();
+	std::shared_ptr<Graphics::Camera> perviousCamera = shadowMapPass->getCamera();
 
 	// Horizontal Pass
 	{
@@ -73,7 +73,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
 		graphics->setSize(textureSize, textureSize);
 		graphics->setLocation(0, 0);
-		graphics->setTexture(previous->getRenderTarget()->getColorTarget(0));
+		graphics->setTexture(perviousCamera->getRenderTarget()->getColorTarget(0));
 		graphics->setGroupReference("HorizontalBlurPass");
 		pass->addComponent(graphics);
 
@@ -81,7 +81,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		{
 			pass->showColorTarget(512, 0, 256, 256);
 		}
-		previous = pass->getCamera();
+		perviousCamera = pass->getCamera();
 		elements->push_back(pass);
 	}
 
@@ -108,7 +108,7 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
 		graphics->setSize(textureSize, textureSize);
 		graphics->setLocation(0, 0);
-		graphics->setTexture(previousPass->getRenderTarget()->getColorTarget(0));
+		graphics->setTexture(perviousCamera->getRenderTarget()->getColorTarget(0));
 		graphics->setGroupReference("VerticalBlurPass");
 		pass->addComponent(graphics);
 
@@ -116,10 +116,11 @@ std::shared_ptr<Graphics::Camera> setupBlurPasses(
 		{
 			pass->showColorTarget(756, 0, 256, 256);
 		}
+		perviousCamera = pass->getCamera();
 		elements->push_back(pass);
 	}
 
-	return previous;
+	return perviousCamera;
 }
 
 /// Create the pass that renders the scene from the view of the light source
@@ -131,6 +132,8 @@ std::shared_ptr<Graphics::RenderPass> createLightMapPass(int textureSize, bool d
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 0, true);
 	pass->setRenderTarget(renderTarget);
 	pass->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
+	std::dynamic_pointer_cast<Graphics::OsgCamera>(pass->getCamera())->getOsgCamera()->setReferenceFrame(
+		osg::Transform::ABSOLUTE_RF);
 
 	auto material = Graphics::buildMaterial("Shaders/depth_map.vert", "Shaders/depth_map.frag");
 	material->getProgram()->setGlobalScope(true);
@@ -153,6 +156,9 @@ std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, bool 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 1, false);
 	pass->setRenderTarget(renderTarget);
 	pass->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
+	std::dynamic_pointer_cast<Graphics::OsgCamera>(pass->getCamera())->getOsgCamera()->setReferenceFrame(
+		osg::Transform::ABSOLUTE_RF);
+
 
 	auto material = Graphics::buildMaterial("Shaders/shadow_map.vert", "Shaders/shadow_map.frag");
 	material->getProgram()->setGlobalScope(true);
@@ -170,7 +176,8 @@ std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, bool 
 std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 			std::shared_ptr<Framework::Component> camera,
 			std::shared_ptr<Framework::Component> light,
-			int textureSize,
+			int depthTextureSize,
+			int shadowTextureSize,
 			std::array<double, 6> lightCameraProjection,
 			bool useBlur,
 			double blurRadius,
@@ -184,10 +191,11 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 	auto osgCamera = Framework::checkAndConvert<Graphics::OsgCamera>(camera, "SurgSim::Graphics::OsgCamera");
 	auto osgLight = Framework::checkAndConvert<Graphics::OsgLight>(light, "SurgSim::Graphics::OsgLight");
 
-	auto lightMapPass = createLightMapPass(textureSize, showDebug);
+	auto lightMapPass = createLightMapPass(depthTextureSize, showDebug);
 	result.push_back(lightMapPass);
 
 	lightMapPass->getCamera()->setValue("OrthogonalProjection", lightCameraProjection);
+
 	auto cameraNode = std::dynamic_pointer_cast<Graphics::OsgCamera>(lightMapPass->getCamera())->getOsgCamera();
 	cameraNode->getOrCreateStateSet()->setAttributeAndModes(
 		new osg::PolygonMode(osg::PolygonMode::BACK, osg::PolygonMode::FILL), osg::StateAttribute::ON);
@@ -201,7 +209,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 	// to the light map pass
 	copier->connect(osgLight, "Pose", lightMapPass->getPoseComponent(), "Pose");
 
-	auto shadowMapPass = createShadowMapPass(textureSize, showDebug);
+	auto shadowMapPass = createShadowMapPass(shadowTextureSize, showDebug);
 	result.push_back(shadowMapPass);
 
 	shadowMapPass->getMaterial()->addUniform("mat4", "lightViewMatrix");
@@ -226,7 +234,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 	// whole scene
 	auto shadowCamera = shadowMapPass->getCamera();
 	copier->connect(osgCamera, "ProjectionMatrix", shadowCamera , "ProjectionMatrix");
-	copier->connect(osgCamera, "Pose", shadowMapPass->getPoseComponent(), "Pose");
+	copier->connect(osgCamera, "Pose", shadowCamera, "LocalPose");
 
 	// Put the result of the last pass into the main camera to make it accessible
 	auto material = std::make_shared<Graphics::OsgMaterial>("camera material");
@@ -236,7 +244,12 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 
 	if (useBlur)
 	{
-		auto blurrPass = setupBlurPasses(shadowMapPass, textureSize, blurRadius, showDebug, &result);
+		auto blurrPass = setupBlurPasses(
+							 shadowMapPass,
+							 shadowTextureSize,
+							 static_cast<float>(blurRadius),
+							 showDebug,
+							 &result);
 		texture = blurrPass->getRenderTarget()->getColorTarget(0);
 	}
 	else

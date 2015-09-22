@@ -62,6 +62,78 @@ const osg::Camera::RenderOrder RenderOrderEnums[3] =
 	osg::Camera::POST_RENDER
 };
 
+/// Update the main camera uniforms to reflect the state of the rendering camera, this is used when rendering
+/// stereo via osg, the mainCamera.* uniforms will carry the values of the currently rendering camera, i.e. the left
+/// and the right view camera.
+class UniformUpdater : public osg::NodeCallback
+{
+public:
+	UniformUpdater(osg::Uniform* projection, osg::Uniform* inverseProjection,
+				   osg::Uniform* view,	osg::Uniform* inverseView) :
+		m_projection(projection),
+		m_inverseProjection(inverseProjection),
+		m_view(view),
+		m_inverseView(inverseView)
+	{
+
+	}
+
+	virtual void operator()(osg::Node* node, osg::NodeVisitor* nodeVisitor)
+	{
+		osgUtil::CullVisitor* cv = dynamic_cast<osgUtil::CullVisitor*>(nodeVisitor);
+		if (cv != nullptr)
+		{
+			auto camera = cv->getCurrentCamera();
+			const auto& projection = camera->getProjectionMatrix();
+			m_projection->set(projection);
+			m_inverseProjection->set(osg::Matrix::inverse(projection));
+			m_view->set(camera->getViewMatrix());
+			m_inverseView->set(camera->getInverseViewMatrix());
+		}
+		traverse(node, nodeVisitor);
+	}
+
+private:
+	osg::ref_ptr<osg::Uniform> m_projection;
+	osg::ref_ptr<osg::Uniform> m_inverseProjection;
+	osg::ref_ptr<osg::Uniform> m_view;
+	osg::ref_ptr<osg::Uniform> m_inverseView;
+};
+
+osg::Uniform* addMatrixUniform(osg::Node* node, const std::string& name)
+{
+	auto uniform = new osg::Uniform;
+
+	uniform->setName(name);
+	uniform->setType(osg::Uniform::FLOAT_MAT4);
+
+	osg::Matrix matrix;
+	uniform->set(matrix);
+
+	node->getOrCreateStateSet()->addUniform(uniform);
+
+	return uniform;
+}
+
+osg::Switch* createUniformUpdateNode(long mask)
+{
+	auto node = new osg::Switch;
+
+	auto projection = addMatrixUniform(node, "mainCamera.projectionMatrix");
+	auto inverseProjection = addMatrixUniform(node, "mainCamera.inverseProjectionMatrix");
+	auto view = addMatrixUniform(node, "mainCamera.viewMatrix");
+	auto inverseView = addMatrixUniform(node, "mainCamera.inverseViewMatrix");
+
+	auto callback = new UniformUpdater(projection, inverseProjection, view, inverseView);
+	node->addCullCallback(callback);
+	node->setNodeMask(mask);
+
+	return node;
+}
+
+const long CullMask = 0xfffffff1;
+const long CullMaskLeft = 0x1;
+const long CullMaskRight = 0x2;
 
 };
 
@@ -79,7 +151,8 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_camera(new osg::Camera()),
 	m_viewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("viewMatrix")),
 	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix")),
-	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor"))
+	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor")),
+	m_isMainCamera(false)
 {
 	m_switch->removeChildren(0, m_switch->getNumChildren());
 	m_camera->setName(name + " Camera");
@@ -92,6 +165,12 @@ OsgCamera::OsgCamera(const std::string& name) :
 	setPerspectiveProjection(45.0, 1.0, 0.01, 10.0);
 
 	m_camera->setComputeNearFarMode(osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR);
+
+	// Hopefully this will ignore the left and right nodes when rendering mono and
+	// pick the appropriate node when rendering stereo
+	m_camera->setCullMask(CullMask);
+	m_camera->setCullMaskLeft(CullMaskLeft);
+	m_camera->setCullMaskRight(CullMaskRight);
 
 	/// Update storage of view and projection matrices
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
@@ -165,7 +244,7 @@ void OsgCamera::update(double dt)
 		// instantiation of the viewer with the view port that may change the matrix inbetween, for now ... update
 		// every frame
 		// #workaround
-		m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+		// m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 
 		auto viewMatrix = getViewMatrix();
 		auto floatMatrix = viewMatrix.cast<float>();
@@ -308,6 +387,40 @@ std::array<double, 2> OsgCamera::getViewportSize() const
 	std::array<double, 2> dimensions = {viewPort->width(), viewPort->height()};
 
 	return dimensions;
+}
+
+void OsgCamera::setMainCamera(bool val)
+{
+	if (val != m_isMainCamera)
+	{
+		if (val)
+		{
+			m_camera->removeChild(m_materialProxy);
+
+			std::array<long, 2> masks = {CullMaskLeft, CullMaskRight};
+
+			// Insert two nodes into the camera hierarchy, they will update the global uniforms with the correct
+			// value. Also attach the material proxy to each of the nodes.
+			for (auto& mask : masks)
+			{
+				auto node = createUniformUpdateNode(mask);
+				m_camera->addChild(node);
+				node->addChild(m_materialProxy);
+			}
+		}
+		else
+		{
+			// Remove the update nodes and hook the material proxy node back up
+			m_camera->removeChildren(0, m_camera->getNumChildren());
+			m_camera->addChild(m_materialProxy);
+		}
+		m_isMainCamera = val;
+	}
+}
+
+bool OsgCamera::isMainCamera()
+{
+	return m_isMainCamera;
 }
 
 void OsgCamera::setPerspectiveProjection(double fovy, double aspect, double near, double far)

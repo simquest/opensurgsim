@@ -20,10 +20,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::TrackIRDevice, TrackIRDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::TrackIRDevice, TrackIRDevice);
 
 TrackIRDevice::TrackIRDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, TrackIRScaffold::buildDeviceInputData()),
@@ -112,5 +112,5 @@ double TrackIRDevice::defaultOrientationScale()
 	return 1.0;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

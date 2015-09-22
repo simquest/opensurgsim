@@ -17,7 +17,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 RawMultiAxisThread::RawMultiAxisThread(RawMultiAxisScaffold* scaffold, RawMultiAxisScaffold::DeviceData* deviceData) :
@@ -52,5 +52,5 @@ void RawMultiAxisThread::doBeforeStop()
 	m_scaffold->runAfterLastFrame(m_deviceData);
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

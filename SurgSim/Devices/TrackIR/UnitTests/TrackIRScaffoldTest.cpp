@@ -23,8 +23,8 @@
 #include "SurgSim/Devices/TrackIR/TrackIRDevice.h"
 #include "SurgSim/Devices/TrackIR/TrackIRScaffold.h"
 
-using SurgSim::Device::TrackIRDevice;
-using SurgSim::Device::TrackIRScaffold;
+using SurgSim::Devices::TrackIRDevice;
+using SurgSim::Devices::TrackIRScaffold;
 
 TEST(TrackIRScaffoldTest, CreateAndDestroyScaffold)
 {

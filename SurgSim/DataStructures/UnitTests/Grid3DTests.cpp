@@ -232,6 +232,91 @@ TYPED_TEST(Grid3DTestBase, NeighborsTest)
 	ASSERT_EQ(0u, grid.getNeighbors(e5).size());
 }
 
+TYPED_TEST(Grid3DTestBase, NeighborsPosition)
+{
+	typedef typename TestFixture::GridType GridType;
+	typedef typename TestFixture::TypeElement TypeElement;
+
+	GridType grid(this->m_size, this->m_aabb);
+
+	// Build the following grid:
+	// Cell(e0, e1) <- neighbor -> Cell(e2) <- neighbor -> Cell(e3) <- ..not neighbor.. -> Cell(e4)
+
+	Eigen::Matrix<double, TestFixture::dimension, 1> position =
+		Eigen::Matrix<double, TestFixture::dimension, 1>::Zero();
+
+	// Add an element inside of the grid
+	TypeElement e0(0), e1(1);
+	grid.addElement(e0, position);
+	auto positione0 = position;
+
+	// Add an element inside of the grid, in the same cell
+	grid.addElement(e1, position);
+
+	// Add an element inside of the grid, in a different cell
+	position[0] += this->m_size[0] * 1.1; // Next cell on the 1st dimension
+	TypeElement e2(2);
+	grid.addElement(e2, position);
+
+	// Add an element inside of the grid, in a different cell
+	position[0] += this->m_size[0] * 1.1; // Next cell on the 1st dimension
+	TypeElement e3(3);
+	grid.addElement(e3, position);
+
+	position[0] += this->m_size[0] * 1.1; // Next cell on the 1st dimension
+	auto positionEmpty = position;
+
+	// Add an element inside of the grid, far away from all other elements
+	position[0] += this->m_size[0] * 1.1; // Few cells further on the 1st dimension
+	TypeElement e4(4);
+	grid.addElement(e4, position);
+
+	{
+		// e0's neighbors = {e0, e1, e2}
+		// e0's position has a grid cell in it, should return neighbors of e0
+		auto& neighbors = grid.getNeighbors(positione0);
+		EXPECT_EQ(3u, neighbors.size());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e0) != neighbors.end());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e1) != neighbors.end());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e2) != neighbors.end());
+	}
+
+	{
+		// Move the position just a little bit away from e0, should still result in the e0 cell
+		auto positionNote0 = positione0 * 1.01;
+		auto& neighbors = grid.getNeighbors(positionNote0);
+		EXPECT_EQ(3u, neighbors.size());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e0) != neighbors.end());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e1) != neighbors.end());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e2) != neighbors.end());
+	}
+
+	{
+		// This cell does not exist but should return e3 and e4 as neighbors, it's not cached
+		auto& neighbors = grid.getNeighbors(positionEmpty);
+		EXPECT_EQ(2u, neighbors.size());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e3) != neighbors.end());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e4) != neighbors.end());
+	}
+
+	{
+		// This cell does not exist but should return e3 and e4 as neighbors, this is from
+		// the cache now
+		auto& neighbors = grid.getNeighbors(positionEmpty);
+		EXPECT_EQ(2u, neighbors.size());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e3) != neighbors.end());
+		EXPECT_TRUE(std::find(neighbors.begin(), neighbors.end(), e4) != neighbors.end());
+	}
+
+	{
+		// This is outside of the AABB
+		position = this->m_size * 3;
+		auto& neighbors = grid.getNeighbors(position);
+		EXPECT_EQ(0u, neighbors.size());
+	}
+
+}
+
 TYPED_TEST(Grid3DTestBase, Neighbors3DTest)
 {
 	typedef typename TestFixture::GridType GridType;

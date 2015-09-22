@@ -21,10 +21,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::NimbleDevice, NimbleDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::NimbleDevice, NimbleDevice);
 
 NimbleDevice::NimbleDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, NimbleScaffold::buildDeviceInputData()), m_trackedHandDataIndex(0)
@@ -80,5 +80,5 @@ bool NimbleDevice::isInitialized() const
 	return (m_scaffold != nullptr);
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

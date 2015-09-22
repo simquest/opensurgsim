@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Blocks/GraphicsUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -24,6 +25,7 @@
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
@@ -31,6 +33,7 @@
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -395,8 +398,7 @@ TEST_F(OsgProgramRenderTests, BlurShader)
 
 	auto texture1 = std::make_shared<Graphics::OsgTexture2d>();
 	std::string filename;
-	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("OsgScreenSpaceQuadRenderTests/CheckerBoard.png",
-														   &filename));
+	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("Textures/checkered.png", &filename));
 	texture1->loadImage(filename);
 
 

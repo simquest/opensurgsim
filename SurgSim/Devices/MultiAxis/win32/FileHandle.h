@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A wrapper for an Windows-style HANDLE file descriptor.
@@ -120,7 +120,7 @@ private:
 	uint64_t m_openFlags;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_WIN32_FILEHANDLE_H

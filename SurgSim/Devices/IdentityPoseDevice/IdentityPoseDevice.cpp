@@ -33,10 +33,10 @@ using SurgSim::DataStructures::DataGroupBuilder;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::IdentityPoseDevice, IdentityPoseDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::IdentityPoseDevice, IdentityPoseDevice);
 
 IdentityPoseDevice::IdentityPoseDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, buildInputData())
@@ -81,5 +81,5 @@ bool IdentityPoseDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputC
 }
 
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

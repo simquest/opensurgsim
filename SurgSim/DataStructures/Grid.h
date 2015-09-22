@@ -70,6 +70,12 @@ public:
 	/// \return The element's neighbors list (including the element itself)
 	const std::vector<T>& getNeighbors(const T& element);
 
+	/// Retrieve the neighbors of a location
+	/// \param position The position for which the neighbors are requested
+	/// \return The neighbors for this position, i.e. all the elements in the positions cell and all surrounding cells
+	template <class Derived>
+	const std::vector<T>& getNeighbors(const Eigen::MatrixBase<Derived>& position);
+
 protected:
 	/// Data structure for a cell's content (the list of elements and the list of all the neighbors)
 	typedef struct
