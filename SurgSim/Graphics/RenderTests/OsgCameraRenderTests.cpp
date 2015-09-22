@@ -194,10 +194,11 @@ TEST_F(OsgCameraRenderTests, Resize)
 	for (int i = 0; i < 10; i++)
 	{
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-		viewElement->getView()->setDimensions(std::array<int, 2> {width + (i * 50), height + (i % 2 * 35)});
+		std::array<int, 2> newDimensions = {width + (i * 50), height + (i % 2 * 35)};
+		viewElement->getView()->setDimensions(newDimensions);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 		std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
-		std::array<int, 2> swapped {dimensions[1], dimensions[0]};
+		std::array<int, 2> swapped = {dimensions[1], dimensions[0]};
 		viewElement->getView()->setDimensions(swapped);
 	}
 }

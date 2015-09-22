@@ -236,7 +236,7 @@ TEST(OsgCameraTests, Serialization)
 
 	// Set values.
 	SurgSim::Math::Matrix44d projection = SurgSim::Math::Matrix44d::Random();
-	std::array<double, 2> viewport { 1024, 768};
+	std::array<double, 2> viewport = { 1024, 768};
 	camera->setValue("ProjectionMatrix", projection);
 	camera->setValue("ViewportSize", viewport);
 	camera->setValue("AmbientColor", SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4));
