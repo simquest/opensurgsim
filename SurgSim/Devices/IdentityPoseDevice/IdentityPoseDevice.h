@@ -46,11 +46,11 @@ public:
 
 	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer);
 
-protected:
 	virtual bool initialize();
 
 	virtual bool finalize();
 
+protected:
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildInputData();
 };
