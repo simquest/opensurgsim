@@ -130,15 +130,20 @@ bool LeapDevice::isProvidingImages() const
 bool LeapDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized()) << getName() << "is already initialized, cannot initialize again.";
-	m_scaffold = LeapScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(isInitialized()) << getName() << " initialization failed, cannot get scaffold.";
+	auto scaffold = LeapScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr) << getName() << " initialization failed, cannot get scaffold.";
 
 	if (m_requestedHmdTrackingMode.hasValue())
 	{
-		m_scaffold->setUseHmdTrackingMode(m_requestedHmdTrackingMode.getValue());
+		scaffold->setUseHmdTrackingMode(m_requestedHmdTrackingMode.getValue());
 	}
-
-	return m_scaffold->registerDevice(this);
+	bool registered = false;
+	if (scaffold->registerDevice(this))
+	{
+		m_scaffold = std::move(scaffold);
+		registered = true;
+	}
+	return registered;
 }
 
 bool LeapDevice::finalize()

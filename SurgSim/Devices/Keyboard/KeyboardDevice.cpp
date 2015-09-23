@@ -42,10 +42,15 @@ KeyboardDevice::~KeyboardDevice()
 bool KeyboardDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized());
-	m_scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(m_scaffold != nullptr);
-	m_scaffold->registerDevice(this);
-	return true;
+	auto scaffold = KeyboardScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr);
+	bool registered = false;
+	if (scaffold->registerDevice(this))
+	{
+		m_scaffold = std::move(scaffold);
+		registered = true;
+	}
+	return registered;
 }
 
 bool KeyboardDevice::finalize()
