@@ -69,44 +69,24 @@ public:
 	/// \return The device name.
 	std::string getName() const override;
 
-	/// Fully initialize the device.
-	/// When the manager object creates the device, the internal state of the device usually isn't fully
-	/// initialized yet.  This method performs any needed initialization.
-	/// \return True on success.
 	bool initialize() override;
 
-	/// Finalize (de-initialize) the device.
-	/// \return True on success.
 	bool finalize() override;
 
 	/// Check whether this device is initialized.
 	/// \return True if initialized.
 	bool isInitialized() const;
 
-	/// Connect this device to an InputConsumerInterface, which will receive the data that comes from this device.
-	/// \param inputConsumer The InputConsumerInterface to connect with.
-	/// \return True if successful.
 	bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
 
-	/// Disconnect this device from an InputConsumerInterface, which will no longer receive data from this device.
-	/// \param inputConsumer The InputConsumerInterface to disconnect from.
-	/// \return True if successful.
 	bool removeInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
 
 	void clearInputConsumers() override;
 
-	/// Connect this device to an OutputProducerInterface, which will send data to this device.
-	/// \param outputProducer The OutputProducerInterface to connect with.
-	/// \return True if successful.
 	bool setOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
 
-	/// Disconnect this device from an OutputProducerInterface, which will no longer send data to this device.
-	/// \param outputProducer The OutputProducerInterface to disconnect from.
-	/// \return True if successful.
 	bool removeOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
 
-	/// Getter for whether or not this device is connected with an OutputProducerInterface.
-	/// \return True if an OutputProducerInterface is connected.
 	bool hasOutputProducer() override;
 
 	void clearOutputProducer() override;
