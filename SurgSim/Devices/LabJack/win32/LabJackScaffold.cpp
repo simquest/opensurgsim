@@ -88,30 +88,8 @@ public:
 		m_address(address),
 		m_model(model),
 		m_connection(connection),
-		m_deviceHandle(LABJACK_INVALID_HANDLE),
-		m_scaffold(LabJackScaffold::getOrCreateSharedInstance())
+		m_deviceHandle(LABJACK_INVALID_HANDLE)
 	{
-		create();
-	}
-
-	/// Destructor.
-	~Handle()
-	{
-		SURGSIM_ASSERT(!isValid()) << "Expected destroy() to be called before Handle object destruction.";
-	}
-
-	/// \return Whether or not the wrapped handle is valid.
-	bool isValid() const
-	{
-		return (m_deviceHandle != LABJACK_INVALID_HANDLE);
-	}
-
-	/// Helper function called by the constructor to open the LabJack device for communications.
-	void create()
-	{
-		SURGSIM_ASSERT(!isValid()) <<
-			"Expected LabJackScaffold::Handle::create() to be called on an uninitialized object.";
-
 		int firstFound = 0;
 		if (m_address.length() == 0)
 		{
@@ -128,30 +106,41 @@ public:
 				boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 			}
 		}
-		SURGSIM_LOG_IF(!isOk(error), m_scaffold->getLogger(), SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), Framework::Logger::getLogger("Devices/LabJack"), SEVERE) <<
 			"Failed to initialize a device. Model: " << m_model << ". Connection: " << m_connection << ". Address: '" <<
 			m_address << "'." << std::endl << formatErrorMessage(error);
+	}
+
+	/// Destructor.
+	~Handle()
+	{
+		destroy();
+	}
+
+	/// \return Whether or not the wrapped handle is valid.
+	bool isValid() const
+	{
+		return (m_deviceHandle != LABJACK_INVALID_HANDLE);
 	}
 
 	/// Close communication with the hardware.
 	/// \param reset true to cause a hardware reset & USB re-enumeration.  Otherwise the hardware's settings will be
 	///		unchanged (i.e., it will continue timing, counting, and outputting).
 	/// \return true.
-	bool destroy(bool reset = false)
+	void destroy(bool reset = false)
 	{
 		if (isValid())
 		{
 			if (reset)
 			{
 				const LJ_ERROR error = ResetLabJack(m_deviceHandle);
-				SURGSIM_LOG_IF(!isOk(error), m_scaffold->getLogger(), SEVERE) <<
+				SURGSIM_LOG_IF(!isOk(error), Framework::Logger::getLogger("Devices/LabJack"), SEVERE) <<
 					"Failed to reset the LabJack device. Model: " << m_model << ". Connection: " <<
 					m_connection << ". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
 			}
 
 			m_deviceHandle = LABJACK_INVALID_HANDLE;
 		}
-		return true;
 	}
 
 	/// \return The LabJackUD's handle wrapped by this Handle.
@@ -173,8 +162,6 @@ private:
 	LabJack::Model m_model;
 	/// The connection to the device.
 	LabJack::Connection m_connection;
-	/// The scaffold.
-	std::shared_ptr<LabJackScaffold> m_scaffold;
 };
 
 /// The per-device data.
@@ -200,6 +187,12 @@ public:
 
 	~DeviceData()
 	{
+		if (thread != nullptr)
+		{
+			thread->stop();
+			thread = nullptr;
+		}
+		deviceHandle->destroy(deviceObject->getResetOnDestruct());
 	}
 
 	/// The corresponding device object.
@@ -313,27 +306,18 @@ private:
 };
 
 LabJackScaffold::LabJackScaffold() :
+	m_logger(Framework::Logger::getLogger("Devices/LabJack")),
 	m_state(new StateData)
 {
-	m_logger = SurgSim::Framework::Logger::getLogger("LabJack device");
-	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.  LabJackUD driver version: " <<
-		GetDriverVersion() << ".";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.  LabJackUD driver version: " << GetDriverVersion();
 }
 
 LabJackScaffold::~LabJackScaffold()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
 	if (!m_state->activeDeviceList.empty())
 	{
 		SURGSIM_LOG_SEVERE(m_logger) << "Destroying scaffold while devices are active!?!";
-		for (auto it = m_state->activeDeviceList.begin();  it != m_state->activeDeviceList.end();  ++it)
-		{
-			if ((*it)->thread)
-			{
-				destroyPerDeviceThread(it->get());
-			}
-		}
 		m_state->activeDeviceList.clear();
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold destroyed.";
@@ -438,7 +422,6 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 						SURGSIM_LOG_INFO(m_logger) << "Tried to register a device named '" << device->getName() <<
 							"', but a device with the same handle (" << handle->get() << ") is already present!  " <<
 							"This can happen if multiple LabJack devices are used without setting their addresses.";
-						handle->destroy(); // The handle was initialized and will be destructed.
 						result = false;
 					}
 					else
@@ -501,13 +484,10 @@ bool LabJackScaffold::registerDevice(LabJackDevice* device)
 				info.get()->thread = std::move(thread);
 				m_state->activeDeviceList.emplace_back(std::move(info));
 			}
-			else
-			{
-				info->deviceHandle->destroy();
-			}
 		}
 	}
 
+	SURGSIM_LOG_IF(result, m_logger, INFO) << "Device " << device->getName() << " registered.";
 	return result;
 }
 
@@ -520,22 +500,15 @@ bool LabJackScaffold::unregisterDevice(const LabJackDevice* const device)
 			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 		if (matching != m_state->activeDeviceList.end())
 		{
-			if ((*matching)->thread)
-			{
-				destroyPerDeviceThread(matching->get());
-				matching->get()->deviceHandle->destroy(matching->get()->deviceObject->getResetOnDestruct());
-			}
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK
 			found = true;
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " unregistered.";
 		}
 	}
 
-	if (!found)
-	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "Attempted to release a non-registered device named '" <<
-			device->getName() << ".";
-	}
+	SURGSIM_LOG_IF(!found, m_logger, CRITICAL) << "Attempted to release a non-registered device named '" <<
+		device->getName() << ".";
 	return found;
 }
 
@@ -791,17 +764,6 @@ bool LabJackScaffold::updateDevice(LabJackScaffold::DeviceData* info)
 	return true;
 }
 
-bool LabJackScaffold::destroyPerDeviceThread(DeviceData* data)
-{
-	SURGSIM_ASSERT(data->thread) << "LabJack: destroying a per-device thread, but none exists for this DeviceData";
-
-	std::unique_ptr<LabJackThread> thread = std::move(data->thread);
-	thread->stop();
-	thread.reset();
-
-	return true;
-}
-
 SurgSim::DataStructures::DataGroup LabJackScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
@@ -1040,11 +1002,6 @@ bool LabJackScaffold::configureAnalog(DeviceData* deviceData)
 bool LabJackScaffold::configureDigital(DeviceData* deviceData)
 {
 	return true;
-}
-
-std::shared_ptr<SurgSim::Framework::Logger> LabJackScaffold::getLogger() const
-{
-	return m_logger;
 }
 
 };  // namespace Devices
