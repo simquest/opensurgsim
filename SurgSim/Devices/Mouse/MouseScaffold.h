@@ -43,26 +43,16 @@ class MouseScaffold
 
 public:
 	/// Constructor.
-	/// \param logger (optional) The logger to be used by the scaffold object and the devices it manages.
-	/// If unspecified or empty, a console logger will be created and used.
-	explicit MouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	explicit MouseScaffold();
+
 	/// Destructor
 	~MouseScaffold();
-
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
-
+	
 	/// Gets or creates the scaffold shared by all MouseDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<MouseScaffold> getOrCreateSharedInstance();
-
-	/// Sets the default log level.
-	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
-	/// \param logLevel The log level.
-	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
-
+	
 private:
 	/// Internal per-device information.
 	struct DeviceData;
@@ -96,8 +86,6 @@ private:
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-	/// The default logging level.
-	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 	/// The mouse device managed by this scaffold
 	std::unique_ptr<DeviceData> m_device;
 };
