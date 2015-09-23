@@ -27,7 +27,7 @@ namespace Devices
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::KeyboardDevice, KeyboardDevice);
 
 KeyboardDevice::KeyboardDevice(const std::string& deviceName) :
-	SurgSim::Input::CommonDevice(deviceName, KeyboardScaffold::buildDeviceInputData())
+	Input::CommonDevice(deviceName, KeyboardScaffold::buildDeviceInputData())
 {
 }
 
@@ -42,20 +42,16 @@ KeyboardDevice::~KeyboardDevice()
 bool KeyboardDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized());
-
 	m_scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(m_scaffold);
-
+	SURGSIM_ASSERT(m_scaffold != nullptr);
 	m_scaffold->registerDevice(this);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
-
 	return true;
 }
 
 bool KeyboardDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
+	m_scaffold->unregisterDevice();
 	m_scaffold.reset();
 	return true;
 }
