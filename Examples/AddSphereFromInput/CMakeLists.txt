@@ -22,7 +22,6 @@ link_directories(
 
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}
-	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
 )
 

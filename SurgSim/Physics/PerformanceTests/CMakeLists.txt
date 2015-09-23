@@ -16,7 +16,6 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
 )
 
