@@ -34,11 +34,14 @@ public:
 	/// \param qT1 Starting and ending vertices for segment q at time 1
 	/// \param thicknessP Radius of segment P
 	/// \param thicknessQ Radius of segment Q
+	/// \param timePrecisionEpsilon Desired time accuracy
+	/// \param distanceEpsilon Desired distance accuracy
 	SegmentSegmentCcdCheck(const std::array<Math::Vector3d, 2>& pT0,
 						   const std::array<Math::Vector3d, 2>& pT1,
 						   const std::array<Math::Vector3d, 2>& qT0,
 						   const std::array<Math::Vector3d, 2>& qT1,
-						   double thicknessP, double thicknessQ);
+						   double thicknessP, double thicknessQ,
+						   double timePrecisionEpsilon, double distanceEpsilon);
 	/// @{
 	/// Motion accessors
 	/// \return the motion vector (value(t1) - value(t0)) for the segment endpoints p1, p2, q1, and q2, respectively.
@@ -94,7 +97,9 @@ public:
 
 	/// @{
 	/// Algorithm epsilons
-	/// \return the algorithm epsilon parameters for no thickness detections.
+	/// \return the algorithm epsilon parameters for "close enough" decisions.
+	double timePrecisionEpsilon() const;
+	double distanceEpsilon() const;
 	double tripleProductEpsilon() const;
 	double muNuEpsilon() const;
 	/// @}
@@ -172,7 +177,9 @@ private:
 	/// @}
 
 	/// @{
-	/// The algorithm epsilon parameters for no thickness detections.
+	/// The algorithm epsilon parameters for "close enough" decisions.
+	double m_timePrecisionEpsilon;
+	double m_distanceEpsilon;
 	double m_volumeEpsilonTimes6;
 	double m_muNuEpsilon;
 	/// @}

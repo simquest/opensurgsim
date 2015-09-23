@@ -47,8 +47,8 @@ TEST(SegmentSegmentCcdCheckTests, Initialization)
 	std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(2.0, 1.0, 4.0), Math::Vector3d(1.0, 3.5, 2.5)};
 	std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(0.0, 1.0, 2.0), Math::Vector3d(-2.0, 1.5, 3.5)};
 
-	ASSERT_NO_THROW(SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06));
-	SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06);
+	ASSERT_NO_THROW(SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06));
+	SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06);
 
 	Math::Vector3d p11 = status.p11();
 	Math::Vector3d p12 = status.p12();
@@ -75,6 +75,8 @@ TEST(SegmentSegmentCcdCheckTests, Initialization)
 
 	EXPECT_DOUBLE_EQ(1.0e-06, status.thicknessP());
 	EXPECT_DOUBLE_EQ(2.0e-06, status.thicknessQ());
+	EXPECT_DOUBLE_EQ(3.0e-06, status.timePrecisionEpsilon());
+	EXPECT_DOUBLE_EQ(4.0e-06, status.distanceEpsilon());
 	EXPECT_DOUBLE_EQ(0.0, status.tripleProductEpsilon());
 	EXPECT_DOUBLE_EQ(0.0, status.muNuEpsilon());
 
@@ -114,7 +116,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(1.0, -1.0, 1.0), Math::Vector3d(-1.0, 1.0, 1.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(1.0, -1.0, 0.0), Math::Vector3d(-1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 
 		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 0.7500000001)));
@@ -135,7 +137,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(1.0, -1.0, 0.0), Math::Vector3d(-1.0, 1.0, 0.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(1.0, -1.0, 1.0), Math::Vector3d(-1.0, 1.0, 1.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 
 		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.2499999999, 1.0)));
@@ -159,7 +161,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 			Math::Vector3d(0.0, 1.7500000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(2, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -177,7 +179,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 			Math::Vector3d(0.0, 1.7499999999, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -195,7 +197,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 			Math::Vector3d(0.0, -0.7500000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(2, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -213,7 +215,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 			Math::Vector3d(0.0, -0.7499999999, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -231,7 +233,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(2, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -249,7 +251,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -267,7 +269,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(2, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -285,7 +287,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 };
@@ -301,7 +303,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(1.0, -1.0, 1.0), Math::Vector3d(-1.0, 1.0, 1.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(1.0, -1.0, -1.0), Math::Vector3d(-1.0, 1.0, -1.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 
 		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.5000000001)));
@@ -328,7 +330,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(1.0, -1.0, 1.0), Math::Vector3d(-1.0, 1.0, 1.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 
 		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.25, 1.0)));
@@ -352,7 +354,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 			Math::Vector3d(0.0, 1.0000000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(2, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -370,7 +372,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 			Math::Vector3d(0.0, 1.0000000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -388,7 +390,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 			Math::Vector3d(0.0, -0.0000000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(2, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -406,7 +408,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 			Math::Vector3d(0.0, 0.0000000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -424,7 +426,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(2, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -442,7 +444,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -460,7 +462,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(2, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
@@ -478,7 +480,7 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25);
+		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 };

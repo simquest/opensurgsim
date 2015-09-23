@@ -25,10 +25,12 @@ SegmentSegmentCcdCheck::SegmentSegmentCcdCheck(
 	const std::array<Math::Vector3d, 2>& pT1,
 	const std::array<Math::Vector3d, 2>& qT0,
 	const std::array<Math::Vector3d, 2>& qT1,
-	double thicknessP, double thicknessQ)
+	double thicknessP, double thicknessQ,
+	double timePrecisionEpsilon,  double distanceEpsilon)
 	: m_motionP1(pT0[0], pT1[0]), m_motionP2(pT0[1], pT1[1]), m_motionQ1(qT0[0], qT1[0]), m_motionQ2(qT0[1], qT1[1]),
-	  m_relativeP1Q1(m_motionQ1 - m_motionP1), m_relativeP1P2(m_motionP2 - m_motionP1),
+	  m_relativeP1Q1(m_motionQ1 - m_motionP1),
 	  m_relativeQ1Q2(m_motionQ2 - m_motionQ1),
+	  m_relativeP1P2(m_motionP2 - m_motionP1),
 	  m_P1Q1_P1P2_Q1Q2(Math::analyticTripleProduct(m_relativeP1Q1, m_relativeP1P2, m_relativeQ1Q2)),
 	  m_P1P2_P1Q1(Math::analyticDotProduct(m_relativeP1P2, m_relativeP1Q1)),
 	  m_Q1Q2_P1Q1(Math::analyticDotProduct(m_relativeQ1Q2, m_relativeP1Q1)),
@@ -39,6 +41,7 @@ SegmentSegmentCcdCheck::SegmentSegmentCcdCheck(
 	  m_P1P2xQ1Q2_y(Math::analyticCrossProductYAxis(m_relativeP1P2, m_relativeQ1Q2)),
 	  m_P1P2xQ1Q2_z(Math::analyticCrossProductZAxis(m_relativeP1P2, m_relativeQ1Q2)),
 	  m_thicknessP(thicknessP), m_thicknessQ(thicknessQ),
+	  m_timePrecisionEpsilon(timePrecisionEpsilon), m_distanceEpsilon(distanceEpsilon),
 	  m_volumeEpsilonTimes6(0), m_muNuEpsilon(0)
 {
 }
@@ -151,6 +154,16 @@ double SegmentSegmentCcdCheck::thicknessP() const
 double SegmentSegmentCcdCheck::thicknessQ() const
 {
 	return m_thicknessQ;
+}
+
+double SegmentSegmentCcdCheck::timePrecisionEpsilon() const
+{
+	return m_timePrecisionEpsilon;
+}
+
+double SegmentSegmentCcdCheck::distanceEpsilon() const
+{
+	return m_distanceEpsilon;
 }
 
 double SegmentSegmentCcdCheck::tripleProductEpsilon() const
