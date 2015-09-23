@@ -64,11 +64,8 @@ public:
 	/// Destructor
 	virtual ~MouseDevice();
 
-	/// Initialize corresponding MouseScaffold.
-	/// \return True if MouseScaffold is initialized successfully; Otherwise, false.
 	bool initialize() override;
-	/// "De"-initialize corresponding MouseScaffold.
-	/// \return True if MouseScaffold is 'de'-initialized successfully; Otherwise, false.
+
 	bool finalize() override;
 
 	/// Check if the scaffold of this device is initialized.

@@ -58,11 +58,8 @@ public:
 	/// Destructor
 	virtual ~KeyboardDevice();
 
-	/// Initialize this device and register it with corresponding scaffold.
-	/// \return True on success; false otherwise.
 	bool initialize() override;
-	/// "De"-initialize this device and unregister from the scaffold.
-	/// \return True on success; false, otherwise.
+
 	bool finalize() override;
 
 	/// Check if the scaffold of this device is initialized.
