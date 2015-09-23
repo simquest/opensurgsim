@@ -43,19 +43,10 @@ public:
 	/// Destructor.
 	~RawMultiAxisScaffold();
 
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
-
 	/// Gets or creates the scaffold shared by all RawMultiAxisDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<RawMultiAxisScaffold> getOrCreateSharedInstance();
-
-	/// Sets the default log level.
-	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
-	/// \param logLevel The log level.
-	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
 private:
 	/// Internal shared state data type.
@@ -105,14 +96,6 @@ private:
 	/// Updates the device information for a single device.
 	/// \return true on success.
 	bool updateDevice(DeviceData* info);
-
-	/// Initializes the RawMultiAxis SDK.
-	/// \return true on success.
-	bool initializeSdk();
-
-	/// Finalizes (de-initializes) the RawMultiAxis SDK.
-	/// \return true on success.
-	bool finalizeSdk();
 
 	/// Scans hardware that is present in the system, and if an unused device is found, register an object for it.
 	///

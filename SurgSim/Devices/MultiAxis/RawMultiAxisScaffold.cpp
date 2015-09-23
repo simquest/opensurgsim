@@ -153,13 +153,10 @@ struct RawMultiAxisScaffold::StateData
 {
 public:
 	/// Initialize the state.
-	StateData() : isApiInitialized(false)
+	StateData()
 	{
 	}
-
-	/// True if the API has been initialized (and not finalized).
-	bool isApiInitialized;
-
+	
 	/// The list of known devices.
 	std::list<std::unique_ptr<RawMultiAxisScaffold::DeviceData>> activeDeviceList;
 
@@ -198,38 +195,14 @@ RawMultiAxisScaffold::~RawMultiAxisScaffold()
 			}
 			m_state->activeDeviceList.clear();
 		}
-
-		if (m_state->isApiInitialized)
-		{
-			finalizeSdk();
-		}
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Shared scaffold destroyed.";
 }
 
-std::shared_ptr<SurgSim::Framework::Logger> RawMultiAxisScaffold::getLogger() const
-{
-	return m_logger;
-}
-
-
 bool RawMultiAxisScaffold::registerDevice(RawMultiAxisDevice* device)
 {
-	{
-		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
-		if (! m_state->isApiInitialized)
-		{
-			if (! initializeSdk())
-			{
-				return false;
-			}
-		}
-	}
-
 	int numUsedDevicesSeen = 0;
-	bool deviceFound = findUnusedDeviceAndRegister(device, &numUsedDevicesSeen);
-	if (! deviceFound)
+	if (!findUnusedDeviceAndRegister(device, &numUsedDevicesSeen))
 	{
 		if (numUsedDevicesSeen > 0)
 		{
@@ -244,6 +217,7 @@ bool RawMultiAxisScaffold::registerDevice(RawMultiAxisDevice* device)
 		return false;
 	}
 
+	SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << "registered.";
 	return true;
 }
 
@@ -264,13 +238,11 @@ bool RawMultiAxisScaffold::unregisterDevice(const RawMultiAxisDevice* const devi
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK
 			found = true;
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " unregistered.";
 		}
 	}
 
-	if (! found)
-	{
-		SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: Attempted to release a non-registered device.";
-	}
+	SURGSIM_LOG_IF(!found, m_logger, WARNING) << "Attempted to release a non-registered device " << device->getName();
 	return found;
 }
 
@@ -313,7 +285,7 @@ void RawMultiAxisScaffold::setAxisDominance(const RawMultiAxisDevice* device, bo
 bool RawMultiAxisScaffold::runInputFrame(RawMultiAxisScaffold::DeviceData* info)
 {
 	info->deviceObject->pullOutput();
-	if (! updateDevice(info))
+	if (!updateDevice(info))
 	{
 		return false;
 	}
@@ -364,7 +336,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	}
 
 	bool didUpdate = false;
-	if (! info->deviceHandle->updateStates(&(info->axisStates), &(info->buttonStates), &didUpdate))
+	if (!info->deviceHandle->updateStates(&(info->axisStates), &(info->buttonStates), &didUpdate))
 	{
 		// If updateStates returns false, the device is no longer usable, so we exit and stop its update loop.
 		return false;
@@ -385,7 +357,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	// happen before filtering, and putting dominance AND filtering (and integrator) into components is too much.
 	Vector3d position;
 	Vector3d rotation;
-	if (! info->useAxisDominance)
+	if (!info->useAxisDominance)
 	{
 		position = Vector3d(info->axisStates[0], info->axisStates[1], info->axisStates[2]) * info->positionScale;
 		rotation = Vector3d(info->axisStates[3], info->axisStates[4], info->axisStates[5]) * info->orientationScale;
@@ -437,33 +409,13 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	return true;
 }
 
-bool RawMultiAxisScaffold::initializeSdk()
-{
-	SURGSIM_ASSERT(! m_state->isApiInitialized);
-
-	// nothing to do!
-
-	m_state->isApiInitialized = true;
-	return true;
-}
-
-bool RawMultiAxisScaffold::finalizeSdk()
-{
-	SURGSIM_ASSERT(m_state->isApiInitialized);
-
-	// nothing to do!
-
-	m_state->isApiInitialized = false;
-	return true;
-}
-
 std::unique_ptr<SystemInputDeviceHandle> RawMultiAxisScaffold::openDevice(const std::string& path)
 {
 	std::unique_ptr<SystemInputDeviceHandle> handle = createInputDeviceHandle(path, m_logger);
-	if (! handle)
+	if (!handle)
 	{
 		int64_t error = getSystemErrorCode();
-		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": error " << error <<
+		SURGSIM_LOG_INFO(m_logger) << "Could not open device " << path << ": error " << error <<
 			", " << getSystemErrorText(error);
 	}
 	return std::move(handle);
@@ -478,7 +430,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 	// Make sure the object is unique.
 	auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "RawMultiAxis: Tried to register a device" <<
+	SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "Tried to register a device" <<
 		" which is already present!";
 
 	// Make sure the name is unique.
@@ -487,7 +439,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		[&deviceName](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == deviceName; });
 	if (sameName != m_state->activeDeviceList.end())
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "RawMultiAxis: Tried to register a device when the same name is" <<
+		SURGSIM_LOG_CRITICAL(m_logger) << "Tried to register a device when the same name is" <<
 			" already present!";
 		return false;
 	}
@@ -501,7 +453,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		// Check if this is the device we wanted.
 
 		std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(devicePath);
-		if (! handle)
+		if (!handle)
 		{
 			// message was already printed
 			continue;
@@ -522,7 +474,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 				reportedName << ")";
 		}
 
-		if (! handle->hasTranslationAndRotationAxes())
+		if (!handle->hasTranslationAndRotationAxes())
 		{
 			continue;
 		}
@@ -554,7 +506,7 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 	// The controller is not yet in use.
 
 	std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(path);
-	if (! handle)
+	if (!handle)
 	{
 		return false;
 	}
@@ -573,7 +525,7 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 
 bool RawMultiAxisScaffold::createPerDeviceThread(DeviceData* data)
 {
-	SURGSIM_ASSERT(! data->thread);
+	SURGSIM_ASSERT(!data->thread);
 
 	std::unique_ptr<RawMultiAxisThread> thread(new RawMultiAxisThread(this, data));
 	thread->start();
