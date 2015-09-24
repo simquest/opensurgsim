@@ -34,16 +34,18 @@ class TestDevice : public CommonDevice
 public:
 	explicit TestDevice(const std::string& uniqueName);
 
-	virtual bool initialize();
+	bool initialize() override;
 
-	virtual bool finalize();
+	bool finalize() override;
 
-	virtual void pushInput();
+	bool isInitialized() const override;
+
+	void pushInput() override;
 
 	// Send some data down the stream
 	void pushInput(const std::string& data);
 
-	virtual bool pullOutput();
+	bool pullOutput() override;
 
 	const DataGroup& getOutputData() const;
 

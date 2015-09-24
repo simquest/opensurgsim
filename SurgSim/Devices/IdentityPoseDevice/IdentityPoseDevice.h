@@ -50,6 +50,8 @@ public:
 
 	bool finalize() override;
 
+	bool isInitialized() const override;
+
 protected:
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildInputData();

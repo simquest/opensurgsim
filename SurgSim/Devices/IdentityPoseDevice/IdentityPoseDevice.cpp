@@ -43,6 +43,11 @@ bool IdentityPoseDevice::initialize()
 	return true;
 }
 
+bool IdentityPoseDevice::isInitialized() const
+{
+	return true;
+}
+
 bool IdentityPoseDevice::finalize()
 {
 	SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/IdentityPose")) << "Device " << getName() << " finalized.";

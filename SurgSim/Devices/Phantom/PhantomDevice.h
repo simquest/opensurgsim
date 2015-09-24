@@ -83,8 +83,7 @@ public:
 
 	bool finalize() override;
 
-	/// Check whether this device is initialized.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 private:
 	friend class PhantomScaffold;

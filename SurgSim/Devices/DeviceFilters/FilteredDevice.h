@@ -49,7 +49,13 @@ public:
 	virtual ~FilteredDevice();
 
 	std::string getName() const override;
+	
 	bool initialize() override;
+	
+	bool finalize() override;
+
+	bool isInitialized() const override;
+
 	bool addInputConsumer(std::shared_ptr<Input::InputConsumerInterface> inputConsumer) override;
 	bool removeInputConsumer(std::shared_ptr<Input::InputConsumerInterface> inputConsumer) override;
 	void clearInputConsumers() override;
@@ -57,7 +63,6 @@ public:
 	bool removeOutputProducer(std::shared_ptr<Input::OutputProducerInterface> outputProducer) override;
 	bool hasOutputProducer() override;
 	void clearOutputProducer() override;
-	bool finalize() override;
 
 	/// Sets the raw/base device.
 	/// \param device The device connected to the filter(s).
@@ -78,12 +83,12 @@ public:
 	bool setDevices(const std::vector<std::shared_ptr<Input::DeviceInterface>>& devices);
 
 private:
+	/// Implements the finalize functionality.
+	/// \return true if the initialized subdevices finalize.
+	bool doFinalize();
 
 	/// The name of this device.
 	std::string m_name;
-
-	/// true if initialize has been called and finalize has not been called.
-	bool m_initialized;
 
 	/// The devices.  m_devices.back() will be connected to any InputComponent or OutputComponent.
 	/// m_devices.front() is the raw/base device to be filtered. If this contains more than one element, all but

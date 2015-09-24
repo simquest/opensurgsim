@@ -90,6 +90,11 @@ public:
 		return true;
 	}
 
+	bool isInitialized() const
+	{
+		return true;
+	}
+
 	bool finalize()
 	{
 		return true;

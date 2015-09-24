@@ -33,6 +33,11 @@ bool TestDevice::finalize()
 	return true;
 }
 
+bool TestDevice::isInitialized() const
+{
+	return true;
+}
+
 // expose the pushInput method to the world
 void TestDevice::pushInput()
 {

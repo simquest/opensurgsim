@@ -38,6 +38,11 @@ bool DeviceFilter::finalize()
 	return true;
 }
 
+bool DeviceFilter::isInitialized() const
+{
+	return true;
+}
+
 void DeviceFilter::initializeInput(const std::string& device, const DataGroup& inputData)
 {
 	filterInput(device, inputData, &getInputData());

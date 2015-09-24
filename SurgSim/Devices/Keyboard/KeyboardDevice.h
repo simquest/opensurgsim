@@ -62,9 +62,7 @@ public:
 
 	bool finalize() override;
 
-	/// Check if the scaffold of this device is initialized.
-	/// \return True if this the scaffold of this device is initialized; Otherwise, false.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device

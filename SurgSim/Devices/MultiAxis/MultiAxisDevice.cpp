@@ -43,6 +43,10 @@ MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
 
 MultiAxisDevice::~MultiAxisDevice()
 {
+	if (isInitialized())
+	{
+		finalize();
+	}
 }
 
 
@@ -54,17 +58,24 @@ std::string MultiAxisDevice::getName() const
 
 bool MultiAxisDevice::initialize()
 {
-	m_rawDevice->addInputConsumer(m_filter);
-	m_rawDevice->setOutputProducer(m_filter);
-
-	// Elements need to be initialized, in proper order.
-	return m_filter->initialize() && m_rawDevice->initialize();
+	SURGSIM_ASSERT(!isInitialized());
+	bool result = m_rawDevice->addInputConsumer(m_filter) && m_rawDevice->setOutputProducer(m_filter) &&
+		m_filter->initialize();
+	if (result && !m_rawDevice->initialize())
+	{
+		result = false;
+		if (m_filter->isInitialized())
+		{
+			m_filter->finalize();
+		}
+	}
+	return result;
 }
 
 
 bool MultiAxisDevice::finalize()
 {
-	// All elements need to be finalized (beware of &&), in proper order.
+	SURGSIM_ASSERT(isInitialized());
 	bool deviceOk = m_rawDevice->finalize();
 	bool filterOk = m_filter->finalize();
 	return deviceOk && filterOk;
@@ -73,7 +84,7 @@ bool MultiAxisDevice::finalize()
 
 bool MultiAxisDevice::isInitialized() const
 {
-	return m_rawDevice->isInitialized();
+	return m_rawDevice->isInitialized() && m_filter->isInitialized();
 }
 
 bool MultiAxisDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)

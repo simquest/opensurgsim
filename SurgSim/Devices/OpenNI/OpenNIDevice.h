@@ -54,9 +54,7 @@ public:
 
 	bool finalize() override;
 
-	/// Check if this device is initialized.
-	/// \return True if this device is initialized; otherwise, false.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 private:
 	friend class OpenNIScaffold;

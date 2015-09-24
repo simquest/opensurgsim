@@ -48,6 +48,8 @@ public:
 
 	bool finalize() override;
 
+	bool isInitialized() const override;
+
 	void initializeInput(const std::string& device, const DataStructures::DataGroup& inputData) override;
 
 	void handleInput(const std::string& device, const DataStructures::DataGroup& inputData) override;

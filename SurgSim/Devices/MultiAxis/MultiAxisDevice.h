@@ -73,9 +73,7 @@ public:
 
 	bool finalize() override;
 
-	/// Check whether this device is initialized.
-	/// \return True if initialized.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 	bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
 

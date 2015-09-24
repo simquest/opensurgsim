@@ -97,8 +97,7 @@ public:
 
 	bool finalize() override;
 
-	/// Check whether this device is initialized.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 	/// Sets the position scale for this device.
 	/// The position scale controls how much the pose changes for a given device translation.

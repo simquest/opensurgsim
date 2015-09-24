@@ -283,15 +283,11 @@ public:
 	/// Destructor.
 	virtual ~LabJackDevice();
 
-	/// Fully initialize the device.
-	/// When the manager object creates the device, the internal state of the device usually isn't fully
-	/// initialized yet.  This method performs any needed initialization.
-	/// \return True on success.
-	/// \exception Asserts if already initialized, or if unable to get a scaffold.
 	bool initialize() override;
 
-	/// Check whether this device is initialized.
-	bool isInitialized() const;
+	bool finalize() override;
+
+	bool isInitialized() const override;
 
 	/// Set the model, e.g., U6.
 	/// \param model The model.
@@ -481,11 +477,6 @@ public:
 	int getAnalogInputSettling() const;
 
 private:
-	/// Finalize (de-initialize) the device.
-	/// \return True if device was successfully un-registered.
-	/// \exception Asserts if not initialized.
-	bool finalize() override;
-
 	friend class LabJackScaffold;
 
 	/// The single scaffold object that handles communications with all instances of LabJackDevice.

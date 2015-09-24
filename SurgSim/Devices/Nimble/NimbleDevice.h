@@ -77,8 +77,7 @@ public:
 
 	bool finalize() override;
 
-	/// \return True, if this device is initialized.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 private:
 	friend class NimbleScaffold;

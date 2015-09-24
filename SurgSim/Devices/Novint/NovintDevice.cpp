@@ -90,7 +90,7 @@ bool NovintDevice::initialize()
 	std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
-	if (! scaffold->registerDevice(this))
+	if (!scaffold->registerDevice(this))
 	{
 		return false;
 	}
