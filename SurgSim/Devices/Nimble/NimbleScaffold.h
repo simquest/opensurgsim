@@ -39,10 +39,6 @@ public:
 	/// Destructor.
 	~NimbleScaffold();
 
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
-
 	/// Gets or creates the scaffold shared by all NimbleDevice instances.
 	/// The scaffold is managed using a SingleInstance object.
 	/// \return the scaffold object.
@@ -64,7 +60,7 @@ private:
 	/// Constructor.
 	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
 	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit NimbleScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	explicit NimbleScaffold();
 
 	/// Registers the specified device object.
 	/// \param device The device object to be used.
