@@ -17,7 +17,6 @@
 
 #include "SurgSim/Devices/Sixense/SixenseScaffold.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Assert.h"
 
 
 namespace SurgSim
@@ -44,29 +43,26 @@ SixenseDevice::~SixenseDevice()
 
 bool SixenseDevice::initialize()
 {
-	SURGSIM_ASSERT(! isInitialized());
-	std::shared_ptr<SixenseScaffold> scaffold = SixenseScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(scaffold);
+	SURGSIM_ASSERT(!isInitialized());
+	auto scaffold = SixenseScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr);
 
-	if (! scaffold->registerDevice(this))
+	bool initialize = false;
+	if (scaffold->registerDevice(this))
 	{
-		return false;
+		m_scaffold = std::move(scaffold);
+		initialize = true;
 	}
-
-	m_scaffold = std::move(scaffold);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
-	return true;
+	return initialize;
 }
 
 bool SixenseDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
 	bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return ok;
 }
-
 
 bool SixenseDevice::isInitialized() const
 {
