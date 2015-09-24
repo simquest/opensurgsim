@@ -39,26 +39,15 @@ class TrackIRScaffold
 {
 public:
 	/// Constructor.
-	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
-	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit TrackIRScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	explicit TrackIRScaffold();
 
 	/// Destructor.
 	~TrackIRScaffold();
-
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger used by this scaffold.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all TrackIRDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<TrackIRScaffold> getOrCreateSharedInstance();
-
-	/// Sets the default log level.
-	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
-	/// \param logLevel The log level.
-	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
 private:
 	/// Internal shared state data type.
@@ -133,9 +122,6 @@ private:
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-
-	/// The default logging level.
-	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
