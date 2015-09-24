@@ -16,9 +16,9 @@
 #ifndef SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSMESHBEHAVIOR_H
 #define SURGSIM_BLOCKS_TRANSFERPHYSICSTOGRAPHICSMESHBEHAVIOR_H
 
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Macros.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
 
 namespace SurgSim
 {
@@ -48,7 +48,7 @@ SURGSIM_STATIC_REGISTRATION(TransferPhysicsToGraphicsMeshBehavior);
 /// index. If an index map is available, for each pair in the index map it will take the nodeId from the first
 /// member of the pair and copy it to the vertex with the id of the second member of the pair.
 /// The index map can be computed from meshes given to this behavior or precomputed via other means.
-class TransferPhysicsToGraphicsMeshBehavior : public SurgSim::Framework::Behavior
+class TransferPhysicsToGraphicsMeshBehavior : public Framework::Behavior
 {
 public:
 	/// Constructor
@@ -59,19 +59,19 @@ public:
 
 	/// Set the representation from which the positions are from
 	/// \param source The physics representation
-	void setSource(const std::shared_ptr<SurgSim::Framework::Component>& source);
+	void setSource(const std::shared_ptr<Framework::Component>& source);
 
 	/// Set the representation which will receive the positions
 	/// \param target The Graphics Mesh representation
-	void setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target);
+	void setTarget(const std::shared_ptr<Framework::Component>& target);
 
 	/// Get the Physics representation which sends the positions
 	/// \return The Physics representation which produces positions.
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getSource() const;
+	std::shared_ptr<Physics::DeformableRepresentation> getSource() const;
 
 	/// Get the Graphics representation which receives the positions
 	/// \return The Graphics Mesh representation which receives positions.
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> getTarget() const;
+	std::shared_ptr<Graphics::MeshRepresentation> getTarget() const;
 
 	/// Generate a mapping, for each point in source find the points target that coincide
 	/// \param source Source of search
@@ -107,10 +107,10 @@ private:
 	void setIndexMap(const std::pair<std::shared_ptr<Framework::Asset>, std::shared_ptr<Framework::Asset>>& meshes);
 
 	/// The DeformableRepresentation from which the Ode state comes.
-	std::shared_ptr<SurgSim::Physics::DeformableRepresentation> m_source;
+	std::shared_ptr<Physics::DeformableRepresentation> m_source;
 
 	/// The Graphics Mesh Representation to which the vertices' positions are set.
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> m_target;
+	std::shared_ptr<Graphics::MeshRepresentation> m_target;
 
 	/// The mapping to be used if not empty.
 	std::vector<std::pair<size_t, size_t>> m_indexMap;

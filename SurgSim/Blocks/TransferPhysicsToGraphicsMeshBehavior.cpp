@@ -15,17 +15,17 @@
 
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
 
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "SurgSim/DataStructures/Grid.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
-#include "SurgSim/DataStructures/Grid.h"
-#include "SurgSim/DataStructures/DataStructuresConvert.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
-#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Aabb.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
 using SurgSim::Framework::checkAndConvert;
@@ -39,12 +39,12 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::TransferPhysics
 				 TransferPhysicsToGraphicsMeshBehavior);
 
 TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(const std::string& name) :
-	SurgSim::Framework::Behavior(name)
+	Framework::Behavior(name)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferPhysicsToGraphicsMeshBehavior,
-									  std::shared_ptr<SurgSim::Framework::Component>, Source, getSource, setSource);
+									  std::shared_ptr<Framework::Component>, Source, getSource, setSource);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TransferPhysicsToGraphicsMeshBehavior,
-									  std::shared_ptr<SurgSim::Framework::Component>, Target, getTarget, setTarget);
+									  std::shared_ptr<Framework::Component>, Target, getTarget, setTarget);
 
 	// Enable full serialization on the index map type, but need to deal with overloaded functions
 	{
@@ -56,7 +56,7 @@ TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(con
 		auto setter = (void(ClassType::*)(const ParamType&))&ClassType::setIndexMap;
 
 		setAccessors("IndexMap", std::bind(getter, this),
-					 std::bind(setter, this, std::bind(SurgSim::Framework::convert<ParamType>, std::placeholders::_1)));
+					 std::bind(setter, this, std::bind(Framework::convert<ParamType>, std::placeholders::_1)));
 
 		setSerializable("IndexMap",
 						std::bind(&YAML::convert<ParamType>::encode, std::bind(getter, this)),
@@ -70,7 +70,7 @@ TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(con
 		auto setter = (void(ClassType::*)(const ParamType&))&ClassType::setIndexMap;
 
 		setSetter("IndexMapMeshNames",
-				  std::bind(setter, this, std::bind(SurgSim::Framework::convert<ParamType>, std::placeholders::_1)));
+				  std::bind(setter, this, std::bind(Framework::convert<ParamType>, std::placeholders::_1)));
 
 		setDecoder("IndexMapMeshNames",
 				   std::bind(setter, this, std::bind(&YAML::Node::as<ParamType>, std::placeholders::_1)));
@@ -83,7 +83,7 @@ TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(con
 		auto setter = (void(ClassType::*)(const ParamType&))&ClassType::setIndexMap;
 
 		setSetter("IndexMapMeshes",
-				  std::bind(setter, this, std::bind(SurgSim::Framework::convert<ParamType>, std::placeholders::_1)));
+				  std::bind(setter, this, std::bind(Framework::convert<ParamType>, std::placeholders::_1)));
 
 		setDecoder("IndexMapMeshes",
 				   std::bind(setter, this, std::bind(&YAML::Node::as<ParamType>, std::placeholders::_1)));
@@ -92,26 +92,26 @@ TransferPhysicsToGraphicsMeshBehavior::TransferPhysicsToGraphicsMeshBehavior(con
 
 }
 
-void TransferPhysicsToGraphicsMeshBehavior::setSource(const std::shared_ptr<SurgSim::Framework::Component>& source)
+void TransferPhysicsToGraphicsMeshBehavior::setSource(const std::shared_ptr<Framework::Component>& source)
 {
 	SURGSIM_ASSERT(nullptr != source) << " 'source' can not be nullptr.";
-	m_source = checkAndConvert<SurgSim::Physics::DeformableRepresentation>(
-				   source, "SurgSim::Physics::DeformableRepresentation");
+	m_source = checkAndConvert<Physics::DeformableRepresentation>(
+				   source, "Physics::DeformableRepresentation");
 }
 
-void TransferPhysicsToGraphicsMeshBehavior::setTarget(const std::shared_ptr<SurgSim::Framework::Component>& target)
+void TransferPhysicsToGraphicsMeshBehavior::setTarget(const std::shared_ptr<Framework::Component>& target)
 {
 	SURGSIM_ASSERT(nullptr != target) << " 'target' can not be nullptr.";
-	m_target = checkAndConvert<SurgSim::Graphics::MeshRepresentation>(
-				   target, "SurgSim::Graphics::MeshRepresentation");
+	m_target = checkAndConvert<Graphics::MeshRepresentation>(
+				   target, "Graphics::MeshRepresentation");
 }
 
-std::shared_ptr<SurgSim::Physics::DeformableRepresentation> TransferPhysicsToGraphicsMeshBehavior::getSource() const
+std::shared_ptr<Physics::DeformableRepresentation> TransferPhysicsToGraphicsMeshBehavior::getSource() const
 {
 	return m_source;
 }
 
-std::shared_ptr<SurgSim::Graphics::MeshRepresentation> TransferPhysicsToGraphicsMeshBehavior::getTarget() const
+std::shared_ptr<Graphics::MeshRepresentation> TransferPhysicsToGraphicsMeshBehavior::getTarget() const
 {
 	return m_target;
 }
@@ -154,7 +154,7 @@ bool TransferPhysicsToGraphicsMeshBehavior::doWakeUp()
 	{
 		for (size_t nodeId = 0; nodeId < state->getNumNodes(); ++nodeId)
 		{
-			SurgSim::Graphics::Mesh::VertexType vertex(state->getPosition(nodeId));
+			Graphics::Mesh::VertexType vertex(state->getPosition(nodeId));
 			target->addVertex(vertex);
 		}
 	}
@@ -212,7 +212,7 @@ std::vector<std::pair<size_t, size_t>> generateIndexMap(
 										const std::shared_ptr<DataStructures::TriangleMeshPlain>& source,
 										const std::shared_ptr<DataStructures::TriangleMeshPlain>& target)
 {
-	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger())
+	SURGSIM_LOG_INFO(Framework::Logger::getDefaultLogger())
 			<< "Building map";
 
 	SURGSIM_ASSERT(source->getNumVertices() > 0 && target->getNumVertices() > 0)
@@ -221,21 +221,20 @@ std::vector<std::pair<size_t, size_t>> generateIndexMap(
 
 	// Caclulate AABB for Mesh
 	const auto& vertices = target->getVertices();
-	SurgSim::Math::Aabbd bounds;
+	Math::Aabbd bounds;
 
 	for (const auto& vertex : vertices)
 	{
-		// m_updateMesh.addVertex(SurgSim::Graphics::Mesh::VertexType(m_, SurgSim::Graphics::VertexData()));
 		bounds.extend(vertex.position);
 	}
 
-	bounds.extend(bounds.max() * 1.1);
-	bounds.extend(bounds.min() * 1.1);
+	bounds.extend(bounds.max() + Math::Vector3d(0.1, 0.1, 0.1));
+	bounds.extend(bounds.min() - Math::Vector3d(0.1, 0.1, 0.1));
 
 	// Add All vertices to grid
 	// 100 Seems like a reasonable value ...
-	SurgSim::Math::Vector3d cellSize(bounds.diagonal() / 100.0);
-	SurgSim::DataStructures::Grid<size_t, 3> grid(cellSize, bounds);
+	Math::Vector3d cellSize(bounds.diagonal() / 100.0);
+	DataStructures::Grid<size_t, 3> grid(cellSize, bounds);
 
 	size_t index = 0;
 	for (const auto& vertex : vertices)
@@ -246,11 +245,11 @@ std::vector<std::pair<size_t, size_t>> generateIndexMap(
 	std::vector<std::pair<size_t, size_t>> indexMap;
 
 	// For each state node query grid for neighbors
-	indexMap.reserve(source->getNumVertices());
+	indexMap.reserve(target->getNumVertices());
 	for (size_t nodeId = 0; nodeId < source->getNumVertices(); ++nodeId)
 	{
 		bool hasNeighbors = false;
-		auto position = source->getVertexPosition(nodeId);
+		const auto& position = source->getVertexPosition(nodeId);
 
 		// make a copy
 		const std::vector<size_t>& neighbors = grid.getNeighbors(position);
@@ -265,9 +264,9 @@ std::vector<std::pair<size_t, size_t>> generateIndexMap(
 			}
 		}
 
-		if (! hasNeighbors)
+		if (!hasNeighbors)
 		{
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Vascular"))
+			SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Vascular"))
 					<< "No coincident point found for node with index " << index;
 
 		}

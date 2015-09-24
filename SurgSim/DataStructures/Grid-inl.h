@@ -217,7 +217,7 @@ template <typename T, size_t N>
 template <class Derived>
 const std::vector<T>& Grid<T, N>::getNeighbors(const Eigen::MatrixBase<Derived>& position)
 {
-	const static std::vector<T> empty;
+	static const std::vector<T> empty;
 
 	// If outside the bounding box, can't find any neighbors
 	if (m_aabb.contains(position))
