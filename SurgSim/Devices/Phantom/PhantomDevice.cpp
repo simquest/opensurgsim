@@ -55,24 +55,22 @@ std::string PhantomDevice::getInitializationName() const
 bool PhantomDevice::initialize()
 {
 	SURGSIM_ASSERT(! isInitialized());
-	std::shared_ptr<PhantomScaffold> scaffold = PhantomScaffold::getOrCreateSharedInstance();
+	auto scaffold = PhantomScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
-	if (! scaffold->registerDevice(this))
+	bool initialize = false;
+	if (scaffold->registerDevice(this))
 	{
-		return false;
+		m_scaffold = std::move(scaffold);
+		initialize = true;
 	}
-
-	m_scaffold = std::move(scaffold);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
-	return true;
+	return initialize;
 }
 
 
 bool PhantomDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
 	bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return ok;
