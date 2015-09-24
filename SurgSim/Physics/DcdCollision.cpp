@@ -109,9 +109,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			{
 				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
 				{
-					std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
-					pair->setRepresentations(*first,*second);
-					pairs.push_back(pair);
+					pairs.emplace_back(std::make_shared<CollisionPair>(*first, *second));
 				}
 			}
 		}

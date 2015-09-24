@@ -86,8 +86,7 @@ void Representation::update(const double& dt)
 
 bool Representation::ignore(const std::string& fullName)
 {
-	auto insertion = m_ignoring.insert(fullName);
-	return insertion.second;
+	return m_ignoring.insert(fullName).second;
 }
 
 bool Representation::ignore(const std::shared_ptr<Representation>& representation)
