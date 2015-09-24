@@ -102,6 +102,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(SYSTEM
 	${Boost_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
 	${YAML_CPP_INCLUDE_DIR}
 )
 

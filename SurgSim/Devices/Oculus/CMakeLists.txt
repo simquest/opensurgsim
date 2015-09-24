@@ -18,7 +18,6 @@ find_package(OculusSdk)
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${OCULUSSDK_INCLUDE_DIR}"
-	"${OSG_INCLUDE_DIR}"
 )
 
 set(OCULUS_DEVICE_SOURCES
