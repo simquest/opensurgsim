@@ -87,16 +87,16 @@ bool NovintDevice::getInitializationName(std::string* initializationName) const
 bool NovintDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized());
-	std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(scaffold);
+	auto scaffold = NovintScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr);
 
-	if (!scaffold->registerDevice(this))
+	bool initialize = false;
+	if (scaffold->registerDevice(this))
 	{
-		return false;
+		m_scaffold = std::move(scaffold);
+		initialize = true;
 	}
-
-	m_scaffold = std::move(scaffold);
-	return true;
+	return initialize;
 }
 
 bool NovintDevice::finalize()

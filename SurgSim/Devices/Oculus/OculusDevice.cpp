@@ -43,21 +43,24 @@ OculusDevice::~OculusDevice()
 
 bool OculusDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized()) << getName() << " is already initialized, cannot initialize again.";
+	SURGSIM_ASSERT(!isInitialized());
+	auto scaffold = OculusScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr);
 
-	m_scaffold = OculusScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(m_scaffold != nullptr) << "OculusDevice::initialize(): Failed to obtain an Oculus scaffold.";
-
-	return m_scaffold->registerDevice(this);
+	bool initialize = false;
+	if (scaffold->registerDevice(this))
+	{
+		m_scaffold = std::move(scaffold);
+		initialize = true;
+	}
+	return initialize;
 }
 
 bool OculusDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalized.";
-
 	bool result = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
-
 	return result;
 }
 
