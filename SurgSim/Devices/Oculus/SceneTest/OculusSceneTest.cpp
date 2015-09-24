@@ -32,8 +32,9 @@
 #include "SurgSim/Devices/Oculus/OculusDevice.h"
 #include "SurgSim/Devices/Oculus/OculusView.h"
 
-using namespace SurgSim;
-using Math::Vector3d;
+using SurgSim::Framework::Logger;
+using SurgSim::Framework::Runtime;
+using SurgSim::Math::Vector3d;
 
 namespace po = boost::program_options;
 
@@ -68,15 +69,15 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	std::shared_ptr<Framework::Runtime> runtime;
+	std::shared_ptr<Runtime> runtime;
 
 	if (variables.count("config-file") == 1)
 	{
-		runtime = std::make_shared<Framework::Runtime>(variables["config-file"].as<std::string>());
+		runtime = std::make_shared<Runtime>(variables["config-file"].as<std::string>());
 	}
 	else
 	{
-		runtime = std::make_shared<Framework::Runtime>();
+		runtime = std::make_shared<Runtime>();
 	}
 
 	auto data = runtime->getApplicationData();
@@ -146,7 +147,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger())
 					<< "Can't find " << file;
 		}
 	}
