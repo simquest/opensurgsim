@@ -31,6 +31,9 @@ namespace Particles
 {
 
 /// Class to generate points on the surface of a mesh
+/// \note Each triangle in the mesh has equal weight in the distribution of
+/// points. As a result, areas with higher triangle density have a higher
+/// likely hood of generating points than areas with a lower triangle density.
 class RandomMeshPointGenerator: public PointGenerator
 {
 public:

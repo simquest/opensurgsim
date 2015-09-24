@@ -56,9 +56,11 @@ Math::Vector3d RandomMeshPointGenerator::pointOnShape(std::shared_ptr<Math::Shap
 		// Find a random point on the triangle using algorithm developed by Osada et al.
 		//   R. Osada, T. Funkhouser, B. Chazelle, D. Dobkin, "Shape Distributions",
 		//   ACM Transactions on Graphics, vol. 21, no. 4, pp. 807–832, October 2002
-		Vector2d r = Vector2d::NullaryExpr([&](int index){return m_closedZeroOneDistribution(m_generator);});
-		r[0] = sqrt(r[0]);
-		point = (1 - r[0]) * vertices[0] + r[0] * (1 - r[1]) * vertices[1] + r[0] * r[1] * vertices[2];
+		Vector2d random = Vector2d::NullaryExpr([&](int index){return m_closedZeroOneDistribution(m_generator);});
+		random[0] = sqrt(random[0]);
+		point = (1 - random[0]) * vertices[0];
+		point += random[0] * (1 - random[1]) * vertices[1];
+		point += random[0] * random[1] * vertices[2];
 	}
 	else
 	{
