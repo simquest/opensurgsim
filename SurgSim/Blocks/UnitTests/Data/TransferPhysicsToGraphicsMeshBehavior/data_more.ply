@@ -1,0 +1,27 @@
+ply
+# contains the following points from data.ply
+# 0: 0
+# 1: 2 
+# 2: 3
+# 3: 4
+# and one extra point that will not be connected
+format ascii 1.0
+comment Created by hand
+element vertex 10
+property float x
+property float y
+property float z
+element face 0
+property list uchar uint vertex_indices
+end_header
+2.000000 2.000000 2.000000
+-0.050000 0.050000 0.050000
+-0.050000 0.050000 -0.050000
+0.050000 0.050000 0.050000
+-0.050000 0.050000 0.050000
+-0.050000 0.050000 -0.050000
+-0.050000 0.050000 -0.050000
+0.050000 0.050000 0.050000
+0.050000 0.050000 0.050000
+0.050000 0.050000 0.050000
+
