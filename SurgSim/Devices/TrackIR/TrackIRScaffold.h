@@ -39,7 +39,7 @@ class TrackIRScaffold
 {
 public:
 	/// Constructor.
-	explicit TrackIRScaffold();
+	TrackIRScaffold();
 
 	/// Destructor.
 	~TrackIRScaffold();

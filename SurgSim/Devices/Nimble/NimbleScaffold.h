@@ -60,7 +60,7 @@ private:
 	/// Constructor.
 	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
 	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit NimbleScaffold();
+	NimbleScaffold();
 
 	/// Registers the specified device object.
 	/// \param device The device object to be used.

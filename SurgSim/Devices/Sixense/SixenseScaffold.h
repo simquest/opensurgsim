@@ -37,7 +37,7 @@ class SixenseScaffold
 public:
 	/// Destructor.
 	~SixenseScaffold();
-	
+
 	/// Gets or creates the scaffold shared by all SixenseDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
@@ -54,7 +54,7 @@ private:
 	friend struct StateData;
 
 	/// Constructor.
-	explicit SixenseScaffold();
+	SixenseScaffold();
 
 	/// Registers the specified device object.
 	/// If successful, the device object will become connected to an unused controller.

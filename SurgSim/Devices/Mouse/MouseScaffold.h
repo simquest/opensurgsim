@@ -43,16 +43,16 @@ class MouseScaffold
 
 public:
 	/// Constructor.
-	explicit MouseScaffold();
+	MouseScaffold();
 
 	/// Destructor
 	~MouseScaffold();
-	
+
 	/// Gets or creates the scaffold shared by all MouseDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<MouseScaffold> getOrCreateSharedInstance();
-	
+
 private:
 	/// Internal per-device information.
 	struct DeviceData;

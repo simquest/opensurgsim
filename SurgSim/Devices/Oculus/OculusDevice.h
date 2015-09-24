@@ -58,7 +58,7 @@ public:
 	virtual ~OculusDevice();
 
 	bool initialize() override;
-	
+
 	bool finalize() override;
 
 	bool isInitialized() const override;

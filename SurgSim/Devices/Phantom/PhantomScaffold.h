@@ -39,7 +39,7 @@ class PhantomScaffold
 {
 public:
 	/// Constructor.
-	explicit PhantomScaffold();
+	PhantomScaffold();
 
 	/// Destructor.
 	~PhantomScaffold();

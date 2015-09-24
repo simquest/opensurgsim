@@ -49,9 +49,9 @@ public:
 	virtual ~FilteredDevice();
 
 	std::string getName() const override;
-	
+
 	bool initialize() override;
-	
+
 	bool finalize() override;
 
 	bool isInitialized() const override;

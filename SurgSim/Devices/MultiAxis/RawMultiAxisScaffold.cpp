@@ -156,7 +156,7 @@ public:
 	StateData()
 	{
 	}
-	
+
 	/// The list of known devices.
 	std::list<std::unique_ptr<RawMultiAxisScaffold::DeviceData>> activeDeviceList;
 
