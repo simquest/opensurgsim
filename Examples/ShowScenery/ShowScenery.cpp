@@ -16,23 +16,25 @@
 #include <memory>
 
 #include <boost/program_options.hpp>
-
 #include "SurgSim/Framework/Framework.h"
 #include "SurgSim/Graphics/Graphics.h"
 #include "SurgSim/Math/Math.h"
 
-using namespace SurgSim;
-using Math::Vector3d;
+using SurgSim::Framework::BasicSceneElement;
+using SurgSim::Framework::Logger;
+using SurgSim::Framework::Runtime;
+using SurgSim::Graphics::OsgAxesRepresentation;
+using SurgSim::Graphics::OsgSceneryRepresentation;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Math::Vector3d;
 
 namespace po = boost::program_options;
 
 namespace
 {
 
-std::shared_ptr<Graphics::OsgViewElement> createView(const std::string& name, int x, int y, int width, int height)
+std::shared_ptr<OsgViewElement> createView(const std::string& name, int x, int y, int width, int height)
 {
-	using Graphics::OsgViewElement;
-
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
 	std::array<int, 2> position = {x, y};
 	std::array<int, 2> dimensions = {width, height};
@@ -74,15 +76,15 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	std::shared_ptr<Framework::Runtime> runtime;
+	std::shared_ptr<Runtime> runtime;
 
 	if (variables.count("config-file") == 1)
 	{
-		runtime = std::make_shared<Framework::Runtime>(variables["config-file"].as<std::string>());
+		runtime = std::make_shared<Runtime>(variables["config-file"].as<std::string>());
 	}
 	else
 	{
-		runtime = std::make_shared<Framework::Runtime>();
+		runtime = std::make_shared<Runtime>();
 	}
 
 	auto data = runtime->getApplicationData();
@@ -97,9 +99,9 @@ int main(int argc, char* argv[])
 	viewElement->enableManipulator(true);
 	viewElement->setManipulatorParameters(Vector3d(0, 0, 2), Vector3d(0, 0, 0));
 
-	auto element = std::make_shared<Framework::BasicSceneElement>("Graphics");
+	auto element = std::make_shared<BasicSceneElement>("Graphics");
 
-	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("axes");
+	auto axes = std::make_shared<OsgAxesRepresentation>("axes");
 	element->addComponent(axes);
 
 	auto files = variables["input-file"].as<std::vector<std::string>>();
@@ -120,13 +122,13 @@ int main(int argc, char* argv[])
 		// try to show as many scenery objects as possible
 		if (appData->tryFindFile(file, &path))
 		{
-			auto graphics = std::make_shared<Graphics::OsgSceneryRepresentation>(file);
+			auto graphics = std::make_shared<OsgSceneryRepresentation>(file);
 			graphics->loadModel(file);
 			element->addComponent(graphics);
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger())
 					<< "Can't find " << file;
 		}
 	}
