@@ -16,7 +16,8 @@
 #ifndef SURGSIM_PHYSICS_FEM1DCONSTRAINTFRICTIONLESSCONTACT_H
 #define SURGSIM_PHYSICS_FEM1DCONSTRAINTFRICTIONLESSCONTACT_H
 
-#include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
+#include "SurgSim/Physics/Fem1DLocalization.h"
 
 namespace SurgSim
 {
@@ -24,29 +25,7 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Fem1DRepresentation frictionless contact constraint implementation.
-class Fem1DConstraintFrictionlessContact : public ConstraintImplementation
-{
-public:
-	/// Constructor
-	Fem1DConstraintFrictionlessContact();
-
-	/// Destructor
-	virtual ~Fem1DConstraintFrictionlessContact();
-
-	SurgSim::Physics::ConstraintType getConstraintType() const override;
-
-private:
-	size_t doGetNumDof() const override;
-
-	void doBuild(double dt,
-				 const ConstraintData& data,
-				 const std::shared_ptr<Localization>& localization,
-				 MlcpPhysicsProblem* mlcp,
-				 size_t indexOfRepresentation,
-				 size_t indexOfConstraint,
-				 ConstraintSideSign sign) override;
-};
+typedef FemConstraintFrictionlessContact<Fem1DLocalization> Fem1DConstraintFrictionlessContact;
 
 }; // namespace Physics
 

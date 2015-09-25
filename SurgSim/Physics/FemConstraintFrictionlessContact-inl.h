@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_PHYSICS_FEMCONSTRAINTFRICTIONLESSCONTACT_INL_H
+#define SURGSIM_PHYSICS_FEMCONSTRAINTFRICTIONLESSCONTACT_INL_H
+
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/Fem1DConstraintFrictionlessContact.h"
-#include "SurgSim/Physics/Fem1DLocalization.h"
-#include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
-#include "SurgSim/Physics/Localization.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -28,15 +28,18 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem1DConstraintFrictionlessContact::Fem1DConstraintFrictionlessContact()
+template <class FemLocalization>
+FemConstraintFrictionlessContact<FemLocalization>::FemConstraintFrictionlessContact()
 {
 }
 
-Fem1DConstraintFrictionlessContact::~Fem1DConstraintFrictionlessContact()
+template <class FemLocalization>
+FemConstraintFrictionlessContact<FemLocalization>::~FemConstraintFrictionlessContact()
 {
 }
 
-void Fem1DConstraintFrictionlessContact::doBuild(double dt,
+template <class FemLocalization>
+void FemConstraintFrictionlessContact<FemLocalization>::doBuild(double dt,
 												 const ConstraintData& data,
 												 const std::shared_ptr<Localization>& localization,
 												 MlcpPhysicsProblem* mlcp,
@@ -44,8 +47,9 @@ void Fem1DConstraintFrictionlessContact::doBuild(double dt,
 												 size_t indexOfConstraint,
 												 ConstraintSideSign sign)
 {
-	std::shared_ptr<Fem1DRepresentation> fem
-		= std::static_pointer_cast<Fem1DRepresentation>(localization->getRepresentation());
+	std::shared_ptr<FemRepresentation> fem
+		= std::static_pointer_cast<FemRepresentation>(localization->getRepresentation());
+	const size_t numDofPerNode = fem->getNumDofPerNode();
 
 	if (!fem->isActive())
 	{
@@ -55,7 +59,7 @@ void Fem1DConstraintFrictionlessContact::doBuild(double dt,
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
 	const SurgSim::Math::Vector3d& n = static_cast<const ContactConstraintData&>(data).getNormal();
 	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
-		= std::static_pointer_cast<Fem1DLocalization>(localization)->getLocalPosition();
+		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
 	Vector3d globalPosition = localization->calculatePosition();
 
 	// Update b with new violation
@@ -82,9 +86,9 @@ void Fem1DConstraintFrictionlessContact::doBuild(double dt,
 		if (coord.coordinate[index] != 0.0)
 		{
 			size_t nodeIndex = femElement->getNodeId(index);
-			m_newH.insert(6 * nodeIndex + 0) = coord.coordinate[index] * n[0] * scale * dt;
-			m_newH.insert(6 * nodeIndex + 1) = coord.coordinate[index] * n[1] * scale * dt;
-			m_newH.insert(6 * nodeIndex + 2) = coord.coordinate[index] * n[2] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeIndex + 0) = coord.coordinate[index] * n[0] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeIndex + 1) = coord.coordinate[index] * n[1] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeIndex + 2) = coord.coordinate[index] * n[2] * scale * dt;
 		}
 	}
 
@@ -92,12 +96,14 @@ void Fem1DConstraintFrictionlessContact::doBuild(double dt,
 		indexOfConstraint);
 }
 
-SurgSim::Physics::ConstraintType Fem1DConstraintFrictionlessContact::getConstraintType() const
+template <class FemLocalization>
+SurgSim::Physics::ConstraintType FemConstraintFrictionlessContact<FemLocalization>::getConstraintType() const
 {
 	return SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 }
 
-size_t Fem1DConstraintFrictionlessContact::doGetNumDof() const
+template <class FemLocalization>
+size_t FemConstraintFrictionlessContact<FemLocalization>::doGetNumDof() const
 {
 	return 1;
 }
@@ -105,3 +111,5 @@ size_t Fem1DConstraintFrictionlessContact::doGetNumDof() const
 }; //  namespace Physics
 
 }; //  namespace SurgSim
+
+#endif // SURGSIM_PHYSICS_FEMCONSTRAINTFRICTIONLESSCONTACT_INL_H
