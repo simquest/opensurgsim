@@ -1,0 +1,12 @@
+- SurgSim::Devices::FilteredDevice:
+    Name: ConstantPose
+    Device:
+      SurgSim::Devices::IdentityPoseDevice:
+        Name: Identity
+    Filters:
+      - SurgSim::Devices::PoseTransform:
+          Name: Transform
+          TranslationScale: 3.4
+          Transform:
+            Quaternion: {Angle: 12.3, Axis: [0.5, 0.5, 0.0]}
+            Translation: [7.8, 8.9, 9.0]

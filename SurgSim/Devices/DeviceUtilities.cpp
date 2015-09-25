@@ -17,6 +17,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "SurgSim/Devices/DeviceFilters/DeviceFilter.h"
+#include "SurgSim/Devices/DeviceFilters/FilteredDevice.h"
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -46,9 +48,46 @@ std::shared_ptr<DeviceInterface> tryConvertDevice(const YAML::Node& possibleDevi
 				SURGSIM_LOG_DEBUG(logger) << "Loading: " << std::endl << possibleDevice;
 				std::string name = data[NamePropertyName].as<std::string>();
 				device = DeviceInterface::getFactory().create(className, name);
-				std::vector<std::string> ignoredProperties;
-				ignoredProperties.push_back(NamePropertyName);
-				device->decode(data, ignoredProperties);
+				auto filteredDevice = std::dynamic_pointer_cast<SurgSim::Devices::FilteredDevice>(device);
+				if (filteredDevice == nullptr)
+				{
+					std::vector<std::string> ignoredProperties;
+					ignoredProperties.push_back(NamePropertyName);
+					device->decode(data, ignoredProperties);
+				}
+				else
+				{
+					if (data["Device"].IsDefined())
+					{
+						auto baseDevice = tryConvertDevice(data["Device"], fileName);
+						if (baseDevice != nullptr)
+						{
+							filteredDevice->setDevice(baseDevice);
+						}
+					}
+					if (data["Filters"].IsDefined() && data["Filters"].IsSequence())
+					{
+						for (const YAML::Node& filterNode : data["Filters"])
+						{
+							auto filter = tryConvertDevice(filterNode, fileName);
+							if (filter != nullptr)
+							{
+								auto typedFilter = std::dynamic_pointer_cast<SurgSim::Devices::DeviceFilter>(filter);
+								if (typedFilter != nullptr)
+								{
+									filteredDevice->addFilter(typedFilter);
+								}
+								else
+								{
+									SURGSIM_LOG_WARNING(logger) << "File " << fileName << " has a " <<
+										filter->getClassName() << " named " << filter->getName() <<
+										" in a FilteredDevice's Filters node, but it is not a DeviceFilter : " <<
+										std::endl << data["Filters"];
+								}
+							}
+						}
+					}
+				}
 				if (device->initialize())
 				{
 					SURGSIM_LOG_INFO(logger) << "Successfully loaded " << className << " named " << name;
