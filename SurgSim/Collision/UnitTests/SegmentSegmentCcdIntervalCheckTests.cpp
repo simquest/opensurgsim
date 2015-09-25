@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Collision/SegmentSegmentCcdCheck.h"
+#include "SurgSim/Collision/SegmentSegmentCcdIntervalCheck.h"
 #include "SurgSim/Math/LinearMotionArithmetic.h"
 
 namespace SurgSim
@@ -35,11 +35,11 @@ double epsilon = 1.0e-10;
 }
 
 template <typename T>
-class SegmentSegmentCcdCheckTests : public ::testing::Test
+class SegmentSegmentCcdIntervalCheckTests : public ::testing::Test
 {
 };
 
-TEST(SegmentSegmentCcdCheckTests, Initialization)
+TEST(SegmentSegmentCcdIntervalCheckTests, Initialization)
 {
 	// Set up some arbitrary locations to check the class initialization.
 	std::array<Math::Vector3d, 2> pStart = {Math::Vector3d(-1.0, 1.0, 0.0), Math::Vector3d(-0.5, 1.5, 1.5)};
@@ -47,17 +47,17 @@ TEST(SegmentSegmentCcdCheckTests, Initialization)
 	std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(2.0, 1.0, 4.0), Math::Vector3d(1.0, 3.5, 2.5)};
 	std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(0.0, 1.0, 2.0), Math::Vector3d(-2.0, 1.5, 3.5)};
 
-	ASSERT_NO_THROW(SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06));
-	SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06);
+	ASSERT_NO_THROW(SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06));
+	SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06);
 
-	Math::Vector3d p11 = status.p11();
-	Math::Vector3d p12 = status.p12();
-	Math::Vector3d p21 = status.p21();
-	Math::Vector3d p22 = status.p22();
-	Math::Vector3d q11 = status.q11();
-	Math::Vector3d q12 = status.q12();
-	Math::Vector3d q21 = status.q21();
-	Math::Vector3d q22 = status.q22();
+	Math::Vector3d p11 = status.p1T0();
+	Math::Vector3d p12 = status.p1T1();
+	Math::Vector3d p21 = status.p2T0();
+	Math::Vector3d p22 = status.p2T1();
+	Math::Vector3d q11 = status.q1T0();
+	Math::Vector3d q12 = status.q1T1();
+	Math::Vector3d q21 = status.q2T0();
+	Math::Vector3d q22 = status.q2T1();
 
 	EXPECT_TRUE(p11.isApprox(Math::Vector3d(-1.0, 1.0, 0.0), epsilon));
 	EXPECT_TRUE(p12.isApprox(Math::Vector3d(-1.0, 1.0, 1.5), epsilon));
@@ -79,6 +79,7 @@ TEST(SegmentSegmentCcdCheckTests, Initialization)
 	EXPECT_DOUBLE_EQ(4.0e-06, status.distanceEpsilon());
 	EXPECT_DOUBLE_EQ(0.0, status.tripleProductEpsilon());
 	EXPECT_DOUBLE_EQ(0.0, status.muNuEpsilon());
+
 
 	auto p1q1 = status.motionQ1() - status.motionP1();
 	auto p1p2 = status.motionP2() - status.motionP1();
@@ -105,7 +106,28 @@ TEST(SegmentSegmentCcdCheckTests, Initialization)
 	EXPECT_TRUE(cross.isApprox(status.crossValueOnInterval(range), epsilon));
 };
 
-TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
+TEST(SegmentSegmentCcdIntervalCheckTests, SetGetTests)
+{
+	// Set up some arbitrary locations to check the class initialization.
+	std::array<Math::Vector3d, 2> pStart = {Math::Vector3d(-1.0, 1.0, 0.0), Math::Vector3d(-0.5, 1.5, 1.5)};
+	std::array<Math::Vector3d, 2> pEnd = {Math::Vector3d(-1.0, 1.0, 1.5), Math::Vector3d(-0.5, 1.5, 3.0)};
+	std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(2.0, 1.0, 4.0), Math::Vector3d(1.0, 3.5, 2.5)};
+	std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(0.0, 1.0, 2.0), Math::Vector3d(-2.0, 1.5, 3.5)};
+
+	SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06);
+
+	status.setTimePrecisionEpsilon(5.0e-06);
+	status.setDistanceEpsilon(6.0e-06);
+	status.setTripleProductEpsilon(7.0e-06);
+	status.setMuNuEpsilon(8.0e-06);
+
+	EXPECT_DOUBLE_EQ(5.0e-06, status.timePrecisionEpsilon());
+	EXPECT_DOUBLE_EQ(6.0e-06, status.distanceEpsilon());
+	EXPECT_DOUBLE_EQ(7.0e-06, status.tripleProductEpsilon());
+	EXPECT_DOUBLE_EQ(8.0e-06, status.muNuEpsilon());
+};
+
+TEST(SegmentSegmentCcdIntervalCheckTests, CollisionChecksWithThickness)
 {
 	{
 		// Two crossed segments intersecting at X = Y = 0 when the distance between is <= 0.75. This
@@ -116,17 +138,26 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(1.0, -1.0, 1.0), Math::Vector3d(-1.0, 1.0, 1.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(1.0, -1.0, 0.0), Math::Vector3d(-1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 0.7500000001)));
-		EXPECT_EQ(1, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 0.7499999999)));
-		EXPECT_EQ(1, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 0.5)));
-		EXPECT_EQ(1, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.5, 0.7499999999)));
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.5, 0.7500000001)));
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.7499999999, 1.0)));
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.7500000001, 1.0)));
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.9, 0.95)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 0.7500000001)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 0.7499999999)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 0.5)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.5, 0.7499999999)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.5, 0.7500000001)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.7499999999, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.7500000001, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.9, 0.95)));
 	}
 	{
 		// Two crossed segments intersecting at X = Y = 0 when the distance between is <= 0.75. This
@@ -137,14 +168,20 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(1.0, -1.0, 0.0), Math::Vector3d(-1.0, 1.0, 0.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(1.0, -1.0, 1.0), Math::Vector3d(-1.0, 1.0, 1.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.2499999999, 1.0)));
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.2499999999, 0.2500000001)));
-		EXPECT_EQ(1, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.2500000001, 1.0)));
-		EXPECT_EQ(1, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.5, 1.0)));
-		EXPECT_EQ(1, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.5, 0.7499999999)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.2499999999, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.2499999999, 0.2500000001)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.2500000001, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.5, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.5, 0.7499999999)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around Q1. Segments never get close enough.");
@@ -161,8 +198,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 			Math::Vector3d(0.0, 1.7500000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(2, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionEndpoints,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around Q1. Segments get close enough right around time = 1.0.");
@@ -179,8 +217,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 			Math::Vector3d(0.0, 1.7499999999, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around Q2. Segments never get close enough.");
@@ -197,8 +236,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 			Math::Vector3d(0.0, -0.7500000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(2, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionEndpoints,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around Q2. Segments get close enough right around time = 1.0.");
@@ -215,8 +255,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 			Math::Vector3d(0.0, -0.7499999999, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around P1. Segments never get close enough.");
@@ -233,8 +274,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(2, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionEndpoints,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around P1. Segments get close enough right around time = 1.0.");
@@ -251,8 +293,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around P2. Segments never get close enough.");
@@ -269,8 +312,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(2, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionEndpoints,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around P2. Segments get close enough right around time = 1.0.");
@@ -287,12 +331,13 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(0, status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestWithThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 };
 
-TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
+TEST(SegmentSegmentCcdIntervalCheckTests, CollisionChecksWithoutThickness)
 {
 	{
 		// Two crossed segments intersecting at X = Y = 0 when the distance between is = 0.0. This
@@ -303,17 +348,26 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(1.0, -1.0, 1.0), Math::Vector3d(-1.0, 1.0, 1.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(1.0, -1.0, -1.0), Math::Vector3d(-1.0, 1.0, -1.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.5000000001)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.4999999999)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.25)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.25, 0.4999999999)));
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.4999999999, 0.5000000001)));
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.4999999999, 1.0)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.5000000001, 1.0)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.9, 0.95)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.5000000001)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.4999999999)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.25)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.25, 0.4999999999)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.4999999999, 0.5000000001)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.4999999999, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.5000000001, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.9, 0.95)));
 	}
 	{
 		// Two crossed segments intersecting at X = Y = 0 when the distance between is = 0.0. This
@@ -330,14 +384,20 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(1.0, -1.0, 1.0), Math::Vector3d(-1.0, 1.0, 1.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.25, 1.0)));
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.1)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.000001, 1.0)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.5, 1.0)));
-		EXPECT_EQ(1, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.5, 0.7499999999)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.25, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 0.1)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.000001, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.5, 1.0)));
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionVolume,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.5, 0.7499999999)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around Q1. Segments never get close enough.");
@@ -354,8 +414,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 			Math::Vector3d(0.0, 1.0000000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(2, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionEndpoints,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around Q1. Segments get close enough right around time = 1.0.");
@@ -372,8 +433,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 			Math::Vector3d(0.0, 1.0000000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around Q2. Segments never get close enough.");
@@ -390,8 +452,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 			Math::Vector3d(0.0, -0.0000000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(2, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionEndpoints,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around Q2. Segments get close enough right around time = 1.0.");
@@ -408,8 +471,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 			Math::Vector3d(0.0, 0.0000000001, 0.0)
 		};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around P1. Segments never get close enough.");
@@ -426,8 +490,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(2, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionEndpoints,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around P1. Segments get close enough right around time = 1.0.");
@@ -444,8 +509,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around P2. Segments never get close enough.");
@@ -462,8 +528,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(2, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckNoCollisionEndpoints,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 	{
 		SCOPED_TRACE("Slanted T formation around P2. Segments get close enough right around time = 1.0.");
@@ -480,8 +547,9 @@ TEST(SegmentSegmentCcdCheckTests, CollisionChecksWithoutThickness)
 		std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(-1.0, -1.0, -2.0), Math::Vector3d(1.0, 1.0, -2.0)};
 		std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(-1.0, -1.0, 0.0), Math::Vector3d(1.0, 1.0, 0.0)};
 
-		SegmentSegmentCcdCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
-		EXPECT_EQ(0, status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
+		SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
+		EXPECT_EQ(SegmentSegmentCcdIntervalCheck::IntervalCheckPossibleCollision,
+				  status.possibleCollisionTestNoThickness(Math::Interval<double> (0.0, 1.0)));
 	}
 };
 

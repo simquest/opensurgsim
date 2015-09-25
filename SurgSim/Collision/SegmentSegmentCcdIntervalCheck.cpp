@@ -13,14 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/SegmentSegmentCcdCheck.h"
+#include "SurgSim/Collision/SegmentSegmentCcdIntervalCheck.h"
 
 namespace SurgSim
 {
 namespace Collision
 {
-
-SegmentSegmentCcdCheck::SegmentSegmentCcdCheck(
+// The order of initialization MUST match the necessary initialization order --
+// if member B is calculated from member A, then B must of course be initialized after A in
+// the constructor, and B must be declared after A in here the class definition.
+SegmentSegmentCcdIntervalCheck::SegmentSegmentCcdIntervalCheck(
 	const std::array<Math::Vector3d, 2>& pT0,
 	const std::array<Math::Vector3d, 2>& pT1,
 	const std::array<Math::Vector3d, 2>& qT0,
@@ -47,97 +49,97 @@ SegmentSegmentCcdCheck::SegmentSegmentCcdCheck(
 }
 
 // Accessors
-const Math::LinearMotionND<double, 3>& SegmentSegmentCcdCheck::motionP1() const
+const Math::LinearMotionND<double, 3>& SegmentSegmentCcdIntervalCheck::motionP1() const
 {
 	return m_motionP1;
 }
 
-const Math::LinearMotionND<double, 3>& SegmentSegmentCcdCheck::motionP2() const
+const Math::LinearMotionND<double, 3>& SegmentSegmentCcdIntervalCheck::motionP2() const
 {
 	return m_motionP2;
 }
 
-const Math::LinearMotionND<double, 3>& SegmentSegmentCcdCheck::motionQ1() const
+const Math::LinearMotionND<double, 3>& SegmentSegmentCcdIntervalCheck::motionQ1() const
 {
 	return m_motionQ1;
 }
 
-const Math::LinearMotionND<double, 3>& SegmentSegmentCcdCheck::motionQ2() const
+const Math::LinearMotionND<double, 3>& SegmentSegmentCcdIntervalCheck::motionQ2() const
 {
 	return m_motionQ2;
 }
 
-Math::Vector3d SegmentSegmentCcdCheck::p11() const
+Math::Vector3d SegmentSegmentCcdIntervalCheck::p1T0() const
 {
 	return m_motionP1.getStart();
 }
 
-Math::Vector3d SegmentSegmentCcdCheck::p12() const
+Math::Vector3d SegmentSegmentCcdIntervalCheck::p1T1() const
 {
 	return m_motionP1.getEnd();
 }
 
-Math::Vector3d SegmentSegmentCcdCheck::p21() const
+Math::Vector3d SegmentSegmentCcdIntervalCheck::p2T0() const
 {
 	return m_motionP2.getStart();
 }
 
-Math::Vector3d SegmentSegmentCcdCheck::p22() const
+Math::Vector3d SegmentSegmentCcdIntervalCheck::p2T1() const
 {
 	return m_motionP2.getEnd();
 }
 
-Math::Vector3d SegmentSegmentCcdCheck::q11() const
+Math::Vector3d SegmentSegmentCcdIntervalCheck::q1T0() const
 {
 	return m_motionQ1.getStart();
 }
 
-Math::Vector3d SegmentSegmentCcdCheck::q12() const
+Math::Vector3d SegmentSegmentCcdIntervalCheck::q1T1() const
 {
 	return m_motionQ1.getEnd();
 }
 
-Math::Vector3d SegmentSegmentCcdCheck::q21() const
+Math::Vector3d SegmentSegmentCcdIntervalCheck::q2T0() const
 {
 	return m_motionQ2.getStart();
 }
 
-Math::Vector3d SegmentSegmentCcdCheck::q22() const
+Math::Vector3d SegmentSegmentCcdIntervalCheck::q2T1() const
 {
 	return m_motionQ2.getEnd();
 }
 
-const Math::PolynomialValues<double, 3>& SegmentSegmentCcdCheck::P1Q1_P1P2_Q1Q2() const
+const Math::PolynomialValues<double, 3>& SegmentSegmentCcdIntervalCheck::P1Q1_P1P2_Q1Q2() const
 {
 	return m_P1Q1_P1P2_Q1Q2;
 }
 
-const Math::PolynomialValues<double, 2>& SegmentSegmentCcdCheck::P1P2_P1Q1() const
+const Math::PolynomialValues<double, 2>& SegmentSegmentCcdIntervalCheck::P1P2_P1Q1() const
 {
 	return m_P1P2_P1Q1;
 }
 
-const Math::PolynomialValues<double, 2>& SegmentSegmentCcdCheck::Q1Q2_P1Q1() const
+const Math::PolynomialValues<double, 2>& SegmentSegmentCcdIntervalCheck::Q1Q2_P1Q1() const
 {
 	return m_Q1Q2_P1Q1;
 }
 
-const Math::PolynomialValues<double, 2>& SegmentSegmentCcdCheck::P1P2_Q1Q2() const
+const Math::PolynomialValues<double, 2>& SegmentSegmentCcdIntervalCheck::P1P2_Q1Q2() const
 {
 	return m_P1P2_Q1Q2;
 }
 
-const Math::PolynomialValues<double, 2>& SegmentSegmentCcdCheck::P1P2_sq() const
+const Math::PolynomialValues<double, 2>& SegmentSegmentCcdIntervalCheck::P1P2_sq() const
 {
 	return m_P1P2_sq;
 }
 
-const Math::PolynomialValues<double, 2>& SegmentSegmentCcdCheck::Q1Q2_sq() const
+const Math::PolynomialValues<double, 2>& SegmentSegmentCcdIntervalCheck::Q1Q2_sq() const
 {
 	return m_Q1Q2_sq;
 }
 
-Math::Interval<double> SegmentSegmentCcdCheck::crossValueOnInterval(
+Math::Interval<double> SegmentSegmentCcdIntervalCheck::crossValueOnInterval(
 	const Math::Interval<double>& range) const
 {
 	return (
@@ -147,36 +149,57 @@ Math::Interval<double> SegmentSegmentCcdCheck::crossValueOnInterval(
 		   );
 }
 
-double SegmentSegmentCcdCheck::thicknessP() const
+double SegmentSegmentCcdIntervalCheck::thicknessP() const
 {
 	return m_thicknessP;
 }
-double SegmentSegmentCcdCheck::thicknessQ() const
+double SegmentSegmentCcdIntervalCheck::thicknessQ() const
 {
 	return m_thicknessQ;
 }
 
-double SegmentSegmentCcdCheck::timePrecisionEpsilon() const
+void SegmentSegmentCcdIntervalCheck::setTimePrecisionEpsilon(double epsilon)
+{
+	m_timePrecisionEpsilon = epsilon;
+}
+
+void SegmentSegmentCcdIntervalCheck::setDistanceEpsilon(double epsilon)
+{
+	m_distanceEpsilon = epsilon;
+}
+
+void SegmentSegmentCcdIntervalCheck::setTripleProductEpsilon(double epsilon)
+{
+	m_volumeEpsilonTimes6 = epsilon;
+}
+
+void SegmentSegmentCcdIntervalCheck::setMuNuEpsilon(double epsilon)
+{
+	m_muNuEpsilon = epsilon;
+}
+
+double SegmentSegmentCcdIntervalCheck::timePrecisionEpsilon() const
 {
 	return m_timePrecisionEpsilon;
 }
 
-double SegmentSegmentCcdCheck::distanceEpsilon() const
+double SegmentSegmentCcdIntervalCheck::distanceEpsilon() const
 {
 	return m_distanceEpsilon;
 }
 
-double SegmentSegmentCcdCheck::tripleProductEpsilon() const
+double SegmentSegmentCcdIntervalCheck::tripleProductEpsilon() const
 {
 	return m_volumeEpsilonTimes6;
 }
 
-double SegmentSegmentCcdCheck::muNuEpsilon() const
+double SegmentSegmentCcdIntervalCheck::muNuEpsilon() const
 {
 	return m_muNuEpsilon;
 }
 
-int SegmentSegmentCcdCheck::possibleCollisionTestNoThickness(const Math::Interval<double>& range) const
+SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCheck::possibleCollisionTestNoThickness(
+	const Math::Interval<double>& range) const
 {
 	Math::Interval<double> P1Q1_P1P2_Q1Q2_values = P1Q1_P1P2_Q1Q2().valuesOverInterval(range);
 	Math::Interval<double> P1P2_P1Q1_values = P1P2_P1Q1().valuesOverInterval(range);
@@ -189,13 +212,14 @@ int SegmentSegmentCcdCheck::possibleCollisionTestNoThickness(const Math::Interva
 	P1Q1_P1P2_Q1Q2_values.addThickness(m_volumeEpsilonTimes6);
 
 	bool lineDistanceIsZero = P1Q1_P1P2_Q1Q2_values.containsZero();
-	if (! lineDistanceIsZero)
+	if (!lineDistanceIsZero)
 	{
-		return 1;  // collision check #1 says no collision
+		return IntervalCheckNoCollisionVolume;  // collision check #1 says no collision
 	}
 
 	// [The following eqns and their derivation are written up in
-	// Docs/Collision detection/Segment-segment CCD location check.pdf]
+	// the document Segment-segmentCCDlocationcheck.pdf in the Assembla OSS Files page. See link:
+	// https://www.assembla.com/spaces/OpenSurgSim/documents/dce2Euy6Cr5znOdmr6CpXy/download/dce2Euy6Cr5znOdmr6CpXy
 	// 0 = \mu (P1P2 x Q1Q2)^2 - (P1P2 * P1Q1) Q1Q2^2 + (Q1Q2 * P1Q1) (P1P2 * Q1Q2)
 	// 0 = \nu (P1P2 x Q1Q2)^2 - (Q1Q2 * P1Q1) P1P2^2 + (P1P2 * P1Q1) (P1P2 * Q1Q2)
 
@@ -212,15 +236,16 @@ int SegmentSegmentCcdCheck::possibleCollisionTestNoThickness(const Math::Interva
 										  P1P2_Q1Q2_values;
 
 	bool segmentLocationsMakeCollisionPossible = muExpression.containsZero() && nuExpression.containsZero();
-	if (! segmentLocationsMakeCollisionPossible)
+	if (!segmentLocationsMakeCollisionPossible)
 	{
-		return 2;  // collision check #2 says no collision
+		return IntervalCheckNoCollisionEndpoints;  // collision check #2 says no collision
 	}
 
-	return 0;  // as far as we know, a collision is possible
+	return IntervalCheckPossibleCollision;  // as far as we know, a collision is possible
 }
 
-int SegmentSegmentCcdCheck::possibleCollisionTestWithThickness(const Math::Interval<double>& range) const
+SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCheck::possibleCollisionTestWithThickness(
+	const Math::Interval<double>& range) const
 {
 	Math::Interval<double> P1Q1_P1P2_Q1Q2_values = P1Q1_P1P2_Q1Q2().valuesOverInterval(range);
 	Math::Interval<double> P1P2_P1Q1_values      = P1P2_P1Q1().valuesOverInterval(range);
@@ -232,13 +257,13 @@ int SegmentSegmentCcdCheck::possibleCollisionTestWithThickness(const Math::Inter
 
 	// Now we need to account for thickness.  [Look at Docs/Collision detection/Segment-segment
 	// CCD with thickness.pdf for details!]
-	double maxLengthP = sqrt(P1P2_sq_values.getMax());
-	double maxLengthQ = sqrt(Q1Q2_sq_values.getMax());
+	double maxLengthP = std::sqrt(P1P2_sq_values.getMax());
+	double maxLengthQ = std::sqrt(Q1Q2_sq_values.getMax());
 	// Figure out some upper bounds on the value of | P1P2 x Q1Q2 |.
 	// TO DO: figure out if both of the bounds are effective, i.e. if it makes sense to keep them both.
 	// (My guess would be that the first is more effective for perpendicular segments, second for near-parallel.)
 	double crossProductUpperBound1  = maxLengthP * maxLengthQ;             // ignores the sine of the angle
-	double crossProductUpperBound2  = sqrt(P1P2xQ1Q2_sq_values.getMax());  // uses Interval_nD -> NOT necessarily tight
+	double crossProductUpperBound2  = std::sqrt(P1P2xQ1Q2_sq_values.getMax());  // uses Interval_nD -> NOT necessarily tight
 	double crossProductUpperBound = std::min(crossProductUpperBound1,
 									crossProductUpperBound2);  // pick the LOWEST of the upper bounds...
 	// Compute the upper bound on the volume that the tetrahedron P1P2Q1Q2 would have if the segments were
@@ -255,17 +280,13 @@ int SegmentSegmentCcdCheck::possibleCollisionTestWithThickness(const Math::Inter
 	bool lineDistanceIsSmallEnough = P1Q1_P1P2_Q1Q2_values.containsZero();
 	if (!lineDistanceIsSmallEnough)
 	{
-		return 1;  // collision check #1 says no collision
+		return IntervalCheckNoCollisionVolume;  // collision check #1 says no collision
 	}
 
 	// If we detected that a collision is possible based on segment orientation, then we will make one more
 	// check to verify that the actual points of closest approach live on the segments.
-	double minLengthP = sqrt(P1P2_sq_values.getMin());
-	double minLengthQ = sqrt(Q1Q2_sq_values.getMin());
-
-	// This bit is somewhat screwed up.  A fully self-consistent check wouldn't use
-	// the overshoots, and would instead
-	// check the distances of each endpoint-endpoint pair (4 in all). --bert 2011-05-11
+	double minLengthP = std::sqrt(P1P2_sq_values.getMin());
+	double minLengthQ = std::sqrt(Q1Q2_sq_values.getMin());
 	Math::Interval<double> weightCoefficient = P1P2xQ1Q2_sq_values;
 
 	// So, if we consider the endpoints, then the lambda and \mu overshoots extend the physical dimension
@@ -286,10 +307,10 @@ int SegmentSegmentCcdCheck::possibleCollisionTestWithThickness(const Math::Inter
 	bool segmentLocationsMakeCollisionPossible = lambdaExpression.containsZero() && muExpression.containsZero();
 	if (!segmentLocationsMakeCollisionPossible)
 	{
-		return 2;  // collision check #2 says no collision
+		return IntervalCheckNoCollisionEndpoints;  // collision check #2 says no collision
 	}
 
-	return 0;  // as far as we know, a collision is possible
+	return IntervalCheckPossibleCollision;  // as far as we know, a collision is possible
 }
 
 }; // namespace Collision
