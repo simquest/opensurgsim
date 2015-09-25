@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This test uses the Stanford Bunny from http://graphics.stanford.edu/data/3Dscanrep/
-
 #include <gtest/gtest.h>
 
 #include <memory>
@@ -87,13 +85,13 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	scene->addSceneElement(element);
 
 	// Create the point cloud
-	auto bunny = std::make_shared<Graphics::OsgMeshRepresentation>("Bunny");
-	bunny->loadMesh("Geometry/stanford_bunny.ply");
+	auto mesh = std::make_shared<Graphics::OsgMeshRepresentation>("Mesh");
+	mesh->loadMesh("Geometry/sphere.ply");
 
 	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
 
 	graphics->setLocalPose(makeRigidTranslation(Math::Vector3d(0.01, -0.1, -0.25)));
-	for (const auto& vertex : bunny->getMesh()->getVertices())
+	for (const auto& vertex : mesh->getMesh()->getVertices())
 	{
 		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));
 	}
