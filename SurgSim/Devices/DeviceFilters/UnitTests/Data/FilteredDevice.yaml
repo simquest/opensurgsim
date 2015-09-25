@@ -1,9 +1,8 @@
 - SurgSim::Devices::FilteredDevice:
     Name: ConstantPose
-    Device:
-      SurgSim::Devices::IdentityPoseDevice:
-        Name: Identity
-    Filters:
+    Devices:
+      - SurgSim::Devices::IdentityPoseDevice:
+          Name: Identity
       - SurgSim::Devices::PoseTransform:
           Name: Transform
           TranslationScale: 3.4

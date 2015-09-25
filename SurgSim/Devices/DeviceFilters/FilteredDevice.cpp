@@ -30,7 +30,7 @@ namespace Devices
 
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::FilteredDevice, FilteredDevice);
 
-FilteredDevice::FilteredDevice(const std::string& name) : m_name(name), m_initialized(false)
+FilteredDevice::FilteredDevice(const std::string& name) : m_name(name)
 {
 }
 
@@ -41,9 +41,7 @@ FilteredDevice::~FilteredDevice()
 
 bool FilteredDevice::finalize()
 {
-	m_device->clearInputConsumers();
-	m_device->clearOutputProducer();
-	for (auto& device : m_filters)
+	for (auto& device : m_devices)
 	{
 		device->clearInputConsumers();
 		device->clearOutputProducer();
@@ -58,97 +56,102 @@ std::string FilteredDevice::getName() const
 
 bool FilteredDevice::initialize()
 {
-	boost::unique_lock<boost::shared_mutex>(m_filterMutex);
-	SURGSIM_ASSERT(!m_initialized) << "Cannot initialize more than once.";
+	boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
 	bool result = true;
 	auto logger = Framework::Logger::getLogger("Devices/FilteredDevice");
 
-	if (m_device == nullptr)
+	if (m_devices.size() == 0)
 	{
-		SURGSIM_LOG_WARNING(logger) << "A raw/base device is required.";
-		result = false;
-	}
-	if (m_filters.size() == 0)
-	{
-		SURGSIM_LOG_WARNING(logger) << "At least one filter is required.";
+		SURGSIM_LOG_WARNING(logger) << "At least one device is required.";
 		result = false;
 	}
 
 	if (result)
 	{
-		result = m_device->addInputConsumer(m_filters.front()) && m_device->setOutputProducer(m_filters.front());
-		for (size_t i = 0; i < m_filters.size() - 1; ++i)
+		for (size_t i = 0; i < m_devices.size() - 1; ++i)
 		{
-			result &= m_filters[i]->addInputConsumer(m_filters[i + 1]) &&
-				m_filters[i]->setOutputProducer(m_filters[i + 1]);
+			auto deviceFilter = std::dynamic_pointer_cast<DeviceFilter>(m_devices[i + 1]);
+			if (deviceFilter == nullptr)
+			{
+				result = false;
+				SURGSIM_LOG_SEVERE(logger) << getName() <<
+					" contains a device that is not a DeviceFilter and was not the first device added.";
+			}
+			else
+			{
+				result &= m_devices[i]->addInputConsumer(deviceFilter) &&
+					m_devices[i]->setOutputProducer(deviceFilter);
+			}
 		}
 
-		for (auto& filter : m_filters)
+		for (auto& device : m_devices)
 		{
-			result &= filter->initialize();
+			result &= device->initialize();
 		}
-		result &= m_device->initialize();
 	}
 
-	m_initialized = result;
 	SURGSIM_LOG_IF(!result, logger, WARNING) << "Failed to initialize.";
 	return result;
 }
 
 bool FilteredDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer)
 {
-	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
-	return m_filters.back()->addInputConsumer(inputConsumer);
+	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
+	return m_devices.back()->addInputConsumer(inputConsumer);
 }
 
 bool FilteredDevice::removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer)
 {
-	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
-	return m_filters.back()->removeInputConsumer(inputConsumer);
+	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
+	return m_devices.back()->removeInputConsumer(inputConsumer);
 }
 
 void FilteredDevice::clearInputConsumers()
 {
-	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
-	m_filters.back()->clearInputConsumers();
+	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
+	m_devices.back()->clearInputConsumers();
 }
 
 bool FilteredDevice::setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer)
 {
-	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
-	return m_filters.back()->setOutputProducer(outputProducer);
+	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
+	return m_devices.back()->setOutputProducer(outputProducer);
 }
 
 bool FilteredDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer)
 {
-	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
-	return m_filters.back()->removeOutputProducer(outputProducer);
+	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
+	return m_devices.back()->removeOutputProducer(outputProducer);
 }
 
 bool FilteredDevice::hasOutputProducer()
 {
-	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
-	return m_filters.back()->hasOutputProducer();
+	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
+	return m_devices.back()->hasOutputProducer();
 }
 
 void FilteredDevice::clearOutputProducer()
 {
-	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
-	m_filters.back()->clearOutputProducer();
+	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
+	m_devices.back()->clearOutputProducer();
 }
 
-void FilteredDevice::setDevice(std::shared_ptr<Input::DeviceInterface> device)
+bool FilteredDevice::addDevice(std::shared_ptr<Input::DeviceInterface> device)
 {
-	SURGSIM_ASSERT(!m_initialized) << "Cannot set device after initialization";
-	SURGSIM_ASSERT(device != nullptr) << "Cannot set a nullptr device.";
-	m_device = device;
-}
-
-void FilteredDevice::addFilter(std::shared_ptr<DeviceFilter> device)
-{
-	boost::unique_lock<boost::shared_mutex>(m_filterMutex);
-	SURGSIM_ASSERT(!m_initialized) << "Cannot add filter after initialization";
-	m_filters.push_back(device);
+	SURGSIM_ASSERT(device != nullptr) << "device cannot be nullptr";
+	bool result = true;
+	if ((m_devices.size() > 0) && (std::dynamic_pointer_cast<DeviceFilter>(device) == nullptr))
+	{
+		result = false;
+		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices")) <<
+			"Any device added after the first must be a DeviceFilter.";
+	}
+	if (result)
+	{
+		boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
+		m_devices.push_back(device);
+	}
+	return result;
 }
 
 };  // namespace Devices

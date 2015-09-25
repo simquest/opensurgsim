@@ -57,33 +57,14 @@ std::shared_ptr<DeviceInterface> tryConvertDevice(const YAML::Node& possibleDevi
 				}
 				else
 				{
-					if (data["Device"].IsDefined())
+					if (data["Devices"].IsDefined() && data["Devices"].IsSequence())
 					{
-						auto baseDevice = tryConvertDevice(data["Device"], fileName);
-						if (baseDevice != nullptr)
+						for (const YAML::Node& deviceNode : data["Devices"])
 						{
-							filteredDevice->setDevice(baseDevice);
-						}
-					}
-					if (data["Filters"].IsDefined() && data["Filters"].IsSequence())
-					{
-						for (const YAML::Node& filterNode : data["Filters"])
-						{
-							auto filter = tryConvertDevice(filterNode, fileName);
-							if (filter != nullptr)
+							auto subdevice = tryConvertDevice(deviceNode, fileName);
+							if (subdevice != nullptr)
 							{
-								auto typedFilter = std::dynamic_pointer_cast<SurgSim::Devices::DeviceFilter>(filter);
-								if (typedFilter != nullptr)
-								{
-									filteredDevice->addFilter(typedFilter);
-								}
-								else
-								{
-									SURGSIM_LOG_WARNING(logger) << "File " << fileName << " has a " <<
-										filter->getClassName() << " named " << filter->getName() <<
-										" in a FilteredDevice's Filters node, but it is not a DeviceFilter : " <<
-										std::endl << data["Filters"];
-								}
+								filteredDevice->addDevice(subdevice);
 							}
 						}
 					}
