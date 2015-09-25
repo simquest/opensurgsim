@@ -14,7 +14,6 @@
 # limitations under the License.
 
 include_directories(
-	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
 )
 

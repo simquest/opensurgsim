@@ -124,7 +124,7 @@ protected:
 	virtual bool handleMouseWheel(const osgGA::GUIEventAdapter& eventAdapter,
 								  osgGA::GUIActionAdapter& actionAdapter); //NOLINT
 
-	virtual void updateCamera(osg::Camera& camera) override;
+	void updateCamera(osg::Camera& camera) override;
 
 };
 

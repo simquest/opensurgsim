@@ -29,6 +29,7 @@
 #include "SurgSim/Physics/Computation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
@@ -315,6 +316,16 @@ public:
 	explicit MockFem1DRepresentation(const std::string& name);
 
 	bool doInitialize() override;
+
+	double getMassPerNode(size_t nodeId);
+};
+
+class MockFem2DRepresentation : public SurgSim::Physics::Fem2DRepresentation
+{
+public:
+	explicit MockFem2DRepresentation(const std::string& name);
+
+	double getMassPerNode(size_t nodeId);
 };
 
 class MockFixedConstraintFixedPoint : public ConstraintImplementation

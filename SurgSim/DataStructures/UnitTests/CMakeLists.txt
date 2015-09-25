@@ -15,7 +15,6 @@
 
 include_directories (
 	${gtest_SOURCE_DIR}/include
-	${OSG_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES

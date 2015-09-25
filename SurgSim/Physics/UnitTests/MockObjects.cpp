@@ -470,6 +470,20 @@ bool MockFem1DRepresentation::doInitialize()
 	return Fem1DRepresentation::doInitialize();
 }
 
+double MockFem1DRepresentation::getMassPerNode(size_t nodeId)
+{
+	return m_massPerNode[nodeId];
+}
+
+MockFem2DRepresentation::MockFem2DRepresentation(const std::string& name) : SurgSim::Physics::Fem2DRepresentation(name)
+{
+}
+
+double MockFem2DRepresentation::getMassPerNode(size_t nodeId)
+{
+	return m_massPerNode[nodeId];
+}
+
 MockFixedConstraintFixedPoint::MockFixedConstraintFixedPoint() : ConstraintImplementation()
 {
 }
