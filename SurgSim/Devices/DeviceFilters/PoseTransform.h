@@ -21,17 +21,15 @@
 #include <string>
 
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Input/CommonDevice.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Devices/DeviceFilters/DeviceFilter.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
-
 namespace Devices
 {
+
 /// A device filter that transforms the input pose.  It can scale the translation, and/or apply a constant transform.
 /// Any other data in the DataGroup is passed through.  For an input/output device (e.g., a haptic device), the filter
 /// should be added as one of the device's input consumers and set as the device's output producer.  For a purely input
@@ -50,8 +48,7 @@ namespace Devices
 /// \sa	SurgSim::Input::CommonDevice
 /// \sa	SurgSim::Input::InputConsumerInterface
 /// \sa	SurgSim::Input::OutputProducerInterface
-class PoseTransform : public Input::CommonDevice,
-	public Input::InputConsumerInterface, public Input::OutputProducerInterface
+class PoseTransform : public DeviceFilter
 {
 public:
 	/// Constructor.
@@ -59,38 +56,6 @@ public:
 	explicit PoseTransform(const std::string& name);
 
 	SURGSIM_CLASSNAME(SurgSim::Devices::PoseTransform);
-
-	/// Destructor.
-	virtual ~PoseTransform();
-
-	/// Fully initialize the device.
-	/// When the manager object creates the device, the internal state of the device usually isn't fully
-	/// initialized yet.  This method performs any needed initialization.
-	/// \return True on success.
-	bool initialize() override;
-
-	/// Set the initial input data.  Used when transforming the pose coming from an input device.
-	/// \param device The name of the device that is producing the input.  This should only be used to identify
-	/// 	the device (e.g. if the consumer is listening to several devices at once).
-	/// \param inputData The application input state coming from the device.
-	void initializeInput(const std::string& device, const DataStructures::DataGroup& inputData) override;
-
-	/// Notifies the consumer that the application input coming from the device has been updated.
-	/// Used when transforming the pose coming from an input device.
-	/// \param device The name of the device that is producing the input.  This should only be used to identify
-	/// 	the device (e.g. if the consumer is listening to several devices at once).
-	/// \param inputData The application input state coming from the device.
-	void handleInput(const std::string& device, const DataStructures::DataGroup& inputData) override;
-
-	/// Asks the producer to provide output state to the device.  Passes through all data, modifying the data entries
-	/// used by haptic devices.  Note that devices may never call this method, e.g. because the device doesn't actually
-	/// have any output capability.
-	/// \param device The name of the device that is requesting the output.  This should only be used to identify
-	/// 	the device (e.g. if the producer is listening to several devices at once).
-	/// \param [out] outputData The data being sent to the device.
-	/// \return True if the producer has provided output data.  A producer that returns false should leave outputData
-	///		unmodified.
-	bool requestOutput(const std::string& device, DataStructures::DataGroup* outputData) override;
 
 	/// \return Get the translation scale factor.
 	double getTranslationScale() const;
@@ -111,24 +76,11 @@ public:
 	void setTransform(const Math::RigidTransform3d& transform);
 
 private:
-	/// Finalize (de-initialize) the device.
-	/// \return True on success.
-	bool finalize() override;
+	void filterInput(const std::string& device, const DataStructures::DataGroup& dataToFilter,
+		DataStructures::DataGroup* result) override;
 
-	/// Filter the input data.
-	/// \param dataToFilter The data that will be filtered.
-	/// \param [in,out] result A pointer to a DataGroup object that must be assignable to by the dataToFilter object.
-	///		Will contain the filtered data.
-	void inputFilter(const DataStructures::DataGroup& dataToFilter, DataStructures::DataGroup* result);
-
-	/// Filter the output data.
-	/// If this device filter offsets/scales input data from a haptic device, then when output data (forces, torques,
-	/// Jacobians) are created for output to that device, this function incorporates the transform/scaling to correct
-	/// the displayed outputs.
-	/// \param dataToFilter The data that will be filtered.
-	/// \param [in,out] result A pointer to a DataGroup object that must be assignable to by the dataToFilter object.
-	///		Will contain the filtered data.
-	void outputFilter(const DataStructures::DataGroup& dataToFilter, DataStructures::DataGroup* result);
+	void filterOutput(const std::string& device, const DataStructures::DataGroup& dataToFilter,
+		DataStructures::DataGroup* result) override;
 
 	/// The mutex that protects the transform and scaling factor.
 	boost::mutex m_mutex;
@@ -141,23 +93,6 @@ private:
 
 	/// The scaling factor applied to each direction of the translation.
 	double m_translationScale;
-
-	///@{
-	/// The indices into the DataGroups.
-	int m_poseIndex;
-	int m_linearVelocityIndex;
-	int m_angularVelocityIndex;
-	int m_forceIndex;
-	int m_torqueIndex;
-	int m_springJacobianIndex;
-	int m_inputPoseIndex;
-	int m_damperJacobianIndex;
-	int m_inputLinearVelocityIndex;
-	int m_inputAngularVelocityIndex;
-	///@}
-
-	/// True if the output DataGroup indices have been cached.
-	bool m_cachedOutputIndices;
 };
 
 };  // namespace Devices

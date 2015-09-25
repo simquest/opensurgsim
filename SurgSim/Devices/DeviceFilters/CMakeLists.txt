@@ -22,18 +22,21 @@ set(LIBS
 )
 
 set(DEVICE_FILTERS_SOURCES
+	DeviceFilter.cpp
 	ForceScale.cpp
 	PoseIntegrator.cpp
 	PoseTransform.cpp
 )
 
 set(DEVICE_FILTERS_HEADERS
+	DeviceFilter.h
 	ForceScale.h
 	PoseIntegrator.h
 	PoseTransform.h
 )
 
 set(DEVICE_HEADERS ${DEVICE_HEADERS}
+	DeviceFilters/DeviceFilter.h #NOLINT
 	DeviceFilters/ForceScale.h #NOLINT
 	DeviceFilters/PoseIntegrator.h #NOLINT
 	DeviceFilters/PoseTransform.h #NOLINT

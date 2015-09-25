@@ -18,6 +18,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	DeviceFilterTest.cpp
 	ForceScaleTest.cpp
 	PoseIntegratorTest.cpp
 	PoseTransformTest.cpp
