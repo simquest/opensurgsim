@@ -49,7 +49,6 @@ const double dt = 1e-3;
 
 static void addBeam(Fem1DRepresentation* fem,
 					size_t node0, size_t node1,
-					const SurgSim::Math::OdeState& state,
 					double radius = 0.01,
 					double massDensity = 1.0,
 					double poissonRatio = 0.1,
@@ -84,10 +83,10 @@ public:
 		state->getPositions().segment<3>(3 * 6) = Vector3d(0.35,  0.52,  0.50);
 		state->getPositions().segment<3>(4 * 6) = Vector3d(1.14,  0.66,  0.71);
 
-		addBeam(m_fem.get(), 0, 1, *state);
-		addBeam(m_fem.get(), 1, 2, *state);
-		addBeam(m_fem.get(), 2, 3, *state);
-		addBeam(m_fem.get(), 3, 4, *state);
+		addBeam(m_fem.get(), 0, 1);
+		addBeam(m_fem.get(), 1, 2);
+		addBeam(m_fem.get(), 2, 3);
+		addBeam(m_fem.get(), 3, 4);
 
 		m_fem->setInitialState(state);
 		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED);
@@ -276,7 +275,8 @@ TEST_F(Fem1DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 
 	mlcpPhysicsProblem.b.block<1, 1>(0, 0)[0] = 0.6991;
 
-	// Place mass-spring at 5th dof and 1th constraint.
+	// Place the Fem at 5th dof (1 or multiple representations exist before, covering a total of 5 dof)
+	// and the constraint at the index 1 (1 atomic constraint exists before this one)
 	size_t indexOfRepresentation = 5;
 	size_t indexOfConstraint = 1;
 
