@@ -61,7 +61,7 @@ TEST(FilteredDeviceTest, Serialization)
 	ASSERT_NE(nullptr, device);
 	auto typedDevice = std::dynamic_pointer_cast<FilteredDevice>(device);
 	ASSERT_NE(nullptr, typedDevice);
-	
+
 	auto input = std::make_shared<MockInputOutput>();
 	ASSERT_TRUE(device->addInputConsumer(input));
 	SurgSim::Math::RigidTransform3d pose;
