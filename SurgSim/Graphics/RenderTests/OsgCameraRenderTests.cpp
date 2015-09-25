@@ -191,16 +191,13 @@ TEST_F(OsgCameraRenderTests, Resize)
 	scene->addSceneElement(element);
 
 	runtime->start();
-	for (int i = 0; i < 10; i++)
-	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-		std::array<int, 2> newDimensions = {width + (i * 50), height + (i % 2 * 35)};
-		viewElement->getView()->setDimensions(newDimensions);
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-		std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
-		std::array<int, 2> swapped = {dimensions[1], dimensions[0]};
-		viewElement->getView()->setDimensions(swapped);
-	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	std::array<int, 2> dimensions = {width + 500, height + 100};
+	viewElement->getView()->setDimensions(dimensions);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	std::array<int, 2> swapped = {dimensions[1], dimensions[0]};
+	viewElement->getView()->setDimensions(swapped);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 }
 
 }; // namespace Graphics

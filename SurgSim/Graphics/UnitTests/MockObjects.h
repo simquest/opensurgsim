@@ -396,12 +396,12 @@ public:
 	{
 
 	}
-	
+
 	void setMainCamera(bool val) override
 	{
-		
+
 	}
-	
+
 	bool isMainCamera() override
 	{
 		return false;

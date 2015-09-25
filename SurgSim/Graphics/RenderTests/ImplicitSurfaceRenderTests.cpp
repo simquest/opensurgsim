@@ -52,6 +52,9 @@ class ImplicitSurfaceRenderTests : public RenderTest
 
 TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 {
+	std::array<int, 2> dimensions = {1280, 720};
+	viewElement->getView()->setDimensions(dimensions);
+	viewElement->getCamera()->setPerspectiveProjection(45, 1.7, 0.01, 10.0);
 	viewElement->enableManipulator(true);
 
 
