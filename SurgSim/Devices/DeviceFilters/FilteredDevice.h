@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DEVICES_DEVICEFILTERS_FILTEREDDEVICE_H
 #define SURGSIM_DEVICES_DEVICEFILTERS_FILTEREDDEVICE_H
 
+#include <boost/thread/shared_mutex.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -81,6 +82,9 @@ private:
 	/// The DeviceFilter(s).  m_devices.back() is the DeviceFilter to be connected to any
 	/// InputComponent or OutputComponent.  m_devices.front() will be connected to the raw/base device.
 	std::vector<std::shared_ptr<DeviceFilter>> m_filters;
+
+	/// The mutex to protect access to the filters.
+	boost::shared_mutex m_filterMutex;
 };
 
 };  // namespace Devices

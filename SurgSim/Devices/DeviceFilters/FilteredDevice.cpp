@@ -58,6 +58,7 @@ std::string FilteredDevice::getName() const
 
 bool FilteredDevice::initialize()
 {
+	boost::unique_lock<boost::shared_mutex>(m_filterMutex);
 	SURGSIM_ASSERT(!m_initialized) << "Cannot initialize more than once.";
 	bool result = true;
 	auto logger = Framework::Logger::getLogger("Devices/FilteredDevice");
@@ -96,36 +97,43 @@ bool FilteredDevice::initialize()
 
 bool FilteredDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer)
 {
+	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
 	return m_filters.back()->addInputConsumer(inputConsumer);
 }
 
 bool FilteredDevice::removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer)
 {
+	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
 	return m_filters.back()->removeInputConsumer(inputConsumer);
 }
 
 void FilteredDevice::clearInputConsumers()
 {
+	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
 	m_filters.back()->clearInputConsumers();
 }
 
 bool FilteredDevice::setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer)
 {
+	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
 	return m_filters.back()->setOutputProducer(outputProducer);
 }
 
 bool FilteredDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer)
 {
+	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
 	return m_filters.back()->removeOutputProducer(outputProducer);
 }
 
 bool FilteredDevice::hasOutputProducer()
 {
+	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
 	return m_filters.back()->hasOutputProducer();
 }
 
 void FilteredDevice::clearOutputProducer()
 {
+	boost::shared_lock<boost::shared_mutex>(m_filterMutex);
 	m_filters.back()->clearOutputProducer();
 }
 
@@ -138,6 +146,7 @@ void FilteredDevice::setDevice(std::shared_ptr<Input::DeviceInterface> device)
 
 void FilteredDevice::addFilter(std::shared_ptr<DeviceFilter> device)
 {
+	boost::unique_lock<boost::shared_mutex>(m_filterMutex);
 	SURGSIM_ASSERT(!m_initialized) << "Cannot add filter after initialization";
 	m_filters.push_back(device);
 }
