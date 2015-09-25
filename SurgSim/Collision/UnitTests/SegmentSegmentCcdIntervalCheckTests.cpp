@@ -47,7 +47,8 @@ TEST(SegmentSegmentCcdIntervalCheckTests, Initialization)
 	std::array<Math::Vector3d, 2> qStart = {Math::Vector3d(2.0, 1.0, 4.0), Math::Vector3d(1.0, 3.5, 2.5)};
 	std::array<Math::Vector3d, 2> qEnd = {Math::Vector3d(0.0, 1.0, 2.0), Math::Vector3d(-2.0, 1.5, 3.5)};
 
-	ASSERT_NO_THROW(SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06));
+	ASSERT_NO_THROW(SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd,
+					1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06));
 	SegmentSegmentCcdIntervalCheck status(pStart, pEnd, qStart, qEnd, 1.0e-06, 2.0e-06, 3.0e-06, 4.0e-06);
 
 	Math::Vector3d p11 = status.p1T0();

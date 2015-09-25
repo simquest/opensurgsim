@@ -263,7 +263,7 @@ SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCh
 	// TO DO: figure out if both of the bounds are effective, i.e. if it makes sense to keep them both.
 	// (My guess would be that the first is more effective for perpendicular segments, second for near-parallel.)
 	double crossProductUpperBound1  = maxLengthP * maxLengthQ;             // ignores the sine of the angle
-	double crossProductUpperBound2  = std::sqrt(P1P2xQ1Q2_sq_values.getMax());  // uses Interval_nD -> NOT necessarily tight
+	double crossProductUpperBound2  = std::sqrt(P1P2xQ1Q2_sq_values.getMax()); // NOT necessarily tight
 	double crossProductUpperBound = std::min(crossProductUpperBound1,
 									crossProductUpperBound2);  // pick the LOWEST of the upper bounds...
 	// Compute the upper bound on the volume that the tetrahedron P1P2Q1Q2 would have if the segments were

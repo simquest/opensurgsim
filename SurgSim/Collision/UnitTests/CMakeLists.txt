@@ -31,8 +31,8 @@ set(UNIT_TEST_SOURCES
 	OctreeContactCalculationTests.cpp
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp
-	ShapeCollisionRepresentationTest.cpp
 	SegmentSegmentCcdIntervalCheckTests.cpp
+	ShapeCollisionRepresentationTest.cpp
 	SphereDoubleSidedPlaneContactCalculationTests.cpp
 	SpherePlaneContactCalculationTests.cpp
 	SphereSphereContactCalculationTests.cpp

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_SEGMENTSEGMENTINTERVALCCDCHECK_H
-#define SURGSIM_COLLISION_SEGMENTSEGMENTINTERVALCCDCHECK_H
+#ifndef SURGSIM_COLLISION_SEGMENTSEGMENTCCDINTERVALCHECK_H
+#define SURGSIM_COLLISION_SEGMENTSEGMENTCCDINTERVALCHECK_H
 
 #include "SurgSim/Math/LinearMotionArithmetic.h"
 #include "SurgSim/Math/PolynomialValues.h"
@@ -226,4 +226,4 @@ private:
 }; // namespace Collision
 }; // namespace SurgSim
 
-#endif // SURGSIM_COLLISION_SEGMENTSEGMENTINTERVALCCDCHECK_H
+#endif // SURGSIM_COLLISION_SEGMENTSEGMENTCCDINTERVALCHECK_H
