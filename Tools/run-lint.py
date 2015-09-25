@@ -411,7 +411,7 @@ if __name__ == '__main__':
           args.files.append(os.path.join(current_dir, 'CMakeLists.txt'))
         # always skip .git, build directories, ThirdParty...
         for bad in filter(lambda x:
-                            re.search(r'^(?:\.git|build.*|ThirdParty)$', x, re.IGNORECASE),
+                            re.search(r'^(?:\.git|build.*|ThirdParty|Modules)$', x, re.IGNORECASE),
                           subdirs):
           subdirs.remove(bad)
 
