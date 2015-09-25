@@ -59,13 +59,13 @@ public:
 	bool finalize() override;
 
 	/// Sets the raw/base device.
-	/// \param The non-filter device.
+	/// \param device The device connected to the filter(s).
 	void setDevice(std::shared_ptr<Input::DeviceInterface> device);
 
 	/// Adds a DeviceFilter.  The first filter that is added will be connected to the raw/base device.
 	/// The last filter that is added will interface with InputConsumers and/or an OutputProducer.
 	/// Any filters added in-between will be connected in order.
-	/// \param A DeviceFilter.
+	/// \param device A DeviceFilter.
 	void addFilter(std::shared_ptr<DeviceFilter> device);
 
 private:
