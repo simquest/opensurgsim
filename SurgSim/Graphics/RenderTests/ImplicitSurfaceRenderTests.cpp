@@ -52,8 +52,9 @@ class ImplicitSurfaceRenderTests : public RenderTest
 
 TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 {
+	std::array<int, 2> dimensions = {1280, 720};
+	viewElement->getView()->setDimensions(dimensions);
 	viewElement->enableManipulator(true);
-
 
 	auto light = std::make_shared<Graphics::OsgLight>("Light");
 	light->setDiffuseColor(Math::Vector4d(1.0, 1.0, 1.0, 1.0));
@@ -68,7 +69,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
 			Blocks::createImplicitSurfaceEffect(viewElement->getView(), viewElement->getCamera(), light, 0.01f, 800.0f,
 												1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0),
-												Math::Vector4f(1.0, 1.0, 1.0, 1.0), 100, false);
+												Math::Vector4f(1.0, 1.0, 1.0, 1.0), 100, true);
 
 	for (auto element : surface)
 	{
@@ -85,7 +86,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	// Create the point cloud
 	auto bunny = std::make_shared<Graphics::OsgMeshRepresentation>("Bunny");
-	bunny->loadMesh("Geometry/stanford_bunny.ply");
+	bunny->loadMesh("Geometry/suzanne.ply");
 
 	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
 
@@ -104,7 +105,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(10000));
 	runtime->stop();
 }
 
