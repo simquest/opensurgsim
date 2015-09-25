@@ -41,7 +41,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem2DRepresentation.cpp
 	Fem3D.cpp
 	Fem3DConstraintFixedPoint.cpp
-	Fem3DConstraintFrictionlessContact.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
@@ -103,12 +102,14 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem-inl.h
 	Fem1D.h
 	Fem1DConstraintFixedPoint.h
+	Fem1DConstraintFrictionlessContact.h
 	Fem1DElementBeam.h
 	Fem1DLocalization.h
 	Fem1DPlyReaderDelegate.h
 	Fem1DRepresentation.h
 	Fem2D.h
 	Fem2DConstraintFixedPoint.h
+	Fem2DConstraintFrictionlessContact.h
 	Fem2DElementTriangle.h
 	Fem2DLocalization.h
 	Fem2DPlyReaderDelegate.h
@@ -122,6 +123,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DLocalization.h
 	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
+	FemConstraintFrictionlessContact.h
+	FemConstraintFrictionlessContact-inl.h
 	FemElement.h
 	FemElement-inl.h
 	FemElementStructs.h
