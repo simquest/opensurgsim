@@ -40,14 +40,14 @@ void ForceScale::filterOutput(const std::string& device, const DataGroup& dataTo
 
 	*result = dataToFilter;
 
-	Vector3d force = Vector3d::Zero();
+	Vector3d force;
 	if (dataToFilter.vectors().get(DataStructures::Names::FORCE, &force))
 	{
 		force *= m_forceScale;
 		result->vectors().set(DataStructures::Names::FORCE, force);
 	}
 
-	Vector3d torque = Vector3d::Zero();
+	Vector3d torque;
 	if (dataToFilter.vectors().get(DataStructures::Names::TORQUE, &torque))
 	{
 		torque *= m_torqueScale;
