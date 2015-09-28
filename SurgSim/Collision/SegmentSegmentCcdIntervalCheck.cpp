@@ -217,7 +217,7 @@ SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCh
 		return IntervalCheckNoCollisionVolume;  // collision check #1 says no collision
 	}
 
-	// [The following eqns and their derivation are written up in
+	// The following eqns and their derivation are written up in
 	// the document Segment-segmentCCDlocationcheck.pdf in the Assembla OSS Files page. See link:
 	// https://www.assembla.com/spaces/OpenSurgSim/documents/dce2Euy6Cr5znOdmr6CpXy/download/dce2Euy6Cr5znOdmr6CpXy
 	// 0 = \mu (P1P2 x Q1Q2)^2 - (P1P2 * P1Q1) Q1Q2^2 + (Q1Q2 * P1Q1) (P1P2 * Q1Q2)
@@ -255,8 +255,10 @@ SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCh
 	Math::Interval<double> Q1Q2_sq_values        = Q1Q2_sq().valuesOverInterval(range);
 	Math::Interval<double> P1P2xQ1Q2_sq_values   = crossValueOnInterval(range);
 
-	// Now we need to account for thickness.  [Look at Docs/Collision detection/Segment-segment
-	// CCD with thickness.pdf for details!]
+	// Now we need to account for thickness.
+	// The following eqns and their derivation are written up in
+	// the document Line-lineCCDwiththickness.pdf in the Assembla OSS Files page. See link:
+	// https://www.assembla.com/spaces/OpenSurgSim/documents/c_CS4My6Cr5APjacwqjQXA/download/c_CS4My6Cr5APjacwqjQXA
 	double maxLengthP = std::sqrt(P1P2_sq_values.getMax());
 	double maxLengthQ = std::sqrt(Q1Q2_sq_values.getMax());
 	// Figure out some upper bounds on the value of | P1P2 x Q1Q2 |.
