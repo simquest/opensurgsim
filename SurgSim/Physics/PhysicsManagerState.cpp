@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -155,18 +155,6 @@ void PhysicsManagerState::setCollisionPairs(const std::vector<std::shared_ptr<Su
 const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& PhysicsManagerState::getCollisionPairs()
 {
 	return m_collisionPairs;
-}
-
-void PhysicsManagerState::setExcludedCollisionPairs(
-	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& val)
-{
-	m_excludedCollisionPairs = val;
-}
-
-const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>&
-	PhysicsManagerState::getExcludedCollisionPairs() const
-{
-	return m_excludedCollisionPairs;
 }
 
 void PhysicsManagerState::setConstraintGroup(

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,43 +88,6 @@ void PhysicsManager::getFinalState(SurgSim::Physics::PhysicsManagerState* s) con
 	m_finalState.get(s);
 }
 
-std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>::iterator PhysicsManager::findExcludedCollisionPair(
-	std::shared_ptr<SurgSim::Collision::Representation> representation1,
-	std::shared_ptr<SurgSim::Collision::Representation> representation2)
-{
-	return std::find_if(m_excludedCollisionPairs.begin(), m_excludedCollisionPairs.end(),
-		[&representation1, &representation2] (const std::shared_ptr<SurgSim::Collision::CollisionPair>&pair)
-		{
-			return (pair->getFirst() == representation1 && pair->getSecond() == representation2)
-				|| (pair->getFirst() == representation2 && pair->getSecond() == representation1);
-		});
-}
-
-void PhysicsManager::addExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
-											  std::shared_ptr<SurgSim::Collision::Representation> representation2)
-{
-	boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
-
-	if (findExcludedCollisionPair(representation1, representation2) == m_excludedCollisionPairs.end())
-	{
-		m_excludedCollisionPairs.push_back(
-			std::make_shared<SurgSim::Collision::CollisionPair>(representation1, representation2));
-	}
-}
-
-void PhysicsManager::removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
-												 std::shared_ptr<SurgSim::Collision::Representation> representation2)
-{
-	boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
-
-	auto candidatePair = findExcludedCollisionPair(representation1, representation2);
-
-	if (candidatePair != m_excludedCollisionPairs.end())
-	{
-		m_excludedCollisionPairs.erase(candidatePair);
-	}
-}
-
 bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	std::shared_ptr<Representation> representation = tryAddComponent(component, &m_representations);
@@ -157,11 +120,6 @@ bool PhysicsManager::doUpdate(double dt)
 	state->setCollisionRepresentations(m_collisionRepresentations);
 	state->setParticleRepresentations(m_particleRepresentations);
 	state->setConstraintComponents(m_constraintComponents);
-
-	{
-		boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
-		state->setExcludedCollisionPairs(m_excludedCollisionPairs);
-	}
 
 	for (const auto& computation : m_computations)
 	{
