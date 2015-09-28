@@ -30,7 +30,9 @@ static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 /// should be rendered as a surface need to be in the render group GROUP_IMPLICIT_SURFACE.
 /// The rest is done by the graphics system.
 /// All of the elements added are \sa RenderPass elements
+/// \param view the view to pull screen space dimensions from
 /// \param camera the view camera that is used for this pass
+/// \param light the scene light to be used to shade the surface
 /// \param sphereRadius the radius in meters that each point sprite sphere should have
 /// \param sphereScale the scaling factor for the point sprite sphere based on distance from the camera
 /// \param textureSize the size of the render textures, not including the final pass that takes the size of the
