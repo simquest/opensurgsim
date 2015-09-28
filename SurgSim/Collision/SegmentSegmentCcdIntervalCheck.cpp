@@ -214,7 +214,7 @@ SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCh
 	bool lineDistanceIsZero = P1Q1_P1P2_Q1Q2_values.containsZero();
 	if (!lineDistanceIsZero)
 	{
-		return IntervalCheckNoCollisionVolume;  // collision check #1 says no collision
+		return IntervalCheckNoCollisionVolume;
 	}
 
 	// The following eqns and their derivation are written up in
@@ -238,10 +238,10 @@ SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCh
 	bool segmentLocationsMakeCollisionPossible = muExpression.containsZero() && nuExpression.containsZero();
 	if (!segmentLocationsMakeCollisionPossible)
 	{
-		return IntervalCheckNoCollisionEndpoints;  // collision check #2 says no collision
+		return IntervalCheckNoCollisionEndpoints;
 	}
 
-	return IntervalCheckPossibleCollision;  // as far as we know, a collision is possible
+	return IntervalCheckPossibleCollision;
 }
 
 SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCheck::possibleCollisionTestWithThickness(
@@ -282,7 +282,7 @@ SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCh
 	bool lineDistanceIsSmallEnough = P1Q1_P1P2_Q1Q2_values.containsZero();
 	if (!lineDistanceIsSmallEnough)
 	{
-		return IntervalCheckNoCollisionVolume;  // collision check #1 says no collision
+		return IntervalCheckNoCollisionVolume;
 	}
 
 	// If we detected that a collision is possible based on segment orientation, then we will make one more
@@ -309,10 +309,10 @@ SegmentSegmentCcdIntervalCheck::IntervalCheckResults SegmentSegmentCcdIntervalCh
 	bool segmentLocationsMakeCollisionPossible = lambdaExpression.containsZero() && muExpression.containsZero();
 	if (!segmentLocationsMakeCollisionPossible)
 	{
-		return IntervalCheckNoCollisionEndpoints;  // collision check #2 says no collision
+		return IntervalCheckNoCollisionEndpoints;
 	}
 
-	return IntervalCheckPossibleCollision;  // as far as we know, a collision is possible
+	return IntervalCheckPossibleCollision;
 }
 
 }; // namespace Collision
