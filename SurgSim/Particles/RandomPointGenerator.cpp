@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,42 +18,44 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Particles/DefaultPointGenerator.h"
 #include "SurgSim/Particles/RandomBoxPointGenerator.h"
+#include "SurgSim/Particles/RandomMeshPointGenerator.h"
 #include "SurgSim/Particles/RandomSpherePointGenerator.h"
+
 
 namespace SurgSim
 {
 namespace Particles
 {
-using SurgSim::Math::Vector3d;
 
 RandomPointGenerator::RandomPointGenerator()
 {
-	for (size_t index = 0; index < static_cast<size_t>(SurgSim::Math::SHAPE_TYPE_COUNT); ++index)
+	for (size_t index = 0; index < static_cast<size_t>(Math::SHAPE_TYPE_COUNT); ++index)
 	{
 		m_pointGenerators[index].reset(new DefaultPointGenerator());
 	}
 
-	m_pointGenerators[SurgSim::Math::SHAPE_TYPE_BOX].reset(new RandomBoxPointGenerator());
-	m_pointGenerators[SurgSim::Math::SHAPE_TYPE_SPHERE].reset(new RandomSpherePointGenerator());
+	m_pointGenerators[Math::SHAPE_TYPE_BOX].reset(new RandomBoxPointGenerator());
+	m_pointGenerators[Math::SHAPE_TYPE_MESH].reset(new RandomMeshPointGenerator());
+	m_pointGenerators[Math::SHAPE_TYPE_SPHERE].reset(new RandomSpherePointGenerator());
 }
 
-Vector3d RandomPointGenerator::pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape)
+Math::Vector3d RandomPointGenerator::pointInShape(std::shared_ptr<Math::Shape> shape)
 {
 	SURGSIM_ASSERT(shape != nullptr) << "Empty shape passed in.";
 
 	auto shapeType = shape->getType();
-	SURGSIM_ASSERT(SurgSim::Math::SHAPE_TYPE_NONE < shapeType && shapeType < SurgSim::Math::SHAPE_TYPE_COUNT) <<
+	SURGSIM_ASSERT(Math::SHAPE_TYPE_NONE < shapeType && shapeType < Math::SHAPE_TYPE_COUNT) <<
 		"Unknown shape type passed in.";
 
 	return m_pointGenerators[shapeType]->pointInShape(shape);
 }
 
-Vector3d RandomPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape)
+Math::Vector3d RandomPointGenerator::pointOnShape(std::shared_ptr<Math::Shape> shape)
 {
 	SURGSIM_ASSERT(shape != nullptr) << "Empty shape passed in.";
 
 	auto shapeType = shape->getType();
-	SURGSIM_ASSERT(SurgSim::Math::SHAPE_TYPE_NONE < shapeType && shapeType < SurgSim::Math::SHAPE_TYPE_COUNT) <<
+	SURGSIM_ASSERT(Math::SHAPE_TYPE_NONE < shapeType && shapeType < Math::SHAPE_TYPE_COUNT) <<
 		"Unknown shape type passed in.";
 
 	return m_pointGenerators[shapeType]->pointOnShape(shape);

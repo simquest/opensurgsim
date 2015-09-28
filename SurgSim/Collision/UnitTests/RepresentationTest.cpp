@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
 
 
 #include <gtest/gtest.h>
+#include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/ThreadPool.h"
@@ -183,6 +185,60 @@ TEST_F(RepresentationTest, AddContactsInParallelTest)
 		p.wait();
 	});
 	ASSERT_EQ(numContacts, rep->getCollisions().unsafeGet()[rep].size());
+}
+
+TEST_F(RepresentationTest, Ignoring)
+{
+	ASSERT_EQ(0, planeRep->getIgnoring().size());
+	ASSERT_EQ(0, sphereRep->getIgnoring().size());
+
+	EXPECT_TRUE(planeRep->ignore("Test"));
+	EXPECT_FALSE(planeRep->ignore("Test"));
+	EXPECT_TRUE(planeRep->ignore(sphereRep));
+
+	EXPECT_TRUE(planeRep->isIgnoring("Test"));
+	EXPECT_TRUE(planeRep->isIgnoring("Element/SphereShape"));
+	EXPECT_FALSE(planeRep->isIgnoring("Invalid"));
+
+	auto ignoring = planeRep->getIgnoring();
+	ASSERT_EQ(2, ignoring.size());
+	EXPECT_NE(ignoring.end(), std::find(ignoring.begin(), ignoring.end(), "Test"));
+	EXPECT_NE(ignoring.end(), std::find(ignoring.begin(), ignoring.end(), "Element/SphereShape"));
+
+	std::vector<std::string> newExclusions;
+	newExclusions.push_back("Test");
+	newExclusions.push_back("Element/PlaneShape");
+	sphereRep->setIgnoring(newExclusions);
+
+	EXPECT_TRUE(sphereRep->isIgnoring("Test"));
+	EXPECT_TRUE(sphereRep->isIgnoring("Element/PlaneShape"));
+	EXPECT_FALSE(sphereRep->isIgnoring("Invalid"));
+
+	ignoring = sphereRep->getIgnoring();
+	ASSERT_EQ(2, ignoring.size());
+	EXPECT_NE(ignoring.end(), std::find(ignoring.begin(), ignoring.end(), "Test"));
+	EXPECT_NE(ignoring.end(), std::find(ignoring.begin(), ignoring.end(), "Element/PlaneShape"));
+}
+
+TEST_F(RepresentationTest, SerializationTest)
+{
+	std::vector<std::string> ignoring;
+	ignoring.push_back("Test");
+	ignoring.push_back("Element/PlaneShape");
+	EXPECT_NO_THROW(sphereRep->setValue("Ignoring", ignoring));
+
+	YAML::Node node;
+	EXPECT_NO_THROW(node = YAML::convert<Framework::Component>::encode(*sphereRep));
+	EXPECT_TRUE(node.IsMap());
+
+	std::shared_ptr<Representation> decodedSphereRep;
+	ASSERT_NO_THROW(decodedSphereRep = std::dynamic_pointer_cast<Representation>(
+				node.as<std::shared_ptr<Framework::Component>>()));
+
+	ASSERT_NE(nullptr, decodedSphereRep);
+	EXPECT_EQ(2, decodedSphereRep->getIgnoring().size());
+	EXPECT_TRUE(decodedSphereRep->isIgnoring("Test"));
+	EXPECT_TRUE(decodedSphereRep->isIgnoring("Element/PlaneShape"));
 }
 
 }; // namespace Collision

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -123,14 +123,6 @@ public:
 	/// \return	The collision pairs.
 	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& getCollisionPairs();
 
-	/// Sets the exclusion pairs
-	/// \param val The list of collision pairs to be excluded from collision.
-	void setExcludedCollisionPairs(const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& val);
-
-	/// Gets the exclusion pairs
-	/// \return The stored exclusion pairs
-	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& getExcludedCollisionPairs() const;
-
 	/// Sets the group of constraints to a given value, the grouping indicates what type of constraint we are dealing
 	/// with.
 	/// \param	type	   	The type of constraint grouping e.g. Contact Constraints.
@@ -216,9 +208,6 @@ private:
 
 	/// The local list of collision pairs.
 	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> m_collisionPairs;
-
-	/// List of collision pairs to be excluded.
-	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> m_excludedCollisionPairs;
 
 	/// The local map of constraints.
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -216,6 +216,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 			std::make_shared<ShapeCollisionRepresentation>("VirtualToothCollision" + std::to_string(i));
 		virtualToothCollision->setShape(*it);
 		virtualToothCollision->setLocalPose(RigidTransform3d::Identity());
+		virtualToothCollision->ignore(collisionRepresentation);
 
 		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
@@ -256,6 +257,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>("Collision");
+	collisionRepresentation->ignore("wound/Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
 	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>(armName);
@@ -267,19 +269,6 @@ std::shared_ptr<SceneElement> createArmSceneElement(
 	armSceneElement->addComponent(material);
 
 	return armSceneElement;
-}
-
-template <typename Type>
-std::shared_ptr<Type> getComponentChecked(std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement,
-		const std::string& name)
-{
-	std::shared_ptr<SurgSim::Framework::Component> component = sceneElement->getComponent(name);
-	SURGSIM_ASSERT(component != nullptr) << "Failed to get Component named '" << name << "'.";
-
-	std::shared_ptr<Type> result = std::dynamic_pointer_cast<Type>(component);
-	SURGSIM_ASSERT(result != nullptr) << "Failed to convert Component to requested type.";
-
-	return result;
 }
 
 std::shared_ptr<OsgViewElement> createViewElement()
@@ -444,19 +433,6 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(stapler);
 	scene->addSceneElement(wound);
 	scene->addSceneElement(keyboard);
-
-	// Exclude collision between certain Collision::Representations
-	physicsManager->addExcludedCollisionPair(
-		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
-		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision0"));
-
-	physicsManager->addExcludedCollisionPair(
-		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
-		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision1"));
-
-	physicsManager->addExcludedCollisionPair(
-		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
-		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
 
 	runtime->execute();
 	return 0;

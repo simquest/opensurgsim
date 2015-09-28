@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM3DCONSTRAINTFRICTIONLESSCONTACT_H
-#define SURGSIM_PHYSICS_FEM3DCONSTRAINTFRICTIONLESSCONTACT_H
+#ifndef SURGSIM_PHYSICS_FEM1DCONSTRAINTFRICTIONLESSCONTACT_H
+#define SURGSIM_PHYSICS_FEM1DCONSTRAINTFRICTIONLESSCONTACT_H
 
 #include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
-#include "SurgSim/Physics/Fem3DLocalization.h"
+#include "SurgSim/Physics/Fem1DLocalization.h"
 
 namespace SurgSim
 {
@@ -25,10 +25,10 @@ namespace SurgSim
 namespace Physics
 {
 
-typedef FemConstraintFrictionlessContact<Fem3DLocalization> Fem3DConstraintFrictionlessContact;
+typedef FemConstraintFrictionlessContact<Fem1DLocalization> Fem1DConstraintFrictionlessContact;
 
-};  // namespace Physics
+}; // namespace Physics
 
-};  // namespace SurgSim
+}; // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_FEM3DCONSTRAINTFRICTIONLESSCONTACT_H
+#endif // SURGSIM_PHYSICS_FEM1DCONSTRAINTFRICTIONLESSCONTACT_H

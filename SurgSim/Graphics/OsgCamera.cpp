@@ -115,7 +115,7 @@ osg::Uniform* addMatrixUniform(osg::Node* node, const std::string& name)
 	return uniform;
 }
 
-osg::Switch* createUniformUpdateNode(long mask)
+osg::Switch* createUniformUpdateNode(long mask) // NOLINT
 {
 	auto node = new osg::Switch;
 
@@ -131,9 +131,9 @@ osg::Switch* createUniformUpdateNode(long mask)
 	return node;
 }
 
-const long CullMask = 0xfffffff1;
-const long CullMaskLeft = 0x1;
-const long CullMaskRight = 0x2;
+const long CullMask = 0xfffffff1; // NOLINT
+const long CullMaskLeft = 0x1; // NOLINT
+const long CullMaskRight = 0x2; // NOLINT
 
 };
 
@@ -397,7 +397,7 @@ void OsgCamera::setMainCamera(bool val)
 		{
 			m_camera->removeChild(m_materialProxy);
 
-			std::array<long, 2> masks = {CullMaskLeft, CullMaskRight};
+			std::array<long, 2> masks = {CullMaskLeft, CullMaskRight}; // NOLINT
 
 			// Insert two nodes into the camera hierarchy, they will update the global uniforms with the correct
 			// value. Also attach the material proxy to each of the nodes.
