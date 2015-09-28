@@ -42,7 +42,7 @@ Math::Vector3d RandomMeshPointGenerator::pointOnShape(std::shared_ptr<Math::Shap
 	if (mesh->getNumTriangles() > 0)
 	{
 		auto& triangles = mesh->getTriangles();
-		std::uniform_int_distribution<int> triangleSelector(0, triangles.size() - 1);
+		std::uniform_int_distribution<int> triangleSelector(0, static_cast<int>(triangles.size()) - 1);
 
 		bool validTriangleFound = false;
 		size_t index;
