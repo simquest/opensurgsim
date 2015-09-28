@@ -455,6 +455,16 @@ public:
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
+	void setViewportSize(std::array<double, 2> dimensions)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	std::array<double, 2> getViewportSize() const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
 private:
 	/// Number of times the camera has been updated
 	int m_numUpdates;
@@ -525,6 +535,18 @@ public:
 	{
 		std::array<int, 2> result = {m_width, m_height};
 		return result;
+	}
+
+	void setDimensionsDouble(const std::array<double, 2>& dimensions)
+	{
+		m_width = dimensions[0];
+		m_height = dimensions[1];
+	}
+
+	std::array<double, 2> getDimensionsDouble() const
+	{
+		std::array<double, 2> result = {static_cast<double>(m_width), static_cast<double>(m_height)};
+		return std::move(result);
 	}
 
 	/// Sets whether the view window has a border

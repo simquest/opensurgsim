@@ -400,6 +400,11 @@ TEST_F(OsgProgramRenderTests, BlurShader)
 	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("Textures/checkered.png", &filename));
 	texture1->loadImage(filename);
 
+
+	auto texture2 = std::make_shared<Graphics::OsgTexture2d>();
+	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("Textures/checkered.png", &filename));
+	texture2->loadImage(filename);
+
 	// Material
 	auto material = Graphics::buildMaterial("Shaders/gauss_blur_horizontal.vert",
 											"Shaders/gauss_blur.frag");
@@ -438,71 +443,6 @@ TEST_F(OsgProgramRenderTests, BlurShader)
 	element->addComponent(material);
 
 	scene->addSceneElement(element);
-
-	run();
-}
-
-TEST_F(OsgProgramRenderTests, TwoSided)
-{
-	using SurgSim::Math::Vector2d;
-
-	// ShadowMap placeholder
-	auto material = std::make_shared<Graphics::OsgMaterial>("placeholder");
-	Blocks::enable2DTexture(material, "shadowMap", Graphics::SHADOW_TEXTURE_UNIT, "Textures/black.png");
-	viewElement->addComponent(material);
-	viewElement->getCamera()->setMaterial(material);
-
-	auto element = std::make_shared<Framework::BasicSceneElement>("Graphics");
-	auto rep = std::make_shared<Graphics::OsgMeshRepresentation>("Mesh");
-
-	auto mesh = rep->getMesh();
-
-	auto vertex = Mesh::VertexType();
-	vertex.position = Vector3d(-1.0, -1.0, 0.0);
-	vertex.data.texture = Vector2d(0.0, 0.0);
-	mesh->addVertex(vertex);
-	vertex.position = Vector3d(-1.0, 1.0, 0.0);
-	vertex.data.texture = Vector2d(0.0, 1.0);
-	mesh->addVertex(vertex);
-	vertex.position = Vector3d(1.0, -1.0, 0.0);
-	vertex.data.texture = Vector2d(1.0, 0.0);
-	mesh->addVertex(vertex);
-	vertex.position = Vector3d(1.0, 1.0, 0.0);
-	vertex.data.texture = Vector2d(1.0, 1.0);
-	mesh->addVertex(vertex);
-
-	{
-		Mesh::TriangleType::IdType ids = {{3, 1, 0}};
-		mesh->addTriangle(Mesh::TriangleType(ids));
-	}
-	{
-		Mesh::TriangleType::IdType ids = {{0, 2, 3}};
-		mesh->addTriangle(Mesh::TriangleType(ids));
-	}
-	mesh->dirty();
-	element->addComponent(rep);
-
-	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
-	element->addComponent(axes);
-
-	material = Graphics::buildMaterial("Shaders/ds_mapping_material.vert",
-									   "Shaders/ds_mapping_material_twosided.frag");
-
-	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
-
-	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(0.8, 0.8, 0.8, 1.0));
-
-	material->addUniform("float", "shininess");
-	material->setValue("shininess", 10.0f);
-
-	Blocks::enable2DTexture(material, "diffuseMap", Graphics::DIFFUSE_TEXTURE_UNIT, "Textures/checkered.png", false);
-
-	element->addComponent(material);
-
-	scene->addSceneElement(element);
-	rep->setMaterial(material);
 
 	run();
 }

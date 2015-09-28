@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,17 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gmock/gmock.h>
+/// \file sphere_normal.vert
+/// Vertex Shader to calculate normals of a point sprite sphere generated surface
+/// Most of the equations and concepts come from the nVidia
+/// Screen Space Fluid Rendering paper and presentation from GDC '10
+/// found here: http://developer.download.nvidia.com/presentations/2010/gdc/Direct3D_Effects.pdf
 
-#include "SurgSim/Framework/Logger.h"
-#include "SurgSim/Framework/LogOutput.h"
+#version 120
 
-int main(int argc, char** argv)
+void main(void)
 {
-	//Disable logging during tests
-	std::shared_ptr<SurgSim::Framework::LoggerManager> loggerManager;
-	loggerManager = SurgSim::Framework::Logger::getLoggerManager();
-	loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
-	testing::InitGoogleMock(&argc, argv);
-	return RUN_ALL_TESTS();
+	gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
