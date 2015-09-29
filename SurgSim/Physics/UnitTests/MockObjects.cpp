@@ -349,7 +349,15 @@ double MockFemElement::getVolume(const OdeState& state) const
 
 Vector MockFemElement::computeCartesianCoordinate(const OdeState& state, const Vector& barycentricCoordinate) const
 {
-	return SurgSim::Math::Vector3d::Zero();
+	SURGSIM_ASSERT(getNumNodes() == barycentricCoordinate.size());
+
+	Vector result = Vector::Zero(3);
+	for (size_t node = 0; node < getNumNodes(); node++)
+	{
+		result += state.getPosition(getNodeId(node)) * barycentricCoordinate[node];
+	}
+
+	return result;
 }
 
 Vector MockFemElement::computeNaturalCoordinate(const OdeState& state, const Vector& globalCoordinate) const
