@@ -36,11 +36,7 @@ LeapDevice::LeapDevice(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, bool, UseHmdTrackingMode, isUsingHmdTrackingMode,
 			setUseHmdTrackingMode);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, bool, ProvideImages, isProvidingImages, setProvideImages);
-
-	auto getter = std::bind(&LeapDevice::getHandTypeAsString, this);
-	auto setter = std::bind((void(LeapDevice::*)(const std::string&)) &LeapDevice::setHandType, this,
-			std::bind(SurgSim::Framework::convert<std::string>, std::placeholders::_1));
-	setAccessors("HandType", getter, setter);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LeapDevice, SurgSim::Devices::HandType, HandType, getHandType, setHandType);
 }
 
 
@@ -60,39 +56,6 @@ void LeapDevice::setHandType(HandType type)
 HandType LeapDevice::getHandType() const
 {
 	return m_handType;
-}
-
-void LeapDevice::setHandType(const std::string& type)
-{
-	std::string lowerCaseType = type;
-	std::transform(lowerCaseType.begin(), lowerCaseType.end(), lowerCaseType.begin(), ::tolower);
-	if (lowerCaseType == "left")
-	{
-		m_handType = HANDTYPE_LEFT;
-	}
-	else if (lowerCaseType == "right")
-	{
-		m_handType = HANDTYPE_RIGHT;
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Leap")) << "Cannot set hand type to :" << type
-			<< ". Valid hand types are 'Left' and 'Right'.";
-	}
-}
-
-std::string LeapDevice::getHandTypeAsString() const
-{
-	std::string result;
-	if (m_handType == HANDTYPE_LEFT)
-	{
-		result = "Left";
-	}
-	else
-	{
-		result = "Right";
-	}
-	return result;
 }
 
 void LeapDevice::setUseHmdTrackingMode(bool useHmdTrackingMode)

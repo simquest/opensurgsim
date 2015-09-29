@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 #ifndef SURGSIM_FRAMEWORK_ACCESSIBLE_H
 #define SURGSIM_FRAMEWORK_ACCESSIBLE_H
 
-#include <string>
-#include <memory>
-#include <unordered_map>
-#include <functional>
 #include <boost/any.hpp>
+#include <boost/preprocessor.hpp>
+#include <functional>
+#include <memory>
+#include <string>
+#include <unordered_map>
 #include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Math/Matrix.h"
@@ -242,8 +243,56 @@ std::string convert(boost::any val);
 		setSetter(#property, std::bind((void(class::*)(const type&))&class::setter, this,\
 					std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)));\
 	}
+
+
 }; // Framework
 }; // SurgSim
+
+#define SURGSIM_ENUM_TOSTRING(r, data, elem)    \
+	case data::elem: \
+		result = BOOST_PP_STRINGIZE(elem); \
+		break;
+
+#define SURGSIM_ENUM_FROMSTRING(r, data, elem)    \
+	if (value == BOOST_PP_STRINGIZE(elem)) \
+	{ \
+		rhs = data::elem; \
+		return true; \
+	}
+
+#define SURGSIM_SERIALIZABLE_ENUM(name, enumerators) \
+	enum name : int8_t\
+	{ \
+		BOOST_PP_SEQ_ENUM(enumerators) \
+	}; \
+	namespace YAML \
+	{ \
+	template <> \
+	struct convert<name> \
+	{ \
+		static Node encode(const name& rhs) \
+		{ \
+			Node result; \
+			using name; \
+			switch (rhs) \
+			{ \
+				BOOST_PP_SEQ_FOR_EACH(SURGSIM_ENUM_TOSTRING, name, enumerators) \
+				default: \
+					SURGSIM_FAILURE() << "Can not find enum value in " << #name  << ": " << rhs; \
+			} \
+			return result; \
+		} \
+		static bool decode(const Node& node, name& rhs) \
+		{ \
+			using name; \
+			std::string value = node.as<std::string>(); \
+			std::transform(value.begin(), value.end(), value.begin(), ::toupper); \
+			BOOST_PP_SEQ_FOR_EACH(SURGSIM_ENUM_FROMSTRING, name, enumerators) \
+			SURGSIM_FAILURE() << "Unknown " <<  #name << ": " << value; \
+			return false; \
+		} \
+	}; \
+	}
 
 #include "SurgSim/Framework/Accessible-inl.h"
 
