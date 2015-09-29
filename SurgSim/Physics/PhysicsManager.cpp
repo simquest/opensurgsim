@@ -96,15 +96,15 @@ bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::
 	std::shared_ptr<ConstraintComponent> constraintComponent = tryAddComponent(component, &m_constraintComponents);
 
 	return representation != nullptr || collisionRep != nullptr || particles != nullptr ||
-		constraintComponent != nullptr;
+		   constraintComponent != nullptr;
 }
 
 bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryRemoveComponent(component, &m_representations) ||
-		tryRemoveComponent(component, &m_collisionRepresentations) ||
-		tryRemoveComponent(component, &m_constraintComponents) ||
-		tryRemoveComponent(component, &m_particleRepresentations);
+		   tryRemoveComponent(component, &m_collisionRepresentations) ||
+		   tryRemoveComponent(component, &m_constraintComponents) ||
+		   tryRemoveComponent(component, &m_particleRepresentations);
 }
 
 bool PhysicsManager::doUpdate(double dt)
