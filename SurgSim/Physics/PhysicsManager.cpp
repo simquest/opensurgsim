@@ -131,5 +131,20 @@ bool PhysicsManager::doUpdate(double dt)
 	return true;
 }
 
+void PhysicsManager::doBeforeStop()
+{
+	// Empty the physics manager state
+	m_finalState.set(PhysicsManagerState());
+
+	// Give all known components a chance to untangle themselves
+	retireComponents(m_representations);
+	retireComponents(m_particleRepresentations);
+	retireComponents(m_collisionRepresentations);
+	retireComponents(m_constraintComponents);
+
+	// Call up the class hierarchy
+	ComponentManager::doBeforeStop();
+}
+
 }; // Physics
 }; // SurgSim

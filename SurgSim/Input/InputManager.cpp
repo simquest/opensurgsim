@@ -55,6 +55,14 @@ bool InputManager::doUpdate(double dt)
 	return true;
 }
 
+void InputManager::doBeforeStop()
+{
+	retireComponents(m_inputs);
+	retireComponents(m_outputs);
+
+	ComponentManager::doBeforeStop();
+}
+
 bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	auto input = tryAddComponent(component, &m_inputs);

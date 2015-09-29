@@ -256,6 +256,8 @@ void OsgManager::doBeforeStop()
 #endif
 	// Delete the viewer so that the graphics context will be released in the manager's thread
 	m_viewer = nullptr;
+
+	Graphics::Manager::doBeforeStop();
 }
 
 osg::ref_ptr<osgViewer::CompositeViewer> OsgManager::getOsgCompositeViewer() const

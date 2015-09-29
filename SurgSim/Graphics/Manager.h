@@ -114,6 +114,7 @@ protected:
 	/// \param group The group to be added.
 	virtual void addGroup(std::shared_ptr<Group> group);
 
+	void doBeforeStop() override;
 
 private:
 

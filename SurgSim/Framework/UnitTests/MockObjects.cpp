@@ -22,7 +22,8 @@ MockComponent::MockComponent(const std::string& name, bool succeedInit, bool suc
 	succeedWithInit(succeedInit),
 	succeedWithWakeUp(succeedWakeUp),
 	didWakeUp(false),
-	didInit(false)
+	didInit(false),
+	didRetire(false)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(
 		MockComponent, bool, SucceedWithInit, getSucceedWithInit, setSucceedWithInit);
@@ -45,6 +46,12 @@ bool MockComponent::doWakeUp()
 {
 	didWakeUp = true;
 	return succeedWithWakeUp;
+}
+
+void MockComponent::doRetire()
+{
+	didRetire = true;
+	Component::doRetire();
 }
 
 bool MockComponent::getSucceedWithInit() const

@@ -137,8 +137,9 @@ public:
 
 	virtual ~MockComponent();
 
-	virtual bool doInitialize();
-	virtual bool doWakeUp();
+	bool doInitialize() override;
+	bool doWakeUp() override;
+	void doRetire() override;
 
 	bool getSucceedWithInit() const;
 	void setSucceedWithInit(bool val);
@@ -150,6 +151,7 @@ public:
 	bool succeedWithWakeUp;
 	bool didWakeUp;
 	bool didInit;
+	bool didRetire;
 };
 
 class MockBehavior : public SurgSim::Framework::Behavior
@@ -257,6 +259,8 @@ private:
 	virtual void doBeforeStop()
 	{
 		didBeforeStop = true;
+		retireComponents(m_components);
+		ComponentManager::doBeforeStop();
 	}
 
 	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override

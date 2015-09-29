@@ -118,5 +118,11 @@ bool Representation::isIgnoring(const std::shared_ptr<Representation>& represent
 	return isIgnoring(representation->getFullName());
 }
 
+void Representation::doRetire()
+{
+	m_collisions.unsafeGet().clear();
+	Framework::Representation::doRetire();
+}
+
 }; // namespace Collision
 }; // namespace SurgSim

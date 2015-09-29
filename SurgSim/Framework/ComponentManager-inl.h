@@ -76,6 +76,17 @@ bool ComponentManager::tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Co
 	return result;
 };
 
+template<class T>
+void ComponentManager::retireComponents(const std::vector<std::shared_ptr<T>>& container)
+{
+	static_assert(std::is_base_of<Component, T>::value == true, "Class has to be of type component");
+	for (const auto& component : container)
+	{
+		component->retire();
+	}
+}
+
+
 }; // namespace Framework
 }; // namespace SurgSim
 
