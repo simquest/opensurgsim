@@ -121,6 +121,7 @@ bool Representation::isIgnoring(const std::shared_ptr<Representation>& represent
 void Representation::doRetire()
 {
 	m_collisions.unsafeGet().clear();
+	m_collisions.publish();
 	Framework::Representation::doRetire();
 }
 
