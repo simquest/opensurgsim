@@ -89,7 +89,11 @@ protected:
 		}
 		for (int i = 0; i < segmentNumEdges; ++i)
 		{
-			std::array<size_t, 2> edgePoints = {segmentEdges[i][0], segmentEdges[i][1]};
+			std::array<size_t, 2> edgePoints;
+			for (int j = 0; j < 2; j++)
+			{
+				edgePoints[j] = segmentEdges[i][j];
+			}
 			SegmentMeshPlain::EdgeType e(edgePoints);
 			mesh->addEdge(e);
 		}
@@ -101,7 +105,7 @@ protected:
 	std::shared_ptr<MeshShape> createCubeMeshShape()
 	{
 		// Create a Mesh Cube
-		static const int cubeNumPoints = 12;
+		static const int cubeNumPoints = 8;
 		static const double cubePoints[8][3] =
 		{
 			{-0.5, -0.5, -0.5}, {0.5, -0.5, -0.5}, {0.5, 0.5, -0.5}, {-0.5, 0.5, -0.5},
