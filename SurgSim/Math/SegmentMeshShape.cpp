@@ -34,6 +34,13 @@ SegmentMeshShape::SegmentMeshShape()
 	updateAabbTree();
 }
 
+SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
+	DataStructures::SegmentMeshPlain(other),
+	m_radius(other.m_radius)
+{
+	updateAabbTree();
+}
+
 int SegmentMeshShape::getType() const
 {
 	return SHAPE_TYPE_SEGMENTMESH;
@@ -89,6 +96,14 @@ bool SegmentMeshShape::doLoad(const std::string& fileName)
 std::shared_ptr<const DataStructures::AabbTree> SegmentMeshShape::getAabbTree() const
 {
 	return m_aabbTree;
+}
+
+std::shared_ptr<Shape> SegmentMeshShape::getTransformed(const RigidTransform3d& pose)
+{
+	auto transformed = std::make_shared<SegmentMeshShape>(*this);
+	transformed->transform(pose);
+	transformed->update();
+	return transformed;
 }
 
 void SegmentMeshShape::updateAabbTree()

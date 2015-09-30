@@ -28,6 +28,7 @@ set(SURGSIM_COLLISION_SOURCES
 	OctreePlaneDcdContact.cpp
 	OctreeSphereDcdContact.cpp
 	Representation.cpp
+	SegmentMeshTriangleMeshDcdContact.cpp
 	SegmentSegmentCcdIntervalCheck.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
@@ -55,6 +56,7 @@ set(SURGSIM_COLLISION_HEADERS
 	OctreePlaneDcdContact.h
 	OctreeSphereDcdContact.h
 	Representation.h
+	SegmentMeshTriangleMeshDcdContact.h
 	SegmentSegmentCcdIntervalCheck.h
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h
