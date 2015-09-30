@@ -16,7 +16,6 @@
 #ifndef SURGSIM_PHYSICS_FEM2DCONSTRAINTFRICTIONLESSCONTACT_H
 #define SURGSIM_PHYSICS_FEM2DCONSTRAINTFRICTIONLESSCONTACT_H
 
-#include "SurgSim/Physics/Fem2DLocalization.h"
 #include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
 
 namespace SurgSim
@@ -25,7 +24,7 @@ namespace SurgSim
 namespace Physics
 {
 
-typedef FemConstraintFrictionlessContact<Fem2DLocalization> Fem2DConstraintFrictionlessContact;
+typedef FemConstraintFrictionlessContact Fem2DConstraintFrictionlessContact;
 
 }; // namespace Physics
 
