@@ -13,11 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Fem1DConstraintFixedPoint.h"
-#include "SurgSim/Physics/Fem1DLocalization.h"
-#include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/FemConstraintFixedPoint.h"
 #include "SurgSim/Physics/FemElement.h"
-#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/FemLocalization.h"
+#include "SurgSim/Physics/FemRepresentation.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -27,24 +26,25 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem1DConstraintFixedPoint::Fem1DConstraintFixedPoint()
+FemConstraintFixedPoint::FemConstraintFixedPoint()
 {
 }
 
-Fem1DConstraintFixedPoint::~Fem1DConstraintFixedPoint()
+FemConstraintFixedPoint::~FemConstraintFixedPoint()
 {
 }
 
-void Fem1DConstraintFixedPoint::doBuild(double dt,
-										const ConstraintData& data,
-										const std::shared_ptr<Localization>& localization,
-										MlcpPhysicsProblem* mlcp,
-										size_t indexOfRepresentation,
-										size_t indexOfConstraint,
-										ConstraintSideSign sign)
+void FemConstraintFixedPoint::doBuild(double dt,
+	const ConstraintData& data,
+	const std::shared_ptr<Localization>& localization,
+	MlcpPhysicsProblem* mlcp,
+	size_t indexOfRepresentation,
+	size_t indexOfConstraint,
+	ConstraintSideSign sign)
 {
-	std::shared_ptr<Fem1DRepresentation> fem
-		= std::static_pointer_cast<Fem1DRepresentation>(localization->getRepresentation());
+	std::shared_ptr<FemRepresentation> fem
+		= std::static_pointer_cast<FemRepresentation>(localization->getRepresentation());
+	const size_t numDofPerNode = fem->getNumDofPerNode();
 
 	if (!fem->isActive())
 	{
@@ -53,7 +53,7 @@ void Fem1DConstraintFixedPoint::doBuild(double dt,
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
 	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
-		= std::static_pointer_cast<Fem1DLocalization>(localization)->getLocalPosition();
+		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
 
 	Vector3d globalPosition = localization->calculatePosition();
 
@@ -101,20 +101,20 @@ void Fem1DConstraintFixedPoint::doBuild(double dt,
 			if (coord.coordinate[index] != 0.0)
 			{
 				size_t nodeIndex = femElement->getNodeId(index);
-				m_newH.insert(6 * nodeIndex + axis) = coord.coordinate[index] * (dt * scale);
+				m_newH.insert(numDofPerNode * nodeIndex + axis) = coord.coordinate[index] * (dt * scale);
 			}
 		}
 		mlcp->updateConstraint(m_newH, fem->getComplianceMatrix() * m_newH.transpose(),
-							   indexOfRepresentation, indexOfConstraint + axis);
+			indexOfRepresentation, indexOfConstraint + axis);
 	}
 }
 
-SurgSim::Physics::ConstraintType Fem1DConstraintFixedPoint::getConstraintType() const
+SurgSim::Physics::ConstraintType FemConstraintFixedPoint::getConstraintType() const
 {
 	return SurgSim::Physics::FIXED_3DPOINT;
 }
 
-size_t Fem1DConstraintFixedPoint::doGetNumDof() const
+size_t FemConstraintFixedPoint::doGetNumDof() const
 {
 	return 3;
 }

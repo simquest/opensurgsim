@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_FEM2DCONSTRAINTFIXEDPOINT_H
 #define SURGSIM_PHYSICS_FEM2DCONSTRAINTFIXEDPOINT_H
 
-#include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/FemConstraintFixedPoint.h"
 
 namespace SurgSim
 {
@@ -24,31 +24,7 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Fem2DRepresentation bilateral 3d constraint implementation.
-///
-/// The family of FixedPoint constraints enforce equality between two points.
-class Fem2DConstraintFixedPoint : public ConstraintImplementation
-{
-public:
-	/// Constructor
-	Fem2DConstraintFixedPoint();
-
-	/// Destructor
-	virtual ~Fem2DConstraintFixedPoint();
-
-	SurgSim::Physics::ConstraintType getConstraintType() const override;
-
-private:
-	size_t doGetNumDof() const override;
-
-	void doBuild(double dt,
-				 const ConstraintData& data,
-				 const std::shared_ptr<Localization>& localization,
-				 MlcpPhysicsProblem* mlcp,
-				 size_t indexOfRepresentation,
-				 size_t indexOfConstraint,
-				 ConstraintSideSign sign) override;
-};
+typedef FemConstraintFixedPoint Fem2DConstraintFixedPoint;
 
 }; // namespace Physics
 
