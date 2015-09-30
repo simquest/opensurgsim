@@ -86,15 +86,17 @@ void SegmentMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Colli
 				auto verticesSegment = segmentMesh->getEdgePositions(*j);
 
 				// Check if the triangles intersect.
-				if (SurgSim::Math::calculateContactTriangleCapsule(verticesTriangle[0], verticesTriangle[1], verticesTriangle[2],
-					normalTriangle, verticesSegment[0], verticesSegment[1], radius, &depth, &penetrationPointSegment, &penetrationPointTriangle,
-					&normal))
+				if (SurgSim::Math::calculateContactTriangleCapsule(
+					verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
+					verticesSegment[0], verticesSegment[1], radius,
+					&depth, &penetrationPointSegment, &penetrationPointTriangle, &normal))
 				{
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
 					Vector3d barycentricCoordinate;
-					SurgSim::Math::barycentricCoordinates(penetrationPointSegment, verticesTriangle[0], verticesTriangle[1], verticesTriangle[2],
-						normalTriangle, &barycentricCoordinate);
+					SurgSim::Math::barycentricCoordinates(penetrationPointSegment,
+						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
+						&barycentricCoordinate);
 					penetrationPoints.first.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
 					penetrationPoints.first.rigidLocalPosition.setValue(

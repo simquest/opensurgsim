@@ -212,7 +212,7 @@ protected:
 
 				// Applying this correction to the two shapes should remove all intersections.
 				segmentMeshRep->setLocalPose(correctionTransform * transform.first * segmentMeshShapeTransform);
-				
+
 				// Perform collision detection.
 				std::shared_ptr<CollisionPair> pair2 = std::make_shared<CollisionPair>(segmentMeshRep, triangleMeshRep);
 				calcContact.calculateContact(pair2);
@@ -245,7 +245,7 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 
 	auto segmentMeshShape = createSegmentMeshShape();
 	auto meshShape = createCubeMeshShape();
-	
+
 	RigidTransform3d segmentMeshShapeTransform;
 	RigidTransform3d meshShapeTransform;
 
