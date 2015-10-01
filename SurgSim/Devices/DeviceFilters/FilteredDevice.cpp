@@ -79,15 +79,15 @@ bool FilteredDevice::initialize()
 		result = m_device->addInputConsumer(m_filters.front()) && m_device->setOutputProducer(m_filters.front());
 		for (size_t i = 0; i < m_filters.size() - 1; ++i)
 		{
-			result &= m_filters[i]->addInputConsumer(m_filters[i + 1]) &&
+			result = result && m_filters[i]->addInputConsumer(m_filters[i + 1]) &&
 				m_filters[i]->setOutputProducer(m_filters[i + 1]);
 		}
 
 		for (auto& filter : m_filters)
 		{
-			result &= filter->initialize();
+			result = result && filter->initialize();
 		}
-		result &= m_device->initialize();
+		result = result && m_device->initialize();
 	}
 
 	m_initialized = result;
