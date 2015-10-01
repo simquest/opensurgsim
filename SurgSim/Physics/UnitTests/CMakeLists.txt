@@ -54,6 +54,7 @@ set(UNIT_TEST_SOURCES
 	Fem3DPlyReaderDelegateTests.cpp
 	Fem3DRepresentationTests.cpp
 	FemElementTests.cpp
+	FemLocalizationTest.cpp
 	FemRepresentationTests.cpp
 	FixedConstraintFixedPointTests.cpp
 	FixedConstraintFrictionlessContactTests.cpp
