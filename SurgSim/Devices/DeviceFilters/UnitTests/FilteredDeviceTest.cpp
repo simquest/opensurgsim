@@ -23,8 +23,6 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Devices.h"
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
 using SurgSim::DataStructures::DataGroup;
@@ -37,28 +35,17 @@ TEST(FilteredDeviceTest, ByHand)
 	auto filteredDevice = std::make_shared<FilteredDevice>("device");
 	ASSERT_FALSE(filteredDevice->initialize());
 
-	ASSERT_ANY_THROW(filteredDevice->addDevice(nullptr));
-	ASSERT_TRUE(filteredDevice->addDevice(std::make_shared<SurgSim::Devices::IdentityPoseDevice>("identity")));
-	ASSERT_FALSE(filteredDevice->addDevice(std::make_shared<SurgSim::Devices::IdentityPoseDevice>("identity2")));
+	ASSERT_ANY_THROW(filteredDevice->setDevice(nullptr));
+	ASSERT_NO_THROW(filteredDevice->setDevice(std::make_shared<SurgSim::Devices::IdentityPoseDevice>("identity")));
 
-	auto filter1 = std::make_shared<SurgSim::Devices::PoseTransform>("filter1");
-	auto vector = SurgSim::Math::Vector3d(1.0, 2.0, 3.0);
-	auto transform = SurgSim::Math::makeRigidTranslation(vector);
-	filter1->setTransform(transform);
-	filteredDevice->addDevice(filter1);
-	auto filter2 = std::make_shared<SurgSim::Devices::PoseTransform>("filter2");
-	double scale = 13.8;
-	filter2->setTranslationScale(scale);
-	filteredDevice->addDevice(filter2);
+	filteredDevice->addFilter(std::make_shared<SurgSim::Devices::PoseTransform>("filter1"));
+	filteredDevice->addFilter(std::make_shared<SurgSim::Devices::PoseTransform>("filter2"));
 	EXPECT_TRUE(filteredDevice->initialize());
+	EXPECT_ANY_THROW(filteredDevice->initialize());
 
 	auto inputOutput = std::make_shared<MockInputOutput>();
 	EXPECT_TRUE(filteredDevice->addInputConsumer(inputOutput));
 	EXPECT_TRUE(filteredDevice->removeInputConsumer(inputOutput));
-	SurgSim::Math::RigidTransform3d pose;
-	EXPECT_TRUE(inputOutput->m_lastReceivedInput.poses().get(SurgSim::DataStructures::Names::POSE, &pose));
-	// Check the order that the transforms are being applied.  The first filter added should go first.
-	EXPECT_TRUE(pose.translation().isApprox(vector * scale));
 
 	EXPECT_TRUE(filteredDevice->setOutputProducer(inputOutput));
 	EXPECT_TRUE(filteredDevice->hasOutputProducer());
@@ -87,4 +74,7 @@ TEST(FilteredDeviceTest, Serialization)
 	SurgSim::Math::RigidTransform3d expectedTransform =
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(angleAxis), translation);
 	EXPECT_TRUE(pose.isApprox(expectedTransform));
+
+	ASSERT_NO_THROW(device = SurgSim::Devices::loadDevice("BadFilteredDevice.yaml"));
+	EXPECT_EQ(nullptr, device);
 }
