@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> p
 		penetrationPoints.second.rigidLocalPosition.setValue(
 			(pair->getSecond()->getPose().linear().inverse() * normal) * secondSphere->getRadius());
 
-		pair->addDcdContact(maxDist - dist, normal, penetrationPoints);
+		pair->addContact(maxDist - dist, normal, penetrationPoints);
 	}
 }
 

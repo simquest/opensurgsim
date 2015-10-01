@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -318,7 +318,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
 				auto contact = std::make_shared<TriangleContact>(
-								   COLLISION_DETECTION_TYPE_DISCRETE, expectedDepth,
+								   COLLISION_TYPE_DISCRETE, expectedDepth,
 								   1.0, expectedContact, expectedNormal, expectedPenetrationPoints);
 				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
 				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
@@ -428,7 +428,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
 				auto contact = std::make_shared<TriangleContact>(
-								   COLLISION_DETECTION_TYPE_DISCRETE,
+								   COLLISION_TYPE_DISCRETE,
 								   expectedDepth, expectedTime, expectedContact,
 								   pose.linear() * Vector3d(0, 0, -1),
 								   expectedPenetrationPoints);
@@ -449,7 +449,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 				triangleLocalPosition.index = 0;
 				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
 				auto contact = std::make_shared<TriangleContact>(
-								   COLLISION_DETECTION_TYPE_DISCRETE,
+								   COLLISION_TYPE_DISCRETE,
 								   expectedDepth, expectedTime, expectedContact,
 								   pose.linear() * Vector3d(0, 1, 0),
 								   expectedPenetrationPoints);

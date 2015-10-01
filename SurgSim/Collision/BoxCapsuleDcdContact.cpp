@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -198,7 +198,7 @@ std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateContact(
 		normal = boxPose.linear() * normal;
 		std::pair<Location, Location> penetrationPoints = std::make_pair(Location(deepestBoxPoint),
 				Location(capsulePose.inverse() * boxPose * deepestCapsulePoint));
-		contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, distance, 1.0,
+		contacts.push_back(std::make_shared<Contact>(COLLISION_TYPE_DISCRETE, distance, 1.0,
 						   Vector3d::Zero(), normal, penetrationPoints));
 	}
 	return std::move(contacts);

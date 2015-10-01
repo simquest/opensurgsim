@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ namespace Collision
 /// Struct to store the triangle vertices along with the Contact struct.
 struct TriangleContact : public Contact
 {
-	TriangleContact(const CollisionDetectionType newCollisionType,
+	TriangleContact(const CollisionType newCollisionType,
 					const double& newDepth,
 					const double& newTime,
 					const SurgSim::Math::Vector3d& newContact,
@@ -84,7 +84,7 @@ struct TriangleContact : public Contact
 /// \param expectedNormal The expected normal.
 /// \param expectedPenetrationPointFirst The expected first penetration point.
 /// \param expectedPenetrationPointSecond The expected second penetration point.
-void checkContactInfo(std::shared_ptr<Contact> contact, CollisionDetectionType expectedType,
+void checkContactInfo(std::shared_ptr<Contact> contact, CollisionType expectedType,
 					  double expectedDepth, double expectedTime,
 					  const Vector3d& expectedNormal, const Vector3d& expectedPenetrationPointFirst,
 					  const Vector3d& expectedPenetrationPointSecond);

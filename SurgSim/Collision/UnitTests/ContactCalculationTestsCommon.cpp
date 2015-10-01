@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace Collision
 	}
 }
 
-void checkContactInfo(std::shared_ptr<Contact> contact, CollisionDetectionType expectedType,
+void checkContactInfo(std::shared_ptr<Contact> contact, CollisionType expectedType,
 					  double expectedDepth, double expectedTime,
 					  const Vector3d& expectedNormal, const Vector3d& expectedPenetrationPointFirst,
 					  const Vector3d& expectedPenetrationPointSecond)
@@ -177,7 +177,7 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContac
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(
-										COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
+										COLLISION_TYPE_DISCRETE, depth, 1.0,
 										Vector3d::Zero(), collisionNormal, penetrationPoint));
 	}
 }
@@ -208,7 +208,7 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>* exp
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(
-										COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth),
+										COLLISION_TYPE_DISCRETE, std::abs(depth),
 										1.0, Vector3d::Zero(), collisionNormal, penetrationPoint));
 	}
 }

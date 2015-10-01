@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -510,7 +510,7 @@ TEST_F(VirtualToolCouplerTest, SetHapticOutputOnlyWhenColliding)
 	auto& collisions = collision->getCollisions().unsafeGet();
 	collisions[std::make_shared<RigidCollisionRepresentation>("collision2")].push_back(
 		std::make_shared<Collision::Contact>(
-			Collision::COLLISION_DETECTION_TYPE_DISCRETE, 0.1, 1.0,
+			Collision::COLLISION_TYPE_DISCRETE, 0.1, 1.0,
 			Vector3d::UnitX().eval(), Vector3d::UnitY().eval(),
 			std::make_pair(DataStructures::Location(), DataStructures::Location())));
 	virtualToolCoupler->update(0.1);

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateCo
 														  DataStructures::Location::TRIANGLE),
 												 Location(particle));
 					contacts.push_back(std::make_shared<Contact>(
-										   COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
+										   COLLISION_TYPE_DISCRETE, depth, 1.0,
 										   Vector3d::Zero(), -normal, penetrationPoints));
 				}
 			}

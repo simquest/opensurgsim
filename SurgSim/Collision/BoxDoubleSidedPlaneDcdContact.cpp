@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateCont
 				std::pair<Location, Location> penetrationPoints = std::make_pair(Location(boxVertices[i]),
 						Location(planePose.inverse() * (boxPose * boxVertices[i] + normal * std::abs(d[i]))));
 				contacts.push_back(std::make_shared<Contact>(
-									   COLLISION_DETECTION_TYPE_DISCRETE,
+									   COLLISION_TYPE_DISCRETE,
 									   std::abs(d[i]), 1.0, Vector3d::Zero(), normal,
 									   penetrationPoints));
 
