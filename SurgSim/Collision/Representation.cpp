@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ namespace Collision
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Ignoring, getIgnoring, setIgnoring);
 }
 
 Representation::~Representation()
@@ -81,6 +82,40 @@ bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 
 void Representation::update(const double& dt)
 {
+}
+
+bool Representation::ignore(const std::string& fullName)
+{
+	return m_ignoring.insert(fullName).second;
+}
+
+bool Representation::ignore(const std::shared_ptr<Representation>& representation)
+{
+	return ignore(representation->getFullName());
+}
+
+void Representation::setIgnoring(const std::vector<std::string>& ignoring)
+{
+	m_ignoring.clear();
+	for (auto& fullName : ignoring)
+	{
+		ignore(fullName);
+	}
+}
+
+std::vector<std::string> Representation::getIgnoring() const
+{
+	return std::vector<std::string>(std::begin(m_ignoring), std::end(m_ignoring));
+}
+
+bool Representation::isIgnoring(const std::string& fullName) const
+{
+	return m_ignoring.find(fullName) != m_ignoring.end();
+}
+
+bool Representation::isIgnoring(const std::shared_ptr<Representation>& representation) const
+{
+	return isIgnoring(representation->getFullName());
 }
 
 }; // namespace Collision

@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2015, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ set(SURGSIM_PARTICLES_SOURCES
 	ParticlesCollisionRepresentation.cpp
 	PointGenerator.cpp
 	RandomBoxPointGenerator.cpp
+	RandomMeshPointGenerator.cpp
 	RandomPointGenerator.cpp
 	RandomSpherePointGenerator.cpp
 	Representation.cpp
@@ -32,6 +33,7 @@ set(SURGSIM_PARTICLES_HEADERS
 	ParticlesCollisionRepresentation.h
 	PointGenerator.h
 	RandomBoxPointGenerator.h
+	RandomMeshPointGenerator.h
 	RandomPointGenerator.h
 	RandomSpherePointGenerator.h
 	Representation.h
