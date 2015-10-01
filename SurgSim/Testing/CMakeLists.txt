@@ -40,8 +40,8 @@ surgsim_create_library_header(Testing.h "${SURGSIM_TESTING_HEADERS}")
 
 add_library(
 	SurgSimTesting
-	"${SURGSIM_TESTING_SOURCES}"
-	"${SURGSIM_TESTING_HEADERS}"
+	${SURGSIM_TESTING_SOURCES}
+	${SURGSIM_TESTING_HEADERS}
 )
 
 set(LIBS
