@@ -260,6 +260,10 @@ std::string convert(boost::any val);
 		return true; \
 	}
 
+/// A macro to create an enum that can be easily serialized
+/// During serialization, the enum will be converted to its string based named,
+/// back to an enum during deserialization. The enum must already be forward
+/// declared in its namespace before calling this macro in the global namespace.
 #define SURGSIM_SERIALIZABLE_ENUM(name, enumerators) \
 	enum name : int8_t\
 	{ \
