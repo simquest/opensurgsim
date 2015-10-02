@@ -90,7 +90,7 @@ protected:
 	/// \param computation The Computation to add
 	void addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation);
 
-	virtual void doBeforeStop() override;
+	void doBeforeStop() override;
 
 private:
 	std::vector<std::shared_ptr<Representation>> m_representations;

@@ -86,7 +86,7 @@ public:
 	bool wakeUp();
 
 	/// Retire this component, this will be called when the component is removed from the ComponentManager that is
-	/// responsible for handling this component. This gives the component a chance to get rid of all handled
+	/// responsible for handling this component. This gives the component a chance to get rid of all shared objects
 	void retire();
 
 	/// Sets the scene.

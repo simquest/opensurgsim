@@ -203,11 +203,5 @@ bool Component::isLocalActive() const
 	return m_isLocalActive;
 }
 
-void doRetire()
-{
-	return;
-}
-
-
 }; // namespace Framework
 }; // namespace SurgSim
