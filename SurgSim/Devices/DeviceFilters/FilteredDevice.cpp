@@ -60,8 +60,8 @@ std::string FilteredDevice::getName() const
 
 bool FilteredDevice::initialize()
 {
-	boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
 	SURGSIM_ASSERT(!m_initialized) << "Already initialized.";
+	boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
 	SURGSIM_ASSERT(m_devices.size() > 0) << "There must be at least one device.";
 
 	bool result = true;
@@ -191,14 +191,15 @@ void FilteredDevice::setDevice(std::shared_ptr<Input::DeviceInterface> device)
 {
 	SURGSIM_ASSERT(!m_initialized) << "Cannot set device after initialization";
 	SURGSIM_ASSERT(device != nullptr) << "Cannot set a nullptr device.";
+	boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
 	m_devices[0] = device;
 }
 
 void FilteredDevice::addFilter(std::shared_ptr<DeviceFilter> filter)
 {
-	boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
 	SURGSIM_ASSERT(!m_initialized) << "Cannot add filter after initialization";
 	SURGSIM_ASSERT(filter != nullptr) << "Cannot add a nullptr filter.";
+	boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
 	m_devices.push_back(filter);
 }
 
@@ -210,9 +211,9 @@ const std::vector<std::shared_ptr<Input::DeviceInterface>>& FilteredDevice::getD
 
 bool FilteredDevice::setDevices(const std::vector<std::shared_ptr<Input::DeviceInterface>>& devices)
 {
-	boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
 	SURGSIM_ASSERT(!m_initialized) << "Cannot set devices after initialization";
 	bool result = true;
+	boost::unique_lock<boost::shared_mutex>(m_deviceMutex);
 	if (devices.size() > 0)
 	{
 		for (const auto& device : devices)
