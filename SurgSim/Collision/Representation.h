@@ -84,7 +84,7 @@ public:
 	/// \param contact The contact to be added
 	/// \note This method is thread-safe
 	void addContact(const std::shared_ptr<Representation>& other,
-		const std::shared_ptr<SurgSim::Collision::Contact>& contact);
+					const std::shared_ptr<SurgSim::Collision::Contact>& contact);
 
 	/// Check whether this collision representation collided with another during the last update
 	/// \param other other collision representation to check against
@@ -127,6 +127,8 @@ public:
 protected:
 	/// Invalidate the cached posed shape
 	void invalidatePosedShape();
+
+	void doRetire() override;
 
 private:
 	/// A map which associates a list of contacts with each collision representation.

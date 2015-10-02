@@ -207,3 +207,11 @@ void SurgSim::Graphics::Manager::addGroup(std::shared_ptr<Group> group)
 	m_groups[group->getName()] = group;
 	SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added group " << group->getName();
 }
+
+void Manager::doBeforeStop()
+{
+	retireComponents(m_views);
+	retireComponents(m_representations);
+
+	ComponentManager::doBeforeStop();
+}

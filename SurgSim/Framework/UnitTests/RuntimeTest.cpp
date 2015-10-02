@@ -125,6 +125,11 @@ TEST(RuntimeTest, SceneInitialization)
 
 	runtime->stop();
 	EXPECT_TRUE(manager->didBeforeStop);
+
+	for (int i = 0; i < 4; i++)
+	{
+		EXPECT_TRUE(components[i]->didRetire);
+	}
 }
 
 TEST(RuntimeTest, PausedStep)
@@ -237,6 +242,8 @@ TEST(RuntimeTest, AddComponentAddDuringRuntime)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
 
 	runtime->stop();
+
+	EXPECT_FALSE(components[1]->isAwake());
 }
 
 TEST(RuntimeTest, LoadAndAddScene)

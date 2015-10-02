@@ -96,15 +96,15 @@ bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::
 	std::shared_ptr<ConstraintComponent> constraintComponent = tryAddComponent(component, &m_constraintComponents);
 
 	return representation != nullptr || collisionRep != nullptr || particles != nullptr ||
-		constraintComponent != nullptr;
+		   constraintComponent != nullptr;
 }
 
 bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryRemoveComponent(component, &m_representations) ||
-		tryRemoveComponent(component, &m_collisionRepresentations) ||
-		tryRemoveComponent(component, &m_constraintComponents) ||
-		tryRemoveComponent(component, &m_particleRepresentations);
+		   tryRemoveComponent(component, &m_collisionRepresentations) ||
+		   tryRemoveComponent(component, &m_constraintComponents) ||
+		   tryRemoveComponent(component, &m_particleRepresentations);
 }
 
 bool PhysicsManager::doUpdate(double dt)
@@ -129,6 +129,21 @@ bool PhysicsManager::doUpdate(double dt)
 	m_finalState.set(*(stateList.back()));
 
 	return true;
+}
+
+void PhysicsManager::doBeforeStop()
+{
+	// Empty the physics manager state
+	m_finalState.set(PhysicsManagerState());
+
+	// Give all known components a chance to untangle themselves
+	retireComponents(m_representations);
+	retireComponents(m_particleRepresentations);
+	retireComponents(m_collisionRepresentations);
+	retireComponents(m_constraintComponents);
+
+	// Call up the class hierarchy
+	ComponentManager::doBeforeStop();
 }
 
 }; // Physics

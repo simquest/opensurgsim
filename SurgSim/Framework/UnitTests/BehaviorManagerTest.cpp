@@ -46,10 +46,11 @@ TEST(BehaviorManagerTest, BehaviorInitTest)
 
 	runtime->start();
 	EXPECT_TRUE(behaviorManager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
+	EXPECT_TRUE(behavior->isAwake());
 	runtime->stop();
 
-	EXPECT_TRUE(behavior->isAwake());
+	EXPECT_FALSE(behavior->isAwake());
 	EXPECT_FALSE(component->isAwake());
 	EXPECT_GT(behavior->updateCount, 0);
 
