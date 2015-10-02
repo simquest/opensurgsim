@@ -31,7 +31,7 @@ class LeapScaffold;
 
 SURGSIM_STATIC_REGISTRATION(LeapDevice);
 
-enum HandType : int8_t;
+enum HandType : SURGSIM_ENUM_TYPE;
 
 /// A class implementing the communication with one hand tracked by Leap Motion camera
 ///

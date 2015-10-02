@@ -50,8 +50,6 @@ public:
 	typedef std::function<YAML::Node(void)> EncoderType;
 	typedef std::function<void(const YAML::Node*)> DecoderType;
 
-
-
 	/// Retrieves the value with the name by executing the getter if it is found and tries to convert
 	/// it to the given type.
 	/// \throws SurgSim::Framework::AssertionFailure If the conversion fails or the property cannot be found.
@@ -66,7 +64,6 @@ public:
 	/// \param	name	The name of the property.
 	/// \return	The value of the property if the getter was found
 	boost::any getValue(const std::string& name) const;
-
 
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to
 	/// the type of the output parameter. This does not throw.
@@ -260,12 +257,15 @@ std::string convert(boost::any val);
 		return true; \
 	}
 
+/// Required type of enums used by SURGSIM_SERIALIZABLE_ENUM
+#define SURGSIM_ENUM_TYPE int8_t
+
 /// A macro to create an enum that can be easily serialized
 /// During serialization, the enum will be converted to its string based named,
 /// back to an enum during deserialization. The enum must already be forward
 /// declared in its namespace before calling this macro in the global namespace.
 #define SURGSIM_SERIALIZABLE_ENUM(name, enumerators) \
-	enum name : int8_t\
+	enum name : SURGSIM_ENUM_TYPE\
 	{ \
 		BOOST_PP_SEQ_ENUM(enumerators) \
 	}; \

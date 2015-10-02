@@ -48,7 +48,7 @@ typedef std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> ContactMapType;
 
 /// The type of collision detection
-enum CollisionType : int8_t;
+enum CollisionType : SURGSIM_ENUM_TYPE;
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
