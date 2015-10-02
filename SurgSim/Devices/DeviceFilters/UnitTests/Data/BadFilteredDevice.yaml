@@ -1,8 +1,0 @@
-- SurgSim::Devices::FilteredDevice:
-    Name: ConstantPose
-    Device:
-      SurgSim::Devices::IdentityPoseDevice:
-        Name: Identity
-    Filters:
-      - SurgSim::Devices::IdentityPoseDevice:
-        Name: NotAFilter

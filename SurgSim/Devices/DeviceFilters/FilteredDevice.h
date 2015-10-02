@@ -66,25 +66,35 @@ public:
 	/// Adds a DeviceFilter.  The first filter that is added will be connected to the raw/base device.
 	/// The last filter that is added will interface with InputConsumers and/or an OutputProducer.
 	/// Any filters added in-between will be connected in order.
-	/// \param device A DeviceFilter.
-	void addFilter(std::shared_ptr<DeviceFilter> device);
+	/// \param filter A DeviceFilter.
+	void addFilter(std::shared_ptr<DeviceFilter> filter);
+
+	/// \return All devices.
+	const std::vector<std::shared_ptr<Input::DeviceInterface>>& getDevices() const;
+
+	/// Sets the devices.
+	/// \param devices All the devices.
+	/// \return true on success
+	bool setDevices(const std::vector<std::shared_ptr<Input::DeviceInterface>>& devices);
 
 private:
-	/// The name of the device.
+
+	/// The name of this device.
 	std::string m_name;
 
-	/// true if initialize has been called.
+	/// true if initialize has been called and finalize has not been called.
 	bool m_initialized;
 
-	/// The raw/base device to be filtered.
-	std::shared_ptr<Input::DeviceInterface> m_device;
+	/// The devices.  m_devices.back() will be connected to any InputComponent or OutputComponent.
+	/// m_devices.front() is the raw/base device to be filtered. If this contains more than one element, all but
+	/// the front element are DeviceFilters.
+	std::vector<std::shared_ptr<Input::DeviceInterface>> m_devices;
 
-	/// The DeviceFilter(s).  m_devices.back() is the DeviceFilter to be connected to any
-	/// InputComponent or OutputComponent.  m_devices.front() will be connected to the raw/base device.
-	std::vector<std::shared_ptr<DeviceFilter>> m_filters;
+	/// The mutex to protect access to the devices.
+	boost::shared_mutex m_deviceMutex;
 
-	/// The mutex to protect access to the filters.
-	boost::shared_mutex m_filterMutex;
+	/// The logger.
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 };  // namespace Devices
