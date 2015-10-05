@@ -27,20 +27,16 @@ namespace Collision
 
 class CollisionPair;
 
-/// Class to calculate intersections between a triangle mesh and a triangle mesh
+/// Class to calculate intersections between a segment mesh and a triangle mesh
 class SegmentMeshTriangleMeshDcdContact : public ContactCalculation
 {
 public:
 	/// Constructor.
 	SegmentMeshTriangleMeshDcdContact();
 
-	/// Function that returns the shapes between which this class performs collision detection.
-	/// \return int std::pair containing the shape types.
 	std::pair<int, int> getShapeTypes() override;
 
 private:
-	/// Calculate the actual contact between two shapes of the given CollisionPair.
-	/// \param    pair    The symmetric pair that is under consideration.
 	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 };
 
