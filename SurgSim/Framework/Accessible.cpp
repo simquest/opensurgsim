@@ -146,7 +146,7 @@ YAML::Node Accessible::encode() const
 void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& ignoredProperties)
 {
 	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Framework/Accessible")) <<
-		"Decoding node: \n" << node;
+			"Decoding node: \n" << node;
 	SURGSIM_ASSERT(node.IsMap()) << "Node to be decoded has to be map.";
 
 	for (auto data = node.begin(); data != node.end(); ++data)
@@ -175,7 +175,7 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 				}
 				catch (std::exception e)
 				{
-					SURGSIM_FAILURE() << e.what() << " for value " << temporary.as<std::string>();
+					SURGSIM_FAILURE() << e.what() << " for value " << std::endl << temporary;
 				}
 			}
 			else

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -911,7 +911,7 @@ bool doesCollideSegmentTriangle(
 	// Ray is parallel to triangle plane
 	if (std::abs(b) <= Geometry::AngularEpsilon)
 	{
-		if (a == 0)
+		if (std::abs(a) <= Geometry::AngularEpsilon)
 		{
 			// Ray lies in triangle plane
 			Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
@@ -960,13 +960,13 @@ bool doesCollideSegmentTriangle(
 	// Get and test parametric coords
 	T s = (uv * wv - vv * wu) / D;
 	// I is outside T
-	if (s < 0 || s > 1)
+	if (s < -Geometry::DistanceEpsilon || s > 1 + Geometry::DistanceEpsilon)
 	{
 		return false;
 	}
 	T t = (uv * wu - uu * wv) / D;
 	// I is outside T
-	if (t < 0 || (s + t) > 1)
+	if (t < -Geometry::DistanceEpsilon || (s + t) > 1 + Geometry::DistanceEpsilon)
 	{
 		return false;
 	}

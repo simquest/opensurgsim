@@ -124,12 +124,16 @@ TEST(ViewElementTests, StartUpTest)
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-	runtime->stop();
 
 	/// Check that the view element was initialized and awoken
-	EXPECT_TRUE(viewElement->isInitialized());
 	EXPECT_TRUE(viewElement->getView()->isInitialized());
 	EXPECT_TRUE(viewElement->getView()->isAwake());
+	runtime->stop();
+
+	/// Check that the view element was initialized and retired again
+	EXPECT_TRUE(viewElement->isInitialized());
+	EXPECT_TRUE(viewElement->getView()->isInitialized());
+	EXPECT_FALSE(viewElement->getView()->isAwake());
 }
 
 TEST(ViewElementTests, ViewTest)

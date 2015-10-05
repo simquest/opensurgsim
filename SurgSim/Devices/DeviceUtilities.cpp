@@ -17,6 +17,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "SurgSim/Devices/DeviceFilters/DeviceFilter.h"
+#include "SurgSim/Devices/DeviceFilters/FilteredDevice.h"
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -46,9 +48,27 @@ std::shared_ptr<DeviceInterface> tryConvertDevice(const YAML::Node& possibleDevi
 				SURGSIM_LOG_DEBUG(logger) << "Loading: " << std::endl << possibleDevice;
 				std::string name = data[NamePropertyName].as<std::string>();
 				device = DeviceInterface::getFactory().create(className, name);
-				std::vector<std::string> ignoredProperties;
-				ignoredProperties.push_back(NamePropertyName);
-				device->decode(data, ignoredProperties);
+				auto filteredDevice = std::dynamic_pointer_cast<SurgSim::Devices::FilteredDevice>(device);
+				if (filteredDevice == nullptr)
+				{
+					std::vector<std::string> ignoredProperties;
+					ignoredProperties.push_back(NamePropertyName);
+					device->decode(data, ignoredProperties);
+				}
+				else
+				{
+					if (data["Devices"].IsDefined() && data["Devices"].IsSequence())
+					{
+						std::vector<std::shared_ptr<SurgSim::Input::DeviceInterface>> subDevices;
+						for (const YAML::Node& deviceNode : data["Devices"])
+						{
+							subDevices.push_back(tryConvertDevice(deviceNode, fileName));
+						}
+						SURGSIM_LOG_IF(!filteredDevice->setDevices(subDevices), logger, WARNING) <<
+							"File " << fileName << " failed to setDevices on a FilteredDevice : " <<
+							std::endl << data["Devices"];
+					}
+				}
 				if (device->initialize())
 				{
 					SURGSIM_LOG_INFO(logger) << "Successfully loaded " << className << " named " << name;
