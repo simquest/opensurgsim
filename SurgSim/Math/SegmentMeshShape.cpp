@@ -35,9 +35,9 @@ SegmentMeshShape::SegmentMeshShape()
 }
 
 SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
-	DataStructures::SegmentMeshPlain(other),
-	m_radius(other.m_radius)
+	DataStructures::SegmentMeshPlain(other)
 {
+	setRadius(other.m_radius);
 	updateAabbTree();
 }
 
