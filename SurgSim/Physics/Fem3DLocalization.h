@@ -17,7 +17,7 @@
 #define SURGSIM_PHYSICS_FEM3DLOCALIZATION_H
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
-#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/FemLocalization.h"
 
 namespace SurgSim
 {
@@ -32,7 +32,7 @@ namespace Physics
 /// the local coordinates are the barycentric coordinates of the nodes in this FemElement).
 /// It is used, for example, as a helper class for filling out the MlcpPhysicsProblem in
 /// Fem3DRepresentationContact::doBuild, which constrains the motion of Fem3DRepresentation at a frictionless contact.
-class Fem3DLocalization : public Localization
+class Fem3DLocalization : public FemLocalization
 {
 public:
 	/// Constructor
@@ -44,28 +44,10 @@ public:
 	/// Destructor
 	virtual ~Fem3DLocalization();
 
-	/// Sets the local position.
-	/// \param localPosition The local position to set the localization at.
-	void setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition);
-
-	/// Gets the local position.
-	/// \return The local position set for this localization.
-	const SurgSim::DataStructures::IndexedLocalCoordinate& getLocalPosition() const;
-
 	/// Query if 'representation' is valid representation.
 	/// \param	representation	The representation.
 	/// \return	true if valid representation, false if not.
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
-
-private:
-	/// Calculates the global position of this localization.
-	/// \param time The time in [0..1] at which the position should be calculated.
-	/// \return The global position of the localization at the requested time.
-	/// \note time can be useful when dealing with CCD.
-	SurgSim::Math::Vector3d doCalculatePosition(double time);
-
-	/// Barycentric position in local coordinates
-	SurgSim::DataStructures::IndexedLocalCoordinate m_position;
 };
 
 } // namespace Physics

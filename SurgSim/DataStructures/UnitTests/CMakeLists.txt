@@ -15,7 +15,6 @@
 
 include_directories (
 	${gtest_SOURCE_DIR}/include
-	${OSG_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -42,6 +41,7 @@ set(UNIT_TEST_SOURCES
 	OctreeNodeTests.cpp
 	OptionalValueTests.cpp
 	PlyReaderTests.cpp
+	SegmentMeshTest.cpp
 	TetrahedronMeshTest.cpp
 	TriangleMeshTest.cpp
 )

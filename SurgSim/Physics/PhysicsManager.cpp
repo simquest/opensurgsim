@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Physics/BuildMlcp.h"
+#include "SurgSim/Physics/ClearCollisions.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/DcdCollision.h"
@@ -25,6 +26,7 @@
 #include "SurgSim/Physics/ParticleCollisionResponse.h"
 #include "SurgSim/Physics/PostUpdate.h"
 #include "SurgSim/Physics/PreUpdate.h"
+#include "SurgSim/Physics/PublishCollisions.h"
 #include "SurgSim/Physics/PushResults.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/SolveMlcp.h"
@@ -57,7 +59,9 @@ bool PhysicsManager::doInitialize()
 	addComputation(std::make_shared<PreUpdate>(copyState));
 	addComputation(std::make_shared<FreeMotion>(copyState));
 	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
+	addComputation(std::make_shared<ClearCollisions>(copyState));
 	addComputation(std::make_shared<DcdCollision>(copyState));
+	addComputation(std::make_shared<PublishCollisions>(copyState));
 	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
 	addComputation(std::make_shared<BuildMlcp>(copyState));
 	addComputation(std::make_shared<SolveMlcp>(copyState));
@@ -84,43 +88,6 @@ void PhysicsManager::getFinalState(SurgSim::Physics::PhysicsManagerState* s) con
 	m_finalState.get(s);
 }
 
-std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>::iterator PhysicsManager::findExcludedCollisionPair(
-	std::shared_ptr<SurgSim::Collision::Representation> representation1,
-	std::shared_ptr<SurgSim::Collision::Representation> representation2)
-{
-	return std::find_if(m_excludedCollisionPairs.begin(), m_excludedCollisionPairs.end(),
-		[&representation1, &representation2] (const std::shared_ptr<SurgSim::Collision::CollisionPair>&pair)
-		{
-			return (pair->getFirst() == representation1 && pair->getSecond() == representation2)
-				|| (pair->getFirst() == representation2 && pair->getSecond() == representation1);
-		});
-}
-
-void PhysicsManager::addExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
-											  std::shared_ptr<SurgSim::Collision::Representation> representation2)
-{
-	boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
-
-	if (findExcludedCollisionPair(representation1, representation2) == m_excludedCollisionPairs.end())
-	{
-		m_excludedCollisionPairs.push_back(
-			std::make_shared<SurgSim::Collision::CollisionPair>(representation1, representation2));
-	}
-}
-
-void PhysicsManager::removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
-												 std::shared_ptr<SurgSim::Collision::Representation> representation2)
-{
-	boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
-
-	auto candidatePair = findExcludedCollisionPair(representation1, representation2);
-
-	if (candidatePair != m_excludedCollisionPairs.end())
-	{
-		m_excludedCollisionPairs.erase(candidatePair);
-	}
-}
-
 bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	std::shared_ptr<Representation> representation = tryAddComponent(component, &m_representations);
@@ -129,15 +96,15 @@ bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::
 	std::shared_ptr<ConstraintComponent> constraintComponent = tryAddComponent(component, &m_constraintComponents);
 
 	return representation != nullptr || collisionRep != nullptr || particles != nullptr ||
-		constraintComponent != nullptr;
+		   constraintComponent != nullptr;
 }
 
 bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryRemoveComponent(component, &m_representations) ||
-		tryRemoveComponent(component, &m_collisionRepresentations) ||
-		tryRemoveComponent(component, &m_constraintComponents) ||
-		tryRemoveComponent(component, &m_particleRepresentations);
+		   tryRemoveComponent(component, &m_collisionRepresentations) ||
+		   tryRemoveComponent(component, &m_constraintComponents) ||
+		   tryRemoveComponent(component, &m_particleRepresentations);
 }
 
 bool PhysicsManager::doUpdate(double dt)
@@ -154,11 +121,6 @@ bool PhysicsManager::doUpdate(double dt)
 	state->setParticleRepresentations(m_particleRepresentations);
 	state->setConstraintComponents(m_constraintComponents);
 
-	{
-		boost::mutex::scoped_lock lock(m_excludedCollisionPairMutex);
-		state->setExcludedCollisionPairs(m_excludedCollisionPairs);
-	}
-
 	for (const auto& computation : m_computations)
 	{
 		stateList.push_back(computation->update(dt, stateList.back()));
@@ -167,6 +129,21 @@ bool PhysicsManager::doUpdate(double dt)
 	m_finalState.set(*(stateList.back()));
 
 	return true;
+}
+
+void PhysicsManager::doBeforeStop()
+{
+	// Empty the physics manager state
+	m_finalState.set(PhysicsManagerState());
+
+	// Give all known components a chance to untangle themselves
+	retireComponents(m_representations);
+	retireComponents(m_particleRepresentations);
+	retireComponents(m_collisionRepresentations);
+	retireComponents(m_constraintComponents);
+
+	// Call up the class hierarchy
+	ComponentManager::doBeforeStop();
 }
 
 }; // Physics

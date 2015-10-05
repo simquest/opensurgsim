@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,26 +80,10 @@ int main(int argc, char* argv[])
 
 	runtime->loadScene("StaplingDemo.yaml");
 
-	std::shared_ptr<SceneElement> arm = runtime->getScene()->getSceneElement("arm");
-	std::shared_ptr<SceneElement> wound = runtime->getScene()->getSceneElement("wound");
-	std::shared_ptr<SceneElement> stapler = runtime->getScene()->getSceneElement("stapler");
 	std::shared_ptr<SceneElement> view = runtime->getScene()->getSceneElement("StaplingDemoView");
 	auto osgView = std::dynamic_pointer_cast<OsgView>(view->getComponent("StaplingDemoView View"));
 	SURGSIM_ASSERT(nullptr != osgView) << "No OsgView held by SceneElement StaplingDemoView.";
 	inputManager->addDevice(osgView->getKeyboardDevice());
-
-	// Exclude collision between certain Collision::Representations
-	physicsManager->addExcludedCollisionPair(
-		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
-		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision0"));
-
-	physicsManager->addExcludedCollisionPair(
-		getComponentChecked<SurgSim::Collision::Representation>(stapler, "Collision"),
-		getComponentChecked<SurgSim::Collision::Representation>(stapler, "VirtualToothCollision1"));
-
-	physicsManager->addExcludedCollisionPair(
-		getComponentChecked<SurgSim::Collision::Representation>(wound, "Collision"),
-		getComponentChecked<SurgSim::Collision::Representation>(arm, "Collision"));
 
 	runtime->execute();
 

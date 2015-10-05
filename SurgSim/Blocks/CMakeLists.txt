@@ -14,7 +14,6 @@
 # limitations under the License.
 
 include_directories(
-	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
 )
 
@@ -22,6 +21,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	DebugDumpBehavior.cpp
 	DriveElementFromInputBehavior.cpp
 	GraphicsUtilities.cpp
+	ImplicitSurface.cpp
 	KeyboardTogglesComponentBehavior.cpp
 	MassSpring1DRepresentation.cpp
 	MassSpring2DRepresentation.cpp
@@ -41,6 +41,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	DebugDumpBehavior.h
 	DriveElementFromInputBehavior.h
 	GraphicsUtilities.h
+	ImplicitSurface.h
 	KeyboardTogglesComponentBehavior.h
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
@@ -78,4 +79,4 @@ if(BUILD_TESTING)
 endif()
 
 # Put SurgSimBlocks into folder "Blocks"
-set_target_properties(SurgSimBlocks PROPERTIES FOLDER "Blocks") 
+set_target_properties(SurgSimBlocks PROPERTIES FOLDER "Blocks")

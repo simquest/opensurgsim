@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ DefaultPointGenerator::~DefaultPointGenerator()
 Vector3d DefaultPointGenerator::pointInShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
 	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) <<
-		"PointGenerator does not support generate point in shape: "<< shape->getType() << " yet.";
+		"PointGenerator does not support generating points in shape type: "<< shape->getType();
 
 	return Vector3d::Zero();
 }
@@ -39,7 +39,7 @@ Vector3d DefaultPointGenerator::pointInShape(std::shared_ptr<SurgSim::Math::Shap
 Vector3d DefaultPointGenerator::pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
 	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) <<
-		"PointGenerator does not support generate point on the surface of shape: "<< shape->getType() << " yet.";
+		"PointGenerator does not support generating points on the surface of shape type: "<< shape->getType();
 
 	return Vector3d::Zero();
 }

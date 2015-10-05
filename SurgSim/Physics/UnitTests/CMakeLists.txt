@@ -19,6 +19,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
+	ClearCollisionsTests.cpp
 	ComputationTests.cpp
 	ConstraintComponentTests.cpp
 	ConstraintImplementationFactoryTests.cpp
@@ -31,12 +32,14 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
 	Fem1DConstraintFixedPointTests.cpp
+	Fem1DConstraintFrictionlessContactTests.cpp
 	Fem1DElementBeamTests.cpp
 	Fem1DLocalizationTest.cpp
 	Fem1DMechanicalValidationTests.cpp
 	Fem1DPlyReaderDelegateTests.cpp
 	Fem1DRepresentationTests.cpp
 	Fem2DConstraintFixedPointTests.cpp
+	Fem2DConstraintFrictionlessContactTests.cpp
 	Fem2DElementTriangleTests.cpp
 	Fem2DLocalizationTest.cpp
 	Fem2DMechanicalValidationTests.cpp
@@ -51,6 +54,7 @@ set(UNIT_TEST_SOURCES
 	Fem3DPlyReaderDelegateTests.cpp
 	Fem3DRepresentationTests.cpp
 	FemElementTests.cpp
+	FemLocalizationTest.cpp
 	FemRepresentationTests.cpp
 	FixedConstraintFixedPointTests.cpp
 	FixedConstraintFrictionlessContactTests.cpp
@@ -69,6 +73,7 @@ set(UNIT_TEST_SOURCES
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
+	PublishCollisionsTests.cpp
 	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp

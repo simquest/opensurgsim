@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 #ifndef SURGSIM_COLLISION_REPRESENTATION_H
 #define SURGSIM_COLLISION_REPRESENTATION_H
 
+#include <boost/thread/mutex.hpp>
 #include <list>
 #include <memory>
 #include <unordered_map>
-
-#include <boost/thread/mutex.hpp>
+#include <unordered_set>
 
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Representation.h"
+
 
 namespace SurgSim
 {
@@ -83,7 +84,7 @@ public:
 	/// \param contact The contact to be added
 	/// \note This method is thread-safe
 	void addContact(const std::shared_ptr<Representation>& other,
-		const std::shared_ptr<SurgSim::Collision::Contact>& contact);
+					const std::shared_ptr<SurgSim::Collision::Contact>& contact);
 
 	/// Check whether this collision representation collided with another during the last update
 	/// \param other other collision representation to check against
@@ -94,9 +95,40 @@ public:
 	/// \param dt the time passed from the last update.
 	virtual void update(const double& dt);
 
+	/// Set a collision representation to ignore
+	/// Collisions with this collision representation will not be detected
+	/// \param fullName The full name of the collision representation to ignore
+	bool ignore(const std::string& fullName);
+
+	/// Set a collision representation to ignore
+	/// Collisions with this collision representation will not be detected
+	/// \param representation The collision representation to ignore
+	bool ignore(const std::shared_ptr<Representation>& representation);
+
+	/// Set the collision representations to ignore
+	/// Collisions with these collision representation will not be detected
+	/// \param ignoring The collision representations (given by full name) to ignore
+	void setIgnoring(const std::vector<std::string>& ignoring);
+
+	/// Get the ignored collision representations
+	/// \return The full names of all the ignored collision representations
+	std::vector<std::string> getIgnoring() const;
+
+	/// Is the collision representation being ignored
+	/// \param fullName The full name of the collision representation to check
+	/// return True if the collision representation is being ignored
+	bool isIgnoring(const std::string& fullName) const;
+
+	/// Is the collision representation being ignored
+	/// \param representation The collision representation to check
+	/// return True if the collision representation is being ignored
+	bool isIgnoring(const std::shared_ptr<Representation>& representation) const;
+
 protected:
 	/// Invalidate the cached posed shape
 	void invalidatePosedShape();
+
+	void doRetire() override;
 
 private:
 	/// A map which associates a list of contacts with each collision representation.
@@ -115,6 +147,9 @@ private:
 
 	/// Pose of m_posedShape
 	Math::RigidTransform3d m_posedShapePose;
+
+	/// Ignored collision representations
+	std::unordered_set<std::string> m_ignoring;
 };
 
 

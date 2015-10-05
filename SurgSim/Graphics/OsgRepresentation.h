@@ -21,6 +21,7 @@
 #include <osg/ref_ptr>
 
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 
 namespace osg
 {
@@ -125,6 +126,9 @@ protected:
 
 	/// Indicates if the representation is rendered as a wireframe.
 	bool m_drawAsWireFrame;
+
+	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_modelMatrixUniform;
+
 };
 
 }; // Graphics

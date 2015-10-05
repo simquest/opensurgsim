@@ -16,10 +16,12 @@
 #include "SurgSim/Blocks/GraphicsUtilities.h"
 
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/TransferPropertiesBehavior.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgRenderTarget.h"
@@ -32,11 +34,8 @@
 #include "SurgSim/Graphics/OsgUniformFactory.h"
 #include "SurgSim/Graphics/RenderPass.h"
 
-#include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Framework/TransferPropertiesBehavior.h"
-#include "SurgSim/Framework/PoseComponent.h"
-#include "SurgSim/Framework/BasicSceneElement.h"
 #include "osg/PolygonMode"
+
 namespace SurgSim
 {
 namespace Blocks

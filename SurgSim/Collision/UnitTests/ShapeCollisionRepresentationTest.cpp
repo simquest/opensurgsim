@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -90,9 +90,6 @@ TEST(ShapeCollisionRepresentationTest, SerializationTest)
 	YAML::Node node;
 	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*collisionRepresentation));
 	EXPECT_EQ(1u, node.size());
-
-	YAML::Node data = node["SurgSim::Collision::ShapeCollisionRepresentation"];
-	EXPECT_EQ(5u, data.size());
 
 	std::shared_ptr<ShapeCollisionRepresentation> newShapeCollisionRepresentation;
 	ASSERT_NO_THROW(newShapeCollisionRepresentation = std::dynamic_pointer_cast<ShapeCollisionRepresentation>

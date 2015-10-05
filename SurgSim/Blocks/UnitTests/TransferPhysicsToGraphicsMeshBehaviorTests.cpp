@@ -19,6 +19,8 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Blocks/TransferPhysicsToGraphicsMeshBehavior.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -42,12 +44,17 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, ConstructorTest)
+namespace SurgSim
+{
+namespace Blocks
+{
+
+TEST(TransferPhysicsToGraphicsMeshBehaviorTests, Constructor)
 {
 	ASSERT_NO_THROW(TransferPhysicsToGraphicsMeshBehavior("TestBehavior"));
 }
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetSourceTest)
+TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetSource)
 {
 	auto physics = std::make_shared<Fem3DRepresentation>("PhysicsDeformable");
 	auto rigid = std::make_shared<RigidRepresentation>("PhysicsRigid");
@@ -59,7 +66,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetSourceTest)
 	EXPECT_EQ(physics, behavior->getSource());
 }
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetTargetTest)
+TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetTarget)
 {
 	auto graphics = std::make_shared<OsgMeshRepresentation>("OsgMesh");
 	auto graphicsBox = std::make_shared<OsgBoxRepresentation>("OsgBox");
@@ -71,7 +78,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SetGetTargetTest)
 	EXPECT_EQ(graphics, behavior->getTarget());
 }
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
+TEST(TransferPhysicsToGraphicsMeshBehaviorTests, Update)
 {
 	auto runtime = std::make_shared<Runtime>("config.txt");
 	auto behaviorManager = std::make_shared<BehaviorManager>();
@@ -121,7 +128,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, UpdateTest)
 	runtime->stop();
 }
 
-TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
+TEST(TransferPhysicsToGraphicsMeshBehaviorTests, Serialization)
 {
 	std::string filename = std::string("Geometry/wound_deformable_with_texture.ply");
 
@@ -142,13 +149,97 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, SerializationTest)
 	EXPECT_EQ(1u, node.size());
 
 	YAML::Node data = node["SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior"];
-	EXPECT_EQ(5u, data.size());
-
 	std::shared_ptr<TransferPhysicsToGraphicsMeshBehavior> newBehavior;
 	ASSERT_NO_THROW(newBehavior = std::dynamic_pointer_cast<TransferPhysicsToGraphicsMeshBehavior>(
-									node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+									  node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 
 	EXPECT_EQ("SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior", newBehavior->getClassName());
 	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<SurgSim::Physics::DeformableRepresentation>>("Source"));
 	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<SurgSim::Graphics::MeshRepresentation>>("Target"));
+
+
 }
+
+TEST(TransferPhysicsToGraphicsMeshBehaviorTests, MappingAccessors)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	auto behavior = std::make_shared<TransferPhysicsToGraphicsMeshBehavior>("Behavior");
+
+	auto names = std::make_pair(std::string("TransferPhysicsToGraphicsMeshBehavior/data.ply"),
+								std::string("TransferPhysicsToGraphicsMeshBehavior/data.ply"));
+
+	// Plain Setter
+	auto indices = behavior->getIndexMap();
+	std::vector<std::pair<size_t, size_t>> empty;
+	EXPECT_TRUE(indices.empty());
+
+	indices.push_back(std::make_pair(0, 0));
+	behavior->setValue("IndexMap", indices);
+	EXPECT_EQ(1u, behavior->getIndexMap().size());
+
+	// SetValue with pair
+	ASSERT_NO_THROW(behavior->setValue("IndexMapMeshNames", names));
+	indices = behavior->getValue<std::vector<std::pair<size_t, size_t>>>("IndexMap");
+	EXPECT_EQ(4, indices.size());
+
+	// SetValue with pair of meshes
+	std::shared_ptr<Framework::Asset> mesh1 = std::make_shared<DataStructures::TriangleMeshPlain>();
+	mesh1->load("TransferPhysicsToGraphicsMeshBehavior/data.ply");
+
+	std::shared_ptr<Framework::Asset> mesh2 = std::make_shared<DataStructures::TriangleMeshPlain>();
+	mesh2->load("TransferPhysicsToGraphicsMeshBehavior/data_more.ply");
+
+	auto meshes = std::make_pair(mesh1, mesh2);
+	ASSERT_NO_THROW(behavior->setValue("IndexMapMeshes", meshes));
+	EXPECT_EQ(9u, behavior->getIndexMap().size());
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*behavior));
+	EXPECT_EQ(1u, node.size());
+
+	YAML::Node data = node["SurgSim::Blocks::TransferPhysicsToGraphicsMeshBehavior"];
+	std::shared_ptr<TransferPhysicsToGraphicsMeshBehavior> newBehavior;
+	ASSERT_NO_THROW(newBehavior = std::dynamic_pointer_cast<TransferPhysicsToGraphicsMeshBehavior>(
+									  node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+
+	EXPECT_EQ(9u, newBehavior->getIndexMap().size());
+}
+
+TEST(TransferPhysicsToGraphicsMeshBehaviorTests, Mapping)
+{
+	Framework::ApplicationData data("config.txt");
+	auto mesh1 = std::make_shared<DataStructures::TriangleMeshPlain>();
+	mesh1->load("TransferPhysicsToGraphicsMeshBehavior/data.ply", data);
+
+	auto indices = generateIndexMap(mesh1, mesh1);
+
+	EXPECT_EQ(mesh1->getNumVertices(), indices.size());
+	for (const auto& pair : indices)
+	{
+		EXPECT_EQ(pair.first, pair.second);
+	}
+
+	auto mesh2 = std::make_shared<DataStructures::TriangleMeshPlain>();
+	mesh2->load("TransferPhysicsToGraphicsMeshBehavior/data_more.ply", data);
+
+	indices = generateIndexMap(mesh1, mesh2);
+	EXPECT_EQ(9u, indices.size());
+
+	std::array<size_t, 4> counts = {0, 0, 0, 0};
+
+	for (const auto& pair : indices)
+	{
+		++counts[pair.first];
+		// Nothing should refer to the first vertex
+		EXPECT_NE(0, pair.second);
+	}
+
+	EXPECT_EQ(0u, counts[0]);
+	EXPECT_EQ(2u, counts[1]);
+	EXPECT_EQ(3u, counts[2]);
+	EXPECT_EQ(4u, counts[3]);
+}
+
+}
+}
+

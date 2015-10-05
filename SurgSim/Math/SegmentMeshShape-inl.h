@@ -12,29 +12,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
-#include "SurgSim/Devices/Novint/Novint7DofDevice.h"
+#ifndef SURGSIM_MATH_SEGMENTMESHSHAPE_INL_H
+#define SURGSIM_MATH_SEGMENTMESHSHAPE_INL_H
 
 namespace SurgSim
 {
-namespace Devices
+namespace Math
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::Novint7DofDevice, Novint7DofDevice);
-
-Novint7DofDevice::Novint7DofDevice(const std::string& uniqueName) :
-	NovintCommonDevice(uniqueName)
+template <class VertexData, class EdgeData>
+SegmentMeshShape::SegmentMeshShape(
+	const SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
+	double radius) : SurgSim::DataStructures::SegmentMeshPlain(mesh)
 {
+	setRadius(radius);
+	updateAabbTree();
 }
 
-Novint7DofDevice::~Novint7DofDevice()
-{
-}
+}; // namespace Math
+}; // namespace SurgSim
 
-bool Novint7DofDevice::is7DofDevice() const
-{
-	return true;
-}
-
-};  // namespace Devices
-};  // namespace SurgSim
+#endif // SURGSIM_MATH_SEGMENTMESHSHAPE_INL_H

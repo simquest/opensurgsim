@@ -97,6 +97,7 @@ void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 	{
 		osg::PointSprite* sprite = new osg::PointSprite();
 		stateSet->setTextureAttributeAndModes(m_unit, sprite, osg::StateAttribute::ON);
+		stateSet->setMode(GL_VERTEX_PROGRAM_POINT_SIZE, osg::StateAttribute::ON);
 	}
 	stateSet->setTextureAttributeAndModes(m_unit, m_texture->getOsgTexture(),
 										  osg::StateAttribute::ON);

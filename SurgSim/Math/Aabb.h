@@ -62,6 +62,7 @@ bool doAabbIntersect(const Eigen::AlignedBox<Scalar, Dim>& a,
 {
 	return !a.intersection(b).isEmpty();
 }
+
 /// Convenience function for creating a bounding box from three vertices (e.g. the vertices of a triangle)
 /// \tparam Scalar numeric type
 /// \tparam Dim dimension of the space to be used
@@ -76,8 +77,9 @@ Eigen::AlignedBox<Scalar, Dim> makeAabb(
 	Eigen::AlignedBox<Scalar, Dim> result(vector0);
 	result.extend(vector1);
 	result.extend(vector2);
-	return std::move(result);
+	return result;
 }
+
 }
 }
 

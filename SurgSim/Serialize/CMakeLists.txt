@@ -15,7 +15,6 @@
 
 
 include_directories(
-	${OSG_INCLUDE_DIR}
 )
 
 set(SURGSIM_SERIALIZE_SOURCES

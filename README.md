@@ -47,6 +47,7 @@ dependencies are easily installed through apt-get:
 
     sudo apt-get install libboost-all-dev cmake doxygen libeigen3-dev
     sudo apt-get install google-mock libjs-mathjax libopenscenegraph-dev
+    sudo apt-get install libyaml-cpp-dev
 
 To build OpenSurgSim, issue the following commands from the same directory used
 to obtain OpenSurgSim (see Section 1)
@@ -128,6 +129,10 @@ Required Dependencies
   Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation  
   Minimum Version: 3.2.0  
   
+* yaml-cpp  
+  Homepage: https://github.com/jbeder/yaml-cpp  
+  Minimum Version: 0.5.2  
+
 Optional Dependencies
 ---------------------
 

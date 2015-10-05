@@ -105,7 +105,9 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 	Vector3d correction = normal * (penetrationDepth - SurgSim::Math::Geometry::DistanceEpsilon);
 
 	SURGSIM_ASSERT(SurgSim::Math::doesIntersectTriangleTriangle(
-					   (Vector3d)(triangleA0 + correction), (Vector3d)(triangleA1 + correction), (Vector3d)(triangleA2 + correction),
+					   (Vector3d)(triangleA0 + correction),
+					   (Vector3d)(triangleA1 + correction),
+					   (Vector3d)(triangleA2 + correction),
 					   triangleB0, triangleB1, triangleB2))
 			<< "Correct normal and depth assertion failed with: "
 			"n [" << normal.transpose() << "], "
@@ -120,7 +122,9 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 	correction = normal * (penetrationDepth + 2.0 * SurgSim::Math::Geometry::DistanceEpsilon);
 
 	SURGSIM_ASSERT(!SurgSim::Math::doesIntersectTriangleTriangle(
-					   (Vector3d)(triangleA0 + correction), (Vector3d)(triangleA1 + correction), (Vector3d)(triangleA2 + correction),
+					   (Vector3d)(triangleA0 + correction),
+					   (Vector3d)(triangleA1 + correction),
+					   (Vector3d)(triangleA2 + correction),
 					   triangleB0, triangleB1, triangleB2))
 			<< "Correct normal and depth assertion failed with: "
 			"n [" << normal.transpose() << "], "

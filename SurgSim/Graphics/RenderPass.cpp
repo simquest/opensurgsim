@@ -137,7 +137,7 @@ void RenderPass::hideDepthTarget()
 }
 
 std::shared_ptr<ScreenSpaceQuadRepresentation> RenderPass::buildDebugQuad(const std::string& name,
-		std::shared_ptr<Texture> texture)
+																		  std::shared_ptr<Texture> texture)
 {
 	auto result = std::make_shared<OsgScreenSpaceQuadRepresentation>(name);
 	result->setTexture(texture);

@@ -31,13 +31,8 @@ namespace Devices
 {
 
 PoseIntegrator::PoseIntegrator(const std::string& name) :
-	CommonDevice(name),
-	m_poseResult(PoseType::Identity()),
-	m_firstInput(true),
-	m_poseIndex(-1),
-	m_linearVelocityIndex(-1),
-	m_angularVelocityIndex(-1),
-	m_resetIndex(-1)
+	DeviceFilter(name),
+	m_poseResult(PoseType::Identity())
 {
 }
 
@@ -49,31 +44,19 @@ const PoseIntegrator::PoseType& PoseIntegrator::integrate(const PoseType& pose)
 	return m_poseResult;
 }
 
-bool PoseIntegrator::initialize()
+void PoseIntegrator::initializeInput(const std::string& device, const DataStructures::DataGroup& inputData)
 {
-	return true;
-}
-
-bool PoseIntegrator::finalize()
-{
-	return true;
-}
-
-void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
-{
-	if (m_firstInput)
+	if (getInputData().isEmpty())
 	{
-		m_firstInput = false;
-
-		if (!inputData.vectors().hasEntry(SurgSim::DataStructures::Names::LINEAR_VELOCITY) ||
-			!inputData.vectors().hasEntry(SurgSim::DataStructures::Names::ANGULAR_VELOCITY))
+		if (!inputData.vectors().hasEntry(DataStructures::Names::LINEAR_VELOCITY) ||
+			!inputData.vectors().hasEntry(DataStructures::Names::ANGULAR_VELOCITY))
 		{
-			SurgSim::DataStructures::DataGroupBuilder builder;
+			DataStructures::DataGroupBuilder builder;
 			builder.addEntriesFrom(inputData);
-			builder.addVector(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
-			builder.addVector(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
+			builder.addVector(DataStructures::Names::LINEAR_VELOCITY);
+			builder.addVector(DataStructures::Names::ANGULAR_VELOCITY);
 			getInputData() = builder.createData();
-			m_copier = std::make_shared<SurgSim::DataStructures::DataGroupCopier>(inputData, &getInputData());
+			m_copier = std::make_shared<DataStructures::DataGroupCopier>(inputData, &getInputData());
 		}
 	}
 
@@ -86,19 +69,14 @@ void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::D
 		m_copier->copy(inputData, &getInputData());
 	}
 
-	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
-	m_linearVelocityIndex = getInputData().vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
-	m_angularVelocityIndex = getInputData().vectors().getIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
-	m_resetIndex = inputData.booleans().getIndex(m_resetName);
-
-	SurgSim::Math::RigidTransform3d pose;
-	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
+	PoseType pose;
+	if (inputData.poses().get(DataStructures::Names::POSE, &pose))
 	{
 		m_poseResult = pose;
 	}
 }
 
-void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
+void PoseIntegrator::handleInput(const std::string& device, const DataStructures::DataGroup& inputData)
 {
 	if (m_copier == nullptr)
 	{
@@ -109,67 +87,48 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 		m_copier->copy(inputData, &getInputData());
 	}
 
-	if (m_poseIndex >= 0)
+	PoseType pose;
+	if (inputData.poses().get(DataStructures::Names::POSE, &pose))
 	{
-		SurgSim::Math::RigidTransform3d pose;
-		if (inputData.poses().get(m_poseIndex, &pose))
+		m_timer.markFrame();
+		double rate = m_timer.getAverageFrameRate();
+		if (m_timer.getNumberOfClockFails() > 0)
 		{
-			m_timer.markFrame();
-			double rate = m_timer.getAverageFrameRate();
-			if (m_timer.getNumberOfClockFails() > 0)
-			{
-				m_timer.start();
-				rate = 0.0;
-				SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Devices/Filters/PoseIntegrator")) <<
-					"The Timer used by " << getName() <<
-					" had a clock fail.  The calculated velocities will be zero this update.";
-			}
-
-			if (!boost::math::isnormal(rate))
-			{
-				rate = 0.0;
-			}
-
-			if (m_resetIndex >= 0)
-			{
-				bool reset = false;
-				inputData.booleans().get(m_resetName, &reset);
-				if (reset)
-				{
-					pose.translation() = -m_poseResult.translation();
-					pose.linear() = m_poseResult.linear().transpose();
-				}
-			}
-
-			// Before updating the current pose, use it to calculate the angular velocity.
-			Vector3d rotationAxis;
-			double angle;
-			SurgSim::Math::computeAngleAndAxis(pose.rotation(), &angle, &rotationAxis);
-			rotationAxis = m_poseResult.rotation() * rotationAxis; // rotate the axis into global space
-			// The angular and linear indices must exist because the entries were added in initializeInput.
-			getInputData().vectors().set(m_angularVelocityIndex, rotationAxis * angle * rate);
-
-			getInputData().poses().set(m_poseIndex, integrate(pose));
-
-			getInputData().vectors().set(m_linearVelocityIndex, pose.translation() * rate);
+			m_timer.start();
+			rate = 0.0;
+			SURGSIM_LOG_DEBUG(Framework::Logger::getLogger("Devices/Filters/PoseIntegrator")) <<
+				"The Timer used by " << getName() <<
+				" had a clock fail.  The calculated velocities will be zero this update.";
 		}
+
+		if (!boost::math::isnormal(rate))
+		{
+			rate = 0.0;
+		}
+
+		bool reset = false;
+		inputData.booleans().get(m_resetName, &reset);
+		if (reset)
+		{
+			pose.translation() = -m_poseResult.translation();
+			pose.linear() = m_poseResult.linear().transpose();
+		}
+
+		// Before updating the current pose, use it to calculate the angular velocity.
+		Vector3d rotationAxis;
+		double angle;
+		Math::computeAngleAndAxis(pose.rotation(), &angle, &rotationAxis);
+		rotationAxis = m_poseResult.rotation() * rotationAxis; // rotate the axis into global space
+		getInputData().vectors().set(DataStructures::Names::ANGULAR_VELOCITY, rotationAxis * angle * rate);
+		getInputData().poses().set(DataStructures::Names::POSE, integrate(pose));
+		getInputData().vectors().set(DataStructures::Names::LINEAR_VELOCITY, pose.translation() * rate);
 	}
 	pushInput();
 }
 
-bool PoseIntegrator::requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData)
-{
-	bool state = pullOutput();
-	if (state)
-	{
-		*outputData = getOutputData();
-	}
-	return state;
-}
-
 void PoseIntegrator::setReset(const std::string& name)
 {
-	SURGSIM_ASSERT(m_firstInput) <<
+	SURGSIM_ASSERT(getInputData().isEmpty()) <<
 		"PoseIntegrator::setReset cannot be called after the first call to initializeInput.";
 	m_resetName = name;
 }

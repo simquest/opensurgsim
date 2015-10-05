@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,13 +48,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 	auto threadPool = Framework::Runtime::getThreadPool();
-	auto const& representations = state->getActiveCollisionRepresentations();
 	std::vector<std::future<void>> tasks;
-
-	for (auto& representation : representations)
-	{
-		representation->getCollisions().unsafeGet().clear();
-	}
 
 	updatePairs(result);
 
@@ -68,11 +62,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	}
 
 	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.wait();});
-
-	for (auto& representation : representations)
-	{
-		representation->getCollisions().publish();
-	}
 
 	return result;
 }
@@ -118,24 +107,10 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			++second;
 			for (; second != std::end(representations); ++second)
 			{
-				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
-				pair->setRepresentations(*first,*second);
-				pairs.push_back(pair);
-			}
-		}
-
-		auto& excludedPairs = state->getExcludedCollisionPairs();
-		for (auto it = excludedPairs.cbegin(); it != excludedPairs.cend(); ++it)
-		{
-			auto candidate = std::find_if(pairs.begin(), pairs.end(), [&it](const std::shared_ptr<CollisionPair> &pair)
-			{
-				return (pair->getFirst() == (*it)->getFirst() && pair->getSecond() == (*it)->getSecond())
-					|| (pair->getFirst() == (*it)->getSecond() && pair->getSecond() == (*it)->getFirst());
-			});
-
-			if (candidate != pairs.end())
-			{
-				pairs.erase(candidate);
+				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
+				{
+					pairs.emplace_back(std::make_shared<CollisionPair>(*first, *second));
+				}
 			}
 		}
 

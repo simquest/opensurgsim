@@ -84,6 +84,15 @@ public:
 		n = r * n;
 	}
 
+	// Transform this triangle by the given matrix.
+	void transform(SurgSim::Math::RigidTransform3d transform)
+	{
+		v0  = transform * v0;
+		v1  = transform * v1;
+		v2  = transform * v2;
+		n = transform.linear() * n;
+	}
+
 	// Vertices of this triangle.
 	Vector3d v0;
 	Vector3d v1;

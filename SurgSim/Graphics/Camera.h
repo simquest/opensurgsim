@@ -106,6 +106,12 @@ public:
 	/// \param x,y,width,height [out] non-nullptr parameters to write the viewport parameters
 	virtual void getViewport(int* x, int* y, int* width, int* height) const  = 0;
 
+	/// Sets the width and height of the viewport
+	/// \param dimensions size of the viewport in screen sapce
+	virtual void setViewportSize(std::array<double, 2> dimensions) = 0;
+
+	/// Gets the dimensions of the viewport
+	virtual std::array<double, 2> getViewportSize() const = 0;
 
 	/// Set the projection matrix with the appropriate  perspective projection parameters
 	/// \param fovy Field of view along the y-axis
@@ -155,6 +161,22 @@ public:
 	/// \return the ambient light that gets added to the scene
 	virtual SurgSim::Math::Vector4d getAmbientColor() = 0;
 
+	/// Marks the camera as a main view camera, this means that view dependent passes should follow this camera with
+	/// their appropriate calculations, for this purpose when isMainCamera() is true, the camera provides a uniform
+	/// struct with it's transforms. This function will most likely be called by the view.
+	/// \code
+	/// struct MainCamera {
+	///     mat4 viewMatrix;
+	///     mat4 inverseViewMatrix;
+	///     mat4 projectionMatrix;
+	///     mat4 mainProjectionMatrix;
+	/// };
+	/// uniform MainCamera mainCamera;
+	/// \endcode
+	virtual void setMainCamera(bool val) = 0;
+
+	/// \return whether this is used as a main camera
+	virtual bool isMainCamera() = 0;
 
 private:
 

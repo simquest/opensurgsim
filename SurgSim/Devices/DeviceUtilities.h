@@ -38,6 +38,25 @@ namespace Devices
 std::shared_ptr<Input::DeviceInterface> createDevice(const std::vector<std::string>& classNames,
 		const std::string& name);
 
+/// Attempts to create and initialize a device
+/// \param className The fully-qualified device class name to try.
+/// \param name The name to be given to the created device
+/// \return An initialized device or nullptr if no device was available.
+std::shared_ptr<Input::DeviceInterface> createDevice(const std::string& className, const std::string& name);
+
+/// Loads a single device from the file, the first device that successfully initializes.
+/// The file format should be just a list of DeviceInterfaces
+/// \code
+/// - SurgSim::Device::MultiAxisDevice:
+///        Name: element1
+/// - SurgSim::Device::IdentityPoseDevice:
+///        Name: element1
+/// \endcode
+/// \param fileName the filename of the devices to be loaded, needs to be found
+/// \return an initialized device, or nullptr if no device could be created and initialized
+/// \throws If the file cannot be found or is an invalid file
+std::shared_ptr<Input::DeviceInterface> loadDevice(const std::string& fileName);
+
 };
 };
 

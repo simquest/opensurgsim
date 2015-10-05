@@ -40,8 +40,10 @@ View::View(const std::string& name) :
 	m_screenHeight(0.0)
 {
 	typedef std::array<int, 2> CoordinateType;
+	typedef std::array<double, 2> DoubleType;
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, CoordinateType, Position, getPosition, setPosition);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, CoordinateType, Dimensions, getDimensions, setDimensions);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, DoubleType, DimensionsDouble, getDimensionsDouble, setDimensionsDouble);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, std::shared_ptr<SurgSim::Framework::Component>, Camera,
 									  getCamera, setCamera);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(View, bool, WindowBorder, isWindowBorderEnabled, setWindowBorderEnabled);
@@ -57,7 +59,12 @@ View::View(const std::string& name) :
 
 void View::setCamera(std::shared_ptr<Component> camera)
 {
+	if (m_camera != nullptr)
+	{
+		m_camera->setMainCamera(false);
+	}
 	m_camera = checkAndConvert<Camera>(camera, "SurgSim::Graphics::Camera");
+	m_camera->setMainCamera(true);
 }
 
 std::shared_ptr<Camera> View::getCamera() const
