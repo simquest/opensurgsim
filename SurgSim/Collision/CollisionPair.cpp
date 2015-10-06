@@ -55,21 +55,21 @@ void CollisionPair::setRepresentations(const std::shared_ptr<Representation>& fi
 
 	if (m_representations.first == m_representations.second)
 	{
-		m_type = m_representations.first->getSelfCollisionType();
+		m_type = m_representations.first->getSelfCollisionDetectionType();
 	}
-	else if (m_representations.first->getCollisionType() == COLLISION_TYPE_NONE ||
-				m_representations.second->getCollisionType() == COLLISION_TYPE_NONE)
+	else if (m_representations.first->getCollisionDetectionType() == COLLISION_DETECTION_TYPE_NONE ||
+				m_representations.second->getCollisionDetectionType() == COLLISION_DETECTION_TYPE_NONE)
 	{
-		m_type = COLLISION_TYPE_NONE;
+		m_type = COLLISION_DETECTION_TYPE_NONE;
 	}
-	else if (m_representations.first->getCollisionType() == COLLISION_TYPE_CONTINUOUS &&
-				m_representations.second->getCollisionType() == COLLISION_TYPE_CONTINUOUS)
+	else if (m_representations.first->getCollisionDetectionType() == COLLISION_DETECTION_TYPE_CONTINUOUS &&
+				m_representations.second->getCollisionDetectionType() == COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
-		m_type = COLLISION_TYPE_CONTINUOUS;
+		m_type = COLLISION_DETECTION_TYPE_CONTINUOUS;
 	}
 	else
 	{
-		m_type = COLLISION_TYPE_DISCRETE;
+		m_type = COLLISION_DETECTION_TYPE_DISCRETE;
 	}
 }
 
@@ -79,7 +79,7 @@ const std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>
 	return m_representations;
 }
 
-CollisionType CollisionPair::getType() const
+CollisionDetectionType CollisionPair::getType() const
 {
 	return m_type;
 }
@@ -99,26 +99,33 @@ bool CollisionPair::hasContacts() const
 	return !m_contacts.empty();
 }
 
-void CollisionPair::addContact(const double& depth, const double& time, const SurgSim::Math::Vector3d& contactPoint,
+void CollisionPair::addCcdContact(const double& depth, const double& time, const SurgSim::Math::Vector3d& contactPoint,
 		const SurgSim::Math::Vector3d& normal, const std::pair<Location, Location>& penetrationPoints)
 {
-	addContact(std::make_shared<Contact>(getType(), depth, time, contactPoint, normal, penetrationPoints));
+	SURGSIM_ASSERT(getType() == COLLISION_DETECTION_TYPE_CONTINUOUS)
+		<< "Can only add CCD contacts to a CollisionPair that is COLLISION_DETECTION_TYPE_CONTINUOUS";
+	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_CONTINUOUS, depth, time, contactPoint, normal,
+				penetrationPoints));
 }
 
-void CollisionPair::addContact(const double& depth, const SurgSim::Math::Vector3d& normal,
+void CollisionPair::addDcdContact(const double& depth, const SurgSim::Math::Vector3d& normal,
 		const std::pair<Location, Location>& penetrationPoints)
 {
-	addContact(std::make_shared<Contact>(getType(), depth, 1.0, Math::Vector3d::Zero(), normal, penetrationPoints));
+	SURGSIM_ASSERT(getType() == COLLISION_DETECTION_TYPE_DISCRETE)
+		<< "Can only add DCD contacts to a CollisionPair that is COLLISION_DETECTION_TYPE_DISCRETE";
+	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0, Math::Vector3d::Zero(), normal,
+				penetrationPoints));
 }
 
 void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
 {
+	SURGSIM_ASSERT(contact->type == getType())
+		<< "Only contacts with the same CollisionDetectionType can be added to this CollisionPair.";
 	m_contacts.push_back(contact);
 	m_representations.first->addContact(m_representations.second, contact);
-	std::shared_ptr<Contact> contact2 =
-		std::make_shared<Contact>(contact->collisionType, contact->depth, contact->time, contact->contact,
-								  -contact->normal, std::pair<Location, Location>(
-									  contact->penetrationPoints.second, contact->penetrationPoints.first));
+	auto contact2 = std::make_shared<Contact>(contact->type, contact->depth, contact->time, contact->contact,
+								  -contact->normal,
+								  std::make_pair(contact->penetrationPoints.second, contact->penetrationPoints.first));
 	m_representations.second->addContact(m_representations.first, contact2);
 }
 

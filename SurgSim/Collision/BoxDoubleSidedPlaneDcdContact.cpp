@@ -158,7 +158,7 @@ std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateCont
 				std::pair<Location, Location> penetrationPoints = std::make_pair(Location(boxVertices[i]),
 						Location(planePose.inverse() * (boxPose * boxVertices[i] + normal * std::abs(d[i]))));
 				contacts.push_back(std::make_shared<Contact>(
-									   COLLISION_TYPE_DISCRETE,
+									   COLLISION_DETECTION_TYPE_DISCRETE,
 									   std::abs(d[i]), 1.0, Vector3d::Zero(), normal,
 									   penetrationPoints));
 

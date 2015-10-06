@@ -48,7 +48,7 @@ typedef std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> ContactMapType;
 
 /// The type of collision detection
-enum CollisionType : SURGSIM_ENUM_TYPE;
+enum CollisionDetectionType : SURGSIM_ENUM_TYPE;
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
@@ -71,19 +71,19 @@ public:
 
 	/// Set the type of collision detection to use between this representation and other representations
 	/// \param type The collision detection type
-	void setCollisionType(CollisionType type);
+	void setCollisionDetectionType(CollisionDetectionType type);
 
 	/// Get the type of collision detection used between this representation and other representations
 	/// \return The collision detection type
-	CollisionType getCollisionType() const;
+	CollisionDetectionType getCollisionDetectionType() const;
 
 	/// Set the type of collision detection to use between this representation and itself
 	/// \param type The collision detection type
-	void setSelfCollisionType(CollisionType type);
+	void setSelfCollisionDetectionType(CollisionDetectionType type);
 
 	/// Get the type of collision detection used between this representation and itself
 	/// \return The collision detection type
-	CollisionType getSelfCollisionType() const;
+	CollisionDetectionType getSelfCollisionDetectionType() const;
 
 	/// Get the shape
 	/// \return The actual shape used for collision.
@@ -116,22 +116,22 @@ public:
 
 	/// Set a collision representation to ignore
 	/// Collisions with this collision representation will not be detected
-	/// \note This method conflicts with setOnlyCollideWith. You can only set what
-	/// representations to ignore or only collide with, not both.
+	/// \note This method conflicts with setAllowing. You can only set what
+	/// representations to ignore or allow collisions with, not both.
 	/// \param fullName The full name of the collision representation to ignore
 	bool ignore(const std::string& fullName);
 
 	/// Set a collision representation to ignore
 	/// Collisions with this collision representation will not be detected
-	/// \note This method conflicts with setOnlyCollideWith. You can only set what
-	/// representations to ignore or only collide with, not both.
+	/// \note This method conflicts with setAllowing. You can only set what
+	/// representations to ignore or allow collisions with, not both.
 	/// \param representation The collision representation to ignore
 	bool ignore(const std::shared_ptr<Representation>& representation);
 
 	/// Set the collision representations to ignore
 	/// Collisions with these collision representation will not be detected
-	/// \note This method conflicts with setOnlyCollideWith. You can only set what
-	/// representations to ignore or only collide with, not both.
+	/// \note This method conflicts with setAllowing. You can only set what
+	/// representations to ignore or allow collisions with, not both.
 	/// \param fullNames The collision representations (given by full name) to ignore
 	void setIgnoring(const std::vector<std::string>& fullNames);
 
@@ -145,12 +145,12 @@ public:
 	/// return True if the collision representation is being ignored
 	bool isIgnoring(const std::shared_ptr<Representation>& representation) const;
 
-	/// Set the only collision representations to collide with
+	/// Set the only collision representations to allow collisions with
 	/// Only Collisions with these collision representation will be detected
 	/// \note This method conflicts with ignore and setIgnoring. You can only set what
-	/// representations to ignore or only collide with, not both.
-	/// \param fullNames The collision representations (given by full name) to only collide with
-	void setOnlyCollideWith(const std::vector<std::string>& fullNames);
+	/// representations to ignore or allow collisions with, not both.
+	/// \param fullNames The collision representations (given by full name) to allow
+	void setAllowing(const std::vector<std::string>& fullNames);
 
 protected:
 	/// Invalidate the cached posed shape
@@ -160,16 +160,16 @@ protected:
 	/// \return The full names of all the ignored collision representations
 	std::vector<std::string> getIgnoring() const;
 
-	/// Get the only collision representations that this representation can collide with
-	/// \return The full names of all the collision representations to only collide with
-	std::vector<std::string> getOnlyCollideWith() const;
+	/// Get the only collision representations that this representation is allowed to collide with
+	/// \return The full names of all the collision representations to allow
+	std::vector<std::string> getAllowing() const;
 
 private:
 	/// The type of collision detection
-	CollisionType m_collisionType;
+	CollisionDetectionType m_collisionDetectionType;
 
 	/// The type of self collision detection
-	CollisionType m_selfCollisionType;
+	CollisionDetectionType m_selfCollisionDetectionType;
 
 	/// A map which associates a list of contacts with each collision representation.
 	/// Every contact added to this map follows the convention of pointing the contact normal toward this
@@ -191,18 +191,18 @@ private:
 	/// Ignored collision representations
 	std::unordered_set<std::string> m_ignoring;
 
-	/// Collision representations to only collide with
-	std::unordered_set<std::string> m_onlyCollideWith;
+	/// Allowed collision representations
+	std::unordered_set<std::string> m_allowing;
 };
 
 }; // namespace Collision
 }; // namespace SurgSim
 
-SURGSIM_SERIALIZABLE_ENUM(SurgSim::Collision::CollisionType,
-	(COLLISION_TYPE_NONE)
-	(COLLISION_TYPE_DISCRETE)
-	(COLLISION_TYPE_CONTINUOUS)
-	(MAX_COLLISION_TYPES)
+SURGSIM_SERIALIZABLE_ENUM(SurgSim::Collision::CollisionDetectionType,
+	(COLLISION_DETECTION_TYPE_NONE)
+	(COLLISION_DETECTION_TYPE_DISCRETE)
+	(COLLISION_DETECTION_TYPE_CONTINUOUS)
+	(MAX_COLLISION_DETECTION_TYPES)
 )
 
 #endif

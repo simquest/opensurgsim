@@ -75,7 +75,7 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 			penetrationPoints.second.rigidLocalPosition.setValue(
 				representationPlane->getPose().inverse() * (vertex.position - normal * d));
 
-			pair->addContact(-d, normal, penetrationPoints);
+			pair->addDcdContact(-d, normal, penetrationPoints);
 		}
 	}
 }

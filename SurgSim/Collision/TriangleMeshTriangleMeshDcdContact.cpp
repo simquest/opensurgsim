@@ -219,7 +219,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 					penetrationPoints.second.rigidLocalPosition.setValue(
 						pair->getSecond()->getPose().inverse() * penetrationPointB);
 
-					pair->addContact(std::abs(depth), normal, penetrationPoints);
+					pair->addDcdContact(std::abs(depth), normal, penetrationPoints);
 				}
 			}
 		}

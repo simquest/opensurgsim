@@ -131,7 +131,7 @@ std::list<std::shared_ptr<Contact>> BoxSphereDcdContact::calculateContact(
 
 	// Create the contact.
 	contacts.push_back(std::make_shared<Contact>(
-						   COLLISION_TYPE_DISCRETE, depth, 1.0,
+						   COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
 						   Vector3d::Zero(), normal, penetrationPoints));
 	return std::move(contacts);
 }

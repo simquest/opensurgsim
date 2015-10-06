@@ -148,10 +148,10 @@ TEST_F(DcdCollisionTest, ExlcudeCollisionsTest3)
 	ASSERT_EQ(0u, newState->getCollisionPairs().size());
 }
 
-TEST_F(DcdCollisionTest, CollisionTypeContinuousTest)
+TEST_F(DcdCollisionTest, IgnoreContinuousTypeCollisions)
 {
-	sphere1Collision->setCollisionType(Collision::COLLISION_TYPE_CONTINUOUS);
-	sphere2Collision->setCollisionType(Collision::COLLISION_TYPE_CONTINUOUS);
+	sphere1Collision->setCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
+	sphere2Collision->setCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
 	sphere2->setPose(Math::makeRigidTransform(Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.5)));
 
 	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);
@@ -159,9 +159,9 @@ TEST_F(DcdCollisionTest, CollisionTypeContinuousTest)
 	EXPECT_FALSE(newState->getCollisionPairs().at(0)->hasContacts());
 }
 
-TEST_F(DcdCollisionTest, CollisionTypeNoneTest)
+TEST_F(DcdCollisionTest, IgnoreNoneTypeCollisions)
 {
-	sphere2Collision->setCollisionType(Collision::COLLISION_TYPE_NONE);
+	sphere2Collision->setCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_NONE);
 	sphere2->setPose(Math::makeRigidTransform(Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.5)));
 
 	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);

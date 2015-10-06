@@ -51,7 +51,7 @@ public:
 			{
 				std::pair<SurgSim::DataStructures::Location, SurgSim::DataStructures::Location> newPenetrationPoints;
 				auto collision = std::make_shared<SurgSim::Collision::Contact>(
-					SurgSim::Collision::COLLISION_TYPE_DISCRETE,
+					SurgSim::Collision::COLLISION_DETECTION_TYPE_DISCRETE,
 					1.0, 1.0, SurgSim::Math::Vector3d::Ones(), SurgSim::Math::Vector3d::UnitX(),
 					newPenetrationPoints);
 				rigid->addContact(rigid, collision);

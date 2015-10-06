@@ -112,7 +112,7 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expec
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(
-										COLLISION_TYPE_DISCRETE, depth, 1.0,
+										COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
 										Vector3d::Zero(), collisionNormal, penetrationPoint));
 	}
 }

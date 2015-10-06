@@ -74,7 +74,7 @@ void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pa
 		penetrationPoints.second.rigidLocalPosition.setValue(
 			representationPlane->getPose().inverse() * (sphereCenter - normal * dist));
 
-		pair->addContact(depth, normal, penetrationPoints);
+		pair->addDcdContact(depth, normal, penetrationPoints);
 	}
 }
 

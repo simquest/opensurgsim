@@ -277,7 +277,6 @@ std::string convert(boost::any val);
 		static Node encode(const name& rhs) \
 		{ \
 			Node result; \
-			using name; \
 			switch (rhs) \
 			{ \
 				BOOST_PP_SEQ_FOR_EACH(SURGSIM_ENUM_TOSTRING, name, enumerators) \
@@ -288,7 +287,6 @@ std::string convert(boost::any val);
 		} \
 		static bool decode(const Node& node, name& rhs) \
 		{ \
-			using name; \
 			std::string value = node.as<std::string>(); \
 			std::transform(value.begin(), value.end(), value.begin(), ::toupper); \
 			BOOST_PP_SEQ_FOR_EACH(SURGSIM_ENUM_FROMSTRING, name, enumerators) \

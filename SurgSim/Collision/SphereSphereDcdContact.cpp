@@ -58,7 +58,7 @@ void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> p
 		penetrationPoints.second.rigidLocalPosition.setValue(
 			(pair->getSecond()->getPose().linear().inverse() * normal) * secondSphere->getRadius());
 
-		pair->addContact(maxDist - dist, normal, penetrationPoints);
+		pair->addDcdContact(maxDist - dist, normal, penetrationPoints);
 	}
 }
 

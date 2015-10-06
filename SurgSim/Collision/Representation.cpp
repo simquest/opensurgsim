@@ -27,15 +27,15 @@ namespace Collision
 
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
-	m_collisionType(COLLISION_TYPE_DISCRETE),
-	m_selfCollisionType(COLLISION_TYPE_NONE)
+	m_collisionDetectionType(COLLISION_DETECTION_TYPE_DISCRETE),
+	m_selfCollisionDetectionType(COLLISION_DETECTION_TYPE_NONE)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Ignore, getIgnoring, setIgnoring);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, OnlyCollideWith, getOnlyCollideWith,
-			setOnlyCollideWith);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, CollisionType, CollisionType, getCollisionType, setCollisionType);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, CollisionType, SelfCollisionType, getSelfCollisionType,
-			setSelfCollisionType);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Allow, getAllowing, setAllowing);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, CollisionDetectionType, CollisionDetectionType,
+			getCollisionDetectionType, setCollisionDetectionType);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, CollisionDetectionType, SelfCollisionDetectionType,
+			getSelfCollisionDetectionType, setSelfCollisionDetectionType);
 }
 
 Representation::~Representation()
@@ -43,24 +43,24 @@ Representation::~Representation()
 
 }
 
-void Representation::setCollisionType(CollisionType type)
+void Representation::setCollisionDetectionType(CollisionDetectionType type)
 {
-	m_collisionType = type;
+	m_collisionDetectionType = type;
 }
 
-CollisionType Representation::getCollisionType() const
+CollisionDetectionType Representation::getCollisionDetectionType() const
 {
-	return m_collisionType;
+	return m_collisionDetectionType;
 }
 
-void Representation::setSelfCollisionType(CollisionType type)
+void Representation::setSelfCollisionDetectionType(CollisionDetectionType type)
 {
-	m_selfCollisionType = type;
+	m_selfCollisionDetectionType = type;
 }
 
-CollisionType Representation::getSelfCollisionType() const
+CollisionDetectionType Representation::getSelfCollisionDetectionType() const
 {
-	return m_selfCollisionType;
+	return m_selfCollisionDetectionType;
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
@@ -114,11 +114,11 @@ void Representation::update(const double& dt)
 
 bool Representation::ignore(const std::string& fullName)
 {
-	if (!m_onlyCollideWith.empty())
+	if (!m_allowing.empty())
 	{
 		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger())
 			<< "Collision Representation named " << getName() << " can not ignore " << fullName
-			<< ". You can only set what representation to ignore or only collide with, not both.";
+			<< ". You can only set what representations to ignore or allow, not both.";
 		return false;
 	}
 	else
@@ -134,11 +134,11 @@ bool Representation::ignore(const std::shared_ptr<Representation>& representatio
 
 void Representation::setIgnoring(const std::vector<std::string>& fullNames)
 {
-	if (!m_onlyCollideWith.empty())
+	if (!m_allowing.empty())
 	{
 		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger())
 			<< "Collision Representation named " << getName() << " can not ignore other representations. "
-			<< "You can only set what representations to ignore or only collide with, not both.";
+			<< "You can only set what representations to ignore or allow, not both.";
 	}
 	else
 	{
@@ -157,9 +157,9 @@ std::vector<std::string> Representation::getIgnoring() const
 
 bool Representation::isIgnoring(const std::string& fullName) const
 {
-	if (!m_onlyCollideWith.empty())
+	if (!m_allowing.empty())
 	{
-		return m_onlyCollideWith.find(fullName) == m_onlyCollideWith.end();
+		return m_allowing.find(fullName) == m_allowing.end();
 	}
 	else
 	{
@@ -172,27 +172,27 @@ bool Representation::isIgnoring(const std::shared_ptr<Representation>& represent
 	return isIgnoring(representation->getFullName());
 }
 
-void Representation::setOnlyCollideWith(const std::vector<std::string>& fullNames)
+void Representation::setAllowing(const std::vector<std::string>& fullNames)
 {
 	if (!m_ignoring.empty())
 	{
 		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger())
-			<< "Collision Representation named " << getName() << " cannot use setOnlyCollideWith. "
-			<< "You can only set what representations to ignore or only collide with, not both.";
+			<< "Collision Representation named " << getName() << " cannot use setAllowing. "
+			<< "You can only set what representations to ignore or allow, not both.";
 	}
 	else
 	{
-		m_onlyCollideWith.clear();
+		m_allowing.clear();
 		for (auto& fullName : fullNames)
 		{
-			m_onlyCollideWith.insert(fullName);
+			m_allowing.insert(fullName);
 		}
 	}
 }
 
-std::vector<std::string> Representation::getOnlyCollideWith() const
+std::vector<std::string> Representation::getAllowing() const
 {
-	return std::vector<std::string>(std::begin(m_onlyCollideWith), std::end(m_onlyCollideWith));
+	return std::vector<std::string>(std::begin(m_allowing), std::end(m_allowing));
 }
 
 

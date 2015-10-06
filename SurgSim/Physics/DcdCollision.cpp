@@ -54,7 +54,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 
 	for (auto& pair : result->getCollisionPairs())
 	{
-		if (pair->getType() == Collision::COLLISION_TYPE_DISCRETE)
+		if (pair->getType() == Collision::COLLISION_DETECTION_TYPE_DISCRETE)
 		{
 			tasks.push_back(threadPool->enqueue<void>([&] ()
 			{
@@ -111,7 +111,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
 				{
 					auto pair = std::make_shared<CollisionPair>(*first, *second);
-					if (pair->getType() != Collision::COLLISION_TYPE_NONE)
+					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
 					{
 						pairs.push_back(std::move(pair));
 					}

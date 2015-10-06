@@ -510,7 +510,7 @@ TEST_F(VirtualToolCouplerTest, SetHapticOutputOnlyWhenColliding)
 	auto& collisions = collision->getCollisions().unsafeGet();
 	collisions[std::make_shared<RigidCollisionRepresentation>("collision2")].push_back(
 		std::make_shared<Collision::Contact>(
-			Collision::COLLISION_TYPE_DISCRETE, 0.1, 1.0,
+			Collision::COLLISION_DETECTION_TYPE_DISCRETE, 0.1, 1.0,
 			Vector3d::UnitX().eval(), Vector3d::UnitY().eval(),
 			std::make_pair(DataStructures::Location(), DataStructures::Location())));
 	virtualToolCoupler->update(0.1);

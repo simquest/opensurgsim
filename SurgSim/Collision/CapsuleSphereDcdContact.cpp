@@ -70,7 +70,7 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 		penetrationPoints.second.rigidLocalPosition.setValue(
 			representationSphere->getPose().inverse() * (sphereCenter + normal * sphere->getRadius()));
 
-		pair->addContact(depth, normal, penetrationPoints);
+		pair->addDcdContact(depth, normal, penetrationPoints);
 	}
 }
 

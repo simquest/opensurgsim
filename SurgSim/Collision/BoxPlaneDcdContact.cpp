@@ -84,7 +84,7 @@ std::list<std::shared_ptr<Contact>> BoxPlaneDcdContact::calculateContact(
 			std::pair<Location, Location> penetrationPoints = std::make_pair(Location(boxVertex),
 					Location(boxLocalToPlaneLocal * (boxVertex - planeNormal * d)));
 			contacts.push_back(std::make_shared<Contact>(
-								   COLLISION_TYPE_DISCRETE, -d, 1.0,
+								   COLLISION_DETECTION_TYPE_DISCRETE, -d, 1.0,
 								   Vector3d::Zero(), planePose.linear() * planeShape.getNormal(), penetrationPoints));
 		}
 	}

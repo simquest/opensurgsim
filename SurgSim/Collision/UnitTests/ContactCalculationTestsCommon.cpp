@@ -36,12 +36,12 @@ namespace Collision
 	}
 }
 
-void checkContactInfo(std::shared_ptr<Contact> contact, CollisionType expectedType,
+void checkContactInfo(std::shared_ptr<Contact> contact, CollisionDetectionType expectedType,
 					  double expectedDepth, double expectedTime,
 					  const Vector3d& expectedNormal, const Vector3d& expectedPenetrationPointFirst,
 					  const Vector3d& expectedPenetrationPointSecond)
 {
-	EXPECT_EQ(expectedType, contact->collisionType);
+	EXPECT_EQ(expectedType, contact->type);
 	EXPECT_NEAR(expectedDepth, contact->depth, SurgSim::Math::Geometry::DistanceEpsilon);
 	EXPECT_NEAR(expectedTime, contact->time, SurgSim::Math::Geometry::DistanceEpsilon);
 	EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal));
@@ -96,7 +96,7 @@ bool checkMeshLocalCoordinate(
 		// Compare the time.
 		contactPresent &= std::abs(expected->time - it->get()->time) <= ScalarEpsilon;
 		// Compare the contact types.
-		contactPresent &= (expected->collisionType == it->get()->collisionType);
+		contactPresent &= (expected->type == it->get()->type);
 		// Check if the optional 'meshLocalCoordinate' are the same.
 		std::shared_ptr<SurgSim::Collision::TriangleContact> triangleContact;
 		std::shared_ptr<SurgSim::Collision::Contact> contact;
@@ -177,7 +177,7 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContac
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(
-										COLLISION_TYPE_DISCRETE, depth, 1.0,
+										COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
 										Vector3d::Zero(), collisionNormal, penetrationPoint));
 	}
 }
@@ -208,7 +208,7 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>* exp
 		penetrationPoint.first.rigidLocalPosition.setValue(boxLocalVertex);
 		penetrationPoint.second.rigidLocalPosition.setValue(planeLocalVertex);
 		expectedContacts->push_back(std::make_shared<Contact>(
-										COLLISION_TYPE_DISCRETE, std::abs(depth),
+										COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth),
 										1.0, Vector3d::Zero(), collisionNormal, penetrationPoint));
 	}
 }
