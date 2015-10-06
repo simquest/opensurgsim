@@ -29,8 +29,8 @@ namespace Math
 SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SegmentMeshShape, SegmentMeshShape);
 
 SegmentMeshShape::SegmentMeshShape()
-	: m_radius(0.0)
 {
+	setRadius(0.0);
 	updateAabbTree();
 }
 
@@ -68,7 +68,8 @@ bool SegmentMeshShape::isValid() const
 {
 	// If the radius is less than DistanceEpsilon, the collision detection (which assumes the segments are capsules),
 	/// will not work correctly.
-	return (m_radius >= Geometry::DistanceEpsilon);
+	return (m_radius >= Geometry::DistanceEpsilon &&
+			m_segmentEndBoundingBoxHalfExtent.isApprox(Vector3d(m_radius, m_radius, m_radius)));
 }
 
 void SegmentMeshShape::setRadius(double radius)

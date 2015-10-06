@@ -57,6 +57,33 @@ static const double ScalarEpsilon = 1e-10;
 
 }
 
+/// Calculate the barycentric coordinates of a point with respect to a line segment.
+/// \tparam T Floating point type of the calculation, can usually be inferred.
+/// \tparam MOpt Eigen Matrix options, can usually be inferred.
+/// \param pt Vertex of the point.
+/// \param sv0, sv1 Vertices of the line segment.
+/// \param [out] coordinates Barycentric coordinates.
+/// \return bool true on success, false if two or more if the line segment is considered degenerate
+/// \note The point need not be on the line segment, in which case, the barycentric coordinate of the projection
+/// is calculated.
+template <class T,int MOpt> inline
+bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+							const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+							const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+							Eigen::Matrix<T, 2, 1, MOpt>* coordinates)
+{
+	const Eigen::Matrix<T, 3, 1, MOpt> line = sv1 - sv0;
+	const T length2 = line.squaredNorm();
+	if (length2 < Geometry::SquaredDistanceEpsilon)
+	{
+		coordinates->setConstant((std::numeric_limits<double>::quiet_NaN()));
+		return false;
+	}
+	(*coordinates)[1] = (pt - sv0).dot(line) / length2;
+	(*coordinates)[0] = static_cast<T>(1) - (*coordinates)[1];
+	return true;
+}
+
 /// Calculate the barycentric coordinates of a point with respect to a triangle.
 /// \pre The normal must be unit length
 /// \pre The triangle vertices must be in counter clockwise order in respect to the normal

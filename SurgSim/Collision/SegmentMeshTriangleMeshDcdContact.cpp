@@ -58,7 +58,7 @@ void SegmentMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Colli
 	double radius = segmentMesh->getRadius();
 	double depth = 0.0;
 	Vector3d normal;
-	Vector3d penetrationPointSegment, penetrationPointTriangle;
+	Vector3d penetrationPointCapsule, penetrationPointTriangle;
 
 	for (auto& intersection : intersectionList)
 	{
@@ -89,12 +89,19 @@ void SegmentMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Colli
 				if (SurgSim::Math::calculateContactTriangleCapsule(
 					verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
 					verticesSegment[0], verticesSegment[1], radius,
-					&depth, &penetrationPointTriangle, &penetrationPointSegment, &normal))
+					&depth, &penetrationPointTriangle, &penetrationPointCapsule, &normal))
 				{
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
+					
+					SurgSim::Math::Vector2d barycentricCoordinate2;
+					SurgSim::Math::barycentricCoordinates(penetrationPointCapsule,
+						verticesSegment[0], verticesSegment[1], &barycentricCoordinate2);
+					penetrationPoints.first.elementMeshLocalCoordinate.setValue(
+						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate2));
 					penetrationPoints.first.rigidLocalPosition.setValue(
 						pair->getFirst()->getPose().inverse() * penetrationPointTriangle);
+					
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
 						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
@@ -102,7 +109,7 @@ void SegmentMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Colli
 					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
 					penetrationPoints.second.rigidLocalPosition.setValue(
-						pair->getSecond()->getPose().inverse() * penetrationPointSegment);
+						pair->getSecond()->getPose().inverse() * penetrationPointCapsule);
 
 					pair->addDcdContact(std::abs(depth), -normal, penetrationPoints);
 				}
