@@ -23,14 +23,24 @@
 
 uniform sampler2D depthMap;
 uniform float maxDepth = 0.999999f;
-uniform mat4 mainInverseProjectionMatrix;
 uniform float texelSize = 1.0/1024.0;
+
+/// Main Camera Matrices
+struct MainCamera
+{
+	mat4 viewMatrix;
+	mat4 inverseViewMatrix;
+	mat4 projectionMatrix;
+	mat4 inverseProjectionMatrix;
+};
+
+uniform MainCamera mainCamera;
 
 vec3 getEyeSpacePos(vec2 texCoord, float z)
 {
 	vec2 homogenous = texCoord * 2.0 - 1.0;
 	vec4 clipSpacePos = vec4(homogenous, z, 1.0);
-	vec4 eyeSpacePos = mainInverseProjectionMatrix * clipSpacePos;
+	vec4 eyeSpacePos = mainCamera.inverseProjectionMatrix * clipSpacePos;
 	return eyeSpacePos.xyz/eyeSpacePos.w;
 }
 

@@ -170,7 +170,6 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 
 std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffect(
 			std::shared_ptr<Framework::Component> view,
-			std::shared_ptr<Framework::Component> camera,
 			std::shared_ptr<Framework::Component> light,
 			float sphereRadius,
 			float sphereScale,
@@ -181,10 +180,10 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 			bool showDebug)
 {
 	SURGSIM_ASSERT(view != nullptr) << "View can't be nullptr.";
-	SURGSIM_ASSERT(camera != nullptr) << "Camera can't be nullptr.";
 	SURGSIM_ASSERT(light != nullptr) << "Light can't be nullptr.";
 	auto graphicsView = Framework::checkAndConvert<Graphics::View>(view, "SurgSim::Graphics::View");
-	auto osgCamera = Framework::checkAndConvert<Graphics::OsgCamera>(camera, "SurgSim::Graphics::OsgCamera");
+	auto osgCamera = Framework::checkAndConvert<Graphics::OsgCamera>(graphicsView->getCamera(),
+																	 "SurgSim::Graphics::OsgCamera");
 	auto osgLight = Framework::checkAndConvert<Graphics::OsgLight>(light, "SurgSim::Graphics::OsgLight");
 
 	auto copier =  std::make_shared<Framework::TransferPropertiesBehavior>("Copier");

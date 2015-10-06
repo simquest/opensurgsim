@@ -24,8 +24,18 @@
 uniform sampler2D shadowMap;
 uniform sampler2D depthMap;
 uniform sampler2D normalMap;
-uniform mat4 mainInverseProjectionMatrix;
 uniform float shininess;
+
+/// Main Camera Matrices
+struct MainCamera
+{
+	mat4 viewMatrix;
+	mat4 inverseViewMatrix;
+	mat4 projectionMatrix;
+	mat4 inverseProjectionMatrix;
+};
+
+uniform MainCamera mainCamera;
 
 // Oss provided uniforms
 uniform vec4 ambientColor;
@@ -43,7 +53,7 @@ vec3 getEyeSpacePos(vec2 texCoord, float z)
 {
     vec2 homogenous = texCoord * 2.0 - 1.0;
 	vec4 clipSpacePos = vec4(homogenous, z, 1.0);
-	vec4 eyeSpacePos = mainInverseProjectionMatrix * clipSpacePos;
+	vec4 eyeSpacePos = mainCamera.inverseProjectionMatrix * clipSpacePos;
 	return eyeSpacePos.xyz/eyeSpacePos.w;
 }
 

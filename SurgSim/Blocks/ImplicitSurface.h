@@ -43,7 +43,6 @@ static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 /// \param showDebug whether to show debug information
 std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffect(
 			std::shared_ptr<Framework::Component> view,
-			std::shared_ptr<Framework::Component> camera,
 			std::shared_ptr<Framework::Component> light,
 			float sphereRadius,
 			float sphereScale,

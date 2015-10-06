@@ -22,6 +22,18 @@
 #version 120
 
 uniform float sphereRadius;
+
+/// Main Camera Matrices
+struct MainCamera
+{
+	mat4 viewMatrix;
+	mat4 inverseViewMatrix;
+	mat4 projectionMatrix;
+	mat4 inverseProjectionMatrix;
+};
+
+uniform MainCamera mainCamera;
+
 varying vec3 eyeSpacePos;
 
 void main(void)
@@ -38,7 +50,7 @@ void main(void)
 
 	// calculate depth
 	vec4 pixelPos = vec4(eyeSpacePos + normal*sphereRadius, 1.0);
-	vec4 clipSpacePos = gl_ProjectionMatrix * pixelPos;
+	vec4 clipSpacePos = mainCamera.projectionMatrix * pixelPos;
 	float normDepth = clipSpacePos.z / clipSpacePos.w;
 	gl_FragDepth = 0.5 * normDepth + 0.5;
 }

@@ -24,12 +24,25 @@
 uniform float sphereRadius;
 uniform float sphereScale;
 
+/// Main Camera Matrices
+struct MainCamera
+{
+	mat4 viewMatrix;
+	mat4 inverseViewMatrix;
+	mat4 projectionMatrix;
+	mat4 inverseProjectionMatrix;
+};
+
+uniform MainCamera mainCamera;
+
+uniform mat4 modelMatrix;
+
 varying vec3 eyeSpacePos;
 
 void main(void)
 {
-	eyeSpacePos = vec3(gl_ModelViewMatrix * gl_Vertex);
+	eyeSpacePos = vec3(mainCamera.viewMatrix * modelMatrix * gl_Vertex);
 	float dist = length(eyeSpacePos);
 	gl_PointSize = sphereRadius * (sphereScale / dist);
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_Position = mainCamera.projectionMatrix * mainCamera.viewMatrix * modelMatrix * gl_Vertex;
 }
