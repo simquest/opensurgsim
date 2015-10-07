@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Devices/DeviceFilters/FilteredDevice.h"
 #include "SurgSim/Input/CommonDevice.h"
 
 namespace SurgSim
@@ -52,8 +53,8 @@ SURGSIM_STATIC_REGISTRATION(MultiAxisDevice);
 ///   | ----       | ----              | ---                                                                       |
 ///   | bool       | "led1"            | If the device has at least one LED light, controls the first one.         |
 ///
-/// \sa RawMultiAxisDevice, SurgSim::Input::DeviceInterface
-class MultiAxisDevice : public SurgSim::Input::DeviceInterface
+/// \sa RawMultiAxisDevice
+class MultiAxisDevice : public FilteredDevice
 {
 public:
 	/// Constructor.
@@ -61,33 +62,6 @@ public:
 	explicit MultiAxisDevice(const std::string& uniqueName);
 
 	SURGSIM_CLASSNAME(SurgSim::Devices::MultiAxisDevice);
-
-	/// Destructor.
-	virtual ~MultiAxisDevice();
-
-	/// Get the device name.
-	/// \return The device name.
-	std::string getName() const override;
-
-	bool initialize() override;
-
-	bool finalize() override;
-
-	bool isInitialized() const override;
-
-	bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
-
-	bool removeInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
-
-	void clearInputConsumers() override;
-
-	bool setOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
-
-	bool removeOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
-
-	bool hasOutputProducer() override;
-
-	void clearOutputProducer() override;
 
 	/// Sets the position scale for this device.
 	/// The position scale controls how much the pose changes for a given device translation.
@@ -132,9 +106,6 @@ private:
 	/// Get the default rotation from device ticks to radians.
 	/// \return The default rotation scale, in radians per tick.
 	static double defaultOrientationScale();
-
-	/// The device name.
-	std::string m_name;
 
 	/// The raw underlying device.
 	std::shared_ptr<RawMultiAxisDevice> m_rawDevice;
