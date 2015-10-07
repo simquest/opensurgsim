@@ -55,9 +55,9 @@ bool MouseDevice::initialize()
 bool MouseDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-	m_scaffold->unregisterDevice();
+	bool unregistered = m_scaffold->unregisterDevice();
 	m_scaffold.reset();
-	return true;
+	return unregistered;
 }
 
 bool MouseDevice::isInitialized() const

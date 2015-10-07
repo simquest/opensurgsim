@@ -148,7 +148,7 @@ bool LeapDevice::initialize()
 
 bool LeapDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized()) << getName() << "is not initialized, cannot finalized.";
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool success = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return success;

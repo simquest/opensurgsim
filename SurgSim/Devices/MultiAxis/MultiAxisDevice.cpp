@@ -69,6 +69,11 @@ bool MultiAxisDevice::initialize()
 			m_filter->finalize();
 		}
 	}
+	if (!result)
+	{
+		m_rawDevice->removeInputConsumer(m_filter);
+		m_rawDevice->removeOutputProducer(m_filter);
+	}
 	return result;
 }
 
