@@ -49,7 +49,7 @@ public:
 	/// \param n, m The size of the block (n rows, m columns)
 	/// \param subMatrix The matrix from which the row/column is copied
 	/// \param colRowId The column or row id depending on the template parameter Opt
-	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId) {}
+	void assign(T* ptr, size_t start, size_t n, Index m, const DerivedSub& subMatrix, size_t colRowId) {}
 
 	/// Do the assignment of a single matrix element (operator =)
 	/// \param ptr The matrix element to be assigned
@@ -62,7 +62,7 @@ public:
 	/// \param n, m The size of the block (n rows, m columns)
 	/// \param subMatrix The matrix from which the row/column is added
 	/// \param colRowId The column or row id depending on the template parameter Opt
-	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colRowId) {}
+	void add(T* ptr, size_t start, size_t n, size_t m, const DerivedSub& subMatrix, size_t colRowId) {}
 
 	/// Do the addition of a single matrix element (operator +=)
 	/// \param ptr The matrix element to be increased
@@ -78,7 +78,7 @@ public:
 	typedef typename SparseType::Scalar T;
 	typedef typename SparseType::Index Index;
 
-	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colId)
+	void assign(T* ptr, size_t start, size_t n, size_t m, const DerivedSub& subMatrix, size_t colId)
 	{
 		typedef Eigen::Matrix < T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor > ColVector;
 		typedef typename Eigen::Matrix < T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor >::Index IndexVector;
@@ -95,7 +95,7 @@ public:
 		*ptr = value;
 	}
 
-	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index colId)
+	void add(T* ptr, size_t start, size_t n, size_t m, const DerivedSub& subMatrix, size_t colId)
 	{
 		typedef Eigen::Matrix < T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor > ColVector;
 		typedef typename Eigen::Matrix < T, Eigen::Dynamic, 1, Eigen::DontAlign | Eigen::ColMajor >::Index IndexVector;
@@ -121,7 +121,7 @@ public:
 	typedef typename SparseType::Scalar T;
 	typedef typename SparseType::Index Index;
 
-	void assign(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index rowId)
+	void assign(T* ptr, size_t start, size_t n, size_t m, const DerivedSub& subMatrix, size_t rowId)
 	{
 		typedef Eigen::Matrix < T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor > RowVector;
 		typedef typename Eigen::Matrix < T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor >::Index IndexVector;
@@ -138,7 +138,7 @@ public:
 		*ptr = value;
 	}
 
-	void add(T* ptr, Index start, Index n, Index m, const DerivedSub& subMatrix, Index rowId)
+	void add(T* ptr, size_t start, size_t n, size_t m, const DerivedSub& subMatrix, size_t rowId)
 	{
 		typedef Eigen::Matrix < T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor > RowVector;
 		typedef typename Eigen::Matrix < T, 1, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor >::Index IndexVector;
@@ -184,10 +184,10 @@ public:
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnStart, Index n, Index m,
+void blockWithSearch(const DerivedSub& subMatrix, size_t rowStart, size_t columnStart, size_t n, size_t m,
 					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
 					 void (Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::*op)
-					   (T*, Index, Index, Index, const DerivedSub&, Index))
+					   (T*, size_t, size_t, size_t, const DerivedSub&, size_t))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -201,8 +201,8 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 	SURGSIM_ASSERT(subMatrix.rows() >= static_cast<DerivedSubIndexType>(n)) << "subMatrix doesn't have enough rows";
 	SURGSIM_ASSERT(subMatrix.cols() >= static_cast<DerivedSubIndexType>(m)) << "subMatrix doesn't have enough columns";
 
-	SURGSIM_ASSERT(matrix->rows() >= rowStart + static_cast<Index>(n)) << "The block is out of range in matrix";
-	SURGSIM_ASSERT(matrix->cols() >= columnStart + static_cast<Index>(m)) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->rows() >= static_cast<Index>(rowStart + n)) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->cols() >= static_cast<Index>(columnStart + m)) << "The block is out of range in matrix";
 	SURGSIM_ASSERT(matrix->valuePtr() != nullptr) << "The matrix is not initialized correctly, null pointer to values";
 
 	T* ptr = matrix->valuePtr();
@@ -265,7 +265,7 @@ void blockWithSearch(const DerivedSub& subMatrix, Index rowStart, Index columnSt
 /// \note If the structure of the matrix is known and constant through time, it is recommended to
 /// \note pre-allocate the matrix structure and use an optimized dedicated blockXXX method.
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index rowStart, Index columnStart,
+void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, size_t rowStart, size_t columnStart,
 					Eigen::SparseMatrix<T, Opt, Index>* matrix,
 					void (Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::*op)(T*, const T&))
 {
@@ -315,7 +315,7 @@ void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, Index 
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void blockOperation(const DerivedSub& subMatrix, Index rowStart, Index columnStart,
+void blockOperation(const DerivedSub& subMatrix, size_t rowStart, size_t columnStart,
 					Eigen::SparseMatrix<T, Opt, Index>* matrix,
 					void (Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::*op)(T*, const T&))
 {
@@ -328,8 +328,8 @@ void blockOperation(const DerivedSub& subMatrix, Index rowStart, Index columnSta
 
 	Index n = static_cast<Index>(subMatrix.rows());
 	Index m = static_cast<Index>(subMatrix.cols());
-	SURGSIM_ASSERT(matrix->rows() >= rowStart + static_cast<Index>(n)) << "The block is out of range in matrix";
-	SURGSIM_ASSERT(matrix->cols() >= columnStart + static_cast<Index>(m)) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->rows() >= static_cast<Index>(rowStart) + n) << "The block is out of range in matrix";
+	SURGSIM_ASSERT(matrix->cols() >= static_cast<Index>(columnStart) + m) << "The block is out of range in matrix";
 
 	for (Index row = 0; row < n; ++row)
 	{
@@ -354,20 +354,20 @@ void blockOperation(const DerivedSub& subMatrix, Index rowStart, Index columnSta
 /// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
 /// \note This is a specialization of addSubMatrix for sparse matrices.
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void addSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockIdCol,
+void addSubMatrix(const DerivedSub& subMatrix, size_t blockIdRow, size_t blockIdCol,
 				  Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true)
 {
 	if (initialize)
 	{
-		blockOperation(subMatrix, static_cast<Index>(subMatrix.rows() * blockIdRow),
-					   static_cast<Index>(subMatrix.cols() * blockIdCol), matrix,
+		blockOperation(subMatrix, static_cast<size_t>(subMatrix.rows() * blockIdRow),
+					   static_cast<size_t>(subMatrix.cols() * blockIdCol), matrix,
 					   &Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::add);
 	}
 	else
 	{
-		blockWithSearch(subMatrix, static_cast<Index>(subMatrix.rows() * blockIdRow),
-						static_cast<Index>(subMatrix.cols() * blockIdCol),
-						static_cast<Index>(subMatrix.rows()), static_cast<Index>(subMatrix.cols()), matrix,
+		blockWithSearch(subMatrix, static_cast<size_t>(subMatrix.rows() * blockIdRow),
+						static_cast<size_t>(subMatrix.cols() * blockIdCol),
+						static_cast<size_t>(subMatrix.rows()), static_cast<size_t>(subMatrix.cols()), matrix,
 						&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::add);
 	}
 }
@@ -383,20 +383,20 @@ void addSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockIdCo
 /// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
 /// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void assignSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockIdCol,
+void assignSubMatrix(const DerivedSub& subMatrix, size_t blockIdRow, size_t blockIdCol,
 				  Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true)
 {
 	if (initialize)
 	{
-		blockOperation(subMatrix, static_cast<Index>(subMatrix.rows() * blockIdRow),
-			static_cast<Index>(subMatrix.cols() * blockIdCol), matrix,
+		blockOperation(subMatrix, (subMatrix.rows() * blockIdRow),
+			(subMatrix.cols() * blockIdCol), matrix,
 			&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::assign);
 	}
 	else
 	{
-		blockWithSearch(subMatrix, static_cast<Index>(subMatrix.rows() * blockIdRow),
-			static_cast<Index>(subMatrix.cols() * blockIdCol),
-			static_cast<Index>(subMatrix.rows()), static_cast<Index>(subMatrix.cols()), matrix,
+		blockWithSearch(subMatrix, (subMatrix.rows() * blockIdRow),
+			(subMatrix.cols() * blockIdCol),
+			subMatrix.rows(), subMatrix.cols(), matrix,
 			&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::assign);
 	}
 }
@@ -405,7 +405,7 @@ void assignSubMatrix(const DerivedSub& subMatrix, Index blockIdRow, Index blockI
 /// \param row The row to set to zero
 /// \param[in,out] matrix The matrix to set the zero row on.
 template <typename T, int Opt, typename Index>
-void zeroRow(Index row, Eigen::SparseMatrix<T, Opt, Index>* matrix)
+void zeroRow(size_t row, Eigen::SparseMatrix<T, Opt, Index>* matrix)
 {
 	for (Index column = 0; column < matrix->cols(); ++column)
 	{
@@ -420,7 +420,7 @@ void zeroRow(Index row, Eigen::SparseMatrix<T, Opt, Index>* matrix)
 /// \param column The column to set to zero
 /// \param[in,out] matrix The matrix to set the zero column on.
 template <typename T, int Opt, typename Index>
-inline void zeroColumn(Index column, Eigen::SparseMatrix<T, Opt, Index>* matrix)
+inline void zeroColumn(size_t column, Eigen::SparseMatrix<T, Opt, Index>* matrix)
 {
 	for (Index row = 0; row < matrix->rows(); ++row)
 	{

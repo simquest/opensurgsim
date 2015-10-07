@@ -29,7 +29,7 @@ namespace Physics
 
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
-									  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
+									  size_t blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
 									  bool initialize) const
 {
 	using SurgSim::Math::addSubMatrix;

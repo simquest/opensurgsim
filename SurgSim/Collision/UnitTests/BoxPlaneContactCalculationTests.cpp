@@ -131,8 +131,8 @@ TEST(BoxPlaneContactCalculationTests, UnitTests)
 		SCOPED_TRACE("Intersection in front of plane, one contact, rotated plane");
 		globalQuat = SurgSim::Math::makeRotationQuaternion(-0.3257, Vector3d(-0.4575,-0.8563,0.63457).normalized());
 		double angle = -35.264389682754654315377000330019*(M_PI/180.0);
-		boxQuat = globalQuat * Quaterniond(SurgSim::Math::makeRotationMatrix(angle, Vector3d(0.0,1.0,0.0)) *
-				  SurgSim::Math::makeRotationMatrix(-M_PI_4, Vector3d(0.0,0.0,1.0)));
+		boxQuat = globalQuat * (SurgSim::Math::makeRotationQuaternion(angle, Vector3d(0.0,1.0,0.0)) *
+				 SurgSim::Math::makeRotationQuaternion(-M_PI_4, Vector3d(0.0,0.0,1.0)));
 		boxTrans = Vector3d(std::sqrt(0.75),0.0,0.0);
 		planeQuat = globalQuat * SurgSim::Math::makeRotationQuaternion(-M_PI_2, Vector3d(0.0,0.0,1.0));
 		planeTrans = boxTrans + globalQuat * Vector3d(-std::sqrt(0.75),0.0,0.0);
@@ -146,8 +146,8 @@ TEST(BoxPlaneContactCalculationTests, UnitTests)
 		SCOPED_TRACE("Intersection inside of plane, one contact, rotated plane");
 		globalQuat = SurgSim::Math::makeRotationQuaternion(0.3465, Vector3d(54.4575,76.8563,43.63457).normalized());
 		double angle = -35.264389682754654315377000330019*(M_PI/180.0);
-		boxQuat = globalQuat * Quaterniond(SurgSim::Math::makeRotationMatrix(angle, Vector3d(0.0,1.0,0.0)) *
-				  SurgSim::Math::makeRotationMatrix(-M_PI_4, Vector3d(0.0,0.0,1.0)));
+		boxQuat = globalQuat * (SurgSim::Math::makeRotationQuaternion(angle, Vector3d(0.0,1.0,0.0)) *
+				  SurgSim::Math::makeRotationQuaternion(-M_PI_4, Vector3d(0.0,0.0,1.0)));
 		boxTrans = Vector3d(std::sqrt(0.73),0.0,0.0);
 		planeQuat = globalQuat * SurgSim::Math::makeRotationQuaternion(-M_PI_2, Vector3d(0.0,0.0,1.0));
 		planeTrans = boxTrans + globalQuat * Vector3d(-std::sqrt(0.75),0.0,0.0);
