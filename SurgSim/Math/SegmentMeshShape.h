@@ -20,7 +20,6 @@
 #include "SurgSim/DataStructures/SegmentMesh.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/SegmentMeshShape.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim

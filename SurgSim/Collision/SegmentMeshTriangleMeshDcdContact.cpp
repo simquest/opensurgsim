@@ -49,13 +49,25 @@ std::pair<int,int> SegmentMeshTriangleMeshDcdContact::getShapeTypes()
 
 void SegmentMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	auto segmentMesh = std::static_pointer_cast<SegmentMeshShape>(pair->getFirst()->getPosedShape());
-	auto triangleMesh = std::static_pointer_cast<MeshShape>(pair->getSecond()->getPosedShape());
+	auto segmentMeshShape = std::static_pointer_cast<SegmentMeshShape>(pair->getFirst()->getPosedShape());
+	auto triangleMeshShape = std::static_pointer_cast<MeshShape>(pair->getSecond()->getPosedShape());
+
+	auto contacts = calculateContact(*segmentMeshShape, *triangleMeshShape);
+	for (auto& contact : contacts)
+	{
+		pair->addContact(contact);
+	}
+}
+
+std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculateContact(
+	const Math::SegmentMeshShape& segmentMeshShape, const Math::MeshShape& triangleMeshShape)
+{
+	std::list<std::shared_ptr<Contact>> contacts;
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= segmentMesh->getAabbTree()->spatialJoin(*triangleMesh->getAabbTree());
+		= segmentMeshShape.getAabbTree()->spatialJoin(*triangleMeshShape.getAabbTree());
 
-	double radius = segmentMesh->getRadius();
+	double radius = segmentMeshShape.getRadius();
 	double depth = 0.0;
 	Vector3d normal;
 	Vector3d penetrationPointCapsule, penetrationPointTriangle;
@@ -73,17 +85,17 @@ void SegmentMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Colli
 
 		for (auto i = triangleList.begin(); i != triangleList.end(); ++i)
 		{
-			const Vector3d& normalTriangle = triangleMesh->getNormal(*i);
+			const Vector3d& normalTriangle = triangleMeshShape.getNormal(*i);
 			if (normalTriangle.isZero())
 			{
 				continue;
 			}
 
-			const auto& verticesTriangle = triangleMesh->getTrianglePositions(*i);
+			const auto& verticesTriangle = triangleMeshShape.getTrianglePositions(*i);
 
 			for (auto j = edgeList.begin(); j != edgeList.end(); ++j)
 			{
-				const auto& verticesSegment = segmentMesh->getEdgePositions(*j);
+				const auto& verticesSegment = segmentMeshShape.getEdgePositions(*j);
 
 				// Check if the triangle and capsule intersect.
 				if (SurgSim::Math::calculateContactTriangleCapsule(
@@ -93,29 +105,31 @@ void SegmentMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Colli
 				{
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
-					
+
 					SurgSim::Math::Vector2d barycentricCoordinate2;
 					SurgSim::Math::barycentricCoordinates(penetrationPointCapsule,
 						verticesSegment[0], verticesSegment[1], &barycentricCoordinate2);
 					penetrationPoints.first.elementMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate2));
-					penetrationPoints.first.rigidLocalPosition.setValue(
-						pair->getFirst()->getPose().inverse() * penetrationPointTriangle);
-					
+					penetrationPoints.first.rigidLocalPosition.setValue(penetrationPointTriangle);
+
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
 						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
 						&barycentricCoordinate);
 					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
-					penetrationPoints.second.rigidLocalPosition.setValue(
-						pair->getSecond()->getPose().inverse() * penetrationPointCapsule);
+					penetrationPoints.second.rigidLocalPosition.setValue(penetrationPointCapsule);
 
-					pair->addDcdContact(std::abs(depth), -normal, penetrationPoints);
+					// Create the contact.
+					contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth),
+						1.0, Vector3d::Zero(), -normal, penetrationPoints));
 				}
 			}
 		}
 	}
+
+	return contacts;
 }
 
 }; // namespace Collision

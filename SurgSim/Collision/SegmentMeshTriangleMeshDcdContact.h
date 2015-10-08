@@ -19,6 +19,8 @@
 #include <memory>
 
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/SegmentMeshShape.h"
 
 namespace SurgSim
 {
@@ -34,7 +36,16 @@ public:
 	/// Constructor.
 	SegmentMeshTriangleMeshDcdContact();
 
+	using ContactCalculation::calculateContact;
+
 	std::pair<int, int> getShapeTypes() override;
+
+	/// Calculate the contacts using the typed shapes directly
+	/// \param segmentMeshShape the segment mesh shape
+	/// \param triangleMeshShape the triangle mesh shape
+	/// \return a list of contacts between the shapes, if any
+	std::list<std::shared_ptr<Contact>> calculateContact(const Math::SegmentMeshShape& segmentMeshShape,
+		const Math::MeshShape& triangleMeshShape);
 
 private:
 	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
