@@ -126,5 +126,64 @@ TEST_F(CompoundShapeTest, Center)
 	EXPECT_DOUBLE_EQ(3.0, compoundShape->getVolume());
 }
 
+TEST_F(CompoundShapeTest, SecondMomentOfVolumeBasic)
+{
+	auto zero = Math::Matrix33d::Zero();
+	EXPECT_TRUE(zero.isApprox(compoundShape->getSecondMomentOfVolume()));
+
+	auto box1 = std::make_shared<BoxShape>(1.0, 1.0, 1.0);
+	auto box2 = std::make_shared<BoxShape>(2.0, 1.0, 1.0);
+
+	auto left = makeRigidTranslation(Vector3d(-0.5, 0.0, 0.0));
+	auto right = makeRigidTranslation(Vector3d(0.5, 0.0, 0.0));
+
+	compoundShape->addShape(box1);
+
+	auto shapeInertia = box1->getSecondMomentOfVolume();
+	auto compoundInertia = compoundShape->getSecondMomentOfVolume();
+
+	EXPECT_TRUE(shapeInertia.isApprox(compoundInertia));
+
+	compoundShape->clearShapes();
+	compoundShape->addShape(box1, left);
+	compoundShape->addShape(box1, right);
+
+	shapeInertia = box2->getSecondMomentOfVolume();
+	compoundInertia = compoundShape->getSecondMomentOfVolume();
+
+	EXPECT_TRUE(shapeInertia.isApprox(compoundInertia));
+}
+
+TEST_F(CompoundShapeTest, SecondMomentOfVolumeComplex)
+{
+	// Organisation of shape 
+	// 
+	//  tl Y-Axis
+	//  tl ^
+	//  bl -> 0, Z-Axis 
+	//  bl
+	//  bl
+
+	auto base = std::make_shared<BoxShape>(1.0,5.0,2.0);
+
+	auto l = std::make_shared<BoxShape>(1.0,5.0,1.0);
+	compoundShape->addShape(l, makeRigidTranslation(Vector3d(0.0, 0.0, 0.5)));
+	
+	auto t = std::make_shared<BoxShape>(2.0,1.0,1.0);
+	Quaterniond quat = makeRotationQuaternion(M_PI_2, Vector3d::UnitZ().eval());
+	auto transform = makeRigidTransform(quat, Vector3d(0.0, 1.5, -0.5));
+	compoundShape->addShape(t, transform);
+
+	auto b = std::make_shared<BoxShape>(3.0,1.0,1.0);
+	quat = makeRotationQuaternion(-M_PI_2, Vector3d::UnitZ().eval());
+	transform = makeRigidTransform(quat, Vector3d(0.0, -1.0, -0.5));
+	compoundShape->addShape(b, transform);
+
+	auto shapeInertia = base->getSecondMomentOfVolume();
+	auto compoundInertia = compoundShape->getSecondMomentOfVolume();
+	EXPECT_TRUE(shapeInertia.isApprox(compoundInertia));
+
+}
+
 }
 }

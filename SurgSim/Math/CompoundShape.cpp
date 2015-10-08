@@ -84,7 +84,38 @@ Vector3d CompoundShape::getCenter() const
 
 SurgSim::Math::Matrix33d CompoundShape::getSecondMomentOfVolume() const
 {
-	SURGSIM_FAILURE() << "This is not implemented yet !";
+	// Calculate the compound values, this needs to be done outisde of the ReadLock, otherwise 
+	// this might freeze up
+	auto center = getCenter();
+	auto volume = getVolume();
+
+	ReadLock lock(m_mutex);
+
+	if (!m_secondMoment.hasValue())
+	{
+		Math::Matrix33d result = Math::Matrix33d::Zero();
+
+
+		UpgradeLock write(lock);
+
+		if (m_shapes.size() > 0)
+		{
+			for (const auto& subShape : m_shapes)
+			{
+				std::shared_ptr<Shape> shape = subShape.first;
+				RigidTransform3d pose = subShape.second;
+
+				const auto& r = pose.linear();
+				Math::Matrix33d	skew = Math::makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
+				Math::Matrix33d inertia = r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
+
+				result += inertia; 
+			}
+
+		}
+		m_secondMoment = result;
+	}
+	return *m_secondMoment;
 }
 
 
