@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Devices/DeviceFilters/DeviceFilter.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/LabJack/LabJackDevice.h"
 #include "SurgSim/Input/CommonDevice.h"
@@ -35,15 +36,14 @@ using SurgSim::Input::DeviceInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-class LabJackToPoseFilter : public SurgSim::Input::CommonDevice,
-	public SurgSim::Input::InputConsumerInterface, public SurgSim::Input::OutputProducerInterface
+class LabJackToPoseFilter : public SurgSim::Devices::DeviceFilter
 {
 
 public:
 	LabJackToPoseFilter(const std::string& name, int firstTimerForQuadrature, int resetQuadrature, int plusX,
 		int minusX, double translationPerUpdate, int positiveAnalogDifferential, int analogSingleEnded, int xOut,
 		int loopbackOut) :
-		SurgSim::Input::CommonDevice(name),
+		SurgSim::Devices::DeviceFilter(name),
 		m_pose(RigidTransform3d::Identity()),
 		m_translationPerUpdate(translationPerUpdate),
 		m_lineForPlusX(plusX),
@@ -79,28 +79,8 @@ public:
 		m_analogOutputIndex = m_outputData.scalars().getIndex(outputName);
 		m_digitalOutputIndex = m_outputData.booleans().getIndex(digitalOutputName);
 	}
-
-	virtual ~LabJackToPoseFilter()
-	{
-		finalize();
-	}
-
-	bool initialize()
-	{
-		return true;
-	}
-
-	bool isInitialized() const
-	{
-		return true;
-	}
-
-	bool finalize()
-	{
-		return true;
-	}
-
-	void initializeInput(const std::string& device, const DataGroup& inputData)
+	
+	void initializeInput(const std::string& device, const DataGroup& inputData) override
 	{
 		m_digitalInputPlusXIndex = inputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +
 			std::to_string(m_lineForPlusX));
@@ -115,28 +95,12 @@ public:
 			inputData.scalars().getIndex(SurgSim::DataStructures::Names::ANALOG_INPUT_PREFIX +
 			std::to_string(m_analogInputSingleEnded));
 
-		inputFilter(inputData, &getInputData());
+		filterInput(device, inputData, &getInputData());
 	}
 
-	void handleInput(const std::string& device, const DataGroup& inputData)
+	void filterInput(const std::string& device, const DataGroup& dataToFilter, DataGroup* result) override
 	{
-		m_lastInputData = inputData;
-		inputFilter(inputData, &getInputData());
-		pushInput();
-	}
-
-	bool requestOutput(const std::string& device, DataGroup* outputData)
-	{
-		bool state = pullOutput();
-		if (state)
-		{
-			outputFilter(m_outputData, outputData);
-		}
-		return state;
-	}
-
-	void inputFilter(const DataGroup& dataToFilter, DataGroup* result)
-	{
+		m_lastInputData = dataToFilter;
 		// Turn LabJack inputs into a pose so it can control the sphere.
 		if (m_digitalInputPlusXIndex >= 0)
 		{
@@ -196,9 +160,9 @@ public:
 		result->poses().set(m_poseIndex, m_pose);
 	}
 
-	void outputFilter(const DataGroup& dataToFilter, DataGroup* result)
+	void filterOutput(const std::string& device, const DataGroup& dataToFilter, DataGroup* result) override
 	{
-		*result = dataToFilter;
+		*result = m_outputData;
 		const double xScaling = 100.0;
 		const double x = std::min(5.0, std::abs(m_pose.translation().x() * xScaling));
 		result->scalars().set(m_analogOutputIndex, x);
@@ -298,8 +262,6 @@ int main(int argc, char** argv)
 
 	if (toolDevice->initialize())
 	{
-		filter->initialize();
-
 		// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--
 		// a pretend device that doesn't actually move.
 		std::shared_ptr<DeviceInterface> squareDevice = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
