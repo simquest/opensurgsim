@@ -21,8 +21,22 @@
 
 #version 120
 
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform float sphereRadius;
+
+// Incoming from the vertex shader
 varying vec3 eyeSpacePos;
+
+// Main Camera Matrices
+struct MainCamera
+{
+	mat4 viewMatrix;
+	mat4 inverseViewMatrix;
+	mat4 projectionMatrix;
+	mat4 inverseProjectionMatrix;
+};
+
+uniform MainCamera mainCamera;
 
 void main(void)
 {
@@ -38,7 +52,7 @@ void main(void)
 
 	// calculate depth
 	vec4 pixelPos = vec4(eyeSpacePos + normal*sphereRadius, 1.0);
-	vec4 clipSpacePos = gl_ProjectionMatrix * pixelPos;
+	vec4 clipSpacePos = mainCamera.projectionMatrix * pixelPos;
 	float normDepth = clipSpacePos.z / clipSpacePos.w;
 	gl_FragDepth = 0.5 * normDepth + 0.5;
 }
