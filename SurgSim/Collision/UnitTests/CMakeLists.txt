@@ -32,6 +32,7 @@ set(UNIT_TEST_SOURCES
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp
 	SegmentSegmentCcdIntervalCheckTests.cpp
+	SegmentSegmentCcdStaticContactTests.cpp
 	ShapeCollisionRepresentationTest.cpp
 	SphereDoubleSidedPlaneContactCalculationTests.cpp
 	SpherePlaneContactCalculationTests.cpp
