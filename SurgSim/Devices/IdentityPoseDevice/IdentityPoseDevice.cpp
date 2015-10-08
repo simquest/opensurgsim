@@ -33,24 +33,29 @@ namespace Devices
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::IdentityPoseDevice, IdentityPoseDevice);
 
 IdentityPoseDevice::IdentityPoseDevice(const std::string& uniqueName) :
-	Input::CommonDevice(uniqueName, buildInputData())
+	Input::CommonDevice(uniqueName, buildInputData()),
+	m_initialized(false)
 {
 }
 
 bool IdentityPoseDevice::initialize()
 {
+	SURGSIM_ASSERT(!isInitialized());
 	SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/IdentityPose")) << "Device " << getName() << " initialized.";
+	m_initialized = true;
 	return true;
 }
 
 bool IdentityPoseDevice::isInitialized() const
 {
-	return true;
+	return m_initialized;
 }
 
 bool IdentityPoseDevice::finalize()
 {
+	SURGSIM_ASSERT(isInitialized());
 	SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/IdentityPose")) << "Device " << getName() << " finalized.";
+	m_initialized = false;
 	return true;
 }
 

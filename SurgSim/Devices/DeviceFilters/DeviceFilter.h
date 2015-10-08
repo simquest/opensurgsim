@@ -72,6 +72,10 @@ protected:
 	///		Will contain the filtered data.
 	virtual void filterOutput(const std::string& device, const DataStructures::DataGroup& dataToFilter,
 		DataStructures::DataGroup* result);
+
+private:
+	/// true if initialized and not finalized.
+	bool m_initialized;
 };
 
 };  // namespace Devices

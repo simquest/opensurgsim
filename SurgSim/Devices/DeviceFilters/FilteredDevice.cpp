@@ -32,6 +32,7 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::FilteredDevi
 
 FilteredDevice::FilteredDevice(const std::string& name) :
 	m_name(name),
+	m_initialized(false),
 	m_logger(Framework::Logger::getLogger("Devices/FilteredDevice"))
 {
 	m_devices.push_back(nullptr);
@@ -75,7 +76,10 @@ bool FilteredDevice::initialize()
 
 		for (auto& device : m_devices)
 		{
-			result = result && device->initialize();
+			if (!device->isInitialized())
+			{
+				result = result && device->initialize();
+			}
 		}
 
 		if (!result)
@@ -84,28 +88,20 @@ bool FilteredDevice::initialize()
 		}
 	}
 
+	m_initialized = result;
 	SURGSIM_LOG_IF(!result, m_logger, WARNING) << "Failed to initialize " << getName();
 	return result;
 }
 
 bool FilteredDevice::isInitialized() const
 {
-	bool initialized = false;
-	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
-	if (m_devices.size() > 0)
-	{
-		initialized = true;
-		for (const auto& device : m_devices)
-		{
-			initialized = initialized && (device != nullptr) && device->isInitialized();
-		}
-	}
-	return initialized;
+	return m_initialized;
 }
 
 bool FilteredDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
+	m_initialized = false;
 	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
 	return doFinalize();
 }

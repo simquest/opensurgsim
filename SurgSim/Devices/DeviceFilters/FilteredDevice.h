@@ -90,6 +90,9 @@ private:
 	/// The name of this device.
 	std::string m_name;
 
+	/// true if initialized and not finalized.
+	bool m_initialized;
+
 	/// The devices.  m_devices.back() will be connected to any InputComponent or OutputComponent.
 	/// m_devices.front() is the raw/base device to be filtered. If this contains more than one element, all but
 	/// the front element are DeviceFilters.

@@ -54,6 +54,9 @@ public:
 	DataGroup buildOutputData();
 
 	std::string lastPulledData;
+
+	/// true if initialized and not finalized.
+	bool m_initialized;
 };
 
 
