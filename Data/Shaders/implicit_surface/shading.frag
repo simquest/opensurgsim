@@ -21,12 +21,13 @@
 
 #version 120
 
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform sampler2D shadowMap;
 uniform sampler2D depthMap;
 uniform sampler2D normalMap;
 uniform float shininess;
 
-/// Main Camera Matrices
+// Main Camera Matrices
 struct MainCamera
 {
 	mat4 viewMatrix;

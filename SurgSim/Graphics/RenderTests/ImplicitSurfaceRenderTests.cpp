@@ -91,7 +91,6 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
 
-	// graphics->setLocalPose(makeRigidTranslation(Math::Vector3d(0.0, 0.0, 0.0)));
 	for (const auto& vertex : mesh->getMesh()->getVertices())
 	{
 		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));

@@ -21,10 +21,13 @@
 
 #version 120
 
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform float sphereRadius;
+
+// Incoming from the vertex shader
 varying vec3 eyeSpacePos;
 
-/// Main Camera Matrices
+// Main Camera Matrices
 struct MainCamera
 {
 	mat4 viewMatrix;

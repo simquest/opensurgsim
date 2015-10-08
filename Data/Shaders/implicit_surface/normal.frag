@@ -21,11 +21,12 @@
 
 #version 120
 
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform sampler2D depthMap;
 uniform float maxDepth = 0.999999f;
 uniform float texelSize = 1.0/1024.0;
 
-/// Main Camera Matrices
+// Main Camera Matrices
 struct MainCamera
 {
 	mat4 viewMatrix;

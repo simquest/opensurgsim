@@ -40,7 +40,7 @@ struct LightSource {
 uniform LightSource lightSource;
 
 // Outgoing Values
-// Normalized direction vector
+// Normalized light direction vector
 varying vec3 lightDir;
 
 varying vec2 texCoord0; ///< Texture unit 0 texture coordinates
