@@ -30,7 +30,7 @@ set(MOUSE_DEVICE_HEADERS
 	OsgMouseHandler.h
 )
 
-set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} MouseDevice.h PARENT_SCOPE)
+set(DEVICE_HEADERS ${DEVICE_HEADERS} Mouse/MouseDevice.h PARENT_SCOPE)
 
 surgsim_add_library(
 	OSS

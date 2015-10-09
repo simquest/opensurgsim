@@ -19,6 +19,7 @@ include_directories(
 )
 
 set(SURGSIM_BLOCKS_SOURCES
+	DebugDumpBehavior.cpp
 	DriveElementFromInputBehavior.cpp
 	GraphicsUtilities.cpp
 	KeyboardTogglesComponentBehavior.cpp
@@ -27,14 +28,17 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpring3DRepresentation.cpp
 	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
+	ShadowMapping.cpp
 	SphereElement.cpp
 	TransferParticlesToPointCloudBehavior.cpp
 	TransferPhysicsToGraphicsMeshBehavior.cpp
 	TransferPhysicsToPointCloudBehavior.cpp
+	TransferPhysicsToVerticesBehavior.cpp
 	VisualizeContactsBehavior.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
+	DebugDumpBehavior.h
 	DriveElementFromInputBehavior.h
 	GraphicsUtilities.h
 	KeyboardTogglesComponentBehavior.h
@@ -43,10 +47,12 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpring3DRepresentation.h
 	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
+	ShadowMapping.h
 	SphereElement.h
 	TransferParticlesToPointCloudBehavior.h
 	TransferPhysicsToGraphicsMeshBehavior.h
 	TransferPhysicsToPointCloudBehavior.h
+	TransferPhysicsToVerticesBehavior.h
 	VisualizeContactsBehavior.h
 )
 surgsim_create_library_header(OSS Blocks.h "${SURGSIM_BLOCKS_HEADERS}")

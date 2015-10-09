@@ -29,7 +29,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::NovintDevice;
+using SurgSim::Devices::NovintDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Framework::Clock;
 using SurgSim::Math::Matrix44d;

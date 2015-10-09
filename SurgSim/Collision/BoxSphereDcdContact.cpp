@@ -36,9 +36,9 @@ BoxSphereDcdContact::BoxSphereDcdContact()
 {
 }
 
-std::pair<int,int> BoxSphereDcdContact::getShapeTypes()
+std::pair<int, int> BoxSphereDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_SPHERE);
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_SPHERE);
 }
 
 void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
@@ -57,8 +57,10 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 }
 
 std::list<std::shared_ptr<Contact>> BoxSphereDcdContact::calculateContact(
-		const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
-		const SurgSim::Math::SphereShape& sphereShape, const SurgSim::Math::RigidTransform3d& spherePose)
+									 const SurgSim::Math::BoxShape& boxShape,
+									 const SurgSim::Math::RigidTransform3d& boxPose,
+									 const SurgSim::Math::SphereShape& sphereShape,
+									 const SurgSim::Math::RigidTransform3d& spherePose)
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -128,7 +130,9 @@ std::list<std::shared_ptr<Contact>> BoxSphereDcdContact::calculateContact(
 			Location(spherePose.inverse() * (sphereCenter + (normal * sphereShape.getRadius()))));
 
 	// Create the contact.
-	contacts.push_back(std::make_shared<Contact>(depth, Vector3d::Zero(), normal, penetrationPoints));
+	contacts.push_back(std::make_shared<Contact>(
+						   COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
+						   Vector3d::Zero(), normal, penetrationPoints));
 	return std::move(contacts);
 }
 

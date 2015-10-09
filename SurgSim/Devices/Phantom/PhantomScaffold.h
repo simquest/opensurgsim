@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class PhantomDevice;
@@ -34,7 +34,7 @@ class PhantomDevice;
 /// Omni, PHANTOM Desktop, and the PHANTOM Premium series devices.  The implementation is currently limited to
 /// 3DoF haptic output (forces only, no torques).
 ///
-/// \sa SurgSim::Device::PhantomDevice
+/// \sa SurgSim::Devices::PhantomDevice
 class PhantomScaffold
 {
 public:
@@ -169,7 +169,7 @@ private:
 	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_PHANTOM_PHANTOMSCAFFOLD_H

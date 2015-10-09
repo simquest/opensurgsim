@@ -119,6 +119,8 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 void applyMaterials(std::shared_ptr<SurgSim::Framework::Scene> scene,
 					std::string materialFilename,
 					const Materials& materials);
+
+
 }
 }
 #endif

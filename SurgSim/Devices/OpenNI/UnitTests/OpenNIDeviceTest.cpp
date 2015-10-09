@@ -28,8 +28,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::OpenNIDevice;
-using SurgSim::Device::OpenNIScaffold;
+using SurgSim::Devices::OpenNIDevice;
+using SurgSim::Devices::OpenNIScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;

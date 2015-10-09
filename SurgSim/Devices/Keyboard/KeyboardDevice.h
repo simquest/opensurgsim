@@ -23,10 +23,12 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class KeyboardScaffold;
 class OsgKeyboardHandler;
+
+SURGSIM_STATIC_REGISTRATION(KeyboardDevice);
 
 /// A class implementing the communication with a keyboard
 ///
@@ -50,6 +52,9 @@ public:
 	/// Constructor
 	/// \param deviceName Name for keyboard device
 	explicit KeyboardDevice(const std::string& deviceName);
+
+	SURGSIM_CLASSNAME(SurgSim::Devices::KeyboardDevice);
+
 	/// Destructor
 	virtual ~KeyboardDevice();
 
@@ -73,7 +78,7 @@ private:
 	std::shared_ptr<KeyboardScaffold> m_scaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif //SURGSIM_DEVICES_KEYBOARD_KEYBOARDDEVICE_H

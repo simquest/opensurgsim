@@ -23,11 +23,12 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
-
 class MouseScaffold;
 class OsgMouseHandler;
+
+SURGSIM_STATIC_REGISTRATION(MouseDevice);
 
 /// A class implementing the communication with a mouse
 ///
@@ -57,6 +58,9 @@ public:
 	/// Constructor
 	/// \param deviceName Name for mouse device
 	explicit MouseDevice(const std::string& deviceName);
+
+	SURGSIM_CLASSNAME(SurgSim::Devices::MouseDevice);
+
 	/// Destructor
 	virtual ~MouseDevice();
 
@@ -80,7 +84,7 @@ private:
 	std::shared_ptr<MouseScaffold> m_scaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif //SURGSIM_DEVICES_MOUSE_MOUSEDEVICE_H

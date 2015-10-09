@@ -92,8 +92,8 @@ int main(int argc, char* argv[])
 
 	std::array<std::string, 2> devices =
 	{
-		"SurgSim::Device::OculusDevice",
-		"SurgSim::Device::IdentityPoseDevice"
+		"SurgSim::Devices::OculusDevice",
+		"SurgSim::Devices::IdentityPoseDevice"
 	};
 
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device;

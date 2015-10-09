@@ -22,8 +22,8 @@
 #include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
 using SurgSim::Input::DeviceInterface;
-using SurgSim::Device::Novint7DofDevice;
-using SurgSim::Device::IdentityPoseDevice;
+using SurgSim::Devices::Novint7DofDevice;
+using SurgSim::Devices::IdentityPoseDevice;
 
 // The initialization name of the Novint6DofDevice.  An empty string will use the first available Falcon.
 static const char* const NOVINT_DEVICE_NAME = "";

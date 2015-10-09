@@ -26,8 +26,8 @@
 #include "SurgSim/Math/Math.h"
 #include "SurgSim/Physics/Physics.h"
 
-using SurgSim::Device::IdentityPoseDevice;
-using SurgSim::Device::MultiAxisDevice;
+using SurgSim::Devices::IdentityPoseDevice;
+using SurgSim::Devices::MultiAxisDevice;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::SceneElement;

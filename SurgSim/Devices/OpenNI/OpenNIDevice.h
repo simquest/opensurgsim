@@ -20,9 +20,11 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class OpenNIScaffold;
+
+SURGSIM_STATIC_REGISTRATION(OpenNIDevice);
 
 /// A class implementing the communication with one OpenNI compatible depth camera
 ///
@@ -35,13 +37,15 @@ class OpenNIScaffold;
 ///
 /// \par Application output used by the device: none.
 ///
-/// \sa SurgSim::Device::OpenNIScaffold
+/// \sa SurgSim::Devices::OpenNIScaffold
 class OpenNIDevice : public SurgSim::Input::CommonDevice
 {
 public:
 	/// Constructor.
 	/// \param name A unique name for the device that will be used by the application.
 	explicit OpenNIDevice(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Devices::OpenNIDevice);
 
 	/// Destructor.
 	virtual ~OpenNIDevice();

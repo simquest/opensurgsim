@@ -17,8 +17,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
+
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::NovintDevice, NovintDevice);
 
 NovintDevice::NovintDevice(const std::string& uniqueName) :
 	NovintCommonDevice(uniqueName)
@@ -29,5 +31,5 @@ NovintDevice::~NovintDevice()
 {
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

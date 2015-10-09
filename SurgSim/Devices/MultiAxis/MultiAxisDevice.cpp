@@ -23,10 +23,10 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
-SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::MultiAxisDevice, MultiAxisDevice);
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::MultiAxisDevice, MultiAxisDevice);
 
 MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
 	m_name(uniqueName),
@@ -160,5 +160,5 @@ void MultiAxisDevice::setReset(const std::string& name)
 	m_filter->setReset(name);
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

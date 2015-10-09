@@ -23,10 +23,11 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class SixenseScaffold;
 
+SURGSIM_STATIC_REGISTRATION(SixenseDevice);
 
 /// A class implementing the communication with one Sixense controller, for example one of the two on the Razer Hydra.
 ///
@@ -57,6 +58,8 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit SixenseDevice(const std::string& uniqueName);
 
+	SURGSIM_CLASSNAME(SurgSim::Devices::SixenseDevice);
+
 	/// Destructor.
 	virtual ~SixenseDevice();
 
@@ -73,7 +76,7 @@ private:
 	std::shared_ptr<SixenseScaffold> m_scaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_SIXENSE_SIXENSEDEVICE_H

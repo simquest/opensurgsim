@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 /// A wrapper for system-dependent access to an input/HID device.
@@ -82,7 +82,7 @@ private:
 	SystemInputDeviceHandle& operator=(const SystemInputDeviceHandle& other) /*= delete*/;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_MULTIAXIS_SYSTEMINPUTDEVICEHANDLE_H

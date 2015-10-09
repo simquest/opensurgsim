@@ -28,7 +28,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 FileDescriptor::FileDescriptor() :
@@ -162,5 +162,5 @@ bool FileDescriptor::readBytes(void* dataBuffer, size_t bytesToRead, size_t* byt
 	}
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

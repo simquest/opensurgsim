@@ -19,7 +19,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 SixenseThread::~SixenseThread()
@@ -42,5 +42,5 @@ bool SixenseThread::doStartUp()
 	return true;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

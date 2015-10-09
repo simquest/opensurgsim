@@ -23,13 +23,13 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 class SixenseScaffold;
 
 /// A class implementing the thread context for sampling Sixense devices.
-/// \sa SurgSim::Device::SixenseScaffold
+/// \sa SurgSim::Devices::SixenseScaffold
 class SixenseThread : public SurgSim::Framework::BasicThread
 {
 public:
@@ -51,7 +51,7 @@ private:
 	SixenseScaffold* m_scaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_SIXENSE_SIXENSETHREAD_H

@@ -68,7 +68,14 @@ const std::string& FemRepresentation::getFemElementType() const
 
 bool FemRepresentation::doInitialize()
 {
-	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
+	// DeformableRepresentation::doInitialize will
+	// 1) assert if initial state is not set
+	// 2) transform m_initialState properly with the initial pose
+	// => FemElement::initialize(m_initialState) is using the correct transformed state
+	if (!DeformableRepresentation::doInitialize())
+	{
+		return false;
+	}
 
 	// Initialize the FemElements
 	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)
@@ -218,21 +225,17 @@ void FemRepresentation::update(double dt)
 												 "Initial state has not been set yet. Did you call setInitialState() ?";
 
 	// Solve the ode and compute the requested compliance matrix
-	if (m_useComplianceWarping)
+	if (getComplianceWarping())
 	{
-		if (!m_isInitialComplianceMatrixComputed)
+		if (!isInitialComplianceMatrixComputed())
 		{
 			m_odeSolver->computeMatrices(dt, *m_initialState, true);
-			m_isInitialComplianceMatrixComputed = true;
+			setIsInitialComplianceMatrixComputed(true);
 		}
 		m_odeSolver->solve(dt, *m_currentState, m_newState.get(), false);
 
-		// Update the compliance matrix by first updating the nodes transformation
-		updateNodesTransformation(*m_newState);
-
-		// Then, update the compliance matrix using compliance warping
-		m_complianceWarpingMatrix = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
-									m_complianceWarpingTransformation.transpose();
+		// Update the compliance matrix
+		updateComplianceMatrix(*m_newState);
 	}
 	else
 	{
@@ -299,16 +302,21 @@ SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Ma
 	return SurgSim::Math::Matrix();
 }
 
-void FemRepresentation::updateNodesTransformation(const SurgSim::Math::OdeState& state)
+void FemRepresentation::updateComplianceMatrix(const SurgSim::Math::OdeState& state)
 {
 	using SurgSim::Math::assignSubMatrix;
 
+	// Update the compliance warping transformation using all the nodes' transformation
 	typedef Eigen::SparseMatrix<double>::Index Index;
 	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
 	{
 		assignSubMatrix(getNodeTransformation(state, nodeId), static_cast<Index>(nodeId),
 			static_cast<Index>(nodeId), &m_complianceWarpingTransformation, false);
 	}
+
+	// Then, transform the initial compliance matrix to get the current compliance warping matrix
+	m_complianceWarpingMatrix = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
+		m_complianceWarpingTransformation.transpose();
 }
 
 void FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
@@ -530,6 +538,16 @@ void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,
 			addSubVector(gravitynD * (scale * m_massPerNode[nodeId]), nodeId, getNumDofPerNode(), f);
 		}
 	}
+}
+
+bool FemRepresentation::isInitialComplianceMatrixComputed() const
+{
+	return m_isInitialComplianceMatrixComputed;
+}
+
+void FemRepresentation::setIsInitialComplianceMatrixComputed(bool flag)
+{
+	m_isInitialComplianceMatrixComputed = flag;
 }
 
 } // namespace Physics

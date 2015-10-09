@@ -60,6 +60,8 @@ set(SURGSIM_MATH_HEADERS
 	IntervalArithmetic-inl.h
 	KalmanFilter.h
 	KalmanFilter-inl.h
+	LinearMotionArithmetic.h
+	LinearMotionArithmetic-inl.h
 	LinearSolveAndInverse.h
 	LinearSolveAndInverse-inl.h
 	LinearSparseSolveAndInverse.h
@@ -94,6 +96,12 @@ set(SURGSIM_MATH_HEADERS
 	ParticlesShape.h
 	ParticlesShape-inl.h
 	PlaneShape.h
+	Polynomial.h
+	Polynomial-inl.h
+	PolynomialRoots.h
+	PolynomialRoots-inl.h
+	PolynomialValues.h
+	PolynomialValues-inl.h
 	Quaternion.h
 	RigidTransform.h
 	Shape.h

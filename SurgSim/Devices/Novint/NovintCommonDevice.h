@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class NovintScaffold;
 
@@ -111,7 +111,7 @@ private:
 	double m_orientationScale;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_NOVINT_NOVINTCOMMONDEVICE_H

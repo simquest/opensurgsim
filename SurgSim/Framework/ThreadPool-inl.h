@@ -26,6 +26,8 @@ class ThreadPool::TaskBase
 {
 public:
 	virtual void execute() = 0;
+
+	virtual ~TaskBase() {}
 };
 
 template<class R>

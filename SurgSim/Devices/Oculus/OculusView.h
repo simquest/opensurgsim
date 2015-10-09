@@ -40,7 +40,7 @@ namespace Input
 class InputComponent;
 }
 
-namespace Device
+namespace Devices
 {
 
 SURGSIM_STATIC_REGISTRATION(OculusView);
@@ -56,7 +56,7 @@ public:
 	/// Destructor
 	~OculusView();
 
-	SURGSIM_CLASSNAME(SurgSim::Device::OculusView);
+	SURGSIM_CLASSNAME(SurgSim::Devices::OculusView);
 
 	/// Set the InputComponent this view connects to.
 	/// Projection matrices of the Oculus device are passed via the DataGroup the InputComponent carries.

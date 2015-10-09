@@ -193,6 +193,7 @@ TEST(OsgCameraTests, MatricesTest)
 	Matrix44d projectionMatrix = Matrix44d::Random();
 	camera->setProjectionMatrix(projectionMatrix);
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(projectionMatrix));
+	EXPECT_TRUE(camera->getInverseProjectionMatrix().isApprox(projectionMatrix.inverse()));
 }
 
 TEST(OsgCameraTests, RenderTargetTest)

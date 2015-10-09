@@ -20,8 +20,8 @@
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
-using SurgSim::Device::IdentityPoseDevice;
-using SurgSim::Device::OculusDevice;
+using SurgSim::Devices::IdentityPoseDevice;
+using SurgSim::Devices::OculusDevice;
 using SurgSim::Input::DeviceInterface;
 
 int main(int argc, char** argv)

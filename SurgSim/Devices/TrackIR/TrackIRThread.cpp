@@ -19,7 +19,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 TrackIRThread::TrackIRThread(TrackIRScaffold* scaffold, TrackIRScaffold::DeviceData* deviceData) :
@@ -49,5 +49,5 @@ bool TrackIRThread::doUpdate(double dt)
 	return m_scaffold->runInputFrame(m_deviceData);
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

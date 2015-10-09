@@ -24,10 +24,11 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
-
 class LeapScaffold;
+
+SURGSIM_STATIC_REGISTRATION(LeapDevice);
 
 enum HandType
 {
@@ -35,11 +36,6 @@ enum HandType
 	HANDTYPE_RIGHT
 };
 
-enum LeapTrackingMode
-{
-	LEAP_TRACKING_MODE_DESKTOP,
-	LEAP_TRACKING_MODE_HMD
-};
 
 /// A class implementing the communication with one hand tracked by Leap Motion camera
 ///
@@ -67,7 +63,7 @@ enum LeapTrackingMode
 ///
 /// \par Application output used by the device: none.
 ///
-/// \sa SurgSim::Device::LeapScaffold
+/// \sa SurgSim::Devices::LeapScaffold
 class LeapDevice : public SurgSim::Input::CommonDevice
 {
 public:
@@ -75,28 +71,38 @@ public:
 	/// \param name A unique name for the device that will be used by the application.
 	explicit LeapDevice(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Devices::LeapDevice);
+
 	/// Destructor.
 	virtual ~LeapDevice();
 
-	/// Set the type of hand, left or right
+	/// Set the type of hand
 	/// \param type The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
 	void setHandType(HandType type);
 
-	/// Get the type of hand, left or right
+	/// Set the type of hand
+	/// \param type The hand type as a string, either "Left" or "Right" (case insensitive)
+	void setHandType(const std::string& type);
+
+	/// Get the type of hand
 	/// \return The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
 	HandType getHandType() const;
 
-	/// Set the hand tracking mode
-	/// This is a global setting that optimizes hand tracking based on the Leap camera
-	/// placement. The default is LEAP_TRACKING_MODE_DESKTOP, where the camera is placed
-	/// face up on a desktop. Use LEAP_TRACKING_MODE_HMD when the camera is attached to
-	/// the front of a head mounted display.
-	/// \param mode The tracking mode, either LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
-	void setTrackingMode(LeapTrackingMode mode);
+	/// Get the type of hand as a string
+	/// \return The hand type as a string, either "Left" or "Right"
+	std::string getHandTypeAsString() const;
 
-	/// Get the hand tracking mode
-	/// \return The current tracking mode, either LEAP_TRACKING_MODE_DESKTOP or LEAP_TRACKING_MODE_HMD
-	LeapTrackingMode getTrackingMode() const;
+	/// Set the hand tracking mode to HMD
+	/// This is a global setting that optimizes hand tracking based on the Leap camera
+	/// placement. The default is desktop mode, where the camera is placed
+	/// face up on a desktop. Use Hmd mode when the camera is attached to
+	/// the front of a head mounted display.
+	/// \param useHmdTrackingMode True if Hmd tracking mode is to be used
+	void setUseHmdTrackingMode(bool useHmdTrackingMode);
+
+	/// Is Using HMD Tracking Mode
+	/// \return True is HMD Tracking Mode is on
+	bool isUsingHmdTrackingMode() const;
 
 	/// Set if the device should provide the stereo infrared images
 	/// \param provideImages True if providing images
@@ -122,7 +128,7 @@ private:
 	HandType m_handType;
 
 	/// Tracking mode
-	DataStructures::OptionalValue<LeapTrackingMode> m_requestedTrackingMode;
+	DataStructures::OptionalValue<bool> m_requestedHmdTrackingMode;
 
 	/// Request Camera Images mode
 	bool m_isProvidingImages;

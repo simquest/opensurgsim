@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Blocks/GraphicsUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -24,11 +25,15 @@
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -154,11 +159,11 @@ struct OsgProgramRenderTests : public RenderTest
 		viewElement->enableManipulator(true);
 	}
 
-	void run()
+	void run(size_t time = 500)
 	{
 		// Action
 		runtime->start();
-		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(time));
 		runtime->stop();
 	}
 };
@@ -383,6 +388,122 @@ TEST_F(OsgProgramRenderTests, NormalMap)
 	viewElement->setPose(makeRigidTransform(Vector3d(0.5, 0.5, -0.5),
 											Vector3d(0.0, 0.0, 0.0),
 											Vector3d(0.0, 1.0, 0.0)));
+
+	run();
+}
+
+TEST_F(OsgProgramRenderTests, BlurShader)
+{
+	auto element = std::make_shared<Framework::BasicSceneElement>("Graphics");
+
+	auto texture1 = std::make_shared<Graphics::OsgTexture2d>();
+	std::string filename;
+	ASSERT_TRUE(Runtime::getApplicationData()->tryFindFile("Textures/checkered.png", &filename));
+	texture1->loadImage(filename);
+
+	// Material
+	auto material = Graphics::buildMaterial("Shaders/gauss_blur_horizontal.vert",
+											"Shaders/gauss_blur.frag");
+	material->addUniform("float", "width");
+	material->setValue("width", 1024.0f);
+	material->addUniform("float", "blurRadius");
+	material->setValue("blurRadius", 16.0f);
+	material->getProgram()->setGlobalScope(true);
+
+	auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");
+	graphics->setSize(1024, 1024);
+	graphics->setLocation(0, 0);
+	graphics->setTexture(texture1);
+	graphics->setGroupReference("BlurrPass");
+	element->addComponent(graphics);
+
+	auto passCamera = std::make_shared<Graphics::OsgCamera>("BlurrPassCamera");
+	auto osgCamera = passCamera->getOsgCamera();
+	passCamera->setRenderGroupReference("BlurrPass");
+	passCamera->setGroupReference(Graphics::Representation::DefaultGroupName);
+	osgCamera->setViewport(0, 0, 1024, 1024);
+	osgCamera->setProjectionMatrixAsOrtho2D(0, 1024, 0, 1024);
+	passCamera->setMaterial(material);
+
+	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
+	passCamera->setRenderTarget(renderTarget);
+	element->addComponent(passCamera);
+
+
+	graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("DebugQuad");
+	graphics->setLocation(512, 512);
+	graphics->setSize(256, 256);
+	graphics->setTexture(passCamera->getRenderTarget()->getColorTarget(0));
+	element->addComponent(graphics);
+
+	element->addComponent(material);
+
+	scene->addSceneElement(element);
+
+	run();
+}
+
+TEST_F(OsgProgramRenderTests, TwoSided)
+{
+	using SurgSim::Math::Vector2d;
+
+	// ShadowMap placeholder
+	auto material = std::make_shared<Graphics::OsgMaterial>("placeholder");
+	Blocks::enable2DTexture(material, "shadowMap", Graphics::SHADOW_TEXTURE_UNIT, "Textures/black.png");
+	viewElement->addComponent(material);
+	viewElement->getCamera()->setMaterial(material);
+
+	auto element = std::make_shared<Framework::BasicSceneElement>("Graphics");
+	auto rep = std::make_shared<Graphics::OsgMeshRepresentation>("Mesh");
+
+	auto mesh = rep->getMesh();
+
+	auto vertex = Mesh::VertexType();
+	vertex.position = Vector3d(-1.0, -1.0, 0.0);
+	vertex.data.texture = Vector2d(0.0, 0.0);
+	mesh->addVertex(vertex);
+	vertex.position = Vector3d(-1.0, 1.0, 0.0);
+	vertex.data.texture = Vector2d(0.0, 1.0);
+	mesh->addVertex(vertex);
+	vertex.position = Vector3d(1.0, -1.0, 0.0);
+	vertex.data.texture = Vector2d(1.0, 0.0);
+	mesh->addVertex(vertex);
+	vertex.position = Vector3d(1.0, 1.0, 0.0);
+	vertex.data.texture = Vector2d(1.0, 1.0);
+	mesh->addVertex(vertex);
+
+	{
+		Mesh::TriangleType::IdType ids = {{3, 1, 0}};
+		mesh->addTriangle(Mesh::TriangleType(ids));
+	}
+	{
+		Mesh::TriangleType::IdType ids = {{0, 2, 3}};
+		mesh->addTriangle(Mesh::TriangleType(ids));
+	}
+	mesh->dirty();
+	element->addComponent(rep);
+
+	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
+	element->addComponent(axes);
+
+	material = Graphics::buildMaterial("Shaders/ds_mapping_material.vert",
+									   "Shaders/ds_mapping_material_twosided.frag");
+
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", Math::Vector4f(0.8, 0.8, 0.8, 1.0));
+
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 10.0f);
+
+	Blocks::enable2DTexture(material, "diffuseMap", Graphics::DIFFUSE_TEXTURE_UNIT, "Textures/checkered.png", false);
+
+	element->addComponent(material);
+
+	scene->addSceneElement(element);
+	rep->setMaterial(material);
 
 	run();
 }

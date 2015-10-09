@@ -23,9 +23,11 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 class TrackIRScaffold;
+
+SURGSIM_STATIC_REGISTRATION(TrackIRDevice);
 
 /// A class implementing the communication with Natural Point TrackIR camera.
 /// Z is the direction that the camera faces.
@@ -45,6 +47,8 @@ public:
 	/// Constructor.
 	/// \param uniqueName A unique name for the device.
 	explicit TrackIRDevice(const std::string& uniqueName);
+
+	SURGSIM_CLASSNAME(SurgSim::Devices::TrackIRDevice);
 
 	/// Destructor.
 	virtual ~TrackIRDevice();
@@ -91,7 +95,7 @@ private:
 	std::shared_ptr<TrackIRScaffold> m_scaffold;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_TRACKIR_TRACKIRDEVICE_H

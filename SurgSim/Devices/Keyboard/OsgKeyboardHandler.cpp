@@ -23,7 +23,7 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 OsgKeyboardHandler::OsgKeyboardHandler() : m_keyboardScaffold(KeyboardScaffold::getOrCreateSharedInstance())
@@ -69,5 +69,5 @@ bool OsgKeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
 	return result;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

@@ -98,7 +98,7 @@ public:
 		addTetraheadron(m_fem.get(), 0, 1, 4, 5, *state);
 
 		m_fem->setInitialState(state);
-		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
+		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED);
 		m_fem->setLocalActive(true);
 
 		m_fem->initialize(std::make_shared<Runtime>());

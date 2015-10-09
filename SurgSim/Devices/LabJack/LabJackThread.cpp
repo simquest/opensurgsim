@@ -17,13 +17,14 @@
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 LabJackThread::LabJackThread(LabJackScaffold* scaffold, LabJackScaffold::DeviceData* deviceData) :
 	BasicThread("LabJack thread"),
 	m_scaffold(scaffold),
 	m_deviceData(deviceData)
 {
+	m_scaffold->configureDevice(m_deviceData);
 }
 
 LabJackThread::~LabJackThread()
@@ -32,7 +33,7 @@ LabJackThread::~LabJackThread()
 
 bool LabJackThread::doInitialize()
 {
-	return m_scaffold->configureDevice(m_deviceData);
+	return true;
 }
 
 bool LabJackThread::doStartUp()
@@ -45,5 +46,5 @@ bool LabJackThread::doUpdate(double dt)
 	return m_scaffold->runInputFrame(m_deviceData);
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

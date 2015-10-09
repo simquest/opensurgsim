@@ -135,7 +135,9 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_TRUE(safePlaneCollisions->empty());
 
 	std::shared_ptr<Contact> dummyContact =
-		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
+		std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE,
+								  0.0, 1.0, Vector3d::Zero(), Vector3d::Zero(),
+								  std::make_pair(Location(), Location()));
 	unsafeSphereCollisions[planeRep].push_back(dummyContact);
 
 	auto spherePlanePair = unsafeSphereCollisions.find(planeRep);
@@ -160,18 +162,26 @@ TEST_F(RepresentationTest, CollisionTest)
 TEST_F(RepresentationTest, AddContactsInParallelTest)
 {
 	auto rep = std::make_shared<ShapeCollisionRepresentation>("collisionRepReference");
-	auto contact = std::make_shared<Contact>(0.1, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
-		std::make_pair(DataStructures::Location(), DataStructures::Location()));
+	auto contact = std::make_shared<Contact>(
+					   COLLISION_DETECTION_TYPE_DISCRETE, 0.1, 1.0,
+					   Math::Vector3d::Zero(), Math::Vector3d::Zero(),
+					   std::make_pair(DataStructures::Location(), DataStructures::Location()));
 	auto threadPool = Framework::Runtime::getThreadPool();
 	std::vector<std::future<void>> tasks;
 	const size_t numContacts = 500;
 
 	for (size_t i = 0; i < numContacts; i++)
 	{
-		tasks.push_back(threadPool->enqueue<void>([&rep, &contact](){ rep->addContact(rep, contact); }));
+		tasks.push_back(threadPool->enqueue<void>([&rep, &contact]()
+		{
+			rep->addContact(rep, contact);
+		}));
 	}
 
-	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.wait();});
+	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p)
+	{
+		p.wait();
+	});
 	ASSERT_EQ(numContacts, rep->getCollisions().unsafeGet()[rep].size());
 }
 

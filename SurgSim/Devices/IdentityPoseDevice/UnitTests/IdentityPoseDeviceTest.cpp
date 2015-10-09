@@ -25,7 +25,7 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Testing/MockInputOutput.h"
 
-using SurgSim::Device::IdentityPoseDevice;
+using SurgSim::Devices::IdentityPoseDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
@@ -47,7 +47,7 @@ TEST(IdentityPoseDeviceTest, Factory)
 {
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
 	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create(
-								 "SurgSim::Device::IdentityPoseDevice", "Device"));
+								 "SurgSim::Devices::IdentityPoseDevice", "Device"));
 	EXPECT_NE(nullptr, device);
 }
 

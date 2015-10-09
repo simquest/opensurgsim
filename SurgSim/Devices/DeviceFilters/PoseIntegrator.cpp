@@ -27,7 +27,7 @@ using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 PoseIntegrator::PoseIntegrator(const std::string& name) :
@@ -174,5 +174,5 @@ void PoseIntegrator::setReset(const std::string& name)
 	m_resetName = name;
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

@@ -32,13 +32,13 @@ class Logger;
 namespace SurgSim
 {
 
-namespace Device
+namespace Devices
 {
 class OculusDevice;
 
 /// A class that manages Oculus Rift DK2 devices.
 ///
-/// \sa SurgSim::Device::OculusDevice
+/// \sa SurgSim::Devices::OculusDevice
 class OculusScaffold : SurgSim::Framework::BasicThread
 {
 public:
@@ -72,6 +72,11 @@ private:
 	/// \return True if the initialization succeeds, false if it fails.
 	bool registerDevice(OculusDevice* device);
 
+	/// Do the Oculus SDK specific registration
+	/// \param info The device data
+	/// \return true on success, false on failure.
+	bool doRegisterDevice(DeviceData* info);
+
 	/// Unregisters the specified device object.
 	/// \param device The device object.
 	/// \return true on success, false on failure.
@@ -95,7 +100,7 @@ private:
 	std::unique_ptr<StateData> m_state;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_OCULUS_OCULUSSCAFFOLD_H

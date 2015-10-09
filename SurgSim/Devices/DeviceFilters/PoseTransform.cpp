@@ -25,7 +25,7 @@ using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
-namespace Device
+namespace Devices
 {
 
 PoseTransform::PoseTransform(const std::string& name) :
@@ -275,5 +275,5 @@ void PoseTransform::setTransform(const RigidTransform3d& transform)
 	m_transformInverse = m_transform.inverse();
 }
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim

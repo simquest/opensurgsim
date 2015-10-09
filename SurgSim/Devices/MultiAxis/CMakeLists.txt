@@ -58,9 +58,9 @@ set(MULTIAXIS_DEVICE_HEADERS
 	SystemInputDeviceHandle.h
 )
 
-set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS}
-	MultiAxisDevice.h
-	RawMultiAxisDevice.h
+set(DEVICE_HEADERS ${DEVICE_HEADERS}
+	MultiAxis/MultiAxisDevice.h #NOLINT
+	MultiAxis/RawMultiAxisDevice.h #NOLINT
 	PARENT_SCOPE)
 
 set(MULTIAXIS_DEVICE_LINUX_SOURCES

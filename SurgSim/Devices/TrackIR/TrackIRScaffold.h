@@ -28,13 +28,13 @@ namespace DataStructures
 class DataGroup;
 }
 
-namespace Device
+namespace Devices
 {
 class TrackIRDevice;
 
 /// A class that manages Natural Point TRACKIR devices.
 ///
-/// \sa SurgSim::Device::TrackIRDevice
+/// \sa SurgSim::Devices::TrackIRDevice
 class TrackIRScaffold
 {
 public:
@@ -141,7 +141,7 @@ private:
 	std::unique_ptr<StateData> m_state;
 };
 
-};  // namespace Device
+};  // namespace Devices
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DEVICES_TRACKIR_TRACKIRSCAFFOLD_H
