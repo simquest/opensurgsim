@@ -83,12 +83,14 @@ class PhantomScaffold::Handle
 {
 public:
 	Handle() :
-		m_deviceHandle(HD_INVALID_HANDLE)
+		m_deviceHandle(HD_INVALID_HANDLE),
+		m_logger(Framework::Logger::getLogger("Devices/Phantom"))
 	{
 	}
 
 	Handle(const std::string& deviceName, const std::string& initializationName) :
-		m_deviceHandle(HD_INVALID_HANDLE)
+		m_deviceHandle(HD_INVALID_HANDLE),
+		m_logger(Framework::Logger::getLogger("Devices/Phantom"))
 	{
 		create(deviceName, initializationName);
 	}
@@ -120,14 +122,14 @@ public:
 		if (checkForFatalError("Failed to initialize"))
 		{
 			// HDAPI error message already logged
-			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Phantom")) << std::endl <<
+			SURGSIM_LOG_INFO(m_logger) << std::endl <<
 				"  Device name: '" << deviceName << "'" << std::endl <<
 				"  OpenHaptics device name: '" << initializationName << "'" << std::endl;
 			return false;
 		}
 		else if (deviceHandle == HD_INVALID_HANDLE)
 		{
-			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Phantom")) <<
+			SURGSIM_LOG_SEVERE(m_logger) <<
 				"Failed to initialize '" << deviceName << "'" << std::endl <<
 				"  Error details: unknown (HDAPI returned an invalid handle)" << std::endl <<
 				"  OpenHaptics device name: '" << initializationName << "'" << std::endl;
@@ -167,6 +169,8 @@ private:
 
 	/// The OpenHaptics device handle (or HD_INVALID_HANDLE if not valid).
 	HHD m_deviceHandle;
+	/// The logger.
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 

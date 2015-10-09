@@ -88,7 +88,8 @@ public:
 		m_address(address),
 		m_model(model),
 		m_connection(connection),
-		m_deviceHandle(LABJACK_INVALID_HANDLE)
+		m_deviceHandle(LABJACK_INVALID_HANDLE),
+		m_logger(Framework::Logger::getLogger("Devices/LabJack"))
 	{
 		int firstFound = 0;
 		if (m_address.length() == 0)
@@ -106,7 +107,7 @@ public:
 				boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 			}
 		}
-		SURGSIM_LOG_IF(!isOk(error), Framework::Logger::getLogger("Devices/LabJack"), SEVERE) <<
+		SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 			"Failed to initialize a device. Model: " << m_model << ". Connection: " << m_connection << ". Address: '" <<
 			m_address << "'." << std::endl << formatErrorMessage(error);
 	}
@@ -133,7 +134,7 @@ public:
 			if (reset)
 			{
 				const LJ_ERROR error = ResetLabJack(m_deviceHandle);
-				SURGSIM_LOG_IF(!isOk(error), Framework::Logger::getLogger("Devices/LabJack"), SEVERE) <<
+				SURGSIM_LOG_IF(!isOk(error), m_logger, SEVERE) <<
 					"Failed to reset the LabJack device. Model: " << m_model << ". Connection: " <<
 					m_connection << ". Address: '" << m_address << "'." << std::endl << formatErrorMessage(error);
 			}
@@ -161,6 +162,8 @@ private:
 	LabJack::Model m_model;
 	/// The connection to the device.
 	LabJack::Connection m_connection;
+	/// The logger.
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 /// The per-device data.

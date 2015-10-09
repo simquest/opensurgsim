@@ -192,14 +192,14 @@ public:
 		m_deviceHandle(LABJACK_INVALID_HANDLE),
 		m_address(address),
 		m_model(model),
-		m_connection(connection)
+		m_connection(connection),
+		m_logger(Framework::Logger::getLogger("Devices/LabJack"))
 	{
-		auto logger = Framework::Logger::getLogger("Devices/LabJack");
 		bool result = true;
 
 		if (m_model == LabJack::MODEL_UE9)
 		{
-			SURGSIM_LOG_SEVERE(logger) << "Failed to open a device. " <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Failed to open a device. " <<
 				"The UE9 model LabJack is not supported for the low-level driver used on Linux & Mac. " <<
 				"The commands for the UE9 have a different structure, which is not currently implemented." <<
 				std::endl <<
@@ -210,7 +210,7 @@ public:
 
 		if (m_connection != LabJack::CONNECTION_USB)
 		{
-			SURGSIM_LOG_SEVERE(logger) << "Failed to open a device. " <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Failed to open a device. " <<
 				"The LabJackDevice connection must be set to USB for the low-level driver used on Linux & Mac." <<
 				std::endl <<
 				"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
@@ -227,7 +227,7 @@ public:
 			}
 			catch (int e)
 			{
-				SURGSIM_LOG_SEVERE(logger) << "Failed to open a device. " <<
+				SURGSIM_LOG_SEVERE(m_logger) << "Failed to open a device. " <<
 					"The LabJackDevice address should be a string representation of an unsigned integer " <<
 					"corresponding to the device number (or the empty string to get the first device), " <<
 					"but the conversion from string to integer failed." << std::endl <<
@@ -252,7 +252,7 @@ public:
 			}
 			if (m_deviceHandle == LABJACK_INVALID_HANDLE)
 			{
-				SURGSIM_LOG_SEVERE(logger) << "Failed to open a device." << std::endl <<
+				SURGSIM_LOG_SEVERE(m_logger) << "Failed to open a device." << std::endl <<
 					"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 					m_address << "'." << std::endl <<
 					"  labjackusb error code: " << errno << "." << std::endl;
@@ -278,7 +278,6 @@ public:
 	///		unchanged (i.e., it will continue timing, counting, and outputting).
 	void destroy(bool reset = false)
 	{
-		auto logger = Framework::Logger::getLogger("Devices/LabJack");
 		if (isValid())
 		{
 			if (reset)
@@ -298,7 +297,7 @@ public:
 				bool sendResult = true;
 				if (sent < sendBytesSize)
 				{
-					SURGSIM_LOG_SEVERE(logger) <<
+					SURGSIM_LOG_SEVERE(m_logger) <<
 						"Failed to write reset command to a device." <<
 						"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 						m_address << "'." << std::endl << sendBytesSize << " bytes should have been sent, but only " <<
@@ -313,7 +312,7 @@ public:
 					const int read = LJUSB_Read(m_deviceHandle, &(readBytes[0]), readBytesSize);
 					if (read < readBytesSize)
 					{
-						SURGSIM_LOG_SEVERE(logger) << "Failed to read response of reset command." <<
+						SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of reset command." <<
 							"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 							m_address << "'." << std::endl <<
 							readBytesSize << " bytes were expected, but only " << read << " were received." <<
@@ -321,7 +320,7 @@ public:
 					}
 					else if (LabJack::normalChecksum8(readBytes, readBytesSize) != readBytes[0])
 					{
-						SURGSIM_LOG_SEVERE(logger) << "Failed to read response of reset command." <<
+						SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of reset command." <<
 							"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 							m_address << "'." << std::endl <<
 							"The checksums are bad." << std::endl << "  labjackusb error code: " << errno << "." <<
@@ -329,7 +328,7 @@ public:
 					}
 					else if (readBytes[3] != 0)
 					{
-						SURGSIM_LOG_SEVERE(logger) << "Failed to read response of reset command." <<
+						SURGSIM_LOG_SEVERE(m_logger) << "Failed to read response of reset command." <<
 							"  Model: '" << m_model << "'.  Connection: '" << m_connection << "'.  Address: '" <<
 							m_address << "'." << std::endl <<
 							"The device library returned an error code: " << static_cast<int>(readBytes[3]) << "." <<
@@ -362,6 +361,8 @@ private:
 	SurgSim::Devices::LabJack::Model m_model;
 	/// The connection to the device.
 	SurgSim::Devices::LabJack::Connection m_connection;
+	/// The logger.
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 /// The per-device data.
