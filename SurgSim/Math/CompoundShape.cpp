@@ -86,9 +86,9 @@ Vector3d CompoundShape::getCenter() const
 }
 
 
-SurgSim::Math::Matrix33d CompoundShape::getSecondMomentOfVolume() const
+Matrix33d CompoundShape::getSecondMomentOfVolume() const
 {
-	// Calculate the compound values, this needs to be done outisde of the ReadLock, otherwise 
+	// Calculate the compound values, this needs to be done outside of the ReadLock, otherwise 
 	// this might freeze up
 	auto center = getCenter();
 	auto volume = getVolume();
@@ -97,8 +97,7 @@ SurgSim::Math::Matrix33d CompoundShape::getSecondMomentOfVolume() const
 
 	if (!m_secondMoment.hasValue())
 	{
-		Math::Matrix33d result = Math::Matrix33d::Zero();
-
+		Matrix33d result = Matrix33d::Zero();
 
 		UpgradeLock write(lock);
 
@@ -106,12 +105,11 @@ SurgSim::Math::Matrix33d CompoundShape::getSecondMomentOfVolume() const
 		{
 			for (const auto& subShape : m_shapes)
 			{
-				std::shared_ptr<Shape> shape = subShape.first;
-				RigidTransform3d pose = subShape.second;
-
+				const auto& shape = subShape.first;
+				const auto& pose = subShape.second;
 				const auto& r = pose.linear();
-				Math::Matrix33d	skew = Math::makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
-				Math::Matrix33d inertia = r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
+				Matrix33d	skew = makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
+				Matrix33d inertia = r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
 
 				result += inertia; 
 			}
@@ -135,10 +133,10 @@ void CompoundShape::invalidateData()
 	m_secondMoment.invalidate();
 }
 
-size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose /*= RigidTransform3d::Identity()*/)
+size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose)
 {
 	WriteLock lock(m_mutex);
-	m_shapes.push_back(make_pair(shape, pose));
+	m_shapes.emplace_back(shape, pose);
 	invalidateData();
 	return m_shapes.size() - 1;
 }

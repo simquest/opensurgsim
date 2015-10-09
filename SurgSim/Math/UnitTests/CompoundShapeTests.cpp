@@ -79,7 +79,7 @@ TEST_F(CompoundShapeTest, Transforms)
 	compoundShape->setPose(0, transform2);
 	EXPECT_TRUE(transform2.isApprox(compoundShape->getPose(0)));
 
-	compoundShape->setPose(0, transform1);
+	compoundShape->setPose(1, transform1);
 
 	std::vector<RigidTransform3d> poses; 
 	

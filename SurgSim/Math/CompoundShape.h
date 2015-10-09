@@ -63,10 +63,15 @@ public:
 	/// \return the pose of a specific shape
 	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
 	RigidTransform3d getPose(size_t index) const;
+
+	/// Sets the poses for all shapes
+	/// \param poses array of poses to be copied to each shape
+	/// \throws SurgSimm::AssertialFailure if the size of poses.size() != getNumShapes()
 	void setPoses(const std::vector<RigidTransform3d>& poses);
 
 	/// Set the pose for the specified shape
 	/// \param index index of the target shape
+	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
 	void setPose(size_t index, const RigidTransform3d& pose);
 
 	/// \return the number of shapes in this shape
@@ -93,7 +98,7 @@ private:
 	/// Clears the data for the volume, center and secondMoment so it can be recalculated when needed again
 	void invalidateData();
 
-	std::vector<std::pair<std::shared_ptr<Shape>, RigidTransform3d>> m_shapes;
+	std::vector<SubShape> m_shapes;
 
 	typedef boost::upgrade_lock<boost::shared_mutex> ReadLock;
 	typedef boost::unique_lock<boost::shared_mutex> WriteLock;
