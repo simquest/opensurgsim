@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/CompoundShape.h"
+#include "SurgSim/Math/MathConvert.h"
 
 namespace SurgSim
 {
@@ -23,7 +24,10 @@ namespace Math
 
 CompoundShape::CompoundShape()
 {
-
+	{
+		typedef std::vector<SubShape> PropertyType;
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Math::CompoundShape, PropertyType, Shapes, getShapes, setShapes);
+	}
 }
 
 CompoundShape::~CompoundShape()

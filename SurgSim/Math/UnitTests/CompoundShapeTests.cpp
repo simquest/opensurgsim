@@ -182,6 +182,23 @@ TEST_F(CompoundShapeTest, SecondMomentOfVolumeComplex)
 	auto shapeInertia = base->getSecondMomentOfVolume();
 	auto compoundInertia = compoundShape->getSecondMomentOfVolume();
 	EXPECT_TRUE(shapeInertia.isApprox(compoundInertia));
+}
+
+TEST_F(CompoundShapeTest, Properties)
+{
+	auto box = std::make_shared<BoxShape>(1.0, 5.0, 2.0);
+	std::vector<CompoundShape::SubShape> shapes, result;
+	shapes.emplace_back(shape1, transform1);
+	shapes.emplace_back(box, transform2);
+
+
+	ASSERT_NO_THROW(compoundShape->setValue("Shapes", shapes));
+
+	ASSERT_NO_THROW(result = compoundShape->getValue<std::vector<CompoundShape::SubShape>>("Shapes"));
+
+	// Spot check content
+	EXPECT_EQ(2u, result.size());
+	EXPECT_TRUE(transform2.isApprox(result[1].second));
 
 }
 
