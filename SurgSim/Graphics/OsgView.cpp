@@ -200,15 +200,10 @@ void OsgView::update(double dt)
 	}
 	else if (isActive())
 	{
-		if(!isStereo())
+		if (!isStereo())
 		{
-			int width = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
-			int height = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
-			if(width != m_dimensions[0] || height != m_dimensions[1])
-			{
-				m_dimensions[0] = width;
-				m_dimensions[1] = height;
-			}
+			m_dimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
+			m_dimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
 		}
 	}
 	if (isManipulatorEnabled())
