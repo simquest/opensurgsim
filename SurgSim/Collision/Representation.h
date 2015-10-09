@@ -103,7 +103,7 @@ public:
 	/// \param contact The contact to be added
 	/// \note This method is thread-safe
 	void addContact(const std::shared_ptr<Representation>& other,
-		const std::shared_ptr<SurgSim::Collision::Contact>& contact);
+					const std::shared_ptr<SurgSim::Collision::Contact>& contact);
 
 	/// Check whether this collision representation collided with another during the last update
 	/// \param other other collision representation to check against
@@ -163,6 +163,8 @@ protected:
 	/// Get the only collision representations that this representation is allowed to collide with
 	/// \return The full names of all the collision representations to allow
 	std::vector<std::string> getAllowing() const;
+
+	void doRetire() override;
 
 private:
 	/// The type of collision detection

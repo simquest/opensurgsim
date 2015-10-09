@@ -198,6 +198,12 @@ std::vector<std::string> Representation::getAllowing() const
 	return std::vector<std::string>(std::begin(m_allowing), std::end(m_allowing));
 }
 
+void Representation::doRetire()
+{
+	m_collisions.unsafeGet().clear();
+	m_collisions.publish();
+	Framework::Representation::doRetire();
+}
 
 }; // namespace Collision
 }; // namespace SurgSim

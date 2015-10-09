@@ -303,7 +303,14 @@ bool SceneElement::decode(const YAML::Node& node)
 				}
 				else
 				{
-					addComponent(nodeIt->as<std::shared_ptr<SurgSim::Framework::Component>>());
+					try
+					{
+						addComponent(nodeIt->as<std::shared_ptr<SurgSim::Framework::Component>>());
+					}
+					catch (YAML::Exception e)
+					{
+						SURGSIM_FAILURE() << e.what() << "for " << std::endl << *nodeIt;
+					}
 				}
 			}
 			result = true;

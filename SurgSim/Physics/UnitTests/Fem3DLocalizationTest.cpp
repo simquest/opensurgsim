@@ -20,6 +20,8 @@
 
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
@@ -166,211 +168,17 @@ TEST_F(Fem3DLocalizationTest, ConstructorTest)
 	ASSERT_NO_THROW(std::make_shared<Fem3DLocalization>(m_fem3DCube, m_validLocalPositionForCube););
 }
 
-TEST_F(Fem3DLocalizationTest, SetGetRepresentation)
+TEST_F(Fem3DLocalizationTest, IsValidRepresentation)
 {
 	Fem3DLocalization localization(m_fem, m_validLocalPosition);
 
-	EXPECT_NE(nullptr, localization.getRepresentation());
-	EXPECT_EQ(m_fem, localization.getRepresentation());
+	ASSERT_TRUE(localization.isValidRepresentation(m_fem));
 
-	EXPECT_EQ(1u, localization.getLocalPosition().index);
-	EXPECT_TRUE(localization.getLocalPosition().coordinate.isApprox(m_validLocalPosition.coordinate));
+	// nullptr is valid
+	ASSERT_TRUE(localization.isValidRepresentation(nullptr));
 
-	localization.setRepresentation(nullptr);
-	EXPECT_EQ(nullptr, localization.getRepresentation());
-	localization.setRepresentation(m_fem);
-	EXPECT_EQ(m_fem, localization.getRepresentation());
-
-	SurgSim::DataStructures::IndexedLocalCoordinate m_otherValidLocalPosition;
-	m_otherValidLocalPosition.index = 0;
-	m_otherValidLocalPosition.coordinate = SurgSim::Math::Vector::Zero(4);
-	m_otherValidLocalPosition.coordinate[1] = 1.0;
-
-	localization.setLocalPosition(m_otherValidLocalPosition);
-	EXPECT_EQ(m_otherValidLocalPosition.index, localization.getLocalPosition().index);
-	EXPECT_TRUE(localization.getLocalPosition().coordinate.isApprox(m_otherValidLocalPosition.coordinate));
-}
-
-TEST_F(Fem3DLocalizationTest, SetGetLocalization)
-{
-	using SurgSim::Math::Vector4d;
-	using SurgSim::Math::Vector3d;
-
-	{
-		SCOPED_TRACE("Uninitialized Representation");
-
-		// Uninitialized Representation
-		EXPECT_THROW(std::make_shared<Fem3DLocalization>(nullptr, m_validLocalPosition),
-			SurgSim::Framework::AssertionFailure);
-	}
-
-	{
-		SCOPED_TRACE("Incorrectly formed natural coordinate");
-
-		// Incorrectly formed natural coordinate
-		auto localization = std::make_shared<Fem3DLocalization>(m_fem, m_validLocalPosition);
-		EXPECT_THROW(localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector4d(0.89, 0.54, 0.45, 0.64))),
-			SurgSim::Framework::AssertionFailure);
-
-		EXPECT_THROW(localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector3d(1.0, 0.0, 0.0))),
-			SurgSim::Framework::AssertionFailure);
-	}
-
-	{
-		SCOPED_TRACE("Out of bounds element Id");
-
-		// Out of bounds element Id
-		auto localization = std::make_shared<Fem3DLocalization>(m_fem, m_validLocalPosition);
-		EXPECT_THROW(localization->setLocalPosition(IndexedLocalCoordinate(6u, Vector4d(1.0, 0.0, 0.0, 0.0))),
-			SurgSim::Framework::AssertionFailure);
-	}
-
-	{
-		SCOPED_TRACE("valid");
-
-		auto localization = std::make_shared<Fem3DLocalization>(m_fem, m_validLocalPosition);
-		EXPECT_NO_THROW(localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector4d(0.2, 0.6, 0.1, 0.1))));
-		EXPECT_EQ(1u, localization->getLocalPosition().index);
-		EXPECT_TRUE(localization->getLocalPosition().coordinate.isApprox(Vector4d(0.2, 0.6, 0.1, 0.1)));
-	}
-}
-
-TEST_F(Fem3DLocalizationTest, CalculatePositionTest)
-{
-	using SurgSim::Math::Vector;
-	using SurgSim::Math::Vector3d;
-	using SurgSim::Math::Vector4d;
-
-	auto localization = std::make_shared<Fem3DLocalization>(m_fem, m_validLocalPosition);
-
-	// Test tetrahedron 1: nodes 0, 1, 2, 3
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector4d(1.0, 0.0, 0.0, 0.0)));
-	EXPECT_TRUE(Vector3d(0.0, 0.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector4d(0.0, 1.0, 0.0, 0.0)));
-	EXPECT_TRUE(Vector3d(0.0, 1.0, -1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector4d(0.0, 0.0, 1.0, 0.0)));
-	EXPECT_TRUE(Vector3d(-1.0, 1.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector4d(0.0, 0.0, 0.0, 1.0)));
-	EXPECT_TRUE(Vector3d(0.0, 1.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test tetrahedron 2: nodes 0, 1, 3, 4
-	localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector4d(1.0, 0.0, 0.0, 0.0)));
-	EXPECT_TRUE(Vector3d(0.0, 0.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector4d(0.0, 1.0, 0.0, 0.0)));
-	EXPECT_TRUE(Vector3d(0.0, 1.0, -1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector4d(0.0, 0.0, 1.0, 0.0)));
-	EXPECT_TRUE(Vector3d(0.0, 1.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector4d(0.0, 0.0, 0.0, 1.0)));
-	EXPECT_TRUE(Vector3d(1.0, 1.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test tetrahedron 3: nodes 0, 1, 4, 5
-	localization->setLocalPosition(IndexedLocalCoordinate(2u, Vector4d(1.0, 0.0, 0.0, 0.0)));
-	EXPECT_TRUE(Vector3d(0.0, 0.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(2u, Vector4d(0.0, 1.0, 0.0, 0.0)));
-	EXPECT_TRUE(Vector3d(0.0, 1.0, -1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(2u, Vector4d(0.0, 0.0, 1.0, 0.0)));
-	EXPECT_TRUE(Vector3d(1.0, 1.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(2u, Vector4d(0.0, 0.0, 0.0, 1.0)));
-	EXPECT_TRUE(Vector3d(1.0, 0.0, -1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Advanced tests
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector4d(0.31, 0.03, 0.19, 0.47)));
-	//   0.31 * ( 0.0,  0.0,  0.0) => ( 0.0,  0.0,   0.0 )
-	// + 0.03 * ( 0.0,  1.0, -1.0) => ( 0.0,  0.03, -0.03)
-	// + 0.19 * (-1.0,  1.0,  0.0) => (-0.19, 0.19,  0.0 )
-	// + 0.47 * ( 0.0,  1.0,  0.0) => ( 0.0,  0.47,  0.0 )
-	//                              = (-0.19, 0.69, -0.03)
-	EXPECT_TRUE(Vector3d(-0.19, 0.69, -0.03).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector4d(0.05, 0.81, 0.06, 0.08)));
-	//   0.05 * ( 0.0,  0.0,  0.0) => (0.0,  0.0,   0.0 )
-	// + 0.81 * ( 0.0,  1.0, -1.0) => (0.0,  0.81, -0.81)
-	// + 0.06 * ( 0.0,  1.0,  0.0) => (0.0,  0.06,  0.0 )
-	// + 0.08 * ( 1.0,  1.0,  0.0) => (0.08, 0.08,  0.0 )
-	//                              = (0.08, 0.95, -0.81)
-	EXPECT_TRUE(Vector3d(0.08, 0.95, -0.81).isApprox(localization->calculatePosition(), epsilon));
-
-	localization->setLocalPosition(IndexedLocalCoordinate(2u, Vector4d(0.11, 0.15, 0.67, 0.07)));
-	//   0.11 * ( 0.0,  0.0,  0.0) => (0.0,  0.0,   0.0 )
-	// + 0.15 * ( 0.0,  1.0, -1.0) => (0.0,  0.15, -0.15)
-	// + 0.67 * ( 1.0,  1.0,  0.0) => (0.67, 0.67,  0.0 )
-	// + 0.07 * ( 1.0,  0.0, -1.0) => (0.07, 0.0,  -0.07)
-	//                              = (0.74, 0.82, -0.22)
-	EXPECT_TRUE(Vector3d(0.74, 0.82, -0.22).isApprox(localization->calculatePosition(), epsilon));
-}
-
-TEST_F(Fem3DLocalizationTest, CalculatePositionTest3DCube)
-{
-	auto localization = std::make_shared<Fem3DLocalization>(m_fem3DCube, m_validLocalPositionForCube);
-	SurgSim::Math::Vector cubeNodes(8);
-
-	// Test central node
-	cubeNodes << 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(0.0, 0.0, 0.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test node 0:
-	cubeNodes << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(-1.0, -1.0, -1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test node 1:
-	cubeNodes << 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(1.0, -1.0, -1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test node 2:
-	cubeNodes << 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(1.0, 1.0, -1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test node 3:
-	cubeNodes << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(-1.0, 1.0, -1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test node 4:
-	cubeNodes << 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(-1.0, -1.0, 1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test node 5:
-	cubeNodes << 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(1.0, -1.0, 1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test node 6:
-	cubeNodes << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(1.0, 1.0, 1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Test node 7:
-	cubeNodes << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(-1.0, 1.0, 1.0).isApprox(localization->calculatePosition(), epsilon));
-
-	// Advantage test
-	cubeNodes << 0.03, 0.09, 0.07, 0.05, 0.1, 0.13, 0.26, 0.27;
-	localization->setLocalPosition(IndexedLocalCoordinate(0u, cubeNodes));
-	EXPECT_TRUE(SurgSim::Math::Vector3d(0.1, 0.3, 0.52).isApprox(localization->calculatePosition(), epsilon));
-	// 0.03 * (-1.0,-1.0,-1.0) => (-0.03, -0.03, -0.03)
-	// 0.09 * ( 1.0,-1.0,-1.0) => ( 0.09, -0.09, -0.09)
-	// 0.07 * ( 1.0, 1.0,-1.0) => ( 0.07,  0.07, -0.07)
-	// 0.05 * (-1.0, 1.0,-1.0) => (-0.05,  0.05, -0.05)
-	// 0.1  * (-1.0,-1.0, 1.0) => (-0.1,  -0.1,   0.1)
-	// 0.13 * ( 1.0,-1.0, 1.0) => ( 0.13, -0.13,  0.13)
-	// 0.26 * ( 1.0, 1.0, 1.0) => ( 0.26,  0.26,  0.26)
-	// 0.27 * (-1.0, 1.0, 1.0) => (-0.27,  0.27,  0.27)
-	//                         =  ( 0.1,   0.3,   0.52)
+	ASSERT_FALSE(localization.isValidRepresentation(std::make_shared<Fem1DRepresentation>("fem1d")));
+	ASSERT_FALSE(localization.isValidRepresentation(std::make_shared<Fem2DRepresentation>("fem2d")));
 }
 
 } // namespace SurgSim

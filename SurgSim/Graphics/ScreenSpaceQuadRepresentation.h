@@ -16,7 +16,12 @@
 #ifndef SURGSIM_GRAPHICS_SCREENSPACEQUADREPRESENTATION_H
 #define SURGSIM_GRAPHICS_SCREENSPACEQUADREPRESENTATION_H
 
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/Representation.h"
+
+#include <array>
 
 namespace SurgSim
 {
@@ -36,7 +41,6 @@ public:
 	/// \param	name	The name.
 	explicit ScreenSpaceQuadRepresentation(const std::string name) : Representation(name)
 	{
-
 	}
 
 	~ScreenSpaceQuadRepresentation()

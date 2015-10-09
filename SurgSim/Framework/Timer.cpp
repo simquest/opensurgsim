@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ double Timer::getCumulativeTime() const
 		boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
 
 		cumulativeTime = std::accumulate(std::begin(m_frameDurations), std::end(m_frameDurations),
-		TimerDuration());
+			TimerDuration::zero());
 	}
 
 	return cumulativeTime.count();
@@ -87,7 +87,7 @@ double Timer::getAverageFramePeriod() const
 
 		numDuration = m_frameDurations.size();
 		cumulativeTime = std::accumulate(std::begin(m_frameDurations), std::end(m_frameDurations),
-			TimerDuration());
+			TimerDuration::zero());
 	}
 	SURGSIM_ASSERT(numDuration > 0) <<
 		"Attempted to access the frames for a Timer with no frames.";

@@ -18,15 +18,16 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	DeviceFilterTest.cpp
+	FilteredDeviceTest.cpp
 	ForceScaleTest.cpp
 	PoseIntegratorTest.cpp
 	PoseTransformTest.cpp
 )
 
 set(LIBS
-	IdentityPoseDevice
 	SurgSimDataStructures
-	SurgSimDeviceFilters
+	SurgSimDevices
 	SurgSimFramework
 	SurgSimInput
 	SurgSimMath
@@ -36,3 +37,11 @@ set(LIBS
 surgsim_add_unit_tests(SurgSimDeviceFiltersTest)
 
 set_target_properties(SurgSimDeviceFiltersTest PROPERTIES FOLDER "Devices")
+
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)

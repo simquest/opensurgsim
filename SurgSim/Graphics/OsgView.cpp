@@ -142,6 +142,24 @@ std::array<int, 2> OsgView::getDimensions() const
 	return m_dimensions;
 }
 
+void OsgView::setDimensionsDouble(const std::array<double, 2>& dimensions)
+{
+	if (m_dimensions[0] != static_cast<int>(dimensions[0]) && m_dimensions[1] != static_cast<int>(dimensions[1]))
+	{
+		m_areWindowSettingsDirty = true;
+		m_dimensions[0] = dimensions[0];
+		m_dimensions[1] = dimensions[1];
+	}
+}
+
+std::array<double, 2> OsgView::getDimensionsDouble() const
+{
+	std::array<int, 2> m_d = getDimensions();
+
+	std::array<double, 2> dimensions = {static_cast<double>(m_d[0]), static_cast<double>(m_d[1])};
+	return dimensions;
+}
+
 void OsgView::setWindowBorderEnabled(bool enabled)
 {
 	m_isWindowBorderEnabled = enabled;
@@ -171,12 +189,21 @@ void OsgView::update(double dt)
 		{
 			osgViewer::GraphicsWindow* window =
 				dynamic_cast<osgViewer::GraphicsWindow*>(viewCamera->getGraphicsContext());
-			if (window)
+			if (window && !isFullScreen())
 			{
 				window->setWindowDecoration(m_isWindowBorderEnabled);
 				window->setWindowRectangle(m_position[0], m_position[1], m_dimensions[0], m_dimensions[1]);
 				m_areWindowSettingsDirty = false;
 			}
+
+		}
+	}
+	else if (isActive())
+	{
+		if (!isStereo())
+		{
+			m_dimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
+			m_dimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
 		}
 	}
 	if (isManipulatorEnabled())
@@ -214,6 +241,9 @@ bool OsgView::doWakeUp()
 	if (isFullScreen())
 	{
 		m_view->setUpViewOnSingleScreen(getTargetScreen());
+		m_dimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
+		m_dimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
+		m_isWindowBorderEnabled = false;
 	}
 	else
 	{

@@ -15,6 +15,7 @@
 
 #include <memory>
 
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
 #include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
@@ -82,6 +83,8 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::st
 	m_transform->setCullingActive(false);
 	m_transform->addChild(m_geode);
 
+	// By default use float texture coordinates, this makes this useable without a texture set
+	setTextureCoordinates(0.0, 0.0, 1.0, 1.0);
 
 	m_switch->addChild(m_materialProxy);
 	m_materialProxy->addChild(m_transform);
