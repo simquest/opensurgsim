@@ -40,7 +40,7 @@ IdentityPoseDevice::IdentityPoseDevice(const std::string& uniqueName) :
 
 bool IdentityPoseDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/IdentityPose")) << "Device " << getName() << " initialized.";
 	m_initialized = true;
 	return true;
@@ -53,7 +53,7 @@ bool IdentityPoseDevice::isInitialized() const
 
 bool IdentityPoseDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/IdentityPose")) << "Device " << getName() << " finalized.";
 	m_initialized = false;
 	return true;

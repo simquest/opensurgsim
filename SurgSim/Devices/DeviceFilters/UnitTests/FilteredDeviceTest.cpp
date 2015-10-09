@@ -72,7 +72,7 @@ TEST(FilteredDeviceTest, GetSetDevices)
 	devices.push_back(std::make_shared<SurgSim::Devices::IdentityPoseDevice>(subDeviceName));
 	devices.push_back(std::make_shared<SurgSim::Devices::PoseTransform>("filter1"));
 	devices.push_back(std::make_shared<SurgSim::Devices::PoseTransform>("filter2"));
-	
+
 	auto filteredDevice = std::make_shared<FilteredDevice>("device");
 	ASSERT_NO_THROW(filteredDevice->setDevices(devices));
 	EXPECT_TRUE(filteredDevice->initialize());

@@ -43,7 +43,7 @@ SixenseDevice::~SixenseDevice()
 
 bool SixenseDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	auto scaffold = SixenseScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold != nullptr);
 
@@ -58,7 +58,7 @@ bool SixenseDevice::initialize()
 
 bool SixenseDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return ok;

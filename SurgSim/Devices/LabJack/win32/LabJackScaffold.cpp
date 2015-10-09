@@ -126,7 +126,6 @@ public:
 	/// Close communication with the hardware.
 	/// \param reset true to cause a hardware reset & USB re-enumeration.  Otherwise the hardware's settings will be
 	///		unchanged (i.e., it will continue timing, counting, and outputting).
-	/// \return true.
 	void destroy(bool reset = false)
 	{
 		if (isValid())

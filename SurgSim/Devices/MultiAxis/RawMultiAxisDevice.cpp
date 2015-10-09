@@ -46,7 +46,7 @@ RawMultiAxisDevice::~RawMultiAxisDevice()
 
 bool RawMultiAxisDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	std::shared_ptr<RawMultiAxisScaffold> scaffold = RawMultiAxisScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
@@ -65,7 +65,7 @@ bool RawMultiAxisDevice::initialize()
 
 bool RawMultiAxisDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return ok;

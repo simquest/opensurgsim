@@ -41,7 +41,7 @@ KeyboardDevice::~KeyboardDevice()
 
 bool KeyboardDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	auto scaffold = KeyboardScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold != nullptr);
 	bool registered = false;
@@ -55,7 +55,7 @@ bool KeyboardDevice::initialize()
 
 bool KeyboardDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool unregistered = m_scaffold->unregisterDevice();
 	m_scaffold.reset();
 	return unregistered;

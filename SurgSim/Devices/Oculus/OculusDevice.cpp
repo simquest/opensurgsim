@@ -43,7 +43,7 @@ OculusDevice::~OculusDevice()
 
 bool OculusDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	auto scaffold = OculusScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold != nullptr);
 

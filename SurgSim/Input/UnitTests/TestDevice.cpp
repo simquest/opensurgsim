@@ -24,7 +24,7 @@ TestDevice::TestDevice(const std::string& uniqueName) :
 // required by the DeviceInterface API
 bool TestDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	m_initialized = true;
 	return true;
 }
@@ -32,7 +32,7 @@ bool TestDevice::initialize()
 // required by the DeviceInterface API
 bool TestDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	m_initialized = false;
 	return true;
 }

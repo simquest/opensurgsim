@@ -30,14 +30,14 @@ DeviceFilter::DeviceFilter(const std::string& name) : CommonDevice(name), m_init
 
 bool DeviceFilter::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	m_initialized = true;
 	return true;
 }
 
 bool DeviceFilter::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	m_initialized = false;
 	return true;
 }

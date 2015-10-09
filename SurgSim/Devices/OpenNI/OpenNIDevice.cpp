@@ -41,7 +41,7 @@ OpenNIDevice::~OpenNIDevice()
 
 bool OpenNIDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	auto scaffold = OpenNIScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold != nullptr);
 
@@ -56,7 +56,7 @@ bool OpenNIDevice::initialize()
 
 bool OpenNIDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized()) << getName() << "is not initialized, cannot finalize.";
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool success = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return success;

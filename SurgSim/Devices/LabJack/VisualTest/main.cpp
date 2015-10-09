@@ -79,7 +79,7 @@ public:
 		m_analogOutputIndex = m_outputData.scalars().getIndex(outputName);
 		m_digitalOutputIndex = m_outputData.booleans().getIndex(digitalOutputName);
 	}
-	
+
 	void initializeInput(const std::string& device, const DataGroup& inputData) override
 	{
 		m_digitalInputPlusXIndex = inputData.booleans().getIndex(SurgSim::DataStructures::Names::DIGITAL_INPUT_PREFIX +

@@ -86,7 +86,7 @@ bool NovintDevice::getInitializationName(std::string* initializationName) const
 
 bool NovintDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	auto scaffold = NovintScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold != nullptr);
 
@@ -101,7 +101,7 @@ bool NovintDevice::initialize()
 
 bool NovintDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool result = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return result;
