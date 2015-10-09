@@ -95,8 +95,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	/// Sets the position scale for this device.
@@ -126,6 +124,8 @@ public:
 
 private:
 	friend class NovintScaffold;
+
+	bool finalize() override;
 
 	///@{
 	/// Used for serializing optional properties

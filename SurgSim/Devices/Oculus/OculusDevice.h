@@ -59,8 +59,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	/// Set the near plane
@@ -79,6 +77,8 @@ public:
 
 private:
 	friend class OculusScaffold;
+
+	bool finalize() override;
 
 	/// Near Plane
 	float m_nearPlane;

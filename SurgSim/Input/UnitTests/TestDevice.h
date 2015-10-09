@@ -36,8 +36,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	void pushInput() override;
@@ -57,6 +55,9 @@ public:
 
 	/// true if initialized and not finalized.
 	bool m_initialized;
+
+private:
+	bool finalize() override;
 };
 
 

@@ -55,8 +55,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	/// Sets the position scale for this device.
@@ -75,6 +73,8 @@ public:
 
 private:
 	friend class TrackIRScaffold;
+
+	bool finalize() override;
 
 	// Returns the default position scale
 	static double defaultPositionScale();

@@ -63,24 +63,25 @@ TEST(FilteredDeviceTest, WithFilters)
 	EXPECT_TRUE(filteredDevice->hasOutputProducer());
 	EXPECT_TRUE(filteredDevice->removeOutputProducer(inputOutput));
 	EXPECT_FALSE(filteredDevice->hasOutputProducer());
+}
 
-	auto devices = filteredDevice->getDevices();
+TEST(FilteredDeviceTest, GetSetDevices)
+{
+	std::vector<std::shared_ptr<SurgSim::Input::DeviceInterface>> devices;
+	std::string subDeviceName = "identity";
+	devices.push_back(std::make_shared<SurgSim::Devices::IdentityPoseDevice>(subDeviceName));
+	devices.push_back(std::make_shared<SurgSim::Devices::PoseTransform>("filter1"));
+	devices.push_back(std::make_shared<SurgSim::Devices::PoseTransform>("filter2"));
+	
+	auto filteredDevice = std::make_shared<FilteredDevice>("device");
+	ASSERT_NO_THROW(filteredDevice->setDevices(devices));
+	EXPECT_TRUE(filteredDevice->initialize());
+	ASSERT_ANY_THROW(filteredDevice->setDevices(devices));
+
+	auto actualDevices = filteredDevice->getDevices();
 	EXPECT_EQ(3, devices.size());
 	EXPECT_EQ(subDeviceName, devices[0]->getName());
-	ASSERT_ANY_THROW(filteredDevice->setDevices(devices));
-	EXPECT_TRUE(filteredDevice->finalize());
-
-	auto filteredDevice2 = std::make_shared<FilteredDevice>("device2");
-	auto badDevices = devices;
-	badDevices[2] = std::make_shared<SurgSim::Devices::IdentityPoseDevice>("identity3");
-	EXPECT_FALSE(filteredDevice2->setDevices(badDevices));
-	badDevices[2] = nullptr;
-	EXPECT_FALSE(filteredDevice2->setDevices(badDevices));
-
-	EXPECT_TRUE(filteredDevice2->setDevices(devices));
-	EXPECT_TRUE(filteredDevice2->initialize());
-	auto devices2 = filteredDevice2->getDevices();
-	EXPECT_EQ(devices, devices2);
+	EXPECT_EQ("SurgSim::Devices::IdentityPoseDevice", devices[0]->getClassName());
 }
 
 TEST(FilteredDeviceTest, NoFilters)

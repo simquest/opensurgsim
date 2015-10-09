@@ -52,8 +52,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	bool addInputConsumer(std::shared_ptr<Input::InputConsumerInterface> inputConsumer) override;
@@ -83,9 +81,10 @@ public:
 	bool setDevices(const std::vector<std::shared_ptr<Input::DeviceInterface>>& devices);
 
 private:
+	bool finalize() override;
+
 	/// Implements the finalize functionality.
-	/// \return true if the initialized subdevices finalize.
-	bool doFinalize();
+	void doFinalize();
 
 	/// The name of this device.
 	std::string m_name;

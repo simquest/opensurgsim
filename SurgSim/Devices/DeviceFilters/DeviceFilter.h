@@ -46,8 +46,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	void initializeInput(const std::string& device, const DataStructures::DataGroup& inputData) override;
@@ -74,6 +72,8 @@ protected:
 		DataStructures::DataGroup* result);
 
 private:
+	bool finalize() override;
+
 	/// true if initialized and not finalized.
 	bool m_initialized;
 };

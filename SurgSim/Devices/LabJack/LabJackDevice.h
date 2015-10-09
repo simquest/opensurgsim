@@ -285,8 +285,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	/// Set the model, e.g., U6.
@@ -478,6 +476,8 @@ public:
 
 private:
 	friend class LabJackScaffold;
+
+	bool finalize() override;
 
 	/// The single scaffold object that handles communications with all instances of LabJackDevice.
 	std::shared_ptr<LabJackScaffold> m_scaffold;

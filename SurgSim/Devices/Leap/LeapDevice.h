@@ -114,12 +114,12 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 private:
 	friend class LeapScaffold;
+
+	bool finalize() override;
 
 	std::shared_ptr<LeapScaffold> m_scaffold;
 

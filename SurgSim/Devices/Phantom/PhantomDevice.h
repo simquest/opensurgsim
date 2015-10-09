@@ -81,12 +81,12 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 private:
 	friend class PhantomScaffold;
+
+	bool finalize() override;
 
 	std::shared_ptr<PhantomScaffold> m_scaffold;
 	std::string m_initializationName;

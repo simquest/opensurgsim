@@ -60,9 +60,6 @@ public:
 	/// initialized yet.  This method performs any needed initialization.
 	virtual bool initialize() = 0;
 
-	/// Finalize (de-initialize) the device.
-	virtual bool finalize() = 0;
-
 	/// \return true if the device has been initialized and has not yet been finalized.
 	virtual bool isInitialized() const = 0;
 
@@ -96,6 +93,10 @@ public:
 
 	/// Removes any OutputProducer
 	virtual void clearOutputProducer() = 0;
+
+private:
+	/// Finalize (de-initialize) the device.
+	virtual bool finalize() = 0;
 };
 
 

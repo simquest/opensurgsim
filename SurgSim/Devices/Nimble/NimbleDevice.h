@@ -75,12 +75,12 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 private:
 	friend class NimbleScaffold;
+
+	bool finalize() override;
 
 	/// The shared pointer to the NimbleScaffold.
 	std::shared_ptr<NimbleScaffold> m_scaffold;

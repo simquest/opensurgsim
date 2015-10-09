@@ -48,8 +48,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 protected:
@@ -57,6 +55,8 @@ protected:
 	static SurgSim::DataStructures::DataGroup buildInputData();
 
 private:
+	bool finalize() override;
+
 	/// true if initialized and not finalized.
 	bool m_initialized;
 };

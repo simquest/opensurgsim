@@ -66,8 +66,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	/// Get mouse handler
@@ -75,6 +73,8 @@ public:
 	OsgMouseHandler* getMouseHandler() const;
 
 private:
+	bool finalize() override;
+
 	/// Communication with hardware is handled by scaffold.
 	std::shared_ptr<MouseScaffold> m_scaffold;
 };

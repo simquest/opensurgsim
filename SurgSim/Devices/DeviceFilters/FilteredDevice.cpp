@@ -103,12 +103,12 @@ bool FilteredDevice::finalize()
 	SURGSIM_ASSERT(isInitialized());
 	m_initialized = false;
 	boost::shared_lock<boost::shared_mutex>(m_deviceMutex);
-	return doFinalize();
+	doFinalize();
+	return true;
 }
 
-bool FilteredDevice::doFinalize()
+void FilteredDevice::doFinalize()
 {
-	bool result = true;
 	for (size_t i = 0; i < m_devices.size() - 1; ++i)
 	{
 		auto deviceFilter = std::dynamic_pointer_cast<DeviceFilter>(m_devices[i + 1]);
@@ -116,15 +116,6 @@ bool FilteredDevice::doFinalize()
 		m_devices[i]->removeInputConsumer(deviceFilter);
 		m_devices[i]->removeOutputProducer(deviceFilter);
 	}
-
-	for (auto& device : m_devices)
-	{
-		if (device->isInitialized())
-		{
-			result = device->finalize() && result;
-		}
-	}
-	return result;
 }
 
 bool FilteredDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer)

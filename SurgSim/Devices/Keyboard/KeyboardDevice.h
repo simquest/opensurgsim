@@ -60,8 +60,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	/// Get keyboard handler
@@ -69,6 +67,8 @@ public:
 	OsgKeyboardHandler* getKeyboardHandler() const;
 
 private:
+	bool finalize() override;
+
 	/// Communication with hardware is handled by scaffold.
 	std::shared_ptr<KeyboardScaffold> m_scaffold;
 };

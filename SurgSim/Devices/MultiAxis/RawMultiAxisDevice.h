@@ -68,8 +68,6 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 	/// Sets the position scale for this device.
@@ -95,6 +93,8 @@ public:
 	bool isUsingAxisDominance() const;
 
 private:
+	bool finalize() override;
+
 	// Returns the default position scale, in meters per tick.
 	static double defaultPositionScale()
 	{

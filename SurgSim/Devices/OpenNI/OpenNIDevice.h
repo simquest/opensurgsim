@@ -52,12 +52,12 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
 	bool isInitialized() const override;
 
 private:
 	friend class OpenNIScaffold;
+
+	bool finalize() override;
 
 	std::shared_ptr<OpenNIScaffold> m_scaffold;
 };
