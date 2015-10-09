@@ -141,7 +141,7 @@ public:
 				osg::Shader* shader = new osg::Shader(*m_shader);
 				rigTransform->setShader(shader);
 
-				for (size_t i = 0; i < meshGeode->getDrawableList().size(); ++i)
+				for (size_t i = 0; i < meshGeode->getNumDrawables(); ++i)
 				{
 					auto rigGeometry = dynamic_cast<osgAnimation::RigGeometry*>(meshGeode->getDrawable(i));
 					if (nullptr != rigGeometry)
