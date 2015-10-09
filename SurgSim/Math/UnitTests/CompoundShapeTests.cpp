@@ -41,7 +41,7 @@ public:
 	}
 
 	std::shared_ptr<CompoundShape> compoundShape;
-	std::shared_ptr<Shape> shape1; 
+	std::shared_ptr<Shape> shape1;
 	std::shared_ptr<Shape> shape2;
 
 	RigidTransform3d transform1;
@@ -51,7 +51,7 @@ public:
 TEST_F(CompoundShapeTest, SimpleShapes)
 {
 	EXPECT_EQ(0u, compoundShape->getNumShapes());
-	
+
 	auto index = compoundShape->addShape(shape1);
 	EXPECT_EQ(0u, index);
 	EXPECT_EQ(1u, compoundShape->getNumShapes());
@@ -72,7 +72,7 @@ TEST_F(CompoundShapeTest, Transforms)
 {
 	compoundShape->addShape(shape1);
 	EXPECT_TRUE(RigidTransform3d::Identity().isApprox(compoundShape->getPose(0)));
-	
+
 	compoundShape->addShape(shape2, transform2);
 	EXPECT_TRUE(transform2.isApprox(compoundShape->getPose(1)));
 
@@ -81,8 +81,8 @@ TEST_F(CompoundShapeTest, Transforms)
 
 	compoundShape->setPose(1, transform1);
 
-	std::vector<RigidTransform3d> poses; 
-	
+	std::vector<RigidTransform3d> poses;
+
 	EXPECT_ANY_THROW(compoundShape->setPoses(poses));
 	poses.push_back(transform1);
 	poses.push_back(transform2);
@@ -106,23 +106,23 @@ TEST_F(CompoundShapeTest, Volume)
 TEST_F(CompoundShapeTest, Center)
 {
 	Vector3d center = Vector3d::Zero();
-	EXPECT_TRUE(center.isApprox(compoundShape->getCenter())) 
-		<< "Expected:" << center.transpose() 
-		<< " Actual: " << compoundShape->getCenter().transpose();
+	EXPECT_TRUE(center.isApprox(compoundShape->getCenter()))
+			<< "Expected:" << center.transpose()
+			<< " Actual: " << compoundShape->getCenter().transpose();
 
 
 	center = transform1.translation();
 	compoundShape->addShape(shape1, transform1);
 	EXPECT_TRUE(center.isApprox(compoundShape->getCenter()))
-		<< "Expected:" << center.transpose() 
-		<< " Actual: " << compoundShape->getCenter().transpose();
+			<< "Expected:" << center.transpose()
+			<< " Actual: " << compoundShape->getCenter().transpose();
 	EXPECT_DOUBLE_EQ(1.0, compoundShape->getVolume());
 
 	center = Vector3d(1.0 - 2.0 / 3.0, 0.0, 0.0);
 	compoundShape->addShape(shape2, transform2);
 	EXPECT_TRUE(center.isApprox(compoundShape->getCenter()))
-		<< "Expected:" << center.transpose()
-		<< " Actual: " << compoundShape->getCenter().transpose();
+			<< "Expected:" << center.transpose()
+			<< " Actual: " << compoundShape->getCenter().transpose();
 	EXPECT_DOUBLE_EQ(3.0, compoundShape->getVolume());
 }
 
@@ -156,25 +156,25 @@ TEST_F(CompoundShapeTest, SecondMomentOfVolumeBasic)
 
 TEST_F(CompoundShapeTest, SecondMomentOfVolumeComplex)
 {
-	// Organisation of shape 
-	// 
+	// Organisation of shape
+	//
 	//  tl Y-Axis
 	//  tl ^
-	//  bl -> 0, Z-Axis 
+	//  bl -> 0, Z-Axis
 	//  bl
 	//  bl
 
-	auto base = std::make_shared<BoxShape>(1.0,5.0,2.0);
+	auto base = std::make_shared<BoxShape>(1.0, 5.0, 2.0);
 
-	auto l = std::make_shared<BoxShape>(1.0,5.0,1.0);
+	auto l = std::make_shared<BoxShape>(1.0, 5.0, 1.0);
 	compoundShape->addShape(l, makeRigidTranslation(Vector3d(0.0, 0.0, 0.5)));
-	
-	auto t = std::make_shared<BoxShape>(2.0,1.0,1.0);
+
+	auto t = std::make_shared<BoxShape>(2.0, 1.0, 1.0);
 	Quaterniond quat = makeRotationQuaternion(M_PI_2, Vector3d::UnitZ().eval());
 	auto transform = makeRigidTransform(quat, Vector3d(0.0, 1.5, -0.5));
 	compoundShape->addShape(t, transform);
 
-	auto b = std::make_shared<BoxShape>(3.0,1.0,1.0);
+	auto b = std::make_shared<BoxShape>(3.0, 1.0, 1.0);
 	quat = makeRotationQuaternion(-M_PI_2, Vector3d::UnitZ().eval());
 	transform = makeRigidTransform(quat, Vector3d(0.0, -1.0, -0.5));
 	compoundShape->addShape(b, transform);

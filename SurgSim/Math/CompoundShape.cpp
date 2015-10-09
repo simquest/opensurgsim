@@ -47,7 +47,7 @@ double CompoundShape::getVolume() const
 	{
 		UpgradeLock write(lock);
 		double volume = 0.0;
-		
+
 		for (const auto& shape : m_shapes)
 		{
 			volume += (shape.first)->getVolume();
@@ -71,12 +71,12 @@ Vector3d CompoundShape::getCenter() const
 			for (const auto& shape : m_shapes)
 			{
 				double volume = shape.first->getVolume();
-				result += shape.second*(shape.first->getCenter())*volume;
+				result += shape.second * (shape.first->getCenter()) * volume;
 				total += volume;
 			}
 			result /= total;
 
-			// We have it, write the total volume as well ... 
+			// We have it, write the total volume as well ...
 			m_volume = total;
 		}
 		m_center = result;
@@ -88,10 +88,9 @@ Vector3d CompoundShape::getCenter() const
 
 Matrix33d CompoundShape::getSecondMomentOfVolume() const
 {
-	// Calculate the compound values, this needs to be done outside of the ReadLock, otherwise 
+	// Calculate the compound values, this needs to be done outside of the ReadLock, otherwise
 	// this might freeze up
 	auto center = getCenter();
-	auto volume = getVolume();
 
 	ReadLock lock(m_mutex);
 
@@ -111,7 +110,7 @@ Matrix33d CompoundShape::getSecondMomentOfVolume() const
 				Matrix33d	skew = makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
 				Matrix33d inertia = r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
 
-				result += inertia; 
+				result += inertia;
 			}
 
 		}
@@ -157,7 +156,7 @@ const std::vector<CompoundShape::SubShape>& CompoundShape::getShapes() const
 const std::shared_ptr<Shape>& CompoundShape::getShape(size_t index) const
 {
 	ReadLock lock(m_mutex);
-	SURGSIM_ASSERT(index < m_shapes.size())<< "Shape index out of range.";
+	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
 	return m_shapes[index].first;
 }
 

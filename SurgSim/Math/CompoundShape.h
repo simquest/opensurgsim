@@ -36,7 +36,7 @@ class CompoundShape : public Shape
 public:
 	/// Constructor
 	CompoundShape();
-	
+
 	/// Destructor
 	~CompoundShape();
 
@@ -47,7 +47,7 @@ public:
 	/// \param pose for the newly added shape
 	/// \return the index of the newly added shape
 	size_t addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose = RigidTransform3d::Identity());
-	
+
 	/// Sets the shapes for this object, the shapes should be a list of shapes together with their respective poses,
 	/// this will clear all the previously contained shapes
 	/// \param shapes list of shapes
@@ -71,20 +71,21 @@ public:
 
 	/// Set the pose for the specified shape
 	/// \param index index of the target shape
+	/// \param pose new pose for the indicated shape
 	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
 	void setPose(size_t index, const RigidTransform3d& pose);
 
 	/// \return the number of shapes in this shape
 	size_t getNumShapes() const;
-	
+
 	/// clears all the enclosed shapes
 	void clearShapes();
 
 	int getType() const override;
 
 	/// \return the volume of the shape
-	/// \note that currently this is a very simple sum of all the volumes of the enclosed shapes it will 
-	/// disregard any overlapping shapes.  
+	/// \note that currently this is a very simple sum of all the volumes of the enclosed shapes it will
+	/// disregard any overlapping shapes.
 	double getVolume() const override;
 
 	Vector3d getCenter() const override;
@@ -113,7 +114,7 @@ private:
 	mutable DataStructures::OptionalValue<double> m_volume;
 	mutable DataStructures::OptionalValue<Matrix33d> m_secondMoment;
 	///@}
-	
+
 };
 
 }
