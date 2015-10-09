@@ -24,6 +24,8 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::KeyboardDevice, KeyboardDevice);
+
 KeyboardDevice::KeyboardDevice(const std::string& deviceName) :
 	SurgSim::Input::CommonDevice(deviceName, KeyboardScaffold::buildDeviceInputData())
 {

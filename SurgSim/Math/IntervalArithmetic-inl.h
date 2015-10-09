@@ -577,7 +577,7 @@ Interval_nD<T, 3>::Interval_nD(const std::array<Interval<T>, 3>& x)
 }
 
 template <class T>
-Interval_nD<T, 3>::Interval_nD(Interval<T> x, Interval<T> y, Interval<T> z)
+Interval_nD<T, 3>::Interval_nD(const Interval<T>& x, const Interval<T>& y, const Interval<T>& z)
 {
 	m_interval[0] = x;
 	m_interval[1] = y;
@@ -834,7 +834,7 @@ void IntervalArithmetic_submul(const Interval<T>& a, const Interval<T>& b, Inter
 	res->m_max -= min;
 }
 
-// Interval nD functions
+// Interval functions
 template <typename T>
 std::ostream& operator<< (std::ostream& o, const Interval<T>& interval)
 {

@@ -329,7 +329,7 @@ public:
 	/// \param x first interval to be added to the 3 group
 	/// \param y second interval to be added to the 3 group
 	/// \param z third interval to be added to the 3 group
-	Interval_nD(Interval<T> x, Interval<T> y, Interval<T> z);
+	Interval_nD(const Interval<T>& x, const Interval<T>& y, const Interval<T>& z);
 
 	/// Copy constructor
 	/// \param i interval 3 group to copied

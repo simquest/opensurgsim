@@ -35,7 +35,7 @@ set(OCULUS_DEVICE_HEADERS
 	OculusView.h
 )
 
-set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} OculusDevice.h PARENT_SCOPE)
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} Oculus/OculusDevice.h Oculus/OculusView.h PARENT_SCOPE)
 
 surgsim_add_library(
 	OSS

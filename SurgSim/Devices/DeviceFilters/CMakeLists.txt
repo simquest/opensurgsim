@@ -33,7 +33,11 @@ set(DEVICE_FILTERS_HEADERS
 	PoseTransform.h
 )
 
-set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} ${DEVICE_FILTERS_HEADERS} PARENT_SCOPE)
+set(SURGSIM_DEVICES_HEADERS ${SURGSIM_DEVICES_HEADERS} 
+	DeviceFilters/ForceScale.h #NOLINT
+	DeviceFilters/PoseIntegrator.h #NOLINT
+	DeviceFilters/PoseTransform.h #NOLINT
+	PARENT_SCOPE)
 
 surgsim_add_library(
 	OSS

@@ -24,6 +24,8 @@ namespace SurgSim
 namespace Device
 {
 
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Device::NimbleDevice, NimbleDevice);
+
 NimbleDevice::NimbleDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, NimbleScaffold::buildDeviceInputData()), m_trackedHandDataIndex(0)
 {

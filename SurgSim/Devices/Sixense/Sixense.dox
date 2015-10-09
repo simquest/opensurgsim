@@ -9,6 +9,6 @@ Dependencies:
 - An environment variable named SIXENSESDK_PATH or SIXENSE_ROOT must be set to the directory containing <tt>(include\\)sixense.h</tt>
 - Executables that incorporate this device must have access to the appropriate libraries at runtime, either by adding the appropriate 
   folder(s) to the path environment variable, or copying the libraries into the folder with the executable.
-- Sixense's SDK is distributed/built under Visual Studio 2010 (no source code available). To run applications under debug mode with 
+- Sixense's SDK is distributed/built under Visual Studio 2010 or 2013 (no source code available). To run applications under debug mode with 
   Sixense's SDK, MSVCP100d.dll is required, which is only distributed in Visual Studio 2010.
 */
