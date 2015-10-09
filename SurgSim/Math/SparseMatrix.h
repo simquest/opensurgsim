@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -249,43 +249,6 @@ void blockWithSearch(const DerivedSub& subMatrix, size_t rowStart, size_t column
 							   "The matrix is missing elements of the block (but not the 1st element on a row/column)";
 
 		(operation.*op)(ptr, innerFirstElement, n, m, subMatrix, outerLoop);
-	}
-}
-
-/// Runs a given operation on a SparseMatrix block using a SparseMatrix/SparseVector/Sparse expression as input
-/// \tparam DerivedSub Type of the sub matrix/vector (any SparseMatrix, SparseVector or sparse expression)
-/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
-/// \param subMatrix The sub-matrix/vector to use as input
-/// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
-/// \param[in,out] matrix The sparse matrix in which the block will be altered.
-/// \param op The operation to run on the block
-/// \exception SurgSim::Framework::AssertionFailure If 'matrix' is a nullptr or the block is out of 'matrix' range
-/// \note The size of the block is directly given by 'subMatrix' size. <br>
-/// \note No assumption is made on any matrix/vector, it executes a slow insertion/search. <br>
-/// \note If the structure of the matrix is known and constant through time, it is recommended to
-/// \note pre-allocate the matrix structure and use an optimized dedicated blockXXX method.
-template <typename DerivedSub, typename T, int Opt, typename Index>
-void blockOperation(const Eigen::SparseMatrixBase<DerivedSub>& subMatrix, size_t rowStart, size_t columnStart,
-					Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					void (Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::*op)(T*, const T&))
-{
-	typedef typename DerivedSub::InnerIterator InnerIterator;
-
-	static Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>> operation;
-
-	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
-
-	SURGSIM_ASSERT(matrix->rows() >= rowStart + subMatrix.rows()) << "The block is out of range in matrix";
-	SURGSIM_ASSERT(matrix->cols() >= columnStart + subMatrix.cols()) << "The block is out of range in matrix";
-
-	for (auto outer = 0; outer < subMatrix.outerSize(); outer++)
-	{
-		for (InnerIterator it(subMatrix.const_cast_derived(), outer); it; ++it)
-		{
-			(operation.*op)(
-				&matrix->coeffRef(rowStart + static_cast<Index>(it.row()), columnStart + static_cast<Index>(it.col())),
-				static_cast<T>(it.value()));
-		}
 	}
 }
 
