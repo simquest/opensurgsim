@@ -15,8 +15,6 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 
-#include <numeric>
-
 #include "SurgSim/Framework/Assert.h"
 
 using SurgSim::DataStructures::Location;

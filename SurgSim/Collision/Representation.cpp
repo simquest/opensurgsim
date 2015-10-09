@@ -129,7 +129,10 @@ bool Representation::ignore(const std::string& fullName)
 
 bool Representation::ignore(const std::shared_ptr<Representation>& representation)
 {
-	return ignore(representation->getFullName());
+	std::string fullName = representation->getFullName();
+	SURGSIM_LOG_IF(representation->getSceneElement() == nullptr, Framework::Logger::getDefaultLogger(), WARNING)
+		<< "Ignoring " << fullName << " may not work. It is not in a scene element yet, so its full name is unknown.";
+	return ignore(fullName);
 }
 
 void Representation::setIgnoring(const std::vector<std::string>& fullNames)
