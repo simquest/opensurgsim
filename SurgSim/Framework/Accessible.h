@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 #ifndef SURGSIM_FRAMEWORK_ACCESSIBLE_H
 #define SURGSIM_FRAMEWORK_ACCESSIBLE_H
 
-#include <string>
-#include <memory>
-#include <unordered_map>
-#include <functional>
 #include <boost/any.hpp>
+#include <boost/preprocessor.hpp>
+#include <functional>
+#include <memory>
+#include <string>
+#include <unordered_map>
 #include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Math/Matrix.h"
@@ -49,8 +50,6 @@ public:
 	typedef std::function<YAML::Node(void)> EncoderType;
 	typedef std::function<void(const YAML::Node*)> DecoderType;
 
-
-
 	/// Retrieves the value with the name by executing the getter if it is found and tries to convert
 	/// it to the given type.
 	/// \throws SurgSim::Framework::AssertionFailure If the conversion fails or the property cannot be found.
@@ -65,7 +64,6 @@ public:
 	/// \param	name	The name of the property.
 	/// \return	The value of the property if the getter was found
 	boost::any getValue(const std::string& name) const;
-
 
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to
 	/// the type of the output parameter. This does not throw.
@@ -242,8 +240,61 @@ std::string convert(boost::any val);
 		setSetter(#property, std::bind((void(class::*)(const type&))&class::setter, this,\
 					std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)));\
 	}
+
+
 }; // Framework
 }; // SurgSim
+
+#define SURGSIM_ENUM_TOSTRING(r, data, elem)    \
+	case data::elem: \
+		result = BOOST_PP_STRINGIZE(elem); \
+		break;
+
+#define SURGSIM_ENUM_FROMSTRING(r, data, elem)    \
+	if (value == BOOST_PP_STRINGIZE(elem)) \
+	{ \
+		rhs = data::elem; \
+		return true; \
+	}
+
+/// Required type of enums used by SURGSIM_SERIALIZABLE_ENUM
+#define SURGSIM_ENUM_TYPE int8_t
+
+/// A macro to create an enum that can be easily serialized
+/// During serialization, the enum will be converted to its string based named,
+/// back to an enum during deserialization. The enum must already be forward
+/// declared in its namespace before calling this macro in the global namespace.
+#define SURGSIM_SERIALIZABLE_ENUM(name, enumerators) \
+	enum name : SURGSIM_ENUM_TYPE\
+	{ \
+		BOOST_PP_SEQ_ENUM(enumerators) \
+	}; \
+	namespace YAML \
+	{ \
+	template <> \
+	struct convert<name> \
+	{ \
+		static Node encode(const name& rhs) \
+		{ \
+			Node result; \
+			switch (rhs) \
+			{ \
+				BOOST_PP_SEQ_FOR_EACH(SURGSIM_ENUM_TOSTRING, name, enumerators) \
+				default: \
+					SURGSIM_FAILURE() << "Can not find enum value in " << #name  << ": " << rhs; \
+			} \
+			return result; \
+		} \
+		static bool decode(const Node& node, name& rhs) \
+		{ \
+			std::string value = node.as<std::string>(); \
+			std::transform(value.begin(), value.end(), value.begin(), ::toupper); \
+			BOOST_PP_SEQ_FOR_EACH(SURGSIM_ENUM_FROMSTRING, name, enumerators) \
+			SURGSIM_FAILURE() << "Unknown " <<  #name << ": " << value; \
+			return false; \
+		} \
+	}; \
+	}
 
 #include "SurgSim/Framework/Accessible-inl.h"
 

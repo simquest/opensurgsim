@@ -54,11 +54,14 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 
 	for (auto& pair : result->getCollisionPairs())
 	{
-		tasks.push_back(threadPool->enqueue<void>([&] ()
+		if (pair->getType() == Collision::COLLISION_DETECTION_TYPE_DISCRETE)
 		{
-			m_contactCalculations[pair->getFirst()->getShapeType()]
-								 [pair->getSecond()->getShapeType()]->calculateContact(pair);
-		}));
+			tasks.push_back(threadPool->enqueue<void>([&] ()
+			{
+				m_contactCalculations[pair->getFirst()->getShapeType()]
+									 [pair->getSecond()->getShapeType()]->calculateContact(pair);
+			}));
+		}
 	}
 
 	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.wait();});
@@ -100,16 +103,18 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 	{
 		std::vector<std::shared_ptr<CollisionPair>> pairs;
 		auto firstEnd = std::end(representations);
-		--firstEnd;
 		for (auto first = std::begin(representations); first != firstEnd; ++first)
 		{
 			auto second = first;
-			++second;
 			for (; second != std::end(representations); ++second)
 			{
 				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
 				{
-					pairs.emplace_back(std::make_shared<CollisionPair>(*first, *second));
+					auto pair = std::make_shared<CollisionPair>(*first, *second);
+					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
+					{
+						pairs.push_back(std::move(pair));
+					}
 				}
 			}
 		}

@@ -91,7 +91,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Id: 485750a6-32c7-4487-a362-050fee89f45d
               Name: Collision
-              Ignoring: [wound/Collision]
+              Ignore: [wound/Collision]
               LocalPose:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
@@ -299,7 +299,7 @@ SurgSim::Framework::Scene:
                   FileName: Geometry/virtual_staple_1.ply
               Id: b7f70a7d-a6ab-4719-8fcd-698912de1aa6
               Name: VirtualToothCollision0
-              Ignoring: [stapler/Collision]
+              Ignore: [stapler/Collision]
               LocalPose:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
@@ -321,7 +321,7 @@ SurgSim::Framework::Scene:
                   FileName: Geometry/virtual_staple_2.ply
               Id: c5fae459-35d8-4ded-b478-d04ed66e8694
               Name: VirtualToothCollision1
-              Ignoring: [stapler/Collision]
+              Ignore: [stapler/Collision]
               LocalPose:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
