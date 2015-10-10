@@ -102,14 +102,12 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
-	/// Check if this device is initialized.
-	/// \return True if this device is initialized; otherwise, false.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 private:
 	friend class LeapScaffold;
+
+	bool finalize() override;
 
 	std::shared_ptr<LeapScaffold> m_scaffold;
 

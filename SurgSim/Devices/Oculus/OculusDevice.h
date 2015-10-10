@@ -58,7 +58,8 @@ public:
 	virtual ~OculusDevice();
 
 	bool initialize() override;
-	bool finalize() override;
+
+	bool isInitialized() const override;
 
 	/// Set the near plane
 	/// \param nearPlane The near plane
@@ -74,12 +75,10 @@ public:
 	/// \return The far plane
 	float getFarPlane() const;
 
-	/// Check whether this device is initialized.
-	/// \return True if this device is initialized; false otherwise.
-	bool isInitialized() const;
-
 private:
 	friend class OculusScaffold;
+
+	bool finalize() override;
 
 	/// Near Plane
 	float m_nearPlane;

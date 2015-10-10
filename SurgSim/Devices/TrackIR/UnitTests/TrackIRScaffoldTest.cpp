@@ -155,22 +155,6 @@ TEST(TrackIRScaffoldTest, CreateDeviceSeveralTimes)
 	}
 }
 
-TEST(TrackIRScaffoldTest, RegisterAndUnregisterDevice)
-{
-	std::shared_ptr<TrackIRScaffold> scaffold = TrackIRScaffold::getOrCreateSharedInstance();
-	ASSERT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
-
-	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_NE(nullptr, device) << "Device creation failed.";
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
-
-	ASSERT_TRUE(device->finalize()) << "Finalization failed.";
-	ASSERT_NE(nullptr, scaffold) << "The scaffold should NOT be destroyed!";
-
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
-	ASSERT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
-}
-
 TEST(TrackIRScaffoldTest, CreateDeviceSeveralTimesWithScaffoldRef)
 {
 	std::shared_ptr<TrackIRScaffold> lastScaffold;

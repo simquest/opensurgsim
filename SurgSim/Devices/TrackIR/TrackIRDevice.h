@@ -53,16 +53,9 @@ public:
 	/// Destructor.
 	virtual ~TrackIRDevice();
 
-	/// Initialize this device, register it with the scaffold.
-	/// \return True on success; false otherwise.
 	bool initialize() override;
-	/// Finalize this device, unregister this device from the scaffold.
-	/// \return True on success; false otherwise.
-	bool finalize() override;
 
-	/// Check whether this device is initialized.
-	/// \return True if this device is initialized; false otherwise.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 	/// Sets the position scale for this device.
 	/// The position scale controls how much the pose changes for a given device translation.
@@ -80,6 +73,8 @@ public:
 
 private:
 	friend class TrackIRScaffold;
+
+	bool finalize() override;
 
 	// Returns the default position scale
 	static double defaultPositionScale();

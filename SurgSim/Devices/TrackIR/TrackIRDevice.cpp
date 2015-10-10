@@ -40,27 +40,24 @@ TrackIRDevice::~TrackIRDevice()
 	}
 }
 
-
 bool TrackIRDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized()) << "TrackIR device already initialized.";
-	std::shared_ptr<TrackIRScaffold> scaffold = TrackIRScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(scaffold) << "TrackIRDevice::initialize(): Failed to obtain a TrackIR scaffold.";
+	auto scaffold = TrackIRScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr) << "TrackIRDevice::initialize(): Failed to obtain a TrackIR scaffold.";
 
-	if (!scaffold->registerDevice(this))
+	bool initialize = false;
+	if (scaffold->registerDevice(this))
 	{
-		return false;
+		m_scaffold = std::move(scaffold);
+		initialize = true;
 	}
-
-	m_scaffold = std::move(scaffold);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
-	return true;
+	return initialize;
 }
 
 bool TrackIRDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized()) << "TrackIR device already finalized.";
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
 	bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return ok;

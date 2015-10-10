@@ -76,8 +76,6 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 	const double orientationScale = 2.0;
 	device->setOrientationScale(orientationScale);
 	EXPECT_EQ(orientationScale, device->getOrientationScale());
-
-	EXPECT_TRUE(device->finalize());
 }
 
 TEST(NovintDeviceTest, CreateAndInitializeDeviceBySerialNumber)
@@ -109,8 +107,6 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceBySerialNumber)
 	const double orientationScale = 2.0;
 	device->setOrientationScale(orientationScale);
 	EXPECT_EQ(orientationScale, device->getOrientationScale());
-
-	EXPECT_TRUE(device->finalize());
 }
 
 TEST(NovintDeviceTest, CreateAndInitializeDefaultDevices)
