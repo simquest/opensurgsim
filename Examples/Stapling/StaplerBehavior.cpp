@@ -35,7 +35,7 @@
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/Fem3DConstraintFixedPoint.h"
+#include "SurgSim/Physics/FemConstraintFixedPoint.h"
 #include "SurgSim/Physics/FixedConstraintFixedPoint.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"

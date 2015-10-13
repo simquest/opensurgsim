@@ -48,6 +48,12 @@ private:
 				 ConstraintSideSign sign) override;
 };
 
+typedef FemConstraintFrictionlessContact Fem1DConstraintFrictionlessContact;
+
+typedef FemConstraintFrictionlessContact Fem2DConstraintFrictionlessContact;
+
+typedef FemConstraintFrictionlessContact Fem3DConstraintFrictionlessContact;
+
 }; // namespace Physics
 
 }; // namespace SurgSim

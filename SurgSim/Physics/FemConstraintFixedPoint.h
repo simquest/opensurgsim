@@ -48,6 +48,12 @@ private:
 		ConstraintSideSign sign) override;
 };
 
+typedef FemConstraintFixedPoint Fem1DConstraintFixedPoint;
+
+typedef FemConstraintFixedPoint Fem2DConstraintFixedPoint;
+
+typedef FemConstraintFixedPoint Fem3DConstraintFixedPoint;
+
 }; // namespace Physics
 
 }; // namespace SurgSim

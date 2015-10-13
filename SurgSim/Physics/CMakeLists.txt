@@ -101,22 +101,16 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem.h
 	Fem-inl.h
 	Fem1D.h
-	Fem1DConstraintFixedPoint.h
-	Fem1DConstraintFrictionlessContact.h
 	Fem1DElementBeam.h
 	Fem1DLocalization.h
 	Fem1DPlyReaderDelegate.h
 	Fem1DRepresentation.h
 	Fem2D.h
-	Fem2DConstraintFixedPoint.h
-	Fem2DConstraintFrictionlessContact.h
 	Fem2DElementTriangle.h
 	Fem2DLocalization.h
 	Fem2DPlyReaderDelegate.h
 	Fem2DRepresentation.h
 	Fem3D.h
-	Fem3DConstraintFixedPoint.h
-	Fem3DConstraintFrictionlessContact.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h
