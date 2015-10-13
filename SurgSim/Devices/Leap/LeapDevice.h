@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,16 +26,12 @@ namespace SurgSim
 {
 namespace Devices
 {
+
 class LeapScaffold;
 
 SURGSIM_STATIC_REGISTRATION(LeapDevice);
 
-enum HandType
-{
-	HANDTYPE_LEFT,
-	HANDTYPE_RIGHT
-};
-
+enum HandType : SURGSIM_ENUM_TYPE;
 
 /// A class implementing the communication with one hand tracked by Leap Motion camera
 ///
@@ -80,17 +76,9 @@ public:
 	/// \param type The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
 	void setHandType(HandType type);
 
-	/// Set the type of hand
-	/// \param type The hand type as a string, either "Left" or "Right" (case insensitive)
-	void setHandType(const std::string& type);
-
 	/// Get the type of hand
 	/// \return The hand type, either HANDTYPE_LEFT or HANDTYPE_RIGHT
 	HandType getHandType() const;
-
-	/// Get the type of hand as a string
-	/// \return The hand type as a string, either "Left" or "Right"
-	std::string getHandTypeAsString() const;
 
 	/// Set the hand tracking mode to HMD
 	/// This is a global setting that optimizes hand tracking based on the Leap camera
@@ -114,14 +102,12 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
-	/// Check if this device is initialized.
-	/// \return True if this device is initialized; otherwise, false.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 private:
 	friend class LeapScaffold;
+
+	bool finalize() override;
 
 	std::shared_ptr<LeapScaffold> m_scaffold;
 
@@ -136,5 +122,7 @@ private:
 
 };
 };
+
+SURGSIM_SERIALIZABLE_ENUM(SurgSim::Devices::HandType, (HANDTYPE_LEFT)(HANDTYPE_RIGHT));
 
 #endif //SURGSIM_DEVICES_LEAP_LEAPDEVICE_H

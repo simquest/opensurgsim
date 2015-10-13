@@ -53,19 +53,18 @@ private:
 	DeviceData& operator=(const DeviceData&) /*= delete*/;
 };
 
-MouseScaffold::MouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) : m_logger(logger)
+MouseScaffold::MouseScaffold() : m_logger(Framework::Logger::getLogger("Devices/Mouse"))
 {
-	if (nullptr == m_logger)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("Mouse device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
-	SURGSIM_LOG_DEBUG(m_logger) << "Mouse: Shared scaffold created.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.";
 }
 
 MouseScaffold::~MouseScaffold()
 {
-	unregisterDevice();
+	if (m_device != nullptr)
+	{
+		unregisterDevice();
+	}
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold destroyed.";
 }
 
 bool MouseScaffold::registerDevice(MouseDevice* device)
@@ -73,21 +72,18 @@ bool MouseScaffold::registerDevice(MouseDevice* device)
 	m_device.reset(new DeviceData(device));
 	if (nullptr == m_device)
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "MouseScaffold::registerDevice(): failed to create a DeviceData";
+		SURGSIM_LOG_CRITICAL(m_logger) << "Failed to create a DeviceData for " << device->getName();
 		return false;
 	}
+	SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " registered.";
 	return true;
 }
 
 bool MouseScaffold::unregisterDevice()
 {
 	m_device.reset();
-	if (nullptr == m_device)
-	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Mouse: Shared scaffold unregistered.";
-		return true;
-	}
-	return false;
+	SURGSIM_LOG_DEBUG(m_logger) << "Unregistered device.";
+	return true;
 }
 
 bool MouseScaffold::updateDevice(int buttonMask, float x, float y, int scrollDeltaX, int scrollDeltaY)
@@ -114,7 +110,6 @@ OsgMouseHandler* MouseScaffold::getMouseHandler() const
 	return m_device->mouseHandler.get();
 }
 
-
 /// Builds the data layout for the application input (i.e. device output).
 SurgSim::DataStructures::DataGroup MouseScaffold::buildDeviceInputData()
 {
@@ -135,19 +130,6 @@ std::shared_ptr<MouseScaffold> MouseScaffold::getOrCreateSharedInstance()
 	static SurgSim::Framework::SharedInstance<MouseScaffold> sharedInstance;
 	return sharedInstance.get();
 }
-
-void MouseScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
-}
-
-std::shared_ptr<SurgSim::Framework::Logger> MouseScaffold::getLogger() const
-{
-	return m_logger;
-}
-
-
-SurgSim::Framework::LogLevel MouseScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 };  // namespace Devices
 };  // namespace SurgSim

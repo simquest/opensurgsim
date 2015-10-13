@@ -17,7 +17,6 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Assert.h"
 
 
 namespace SurgSim
@@ -28,7 +27,7 @@ namespace Devices
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::RawMultiAxisDevice, RawMultiAxisDevice);
 
 RawMultiAxisDevice::RawMultiAxisDevice(const std::string& uniqueName) :
-	SurgSim::Input::CommonDevice(uniqueName, RawMultiAxisScaffold::buildDeviceInputData()),
+	Input::CommonDevice(uniqueName, RawMultiAxisScaffold::buildDeviceInputData()),
 	m_positionScale(defaultPositionScale()),
 	m_orientationScale(defaultOrientationScale()),
 	m_useAxisDominance(false)
@@ -47,11 +46,11 @@ RawMultiAxisDevice::~RawMultiAxisDevice()
 
 bool RawMultiAxisDevice::initialize()
 {
-	SURGSIM_ASSERT(! isInitialized());
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
 	std::shared_ptr<RawMultiAxisScaffold> scaffold = RawMultiAxisScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
-	if (! scaffold->registerDevice(this))
+	if (!scaffold->registerDevice(this))
 	{
 		return false;
 	}
@@ -60,15 +59,13 @@ bool RawMultiAxisDevice::initialize()
 	m_scaffold->setPositionScale(this, m_positionScale);
 	m_scaffold->setOrientationScale(this, m_orientationScale);
 	m_scaffold->setAxisDominance(this, m_useAxisDominance);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
 	return true;
 }
 
 
 bool RawMultiAxisDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return ok;

@@ -73,7 +73,6 @@ std::shared_ptr<Graphics::RenderPass> createDepthPass(
 }
 
 std::shared_ptr<Graphics::RenderPass> createNormalPass(
-		std::shared_ptr<Framework::TransferPropertiesBehavior> copier,
 		std::shared_ptr<Graphics::Camera> camera,
 		std::shared_ptr<Graphics::Texture> depthMap,
 		int textureSize,
@@ -94,9 +93,6 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 	material->getUniform("depthMap")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
 	material->addUniform("float", "texelSize");
 	material->setValue("texelSize", static_cast<float>(1.0 / textureSize));
-	material->addUniform("mat4", "mainInverseProjectionMatrix");
-
-	copier->connect(camera, "FloatInverseProjectionMatrix", material, "mainInverseProjectionMatrix");
 
 	renderPass->setMaterial(material);
 
@@ -153,9 +149,6 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	material->setValue("specularColor", specularColor);
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", shininess);
-	material->addUniform("mat4", "mainInverseProjectionMatrix");
-
-	copier->connect(camera, "FloatInverseProjectionMatrix", material, "mainInverseProjectionMatrix");
 
 	renderPass->setMaterial(material);
 
@@ -192,7 +185,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 
 	auto depthPass = createDepthPass(copier, osgCamera, sphereRadius, sphereScale, textureSize, showDebug);
 
-	auto normalPass = createNormalPass(copier, osgCamera, depthPass->getRenderTarget()->getDepthTarget(),
+	auto normalPass = createNormalPass(osgCamera, depthPass->getRenderTarget()->getDepthTarget(),
 									   textureSize, showDebug);
 
 	auto shadingPass = createShadingPass(copier, graphicsView, osgCamera, osgLight,

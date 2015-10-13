@@ -21,16 +21,27 @@
 
 #version 120
 
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform sampler2D depthMap;
 uniform float maxDepth = 0.999999f;
-uniform mat4 mainInverseProjectionMatrix;
 uniform float texelSize = 1.0/1024.0;
+
+// Main Camera Matrices
+struct MainCamera
+{
+	mat4 viewMatrix;
+	mat4 inverseViewMatrix;
+	mat4 projectionMatrix;
+	mat4 inverseProjectionMatrix;
+};
+
+uniform MainCamera mainCamera;
 
 vec3 getEyeSpacePos(vec2 texCoord, float z)
 {
 	vec2 homogenous = texCoord * 2.0 - 1.0;
 	vec4 clipSpacePos = vec4(homogenous, z, 1.0);
-	vec4 eyeSpacePos = mainInverseProjectionMatrix * clipSpacePos;
+	vec4 eyeSpacePos = mainCamera.inverseProjectionMatrix * clipSpacePos;
 	return eyeSpacePos.xyz/eyeSpacePos.w;
 }
 
@@ -66,7 +77,6 @@ void main(void)
 
 	vec3 normal = cross(ddx, ddy);
 	normal = normalize(normal);
-	normal = 0.5f*(normal+1.0f);
 
-	gl_FragColor = vec4(normal, 1.0);
+	gl_FragColor = 0.5 * (-normalize(mainCamera.inverseViewMatrix * vec4(normal, 1.0)) + 1.0);
 }

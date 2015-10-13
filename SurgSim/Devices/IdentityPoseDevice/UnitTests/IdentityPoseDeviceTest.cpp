@@ -59,19 +59,15 @@ TEST(IdentityPoseDeviceTest, AddInputConsumer)
 
 	EXPECT_TRUE(device.addInputConsumer(consumer));
 
-	// IdentityPoseDevice is supposed to shove an identity pose (and a button) at every consumer when it's added.
+	// IdentityPoseDevice is supposed to shove an identity pose at every consumer when it's added.
 	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::Names::BUTTON_0));
 
 	// Check the data.
 	RigidTransform3d pose = SurgSim::Math::makeRigidTransform(SurgSim::Math::Vector3d(1.3, 32.0, 68.0),
 							SurgSim::Math::Vector3d(13.2, 2.8, 8.0), SurgSim::Math::Vector3d(273.0, -32.0, -6.0));
 	ASSERT_TRUE(consumer->m_lastReceivedInput.poses().get(SurgSim::DataStructures::Names::POSE, &pose));
 	EXPECT_NEAR(0, (pose.matrix() - Matrix44d::Identity()).norm(), 1e-6);
-	bool button0 = false;
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().get(SurgSim::DataStructures::Names::BUTTON_0, &button0));
-	EXPECT_FALSE(button0);
 
 	// Adding the same input consumer again should fail.
 	EXPECT_FALSE(device.addInputConsumer(consumer));
@@ -97,7 +93,7 @@ TEST(IdentityPoseDeviceTest, RemoveInputConsumer)
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	EXPECT_TRUE(device.addInputConsumer(consumer));
-	// IdentityPoseDevice is supposed to shove an identity pose (and a button) at every consumer when it's added.
+	// IdentityPoseDevice is supposed to shove an identity pose at every consumer when it's added.
 	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
 
 	EXPECT_TRUE(device.removeInputConsumer(consumer));

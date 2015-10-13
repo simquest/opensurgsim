@@ -46,7 +46,7 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
+	bool isInitialized() const override;
 
 	void initializeInput(const std::string& device, const DataStructures::DataGroup& inputData) override;
 
@@ -70,6 +70,12 @@ protected:
 	///		Will contain the filtered data.
 	virtual void filterOutput(const std::string& device, const DataStructures::DataGroup& dataToFilter,
 		DataStructures::DataGroup* result);
+
+private:
+	bool finalize() override;
+
+	/// true if initialized and not finalized.
+	bool m_initialized;
 };
 
 };  // namespace Devices

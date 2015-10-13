@@ -64,22 +64,17 @@ public:
 	/// Destructor
 	virtual ~MouseDevice();
 
-	/// Initialize corresponding MouseScaffold.
-	/// \return True if MouseScaffold is initialized successfully; Otherwise, false.
 	bool initialize() override;
-	/// "De"-initialize corresponding MouseScaffold.
-	/// \return True if MouseScaffold is 'de'-initialized successfully; Otherwise, false.
-	bool finalize() override;
 
-	/// Check if the scaffold of this device is initialized.
-	/// \return True if this the scaffold of this device is initialized; Otherwise, false.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 	/// Get mouse handler
 	/// \return The mouse handler associated with this device
 	OsgMouseHandler* getMouseHandler() const;
 
 private:
+	bool finalize() override;
+
 	/// Communication with hardware is handled by scaffold.
 	std::shared_ptr<MouseScaffold> m_scaffold;
 };
