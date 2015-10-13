@@ -72,7 +72,7 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculate
 	Vector3d normal;
 	Vector3d penetrationPointCapsule, penetrationPointTriangle;
 
-	for (auto& intersection : intersectionList)
+	for (const auto& intersection : intersectionList)
 	{
 		std::shared_ptr<SurgSim::DataStructures::AabbTreeNode> nodeSegment = intersection.first;
 		std::shared_ptr<SurgSim::DataStructures::AabbTreeNode> nodeTriangle = intersection.second;
