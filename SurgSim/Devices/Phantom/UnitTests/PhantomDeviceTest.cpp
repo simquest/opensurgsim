@@ -213,9 +213,9 @@ TEST(PhantomDeviceTest, OutputProducer)
 TEST(PhantomDeviceTest, FactoryCreation)
 {
 	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
-	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create("SurgSim::Device::PhantomDevice",
+	ASSERT_NO_THROW(device = SurgSim::Input::DeviceInterface::getFactory().create("SurgSim::Devices::PhantomDevice",
 		"TestPhantom"));
-	EXPECT_EQ("SurgSim::Device::PhantomDevice", device->getClassName());
+	EXPECT_EQ("SurgSim::Devices::PhantomDevice", device->getClassName());
 }
 
 TEST(PhantomDeviceTest, AccessibleTest)

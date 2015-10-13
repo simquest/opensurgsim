@@ -53,35 +53,30 @@ bool LabJackDevice::initialize()
 	SURGSIM_ASSERT(!isInitialized()) << "LabJackDevice already initialized.";
 
 	std::shared_ptr<LabJackScaffold> scaffold = LabJackScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(scaffold) << "LabJackDevice failed to get a LabJackScaffold.";
+	SURGSIM_ASSERT(scaffold != nullptr) << "LabJackDevice failed to get a LabJackScaffold.";
 
-	if (getDigitalOutputs().size() > 0)
-	{
-		SURGSIM_LOG_IF(!hasOutputProducer(), scaffold->getLogger(), WARNING) << "LabJackDevice named " << getName() <<
-			" has digital output channels but no output producer to provide the output data. Call setOutputProducer.";
-	}
+	auto logger = Framework::Logger::getLogger("Devices/LabJack");
+	SURGSIM_LOG_IF((getDigitalOutputs().size() > 0) && !hasOutputProducer(), logger, WARNING) <<
+		"LabJackDevice named " << getName() <<
+		" has digital output channels but no output producer to provide the output data. Call setOutputProducer.";
 
-	if (getAnalogOutputs().size() > 0)
-	{
-		SURGSIM_LOG_IF(!hasOutputProducer(), scaffold->getLogger(), WARNING) << "LabJackDevice named " << getName() <<
-			" has analog output channels but no output producer to provide the output data. Call setOutputProducer.";
-	}
+	SURGSIM_LOG_IF((getAnalogOutputs().size() > 0) && !hasOutputProducer(), logger, WARNING) <<
+		"LabJackDevice named " << getName() <<
+		" has analog output channels but no output producer to provide the output data. Call setOutputProducer.";
 
-	bool found = false;
+	bool registered = false;
 	// registerDevice will set this object's type and/or connection, if they are currently set to SEARCH.
 	if (scaffold->registerDevice(this))
 	{
 		m_scaffold = std::move(scaffold);
-		SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": Initialized.";
-		found = true;
+		registered = true;
 	}
-	return found;
+	return registered;
 }
 
 bool LabJackDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized()) << "LabJackDevice has not been initialized before finalize.";
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
 	const bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return ok;
@@ -207,16 +202,14 @@ int LabJackDevice::getTimerCounterPinOffset() const
 void LabJackDevice::enableTimer(int index, LabJack::TimerMode mode)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be enabled for a LabJackDevice after it is initialized.";
-	LabJack::TimerSettings timerModeAndOptionalInitialValue = {mode,
-		SurgSim::DataStructures::OptionalValue<int>()};
+	LabJack::TimerSettings timerModeAndOptionalInitialValue = {mode, DataStructures::OptionalValue<int>()};
 	m_timers[index] = std::move(timerModeAndOptionalInitialValue);
 }
 
 void LabJackDevice::enableTimer(int index, LabJack::TimerMode mode, int initialValue)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Timers cannot be enabled for a LabJackDevice after it is initialized.";
-	LabJack::TimerSettings timerModeAndOptionalInitialValue = {mode,
-		SurgSim::DataStructures::OptionalValue<int>(initialValue)};
+	LabJack::TimerSettings timerModeAndOptionalInitialValue = {mode, DataStructures::OptionalValue<int>(initialValue)};
 	m_timers[index] = std::move(timerModeAndOptionalInitialValue);
 }
 
@@ -248,7 +241,7 @@ void LabJackDevice::enableAnalogInput(int positiveChannel, LabJack::Range range,
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Analog inputs cannot be enabled for a LabJackDevice after it is initialized.";
 	LabJack::AnalogInputSettings rangeAndOptionalNegativeChannel = {range,
-		SurgSim::DataStructures::OptionalValue<int>(negativeChannel)};
+		DataStructures::OptionalValue<int>(negativeChannel)};
 	m_analogInputs[positiveChannel] = std::move(rangeAndOptionalNegativeChannel);
 }
 
@@ -256,8 +249,7 @@ void LabJackDevice::enableAnalogInput(int channel, LabJack::Range range)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
 		"Analog inputs cannot be enabled for a LabJackDevice after it is initialized.";
-	LabJack::AnalogInputSettings rangeAndOptionalNegativeChannel = {range,
-		SurgSim::DataStructures::OptionalValue<int>()};
+	LabJack::AnalogInputSettings rangeAndOptionalNegativeChannel = {range, DataStructures::OptionalValue<int>()};
 	m_analogInputs[channel] = std::move(rangeAndOptionalNegativeChannel);
 }
 

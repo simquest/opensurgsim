@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,6 +55,33 @@ static const double AngularEpsilon = 1e-10;
 /// Used as epsilon for scalar comparisons
 static const double ScalarEpsilon = 1e-10;
 
+}
+
+/// Calculate the barycentric coordinates of a point with respect to a line segment.
+/// \tparam T Floating point type of the calculation, can usually be inferred.
+/// \tparam MOpt Eigen Matrix options, can usually be inferred.
+/// \param pt Vertex of the point.
+/// \param sv0, sv1 Vertices of the line segment.
+/// \param [out] coordinates Barycentric coordinates.
+/// \return bool true on success, false if two or more if the line segment is considered degenerate
+/// \note The point need not be on the line segment, in which case, the barycentric coordinate of the projection
+/// is calculated.
+template <class T,int MOpt> inline
+bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+							const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+							const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+							Eigen::Matrix<T, 2, 1, MOpt>* coordinates)
+{
+	const Eigen::Matrix<T, 3, 1, MOpt> line = sv1 - sv0;
+	const T length2 = line.squaredNorm();
+	if (length2 < Geometry::SquaredDistanceEpsilon)
+	{
+		coordinates->setConstant((std::numeric_limits<double>::quiet_NaN()));
+		return false;
+	}
+	(*coordinates)[1] = (pt - sv0).dot(line) / length2;
+	(*coordinates)[0] = static_cast<T>(1) - (*coordinates)[1];
+	return true;
 }
 
 /// Calculate the barycentric coordinates of a point with respect to a triangle.
@@ -911,7 +938,7 @@ bool doesCollideSegmentTriangle(
 	// Ray is parallel to triangle plane
 	if (std::abs(b) <= Geometry::AngularEpsilon)
 	{
-		if (a == 0)
+		if (std::abs(a) <= Geometry::AngularEpsilon)
 		{
 			// Ray lies in triangle plane
 			Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
@@ -960,13 +987,13 @@ bool doesCollideSegmentTriangle(
 	// Get and test parametric coords
 	T s = (uv * wv - vv * wu) / D;
 	// I is outside T
-	if (s < 0 || s > 1)
+	if (s < -Geometry::DistanceEpsilon || s > 1 + Geometry::DistanceEpsilon)
 	{
 		return false;
 	}
 	T t = (uv * wu - uu * wv) / D;
 	// I is outside T
-	if (t < 0 || (s + t) > 1)
+	if (t < -Geometry::DistanceEpsilon || (s + t) > 1 + Geometry::DistanceEpsilon)
 	{
 		return false;
 	}

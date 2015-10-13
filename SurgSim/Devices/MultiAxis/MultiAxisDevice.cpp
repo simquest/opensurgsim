@@ -29,86 +29,17 @@ namespace Devices
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::MultiAxisDevice, MultiAxisDevice);
 
 MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
-	m_name(uniqueName),
-	m_rawDevice(new RawMultiAxisDevice(uniqueName + "_RawBase"))
+	FilteredDevice(uniqueName),
+	m_rawDevice(std::make_shared<RawMultiAxisDevice>(uniqueName + "_RawBase")),
+	m_filter(std::make_shared<PoseIntegrator>(uniqueName + "_Integrator"))
 {
-	m_filter = std::make_shared<PoseIntegrator>(uniqueName + "_Integrator");
-	m_filter->setNameForCallback(uniqueName);  // the filter should make callbacks as the entire device
-
 	m_rawDevice->setPositionScale(defaultPositionScale());
 	m_rawDevice->setOrientationScale(defaultOrientationScale());
 	m_rawDevice->setAxisDominance(true);
-}
+	setDevice(m_rawDevice);
 
-
-MultiAxisDevice::~MultiAxisDevice()
-{
-}
-
-
-std::string MultiAxisDevice::getName() const
-{
-	return m_name;
-}
-
-
-bool MultiAxisDevice::initialize()
-{
-	m_rawDevice->addInputConsumer(m_filter);
-	m_rawDevice->setOutputProducer(m_filter);
-
-	// Elements need to be initialized, in proper order.
-	return m_filter->initialize() && m_rawDevice->initialize();
-}
-
-
-bool MultiAxisDevice::finalize()
-{
-	// All elements need to be finalized (beware of &&), in proper order.
-	bool deviceOk = m_rawDevice->finalize();
-	bool filterOk = m_filter->finalize();
-	return deviceOk && filterOk;
-}
-
-
-bool MultiAxisDevice::isInitialized() const
-{
-	return m_rawDevice->isInitialized();
-}
-
-bool MultiAxisDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
-{
-	return m_filter->addInputConsumer(inputConsumer);
-}
-
-bool MultiAxisDevice::removeInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
-{
-	return m_filter->removeInputConsumer(inputConsumer);
-}
-
-void MultiAxisDevice::clearInputConsumers()
-{
-	m_filter->clearInputConsumers();
-}
-
-bool MultiAxisDevice::setOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer)
-{
-	return m_filter->setOutputProducer(outputProducer);
-}
-
-bool MultiAxisDevice::removeOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer)
-{
-	return m_filter->removeOutputProducer(outputProducer);
-}
-
-bool MultiAxisDevice::hasOutputProducer()
-{
-	return m_filter->hasOutputProducer();
-}
-
-void MultiAxisDevice::clearOutputProducer()
-{
-	m_filter->clearOutputProducer();
+	m_filter->setNameForCallback(uniqueName);  // the filter should make callbacks as the entire device
+	addFilter(m_filter);
 }
 
 void MultiAxisDevice::setPositionScale(double scale)
@@ -116,18 +47,15 @@ void MultiAxisDevice::setPositionScale(double scale)
 	m_rawDevice->setPositionScale(scale);
 }
 
-
 double MultiAxisDevice::getPositionScale() const
 {
 	return m_rawDevice->getPositionScale();
 }
 
-
 void MultiAxisDevice::setOrientationScale(double scale)
 {
 	m_rawDevice->setOrientationScale(scale);
 }
-
 
 double MultiAxisDevice::getOrientationScale() const
 {
@@ -138,7 +66,6 @@ void MultiAxisDevice::setAxisDominance(bool onOff)
 {
 	m_rawDevice->setAxisDominance(onOff);
 }
-
 
 bool MultiAxisDevice::isUsingAxisDominance() const
 {

@@ -28,6 +28,7 @@ set(LIBS
 	IdentityPoseDevice
 	LabJackDevice
 	SurgSimDataStructures
+	SurgSimDeviceFilters
 	SurgSimInput
 	SurgSimMath
 	VisualTestCommon

@@ -43,25 +43,14 @@ class KeyboardScaffold
 
 public:
 	/// Constructor.
-	/// \param logger (optional) The logger to be used by the scaffold object and the devices it manages.
-	/// If unspecified or empty, a console logger will be created and used.
-	explicit KeyboardScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	KeyboardScaffold();
 	/// Destructor
 	~KeyboardScaffold();
-
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all KeyboardDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<KeyboardScaffold> getOrCreateSharedInstance();
-
-	/// Sets the default log level.
-	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
-	/// \param logLevel The log level.
-	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
 private:
 	/// Internal per-device information.
@@ -72,6 +61,7 @@ private:
 	/// \param device The device object to be used, which should have a unique name.
 	/// \return True if the initialization succeeds, false if it fails.
 	bool registerDevice(KeyboardDevice* device);
+
 	/// Unregisters the specified device object.
 	/// The corresponding controller will become unused, and can be re-registered later.
 	/// \return True on success, false on failure.
@@ -90,11 +80,8 @@ private:
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 
-
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-	/// The default logging level.
-	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 	/// The keyboard device managed by this scaffold
 	std::unique_ptr<DeviceData> m_device;
 };

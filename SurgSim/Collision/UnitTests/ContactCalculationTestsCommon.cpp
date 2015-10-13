@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ void checkContactInfo(std::shared_ptr<Contact> contact, CollisionDetectionType e
 					  const Vector3d& expectedNormal, const Vector3d& expectedPenetrationPointFirst,
 					  const Vector3d& expectedPenetrationPointSecond)
 {
-	EXPECT_EQ(expectedType, contact->collisionType);
+	EXPECT_EQ(expectedType, contact->type);
 	EXPECT_NEAR(expectedDepth, contact->depth, SurgSim::Math::Geometry::DistanceEpsilon);
 	EXPECT_NEAR(expectedTime, contact->time, SurgSim::Math::Geometry::DistanceEpsilon);
 	EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal));
@@ -96,7 +96,7 @@ bool checkMeshLocalCoordinate(
 		// Compare the time.
 		contactPresent &= std::abs(expected->time - it->get()->time) <= ScalarEpsilon;
 		// Compare the contact types.
-		contactPresent &= (expected->collisionType == it->get()->collisionType);
+		contactPresent &= (expected->type == it->get()->type);
 		// Check if the optional 'meshLocalCoordinate' are the same.
 		std::shared_ptr<SurgSim::Collision::TriangleContact> triangleContact;
 		std::shared_ptr<SurgSim::Collision::Contact> contact;

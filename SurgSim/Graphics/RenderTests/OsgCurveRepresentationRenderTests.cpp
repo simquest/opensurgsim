@@ -134,7 +134,7 @@ TEST_F(OsgCurveRepresentationRenderTests, DynamicRotate)
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000.0 / 30.0));
 	}
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 }
 

@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2015, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ set(SURGSIM_COLLISION_SOURCES
 	OctreePlaneDcdContact.cpp
 	OctreeSphereDcdContact.cpp
 	Representation.cpp
+	SegmentMeshTriangleMeshDcdContact.cpp
 	SegmentSegmentCcdIntervalCheck.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
@@ -44,7 +45,6 @@ set(SURGSIM_COLLISION_HEADERS
 	BoxPlaneDcdContact.h
 	BoxSphereDcdContact.h
 	CapsuleSphereDcdContact.h
-	CollisionDetectionType.h
 	CollisionPair.h
 	ContactCalculation.h
 	DcdCollision.h
@@ -55,6 +55,7 @@ set(SURGSIM_COLLISION_HEADERS
 	OctreePlaneDcdContact.h
 	OctreeSphereDcdContact.h
 	Representation.h
+	SegmentMeshTriangleMeshDcdContact.h
 	SegmentSegmentCcdIntervalCheck.h
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h

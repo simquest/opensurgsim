@@ -21,8 +21,10 @@
 #include <gtest/gtest.h>
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-#include "SurgSim/Devices/DeviceFilters/PoseTransform.h"
+#include "SurgSim/Devices/Devices.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Input/CommonDevice.h"
+#include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -287,4 +289,24 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 	ASSERT_TRUE(actualData.booleans().get("extraData", &actualBoolean));
 	bool expectedBoolean = true;
 	EXPECT_EQ(expectedBoolean, actualBoolean);
+}
+
+TEST(PoseTransformDeviceFilterTest, Serialization)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	std::string fileName = "PoseTransform.yaml";
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device;
+	ASSERT_NO_THROW(device = SurgSim::Devices::loadDevice(fileName));
+	ASSERT_NE(nullptr, device);
+	auto typedDevice = std::dynamic_pointer_cast<PoseTransform>(device);
+	ASSERT_NE(nullptr, typedDevice);
+	EXPECT_NEAR(3.4, typedDevice->getTranslationScale(), 1e-10);
+
+	Eigen::AngleAxisd angleAxis;
+	angleAxis.angle() = 12.3;
+	angleAxis.axis() = SurgSim::Math::Vector3d(0.5, 0.5, 0.0);
+	SurgSim::Math::Vector3d translation = SurgSim::Math::Vector3d(7.8, 8.9, 9.0);
+	SurgSim::Math::RigidTransform3d expectedTransform =
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(angleAxis), translation);
+	EXPECT_TRUE(typedDevice->getTransform().isApprox(expectedTransform));
 }

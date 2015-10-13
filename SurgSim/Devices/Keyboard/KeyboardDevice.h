@@ -58,22 +58,17 @@ public:
 	/// Destructor
 	virtual ~KeyboardDevice();
 
-	/// Initialize this device and register it with corresponding scaffold.
-	/// \return True on success; false otherwise.
 	bool initialize() override;
-	/// "De"-initialize this device and unregister from the scaffold.
-	/// \return True on success; false, otherwise.
-	bool finalize() override;
 
-	/// Check if the scaffold of this device is initialized.
-	/// \return True if this the scaffold of this device is initialized; Otherwise, false.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device
 	OsgKeyboardHandler* getKeyboardHandler() const;
 
 private:
+	bool finalize() override;
+
 	/// Communication with hardware is handled by scaffold.
 	std::shared_ptr<KeyboardScaffold> m_scaffold;
 };

@@ -50,6 +50,7 @@ void MockInputOutput::handleInput(const std::string& device, const DataGroup& in
 void MockInputOutput::initializeInput(const std::string& device, const DataGroup& inputData)
 {
 	++m_numTimesInitializedInput;
+	m_lastReceivedInput = inputData;
 }
 
 }; // Testing

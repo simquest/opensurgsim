@@ -276,17 +276,13 @@ private:
 	StateData& operator=(const StateData&);
 };
 
-NimbleScaffold::NimbleScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	SurgSim::Framework::BasicThread("Nimble Scaffold"), m_logger(logger),
+NimbleScaffold::NimbleScaffold() :
+	SurgSim::Framework::BasicThread("Nimble Scaffold"), m_logger(Framework::Logger::getLogger("Devices/Nimble")),
 	m_state(new StateData()), m_serverIpAddress("127.0.0.1"), m_serverPort("1988"),
 	m_serverSocketOpen(false)
 {
 	setRate(1000.0);
-	if (m_logger == nullptr)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("Nimble device");
-	}
-	SURGSIM_LOG_DEBUG(m_logger) << "Nimble: Shared scaffold created.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.";
 }
 
 NimbleScaffold::~NimbleScaffold()
@@ -316,11 +312,12 @@ bool NimbleScaffold::registerDevice(NimbleDevice* device)
 		if (found == m_state->activeDevices.end())
 		{
 			m_state->activeDevices.push_back(device);
-			SURGSIM_LOG_INFO(m_logger) << "Nimble: Device registered in Scaffold.";
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " registered in Scaffold.";
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Nimble: Attempt to register device with the same name again.";
+			SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register device " << device->getName() <<
+				" with the same name again.";
 			success = false;
 		}
 	}
@@ -349,12 +346,12 @@ bool NimbleScaffold::unregisterDevice(const NimbleDevice* device)
 		if (found != m_state->activeDevices.end())
 		{
 			m_state->activeDevices.erase(found);
-			SURGSIM_LOG_INFO(m_logger) << "Nimble: Device unregistered from Scaffold.";
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " unregistered from Scaffold.";
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(m_logger)
-				<< "Nimble: Attempted to unregister a device from Scaffold which is not registered.";
+			SURGSIM_LOG_WARNING(m_logger) << "Attempted to unregister a device " << device->getName() <<
+				" from Scaffold which is not registered.";
 			success = false;
 		}
 	}
@@ -480,11 +477,6 @@ SurgSim::DataStructures::DataGroup NimbleScaffold::buildDeviceInputData()
 		builder.addPose(name->first);
 	}
 	return builder.createData();
-}
-
-std::shared_ptr<SurgSim::Framework::Logger> NimbleScaffold::getLogger() const
-{
-	return m_logger;
 }
 
 std::shared_ptr<NimbleScaffold> NimbleScaffold::getOrCreateSharedInstance()

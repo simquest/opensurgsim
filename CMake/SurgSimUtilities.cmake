@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2015, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -211,7 +211,11 @@ function(surgsim_add_library LIBRARY_NAME SOURCES HEADERS)
 	if (SOURCES)
 		add_library(${LIBRARY_NAME} ${SOURCES} ${HEADERS})
 
-		set_target_properties(${LIBRARY_NAME} PROPERTIES PUBLIC_HEADER "${HEADERS}")
+		set_target_properties(${LIBRARY_NAME} PROPERTIES
+			PUBLIC_HEADER "${HEADERS}"
+			VERSION ${OPENSURGSIM_VERSION}
+			SOVERSION ${OPENSURGSIM_VERSION})
+
 		install(TARGETS ${LIBRARY_NAME}
 			EXPORT ${PROJECT_NAME}Targets
 			RUNTIME DESTINATION "${INSTALL_BIN_DIR}"

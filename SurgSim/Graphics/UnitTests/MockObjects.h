@@ -539,8 +539,8 @@ public:
 
 	void setDimensionsDouble(const std::array<double, 2>& dimensions)
 	{
-		m_width = dimensions[0];
-		m_height = dimensions[1];
+		m_width = static_cast<int>(dimensions[0]);
+		m_height = static_cast<int>(dimensions[1]);
 	}
 
 	std::array<double, 2> getDimensionsDouble() const

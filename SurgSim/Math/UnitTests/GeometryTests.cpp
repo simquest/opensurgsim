@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -142,6 +142,38 @@ protected:
 
 	MockTriangle tri;
 };
+
+
+TEST_F(GeometryTest, BaryCentricOfSegment)
+{
+	typedef Eigen::Matrix<SizeType, 2, 1> Vector2;
+
+	Vector2 outputPoint;
+	EXPECT_TRUE(barycentricCoordinates(plainSegment.a, plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(1.0, 0.0).isApprox(outputPoint));
+
+	EXPECT_TRUE(barycentricCoordinates(plainSegment.b, plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(0.0, 1.0).isApprox(outputPoint));
+
+	// Halfway points
+	EXPECT_TRUE(barycentricCoordinates(plainSegment.pointOnLine(0.5), plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(0.5, 0.5).isApprox(outputPoint));
+
+	// Random point
+	EXPECT_TRUE(barycentricCoordinates(plainSegment.pointOnLine(0.327), plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(1.0 - 0.327, 0.327).isApprox(outputPoint));
+
+	// Point not on line
+	VectorType orthogonal =
+		plainSegment.ab.cross(VectorType(plainSegment.ab[0] * 0.5, plainSegment.ab[1] * 0.6, plainSegment.ab[2] * 0.7));
+	VectorType point = plainSegment.pointOnLine(0.486) + orthogonal;
+	EXPECT_TRUE(barycentricCoordinates(point, plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(1.0 - 0.486, 0.486).isApprox(outputPoint));
+
+	// Degenerate
+	EXPECT_FALSE(barycentricCoordinates(degenerateSegment.a, degenerateSegment.a, degenerateSegment.b, &outputPoint));
+	EXPECT_TRUE(boost::math::isnan(outputPoint[0]) && boost::math::isnan(outputPoint[1]));
+}
 
 
 TEST_F(GeometryTest, BaryCentricWithNormal)
@@ -1041,7 +1073,7 @@ void checkTriPlaneDistance(const TriPlaneData& data)
 
 	distance = distanceTrianglePlane(tri.v0, tri.v1, tri.v2, n, d, &triangleResultPoint, &planeResultPoint);
 	EXPECT_NEAR((planeResultPoint - triangleResultPoint).norm(), std::abs(distance), epsilon);
-	EXPECT_TRUE(distance * sign > 0 || distance == static_cast<double>(sign));
+	EXPECT_TRUE((sign == 0 && std::abs(distance) <= epsilon) || (distance * sign > 0));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(triangleResultPoint));
 	EXPECT_TRUE(expectedPlanePoint.isApprox(planeResultPoint));
 }
