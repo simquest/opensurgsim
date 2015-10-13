@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMCONSTRAINTFRICTIONLESSCONTACT_INL_H
-#define SURGSIM_PHYSICS_FEMCONSTRAINTFRICTIONLESSCONTACT_INL_H
+#include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemLocalization.h"
+#include "SurgSim/Physics/FemRepresentation.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -28,24 +29,21 @@ namespace SurgSim
 namespace Physics
 {
 
-template <class FemLocalization>
-FemConstraintFrictionlessContact<FemLocalization>::FemConstraintFrictionlessContact()
+FemConstraintFrictionlessContact::FemConstraintFrictionlessContact()
 {
 }
 
-template <class FemLocalization>
-FemConstraintFrictionlessContact<FemLocalization>::~FemConstraintFrictionlessContact()
+FemConstraintFrictionlessContact::~FemConstraintFrictionlessContact()
 {
 }
 
-template <class FemLocalization>
-void FemConstraintFrictionlessContact<FemLocalization>::doBuild(double dt,
-												 const ConstraintData& data,
-												 const std::shared_ptr<Localization>& localization,
-												 MlcpPhysicsProblem* mlcp,
-												 size_t indexOfRepresentation,
-												 size_t indexOfConstraint,
-												 ConstraintSideSign sign)
+void FemConstraintFrictionlessContact::doBuild(double dt,
+											   const ConstraintData& data,
+											   const std::shared_ptr<Localization>& localization,
+											   MlcpPhysicsProblem* mlcp,
+											   size_t indexOfRepresentation,
+											   size_t indexOfConstraint,
+											   ConstraintSideSign sign)
 {
 	std::shared_ptr<FemRepresentation> fem
 		= std::static_pointer_cast<FemRepresentation>(localization->getRepresentation());
@@ -96,14 +94,12 @@ void FemConstraintFrictionlessContact<FemLocalization>::doBuild(double dt,
 		indexOfConstraint);
 }
 
-template <class FemLocalization>
-SurgSim::Physics::ConstraintType FemConstraintFrictionlessContact<FemLocalization>::getConstraintType() const
+SurgSim::Physics::ConstraintType FemConstraintFrictionlessContact::getConstraintType() const
 {
 	return SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 }
 
-template <class FemLocalization>
-size_t FemConstraintFrictionlessContact<FemLocalization>::doGetNumDof() const
+size_t FemConstraintFrictionlessContact::doGetNumDof() const
 {
 	return 1;
 }
@@ -111,5 +107,3 @@ size_t FemConstraintFrictionlessContact<FemLocalization>::doGetNumDof() const
 }; //  namespace Physics
 
 }; //  namespace SurgSim
-
-#endif // SURGSIM_PHYSICS_FEMCONSTRAINTFRICTIONLESSCONTACT_INL_H
