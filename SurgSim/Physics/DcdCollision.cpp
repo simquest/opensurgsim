@@ -87,6 +87,7 @@ void DcdCollision::populateCalculationTable()
 	setDcdContactInTable(std::make_shared<Collision::OctreeDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::OctreePlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::OctreeSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<Collision::SegmentMeshTriangleMeshDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::SphereSphereDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::SphereDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::SpherePlaneDcdContact>());
