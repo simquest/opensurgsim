@@ -32,34 +32,19 @@ namespace Collision
 class CollisionPair;
 
 /// Class to calculate intersections between a box and a sphere
-class BoxSphereDcdContact : public ContactCalculation
+class BoxSphereDcdContact : public ShapeShapeContactCalculation<Math::BoxShape, Math::SphereShape>
 {
 public:
-	/// Constructor.
-	BoxSphereDcdContact();
 
 	using ContactCalculation::calculateContact;
 
-	/// Calculate the contacts using the typed shapes directly
-	/// \param boxShape the box shape
-	/// \param boxPose the pose of the box
-	/// \param sphereShape the sphere shape
-	/// \param spherePose the pose of the sphere
-	/// \return a list of contacts between the shapes, if any
 	std::list<std::shared_ptr<Contact>> calculateContact(
-			const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
-			const SurgSim::Math::SphereShape& sphereShape, const SurgSim::Math::RigidTransform3d& spherePose);
+										 const Math::BoxShape& boxShape,
+										 const Math::RigidTransform3d& boxPose,
+										 const Math::SphereShape& sphereShape,
+										 const Math::RigidTransform3d& spherePose) const override;
 
-	std::pair<int,int> getShapeTypes() override;
-
-private:
-	/// Calculate the actual contact between two shapes of the given CollisionPair.
-	/// \param    pair    The symmetric pair that is under consideration.
-	/// \note If there is a contact, the normal in the local space is always normal to the box face closest to the
-	/// sphere center.  That means that if a penetration near the corner increases or decreases in depth the normal may
-	/// switch directions instantly, leading to instabilities.
-	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
-
+	std::pair<int, int> getShapeTypes() override;
 };
 
 }; // namespace Collision
