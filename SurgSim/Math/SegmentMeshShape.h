@@ -45,7 +45,7 @@ public:
 	/// \note The default radius is positive EPSILON to be relevant in collision detection calculations.
 	template <class VertexData, class EdgeData>
 	explicit SegmentMeshShape(const DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
-		double radius = Geometry::DistanceEpsilon);
+							  double radius = Geometry::DistanceEpsilon);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::SegmentMeshShape);
 
@@ -63,6 +63,8 @@ public:
 
 	/// \return The object's associated AabbTree
 	std::shared_ptr<const DataStructures::AabbTree> getAabbTree() const;
+
+	bool isTransformable() const override;
 
 protected:
 	bool doUpdate() override;
