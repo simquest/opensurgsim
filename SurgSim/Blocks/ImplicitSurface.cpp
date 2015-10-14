@@ -87,8 +87,8 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 		auto material = Graphics::buildMaterial("Shaders/gauss_blur_vertical.vert", "Shaders/bilateral_blur.frag");
 		material->addUniform("sampler2D", "texture");
 		material->setValue("texture", previousCamera->getRenderTarget()->getDepthTarget());
-		material->addUniform("float", "width");
-		material->setValue("width", static_cast<float>(textureSize));
+		material->addUniform("float", "height");
+		material->setValue("height", static_cast<float>(textureSize));
 		material->addUniform("float", "blurRadius");
 		material->setValue("blurRadius", floatRadius);
 		renderPass->setMaterial(material);
@@ -265,7 +265,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 
 	auto depthPass = createDepthPass(copier, osgCamera, sphereRadius, sphereScale, textureSize, showDebug);
 
-	auto blurPass = createBlurPass(depthPass, textureSize, 2.0, &result, showDebug);
+	auto blurPass = createBlurPass(depthPass, textureSize, 4.0, &result, showDebug);
 
 	auto normalPass = createNormalPass(blurPass->getRenderTarget()->getDepthTarget(),
 									   textureSize, showDebug);
