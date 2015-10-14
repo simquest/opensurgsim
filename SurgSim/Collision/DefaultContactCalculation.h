@@ -41,16 +41,18 @@ public:
 	/// Destructor
 	virtual ~DefaultContactCalculation();
 
-	/// Function that returns the shapes between which this class performs collision detection.
-	/// \return int std::pair containing the shape types.
-	std::pair<int,int> getShapeTypes() override;
+	std::pair<int, int> getShapeTypes() override;
 
 private:
 	bool m_doAssert;
 
-	/// Calculate the actual contact between two shapes of the given CollisionPair.
-	/// \param	pair	The symmetric pair that is under consideration.
 	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+
+	std::list<std::shared_ptr<Contact>> doCalculateContact(
+										 const std::shared_ptr<Math::Shape>& shape1,
+										 const Math::RigidTransform3d& pose1,
+										 const std::shared_ptr<Math::Shape>& shape2,
+										 const Math::RigidTransform3d& pose2) override;
 };
 
 }; // namespace Collision

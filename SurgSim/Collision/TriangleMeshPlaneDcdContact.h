@@ -18,8 +18,9 @@
 
 #include <memory>
 
-#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/PlaneShape.h"
 
 namespace SurgSim
 {
@@ -27,22 +28,19 @@ namespace Collision
 {
 
 /// Class to calculate intersections between a triangle mesh and a plane
-class TriangleMeshPlaneDcdContact : public ContactCalculation
+class TriangleMeshPlaneDcdContact : public ShapeShapeContactCalculation<Math::MeshShape, Math::PlaneShape>
 {
 public:
 
-	/// Constructor
-	TriangleMeshPlaneDcdContact();
+	using ContactCalculation::calculateContact;
 
-	/// Function that returns the shapes between which this class performs collision detection.
-	/// \return int std::pair containing the shape types.
+	std::list<std::shared_ptr<Contact>> calculateContact(
+										 const Math::MeshShape& mesh,
+										 const Math::RigidTransform3d& meshPose,
+										 const Math::PlaneShape& plane,
+										 const Math::RigidTransform3d& planePose) const override;
+
 	std::pair<int, int> getShapeTypes() override;
-
-private:
-	/// Calculate the actual contact between two shapes of the given CollisionPair.
-	/// \param pair The symmetric pair that is under consideration.
-	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
-
 };
 
 };

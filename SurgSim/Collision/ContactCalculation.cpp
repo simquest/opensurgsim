@@ -33,30 +33,80 @@ ContactCalculation::~ContactCalculation()
 
 void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	std::pair<int,int> shapeTypes = getShapeTypes();
+	doCalculateContact(pair);
+}
+
+std::list<std::shared_ptr<Contact>> ContactCalculation::calculateContact(
+									 const std::shared_ptr<Math::Shape>& shape1,
+									 const Math::RigidTransform3d& pose1,
+									 const std::shared_ptr<Math::Shape>& shape2,
+									 const Math::RigidTransform3d& pose2)
+{
+	auto types = getShapeTypes();
+	auto incoming = std::make_pair(shape1->getType(), shape2->getType());
+	if (incoming == types)
+	{
+		return doCalculateContact(shape1, pose1, shape2, pose2);
+	}
+	if (incoming.first == types.second && incoming.second == types.first)
+	{
+		SURGSIM_FAILURE() << "The shapes need to be passed in the correct order";
+		/// HS-14-oct-2015 This section is currently unused as the collision pair interface will take care of the
+		/// correct order, this will be correctly implemented and tested for the compound collision object
+		return doCalculateContact(shape2, pose2, shape1, pose1);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Incorrect shape type for this calculation expected "
+						  << types.first << ", " << types.second
+						  << " received " << incoming.first << ", " << incoming.second << ".";
+		return std::list<std::shared_ptr<Contact>>();
+	}
+}
+
+void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+{
+	std::pair<int, int> shapeTypes = getShapeTypes();
 	int firstShapeType = pair->getFirst()->getShapeType();
 	int secondShapeType = pair->getSecond()->getShapeType();
 
 	if (firstShapeType != secondShapeType && firstShapeType == shapeTypes.second &&
-			secondShapeType == shapeTypes.first)
+		secondShapeType == shapeTypes.first)
 	{
 		pair->swapRepresentations();
 		std::swap(firstShapeType, secondShapeType);
 	}
 
-	if(shapeTypes.first != SurgSim::Math::SHAPE_TYPE_NONE)
+	if (shapeTypes.first != SurgSim::Math::SHAPE_TYPE_NONE)
 	{
 		SURGSIM_ASSERT(firstShapeType == shapeTypes.first) <<
-			"First Object, wrong type of object" << firstShapeType;
+				"First Object, wrong type of object" << firstShapeType;
 	}
 
-	if(shapeTypes.second != SurgSim::Math::SHAPE_TYPE_NONE)
+	if (shapeTypes.second != SurgSim::Math::SHAPE_TYPE_NONE)
 	{
 		SURGSIM_ASSERT(secondShapeType == shapeTypes.second) <<
-			"Second Object, wrong type of object" << secondShapeType;
+				"Second Object, wrong type of object" << secondShapeType;
 	}
 
-	doCalculateContact(pair);
+	std::shared_ptr<Math::Shape> shape1 = pair->getFirst()->getShape();
+	if (shape1->isTransformable())
+	{
+		shape1 = pair->getFirst()->getPosedShape();
+	}
+
+	std::shared_ptr<Math::Shape> shape2 = pair->getSecond()->getShape();
+	if (shape2->isTransformable())
+	{
+		shape2 = pair->getSecond()->getPosedShape();
+	}
+
+	auto contacts = doCalculateContact(shape1, pair->getFirst()->getPose(),
+									   shape2, pair->getSecond()->getPose());
+	for (auto& contact : contacts)
+	{
+		pair->addContact(contact);
+	}
 }
 
 }; // namespace Collision

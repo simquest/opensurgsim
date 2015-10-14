@@ -30,54 +30,45 @@ namespace SurgSim
 {
 namespace Collision
 {
-
-TriangleMeshPlaneDcdContact::TriangleMeshPlaneDcdContact()
-{
-}
-
 std::pair<int, int> TriangleMeshPlaneDcdContact::getShapeTypes()
 {
 	return std::pair<int, int> (SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
-void TriangleMeshPlaneDcdContact::doCalculateContact
-(std::shared_ptr<CollisionPair> pair)
+std::list<std::shared_ptr<Contact>> TriangleMeshPlaneDcdContact::calculateContact(
+									 const Math::MeshShape& mesh,
+									 const Math::RigidTransform3d& meshPose,
+									 const Math::PlaneShape& plane, const Math::RigidTransform3d& planePose) const
 {
-	std::shared_ptr<Representation> representationTriangleMesh;
-	std::shared_ptr<Representation> representationPlane;
-
-	representationTriangleMesh = pair->getFirst();
-	representationPlane = pair->getSecond();
-
-	auto mesh = std::static_pointer_cast<MeshShape>(representationTriangleMesh->getPosedShape());
-
-	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));
+	std::list<std::shared_ptr<Contact>> contacts;
 
 	// Transform the plane normal to Mesh co-ordinate system.
-	RigidTransform3d planeLocalToMeshLocal = representationPlane->getPose();
-	Vector3d planeNormal = planeLocalToMeshLocal.linear() * plane->getNormal();
-	Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
-	Vector3d planePoint = planeLocalToMeshLocal * planeNormalScaled;
+	Vector3d planeNormal = planePose.linear() * plane.getNormal();
+	Vector3d planeNormalScaled = plane.getNormal() * -plane.getD();
+	Vector3d planePoint = planePose * planeNormalScaled;
 	double planeD = -planeNormal.dot(planePoint);
 
 	double d;
 	Vector3d normal;
-	for (auto& vertex : mesh->getVertices())
+	for (auto& vertex : mesh.getVertices())
 	{
 		d = planeNormal.dot(vertex.position) + planeD;
 		if (d < SurgSim::Math::Geometry::DistanceEpsilon)
 		{
 			// Create the contact
-			normal = representationPlane->getPose().linear() * plane->getNormal();
+			normal = planePose.linear() * plane.getNormal();
 			std::pair<Location, Location> penetrationPoints;
 			penetrationPoints.first.rigidLocalPosition.setValue(
-				representationTriangleMesh->getPose().inverse() * vertex.position);
+				meshPose.inverse() * vertex.position);
 			penetrationPoints.second.rigidLocalPosition.setValue(
-				representationPlane->getPose().inverse() * (vertex.position - normal * d));
+				planePose.inverse() * (vertex.position - normal * d));
 
-			pair->addDcdContact(-d, normal, penetrationPoints);
+			contacts.emplace_back(std::make_shared<Contact>(
+									  COLLISION_DETECTION_TYPE_DISCRETE, -d, 1.0,
+									  Vector3d::Zero(), normal, penetrationPoints));
 		}
 	}
+	return contacts;
 }
 
 }; // Physics
