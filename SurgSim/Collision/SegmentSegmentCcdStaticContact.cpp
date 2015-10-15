@@ -44,8 +44,8 @@ bool SegmentSegmentCcdStaticContact::collideStaticSegmentSegment(
 	const double totalThickness = radiusP + radiusQ;
 	const double totalThickness2 = totalThickness * totalThickness;
 
-	// Based on the outline of http://www.geometrictools.com/Distance.html, also refer to
-	//	http://softsurfer.com/Archive/algorithm_0106 for a geometric interpretation
+	// Based on the outline of:
+	// https://www.assembla.com/spaces/OpenSurgSim/documents/cRWomWC2er5ykpacwqjQYw/download/cRWomWC2er5ykpacwqjQYw.
 	// We are minimizing the squared distance R(sp,sq) = (a.sp)^2 + 2b.sp.sq + (c.sq)^2 + 2d.sq + 2e.sp + f
 	// for P(s) = (1-s).P0 + s.P1 and Q(t) = (1-t).Q0 + t.Q1, and as defined in the paper:
 	//  a = (P1 - P0)(P1 - P0)
@@ -83,10 +83,16 @@ bool SegmentSegmentCcdStaticContact::collideStaticSegmentSegment(
 	// algorithm specific to parallel segments.
 	if (ratio >= m_degenerateEpsilon)
 	{
-		*r = b * e - c * d;
-		*s = b * d - a * e;
-		int region = computeCollisionRegion(*r, *s, ratio);
-		SegmentCcdEdgeType edge = computeCollisionEdge(region, a, b, d);
+		// This section of the code carries out the steps of the cited paper.
+		//   1. Determine the points of closest approach for the infinite lines containing p and q
+		//   2. Determine where these values fall with respect to the segment end points and which edges (if any)
+		//      must be clamped to the parametric range [0.0, 1.0]
+		//   4. Calculate the parametrics for the closest approach of the segments using the edge information.
+		double infiniteLineR = b * e - c * d;
+		double infiniteLineS = b * d - a * e;
+		*r = infiniteLineR;
+		*s = infiniteLineS;
+		SegmentCcdEdgeType edge = computeCollisionEdge(a, b, d, infiniteLineR, infiniteLineS, ratio);
 		computeCollisionParametrics(edge, a, b, c, d, e, ratio, r, s);
 	}
 	else // Parallel case
@@ -107,7 +113,7 @@ bool SegmentSegmentCcdStaticContact::collideStaticSegmentSegment(
 bool SegmentSegmentCcdStaticContact::collideStaticPointSegment(
 	const Math::Vector3d& point,
 	const std::array<SurgSim::Math::Vector3d, 2>& p,
-	double thicknessA, double thicknessP,
+	double thicknessPoint, double thicknessSegment,
 	double* r)
 {
 	Math::Vector3d b = p[0];
@@ -119,7 +125,7 @@ bool SegmentSegmentCcdStaticContact::collideStaticPointSegment(
 	double caNormSQ = ca.squaredNorm();
 	double bcNormSQ = bc.squaredNorm();
 
-	double totalThicknessSQ = (thicknessA + thicknessP) * (thicknessA + thicknessP);
+	double totalThicknessSQ = (thicknessPoint + thicknessSegment) * (thicknessPoint + thicknessSegment);
 
 	// p is essentially a point
 	if (bcNormSQ < m_degenerateEpsilon)
@@ -144,24 +150,33 @@ bool SegmentSegmentCcdStaticContact::collideStaticPointSegment(
 	*r =  bc.dot(ba) / bcNormSQ;
 
 	// Clamp abscissa
-	if (*r < 0.0)
-	{
-		*r = 0.0;
-	}
-
-	if (*r > 1.0)
-	{
-		*r = 1.0;
-	}
+	*r = std::max(0.0, std::min(1.0, *r));
 
 	// Compute the closest point of a on [bc]
 	Math::Vector3d closestPtOnBC = Math::interpolate(b, c, *r);
 	return (closestPtOnBC - point).squaredNorm() <= totalThicknessSQ;
 }
 
-int SegmentSegmentCcdStaticContact::computeCollisionRegion(double r, double s, double ratio) const
+SegmentSegmentCcdStaticContact::SegmentCcdEdgeType SegmentSegmentCcdStaticContact::computeCollisionEdge(
+	double a, double b, double d,
+	double r, double s, double ratio) const
 {
-	int region;
+	// Region mappings from reference:
+	//
+	//	    r=0    r=1
+	//		^
+	//      |       |
+	//	4   |   3   |   2
+	//	----|-------|-------    s=1
+	//	    |		|
+	//	5   |   0   |   1
+	//	    |       |
+	//	----|-------|------->   s=0
+	//	    |       |
+	//  6   |   7   |   8
+	//      |       |
+	//
+	SegmentSegmentCcdStaticContact::SegmentCcdEdgeType edge = SegmentCcdEdgeTypeEdgeInvalid;
 
 	if (r >= 0)
 	{
@@ -171,16 +186,19 @@ int SegmentSegmentCcdStaticContact::computeCollisionRegion(double r, double s, d
 			{
 				if (s <= ratio)
 				{
-					region = 0;
+					// region = 0; (0 <= r,s <= 1)
+					edge = SegmentCcdEdgeTypeEdgeSkip;
 				}
 				else
 				{
-					region = 3;
+					// region = 3; (0 <= r <= 1; 1 <= s)
+					edge = SegmentCcdEdgeTypeS1;
 				}
 			}
 			else
 			{
-				region = 7;
+				// region = 7; (0 <= r <= 1; s <= 0)
+				edge = SegmentCcdEdgeTypeS0;
 			}
 		}
 		else
@@ -189,16 +207,33 @@ int SegmentSegmentCcdStaticContact::computeCollisionRegion(double r, double s, d
 			{
 				if (s <= ratio)
 				{
-					region = 1;
+					// region = 1; (1 <= r; 0 <= s <= 1)
+					edge = SegmentCcdEdgeTypeR1;
 				}
 				else
 				{
-					region = 2;
+					// region = 2; (1 <= r,s)
+					if (a + b + d > 0)
+					{
+						edge = SegmentCcdEdgeTypeS1;
+					}
+					else
+					{
+						edge = SegmentCcdEdgeTypeR1;
+					}
 				}
 			}
 			else
 			{
-				region = 8;
+				// region = 8; (1 <= r; s <= 0)
+				if (a + d > 0)
+				{
+					edge = SegmentCcdEdgeTypeS0;
+				}
+				else
+				{
+					edge = SegmentCcdEdgeTypeR1;
+				}
 			}
 		}
 	}
@@ -208,62 +243,25 @@ int SegmentSegmentCcdStaticContact::computeCollisionRegion(double r, double s, d
 		{
 			if (s <= ratio)
 			{
-				region = 5;
-			}
-			else
-			{
-				region = 4;
-			}
-		}
-		else
-		{
-			region = 6;
-		}
-	}
-	return region;
-}
-
-SegmentSegmentCcdStaticContact::SegmentCcdEdgeType SegmentSegmentCcdStaticContact::computeCollisionEdge(int region,
-		double a,
-		double b,
-		double d) const
-{
-	SegmentSegmentCcdStaticContact::SegmentCcdEdgeType edge = SegmentCcdEdgeTypeEdgeInvalid;
-	switch (region)
-	{
-		case 0: // Global minimum inside [0,1] [0,1]
-			edge = SegmentCcdEdgeTypeEdgeSkip;
-			break;
-		case 1:
-			edge = SegmentCcdEdgeTypeR1;
-			break;
-		case 2: // Upper right corner. One of r and s must be 1.
-			if (a + b + d > 0)
-			{
-				edge = SegmentCcdEdgeTypeS1;
-			}
-			else
-			{
-				edge = SegmentCcdEdgeTypeR1;
-			}
-			break;
-		case 3: // Upper center, s must be 1
-			edge = SegmentCcdEdgeTypeS1;
-			break;
-		case 4: // Upper left, either r is 0 or s is 1
-			if (b + d > 0)
-			{
+				// region = 5;(r <= 0; 0 <= s <= 1)
 				edge = SegmentCcdEdgeTypeR0;
 			}
 			else
 			{
-				edge = SegmentCcdEdgeTypeS1;
+				// region = 4;  (r <= 0; 1 <= s)
+				if (b + d > 0)
+				{
+					edge = SegmentCcdEdgeTypeR0;
+				}
+				else
+				{
+					edge = SegmentCcdEdgeTypeS1;
+				}
 			}
-			break;
-		case 5: // Left middle, r is 0
-			edge = SegmentCcdEdgeTypeR0;
-			break;
-		case 6: // Lower left, either r is 0 or s is 0
+		}
+		else
+		{
+			// region = 6; (r <= 0; s <= 0)
 			if (d > 0)
 			{
 				edge = SegmentCcdEdgeTypeR0;
@@ -272,24 +270,8 @@ SegmentSegmentCcdStaticContact::SegmentCcdEdgeType SegmentSegmentCcdStaticContac
 			{
 				edge = SegmentCcdEdgeTypeS0;
 			}
-			break;
-		case 7: // Lower center, s is 0
-			edge = SegmentCcdEdgeTypeS0;
-			break;
-		case 8: // Lower right, either r is 1 or s is 0
-			if (a + d > 0)
-			{
-				edge = SegmentCcdEdgeTypeS0;
-			}
-			else
-			{
-				edge = SegmentCcdEdgeTypeR1;
-			}
-			break;
-		default:
-			break;
+		}
 	}
-
 	return edge;
 }
 
@@ -388,12 +370,10 @@ void SegmentSegmentCcdStaticContact::computeCollisionParametrics(SegmentCcdEdgeT
 void SegmentSegmentCcdStaticContact::computeParallelSegmentParametrics(double a, double b, double d, double* r,
 		double* s) const
 {
-	double tmp;
-
-	if (b > 0)
+	if (b > 0.0)
 	{
 		// Segments have different directions
-		if (d >= 0)
+		if (d >= 0.0)
 		{
 			// 0-0 end points since r-segment 0 less than s-segment 0
 			*r = 0.0;
@@ -409,7 +389,7 @@ void SegmentSegmentCcdStaticContact::computeParallelSegmentParametrics(double a,
 		{
 			// r-segment 1 is definitely closer
 			*r = 1.0;
-			tmp = a + d;
+			double tmp = a + d;
 			if (-tmp >= b)
 			{
 				*s = 1.0;
@@ -429,7 +409,7 @@ void SegmentSegmentCcdStaticContact::computeParallelSegmentParametrics(double a,
 			*r = 1.0;
 			*s = 0.0;
 		}
-		else if (d <= 0)
+		else if (d <= 0.0)
 		{
 			// mid-0
 			*r = -d / a;
@@ -437,11 +417,11 @@ void SegmentSegmentCcdStaticContact::computeParallelSegmentParametrics(double a,
 		}
 		else
 		{
-			*r = 0;
+			*r = 0.0;
 			// 1-mid
 			if (d >= -b)
 			{
-				*s = 1;
+				*s = 1.0;
 			}
 			else
 			{
