@@ -38,22 +38,10 @@ public:
 	/// Destructor.
 	~SixenseScaffold();
 
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
-
 	/// Gets or creates the scaffold shared by all SixenseDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<SixenseScaffold> getOrCreateSharedInstance();
-
-	/// Sets the default log level.
-	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
-	/// \param logLevel The log level.
-	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
 private:
 	/// Internal shared state data type.
@@ -66,9 +54,7 @@ private:
 	friend struct StateData;
 
 	/// Constructor.
-	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
-	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	SixenseScaffold();
 
 	/// Registers the specified device object.
 	/// If successful, the device object will become connected to an unused controller.
@@ -140,8 +126,6 @@ private:
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
 
-	/// The default logging level.
-	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 	/// How long we're willing to wait for devices to be detected, in milliseconds.
 	static int m_startupDelayMilliseconds;
 	/// How long to wait between trying to detect devices, in milliseconds.

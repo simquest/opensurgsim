@@ -27,9 +27,6 @@ namespace SurgSim
 namespace Devices
 {
 
-using SurgSim::DataStructures::DataGroup;
-using SurgSim::DataStructures::DataGroupBuilder;
-
 /// Struct to hold a KeyboardDevice object, a KeyboardHandler object, and a mutex for data passing.
 struct KeyboardScaffold::DeviceData
 {
@@ -53,19 +50,18 @@ private:
 	DeviceData& operator=(const DeviceData&) /*= delete*/;
 };
 
-KeyboardScaffold::KeyboardScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) : m_logger(logger)
+KeyboardScaffold::KeyboardScaffold() : m_logger(Framework::Logger::getLogger("Devices/Keyboard"))
 {
-	if (!m_logger)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("Keyboard device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
-	SURGSIM_LOG_DEBUG(m_logger) << "Keyboard: Shared scaffold created.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.";
 }
 
 KeyboardScaffold::~KeyboardScaffold()
 {
-	unregisterDevice();
+	if (m_device != nullptr)
+	{
+		unregisterDevice();
+	}
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold destroyed.";
 }
 
 bool KeyboardScaffold::registerDevice(KeyboardDevice* device)
@@ -73,9 +69,10 @@ bool KeyboardScaffold::registerDevice(KeyboardDevice* device)
 	m_device.reset(new DeviceData(device));
 	if (m_device == nullptr)
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "KeyboardScaffold::registerDevice(): failed to create a DeviceData";
+		SURGSIM_LOG_CRITICAL(m_logger) << "Failed to create a DeviceData";
 		return false;
 	}
+	SURGSIM_LOG_DEBUG(m_logger) << "Registered device " << device->getName();
 	return true;
 }
 
@@ -84,16 +81,17 @@ bool KeyboardScaffold::unregisterDevice()
 	m_device.reset();
 	if (m_device == nullptr)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Keyboard: Shared scaffold unregistered.";
+		SURGSIM_LOG_DEBUG(m_logger) << "Unregistered device";
 		return true;
 	}
+	SURGSIM_LOG_DEBUG(m_logger) << "There is no device to unregister.";
 	return false;
 }
 
 bool KeyboardScaffold::updateDevice(int key, int modifierMask)
 {
 	boost::lock_guard<boost::mutex> lock(m_device->mutex);
-	SurgSim::DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
+	DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
 	inputData.integers().set("key", key);
 	inputData.integers().set("modifierMask", modifierMask);
 
@@ -106,11 +104,9 @@ OsgKeyboardHandler* KeyboardScaffold::getKeyboardHandler() const
 	return m_device->keyboardHandler.get();
 }
 
-
-/// Builds the data layout for the application input (i.e. device output).
-SurgSim::DataStructures::DataGroup KeyboardScaffold::buildDeviceInputData()
+DataStructures::DataGroup KeyboardScaffold::buildDeviceInputData()
 {
-	DataGroupBuilder builder;
+	DataStructures::DataGroupBuilder builder;
 	builder.addInteger("key");
 	builder.addInteger("modifierMask");
 	return builder.createData();
@@ -118,21 +114,9 @@ SurgSim::DataStructures::DataGroup KeyboardScaffold::buildDeviceInputData()
 
 std::shared_ptr<KeyboardScaffold> KeyboardScaffold::getOrCreateSharedInstance()
 {
-	static SurgSim::Framework::SharedInstance<KeyboardScaffold> sharedInstance;
+	static Framework::SharedInstance<KeyboardScaffold> sharedInstance;
 	return sharedInstance.get();
 }
-
-void KeyboardScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
-}
-
-std::shared_ptr<SurgSim::Framework::Logger> KeyboardScaffold::getLogger() const
-{
-	return m_logger;
-}
-
-SurgSim::Framework::LogLevel KeyboardScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 };  // namespace Devices
 };  // namespace SurgSim

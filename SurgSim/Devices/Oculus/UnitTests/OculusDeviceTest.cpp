@@ -68,20 +68,6 @@ TEST(OculusDeviceTest, Factory)
 	EXPECT_NE(nullptr, device);
 }
 
-TEST(OculusDeviceTest, FinalizeDevice)
-{
-	auto device = std::make_shared<OculusDevice>("Oculus");
-	ASSERT_TRUE(nullptr != device) << "Device creation failed.";
-
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is an Oculus device plugged in?";
-	EXPECT_TRUE(device->isInitialized());
-	EXPECT_EQ("Oculus", device->getName());
-
-	ASSERT_TRUE(device->finalize()) << "Finalization failed.";
-	EXPECT_FALSE(device->isInitialized());
-	EXPECT_EQ("Oculus", device->getName());
-}
-
 TEST(OculusDeviceTest, RegisterMoreThanOneDevice)
 {
 	auto device1 = std::make_shared<OculusDevice>("Oculus");
@@ -91,14 +77,6 @@ TEST(OculusDeviceTest, RegisterMoreThanOneDevice)
 	auto device2 = std::make_shared<OculusDevice>("Oculus2");
 	ASSERT_TRUE(nullptr != device2) << "Device creation failed.";
 	ASSERT_FALSE(device2->initialize()) << "Initialization should not have succeceded, only one device allowed.";
-}
-
-TEST(OculusDeviceTest, RegisterAndUnregisterDevice)
-{
-	auto device = std::make_shared<OculusDevice>("Oculus");
-	ASSERT_NE(nullptr, device) << "Device creation failed.";
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is an Oculus device plugged in?";
-	ASSERT_TRUE(device->finalize()) << "Finalization failed.";
 }
 
 TEST(OculusDeviceTest, InputConsumer)

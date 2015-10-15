@@ -50,10 +50,6 @@ public:
 	/// Destructor.
 	~LabJackScaffold();
 
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
-
 	/// Gets or creates the scaffold shared by all LabJackDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
@@ -134,10 +130,10 @@ private:
 	bool configureAnalog(DeviceData* deviceData);
 
 	/// Builds the data layout for the application input (i.e. device output).
-	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
+	static DataStructures::DataGroup buildDeviceInputData();
 
 	/// Logger used by the scaffold and all devices.
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+	std::shared_ptr<Framework::Logger> m_logger;
 
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;

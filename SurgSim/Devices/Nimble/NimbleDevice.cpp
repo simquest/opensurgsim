@@ -52,25 +52,22 @@ void NimbleDevice::setupToTrackRightHand()
 bool NimbleDevice::initialize()
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Nimble: Attempt to initialize already initialized device.";
-	m_scaffold = NimbleScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(m_scaffold != nullptr) << "Unable to acquire a NimbleScaffold instance";
+	auto scaffold = NimbleScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr) << "Unable to acquire a NimbleScaffold instance";
 
-	if (!m_scaffold->registerDevice(this))
+	bool initialize = false;
+	if (scaffold->registerDevice(this))
 	{
-		return false;
+		m_scaffold = std::move(scaffold);
+		initialize = true;
 	}
-
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
-	return true;
+	return initialize;
 }
 
 bool NimbleDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized()) << "Nimble: Attempt to finalize an uninitialized device.";
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
-
 	bool ok = m_scaffold->unregisterDevice(this);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalized.";
 	m_scaffold.reset();
 	return ok;
 }

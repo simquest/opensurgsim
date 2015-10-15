@@ -15,20 +15,14 @@
 
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Matrix44d;
-using SurgSim::Math::Matrix33d;
-using SurgSim::Math::RigidTransform3d;
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::Math::RigidTransform3d;
 
 
 namespace SurgSim
@@ -39,33 +33,42 @@ namespace Devices
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::IdentityPoseDevice, IdentityPoseDevice);
 
 IdentityPoseDevice::IdentityPoseDevice(const std::string& uniqueName) :
-	SurgSim::Input::CommonDevice(uniqueName, buildInputData())
+	Input::CommonDevice(uniqueName, buildInputData()),
+	m_initialized(false)
 {
 }
 
 bool IdentityPoseDevice::initialize()
 {
-	// required by the DeviceInterface API
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
+	SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/IdentityPose")) << "Device " << getName() << " initialized.";
+	m_initialized = true;
 	return true;
+}
+
+bool IdentityPoseDevice::isInitialized() const
+{
+	return m_initialized;
 }
 
 bool IdentityPoseDevice::finalize()
 {
-	// required by the DeviceInterface API
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
+	SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/IdentityPose")) << "Device " << getName() << " finalized.";
+	m_initialized = false;
 	return true;
 }
 
 DataGroup IdentityPoseDevice::buildInputData()
 {
 	DataGroupBuilder builder;
-	builder.addPose(SurgSim::DataStructures::Names::POSE);
-	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_0);
+	builder.addPose(DataStructures::Names::POSE);
 	return builder.createData();
 }
 
-bool IdentityPoseDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
+bool IdentityPoseDevice::addInputConsumer(std::shared_ptr<Input::InputConsumerInterface> inputConsumer)
 {
-	if (! CommonDevice::addInputConsumer(std::move(inputConsumer)))
+	if (!CommonDevice::addInputConsumer(std::move(inputConsumer)))
 	{
 		return false;
 	}
@@ -73,8 +76,7 @@ bool IdentityPoseDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputC
 	// The IdentityPoseDevice doesn't have any input events; it just sits there.
 	// So we push the output to all the consumers, including the new one, right away after we add a consumer.
 	// This ensures that all consumers always see the identity pose.
-	getInputData().poses().set(SurgSim::DataStructures::Names::POSE, RigidTransform3d::Identity());
-	getInputData().booleans().set(SurgSim::DataStructures::Names::BUTTON_0, false);
+	getInputData().poses().set(DataStructures::Names::POSE, RigidTransform3d::Identity());
 	pushInput();
 
 	return true;

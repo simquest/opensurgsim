@@ -42,7 +42,7 @@ public:
 };
 
 
-TEST_F(KeyboardDeviceTest, CreateInitializeAndDestroyDevice)
+TEST_F(KeyboardDeviceTest, InitializeDevice)
 {
 	std::shared_ptr<KeyboardDevice> device = std::make_shared<KeyboardDevice>("TestKeyboard");
 
@@ -51,15 +51,6 @@ TEST_F(KeyboardDeviceTest, CreateInitializeAndDestroyDevice)
 
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Keyboard device plugged in?";
 	EXPECT_TRUE(device->isInitialized());
-
-	ASSERT_TRUE(device->finalize()) << "Device finalization failed";
-	EXPECT_FALSE(device->isInitialized());
-
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Keyboard device plugged in?";
-	EXPECT_TRUE(device->isInitialized());
-
-	ASSERT_TRUE(device->finalize()) << "Device finalization failed";
-	EXPECT_FALSE(device->isInitialized());
 }
 
 TEST_F(KeyboardDeviceTest, InputConsumer)
@@ -74,8 +65,6 @@ TEST_F(KeyboardDeviceTest, InputConsumer)
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("key"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("modifierMask"));
-
-	device->finalize();
 }
 
 
