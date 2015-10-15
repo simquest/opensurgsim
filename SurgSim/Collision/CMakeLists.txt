@@ -60,6 +60,7 @@ set(SURGSIM_COLLISION_HEADERS
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h
 	SpherePlaneDcdContact.h
+	ShapeShapeContactCalculation.h
 	SphereSphereDcdContact.h
 	TriangleMeshParticlesDcdContact.h
 	TriangleMeshPlaneDcdContact.h

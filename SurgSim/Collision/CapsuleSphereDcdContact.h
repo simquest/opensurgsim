@@ -20,7 +20,7 @@
 
 #include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/SphereShape.h"
-#include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Collision/ShapeShapeContactCalculation.h"
 
 namespace SurgSim
 {

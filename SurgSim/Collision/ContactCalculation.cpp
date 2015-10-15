@@ -55,13 +55,11 @@ std::list<std::shared_ptr<Contact>> ContactCalculation::calculateContact(
 		/// correct order, this will be correctly implemented and tested for the compound collision object
 		return doCalculateContact(shape2, pose2, shape1, pose1);
 	}
-	else
-	{
-		SURGSIM_FAILURE() << "Incorrect shape type for this calculation expected "
-						  << types.first << ", " << types.second
-						  << " received " << incoming.first << ", " << incoming.second << ".";
-		return std::list<std::shared_ptr<Contact>>();
-	}
+
+	SURGSIM_FAILURE() << "Incorrect shape type for this calculation expected "
+					  << types.first << ", " << types.second
+					  << " received " << incoming.first << ", " << incoming.second << ".";
+	return std::list<std::shared_ptr<Contact>>();
 }
 
 void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)

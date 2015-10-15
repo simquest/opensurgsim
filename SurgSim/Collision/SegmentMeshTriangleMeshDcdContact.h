@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Collision/ShapeShapeContactCalculation.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/SegmentMeshShape.h"
 
