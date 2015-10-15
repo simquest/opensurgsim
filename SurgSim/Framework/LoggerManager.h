@@ -73,6 +73,9 @@ private:
 	/// Keep track of all the loggers
 	std::unordered_map<std::string, std::shared_ptr<Logger>> m_loggers;
 
+	/// Keep track of subgroup thresholds.
+	std::vector<std::pair<std::string, int>> m_thresholds;
+
 	/// Use for default output of the logger
 	std::shared_ptr<LogOutput> m_defaultOutput;
 
