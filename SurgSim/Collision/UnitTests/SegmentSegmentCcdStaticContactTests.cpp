@@ -43,20 +43,16 @@ class MockSegmentSegmentCcdStaticContact : public SurgSim::Collision::SegmentSeg
 public:
 	bool collideStaticPointSegment(
 		const Math::Vector3d& point, const std::array<SurgSim::Math::Vector3d, 2>& p,
-		double thicknessA, double thicknessP,
+		double thicknessPoint, double thicknessSegment,
 		double* r)
 	{
-		return SegmentSegmentCcdStaticContact::collideStaticPointSegment(point, p, thicknessA, thicknessP, r);
+		return SegmentSegmentCcdStaticContact::collideStaticPointSegment(point, p, thicknessPoint, thicknessSegment, r);
 	}
 
-	int computeCollisionRegion(double r, double s, double ratio) const
+	SegmentCcdEdgeType computeCollisionEdge(double a, double b, double d,
+											double r, double s, double ratio) const
 	{
-		return SegmentSegmentCcdStaticContact::computeCollisionRegion(r, s, ratio);
-	}
-
-	SegmentCcdEdgeType computeCollisionEdge(int region, double a, double b, double d) const
-	{
-		return SegmentSegmentCcdStaticContact::computeCollisionEdge(region, a, b, d);
+		return SegmentSegmentCcdStaticContact::computeCollisionEdge(a, b, d, r, s, ratio);
 	}
 
 	void computeCollisionParametrics(SegmentCcdEdgeType edge, double a, double b, double c, double d, double e,
@@ -77,67 +73,7 @@ TEST(SegmentSegmentCcdStaticContactTests, Initialization)
 	SegmentSegmentCcdStaticContact staticTest;
 };
 
-TEST(SegmentSegmentCcdStaticContactTests, RegionGenerator)
-{
-	MockSegmentSegmentCcdStaticContact staticTest;
-	const double ratio = 0.5;
-
-	for (double r = -1.0; r <= 0.0; r += 0.1)
-	{
-		for (double s = -1.0; s < 0.0; s += 0.1)
-		{
-			EXPECT_EQ(6, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-
-		for (double s = 0.0; s <= ratio; s += 0.1)
-		{
-			EXPECT_EQ(5, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-
-		for (double s = ratio + 0.1; s <= 2 * ratio; s += 0.1)
-		{
-			EXPECT_EQ(4, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-	}
-
-	for (double r = 0.0; r <= ratio; r += 0.1)
-	{
-		for (double s = -1.0; s < 0.0; s += 0.1)
-		{
-			EXPECT_EQ(7, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-
-		for (double s = 0.0; s <= ratio; s += 0.1)
-		{
-			EXPECT_EQ(0, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-
-		for (double s = ratio + 0.1; s <= 2 * ratio; s += 0.1)
-		{
-			EXPECT_EQ(3, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-	}
-
-	for (double r = ratio + 0.1; r <= 2 * ratio; r += 0.1)
-	{
-		for (double s = -1.0; s < 0.0; s += 0.1)
-		{
-			EXPECT_EQ(8, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-
-		for (double s = 0.0; s <= ratio; s += 0.1)
-		{
-			EXPECT_EQ(1, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-
-		for (double s = ratio + 0.1; s <= 2 * ratio; s += 0.1)
-		{
-			EXPECT_EQ(2, staticTest.computeCollisionRegion(r, s, ratio));
-		}
-	}
-};
-
-TEST(SegmentSegmentCcdStaticContactTests, EdgeGenerator)
+TEST(SegmentSegmentCcdStaticContactTests, RegionAndEdgeGenerator)
 {
 	MockSegmentSegmentCcdStaticContact staticTest;
 	const double ratio = 0.5;
@@ -145,27 +81,95 @@ TEST(SegmentSegmentCcdStaticContactTests, EdgeGenerator)
 	double b = 1.0;
 	double d = 3.0;
 
-	// Both on segments
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeEdgeSkip, staticTest.computeCollisionEdge(0, a, b, d));
+	for (double r = -1.0; r <= 0.0; r += 0.1)
+	{
+		for (double s = -1.0; s < 0.0; s += 0.1)
+		{
+			// Region 6
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0, staticTest.computeCollisionEdge(a, b, d, r, s,
+					  ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0, staticTest.computeCollisionEdge(a, b, -d, r, s,
+					  ratio));
+		}
 
-	// One on segment, one off.
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1, staticTest.computeCollisionEdge(1, a, b, d));
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1, staticTest.computeCollisionEdge(3, a, b, d));
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0, staticTest.computeCollisionEdge(5, a, b, d));
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0, staticTest.computeCollisionEdge(7, a, b, d));
+		for (double s = 0.0; s <= ratio; s += 0.1)
+		{
+			// Region 5
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
+		}
 
-	// Both off.
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1, staticTest.computeCollisionEdge(2, a, b, d));
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1, staticTest.computeCollisionEdge(2, a, b, -d));
+		for (double s = ratio + 0.1; s <= 2 * ratio; s += 0.1)
+		{
+			// Region 4
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
+		}
+	}
 
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0, staticTest.computeCollisionEdge(4, a, b, d));
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1, staticTest.computeCollisionEdge(4, a, b, -d));
+	for (double r = 0.0; r <= ratio; r += 0.1)
+	{
+		for (double s = -1.0; s < 0.0; s += 0.1)
+		{
+			// Region 7
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
+		}
 
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0, staticTest.computeCollisionEdge(6, a, b, d));
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0, staticTest.computeCollisionEdge(6, a, b, -d));
+		for (double s = 0.0; s <= ratio; s += 0.1)
+		{
+			// Region 0
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeEdgeSkip,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeEdgeSkip,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
+		}
 
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0, staticTest.computeCollisionEdge(8, a, b, d));
-	EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1, staticTest.computeCollisionEdge(8, a, b, -d));
+		for (double s = ratio + 0.1; s <= 2 * ratio; s += 0.1)
+		{
+			// Region 3
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
+		}
+	}
+
+	for (double r = ratio + 0.1; r <= 2 * ratio; r += 0.1)
+	{
+		for (double s = -1.0; s < 0.0; s += 0.1)
+		{
+			// Region 8
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
+		}
+
+		for (double s = 0.0; s <= ratio; s += 0.1)
+		{
+			// Region 1
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
+		}
+
+		for (double s = ratio + 0.1; s <= 2 * ratio; s += 0.1)
+		{
+			// Region 2
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
+		}
+	}
 };
 
 TEST(SegmentSegmentCcdStaticContactTests, CalculateParametrics)
@@ -180,106 +184,113 @@ TEST(SegmentSegmentCcdStaticContactTests, CalculateParametrics)
 	double ratio = 5.0;
 	double r = 4.5;
 	double s = 4.0;
+	{
+		SCOPED_TRACE("Testing region 0. Nearest point is on both segments.");
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeEdgeSkip,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(0.9, r);
+		EXPECT_DOUBLE_EQ(0.8, s);
+	}
 
-	SCOPED_TRACE("Testing region 0. Nearest point is on both segments.");
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeEdgeSkip,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(0.9, r);
-	EXPECT_DOUBLE_EQ(0.8, s);
+	{
+		SCOPED_TRACE("Testing when r = 0. s depends on e and c.");
+		e = 5.0;
+		c = 7.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(0.0, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
 
-	SCOPED_TRACE("Testing when r = 0. s depends on e and c.");
-	e = 5.0;
-	c = 7.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(0.0, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+		e = -5.0;
+		c = 7.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(0.0, r);
+		EXPECT_DOUBLE_EQ(5.0 / 7.0, s);
 
-	e = -5.0;
-	c = 7.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(0.0, r);
-	EXPECT_DOUBLE_EQ(5.0 / 7.0, s);
+		e = -5.0;
+		c = 4.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(0.0, r);
+		EXPECT_DOUBLE_EQ(1.0, s);
+	}
 
-	e = -5.0;
-	c = 4.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(0.0, r);
-	EXPECT_DOUBLE_EQ(1.0, s);
+	{
+		SCOPED_TRACE("Testing when r = 1. s depends on e, b, and c.");
+		e = 5.0;
+		b = -4.0;
+		c = 4.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(1.0, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
 
-	SCOPED_TRACE("Testing when r = 1. s depends on e, b, and c.");
-	e = 5.0;
-	b = -4.0;
-	c = 4.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(1.0, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+		e = -5.0;
+		b = 4.0;
+		c = 4.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(1.0, r);
+		EXPECT_DOUBLE_EQ(0.25, s);
 
-	e = -5.0;
-	b = 4.0;
-	c = 4.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(1.0, r);
-	EXPECT_DOUBLE_EQ(0.25, s);
+		e = -5.0;
+		b = -4.0;
+		c = 4.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(1.0, r);
+		EXPECT_DOUBLE_EQ(1.0, s);
+	}
 
-	e = -5.0;
-	b = -4.0;
-	c = 4.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR1,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(1.0, r);
-	EXPECT_DOUBLE_EQ(1.0, s);
+	{
+		SCOPED_TRACE("Testing when s = 0. r depends on d and a.");
+		d = 7.0;
+		a = 8.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(0.0, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
 
-	SCOPED_TRACE("Testing when s = 0. r depends on d and a.");
-	d = 7.0;
-	a = 8.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(0.0, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+		d = -7.0;
+		a = 8.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(0.875, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
 
-	d = -7.0;
-	a = 8.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(0.875, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+		d = -9.0;
+		a = 8.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(1.0, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
 
-	d = -9.0;
-	a = 8.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(1.0, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+		SCOPED_TRACE("Testing when s = 1. r depends on d, b, and a.");
+		d = 6.0;
+		b = -1.0;
+		a = 8.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(0.0, r);
+		EXPECT_DOUBLE_EQ(1.0, s);
 
-	SCOPED_TRACE("Testing when s = 1. r depends on d, b, and a.");
-	d = 6.0;
-	b = -1.0;
-	a = 8.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(0.0, r);
-	EXPECT_DOUBLE_EQ(1.0, s);
+		d = -6.0;
+		b = -1.0;
+		a = 8.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(0.875, r);
+		EXPECT_DOUBLE_EQ(1.0, s);
 
-	d = -6.0;
-	b = -1.0;
-	a = 8.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(0.875, r);
-	EXPECT_DOUBLE_EQ(1.0, s);
-
-	d = -6.0;
-	b = -6.0;
-	a = 8.0;
-	staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
-										   a, b, c, d, e, ratio, &r, &s);
-	EXPECT_DOUBLE_EQ(1.0, r);
-	EXPECT_DOUBLE_EQ(1.0, s);
+		d = -6.0;
+		b = -6.0;
+		a = 8.0;
+		staticTest.computeCollisionParametrics(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS1,
+											   a, b, c, d, e, ratio, &r, &s);
+		EXPECT_DOUBLE_EQ(1.0, r);
+		EXPECT_DOUBLE_EQ(1.0, s);
+	}
 
 };
 
@@ -293,69 +304,85 @@ TEST(SegmentSegmentCcdStaticContactTests, CalculateParallelParametrics)
 	double r = 4.5;
 	double s = 4.0;
 
-	SCOPED_TRACE("Segments in opposite directions. End point r = s = 0.");
-	a = 4.0;
-	b = 3.2;
-	d = 3.2;
-	staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
-	EXPECT_DOUBLE_EQ(0.0, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+	{
+		SCOPED_TRACE("Segments in opposite directions. End point r = s = 0.");
+		a = 4.0;
+		b = 3.2;
+		d = 3.2;
+		staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
+		EXPECT_DOUBLE_EQ(0.0, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
+	}
 
-	SCOPED_TRACE("Segments in opposite directions. End point s0 in r.");
-	a = 4.0;
-	b = 4.0;
-	d = -3.2;
-	staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
-	EXPECT_DOUBLE_EQ(0.8, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+	{
+		SCOPED_TRACE("Segments in opposite directions. End point s0 in r.");
+		a = 4.0;
+		b = 4.0;
+		d = -3.2;
+		staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
+		EXPECT_DOUBLE_EQ(0.8, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
+	}
 
-	SCOPED_TRACE("Segments in opposite directions. End point r = s = 1.");
-	a = 4.0;
-	b = 3.2;
-	d = -9.2;
-	staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
-	EXPECT_DOUBLE_EQ(1.0, r);
-	EXPECT_DOUBLE_EQ(1.0, s);
+	{
+		SCOPED_TRACE("Segments in opposite directions. End point r = s = 1.");
+		a = 4.0;
+		b = 3.2;
+		d = -9.2;
+		staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
+		EXPECT_DOUBLE_EQ(1.0, r);
+		EXPECT_DOUBLE_EQ(1.0, s);
+	}
 
-	SCOPED_TRACE("Segments in opposite directions. End point r = 1 is closest to s.");
-	a = 4.0;
-	b = 3.2;
-	d = -5.6;
-	staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
-	EXPECT_DOUBLE_EQ(1.0, r);
-	EXPECT_DOUBLE_EQ(0.5, s);
+	{
+		SCOPED_TRACE("Segments in opposite directions. End point r = 1 is closest to s.");
+		a = 4.0;
+		b = 3.2;
+		d = -5.6;
+		staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
+		EXPECT_DOUBLE_EQ(1.0, r);
+		EXPECT_DOUBLE_EQ(0.5, s);
+	}
 
-	SCOPED_TRACE("Segments in same directions, but don't overlap. End point r = 1, s = 0.");
-	a = 4.0;
-	b = -3.2;
-	d = -4.2;
-	staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
-	EXPECT_DOUBLE_EQ(1.0, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+	{
+		SCOPED_TRACE("Segments in same directions, but don't overlap. End point r = 1, s = 0.");
+		a = 4.0;
+		b = -3.2;
+		d = -4.2;
+		staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
+		EXPECT_DOUBLE_EQ(1.0, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
+	}
 
-	SCOPED_TRACE("Segments in same directions, r overlaps s0.");
-	a = 4.0;
-	b = -3.2;
-	d = -3.0;
-	staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
-	EXPECT_DOUBLE_EQ(0.75, r);
-	EXPECT_DOUBLE_EQ(0.0, s);
+	{
+		SCOPED_TRACE("Segments in same directions, r overlaps s0.");
+		a = 4.0;
+		b = -3.2;
+		d = -3.0;
+		staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
+		EXPECT_DOUBLE_EQ(0.75, r);
+		EXPECT_DOUBLE_EQ(0.0, s);
+	}
 
-	SCOPED_TRACE("Segments in same directions, end points r0 and s1 closest.");
-	a = 4.0;
-	b = -3.2;
-	d = 6.0;
-	staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
-	EXPECT_DOUBLE_EQ(0.0, r);
-	EXPECT_DOUBLE_EQ(1.0, s);
+	{
+		SCOPED_TRACE("Segments in same directions, end points r0 and s1 closest.");
+		a = 4.0;
+		b = -3.2;
+		d = 6.0;
+		staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
+		EXPECT_DOUBLE_EQ(0.0, r);
+		EXPECT_DOUBLE_EQ(1.0, s);
+	}
 
-	SCOPED_TRACE("Segments in same directions, and r0 overlaps s.");
-	a = 4.0;
-	b = -3.2;
-	d = 2.4;
-	staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
-	EXPECT_DOUBLE_EQ(0.0, r);
-	EXPECT_DOUBLE_EQ(0.75, s);
+	{
+		SCOPED_TRACE("Segments in same directions, and r0 overlaps s.");
+		a = 4.0;
+		b = -3.2;
+		d = 2.4;
+		staticTest.computeParallelSegmentParametrics(a, b, d, &r, &s);
+		EXPECT_DOUBLE_EQ(0.0, r);
+		EXPECT_DOUBLE_EQ(0.75, s);
+	}
 };
 
 TEST(SegmentSegmentCcdStaticContactTests, PointSegmentCollisions)
@@ -370,82 +397,100 @@ TEST(SegmentSegmentCcdStaticContactTests, PointSegmentCollisions)
 	double thicknessP = 0.75;
 	double r;
 
-	SCOPED_TRACE("Segment degenerate, end 0 is close enough.");
-	point = Math::Vector3d(0.0, 0.0, 0.0);
-	p0 = Math::Vector3d(0.0, 0.0, 1.0 - 1.0e-09 / 4.0);
-	p1 = Math::Vector3d(0.0, 0.0, 1.0 + 1.0e-09 / 4.0);
-	p[0] = p0;
-	p[1] = p1;
-	EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
-	EXPECT_DOUBLE_EQ(0.0, r);
+	{
+		SCOPED_TRACE("Segment degenerate, end 0 is close enough.");
+		point = Math::Vector3d(0.0, 0.0, 0.0);
+		p0 = Math::Vector3d(0.0, 0.0, 1.0 - 1.0e-09 / 4.0);
+		p1 = Math::Vector3d(0.0, 0.0, 1.0 + 1.0e-09 / 4.0);
+		p[0] = p0;
+		p[1] = p1;
+		EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+		EXPECT_DOUBLE_EQ(0.0, r);
+	}
 
-	SCOPED_TRACE("Segment degenerate, end 1 is close enough.");
-	point = Math::Vector3d(0.0, 0.0, 0.0);
-	p0 = Math::Vector3d(0.0, 0.0, 1.0 - 1.0e-09 / 4.0);
-	p1 = Math::Vector3d(0.0, 0.0, 1.0 + 1.0e-09 / 4.0);
-	p[0] = p1;
-	p[1] = p0;
-	EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
-	EXPECT_DOUBLE_EQ(1.0, r);
+	{
+		SCOPED_TRACE("Segment degenerate, end 1 is close enough.");
+		point = Math::Vector3d(0.0, 0.0, 0.0);
+		p0 = Math::Vector3d(0.0, 0.0, 1.0 - 1.0e-09 / 4.0);
+		p1 = Math::Vector3d(0.0, 0.0, 1.0 + 1.0e-09 / 4.0);
+		p[0] = p1;
+		p[1] = p0;
+		EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+		EXPECT_DOUBLE_EQ(1.0, r);
+	}
 
-	SCOPED_TRACE("Segment degenerate, neither point close enough.");
-	point = Math::Vector3d(0.0, 0.0, 0.0);
-	p0 = Math::Vector3d(0.0, 0.0, 1.0 - 1.0e-09 / 4.0);
-	p1 = Math::Vector3d(1.0, 0.0, 1.0 + 1.0e-09 / 4.0);
-	p[0] = p1;
-	p[1] = p1;
-	EXPECT_FALSE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+	{
+		SCOPED_TRACE("Segment degenerate, neither point close enough.");
+		point = Math::Vector3d(0.0, 0.0, 0.0);
+		p0 = Math::Vector3d(0.0, 0.0, 1.0 - 1.0e-09 / 4.0);
+		p1 = Math::Vector3d(1.0, 0.0, 1.0 + 1.0e-09 / 4.0);
+		p[0] = p1;
+		p[1] = p1;
+		EXPECT_FALSE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+	}
 
-	SCOPED_TRACE("Segment clamped to 0, close enough");
-	point = Math::Vector3d(0.0, 0.5, 0.0);
-	p0 = Math::Vector3d(0.5, 0.0, 0.25);
-	p1 = Math::Vector3d(1.5, 0.0, 0.25);
-	p[0] = p0;
-	p[1] = p1;
-	EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
-	EXPECT_DOUBLE_EQ(0.0, r);
+	{
+		SCOPED_TRACE("Segment clamped to 0, close enough");
+		point = Math::Vector3d(0.0, 0.5, 0.0);
+		p0 = Math::Vector3d(0.5, 0.0, 0.25);
+		p1 = Math::Vector3d(1.5, 0.0, 0.25);
+		p[0] = p0;
+		p[1] = p1;
+		EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+		EXPECT_DOUBLE_EQ(0.0, r);
+	}
 
-	SCOPED_TRACE("Segment clamped to 0, not close enough");
-	point = Math::Vector3d(0.0, 1.0, 0.0);
-	p0 = Math::Vector3d(0.5, 0.0, 0.25);
-	p1 = Math::Vector3d(1.5, 0.0, 0.25);
-	p[0] = p0;
-	p[1] = p1;
-	EXPECT_FALSE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+	{
+		SCOPED_TRACE("Segment clamped to 0, not close enough");
+		point = Math::Vector3d(0.0, 1.0, 0.0);
+		p0 = Math::Vector3d(0.5, 0.0, 0.25);
+		p1 = Math::Vector3d(1.5, 0.0, 0.25);
+		p[0] = p0;
+		p[1] = p1;
+		EXPECT_FALSE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+	}
 
-	SCOPED_TRACE("Segment clamped to 1, close enough");
-	point = Math::Vector3d(0.0, 0.5, 0.0);
-	p0 = Math::Vector3d(0.5, 0.0, 0.25);
-	p1 = Math::Vector3d(1.5, 0.0, 0.25);
-	p[0] = p1;
-	p[1] = p0;
-	EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
-	EXPECT_DOUBLE_EQ(1.0, r);
+	{
+		SCOPED_TRACE("Segment clamped to 1, close enough");
+		point = Math::Vector3d(0.0, 0.5, 0.0);
+		p0 = Math::Vector3d(0.5, 0.0, 0.25);
+		p1 = Math::Vector3d(1.5, 0.0, 0.25);
+		p[0] = p1;
+		p[1] = p0;
+		EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+		EXPECT_DOUBLE_EQ(1.0, r);
+	}
 
-	SCOPED_TRACE("Segment clamped to 1, not close enough");
-	point = Math::Vector3d(0.0, 1.0, 0.0);
-	p0 = Math::Vector3d(0.5, 0.0, 0.25);
-	p1 = Math::Vector3d(1.5, 0.0, 0.25);
-	p[0] = p1;
-	p[1] = p0;
-	EXPECT_FALSE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+	{
+		SCOPED_TRACE("Segment clamped to 1, not close enough");
+		point = Math::Vector3d(0.0, 1.0, 0.0);
+		p0 = Math::Vector3d(0.5, 0.0, 0.25);
+		p1 = Math::Vector3d(1.5, 0.0, 0.25);
+		p[0] = p1;
+		p[1] = p0;
+		EXPECT_FALSE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+	}
 
-	SCOPED_TRACE("Segment not clamped, close enough");
-	point = Math::Vector3d(0.0, 0.5, 0.0);
-	p0 = Math::Vector3d(-1.5, 0.0, 0.25);
-	p1 = Math::Vector3d(1.5, 0.0, 0.25);
-	p[0] = p0;
-	p[1] = p1;
-	EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
-	EXPECT_DOUBLE_EQ(0.5, r);
+	{
+		SCOPED_TRACE("Segment not clamped, close enough");
+		point = Math::Vector3d(0.0, 0.5, 0.0);
+		p0 = Math::Vector3d(-1.5, 0.0, 0.25);
+		p1 = Math::Vector3d(1.5, 0.0, 0.25);
+		p[0] = p0;
+		p[1] = p1;
+		EXPECT_TRUE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+		EXPECT_DOUBLE_EQ(0.5, r);
+	}
 
-	SCOPED_TRACE("Segment not clamped, not close enough");
-	point = Math::Vector3d(0.0, 1.0, 0.0);
-	p0 = Math::Vector3d(0.5, 0.0, 0.25);
-	p1 = Math::Vector3d(1.5, 0.0, 0.25);
-	p[0] = p0;
-	p[1] = p1;
-	EXPECT_FALSE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+	{
+		SCOPED_TRACE("Segment not clamped, not close enough");
+		point = Math::Vector3d(0.0, 1.0, 0.0);
+		p0 = Math::Vector3d(0.5, 0.0, 0.25);
+		p1 = Math::Vector3d(1.5, 0.0, 0.25);
+		p[0] = p0;
+		p[1] = p1;
+		EXPECT_FALSE(staticTest.collideStaticPointSegment(point, p, thicknessA, thicknessP, &r));
+	}
 };
 
 TEST(SegmentSegmentCcdStaticContactTests, SegmentSegmentCollisions)

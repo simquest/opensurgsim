@@ -25,32 +25,24 @@ namespace SurgSim
 namespace Collision
 {
 
-/// SegmentSegmentCcdStaticContact computes the self collisions among a SegmentMesh under motion at two
-/// time points parametrized over the time interval [0,1]. An initial phase uses the AABB tree to
-/// select a set of potentially colliding segments from the SegmentMesh. For each of these
-/// candidate segment pairs, the goal is to determine the point of earliest contact should any exist.
+/// SegmentSegmentCcdStaticContact computes if there is contact between two segments at a specific point in time
+/// in support of the CCD calculations for moving intervals. Algorithm optimizations improve performance for
+/// specific orientations and positions of segments such as parallel segments, or segments where the closest
+/// approach is at one or both of the segment endpoints.
 ///
-/// At the highest level the actual collision detection of candidate segment pairs is a two phase
-/// algorithm. First determine if there is contact at the start of an interval and report the contact if
-/// found. If no contact is found at the start, subdivide the interval, determine which of the resulting
-/// candidate subintervals may have collisions, and then recursively check those promising subintervals.
-/// Note that a simple algorithm based on interval arithmetic (including the Interval, LinearMotion and
-/// Polynomial interval classes) allows for a quick determination of promising subintervals allowing many
-/// of the subintervals to be pruned during the subdivision step without forcing the recursion to bottom out.
-///
-/// \sa Interval, LinearMotion, Polynomial, SegmentSegmentCcdIntervalCheck
+/// \sa SegmentSegmentCcdIntervalCheck
 ///
 class SegmentSegmentCcdStaticContact
 {
 public:
 	enum SegmentCcdEdgeType
 	{
-		SegmentCcdEdgeTypeR0,
-		SegmentCcdEdgeTypeR1,
-		SegmentCcdEdgeTypeS0,
-		SegmentCcdEdgeTypeS1,
-		SegmentCcdEdgeTypeEdgeSkip,
-		SegmentCcdEdgeTypeEdgeInvalid
+		SegmentCcdEdgeTypeR0,			// Closest approach occurs at parametric value r = 0
+		SegmentCcdEdgeTypeR1,			// Closest approach occurs at parametric value r = 1
+		SegmentCcdEdgeTypeS0,			// Closest approach occurs at parametric value s = 0
+		SegmentCcdEdgeTypeS1,			// Closest approach occurs at parametric value s = 1
+		SegmentCcdEdgeTypeEdgeSkip,		// Closest approach is not at segment boundary (0.0 <= r,s, <= 1.0)
+		SegmentCcdEdgeTypeEdgeInvalid	// Invalid value
 	};
 
 	/// Constructor.
@@ -89,42 +81,20 @@ protected:
 	/// Determine whether a single point and a segment collide.
 	/// \param point point position.
 	/// \param p segment endpoints.
-	/// \param thicknessA radius of A.
-	/// \param thicknessP radius of segment P.
+	/// \param thicknessPoint radius of the point.
+	/// \param thicknessSegment radius of the segment.
 	/// \param r [out] parametric location of the collision point (if any) on segment p.
 	/// \return false if no collision is occurring, or true otherwise.
 	bool collideStaticPointSegment(
 		const Math::Vector3d& point,
 		const std::array<SurgSim::Math::Vector3d, 2>& p,
-		double thicknessA, double thicknessP,
+		double thicknessPoint, double thicknessSegment,
 		double* r
 	);
 
-	/// Get the region of the global minimum in the r-s space based on the line-line solution
-	/// for parametric variables r and s. The regions determine the potential solutions for
-	/// the contact problem. Region 0 is the proper collision region where the parametric
-	/// values of r and s are in the range [0, 1]. For all other regions, at least one of
-	/// the parametric values will need to be clamped to the [0, 1] range.
+	/// Find the edge to be clamped for the closest point solution using the outline of:
+	/// https://www.assembla.com/spaces/OpenSurgSim/documents/cRWomWC2er5ykpacwqjQYw/download/cRWomWC2er5ykpacwqjQYw
 	///
-	///		r=0	   r=1
-	///		^
-	///		|		|
-	///	4	|	3	|	2
-	///	----|-------|-------	s=1
-	///		|		|
-	///	5	|	0	|	1
-	///		|		|
-	///	----|-------|------->	s=0
-	///		|		|
-	///	6	|	7	|	8
-	///		|		|
-	///
-	/// \param r unnormalized parametric location of the intersection point on line p
-	/// \param s unnormalized parametric location of the intersection point on line q
-	/// \param ratio normalization value defined as (p dot p) . (q dot q) - (p dot q)^2.
-	/// \return the region where r and s lie as defined in the above diagram
-	int computeCollisionRegion(double r, double s, double ratio) const;
-
 	/// Calculates the parametric value that must be clamped in determining the segment -
 	/// segment distance where:
 	/// SegmentCcdEdgeTypeR0 clamp parametric value r to 0
@@ -138,15 +108,20 @@ protected:
 	/// d = (P1 - P0)(P0 - Q0)
 	/// e = -(Q1 - Q0)(P0 - Q0)
 	/// f = (P0 - Q0)(P0 - Q0)
-	/// \param region region under consideration
 	/// \param a value of p dot p
 	/// \param b value of -(p dot q)
 	/// \param d value of p dot (q[0] - p[0])
+	/// \param r unnormalized parametric location of the intersection point on line p
+	/// \param s unnormalized parametric location of the intersection point on line q
+	/// \param ratio normalization value defined as (p dot p) . (q dot q) - (p dot q)^2.
 	/// \return an indicator of the edge (r and s) which must be clamped and its clamp value.
-	SegmentCcdEdgeType computeCollisionEdge(int region, double a, double b, double d) const;
+	SegmentCcdEdgeType computeCollisionEdge(double a, double b, double d,
+											double r, double s, double ratio) const;
 
 	/// Given an edge indicator, clamp the indicated parametric edge and calculate the minimum parametric
-	/// value for the other edge. Definitions of the values are:
+	/// value for the other segment using the outline of:
+	/// https://www.assembla.com/spaces/OpenSurgSim/documents/cRWomWC2er5ykpacwqjQYw/download/cRWomWC2er5ykpacwqjQYw
+	/// Definitions of the values are:
 	/// a = (P1 - P0)(P1 - P0)
 	/// b = -(P1 - P0)(Q1 - Q0)
 	/// c = (Q1 - Q0)(Q1 - Q0)
