@@ -142,7 +142,7 @@ public:
 private:
 	/// \param The contact for one of the representation
 	/// \return The corresponding contact for the second representation
-	std::shared_ptr<Contact> makeComplimentary(std::shared_ptr<Contact>& contact);
+	std::shared_ptr<Contact> makeComplimentary(const std::shared_ptr<Contact>& contact);
 
 	/// Pair of objects that are colliding
 	std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>> m_representations;

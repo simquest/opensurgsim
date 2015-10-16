@@ -64,7 +64,7 @@ std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt,
 		auto contactConstraintData = std::dynamic_pointer_cast<ContactConstraintData>(constraint->getData());
 		SURGSIM_ASSERT(contactConstraintData != nullptr) << "";
 
-		auto& contact = contactConstraintData->getContact();
+		auto contact = contactConstraintData->getContact();
 
 		contact->force = lambda[indexConstraint] * contact->normal;
 	}

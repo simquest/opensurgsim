@@ -153,7 +153,7 @@ bool CollisionPair::isSwapped() const
 	return m_isSwapped;
 }
 
-std::shared_ptr<Contact> CollisionPair::makeComplimentary(std::shared_ptr<Contact>& contact)
+std::shared_ptr<Contact> CollisionPair::makeComplimentary(const std::shared_ptr<Contact>& contact)
 {
 	auto contact2 = std::make_shared<Contact>(contact->type, contact->depth, contact->time, contact->contact,
 		-contact->normal, std::make_pair(contact->penetrationPoints.second, contact->penetrationPoints.first));
