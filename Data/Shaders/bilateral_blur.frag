@@ -40,8 +40,8 @@ const float weights[7] = float[](
 void main(void)
 {
     float depth = texture2D(texture, texCoord0).x;
-    float result = 0;
-    float normalization = 0;
+    float result = 0.0;
+    float normalization = 0.0;
 
         for (int i = 0; i < 7; i++)
         {
