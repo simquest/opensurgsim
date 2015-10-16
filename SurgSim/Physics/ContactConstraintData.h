@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_CONTACTCONSTRAINTDATA_H
 #define SURGSIM_PHYSICS_CONTACTCONSTRAINTDATA_H
 
+#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Physics/ConstraintData.h"
-
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -67,12 +67,27 @@ public:
 		return m_distance;
 	}
 
+	/// \return The contact that uses this constraint data.
+	std::shared_ptr<Collision::Contact> getContact()
+	{
+		return m_contact;
+	}
+
+	/// \param contacts The The contacts that use this constraint data.
+	void setContact(const std::shared_ptr<Collision::Contact>& contact)
+	{
+		m_contact = contact;
+	}
+
 private:
 	/// Plane equation normal vector (normalized vector)
 	SurgSim::Math::Vector3d m_normal;
 
 	/// Plane equation distance to origin
 	double m_distance;
+
+	/// The contacts that use this constraint data.
+	std::shared_ptr<Collision::Contact> m_contact;
 };
 
 };  // namespace Physics

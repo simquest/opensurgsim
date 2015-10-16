@@ -44,7 +44,7 @@ struct Contact
 			const std::pair<SurgSim::DataStructures::Location,
 			SurgSim::DataStructures::Location>& newPenetrationPoints) :
 		type(newType), depth(newDepth), time(newTime), contact(newContact),
-		normal(newNormal), penetrationPoints(newPenetrationPoints)
+		normal(newNormal), penetrationPoints(newPenetrationPoints), force(SurgSim::Math::Vector3d::Zero())
 	{
 	};
 	CollisionDetectionType type;						///< What collision algorithm class was used to get the contact
@@ -54,6 +54,7 @@ struct Contact
 	SurgSim::Math::Vector3d normal;						///< The normal on the contact point (normalized)
 	std::pair<SurgSim::DataStructures::Location,
 		SurgSim::DataStructures::Location> penetrationPoints;	///< The deepest point inside the opposing object
+	SurgSim::Math::Vector3d force;						///< The reaction force to correct this contact.
 };
 
 /// Collision Pair class, it signifies a pair of items that should be checked with the
@@ -122,6 +123,9 @@ public:
 	/// \param	contact	The contact between the first and the second representation.
 	void addContact(const std::shared_ptr<Contact>& contact);
 
+	/// Update the representations by adding the contact to them.
+	void updateRepresentations();
+
 	/// \return	All the contacts.
 	const std::list<std::shared_ptr<Contact>>& getContacts() const;
 
@@ -136,6 +140,10 @@ public:
 	bool isSwapped() const;
 
 private:
+	/// \param The contact for one of the representation
+	/// \return The corresponding contact for the second representation
+	std::shared_ptr<Contact> makeComplimentary(std::shared_ptr<Contact>& contact);
+
 	/// Pair of objects that are colliding
 	std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>> m_representations;
 

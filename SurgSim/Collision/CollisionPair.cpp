@@ -120,11 +120,15 @@ void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
 	SURGSIM_ASSERT(contact->type == getType())
 		<< "Only contacts with the same CollisionDetectionType can be added to this CollisionPair.";
 	m_contacts.push_back(contact);
-	m_representations.first->addContact(m_representations.second, contact);
-	auto contact2 = std::make_shared<Contact>(contact->type, contact->depth, contact->time, contact->contact,
-								  -contact->normal,
-								  std::make_pair(contact->penetrationPoints.second, contact->penetrationPoints.first));
-	m_representations.second->addContact(m_representations.first, contact2);
+}
+
+void CollisionPair::updateRepresentations()
+{
+	for (auto contact : m_contacts)
+	{
+		m_representations.first->addContact(m_representations.second, contact);
+		m_representations.second->addContact(m_representations.first, makeComplimentary(contact));
+	}
 }
 
 const std::list<std::shared_ptr<Contact>>& CollisionPair::getContacts() const
@@ -139,7 +143,7 @@ void CollisionPair::clearContacts()
 
 void CollisionPair::swapRepresentations()
 {
-	SURGSIM_ASSERT(! hasContacts()) << "Can't swap representations after contacts have already been calculated";
+	SURGSIM_ASSERT(!hasContacts()) << "Can't swap representations after contacts have already been calculated";
 	m_isSwapped = !m_isSwapped;
 	std::swap(m_representations.first, m_representations.second);
 }
@@ -147,6 +151,14 @@ void CollisionPair::swapRepresentations()
 bool CollisionPair::isSwapped() const
 {
 	return m_isSwapped;
+}
+
+std::shared_ptr<Contact> CollisionPair::makeComplimentary(std::shared_ptr<Contact>& contact)
+{
+	auto contact2 = std::make_shared<Contact>(contact->type, contact->depth, contact->time, contact->contact,
+		-contact->normal, std::make_pair(contact->penetrationPoints.second, contact->penetrationPoints.first));
+	contact2->force = -contact->force;
+	return contact2;
 }
 
 }; // namespace Collision

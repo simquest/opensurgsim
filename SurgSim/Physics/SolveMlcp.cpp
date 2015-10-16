@@ -16,6 +16,8 @@
 #include "SurgSim/Physics/SolveMlcp.h"
 
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
 namespace SurgSim
@@ -37,6 +39,35 @@ std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt,
 
 	// Solve the Mlcp using a Gauss-Seidel solver
 	m_gaussSeidelSolver.solve(result->getMlcpProblem(), &(result->getMlcpSolution()));
+
+	// lambda
+	const Eigen::VectorXd& lambda = result->getMlcpSolution().x;
+	if (lambda.size() == 0)
+	{
+		return result;
+	}
+
+	// Copy constraintForces back to contact
+	auto& constraintsMapping = result->getConstraintsMapping();
+	const auto& activeConstraints = result->getActiveConstraints();
+
+	for (auto& constraint : activeConstraints)
+	{
+		if (constraint->getType() != ConstraintType::FRICTIONLESS_3DCONTACT)
+		{
+			continue;
+		}
+
+		ptrdiff_t indexConstraint = constraintsMapping.getValue(constraint.get());
+		SURGSIM_ASSERT(indexConstraint >= 0) << "Index for constraint is invalid: " << indexConstraint << std::endl;
+
+		auto contactConstraintData = std::dynamic_pointer_cast<ContactConstraintData>(constraint->getData());
+		SURGSIM_ASSERT(contactConstraintData != nullptr) << "";
+
+		auto& contact = contactConstraintData->getContact();
+
+		contact->force = lambda[indexConstraint] * contact->normal;
+	}
 
 	return result;
 }
