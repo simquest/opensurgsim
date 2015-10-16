@@ -71,9 +71,10 @@ protected:
 	virtual void filterOutput(const std::string& device, const DataStructures::DataGroup& dataToFilter,
 		DataStructures::DataGroup* result);
 
-private:
+protected:
 	bool finalize() override;
 
+private:
 	/// true if initialized and not finalized.
 	bool m_initialized;
 };
