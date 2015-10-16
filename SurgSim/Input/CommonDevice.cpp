@@ -95,7 +95,7 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 			return false;
 		}
 	}
-	
+
 	// NB: callbacks are called with the local m_nameForCallback.
 	// This allows e.g. filters to call their callbacks with a name different from their "real" name.
 	inputConsumer->initializeInput(m_nameForCallback, m_inputData);
