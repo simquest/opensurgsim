@@ -125,14 +125,11 @@ TEST(LoggerManagerTest, Threshold)
 	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, testLogger->getThreshold());
 	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, loggerManager->getThreshold());
 
-	/// setThreshold(pattern, level) will not affect newly created loggers
+	/// setThreshold(pattern, level) will affect newly created loggers if the logger's name matches the pattern
 	auto testLogger2 = loggerManager->getLogger("testLogger2");
 	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, testLogger2->getThreshold());
-
-	/// setThreshold(pattern, level) will not affect newly created loggers
-	/// even the logger's name match the pattern
 	auto logger5 = loggerManager->getLogger("logger5");
-	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, logger5->getThreshold());
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_WARNING, logger5->getThreshold());
 
 	/// Logger manager should own the logger.
 	loggerManager->getLogger("xxx")->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);

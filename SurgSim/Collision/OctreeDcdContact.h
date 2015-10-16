@@ -61,9 +61,13 @@ private:
 	/// node's children. Once a leaf node is reached, contacts are added to the
 	/// CollisionPair.
 	/// \param node the octree node to collide with
-	/// \param [in,out] pair the collision pair that is under consideration
-	/// \param nodePath the path of the current node
+	/// \param octreePose the pose of the octree shape
+	/// \param shape the shape that the octree is colliding with
+	/// \param shapePose the pose of the shape
+	/// \param nodePath the NodePath of the current octree node
+	/// \param result [in,out] all generated contacts are agreggated here
 
+	/// \param nodePath the path of the current node
 	void OctreeDcdContact::calculateContactWithNode(
 		std::shared_ptr<const SurgSim::Math::OctreeShape::NodeType> node,
 		Math::RigidTransform3d octreePose,

@@ -42,9 +42,12 @@ std::list<std::shared_ptr<Contact>> OctreeDcdContact::doCalculateContact(
 									 const std::shared_ptr<Math::Shape>& shape2,
 									 const Math::RigidTransform3d& pose2)
 {
+	SURGSIM_ASSERT(shape1->getType() == Math::SHAPE_TYPE_OCTREE) << "Octree Contact needs an OctreeShape.";
+
 	SurgSim::DataStructures::OctreePath nodePath;
 	std::list<std::shared_ptr<Contact>> result;
 	std::shared_ptr<Math::OctreeShape> shape = std::static_pointer_cast<Math::OctreeShape>(shape1);
+
 	calculateContactWithNode(shape->getOctree(), pose1, shape2, pose2, &nodePath, &result);
 	return result;
 }

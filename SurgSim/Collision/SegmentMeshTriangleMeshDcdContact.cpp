@@ -38,29 +38,16 @@ namespace SurgSim
 namespace Collision
 {
 
-SegmentMeshTriangleMeshDcdContact::SegmentMeshTriangleMeshDcdContact()
+std::pair<int, int> SegmentMeshTriangleMeshDcdContact::getShapeTypes()
 {
-}
-
-std::pair<int,int> SegmentMeshTriangleMeshDcdContact::getShapeTypes()
-{
-	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_SEGMENTMESH, SurgSim::Math::SHAPE_TYPE_MESH);
-}
-
-void SegmentMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
-{
-	auto segmentMeshShape = std::static_pointer_cast<SegmentMeshShape>(pair->getFirst()->getPosedShape());
-	auto triangleMeshShape = std::static_pointer_cast<MeshShape>(pair->getSecond()->getPosedShape());
-
-	auto contacts = calculateContact(*segmentMeshShape, *triangleMeshShape);
-	for (auto& contact : contacts)
-	{
-		pair->addContact(contact);
-	}
+	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_SEGMENTMESH, SurgSim::Math::SHAPE_TYPE_MESH);
 }
 
 std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculateContact(
-	const Math::SegmentMeshShape& segmentMeshShape, const Math::MeshShape& triangleMeshShape)
+									 const Math::SegmentMeshShape& segmentMeshShape,
+									 const Math::RigidTransform3d&,
+									 const Math::MeshShape& triangleMeshShape,
+									 const Math::RigidTransform3d&) const
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -99,31 +86,31 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculate
 
 				// Check if the triangle and capsule intersect.
 				if (SurgSim::Math::calculateContactTriangleCapsule(
-					verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
-					verticesSegment[0], verticesSegment[1], radius,
-					&depth, &penetrationPointTriangle, &penetrationPointCapsule, &normal))
+						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
+						verticesSegment[0], verticesSegment[1], radius,
+						&depth, &penetrationPointTriangle, &penetrationPointCapsule, &normal))
 				{
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
 
 					SurgSim::Math::Vector2d barycentricCoordinate2;
 					SurgSim::Math::barycentricCoordinates(penetrationPointCapsule,
-						verticesSegment[0], verticesSegment[1], &barycentricCoordinate2);
+														  verticesSegment[0], verticesSegment[1], &barycentricCoordinate2);
 					penetrationPoints.first.elementMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate2));
 					penetrationPoints.first.rigidLocalPosition.setValue(penetrationPointTriangle);
 
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
-						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
-						&barycentricCoordinate);
+														  verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
+														  &barycentricCoordinate);
 					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
 					penetrationPoints.second.rigidLocalPosition.setValue(penetrationPointCapsule);
 
 					// Create the contact.
 					contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth),
-						1.0, Vector3d::Zero(), -normal, penetrationPoints));
+									   1.0, Vector3d::Zero(), -normal, penetrationPoints));
 				}
 			}
 		}
