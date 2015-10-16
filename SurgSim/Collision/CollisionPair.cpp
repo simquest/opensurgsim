@@ -124,10 +124,10 @@ void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
 
 void CollisionPair::updateRepresentations()
 {
-	for (auto contact : m_contacts)
+	for (auto& contact : m_contacts)
 	{
 		m_representations.first->addContact(m_representations.second, contact);
-		m_representations.second->addContact(m_representations.first, makeComplimentary(contact));
+		m_representations.second->addContact(m_representations.first, contact->makeComplimentary());
 	}
 }
 
@@ -151,14 +151,6 @@ void CollisionPair::swapRepresentations()
 bool CollisionPair::isSwapped() const
 {
 	return m_isSwapped;
-}
-
-std::shared_ptr<Contact> CollisionPair::makeComplimentary(const std::shared_ptr<Contact>& contact)
-{
-	auto contact2 = std::make_shared<Contact>(contact->type, contact->depth, contact->time, contact->contact,
-		-contact->normal, std::make_pair(contact->penetrationPoints.second, contact->penetrationPoints.first));
-	contact2->force = -contact->force;
-	return contact2;
 }
 
 }; // namespace Collision

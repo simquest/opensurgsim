@@ -60,13 +60,6 @@ std::shared_ptr<PhysicsManagerState>
 		}
 	}
 
-	// Update the representations with the contact data.
-	auto& pairs = result->getCollisionPairs();
-	for (auto& pair : pairs)
-	{
-		pair->updateRepresentations();
-	}
-
 	return result;
 }
 

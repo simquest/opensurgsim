@@ -86,7 +86,7 @@ private:
 	/// Plane equation distance to origin
 	double m_distance;
 
-	/// The contacts that use this constraint data.
+	/// The contact that uses this constraint data.
 	std::shared_ptr<Collision::Contact> m_contact;
 };
 
