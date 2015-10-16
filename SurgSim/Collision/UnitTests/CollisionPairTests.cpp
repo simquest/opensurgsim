@@ -189,6 +189,7 @@ TEST(CollisionPairTests, addContactTest)
 
 	CollisionPair pair(rep0, rep1);
 	pair.addDcdContact(1.0, Vector3d::UnitY(), penetrationPoints);
+	pair.updateRepresentations();
 
 	rep0->update(0.0);
 	rep0->getCollisions().publish();

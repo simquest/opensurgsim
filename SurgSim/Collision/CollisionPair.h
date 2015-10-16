@@ -44,9 +44,16 @@ struct Contact
 			const std::pair<SurgSim::DataStructures::Location,
 			SurgSim::DataStructures::Location>& newPenetrationPoints) :
 		type(newType), depth(newDepth), time(newTime), contact(newContact),
-		normal(newNormal), penetrationPoints(newPenetrationPoints)
+		normal(newNormal), penetrationPoints(newPenetrationPoints), force(SurgSim::Math::Vector3d::Zero())
 	{
-	};
+	}
+	std::shared_ptr<Contact> makeComplimentary()
+	{
+		auto complimentary = std::make_shared<Contact>(type, depth, time, contact,
+			-normal, std::make_pair(penetrationPoints.second, penetrationPoints.first));
+		complimentary->force = -force;
+		return complimentary;
+	}
 	CollisionDetectionType type;						///< What collision algorithm class was used to get the contact
 	double depth;										///< What is the penetration depth for the representation
 	double time;										///< What is the time of the collision, CCD only
@@ -54,6 +61,7 @@ struct Contact
 	SurgSim::Math::Vector3d normal;						///< The normal on the contact point (normalized)
 	std::pair<SurgSim::DataStructures::Location,
 		SurgSim::DataStructures::Location> penetrationPoints;	///< The deepest point inside the opposing object
+	SurgSim::Math::Vector3d force;						///< The reaction force to correct this contact.
 };
 
 /// Collision Pair class, it signifies a pair of items that should be checked with the
@@ -121,6 +129,9 @@ public:
 	/// Adds a contact.
 	/// \param	contact	The contact between the first and the second representation.
 	void addContact(const std::shared_ptr<Contact>& contact);
+
+	/// Update the representations by adding the contacts to them.
+	void updateRepresentations();
 
 	/// \return	All the contacts.
 	const std::list<std::shared_ptr<Contact>>& getContacts() const;
