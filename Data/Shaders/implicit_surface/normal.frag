@@ -76,7 +76,6 @@ void main(void)
 
 	vec3 normal = cross(ddx, ddy);
 	normal = normalize(normal);
-	//normal = 0.5f*(normal+1.0f);
 
 	gl_FragColor =	0.5 * (-normalize(mainCamera.inverseViewMatrix * vec4(normal, 1.0)) + 1.0);
 }

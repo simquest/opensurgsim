@@ -43,26 +43,26 @@ void main(void)
     float result = 0;
     float normalization = 0;
 
-        for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 7; i++)
+    {
+        float sample = texture2D(texture, taps[i]).x;
+        float gaussian = weights[i];
+
+        float closeness = distance(sample, depth); // length(vec3(1,1,1));
+
+        if(closeness < 0.4)
         {
-            float sample = texture2D(texture, taps[i]).x;
-            float gaussian = weights[i];
+            float sampleWeight = exp(-closeness * closeness) * gaussian;
 
-            float closeness = distance(sample, depth); // length(vec3(1,1,1));
-
-            if(closeness < 0.6)
-            {
-                float sampleWeight = exp(-closeness * closeness) * gaussian;
-
-                result += sample * sampleWeight;
-                normalization += sampleWeight;
-            }
-            else
-            {
-                result += depth * gaussian;
-                normalization += gaussian;
-            }
+            result += sample * sampleWeight;
+            normalization += sampleWeight;
         }
+        else
+        {
+            result += depth * gaussian;
+            normalization += gaussian;
+        }
+    }
 
 	gl_FragDepth = result / normalization;
 }

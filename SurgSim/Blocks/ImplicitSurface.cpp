@@ -245,6 +245,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 			std::shared_ptr<Framework::Component> light,
 			float sphereRadius,
 			float sphereScale,
+			float blurRadius,
 			int textureSize,
 			const Math::Vector4f& diffuseColor,
 			const Math::Vector4f& specularColor,
@@ -265,7 +266,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 
 	auto depthPass = createDepthPass(copier, osgCamera, sphereRadius, sphereScale, textureSize, showDebug);
 
-	auto blurPass = createBlurPass(depthPass, textureSize, 4.0, &result, showDebug);
+	auto blurPass = createBlurPass(depthPass, textureSize, blurRadius, &result, showDebug);
 
 	auto normalPass = createNormalPass(blurPass->getRenderTarget()->getDepthTarget(),
 									   textureSize, showDebug);
