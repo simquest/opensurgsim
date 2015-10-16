@@ -17,7 +17,6 @@
 #define SURGSIM_PHYSICS_FEMCONSTRAINTFRICTIONLESSCONTACT_H
 
 #include "SurgSim/Physics/ConstraintImplementation.h"
-#include "SurgSim/Physics/FemRepresentation.h"
 
 namespace SurgSim
 {
@@ -26,7 +25,6 @@ namespace Physics
 {
 
 /// Base class for all FemRepresentation frictionless contact constraint implementation.
-template <class FemLocalization>
 class FemConstraintFrictionlessContact: public ConstraintImplementation
 {
 public:
@@ -50,10 +48,14 @@ private:
 				 ConstraintSideSign sign) override;
 };
 
+typedef FemConstraintFrictionlessContact Fem1DConstraintFrictionlessContact;
+
+typedef FemConstraintFrictionlessContact Fem2DConstraintFrictionlessContact;
+
+typedef FemConstraintFrictionlessContact Fem3DConstraintFrictionlessContact;
+
 }; // namespace Physics
 
 }; // namespace SurgSim
-
-#include "SurgSim/Physics/FemConstraintFrictionlessContact-inl.h"
 
 #endif // SURGSIM_PHYSICS_FEMCONSTRAINTFRICTIONLESSCONTACT_H

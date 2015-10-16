@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H
-#define SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H
+#ifndef SURGSIM_PHYSICS_FEMCONSTRAINTFIXEDPOINT_H
+#define SURGSIM_PHYSICS_FEMCONSTRAINTFIXEDPOINT_H
 
 #include "SurgSim/Physics/ConstraintImplementation.h"
 
@@ -24,17 +24,15 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Fem3DRepresentation bilateral 3d constraint implementation.
-///
-/// The family of FixedPoint constraints enforce equality between two points.
-class Fem3DConstraintFixedPoint : public ConstraintImplementation
+/// Base class for all FemRepresentation fixed point constraint implementation.
+class FemConstraintFixedPoint : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	Fem3DConstraintFixedPoint();
+	FemConstraintFixedPoint();
 
 	/// Destructor
-	virtual ~Fem3DConstraintFixedPoint();
+	virtual ~FemConstraintFixedPoint();
 
 	SurgSim::Physics::ConstraintType getConstraintType() const override;
 
@@ -42,16 +40,22 @@ private:
 	size_t doGetNumDof() const override;
 
 	void doBuild(double dt,
-				 const ConstraintData& data,
-				 const std::shared_ptr<Localization>& localization,
-				 MlcpPhysicsProblem* mlcp,
-				 size_t indexOfRepresentation,
-				 size_t indexOfConstraint,
-				 ConstraintSideSign sign) override;
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign) override;
 };
+
+typedef FemConstraintFixedPoint Fem1DConstraintFixedPoint;
+
+typedef FemConstraintFixedPoint Fem2DConstraintFixedPoint;
+
+typedef FemConstraintFixedPoint Fem3DConstraintFixedPoint;
 
 }; // namespace Physics
 
 }; // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEM3DCONSTRAINTFIXEDPOINT_H
+#endif // SURGSIM_PHYSICS_FEMCONSTRAINTFIXEDPOINT_H

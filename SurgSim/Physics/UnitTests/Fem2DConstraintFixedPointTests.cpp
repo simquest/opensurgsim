@@ -24,10 +24,10 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Physics/Representation.h"
-#include "SurgSim/Physics/Fem2DConstraintFixedPoint.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 #include "SurgSim/Physics/Fem2DLocalization.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
+#include "SurgSim/Physics/FemConstraintFixedPoint.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
 using SurgSim::Math::Vector3d;
