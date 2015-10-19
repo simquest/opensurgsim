@@ -95,7 +95,11 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	auto sphere = std::make_shared<Graphics::OsgSphereRepresentation>("Graphics");
 	sphere->setRadius(0.1);
 
-	auto material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
+	auto material = Graphics::buildMaterial("Shaders/material.vert", "Shaders/material.frag");
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", Math::Vector4f(0.4, 0.4, 0.4, 1.0));
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 	sphere->setMaterial(material);
