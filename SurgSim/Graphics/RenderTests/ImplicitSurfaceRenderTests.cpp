@@ -24,12 +24,15 @@
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -53,6 +56,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	std::array<int, 2> dimensions = {1280, 720};
 	viewElement->getView()->setDimensions(dimensions);
 	viewElement->getCamera()->setPerspectiveProjection(45, 1.7, 0.01, 10.0);
+	viewElement->getCamera()->setAmbientColor(Math::Vector4d(0.2, 0.2, 0.2, 1.0));
 	viewElement->enableManipulator(true);
 
 
@@ -65,6 +69,9 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	lightElement->setPose(makeRigidTranslation(Math::Vector3d(1.0, 1.0, 1.0)));
 	lightElement->addComponent(light);
 	scene->addSceneElement(lightElement);
+
+	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
+	lightElement->addComponent(axes);
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
 			Blocks::createImplicitSurfaceEffect(viewElement->getView(), viewElement->getCamera(), light, 0.01f, 800.0f,
@@ -82,6 +89,21 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	auto element = std::make_shared<Framework::BasicSceneElement>("box");
 	element->setPose(makeRigidTranslation(Math::Vector3d(0.0, 0.0, 0.25)));
 	element->addComponent(cube);
+
+	scene->addSceneElement(element);
+
+	auto sphere = std::make_shared<Graphics::OsgSphereRepresentation>("Graphics");
+	sphere->setRadius(0.1);
+
+	auto material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 10.0f);
+	sphere->setMaterial(material);
+
+	element = std::make_shared<Framework::BasicSceneElement>("Sphere");
+	element->setPose(makeRigidTranslation(Math::Vector3d(0.25, 0.0, 0.0)));
+	element->addComponent(sphere);
+	element->addComponent(material);
 
 	scene->addSceneElement(element);
 
@@ -105,7 +127,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(50000));
 	runtime->stop();
 }
 
