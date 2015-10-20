@@ -53,7 +53,6 @@ uniform LightSource lightSource;
 
 // Oss provided uniforms
 uniform vec4 ambientColor;
-uniform mat4 modelMatrix;
 
 // Incoming from the vertex shader
 varying vec2 texCoord0; ///< Texture unit 0 texture coordinates

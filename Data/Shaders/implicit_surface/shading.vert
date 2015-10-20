@@ -21,10 +21,6 @@
 
 #version 120
 
-// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
-uniform vec4 diffuseColor;
-uniform vec4 specularColor;
-
 // Outgoing Values
 varying vec2 texCoord0; ///< Texture unit 0 texture coordinates
 varying vec4 clipCoord; ///< Projected and transformed vertex coordinates
