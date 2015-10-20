@@ -198,7 +198,7 @@ void RigidRepresentation::beforeUpdate(double dt)
 	RigidRepresentationBase::beforeUpdate(dt);
 
 	SURGSIM_LOG_IF(!m_parametersValid,
-				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getFullName() <<
 						   " deactivated in beforeUpdate because parameters are not valid." << std::endl;
 	if (!m_parametersValid)
 	{
