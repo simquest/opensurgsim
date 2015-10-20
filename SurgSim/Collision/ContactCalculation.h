@@ -21,7 +21,7 @@
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
@@ -66,6 +66,15 @@ public:
 	/// \return Return the shape types this class handles.
 	virtual std::pair<int, int> getShapeTypes() = 0;
 
+	static void registerContactCalculation(const std::shared_ptr<ContactCalculation>& calculation);
+	static void registerContactCalculation(const std::shared_ptr<ContactCalculation>& calculation,
+										   const std::pair<int, int>& types);
+
+	typedef
+	std::array<std::array<std::shared_ptr<ContactCalculation>, Math::SHAPE_TYPE_COUNT>, Math::SHAPE_TYPE_COUNT>
+	TableType;
+
+	static const TableType& getContactTable();
 private:
 
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
@@ -81,6 +90,12 @@ private:
 	virtual std::list<std::shared_ptr<Contact>> doCalculateContact(
 				const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
 				const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) = 0;
+
+
+	static void initializeTable();
+
+
+	static TableType m_contactCalculations;
 
 };
 

@@ -14,14 +14,19 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/ContactCalculation.h"
-
+#include "SurgSim/Collision/DefaultContactCalculation.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Math/Shape.h"
+
+
+#include <thread>
+#include <mutex>
 
 namespace SurgSim
 {
 namespace Collision
 {
+
+ContactCalculation::TableType ContactCalculation::m_contactCalculations;
 
 ContactCalculation::ContactCalculation()
 {
@@ -29,6 +34,38 @@ ContactCalculation::ContactCalculation()
 
 ContactCalculation::~ContactCalculation()
 {
+}
+
+void ContactCalculation::registerContactCalculation(const std::shared_ptr<ContactCalculation>& calculation)
+{
+	registerContactCalculation(calculation, calculation->getShapeTypes());
+}
+
+void ContactCalculation::registerContactCalculation(
+	const std::shared_ptr<ContactCalculation>& calculation,
+	const std::pair<int, int>& types)
+{
+	static std::once_flag flag;
+	std::call_once(flag, ContactCalculation::initializeTable);
+
+	m_contactCalculations[types.first][types.second] = calculation;
+	m_contactCalculations[types.second][types.first] = calculation;
+}
+
+const ContactCalculation::TableType& ContactCalculation::getContactTable()
+{
+	return m_contactCalculations;
+}
+
+void ContactCalculation::initializeTable()
+{
+	for (int i = 0; i < SurgSim::Math::SHAPE_TYPE_COUNT; ++i)
+	{
+		for (int j = 0; j < SurgSim::Math::SHAPE_TYPE_COUNT; ++j)
+		{
+			m_contactCalculations[i][j].reset(new Collision::DefaultContactCalculation(false));
+		}
+	}
 }
 
 void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
@@ -48,12 +85,16 @@ std::list<std::shared_ptr<Contact>> ContactCalculation::calculateContact(
 	{
 		return doCalculateContact(shape1, pose1, shape2, pose2);
 	}
+
 	if (incoming.first == types.second && incoming.second == types.first)
 	{
-		SURGSIM_FAILURE() << "The shapes need to be passed in the correct order";
-		/// HS-14-oct-2015 This section is currently unused as the collision pair interface will take care of the
-		/// correct order, this will be correctly implemented and tested for the compound collision object
-		return doCalculateContact(shape2, pose2, shape1, pose1);
+		auto contacts = doCalculateContact(shape2, pose2, shape1, pose1);
+		for (const auto& contact : contacts)
+		{
+			contact->normal = -contact->normal;
+			// contact->force = -contact->force;
+		}
+		return contacts;
 	}
 
 	SURGSIM_FAILURE() << "Incorrect shape type for this calculation expected "

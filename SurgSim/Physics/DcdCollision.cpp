@@ -50,50 +50,70 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	auto threadPool = Framework::Runtime::getThreadPool();
 	std::vector<std::future<void>> tasks;
 
+	const auto& calculations = ContactCalculation::getContactTable();
+
 	updatePairs(result);
 
 	for (auto& pair : result->getCollisionPairs())
 	{
 		if (pair->getType() == Collision::COLLISION_DETECTION_TYPE_DISCRETE)
 		{
-			tasks.push_back(threadPool->enqueue<void>([&] ()
+			tasks.push_back(threadPool->enqueue<void>([&]()
 			{
-				m_contactCalculations[pair->getFirst()->getShapeType()]
-									 [pair->getSecond()->getShapeType()]->calculateContact(pair);
+				calculations[pair->getFirst()->getShapeType()]
+				[pair->getSecond()->getShapeType()]->calculateContact(pair);
 			}));
 		}
 	}
 
-	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.wait();});
+	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p)
+	{
+		p.wait();
+	});
 
 	return result;
 }
 
 void DcdCollision::populateCalculationTable()
 {
-	for (int i = 0; i < SurgSim::Math::SHAPE_TYPE_COUNT; ++i)
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::BoxCapsuleDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::BoxDoubleSidedPlaneDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::BoxPlaneDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::BoxSphereDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::CapsuleSphereDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::OctreeCapsuleDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::OctreeDoubleSidedPlaneDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::OctreePlaneDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::OctreeSphereDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::SegmentMeshTriangleMeshDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::SphereSphereDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::SphereDoubleSidedPlaneDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::SpherePlaneDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::TriangleMeshParticlesDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::TriangleMeshPlaneDcdContact>());
+	ContactCalculation::registerContactCalculation(std::make_shared<Collision::TriangleMeshTriangleMeshDcdContact>());
+
+	const std::array<int, Math::SHAPE_TYPE_COUNT> allshapes =
 	{
-		for (int j = 0; j < SurgSim::Math::SHAPE_TYPE_COUNT; ++j)
-		{
-			m_contactCalculations[i][j].reset(new Collision::DefaultContactCalculation(false));
-		}
+		Math::SHAPE_TYPE_BOX,
+		Math::SHAPE_TYPE_CAPSULE,
+		Math::SHAPE_TYPE_CYLINDER,
+		Math::SHAPE_TYPE_DOUBLESIDEDPLANE,
+		Math::SHAPE_TYPE_MESH,
+		Math::SHAPE_TYPE_OCTREE,
+		Math::SHAPE_TYPE_PARTICLES,
+		Math::SHAPE_TYPE_PLANE,
+		Math::SHAPE_TYPE_SPHERE,
+		Math::SHAPE_TYPE_SURFACEMESH,
+		Math::SHAPE_TYPE_SEGMENTMESH,
+		Math::SHAPE_TYPE_COMPOUNDSHAPE
+	};
+
+	for (auto type : allshapes)
+	{
+		ContactCalculation::registerContactCalculation(std::make_shared<Collision::CompoundShapeDcdContact>(
+					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, type)));
 	}
-	setDcdContactInTable(std::make_shared<Collision::BoxCapsuleDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::BoxDoubleSidedPlaneDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::BoxPlaneDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::BoxSphereDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::CapsuleSphereDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::OctreeCapsuleDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::OctreeDoubleSidedPlaneDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::OctreePlaneDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::OctreeSphereDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::SegmentMeshTriangleMeshDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::SphereSphereDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::SphereDoubleSidedPlaneDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::SpherePlaneDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::TriangleMeshParticlesDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::TriangleMeshPlaneDcdContact>());
-	setDcdContactInTable(std::make_shared<Collision::TriangleMeshTriangleMeshDcdContact>());
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
@@ -121,16 +141,6 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 		}
 
 		state->setCollisionPairs(pairs);
-	}
-}
-
-void DcdCollision::setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact)
-{
-	std::pair<int,int> shapeTypes = dcdContact->getShapeTypes();
-	m_contactCalculations[shapeTypes.first][shapeTypes.second] = dcdContact;
-	if (shapeTypes.first != shapeTypes.second)
-	{
-		m_contactCalculations[shapeTypes.second][shapeTypes.first] = dcdContact;
 	}
 }
 

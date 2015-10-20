@@ -58,7 +58,7 @@ protected:
 	/// \param dt	The time passed.
 	/// \param state The PhysicsManagerState from previous computation.
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
-		override;
+	override;
 
 private:
 
@@ -68,13 +68,6 @@ private:
 	/// Updates the collision pairs
 	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
 
-	/// Function to populate the m_contactCalculations table for each DcdContact class.
-	void setDcdContactInTable(std::shared_ptr<Collision::ContactCalculation> dcdContact);
-
-	/// Table containing contact calculation, the indices indicate the type of
-	/// the first pair object and the second pair object in order
-	std::shared_ptr<Collision::ContactCalculation> m_contactCalculations[Math::SHAPE_TYPE_COUNT]
-																		[Math::SHAPE_TYPE_COUNT];
 };
 
 }; // Physics
