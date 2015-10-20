@@ -34,12 +34,12 @@ typedef Eigen::SparseMatrix<double> SparseMatrix;
 /// \tparam DerivedSub The class of the matrix from which the data are copied
 /// \tparam SparseType The type of the SparseVector/SparseMatrix containing the chunk of memory
 /// \tparam StorageOrder The storage option of the SparseType
-template <class DerivedSub, class SparseType,
-	int StorageOrder =
-	((SparseType::Flags & Eigen::RowMajorBit) == Eigen::RowMajorBit) ? Eigen::RowMajor : Eigen::ColMajor>
+template < class DerivedSub, class SparseType,
+		   int StorageOrder =
+		   ((SparseType::Flags & Eigen::RowMajorBit) == Eigen::RowMajorBit) ? Eigen::RowMajor : Eigen::ColMajor >
 class Operation
 {
-public:
+public :
 	typedef typename SparseType::Scalar T;
 	typedef typename SparseType::Index Index;
 
@@ -187,7 +187,7 @@ template <typename DerivedSub, typename T, int Opt, typename Index>
 void blockWithSearch(const DerivedSub& subMatrix, size_t rowStart, size_t columnStart, size_t n, size_t m,
 					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
 					 void (Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::*op)
-					   (T*, size_t, size_t, size_t, const DerivedSub&, size_t))
+					 (T*, size_t, size_t, size_t, const DerivedSub&, size_t))
 {
 	typedef typename DerivedSub::Index DerivedSubIndexType;
 
@@ -209,8 +209,8 @@ void blockWithSearch(const DerivedSub& subMatrix, size_t rowStart, size_t column
 	const Index* innerIndices = matrix->innerIndexPtr();
 	const Index* outerIndices = matrix->outerIndexPtr();
 
-	Index outerStart = (Opt == Eigen::ColMajor ? columnStart : rowStart);
-	Index innerStart = (Opt == Eigen::ColMajor ? rowStart : columnStart);
+	Index outerStart = static_cast<Index>(Opt == Eigen::ColMajor ? columnStart : rowStart);
+	Index innerStart = static_cast<Index>(Opt == Eigen::ColMajor ? rowStart : columnStart);
 	Index outerSize = static_cast<Index>(Opt == Eigen::ColMajor ? m : n);
 	Index innerSize = static_cast<Index>(Opt == Eigen::ColMajor ? n : m);
 
@@ -299,7 +299,7 @@ void blockOperation(const DerivedSub& subMatrix, size_t rowStart, size_t columnS
 		for (Index column = 0; column < m; ++column)
 		{
 			(operation.*op)(
-				&matrix->coeffRef(rowStart + row, columnStart + column),
+				&matrix->coeffRef(static_cast<Index>(rowStart) + row, static_cast<Index>(columnStart) + column),
 				static_cast<T>(subMatrix(row, column)));
 		}
 	}
@@ -347,20 +347,20 @@ void addSubMatrix(const DerivedSub& subMatrix, size_t blockIdRow, size_t blockId
 /// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
 template <typename DerivedSub, typename T, int Opt, typename Index>
 void assignSubMatrix(const DerivedSub& subMatrix, size_t blockIdRow, size_t blockIdCol,
-				  Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true)
+					 Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true)
 {
 	if (initialize)
 	{
 		blockOperation(subMatrix, (subMatrix.rows() * blockIdRow),
-			(subMatrix.cols() * blockIdCol), matrix,
-			&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::assign);
+					   (subMatrix.cols() * blockIdCol), matrix,
+					   &Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::assign);
 	}
 	else
 	{
 		blockWithSearch(subMatrix, (subMatrix.rows() * blockIdRow),
-			(subMatrix.cols() * blockIdCol),
-			subMatrix.rows(), subMatrix.cols(), matrix,
-			&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::assign);
+						(subMatrix.cols() * blockIdCol),
+						subMatrix.rows(), subMatrix.cols(), matrix,
+						&Operation<DerivedSub, Eigen::SparseMatrix<T, Opt, Index>>::assign);
 	}
 }
 
@@ -372,9 +372,9 @@ void zeroRow(size_t row, Eigen::SparseMatrix<T, Opt, Index>* matrix)
 {
 	for (Index column = 0; column < matrix->cols(); ++column)
 	{
-		if (matrix->coeff(row, column))
+		if (matrix->coeff(static_cast<Index>(row), column))
 		{
-			matrix->coeffRef(row, column) = 0;
+			matrix->coeffRef(static_cast<Index>(row), column) = 0;
 		}
 	}
 }
@@ -387,9 +387,9 @@ inline void zeroColumn(size_t column, Eigen::SparseMatrix<T, Opt, Index>* matrix
 {
 	for (Index row = 0; row < matrix->rows(); ++row)
 	{
-		if (matrix->coeff(row, column))
+		if (matrix->coeff(row, static_cast<Index>(column)))
 		{
-			matrix->coeffRef(row, column) = 0;
+			matrix->coeffRef(row, static_cast<Index>(column)) = 0;
 		}
 	}
 }
