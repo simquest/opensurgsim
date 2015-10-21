@@ -21,9 +21,6 @@ uniform float shininess;
 uniform sampler2D diffuseMap;
 uniform sampler2D shadowMap;
 
-// Oss provided uniforms
-uniform vec4 ambientColor;
-
 // Incoming from the vertex shader
 varying vec3 lightDir;
 varying vec3 eyeDir;
@@ -33,13 +30,12 @@ varying vec2 texCoord0;
 
 varying vec3 vertexDiffuseColor;
 varying vec3 vertexSpecularColor;
+varying vec3 vertexAmbientColor;
 
 varying vec4 clipCoord;
 
 void main(void) 
 {	
-	vec3 vAmbient = ambientColor.xyz; // Old Term ...  osg_ambientColor * _lightColor;
-
 	vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
 	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
     
@@ -55,7 +51,7 @@ void main(void)
  	vec3 vSpecular = vertexSpecularColor * specular * shadowAmount;		
 
 	vec3 base = texture2D(diffuseMap, texCoord0).rgb;
-	vec3 color = (vAmbient + vDiffuse) * base + vSpecular;
+	vec3 color = (vertexAmbientColor + vDiffuse) * base + vSpecular;
 	
 	gl_FragColor.rgb = color;
 	gl_FragColor.a = 1.0;
