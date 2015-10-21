@@ -76,7 +76,7 @@ void main(void)
         discard;
     }
 
-	vec4 eyeDir4 = mainCamera.inverseViewMatrix * vec4(getEyeSpacePos(texCoord0, depth), 1.0);
+	vec4 eyeDir4 = vec4(getEyeSpacePos(texCoord0, depth), 1.0);
 
 	vec3 lightDir = (mainCamera.viewMatrix * lightSource.position - eyeDir4).xyz;
     float lightDistance = length(lightDir);

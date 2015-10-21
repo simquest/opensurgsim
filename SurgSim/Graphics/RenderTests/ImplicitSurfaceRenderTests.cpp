@@ -66,7 +66,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
 	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
-	lightElement->setPose(makeRigidTranslation(Math::Vector3d(1.0, 1.0, 1.0)));
+	lightElement->setPose(makeRigidTranslation(Math::Vector3d(0.5, 0.5, 0.5)));
 	lightElement->addComponent(light);
 	scene->addSceneElement(lightElement);
 
@@ -76,7 +76,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
 			Blocks::createImplicitSurfaceEffect(viewElement->getView(), viewElement->getCamera(), light, 0.01f, 800.0f,
 												1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0),
-												Math::Vector4f(0.4, 0.4, 0.4, 1.0), 10, false);
+												Math::Vector4f(0.4, 0.4, 0.4, 1.0), 10.0f, false);
 
 	for (auto element : surface)
 	{
