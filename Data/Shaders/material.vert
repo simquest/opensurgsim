@@ -23,6 +23,7 @@ uniform vec4 specularColor;
 // Oss provided uniforms
 uniform mat4 viewMatrix;
 
+uniform vec4 ambientColor;
 
 struct LightSource {
 	vec4 diffuse; 
@@ -46,7 +47,7 @@ varying vec4 clipCoord; ///< Projected and transformed vertex coordinates
 
 varying vec3 vertexDiffuseColor;
 varying vec3 vertexSpecularColor;
-
+varying vec3 vAmbient;
 
 void main(void)
 {
@@ -71,4 +72,6 @@ void main(void)
 		
     vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).xyz;	
 	vertexSpecularColor = (attenuation * specularColor * lightSource.specular).xyz;
+
+	vAmbient = ambientColor.xyz * diffuseColor;
 } 

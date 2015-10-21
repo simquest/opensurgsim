@@ -19,9 +19,6 @@
 // These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform float shininess;
 
-// Oss provided uniforms
-uniform vec4 ambientColor;
-
 // Incoming from the vertex shader
 varying vec3 lightDir;
 varying vec3 eyeDir;
@@ -34,10 +31,10 @@ varying vec3 vertexSpecularColor;
 
 varying vec4 clipCoord;
 
+varying vec3 vAmbient;
+
 void main(void) 
 {	
-	vec3 vAmbient = ambientColor.xyz; // Old Term ...  osg_ambientColor * _lightColor;
-    
     vec3 lightDirNorm = normalize(lightDir);
 	vec3 eyeDirNorm = normalize(eyeDir);
 	vec3 normalDirNorm = normalize(normalDir);
