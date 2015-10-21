@@ -78,5 +78,5 @@ void main(void)
 	vec3 normal = cross(ddx, ddy);
 	normal = normalize(normal);
 
-	gl_FragColor = 0.5 * vec4(normal, 1.0) + 1.0;
+	gl_FragColor = vec4(normal, 1.0);
 }

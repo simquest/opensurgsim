@@ -93,10 +93,10 @@ void main(void)
     float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
     vec3 vAmbient = ambientColor.xyz * vertexDiffuseColor;
 
-    vec3 normal = texture2D(normalMap, texCoord0).xyz * 2.0 - 1.0;
+    vec3 normal = texture2D(normalMap, texCoord0).xyz;
 
     vec3 lightDirNorm = normalize(lightDir);
-    vec3 eyeDirNorm = normalize(eyeDir4).xyz;
+    vec3 eyeDirNorm = normalize(eyeDir4.xyz);
     vec3 normalDirNorm = normalize(normal);
 
     float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
