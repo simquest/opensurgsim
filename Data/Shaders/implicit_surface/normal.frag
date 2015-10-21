@@ -21,11 +21,12 @@
 
 #version 120
 
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform sampler2D depthMap;
 uniform float maxDepth = 0.999999f;
 uniform float texelSize = 1.0/1024.0;
 
-/// Main Camera Matrices
+// Main Camera Matrices
 struct MainCamera
 {
 	mat4 viewMatrix;
@@ -77,5 +78,6 @@ void main(void)
 	vec3 normal = cross(ddx, ddy);
 	normal = normalize(normal);
 
-	gl_FragColor =	0.5 * (-normalize(mainCamera.inverseViewMatrix * vec4(normal, 1.0)) + 1.0);
+	gl_FragColor = vec4(normal, 1.0);
 }
+
