@@ -40,10 +40,35 @@ std::shared_ptr<PhysicsManagerState> PostUpdate::doUpdate(
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
-	auto& representations = result->getActiveRepresentations();
-	for (auto& representation : representations)
 	{
-		representation->afterUpdate(dt);
+		const auto& representations = result->getActiveRepresentations();
+		for (auto& representation : representations)
+		{
+			representation->afterUpdate(dt);
+		}
+	}
+
+	{
+		// Clear the collisions
+		auto const& representations = result->getActiveCollisionRepresentations();
+
+		for (auto& representation : representations)
+		{
+			representation->getCollisions().unsafeGet().clear();
+		}
+
+		// Update the representations with the contact data.
+		auto& pairs = result->getCollisionPairs();
+		for (auto& pair : pairs)
+		{
+			pair->updateRepresentations();
+		}
+
+		// Publish Results
+		for (auto& representation : representations)
+		{
+			representation->getCollisions().publish();
+		}
 	}
 
 	return result;
