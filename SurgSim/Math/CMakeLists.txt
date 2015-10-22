@@ -54,8 +54,8 @@ set(SURGSIM_MATH_HEADERS
 	Aabb.h
 	BoxShape.h
 	CapsuleShape.h
-	CylinderShape.h
 	CompoundShape.h
+	CylinderShape.h
 	DoubleSidedPlaneShape.h
 	GaussLegendreQuadrature.h
 	Geometry.h

@@ -51,7 +51,7 @@ TextRepresentation::TextRepresentation(const std::string name) : Representation(
 									  getBackgroundColor, setBackgroundColor);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, double, BackgroundMargin,
- 									  getBackgroundMargin, setBackgroundMargin);
+									  getBackgroundMargin, setBackgroundMargin);
 
 }
 

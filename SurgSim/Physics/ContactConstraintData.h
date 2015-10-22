@@ -32,8 +32,8 @@ class ContactConstraintData : public ConstraintData
 public:
 	/// Default constructor
 	ContactConstraintData() :
-	ConstraintData(),
-	m_distance(0.0)
+		ConstraintData(),
+		m_distance(0.0)
 	{
 		m_normal.setZero();
 	}
@@ -74,9 +74,9 @@ public:
 	}
 
 	/// \param contacts The The contacts that use this constraint data.
-	void setContact(const std::shared_ptr<Collision::Contact>& contact)
+	void setContact(const std::shared_ptr<Collision::Contact>& contacts)
 	{
-		m_contact = contact;
+		m_contact = contacts;
 	}
 
 private:
