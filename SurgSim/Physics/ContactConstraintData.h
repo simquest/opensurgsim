@@ -73,7 +73,7 @@ public:
 		return m_contact;
 	}
 
-	/// \param contacts The The contacts that use this constraint data.
+	/// \param contacts The contacts that use this constraint data.
 	void setContact(const std::shared_ptr<Collision::Contact>& contacts)
 	{
 		m_contact = contacts;
