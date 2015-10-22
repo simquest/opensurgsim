@@ -95,14 +95,19 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculate
 
 					SurgSim::Math::Vector2d barycentricCoordinate2;
 					SurgSim::Math::barycentricCoordinates(penetrationPointCapsule,
-														  verticesSegment[0], verticesSegment[1], &barycentricCoordinate2);
+														  verticesSegment[0],
+														  verticesSegment[1],
+														  &barycentricCoordinate2);
 					penetrationPoints.first.elementMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate2));
 					penetrationPoints.first.rigidLocalPosition.setValue(penetrationPointTriangle);
 
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
-														  verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
+														  verticesTriangle[0],
+														  verticesTriangle[1],
+														  verticesTriangle[2],
+														  normalTriangle,
 														  &barycentricCoordinate);
 					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));

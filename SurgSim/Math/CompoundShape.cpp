@@ -107,8 +107,9 @@ Matrix33d CompoundShape::getSecondMomentOfVolume() const
 				const auto& shape = subShape.first;
 				const auto& pose = subShape.second;
 				const auto& r = pose.linear();
-				Matrix33d	skew = makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
-				Matrix33d inertia = r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
+				Matrix33d skew = makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
+				Matrix33d inertia =
+					r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
 
 				result += inertia;
 			}

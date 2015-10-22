@@ -66,9 +66,8 @@ private:
 	/// \param shapePose the pose of the shape
 	/// \param nodePath the NodePath of the current octree node
 	/// \param result [in,out] all generated contacts are agreggated here
-
-	/// \param nodePath the path of the current node
-	void OctreeDcdContact::calculateContactWithNode(
+	/// \param nodePath [in,out] the path of the current node
+	void calculateContactWithNode(
 		std::shared_ptr<const SurgSim::Math::OctreeShape::NodeType> node,
 		Math::RigidTransform3d octreePose,
 		const std::shared_ptr<Math::Shape>& shape,
