@@ -130,5 +130,10 @@ void SegmentMeshShape::updateAabbTree()
 	m_aabbTree->set(std::move(items));
 }
 
+bool SegmentMeshShape::isTransformable() const
+{
+	return true;
+}
+
 }; // namespace Math
 }; // namespace SurgSim

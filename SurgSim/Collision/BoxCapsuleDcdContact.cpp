@@ -62,35 +62,16 @@ namespace SurgSim
 namespace Collision
 {
 
-BoxCapsuleDcdContact::BoxCapsuleDcdContact()
-{
-}
-
 std::pair<int, int> BoxCapsuleDcdContact::getShapeTypes()
 {
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_CAPSULE);
-}
-
-void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
-{
-	std::shared_ptr<Representation> box = pair->getFirst();
-	std::shared_ptr<Representation> capsule = pair->getSecond();
-
-	auto boxShape = std::static_pointer_cast<BoxShape>(box->getShape());
-	auto capsuleShape = std::static_pointer_cast<CapsuleShape>(capsule->getShape());
-
-	auto contacts = calculateContact(*boxShape, box->getPose(), *capsuleShape, capsule->getPose());
-	for (auto& contact : contacts)
-	{
-		pair->addContact(contact);
-	}
 }
 
 std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateContact(
 									 const SurgSim::Math::BoxShape& boxShape,
 									 const SurgSim::Math::RigidTransform3d& boxPose,
 									 const SurgSim::Math::CapsuleShape& capsuleShape,
-									 const SurgSim::Math::RigidTransform3d& capsulePose)
+									 const SurgSim::Math::RigidTransform3d& capsulePose) const
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -198,10 +179,10 @@ std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateContact(
 		normal = boxPose.linear() * normal;
 		std::pair<Location, Location> penetrationPoints = std::make_pair(Location(deepestBoxPoint),
 				Location(capsulePose.inverse() * boxPose * deepestCapsulePoint));
-		contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, distance, 1.0,
-						   Vector3d::Zero(), normal, penetrationPoints));
+		contacts.emplace_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, distance, 1.0,
+							  Vector3d::Zero(), normal, penetrationPoints));
 	}
-	return std::move(contacts);
+	return contacts;
 }
 
 }; // namespace Collision

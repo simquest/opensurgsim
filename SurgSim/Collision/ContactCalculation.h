@@ -19,10 +19,18 @@
 #include <memory>
 
 #include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Math/RigidTransform.h"
+
 
 
 namespace SurgSim
 {
+
+namespace Math
+{
+class Shape;
+}
+
 namespace Collision
 {
 
@@ -44,15 +52,35 @@ public:
 	/// \param	pair	A CollisionPair that is under consideration, new contacts will be added to this pair
 	void calculateContact(std::shared_ptr<CollisionPair> pair);
 
+	/// Calculate the contacts between two shapes
+	/// \param shape1, shape2 The shapes for which to calculate the contacts
+	/// \param pose1, pose2 The respective poses for the shapes
+	/// \return a list of contacts between the two given shapes
+	std::list<std::shared_ptr<Contact>> calculateContact(
+										 const std::shared_ptr<Math::Shape>& shape1,
+										 const Math::RigidTransform3d& pose1,
+										 const std::shared_ptr<Math::Shape>& shape2,
+										 const Math::RigidTransform3d& pose2);
+
 	/// Virtual function that returns the shapes that this ContactCalculation class handles.
 	/// \return Return the shape types this class handles.
-	virtual std::pair<int,int> getShapeTypes() = 0;
+	virtual std::pair<int, int> getShapeTypes() = 0;
 
 private:
 
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param	pair	The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) = 0;
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
+
+	/// Virtual function receives the call from the public interface, usually will type the
+	/// shapes statically to their known types and then execute a specific contact calculation
+	/// between the two shapes
+	/// \param shape1, shape2 The shapes for which to calculate the contacts
+	/// \param pose1, pose2 The respective poses for the shapes
+	/// \return a list of contacts between the two given shapes
+	virtual std::list<std::shared_ptr<Contact>> doCalculateContact(
+				const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
+				const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) = 0;
 
 };
 

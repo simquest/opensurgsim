@@ -45,13 +45,15 @@ protected:
 	/// \param otherPose the pose of the other shape
 	/// \return a list of contacts between the shapes, if any
 	virtual std::list<std::shared_ptr<Contact>> boxContactCalculation(
-			const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
-			const SurgSim::Math::Shape& otherShape, const SurgSim::Math::RigidTransform3d& otherPose) = 0;
+				const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
+				const SurgSim::Math::Shape& otherShape, const SurgSim::Math::RigidTransform3d& otherPose) = 0;
 
 private:
-	/// Calculate the actual contact between two shapes of the given CollisionPair.
-	/// \param pair The symmetric pair that is under consideration.
-	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+	std::list<std::shared_ptr<Contact>> doCalculateContact(
+										 const std::shared_ptr<Math::Shape>& shape1,
+										 const Math::RigidTransform3d& pose1,
+										 const std::shared_ptr<Math::Shape>& shape2,
+										 const Math::RigidTransform3d& pose2) override;
 
 	/// Calculate the collision between a specific octree node and a shape
 	/// This function will check for contact between the node and shape. If
@@ -59,11 +61,20 @@ private:
 	/// node's children. Once a leaf node is reached, contacts are added to the
 	/// CollisionPair.
 	/// \param node the octree node to collide with
-	/// \param [in,out] pair the collision pair that is under consideration
+	/// \param octreePose the pose of the octree shape
+	/// \param shape the shape that the octree is colliding with
+	/// \param shapePose the pose of the shape
+	/// \param nodePath the NodePath of the current octree node
+	/// \param result [in,out] all generated contacts are agreggated here
+
 	/// \param nodePath the path of the current node
-	void calculateContactWithNode(std::shared_ptr<const SurgSim::Math::OctreeShape::NodeType> node,
-								  std::shared_ptr<CollisionPair> pair,
-								  std::shared_ptr<SurgSim::DataStructures::OctreePath> nodePath);
+	void OctreeDcdContact::calculateContactWithNode(
+		std::shared_ptr<const SurgSim::Math::OctreeShape::NodeType> node,
+		Math::RigidTransform3d octreePose,
+		const std::shared_ptr<Math::Shape>& shape,
+		const Math::RigidTransform3d& shapePose,
+		SurgSim::DataStructures::OctreePath* nodePath,
+		std::list<std::shared_ptr<Contact>>* result);
 
 	/// Enable a Vector3d to be used as a key in an unordered map.
 	class Vector3dHash

@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Collision/ShapeShapeContactCalculation.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -32,28 +32,18 @@ namespace Collision
 class CollisionPair;
 
 /// Class to calculate intersections between Boxes and Planes
-class BoxPlaneDcdContact : public ContactCalculation
+class BoxPlaneDcdContact : public ShapeShapeContactCalculation<Math::BoxShape, Math::PlaneShape>
 {
 public:
-	/// Constructor.
-	BoxPlaneDcdContact();
-
 	using ContactCalculation::calculateContact;
 
-	/// Calculate the contacts using the typed shapes directly
-	/// \param boxShape the box shape
-	/// \param boxPose the pose of the box
-	/// \param planeShape the plane shape
-	/// \param planePose the pose of the plane
-	/// \return a list of contacts between the shapes, if any
 	std::list<std::shared_ptr<Contact>> calculateContact(
-			const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
-			const SurgSim::Math::PlaneShape& planeShape, const SurgSim::Math::RigidTransform3d& planePose);
+										 const SurgSim::Math::BoxShape& boxShape,
+										 const SurgSim::Math::RigidTransform3d& boxPose,
+										 const SurgSim::Math::PlaneShape& planeShape,
+										 const SurgSim::Math::RigidTransform3d& planePose) const override;
 
-	std::pair<int,int> getShapeTypes() override;
-
-private:
-	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+	std::pair<int, int> getShapeTypes() override;
 };
 
 }; // namespace Collision

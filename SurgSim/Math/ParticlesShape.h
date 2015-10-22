@@ -87,6 +87,8 @@ public:
 
 	bool isValid() const override;
 
+	bool isTransformable() const override;
+
 private:
 	bool doUpdate() override;
 

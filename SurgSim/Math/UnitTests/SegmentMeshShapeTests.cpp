@@ -36,7 +36,7 @@ class SegmentMeshShapeTest : public ::testing::Test
 {
 public:
 	std::shared_ptr<SegmentMeshPlain> build(const Vector3d& start, const Vector3d& direction,
-		size_t numVertices = 10) const
+											size_t numVertices = 10) const
 	{
 		auto mesh = std::make_shared<SegmentMeshPlain>();
 
@@ -76,6 +76,8 @@ TEST_F(SegmentMeshShapeTest, ValidTest)
 	EXPECT_TRUE(shape.isValid());
 	shape.setRadius(SurgSim::Math::Geometry::DistanceEpsilon / 2.0);
 	EXPECT_FALSE(shape.isValid());
+
+	EXPECT_TRUE(shape.isTransformable());
 }
 
 TEST_F(SegmentMeshShapeTest, AabbTest)

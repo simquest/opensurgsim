@@ -43,7 +43,7 @@ MeshShape::MeshShape() :
 
 MeshShape::MeshShape(const MeshShape& other) :
 	DataStructures::TriangleMesh<DataStructures::EmptyData, DataStructures::EmptyData, DataStructures::NormalData>
-		::TriangleMesh(other),
+	::TriangleMesh(other),
 	m_center(other.getCenter()),
 	m_volume(other.getVolume()),
 	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
@@ -244,6 +244,11 @@ void MeshShape::updateAabbTree()
 		}
 	}
 	m_aabbTree->set(std::move(items));
+}
+
+bool MeshShape::isTransformable() const
+{
+	return true;
 }
 
 }; // namespace Math

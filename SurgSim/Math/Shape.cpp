@@ -27,6 +27,11 @@ Shape::~Shape()
 {
 }
 
+bool Shape::isTransformable() const
+{
+	return false;
+}
+
 std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose)
 {
 	SURGSIM_FAILURE() << "getTransformed not implemented for " << getClassName();
@@ -41,6 +46,8 @@ std::string Shape::getClassName() const
 			" in almost all cases, this means there is a class that does not have getClassName() defined.";
 	return "SurgSim::Math::Shape";
 }
+
+
 
 } // namespace Math
 } // namespace SurgSim
