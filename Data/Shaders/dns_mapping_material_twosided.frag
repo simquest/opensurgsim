@@ -34,7 +34,7 @@ varying vec3 vertexDiffuseColor;
 varying vec3 vertexSpecularColor;
 varying vec3 vertexAmbientColor;
 
-void calculateLigthing(
+void calculateLighting(
 	in vec3 l, in vec3 n, in vec3 v, in float shininess, in float shadow,
 	inout vec3 diffuse, inout vec3 specular)
 {
@@ -58,8 +58,6 @@ void main(void)
 	vec3 normalDir = texture2D(normalMap, texCoord0).rgb * 2.0 - 1.0;
 	normalDir.g = -normalDir.g;
 
-	vec3 vAmbient = vec3(ambientColor);
-    
 	vec3 lightDirNorm = normalize(lightDir);
 	vec3 eyeDirNorm = normalize(eyeDir);
 	vec3 normalDirNorm = normalize(normalDir);
@@ -69,7 +67,7 @@ void main(void)
 	vec3 vDiffuse = vertexDiffuseColor;
 	vec3 vSpecular = vertexSpecularColor;
 
-	calculateLigthing(lightDirNorm, normalDirNorm, eyeDirNorm, 
+	calculateLighting(lightDirNorm, normalDirNorm, eyeDirNorm, 
 		shininess, shadowAmount, vDiffuse, vSpecular);
 
 	vec3 color = vDiffuse * base + vSpecular;
@@ -77,7 +75,7 @@ void main(void)
 	vDiffuse = vertexDiffuseColor;
 	vSpecular = vertexSpecularColor;
 
-	calculateLigthing(lightDirNorm, -normalDirNorm, eyeDirNorm, 
+	calculateLighting(lightDirNorm, -normalDirNorm, eyeDirNorm, 
 		shininess, shadowAmount, vDiffuse, vSpecular);
 
 	color += vDiffuse * base + vSpecular;

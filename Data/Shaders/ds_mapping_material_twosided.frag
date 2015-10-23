@@ -35,7 +35,7 @@ varying vec3 vertexAmbientColor;
 varying vec4 clipCoord;
 
 
-void calculateLigthing(
+void calculateLighting(
 	in vec3 l, in vec3 n, in vec3 v, in float shininess, in float shadow,
 	inout vec3 diffuse, inout vec3 specular)
 {
@@ -53,8 +53,6 @@ void calculateLigthing(
 
 void main(void) 
 {	
-	vec3 vAmbient = ambientColor.xyz; // Old Term ...  osg_ambientColor * _lightColor;
-
 	vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
 	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
     
@@ -67,7 +65,7 @@ void main(void)
 	vec3 vDiffuse = vertexDiffuseColor;
 	vec3 vSpecular = vertexSpecularColor;
 
-	calculateLigthing(lightDirNorm, normalDirNorm, eyeDirNorm, 
+	calculateLighting(lightDirNorm, normalDirNorm, eyeDirNorm, 
 		shininess, shadowAmount, vDiffuse, vSpecular);
 
 	vec3 color = vDiffuse * base + vSpecular;
@@ -75,7 +73,7 @@ void main(void)
 	vDiffuse = vertexDiffuseColor;
 	vSpecular = vertexSpecularColor;
 
-	calculateLigthing(lightDirNorm, -normalDirNorm, eyeDirNorm, 
+	calculateLighting(lightDirNorm, -normalDirNorm, eyeDirNorm, 
 		shininess, shadowAmount, vDiffuse, vSpecular);
 
 	color += vDiffuse * base + vSpecular;
