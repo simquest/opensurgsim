@@ -28,10 +28,10 @@ varying vec2 texCoord0;
 
 varying vec3 vertexDiffuseColor;
 varying vec3 vertexSpecularColor;
+varying vec3 vertexAmbientColor;
 
 varying vec4 clipCoord;
 
-varying vec3 vAmbient;
 
 void main(void) 
 {	
@@ -46,7 +46,7 @@ void main(void)
     float specular = temp / (shininess - temp * shininess + temp);
  	vec3 vSpecular = vertexSpecularColor * specular;		
 	
-	vec3 color = vAmbient + vDiffuse + vSpecular;
+	vec3 color = vertexAmbientColor + vDiffuse + vSpecular;
     
 	gl_FragColor.rgb = color;
 	gl_FragColor.a = 1.0;

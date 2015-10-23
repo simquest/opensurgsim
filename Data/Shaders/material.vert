@@ -47,7 +47,7 @@ varying vec4 clipCoord; ///< Projected and transformed vertex coordinates
 
 varying vec3 vertexDiffuseColor;
 varying vec3 vertexSpecularColor;
-varying vec3 vAmbient;
+varying vec3 vertexAmbientColor;
 
 void main(void)
 {
@@ -73,5 +73,5 @@ void main(void)
     vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).xyz;	
 	vertexSpecularColor = (attenuation * specularColor * lightSource.specular).xyz;
 
-	vAmbient = ambientColor.xyz * diffuseColor;
+	vertexAmbientColor = ambientColor.xyz * diffuseColor;
 } 
