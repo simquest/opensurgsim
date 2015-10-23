@@ -243,7 +243,7 @@ protected:
 				Vector3d(0.12155499974405069, -0.0017220000000000000, -0.039350000000000003),
 				Vector3d(0.12419199974405069, -0.0027260000000000001, -0.039763000000000000));
 			Vector3d t1p;
-			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, true, false, t0p, t1p));
+			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, false, false, t0p, t1p));
 		}
 	}
 };
