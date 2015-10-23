@@ -221,8 +221,8 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, size_t blockIdRow, size_t bloc
 /// \tparam Matrix The matrix type
 /// \param row The row to set to zero
 /// \param[in,out] matrix The matrix to set the zero row on.
-template <class Matrix>
-void zeroRow(size_t row, Matrix* matrix)
+template <class Derived>
+void zeroRow(size_t row, Eigen::DenseBase<Derived>* matrix)
 {
 	matrix->middleRows(row, 1).setZero();
 }
@@ -231,8 +231,8 @@ void zeroRow(size_t row, Matrix* matrix)
 /// \tparam Matrix The matrix type
 /// \param column The column to set to zero
 /// \param[in,out] matrix The matrix to set the zero column on.
-template <class Matrix>
-void zeroColumn(size_t column, Matrix* matrix)
+template <class Derived>
+void zeroColumn(size_t column, Eigen::DenseBase<Derived>* matrix)
 {
 	(*matrix).middleCols(column, 1).setZero();
 }
