@@ -35,9 +35,6 @@ struct LightSource {
 
 uniform LightSource lightSource;
 
-uniform vec4 ambientColor;
-
-
 /// Fragment shader supplied values
 varying vec3 lightDir;
 varying vec3 eyeDir;
@@ -47,6 +44,7 @@ varying vec4 clipCoord;
 
 varying vec3 vertexDiffuseColor;
 varying vec3 vertexSpecularColor;
+varying vec3 vertexAmbientColor;
 
 void main(void) 
 {	
@@ -55,8 +53,6 @@ void main(void)
 
 	vec3 normalDir = texture2D(normalMap, texCoord0).rgb * 2.0 - 1.0;
 	normalDir.g = -normalDir.g;
-
-	vec3 vAmbient = vec3(ambientColor);
     
 	vec3 lightDirNorm = normalize(lightDir);
 	vec3 eyeDirNorm = normalize(eyeDir);
@@ -71,7 +67,7 @@ void main(void)
 	vec3 vSpecular = vertexSpecularColor * specular * shadowAmount;		
 
 	vec3 base = texture2D(diffuseMap, texCoord0).rgb;
-	vec3 color = (vAmbient + vDiffuse) * base + vSpecular;
+	vec3 color = (vertexAmbientColor + vDiffuse) * base + vSpecular;
 
 	gl_FragColor.rgb = color;
 	gl_FragColor.a = 1.0;

@@ -23,6 +23,8 @@ uniform vec4 specularColor;
 // OSS provided values
 uniform mat4 viewMatrix;
 
+uniform vec4 ambientColor;
+
 struct LightSource {
 	vec4 diffuse; 
 	vec4 specular; 
@@ -46,6 +48,7 @@ varying vec4 clipCoord;
 
 varying vec3 vertexDiffuseColor;
 varying vec3 vertexSpecularColor;
+varying vec3 vertexAmbientColor;
 
 void main(void) 
 {
@@ -80,4 +83,5 @@ void main(void)
 		
     vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).xyz;	
 	vertexSpecularColor = (attenuation * specularColor * lightSource.specular).xyz;
+	vertexAmbientColor = ambientColor * diffuseColor;
 } 

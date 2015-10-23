@@ -201,7 +201,7 @@ public:
 	/// initialized when necessary. If false, the matrix form is assumed to be previously defined.
 	template <typename DerivedSub, typename T, int Opt, typename Index>
 	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
-							  Index blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
+							  size_t blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
 							  bool initialize = true) const;
 
 	/// Update the FemElement based on the given state.

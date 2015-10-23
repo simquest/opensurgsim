@@ -110,7 +110,7 @@ bool doesIntersectTriangleTriangle(
 	// Distance of first vertex of T2 from the plane of T1 is: DotProduct(t0n, t1v0 - t0v0)
 	Vector3 d2(t0n.dot(t1v0 - t0v0), t0n.dot(t1v1 - t0v0), t0n.dot(t1v2 - t0v0));
 
-	if ((d2.array() <= 0.0).all() || (d2.array() >= 0.0).all())
+	if ((d2.array() < DistanceEpsilon).all() || (d2.array() > -DistanceEpsilon).all())
 	{
 		return false;
 	}
@@ -118,7 +118,7 @@ bool doesIntersectTriangleTriangle(
 	// Check if all the vertices of T1 are on one side of p2.
 	Vector3 d1(t1n.dot(t0v0 - t1v0), t1n.dot(t0v1 - t1v0), t1n.dot(t0v2 - t1v0));
 
-	if ((d1.array() <= 0.0).all() || (d1.array() >= 0.0).all())
+	if ((d1.array() < DistanceEpsilon).all() || (d1.array() > -DistanceEpsilon).all())
 	{
 		return false;
 	}
@@ -155,9 +155,11 @@ bool doesIntersectTriangleTriangle(
 	// If both these are line segments (i.e. the distance between them is > epsilon),
 	// and if they overlap, then the two triangles intersect.
 
-	return !(std::abs(s1[0] - s1[1]) <= DistanceEpsilon && std::abs(s2[0] - s2[1]) <= DistanceEpsilon) &&
-		   !(s1[0] <= s2[0] && s1[0] <= s2[1] && s1[1] <= s2[0] && s1[1] <= s2[1]) &&
-		   !(s1[0] >= s2[0] && s1[0] >= s2[1] && s1[1] >= s2[0] && s1[1] >= s2[1]);
+	return !(std::abs(s1[0] - s1[1]) <= DistanceEpsilon || std::abs(s2[0] - s2[1]) <= DistanceEpsilon) &&
+		   !(s1[0] <= (s2[0] + DistanceEpsilon) && s1[0] <= (s2[1] + DistanceEpsilon) &&
+		     s1[1] <= (s2[0] + DistanceEpsilon) && s1[1] <= (s2[1] + DistanceEpsilon)) &&
+		   !(s1[0] >= (s2[0] - DistanceEpsilon) && s1[0] >= (s2[1] - DistanceEpsilon) &&
+		     s1[1] >= (s2[0] - DistanceEpsilon) && s1[1] >= (s2[1] - DistanceEpsilon));
 }
 
 

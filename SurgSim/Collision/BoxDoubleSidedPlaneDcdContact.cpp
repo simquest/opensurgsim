@@ -31,37 +31,16 @@ namespace SurgSim
 {
 namespace Collision
 {
-
-BoxDoubleSidedPlaneDcdContact::BoxDoubleSidedPlaneDcdContact()
-{
-}
-
 std::pair<int, int> BoxDoubleSidedPlaneDcdContact::getShapeTypes()
 {
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);
 }
 
-void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
-{
-	std::shared_ptr<Representation> box = pair->getFirst();
-	std::shared_ptr<Representation> plane = pair->getSecond();
-
-	auto boxShape = std::static_pointer_cast<BoxShape>(box->getShape());
-	auto planeShape = std::static_pointer_cast<DoubleSidedPlaneShape>(plane->getShape());
-
-	auto contacts = calculateContact(*boxShape, box->getPose(), *planeShape, plane->getPose());
-	for (auto& contact : contacts)
-	{
-		pair->addContact(contact);
-	}
-}
-
-
 std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateContact(
 									 const SurgSim::Math::BoxShape& boxShape,
 									 const SurgSim::Math::RigidTransform3d& boxPose,
 									 const SurgSim::Math::DoubleSidedPlaneShape& planeShape,
-									 const SurgSim::Math::RigidTransform3d& planePose)
+									 const SurgSim::Math::RigidTransform3d& planePose) const
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -157,16 +136,16 @@ std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateCont
 			{
 				std::pair<Location, Location> penetrationPoints = std::make_pair(Location(boxVertices[i]),
 						Location(planePose.inverse() * (boxPose * boxVertices[i] + normal * std::abs(d[i]))));
-				contacts.push_back(std::make_shared<Contact>(
-									   COLLISION_DETECTION_TYPE_DISCRETE,
-									   std::abs(d[i]), 1.0, Vector3d::Zero(), normal,
-									   penetrationPoints));
+				contacts.emplace_back(std::make_shared<Contact>(
+										  COLLISION_DETECTION_TYPE_DISCRETE,
+										  std::abs(d[i]), 1.0, Vector3d::Zero(), normal,
+										  penetrationPoints));
 
 				generateContact = false;
 			}
 		}
 	}
-	return std::move(contacts);
+	return contacts;
 }
 
 }; // namespace Collision

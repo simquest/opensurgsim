@@ -52,9 +52,6 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 	auto result = state;
 	auto& pairs = result->getCollisionPairs();
 
-	auto pairsIt = std::begin(pairs);
-	auto pairsEnd = std::end(pairs);
-
 	std::vector<std::shared_ptr<Constraint>> constraints;
 
 	// This will check all collision pairs for contacts, then iterate over all
@@ -62,50 +59,50 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 	// sides of the collisionpair and the localizations created from the contact
 	// point. The list of all the constraints will be added back into the
 	// Physics state as a result of this computation
-	for (; pairsIt != pairsEnd; ++pairsIt)
+	for (auto& pair : pairs)
 	{
-		if ((*pairsIt)->hasContacts())
+		if (pair->hasContacts())
 		{
-			auto contactsIt = std::begin((*pairsIt)->getContacts());
-			auto contactsEnd = std::end((*pairsIt)->getContacts());
-			for (; contactsIt != contactsEnd; ++contactsIt)
+			auto collisionRepresentations = pair->getRepresentations();
+
+			auto collisionToPhysicsMap = state->getCollisionToPhysicsMap();
+			auto foundFirst = collisionToPhysicsMap.find(collisionRepresentations.first);
+			auto foundSecond = collisionToPhysicsMap.find(collisionRepresentations.second);
+			if (foundFirst == collisionToPhysicsMap.end() || foundSecond == collisionToPhysicsMap.end())
+			{
+				SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
+					collisionRepresentations.first->getName() << " and/or " <<
+					collisionRepresentations.second->getName() << " does not have a physics representation";
+				continue;
+			}
+			std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>> physicsRepresentations;
+			physicsRepresentations.first = foundFirst->second;
+			physicsRepresentations.second = foundSecond->second;
+
+			if (!(physicsRepresentations.first->isActive() && physicsRepresentations.second->isActive()))
+			{
+				SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
+					physicsRepresentations.first->getName() << " and/or " <<
+					physicsRepresentations.second->getName() << " is not an active physics representation";
+				continue;
+			}
+
+			auto contacts = pair->getContacts();
+			for (auto& contact : contacts)
 			{
 				std::pair<std::shared_ptr<Location>, std::shared_ptr<Location>> locations;
 
-				auto collisionRepresentations = (*pairsIt)->getRepresentations();
-
-				auto collisionToPhysicsMap = state->getCollisionToPhysicsMap();
-				auto foundFirst = collisionToPhysicsMap.find(collisionRepresentations.first);
-				auto foundSecond = collisionToPhysicsMap.find(collisionRepresentations.second);
-				if (foundFirst == collisionToPhysicsMap.end() || foundSecond == collisionToPhysicsMap.end())
-				{
-					SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
-						collisionRepresentations.first->getName() << " and/or " <<
-						collisionRepresentations.second->getName() << " does not have a physics representation";
-					continue;
-				}
-				std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>> physicsRepresentations;
-				physicsRepresentations.first = foundFirst->second;
-				physicsRepresentations.second = foundSecond->second;
-
-				if (!(physicsRepresentations.first->isActive() && physicsRepresentations.second->isActive()))
-				{
-					SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
-						physicsRepresentations.first->getName() << " and/or " <<
-						physicsRepresentations.second->getName() << " is not an active physics representation";
-					continue;
-				}
-
 				locations.first = makeLocation(physicsRepresentations.first, collisionRepresentations.first,
-						(*contactsIt)->penetrationPoints.first);
+						contact->penetrationPoints.first);
 				locations.second = makeLocation(physicsRepresentations.second, collisionRepresentations.second,
-						(*contactsIt)->penetrationPoints.second);
+						contact->penetrationPoints.second);
 
 				// HS-2013-jul-12 The type of constraint is fixed here right now, to get to a constraint
 				// that we can change we probably will need to predefine collision pairs and their appropriate
 				// contact constraints so we can look up which constraint to use here
 				auto data = std::make_shared<ContactConstraintData>();
-				data->setPlaneEquation((*contactsIt)->normal, (*contactsIt)->depth);
+				data->setPlaneEquation(contact->normal, contact->depth);
+				data->setContact(contact);
 
 				constraints.push_back(std::make_shared<Constraint>(
 					SurgSim::Physics::FRICTIONLESS_3DCONTACT, data,

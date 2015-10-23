@@ -93,6 +93,8 @@ public:
 
 	bool isValid() const override;
 
+	bool isTransformable() const override;
+
 protected:
 	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;

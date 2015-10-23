@@ -194,7 +194,7 @@ TEST_F(RepresentationTest, AddContactsInParallelTest)
 
 	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p)
 	{
-		p.wait();
+		p.get();
 	});
 	ASSERT_EQ(numContacts, rep->getCollisions().unsafeGet()[rep].size());
 }

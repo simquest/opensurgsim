@@ -446,6 +446,8 @@ TEST(OctreeContactCalculationTests, CheckNumberOfContacts)
 
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(octreeRep, shapeRep);
 	calculator.calculateContact(pair);
+	pair->updateRepresentations();
+
 	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().size());
 	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().count(octreeRep));
 }
