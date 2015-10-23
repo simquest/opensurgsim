@@ -209,6 +209,8 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	renderCamera->setAmbientColor(camera->getAmbientColor());
 	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, dimensions[0], 0, dimensions[1]);
 	copier->connect(view, "DimensionsDouble", renderCamera, "ViewportSize");
+	std::array<double, 2> viewport = {dimensions[0], dimensions[1]};
+	renderCamera->setViewportSize(viewport);
 	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
 	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
@@ -232,11 +234,30 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 
 	renderPass->setMaterial(material);
 
-	auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics");
-	graphics->setSize(dimensions[0], dimensions[1]);
-	graphics->setLocation(0, 0);
-	graphics->setGroupReference("ImplicitSurfaceShadingPass");
-	renderPass->addComponent(graphics);
+	if (view->isStereo())
+	{
+	   auto graphicsLeft = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics Left");
+	   graphicsLeft->setSize(dimensions[0]/2, dimensions[1]);
+	   graphicsLeft->setGroupReference("ImplicitSurfaceShadingPass");
+	   graphicsLeft->getOsgNode()->setNodeMask(0x1);
+	   graphicsLeft->setLocation(0, 0);
+	   renderPass->addComponent(graphicsLeft);
+
+	   auto graphicsRight = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics Right");
+	   graphicsRight->setSize(dimensions[0]/2, dimensions[1]);
+	   graphicsRight->setGroupReference("ImplicitSurfaceShadingPass");
+	   graphicsRight->getOsgNode()->setNodeMask(0x2);
+	   graphicsRight->setLocation(dimensions[0]/2, 0);
+	   renderPass->addComponent(graphicsRight);
+	}
+	else
+	{
+	   auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics");
+	   graphics->setSize(dimensions[0], dimensions[1]);
+	   graphics->setLocation(0, 0);
+	   graphics->setGroupReference("ImplicitSurfaceShadingPass");
+	   renderPass->addComponent(graphics);
+	}
 
 	return renderPass;
 }
