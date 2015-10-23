@@ -34,7 +34,7 @@ class CompoundShapeDcdContactTest : public ::testing::Test
 	virtual void SetUp() override
 	{
 		ContactCalculation::registerContactCalculation(std::make_shared<BoxSphereDcdContact>());
-		ContactCalculation::registerContactCalculation(std::make_shared <BoxPlaneDcdContact>());
+		ContactCalculation::registerContactCalculation(std::make_shared<BoxPlaneDcdContact>());
 		ContactCalculation::registerContactCalculation(std::make_shared<CompoundShapeDcdContact>(
 					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_SPHERE)));
 		ContactCalculation::registerContactCalculation(std::make_shared<CompoundShapeDcdContact>(
@@ -45,8 +45,6 @@ class CompoundShapeDcdContactTest : public ::testing::Test
 	virtual void TearDown() override
 	{
 	}
-
-
 };
 
 // The basic principle here is that colliding a set of shapes with each other should give the same

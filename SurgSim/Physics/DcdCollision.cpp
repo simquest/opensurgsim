@@ -35,7 +35,6 @@ namespace Physics
 DcdCollision::DcdCollision(bool doCopyState) :
 	Computation(doCopyState)
 {
-	populateCalculationTable();
 }
 
 DcdCollision::~DcdCollision()
@@ -72,48 +71,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	});
 
 	return result;
-}
-
-void DcdCollision::populateCalculationTable()
-{
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::BoxCapsuleDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::BoxDoubleSidedPlaneDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::BoxPlaneDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::BoxSphereDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::CapsuleSphereDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::OctreeCapsuleDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::OctreeDoubleSidedPlaneDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::OctreePlaneDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::OctreeSphereDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::SegmentMeshTriangleMeshDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::SphereSphereDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::SphereDoubleSidedPlaneDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::SpherePlaneDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::TriangleMeshParticlesDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::TriangleMeshPlaneDcdContact>());
-	ContactCalculation::registerContactCalculation(std::make_shared<Collision::TriangleMeshTriangleMeshDcdContact>());
-
-	const std::array<int, Math::SHAPE_TYPE_COUNT> allshapes =
-	{
-		Math::SHAPE_TYPE_BOX,
-		Math::SHAPE_TYPE_CAPSULE,
-		Math::SHAPE_TYPE_CYLINDER,
-		Math::SHAPE_TYPE_DOUBLESIDEDPLANE,
-		Math::SHAPE_TYPE_MESH,
-		Math::SHAPE_TYPE_OCTREE,
-		Math::SHAPE_TYPE_PARTICLES,
-		Math::SHAPE_TYPE_PLANE,
-		Math::SHAPE_TYPE_SPHERE,
-		Math::SHAPE_TYPE_SURFACEMESH,
-		Math::SHAPE_TYPE_SEGMENTMESH,
-		Math::SHAPE_TYPE_COMPOUNDSHAPE
-	};
-
-	for (auto type : allshapes)
-	{
-		ContactCalculation::registerContactCalculation(std::make_shared<Collision::CompoundShapeDcdContact>(
-					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, type)));
-	}
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)

@@ -39,8 +39,8 @@ class PhysicsManagerState;
 /// function objects (ContactCalculation) to determine how to calculate a contact between the two
 /// members of each pair, if no specific function exists a default function will be used.
 /// will update the collision pairs accordingly.
-/// \note HS-2013-may-24 Currently handles only RigidRepresentation, all others  will be ignored
-
+/// \note When a new ContactCalculation type gets implemented, the type needs to be registered with the table
+/// inside of ContactCalculation
 class DcdCollision : public Computation
 {
 public:
@@ -61,9 +61,6 @@ protected:
 	override;
 
 private:
-
-	/// Initializes the table of ContactCalculation objects
-	void populateCalculationTable();
 
 	/// Updates the collision pairs
 	void updatePairs(std::shared_ptr<PhysicsManagerState> state);

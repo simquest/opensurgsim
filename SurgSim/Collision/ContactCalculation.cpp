@@ -75,7 +75,7 @@ std::list<std::shared_ptr<Contact>> ContactCalculation::calculateContact(
 		for (const auto& contact : contacts)
 		{
 			contact->normal = -contact->normal;
-			// contact->force = -contact->force;
+			contact->force = -contact->force;
 		}
 		return contacts;
 	}

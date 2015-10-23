@@ -39,6 +39,7 @@ protected:
 				const std::shared_ptr<Math::Shape>& shape2,
 				const Math::RigidTransform3d& pose2) override;
 
+	/// Local shape types for this instance, these can be set to match the expected shapes
 	std::pair<int, int> m_types;
 
 };
