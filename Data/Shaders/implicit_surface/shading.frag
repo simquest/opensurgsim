@@ -58,11 +58,10 @@ uniform vec4 ambientColor;
 varying vec2 texCoord0; ///< Texture unit 0 texture coordinates
 varying vec4 clipCoord; ///< Projected and transformed vertex coordinates
 
-vec3 getEyeSpacePos(vec2 texCoord, float z)
+vec3 getEyeSpacePos(vec3 coord)
 {
-    vec2 homogenous = texCoord * 2.0 - 1.0;
-	z = z * 2.0 - 1.0;
-	vec4 clipSpacePos = vec4(homogenous, z, 1.0);
+    vec3 homogenous = coord * 2.0 - 1.0;
+	vec4 clipSpacePos = vec4(homogenous, 1.0);
 	vec4 eyeSpacePos = mainCamera.inverseProjectionMatrix * clipSpacePos;
 	return eyeSpacePos.xyz/eyeSpacePos.w;
 }
@@ -76,7 +75,7 @@ void main(void)
         discard;
     }
 
-	vec4 eyeDir4 = vec4(getEyeSpacePos(texCoord0, depth), 1.0);
+	vec4 eyeDir4 = vec4(getEyeSpacePos(vec3(texCoord0, depth)), 1.0);
 
 	vec3 lightDir = (mainCamera.viewMatrix * lightSource.position - eyeDir4).xyz;
     float lightDistance = length(lightDir);
