@@ -34,6 +34,7 @@ set(UNIT_TEST_SOURCES
 	RepresentationUtilities.cpp
 	SegmentMeshTriangleMeshContactCalculationTests.cpp
 	SegmentSegmentCcdIntervalCheckTests.cpp
+	SegmentSegmentCcdStaticContactTests.cpp
 	ShapeCollisionRepresentationTest.cpp
 	SphereDoubleSidedPlaneContactCalculationTests.cpp
 	SpherePlaneContactCalculationTests.cpp

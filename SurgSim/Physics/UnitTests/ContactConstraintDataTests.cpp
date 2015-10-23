@@ -33,6 +33,9 @@ namespace
 
 TEST (ContactConstraintDataTests, TestSetGet)
 {
+	using SurgSim::Collision::Contact;
+	using SurgSim::DataStructures::Location;
+
 	ContactConstraintData contactConstraintData;
 	Vector3d n(1.2, 4.5, 6.7);
 	double d = 5.566;
@@ -45,4 +48,10 @@ TEST (ContactConstraintDataTests, TestSetGet)
 
 	EXPECT_NEAR(d , contactConstraintData.getDistance(), epsilon);
 	EXPECT_TRUE(contactConstraintData.getNormal().isApprox(n, epsilon));
+
+	auto contact0 = std::make_shared<Contact>(SurgSim::Collision::COLLISION_DETECTION_TYPE_DISCRETE, 0.0, 0.0,
+		Vector3d::Zero(), Vector3d::UnitX(), std::pair<Location, Location>());
+	contactConstraintData.setContact(contact0);
+
+	EXPECT_TRUE(contactConstraintData.getContact() == contact0);
 }

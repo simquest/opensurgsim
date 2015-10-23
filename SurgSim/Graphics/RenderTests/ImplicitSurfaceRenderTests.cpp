@@ -67,7 +67,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	scene->addSceneElement(lightElement);
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
-			Blocks::createImplicitSurfaceEffect(viewElement->getView(), viewElement->getCamera(), light, 0.01f, 800.0f,
+			Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.01f, 800.0f, 4.0,
 												1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0),
 												Math::Vector4f(0.4, 0.4, 0.4, 1.0), 10, false);
 
@@ -96,7 +96,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));
 	}
 
-	graphics->addGroupReference(Blocks::GROUP_IMPLICIT_SURFACE);
+	graphics->setGroupReference(Blocks::GROUP_IMPLICIT_SURFACE);
 
 	auto sceneElement = std::make_shared<Framework::BasicSceneElement>("PointSprites");
 	sceneElement->addComponent(graphics);
