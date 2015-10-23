@@ -36,4 +36,5 @@
 #include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
 
+
 #endif // SURGSIM_COLLISION_DCDCOLLISION_H
