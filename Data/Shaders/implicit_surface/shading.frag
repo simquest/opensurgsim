@@ -91,7 +91,7 @@ void main(void)
     vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
 
     float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
-    vec3 vAmbient = ambientColor.xyz * vertexDiffuseColor;
+    vec3 vAmbient = ambientColor.xyz * diffuseColor.xyz;
 
     vec3 normal = (texture2D(normalMap, texCoord0).xyz * 2.0) - 1.0;
 
