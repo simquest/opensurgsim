@@ -244,8 +244,6 @@ TEST_F(RenderTests, CompoundCollisionShapePlane)
 	scene->addSceneElement(createSphereObject());
 	scene->addSceneElement(makeScenery()[0]);
 
-	viewElement->getView()->setTargetScreen(1);
-
 	runTest(Vector3d(0.8, 0.8, 0.8), Vector3d(0.0, 0.0, 0.0), 5000);
 
 }
@@ -255,16 +253,12 @@ TEST_F(RenderTests, CompoundCollisionShapeSphere)
 	scene->addSceneElement(createSphereObject());
 	scene->addSceneElement(makeScenery()[1]);
 
-	viewElement->getView()->setTargetScreen(1);
-
 	runTest(Vector3d(0.8, 0.8, 0.8), Vector3d(0.0, 0.0, 0.0), 5000);
 
 }
 
 TEST_F(RenderTests, CompoundCollsionMeshPlane)
 {
-
-	viewElement->getView()->setTargetScreen(1);
 	scene->addSceneElement(createMeshObject());
 	scene->addSceneElement(makeScenery()[0]);
 
