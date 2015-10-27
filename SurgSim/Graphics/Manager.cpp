@@ -99,12 +99,12 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 			light->setGroup(getOrCreateGroup(light->getLightGroupReference()));
 		}
 
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added representation " << representation->getName();
+		SURGSIM_LOG_INFO(m_logger) << "Added representation " << representation->getFullName();
 		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate representation " << representation->getName();
+		SURGSIM_LOG_INFO(m_logger) << "Cannot add duplicate representation " << representation->getFullName();
 	}
 	return result;
 }
@@ -115,12 +115,12 @@ bool Manager::addView(std::shared_ptr<View> view)
 	if (std::find(m_views.begin(), m_views.end(), view) == m_views.end())
 	{
 		m_views.push_back(view);
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added view " << view->getName();
+		SURGSIM_LOG_INFO(m_logger) << "Added view " << view->getFullName();
 		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate view " << view->getName();
+		SURGSIM_LOG_INFO(m_logger) << "Cannot add duplicate view " << view->getFullName();
 	}
 	return result;
 }
@@ -139,12 +139,12 @@ bool Manager::removeRepresentation(std::shared_ptr<Representation> representatio
 	if (it != m_representations.end())
 	{
 		m_representations.erase(it);
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Removed representation " << representation->getName();
+		SURGSIM_LOG_INFO(m_logger) << "Removed representation " << representation->getFullName();
 		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Representation not found " << representation->getName();
+		SURGSIM_LOG_INFO(m_logger) << "Representation not found for removal, " << representation->getFullName();
 	}
 	return result;
 }
@@ -156,12 +156,12 @@ bool Manager::removeView(std::shared_ptr<View> view)
 	if (it != m_views.end())
 	{
 		m_views.erase(it);
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Removed view " << view->getName();
+		SURGSIM_LOG_INFO(m_logger) << "Removed view " << view->getFullName();
 		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " View not found " << view->getName();
+		SURGSIM_LOG_INFO(m_logger) << "View not found for removal, " << view->getFullName();
 	}
 	return result;
 }
@@ -203,9 +203,10 @@ int Manager::getType() const
 void SurgSim::Graphics::Manager::addGroup(std::shared_ptr<Group> group)
 {
 	auto oldGroup = m_groups.find(group->getName());
-	SURGSIM_ASSERT(oldGroup == m_groups.end()) << "Tried to add a group that has already been added.";
+	SURGSIM_ASSERT(oldGroup == m_groups.end()) <<
+		"Tried to add a group that has already been added, " << group->getName();
 	m_groups[group->getName()] = group;
-	SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added group " << group->getName();
+	SURGSIM_LOG_INFO(m_logger) << "Added group " << group->getName();
 }
 
 void Manager::doBeforeStop()

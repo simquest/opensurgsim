@@ -38,13 +38,12 @@ std::shared_ptr<T> ComponentManager::tryAddComponent(std::shared_ptr<SurgSim::Fr
 		auto found = std::find(container->cbegin(), container->cend(), typedComponent);
 		if (found == container->cend())
 		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added component " << component->getName();
+			SURGSIM_LOG_INFO(m_logger) << "Added component " << component->getFullName();
 			container->push_back(typedComponent);
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger)
-					<< __FUNCTION__ << " component " << component->getName() << " already added to " << getName();
+			SURGSIM_LOG_INFO(m_logger) << "Component " << component->getName() << " already added to " << getName();
 			typedComponent = nullptr;
 		}
 	}
