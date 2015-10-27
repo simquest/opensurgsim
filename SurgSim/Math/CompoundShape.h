@@ -109,7 +109,8 @@ private:
 
 	///@{
 	/// Storage for the physical properties of this shape
-	/// mutable so they can be recalculated inside the const functions getVolume(), getCenter(), getSecondMommentOfVolume()
+	/// mutable so they can be recalculated inside the
+	/// const functions getVolume(), getCenter(), getSecondMommentOfVolume()
 	mutable DataStructures::OptionalValue<Vector3d> m_center;
 	mutable DataStructures::OptionalValue<double> m_volume;
 	mutable DataStructures::OptionalValue<Matrix33d> m_secondMoment;

@@ -50,7 +50,7 @@ struct Contact
 	std::shared_ptr<Contact> makeComplimentary()
 	{
 		auto complimentary = std::make_shared<Contact>(type, depth, time, contact,
-			-normal, std::make_pair(penetrationPoints.second, penetrationPoints.first));
+							 -normal, std::make_pair(penetrationPoints.second, penetrationPoints.first));
 		complimentary->force = -force;
 		return complimentary;
 	}

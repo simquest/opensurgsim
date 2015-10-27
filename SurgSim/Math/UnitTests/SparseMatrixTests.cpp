@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@
 /// Tests that exercise the functionality of our sparse matrices, which come
 /// straight from Eigen.
 
-#include <tuple>
-
 #include <gtest/gtest.h>
+#include <tuple>
 
 #include "SurgSim/Math/SparseMatrix.h"
 
@@ -99,14 +98,13 @@ public:
 				m_matrixWithoutExtraCoefficientsExpected.insert(i, j) = 1.0;
 			}
 		}
-		m_matrixWithoutExtraCoefficients.makeCompressed();
-		m_matrixMissingCoefficients.makeCompressed();
-		m_matrixWithoutExtraCoefficientsExpected.makeCompressed();
-
 		m_matrixWithExtraCoefficients = m_matrixWithoutExtraCoefficients;
 		m_matrixWithExtraCoefficientsExpected = m_matrixWithoutExtraCoefficientsExpected;
 		addElementOnBlockRowsCols(&m_matrixWithExtraCoefficients);
 		addElementOnBlockRowsCols(&m_matrixWithExtraCoefficientsExpected);
+
+		m_matrixWithoutExtraCoefficients.makeCompressed();
+		m_matrixWithoutExtraCoefficientsExpected.makeCompressed();
 	}
 
 	void addElementOnBlockRowsCols(Eigen::SparseMatrix<T, Opt, I>* m)
@@ -214,134 +212,6 @@ public:
 				EXPECT_FALSE((dense.block(m_rowId, m_columnId, m_n, m_m).isApprox(expectedMatrix)));
 			}
 		}
-	}
-
-	template <typename Derived>
-	void TestSetSparseMatrixBlock(const Eigen::SparseMatrixBase<Derived>& sub)
-	{
-		using SurgSim::Math::blockOperation;
-		using SurgSim::Math::Operation;
-
-		SetUp();
-
-		// No recipient specified
-		EXPECT_THROW((blockOperation<Derived, T, Opt, I>(sub, m_rowId, m_columnId, nullptr,\
-					  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
-					  SurgSim::Framework::AssertionFailure);
-
-		// Recipient too small
-		EXPECT_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixTooSmall,\
-					  &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
-					  SurgSim::Framework::AssertionFailure);
-
-		// With a recipient that has all the coefficients and no other on the rows/columns
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixWithoutExtraCoefficients,
-						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
-		EXPECT_TRUE((m_matrixWithoutExtraCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
-		EXPECT_TRUE(m_matrixWithoutExtraCoefficientsExpected.isApprox(m_matrixWithoutExtraCoefficients));
-
-		// With a recipient that has all the coefficients and others on the rows/columns
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixWithExtraCoefficients,
-						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
-		EXPECT_TRUE((m_matrixWithExtraCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
-		EXPECT_TRUE(m_matrixWithExtraCoefficientsExpected.isApprox(m_matrixWithExtraCoefficients));
-
-		// With a recipient that does not have all the block coefficients (missing coefficients in the block)
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixMissingCoefficients,
-						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
-		EXPECT_TRUE((m_matrixMissingCoefficients.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
-		EXPECT_TRUE(m_matrixWithoutExtraCoefficientsExpected.isApprox(m_matrixMissingCoefficients));
-
-		// With an empty recipient
-		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixEmpty,
-						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
-		EXPECT_TRUE((m_matrixEmpty.block(m_rowId, m_columnId, 4, 4).isApprox(sub)));
-	}
-
-	template <typename Derived>
-	void TestSetSparseMatrixSegment(const Eigen::SparseMatrixBase<Derived>& sub)
-	{
-		using SurgSim::Math::blockOperation;
-		using SurgSim::Math::Operation;
-
-		SetUp();
-
-		// With an empty recipient
-		Eigen::SparseMatrix<T, Opt, I> m_matrixEmpty(18, 18);
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixEmpty,\
-						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::assign)));
-		EXPECT_TRUE(m_matrixEmpty.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub));
-	}
-
-	template <typename Derived>
-	void TestAddSparseMatrixBlock(const Eigen::SparseMatrixBase<Derived>& sub)
-	{
-		using SurgSim::Math::blockOperation;
-		using SurgSim::Math::Operation;
-
-		typedef typename Derived::Scalar TSub;
-		const int OptSub = Eigen::SparseMatrixBase<Derived>::IsRowMajor ? Eigen::RowMajor : Eigen::ColMajor;
-		typedef typename Derived::Index ISub;
-
-		SetUp();
-
-		Eigen::SparseMatrix<TSub, OptSub, ISub> one(sub.rows(), sub.cols());
-		for (ISub i = 0; i < sub.rows(); i++)
-		{
-			for (ISub j = 0; j < sub.cols(); j++)
-			{
-				one.insert(i, j) = 1.0;
-			}
-		}
-		one.makeCompressed();
-
-		Eigen::SparseMatrix<T, Opt, I> m_matrixOne(18, 18);
-		for (I i = 0; i < 18; i++)
-		{
-			for (I j = 0; j < 18; j++)
-			{
-				m_matrixOne.insert(i, j) = 1.0;
-			}
-		}
-		m_matrixOne.makeCompressed();
-
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixOne,\
-						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)));
-		EXPECT_TRUE(m_matrixOne.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub + one));
-	}
-
-	template <typename Derived>
-	void TestAddSparseMatrixSegment(const Eigen::SparseMatrixBase<Derived>& sub)
-	{
-		using SurgSim::Math::blockOperation;
-		using SurgSim::Math::Operation;
-
-		typedef typename Derived::Scalar TSub;
-		const int OptSub = Eigen::SparseMatrixBase<Derived>::IsRowMajor ? Eigen::RowMajor : Eigen::ColMajor;
-		typedef typename Derived::Index ISub;
-
-		SetUp();
-
-		Eigen::SparseVector<TSub, OptSub, ISub> one(sub.size());
-		for (ISub i = 0; i < sub.size(); i++)
-		{
-			one.insert(i) = 1.0;
-		}
-
-		Eigen::SparseMatrix<T, Opt, I> m_matrixOne(18, 18);
-		for (I i = 0; i < 18; i++)
-		{
-			for (I j = 0; j < 18; j++)
-			{
-				m_matrixOne.insert(i, j) = 1.0;
-			}
-		}
-		m_matrixOne.makeCompressed();
-
-		EXPECT_NO_THROW((blockOperation(sub, m_rowId, m_columnId, &m_matrixOne,\
-						 &Operation<Derived, Eigen::SparseMatrix<T, Opt, I>>::add)));
-		EXPECT_TRUE(m_matrixOne.block(m_rowId, m_columnId, sub.rows(), sub.cols()).isApprox(sub + one));
 	}
 
 	template <class T, int n, int m, int Opt>
@@ -514,37 +384,4 @@ TYPED_TEST(SparseMatrices, addSubMatrixWithSearchDynamicCall)
 	}
 }
 
-TYPED_TEST(SparseMatrices, setSparseMatrixBlockTest)
-{
-	typedef typename tuple_element<0, TypeParam>::type T;
-
-	this->TestSetSparseMatrixBlock(this->template getSparseMatrix<T, 4, 4, Eigen::ColMajor>());
-	this->TestSetSparseMatrixBlock(this->template getSparseMatrix<T, 4, 4, Eigen::RowMajor>());
-	// Using Eigen expression
-	this->TestSetSparseMatrixBlock(this->template getSparseMatrix<T, 6, 7, Eigen::ColMajor>().block(0, 0, 4, 4));
-	this->TestSetSparseMatrixBlock(this->template getSparseMatrix<T, 6, 7, Eigen::RowMajor>().block(0, 0, 4, 4));
-
-	this->TestSetSparseMatrixSegment(this->template getSparseVector<T, 4, Eigen::RowMajor>());
-	this->TestSetSparseMatrixSegment(this->template getSparseVector<T, 4, Eigen::ColMajor>());
-	// Using Eigen expression
-	this->TestSetSparseMatrixSegment(this->template getSparseVector<T, 7, Eigen::ColMajor>().segment(0, 4));
-	this->TestSetSparseMatrixSegment(this->template getSparseVector<T, 7, Eigen::RowMajor>().segment(0, 4));
-}
-
-TYPED_TEST(SparseMatrices, addSparseMatrixBlockTest)
-{
-	typedef typename tuple_element<0, TypeParam>::type T;
-
-	this->TestAddSparseMatrixBlock(this->template getSparseMatrix<T, 4, 4, Eigen::ColMajor>());
-	this->TestAddSparseMatrixBlock(this->template getSparseMatrix<T, 4, 4, Eigen::RowMajor>());
-	// Using Eigen expression
-	this->TestAddSparseMatrixBlock(this->template getSparseMatrix<T, 6, 7, Eigen::ColMajor>().block(0, 0, 4, 4));
-	this->TestAddSparseMatrixBlock(this->template getSparseMatrix<T, 6, 7, Eigen::RowMajor>().block(0, 0, 4, 4));
-
-	this->TestAddSparseMatrixSegment(this->template getSparseVector<T, 4, Eigen::RowMajor>());
-	this->TestAddSparseMatrixSegment(this->template getSparseVector<T, 4, Eigen::ColMajor>());
-	// Using Eigen expression
-	this->TestAddSparseMatrixSegment(this->template getSparseVector<T, 7, Eigen::ColMajor>().segment(0, 4));
-	this->TestAddSparseMatrixSegment(this->template getSparseVector<T, 7, Eigen::RowMajor>().segment(0, 4));
-}
 

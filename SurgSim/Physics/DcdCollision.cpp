@@ -65,10 +65,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 		}
 	}
 
-	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p)
-	{
-		p.wait();
-	});
+	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.get();});
 
 	return result;
 }

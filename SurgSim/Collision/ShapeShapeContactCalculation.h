@@ -17,6 +17,7 @@
 #define SURGSIM_COLLISION_SHAPESHAPECONTACTCALCULATION_H
 
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {

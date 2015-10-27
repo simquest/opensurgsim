@@ -63,7 +63,7 @@ std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(const double& dt,
 
 	for (auto& task : tasks)
 	{
-		task.wait();
+		task.get();
 	}
 
 	return result;

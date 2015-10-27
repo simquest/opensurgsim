@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -172,13 +172,9 @@ TEST_F(LinearSparseSolveAndInverseTests, SparseCGMatrixComponentsTest)
 
 	EXPECT_TRUE(x.isApprox(expectedX, lowPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
 			"Expected: " << expectedX.transpose() << std::endl;
-	EXPECT_FALSE(x.isApprox(expectedX, highPrecision)) << std::endl << "x: " << x.transpose() << std::endl <<
-			"Expected: " << expectedX.transpose() << std::endl;
 
 	inverseMatrix = solveAndInverse.solve(denseMatrix);
 	EXPECT_TRUE(inverseMatrix.isApprox(Matrix::Identity(18, 18), lowPrecision)) << std::endl << "Identity: " <<
-			inverseMatrix << std::endl;
-	EXPECT_FALSE(inverseMatrix.isApprox(Matrix::Identity(18, 18), highPrecision)) << std::endl << "Identity: " <<
 			inverseMatrix << std::endl;
 
 	solveAndInverse.setTolerance(highPrecision);
