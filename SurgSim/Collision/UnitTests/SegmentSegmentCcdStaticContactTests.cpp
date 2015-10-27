@@ -30,7 +30,7 @@ namespace Collision
 
 namespace
 {
-double epsilon = 1.0e-10;
+double epsilon = 1.0e07 * Eigen::NumTraits<double>::dummy_precision();
 }
 
 template <typename T>
@@ -709,6 +709,7 @@ TEST(SegmentSegmentCcdStaticContactTests, SegmentSegmentCollisions)
 
 		for (size_t ctr = 0; ctr < 20; ++ctr)
 		{
+			std::cout << "Counter: " << ctr << " Epsilon: " << epsilon << std::endl;
 			p[0] = p0;
 			p[1] = p1;
 			q[0] = q0;
