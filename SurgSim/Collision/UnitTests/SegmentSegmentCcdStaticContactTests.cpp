@@ -709,7 +709,6 @@ TEST(SegmentSegmentCcdStaticContactTests, SegmentSegmentCollisions)
 
 		for (size_t ctr = 0; ctr < 20; ++ctr)
 		{
-			std::cout << "Counter: " << ctr << " Epsilon: " << epsilon << std::endl;
 			p[0] = p0;
 			p[1] = p1;
 			q[0] = q0;
