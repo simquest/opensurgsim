@@ -62,6 +62,7 @@ set(SURGSIM_COLLISION_HEADERS
 	SegmentSegmentCcdMovingContact.h
 	SegmentSegmentCcdStaticContact.h
 	ShapeCollisionRepresentation.h
+	ShapeShapeContactCalculation.h
 	SphereDoubleSidedPlaneDcdContact.h
 	SpherePlaneDcdContact.h
 	SphereSphereDcdContact.h

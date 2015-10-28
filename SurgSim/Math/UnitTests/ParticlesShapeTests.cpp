@@ -36,6 +36,7 @@ TEST(ParticlesShapeTests, CanConstruct)
 {
 	ASSERT_NO_THROW({ ParticlesShape particles; });
 	ASSERT_NO_THROW({ ParticlesShape particles(0.01); });
+
 }
 
 TEST(ParticlesShapeTests, CopyConstruct)
@@ -67,6 +68,8 @@ TEST(ParticlesShapeTests, DefaultProperties)
 	EXPECT_FALSE(isValid(particles.getCenter()));
 	EXPECT_TRUE(particles.getSecondMomentOfVolume().isZero());
 	EXPECT_NE(nullptr, particles.getAabbTree());
+
+	EXPECT_TRUE(particles.isTransformable());
 }
 
 TEST(ParticlesShapeTests, SetGetRadius)
@@ -86,7 +89,7 @@ TEST(ParticlesShapeTests, GeometricProperties)
 	EXPECT_TRUE(particles.getCenter().isApprox(Vector3d::Zero()));
 	EXPECT_NEAR(unitSphere.getVolume(), particles.getVolume(), epsilon);
 	EXPECT_TRUE(particles.getSecondMomentOfVolume().isApprox(unitSphere.getSecondMomentOfVolume()))
-		<< unitSphere.getSecondMomentOfVolume() << std::endl << particles.getSecondMomentOfVolume();
+			<< unitSphere.getSecondMomentOfVolume() << std::endl << particles.getSecondMomentOfVolume();
 
 	particles.addVertex(ParticlesShape::VertexType(Vector3d::Ones()));
 	particles.update();
@@ -94,14 +97,14 @@ TEST(ParticlesShapeTests, GeometricProperties)
 	EXPECT_NEAR(2.0 * unitSphere.getVolume(), particles.getVolume(), epsilon);
 	Matrix33d distanceSkew = makeSkewSymmetricMatrix(Vector3d::Ones().eval());
 	EXPECT_TRUE(particles.getSecondMomentOfVolume().isApprox(2.0 * unitSphere.getSecondMomentOfVolume()
-		- unitSphere.getVolume() * distanceSkew * distanceSkew));
+				- unitSphere.getVolume() * distanceSkew * distanceSkew));
 
 	particles.addVertex(ParticlesShape::VertexType(-Vector3d::Ones()));
 	particles.update();
 	EXPECT_TRUE(particles.getCenter().isApprox(Vector3d::Zero()));
 	EXPECT_NEAR(3.0 * unitSphere.getVolume(), particles.getVolume(), epsilon);
 	EXPECT_TRUE(particles.getSecondMomentOfVolume().isApprox(3 * unitSphere.getSecondMomentOfVolume()
-		- 2.0 * unitSphere.getVolume() * distanceSkew * distanceSkew));
+				- 2.0 * unitSphere.getVolume() * distanceSkew * distanceSkew));
 }
 
 TEST(ParticlesShapeTests, Serialization)

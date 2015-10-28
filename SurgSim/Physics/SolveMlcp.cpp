@@ -33,7 +33,7 @@ SolveMlcp::~SolveMlcp()
 {}
 
 std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt,
-	const std::shared_ptr<PhysicsManagerState>& state)
+		const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 
@@ -67,13 +67,6 @@ std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt,
 		auto contact = contactConstraintData->getContact();
 
 		contact->force = lambda[indexConstraint] * contact->normal;
-	}
-
-	// Update the representations with the contact data.
-	auto& pairs = result->getCollisionPairs();
-	for (auto& pair : pairs)
-	{
-		pair->updateRepresentations();
 	}
 
 	return result;

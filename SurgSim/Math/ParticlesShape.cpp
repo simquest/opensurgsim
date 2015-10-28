@@ -128,5 +128,10 @@ const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::g
 	return m_aabbTree;
 }
 
+bool ParticlesShape::isTransformable() const
+{
+	return true;
+}
+
 };
 };
