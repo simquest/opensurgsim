@@ -43,7 +43,7 @@ std::shared_ptr<T> ComponentManager::tryAddComponent(std::shared_ptr<SurgSim::Fr
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << "Component " << component->getName() << " already added to " << getName();
+			SURGSIM_LOG_INFO(m_logger) << "Component " << component->getFullName() << " already added to " << getName();
 			typedComponent = nullptr;
 		}
 	}
