@@ -126,7 +126,7 @@ namespace Devices
 class NovintScaffold::Handle
 {
 public:
-	Handle(const std::string& info, bool initBySerialNumber = true) :
+	explicit Handle(const std::string& info, bool initBySerialNumber = true) :
 		m_deviceHandle(HDL_INVALID_HANDLE)
 	{
 		HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
@@ -141,7 +141,7 @@ public:
 
 		if (checkForFatalError("Failed to initialize"))
 		{
-			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) << std::endl << 
+			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) << std::endl <<
 				(initBySerialNumber ? "HDAL serial number: '" : "device name: '") << info << "'";
 		}
 		else if (deviceHandle == HDL_INVALID_HANDLE)
@@ -198,7 +198,7 @@ private:
 class NovintScaffold::Callback
 {
 public:
-	Callback(NovintScaffold* scaffold) : m_callbackHandle(HDL_INVALID_HANDLE)
+	explicit Callback(NovintScaffold* scaffold) : m_callbackHandle(HDL_INVALID_HANDLE)
 	{
 		SURGSIM_ASSERT(scaffold != nullptr) << "Callback::create needs non-nullptr scaffold.";
 		m_callbackHandle = hdlCreateServoOp(run, scaffold, false);
@@ -275,6 +275,7 @@ struct NovintScaffold::DeviceData
 		eulerAngleOffsetRoll(0.0),
 		eulerAngleOffsetYaw(0.0),
 		eulerAngleOffsetPitch(0.0),
+		toolDof(0.0),
 		forwardPointingPoseThreshold(0.9),
 		torqueScale(Vector3d::Constant(1.0)),
 		positionScale(device->getPositionScale()),
@@ -326,6 +327,8 @@ struct NovintScaffold::DeviceData
 	double eulerAngleOffsetYaw;
 	/// The offset added to the pitch Euler angle.
 	double eulerAngleOffsetPitch;
+	/// The tool's degree-of-freedom, e.g., the handle's open/close angle.
+	double toolDof;
 	/// The threshold to determine if the device is pointing forwards before unlocking orientation.
 	double forwardPointingPoseThreshold;
 	/// The scaling factors for the torque axes.
@@ -496,7 +499,7 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 	{
 		auto& sameSerialNumber = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
 											  [&serialNumber](const std::unique_ptr<DeviceData>& info)
-								{ 
+								{
 									return info->serialNumber == serialNumber;
 								});
 		if (sameSerialNumber != m_state->registeredDevices.end())
@@ -514,7 +517,7 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 		auto& sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(),
 													m_state->registeredDevices.cend(),
 													[&initializationName](const std::unique_ptr<DeviceData>& info)
-										{ 
+										{
 											return info->initializationName == initializationName;
 										});
 		if (sameInitializationName != m_state->registeredDevices.end())
@@ -747,6 +750,8 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
 
+		info->toolDof = angles[3];
+
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
 		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
 			Vector3d(Vector3d::UnitX()));
@@ -959,6 +964,7 @@ void NovintScaffold::setInputData(DeviceData* info)
 {
 	DataGroup& inputData = info->deviceObject->getInputData();
 	inputData.poses().set(DataStructures::Names::POSE, info->scaledPose);
+	inputData.scalars().set("toolDof", info->toolDof);
 	inputData.booleans().set(DataStructures::Names::BUTTON_1, info->buttonStates[0]);
 	inputData.booleans().set(DataStructures::Names::BUTTON_2, info->buttonStates[1]);
 	inputData.booleans().set(DataStructures::Names::BUTTON_3, info->buttonStates[2]);
@@ -975,7 +981,7 @@ bool NovintScaffold::createAllHandles()
 	// Then use hdlCatalogDevices to get the serial numbers for other connected devices not listed in device.yaml,
 	// and initialize them (by serial number).
 	// When registerDevice is called the name can be matched to a Handle created from a serial number.
-	for(const auto& item: m_state->nameToSerial)
+	for (const auto& item : m_state->nameToSerial)
 	{
 		std::string deviceName = item.first;
 		std::transform(deviceName.begin(), deviceName.end(), deviceName.begin(), tolower);
@@ -1194,6 +1200,7 @@ DataGroup NovintScaffold::buildDeviceInputData()
 {
 	DataStructures::DataGroupBuilder builder;
 	builder.addPose(DataStructures::Names::POSE);
+	builder.addScalar("toolDof");
 	builder.addBoolean(DataStructures::Names::BUTTON_1);
 	builder.addBoolean(DataStructures::Names::BUTTON_2);
 	builder.addBoolean(DataStructures::Names::BUTTON_3);
