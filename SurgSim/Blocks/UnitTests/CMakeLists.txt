@@ -18,6 +18,7 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
+	CompoundShapeToGraphicsTests.cpp
 	DriveElementFromInputBehaviorTests.cpp
 	KeyboardTogglesComponentBehaviorTests.cpp
 	MassSpring1DRepresentationTests.cpp
