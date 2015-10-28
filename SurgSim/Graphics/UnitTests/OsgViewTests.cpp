@@ -203,8 +203,6 @@ TEST(OsgViewTests, Serialization)
 		view->setValue("CameraPosition", Vector3d(1.5, 1.5, 1.5));
 		view->setValue("CameraLookAt", Vector3d(10.5, 10.5, 10.5));
 		view->setValue("OsgMapUniforms", true);
-		view->setValue("KeyboardDeviceEnabled", true);
-		view->setValue("MouseDeviceEnabled", true);
 
 		/// Serialize
 		YAML::Node node;
@@ -223,6 +221,18 @@ TEST(OsgViewTests, Serialization)
 		EXPECT_EQ(cameraNode[camera->getClassName()]["Id"].as<std::string>(),
 				  node[view->getClassName()]["Camera"][camera->getClassName()]["Id"].as<std::string>());
 	}
+}
+
+
+TEST(OsgViewTests, OnlyOneDevice)
+{
+	std::shared_ptr<OsgView> view1 = std::make_shared<OsgView>("One");
+	std::shared_ptr<OsgView> view2 = std::make_shared<OsgView>("Two");
+
+	view1->enableKeyboardDevice(true);
+	view1->enableMouseDevice(true);
+	EXPECT_ANY_THROW(view2->enableKeyboardDevice(true));
+	EXPECT_ANY_THROW(view2->enableMouseDevice(true));
 }
 
 }  // namespace Graphics
