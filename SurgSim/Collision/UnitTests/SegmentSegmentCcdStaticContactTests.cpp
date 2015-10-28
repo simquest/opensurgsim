@@ -86,10 +86,10 @@ TEST(SegmentSegmentCcdStaticContactTests, RegionAndEdgeGenerator)
 		for (double s = -1.0; s < 0.0; s += 0.1)
 		{
 			// Region 6
-			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0, staticTest.computeCollisionEdge(a, b, d, r, s,
-					  ratio));
-			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0, staticTest.computeCollisionEdge(a, b, -d, r, s,
-					  ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeR0,
+					  staticTest.computeCollisionEdge(a, b, d, r, s, ratio));
+			EXPECT_EQ(SegmentSegmentCcdStaticContact::SegmentCcdEdgeTypeS0,
+					  staticTest.computeCollisionEdge(a, b, -d, r, s, ratio));
 		}
 
 		for (double s = 0.0; s <= ratio; s += 0.1)

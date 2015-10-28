@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the SegmentSegmentCcdCheck functions.
+/// Tests for the SegmentSegmentCcdMovingContact functions.
 
 #include <array>
 
@@ -44,14 +44,6 @@ public:
 	void normalizeSafely(Math::Vector3d* t0, Math::Vector3d* t1, double epsilon) const
 	{
 		SegmentSegmentCcdMovingContact::normalizeSafely(t0, t1, epsilon);
-	}
-
-	Math::Vector3d calculatePXQ(
-		const std::array<Math::Vector3d, 2>& p,
-		const std::array<Math::Vector3d, 2>& q,
-		double epsilon) const
-	{
-		return SegmentSegmentCcdMovingContact::calculatePXQ(p, q, epsilon);
 	}
 
 	bool collideSegmentSegmentBaseCase(
@@ -154,36 +146,6 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSafeNormalization)
 		movingTest.normalizeSafely(&vector1, &vector2, epsilon);
 		EXPECT_TRUE(vector1.isApprox(Math::Vector3d(0.0, 1.0e-11, 2.0e-11), epsilon));
 		EXPECT_TRUE(vector2.isApprox(Math::Vector3d(2.0e-11, 1.0e-11, 0.0), epsilon));
-	}
-};
-
-TEST(SegmentSegmentCcdMovingContactTests, TestSafeCrossProduct)
-{
-	MockSegmentSegmentCcdMovingContact movingTest;
-	Math::Vector3d p0(0.0, 0.0, 0.2);
-	Math::Vector3d p1(0.0, 0.1, 0.2);
-
-	std::array<Math::Vector3d, 2> p;
-	p[0] = p0;
-	p[1] = p1;
-
-	{
-		SCOPED_TRACE("Safe cross product, p1q0 works.");
-		Math::Vector3d q0(0.1, 0.0, 0.2);
-		Math::Vector3d q1(0.0, 0.2, 0.2);
-		std::array<Math::Vector3d, 2> q;
-		q[0] = q0;
-		q[1] = q1;
-		EXPECT_TRUE(movingTest.calculatePXQ(p, q, epsilon).isApprox(Math::Vector3d(0.0, 0.0, -1.0), epsilon));
-	}
-	{
-		SCOPED_TRACE("Safe cross product, p1q0 doesn't work, but p1q1 works.");
-		Math::Vector3d q0(0.0, 0.2, 0.2);
-		Math::Vector3d q1(0.1, 0.0, 0.2);
-		std::array<Math::Vector3d, 2> q;
-		q[0] = q0;
-		q[1] = q1;
-		EXPECT_TRUE(movingTest.calculatePXQ(p, q, epsilon).isApprox(Math::Vector3d(0.0, 0.0, -1.0), epsilon));
 	}
 };
 

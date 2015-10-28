@@ -51,13 +51,14 @@ class CollisionPair;
 class SegmentSegmentCcdMovingContact
 {
 public:
+	static const int SUB_POINTS_PARALLEL_CASE = 5;
+	static const int SUB_POINTS_COPLANAR_CASE = 10;
+
 	/// Constructor.
 	SegmentSegmentCcdMovingContact();
 
 	/// Calculate if, where, and when the segments p and q collide in the interval from t = 0 to t = 1
-	/// for "zero" thickness segments. This case is essentially an upper level wrapper. It delegates the detection
-	/// to collideSegmentSegmentBaseCase and then adds whatever contacts are generated to the collision
-	/// pair list.
+	/// for "zero" thickness segments.
 	/// \param pt0Positions are the segment endpoints for the first segment at time t=0.
 	/// \param pt1Positions are the segment endpoints for the first segment at time t=1.
 	/// \param qt0Positions are the segment endpoints for the second segment at time t=0.
@@ -79,9 +80,7 @@ public:
 		double* t, double* r, double* s, Math::Vector3d* pToQDir);
 
 	/// Calculate if, where, and when the segments p and q collide in the interval from t = 0 to t = 1
-	/// for thick segments. This case is essentially an upper level wrapper. It delegates the detection
-	/// to collideSegmentSegmentBaseCase and then adds whatever contacts are generated to the collision
-	/// pair list.
+	/// for thick segments.
 	/// \param pt0Positions are the segment endpoints for the first segment at time t=0.
 	/// \param pt1Positions are the segment endpoints for the first segment at time t=1.
 	/// \param qt0Positions are the segment endpoints for the second segment at time t=0.
@@ -92,7 +91,7 @@ public:
 	/// \param t [out] parametric location of the collision along the time axes in the interval [0, 1]
 	/// \param r [out] parametric location of the collision along p in the interval [0, 1]
 	/// \param s [out] parametric location of the collision along q in the interval [0, 1]
-	/// \param pToQDir [out] direction from the contact point on p to the contact point on q
+	/// \param pToQDir [out] direction from the contact point on p to the contact point on q at time t
 	/// \return true if p and q collide in interval [0, 1]
 	bool collideMovingSegmentSegment(
 		const std::array<Math::Vector3d, 2>& pt0Positions,
@@ -140,8 +139,8 @@ protected:
 	/// \param thicknessQ radius of segment q.
 	/// \param timePrecisionEpsilon time nearness criteria for declaring a contact.
 	/// \param t [out] parametric location of the collision along the time axes in the interval [0, 1]
-	/// \param r [out] parametric location of the collision along p in the interval [0, 1]
-	/// \param s [out] parametric location of the collision along q in the interval [0, 1]
+	/// \param r [in/out] parametric location of the collision along p in the interval [0, 1]
+	/// \param s [in/out] parametric location of the collision along q in the interval [0, 1]
 	/// \param depth recursion depth.
 	/// \return true if p and q collide in interval [a, b]
 	bool collideSegmentSegmentParallelCase(
@@ -166,8 +165,8 @@ protected:
 	/// \param thicknessQ radius of segment q.
 	/// \param timePrecisionEpsilon time nearness criteria for declaring a contact.
 	/// \param t [out] parametric location of the collision along the time axes in the interval [0, 1]
-	/// \param r [out] parametric location of the collision along p in the interval [0, 1]
-	/// \param s [out] parametric location of the collision along q in the interval [0, 1]
+	/// \param r [in/out] parametric location of the collision along p in the interval [0, 1]
+	/// \param s [in/out] parametric location of the collision along q in the interval [0, 1]
 	/// \param depth recursion depth.
 	/// \return true if p and q collide in interval [a, b]
 	bool collideSegmentSegmentCoplanarCase(
@@ -197,17 +196,6 @@ protected:
 		double* t, double* r, double* s,
 		int depth = 0);
 
-	/// Calculate the best unit normal we can find in the direction of pXq for one of the endpoints of q.
-	/// Try multiple arrangements of the end points to reduce the artifacts when three of the vertices may
-	/// be nearly collinear.
-	/// \param p segment p
-	/// \param q segment q
-	/// \param epsilon when the norm of p x q is above epsilon, the cross product is assumed to be valid.
-	/// return the normalized cross product of p x q
-	Math::Vector3d calculatePXQ(const std::array<Math::Vector3d, 2>& p,
-								const std::array<Math::Vector3d, 2>& q,
-								double epsilon) const;
-
 	/// Safely normalize segments t0 and t1 consistently with each other. Under the assumption that they
 	/// both represent the same segment at two different time points. Ensure that for cases where the segment
 	/// is too small at one or both time points (i.e. they essentially degenerate to a point) that we make
@@ -227,13 +215,12 @@ private:
 	/// \param rNext is the parametric location on segment p at the end of the current time interval
 	/// \param sCurrent is the parametric location on segment q at the start of the current time interval
 	/// \param sNext is the parametric location on segment q at the end of the current time interval
-	/// \param numberSubpoints is the number of points in the current time subdivision
 	/// \param nCurrent is the normal of p x q at the start of the current time interval
 	/// \param nNext is the normal of p x q at the current time point
 	/// \return true if the check indicates a collision may be possible for coplanar segments p and
 	/// q at the current time interval.
 	bool checkForCoplanarContactWithinInterval(double rCurrent, double rNext, double sCurrent, double sNext,
-			int numberSubpoints, const Math::Vector3d& nCurrent, const Math::Vector3d& nNext) const;
+			const Math::Vector3d& nCurrent, const Math::Vector3d& nNext) const;
 
 	/// Minimum distance precision epsilon used in continuous collision detection.
 	const double m_distanceEpsilon;
