@@ -67,6 +67,14 @@ TEST_F(KeyboardDeviceTest, InputConsumer)
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("modifierMask"));
 }
 
+TEST_F(KeyboardDeviceTest, NoTwoKeyboards)
+{
+	std::shared_ptr<KeyboardDevice> device1 = std::make_shared<KeyboardDevice>("TestKeyboard1");
+	std::shared_ptr<KeyboardDevice> device2 = std::make_shared<KeyboardDevice>("TestKeyboard2");
+
+	EXPECT_NO_THROW(device1->initialize());
+	EXPECT_ANY_THROW(device2->initialize());
+}
 
 };  // namespace Devices
 };  // namespace SurgSim

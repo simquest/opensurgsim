@@ -72,6 +72,15 @@ TEST_F(MouseDeviceTest, InputConsumer)
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("scrollDeltaY"));
 }
 
+TEST_F(MouseDeviceTest, NoTwoMice)
+{
+	std::shared_ptr<MouseDevice> device1 = std::make_shared<MouseDevice>("TestMouse1");
+	std::shared_ptr<MouseDevice> device2 = std::make_shared<MouseDevice>("TestMouse2");
+
+	EXPECT_NO_THROW(device1->initialize());
+	EXPECT_ANY_THROW(device2->initialize());
+}
+
 
 };  // namespace Devices
 };  // namespace SurgSim

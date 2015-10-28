@@ -66,6 +66,8 @@ KeyboardScaffold::~KeyboardScaffold()
 
 bool KeyboardScaffold::registerDevice(KeyboardDevice* device)
 {
+	SURGSIM_ASSERT(m_device == nullptr) << "Can't register two Keyboard devices.";
+
 	m_device.reset(new DeviceData(device));
 	if (m_device == nullptr)
 	{
