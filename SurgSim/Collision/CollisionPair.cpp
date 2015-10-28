@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <numeric>
-
 #include "SurgSim/Collision/CollisionPair.h"
 
-#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Assert.h"
 
 using SurgSim::DataStructures::Location;
+
 
 namespace SurgSim
 {
@@ -32,11 +30,9 @@ CollisionPair::CollisionPair()
 }
 
 CollisionPair::CollisionPair(const std::shared_ptr<Representation>& first,
-							 const std::shared_ptr<Representation>& second) :
-	m_representations(first, second), m_isSwapped(false)
+							 const std::shared_ptr<Representation>& second)
 {
-	SURGSIM_ASSERT(first != second) << "Collision Representation cannot collide with itself";
-	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "Collision Representation cannot be null";
+	setRepresentations(first, second);
 }
 
 CollisionPair::~CollisionPair()
@@ -47,7 +43,6 @@ CollisionPair::~CollisionPair()
 void CollisionPair::setRepresentations(const std::shared_ptr<Representation>& first,
 									   const std::shared_ptr<Representation>& second)
 {
-	SURGSIM_ASSERT(first != second) << "Should try to collide with self";
 	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "Collision Representation cannot be null";
 
 	// Invalidate the current contacts
@@ -55,12 +50,36 @@ void CollisionPair::setRepresentations(const std::shared_ptr<Representation>& fi
 	m_representations.first = first;
 	m_representations.second = second;
 	m_isSwapped = false;
+
+	if (m_representations.first == m_representations.second)
+	{
+		m_type = m_representations.first->getSelfCollisionDetectionType();
+	}
+	else if (m_representations.first->getCollisionDetectionType() == COLLISION_DETECTION_TYPE_NONE ||
+				m_representations.second->getCollisionDetectionType() == COLLISION_DETECTION_TYPE_NONE)
+	{
+		m_type = COLLISION_DETECTION_TYPE_NONE;
+	}
+	else if (m_representations.first->getCollisionDetectionType() == COLLISION_DETECTION_TYPE_CONTINUOUS &&
+				m_representations.second->getCollisionDetectionType() == COLLISION_DETECTION_TYPE_CONTINUOUS)
+	{
+		m_type = COLLISION_DETECTION_TYPE_CONTINUOUS;
+	}
+	else
+	{
+		m_type = COLLISION_DETECTION_TYPE_DISCRETE;
+	}
 }
 
 const std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>>&
 		CollisionPair::getRepresentations() const
 {
 	return m_representations;
+}
+
+CollisionDetectionType CollisionPair::getType() const
+{
+	return m_type;
 }
 
 std::shared_ptr<Representation> CollisionPair::getFirst() const
@@ -78,43 +97,38 @@ bool CollisionPair::hasContacts() const
 	return !m_contacts.empty();
 }
 
-void CollisionPair::addContact(const CollisionDetectionType& collisionType,
-							   const double& depth,
-							   const double& time,
-							   const SurgSim::Math::Vector3d& contactPoint,
-							   const SurgSim::Math::Vector3d& normal,
-							   const std::pair<Location, Location>& penetrationPoints)
+void CollisionPair::addCcdContact(const double& depth, const double& time, const SurgSim::Math::Vector3d& contactPoint,
+		const SurgSim::Math::Vector3d& normal, const std::pair<Location, Location>& penetrationPoints)
 {
-	addContact(std::make_shared<Contact>(collisionType, depth, time, contactPoint, normal, penetrationPoints));
+	SURGSIM_ASSERT(getType() == COLLISION_DETECTION_TYPE_CONTINUOUS)
+		<< "Can only add CCD contacts to a CollisionPair that is COLLISION_DETECTION_TYPE_CONTINUOUS";
+	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_CONTINUOUS, depth, time, contactPoint, normal,
+				penetrationPoints));
 }
 
-void CollisionPair::addCcdContact(const double& depth,
-								  const double& time,
-								  const SurgSim::Math::Vector3d& contactPoint,
-								  const SurgSim::Math::Vector3d& normal,
-								  const std::pair<Location, Location>& penetrationPoints)
+void CollisionPair::addDcdContact(const double& depth, const SurgSim::Math::Vector3d& normal,
+		const std::pair<Location, Location>& penetrationPoints)
 {
-	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_CONTINUOUS, depth, time,
-										 contactPoint, normal, penetrationPoints));
-}
-
-void CollisionPair::addDcdContact(const double& depth,
-								  const SurgSim::Math::Vector3d& normal,
-								  const std::pair<Location, Location>& penetrationPoints)
-{
-	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
-										 SurgSim::Math::Vector3d::Zero(), normal, penetrationPoints));
+	SURGSIM_ASSERT(getType() == COLLISION_DETECTION_TYPE_DISCRETE)
+		<< "Can only add DCD contacts to a CollisionPair that is COLLISION_DETECTION_TYPE_DISCRETE";
+	addContact(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0, Math::Vector3d::Zero(), normal,
+				penetrationPoints));
 }
 
 void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
 {
+	SURGSIM_ASSERT(contact->type == getType())
+		<< "Only contacts with the same CollisionDetectionType can be added to this CollisionPair.";
 	m_contacts.push_back(contact);
-	m_representations.first->addContact(m_representations.second, contact);
-	std::shared_ptr<Contact> contact2 =
-		std::make_shared<Contact>(contact->collisionType, contact->depth, contact->time, contact->contact,
-								  -contact->normal, std::pair<Location, Location>(
-									  contact->penetrationPoints.second, contact->penetrationPoints.first));
-	m_representations.second->addContact(m_representations.first, contact2);
+}
+
+void CollisionPair::updateRepresentations()
+{
+	for (auto& contact : m_contacts)
+	{
+		m_representations.first->addContact(m_representations.second, contact);
+		m_representations.second->addContact(m_representations.first, contact->makeComplimentary());
+	}
 }
 
 const std::list<std::shared_ptr<Contact>>& CollisionPair::getContacts() const
@@ -129,7 +143,7 @@ void CollisionPair::clearContacts()
 
 void CollisionPair::swapRepresentations()
 {
-	SURGSIM_ASSERT(! hasContacts()) << "Can't swap representations after contacts have already been calculated";
+	SURGSIM_ASSERT(!hasContacts()) << "Can't swap representations after contacts have already been calculated";
 	m_isSwapped = !m_isSwapped;
 	std::swap(m_representations.first, m_representations.second);
 }

@@ -81,13 +81,12 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
-	/// Check whether this device is initialized.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 private:
 	friend class PhantomScaffold;
+
+	bool finalize() override;
 
 	std::shared_ptr<PhantomScaffold> m_scaffold;
 	std::string m_initializationName;

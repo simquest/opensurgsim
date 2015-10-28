@@ -55,8 +55,14 @@ public:
 	virtual ~MockComponent() {}
 
 protected:
-	virtual bool doInitialize() {return true;}
-	virtual bool doWakeUp() {return true;}
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
 };
 namespace SurgSim
 {
@@ -162,13 +168,13 @@ TEST_F(InputManagerTest, InputfromDevice)
 
 	testDevice1->pushInput("avalue");
 	EXPECT_NO_THROW(listener1->getData(&dataGroup));
-	EXPECT_TRUE(dataGroup.strings().get("helloWorld",&data));
-	EXPECT_EQ("avalue",data);
+	EXPECT_TRUE(dataGroup.strings().get("helloWorld", &data));
+	EXPECT_EQ("avalue", data);
 
 	testDevice1->pushInput("bvalue");
 	EXPECT_NO_THROW(listener1->getData(&dataGroup));
-	EXPECT_TRUE(dataGroup.strings().get("helloWorld",&data));
-	EXPECT_EQ("bvalue",data);
+	EXPECT_TRUE(dataGroup.strings().get("helloWorld", &data));
+	EXPECT_EQ("bvalue", data);
 }
 
 TEST_F(InputManagerTest, OutputAddRemove)

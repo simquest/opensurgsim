@@ -349,7 +349,15 @@ double MockFemElement::getVolume(const OdeState& state) const
 
 Vector MockFemElement::computeCartesianCoordinate(const OdeState& state, const Vector& barycentricCoordinate) const
 {
-	return SurgSim::Math::Vector3d::Zero();
+	SURGSIM_ASSERT(getNumNodes() == static_cast<size_t>(barycentricCoordinate.size()));
+
+	Vector result = Vector::Zero(3);
+	for (size_t node = 0; node < getNumNodes(); node++)
+	{
+		result += state.getPosition(getNodeId(node)) * barycentricCoordinate[node];
+	}
+
+	return result;
 }
 
 Vector MockFemElement::computeNaturalCoordinate(const OdeState& state, const Vector& globalCoordinate) const
@@ -468,6 +476,20 @@ MockFem1DRepresentation::MockFem1DRepresentation(const std::string& name) : Surg
 bool MockFem1DRepresentation::doInitialize()
 {
 	return Fem1DRepresentation::doInitialize();
+}
+
+double MockFem1DRepresentation::getMassPerNode(size_t nodeId)
+{
+	return m_massPerNode[nodeId];
+}
+
+MockFem2DRepresentation::MockFem2DRepresentation(const std::string& name) : SurgSim::Physics::Fem2DRepresentation(name)
+{
+}
+
+double MockFem2DRepresentation::getMassPerNode(size_t nodeId)
+{
+	return m_massPerNode[nodeId];
 }
 
 MockFixedConstraintFixedPoint::MockFixedConstraintFixedPoint() : ConstraintImplementation()

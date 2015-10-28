@@ -102,6 +102,17 @@ bool Component::wakeUp()
 	return m_isAwake;
 }
 
+void Component::retire()
+{
+	doRetire();
+	m_isAwake = false;
+}
+
+void Component::doRetire()
+{
+	return;
+}
+
 void Component::setScene(std::weak_ptr<Scene> scene)
 {
 	m_scene = scene;
@@ -191,7 +202,6 @@ bool Component::isLocalActive() const
 {
 	return m_isLocalActive;
 }
-
 
 }; // namespace Framework
 }; // namespace SurgSim

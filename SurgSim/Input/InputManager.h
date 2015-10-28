@@ -58,6 +58,7 @@ private:
 	bool doInitialize() override;
 	bool doStartUp() override;
 	bool doUpdate(double dt) override;
+	void doBeforeStop() override;
 
 	/// Adds a component, this can be either input or output, it will call the appropriate
 	/// function in the device. For an InputComonent this will succeed if the device name

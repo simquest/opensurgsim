@@ -115,7 +115,7 @@ osg::Uniform* addMatrixUniform(osg::Node* node, const std::string& name)
 	return uniform;
 }
 
-osg::Switch* createUniformUpdateNode(long mask)
+osg::Switch* createUniformUpdateNode(long mask) // NOLINT
 {
 	auto node = new osg::Switch;
 
@@ -131,9 +131,9 @@ osg::Switch* createUniformUpdateNode(long mask)
 	return node;
 }
 
-const long CullMask = 0xfffffff1;
-const long CullMaskLeft = 0x1;
-const long CullMaskRight = 0x2;
+const long CullMask = 0xfffffff1; // NOLINT
+const long CullMaskLeft = 0x1; // NOLINT
+const long CullMaskRight = 0x2; // NOLINT
 
 };
 
@@ -361,6 +361,34 @@ void OsgCamera::getViewport(int* x, int* y, int* width, int* height) const
 	*height = viewPort->height();
 }
 
+void OsgCamera::setViewportSize(std::array<double, 2> dimensions)
+{
+	auto viewPort = m_camera->getViewport();
+
+	if (viewPort != nullptr)
+	{
+		double aspectRatioChange = (dimensions[0] / viewPort->width()) / (dimensions[1] / viewPort->height());
+		m_camera->setViewport(viewPort->x(), viewPort->y(), dimensions[0], dimensions[1]);
+		m_camera->getProjectionMatrix() *= osg::Matrix::scale(1.0 / aspectRatioChange, aspectRatioChange,1.0);
+		m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+	}
+	else
+	{
+		m_camera->setViewport(0, 0, dimensions[0], dimensions[1]);
+	}
+}
+
+std::array<double, 2> OsgCamera::getViewportSize() const
+{
+	auto viewPort = m_camera->getViewport();
+
+	SURGSIM_ASSERT(viewPort != nullptr) << "Trying to access viewport before it has been established.";
+
+	std::array<double, 2> dimensions = {viewPort->width(), viewPort->height()};
+
+	return dimensions;
+}
+
 void OsgCamera::setMainCamera(bool val)
 {
 	if (val != m_isMainCamera)
@@ -369,7 +397,7 @@ void OsgCamera::setMainCamera(bool val)
 		{
 			m_camera->removeChild(m_materialProxy);
 
-			std::array<long, 2> masks = {CullMaskLeft, CullMaskRight};
+			std::array<long, 2> masks = {CullMaskLeft, CullMaskRight}; // NOLINT
 
 			// Insert two nodes into the camera hierarchy, they will update the global uniforms with the correct
 			// value. Also attach the material proxy to each of the nodes.

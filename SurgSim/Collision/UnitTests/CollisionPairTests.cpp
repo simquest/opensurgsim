@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ TEST(CollisionPairTests, InitTest)
 	std::shared_ptr<Representation> rep0 = makeSphereRepresentation(1.0);
 	std::shared_ptr<Representation> rep1 = makeSphereRepresentation(2.0);
 
-	EXPECT_ANY_THROW({CollisionPair pair(rep0, rep0);});
+	EXPECT_NO_THROW({CollisionPair pair(rep0, rep0);});
 	EXPECT_ANY_THROW({CollisionPair pair(nullptr, rep0);});
 	EXPECT_ANY_THROW({CollisionPair pair(nullptr, nullptr);});
 	EXPECT_ANY_THROW({CollisionPair pair(rep0, nullptr);});
@@ -109,6 +109,68 @@ TEST(CollisionPairTests, setRepresentationsTest)
 	EXPECT_FALSE(pair.isSwapped());
 }
 
+TEST(CollisionPairTests, CollisionDetectionTypeTest)
+{
+	std::shared_ptr<Representation> repCCD1 = makeSphereRepresentation(1.0);
+	repCCD1->setCollisionDetectionType(COLLISION_DETECTION_TYPE_CONTINUOUS);
+	std::shared_ptr<Representation> repCCD2 = makeSphereRepresentation(2.0);
+	repCCD2->setCollisionDetectionType(COLLISION_DETECTION_TYPE_CONTINUOUS);
+	std::shared_ptr<Representation> repDCD1 = makeSphereRepresentation(99.0);
+	repDCD1->setCollisionDetectionType(COLLISION_DETECTION_TYPE_DISCRETE);
+	std::shared_ptr<Representation> repDCD2 = makeSphereRepresentation(100.0);
+	repDCD2->setCollisionDetectionType(COLLISION_DETECTION_TYPE_DISCRETE);
+	std::shared_ptr<Representation> repNone = makeSphereRepresentation(300.0);
+	repNone->setCollisionDetectionType(COLLISION_DETECTION_TYPE_NONE);
+
+	{
+		CollisionPair pair(repCCD1, repCCD2);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_CONTINUOUS, pair.getType());
+	}
+	{
+		CollisionPair pair(repDCD1, repDCD2);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE, pair.getType());
+	}
+	{
+		CollisionPair pair(repCCD1, repDCD1);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE, pair.getType());
+	}
+	{
+		CollisionPair pair(repDCD2, repCCD2);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE, pair.getType());
+	}
+	{
+		CollisionPair pair(repNone, repDCD1);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_NONE, pair.getType());
+	}
+	{
+		CollisionPair pair(repCCD1, repNone);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_NONE, pair.getType());
+	}
+}
+
+TEST(CollisionPairTests, SelfCollisionDetectionTypeTest)
+{
+	std::shared_ptr<Representation> repCCD = makeSphereRepresentation(1.0);
+	repCCD->setSelfCollisionDetectionType(COLLISION_DETECTION_TYPE_CONTINUOUS);
+	std::shared_ptr<Representation> repDCD = makeSphereRepresentation(99.0);
+	repDCD->setSelfCollisionDetectionType(COLLISION_DETECTION_TYPE_DISCRETE);
+	std::shared_ptr<Representation> repNone = makeSphereRepresentation(300.0);
+	repNone->setSelfCollisionDetectionType(COLLISION_DETECTION_TYPE_NONE);
+
+	{
+		CollisionPair pair(repCCD, repCCD);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_CONTINUOUS, pair.getType());
+	}
+	{
+		CollisionPair pair(repDCD, repDCD);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE, pair.getType());
+	}
+	{
+		CollisionPair pair(repNone, repNone);
+		EXPECT_EQ(COLLISION_DETECTION_TYPE_NONE, pair.getType());
+	}
+}
+
 TEST(CollisionPairTests, addContactTest)
 {
 	auto rep0 = makeSphereRepresentation(1.0);
@@ -127,6 +189,7 @@ TEST(CollisionPairTests, addContactTest)
 
 	CollisionPair pair(rep0, rep1);
 	pair.addDcdContact(1.0, Vector3d::UnitY(), penetrationPoints);
+	pair.updateRepresentations();
 
 	rep0->update(0.0);
 	rep0->getCollisions().publish();

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,35 +32,16 @@ namespace SurgSim
 namespace Collision
 {
 
-BoxSphereDcdContact::BoxSphereDcdContact()
-{
-}
-
 std::pair<int, int> BoxSphereDcdContact::getShapeTypes()
 {
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_SPHERE);
-}
-
-void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
-{
-	std::shared_ptr<Representation> box = pair->getFirst();
-	std::shared_ptr<Representation> sphere = pair->getSecond();
-
-	auto boxShape = std::static_pointer_cast<BoxShape>(box->getShape());
-	auto sphereShape = std::static_pointer_cast<SphereShape>(sphere->getShape());
-
-	auto contacts = calculateContact(*boxShape, box->getPose(), *sphereShape, sphere->getPose());
-	for (auto& contact : contacts)
-	{
-		pair->addContact(contact);
-	}
 }
 
 std::list<std::shared_ptr<Contact>> BoxSphereDcdContact::calculateContact(
 									 const SurgSim::Math::BoxShape& boxShape,
 									 const SurgSim::Math::RigidTransform3d& boxPose,
 									 const SurgSim::Math::SphereShape& sphereShape,
-									 const SurgSim::Math::RigidTransform3d& spherePose)
+									 const SurgSim::Math::RigidTransform3d& spherePose) const
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -87,7 +68,7 @@ std::list<std::shared_ptr<Contact>> BoxSphereDcdContact::calculateContact(
 	if (distanceSquared - (sphereShape.getRadius() * sphereShape.getRadius()) > SquaredDistanceEpsilon)
 	{
 		// There is no collision.
-		return std::move(contacts);
+		return contacts;
 	}
 
 	double distance = 0.0;
@@ -130,10 +111,10 @@ std::list<std::shared_ptr<Contact>> BoxSphereDcdContact::calculateContact(
 			Location(spherePose.inverse() * (sphereCenter + (normal * sphereShape.getRadius()))));
 
 	// Create the contact.
-	contacts.push_back(std::make_shared<Contact>(
-						   COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
-						   Vector3d::Zero(), normal, penetrationPoints));
-	return std::move(contacts);
+	contacts.emplace_back(std::make_shared<Contact>(
+							  COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
+							  Vector3d::Zero(), normal, penetrationPoints));
+	return contacts;
 }
 
 }; // namespace Collision

@@ -22,6 +22,7 @@
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/ScreenSpaceQuadRepresentation.h"
 
+#include <array>
 #include <osg/Vec3>
 
 #if defined(_MSC_VER)

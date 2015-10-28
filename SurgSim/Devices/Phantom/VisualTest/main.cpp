@@ -28,7 +28,8 @@ using SurgSim::Devices::IdentityPoseDevice;
 
 int main(int argc, char** argv)
 {
-	std::shared_ptr<PhantomDevice> toolDevice = std::make_shared<PhantomDevice>("PhantomDevice", "Default PHANToM");
+	std::shared_ptr<PhantomDevice> toolDevice = std::make_shared<PhantomDevice>("PhantomDevice");
+	toolDevice->setInitializationName("Default PHANToM");
 
 	// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--
 	// a pretend device that doesn't actually move.

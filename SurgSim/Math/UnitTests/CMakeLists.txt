@@ -20,6 +20,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	AabbTests.cpp
+	CompoundShapeTests.cpp
 	GeometryTests.cpp
 	IntervalArithmeticTests.cpp
 	KalmanFilterTests.cpp
@@ -40,20 +41,24 @@ set(UNIT_TEST_SOURCES
 	PolynomialRootTests.cpp
 	PolynomialTests.cpp
 	PolynomialValuesTests.cpp
+	SegmentMeshShapeTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp
+	TriangleCapsuleContactCalculationTests.cpp
 	TriangleTriangleContactCalculationTests.cpp
 	TriangleTriangleIntersectionTests.cpp
 	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	MockCapsule.h
 	MockObject.h
 	MockTriangle.h
 	TriangleTriangleTestParameters.h
 )
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
+	AngleAxisTests.cpp
 	LinearSolveAndInverseTests.cpp
 	LinearSparseSolveAndInverseTests.cpp
 	MatrixTests.cpp

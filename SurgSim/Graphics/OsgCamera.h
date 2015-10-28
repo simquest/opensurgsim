@@ -110,9 +110,14 @@ public:
 		double bottom, double top,
 		double near, double far) override;
 
+
 	void setViewport(int x, int y, int width, int height) override;
 
 	void getViewport(int* x, int* y, int* width, int* height) const override;
+
+	void setViewportSize(std::array<double, 2> dimensions) override;
+
+	std::array<double, 2> getViewportSize() const override;
 
 	void setMainCamera(bool val) override;
 

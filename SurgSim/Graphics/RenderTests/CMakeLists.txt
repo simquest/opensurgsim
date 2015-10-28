@@ -18,6 +18,7 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
+	ImplicitSurfaceRenderTests.cpp
 	OsgBoxRepresentationRenderTests.cpp
 	OsgCameraRenderTests.cpp
 	OsgCapsuleRepresentationRenderTests.cpp

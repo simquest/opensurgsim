@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2015, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ project(OpenSurgSim)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(OPENSURGSIM_MAJOR_VERSION 0)
-set(OPENSURGSIM_MINOR_VERSION 0)
+set(OPENSURGSIM_MINOR_VERSION 6)
 set(OPENSURGSIM_PATCH_VERSION 0)
 set(OPENSURGSIM_VERSION
 	${OPENSURGSIM_MAJOR_VERSION}.${OPENSURGSIM_MINOR_VERSION}.${OPENSURGSIM_PATCH_VERSION})
@@ -89,18 +89,20 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
-option(USE_SYSTEM_YAMLCPP "Should we use the system yaml-cpp?" OFF)
-if(USE_SYSTEM_YAMLCPP)
-	find_package(yaml-cpp 0.5.1.2 EXACT REQUIRED)
-else(USE_SYSTEM_YAMLCPP)
+find_package(yaml-cpp 0.5.2 QUIET)
+if(yaml-cpp_FOUND)
+	message(STATUS "Found yaml-cpp")
+else()
+	message(STATUS "Yaml-cpp was not found. It will be downloaded and built during the build.")
 	include(External_yamlcpp)
-endif(USE_SYSTEM_YAMLCPP)
+endif()
 
 include_directories(${SURGSIM_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(SYSTEM
 	${Boost_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
 	${YAML_CPP_INCLUDE_DIR}
 )
 

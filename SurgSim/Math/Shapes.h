@@ -19,6 +19,7 @@
 /// This file includes all the shapes
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/CapsuleShape.h"
+#include "SurgSim/Math/CompoundShape.h"
 #include "SurgSim/Math/CylinderShape.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/MeshShape.h"

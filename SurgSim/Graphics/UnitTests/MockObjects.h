@@ -394,14 +394,12 @@ public:
 
 	void setRenderOrder(RenderOrder bin, int value) override
 	{
-
 	}
-	
+
 	void setMainCamera(bool val) override
 	{
-		
 	}
-	
+
 	bool isMainCamera() override
 	{
 		return false;
@@ -453,6 +451,16 @@ public:
 	}
 
 	void getViewport(int* x, int* y, int* width, int* height) const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void setViewportSize(std::array<double, 2> dimensions)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	std::array<double, 2> getViewportSize() const
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
@@ -510,7 +518,7 @@ public:
 	std::array<int, 2> getPosition() const override
 	{
 		std::array<int, 2> result = {m_x, m_y};
-		return std::move(result);
+		return result;
 	}
 
 	/// Set the dimensions of this view
@@ -526,6 +534,18 @@ public:
 	std::array<int, 2> getDimensions() const override
 	{
 		std::array<int, 2> result = {m_width, m_height};
+		return result;
+	}
+
+	void setDimensionsDouble(const std::array<double, 2>& dimensions)
+	{
+		m_width = static_cast<int>(dimensions[0]);
+		m_height = static_cast<int>(dimensions[1]);
+	}
+
+	std::array<double, 2> getDimensionsDouble() const
+	{
+		std::array<double, 2> result = {static_cast<double>(m_width), static_cast<double>(m_height)};
 		return std::move(result);
 	}
 

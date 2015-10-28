@@ -48,7 +48,7 @@ namespace
 class TransformUpdater : public osg::NodeCallback
 {
 public:
-	TransformUpdater(osg::Uniform* uniform) : m_uniform(uniform)
+	explicit TransformUpdater(osg::Uniform* uniform) : m_uniform(uniform)
 	{
 
 	}
@@ -78,7 +78,7 @@ public:
 
 	}
 
-	virtual void apply(osg::Transform& node) override
+	void apply(osg::Transform& node) override
 	{
 		auto state = node.getOrCreateStateSet();
 		auto uniform = new osg::Uniform;
@@ -256,6 +256,8 @@ void OsgManager::doBeforeStop()
 #endif
 	// Delete the viewer so that the graphics context will be released in the manager's thread
 	m_viewer = nullptr;
+
+	Graphics::Manager::doBeforeStop();
 }
 
 osg::ref_ptr<osgViewer::CompositeViewer> OsgManager::getOsgCompositeViewer() const

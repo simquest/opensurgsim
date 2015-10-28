@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,26 +14,32 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-
 #include <memory>
 
 #include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/RandomBoxPointGenerator.h"
+#include "SurgSim/Particles/RandomMeshPointGenerator.h"
 #include "SurgSim/Particles/RandomSpherePointGenerator.h"
 
 using SurgSim::Math::BoxShape;
+using SurgSim::Math::Geometry::DistanceEpsilon;
+using SurgSim::Math::MeshShape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
 using SurgSim::Particles::RandomBoxPointGenerator;
+using SurgSim::Particles::RandomMeshPointGenerator;
 using SurgSim::Particles::RandomSpherePointGenerator;
+
 
 TEST(PointGeneratorTest, ConstructorTest)
 {
 	ASSERT_NO_THROW(RandomBoxPointGenerator());
+	ASSERT_NO_THROW(RandomMeshPointGenerator());
 	ASSERT_NO_THROW(RandomSpherePointGenerator());
 }
 
@@ -60,6 +66,32 @@ TEST(PointGeneratorTest, BoxPointGeneratorTest)
 	EXPECT_TRUE(intersection2) << "Point should be on surface of box " << pointOnBox;
 }
 
+TEST(PointGeneratorTest, MeshPointGeneratorTest)
+{
+	auto meshShape = std::make_shared<MeshShape>();
+	std::array<size_t, 3> triangleIds;
+
+	triangleIds[0] = meshShape->addVertex(MeshShape::VertexType(Vector3d(-1.0, 1.0, 1.0)));
+	triangleIds[1] = meshShape->addVertex(MeshShape::VertexType(Vector3d(-1.0, 5.0, 1.0)));
+	triangleIds[2] = meshShape->addVertex(MeshShape::VertexType(Vector3d(-1.0, 1.0, 5.0)));
+	meshShape->addTriangle(MeshShape::TriangleType(triangleIds));
+
+	triangleIds[0] = meshShape->addVertex(MeshShape::VertexType(Vector3d(1.0, 1.0, 1.0)));
+	triangleIds[1] = meshShape->addVertex(MeshShape::VertexType(Vector3d(1.0, 5.0, 1.0)));
+	triangleIds[2] = meshShape->addVertex(MeshShape::VertexType(Vector3d(1.0, 1.0, 5.0)));
+	size_t triangleId = meshShape->addTriangle(MeshShape::TriangleType(triangleIds));
+	meshShape->getTriangle(triangleId).isValid = false;
+
+	auto meshPointGenerator = std::make_shared<RandomMeshPointGenerator>();
+	auto pointOnMesh = meshPointGenerator->pointOnShape(meshShape);
+
+	EXPECT_NEAR(-1.0, pointOnMesh[0], DistanceEpsilon)
+		<< "Point is not on a triangle, or was generated with an invalid triangle.";
+	EXPECT_LE(1.0, pointOnMesh[1]);
+	EXPECT_LE(1.0, pointOnMesh[2]);
+	EXPECT_GE(6.0, pointOnMesh[1] + pointOnMesh[2]);
+}
+
 TEST(PointGeneratorTest, SpherePointGeneratorTest)
 {
 	auto sphereShape = std::make_shared<SphereShape>(2.0);
@@ -69,5 +101,5 @@ TEST(PointGeneratorTest, SpherePointGeneratorTest)
 	EXPECT_LT(pointInsideSphere.norm(), sphereShape->getRadius());
 
 	auto pointOnSphere = spherePointGenerator->pointOnShape(sphereShape);
-	EXPECT_NEAR(sphereShape->getRadius(), pointOnSphere.norm(), SurgSim::Math::Geometry::DistanceEpsilon);
+	EXPECT_NEAR(sphereShape->getRadius(), pointOnSphere.norm(), DistanceEpsilon);
 }

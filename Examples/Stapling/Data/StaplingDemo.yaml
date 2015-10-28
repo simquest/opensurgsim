@@ -91,6 +91,7 @@ SurgSim::Framework::Scene:
               IsLocalActive: true
               Id: 485750a6-32c7-4487-a362-050fee89f45d
               Name: Collision
+              Ignore: [wound/Collision]
               LocalPose:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
@@ -298,6 +299,7 @@ SurgSim::Framework::Scene:
                   FileName: Geometry/virtual_staple_1.ply
               Id: b7f70a7d-a6ab-4719-8fcd-698912de1aa6
               Name: VirtualToothCollision0
+              Ignore: [stapler/Collision]
               LocalPose:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
@@ -319,6 +321,7 @@ SurgSim::Framework::Scene:
                   FileName: Geometry/virtual_staple_2.ply
               Id: c5fae459-35d8-4ded-b478-d04ed66e8694
               Name: VirtualToothCollision1
+              Ignore: [stapler/Collision]
               LocalPose:
                 Quaternion: [0, 0, 0, 1]
                 Translation: [0, 0, 0]
@@ -373,7 +376,7 @@ SurgSim::Framework::Scene:
               Id: 7d447c80-d8c0-4213-a46f-164a800f6d1c
               Name: Physics
               IntegrationScheme:
-                SurgSim::Math::IntegrationScheme: INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER
+                SurgSim::Math::IntegrationScheme: INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT
           - SurgSim::Graphics::OsgMeshRepresentation:
               IsLocalActive: true
               MeshFileName: Geometry/wound_deformable.ply

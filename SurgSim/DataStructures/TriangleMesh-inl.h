@@ -161,6 +161,20 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::getEdge(size_t id)
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
+std::array<SurgSim::Math::Vector3d, 2>
+TriangleMesh<VertexData, EdgeData, TriangleData>::getEdgePositions(size_t id) const
+{
+	auto& ids = getEdge(id).verticesId;
+	std::array<SurgSim::Math::Vector3d, 2> result =
+	{{
+		Vertices<VertexData>::getVertex(ids[0]).position,
+		Vertices<VertexData>::getVertex(ids[1]).position
+	}};
+
+	return result;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
 const typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType&
 TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangle(size_t id) const
 {
@@ -194,13 +208,12 @@ std::array<SurgSim::Math::Vector3d, 3>
 TriangleMesh<VertexData, EdgeData, TriangleData>::getTrianglePositions(size_t id) const
 {
 	auto& ids = getTriangle(id).verticesId;
-	std::array<SurgSim::Math::Vector3d, 3> result
-	= {{
-			Vertices<VertexData>::getVertex(ids[0]).position,
-			Vertices<VertexData>::getVertex(ids[1]).position,
-			Vertices<VertexData>::getVertex(ids[2]).position
-		}
-	};
+	std::array<SurgSim::Math::Vector3d, 3> result =
+	{{
+		Vertices<VertexData>::getVertex(ids[0]).position,
+		Vertices<VertexData>::getVertex(ids[1]).position,
+		Vertices<VertexData>::getVertex(ids[2]).position
+	}};
 
 	return result;
 }

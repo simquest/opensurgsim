@@ -48,20 +48,6 @@ TEST(TrackIRDeviceTest, CreateAndInitializeDevice)
 	EXPECT_EQ("TrackIR", device->getName());
 }
 
-TEST(TrackIRDeviceTest, FinalizeDevice)
-{
-	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(nullptr != device) << "Device creation failed.";
-
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
-	EXPECT_TRUE(device->isInitialized());
-	EXPECT_EQ("TrackIR", device->getName());
-
-	ASSERT_TRUE(device->finalize()) << "Finalization failed.";
-	EXPECT_FALSE(device->isInitialized());
-	EXPECT_EQ("TrackIR", device->getName());
-}
-
 TEST(TrackIRDeviceTest, CreateDevicesWithSameName)
 {
 	std::shared_ptr<TrackIRDevice> device1 = std::make_shared<TrackIRDevice>("TrackIR");

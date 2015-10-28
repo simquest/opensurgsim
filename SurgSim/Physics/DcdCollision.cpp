@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,31 +48,23 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 	auto threadPool = Framework::Runtime::getThreadPool();
-	auto const& representations = state->getActiveCollisionRepresentations();
 	std::vector<std::future<void>> tasks;
-
-	for (auto& representation : representations)
-	{
-		representation->getCollisions().unsafeGet().clear();
-	}
 
 	updatePairs(result);
 
 	for (auto& pair : result->getCollisionPairs())
 	{
-		tasks.push_back(threadPool->enqueue<void>([&] ()
+		if (pair->getType() == Collision::COLLISION_DETECTION_TYPE_DISCRETE)
 		{
-			m_contactCalculations[pair->getFirst()->getShapeType()]
-								 [pair->getSecond()->getShapeType()]->calculateContact(pair);
-		}));
+			tasks.push_back(threadPool->enqueue<void>([&] ()
+			{
+				m_contactCalculations[pair->getFirst()->getShapeType()]
+									 [pair->getSecond()->getShapeType()]->calculateContact(pair);
+			}));
+		}
 	}
 
-	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.wait();});
-
-	for (auto& representation : representations)
-	{
-		representation->getCollisions().publish();
-	}
+	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.get();});
 
 	return result;
 }
@@ -95,6 +87,7 @@ void DcdCollision::populateCalculationTable()
 	setDcdContactInTable(std::make_shared<Collision::OctreeDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::OctreePlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::OctreeSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<Collision::SegmentMeshTriangleMeshDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::SphereSphereDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::SphereDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<Collision::SpherePlaneDcdContact>());
@@ -111,31 +104,19 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 	{
 		std::vector<std::shared_ptr<CollisionPair>> pairs;
 		auto firstEnd = std::end(representations);
-		--firstEnd;
 		for (auto first = std::begin(representations); first != firstEnd; ++first)
 		{
 			auto second = first;
-			++second;
 			for (; second != std::end(representations); ++second)
 			{
-				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
-				pair->setRepresentations(*first,*second);
-				pairs.push_back(pair);
-			}
-		}
-
-		auto& excludedPairs = state->getExcludedCollisionPairs();
-		for (auto it = excludedPairs.cbegin(); it != excludedPairs.cend(); ++it)
-		{
-			auto candidate = std::find_if(pairs.begin(), pairs.end(), [&it](const std::shared_ptr<CollisionPair> &pair)
-			{
-				return (pair->getFirst() == (*it)->getFirst() && pair->getSecond() == (*it)->getSecond())
-					|| (pair->getFirst() == (*it)->getSecond() && pair->getSecond() == (*it)->getFirst());
-			});
-
-			if (candidate != pairs.end())
-			{
-				pairs.erase(candidate);
+				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
+				{
+					auto pair = std::make_shared<CollisionPair>(*first, *second);
+					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
+					{
+						pairs.push_back(std::move(pair));
+					}
+				}
 			}
 		}
 

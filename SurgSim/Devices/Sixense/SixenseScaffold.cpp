@@ -100,15 +100,10 @@ private:
 };
 
 
-SixenseScaffold::SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+SixenseScaffold::SixenseScaffold() :
+	m_logger(Framework::Logger::getLogger("Devices/Sixense")), m_state(new StateData)
 {
-	if (! m_logger)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("Sixense/Hydra device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
-	SURGSIM_LOG_DEBUG(m_logger) << "Sixense/Hydra: Shared scaffold created.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.";
 }
 
 
@@ -205,6 +200,7 @@ bool SixenseScaffold::registerDevice(SixenseDevice* device)
 		return false;
 	}
 
+	SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " initialized.";
 	return true;
 }
 
@@ -221,13 +217,11 @@ bool SixenseScaffold::unregisterDevice(const SixenseDevice* const device)
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK
 			found = true;
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " finalized.";
 		}
 	}
 
-	if (! found)
-	{
-		SURGSIM_LOG_WARNING(m_logger) << "Sixense/Hydra: Attempted to release a non-registered device.";
-	}
+	SURGSIM_LOG_IF(!found, m_logger, SEVERE) << "Attempted to release a non-registered device " << device->getName();
 	return found;
 }
 
@@ -479,13 +473,6 @@ std::shared_ptr<SixenseScaffold> SixenseScaffold::getOrCreateSharedInstance()
 	static SurgSim::Framework::SharedInstance<SixenseScaffold> sharedInstance(creator);
 	return sharedInstance.get();
 }
-
-void SixenseScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
-}
-
-SurgSim::Framework::LogLevel SixenseScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 int SixenseScaffold::m_startupDelayMilliseconds = 6000;
 int SixenseScaffold::m_startupRetryIntervalMilliseconds = 100;

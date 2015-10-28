@@ -163,6 +163,7 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 	{
 		tryRemoveComponent(*it, &m_behaviors);
 		executeRemovals(*it);
+		(*it)->retire();
 	}
 }
 
@@ -203,6 +204,14 @@ void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Compon
 				executeRemovals(*it);
 			}
 		}
+	}
+}
+
+void ComponentManager::doBeforeStop()
+{
+	for (const auto& behavior : m_behaviors)
+	{
+		behavior->retire();
 	}
 }
 

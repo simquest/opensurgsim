@@ -101,16 +101,11 @@ private:
 };
 
 
-TrackIRScaffold::TrackIRScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger),
+TrackIRScaffold::TrackIRScaffold() :
+	m_logger(Framework::Logger::getLogger("Devices/TrackIR")),
 	m_state(new StateData)
 {
-	if (!m_logger)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("TrackIR device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
-	SURGSIM_LOG_DEBUG(m_logger) << "TrackIR: Shared scaffold created.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.";
 }
 
 
@@ -143,11 +138,6 @@ TrackIRScaffold::~TrackIRScaffold()
 		}
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "TrackIR: Shared scaffold destroyed.";
-}
-
-std::shared_ptr<SurgSim::Framework::Logger> TrackIRScaffold::getLogger() const
-{
-	return m_logger;
 }
 
 
@@ -192,6 +182,7 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 
 		startCamera(info.get());
 		m_state->activeDeviceList.emplace_back(std::move(info));
+		SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " initialized.";
 	}
 
 	return m_state->isApiInitialized;
@@ -216,13 +207,11 @@ bool TrackIRScaffold::unregisterDevice(const TrackIRDevice* const device)
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK
 			found = true;
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " unregistered.";
 		}
 	}
 
-	if (!found)
-	{
-		SURGSIM_LOG_WARNING(m_logger) << "TrackIR: Attempted to release a non-registered device.";
-	}
+	SURGSIM_LOG_IF(!found, m_logger, SEVERE) << "Attempted to release a non-registered device " << device->getName();
 	return found;
 }
 
@@ -387,13 +376,6 @@ std::shared_ptr<TrackIRScaffold> TrackIRScaffold::getOrCreateSharedInstance()
 	static SurgSim::Framework::SharedInstance<TrackIRScaffold> sharedInstance;
 	return sharedInstance.get();
 }
-
-void TrackIRScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
-}
-
-SurgSim::Framework::LogLevel TrackIRScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 };  // namespace Devices
 };  // namespace SurgSim

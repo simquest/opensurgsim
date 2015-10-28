@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,12 +67,6 @@ public:
 	bool testDoRemoveComponent(const std::shared_ptr<Component>& component)
 	{
 		return physicsManager->executeRemovals(component);
-	}
-
-	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>* getExcludedCollisionPairs(
-		const SurgSim::Physics::PhysicsManager& physicsManager)
-	{
-		return &physicsManager.m_excludedCollisionPairs;
 	}
 
 	std::shared_ptr<PhysicsManager> physicsManager;
@@ -145,67 +139,6 @@ TEST_F(PhysicsManagerTest, AddRemoveParticleRepresentation)
 	EXPECT_TRUE(testDoRemoveComponent(representation1));
 	EXPECT_FALSE(testDoRemoveComponent(representation1));
 	EXPECT_TRUE(testDoRemoveComponent(representation2));
-}
-
-TEST_F(PhysicsManagerTest, AddRemoveExcludedCollisionPair)
-{
-	auto physicsManager = std::make_shared<PhysicsManager>();
-
-	auto rep1 = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("rep1");
-	auto rep2 = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("rep2");
-	auto rep3 = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("rep3");
-
-	auto collisionPairs = getExcludedCollisionPairs(*physicsManager);
-	EXPECT_EQ(0u, collisionPairs->size());
-
-	{
-		SCOPED_TRACE("Add once.");
-		EXPECT_NO_THROW(physicsManager->addExcludedCollisionPair(rep1, rep2));
-		EXPECT_EQ(1u, collisionPairs->size());
-	}
-
-	{
-		SCOPED_TRACE("Double add.");
-		EXPECT_NO_THROW(physicsManager->addExcludedCollisionPair(rep1, rep2));
-		EXPECT_EQ(1u, collisionPairs->size());
-	}
-
-	{
-		SCOPED_TRACE("Removal.");
-		EXPECT_NO_THROW(physicsManager->removeExcludedCollisionPair(rep1, rep2));
-		EXPECT_EQ(0u, collisionPairs->size());
-	}
-
-	{
-		SCOPED_TRACE("Double removal.");
-		EXPECT_NO_THROW(physicsManager->removeExcludedCollisionPair(rep1, rep2));
-		EXPECT_EQ(0u, collisionPairs->size());
-	}
-
-	{
-		SCOPED_TRACE("Adding multiple.");
-		EXPECT_NO_THROW(physicsManager->addExcludedCollisionPair(rep1, rep2));
-		EXPECT_NO_THROW(physicsManager->addExcludedCollisionPair(rep1, rep3));
-		EXPECT_NO_THROW(physicsManager->addExcludedCollisionPair(rep2, rep3));
-		EXPECT_EQ(3u, collisionPairs->size());
-	}
-
-	{
-		SCOPED_TRACE("Removing multiple.");
-		EXPECT_NO_THROW(physicsManager->removeExcludedCollisionPair(rep1, rep2));
-		EXPECT_NO_THROW(physicsManager->removeExcludedCollisionPair(rep1, rep3));
-		EXPECT_NO_THROW(physicsManager->removeExcludedCollisionPair(rep2, rep3));
-		EXPECT_EQ(0u, collisionPairs->size());
-	}
-
-	{
-		SCOPED_TRACE("Add and remove with swapped representations.");
-		EXPECT_NO_THROW(physicsManager->addExcludedCollisionPair(rep1, rep2));
-		EXPECT_EQ(1u, collisionPairs->size());
-
-		EXPECT_NO_THROW(physicsManager->removeExcludedCollisionPair(rep2, rep1));
-		EXPECT_EQ(0u, collisionPairs->size());
-	}
 }
 
 }; // namespace Physics

@@ -127,6 +127,11 @@ protected:
 	// Managers will only handle matching behaviors
 	std::vector<std::shared_ptr<SurgSim::Framework::Behavior>> m_behaviors;
 
+	void doBeforeStop() override;
+
+	template<class T>
+	void retireComponents(const std::vector<std::shared_ptr<T>>& container);
+
 private:
 	/// Adds a component.
 	/// \param component The component to be added.

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,18 +71,6 @@ public:
 	/// \warning The state contains many pointers.  The objects pointed to are not thread-safe.
 	void getFinalState(SurgSim::Physics::PhysicsManagerState* s) const;
 
-	/// Add an excluded collision pair to the Physics Manager.  The pair will not participate in collisions.
-	/// \param representation1 The first Collision::Representation for the pair
-	/// \param representation2 The second Collision::Representation for the pair
-	void addExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
-								  std::shared_ptr<SurgSim::Collision::Representation> representation2);
-
-	/// Remove an excluded collision pair to the Physics Manager.  The pair will not be excluded from collisions.
-	/// \param representation1 The first Collision::Representation for the pair
-	/// \param representation2 The second Collision::Representation for the pair
-	void removeExcludedCollisionPair(std::shared_ptr<SurgSim::Collision::Representation> representation1,
-									 std::shared_ptr<SurgSim::Collision::Representation> representation2);
-
 protected:
 	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
@@ -102,17 +90,9 @@ protected:
 	/// \param computation The Computation to add
 	void addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation);
 
-private:
-	/// Get an iterator to an excluded collision pair.
-	/// \note Lock m_excludedCollisionPairMutex before calling
-	/// \param representation1 The first Collision::Representation for the pair
-	/// \param representation2 The second Collision::Representation for the pair
-	/// \return If the pair is found, an iterator to the excluded collision pair; otherwise an iterator to the
-	/// container's past-the-end element.
-	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>::iterator findExcludedCollisionPair(
-		std::shared_ptr<SurgSim::Collision::Representation> representation1,
-		std::shared_ptr<SurgSim::Collision::Representation> representation2);
+	void doBeforeStop() override;
 
+private:
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
 	std::vector<std::shared_ptr<Collision::Representation>> m_collisionRepresentations;
@@ -120,12 +100,6 @@ private:
 	std::vector<std::shared_ptr<Particles::Representation>> m_particleRepresentations;
 
 	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
-
-	/// List of Collision::Representation pairs to be excluded from contact generation.
-	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> m_excludedCollisionPairs;
-
-	/// Mutex to protect m_excludedCollisionPairs from being read/written simultaneously.
-	boost::mutex m_excludedCollisionPairMutex;
 
 	/// A list of computations, to perform the physics update.
 	std::list<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;

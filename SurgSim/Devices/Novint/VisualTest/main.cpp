@@ -21,11 +21,14 @@
 
 // The initialization name of the NovintDevice.  An empty string will use the first available Falcon.
 static const char* const NOVINT_DEVICE_NAME = "";
+// true if the Novint should be 7Dof, false if the Novint should be 3Dof.
+static const bool NOVINT_7_DOF = false;
 
 int main(int argc, char** argv)
 {
 	auto toolDevice = std::make_shared<SurgSim::Devices::NovintDevice>("NovintDevice");
 	toolDevice->setInitializationName(NOVINT_DEVICE_NAME);
+	toolDevice->set7DofDevice(NOVINT_7_DOF);
 	auto squareDevice = std::make_shared<SurgSim::Devices::IdentityPoseDevice>("IdentityPoseDevice");
 
 	runToolSquareTest(toolDevice, squareDevice, "Move the Novint Falcon device to move the sphere tool.");

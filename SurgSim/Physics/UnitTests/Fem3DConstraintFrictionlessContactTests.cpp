@@ -21,10 +21,10 @@
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
-#include "SurgSim/Physics/Fem3DConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/Fem3DElementTetrahedron.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
@@ -50,7 +50,6 @@ static void addTetraheadron(Fem3DRepresentation* fem,
 							size_t node1,
 							size_t node2,
 							size_t node3,
-							const SurgSim::Math::OdeState& state,
 							double massDensity = 1.0,
 							double poissonRatio = 0.1,
 							double youngModulus = 1.0)
@@ -60,7 +59,6 @@ static void addTetraheadron(Fem3DRepresentation* fem,
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
-	element->initialize(state);
 	fem->addFemElement(element);
 }
 
@@ -93,9 +91,9 @@ public:
 		state->getPositions().segment<3>(4 * 3) = Vector3d(1.14,  0.66,  0.71);
 		state->getPositions().segment<3>(5 * 3) = Vector3d(1.02, -0.31, -0.54);
 
-		addTetraheadron(m_fem.get(), 0, 1, 2, 3, *state);
-		addTetraheadron(m_fem.get(), 0, 1, 3, 4, *state);
-		addTetraheadron(m_fem.get(), 0, 1, 4, 5, *state);
+		addTetraheadron(m_fem.get(), 0, 1, 2, 3);
+		addTetraheadron(m_fem.get(), 0, 1, 3, 4);
+		addTetraheadron(m_fem.get(), 0, 1, 4, 5);
 
 		m_fem->setInitialState(state);
 		m_fem->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED);
@@ -270,7 +268,8 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 
 	mlcpPhysicsProblem.b.block<1, 1>(0, 0)[0] = 0.6991;
 
-	// Place mass-spring at 5th dof and 1th constraint.
+	// Place the Fem at 5th dof (1 or multiple representations exist before, covering a total of 5 dof)
+	// and the constraint at the index 1 (1 atomic constraint exists before this one)
 	size_t indexOfRepresentation = 5;
 	size_t indexOfConstraint = 1;
 

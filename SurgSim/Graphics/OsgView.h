@@ -77,6 +77,10 @@ public:
 
 	std::array<int, 2> getDimensions() const override;
 
+	void setDimensionsDouble(const std::array<double, 2>& dimensions) override;
+
+	std::array<double, 2> getDimensionsDouble() const override;
+
 	void setWindowBorderEnabled(bool enabled) override;
 
 	bool isWindowBorderEnabled() const override;
