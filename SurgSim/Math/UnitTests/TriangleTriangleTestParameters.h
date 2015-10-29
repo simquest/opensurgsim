@@ -233,6 +233,18 @@ protected:
 			Vector3d t1p;
 			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, true, false, t0p, t1p));
 		}
+		{
+			std::string scenario = "Failed case in Vascular";
+			MockTriangle t0(Vector3d(0.12419200000000000, -0.0027260000000000001, -0.039763000000000000),
+				Vector3d(0.10276100000000001, -0.0020000000000000000, -0.034617000000000002),
+				Vector3d(0.10060200000000000, -0.0026749999999999999, -0.036646999999999999));
+			Vector3d t0p;
+			MockTriangle t1(Vector3d(0.13072899974405072, -0.0023620000000000000, -0.033049000000000002),
+				Vector3d(0.12155499974405069, -0.0017220000000000000, -0.039350000000000003),
+				Vector3d(0.12419199974405069, -0.0027260000000000001, -0.039763000000000000));
+			Vector3d t1p;
+			m_testCases.push_back(TriangleTriangleTestCase(scenario, t0, t1, false, false, t0p, t1p));
+		}
 	}
 };
 

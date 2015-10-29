@@ -104,6 +104,7 @@ public:
 		addElementOnBlockRowsCols(&m_matrixWithExtraCoefficientsExpected);
 
 		m_matrixWithoutExtraCoefficients.makeCompressed();
+		m_matrixMissingCoefficients.makeCompressed();
 		m_matrixWithoutExtraCoefficientsExpected.makeCompressed();
 	}
 
