@@ -30,7 +30,7 @@ namespace Collision
 
 namespace
 {
-double epsilon = 1.0e07 * Eigen::NumTraits<double>::dummy_precision();
+double epsilon = 1.0e-05;
 }
 
 template <typename T>
