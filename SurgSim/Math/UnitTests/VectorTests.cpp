@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1419,27 +1419,6 @@ TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
 		ASSERT_NO_THROW(EXPECT_EQ(true, SurgSim::Math::buildOrthonormalBasis(&i, &j, &k)));
 		testOrthonormalBasis(i, j, k);
 	}
-}
-
-TYPED_TEST(Vector3Tests, nearestPointOnLine)
-{
-	typedef typename TestFixture::Vector3 Vector3;
-	typedef typename Vector3::Scalar T;
-	const int VOpt = Vector3::Options;
-
-	Vector3 point(static_cast<T>(2.0), static_cast<T>(-4.0), static_cast<T>(3.0));
-	Vector3 segmentEnd1(static_cast<T>(-2.0), static_cast<T>(2.0), static_cast<T>(4.0));
-	Vector3 segmentEnd2(static_cast<T>(-1.0), static_cast<T>(1.0), static_cast<T>(2.0));
-	T precision = Eigen::NumTraits<T>::dummy_precision();
-
-	// Assert if segment is degenerate
-	ASSERT_ANY_THROW((SurgSim::Math::nearestPointOnLine<T, VOpt>(point, segmentEnd1, segmentEnd1)));
-
-	// Otherwise, calculate the correct value
-	ASSERT_NO_THROW((SurgSim::Math::nearestPointOnLine<T, VOpt>(point, segmentEnd1, segmentEnd2)));
-
-	auto result = SurgSim::Math::nearestPointOnLine<T, VOpt>(point, segmentEnd1, segmentEnd2);
-	EXPECT_GT(precision, (std::abs((segmentEnd2 - segmentEnd1).dot(result - point))));
 }
 
 TYPED_TEST(Vector3Tests, robustCrossProduct)

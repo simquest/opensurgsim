@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -193,26 +193,6 @@ bool buildOrthonormalBasis(Eigen::Matrix<T, 3, 1, VOpt>* i,
 	*k = i->cross(*j);
 
 	return true;
-}
-
-/// Helper method to determine the nearest point between a point and a line.
-/// \tparam T the numeric data type used for the vector argument. Can usually be deduced.
-/// \tparam VOpt the option flags (alignment etc.) used for the vector argument. Can be deduced.
-/// \param point is the point under consideration.
-/// \param segment0 one point on the line
-/// \param segment1 second point on the line
-/// \return the closest point on the line through the segment to the point under test
-template <class T, int VOpt>
-Eigen::Matrix<T, 3, 1, VOpt> nearestPointOnLine(const Eigen::Matrix<T, 3, 1, VOpt>& point,
-		const Eigen::Matrix<T, 3, 1, VOpt>& segment0, const Eigen::Matrix<T, 3, 1, VOpt>& segment1)
-{
-	auto pointToSegmentStart = segment0 - point;
-	auto segmentDirection = segment1 - segment0;
-	auto squaredNorm = segmentDirection.squaredNorm();
-	SURGSIM_ASSERT(squaredNorm != 0.0) << "Line is defined by two collocated points.";
-	auto distance = -pointToSegmentStart.dot(segmentDirection) / squaredNorm;
-	auto p0Proj = segment0 + distance * segmentDirection;
-	return p0Proj;
 }
 
 /// Calculate the best unit normal we can find in the direction of pXq for one of the endpoints of q.

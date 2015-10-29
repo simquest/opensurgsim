@@ -595,11 +595,11 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	// <13> projections intersect, short segments
 	const VectorType aPoint = VectorType(1, 0, 0);
 	const SizeType shortLength = 0.0001;
-	const Segment shortSegment = Segment(VectorType(0, -shortLength/2, 0), VectorType(0, shortLength/2, 0));
+	const Segment shortSegment = Segment(VectorType(0, -shortLength / 2, 0), VectorType(0, shortLength / 2, 0));
 	const VectorType shortSegmentNormal = shortSegment.ab.cross(aPoint).normalized();
 	const Segment otherShortSegment = Segment(aPoint, aPoint + shortLength * shortSegmentNormal);
 	segments.push_back(SegmentData(shortSegment, otherShortSegment,
-		shortSegment.pointOnLine(0.5), otherShortSegment.a));
+								   shortSegment.pointOnLine(0.5), otherShortSegment.a));
 
 	for (size_t i = 0; i < segments.size(); ++i)
 	{
@@ -618,7 +618,7 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	closestPoint = plainSegment.a;
 	const Vector3d segmentDirection = plainSegment.a - plainSegment.b;
 	otherSegment = Segment(closestPoint + plainNormal * 4 + 2 * segmentDirection,
-		closestPoint + plainNormal * 4 + 4 * segmentDirection);
+						   closestPoint + plainNormal * 4 + 4 * segmentDirection);
 	distance = distanceSegmentSegment(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
 	segments.push_back(SegmentData(plainSegment, otherSegment, closestPoint, otherSegment.a));
 
@@ -630,7 +630,7 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	// <1> anti-parallel, non-overlapping
 	closestPoint = plainSegment.a;
 	otherSegment = Segment(closestPoint + plainNormal * 4 + 4 * segmentDirection,
-		closestPoint + plainNormal * 4 + 2 * segmentDirection);
+						   closestPoint + plainNormal * 4 + 2 * segmentDirection);
 	distance = distanceSegmentSegment(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
 	segments.push_back(SegmentData(plainSegment, otherSegment, closestPoint, otherSegment.b));
 
@@ -753,16 +753,16 @@ TEST_F(GeometryTest, DistancePointTriangle)
 	// Degenerate Edges
 	// Edge v0v1
 	distance = distancePointTriangle(inputPoint,
-			   tri.v0, (tri.v0 + tri.v0v1 * epsilon * 0.01).eval(), tri.v2,
-			   &result);
+									 tri.v0, (tri.v0 + tri.v0v1 * epsilon * 0.01).eval(), tri.v2,
+									 &result);
 	expectedDistance = distancePointSegment(inputPoint, tri.v0, tri.v2, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint, result));
 
 	// Edge v0v2
 	distance = distancePointTriangle(inputPoint,
-			   (tri.v2 - tri.v0v2 * epsilon * 0.01).eval(), tri.v1 , tri.v2,
-			   &result);
+									 (tri.v2 - tri.v0v2 * epsilon * 0.01).eval(), tri.v1 , tri.v2,
+									 &result);
 	expectedDistance = distancePointSegment(inputPoint, tri.v1, tri.v2, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint, result));
@@ -837,22 +837,24 @@ TEST_F(GeometryTest, Coplanarity)
 		{true, Vector3d(0.0, 0.0, 0.0), Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), Vector3d(12.3, -41.3, 0.0)},
 		{false, Vector3d(0.0, 0.0, 0.0), Vector3d(1.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), Vector3d(12.3, -41.3, 4.0)},
 
-		{false, Vector3d(10932.645, 43.1987, -0.009874245),
-				Vector3d(53432.4, -9.87243, 654.31),
-				Vector3d(28.71, 0.005483927, 2.34515),
-				Vector3d(5897.1, -5.432, 512152.7654)}
+		{
+			false, Vector3d(10932.645, 43.1987, -0.009874245),
+			Vector3d(53432.4, -9.87243, 654.31),
+			Vector3d(28.71, 0.005483927, 2.34515),
+			Vector3d(5897.1, -5.432, 512152.7654)
+		}
 	};
 
 	for (auto candidate = std::begin(candidates); candidate != std::end(candidates); ++candidate)
 	{
 		EXPECT_EQ(candidate->expected, isCoplanar(candidate->points[0],
-												  candidate->points[1],
-												  candidate->points[2],
-												  candidate->points[3]))
-			<< "Candidate points were [" << candidate->points[0].transpose() << "], ["
-										 << candidate->points[1].transpose() << "], ["
-										 << candidate->points[2].transpose() << "], ["
-										 << candidate->points[3].transpose() << "]";
+				  candidate->points[1],
+				  candidate->points[2],
+				  candidate->points[3]))
+				<< "Candidate points were [" << candidate->points[0].transpose() << "], ["
+				<< candidate->points[1].transpose() << "], ["
+				<< candidate->points[2].transpose() << "], ["
+				<< candidate->points[3].transpose() << "]";
 	}
 }
 
@@ -1057,6 +1059,45 @@ TEST_F(GeometryTest, SegmentPlaneDistance)
 					  intersectionPoint + triangle.v0v1 - triangle.n * 2.0);
 		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.pointOnLine(0.5), intersectionPoint, -1));
 	}
+}
+
+template <class T>
+class GeometryVectorTestBase : public testing::Test
+{
+public:
+	typedef T Scalar;
+};
+
+template <class T>
+class GeometryVector3Tests : public GeometryVectorTestBase<typename T::Scalar>
+{
+public:
+	typedef T Vector3;
+};
+
+typedef ::testing::Types<SurgSim::Math::Vector3d,
+		SurgSim::Math::Vector3f> GeometryVector3Variants;
+TYPED_TEST_CASE(GeometryVector3Tests, GeometryVector3Variants);
+
+TYPED_TEST(GeometryVector3Tests, nearestPointOnLine)
+{
+	typedef typename TestFixture::Vector3 Vector3;
+	typedef typename Vector3::Scalar T;
+	const int VOpt = Vector3::Options;
+
+	Vector3 point(static_cast<T>(2.0), static_cast<T>(-4.0), static_cast<T>(3.0));
+	Vector3 segmentEnd1(static_cast<T>(-2.0), static_cast<T>(2.0), static_cast<T>(4.0));
+	Vector3 segmentEnd2(static_cast<T>(-1.0), static_cast<T>(1.0), static_cast<T>(2.0));
+	T precision = Eigen::NumTraits<T>::dummy_precision();
+
+	// Assert if segment is degenerate
+	ASSERT_ANY_THROW((SurgSim::Math::nearestPointOnLine<T, VOpt>(point, segmentEnd1, segmentEnd1)));
+
+	// Otherwise, calculate the correct value
+	ASSERT_NO_THROW((SurgSim::Math::nearestPointOnLine<T, VOpt>(point, segmentEnd1, segmentEnd2)));
+
+	auto result = SurgSim::Math::nearestPointOnLine<T, VOpt>(point, segmentEnd1, segmentEnd2);
+	EXPECT_GT(precision, (std::abs((segmentEnd2 - segmentEnd1).dot(result - point))));
 }
 
 typedef std::tuple<MockTriangle, VectorType, double, VectorType, VectorType, int> TriPlaneData;

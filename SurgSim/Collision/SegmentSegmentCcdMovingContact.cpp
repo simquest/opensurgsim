@@ -20,6 +20,7 @@
 #include "SurgSim/Collision/SegmentSegmentCcdIntervalCheck.h"
 #include "SurgSim/Collision/SegmentSegmentCcdStaticContact.h"
 #include "SurgSim/Framework/LogMacros.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector3d;
