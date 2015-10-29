@@ -64,7 +64,7 @@ public:
 	bool doWakeUp() override;
 
 	/// Sets the shape to be used for synchronization
-	/// \param shape the shape
+	/// \param shape The shape to be used
 	void setShape(const std::shared_ptr<Math::CompoundShape>& shape);
 
 	/// Sets the source component, the components needs to provide a shape and that shape needs to be a compound shape
@@ -74,12 +74,12 @@ public:
 
 	/// Sets the graphics targets to be used, each target will be update with the pose of the corresponding sub shape
 	/// in the compound shape. The components need to be graphics representations
-	/// \param component
+	/// \param components The list of graphics representations to be used as targets
 	/// \throws SurgSim::AssertionFailure if one of the components is not a graphics representation
 	void setTargets(const std::vector<std::shared_ptr<Framework::Component>> components);
 
 	/// Adds a single target to the list of targets, the target needs to be a graphics representation
-	/// \param component
+	/// \param component Graphics Representation to be added at the end of the list
 	/// \throws SurgSim::AssertionFailure if the component is not a graphics representation
 	void addTarget(const std::shared_ptr<Framework::Component>& component);
 
