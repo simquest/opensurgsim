@@ -46,6 +46,8 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 
 	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFrictionlessContact>());
 	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFrictionlessContact>());
+	addImplementation(typeid(Fem1DRepresentation), std::make_shared<Fem1DConstraintFrictionlessContact>());
+	addImplementation(typeid(Fem2DRepresentation), std::make_shared<Fem2DConstraintFrictionlessContact>());
 	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DConstraintFrictionlessContact>());
 	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFixedPoint>());
 	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFixedPoint>());

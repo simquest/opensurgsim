@@ -69,6 +69,8 @@ MouseScaffold::~MouseScaffold()
 
 bool MouseScaffold::registerDevice(MouseDevice* device)
 {
+	SURGSIM_ASSERT(m_device == nullptr) << "Can't register two Mouse devices.";
+
 	m_device.reset(new DeviceData(device));
 	if (nullptr == m_device)
 	{
