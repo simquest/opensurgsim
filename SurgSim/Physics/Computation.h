@@ -19,6 +19,8 @@
 #include <vector>
 #include <memory>
 
+#include "SurgSim/Framework/Timer.h"
+
 namespace SurgSim
 {
 namespace Physics
@@ -59,6 +61,10 @@ public:
 	/// \return The fully namespace qualified name of this class.
 	virtual std::string getClassName() const = 0;
 
+	/// Provides access to the update timer.
+	/// \return The timer.
+	Framework::Timer& getTimer();
+
 protected:
 
 	/// Override this function to implement the computations specific behavior
@@ -71,6 +77,9 @@ private:
 
 	/// Copy the PhysicsManagerState object when isCopyingState() is true
 	std::shared_ptr<PhysicsManagerState> preparePhysicsState(const std::shared_ptr<PhysicsManagerState>& state);
+
+	/// The update timer.
+	Framework::Timer m_timer;
 };
 
 
