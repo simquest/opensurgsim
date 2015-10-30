@@ -17,11 +17,12 @@
 #define SURGSIM_COLLISION_CONTACTCALCULATION_H
 
 #include <memory>
+#include <mutex>
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
@@ -66,6 +67,15 @@ public:
 	/// \return Return the shape types this class handles.
 	virtual std::pair<int, int> getShapeTypes() = 0;
 
+	/// Register an instance of a contact calculation in the table
+	/// \param calculation The calculation to be registered
+	static void registerContactCalculation(const std::shared_ptr<ContactCalculation>& calculation);
+
+	typedef
+	std::array<std::array<std::shared_ptr<ContactCalculation>, Math::SHAPE_TYPE_COUNT>, Math::SHAPE_TYPE_COUNT>
+	TableType;
+
+	static const TableType& getContactTable();
 private:
 
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
@@ -81,6 +91,22 @@ private:
 	virtual std::list<std::shared_ptr<Contact>> doCalculateContact(
 				const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
 				const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) = 0;
+
+
+	/// Statically initialize the table, used via call once
+	static void initializeTable();
+
+	///@{
+	/// registration to call at static scope (does not protect the initialization via call_once)
+	/// Mirroring the public functions
+	static void privateRegister(
+		const std::shared_ptr<ContactCalculation>& calculation,
+		const std::pair<int, int>& types);
+	static void privateRegister(const std::shared_ptr<ContactCalculation>& calculation);
+	///@}
+
+	static TableType m_contactCalculations; ///< Static table of contact calculations
+	static std::once_flag m_initializationFlag; ///< Flag used for initialization.
 
 };
 
