@@ -13,13 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iterator>
+
 #include "SurgSim/Blocks/CompoundShapeToGraphics.h"
-#include "SurgSim/Math/CompoundShape.h"
-#include "SurgSim/Graphics/Representation.h"
-#include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/CompoundShape.h"
+#include "SurgSim/Physics/Representation.h"
+
 
 namespace SurgSim
 {
@@ -27,9 +31,16 @@ namespace SurgSim
 namespace Blocks
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::CompoundShapeToGraphics, CompoundShapeToGraphics);
+
 CompoundShapeToGraphics::CompoundShapeToGraphics(const std::string& name) : Framework::Behavior(name)
 {
-
+	{
+		typedef std::vector<std::shared_ptr<Framework::Component>> ParamType;
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(CompoundShapeToGraphics, ParamType, Targets, getTargets, setTargets);
+	}
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CompoundShapeToGraphics, std::shared_ptr<Component>,
+									  Source, getSource, setSource);
 }
 
 CompoundShapeToGraphics::~CompoundShapeToGraphics()
@@ -40,6 +51,9 @@ CompoundShapeToGraphics::~CompoundShapeToGraphics()
 void CompoundShapeToGraphics::update(double dt)
 {
 	size_t i = 0;
+	SURGSIM_ASSERT(m_shape->getNumShapes() >= m_representations.size())
+			<< "Not enough shapes for the representations.";
+
 	for (const auto& representation : m_representations)
 	{
 		representation->setLocalPose(m_shape->getPose(i++));
@@ -66,25 +80,31 @@ bool CompoundShapeToGraphics::doWakeUp()
 
 		SURGSIM_ASSERT(shape != nullptr) << "Source " << m_source->getFullName() << " does not contain a shape.";
 		SURGSIM_ASSERT(shape->getType() == Math::SHAPE_TYPE_COMPOUNDSHAPE) << "Source : " << m_source->getFullName()
-				<< "Does not contain a compoundshape.";
+				<< "Does not contain a compound shape.";
 
 		m_shape = std::dynamic_pointer_cast<Math::CompoundShape>(shape);
 	}
+
+
 	return true;
 }
 
 void CompoundShapeToGraphics::setShape(const std::shared_ptr<Math::CompoundShape>& shape)
 {
+	SURGSIM_ASSERT(m_source == nullptr) << "Can't assign the shape and the source at the same time.";
+	SURGSIM_ASSERT(shape != nullptr) << "Shape should not be nullptr.";
+
 	m_shape = shape;
 	m_source = nullptr;
 }
 
 void CompoundShapeToGraphics::setSource(const std::shared_ptr<Framework::Component>& component)
 {
-	SURGSIM_ASSERT(component->isReadable("Shape")) << "Component : " << component->getFullName()
-			<< "Does not contain a shape .";
+	SURGSIM_ASSERT(m_shape == nullptr) << "Can't assign the shape and the source at the same time.";
+	SURGSIM_ASSERT(component != nullptr) << "Source should not be nullptr.";
+	SURGSIM_ASSERT(component->isReadable("Shape")) << "Source: " << component->getFullName()
+			<< "Does not contain a shape.";
 	m_source = component;
-
 }
 
 void CompoundShapeToGraphics::setTargets(const std::vector<std::shared_ptr<Framework::Component>> components)
@@ -105,9 +125,11 @@ void CompoundShapeToGraphics::addTarget(const std::shared_ptr<Framework::Compone
 	m_representations.push_back(std::move(graphics));
 }
 
-std::vector<std::shared_ptr<Graphics::Representation>> CompoundShapeToGraphics::getTargets() const
+std::vector<std::shared_ptr<Framework::Component>> CompoundShapeToGraphics::getTargets() const
 {
-	return m_representations;
+	std::vector<std::shared_ptr<Framework::Component>> result;
+	std::copy(m_representations.cbegin(), m_representations.cend(), std::back_inserter(result));
+	return result;
 }
 
 std::shared_ptr<Math::CompoundShape> CompoundShapeToGraphics::getShape() const
@@ -119,7 +141,6 @@ std::shared_ptr<Framework::Component> CompoundShapeToGraphics::getSource() const
 {
 	return m_source;
 }
-
 
 }
 }

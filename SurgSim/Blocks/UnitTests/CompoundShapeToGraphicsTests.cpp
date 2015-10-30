@@ -63,6 +63,25 @@ TEST(CompoundShapeToGraphicsTests, SetSource)
 	EXPECT_ANY_THROW(behavior->setSource(graphics));
 }
 
+TEST(CompoundShapeToGraphicsTests, Serialization)
+{
+	auto behavior = std::make_shared<CompoundShapeToGraphics>("Copier");
+
+	auto graphics = std::make_shared<Graphics::OsgSceneryRepresentation>("Graphics");
+	std::shared_ptr<Framework::Component> physics = std::make_shared<Physics::FixedRepresentation>("Physics");
+
+	std::vector<std::shared_ptr<Framework::Component>> targets;
+	targets.push_back(graphics);
+	targets.push_back(graphics);
+	targets.push_back(graphics);
+
+	EXPECT_NO_THROW(behavior->setValue("Targets", targets));
+	EXPECT_NO_THROW(behavior->setValue("Source", physics));
+
+	EXPECT_EQ(3u, behavior->getValue<std::vector<std::shared_ptr<Framework::Component>>>("Targets").size());
+	EXPECT_EQ(physics, behavior->getValue<std::shared_ptr<Framework::Component>>("Source"));
+}
+
 TEST(CompoundShapeToGraphicsTests, SetGraphics)
 {
 	auto behavior = std::make_shared<CompoundShapeToGraphics>("Copier");

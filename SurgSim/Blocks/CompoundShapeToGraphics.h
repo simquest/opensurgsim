@@ -43,6 +43,8 @@ class CompoundShape;
 namespace Blocks
 {
 
+SURGSIM_STATIC_REGISTRATION(CompoundShapeToGraphics);
+
 /// Keep a set of Graphics representations in sync with a CompoundShape, the shape can either be set directly or
 /// pulled from a Physics or Collision Representation. The graphics pieces will be set to coincide with the appropriate
 /// pieces of the compound shape in order.
@@ -50,7 +52,9 @@ class CompoundShapeToGraphics : public Framework::Behavior
 {
 public:
 	/// Constructor
-	CompoundShapeToGraphics(const std::string& name);
+	explicit CompoundShapeToGraphics(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Blocks::CompoundShapeToGraphics);
 
 	/// Destructor
 	~CompoundShapeToGraphics();
@@ -84,7 +88,7 @@ public:
 	void addTarget(const std::shared_ptr<Framework::Component>& component);
 
 	/// \return the registered graphics targets
-	std::vector<std::shared_ptr<Graphics::Representation>> getTargets() const;
+	std::vector<std::shared_ptr<Framework::Component>> getTargets() const;
 
 	/// \return the shape that is being used, if set, nullptr otherwise
 	std::shared_ptr<Math::CompoundShape> getShape() const;
