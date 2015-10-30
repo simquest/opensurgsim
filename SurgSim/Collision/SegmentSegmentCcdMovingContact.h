@@ -20,6 +20,7 @@
 
 #include "SurgSim/Collision/SegmentSegmentCcdIntervalCheck.h"
 #include "SurgSim/Collision/SegmentSegmentCcdStaticContact.h"
+#include "SurgSim/Framework/Logger.h"
 
 namespace SurgSim
 {
@@ -203,7 +204,7 @@ protected:
 	/// \param t0 segment at time 0
 	/// \param t1 segment at time 1
 	/// \param epsilon threshold for valid normalization value.
-	void normalizeSafely(Math::Vector3d* t0, Math::Vector3d* t1, double epsilon) const;
+	void normalizeSegmentsConsistently(Math::Vector3d* t0, Math::Vector3d* t1, double epsilon) const;
 
 private:
 	/// Utility routine to perform a series of checks to determine if a collision is likely within an interval. The
@@ -227,6 +228,9 @@ private:
 
 	/// Utility class for testing interval boundary collisions.
 	Collision::SegmentSegmentCcdStaticContact m_staticTest;
+
+	/// Logger
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 }; // namespace Collision

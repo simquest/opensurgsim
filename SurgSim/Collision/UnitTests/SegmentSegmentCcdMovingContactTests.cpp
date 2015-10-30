@@ -41,9 +41,9 @@ class SegmentSegmentCcdMovingContactTests : public ::testing::Test
 class MockSegmentSegmentCcdMovingContact : public SurgSim::Collision::SegmentSegmentCcdMovingContact
 {
 public:
-	void normalizeSafely(Math::Vector3d* t0, Math::Vector3d* t1, double epsilon) const
+	void normalizeSegmentsConsistently(Math::Vector3d* t0, Math::Vector3d* t1, double epsilon) const
 	{
-		SegmentSegmentCcdMovingContact::normalizeSafely(t0, t1, epsilon);
+		SegmentSegmentCcdMovingContact::normalizeSegmentsConsistently(t0, t1, epsilon);
 	}
 
 	bool collideSegmentSegmentBaseCase(
@@ -119,7 +119,7 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSafeNormalization)
 		SCOPED_TRACE("Normalizing 2 good vectors.");
 		Math::Vector3d vector1(0.0, 0.1, 0.2);
 		Math::Vector3d vector2(0.2, 0.1, 0.0);
-		movingTest.normalizeSafely(&vector1, &vector2, epsilon);
+		movingTest.normalizeSegmentsConsistently(&vector1, &vector2, epsilon);
 		EXPECT_TRUE(vector1.isApprox(Math::Vector3d(0.0, 1.0 / std::sqrt(5.0), 2 / std::sqrt(5.0)), epsilon));
 		EXPECT_TRUE(vector2.isApprox(Math::Vector3d(2 / std::sqrt(5.0), 1.0 / std::sqrt(5.0), 0.0), epsilon));
 	}
@@ -127,7 +127,7 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSafeNormalization)
 		SCOPED_TRACE("Vector 1 is good. Vector 2 is bad.");
 		Math::Vector3d vector1(0.0, 0.1, 0.2);
 		Math::Vector3d vector2(2.0e-11, 1.0e-11, 0.0);
-		movingTest.normalizeSafely(&vector1, &vector2, epsilon);
+		movingTest.normalizeSegmentsConsistently(&vector1, &vector2, epsilon);
 		EXPECT_TRUE(vector1.isApprox(Math::Vector3d(0.0, 1.0 / std::sqrt(5.0), 2 / std::sqrt(5.0)), epsilon));
 		EXPECT_TRUE(vector2.isApprox(Math::Vector3d(0.0, 1.0 / std::sqrt(5.0), 2 / std::sqrt(5.0)), epsilon));
 	}
@@ -135,7 +135,7 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSafeNormalization)
 		SCOPED_TRACE("Vector 1 is bad. Vector 2 is good.");
 		Math::Vector3d vector1(0.0, 1.0e-11, 2.0e-11);
 		Math::Vector3d vector2(0.2, 0.1, 0.0);
-		movingTest.normalizeSafely(&vector1, &vector2, epsilon);
+		movingTest.normalizeSegmentsConsistently(&vector1, &vector2, epsilon);
 		EXPECT_TRUE(vector1.isApprox(Math::Vector3d(2 / std::sqrt(5.0), 1.0 / std::sqrt(5.0), 0.0), epsilon));
 		EXPECT_TRUE(vector2.isApprox(Math::Vector3d(2 / std::sqrt(5.0), 1.0 / std::sqrt(5.0), 0.0), epsilon));
 	}
@@ -143,7 +143,7 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSafeNormalization)
 		SCOPED_TRACE("Normalizing 2 bad vectors.");
 		Math::Vector3d vector1(0.0, 1.0e-11, 2.0e-11);
 		Math::Vector3d vector2(2.0e-11, 1.0e-11, 0.0);
-		movingTest.normalizeSafely(&vector1, &vector2, epsilon);
+		movingTest.normalizeSegmentsConsistently(&vector1, &vector2, epsilon);
 		EXPECT_TRUE(vector1.isApprox(Math::Vector3d(0.0, 1.0e-11, 2.0e-11), epsilon));
 		EXPECT_TRUE(vector2.isApprox(Math::Vector3d(2.0e-11, 1.0e-11, 0.0), epsilon));
 	}

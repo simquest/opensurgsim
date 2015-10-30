@@ -25,18 +25,13 @@
 
 using SurgSim::Math::Vector3d;
 
-namespace
-{
-const std::string ccdMovingContactLogger = "CCDMovingContactLog";
-};
-
 namespace SurgSim
 {
 namespace Collision
 {
 
 SegmentSegmentCcdMovingContact::SegmentSegmentCcdMovingContact() :
-	m_distanceEpsilon(1.0e-09)
+	m_distanceEpsilon(1.0e-09), m_logger(Framework::Logger::getLogger("CCDMovingContactLog"))
 {
 }
 
@@ -94,6 +89,8 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentBaseCase(
 	double timePrecisionEpsilon,
 	double* t, double* r, double* s)
 {
+	bool collisionFound = false;
+
 	const double parallelEpsilon = 1e-9;
 	const double degenerateEpsilon = 1e-10;
 	const double coplanarEpsilon = 1e-18;
@@ -114,88 +111,90 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentBaseCase(
 	// 1st) Case of parallel segment through time step (at t=0 and t=1)
 	//
 	// Check if the cross product is near zero at both t0 and t1.
+	Math::Vector3d p0t0p1t0_vec_q0t0q1t0 = p0t0p1t0.cross(q0t0q1t0);
+	Math::Vector3d p0t1p1t1_vec_q0t1q1t1 = p0t1p1t1.cross(q0t1q1t1);
+	double p0t0p1t0_vec_q0t0q1t0_SQ = p0t0p1t0_vec_q0t0q1t0.squaredNorm();
+	double p0t1p1t1_vec_q0t1q1t1_SQ = p0t1p1t1_vec_q0t1q1t1.squaredNorm();
+	if (p0t0p1t0_vec_q0t0q1t0_SQ < parallelEpsilon2 && p0t1p1t1_vec_q0t1q1t1_SQ < parallelEpsilon2)
 	{
-		Math::Vector3d p0t0p1t0_vec_q0t0q1t0 = p0t0p1t0.cross(q0t0q1t0);
-		Math::Vector3d p0t1p1t1_vec_q0t1q1t1 = p0t1p1t1.cross(q0t1q1t1);
-		double p0t0p1t0_vec_q0t0q1t0_SQ = p0t0p1t0_vec_q0t0q1t0.squaredNorm();
-		double p0t1p1t1_vec_q0t1q1t1_SQ = p0t1p1t1_vec_q0t1q1t1.squaredNorm();
-		if (p0t0p1t0_vec_q0t0q1t0_SQ < parallelEpsilon2 && p0t1p1t1_vec_q0t1q1t1_SQ < parallelEpsilon2)
-		{
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger(ccdMovingContactLogger)) <<
-					"Segments are parallel at start and end of time step. " <<
-					"Handling with parallel method rather than general method.";
+		SURGSIM_LOG_WARNING(m_logger) <<
+									  "Segments are parallel at start and end of time step. " <<
+									  "Handling with parallel method rather than general method.";
 
-			// Either it collides at t=0 or we do a dichotomy to find intersection in [0..1]
-			if (m_staticTest.collideStaticSegmentSegment(pT0, qT0, thicknessP, thicknessQ, r, s))
-			{
-				t = 0;
-				return true;
-			}
-
-			bool collisionFound = collideSegmentSegmentParallelCase(
-									  pT0, // Segment 1 at t=0
-									  pT1, // Segment 1 at t=1
-									  qT0, // Segment 2 at t=0
-									  qT1, // Segment 2 at t=1
-									  0.0, 1.0,
-									  thicknessP, thicknessQ,
-									  timePrecisionEpsilon,
-									  t, r, s);
-
-			return collisionFound;
-		}
-	}
-
-	//#################################################################
-	// 2nd) Case of coplanar segment through time step (at t=0  and t=1)
-
-	// Calculate the normal of p X q for at least one of the end points of
-	// q. Do this at both t-0 and t=1.
-	Math::Vector3d pt0Xqt0 = Math::robustCrossProduct(pT0, qT0, degenerateEpsilon);
-	Math::Vector3d pt1Xqt1 = Math::robustCrossProduct(pT1, qT1, degenerateEpsilon);
-
-	// TODO(wturner): Currently set to (10^-9), but has been as high as (10^-7) in previous versions.
-	// verify that this value works as intended. If not, we will need to add and set another
-	// member variable for the additional threshold.
-	normalizeSafely(&q0t0q1t0, &q0t1q1t1, m_distanceEpsilon);
-
-	// Do the segments remain coplanar all the time ?
-	if (std::fabs(pt0Xqt0.dot(q0t0q1t0)) < coplanarEpsilon &&
-		std::fabs(pt1Xqt1.dot(q0t1q1t1)) < coplanarEpsilon)
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger(ccdMovingContactLogger)) <<
-				"Segments are coplanar at start and end of the time step. Handling with coplanar method.";
-
+		// Either it collides at t=0 or we do a dichotomy to find intersection in [0..1]
 		if (m_staticTest.collideStaticSegmentSegment(pT0, qT0, thicknessP, thicknessQ, r, s))
 		{
 			t = 0;
-			return true;
+			collisionFound = true;
 		}
-
-		// At this point, {r,s} are computed for t=0 !
-		bool collisionFound = collideSegmentSegmentCoplanarCase(
-								  pT0, // Segment 1 at t=0
-								  pT1, // Segment 1 at t=1
-								  qT0, // Segment 2 at t=0
-								  qT1, // Segment 2 at t=1
-								  0.0, 1.0, // Interval boundaries
-								  timePrecisionEpsilon,
-								  thicknessP, thicknessQ,
-								  t, r, s);
-
-		return collisionFound;
+		else
+		{
+			collisionFound = collideSegmentSegmentParallelCase(
+								 pT0, // Segment 1 at t=0
+								 pT1, // Segment 1 at t=1
+								 qT0, // Segment 2 at t=0
+								 qT1, // Segment 2 at t=1
+								 0.0, 1.0,
+								 thicknessP, thicknessQ,
+								 timePrecisionEpsilon,
+								 t, r, s);
+		}
 	}
+	else
+	{
+		//#################################################################
+		// 2nd) Case of coplanar segment through time step (at t=0  and t=1)
 
-	//#################################################################
-	// 3rd) General case
-	SegmentSegmentCcdIntervalCheck state(pT0, pT1, qT0, qT1,
-										 thicknessP, thicknessQ,
-										 timePrecisionEpsilon, -1);
+		// Calculate the normal of p X q for at least one of the end points of
+		// q. Do this at both t=0 and t=1.
+		Math::Vector3d pt0Xqt0 = Math::robustCrossProduct(pT0, qT0, degenerateEpsilon);
+		Math::Vector3d pt1Xqt1 = Math::robustCrossProduct(pT1, qT1, degenerateEpsilon);
 
-	bool collisionFound = collideSegmentSegmentGeneralCase(
-							  state,
-							  0.0, 1.0, // Look inside the interval t [0..1]
-							  t, r, s);
+		// TODO(wturner): Currently set to (10^-9), but has been as high as (10^-7) in previous versions.
+		// verify that this value works as intended. If not, we will need to add and set another
+		// member variable for the additional threshold.
+		normalizeSegmentsConsistently(&q0t0q1t0, &q0t1q1t1, m_distanceEpsilon);
+
+		// Do the segments remain coplanar all the time ?
+		if (std::fabs(pt0Xqt0.dot(q0t0q1t0)) < coplanarEpsilon &&
+			std::fabs(pt1Xqt1.dot(q0t1q1t1)) < coplanarEpsilon)
+		{
+			SURGSIM_LOG_WARNING(m_logger) << "Segments are coplanar at start and end of " <<
+										  "the time step. Handling with coplanar method.";
+
+			if (m_staticTest.collideStaticSegmentSegment(pT0, qT0, thicknessP, thicknessQ, r, s))
+			{
+				t = 0;
+				collisionFound = true;
+			}
+			else
+			{
+				// At this point, {r,s} are computed for t=0 !
+				collisionFound = collideSegmentSegmentCoplanarCase(
+									 pT0, // Segment 1 at t=0
+									 pT1, // Segment 1 at t=1
+									 qT0, // Segment 2 at t=0
+									 qT1, // Segment 2 at t=1
+									 0.0, 1.0, // Interval boundaries
+									 timePrecisionEpsilon,
+									 thicknessP, thicknessQ,
+									 t, r, s);
+			}
+		}
+		else
+		{
+			//#################################################################
+			// 3rd) General case
+			SegmentSegmentCcdIntervalCheck state(pT0, pT1, qT0, qT1,
+												 thicknessP, thicknessQ,
+												 timePrecisionEpsilon, -1);
+
+			collisionFound = collideSegmentSegmentGeneralCase(
+								 state,
+								 0.0, 1.0, // Look inside the interval t [0..1]
+								 t, r, s);
+		}
+	}
 	return collisionFound;
 }
 
@@ -219,7 +218,7 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentParallelCase(
 	std::array<Vector3d, 2> pb = {p0Tb, p1Tb};
 	std::array<Vector3d, 2> qb = {q0Tb, q1Tb};
 
-	if (b - a < timePrecisionEpsilon) // Recursion bottoms out at TOI with time precision!
+	if (b - a < timePrecisionEpsilon)
 	{
 		// We know that no collision happened at t=a, that is why we recursed to this level, but
 		// we believe that there is a collision in the interval. If our time precision is good enough,
@@ -236,7 +235,6 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentParallelCase(
 
 	// Geometry at time t=a
 	Math::Vector3d p0Ta = Math::interpolate(pT0[0], pT1[0], a); // p[0] interpolated at time a
-	Math::Vector3d p1Ta = Math::interpolate(pT0[1], pT1[1], a); // p[1] interpolated at time a
 	Math::Vector3d q0Ta = Math::interpolate(qT0[0], qT1[0], a); // q[0] interpolated at time a
 	Math::Vector3d q1Ta = Math::interpolate(qT0[1], qT1[1], a); // q[1] interpolated at time a
 
@@ -284,7 +282,7 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentParallelCase(
 					   depth + 1);
 		}
 
-		p0Proj = Math::nearestPointOnLine(p0Ta, q_i[0], q_i[1]);
+		p0Proj = Math::nearestPointOnLine(p_i[0], q_i[0], q_i[1]);
 		p0p0Proj[i] = p0Proj - p_i[0];
 	}
 
@@ -327,7 +325,7 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentCoplanarCase(
 	Math::Vector3d q1Tb = Math::interpolate(qT0[1], qT1[1], b); // q[1] interpolated at time b
 
 
-	if (b - a < timePrecisionEpsilon) // TOI found with a precision of 1e-6 x the given time step !!
+	if (b - a < timePrecisionEpsilon)
 	{
 		bool collisionFound = false;
 
@@ -351,9 +349,6 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentCoplanarCase(
 	Math::Vector3d q0Ta = Math::interpolate(qT0[0], qT1[0], a); // q[0] interpolated at time a
 	Math::Vector3d q1Ta = Math::interpolate(qT0[1], qT1[1], a); // q[1] interpolated at time a
 
-	Math::Vector3d p0p1_0 = p1Ta - p0Ta;
-	Math::Vector3d q0q1_0 = q1Ta - q0Ta;
-
 	// Compute intermediate geometry..and work on dichotomy based on 1/nbSubPoint (instead of 1/2)
 	double t_i[SUB_POINTS_COPLANAR_CASE + 1];
 	Math::Vector3d normal[SUB_POINTS_COPLANAR_CASE + 1];
@@ -362,7 +357,7 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentCoplanarCase(
 	t_i[0] = a;
 	r_i[0] = *r;
 	s_i[0] = *s;
-	normal[0] = p0p1_0.cross(q0q1_0).normalized();
+	normal[0] = (p1Ta - p0Ta).cross(q1Ta - q0Ta).normalized();
 
 	for (int i = 1 ; i <= SUB_POINTS_COPLANAR_CASE ; i++)
 	{
@@ -391,9 +386,7 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentCoplanarCase(
 					   t, r, s,
 					   depth + 1);
 		}
-		Math::Vector3d p0p1 = p_i[1] - p_i[0];
-		Math::Vector3d q0q1 = q_i[1] - q_i[0];
-		normal[i] = p0p1.cross(q0q1).normalized();
+		normal[i] = (p_i[1] - p_i[0]).cross(q_i[1] - q_i[0]).normalized();
 	}
 
 	// Check for a flip or a change in normal. If one is detected, then a collision might occur within the
@@ -489,7 +482,8 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentGeneralCase(
 	return false;
 }
 
-void SegmentSegmentCcdMovingContact::normalizeSafely(Math::Vector3d* t0, Math::Vector3d* t1, double epsilon) const
+void SegmentSegmentCcdMovingContact::normalizeSegmentsConsistently(Math::Vector3d* t0, Math::Vector3d* t1,
+		double epsilon) const
 {
 	// safely normalize t0 and t1. We will need to calculate
 	// dot products against them to test orthogonality with p X q at
@@ -509,8 +503,9 @@ void SegmentSegmentCcdMovingContact::normalizeSafely(Math::Vector3d* t0, Math::V
 		{
 			// t0 good, t1 bad
 			*t1 = *t0;	// t1 <- t0
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger(ccdMovingContactLogger)) <<
-					"Segment is degenerate at time 1. Using time 0 value for both coplanarity tests.";
+			SURGSIM_LOG_WARNING(m_logger) <<
+										  "Segment is degenerate at time 1. Using time 0 " <<
+										  "value for both coplanarity tests.";
 		}
 	}
 	else if (norm_t1 >= epsilon)
@@ -518,13 +513,15 @@ void SegmentSegmentCcdMovingContact::normalizeSafely(Math::Vector3d* t0, Math::V
 		// t1 good, t0 bad
 		*t1 *= 1.0 / norm_t1;
 		*t0 = *t1;	// t0 <- t1
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger(ccdMovingContactLogger)) <<
-				"Segment is degenerate at time 0. Using time 1 value for both coplanarity tests.";
+		SURGSIM_LOG_WARNING(m_logger) <<
+									  "Segment is degenerate at time 0. Using time 1 value for " <<
+									  "both coplanarity tests.";
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger(ccdMovingContactLogger)) <<
-				"Segment is degenerate at time 0 and time 1. Unable to normalize for coplanarity tests.";
+		SURGSIM_LOG_WARNING(m_logger) <<
+									  "Segment is degenerate at time 0 and time 1. Unable to " <<
+									  "normalize for coplanarity tests.";
 	}
 }
 
