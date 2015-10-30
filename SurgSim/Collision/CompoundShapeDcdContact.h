@@ -28,16 +28,16 @@ class CompoundShapeDcdContact : public ContactCalculation
 {
 public:
 	/// Constructor
-	CompoundShapeDcdContact(const std::pair<int, int>& types);
+	explicit CompoundShapeDcdContact(const std::pair<int, int>& types);
 
 protected:
 	std::pair<int, int> getShapeTypes() override;
 
-	virtual std::list<std::shared_ptr<Contact>> doCalculateContact(
-				const std::shared_ptr<Math::Shape>& shape1,
-				const Math::RigidTransform3d& pose1,
-				const std::shared_ptr<Math::Shape>& shape2,
-				const Math::RigidTransform3d& pose2) override;
+	std::list<std::shared_ptr<Contact>> doCalculateContact(
+										 const std::shared_ptr<Math::Shape>& shape1,
+										 const Math::RigidTransform3d& pose1,
+										 const std::shared_ptr<Math::Shape>& shape2,
+										 const Math::RigidTransform3d& pose2) override;
 
 	/// Local shape types for this instance, these can be set to match the expected shapes
 	std::pair<int, int> m_types;
