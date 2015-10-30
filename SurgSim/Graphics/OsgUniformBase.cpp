@@ -26,7 +26,7 @@ OsgUniformBase::OsgUniformBase(const std::string& name) : UniformBase(),
 
 void OsgUniformBase::addToStateSet(osg::StateSet* stateSet)
 {
-	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getDefaultLogger()) << "Base Add To Texture StateSet called";
+	SURGSIM_LOG_DEBUG(Framework::Logger::getLogger("Graphics/OsgUniformBase")) << "Base Add To Texture StateSet called";
 	stateSet->addUniform(m_uniform);
 }
 
