@@ -63,8 +63,9 @@ bool RigidRepresentationBase::doInitialize()
 {
 	if (m_shape != nullptr)
 	{
-		SURGSIM_ASSERT(m_shape->isValid()) <<
-			"An invalid shape is used in this RigidRepresentationBase.";
+		SURGSIM_ASSERT(m_shape->isValid())
+				<< "An invalid shape is used in this RigidRepresentationBase.";
+		updateProperties();
 	}
 
 	return true;
