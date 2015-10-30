@@ -191,7 +191,7 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSegmentSegmentGeneralCase)
 
 		SegmentSegmentCcdIntervalCheck statusTrue(pStart, pEnd, qStart, qEnd, 0.5, 0.25, 3.0e-06, 4.0e-06);
 		EXPECT_TRUE(movingTest.collideSegmentSegmentGeneralCase(statusTrue, 0.0, 1.0, &t, &r, &s, 0));
-		EXPECT_DOUBLE_EQ(0.75, t);
+		EXPECT_GT(epsilon, std::abs(0.75 - t));
 		EXPECT_DOUBLE_EQ(0.50, r);
 		EXPECT_DOUBLE_EQ(0.50, s);
 
@@ -520,7 +520,7 @@ TEST(SegmentSegmentCcdMovingContactTests, TestRouting)
 
 		EXPECT_TRUE(movingTest.collideSegmentSegmentBaseCase(pStart, pEnd, qStart, qEnd,
 					0.5, 0.25, 3.0e-06, &t, &r, &s));
-		EXPECT_DOUBLE_EQ(0.75, t);
+		EXPECT_GT(epsilon, std::abs(0.75 - t));
 		EXPECT_DOUBLE_EQ(0.50, r);
 		EXPECT_DOUBLE_EQ(0.50, s);
 	}
