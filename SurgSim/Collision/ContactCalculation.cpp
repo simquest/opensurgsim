@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/ContactCalculation.h"
-#include "SurgSim/Collision/DefaultContactCalculation.h"
-#include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Collision/DcdCollision.h"
-
 #include <thread>
 
+#include "SurgSim/Collision/ContactCalculation.h"
+
+#include "SurgSim/Collision/DcdCollision.h"
+#include "SurgSim/Collision/DefaultContactCalculation.h"
+#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {

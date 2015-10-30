@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
+#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/CompoundShapeDcdContact.h"
 #include "SurgSim/Math/CompoundShape.h"
-#include "SurgSim/Collision/CollisionPair.h"
-
-#include <memory>
 
 namespace SurgSim
 {

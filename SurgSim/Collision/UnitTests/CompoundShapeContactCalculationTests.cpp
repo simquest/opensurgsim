@@ -15,14 +15,13 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Collision/CompoundShapeDcdContact.h"
-#include "SurgSim/Collision/BoxSphereDcdContact.h"
 #include "SurgSim/Collision/BoxPlaneDcdContact.h"
-#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
-#include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Collision/BoxSphereDcdContact.h"
+#include "SurgSim/Collision/CompoundShapeDcdContact.h"
 #include "SurgSim/Collision/ContactCalculation.h"
-
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Math/Shapes.h"
 
 namespace SurgSim
 {
@@ -31,7 +30,7 @@ namespace Collision
 
 class CompoundShapeDcdContactTest : public ::testing::Test
 {
-	virtual void SetUp() override
+	void SetUp() override
 	{
 		ContactCalculation::registerContactCalculation(std::make_shared<BoxSphereDcdContact>());
 		ContactCalculation::registerContactCalculation(std::make_shared<BoxPlaneDcdContact>());
@@ -42,7 +41,7 @@ class CompoundShapeDcdContactTest : public ::testing::Test
 
 	}
 
-	virtual void TearDown() override
+	void TearDown() override
 	{
 	}
 };
