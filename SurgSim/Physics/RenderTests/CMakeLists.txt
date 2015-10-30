@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	CompoundCollisionRenderTest.cpp
 	Fem3DMeshRenderTest.cpp
 	Fem3DvsTruthCubeRenderTest.cpp
 	RenderTest.cpp

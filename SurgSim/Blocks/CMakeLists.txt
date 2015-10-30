@@ -18,6 +18,7 @@ include_directories(
 )
 
 set(SURGSIM_BLOCKS_SOURCES
+	CompoundShapeToGraphics.cpp
 	DebugDumpBehavior.cpp
 	DriveElementFromInputBehavior.cpp
 	GraphicsUtilities.cpp
@@ -38,6 +39,7 @@ set(SURGSIM_BLOCKS_SOURCES
 )
 
 set(SURGSIM_BLOCKS_HEADERS
+	CompoundShapeToGraphics.h
 	DebugDumpBehavior.h
 	DriveElementFromInputBehavior.h
 	GraphicsUtilities.h

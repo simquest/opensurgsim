@@ -30,7 +30,7 @@ namespace Collision
 
 namespace
 {
-double epsilon = 1.0e-10;
+double epsilon = 1.0e-05;
 }
 
 template <typename T>
