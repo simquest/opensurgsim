@@ -98,13 +98,9 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentBaseCase(
 	const double parallelEpsilon2 = parallelEpsilon * parallelEpsilon;
 
 	Math::Vector3d p0t0p1t0 = pT0[1] - pT0[0];
-	Math::Vector3d p0t0q0t0 = qT0[0] - pT0[0];
-	Math::Vector3d p1t0q1t0 = qT0[1] - pT0[1];
 	Math::Vector3d q0t0q1t0 = qT0[1] - qT0[0];
 
 	Math::Vector3d p0t1p1t1 = pT1[1] - pT1[0];
-	Math::Vector3d p0t1q0t1 = qT1[0] - pT1[0];
-	Math::Vector3d p1t1q1t1 = qT1[1] - pT1[1];
 	Math::Vector3d q0t1q1t1 = qT1[1] - qT1[0];
 
 	//#################################################################

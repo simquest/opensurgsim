@@ -1425,7 +1425,6 @@ TYPED_TEST(Vector3Tests, robustCrossProduct)
 {
 	typedef typename TestFixture::Vector3 Vector3;
 	typedef typename Vector3::Scalar T;
-	const int VOpt = Vector3::Options;
 	T epsilon = static_cast<T>(1.0e02 * Eigen::NumTraits<T>::dummy_precision());
 
 	Vector3 p0(static_cast<T>(0.0), static_cast<T>(0.0), static_cast<T>(0.2));
