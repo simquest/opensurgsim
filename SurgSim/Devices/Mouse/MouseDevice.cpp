@@ -40,23 +40,24 @@ MouseDevice::~MouseDevice()
 
 bool MouseDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
-
-	m_scaffold = MouseScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(m_scaffold);
-
-	m_scaffold->registerDevice(this);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
-
-	return true;
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
+	auto scaffold = MouseScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr);
+	bool registered = false;
+	if (scaffold->registerDevice(this))
+	{
+		m_scaffold = std::move(scaffold);
+		registered = true;
+	}
+	return registered;
 }
 
 bool MouseDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
+	bool unregistered = m_scaffold->unregisterDevice();
 	m_scaffold.reset();
-	return true;
+	return unregistered;
 }
 
 bool MouseDevice::isInitialized() const

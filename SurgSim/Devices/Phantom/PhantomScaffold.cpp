@@ -41,6 +41,38 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
 
+namespace
+{
+/// Check for OpenHaptics HDAPI errors, display them, and signal fatal errors.
+/// \param message An additional descriptive message.
+/// \return true if there was a fatal error; false if everything is OK.
+bool checkForFatalError(const char* message)
+{
+	HDErrorInfo error = hdGetError();
+	if (error.errorCode == HD_SUCCESS)
+	{
+		return false;
+	}
+
+	// The HD API maintains an error stack, so in theory there could be more than one error pending.
+	// We do head recursion to get them all in the correct order, and hope we don't overrun the stack...
+	bool anotherFatalError = checkForFatalError(message);
+
+	bool isFatal = ((error.errorCode != HD_WARM_MOTORS) &&
+		(error.errorCode != HD_EXCEEDED_MAX_FORCE) &&
+		(error.errorCode != HD_EXCEEDED_MAX_FORCE_IMPULSE) &&
+		(error.errorCode != HD_EXCEEDED_MAX_VELOCITY) &&
+		(error.errorCode != HD_FORCE_ERROR));
+
+	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Devices/Phantom")) << "Phantom: " << message <<
+		std::endl << "  Error text: '" << hdGetErrorString(error.errorCode) << "'" << std::endl <<
+		"  Error code: 0x" << std::hex << std::setw(4) << std::setfill('0') << error.errorCode <<
+		" (internal: " << std::dec << error.internalErrorCode << ")" << std::endl;
+
+	return (isFatal || anotherFatalError);
+}
+}
+
 namespace SurgSim
 {
 namespace Devices
@@ -52,20 +84,20 @@ class PhantomScaffold::Handle
 public:
 	Handle() :
 		m_deviceHandle(HD_INVALID_HANDLE),
-		m_scaffold(PhantomScaffold::getOrCreateSharedInstance())
+		m_logger(Framework::Logger::getLogger("Devices/Phantom"))
 	{
 	}
 
 	Handle(const std::string& deviceName, const std::string& initializationName) :
 		m_deviceHandle(HD_INVALID_HANDLE),
-		m_scaffold(PhantomScaffold::getOrCreateSharedInstance())
+		m_logger(Framework::Logger::getLogger("Devices/Phantom"))
 	{
 		create(deviceName, initializationName);
 	}
 
 	~Handle()
 	{
-		SURGSIM_ASSERT(! isValid()) << "Expected destroy() to be called before Handle object destruction.";
+		SURGSIM_ASSERT(!isValid()) << "Expected destroy() to be called before Handle object destruction.";
 	}
 
 	bool isValid() const
@@ -75,7 +107,7 @@ public:
 
 	bool create(const std::string& deviceName, const std::string& initializationName)
 	{
-		SURGSIM_ASSERT(! isValid());
+		SURGSIM_ASSERT(!isValid());
 
 		HHD deviceHandle = HD_INVALID_HANDLE;
 		if (initializationName.length() > 0)
@@ -87,18 +119,18 @@ public:
 			deviceHandle = hdInitDevice(HD_DEFAULT_DEVICE);
 		}
 
-		if (m_scaffold->checkForFatalError("Failed to initialize"))
+		if (checkForFatalError("Failed to initialize"))
 		{
 			// HDAPI error message already logged
-			SURGSIM_LOG_INFO(m_scaffold->getLogger()) << std::endl <<
+			SURGSIM_LOG_INFO(m_logger) << std::endl <<
 				"  Device name: '" << deviceName << "'" << std::endl <<
 				"  OpenHaptics device name: '" << initializationName << "'" << std::endl;
 			return false;
 		}
 		else if (deviceHandle == HD_INVALID_HANDLE)
 		{
-			SURGSIM_LOG_SEVERE(m_scaffold->getLogger()) << "Phantom: Failed to initialize '" << deviceName << "'" <<
-				std::endl <<
+			SURGSIM_LOG_SEVERE(m_logger) <<
+				"Failed to initialize '" << deviceName << "'" << std::endl <<
 				"  Error details: unknown (HDAPI returned an invalid handle)" << std::endl <<
 				"  OpenHaptics device name: '" << initializationName << "'" << std::endl;
 			return false;
@@ -120,7 +152,7 @@ public:
 		m_deviceHandle = HD_INVALID_HANDLE;
 
 		hdDisableDevice(deviceHandle);
-		m_scaffold->checkForFatalError("Couldn't disable device");
+		checkForFatalError("Couldn't disable device");
 		return true;
 	}
 
@@ -137,8 +169,8 @@ private:
 
 	/// The OpenHaptics device handle (or HD_INVALID_HANDLE if not valid).
 	HHD m_deviceHandle;
-	/// The scaffold.
-	std::shared_ptr<PhantomScaffold> m_scaffold;
+	/// The logger.
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 
@@ -170,7 +202,7 @@ public:
 	{
 		SURGSIM_ASSERT(! m_haveCallback);
 		m_callbackHandle = hdScheduleAsynchronous(run, m_scaffold.get(), HD_DEFAULT_SCHEDULER_PRIORITY);
-		if (m_scaffold->checkForFatalError("Couldn't run haptic callback"))
+		if (checkForFatalError("Couldn't run haptic callback"))
 		{
 			return false;
 		}
@@ -182,7 +214,7 @@ public:
 	{
 		SURGSIM_ASSERT(m_haveCallback);
 		hdUnschedule(m_callbackHandle);
-		if (m_scaffold->checkForFatalError("Couldn't stop haptic callback"))
+		if (checkForFatalError("Couldn't stop haptic callback"))
 		{
 			return false;
 		}
@@ -259,12 +291,9 @@ struct PhantomScaffold::StateData
 {
 public:
 	/// Initialize the state.
-	StateData() : isApiInitialized(false)
+	StateData()
 	{
 	}
-
-	/// True if the API has been initialized (and not finalized).
-	bool isApiInitialized;
 
 	/// Wrapper for the haptic loop callback handle.
 	std::unique_ptr<PhantomScaffold::Callback> callback;
@@ -296,15 +325,9 @@ HDCallbackCode HDCALLBACK PhantomScaffold::Callback::run(void* data)
 
 
 
-PhantomScaffold::PhantomScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+PhantomScaffold::PhantomScaffold() :
+	m_logger(Framework::Logger::getLogger("Devices/Phantom")), m_state(new StateData)
 {
-	if (! m_logger)
-	{
-		m_logger = SurgSim::Framework::Logger::getLogger("Phantom device");
-		m_logger->setThreshold(m_defaultLogLevel);
-	}
-
 	{
 		// Drain the HDAPI error stack
 		HDErrorInfo error = hdGetError();
@@ -314,7 +337,7 @@ PhantomScaffold::PhantomScaffold(std::shared_ptr<SurgSim::Framework::Logger> log
 		}
 	}
 
-	SURGSIM_LOG_DEBUG(m_logger) << "Phantom: Shared scaffold created.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold created.";
 }
 
 
@@ -334,28 +357,14 @@ PhantomScaffold::~PhantomScaffold()
 			// do anything special with each device?
 			m_state->activeDeviceList.clear();
 		}
-
-		if (m_state->isApiInitialized)
-		{
-			finalizeSdk();
-		}
 	}
-	SURGSIM_LOG_DEBUG(m_logger) << "Phantom: Shared scaffold destroyed.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Shared scaffold destroyed.";
 }
 
 
 bool PhantomScaffold::registerDevice(PhantomDevice* device)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
-	if (! m_state->isApiInitialized)
-	{
-		if (! initializeSdk())
-		{
-			return false;
-		}
-	}
-
 	// Make sure the object is unique.
 	auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
@@ -394,6 +403,7 @@ bool PhantomScaffold::registerDevice(PhantomDevice* device)
 		return false;   // message already printed
 	}
 	m_state->activeDeviceList.emplace_back(std::move(info));
+	SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " initialized.";
 
 	if (m_state->activeDeviceList.size() == 1)
 	{
@@ -418,6 +428,7 @@ bool PhantomScaffold::unregisterDevice(const PhantomDevice* const device)
 			savedInfo = std::move(*matching);
 			m_state->activeDeviceList.erase(matching);
 			// the iterator is now invalid but that's OK
+			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " unregistered.";
 		}
 		haveOtherDevices = (m_state->activeDeviceList.size() > 0);
 	}
@@ -425,7 +436,7 @@ bool PhantomScaffold::unregisterDevice(const PhantomDevice* const device)
 	bool status = true;
 	if (! savedInfo)
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Phantom: Attempted to release a non-registered device.";
+		SURGSIM_LOG_WARNING(m_logger) << "Attempted to release a non-registered device " << device->getName();
 		status = false;
 	}
 	else
@@ -591,29 +602,6 @@ void PhantomScaffold::setInputData(DeviceData* info)
 		(info->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
 }
 
-
-bool PhantomScaffold::initializeSdk()
-{
-	SURGSIM_ASSERT(! m_state->isApiInitialized);
-
-	// nothing to do!
-
-	m_state->isApiInitialized = true;
-	return true;
-}
-
-
-bool PhantomScaffold::finalizeSdk()
-{
-	SURGSIM_ASSERT(m_state->isApiInitialized);
-
-	// nothing to do!
-
-	m_state->isApiInitialized = false;
-	return true;
-}
-
-
 bool PhantomScaffold::runHapticFrame()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
@@ -688,33 +676,6 @@ bool PhantomScaffold::stopScheduler()
 	return true;
 }
 
-
-bool PhantomScaffold::checkForFatalError(const char* message)
-{
-	HDErrorInfo error = hdGetError();
-	if (error.errorCode == HD_SUCCESS)
-	{
-		return false;
-	}
-
-	// The HD API maintains an error stack, so in theory there could be more than one error pending.
-	// We do head recursion to get them all in the correct order, and hope we don't overrun the stack...
-	bool anotherFatalError = checkForFatalError(message);
-
-	bool isFatal = ((error.errorCode != HD_WARM_MOTORS) &&
-		(error.errorCode != HD_EXCEEDED_MAX_FORCE) &&
-		(error.errorCode != HD_EXCEEDED_MAX_FORCE_IMPULSE) &&
-		(error.errorCode != HD_EXCEEDED_MAX_VELOCITY) &&
-		(error.errorCode != HD_FORCE_ERROR));
-
-	SURGSIM_LOG_SEVERE(m_logger) << "Phantom: " << message << std::endl <<
-		"  Error text: '" << hdGetErrorString(error.errorCode) << "'" << std::endl <<
-		"  Error code: 0x" << std::hex << std::setw(4) << std::setfill('0') << error.errorCode <<
-		" (internal: " << std::dec << error.internalErrorCode << ")" << std::endl;
-
-	return (isFatal || anotherFatalError);
-}
-
 SurgSim::DataStructures::DataGroup PhantomScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
@@ -732,14 +693,6 @@ std::shared_ptr<PhantomScaffold> PhantomScaffold::getOrCreateSharedInstance()
 	static SurgSim::Framework::SharedInstance<PhantomScaffold> sharedInstance;
 	return sharedInstance.get();
 }
-
-void PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
-{
-	m_defaultLogLevel = logLevel;
-}
-
-SurgSim::Framework::LogLevel PhantomScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
-
 
 };  // namespace Devices
 };  // namespace SurgSim

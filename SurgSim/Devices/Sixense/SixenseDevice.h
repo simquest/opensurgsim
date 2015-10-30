@@ -65,13 +65,12 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
-	/// Check wheter this device is initialized.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 private:
 	friend class SixenseScaffold;
+
+	bool finalize() override;
 
 	std::shared_ptr<SixenseScaffold> m_scaffold;
 };

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,30 +36,18 @@ namespace SurgSim
 namespace Collision
 {
 
-TriangleMeshParticlesDcdContact::TriangleMeshParticlesDcdContact()
-{
-}
-
 std::pair<int, int> TriangleMeshParticlesDcdContact::getShapeTypes()
 {
 	return std::pair<int, int>(Math::SHAPE_TYPE_MESH, Math::SHAPE_TYPE_PARTICLES);
 }
 
-void TriangleMeshParticlesDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateContact(
+									 const Math::MeshShape& mesh,
+									 const Math::RigidTransform3d&,
+									 const Math::ParticlesShape& particles,
+									 const Math::RigidTransform3d&) const
 {
-	auto mesh = std::static_pointer_cast<Math::MeshShape>(pair->getFirst()->getPosedShape());
-	auto particles = std::static_pointer_cast<Math::ParticlesShape>(pair->getSecond()->getPosedShape());
 
-	auto contacts = calculateContact(*mesh, *particles);
-	for (auto& contact : contacts)
-	{
-		pair->addContact(contact);
-	}
-}
-
-std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateContact(const Math::MeshShape& mesh,
-								 const Math::ParticlesShape& particles)
-{
 	std::list<std::shared_ptr<Contact>> contacts;
 	Vector3d closestPoint;
 	Vector3d coordinates;

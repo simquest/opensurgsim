@@ -24,18 +24,27 @@ namespace SurgSim
 namespace Devices
 {
 
-DeviceFilter::DeviceFilter(const std::string& name) : CommonDevice(name)
+DeviceFilter::DeviceFilter(const std::string& name) : CommonDevice(name), m_initialized(false)
 {
 }
 
 bool DeviceFilter::initialize()
 {
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
+	m_initialized = true;
 	return true;
 }
 
 bool DeviceFilter::finalize()
 {
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
+	m_initialized = false;
 	return true;
+}
+
+bool DeviceFilter::isInitialized() const
+{
+	return m_initialized;
 }
 
 void DeviceFilter::initializeInput(const std::string& device, const DataGroup& inputData)

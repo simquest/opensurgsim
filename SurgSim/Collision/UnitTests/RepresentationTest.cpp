@@ -97,6 +97,18 @@ TEST_F(RepresentationTest, InitTest)
 	EXPECT_NO_THROW(ShapeCollisionRepresentation("Plane"));
 }
 
+TEST_F(RepresentationTest, CollisionDetectionType)
+{
+	EXPECT_EQ(COLLISION_DETECTION_TYPE_NONE, sphereRep->getSelfCollisionDetectionType());
+	EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE, sphereRep->getCollisionDetectionType());
+
+	sphereRep->setCollisionDetectionType(COLLISION_DETECTION_TYPE_NONE);
+	EXPECT_EQ(COLLISION_DETECTION_TYPE_NONE, sphereRep->getCollisionDetectionType());
+
+	sphereRep->setSelfCollisionDetectionType(COLLISION_DETECTION_TYPE_CONTINUOUS);
+	EXPECT_EQ(COLLISION_DETECTION_TYPE_CONTINUOUS, sphereRep->getSelfCollisionDetectionType());
+}
+
 TEST_F(RepresentationTest, PoseTest)
 {
 	RigidTransform3d initialPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0, 2.0, 3.0));
@@ -182,16 +194,13 @@ TEST_F(RepresentationTest, AddContactsInParallelTest)
 
 	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p)
 	{
-		p.wait();
+		p.get();
 	});
 	ASSERT_EQ(numContacts, rep->getCollisions().unsafeGet()[rep].size());
 }
 
 TEST_F(RepresentationTest, Ignoring)
 {
-	ASSERT_EQ(0, planeRep->getIgnoring().size());
-	ASSERT_EQ(0, sphereRep->getIgnoring().size());
-
 	EXPECT_TRUE(planeRep->ignore("Test"));
 	EXPECT_FALSE(planeRep->ignore("Test"));
 	EXPECT_TRUE(planeRep->ignore(sphereRep));
@@ -200,24 +209,39 @@ TEST_F(RepresentationTest, Ignoring)
 	EXPECT_TRUE(planeRep->isIgnoring("Element/SphereShape"));
 	EXPECT_FALSE(planeRep->isIgnoring("Invalid"));
 
-	auto ignoring = planeRep->getIgnoring();
-	ASSERT_EQ(2, ignoring.size());
-	EXPECT_NE(ignoring.end(), std::find(ignoring.begin(), ignoring.end(), "Test"));
-	EXPECT_NE(ignoring.end(), std::find(ignoring.begin(), ignoring.end(), "Element/SphereShape"));
-
 	std::vector<std::string> newExclusions;
 	newExclusions.push_back("Test");
 	newExclusions.push_back("Element/PlaneShape");
 	sphereRep->setIgnoring(newExclusions);
-
 	EXPECT_TRUE(sphereRep->isIgnoring("Test"));
 	EXPECT_TRUE(sphereRep->isIgnoring("Element/PlaneShape"));
 	EXPECT_FALSE(sphereRep->isIgnoring("Invalid"));
 
-	ignoring = sphereRep->getIgnoring();
-	ASSERT_EQ(2, ignoring.size());
-	EXPECT_NE(ignoring.end(), std::find(ignoring.begin(), ignoring.end(), "Test"));
-	EXPECT_NE(ignoring.end(), std::find(ignoring.begin(), ignoring.end(), "Element/PlaneShape"));
+	std::vector<std::string> allowing;
+	allowing.push_back("Invalid");
+	sphereRep->setAllowing(allowing);
+	EXPECT_TRUE(sphereRep->isIgnoring("Test"));
+	EXPECT_TRUE(sphereRep->isIgnoring("Element/PlaneShape"));
+	EXPECT_FALSE(sphereRep->isIgnoring("Invalid"));
+}
+
+TEST_F(RepresentationTest, Allowing)
+{
+	EXPECT_FALSE(sphereRep->isIgnoring("Other"));
+	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
+	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith2"));
+
+	std::vector<std::string> allowing;
+	allowing.push_back("CollideWith1");
+	allowing.push_back("CollideWith2");
+	sphereRep->setAllowing(allowing);
+
+	EXPECT_TRUE(sphereRep->isIgnoring("Other"));
+	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
+	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith2"));
+
+	EXPECT_FALSE(sphereRep->ignore("CollideWith1"));
+	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
 }
 
 TEST_F(RepresentationTest, SerializationTest)
@@ -225,7 +249,10 @@ TEST_F(RepresentationTest, SerializationTest)
 	std::vector<std::string> ignoring;
 	ignoring.push_back("Test");
 	ignoring.push_back("Element/PlaneShape");
-	EXPECT_NO_THROW(sphereRep->setValue("Ignoring", ignoring));
+	EXPECT_NO_THROW(sphereRep->setValue("Ignore", ignoring));
+
+	EXPECT_NO_THROW(sphereRep->setValue("CollisionDetectionType", COLLISION_DETECTION_TYPE_CONTINUOUS));
+	EXPECT_NO_THROW(sphereRep->setValue("SelfCollisionDetectionType", COLLISION_DETECTION_TYPE_DISCRETE));
 
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<Framework::Component>::encode(*sphereRep));
@@ -236,9 +263,14 @@ TEST_F(RepresentationTest, SerializationTest)
 				node.as<std::shared_ptr<Framework::Component>>()));
 
 	ASSERT_NE(nullptr, decodedSphereRep);
-	EXPECT_EQ(2, decodedSphereRep->getIgnoring().size());
 	EXPECT_TRUE(decodedSphereRep->isIgnoring("Test"));
 	EXPECT_TRUE(decodedSphereRep->isIgnoring("Element/PlaneShape"));
+	EXPECT_EQ(COLLISION_DETECTION_TYPE_CONTINUOUS,
+			sphereRep->getValue<CollisionDetectionType>("CollisionDetectionType"));
+	EXPECT_EQ(COLLISION_DETECTION_TYPE_CONTINUOUS, sphereRep->getCollisionDetectionType());
+	EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE,
+			sphereRep->getValue<CollisionDetectionType>("SelfCollisionDetectionType"));
+	EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE, sphereRep->getSelfCollisionDetectionType());
 }
 
 }; // namespace Collision

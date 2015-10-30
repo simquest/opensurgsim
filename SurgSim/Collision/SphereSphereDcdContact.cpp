@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,8 +29,35 @@ namespace SurgSim
 namespace Collision
 {
 
-SphereSphereDcdContact::SphereSphereDcdContact()
+std::list<std::shared_ptr<Contact>> SphereSphereDcdContact::calculateContact(
+									 const Math::SphereShape& sphere1,
+									 const Math::RigidTransform3d& sphere1Pose,
+									 const Math::SphereShape& sphere2,
+									 const Math::RigidTransform3d& sphere2Pose) const
 {
+	std::list<std::shared_ptr<Contact>> contacts;
+
+	Vector3d center1 = sphere1Pose.translation();
+	Vector3d center2 = sphere2Pose.translation();
+
+	Vector3d normal = center1 - center2;
+	double dist = normal.norm();
+	double maxDist = sphere1.getRadius() + sphere2.getRadius();
+	if (dist < maxDist)
+	{
+		std::pair<Location, Location> penetrationPoints;
+		normal.normalize();
+		penetrationPoints.first.rigidLocalPosition.setValue(
+			(sphere1Pose.linear().inverse() * -normal) * sphere1.getRadius());
+		penetrationPoints.second.rigidLocalPosition.setValue(
+			(sphere2Pose.linear().inverse() * normal) * sphere2.getRadius());
+
+		contacts.emplace_back(std::make_shared<Contact>(
+								  COLLISION_DETECTION_TYPE_DISCRETE, maxDist - dist, 1.0,
+								  Vector3d::Zero(), normal, penetrationPoints));
+	}
+
+	return contacts;
 }
 
 std::pair<int, int> SphereSphereDcdContact::getShapeTypes()
@@ -38,29 +65,6 @@ std::pair<int, int> SphereSphereDcdContact::getShapeTypes()
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_SPHERE, SurgSim::Math::SHAPE_TYPE_SPHERE);
 }
 
-void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
-{
-	std::shared_ptr<SphereShape> firstSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
-	std::shared_ptr<SphereShape> secondSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
-
-	Vector3d firstCenter = pair->getFirst()->getPose().translation();
-	Vector3d secondCenter = pair->getSecond()->getPose().translation();
-
-	Vector3d normal = firstCenter - secondCenter;
-	double dist = normal.norm();
-	double maxDist = firstSphere->getRadius() + secondSphere->getRadius();
-	if (dist < maxDist)
-	{
-		std::pair<Location, Location> penetrationPoints;
-		normal.normalize();
-		penetrationPoints.first.rigidLocalPosition.setValue(
-			(pair->getFirst()->getPose().linear().inverse() * -normal) * firstSphere->getRadius());
-		penetrationPoints.second.rigidLocalPosition.setValue(
-			(pair->getSecond()->getPose().linear().inverse() * normal) * secondSphere->getRadius());
-
-		pair->addDcdContact(maxDist - dist, normal, penetrationPoints);
-	}
-}
 
 }; // namespace Collision
 }; // namespace SurgSim

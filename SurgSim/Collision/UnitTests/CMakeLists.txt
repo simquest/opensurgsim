@@ -25,13 +25,16 @@ set(UNIT_TEST_SOURCES
 	BoxSphereContactCalculationTests.cpp
 	CapsuleSphereContactCalculationTests.cpp
 	CollisionPairTests.cpp
+	CompoundShapeContactCalculationTests.cpp
 	ContactCalculationTests.cpp
 	ContactCalculationTestsCommon.cpp
 	DefaultContactCalculationTests.cpp
 	OctreeContactCalculationTests.cpp
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp
+	SegmentMeshTriangleMeshContactCalculationTests.cpp
 	SegmentSegmentCcdIntervalCheckTests.cpp
+	SegmentSegmentCcdStaticContactTests.cpp
 	ShapeCollisionRepresentationTest.cpp
 	SphereDoubleSidedPlaneContactCalculationTests.cpp
 	SpherePlaneContactCalculationTests.cpp

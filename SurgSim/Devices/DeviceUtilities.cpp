@@ -68,6 +68,10 @@ std::shared_ptr<DeviceInterface> tryConvertDevice(const YAML::Node& possibleDevi
 							"File " << fileName << " failed to setDevices on a FilteredDevice : " <<
 							std::endl << data["Devices"];
 					}
+					std::vector<std::string> ignoredProperties;
+					ignoredProperties.push_back(NamePropertyName);
+					ignoredProperties.push_back("Devices");
+					device->decode(data, ignoredProperties);
 				}
 				if (device->initialize())
 				{

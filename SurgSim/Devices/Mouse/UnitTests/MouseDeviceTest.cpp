@@ -42,7 +42,7 @@ public:
 };
 
 
-TEST_F(MouseDeviceTest, CreateInitializeAndDestroyDevice)
+TEST_F(MouseDeviceTest, InitializeDevice)
 {
 	std::shared_ptr<MouseDevice> device = std::make_shared<MouseDevice>("TestMouse");
 
@@ -51,15 +51,6 @@ TEST_F(MouseDeviceTest, CreateInitializeAndDestroyDevice)
 
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Mouse device plugged in?";
 	EXPECT_TRUE(device->isInitialized());
-
-	ASSERT_TRUE(device->finalize()) << "Device finalization failed";
-	EXPECT_FALSE(device->isInitialized());
-
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Mouse device plugged in?";
-	EXPECT_TRUE(device->isInitialized());
-
-	ASSERT_TRUE(device->finalize()) << "Device finalization failed";
-	EXPECT_FALSE(device->isInitialized());
 }
 
 TEST_F(MouseDeviceTest, InputConsumer)
@@ -79,8 +70,15 @@ TEST_F(MouseDeviceTest, InputConsumer)
 	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasData("y"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("scrollDeltaX"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("scrollDeltaY"));
+}
 
-	device->finalize();
+TEST_F(MouseDeviceTest, NoTwoMice)
+{
+	std::shared_ptr<MouseDevice> device1 = std::make_shared<MouseDevice>("TestMouse1");
+	std::shared_ptr<MouseDevice> device2 = std::make_shared<MouseDevice>("TestMouse2");
+
+	EXPECT_NO_THROW(device1->initialize());
+	EXPECT_ANY_THROW(device2->initialize());
 }
 
 

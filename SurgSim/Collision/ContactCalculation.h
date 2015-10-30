@@ -17,12 +17,21 @@
 #define SURGSIM_COLLISION_CONTACTCALCULATION_H
 
 #include <memory>
+#include <mutex>
 
 #include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Math/RigidTransform.h"
 
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
+
+namespace Math
+{
+class Shape;
+}
+
 namespace Collision
 {
 
@@ -44,15 +53,60 @@ public:
 	/// \param	pair	A CollisionPair that is under consideration, new contacts will be added to this pair
 	void calculateContact(std::shared_ptr<CollisionPair> pair);
 
+	/// Calculate the contacts between two shapes
+	/// \param shape1, shape2 The shapes for which to calculate the contacts
+	/// \param pose1, pose2 The respective poses for the shapes
+	/// \return a list of contacts between the two given shapes
+	std::list<std::shared_ptr<Contact>> calculateContact(
+										 const std::shared_ptr<Math::Shape>& shape1,
+										 const Math::RigidTransform3d& pose1,
+										 const std::shared_ptr<Math::Shape>& shape2,
+										 const Math::RigidTransform3d& pose2);
+
 	/// Virtual function that returns the shapes that this ContactCalculation class handles.
 	/// \return Return the shape types this class handles.
-	virtual std::pair<int,int> getShapeTypes() = 0;
+	virtual std::pair<int, int> getShapeTypes() = 0;
 
+	/// Register an instance of a contact calculation in the table
+	/// \param calculation The calculation to be registered
+	static void registerContactCalculation(const std::shared_ptr<ContactCalculation>& calculation);
+
+	typedef
+	std::array<std::array<std::shared_ptr<ContactCalculation>, Math::SHAPE_TYPE_COUNT>, Math::SHAPE_TYPE_COUNT>
+	TableType;
+
+	static const TableType& getContactTable();
 private:
 
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param	pair	The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) = 0;
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
+
+	/// Virtual function receives the call from the public interface, usually will type the
+	/// shapes statically to their known types and then execute a specific contact calculation
+	/// between the two shapes
+	/// \param shape1, shape2 The shapes for which to calculate the contacts
+	/// \param pose1, pose2 The respective poses for the shapes
+	/// \return a list of contacts between the two given shapes
+	virtual std::list<std::shared_ptr<Contact>> doCalculateContact(
+				const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
+				const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) = 0;
+
+
+	/// Statically initialize the table, used via call once
+	static void initializeTable();
+
+	///@{
+	/// registration to call at static scope (does not protect the initialization via call_once)
+	/// Mirroring the public functions
+	static void privateRegister(
+		const std::shared_ptr<ContactCalculation>& calculation,
+		const std::pair<int, int>& types);
+	static void privateRegister(const std::shared_ptr<ContactCalculation>& calculation);
+	///@}
+
+	static TableType m_contactCalculations; ///< Static table of contact calculations
+	static std::once_flag m_initializationFlag; ///< Flag used for initialization.
 
 };
 

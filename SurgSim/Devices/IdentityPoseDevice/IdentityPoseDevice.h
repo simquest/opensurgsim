@@ -44,15 +44,21 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Devices::IdentityPoseDevice);
 
-	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer);
+	bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
+
+	bool initialize() override;
+
+	bool isInitialized() const override;
 
 protected:
-	virtual bool initialize();
-
-	virtual bool finalize();
-
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildInputData();
+
+private:
+	bool finalize() override;
+
+	/// true if initialized and not finalized.
+	bool m_initialized;
 };
 
 

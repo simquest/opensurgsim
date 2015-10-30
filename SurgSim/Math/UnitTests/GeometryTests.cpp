@@ -144,6 +144,38 @@ protected:
 };
 
 
+TEST_F(GeometryTest, BaryCentricOfSegment)
+{
+	typedef Eigen::Matrix<SizeType, 2, 1> Vector2;
+
+	Vector2 outputPoint;
+	EXPECT_TRUE(barycentricCoordinates(plainSegment.a, plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(1.0, 0.0).isApprox(outputPoint));
+
+	EXPECT_TRUE(barycentricCoordinates(plainSegment.b, plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(0.0, 1.0).isApprox(outputPoint));
+
+	// Halfway points
+	EXPECT_TRUE(barycentricCoordinates(plainSegment.pointOnLine(0.5), plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(0.5, 0.5).isApprox(outputPoint));
+
+	// Random point
+	EXPECT_TRUE(barycentricCoordinates(plainSegment.pointOnLine(0.327), plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(1.0 - 0.327, 0.327).isApprox(outputPoint));
+
+	// Point not on line
+	VectorType orthogonal =
+		plainSegment.ab.cross(VectorType(plainSegment.ab[0] * 0.5, plainSegment.ab[1] * 0.6, plainSegment.ab[2] * 0.7));
+	VectorType point = plainSegment.pointOnLine(0.486) + orthogonal;
+	EXPECT_TRUE(barycentricCoordinates(point, plainSegment.a, plainSegment.b, &outputPoint));
+	EXPECT_TRUE(Vector2(1.0 - 0.486, 0.486).isApprox(outputPoint));
+
+	// Degenerate
+	EXPECT_FALSE(barycentricCoordinates(degenerateSegment.a, degenerateSegment.a, degenerateSegment.b, &outputPoint));
+	EXPECT_TRUE(boost::math::isnan(outputPoint[0]) && boost::math::isnan(outputPoint[1]));
+}
+
+
 TEST_F(GeometryTest, BaryCentricWithNormal)
 {
 	// Order of Points is v0,v1,v2

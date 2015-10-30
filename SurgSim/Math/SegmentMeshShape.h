@@ -16,10 +16,10 @@
 #ifndef SURGSIM_MATH_SEGMENTMESHSHAPE_H
 #define SURGSIM_MATH_SEGMENTMESHSHAPE_H
 
+#include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/SegmentMesh.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -39,13 +39,17 @@ public:
 	/// Constructor
 	SegmentMeshShape();
 
+	/// Copy constructor
+	/// \param other The SegmentMeshShape to be copied from
+	explicit SegmentMeshShape(const SegmentMeshShape& other);
+
 	/// Constructor
 	/// \param mesh The segment mesh to build the shape from
 	/// \param radius The radius associated to this surface mesh
 	/// \note The default radius is positive EPSILON to be relevant in collision detection calculations.
 	template <class VertexData, class EdgeData>
 	explicit SegmentMeshShape(const DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
-		double radius = Geometry::DistanceEpsilon);
+							  double radius = Geometry::DistanceEpsilon);
 
 	SURGSIM_CLASSNAME(SurgSim::Math::SegmentMeshShape);
 
@@ -63,6 +67,10 @@ public:
 
 	/// \return The object's associated AabbTree
 	std::shared_ptr<const DataStructures::AabbTree> getAabbTree() const;
+
+	bool isTransformable() const override;
+
+	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
 
 protected:
 	bool doUpdate() override;

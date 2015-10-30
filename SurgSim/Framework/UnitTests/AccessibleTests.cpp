@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@
 
 #include "SurgSim/Math/Matrix.h"
 
+
+enum TestEnum : SURGSIM_ENUM_TYPE;
+SURGSIM_SERIALIZABLE_ENUM(TestEnum, (TEST_ENUM_A)(TEST_ENUM_B));
+
 namespace
 {
 
@@ -34,9 +38,10 @@ public:
 		readWrite(100.0),
 		readOnly(100),
 		sharedPtr(std::make_shared<int>(4)),
+		serializableEnum(TEST_ENUM_A),
 		overloadedValue(200.0),
 		virtualProperty(300),
-		privateProperty(100) // Don't forget to keep this last, otherwise there will be a gcc warning
+		privateProperty(100)
 	{
 		setGetter("normal", std::bind(&TestClass::getNormal, this));
 		setSetter("normal", std::bind(&TestClass::setNormal, this, std::bind(SurgSim::Framework::convert<int>,
@@ -52,6 +57,9 @@ public:
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestClass, float, serializableProperty,
 										  getSerializableProperty, setSerializableProperty);
 
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestClass, TestEnum, serializableEnum,
+										  getSerializableEnum, setSerializableEnum);
+
 		SURGSIM_ADD_RO_PROPERTY(TestClass, int, virtualProperty, getVirtualProperty);
 		SURGSIM_ADD_RO_PROPERTY(TestClass, int, overriddenProperty, getReadWrite);
 
@@ -61,10 +69,11 @@ public:
 	double readWrite;
 	int readOnly;
 
-
 	std::shared_ptr<int> sharedPtr;
 
 	float serializableProperty;
+
+	TestEnum serializableEnum;
 
 	double overloadedValue;
 
@@ -120,6 +129,15 @@ public:
 		serializableProperty = val;
 	}
 
+	TestEnum getSerializableEnum() const
+	{
+		return serializableEnum;
+	}
+	void setSerializableEnum(TestEnum val)
+	{
+		serializableEnum = val;
+	}
+
 	void getOverloadedFunction(double* x) const {}
 	double getOverloadedFunction() const
 	{
@@ -170,6 +188,7 @@ public:
 
 };
 }
+
 
 namespace SurgSim
 {
@@ -381,15 +400,23 @@ TEST(AccessibleTests, Serialize)
 {
 	TestClass a;
 	a.serializableProperty = 100;
+	a.serializableEnum = TEST_ENUM_B;
 
 	YAML::Node node = a.encode();
 
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(100, node["serializableProperty"].as<int>());
+	EXPECT_EQ(TEST_ENUM_B, node["serializableEnum"].as<TestEnum>());
+	EXPECT_EQ("TEST_ENUM_B", node["serializableEnum"].as<std::string>());
 
 	node["serializableProperty"] = 50;
+	node["serializableEnum"] = "TEST_ENUM_A";
 	EXPECT_NO_THROW(a.decode(node));
 	EXPECT_EQ(50, a.serializableProperty);
+	EXPECT_EQ(TEST_ENUM_A, a.serializableEnum);
+
+	node["serializableEnum"] = "INVALID_ENUM_STRING";
+	EXPECT_THROW(a.decode(node), SurgSim::Framework::AssertionFailure);
 }
 
 class MultipleValuesClass : public Accessible

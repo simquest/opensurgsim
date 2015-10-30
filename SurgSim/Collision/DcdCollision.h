@@ -21,17 +21,20 @@
 #include "SurgSim/Collision/BoxPlaneDcdContact.h"
 #include "SurgSim/Collision/BoxSphereDcdContact.h"
 #include "SurgSim/Collision/CapsuleSphereDcdContact.h"
+#include "SurgSim/Collision/CompoundShapeDcdContact.h"
 #include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/DefaultContactCalculation.h"
 #include "SurgSim/Collision/OctreeCapsuleDcdContact.h"
 #include "SurgSim/Collision/OctreeDoubleSidedPlaneDcdContact.h"
 #include "SurgSim/Collision/OctreePlaneDcdContact.h"
 #include "SurgSim/Collision/OctreeSphereDcdContact.h"
-#include "SurgSim/Collision/SphereSphereDcdContact.h"
+#include "SurgSim/Collision/SegmentMeshTriangleMeshDcdContact.h"
 #include "SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h"
 #include "SurgSim/Collision/SpherePlaneDcdContact.h"
+#include "SurgSim/Collision/SphereSphereDcdContact.h"
 #include "SurgSim/Collision/TriangleMeshParticlesDcdContact.h"
 #include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
+
 
 #endif // SURGSIM_COLLISION_DCDCOLLISION_H

@@ -28,7 +28,6 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::RigidTransform3d;
-using SurgSim::Math::Vector3d;
 
 
 namespace
@@ -86,7 +85,7 @@ class LeapScaffold::Listener : public Leap::Listener
 public:
 	Listener() :
 		m_scaffold(LeapScaffold::getOrCreateSharedInstance()),
-		m_logger(Framework::Logger::getLogger("Leap"))
+		m_logger(Framework::Logger::getLogger("Devices/Leap"))
 	{
 	}
 
@@ -146,7 +145,7 @@ struct LeapScaffold::StateData
 
 LeapScaffold::LeapScaffold() :
 	m_state(new StateData),
-	m_logger(Framework::Logger::getLogger("Leap"))
+	m_logger(Framework::Logger::getLogger("Devices/Leap"))
 {
 }
 
