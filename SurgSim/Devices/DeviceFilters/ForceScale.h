@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ namespace SurgSim
 {
 namespace Devices
 {
+
+SURGSIM_STATIC_REGISTRATION(ForceScale);
 
 /// An output device filter that scales forces and/or torques.  Any other entries in the DataGroup are passed through.
 /// For convenience, it is also an InputConsumerInterface that does no filtering of the input data.  Thus it can be
