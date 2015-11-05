@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2013-2015, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,11 +29,13 @@ set(LIBS
 set(LEAP_DEVICE_SOURCES
 	LeapDevice.cpp
 	LeapScaffold.cpp
+	LeapUtilities.cpp
 )
 
 set(LEAP_DEVICE_HEADERS
 	LeapDevice.h
 	LeapScaffold.h
+	LeapUtilities.h
 )
 
 set(DEVICE_HEADERS ${DEVICE_HEADERS} Leap/LeapDevice.h PARENT_SCOPE)
