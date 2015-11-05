@@ -99,13 +99,13 @@ public:
 	/// Get the pixel value at (x, y)
 	/// \param x The horizontal image position
 	/// \param y The vertical image position
-	/// \return mutable pixel value as Eigen::Map of size (m_channels x 1)
+	/// \return mutable pixel value as Eigen::Map of size (channels x 1)
 	Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> operator()(size_t x, size_t y);
 
 	/// Get the pixel value at (x, y), constant version
 	/// \param x The horizontal position in the image
 	/// \param y The vertical position in the image
-	/// \return constant pixel value as Eigen::Map of size (m_channels x 1)
+	/// \return constant pixel value as Eigen::Map of size (channels x 1)
 	Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1>> operator()(size_t x, size_t y) const;
 
 	/// 2D Channel Type;

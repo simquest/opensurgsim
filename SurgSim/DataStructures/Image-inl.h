@@ -114,7 +114,7 @@ template<class T>
 Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> Image<T>::operator()(size_t x, size_t y)
 {
 	SURGSIM_ASSERT(x < m_width) << "x is larger than the image width (" << x << " >= " << m_width << ")";
-	SURGSIM_ASSERT(y < m_height) << "x is larger than the image height (" << y << " >= " << m_height << ")";
+	SURGSIM_ASSERT(y < m_height) << "y is larger than the image height (" << y << " >= " << m_height << ")";
 	return Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>>
 		(m_data.get() + m_channels * (x + y * m_width), m_channels);
 }
@@ -123,7 +123,7 @@ template<class T>
 Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1>> Image<T>::operator()(size_t x, size_t y) const
 {
 	SURGSIM_ASSERT(x < m_width) << "x is larger than the image width (" << x << " >= " << m_width << ")";
-	SURGSIM_ASSERT(y < m_height) << "x is larger than the image height (" << y << " >= " << m_height << ")";
+	SURGSIM_ASSERT(y < m_height) << "y is larger than the image height (" << y << " >= " << m_height << ")";
 	return Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1>>
 		(m_data.get() + m_channels * (x + y * m_width), m_channels);
 }
