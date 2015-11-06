@@ -37,11 +37,6 @@ namespace SurgSim
 namespace Collision
 {
 
-namespace
-{
-double epsilon = 1.0e-10;
-}
-
 class MockSegmentCcdSelfContact : public SurgSim::Collision::SegmentCcdSelfContact
 {
 public:
@@ -563,7 +558,6 @@ TEST_F(SegmentCcdSelfContactTests, CalculateContact)
 		EXPECT_EQ(1, collisionList.size());
 		std::shared_ptr<Collision::Contact> contacted = *(collisionList.begin());
 		EXPECT_EQ(CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, contacted->type);
-		EXPECT_DOUBLE_EQ(0.0, contacted->depth);
 		EXPECT_GT(2.0 * m_selfContact.timeMinPrecisionEpsilon(), std::abs(contacted->time - 0.4375));
 		EXPECT_GT(1.0e-08, contacted->contact.norm());
 		EXPECT_GT(1.0e-04, (contacted->normal.normalized() - Vector3d(0.0, 0.0, -1.0)).norm());

@@ -208,7 +208,7 @@ std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateContact(
 				auto contactPoint = 0.5 * (contactP + contactQ);
 				auto depth = ((contactP - contactQ).dot(normal) > 0.0) ? (contactP - contactQ).norm() : 0.0;
 				contacts.emplace_back(std::make_shared<Contact>(
-										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, 0.0, t,
+										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, depth, t,
 										  contactPoint, normal, penetrationPoints));
 			}
 		}
@@ -252,7 +252,6 @@ bool SegmentCcdSelfContact::detectCollision(
 	// than it is to maintain two nearly identical methods as was done previously.
 	//
 	double totalThickness = segmentRadius1 + segmentRadius2;
-	double effectiveThickness = std::max(totalThickness, m_distanceEpsilon);
 	bool collidingAtT0;
 	SegmentSegmentCcdStaticContact staticContact;
 	if (totalThickness <= m_distanceEpsilon)
