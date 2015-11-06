@@ -159,11 +159,11 @@ std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateContact(
 		double s;	// Parametric location of collision on segment q
 		double t;	// Time of collision (if any)
 		Math::Vector3d pToQDir;
-		Math::Vector3d contactPtP;
-		Math::Vector3d contactPtQ;
+		Math::Vector3d segmentPContact;
+		Math::Vector3d segmentQContact;
 		if (detectCollision(pt0Positions, pt1Positions, qt0Positions, qt1Positions,
 							segmentRadius1, segmentRadius2, timePrecision,
-							&r, &s, &t, &pToQDir, &contactPtP, &contactPtQ))
+							&r, &s, &t, &pToQDir, &segmentPContact, &segmentQContact))
 		{
 			// The segments collide within tolerance, but if the collision is really close to an endpoint
 			// then move it to the start of the segment to aid in removing duplicates.
@@ -182,8 +182,7 @@ std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateContact(
 								   COLLISION_DETECTION_TYPE_CONTINUOUS,
 								   id2,  s, id1, r, timePrecision))
 			{
-				// Penetration is to depth 0 ... so not really a penetration. Still it is probably useful
-				// to encode the segment specific intersection points for later recall. Here we encode each
+				// Encode the segment specific intersection points for later recall. Here we encode each
 				// side of the contact point specific to each segment.
 				std::pair<Location, Location> penetrationPoints;
 				Math::Vector2d parametricCoordinateP(r, 1.0 - r);
@@ -193,9 +192,9 @@ std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateContact(
 				penetrationPoints.second.elementMeshLocalCoordinate.setValue(
 					DataStructures::IndexedLocalCoordinate(id2, parametricCoordinateQ));
 				penetrationPoints.first.rigidLocalPosition.setValue(
-					segmentPose1.inverse() * contactPtP);
+					segmentPose1.inverse() * segmentPContact);
 				penetrationPoints.second.rigidLocalPosition.setValue(
-					segmentPose2.inverse() * contactPtQ);
+					segmentPose2.inverse() * segmentQContact);
 
 				// Calculate the normal and the contact point. The contact point is a point along the normal
 				// connecting the segments. If we are using the segment thickness, the point should be located
@@ -204,9 +203,10 @@ std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateContact(
 				double effectiveRadiusP = m_useSegmentThickness ? segmentRadius1 : m_distanceEpsilon / 2.0;
 				double effectiveRadiusQ = m_useSegmentThickness ? segmentRadius2 : m_distanceEpsilon / 2.0;
 				auto normal = pToQDir.normalized();
-				auto contactP = contactPtP + (effectiveRadiusP * normal);
-				auto contactQ = contactPtQ - (effectiveRadiusQ * normal);
+				auto contactP = segmentPContact + (effectiveRadiusP * normal);
+				auto contactQ = segmentQContact - (effectiveRadiusQ * normal);
 				auto contactPoint = 0.5 * (contactP + contactQ);
+				auto depth = ((contactP - contactQ).dot(normal) > 0.0) ? (contactP - contactQ).norm() : 0.0;
 				contacts.emplace_back(std::make_shared<Contact>(
 										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, 0.0, t,
 										  contactPoint, normal, penetrationPoints));
@@ -214,8 +214,8 @@ std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateContact(
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) <<
-									   "AABB tree detected false positive between segments " << id1 << " and " << id2;
+			SURGSIM_LOG_DEBUG(m_logger) <<
+										"AABB tree detected false positive between segments " << id1 << " and " << id2;
 		}
 	}
 	return contacts;
@@ -337,28 +337,11 @@ void SegmentCcdSelfContact::getUniqueCandidates(
 				}
 
 				// Segment pair has already been added
-				bool duplicated = false;
-				for (const auto& id : *segmentIdList)
+				auto  testValue = (idA < idB) ? std::pair<size_t, size_t>(idA, idB) :
+								  std::pair<size_t, size_t>(idB, idA);
+				if (std::find(segmentIdList->begin(), segmentIdList->end(), testValue) == segmentIdList->end())
 				{
-					if (((idA == id.first) && (idB == id.second)) ||
-						((idA == id.second) && (idB == id.first)))
-					{
-						duplicated = true;
-						continue;
-					}
-				}
-
-				// No duplicates? Then add them smallest to largest
-				if (!duplicated)
-				{
-					if (idA > idB)
-					{
-						segmentIdList->push_back(std::pair<size_t, size_t>(idB, idA));
-					}
-					else
-					{
-						segmentIdList->push_back(std::pair<size_t, size_t>(idA, idB));
-					}
+					segmentIdList->emplace_back(testValue);
 				}
 			}
 		}
@@ -366,12 +349,12 @@ void SegmentCcdSelfContact::getUniqueCandidates(
 }
 
 bool SegmentCcdSelfContact::preFilterCollision(
-	const Math::SegmentMeshShape& segmentA,
-	const Math::SegmentMeshShape& segmentB,
+	const Math::SegmentMeshShape& segmentT0,
+	const Math::SegmentMeshShape& segmentT1,
 	size_t id1, size_t id2) const
 {
-	auto& verticesA = segmentA.getEdge(id1).verticesId;
-	auto& verticesB = segmentB.getEdge(id2).verticesId;
+	auto& verticesA = segmentT0.getEdge(id1).verticesId;
+	auto& verticesB = segmentT1.getEdge(id2).verticesId;
 	if ((verticesA[0] == verticesB[0]) ||
 		(verticesA[0] == verticesB[1]) ||
 		(verticesA[1] == verticesB[0]) ||
@@ -383,10 +366,10 @@ bool SegmentCcdSelfContact::preFilterCollision(
 		return true;
 	}
 
-	std::array<Math::Vector3d, 2> pt0Positions = segmentA.getEdgePositions(id1);
-	std::array<Math::Vector3d, 2> pt1Positions = segmentB.getEdgePositions(id1);
-	std::array<Math::Vector3d, 2> qt0Positions = segmentA.getEdgePositions(id2);
-	std::array<Math::Vector3d, 2> qt1Positions = segmentB.getEdgePositions(id2);
+	std::array<Math::Vector3d, 2> pt0Positions = segmentT0.getEdgePositions(id1);
+	std::array<Math::Vector3d, 2> pt1Positions = segmentT1.getEdgePositions(id1);
+	std::array<Math::Vector3d, 2> qt0Positions = segmentT0.getEdgePositions(id2);
+	std::array<Math::Vector3d, 2> qt1Positions = segmentT1.getEdgePositions(id2);
 
 	auto p1t0 = pt0Positions[0];
 	auto p2t0 = pt0Positions[1];
@@ -422,7 +405,7 @@ bool SegmentCcdSelfContact::detectExcessMovement(const Math::Vector3d& pt0,
 
 bool SegmentCcdSelfContact::findSegSegContact(const Math::SegmentMeshShape& segmentShape,
 		const std::list<std::shared_ptr<Contact>>& contacts,
-		double toi, Collision::CollisionDetectionType collisionType, size_t segId1, double s1,
+		double t, Collision::CollisionDetectionType collisionType, size_t segId1, double s1,
 		size_t segId2, double s2, double timeEpsilon) const
 {
 	for (const auto& contact : contacts)
@@ -436,7 +419,7 @@ bool SegmentCcdSelfContact::findSegSegContact(const Math::SegmentMeshShape& segm
 		// removed as it did not appear to be used (all find segment calls set that
 		// variable to -1) and because it is not available here.
 		if (contact->type == collisionType &&
-			std::abs(contact->time - toi) < timeEpsilon)
+			std::abs(contact->time - t) < timeEpsilon)
 		{
 			// Check that it is the same contact point on both segments
 			if (isSameSegContactPoint(segmentShape, segId1, s1, existingSegId1, existingS1))
@@ -527,9 +510,10 @@ double SegmentCcdSelfContact::maxTimePrecision(
 
 	if (timePrecision < m_timeMinPrecisionEpsilon)
 	{
-		SURGSIM_LOG_WARNING(m_logger) <<
-									  "Minimum time precision(" << m_timeMinPrecisionEpsilon << ") needs to be smaller(" << timePrecision <<
-									  ") to guarantee no missed self - collisions!";
+		SURGSIM_LOG_ONCE(m_logger, WARNING) <<
+											"Minimum time precision(" << m_timeMinPrecisionEpsilon <<
+											") needs to be smaller(" << timePrecision <<
+											") to guarantee no missed self - collisions!";
 		timePrecision = m_timeMinPrecisionEpsilon;
 	}
 	timePrecision = std::min(timePrecision, m_timeMaxPrecisionEpsilon);

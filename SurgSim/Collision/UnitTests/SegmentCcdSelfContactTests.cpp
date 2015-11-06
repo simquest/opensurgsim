@@ -573,6 +573,7 @@ TEST_F(SegmentCcdSelfContactTests, CalculateContact)
 		auto contactQ = contacted->penetrationPoints.second.rigidLocalPosition.getValue();
 		EXPECT_TRUE((contactQ.isApprox(transformQ.inverse() *
 									   (contacted->contact + Vector3d(0.0, 0.0, -0.0001)), 1.0e-06)));
+		EXPECT_GT(1.0e-10, contacted->depth);
 	}
 };
 

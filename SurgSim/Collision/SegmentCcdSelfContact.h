@@ -16,8 +16,6 @@
 #ifndef SURGSIM_COLLISION_SEGMENTCCDSELFCONTACT_H
 #define SURGSIM_COLLISION_SEGMENTCCDSELFCONTACT_H
 
-//#include <memory>
-
 #include "SurgSim/Collision/ShapeShapeContactCalculation.h"
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/Framework/Logger.h"
@@ -133,7 +131,7 @@ protected:
 	/// \param segmentB the segment mesh at time t=1.
 	/// \param segment1SegID the specific identifier of the candidate segment at time t=0.
 	/// \param segment2SegID the specific identifier of the candidate segment at time t=1.
-	/// \return true if this collision should be discarded, false i it should be processed further.
+	/// \return true if this collision should be discarded, false if it should be processed further.
 	bool preFilterCollision(
 		const Math::SegmentMeshShape& segmentA,
 		const Math::SegmentMeshShape& segmentB,
@@ -144,7 +142,7 @@ protected:
 	/// \param pt0 vertex coordinates at time t0
 	/// \param pt1 vertex coordinates at time t1
 	/// \param threshold distance threshold
-	/// \return true if every coordinate of the point has moved less than the threshold
+	/// \return true if any point has exceeded the movement threshold
 	bool detectExcessMovement(const SurgSim::Math::Vector3d& pt0,
 							  const SurgSim::Math::Vector3d& pt1,
 							  double threshold) const;
@@ -152,7 +150,7 @@ protected:
 	/// Search the list of contacts for a match to the current contact.
 	/// \param segmentShape shape to be interrogated to see if the contacts match
 	/// \param contacts the current list of detected contacts
-	/// \param toi time of the contact under consideration.
+	/// \param t time of the contact under consideration.
 	/// \param collisionType type of contact under consideration.
 	/// \param segId1 segment 1 identifier.
 	/// \param s1 parametric location of the contact point along segment 1.
@@ -162,7 +160,7 @@ protected:
 	/// \return true if the contacts match, return false otherwise.
 	bool findSegSegContact(const Math::SegmentMeshShape& segmentShape,
 						   const std::list<std::shared_ptr<Contact>>& contacts,
-						   double toi, Collision::CollisionDetectionType collisionType,
+						   double t, Collision::CollisionDetectionType collisionType,
 						   size_t segId1, double s1, size_t segId2, double s2, double timeEpsilon) const;
 
 	/// Check for the same location among two parametric location specifications.
