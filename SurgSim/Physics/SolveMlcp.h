@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/MlcpGaussSeidelSolver.h"
 #include "SurgSim/Physics/Computation.h"
 
@@ -33,6 +34,8 @@ public:
 	/// Constructor
 	/// \param doCopyState Specify if the ouput state is a copy or not of the input state in Computation::Update()
 	explicit SolveMlcp(bool doCopyState = false);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::SolveMlcp);
 
 	/// Destructor
 	virtual ~SolveMlcp();

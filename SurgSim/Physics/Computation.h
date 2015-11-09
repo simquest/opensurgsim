@@ -54,6 +54,11 @@ public:
 	/// \return	true if copying the state, false if not.
 	bool isCopyingState();
 
+	/// The class name for this class
+	/// \note Use the SURGSIM_CLASSNAME macro in derived classes.
+	/// \return The fully namespace qualified name of this class.
+	virtual std::string getClassName() const = 0;
+
 protected:
 
 	/// Override this function to implement the computations specific behavior
