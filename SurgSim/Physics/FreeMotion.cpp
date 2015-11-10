@@ -52,13 +52,13 @@ std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(const double& dt,
 	auto& representations = result->getActiveRepresentations();
 	for (auto& representation : representations)
 	{
-		tasks.push_back(threadPool->enqueue<void>([&]() { representation->update(dt); }));
+		tasks.push_back(threadPool->enqueue<void>([dt, &representation]() { representation->update(dt); }));
 	}
 
 	auto& particleRepresentations = result->getActiveParticleRepresentations();
 	for (auto& representation : particleRepresentations)
 	{
-		tasks.push_back(threadPool->enqueue<void>([&](){ representation->update(dt); }));
+		tasks.push_back(threadPool->enqueue<void>([dt, &representation]() { representation->update(dt); }));
 	}
 
 	for (auto& task : tasks)
