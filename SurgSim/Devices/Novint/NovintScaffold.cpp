@@ -964,7 +964,7 @@ void NovintScaffold::setInputData(DeviceData* info)
 {
 	DataGroup& inputData = info->deviceObject->getInputData();
 	inputData.poses().set(DataStructures::Names::POSE, info->scaledPose);
-	inputData.scalars().set("toolDof", info->toolDof);
+	inputData.scalars().set(DataStructures::Names::TOOLDOF, info->toolDof);
 	inputData.booleans().set(DataStructures::Names::BUTTON_1, info->buttonStates[0]);
 	inputData.booleans().set(DataStructures::Names::BUTTON_2, info->buttonStates[1]);
 	inputData.booleans().set(DataStructures::Names::BUTTON_3, info->buttonStates[2]);
@@ -1200,7 +1200,7 @@ DataGroup NovintScaffold::buildDeviceInputData()
 {
 	DataStructures::DataGroupBuilder builder;
 	builder.addPose(DataStructures::Names::POSE);
-	builder.addScalar("toolDof");
+	builder.addScalar(DataStructures::Names::TOOLDOF);
 	builder.addBoolean(DataStructures::Names::BUTTON_1);
 	builder.addBoolean(DataStructures::Names::BUTTON_2);
 	builder.addBoolean(DataStructures::Names::BUTTON_3);
