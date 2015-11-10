@@ -750,7 +750,7 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
 
-		info->toolDof = angles[3];
+		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof);
 
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
 		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
