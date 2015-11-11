@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -579,7 +579,7 @@ struct Fem3DVSTruthCubeRenderTests : public RenderTests
 	std::array<Vector3d, 8> cubeCorners;
 };
 
-TEST_F(Fem3DVSTruthCubeRenderTests, DISABLED_rawDataTest)
+TEST_F(Fem3DVSTruthCubeRenderTests, rawDataTest)
 {
 	// Load the truth cube data
 	std::shared_ptr<TruthCubeData> truthCubeData = std::make_shared<TruthCubeData>();
@@ -613,7 +613,7 @@ TEST_F(Fem3DVSTruthCubeRenderTests, DISABLED_rawDataTest)
 }
 
 /// Simulate truth cube with 5% strain (4mm of displacement).
-TEST_F(Fem3DVSTruthCubeRenderTests, DISABLED_Test5percentsStrain)
+TEST_F(Fem3DVSTruthCubeRenderTests, Test5percentsStrain)
 {
 	/// Displacement of the top layer for this setup
 	double displacement = -0.004;
@@ -645,7 +645,7 @@ TEST_F(Fem3DVSTruthCubeRenderTests, DISABLED_Test5percentsStrain)
 }
 
 /// Simulate truth cube with 12.5% strain (10mm of displacement).
-TEST_F(Fem3DVSTruthCubeRenderTests, DISABLED_Test12percentsAndHalfStrain)
+TEST_F(Fem3DVSTruthCubeRenderTests, Test12percentsAndHalfStrain)
 {
 	/// Displacement of the top layer for this setup
 	double displacement = -0.010;
@@ -677,7 +677,7 @@ TEST_F(Fem3DVSTruthCubeRenderTests, DISABLED_Test12percentsAndHalfStrain)
 }
 
 /// Simulate truth cube with 18.25% strain (14.6mm of displacement).
-TEST_F(Fem3DVSTruthCubeRenderTests, DISABLED_Test18percentsAndQuarterStrain)
+TEST_F(Fem3DVSTruthCubeRenderTests, Test18percentsAndQuarterStrain)
 {
 	/// Displacement of the top layer for this setup
 	double displacement = -0.0146;
