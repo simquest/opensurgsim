@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -436,7 +436,7 @@ SurgSim::Math::Vector staticSolver(std::shared_ptr<TruthCubeRepresentation> trut
 	buildConstrainedSystem(truthCubeRepresentation, &A, &B);
 
 	// Solve the constrained system A.X = B
-	SurgSim::Math::Vector X = A.inverse() * B;
+	SurgSim::Math::Vector X = A.partialPivLu().solve(B);
 
 	// Extract the dof displacement vector from the solution X
 	return X.segment(0, numDof);
