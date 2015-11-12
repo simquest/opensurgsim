@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@
 #include "SurgSim/DataStructures/Image.h"
 #include "SurgSim/Math/Matrix.h"
 
+
 namespace
 {
 double epsilon = 1e-10;
 }
-
 
 namespace SurgSim
 {
@@ -175,6 +175,47 @@ TYPED_TEST(ImageTests, PointerAccess)
 	for (int i = 0; i < 9; i++)
 	{
 		EXPECT_NEAR(array[i], image.getData()[i], epsilon);
+	}
+}
+
+TYPED_TEST(ImageTests, PixelAccess)
+{
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+
+	{
+		Image<T> image(20, 30, 3);
+		EXPECT_THROW(image(20, 10), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(image(10, 40), SurgSim::Framework::AssertionFailure);
+		EXPECT_NO_THROW(image(1, 20));
+		EXPECT_NO_THROW(image(10, 29));
+	}
+	{
+		Image<T> image(300, 300, 3);
+		image.setChannel(0, Matrix::Constant(300, 300, T(0)));
+		image.setChannel(1, Matrix::Constant(300, 300, T(1)));
+		image.setChannel(2, Matrix::Constant(300, 300, T(2)));
+
+		Eigen::Matrix<T, 3, 1> pixelValue(T(0), T(1), T(2));
+		EXPECT_TRUE(pixelValue.isApprox(image(1, 2)));
+		EXPECT_TRUE(pixelValue.isApprox(image(100, 50)));
+		EXPECT_TRUE(pixelValue.isApprox(image(50, 200)));
+	}
+	{
+		T array[] = {0, 1, 2, 3, 4, 5, 6, 7};
+		Image<T> image(2, 2, 2, array);
+		typedef Eigen::Matrix<T, 2, 1> PixelType;
+		EXPECT_TRUE(PixelType(T(0), T(1)).isApprox(image(0, 0)));
+		EXPECT_TRUE(PixelType(T(2), T(3)).isApprox(image(1, 0)));
+		EXPECT_TRUE(PixelType(T(4), T(5)).isApprox(image(0, 1)));
+		EXPECT_TRUE(PixelType(T(6), T(7)).isApprox(image(1, 1)));
+	}
+	{
+		Image<T> image(10, 10, 2);
+		image.getAsVector().setConstant(T(0));
+		Eigen::Matrix<T, 2, 1> pixelValue(T(10), T(20));
+		image(5, 5) = pixelValue;
+		EXPECT_TRUE(pixelValue.isApprox(image(5, 5)));
 	}
 }
 
