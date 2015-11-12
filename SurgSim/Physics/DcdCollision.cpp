@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <future>
 #include <vector>
 
 #include "SurgSim/Collision/CollisionPair.h"
@@ -20,7 +21,6 @@
 #include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
@@ -46,7 +46,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
-	auto threadPool = Framework::Runtime::getThreadPool();
 	std::vector<std::future<void>> tasks;
 
 	const auto& calculations = ContactCalculation::getContactTable();
@@ -57,7 +56,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	{
 		if (pair->getType() == Collision::COLLISION_DETECTION_TYPE_DISCRETE)
 		{
-			tasks.push_back(threadPool->enqueue<void>([&]()
+			tasks.push_back(std::async(std::launch::async, [&]()
 			{
 				calculations[pair->getFirst()->getShapeType()]
 				[pair->getSecond()->getShapeType()]->calculateContact(pair);

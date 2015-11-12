@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ int main(int argc, char** argv)
 	//Disable logging during tests
 	std::shared_ptr<SurgSim::Framework::LoggerManager> loggerManager;
 	loggerManager = SurgSim::Framework::Logger::getLoggerManager();
-	loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
+	//loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
+	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();
 }

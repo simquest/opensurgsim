@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
 // limitations under the License.
 
 
+#include <future>
 #include <memory>
 #include <vector>
 
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Physics/FreeMotion.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/Representation.h"
@@ -46,19 +46,18 @@ std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(const double& dt,
 	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
 
-	auto threadPool = Framework::Runtime::getThreadPool();
 	std::vector<std::future<void>> tasks;
 
 	auto& representations = result->getActiveRepresentations();
 	for (auto& representation : representations)
 	{
-		tasks.push_back(threadPool->enqueue<void>([&]() { representation->update(dt); }));
+		tasks.push_back(std::async(std::launch::async, [&]() { representation->update(dt); }));
 	}
 
 	auto& particleRepresentations = result->getActiveParticleRepresentations();
 	for (auto& representation : particleRepresentations)
 	{
-		tasks.push_back(threadPool->enqueue<void>([&](){ representation->update(dt); }));
+		tasks.push_back(std::async(std::launch::async, [&]() { representation->update(dt); }));
 	}
 
 	for (auto& task : tasks)
