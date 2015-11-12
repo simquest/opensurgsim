@@ -323,9 +323,9 @@ void LeapScaffold::updateImageData()
 		typedef DataStructures::DataGroup::ImageType ImageType;
 		ImageType leftImage(images[0].width(), images[0].height(), 1, images[0].data());
 		ImageType rightImage(images[1].width(), images[1].height(), 1, images[1].data());
-		ImageType leftDistortion(images[0].distortionWidth()/2, images[0].distortionHeight(), 2,
+		ImageType leftDistortion(images[0].distortionWidth() / 2, images[0].distortionHeight(), 2,
 				images[0].distortion());
-		ImageType rightDistortion(images[1].distortionWidth()/2, images[1].distortionHeight(), 2,
+		ImageType rightDistortion(images[1].distortionWidth() / 2, images[1].distortionHeight(), 2,
 				images[1].distortion());
 
 		// scale values to 0..1

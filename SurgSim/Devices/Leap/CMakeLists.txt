@@ -38,7 +38,7 @@ set(LEAP_DEVICE_HEADERS
 	LeapUtilities.h
 )
 
-set(DEVICE_HEADERS ${DEVICE_HEADERS} Leap/LeapDevice.h PARENT_SCOPE)
+set(DEVICE_HEADERS ${DEVICE_HEADERS} Leap/LeapDevice.h Leap/LeapUtilities.h PARENT_SCOPE)
 
 surgsim_add_library(
    LeapDevice

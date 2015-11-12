@@ -33,6 +33,9 @@ DataStructures::DataGroup::ImageType undistortLeapImage(const DataStructures::Da
 	Eigen::Vector2f postMultiply;
 	Eigen::Array2f position;
 
+	// Undistort the images using the Leap distortion map.
+	// See Image::distortion() documentation for reference implementation:
+	//   https://developer.leapmotion.com/documentation/cpp/api/Leap.Image.html
 	for (size_t i = 0; i < result.getWidth(); i++)
 	{
 		for (size_t j = 0; j < result.getHeight(); j++)
@@ -40,8 +43,8 @@ DataStructures::DataGroup::ImageType undistortLeapImage(const DataStructures::Da
 			distortionPosition << 63 * i / size[0], 62 * (1 - j / size[1]);
 			corner = distortionPosition.template cast<int>();
 
-			//Bilinear interpolation
-			weights = distortionPosition - distortionPosition.floor();
+			// Bilinear interpolation
+			weights = distortionPosition - distortionPosition.unaryExpr(std::ptr_fun<float, float>(std::floor));
 			preMultiply << 1 - weights[0], weights[0];
 			postMultiply << 1 - weights[1], weights[1];
 			position << preMultiply * distortion.getChannel(0).block<2, 2>(corner[0], corner[1]) * postMultiply,
