@@ -755,8 +755,16 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
-
-		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof);
+		
+		/* HW-Nov-12-2015
+		   Testing on Nov 10, 2015 shows that 
+		   hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof);
+		   gives the correct reading for the 7th Dof value.
+		   However, it didn't give correct value in follow up tests.
+		   'angles[3]' has the value for the 7th Dof now (but it didn't on Nov 10's test).
+		   hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof); should be kept in mind.
+		*/
+		info->toolDof = angles[3]; // Get the reading for 7th Dof, the open/close angle of the tool.
 
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
 		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
