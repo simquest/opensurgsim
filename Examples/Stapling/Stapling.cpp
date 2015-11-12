@@ -354,7 +354,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
 	std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-	physicsManager->setRate(100.0);
+	physicsManager->setRate(500.0);
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
@@ -433,6 +433,10 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(stapler);
 	scene->addSceneElement(wound);
 	scene->addSceneElement(keyboard);
+
+	auto loggerManager = SurgSim::Framework::Logger::getLoggerManager();
+	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_SEVERE);
+	SurgSim::Framework::Logger::getLogger("Physics Manager")->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
 
 	runtime->execute();
 	return 0;

@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 	std::shared_ptr<SurgSim::Framework::LoggerManager> loggerManager;
 	loggerManager = SurgSim::Framework::Logger::getLoggerManager();
 	//loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
-	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 	testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();
 }

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#include <future>
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/PlyReader.h"
@@ -450,9 +452,25 @@ void FemRepresentation::updateFMDK(const SurgSim::Math::OdeState& state, int opt
 {
 	// This function updates the matrices needed to calculate F, M, D, K for each element.
 	// Note that the relevant matrices are updated only for non-linear elements.
-	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
+	std::vector<std::future<void>> tasks;
+	size_t numJobs = 4;
+	size_t numElements = m_femElements.size();
+	size_t jobSize = numElements / numJobs;
+	for (int job = 0; job <= numJobs; job++)
 	{
-		(*femElement)->updateFMDK(state, options);
+		tasks.push_back(std::async(std::launch::async, [=, &state]() 
+						{ 
+							for (int i = job*jobSize; i < numElements && i < (job+1)*jobSize; i++)
+							{
+								m_femElements[i]->updateFMDK(state, options);
+							}
+						}));
+
+	}
+
+	for (auto& task : tasks)
+	{
+		task.get();
 	}
 
 	OdeEquation::updateFMDK(state, options);
