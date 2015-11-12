@@ -141,7 +141,7 @@ public:
 
 		if (checkForFatalError("Failed to initialize"))
 		{
-			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) << std::endl <<
+			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) <<
 				(initBySerialNumber ? "HDAL serial number: '" : "device name: '") << info << "'";
 		}
 		else if (deviceHandle == HDL_INVALID_HANDLE)
@@ -426,9 +426,15 @@ NovintScaffold::NovintScaffold() :
 	m_state->timer.setMaxNumberOfFrames(5000);
 
 	// The canonical HDAL approach (Programmer's Guide, section 4.7 Multiple devices) is:
-	// 1) hdlInitX on all devices that will be used by this application,
+	// 1) hdlInitXXXX on all devices that will be used by this application,
 	// 2) hdlStart (must be after all hdlInitX and before hdlCreateServoOp), then
 	// 3) hdlCreateServoOp (starts the callback).
+	// Note: 1. If no device is initialized (i.e. hdlInitXXX returned an invalid handle), 
+	//          don't call hdlStart() or it will crash.
+	//       2. In order to use Novint 7Dof device, device MUST BE initialized by name (NOT by serial number).
+	//          Novint 3Dof device could be used/initialzed either by name or serial number.
+	//       3. If a Novint device is in 'cut-out' state (happened with E3 binary/serial number), 
+	//          HDAL library will crash.
 
 	// Load the list of Novint devices (devices.yaml) user wants to use.
 	m_state->nameToSerial = getNameMap();
