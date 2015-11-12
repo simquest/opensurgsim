@@ -1,5 +1,5 @@
-// This filrgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ namespace SurgSim
 {
 namespace Devices
 {
+
+SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::ForceScale, ForceScale);
 
 ForceScale::ForceScale(const std::string& name) :
 	DeviceFilter(name),
