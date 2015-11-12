@@ -283,27 +283,27 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSegmentSegmentCoplanarCase)
 						qFlip, qFlip,
 						0.503, 1.0, 1.0e-10,
 						1.0e-09, 1.0e-09, &t, &r, &s, 0));
-		EXPECT_GE(1.0e-06, std::abs(0.504504 - t));
-		EXPECT_GT(1.0e-03, 1.0 - r);
-		EXPECT_GT(1.0e-03, 1.0 - s);
+		EXPECT_GE(2.0e-06, std::abs(0.504504 - t));
+		EXPECT_GT(2.0e-03, 1.0 - r);
+		EXPECT_GT(2.0e-03, 1.0 - s);
 
 		EXPECT_TRUE(movingTest.collideSegmentSegmentCoplanarCase(
 						pFlipStart, pFlipEnd,
 						qFlip, qFlip,
 						0.0, 1.0, 1.0e-10,
 						1.0e-09, 1.0e-09, &t, &r, &s, 0));
-		EXPECT_GE(1.0e-06, std::abs(0.504504 - t));
-		EXPECT_GT(1.0e-03, 1.0 - r);
-		EXPECT_GT(1.0e-03, 1.0 - s);
+		EXPECT_GE(2.0e-06, std::abs(0.504504 - t));
+		EXPECT_GT(2.0e-03, 1.0 - r);
+		EXPECT_GT(2.0e-03, 1.0 - s);
 
 		EXPECT_TRUE(movingTest.collideSegmentSegmentCoplanarCase(
 						pFlipStart, pFlipEnd,
 						qFlip, qFlip,
 						0.0, 0.505, 1.0e-10,
 						1.0e-09, 1.0e-09, &t, &r, &s, 0));
-		EXPECT_GE(1.0e-06, std::abs(0.504504 - t));
-		EXPECT_GT(1.0e-03, 1.0 - r);
-		EXPECT_GT(1.0e-03, 1.0 - s);
+		EXPECT_GE(2.0e-06, std::abs(0.504504 - t));
+		EXPECT_GT(2.0e-03, 1.0 - r);
+		EXPECT_GT(2.0e-03, 1.0 - s);
 	}
 	{
 		SCOPED_TRACE("Test the no flip combinations.");
