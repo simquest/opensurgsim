@@ -401,7 +401,6 @@ NovintScaffold::NovintScaffold() : m_state(new StateData)
 		// Drain the HDAL error stack
 		while (hdlGetError() != HDL_NO_ERROR)
 		{
-			;
 		}
 	}
 	m_state->timer.setMaxNumberOfFrames(5000);
@@ -410,11 +409,11 @@ NovintScaffold::NovintScaffold() : m_state(new StateData)
 	// 1) hdlInitXXXX on all devices that will be used by this application,
 	// 2) hdlStart (must be after all hdlInitX and before hdlCreateServoOp), then
 	// 3) hdlCreateServoOp (starts the callback).
-	// Note: 1. If no device is initialized (i.e. hdlInitXXX returned an invalid handle), 
+	// Note: 1. If no device is initialized (i.e. hdlInitXXX returned an invalid handle),
 	//          don't call hdlStart() or it will crash.
 	//       2. In order to use Novint 7Dof device, device MUST BE initialized by name (NOT by serial number).
 	//          Novint 3Dof device could be used/initialzed either by name or serial number.
-	//       3. If a Novint device is in 'cut-out' state (happened with E3 binary/serial number), 
+	//       3. If a Novint device is in 'cut-out' state (happened with E3 binary/serial number),
 	//          HDAL library will crash.
 
 	// Load the list of Novint devices (devices.yaml) user wants to use.
@@ -537,9 +536,9 @@ bool NovintScaffold::unregisterDevice(const NovintDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-									  [&device](const std::unique_ptr<DeviceData>& info) 
+									  [&device](const std::unique_ptr<DeviceData>& info)
 									  {
-										  return info->deviceObject == device; 
+										  return info->deviceObject == device;
 									  });
 		if (matching != m_state->registeredDevices.end())
 		{
@@ -567,9 +566,9 @@ std::shared_ptr<NovintScaffold::Handle>
 			auto& possibleHandle = it.second;
 			auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
 										  [&possibleHandle](const std::unique_ptr<DeviceData>& info)
-									      {
-									    		return info->deviceHandle == possibleHandle;
-									      });
+										  {
+											  return info->deviceHandle == possibleHandle;
+										  });
 			if (matching == m_state->registeredDevices.end())
 			{
 				handle = possibleHandle;
@@ -736,7 +735,7 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
-		
+
 		/* HW-Nov-12-2015
 		   Testing on Nov 10, 2015 shows that 
 		   hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof);
@@ -1210,7 +1209,7 @@ void NovintScaffold::setPositionScale(const NovintDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-								  [&device](const std::unique_ptr<DeviceData>& info) 
+								  [&device](const std::unique_ptr<DeviceData>& info)
 								  {
 									  return info->deviceObject == device;
 								  });
