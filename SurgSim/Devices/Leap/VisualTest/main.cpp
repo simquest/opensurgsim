@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Leap/LeapDevice.h"
+#include "SurgSim/Devices/Leap/LeapUtilities.h"
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -78,14 +79,17 @@ public:
 			m_spheres[device + inputData.poses().getName(i)]->pose = pose;
 		}
 
-		SurgSim::DataStructures::DataGroup::ImageType data;
-		if (inputData.images().get("left", &data))
+		SurgSim::DataStructures::DataGroup::ImageType image;
+		SurgSim::DataStructures::DataGroup::ImageType distortion;
+		if (inputData.images().get("left", &image) && inputData.images().get("left_distortion", &distortion))
 		{
-			m_leftView->image.set(std::move(data));
+			image = SurgSim::Devices::undistortLeapImage(image, distortion);
+			m_leftView->image.set(std::move(image));
 		}
-		if (inputData.images().get("right", &data))
+		if (inputData.images().get("right", &image) && inputData.images().get("right_distortion", &distortion))
 		{
-			m_rightView->image.set(std::move(data));
+			image = SurgSim::Devices::undistortLeapImage(image, distortion);
+			m_rightView->image.set(std::move(image));
 		}
 	}
 

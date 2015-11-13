@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -95,6 +95,18 @@ public:
 	/// Get the number of channels in this Image
 	/// \return the number of channels
 	size_t getNumChannels() const;
+
+	/// Get the pixel value at (x, y)
+	/// \param x The horizontal image position
+	/// \param y The vertical image position
+	/// \return mutable pixel value as Eigen::Map of size (channels x 1)
+	Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> operator()(size_t x, size_t y);
+
+	/// Get the pixel value at (x, y), constant version
+	/// \param x The horizontal position in the image
+	/// \param y The vertical position in the image
+	/// \return constant pixel value as Eigen::Map of size (channels x 1)
+	Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1>> operator()(size_t x, size_t y) const;
 
 	/// 2D Channel Type;
 	typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> ChannelType;

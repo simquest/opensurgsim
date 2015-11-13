@@ -323,6 +323,10 @@ void LeapScaffold::updateImageData()
 		typedef DataStructures::DataGroup::ImageType ImageType;
 		ImageType leftImage(images[0].width(), images[0].height(), 1, images[0].data());
 		ImageType rightImage(images[1].width(), images[1].height(), 1, images[1].data());
+		ImageType leftDistortion(images[0].distortionWidth() / 2, images[0].distortionHeight(), 2,
+				images[0].distortion());
+		ImageType rightDistortion(images[1].distortionWidth() / 2, images[1].distortionHeight(), 2,
+				images[1].distortion());
 
 		// scale values to 0..1
 		leftImage.getAsVector() *= (1.0f / 255.0f);
@@ -334,6 +338,8 @@ void LeapScaffold::updateImageData()
 			{
 				device->deviceObject->getInputData().images().set("left", leftImage);
 				device->deviceObject->getInputData().images().set("right", rightImage);
+				device->deviceObject->getInputData().images().set("left_distortion", leftDistortion);
+				device->deviceObject->getInputData().images().set("right_distortion", rightDistortion);
 			}
 			else
 			{
@@ -366,6 +372,8 @@ DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 
 	builder.addImage("left");
 	builder.addImage("right");
+	builder.addImage("left_distortion");
+	builder.addImage("right_distortion");
 
 	builder.addPose("pose");
 	builder.addPose("ThumbProximal");

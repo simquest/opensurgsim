@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -111,6 +111,24 @@ Image<T>::~Image()
 }
 
 template<class T>
+Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> Image<T>::operator()(size_t x, size_t y)
+{
+	SURGSIM_ASSERT(x < m_width) << "x is larger than the image width (" << x << " >= " << m_width << ")";
+	SURGSIM_ASSERT(y < m_height) << "y is larger than the image height (" << y << " >= " << m_height << ")";
+	return Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>>
+		(m_data.get() + m_channels * (x + y * m_width), m_channels);
+}
+
+template<class T>
+Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1>> Image<T>::operator()(size_t x, size_t y) const
+{
+	SURGSIM_ASSERT(x < m_width) << "x is larger than the image width (" << x << " >= " << m_width << ")";
+	SURGSIM_ASSERT(y < m_height) << "y is larger than the image height (" << y << " >= " << m_height << ")";
+	return Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1>>
+		(m_data.get() + m_channels * (x + y * m_width), m_channels);
+}
+
+template<class T>
 Eigen::Map<typename Image<T>::ChannelType, Eigen::Unaligned, Eigen::Stride<-1, -1>> Image<T>::getChannel(size_t index)
 {
 	SURGSIM_ASSERT(index < m_channels) << "Channel number is larger than the number of channels";
@@ -177,7 +195,7 @@ template<class T>
 std::array<size_t, 3> Image<T>::getSize() const
 {
 	std::array<size_t, 3> size = {m_width, m_height, m_channels};
-	return std::move(size);
+	return size;
 }
 
 template<class T>
