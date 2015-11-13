@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #ifndef SURGSIM_MATH_VECTOR_H
 #define SURGSIM_MATH_VECTOR_H
 
+#include <array>
 #include <vector>
 
 #include <Eigen/Core>
@@ -159,8 +160,8 @@ void getSubVector(const Vector& vector, const std::vector<size_t> blockIds, size
 /// \note t=1 => returns vector 'next'
 template <typename T, int size, int TOpt>
 Eigen::Matrix<T, size, 1, TOpt> interpolate(
-	const Eigen::Matrix<T, size, 1, TOpt> &previous,
-	const Eigen::Matrix<T, size, 1, TOpt> &next,
+	const Eigen::Matrix<T, size, 1, TOpt>& previous,
+	const Eigen::Matrix<T, size, 1, TOpt>& next,
 	T t)
 {
 	return previous + t * (next - previous);
@@ -193,6 +194,40 @@ bool buildOrthonormalBasis(Eigen::Matrix<T, 3, 1, VOpt>* i,
 
 	return true;
 }
+
+/// Calculate the best unit normal we can find in the direction of pXq for one of the endpoints of q.
+/// Try multiple arrangements of the end points to reduce the artifacts when three of the vertices may
+/// be nearly collinear.
+/// \param p segment p
+/// \param q segment q
+/// \param epsilon when the norm of p x q is above epsilon, the cross product is assumed to be valid.
+/// return the normalized cross product of p x q
+template <class T, int VOpt>
+Eigen::Matrix<T, 3, 1, VOpt> robustCrossProduct(const std::array<Eigen::Matrix<T, 3, 1, VOpt>, 2>& p,
+		const std::array<Eigen::Matrix<T, 3, 1, VOpt>, 2>& q,
+		T epsilon)
+{
+
+	auto p0p1 = p[1] - p[0];
+	auto p1q0 = q[0] - p[1];
+	auto p0q0 = q[0] - p[0];
+	auto p1q1 = q[1] - p[1];
+	auto pXq = p0p1.cross(p1q0);
+	auto norm = pXq.norm();
+	if (norm < epsilon)
+	{
+		pXq = p0p1.cross(p0q0);
+		norm = pXq.norm();
+	}
+	if (norm < epsilon)
+	{
+		pXq = p0p1.cross(p1q1);
+		norm = pXq.norm();
+	}
+	pXq *= static_cast<T>(1.0 / norm);
+	return pXq;
+}
+
 };  // namespace Math
 };  // namespace SurgSim
 

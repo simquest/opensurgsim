@@ -54,5 +54,5 @@ void main(void)
 	vec4 pixelPos = vec4(eyeSpacePos + normal*sphereRadius, 1.0);
 	vec4 clipSpacePos = mainCamera.projectionMatrix * pixelPos;
 	float normDepth = clipSpacePos.z / clipSpacePos.w;
-	gl_FragDepth = 0.5 * normDepth + 0.5;
+	gl_FragDepth = 0.5 + 0.5 * normDepth;
 }

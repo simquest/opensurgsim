@@ -20,6 +20,7 @@ set(SURGSIM_COLLISION_SOURCES
 	BoxSphereDcdContact.cpp
 	CapsuleSphereDcdContact.cpp
 	CollisionPair.cpp
+	CompoundShapeDcdContact.cpp
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
 	OctreeCapsuleDcdContact.cpp
@@ -30,6 +31,7 @@ set(SURGSIM_COLLISION_SOURCES
 	Representation.cpp
 	SegmentMeshTriangleMeshDcdContact.cpp
 	SegmentSegmentCcdIntervalCheck.cpp
+	SegmentSegmentCcdMovingContact.cpp
 	SegmentSegmentCcdStaticContact.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
@@ -47,6 +49,7 @@ set(SURGSIM_COLLISION_HEADERS
 	BoxSphereDcdContact.h
 	CapsuleSphereDcdContact.h
 	CollisionPair.h
+	CompoundShapeDcdContact.h
 	ContactCalculation.h
 	DcdCollision.h
 	DefaultContactCalculation.h
@@ -58,6 +61,7 @@ set(SURGSIM_COLLISION_HEADERS
 	Representation.h
 	SegmentMeshTriangleMeshDcdContact.h
 	SegmentSegmentCcdIntervalCheck.h
+	SegmentSegmentCcdMovingContact.h
 	SegmentSegmentCcdStaticContact.h
 	ShapeCollisionRepresentation.h
 	ShapeShapeContactCalculation.h

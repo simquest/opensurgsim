@@ -212,8 +212,8 @@ std::vector<std::pair<size_t, size_t>> generateIndexMap(
 										const std::shared_ptr<DataStructures::TriangleMeshPlain>& source,
 										const std::shared_ptr<DataStructures::TriangleMeshPlain>& target)
 {
-	SURGSIM_LOG_INFO(Framework::Logger::getDefaultLogger())
-			<< "Building map";
+	auto logger = Framework::Logger::getLogger("Blocks/TransferPhysicsToGraphicsMeshBehavior");
+	SURGSIM_LOG_INFO(logger) << "Building map";
 
 	SURGSIM_ASSERT(source->getNumVertices() > 0 && target->getNumVertices() > 0)
 			<< "Can't build correspondence map, meshes are missing vertices";
@@ -266,8 +266,7 @@ std::vector<std::pair<size_t, size_t>> generateIndexMap(
 
 		if (!hasNeighbors)
 		{
-			SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Vascular"))
-					<< "No coincident point found for node with index " << index;
+			SURGSIM_LOG_WARNING(logger) << "No coincident point found for node with index " << index;
 
 		}
 	}
