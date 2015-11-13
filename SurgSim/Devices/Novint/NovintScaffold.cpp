@@ -344,7 +344,7 @@ struct NovintScaffold::StateData
 {
 public:
 	/// Initialize the state.
-	StateData() : isApiInitialized(false)
+	StateData() : isApiInitialized(false), logger(Framework::Logger::getLogger("Devices/Novint"))
 	{
 	}
 
@@ -376,13 +376,14 @@ public:
 	/// Timer to measure update rate.
 	Framework::Timer timer;
 
+	/// Logger used by the scaffold and all devices.
+	std::shared_ptr<SurgSim::Framework::Logger> logger;
+
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
 	StateData(const StateData&) /*= delete*/;
 	StateData& operator=(const StateData&) /*= delete*/;
 };
-
-
 
 template <typename T>
 static inline T clampToRange(T value, T rangeMin, T rangeMax)
@@ -394,10 +395,7 @@ static inline T clampToRange(T value, T rangeMin, T rangeMax)
 	return value;
 }
 
-
-
-NovintScaffold::NovintScaffold() :
-	m_logger(Framework::Logger::getLogger("Devices/Novint")), m_state(new StateData)
+NovintScaffold::NovintScaffold() : m_state(new StateData)
 {
 	{
 		// Drain the HDAL error stack
@@ -427,18 +425,18 @@ NovintScaffold::NovintScaffold() :
 		hdlStart();
 		if (!isFatalError("Couldn't start HDAL scheduler"))
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << "Scheduler started, hdlStart called.";
+			SURGSIM_LOG_DEBUG(m_state->logger) << "Scheduler started, hdlStart called.";
 
 			std::unique_ptr<Callback> callback(new Callback(this));
 			if (callback->isValid())
 			{
 				m_state->callback = std::move(callback);
 				m_state->isApiInitialized = true;
-				SURGSIM_LOG_DEBUG(m_logger) << "Callback scheduled; Scaffold created successfully.";
+				SURGSIM_LOG_DEBUG(m_state->logger) << "Callback scheduled; Scaffold created successfully.";
 			}
 			else
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << "Failed to create a callback.";
+				SURGSIM_LOG_SEVERE(m_state->logger) << "Failed to create a callback.";
 				hdlStop();
 				isFatalError("Couldn't stop HDAL scheduler");
 			}
@@ -457,22 +455,22 @@ NovintScaffold::~NovintScaffold()
 		boost::this_thread::sleep_until(earliestEndTime);
 
 		m_state->callback = nullptr;
-		SURGSIM_LOG_DEBUG(m_logger) << "Callback reset.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Callback reset.";
 
-		SURGSIM_LOG_DEBUG(m_logger) << "Stopping HDAL scheduler...";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Stopping HDAL scheduler...";
 		hdlStop();
-		SURGSIM_LOG_IF(!isFatalError("Couldn't stop HDAL scheduler"), m_logger, DEBUG) <<
+		SURGSIM_LOG_IF(!isFatalError("Couldn't stop HDAL scheduler"), m_state->logger, DEBUG) <<
 			"HDAL scheduler stopped, hdlStop called.";
 
 		boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
 		if (!m_state->registeredDevices.empty())
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Destroying scaffold while there are still registered devices!?!";
+			SURGSIM_LOG_SEVERE(m_state->logger) << "Destroying scaffold while there are still registered devices!?!";
 			m_state->registeredDevices.clear();
 		}
 
 		destroyAllHandles();
-		SURGSIM_LOG_DEBUG(m_logger) << "Scaffold destroyed.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Scaffold destroyed.";
 	}
 }
 
@@ -491,7 +489,7 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 								});
 		if (sameSerialNumber != m_state->registeredDevices.end())
 		{
-			SURGSIM_LOG_CRITICAL(m_logger) << "Tried to register a device when the same serial number " <<
+			SURGSIM_LOG_CRITICAL(m_state->logger) << "Tried to register a device when the same serial number " <<
 				serialNumber <<" is already present!";
 			return false;
 		}
@@ -509,7 +507,7 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 										});
 		if (sameInitializationName != m_state->registeredDevices.end())
 		{
-			SURGSIM_LOG_CRITICAL(m_logger) << "Tried to register a device when the same initialization (HDAL) name " <<
+			SURGSIM_LOG_CRITICAL(m_state->logger) << "Tried to register a device when the same initialization (HDAL) name " <<
 				initializationName << " is already present!";
 			return false;
 		}
@@ -527,7 +525,7 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 		return false;   // message already printed
 	}
 	m_state->registeredDevices.emplace_back(std::move(info));
-	SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " initialized.";
+	SURGSIM_LOG_INFO(m_state->logger) << "Device " << device->getName() << " initialized.";
 
 	return true;
 }
@@ -546,12 +544,12 @@ bool NovintScaffold::unregisterDevice(const NovintDevice* const device)
 			savedInfo = std::move(*matching);
 			m_state->registeredDevices.erase(matching);
 			m_state->unregisteredHandles.push_back(savedInfo->deviceHandle);
-			SURGSIM_LOG_INFO(m_logger) << "Device " << device->getName() << " finalized.";
+			SURGSIM_LOG_INFO(m_state->logger) << "Device " << device->getName() << " finalized.";
 			result = true;
 			// the iterator is now invalid but that's OK
 		}
 	}
-	SURGSIM_LOG_IF(!result, m_logger, SEVERE) << "Attempted to release a non-registered device.";
+	SURGSIM_LOG_IF(!result, m_state->logger, SEVERE) << "Attempted to release a non-registered device.";
 	return result;
 }
 
@@ -581,7 +579,7 @@ std::shared_ptr<NovintScaffold::Handle>
 			SURGSIM_ASSERT(m_state->serialToHandle.size() == m_state->registeredDevices.size()) <<
 				"Failed to find an un-registered device when the number of registered devices is not equal to" <<
 				" the number of devices found at startup.";
-			SURGSIM_LOG_SEVERE(m_logger) <<
+			SURGSIM_LOG_SEVERE(m_state->logger) <<
 				"Attempted to register a default device, but no more devices are available." <<
 				" There were " << m_state->serialToHandle.size() << " devices available at program start.";
 		}
@@ -597,14 +595,14 @@ std::shared_ptr<NovintScaffold::Handle>
 			}
 			else
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << initializationName <<
+				SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName <<
 					"', which should map to serial number " << serial <<
 					", but no device with that serial number is available.";
 			}
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device named '" << initializationName <<
+			SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName <<
 				"', but that name does not map to a serial number.  Was the configuration file found?" <<
 				" Does it contain the text of a YAML node (for the map from name to serial number)?  Is '" <<
 				initializationName << "' a key in that map?";
@@ -630,7 +628,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Attempted to register a device by serial number for serial number " <<
+			SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device by serial number for serial number " <<
 				info->serialNumber << ", but no device with that serial number is available.";
 		}
 	}
@@ -654,7 +652,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		bool leftHanded = ((gripStatus[1] & 0x01) != 0);
 		if (leftHanded)
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << "'" << info->initializationName << "' is Left-handed.";
+			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Left-handed.";
 			info->isDeviceRollAxisReversed = true;
 			info->eulerAngleOffsetRoll = 0;
 			info->eulerAngleOffsetYaw = -75. * M_PI / 180.;
@@ -662,7 +660,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		}
 		else
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << "'" << info->initializationName << "' is right-handed.";
+			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is right-handed.";
 			info->isDeviceRollAxisReversed = false;
 			info->eulerAngleOffsetRoll = 0;
 			info->eulerAngleOffsetYaw = +75. * M_PI / 180.;
@@ -983,14 +981,14 @@ bool NovintScaffold::createAllHandles()
 		std::transform(deviceName.begin(), deviceName.end(), deviceName.begin(), tolower);
 		if (deviceName == "default")
 		{
-			SURGSIM_LOG_INFO(m_logger) << "'" << item.first <<
+			SURGSIM_LOG_INFO(m_state->logger) << "'" << item.first <<
 				"' is system reserved. No Novint device should be named 'Default' (case insensitive).";
 			continue;
 		}
 
 		// initialize by name
 		auto handle = std::make_shared<NovintScaffold::Handle>(item.first, false);
-		SURGSIM_LOG_IF(!storeHandleIfValid(handle, item.second), m_logger, WARNING) <<
+		SURGSIM_LOG_IF(!storeHandleIfValid(handle, item.second), m_state->logger, WARNING) <<
 			"Failed to initialize Novint device: " << item.first << " (Serial #: " << item.second << ")";
 	}
 
@@ -1001,32 +999,32 @@ bool NovintScaffold::createAllHandles()
 	for (int i = 0; i < numDevices; ++i)
 	{
 		const std::string serial(&(serials[i * HDL_SERNUM_BUFFSIZE]), HDL_SERNUM_BUFFSIZE - 1);
-		SURGSIM_LOG_DEBUG(m_logger) << "Found serial number " << serial << ".";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Found serial number " << serial << ".";
 
 		// Device with serial number 'serial' already initialized.
 		if (m_state->serialToHandle.find(serial) != m_state->serialToHandle.end())
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << "Device with serial number " << serial << " already created.";
+			SURGSIM_LOG_DEBUG(m_state->logger) << "Device with serial number " << serial << " already created.";
 			continue;
 		}
 
 		auto handle = std::make_shared<NovintScaffold::Handle>(serial);
-		SURGSIM_LOG_IF(!storeHandleIfValid(handle, serial), m_logger, WARNING) <<
+		SURGSIM_LOG_IF(!storeHandleIfValid(handle, serial), m_state->logger, WARNING) <<
 			"Failed to initialize Falcon with serial " << serial << ".";
 	}
 	m_state->initializationTime = Framework::Clock::now();
-	SURGSIM_LOG_DEBUG(m_logger) << "All device handles created.";
+	SURGSIM_LOG_DEBUG(m_state->logger) << "All device handles created.";
 
 	return !m_state->serialToHandle.empty();
 }
 
 void NovintScaffold::destroyAllHandles()
 {
-	SURGSIM_LOG_DEBUG(m_logger) << "Destroying all Handles...";
+	SURGSIM_LOG_DEBUG(m_state->logger) << "Destroying all Handles...";
 	m_state->registeredDevices.clear();
 	m_state->unregisteredHandles.clear();
 	m_state->serialToHandle.clear();
-	SURGSIM_LOG_DEBUG(m_logger) << "Handles destroyed.";
+	SURGSIM_LOG_DEBUG(m_state->logger) << "Handles destroyed.";
 }
 
 bool NovintScaffold::storeHandleIfValid(const std::shared_ptr<Handle>& handle, const std::string& serial)
@@ -1051,13 +1049,13 @@ std::map<std::string, std::string> NovintScaffold::getNameMap()
 	std::string filePath;
 	if (applicationData.tryFindFile("devices.yaml", &filePath))
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Found devices.yaml at '" << filePath << "'.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Found devices.yaml at '" << filePath << "'.";
 		YAML::Node node = YAML::LoadFile(filePath);
 		map = node["Novint"].as<std::map<std::string, std::string>>();
 	}
 	else
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Failed to find devices.yaml, cannot map names to serial numbers.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Failed to find devices.yaml, cannot map names to serial numbers.";
 	}
 	return map;
 }
@@ -1067,7 +1065,7 @@ void NovintScaffold::runHapticFrame()
 	m_state->timer.markFrame();
 	if (m_state->timer.getCurrentNumberOfFrames() == m_state->timer.getMaxNumberOfFrames())
 	{
-		SURGSIM_LOG_INFO(m_logger) << std::setprecision(4)
+		SURGSIM_LOG_INFO(m_state->logger) << std::setprecision(4)
 			<< "Rate: " << m_state->timer.getAverageFrameRate() << "Hz "
 			<< "(min individual frame " << 1.0 / m_state->timer.getMaxFramePeriod() << "Hz).";
 		m_state->timer.setMaxNumberOfFrames(static_cast<size_t>(m_state->timer.getAverageFrameRate() * 5.0));
@@ -1127,13 +1125,13 @@ bool NovintScaffold::getGravityCompensation(const NovintScaffold::DeviceData* in
 
 	if (state1 == true && state2 == false)
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "getting gravity compensation state for '" << info->deviceObject->getName() <<
+		SURGSIM_LOG_WARNING(m_state->logger) << "getting gravity compensation state for '" << info->deviceObject->getName() <<
 			"' does nothing!";
 		return false;
 	}
 	else if (state1 != state2)
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "getting gravity compensation state for '" << info->deviceObject->getName() <<
+		SURGSIM_LOG_WARNING(m_state->logger) << "getting gravity compensation state for '" << info->deviceObject->getName() <<
 			"' keeps changing?!?";
 		return false;
 	}
@@ -1167,14 +1165,14 @@ bool NovintScaffold::enforceGravityCompensation(const NovintScaffold::DeviceData
 			// If the state has been changed, log a message.
 			if (isInitialStateValid && (initialState != gravityCompensationState))
 			{
-				SURGSIM_LOG_INFO(m_logger) << "gravity compensation for '" << info->deviceObject->getName() <<
+				SURGSIM_LOG_INFO(m_state->logger) << "gravity compensation for '" << info->deviceObject->getName() <<
 					"' changed to " << (gravityCompensationState? "enabled." : "disabled." );
 			}
 			return true;
 		}
 	}
 
-	SURGSIM_LOG_WARNING(m_logger) << "failed to set gravity compensation for '" << info->deviceObject->getName() <<
+	SURGSIM_LOG_WARNING(m_state->logger) << "failed to set gravity compensation for '" << info->deviceObject->getName() <<
 		"' to " << (gravityCompensationState ? "enabled" : "disabled") << " after " << maxAttempts << " attempts";
 	return false;
 }

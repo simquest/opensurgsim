@@ -179,9 +179,6 @@ private:
 	/// \param scale The multiplicative factor to apply to the rotation angles.
 	void setOrientationScale(const NovintDevice* device, double scale);
 
-	/// Logger used by the scaffold and all devices.
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
 };
