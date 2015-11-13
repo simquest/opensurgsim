@@ -94,15 +94,13 @@ bool isFatalError(const std::string& message)
 
 	// The HDAL maintains an error stack, so in theory there could be more than one error pending.
 	// We do head recursion to get them all in the correct order, and hope we don't overrun the stack...
-	bool anotherFatalError = isFatalError(message);
-
-	bool isFatal = (errorCode != HDL_ERROR_STACK_OVERFLOW);
+	bool isFatal = isFatalError(message);
 
 	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Devices/Novint")) << message << std::endl <<
 		"  Error text from HDAL: '" << convertErrorCodeToString(errorCode) << "'" << std::endl <<
 		"  Error code: 0x" << std::hex << std::setw(4) << std::setfill('0') << errorCode << std::endl;
 
-	return (isFatal || anotherFatalError);
+	return (isFatal || (errorCode != HDL_ERROR_STACK_OVERFLOW));
 }
 }
 
