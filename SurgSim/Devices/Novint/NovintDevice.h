@@ -40,6 +40,7 @@ SURGSIM_STATIC_REGISTRATION(NovintDevice);
 ///   | type       | name                  |                                                      |
 ///   | ----       | ----                  | ---                                                  |
 ///   | pose       | "pose"                | %Device pose (units are meters).                     |
+///   | scalar     | "toolDof"             | %7th Dof (e.g., handle open/close angle)             |
 ///   | bool       | "button1"             | %State of the first device button if present.        |
 ///   | bool       | "button2"             | %State of the second device button if present.       |
 ///   | bool       | "button3"             | %State of the third device button if present.        |
