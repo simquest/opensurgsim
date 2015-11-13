@@ -31,6 +31,7 @@ set(SURGSIM_COLLISION_SOURCES
 	Representation.cpp
 	SegmentMeshTriangleMeshDcdContact.cpp
 	SegmentSegmentCcdIntervalCheck.cpp
+	SegmentSegmentCcdMovingContact.cpp
 	SegmentSegmentCcdStaticContact.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
@@ -60,6 +61,7 @@ set(SURGSIM_COLLISION_HEADERS
 	Representation.h
 	SegmentMeshTriangleMeshDcdContact.h
 	SegmentSegmentCcdIntervalCheck.h
+	SegmentSegmentCcdMovingContact.h
 	SegmentSegmentCcdStaticContact.h
 	ShapeCollisionRepresentation.h
 	ShapeShapeContactCalculation.h
