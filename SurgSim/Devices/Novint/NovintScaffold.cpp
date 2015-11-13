@@ -82,10 +82,9 @@ std::string convertErrorCodeToString(HDLError errorCode)
 }
 
 /// Check for HDAL errors, display them, and signal fatal errors.
-/// Exactly equivalent to <code>checkForFatalError(false, message)</code>.
 /// \param message An additional descriptive message.
 /// \return true if there was a fatal error; false if everything is OK.
-bool checkForFatalError(const char* message)
+bool isFatalError(const std::string& message)
 {
 	HDLError errorCode = hdlGetError();
 	if (errorCode == HDL_NO_ERROR)
@@ -95,26 +94,15 @@ bool checkForFatalError(const char* message)
 
 	// The HDAL maintains an error stack, so in theory there could be more than one error pending.
 	// We do head recursion to get them all in the correct order, and hope we don't overrun the stack...
-	bool anotherFatalError = checkForFatalError(message);
+	bool anotherFatalError = isFatalError(message);
 
 	bool isFatal = (errorCode != HDL_ERROR_STACK_OVERFLOW);
 
 	SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Devices/Novint")) << message << std::endl <<
-		"  Error text: '" << convertErrorCodeToString(errorCode) << "'" << std::endl <<
+		"  Error text from HDAL: '" << convertErrorCodeToString(errorCode) << "'" << std::endl <<
 		"  Error code: 0x" << std::hex << std::setw(4) << std::setfill('0') << errorCode << std::endl;
 
 	return (isFatal || anotherFatalError);
-}
-
-/// Check for HDAL errors, display them, and signal fatal errors.
-/// Exactly equivalent to <code>checkForFatalError(message) || previousError</code>, but less nasty to read.
-/// \param previousError	True if a previous error has occurred.
-/// \param message	An additional descriptive message.
-/// \return	true if there was a fatal error or if previousError is true; false if everything is OK.
-bool checkForFatalError(bool previousError, const char* message)
-{
-	bool newError = checkForFatalError(message);
-	return previousError || newError;
 }
 }
 
@@ -139,7 +127,7 @@ public:
 			deviceHandle = hdlInitNamedDevice(info.c_str());
 		}
 
-		if (checkForFatalError("Failed to initialize"))
+		if (isFatalError("Failed to initialize"))
 		{
 			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) <<
 				(initBySerialNumber ? "HDAL serial number: '" : "device name: '") << info << "'";
@@ -163,12 +151,12 @@ public:
 	{
 		if (isValid())
 		{
-			checkForFatalError("Error prior to calling hdlUninitDevice");
+			isFatalError("Error prior to calling hdlUninitDevice");
 			SURGSIM_LOG_DEBUG(Framework::Logger::getLogger("Devices/Novint")) <<
 				"Handle " << m_deviceHandle << " destructing, calling hdlUninitDevice.";
 			hdlUninitDevice(m_deviceHandle);
 			m_deviceHandle = HDL_INVALID_HANDLE;
-			checkForFatalError("Error calling hdlUninitDevice");
+			isFatalError("Error calling hdlUninitDevice");
 			SURGSIM_LOG_DEBUG(Framework::Logger::getLogger("Devices/Novint")) <<
 				"Handle " << m_deviceHandle << " destructed, hdlUninitDevice called.";
 		}
@@ -202,7 +190,7 @@ public:
 	{
 		SURGSIM_ASSERT(scaffold != nullptr) << "Callback::create needs non-nullptr scaffold.";
 		m_callbackHandle = hdlCreateServoOp(run, scaffold, false);
-		if (!checkForFatalError("Failed to create servoOp callback"))
+		if (!isFatalError("Failed to create servoOp callback"))
 		{
 			if (m_callbackHandle == HDL_INVALID_HANDLE)
 			{
@@ -222,11 +210,11 @@ public:
 	{
 		if (isValid())
 		{
-			checkForFatalError("Error prior to stopping haptic callback");
+			isFatalError("Error prior to stopping haptic callback");
 			SURGSIM_LOG_DEBUG(Framework::Logger::getLogger("Devices/Novint")) <<
 				"Callback destructing, calling hdlDestroyServoOp...";
 			hdlDestroyServoOp(m_callbackHandle);
-			SURGSIM_LOG_IF(!checkForFatalError("Error stopping haptic callback"),
+			SURGSIM_LOG_IF(!isFatalError("Error stopping haptic callback"),
 						   Framework::Logger::getLogger("Devices/Novint"), DEBUG) <<
 								"Callback destructing, hdlDestroyServoOp called.";
 			m_callbackHandle = HDL_INVALID_HANDLE;
@@ -441,7 +429,7 @@ NovintScaffold::NovintScaffold() :
 	if (createAllHandles())
 	{
 		hdlStart();
-		if (!checkForFatalError("Couldn't start HDAL scheduler"))
+		if (!isFatalError("Couldn't start HDAL scheduler"))
 		{
 			SURGSIM_LOG_DEBUG(m_logger) << "Scheduler started, hdlStart called.";
 
@@ -456,7 +444,7 @@ NovintScaffold::NovintScaffold() :
 			{
 				SURGSIM_LOG_SEVERE(m_logger) << "Failed to create a callback.";
 				hdlStop();
-				checkForFatalError("Couldn't stop HDAL scheduler");
+				isFatalError("Couldn't stop HDAL scheduler");
 			}
 		}
 	}
@@ -480,7 +468,7 @@ NovintScaffold::~NovintScaffold()
 
 		SURGSIM_LOG_DEBUG(m_logger) << "Stopping HDAL scheduler...";
 		hdlStop();
-		SURGSIM_LOG_IF(!checkForFatalError("Couldn't stop HDAL scheduler"), m_logger, DEBUG) <<
+		SURGSIM_LOG_IF(!isFatalError("Couldn't stop HDAL scheduler"), m_logger, DEBUG) <<
 			"HDAL scheduler stopped, hdlStop called.";
 
 		boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
@@ -660,12 +648,12 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 	if (result && info->isDevice7Dof)
 	{
 		hdlMakeCurrent(info->deviceHandle->get());
-		checkForFatalError("Couldn't enable the handle");
+		isFatalError("Couldn't enable the handle");
 
 		int gripStatus[2] = { 0, 0 };
 		// OSG2 grips report their "handedness" in the LSB of the second raw status byte
 		hdlGripGetAttributes (HDL_GRIP_STATUS, 2, gripStatus);
-		if (checkForFatalError("Cannot get grip status"))
+		if (isFatalError("Cannot get grip status"))
 		{
 			// HDL reported an error.  An error message was already logged.
 			return false;
@@ -694,7 +682,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 {
 	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
-	bool fatalError = checkForFatalError("hdlMakeCurrent()");
+	bool fatalError = isFatalError("hdlMakeCurrent()");
 
 	info->force.setZero();
 	info->torque.setZero();
@@ -710,7 +698,7 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 
 	// Set the force command (in newtons).
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
-	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
+	fatalError = fatalError || isFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
 	if (info->isDevice7Dof)
 	{
@@ -718,7 +706,7 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 		// used anywhere at the moment.
 		// The 2nd arg to this call is the count; we're setting 4 doubles.
 		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
-		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+		fatalError = fatalError || isFatalError("hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
 	return !fatalError;
 }
@@ -727,17 +715,17 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 {
 	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 	hdlMakeCurrent(info->deviceHandle->get());	// This device is now "current", and all hdlXxx calls apply to it.
-	bool fatalError = checkForFatalError("hdlMakeCurrent()");
+	bool fatalError = isFatalError("hdlMakeCurrent()");
 
 	info->buttonStates.fill(false);
 	hdlGripGetAttributesb(HDL_GRIP_BUTTON, static_cast<int>(info->buttonStates.size()), info->buttonStates.data());
-	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesb(HDL_GRIP_BUTTON)");
+	fatalError = fatalError || isFatalError("hdlGripGetAttributesb(HDL_GRIP_BUTTON)");
 
 	checkDeviceHoming(info);
 	if (info->isPositionHomed)
 	{
 		hdlGripGetAttributev(HDL_GRIP_POSITION, 0, info->scaledPose.translation().data());
-		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributev(HDL_GRIP_POSITION)");
+		fatalError = fatalError || isFatalError("hdlGripGetAttributev(HDL_GRIP_POSITION)");
 		info->scaledPose.translation() *= info->positionScale;
 	}
 
@@ -749,7 +737,7 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		// order to correctly generate joint torques.
 		double angles[4];
 		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
-		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
+		fatalError = fatalError || isFatalError("hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
 
 		// The zero values are NOT the home orientation.
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
@@ -1013,7 +1001,7 @@ bool NovintScaffold::createAllHandles()
 
 	char serials[HDL_MAX_DEVICES * HDL_SERNUM_BUFFSIZE];
 	const int numDevices = hdlCatalogDevices(HDL_NOT_OPEN_BY_ANY_APP, &(serials[0]), NULL);
-	checkForFatalError("Failed to get catalog of devices.");
+	isFatalError("Failed to get catalog of devices.");
 
 	for (int i = 0; i < numDevices; ++i)
 	{
@@ -1053,7 +1041,7 @@ bool NovintScaffold::storeHandleIfValid(const std::shared_ptr<Handle>& handle, c
 	{
 		m_state->serialToHandle[serial] = handle;
 		hdlMakeCurrent(handle->get());
-		checkForFatalError("Failed to make device current.");
+		isFatalError("Failed to make device current.");
 		result = true;
 	}
 	return result;
@@ -1114,13 +1102,13 @@ void NovintScaffold::runHapticFrame()
 			hdlMakeCurrent(handle->get());
 
 			hdlGripSetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &desiredGravityCompensation);
-			checkForFatalError("Cannot set gravity compensation state on recently unregistered device.");
+			isFatalError("Cannot set gravity compensation state on recently unregistered device.");
 
 			hdlGripSetAttributev(HDL_GRIP_FORCE, 0, force.data());
-			checkForFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
+			isFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
 			hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, torque.data());
-			checkForFatalError("hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+			isFatalError("hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 		}
 	}
 	m_state->unregisteredHandles.clear();
@@ -1130,14 +1118,14 @@ bool NovintScaffold::getGravityCompensation(const NovintScaffold::DeviceData* in
 {
 	bool state1 = true;
 	hdlGripGetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &state1);
-	if (checkForFatalError("Cannot get gravity compensation (#1)"))
+	if (isFatalError("Cannot get gravity compensation (#1)"))
 	{
 		return false;
 	}
 
 	bool state2 = false;
 	hdlGripGetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &state2);
-	if (checkForFatalError("Cannot get gravity compensation (#2)"))
+	if (isFatalError("Cannot get gravity compensation (#2)"))
 	{
 		return false;
 	}
@@ -1170,7 +1158,7 @@ bool NovintScaffold::enforceGravityCompensation(const NovintScaffold::DeviceData
 	{
 		bool state = gravityCompensationState;
 		hdlGripSetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &state);
-		if (checkForFatalError("Cannot set gravity compensation state"))
+		if (isFatalError("Cannot set gravity compensation state"))
 		{
 			return false;
 		}
