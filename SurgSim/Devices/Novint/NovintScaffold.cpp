@@ -49,7 +49,8 @@ using SurgSim::Math::Vector4d;
 namespace
 {
 
-/// Convert a HDLError to text.  The text was cut+pasted from the comments in Novint's hdlErrors.h file.
+/// Convert a HDLError to text.
+/// Error code and descriptions are from Novint's hdlErrors.h file.
 std::string convertErrorCodeToString(HDLError errorCode)
 {
 	switch (errorCode)
@@ -102,7 +103,7 @@ bool isFatalError(const std::string& message)
 
 	return (isFatal || (errorCode != HDL_ERROR_STACK_OVERFLOW));
 }
-}
+};
 
 namespace SurgSim
 {
@@ -112,8 +113,7 @@ namespace Devices
 class NovintScaffold::Handle
 {
 public:
-	explicit Handle(const std::string& info, bool initBySerialNumber = true) :
-		m_deviceHandle(HDL_INVALID_HANDLE)
+	explicit Handle(const std::string& info, bool initBySerialNumber = true) : m_deviceHandle(HDL_INVALID_HANDLE)
 	{
 		if (initBySerialNumber)
 		{
@@ -399,10 +399,9 @@ NovintScaffold::NovintScaffold() : m_state(new StateData)
 {
 	{
 		// Drain the HDAL error stack
-		HDLError errorCode = hdlGetError();
-		while (errorCode != HDL_NO_ERROR)
+		while (hdlGetError() != HDL_NO_ERROR)
 		{
-			errorCode = hdlGetError();
+			;
 		}
 	}
 	m_state->timer.setMaxNumberOfFrames(5000);
@@ -455,9 +454,8 @@ NovintScaffold::~NovintScaffold()
 		boost::this_thread::sleep_until(earliestEndTime);
 
 		m_state->callback = nullptr;
-		SURGSIM_LOG_DEBUG(m_state->logger) << "Callback reset.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Callback reset.\nStopping HDAL scheduler...";
 
-		SURGSIM_LOG_DEBUG(m_state->logger) << "Stopping HDAL scheduler...";
 		hdlStop();
 		SURGSIM_LOG_IF(!isFatalError("Couldn't stop HDAL scheduler"), m_state->logger, DEBUG) <<
 			"HDAL scheduler stopped, hdlStop called.";
@@ -479,8 +477,8 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
 	// Make sure the serial number is unique.
-	std::string serialNumber = "";
-	if ((device->getSerialNumber(&serialNumber)) && (serialNumber != ""))
+	std::string serialNumber;
+	if ((device->getSerialNumber(&serialNumber)) && (!serialNumber.empty()))
 	{
 		auto& sameSerialNumber = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
 											  [&serialNumber](const std::unique_ptr<DeviceData>& info)
@@ -496,8 +494,8 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 	}
 
 	// Make sure the initialization name is unique.
-	std::string initializationName = "";
-	if ((device->getInitializationName(&initializationName)) && (initializationName != ""))
+	std::string initializationName;
+	if ((device->getInitializationName(&initializationName)) && (!initializationName.empty()))
 	{
 		auto& sameInitializationName = std::find_if(m_state->registeredDevices.cbegin(),
 													m_state->registeredDevices.cend(),
@@ -507,8 +505,9 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 										});
 		if (sameInitializationName != m_state->registeredDevices.end())
 		{
-			SURGSIM_LOG_CRITICAL(m_state->logger) << "Tried to register a device when the same initialization (HDAL) name " <<
-				initializationName << " is already present!";
+			SURGSIM_LOG_CRITICAL(m_state->logger) <<
+				"Tried to register a device when the same initialization (HDAL) name " << initializationName <<
+				" is already present!";
 			return false;
 		}
 	}
@@ -538,7 +537,10 @@ bool NovintScaffold::unregisterDevice(const NovintDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-			[&device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+									  [&device](const std::unique_ptr<DeviceData>& info) 
+									  {
+										  return info->deviceObject == device; 
+									  });
 		if (matching != m_state->registeredDevices.end())
 		{
 			savedInfo = std::move(*matching);
@@ -564,10 +566,10 @@ std::shared_ptr<NovintScaffold::Handle>
 		{
 			auto& possibleHandle = it.second;
 			auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-				[&possibleHandle](const std::unique_ptr<DeviceData>& info)
-			{
-				return info->deviceHandle == possibleHandle;
-			});
+										  [&possibleHandle](const std::unique_ptr<DeviceData>& info)
+									      {
+									    		return info->deviceHandle == possibleHandle;
+									      });
 			if (matching == m_state->registeredDevices.end())
 			{
 				handle = possibleHandle;
@@ -588,7 +590,7 @@ std::shared_ptr<NovintScaffold::Handle>
 	{
 		if (m_state->nameToSerial.count(initializationName) > 0)
 		{
-			const std::string serial = m_state->nameToSerial[initializationName];
+			const std::string& serial = m_state->nameToSerial[initializationName];
 			if (m_state->serialToHandle.count(serial) > 0)
 			{
 				handle = m_state->serialToHandle[serial];
@@ -616,7 +618,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 {
 	SURGSIM_ASSERT(info->deviceHandle == nullptr) << "The raw handle should be nullptr before initialization.";
 
-	if (info->serialNumber == "")
+	if (info->serialNumber.empty())
 	{
 		info->deviceHandle = findHandleByInitializationName(info->initializationName);
 	}
@@ -628,14 +630,14 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device by serial number for serial number " <<
+			SURGSIM_LOG_SEVERE(m_state->logger) <<
+				"Attempted to register a device by serial number for serial number " <<
 				info->serialNumber << ", but no device with that serial number is available.";
 		}
 	}
 	m_state->unregisteredHandles.remove(info->deviceHandle);
 
 	bool result = info->deviceHandle != nullptr;
-
 	if (result && info->isDevice7Dof)
 	{
 		hdlMakeCurrent(info->deviceHandle->get());
@@ -643,7 +645,7 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 
 		int gripStatus[2] = { 0, 0 };
 		// OSG2 grips report their "handedness" in the LSB of the second raw status byte
-		hdlGripGetAttributes (HDL_GRIP_STATUS, 2, gripStatus);
+		hdlGripGetAttributes(HDL_GRIP_STATUS, 2, gripStatus);
 		if (isFatalError("Cannot get grip status"))
 		{
 			// HDL reported an error.  An error message was already logged.
@@ -747,11 +749,11 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
 		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
-			Vector3d(Vector3d::UnitX()));
+												 Vector3d(Vector3d::UnitX()));
 		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1] * info->orientationScale,
-			Vector3d(Vector3d::UnitY()));
+												 Vector3d(Vector3d::UnitY()));
 		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
-			Vector3d(Vector3d::UnitZ()));
+												 Vector3d(Vector3d::UnitZ()));
 		info->scaledPose.linear() = rotationY * rotationZ * rotationX;
 	}
 
@@ -805,8 +807,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
 	Math::Vector6d deltaPosition;
 	DataGroup::DynamicMatrixType springJacobian;
-	bool havespringJacobian =
-		outputData.matrices().get(DataStructures::Names::SPRING_JACOBIAN, &springJacobian);
+	bool havespringJacobian = outputData.matrices().get(DataStructures::Names::SPRING_JACOBIAN, &springJacobian);
 	if (havespringJacobian)
 	{
 		RigidTransform3d poseForNominal = info->scaledPose;
@@ -815,8 +816,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		Vector3d rotationVector = Vector3d::Zero();
 		Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
 
-		Math::setSubVector(info->scaledPose.translation() - poseForNominal.translation(), 0, 3,
-			&deltaPosition);
+		Math::setSubVector(info->scaledPose.translation() - poseForNominal.translation(), 0, 3, &deltaPosition);
 		Math::setSubVector(rotationVector, 1, 3, &deltaPosition);
 
 		info->force += springJacobian.block<3,6>(0, 0) * deltaPosition;
@@ -825,8 +825,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	// If the damperJacobian was provided, calculate a delta force based on the change in velocity.
 	Math::Vector6d deltaVelocity;
 	DataGroup::DynamicMatrixType damperJacobian;
-	bool havedamperJacobian =
-		outputData.matrices().get(DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
+	bool havedamperJacobian = outputData.matrices().get(DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
 	if (havedamperJacobian)
 	{
 		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
@@ -902,7 +901,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 			// Which axes are going to be commanded may be hugely dependent on small changes in the pose.
 			// We want to gradually decrease the amount of roll torque produced near the degenerate point.
 			double ratio =  ((basisDeterminant - smallBasisDeterminantThreshold) /
-				(mediumBasisDeterminantThreshold - smallBasisDeterminantThreshold));
+							 (mediumBasisDeterminantThreshold - smallBasisDeterminantThreshold));
 			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
 
 			// The "fake" basis matrix replaces the X axis with a fake (so it's always invertible), but the output X
@@ -910,7 +909,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 			Matrix33d fakeDecompositionMatrix = fakeBasisMatrix.inverse();
 			fakeDecompositionMatrix.row(0) = Vector3d::Zero();
 
-			decompositionMatrix = basisMatrix.inverse() * ratio + fakeDecompositionMatrix * (1.-ratio);
+			decompositionMatrix = basisMatrix.inverse() * ratio + fakeDecompositionMatrix * (1.0 - ratio);
 		}
 		else
 		{
@@ -939,11 +938,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
 
 		info->torque[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
-			axisTorqueMin, axisTorqueMax);
+									   axisTorqueMin, axisTorqueMax);
 		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
-			axisTorqueMin, axisTorqueMax);
+									   axisTorqueMin, axisTorqueMax);
 		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
-			axisTorqueMin, axisTorqueMax);
+									   axisTorqueMin, axisTorqueMax);
 		info->torque[3] = 0;
 
 		if (info->isDeviceRollAxisReversed)  // commence swearing.
@@ -1125,14 +1124,14 @@ bool NovintScaffold::getGravityCompensation(const NovintScaffold::DeviceData* in
 
 	if (state1 == true && state2 == false)
 	{
-		SURGSIM_LOG_WARNING(m_state->logger) << "getting gravity compensation state for '" << info->deviceObject->getName() <<
-			"' does nothing!";
+		SURGSIM_LOG_WARNING(m_state->logger) << "getting gravity compensation state for '" <<
+			info->deviceObject->getName() << "' does nothing!";
 		return false;
 	}
 	else if (state1 != state2)
 	{
-		SURGSIM_LOG_WARNING(m_state->logger) << "getting gravity compensation state for '" << info->deviceObject->getName() <<
-			"' keeps changing?!?";
+		SURGSIM_LOG_WARNING(m_state->logger) << "getting gravity compensation state for '" <<
+			info->deviceObject->getName() << "' keeps changing?!?";
 		return false;
 	}
 
@@ -1172,8 +1171,9 @@ bool NovintScaffold::enforceGravityCompensation(const NovintScaffold::DeviceData
 		}
 	}
 
-	SURGSIM_LOG_WARNING(m_state->logger) << "failed to set gravity compensation for '" << info->deviceObject->getName() <<
-		"' to " << (gravityCompensationState ? "enabled" : "disabled") << " after " << maxAttempts << " attempts";
+	SURGSIM_LOG_WARNING(m_state->logger) << "failed to set gravity compensation for '" <<
+		info->deviceObject->getName() << "' to " <<
+		(gravityCompensationState ? "enabled" : "disabled") << " after " << maxAttempts << " attempts";
 	return false;
 }
 
@@ -1210,7 +1210,10 @@ void NovintScaffold::setPositionScale(const NovintDevice* device, double scale)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-		[&device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+								  [&device](const std::unique_ptr<DeviceData>& info) 
+								  {
+									  return info->deviceObject == device;
+								  });
 	if (matching != m_state->registeredDevices.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
@@ -1222,7 +1225,10 @@ void NovintScaffold::setOrientationScale(const NovintDevice* device, double scal
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto& matching = std::find_if(m_state->registeredDevices.begin(), m_state->registeredDevices.end(),
-		[&device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+								  [&device](const std::unique_ptr<DeviceData>& info)
+								  {
+									  return info->deviceObject == device;
+								  });
 	if (matching != m_state->registeredDevices.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);

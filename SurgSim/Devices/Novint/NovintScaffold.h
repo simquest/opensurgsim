@@ -19,7 +19,6 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
@@ -28,7 +27,6 @@ namespace Devices
 {
 
 class NovintDevice;
-
 
 /// A class that manages Novint Falcon devices.
 ///
