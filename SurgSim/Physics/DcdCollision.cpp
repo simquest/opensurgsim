@@ -57,7 +57,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	{
 		if (pair->getType() == Collision::COLLISION_DETECTION_TYPE_DISCRETE)
 		{
-			tasks.push_back(threadPool->enqueue<void>([&]()
+			tasks.push_back(threadPool->enqueue<void>([&calculations, &pair]()
 			{
 				calculations[pair->getFirst()->getShapeType()]
 				[pair->getSecond()->getShapeType()]->calculateContact(pair);
