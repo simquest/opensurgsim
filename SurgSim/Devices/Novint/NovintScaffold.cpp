@@ -188,7 +188,7 @@ public:
 		m_callbackHandle = hdlCreateServoOp(run, scaffold, false);
 		if (!isFatalError("Failed to create servoOp callback"))
 		{
-			if (m_callbackHandle == HDL_INVALID_HANDLE)
+			if (!isValid())
 			{
 				SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 					"Servo operation created, but invalid servo operation entry handle returned." << std::endl <<
@@ -456,11 +456,8 @@ NovintScaffold::~NovintScaffold()
 			m_state->initializationTime + boost::chrono::milliseconds(MINIMUM_LIFETIME_MILLISECONDS);
 		boost::this_thread::sleep_until(earliestEndTime);
 
-		if (m_state->callback != nullptr)
-		{
-			m_state->callback = nullptr;
-			SURGSIM_LOG_DEBUG(m_logger) << "Callback reset.";
-		}
+		m_state->callback = nullptr;
+		SURGSIM_LOG_DEBUG(m_logger) << "Callback reset.";
 
 		SURGSIM_LOG_DEBUG(m_logger) << "Stopping HDAL scheduler...";
 		hdlStop();
@@ -979,13 +976,15 @@ bool NovintScaffold::createAllHandles()
 	// Then use hdlCatalogDevices to get the serial numbers for other connected devices not listed in device.yaml,
 	// and initialize them (by serial number).
 	// When registerDevice is called the name can be matched to a Handle created from a serial number.
+	// Note: initializaiton name is case insensitive.
 	for (const auto& item : m_state->nameToSerial)
 	{
 		std::string deviceName = item.first;
 		std::transform(deviceName.begin(), deviceName.end(), deviceName.begin(), tolower);
 		if (deviceName == "default")
 		{
-			SURGSIM_LOG_INFO(m_logger) << "'Default' is system reserved. No Novint device should be named 'Default'.";
+			SURGSIM_LOG_INFO(m_logger) << "'" << item.first <<
+				"' is system reserved. No Novint device should be named 'Default' (case insensitive).";
 			continue;
 		}
 
