@@ -117,14 +117,13 @@ public:
 	explicit Handle(const std::string& info, bool initBySerialNumber = true) :
 		m_deviceHandle(HDL_INVALID_HANDLE)
 	{
-		HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
 		if (initBySerialNumber)
 		{
-			deviceHandle = hdlInitDeviceBySerialNumber(info.c_str());
+			m_deviceHandle = hdlInitDeviceBySerialNumber(info.c_str());
 		}
 		else
 		{
-			deviceHandle = hdlInitNamedDevice(info.c_str());
+			m_deviceHandle = hdlInitNamedDevice(info.c_str());
 		}
 
 		if (isFatalError("Failed to initialize"))
@@ -132,7 +131,7 @@ public:
 			SURGSIM_LOG_INFO(Framework::Logger::getLogger("Devices/Novint")) <<
 				(initBySerialNumber ? "HDAL serial number: '" : "device name: '") << info << "'";
 		}
-		else if (deviceHandle == HDL_INVALID_HANDLE)
+		else if (!isValid())
 		{
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 				"No error during initializing device " <<
@@ -141,9 +140,8 @@ public:
 		}
 		else
 		{
-			m_deviceHandle = deviceHandle;
 			SURGSIM_LOG_DEBUG(Framework::Logger::getLogger("Devices/Novint")) <<
-				"Handle " << deviceHandle << " created for device: '" << info << "'.";
+				"Handle " << m_deviceHandle << " created for device: '" << info << "'.";
 		}
 	}
 
