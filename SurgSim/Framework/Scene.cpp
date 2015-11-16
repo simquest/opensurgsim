@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest LLC.
+// Copyright 2013-2015, SimQuest LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,6 +73,32 @@ void Scene::addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements
 	for (auto element : elements)
 	{
 		addSceneElement(element);
+	}
+}
+
+void Scene::removeSceneElement(std::shared_ptr<SceneElement> element)
+{
+	bool found;
+	{
+		boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
+		auto it = std::find(m_elements.begin(),  m_elements.end(), element);
+		found = it != m_elements.end();
+		if (found)
+		{
+			m_elements.erase(it);
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
+					<< "Could not find element '" << element->getName() << "' in Scene, unable to remove";
+		}
+	}
+	if (found)
+	{
+		for (auto& component : element->getComponents())
+		{
+			element->removeComponent(component);
+		}
 	}
 }
 
