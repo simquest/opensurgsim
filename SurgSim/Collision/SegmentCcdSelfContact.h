@@ -66,14 +66,14 @@ public:
 	void setTimeMinPrecisionEpsilon(double precision);
 
 	/// \return the minimum time precision allowed when deciding on the depth of recursion.
-	double timeMinPrecisionEpsilon();
+	double getTimeMinPrecisionEpsilon();
 
 	/// Set the maximum time precision allowed when deciding on the depth of recursion.
 	/// \param precision the desired maximum time precision
 	void setTimeMaxPrecisionEpsilon(double precision);
 
 	/// \return the maximum time precision allowed when deciding on the depth of recursion.
-	double timeMaxPrecisionEpsilon();
+	double getTimeMaxPrecisionEpsilon();
 
 	/// Set the maximum separation for which two points are considered the same.
 	/// \param precision the desired maximum separation for which two points are considered the same.
@@ -117,10 +117,10 @@ protected:
 	/// Given a list of potentially intersecting AABB nodes, cull the list of any duplicates
 	/// and return the uniques candidates as synchronized pairs.
 	/// \param intersectionList list of potentially intersecting AABB node.
-	/// \param segmentIdList [out] paired unique matches
+	/// \param segmentIds [out] paired unique matches
 	void getUniqueCandidates(
 		const std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
-		std::list<std::pair<size_t, size_t>>* segmentIdList) const;
+		std::set<std::pair<size_t, size_t>>* segmentIds) const;
 
 	/// From the initial AABB tree collisions, there are some very simple filtering operations that we can
 	/// do to eliminate a number of false positives. Most notably, we do not want to collide a single segment
@@ -132,7 +132,7 @@ protected:
 	/// \param segment1SegID the specific identifier of the candidate segment at time t=0.
 	/// \param segment2SegID the specific identifier of the candidate segment at time t=1.
 	/// \return true if this collision should be discarded, false if it should be processed further.
-	bool preFilterCollision(
+	bool removeInvalidCollisions(
 		const Math::SegmentMeshShape& segmentA,
 		const Math::SegmentMeshShape& segmentB,
 		size_t segment1SegID, size_t segment2SegID) const;
