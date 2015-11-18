@@ -36,7 +36,7 @@ public:
 	using ContactCalculation::calculateContact;
 
 	/// \note this expects the posed version of the shape to be passed
-	std::list<std::shared_ptr<Contact>> calculateContact(
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::MeshShape& mesh1,
 										 const Math::RigidTransform3d& mesh1Pose,
 										 const Math::MeshShape& mesh2,

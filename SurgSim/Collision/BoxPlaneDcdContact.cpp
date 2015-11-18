@@ -36,7 +36,7 @@ std::pair<int, int> BoxPlaneDcdContact::getShapeTypes()
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
-std::list<std::shared_ptr<Contact>> BoxPlaneDcdContact::calculateContact(
+std::list<std::shared_ptr<Contact>> BoxPlaneDcdContact::calculateDcdContact(
 									 const SurgSim::Math::BoxShape& boxShape,
 									 const SurgSim::Math::RigidTransform3d& boxPose,
 									 const SurgSim::Math::PlaneShape& planeShape,

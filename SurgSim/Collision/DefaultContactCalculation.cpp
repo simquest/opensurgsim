@@ -49,11 +49,9 @@ void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair
 			<< pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
 }
 
-std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateContact(
-									 const std::shared_ptr<Math::Shape>& shape1,
-									 const Math::RigidTransform3d& pose1,
-									 const std::shared_ptr<Math::Shape>& shape2,
-									 const Math::RigidTransform3d& pose2)
+std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateDcdContact(
+	const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
+	const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2)
 {
 	SURGSIM_ASSERT(!m_doAssert)
 			<< "Contact calculation not implemented for pairs with types ("

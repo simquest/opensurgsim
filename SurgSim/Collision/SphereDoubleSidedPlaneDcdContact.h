@@ -36,7 +36,7 @@ class SphereDoubleSidedPlaneDcdContact :
 public:
 	using ContactCalculation::calculateContact;
 
-	std::list<std::shared_ptr<Contact>> calculateContact(
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::SphereShape& sphere,
 										 const Math::RigidTransform3d& spherePose,
 										 const Math::DoubleSidedPlaneShape& plane,

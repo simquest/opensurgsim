@@ -35,7 +35,7 @@ class CapsuleSphereDcdContact : public ShapeShapeContactCalculation<Math::Capsul
 public:
 	using ContactCalculation::calculateContact;
 
-	std::list<std::shared_ptr<Contact>> calculateContact(
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::CapsuleShape& capsule,
 										 const Math::RigidTransform3d& capsulePose,
 										 const Math::SphereShape& sphere,

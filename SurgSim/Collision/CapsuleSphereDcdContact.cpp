@@ -36,7 +36,7 @@ std::pair<int, int> CapsuleSphereDcdContact::getShapeTypes()
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_CAPSULE, SurgSim::Math::SHAPE_TYPE_SPHERE);
 }
 
-std::list<std::shared_ptr<Contact>> CapsuleSphereDcdContact::calculateContact(
+std::list<std::shared_ptr<Contact>> CapsuleSphereDcdContact::calculateDcdContact(
 									 const Math::CapsuleShape& capsule, const Math::RigidTransform3d& capsulePose,
 									 const Math::SphereShape& sphere, const Math::RigidTransform3d& spherePose) const
 {

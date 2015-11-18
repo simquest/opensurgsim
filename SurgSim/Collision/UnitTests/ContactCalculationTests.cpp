@@ -79,8 +79,8 @@ TEST(ContactCalculationTests, SwappedShapeTest)
 
 	auto transform = Math::RigidTransform3d::Identity();
 
-	ASSERT_NO_THROW(calc->calculateContact(sphere, transform, plane, transform));
-	ASSERT_NO_THROW(calc->calculateContact(plane, transform, sphere, transform));
+	ASSERT_NO_THROW(calc->calculateDcdContact(sphere, transform, plane, transform));
+	ASSERT_NO_THROW(calc->calculateDcdContact(plane, transform, sphere, transform));
 
 	auto planeRep = std::make_shared<ShapeCollisionRepresentation>("Plane Shape");
 	planeRep->setShape(plane);
@@ -96,8 +96,8 @@ TEST(ContactCalculationTests, SwappedShapeTest)
 	calc->calculateContact(pair1);
 	calc->calculateContact(pair2);
 
-	auto contacts1 = calc->calculateContact(sphere, transform, plane, transform);
-	auto contacts2 = calc->calculateContact(plane, transform, sphere, transform);
+	auto contacts1 = calc->calculateDcdContact(sphere, transform, plane, transform);
+	auto contacts2 = calc->calculateDcdContact(plane, transform, sphere, transform);
 
 	contactsInfoEqualityTest(pair1->getContacts(), contacts1);
 

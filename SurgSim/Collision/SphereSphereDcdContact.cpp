@@ -29,7 +29,7 @@ namespace SurgSim
 namespace Collision
 {
 
-std::list<std::shared_ptr<Contact>> SphereSphereDcdContact::calculateContact(
+std::list<std::shared_ptr<Contact>> SphereSphereDcdContact::calculateDcdContact(
 									 const Math::SphereShape& sphere1,
 									 const Math::RigidTransform3d& sphere1Pose,
 									 const Math::SphereShape& sphere2,

@@ -33,9 +33,9 @@ class CollisionPair;
 class SpherePlaneDcdContact : public ShapeShapeContactCalculation<Math::SphereShape, Math::PlaneShape>
 {
 public:
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
-	std::list<std::shared_ptr<Contact>> calculateContact(
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::SphereShape& sphere,
 										 const Math::RigidTransform3d& spherePose,
 										 const Math::PlaneShape& plane,

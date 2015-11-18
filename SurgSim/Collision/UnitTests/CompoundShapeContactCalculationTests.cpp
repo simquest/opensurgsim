@@ -64,8 +64,8 @@ TEST_F(CompoundShapeDcdContactTest, SingleCube)
 	auto calc2 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_SPHERE];
 
 
-	auto expected = calc1->calculateContact(box, identity, sphere, transform);
-	auto result = calc2->calculateContact(compoundShape, identity, sphere, transform);
+	auto expected = calc1->calculateDcdContact(box, identity, sphere, transform);
+	auto result = calc2->calculateDcdContact(compoundShape, identity, sphere, transform);
 
 	contactsInfoEqualityTest(expected, result);
 }
@@ -93,12 +93,12 @@ TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 	auto calc1 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_PLANE];
 	auto calc2 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_PLANE];
 
-	auto result = calc2->calculateContact(compoundShape, basePose, plane, identity);
+	auto result = calc2->calculateDcdContact(compoundShape, basePose, plane, identity);
 
 	std::list<std::shared_ptr<Contact>> expected;
 
-	expected.splice(expected.end(), calc1->calculateContact(box, basePose * box1Pose, plane, identity));
-	expected.splice(expected.end(), calc1->calculateContact(box, basePose * box2Pose, plane, identity));
+	expected.splice(expected.end(), calc1->calculateDcdContact(box, basePose * box1Pose, plane, identity));
+	expected.splice(expected.end(), calc1->calculateDcdContact(box, basePose * box2Pose, plane, identity));
 
 	contactsInfoEqualityTest(expected, result);
 }

@@ -36,11 +36,9 @@ size_t OctreeDcdContact::Vector3dHash::operator()(const SurgSim::Math::Vector3d&
 }
 
 
-std::list<std::shared_ptr<Contact>> OctreeDcdContact::doCalculateContact(
-									 const std::shared_ptr<Math::Shape>& shape1,
-									 const Math::RigidTransform3d& pose1,
-									 const std::shared_ptr<Math::Shape>& shape2,
-									 const Math::RigidTransform3d& pose2)
+std::list<std::shared_ptr<Contact>> OctreeDcdContact::doCalculateDcdContact(
+	const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
+	const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2)
 {
 	SURGSIM_ASSERT(shape1->getType() == Math::SHAPE_TYPE_OCTREE) << "Octree Contact needs an OctreeShape.";
 

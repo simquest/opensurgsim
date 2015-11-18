@@ -136,7 +136,7 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 } // namespace
 #endif //SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
 
-std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshDcdContact::calculateContact(
+std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshDcdContact::calculateDcdContact(
 									 const Math::MeshShape& meshA,
 									 const Math::RigidTransform3d& meshAPose,
 									 const Math::MeshShape& meshB,

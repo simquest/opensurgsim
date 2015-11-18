@@ -35,7 +35,7 @@ std::pair<int, int> TriangleMeshPlaneDcdContact::getShapeTypes()
 	return std::pair<int, int> (SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
-std::list<std::shared_ptr<Contact>> TriangleMeshPlaneDcdContact::calculateContact(
+std::list<std::shared_ptr<Contact>> TriangleMeshPlaneDcdContact::calculateDcdContact(
 									 const Math::MeshShape& mesh,
 									 const Math::RigidTransform3d& meshPose,
 									 const Math::PlaneShape& plane, const Math::RigidTransform3d& planePose) const

@@ -37,7 +37,7 @@ public:
 	using ContactCalculation::calculateContact;
 
 	/// \note poses are ignored for this calculation
-	std::list<std::shared_ptr<Contact>> calculateContact(
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::MeshShape& mesh,
 										 const Math::RigidTransform3d&,
 										 const Math::ParticlesShape& particles,

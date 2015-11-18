@@ -38,7 +38,7 @@ public:
 
 	using ContactCalculation::calculateContact;
 
-	std::list<std::shared_ptr<Contact>> calculateContact(
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::BoxShape& boxShape,
 										 const Math::RigidTransform3d& boxPose,
 										 const Math::SphereShape& sphereShape,

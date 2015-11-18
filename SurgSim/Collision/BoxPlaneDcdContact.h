@@ -37,7 +37,7 @@ class BoxPlaneDcdContact : public ShapeShapeContactCalculation<Math::BoxShape, M
 public:
 	using ContactCalculation::calculateContact;
 
-	std::list<std::shared_ptr<Contact>> calculateContact(
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const SurgSim::Math::BoxShape& boxShape,
 										 const SurgSim::Math::RigidTransform3d& boxPose,
 										 const SurgSim::Math::PlaneShape& planeShape,

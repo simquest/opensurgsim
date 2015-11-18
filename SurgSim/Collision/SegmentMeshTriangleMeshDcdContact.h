@@ -38,7 +38,7 @@ public:
 
 	std::pair<int, int> getShapeTypes() override;
 
-	std::list<std::shared_ptr<Contact>> calculateContact(
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::SegmentMeshShape& segmentMeshShape,
 										 const Math::RigidTransform3d&,
 										 const Math::MeshShape& triangleMeshShape,

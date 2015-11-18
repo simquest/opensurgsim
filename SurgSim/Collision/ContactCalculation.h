@@ -21,7 +21,6 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Math/RigidTransform.h"
-
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -42,26 +41,24 @@ namespace Collision
 class ContactCalculation
 {
 public:
-
 	/// Constructor
 	ContactCalculation();
 
 	/// Destructor
 	virtual ~ContactCalculation();
 
-	/// Calculate the contacts
+	/// Calculate the contacts for a given pair
 	/// \param	pair	A CollisionPair that is under consideration, new contacts will be added to this pair
 	void calculateContact(std::shared_ptr<CollisionPair> pair);
 
-	/// Calculate the contacts between two shapes
-	/// \param shape1, shape2 The shapes for which to calculate the contacts
-	/// \param pose1, pose2 The respective poses for the shapes
-	/// \return a list of contacts between the two given shapes
-	std::list<std::shared_ptr<Contact>> calculateContact(
-										 const std::shared_ptr<Math::Shape>& shape1,
-										 const Math::RigidTransform3d& pose1,
-										 const std::shared_ptr<Math::Shape>& shape2,
-										 const Math::RigidTransform3d& pose2);
+	/// Calculate the dcd contacts between two posed/transformed shapes
+	/// \param shape1, pose1 The first transformed shape for which to calculate the dcd contacts
+	/// \param shape2, pose2 The second transformed shape for which to calculate the dcd contacts
+	/// \return a list of contacts between the two given posed shapes
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
+		const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
+		const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2);
+
 
 	/// Virtual function that returns the shapes that this ContactCalculation class handles.
 	/// \return Return the shape types this class handles.
@@ -85,12 +82,12 @@ private:
 	/// Virtual function receives the call from the public interface, usually will type the
 	/// shapes statically to their known types and then execute a specific contact calculation
 	/// between the two shapes
-	/// \param shape1, shape2 The shapes for which to calculate the contacts
-	/// \param pose1, pose2 The respective poses for the shapes
-	/// \return a list of contacts between the two given shapes
-	virtual std::list<std::shared_ptr<Contact>> doCalculateContact(
-				const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
-				const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) = 0;
+	/// \param shape1, pose1 The first posed shape for which to calculate the dcd contacts
+	/// \param shape2, pose2 The second posed shape for which to calculate the dcd contacts
+	/// \return a list of dcd contacts between the two given posed shapes
+	virtual std::list<std::shared_ptr<Contact>> doCalculateDcdContact(
+		const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
+		const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) = 0;
 
 
 	/// Statically initialize the table, used via call once

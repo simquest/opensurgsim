@@ -41,7 +41,7 @@ std::pair<int, int> TriangleMeshParticlesDcdContact::getShapeTypes()
 	return std::pair<int, int>(Math::SHAPE_TYPE_MESH, Math::SHAPE_TYPE_PARTICLES);
 }
 
-std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateContact(
+std::list<std::shared_ptr<Contact>> TriangleMeshParticlesDcdContact::calculateDcdContact(
 									 const Math::MeshShape& mesh,
 									 const Math::RigidTransform3d&,
 									 const Math::ParticlesShape& particles,

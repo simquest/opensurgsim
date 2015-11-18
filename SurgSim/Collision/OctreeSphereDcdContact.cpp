@@ -32,7 +32,7 @@ std::list<std::shared_ptr<Contact>> OctreeSphereDcdContact::boxContactCalculatio
 		const SurgSim::Math::BoxShape& boxShape, const SurgSim::Math::RigidTransform3d& boxPose,
 		const SurgSim::Math::Shape& otherShape, const SurgSim::Math::RigidTransform3d& otherPose)
 {
-	return m_calculator.calculateContact(boxShape, boxPose, static_cast<const SphereShape&>(otherShape), otherPose);
+	return m_calculator.calculateDcdContact(boxShape, boxPose, static_cast<const SphereShape&>(otherShape), otherPose);
 }
 
 };

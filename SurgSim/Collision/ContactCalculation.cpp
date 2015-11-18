@@ -56,22 +56,20 @@ void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 	doCalculateContact(pair);
 }
 
-std::list<std::shared_ptr<Contact>> ContactCalculation::calculateContact(
-									 const std::shared_ptr<Math::Shape>& shape1,
-									 const Math::RigidTransform3d& pose1,
-									 const std::shared_ptr<Math::Shape>& shape2,
-									 const Math::RigidTransform3d& pose2)
+std::list<std::shared_ptr<Contact>> ContactCalculation::calculateDcdContact(
+	const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
+	const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2)
 {
 	auto types = getShapeTypes();
 	auto incoming = std::make_pair(shape1->getType(), shape2->getType());
 	if (incoming == types)
 	{
-		return doCalculateContact(shape1, pose1, shape2, pose2);
+		return doCalculateDcdContact(shape1, pose1, shape2, pose2);
 	}
 
 	if (incoming.first == types.second && incoming.second == types.first)
 	{
-		auto contacts = doCalculateContact(shape2, pose2, shape1, pose1);
+		auto contacts = doCalculateDcdContact(shape2, pose2, shape1, pose1);
 		for (const auto& contact : contacts)
 		{
 			contact->normal = -contact->normal;
@@ -123,8 +121,14 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 		shape2 = pair->getSecond()->getPosedShape();
 	}
 
-	auto contacts = doCalculateContact(shape1, pair->getFirst()->getPose(),
-									   shape2, pair->getSecond()->getPose());
+	// Are we using Dcd or Ccd for this pair ?
+	std::list<std::shared_ptr<Contact>> contacts;
+	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
+	{
+		contacts = doCalculateDcdContact(
+			shape1, pair->getFirst()->getPose(),
+			shape2, pair->getSecond()->getPose());
+	}
 	for (auto& contact : contacts)
 	{
 		pair->addContact(contact);
