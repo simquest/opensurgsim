@@ -15,6 +15,8 @@
 
 #include <thread>
 
+#include "SurgSim/Framework/Log.h"
+
 #include "SurgSim/Collision/ContactCalculation.h"
 
 #include "SurgSim/Collision/DcdCollision.h"
@@ -27,6 +29,7 @@ namespace Collision
 {
 
 ContactCalculation::TableType ContactCalculation::m_contactDcdCalculations;
+ContactCalculation::TableType ContactCalculation::m_contactCcdCalculations;
 std::once_flag ContactCalculation::m_initializationFlag;
 
 ContactCalculation::ContactCalculation()
@@ -39,16 +42,30 @@ ContactCalculation::~ContactCalculation()
 
 void ContactCalculation::registerDcdContactCalculation(const std::shared_ptr<ContactCalculation>& calculation)
 {
-	std::call_once(m_initializationFlag, ContactCalculation::initializeTable);
+	std::call_once(m_initializationFlag, ContactCalculation::initializeTables);
 
 	privateDcdRegister(calculation, calculation->getShapeTypes());
 }
 
+void ContactCalculation::registerCcdContactCalculation(const std::shared_ptr<ContactCalculation>& calculation)
+{
+	std::call_once(m_initializationFlag, ContactCalculation::initializeTables);
+
+	privateCcdRegister(calculation, calculation->getShapeTypes());
+}
+
 const ContactCalculation::TableType& ContactCalculation::getDcdContactTable()
 {
-	std::call_once(m_initializationFlag, ContactCalculation::initializeTable);
+	std::call_once(m_initializationFlag, ContactCalculation::initializeTables);
 
 	return m_contactDcdCalculations;
+}
+
+const ContactCalculation::TableType& ContactCalculation::getCcdContactTable()
+{
+	std::call_once(m_initializationFlag, ContactCalculation::initializeTables);
+
+	return m_contactCcdCalculations;
 }
 
 void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
@@ -129,19 +146,31 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 			shape1, pair->getFirst()->getPose(),
 			shape2, pair->getSecond()->getPose());
 	}
+	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
+	{
+	}
+	else
+	{
+		using Framework::Logger;
+		SURGSIM_LOG_ONCE(Logger::getLogger("ContactCalculation"), WARNING) <<
+			"Invalid collision detection type, neither discrete nor continuous";
+	}
+
 	for (auto& contact : contacts)
 	{
 		pair->addContact(contact);
 	}
 }
 
-void ContactCalculation::initializeTable()
+void ContactCalculation::initializeTables()
 {
+	// Fill up both tables with default empty contact calculation
 	for (int i = 0; i < SurgSim::Math::SHAPE_TYPE_COUNT; ++i)
 	{
 		for (int j = 0; j < SurgSim::Math::SHAPE_TYPE_COUNT; ++j)
 		{
 			m_contactDcdCalculations[i][j].reset(new Collision::DefaultContactCalculation(false));
+			m_contactCcdCalculations[i][j].reset(new Collision::DefaultContactCalculation(false));
 		}
 	}
 
@@ -184,6 +213,9 @@ void ContactCalculation::initializeTable()
 		ContactCalculation::privateDcdRegister(std::make_shared<Collision::CompoundShapeDcdContact>(
 											   std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, type)));
 	}
+
+	// Fill up the Ccd contact calculation table
+	//ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentCcdSelfContact>());
 }
 
 void ContactCalculation::privateDcdRegister(
@@ -198,6 +230,20 @@ void ContactCalculation::privateDcdRegister(
 {
 	m_contactDcdCalculations[types.first][types.second] = calculation;
 	m_contactDcdCalculations[types.second][types.first] = calculation;
+}
+
+void ContactCalculation::privateCcdRegister(
+	const std::shared_ptr<ContactCalculation>& calculation)
+{
+	privateCcdRegister(calculation, calculation->getShapeTypes());
+}
+
+void ContactCalculation::privateCcdRegister(
+	const std::shared_ptr<ContactCalculation>& calculation,
+	const std::pair<int, int>& types)
+{
+	m_contactCcdCalculations[types.first][types.second] = calculation;
+	m_contactCcdCalculations[types.second][types.first] = calculation;
 }
 
 }; // namespace Collision

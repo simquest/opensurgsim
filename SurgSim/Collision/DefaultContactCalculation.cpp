@@ -63,5 +63,20 @@ std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateDcdCon
 
 }
 
+std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateCcdContact(
+	const std::shared_ptr<Math::Shape>& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
+	const std::shared_ptr<Math::Shape>& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
+	const std::shared_ptr<Math::Shape>& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
+	const std::shared_ptr<Math::Shape>& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1)
+{
+	SURGSIM_ASSERT(!m_doAssert)
+		<< "Contact calculation not implemented for pairs with types ("
+		<< shape1AtTime0->getType() << ", " << shape2AtTime0->getType() << ").";
+	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
+		<< "Contact calculation not implemented for pairs with types ("
+		<< shape1AtTime0->getType() << ", " << shape2AtTime0->getType() << ").";
+	return std::list<std::shared_ptr<Contact>>();
+}
+
 }; // namespace Collision
 }; // namespace SurgSim

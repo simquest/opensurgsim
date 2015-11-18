@@ -31,7 +31,6 @@ class CollisionPair;
 class DefaultContactCalculation : public ContactCalculation
 {
 public:
-
 	/// Constructor
 	/// \param doAssert If set the calculation will throw an exception if it is executed, this
 	/// 				can be used to detect cases where a  contact calculation is being called
@@ -52,6 +51,11 @@ private:
 		const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
 		const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) override;
 
+	std::list<std::shared_ptr<Contact>> doCalculateCcdContact(
+		const std::shared_ptr<Math::Shape>& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
+		const std::shared_ptr<Math::Shape>& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
+		const std::shared_ptr<Math::Shape>& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
+		const std::shared_ptr<Math::Shape>& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) override;
 };
 
 }; // namespace Collision
