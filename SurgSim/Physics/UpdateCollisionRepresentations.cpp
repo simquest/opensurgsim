@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Physics/UpdateCollisionRepresentations.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Collision/Representation.h"
@@ -36,13 +38,18 @@ std::shared_ptr<PhysicsManagerState> SurgSim::Physics::UpdateCollisionRepresenta
 		const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
-	auto& representations = result->getActiveCollisionRepresentations();
 
-	std::for_each(representations.begin(), representations.end(),
-				  [&dt](std::shared_ptr<SurgSim::Collision::Representation> representation)
+	auto threadPool = Framework::Runtime::getThreadPool();
+	std::vector<std::future<void>> tasks;
+	auto& representations = result->getActiveCollisionRepresentations();
+	for (auto& representation : representations)
 	{
-		representation->update(dt);
-	});
+		tasks.push_back(threadPool->enqueue<void>([dt, &representation]() { representation->update(dt); }));
+	}
+	for (auto& task : tasks)
+	{
+		task.get();
+	}
 
 	return result;
 }

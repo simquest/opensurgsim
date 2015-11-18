@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ namespace SurgSim
 {
 namespace Devices
 {
+
+SURGSIM_STATIC_REGISTRATION(PoseTransform);
 
 /// A device filter that transforms the input pose.  It can scale the translation, and/or apply a constant transform.
 /// Any other data in the DataGroup is passed through.  For an input/output device (e.g., a haptic device), the filter

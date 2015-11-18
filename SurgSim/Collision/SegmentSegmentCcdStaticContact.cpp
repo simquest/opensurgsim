@@ -151,7 +151,7 @@ bool SegmentSegmentCcdStaticContact::collideStaticPointSegment(
 	*r =  bc.dot(ba) / bcNormSQ;
 
 	// Clamp abscissa
-	Math::clamp(r, 0.0, 1.0, 0.0);
+	Math::epsilonClamp(r, 0.0, 1.0, 0.0);
 
 	// Compute the closest point of a on [bc]
 	Math::Vector3d closestPtOnBC = Math::interpolate(b, c, *r);

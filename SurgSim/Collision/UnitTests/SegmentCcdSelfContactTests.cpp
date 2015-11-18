@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,17 +74,17 @@ public:
 		return SegmentCcdSelfContact::detectExcessMovement(pt0, pt1, threshold);
 	}
 
-	bool preFilterCollision(
+	bool removeInvalidCollisions(
 		const Math::SegmentMeshShape& segmentA,
 		const Math::SegmentMeshShape& segmentB,
 		size_t id1, size_t id2) const
 	{
-		return SegmentCcdSelfContact::preFilterCollision(segmentA, segmentB, id1, id2);
+		return SegmentCcdSelfContact::removeInvalidCollisions(segmentA, segmentB, id1, id2);
 	}
 
 	void getUniqueCandidates(
 		const std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
-		std::list<std::pair<size_t, size_t>>* segmentIdList) const
+		std::set<std::pair<size_t, size_t>>* segmentIdList) const
 	{
 		SegmentCcdSelfContact::getUniqueCandidates(intersectionList, segmentIdList);
 	}
@@ -202,16 +202,21 @@ TEST_F(SegmentCcdSelfContactTests, Initialization)
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SEGMENTMESH, shapeTypes.first);
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SEGMENTMESH, shapeTypes.second);
 
-	EXPECT_DOUBLE_EQ(1e-06, selfContact.timeMinPrecisionEpsilon());
-	EXPECT_DOUBLE_EQ(1e-06, selfContact.timeMaxPrecisionEpsilon());
+	EXPECT_DOUBLE_EQ(1e-06, selfContact.getTimeMinPrecisionEpsilon());
+	EXPECT_DOUBLE_EQ(1e-06, selfContact.getTimeMaxPrecisionEpsilon());
 	EXPECT_DOUBLE_EQ(1e-09, selfContact.distanceEpsilon());
+
+	EXPECT_ANY_THROW(selfContact.setTimeMinPrecisionEpsilon(0.0));
+	EXPECT_ANY_THROW(selfContact.setTimeMinPrecisionEpsilon(-2.0e-06));
+	EXPECT_ANY_THROW(selfContact.setTimeMaxPrecisionEpsilon(0.0));
+	EXPECT_ANY_THROW(selfContact.setTimeMaxPrecisionEpsilon(-1.0e-05));
 
 	selfContact.setTimeMinPrecisionEpsilon(2.0e-06);
 	selfContact.setTimeMaxPrecisionEpsilon(1.0e-05);
 	selfContact.setDistanceEpsilon(1.0e-06);
 
-	EXPECT_DOUBLE_EQ(2e-06, selfContact.timeMinPrecisionEpsilon());
-	EXPECT_DOUBLE_EQ(1.0e-05, selfContact.timeMaxPrecisionEpsilon());
+	EXPECT_DOUBLE_EQ(2e-06, selfContact.getTimeMinPrecisionEpsilon());
+	EXPECT_DOUBLE_EQ(1.0e-05, selfContact.getTimeMaxPrecisionEpsilon());
 	EXPECT_DOUBLE_EQ(1.0e-06, selfContact.distanceEpsilon());
 };
 
@@ -374,53 +379,53 @@ TEST_F(SegmentCcdSelfContactTests, DetectExcessMovement)
 	EXPECT_TRUE(m_selfContact.detectExcessMovement(point2, point1, 1.0e-03));
 };
 
-TEST_F(SegmentCcdSelfContactTests, PreFilterCollision)
+TEST_F(SegmentCcdSelfContactTests, RemoveInvalidCollisions)
 {
 	std::shared_ptr<SegmentMeshShape> shapeT0 =
 		buildLoop(1.0e-03, 1.0e-04);
 	std::shared_ptr<SegmentMeshShape> shapeT1 =
 		buildLoop(-1.0e-03, 1.0e-04);
 
-	EXPECT_FALSE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
-	EXPECT_FALSE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 1, 9));
-	EXPECT_FALSE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 8));
-	EXPECT_FALSE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 1, 8));
+	EXPECT_FALSE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_FALSE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 1, 9));
+	EXPECT_FALSE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 8));
+	EXPECT_FALSE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 1, 8));
 
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 1, 1));
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 1));
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 1, 2));
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 1, 0));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 1, 1));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 1));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 1, 2));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 1, 0));
 
 	shapeT0->getVertex(0).position += Vector3d(10, 0, 0);
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
 	shapeT0->getVertex(0).position -= Vector3d(10, 0, 0);
 
 	shapeT0->getVertex(1).position += Vector3d(10, 0, 0);
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
 	shapeT0->getVertex(1).position -= Vector3d(10, 0, 0);
 
 	shapeT1->getVertex(0).position += Vector3d(10, 0, 0);
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
 	shapeT1->getVertex(0).position -= Vector3d(10, 0, 0);
 
 	shapeT1->getVertex(1).position += Vector3d(10, 0, 0);
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
 	shapeT1->getVertex(1).position -= Vector3d(10, 0, 0);
 
 	shapeT0->getVertex(9).position += Vector3d(10, 0, 0);
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
 	shapeT0->getVertex(9).position -= Vector3d(10, 0, 0);
 
 	shapeT0->getVertex(10).position += Vector3d(10, 0, 0);
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
 	shapeT0->getVertex(10).position -= Vector3d(10, 0, 0);
 
 	shapeT1->getVertex(9).position += Vector3d(10, 0, 0);
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
 	shapeT1->getVertex(9).position -= Vector3d(10, 0, 0);
 
 	shapeT1->getVertex(10).position += Vector3d(10, 0, 0);
-	EXPECT_TRUE(m_selfContact.preFilterCollision(*shapeT0, *shapeT1, 0, 9));
+	EXPECT_TRUE(m_selfContact.removeInvalidCollisions(*shapeT0, *shapeT1, 0, 9));
 	shapeT1->getVertex(10).position -= Vector3d(10, 0, 0);
 };
 
@@ -431,7 +436,7 @@ TEST_F(SegmentCcdSelfContactTests, GetUniqueCandidates)
 	std::shared_ptr<SegmentMeshShape> shapeT1 =
 		buildLoop(-1.0e-03, 1.0e-04);
 
-	std::list<std::pair<size_t, size_t>> segmentIdList;
+	std::set<std::pair<size_t, size_t>> segmentIdList;
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
 		= shapeT0->getAabbTree()->spatialJoin(*(shapeT1->getAabbTree()));
 	m_selfContact.getUniqueCandidates(intersectionList, &segmentIdList);
@@ -558,7 +563,7 @@ TEST_F(SegmentCcdSelfContactTests, CalculateContact)
 		EXPECT_EQ(1, collisionList.size());
 		std::shared_ptr<Collision::Contact> contacted = *(collisionList.begin());
 		EXPECT_EQ(CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, contacted->type);
-		EXPECT_GT(2.0 * m_selfContact.timeMinPrecisionEpsilon(), std::abs(contacted->time - 0.4375));
+		EXPECT_GT(2.0 * m_selfContact.getTimeMinPrecisionEpsilon(), std::abs(contacted->time - 0.4375));
 		EXPECT_GT(1.0e-08, contacted->contact.norm());
 		EXPECT_GT(1.0e-04, (contacted->normal.normalized() - Vector3d(0.0, 0.0, -1.0)).norm());
 		auto contactP = contacted->penetrationPoints.first.rigidLocalPosition.getValue();

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,30 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_SCALAR_INL_H
-#define SURGSIM_MATH_SCALAR_INL_H
+#ifndef SURGSIM_DEVICES_LEAP_LEAPUTILITIES_H
+#define SURGSIM_DEVICES_LEAP_LEAPUTILITIES_H
 
-#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/DataStructures/DataGroup.h"
+
 
 namespace SurgSim
 {
-namespace Math
+namespace Devices
 {
 
-template <class T>
-void epsilonClamp(T* value, T min, T max, T epsilon)
-{
-	*value = *value >= (max - epsilon) ? max : (*value <= (min + epsilon) ? min : *value);
-}
-
-template <typename T>
-const T CwiseEpsilonClampOp<T>::operator()(const T& x) const
-{
-	return  x >= m_sup - m_epsilon ? m_sup : (x <= m_inf + m_epsilon ? m_inf : x);
-}
+/// Correct an infrared image from the LeapDevice, given its distortion callibration map
+/// \param image The distorted infrared image
+/// \param distortion The distortion callibration map
+/// \return The corrected infrared image
+DataStructures::DataGroup::ImageType undistortLeapImage(const DataStructures::DataGroup::ImageType& image,
+		const DataStructures::DataGroup::ImageType& distortion);
 
 };
 };
 
-#endif // SURGSIM_MATH_SCALAR_INL_H
+#endif //SURGSIM_DEVICES_LEAP_LEAPUTILITIES_H
 

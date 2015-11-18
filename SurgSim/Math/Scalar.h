@@ -21,7 +21,7 @@ namespace SurgSim
 namespace Math
 {
 /// Clamp any values within an epsilon window to a maximum or minimum value.
-/// \note max is tested first, so if the value < min + epsilon and value > 
+/// \note max is tested first, so if the value < min + epsilon and value >
 /// max - epsilon, value will be set to max.
 /// \tparam T underlying type
 /// \param value [in/out] the value to be clamped
@@ -29,7 +29,22 @@ namespace Math
 /// \param max the maximum value for the clamp
 /// \param epsilon definition of the epsilon window.
 template <class T>
-void clamp(T* value, T min, T max, T epsilon);
+void epsilonClamp(T* value, T min, T max, T epsilon);
+
+// define a custom template unary functor
+template<typename T>
+class CwiseEpsilonClampOp
+{
+public:
+	CwiseEpsilonClampOp(const T& inf, const T& sup, const T& epsilon) : m_inf(inf), m_sup(sup),
+		m_epsilon(epsilon) {}
+	const T operator()(const T& x) const;
+
+private:
+	T m_inf;
+	T m_sup;
+	T m_epsilon;
+};
 
 };
 };
