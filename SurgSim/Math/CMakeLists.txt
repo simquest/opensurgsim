@@ -107,6 +107,8 @@ set(SURGSIM_MATH_HEADERS
 	PolynomialValues-inl.h
 	Quaternion.h
 	RigidTransform.h
+	Scalar.h
+	Scalar-inl.h
 	SegmentMeshShape.h
 	SegmentMeshShape-inl.h
 	Shape.h
