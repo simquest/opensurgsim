@@ -31,8 +31,7 @@ namespace Collision
 class TriangleMeshPlaneDcdContact : public ShapeShapeContactCalculation<Math::MeshShape, Math::PlaneShape>
 {
 public:
-
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::MeshShape& mesh,

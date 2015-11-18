@@ -33,7 +33,7 @@ class CollisionPair;
 class TriangleMeshTriangleMeshDcdContact : public ShapeShapeContactCalculation<Math::MeshShape, Math::MeshShape>
 {
 public:
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
 	/// \note this expects the posed version of the shape to be passed
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(

@@ -34,7 +34,7 @@ class CollisionPair;
 class BoxDoubleSidedPlaneDcdContact : public ShapeShapeContactCalculation<Math::BoxShape, Math::DoubleSidedPlaneShape>
 {
 public:
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const SurgSim::Math::BoxShape& boxShape,

@@ -32,7 +32,7 @@ class CollisionPair;
 class SphereSphereDcdContact : public ShapeShapeContactCalculation<Math::SphereShape, Math::SphereShape>
 {
 public:
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::SphereShape& sphere1,

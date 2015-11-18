@@ -34,7 +34,7 @@ class CollisionPair;
 class TriangleMeshParticlesDcdContact : public ShapeShapeContactCalculation<Math::MeshShape, Math::ParticlesShape>
 {
 public:
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
 	/// \note poses are ignored for this calculation
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(

@@ -33,8 +33,7 @@ class CollisionPair;
 class SegmentMeshTriangleMeshDcdContact : public ShapeShapeContactCalculation<Math::SegmentMeshShape, Math::MeshShape>
 {
 public:
-
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
 	std::pair<int, int> getShapeTypes() override;
 

@@ -32,7 +32,7 @@ namespace Collision
 class BoxCapsuleDcdContact : public ShapeShapeContactCalculation<Math::BoxShape, Math::CapsuleShape>
 {
 public:
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const SurgSim::Math::BoxShape& boxShape,

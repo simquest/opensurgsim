@@ -36,7 +36,7 @@ class BoxSphereDcdContact : public ShapeShapeContactCalculation<Math::BoxShape, 
 {
 public:
 
-	using ContactCalculation::calculateContact;
+	using ContactCalculation::calculateDcdContact;
 
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::BoxShape& boxShape,
