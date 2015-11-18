@@ -101,6 +101,16 @@ public:
 	virtual bool isValid() const = 0;
 };
 
+/// PosedShape is a transformed shape with a record of the pose used to transform it.
+struct PosedShape {
+	PosedShape() {}
+	PosedShape(const std::shared_ptr<Math::Shape>& shape, const Math::RigidTransform3d& pose) :
+		m_shape(shape), m_pose(pose) {}
+
+	std::shared_ptr<Math::Shape> m_shape;
+	Math::RigidTransform3d m_pose;
+};
+
 }; // Math
 }; // SurgSim
 
