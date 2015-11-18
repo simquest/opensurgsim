@@ -159,7 +159,9 @@ TEST(LeapDeviceTest, InputConsumer)
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 120);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("left"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("left_distortion"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("right"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("right_distortion"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("pose"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("ThumbProximal"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("ThumbIntermediate"));

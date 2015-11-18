@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,6 +33,9 @@ class DataGroupCopier;
 
 namespace Devices
 {
+
+SURGSIM_STATIC_REGISTRATION(PoseIntegrator);
+
 /// A device filter that integrates the pose, turning a relative device into an absolute one.
 /// Also provides the instantaneous linear and angular velocities.
 /// \sa	SurgSim::Input::CommonDevice

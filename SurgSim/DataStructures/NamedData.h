@@ -40,6 +40,7 @@ static const char* const BUTTON_1 = "button1";
 static const char* const BUTTON_2 = "button2";
 static const char* const BUTTON_3 = "button3";
 static const char* const BUTTON_4 = "button4";
+static const char* const TOOLDOF = "toolDof";
 
 static const char* const POSE = "pose";
 static const char* const INPUT_POSE = "inputPose";

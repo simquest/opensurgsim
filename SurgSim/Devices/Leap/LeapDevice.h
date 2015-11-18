@@ -40,6 +40,8 @@ enum HandType : SURGSIM_ENUM_TYPE;
 ///   | ----       | ----              			| ---                                                               |
 ///   | image      | "left"						| Left infrared image, each pixel value is between 0 and 1.			|
 ///   | image      | "right"					| Right infrared image, each pixel value is between 0 and 1.		|
+///   | image      | "left_distortion"			| Left distortion calibration map									|
+///   | image      | "right_distortion"			| Right distortion calibration map									|
 ///   | pose       | "pose"						| %Hand pose 														|
 ///   | pose       | "ThumbProximal"			| %Pose of thumb proximal joint										|
 ///   | pose       | "ThumbIntermediate"		| %Pose of thumb intermediate joint									|
