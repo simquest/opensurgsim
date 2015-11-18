@@ -32,11 +32,11 @@ class CompoundShapeDcdContactTest : public ::testing::Test
 {
 	void SetUp() override
 	{
-		ContactCalculation::registerContactCalculation(std::make_shared<BoxSphereDcdContact>());
-		ContactCalculation::registerContactCalculation(std::make_shared<BoxPlaneDcdContact>());
-		ContactCalculation::registerContactCalculation(std::make_shared<CompoundShapeDcdContact>(
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<BoxSphereDcdContact>());
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<BoxPlaneDcdContact>());
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<CompoundShapeDcdContact>(
 					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_SPHERE)));
-		ContactCalculation::registerContactCalculation(std::make_shared<CompoundShapeDcdContact>(
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<CompoundShapeDcdContact>(
 					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_PLANE)));
 
 	}
@@ -60,8 +60,8 @@ TEST_F(CompoundShapeDcdContactTest, SingleCube)
 
 	compoundShape->addShape(box);
 
-	auto calc1 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_SPHERE];
-	auto calc2 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_SPHERE];
+	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_SPHERE];
+	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_SPHERE];
 
 
 	auto expected = calc1->calculateDcdContact(box, identity, sphere, transform);
@@ -90,8 +90,8 @@ TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 	compoundShape->addShape(box, box1Pose);
 	compoundShape->addShape(box, box2Pose);
 
-	auto calc1 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_PLANE];
-	auto calc2 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_PLANE];
+	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_PLANE];
+	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_PLANE];
 
 	auto result = calc2->calculateDcdContact(compoundShape, basePose, plane, identity);
 

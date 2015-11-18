@@ -49,7 +49,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	auto threadPool = Framework::Runtime::getThreadPool();
 	std::vector<std::future<void>> tasks;
 
-	const auto& calculations = ContactCalculation::getContactTable();
+	const auto& calculations = ContactCalculation::getDcdContactTable();
 
 	updatePairs(result);
 

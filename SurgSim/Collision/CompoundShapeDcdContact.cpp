@@ -41,7 +41,7 @@ std::list<std::shared_ptr<Contact>> CompoundShapeDcdContact::doCalculateDcdConta
 {
 	std::list<std::shared_ptr<Contact>> contacts;
 
-	const auto& calculations = ContactCalculation::getContactTable();
+	const auto& calculations = ContactCalculation::getDcdContactTable();
 
 	// Shape1 is compound shape
 	const auto& compoundShape = std::static_pointer_cast<Math::CompoundShape>(shape1);

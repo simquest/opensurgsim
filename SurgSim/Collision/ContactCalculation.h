@@ -66,13 +66,13 @@ public:
 
 	/// Register an instance of a contact calculation in the table
 	/// \param calculation The calculation to be registered
-	static void registerContactCalculation(const std::shared_ptr<ContactCalculation>& calculation);
+	static void registerDcdContactCalculation(const std::shared_ptr<ContactCalculation>& calculation);
 
 	typedef
 	std::array<std::array<std::shared_ptr<ContactCalculation>, Math::SHAPE_TYPE_COUNT>, Math::SHAPE_TYPE_COUNT>
 	TableType;
 
-	static const TableType& getContactTable();
+	static const TableType& getDcdContactTable();
 private:
 
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
@@ -96,15 +96,14 @@ private:
 	///@{
 	/// registration to call at static scope (does not protect the initialization via call_once)
 	/// Mirroring the public functions
-	static void privateRegister(
+	static void privateDcdRegister(
 		const std::shared_ptr<ContactCalculation>& calculation,
 		const std::pair<int, int>& types);
-	static void privateRegister(const std::shared_ptr<ContactCalculation>& calculation);
+	static void privateDcdRegister(const std::shared_ptr<ContactCalculation>& calculation);
 	///@}
 
-	static TableType m_contactCalculations; ///< Static table of contact calculations
+	static TableType m_contactDcdCalculations; ///< Static table of Dcd contact calculations
 	static std::once_flag m_initializationFlag; ///< Flag used for initialization.
-
 };
 
 }; // namespace Collision
