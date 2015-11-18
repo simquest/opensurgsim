@@ -24,6 +24,7 @@
 
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Math/Shape.h"
 
 
 namespace SurgSim
@@ -93,6 +94,18 @@ public:
 	/// \return The shape transformed by the pose of this representation
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getPosedShape();
 
+	/// \return the previous posed shape
+	virtual const Math::PosedShape& getPreviousPosedShape() const;
+
+	/// \return the current posed shape
+	virtual const Math::PosedShape& getCurrentPosedShape() const;
+
+	/// \param posedShape the previous posed shape
+	virtual void setPreviousPosedShape(const Math::PosedShape& posedShape);
+
+	/// \param posedShape the current posed shape
+	virtual void setCurrentPosedShape(const Math::PosedShape& posedShape);
+
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
@@ -153,7 +166,10 @@ public:
 	void setAllowing(const std::vector<std::string>& fullNames);
 
 protected:
-	/// Invalidate the cached posed shape
+	/// Invalidate the cached previous posed shape
+	void invalidatePreviousPosedShape();
+
+	/// Invalidate the cached current posed shape
 	void invalidatePosedShape();
 
 	/// Get the ignored collision representations
@@ -181,14 +197,11 @@ private:
 	/// Mutex to lock write access to m_collisions
 	boost::mutex m_collisionsMutex;
 
-	/// Cached posed shape
-	std::shared_ptr<Math::Shape> m_posedShape;
+	/// Cached posed shapes
+	Math::PosedShape m_previousPosedShape, m_currentPosedShape;
 
 	/// Mutex to lock write access to m_posedShape
-	boost::mutex m_posedShapeMutex;
-
-	/// Pose of m_posedShape
-	Math::RigidTransform3d m_posedShapePose;
+	mutable boost::mutex m_previousPosedShapeMutex, m_currentPosedShapeMutex;
 
 	/// Ignored collision representations
 	std::unordered_set<std::string> m_ignoring;

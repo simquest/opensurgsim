@@ -148,6 +148,19 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	}
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
+		Math::PosedShape posedShape1AtTime0, posedShape1AtTime1, posedShape2AtTime0, posedShape2AtTime1;
+
+		posedShape1AtTime0 = pair->getFirst()->getPreviousPosedShape();
+		posedShape1AtTime1 = pair->getFirst()->getCurrentPosedShape();
+
+		posedShape2AtTime0 = pair->getSecond()->getPreviousPosedShape();
+		posedShape2AtTime1 = pair->getSecond()->getCurrentPosedShape();
+
+		contacts = doCalculateCcdContact(
+			posedShape1AtTime0.m_shape, posedShape1AtTime0.m_pose,
+			posedShape1AtTime1.m_shape, posedShape1AtTime1.m_pose,
+			posedShape2AtTime0.m_shape, posedShape2AtTime0.m_pose,
+			posedShape2AtTime1.m_shape, posedShape2AtTime1.m_pose);
 	}
 	else
 	{

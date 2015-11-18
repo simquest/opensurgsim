@@ -63,30 +63,67 @@ CollisionDetectionType Representation::getSelfCollisionDetectionType() const
 	return m_selfCollisionDetectionType;
 }
 
+const Math::PosedShape& Representation::getPreviousPosedShape() const
+{
+	boost::lock_guard<boost::mutex> lock(m_previousPosedShapeMutex);
+
+	return m_previousPosedShape;
+}
+
+const Math::PosedShape& Representation::getCurrentPosedShape() const
+{
+	boost::lock_guard<boost::mutex> lock(m_currentPosedShapeMutex);
+
+	return m_currentPosedShape;
+}
+
+void Representation::setPreviousPosedShape(const Math::PosedShape& posedShape)
+{
+	boost::lock_guard<boost::mutex> lock(m_previousPosedShapeMutex);
+
+	m_previousPosedShape.m_shape = posedShape.m_shape;
+	m_previousPosedShape.m_pose = posedShape.m_pose;
+}
+
+void Representation::setCurrentPosedShape(const Math::PosedShape& posedShape)
+{
+	boost::lock_guard<boost::mutex> lock(m_currentPosedShapeMutex);
+
+	m_currentPosedShape.m_shape = posedShape.m_shape;
+	m_currentPosedShape.m_pose = posedShape.m_pose;
+}
+
 const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
 {
-	boost::lock_guard<boost::mutex> lock(m_posedShapeMutex);
+	boost::lock_guard<boost::mutex> lock(m_currentPosedShapeMutex);
 
 	Math::RigidTransform3d pose = getPose();
 	if (pose.isApprox(Math::RigidTransform3d::Identity()))
 	{
-		m_posedShape = getShape();
-		m_posedShapePose = Math::RigidTransform3d::Identity();
+		m_currentPosedShape.m_shape = getShape();
+		m_currentPosedShape.m_pose = Math::RigidTransform3d::Identity();
 	}
-	else if (m_posedShape == nullptr || !pose.isApprox(m_posedShapePose))
+	else if (m_currentPosedShape.m_shape == nullptr || !pose.isApprox(m_currentPosedShape.m_pose))
 	{
-		m_posedShape = getShape()->getTransformed(pose);
-		m_posedShapePose = pose;
+		m_currentPosedShape.m_shape = getShape()->getTransformed(pose);
+		m_currentPosedShape.m_pose = pose;
 	}
 
-	return m_posedShape;
+	return m_currentPosedShape.m_shape;
+}
+
+void Representation::invalidatePreviousPosedShape()
+{
+	boost::lock_guard<boost::mutex> lock(m_previousPosedShapeMutex);
+
+	m_previousPosedShape.m_shape = nullptr;
 }
 
 void Representation::invalidatePosedShape()
 {
-	boost::lock_guard<boost::mutex> lock(m_posedShapeMutex);
+	boost::lock_guard<boost::mutex> lock(m_currentPosedShapeMutex);
 
-	m_posedShape = nullptr;
+	m_currentPosedShape.m_shape = nullptr;
 }
 
 SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()
