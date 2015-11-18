@@ -49,17 +49,21 @@ public:
 	/// Constructor.
 	SegmentCcdSelfContact();
 
-	/// Calculate the contacts using the typed shapes directly
-	/// \param segmentShape1 the first segment shape
-	/// \param segmentPose1 the pose of the second segment
-	/// \param segmentShape2 the second segment shape
-	/// \param segmentPose2 the pose of the second segment
-	/// \return a list of contacts between the shapes, if any
-	std::list<std::shared_ptr<Contact>> calculateContact(
-										 const Math::SegmentMeshShape& segmentShape1,
-										 const Math::RigidTransform3d& segmentPose1,
-										 const Math::SegmentMeshShape& segmentShape2,
-										 const Math::RigidTransform3d& segmentPose2) const override;
+	/// \note This dcd contact calculation is empty by nature (this class only handles segment ccd self-collision)
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
+		const Math::SegmentMeshShape& segmentShape1,
+		const Math::RigidTransform3d& segmentPose1,
+		const Math::SegmentMeshShape& segmentShape2,
+		const Math::RigidTransform3d& segmentPose2) const override
+	{
+		return std::list<std::shared_ptr<Contact>>();
+	}
+
+	std::list<std::shared_ptr<Contact>> calculateCcdContact(
+		const Math::SegmentMeshShape& segmentShape1AtTime0, const Math::RigidTransform3d& segmentPose1AtTime0,
+		const Math::SegmentMeshShape& segmentShape1AtTime1, const Math::RigidTransform3d& segmentPose1AtTime1,
+		const Math::SegmentMeshShape& segmentShape2AtTime0, const Math::RigidTransform3d& segmentPose2AtTime0,
+		const Math::SegmentMeshShape& segmentShape2AtTime1, const Math::RigidTransform3d& segmentPose2AtTime1) const override;
 
 	/// Set the minimum time precision allowed when deciding on the depth of recursion.
 	/// \param precision the desired minimum time precision

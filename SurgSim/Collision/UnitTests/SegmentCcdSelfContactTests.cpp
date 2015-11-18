@@ -557,8 +557,11 @@ TEST_F(SegmentCcdSelfContactTests, CalculateContact)
 		auto transformQ = Math::RigidTransform3d::Identity();
 		transformQ.translate(Vector3d(3.0, 4.0, 5.0));
 
-		auto collisionList = m_selfContact.calculateContact(*shapeT0, transformP,
-							 *shapeT1, transformQ);
+		auto collisionList = m_selfContact.calculateCcdContact(
+			*shapeT0, transformP,
+			*shapeT1, transformQ,
+			*shapeT0, transformP,  // unused for self-collision
+			*shapeT1, transformQ); // unused for self-collision
 
 		EXPECT_EQ(1, collisionList.size());
 		std::shared_ptr<Collision::Contact> contacted = *(collisionList.begin());

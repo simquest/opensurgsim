@@ -78,12 +78,18 @@ double SegmentCcdSelfContact::distanceEpsilon()
 	return m_distanceEpsilon;
 }
 
-std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateContact(
-									 const Math::SegmentMeshShape& segmentShape1,
-									 const Math::RigidTransform3d& segmentPose1,
-									 const Math::SegmentMeshShape& segmentShape2,
-									 const Math::RigidTransform3d& segmentPose2) const
+std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateCcdContact(
+	const Math::SegmentMeshShape& segmentShape1AtTime0, const Math::RigidTransform3d& segmentPose1AtTime0,
+	const Math::SegmentMeshShape& segmentShape1AtTime1, const Math::RigidTransform3d& segmentPose1AtTime1,
+	const Math::SegmentMeshShape& segmentShape2AtTime0, const Math::RigidTransform3d& segmentPose2AtTime0,
+	const Math::SegmentMeshShape& segmentShape2AtTime1, const Math::RigidTransform3d& segmentPose2AtTime1) const
 {
+
+	const Math::SegmentMeshShape& segmentShape1 = segmentShape1AtTime0;
+	const Math::RigidTransform3d& segmentPose1 = segmentPose1AtTime0;
+	const Math::SegmentMeshShape& segmentShape2 = segmentShape1AtTime1;
+	const Math::RigidTransform3d& segmentPose2 = segmentPose1AtTime1;
+
 	SURGSIM_ASSERT(segmentShape1.getNumEdges() == segmentShape2.getNumEdges()) <<
 			"Segment CCD self collision detects that " <<
 			"the segment at time t and time t + 1 have different numbers of edges.";
