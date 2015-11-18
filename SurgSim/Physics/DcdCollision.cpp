@@ -86,6 +86,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
 				{
 					auto pair = std::make_shared<CollisionPair>(*first, *second);
+
 					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
 					{
 						pairs.push_back(std::move(pair));

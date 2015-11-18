@@ -87,13 +87,6 @@ void CcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 				{
 					auto pair = std::make_shared<CollisionPair>(*first, *second);
 
-					//// Self-collision ?
-					//// We force the collision detection type with the one set for this representation
-					//if ((*first) == (*second))
-					//{
-					//	pair->setSelfCollisionType((*first)->getSelfCollisionDetectionType());
-					//}
-
 					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
 					{
 						pairs.push_back(std::move(pair));
