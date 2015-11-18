@@ -75,7 +75,7 @@ private:
 	bool doWakeUp() override;
 
 	/// Shape used for collision detection
-	std::shared_ptr<SurgSim::Math::MeshShape> m_shape;
+	std::shared_ptr<SurgSim::Math::MeshShape> m_shape, m_previousShape;
 
 	/// Reference to the deformable driving changes to this mesh
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentation> m_deformable;
