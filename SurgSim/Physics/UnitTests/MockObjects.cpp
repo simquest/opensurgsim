@@ -673,11 +673,6 @@ MockComputation::MockComputation(bool doCopyState) : Computation(doCopyState)
 {
 }
 
-std::string MockComputation::getClassName() const
-{
-	return "SurgSim::Physics::MockComputation";
-}
-
 std::shared_ptr<PhysicsManagerState> MockComputation::doUpdate(const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state)
 {

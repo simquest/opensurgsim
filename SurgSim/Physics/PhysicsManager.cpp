@@ -133,6 +133,7 @@ bool PhysicsManager::doUpdate(double dt)
 			{
 				totalTime += computation->getTimer().getAverageFramePeriod();
 			}
+			const size_t newFrames = static_cast<size_t>(10.0 / std::max(totalTime, dt));
 			for (const auto& computation : m_computations)
 			{
 				auto& timer = computation->getTimer();
@@ -140,7 +141,7 @@ bool PhysicsManager::doUpdate(double dt)
 				SURGSIM_LOG_DEBUG(m_logger) << std::fixed << std::setprecision(0) <<
 					computation->getClassName() << " \taverage duration " << 1e6 * period << " us (max " <<
 					1e6 * timer.getMaxFramePeriod() << " us), " << 100.0 * period / totalTime << "% of Physics.";
-				timer.setMaxNumberOfFrames(static_cast<size_t>(10.0 / std::max(totalTime, dt)));
+				timer.setMaxNumberOfFrames(newFrames);
 				timer.start();
 			}
 		}

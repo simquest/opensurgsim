@@ -470,7 +470,7 @@ class MockComputation : public Computation
 public:
 	explicit MockComputation(bool doCopyState = false);
 
-	std::string getClassName() const override;
+	SURGSIM_CLASSNAME(SurgSim::Physics::MockComputation);
 
 protected:
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
