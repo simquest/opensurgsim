@@ -16,6 +16,7 @@
 
 set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
+	CcdCollision.cpp
 	ClearCollisions.cpp
 	Computation.cpp
 	Constraint.cpp
@@ -85,6 +86,7 @@ set(SURGSIM_PHYSICS_SOURCES
 
 set(SURGSIM_PHYSICS_HEADERS
 	BuildMlcp.h
+	CcdCollision.h
 	ClearCollisions.h
 	Computation.h
 	Constraint.h
