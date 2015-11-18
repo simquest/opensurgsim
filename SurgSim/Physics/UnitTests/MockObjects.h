@@ -470,6 +470,8 @@ class MockComputation : public Computation
 public:
 	explicit MockComputation(bool doCopyState = false);
 
+	std::string getClassName() const override;
+
 protected:
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
 			const std::shared_ptr<PhysicsManagerState>& state) override;
