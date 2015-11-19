@@ -544,10 +544,6 @@ bool calculateContactTriangleCapsule(
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsuleAxis)
 {
-	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
-	typedef Eigen::Matrix<T, 2, 1, MOpt> Vector2;
-	static const T epsilon = static_cast<T>(Geometry::DistanceEpsilon);
-
 	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<T, MOpt>
 		calc(tv0, tv1, tv2, tn, cv0, cv1, cr, penetrationDepth, penetrationPointTriangle, penetrationPointCapsule,
 			 contactNormal, penetrationPointCapsuleAxis);
