@@ -26,6 +26,7 @@ set(UNIT_TEST_SOURCES
 	MassSpring3DRepresentationTests.cpp
 	MassSpringNDRepresentationUtilsTests.cpp
 	PoseInterpolatorTests.cpp
+	PunctureBehaviorTests.cpp
 	SpringTestUtils.cpp
 	TransferParticlesToPointCloudBehaviorTests.cpp
 	TransferPhysicsToGraphicsMeshBehaviorTests.cpp
