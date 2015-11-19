@@ -51,15 +51,16 @@ void DeformableCollisionRepresentation::update(const double& dt)
 
 	auto odeState = physicsRepresentation->getCurrentState();
 	const size_t numNodes = odeState->getNumNodes();
+	auto shape = std::dynamic_pointer_cast<DataStructures::VerticesPlain>(m_shape);
 
-	SURGSIM_ASSERT(m_shape->getNumVertices() == numNodes) <<
+	SURGSIM_ASSERT(shape->getNumVertices() == numNodes) <<
 		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 	{
-		m_shape->setVertexPosition(nodeId, odeState->getPosition(nodeId));
+		shape->setVertexPosition(nodeId, odeState->getPosition(nodeId));
 	}
-	if (!m_shape->update())
+	if (!shape->update())
 	{
 		setLocalActive(false);
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
@@ -91,7 +92,8 @@ bool DeformableCollisionRepresentation::doWakeUp()
 	auto state = physicsRepresentation->getCurrentState();
 	SURGSIM_ASSERT(nullptr != state) <<
 		"DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
-	SURGSIM_ASSERT(m_shape->getNumVertices() == state->getNumNodes()) <<
+	auto shape = std::dynamic_pointer_cast<DataStructures::VerticesPlain>(m_shape);
+	SURGSIM_ASSERT(shape->getNumVertices() == state->getNumNodes()) <<
 		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	update(0.0);
@@ -106,11 +108,11 @@ int DeformableCollisionRepresentation::getShapeType() const
 
 void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
-	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+		shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
 		<< "Deformable collision shape has to be a mesh.  But what passed in is " << shape->getType();
 
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
-	m_shape = meshShape;
+	m_shape = shape;
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const
