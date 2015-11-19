@@ -16,13 +16,16 @@
 #ifndef SURGSIM_MATH_TRIANGLECAPSULECONTACTCALCULATION_INL_H
 #define SURGSIM_MATH_TRIANGLECAPSULECONTACTCALCULATION_INL_H
 
+#include "SurgSim/Math/Valid.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
+
 namespace SurgSim
 {
 
 namespace Math
 {
 
-namespace TriangleCapsuleHelper
+namespace TriangleCapsuleContactCalculation
 {
 
 /// Class used to find the intersection between a parametric line and this cylinder.
@@ -62,8 +65,8 @@ public:
 		// Let a = (Dy^2 + Dz^2), b = (2.Py.Dy + 2.Pz.Dz), c = (Py^2 + Pz^2 - r^2):
 		// => t^2.a + t.b + c = 0, whose solution is:
 		// (-b +/- sqrt(b^2 - 4*a*c))/2*a
-		auto const P = m_inverseTransform * lineStart;
-		auto const D = m_inverseTransform.linear() * lineDir;
+		auto const P = (m_inverseTransform * lineStart).eval();
+		auto const D = (m_inverseTransform.linear() * lineDir).eval();
 
 		T a = D[1] * D[1] + D[2] * D[2];
 		T b = static_cast<T>(2) * (P[1] * D[1] + P[2] * D[2]);
@@ -154,6 +157,376 @@ private:
 	/// Transform world coordinates to local coordinates
 	RigidTransform3 m_inverseTransform;
 };
+
+/// Class used to find the intersection between a triangle and a capsule.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+template <class T, int MOpt>
+class TriangleCapsuleContactCalculation
+{
+	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+	typedef Eigen::Matrix<T, 2, 1, MOpt> Vector2;
+	typedef Eigen::Transform<T, 3, Eigen::Isometry> RigidTransform3;
+
+public:
+	/// Constructor.
+	/// \param tv0,tv1,tv2 Vertices of the triangle.
+	/// \param tn Normal of the triangle, should be normalized.
+	/// \param cv0,cv1 Ends of the capsule axis.
+	/// \param cr Capsule radius.
+	/// \param [out] penetrationDepth The depth of penetration.
+	/// \param [out] penetrationPointTriangle The contact point on triangle.
+	/// \param [out] penetrationPointCapsule The contact point on capsule.
+	/// \param [out] contactNormal The contact normal that points from capsule to triangle.
+	/// \param [out] penetrationPointCapsuleAxis The point on the capsule axis closest to the triangle.
+	TriangleCapsuleContactCalculation(
+		const Vector3& tv0, const Vector3& tv1, const Vector3& tv2,
+		const Vector3& tn,
+		const Vector3& cv0, const Vector3& cv1,
+		double cr,
+		T* penetrationDepth,
+		Vector3* penetrationPointTriangle,
+		Vector3* penetrationPointCapsule,
+		Vector3* contactNormal,
+		Vector3* penetrationPointCapsuleAxis)
+		: tv0(tv0), tv1(tv1), tv2(tv2), tn(tn),
+		  cvTop(cv0), cvBottom(cv1), cr(cr),
+		  penetrationDepth(penetrationDepth),
+		  penetrationPointTriangle(penetrationPointTriangle),
+		  penetrationPointCapsule(penetrationPointCapsule),
+		  contactNormal(contactNormal),
+		  penetrationPointCapsuleAxis(penetrationPointCapsuleAxis)
+	{
+		epsilon = static_cast<T>(Geometry::DistanceEpsilon);
+		distance =
+			distanceSegmentTriangle(cv0, cv1, tv0, tv1, tv2, tn, penetrationPointCapsuleAxis, penetrationPointTriangle);
+		cAxis = (cvBottom - cvTop).normalized();
+		if (cAxis.dot(tn) > 0.0)
+		{
+			cvTop = cv1;
+			cvBottom = cv0;
+			cAxis = -cAxis;
+		}
+	}
+
+	/// \return Whether there is an intersection.
+	bool isIntersecting()
+	{
+		return distance < (cr - epsilon);
+	}
+
+	/// Calculate the contact info.
+	void calculateContact()
+	{
+		bool result =
+			axisAwayFromTriangle() ||
+			axisPerpendicularToTriangle() ||
+			axisTouchingTriangle() ||
+			axisThroughTriangle();
+
+		SURGSIM_ASSERT(result) << "At this point, there has to be an intersection.";
+	}
+
+private:
+	/// \return True, if the axis of the capsule is away from the triangle. Also calculates the contact info.
+	bool axisAwayFromTriangle()
+	{
+		if (distance > epsilon)
+		{
+			*contactNormal = *penetrationPointTriangle - *penetrationPointCapsuleAxis;
+			contactNormal->normalize();
+			*penetrationPointCapsule = *penetrationPointCapsuleAxis + (*contactNormal * cr);
+			*penetrationDepth = cr - distance;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// \return True, if the axis of the capsule is perpendicular to the triangle. Also calculates the contact info.
+	bool axisPerpendicularToTriangle()
+	{
+		if (std::abs(cAxis.dot(tn) + 1.0) < epsilon)
+		{
+			*penetrationPointCapsule = cvBottom - tn * cr;
+			*penetrationPointCapsuleAxis = cvBottom;
+			*contactNormal = -tn;
+			*penetrationDepth = (tv0 - *penetrationPointCapsule).dot(tn);
+			return true;
+		}
+
+		return false;
+	}
+
+	/// \return True, if the axis of the capsule is just touching triangle. Also calculates the contact info.
+	bool axisTouchingTriangle()
+	{
+		bool axisJustTouchingTriangle =
+			isPointOnCapsuleAxisEnd(*penetrationPointCapsuleAxis) || isPointOnTriangleEdge(*penetrationPointTriangle);
+
+		if (axisJustTouchingTriangle)
+		{
+			*contactNormal = -tn;
+
+			auto projectionCvBottom = (cvBottom + tn * (tv0 - cvBottom).dot(tn)).eval();
+			if (SurgSim::Math::isPointInsideTriangle(projectionCvBottom, tv0, tv1, tv2, tn))
+			{
+				*contactNormal = -tn;
+				*penetrationPointCapsule = cvBottom - tn * cr;
+				*penetrationPointCapsuleAxis = cvBottom;
+				*penetrationDepth = (tv0 - *penetrationPointCapsule).dot(tn);
+			}
+			else
+			{
+				farthestIntersectionLineCapsule(*penetrationPointTriangle, -tn,
+					penetrationPointCapsule, penetrationPointCapsuleAxis);
+
+				*penetrationDepth = (*penetrationPointCapsule - tv0).dot(-tn);
+			}
+		}
+
+		return axisJustTouchingTriangle;
+	}
+
+	/// \return True, if the axis of the capsule goes through the triangle. Also calculates the contact info.
+	bool axisThroughTriangle()
+	{
+		if (distance != 0.0)
+		{
+			return false;
+		}
+
+		Vector3 v[3] = {tv0, tv1, tv2};
+		Vector3 planeN[4] = {tn, (-tn.cross(tv1 - tv0)).normalized(), (-tn.cross(tv2 - tv1)).normalized(),
+			(-tn.cross(tv0 - tv2)).normalized()};
+		double planeD[4] = {-tv0.dot(planeN[0]), -tv0.dot(planeN[1]), -tv1.dot(planeN[2]), -tv2.dot(planeN[3])};
+		auto segmentStart = cvTop;
+		auto segmentEnd = cvBottom;
+
+		size_t j = clipSegmentAgaintTriangle(&segmentStart, &segmentEnd, v, planeN, planeD);
+
+		if (j == 0)
+		{
+			*contactNormal = -tn;
+			*penetrationPointCapsule = cvBottom - tn * cr;
+			*penetrationDepth = (tv0 - *penetrationPointCapsule).dot(tn);
+			*penetrationPointCapsuleAxis = cvBottom;
+			*penetrationPointTriangle = *penetrationPointCapsule + tn * *penetrationDepth;
+			return true;
+		}
+
+		Vector3 deepestPoint = ((segmentStart - segmentEnd).dot(planeN[0]) < 0.0) ? segmentStart : segmentEnd;
+		Vector3 edgeVertices[2] = {v[(j - 1) % 3], v[j % 3]};
+		Vector3 triangleEdge = (edgeVertices[1] - edgeVertices[0]).normalized();
+
+		// The capsule axis intersects the plane (planeN[j], planeD[j]). First, the capsule is treated as a cylinder.
+		// Its intersection with this plane is an ellipse. The deepest point on this ellipse along -tn and bounded
+		// by vectors (edgeVertices[0] -> edgeVertices[0] - tn) and (edgeVertices[1] -> edgeVertices[1] - tn) is found.
+		Vector3 center = deepestPoint;
+		Vector3 majorAxis = (triangleEdge * (triangleEdge.dot(cAxis)) + tn * (tn.dot(cAxis))).normalized();
+		double majorRadius = farthestIntersectionLineCylinder(center, majorAxis, &deepestPoint);
+
+		if (std::abs(majorAxis.dot(triangleEdge)) > epsilon)
+		{
+			// majorApex is not the deepest point because the ellipse is angled. The deepest point is between majorApex
+			// and minorApex on the circumference of the ellipse, and the tangent at that point is parallel to the
+			// triangleEdge.
+			auto minorAxis = planeN[j].cross(majorAxis);
+			double minorRadius = farthestIntersectionLineCylinder(center, minorAxis);
+
+			EllipseHelper<T, MOpt> ellipseHelper(center, majorAxis, minorAxis, majorRadius, minorRadius);
+			deepestPoint = ellipseHelper.pointWithTangent(triangleEdge);
+		}
+
+		// Project deepestPoint on the triangle edge to make sure it is within the edge.
+		auto edgeLength = (edgeVertices[1] - edgeVertices[0]).norm();
+		double deepestPointDotEdge = triangleEdge.dot(deepestPoint - edgeVertices[0]);
+		if (deepestPointDotEdge <= -epsilon || deepestPointDotEdge >= edgeLength + epsilon)
+		{
+			// In this case, the intersection of the cylinder with the triangle edge plane gives an ellipse
+			// that is close to a triangle corner and the deepest penetration point on the ellipse is
+			// actually outside the triangle.
+			// Solution: find the deepest point on the ellipse which projection is still on the triangle.
+			// For that: Find the corner edgeVertex of the triangle closest to deepestPointDotEdge
+			// Find the deepest penetration point verifying P - tn*t and the cylinder equation.
+
+			// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
+			Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
+			farthestIntersectionLineCylinder(edgeVertex, -tn, &deepestPoint);
+		}
+
+		clipPointToCapsuleSurface(&deepestPoint, penetrationPointCapsuleAxis);
+
+		*contactNormal = -tn;
+		*penetrationPointCapsule = deepestPoint;
+		*penetrationDepth = -tn.dot(deepestPoint - tv0);
+		*penetrationPointTriangle = deepestPoint + tn * (*penetrationDepth);
+
+		return true;
+	}
+
+	/// \param point The point which is checked against the capsule axis.
+	/// \return True, if the point is on the capsule axis.
+	bool isPointOnCapsuleAxisEnd(const Vector3& point)
+	{
+		Vector2 bary;
+		Math::barycentricCoordinates(point, cvTop, cvBottom, &bary);
+		return bary.minCoeff() < epsilon;
+	}
+
+	/// \param point The point which is checked against the triangle.
+	/// \return True, if the point is on one of the edges of the triangle.
+	bool isPointOnTriangleEdge(Vector3& point)
+	{
+		Vector3 bary;
+		Math::barycentricCoordinates(point, tv0, tv1, tv2, tn, &bary);
+		return bary.minCoeff() < epsilon;
+	}
+
+	/// \param lineStart The origin of the line
+	/// \param lineDir Unit directional vector of the line
+	/// \param [out] The point of intersection.
+	double farthestIntersectionLineCylinder(const Vector3& lineStart, const Vector& lineDir, Vector3* point = nullptr)
+	{
+		if (!cInverseTransform.hasValue())
+		{
+			Vector3 j, k;
+			SurgSim::Math::buildOrthonormalBasis(&cAxis, &j, &k);
+
+			RigidTransform3 transform;
+			transform.translation() = cvTop;
+			transform.linear().col(0) = cAxis;
+			transform.linear().col(1) = j;
+			transform.linear().col(2) = k;
+			cInverseTransform = transform.inverse();
+		}
+
+		// Transform the problem in the cylinder space to solve the local cylinder equation y^2 + z^2 = r^2
+		// Point on ellipse should be on the line, P + t.(D)
+		// => Py^2 + t^2.Dy^2 + 2.Py.t.Dy + Pz^2 + t^2.Dz^2 + 2.Pz.t.Dz = r^2
+		// => t^2.(Dy^2 + Dz^2) + t.(2.Py.Dy + 2.Pz.Dz) + (Py^2 + Pz^2 - r^2) = 0
+		// Let a = (Dy^2 + Dz^2), b = (2.Py.Dy + 2.Pz.Dz), c = (Py^2 + Pz^2 - r^2):
+		// => t^2.a + t.b + c = 0, whose solution is:
+		// (-b +/- sqrt(b^2 - 4*a*c))/2*a
+		auto const P = (cInverseTransform.getValue() * lineStart).eval();
+		auto const D = (cInverseTransform.getValue().linear() * lineDir).eval();
+
+		T a = D[1] * D[1] + D[2] * D[2];
+		T b = static_cast<T>(2) * (P[1] * D[1] + P[2] * D[2]);
+		T c = (P[1] * P[1] + P[2] * P[2] - cr * cr);
+
+		T bb4ac = b * b - static_cast<T>(4) * a * c;
+
+		if (bb4ac < 0.0)
+		{
+			// Cannot use a sqrt on a negative number. Push it to zero if it is small.
+			if (bb4ac >= -Geometry::ScalarEpsilon)
+			{
+				bb4ac = 0.0;
+			}
+			else
+			{
+				return std::numeric_limits<T>::quiet_NaN();
+			}
+		}
+
+		// We have two solutions. We want the larger value.
+		double d = (-b / (static_cast<T>(2) * a)) + std::abs(std::sqrt(bb4ac) / (static_cast<T>(2) * a));
+		SURGSIM_ASSERT(isValid(d));
+		if (point != nullptr)
+		{
+			*point = lineStart + lineDir * d;
+		}
+
+		return d;
+	}
+
+	/// \param point [in,out] The point which is to be clipped.
+	/// \param pointOnCapsuleAxis [out] The recalculated point on the capsule axis.
+	void clipPointToCapsuleSurface(Vector3* point, Vector3* pointOnCapsuleAxis)
+	{
+		// Clip 'point' to be on the surface of the capsule.
+		Vector3 pointOnAxis;
+		double d = SurgSim::Math::distancePointSegment(*point, cvTop, cvBottom, &pointOnAxis);
+		if (std::abs(d - cr) > epsilon)
+		{
+			*point = pointOnAxis + (*point - pointOnAxis).normalized() * cr;
+			*pointOnCapsuleAxis = pointOnAxis;
+		}
+	}
+
+	/// \param lineStart The start of the line segment
+	/// \param lineDir The direction of the line segment
+	/// \param point [in,out] The point which is to be clipped.
+	/// \param pointOnCapsuleAxis [out] The recalculated point on the capsule axis.
+	void farthestIntersectionLineCapsule(const Vector3& lineStart, const Vector& lineDir,
+		Vector3* point, Vector3*pointOnCapsuleAxis)
+	{
+		farthestIntersectionLineCylinder(lineStart, lineDir, point);
+		clipPointToCapsuleSurface(point, pointOnCapsuleAxis);
+	}
+
+	/// \param segmentStart [in,out] The start of the line segment
+	/// \param segmentEnd [in,out] The end of the line segment
+	/// \param v The vertices of the triangle.
+	/// \param planeN Normals of the triangle and each of the edge planes.
+	/// \param planeD d from plane equation for the plane of the triangle and each of the edge planes.
+	size_t clipSegmentAgaintTriangle(Vector3* segmentStart, Vector3* segmentEnd, Vector3* v, Vector3* planeN,
+		double* planeD)
+	{
+		double ratio, dStart, dEnd;
+		size_t j = 4;
+		for (size_t i = 0; i < 4; ++i)
+		{
+			dStart = segmentStart->dot(planeN[i]) + planeD[i];
+			dEnd = segmentEnd->dot(planeN[i]) + planeD[i];
+
+			if (dStart < -epsilon && dEnd > epsilon)
+			{
+				ratio = std::abs(dStart) / (std::abs(dStart) + dEnd);
+				*segmentEnd = *segmentStart + (*segmentEnd - *segmentStart) * ratio;
+				j = i;
+			}
+			else if (dStart > epsilon && dEnd < -epsilon)
+			{
+				ratio = dStart / (dStart + std::abs(dEnd));
+				*segmentStart = *segmentStart + (*segmentEnd - *segmentStart) * ratio;
+				j = i;
+			}
+			else if (dStart < epsilon && dEnd > epsilon)
+			{
+				*segmentEnd = *segmentStart;
+				j = i;
+			}
+			else if (dStart > epsilon && dEnd < epsilon)
+			{
+				*segmentStart = *segmentEnd;
+				j = i;
+			}
+		}
+
+		SURGSIM_ASSERT(j < 4) << "The clipping should have happened at least with the triangle plane.";
+		return j;
+	}
+
+	/// Triangle vertices and normal.
+	Vector3 tv0, tv1, tv2, tn;
+	/// Capsule ends, axis and radius.
+	Vector3 cvTop, cvBottom, cAxis;
+	double cr;
+	/// Distance between triangle and capsule
+	double distance;
+	/// Contact info
+	T* penetrationDepth;
+	Vector3* penetrationPointTriangle;
+	Vector3* penetrationPointCapsule;
+	Vector3* contactNormal;
+	Vector3* penetrationPointCapsuleAxis;
+	/// The inverse transform of the capsule
+	SurgSim::DataStructures::OptionalValue<RigidTransform3> cInverseTransform;
+	/// epsilon
+	T epsilon;
+};
 }
 
 template <class T, int MOpt> inline
@@ -168,165 +541,24 @@ bool calculateContactTriangleCapsule(
 	T* penetrationDepth,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointTriangle,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsule,
-	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsuleAxis)
 {
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+	typedef Eigen::Matrix<T, 2, 1, MOpt> Vector2;
 	static const T epsilon = static_cast<T>(Geometry::DistanceEpsilon);
 
-	double distance =
-		distanceSegmentTriangle(cv0, cv1, tv0, tv1, tv2, tn, penetrationPointCapsule, penetrationPointTriangle);
+	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<T, MOpt>
+		calc(tv0, tv1, tv2, tn, cv0, cv1, cr, penetrationDepth, penetrationPointTriangle, penetrationPointCapsule,
+			 contactNormal, penetrationPointCapsuleAxis);
 
-	// Check if the triangle and capsule intersect.
-	if (distance >= (cr - epsilon))
+	if (calc.isIntersecting())
 	{
-		// Distance between the triangle and the capsule's axis is greater than the radius of the capsule.
-		// Therefore, there is no intersection.
-		return false;
-	}
-
-	// Rest of the below cases have an intersection.
-	if (distance > epsilon)
-	{
-		// The axis of the capsule does not intersect with the triangle, so a correction of (cr - distance) along the
-		// closest points between the two, is the shortest contact correction possible.
-		*contactNormal = *penetrationPointTriangle - *penetrationPointCapsule;
-		contactNormal->normalize();
-		*penetrationDepth = cr - distance;
-		*penetrationPointCapsule += (*contactNormal * cr);
+		calc.calculateContact();
 		return true;
 	}
 
-	// The axis of the capsule intersects with the triangle face. Contact is corrected by moving along the
-	// triangle's normal.
-
-	// One end of the capsule axis is over the triangle plane and the other is under. The capsule axis is calculated
-	// such that it points from above the triangle to below the triangle.
-	Vector3 capsuleTop = cv0;
-	Vector3 capsuleBottom = cv1;
-	Vector3 capsuleAxis = (capsuleBottom - capsuleTop).normalized();
-	if (capsuleAxis.dot(tn) > 0.0)
-	{
-		capsuleTop = cv1;
-		capsuleBottom = cv0;
-		capsuleAxis = -capsuleAxis;
-	}
-
-	// If the capsule axis is perpendicular to the triangle, then the deepest penetration point on the capsule axis
-	// is capsuleBottom
-	if (std::abs(capsuleAxis.dot(tn) + 1.0) < epsilon)
-	{
-		*contactNormal = -tn;
-		*penetrationDepth = cr + (*penetrationPointCapsule - capsuleBottom).dot(tn);
-		*penetrationPointCapsule = capsuleBottom - tn * cr;
-		return true;
-	}
-
-	// At this point, the capsule axis intersects with one of the planes at the triangle edges (containing the
-	// triangle normal). This point of intersection is the deepestPoint on the capsule axis.
-	Vector3 deepestPoint;
-
-	const Vector3 v[3] = {tv0, tv1, tv2};
-	Vector3 triangleEdge;
-	Vector3 planeNormal;
-	double planeD;
-	Vector3 edgeVertices[2];
-
-	bool axisClippedByPlane = false;
-	for (size_t i = 0; i < 3; ++i)
-	{
-		triangleEdge = v[(i + 1) % 3] - v[i];
-		planeNormal = tn.cross(triangleEdge);
-		planeNormal.normalize();
-		planeD = -v[i].dot(planeNormal);
-
-		double capsuleBottomD = capsuleBottom.dot(planeNormal) + planeD;
-		if (capsuleBottomD < 0.0)
-		{
-			double capsuleTopD = capsuleTop.dot(planeNormal) + planeD;
-			SURGSIM_ASSERT(capsuleTopD > 0.0);
-			double ratio = capsuleTopD / (capsuleTopD + std::abs(capsuleBottomD));
-
-			deepestPoint = capsuleTop + (capsuleBottom - capsuleTop) * ratio;
-
-			edgeVertices[0] = v[i];
-			edgeVertices[1] = v[(i + 1) % 3];
-
-			axisClippedByPlane = true;
-			break;
-		}
-	}
-
-	if (!axisClippedByPlane)
-	{
-		*contactNormal = -tn;
-		*penetrationDepth = cr + (*penetrationPointCapsule - capsuleBottom).dot(tn);
-		*penetrationPointCapsule = capsuleBottom - tn * cr;
-		*penetrationPointTriangle = *penetrationPointCapsule + tn * *penetrationDepth;
-		return true;
-	}
-
-	// The capsule axis intersects the plane (planeNormal, planeD). First, the capsule is treated as a cylinder such
-	// its intersection with this plane is given by an ellipse. The deepest point on this ellipse along -tn and bounded
-	// by vectors (edge[0] -> edge[0] - tn) and (edge[1] -> edge[1] - tn) is found.
-	Vector3 center = deepestPoint;
-	triangleEdge.normalize();
-	Vector3 majorAxis = triangleEdge * (triangleEdge.dot(capsuleAxis)) + tn * (tn.dot(capsuleAxis));
-	majorAxis.normalize();
-
-	// CylinderHelper used to find the point of (farthest) intersection along the line and the cylinder.
-	TriangleCapsuleHelper::CylinderHelper<T, MOpt> cylinderHelper(capsuleTop, capsuleAxis, -tn, cr);
-
-	double majorRadius = cylinderHelper.solveFarthestIntersectionWithLine(center, majorAxis);
-	SURGSIM_ASSERT(majorRadius != std::numeric_limits<T>::quiet_NaN());
-	deepestPoint = center + majorAxis * majorRadius;
-
-	if (std::abs(majorAxis.dot(triangleEdge)) > epsilon)
-	{
-		// majorApex is not the deepest point because the ellipse is angled. The deepest point is between majorApex and
-		// minorApex on the circumference of the ellipse, and the tangent at that point is parallel to the triangleEdge.
-		auto minorAxis = planeNormal.cross(majorAxis);
-		double minorRadius = cylinderHelper.solveFarthestIntersectionWithLine(center, minorAxis);
-		SURGSIM_ASSERT(minorRadius != std::numeric_limits<T>::quiet_NaN());
-
-		TriangleCapsuleHelper::EllipseHelper<T, MOpt>
-			ellipseHelper(center, majorAxis, minorAxis, majorRadius, minorRadius);
-		deepestPoint = ellipseHelper.pointWithTangent(triangleEdge);
-	}
-
-	// Project deepestPoint on the triangle edge to make sure it is within the edge.
-	auto edgeLength = (edgeVertices[1] - edgeVertices[0]).norm();
-	double deepestPointDotEdge = triangleEdge.dot(deepestPoint - edgeVertices[0]);
-	if (deepestPointDotEdge <= -epsilon || deepestPointDotEdge >= edgeLength + epsilon)
-	{
-		// In this case, the intersection of the cylinder with the triangle edge plane gives an ellipse
-		// that is close to a triangle corner and the deepest penetration point on the ellipse is
-		// actually outside the triangle.
-		// Solution: find the deepest point on the ellipse which projection is still on the triangle.
-		// For that: Find the corner edgeVertex of the triangle closest to deepestPointDotEdge
-		// Find the deepest penetration point verifying P - tn*t and the cylinder equation.
-
-		// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
-		Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
-		double t = cylinderHelper.solveFarthestIntersectionWithLine(edgeVertex, -tn);
-		SURGSIM_ASSERT(t != std::numeric_limits<T>::quiet_NaN());
-		deepestPoint = edgeVertex + t * (-tn);
-	}
-
-	Vector3 pointOnCapsuleAxis;
-	// Now, clip (center -> deepestPoint) to be on the surface of the capsule. This is done by finding its length.
-	double distanceFromCapsule = SurgSim::Math::distancePointSegment(deepestPoint, cv0, cv1, &pointOnCapsuleAxis);
-	if (std::abs(distanceFromCapsule - cr) > epsilon)
-	{
-		Vector3d direction = (deepestPoint - center).normalized();
-		deepestPoint = center + direction * cr;
-	}
-
-	*contactNormal = -tn;
-	*penetrationPointCapsule = deepestPoint;
-	*penetrationDepth = -tn.dot(deepestPoint - tv0);
-	*penetrationPointTriangle = deepestPoint + tn * (*penetrationDepth);
-
-	return true;
+	return false;
 }
 
 
@@ -341,7 +573,8 @@ template <class T, int MOpt> inline
 	T* penetrationDepth,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
-	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsuleAxis)
 {
 	Eigen::Matrix<T, 3, 1, MOpt> tn = (tv1 - tv0).cross(tv2 - tv0);
 	Eigen::Matrix<T, 3, 1, MOpt> ca = cv1 - cv0;
@@ -352,7 +585,7 @@ template <class T, int MOpt> inline
 	}
 	tn.normalize();
 	return calculateContactTriangleCapsule(tv0, tv1, tv2, tn, cv0, cv1, cr, penetrationDepth,
-		penetrationPoint0, penetrationPoint1, contactNormal);
+		penetrationPoint0, penetrationPoint1, contactNormal, penetrationPointCapsuleAxis);
 }
 
 } // namespace Math

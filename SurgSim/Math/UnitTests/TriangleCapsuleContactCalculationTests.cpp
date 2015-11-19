@@ -77,7 +77,7 @@ protected:
 
 		double expectedPenetrationDepth = (expectedCPoint - expectedTPoint).norm();
 		double penetrationDepth;
-		Vector3d tPoint, cPoint, normal;
+		Vector3d tPoint, cPoint, normal, cPointAxis;
 		bool contactFound = false;
 		std::string traceMessage[12] = {"Triangle vs Capsule",
 			"Triangle (vertices shifted once) vs Capsule",
@@ -101,62 +101,62 @@ protected:
 			case 0:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v0, t.v1, t.v2, t.n, c.v0, c.v1, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 1:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v1, t.v2, t.v0, t.n, c.v0, c.v1, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 2:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v2, t.v0, t.v1, t.n, c.v0, c.v1, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 3:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v0, t.v1, t.v2, t.n, c.v1, c.v0, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 4:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v1, t.v2, t.v0, t.n, c.v1, c.v0, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 5:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v2, t.v0, t.v1, t.n, c.v1, c.v0, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 6:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v2, t.v1, t.v0, c.v0, c.v1, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 7:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v1, t.v0, t.v2, c.v0, c.v1, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 8:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v0, t.v2, t.v1, c.v0, c.v1, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 9:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v2, t.v1, t.v0, c.v1, c.v0, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 10:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v1, t.v0, t.v2, c.v1, c.v0, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			case 11:
 				EXPECT_NO_THROW(
 					contactFound = calculateContactTriangleCapsule(t.v0, t.v2, t.v1, c.v1, c.v0, c.r,
-					&penetrationDepth, &tPoint, &cPoint, &normal));
+					&penetrationDepth, &tPoint, &cPoint, &normal, &cPointAxis));
 				break;
 			}
 
@@ -436,6 +436,18 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase31)
 {
 	testTriangleCapsuleContactCalculation("(Angled, at center) Capsule axis inside triangle",
 		Vector3d(0.0, 0.0, -0.01), Vector3d(0.0, -0.1, 3.0), true);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase32)
+{
+	MockTriangle t(Vector3d(0.0085640543450962274, -0.17216352338611343, 0.032793871473806267),
+		Vector3d(0.17462358883922274, -0.16815838417660384, 0.13533384863957792),
+		Vector3d(0.16119856859908893, -0.21686057517329485, 0.072690609592390418));
+	MockCapsule c(MockCapsule(Vector3d(0.18735007841383616, -0.28690200129741239, 0.11717293620266563),
+		Vector3d(0.10383485572751404, -0.17364876935318688, 0.046339120022104330), 1e-005));
+
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("Failing test 1", t, c, true, false, Vector3d(), Vector3d()));
 }
 
 }

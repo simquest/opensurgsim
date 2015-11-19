@@ -1666,6 +1666,7 @@ bool calculateContactTriangleTriangle(
 /// \param [out] penetrationPointTriangle The contact point on triangle.
 /// \param [out] penetrationPointCapsule The contact point on capsule.
 /// \param [out] contactNormal The contact normal that points from capsule to triangle.
+/// \param [out] penetrationPointCapsuleAxis The point on the capsule axis closest to the triangle.
 /// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
 /// \note If penetrationPointTriangle is moved by (contactNormal*penetrationDepth*0.5) and penetrationPointCapsule
@@ -1682,7 +1683,8 @@ bool calculateContactTriangleCapsule(
 	T* penetrationDepth,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointTriangle,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsule,
-	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsuleAxis);
 
 /// Calculate the contact between a capsule and a triangle.
 /// If the shapes intersect, the deepest penetration of the capsule along the triangle normal is calculated.
@@ -1695,6 +1697,7 @@ bool calculateContactTriangleCapsule(
 /// \param [out] penetrationPointTriangle The contact point on triangle.
 /// \param [out] penetrationPointCapsule The contact point on capsule.
 /// \param [out] contactNormal The contact normal that points from capsule to triangle.
+/// \param [out] penetrationPointCapsuleAxis The point on the capsule axis closest to the triangle.
 /// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
 /// \note If penetrationPointTriangle is moved by (contactNormal*penetrationDepth*0.5) and penetrationPointCapsule
@@ -1710,7 +1713,8 @@ bool calculateContactTriangleCapsule(
 	T* penetrationDepth,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointTriangle,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsule,
-	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsuleAxis);
 
 }; // namespace Math
 }; // namespace SurgSim
