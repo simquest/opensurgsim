@@ -26,10 +26,11 @@ namespace Framework
 template <class Target, class Source>
 std::shared_ptr<Target> checkAndConvert(std::shared_ptr<Source> incoming, const std::string& expectedTypeName)
 {
+	SURGSIM_ASSERT(incoming != nullptr) << "Incoming pointer can't be nullptr";
 	auto result = std::dynamic_pointer_cast<Target>(incoming);
-	SURGSIM_ASSERT(incoming != nullptr && result != nullptr)
+	SURGSIM_ASSERT(result != nullptr)
 			<< "Expected " << expectedTypeName << " but received " << incoming->getClassName() << " which cannot "
-			<< "be converted.";
+			<< "be converted, in component " << incoming->getFullName() << ".";
 	return result;
 };
 
