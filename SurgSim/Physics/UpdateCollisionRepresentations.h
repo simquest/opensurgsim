@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_UPDATECOLLISIONREPRESENTATIONS_H
 #define SURGSIM_PHYSICS_UPDATECOLLISIONREPRESENTATIONS_H
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
@@ -30,6 +31,8 @@ public:
 	/// Constructor
 	/// \param doCopyState whether to copy the PhysicsManagerState on update
 	explicit UpdateCollisionRepresentations(bool doCopyState);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::UpdateCollisionRepresentations);
 
 	/// Destructor
 	virtual ~UpdateCollisionRepresentations();
