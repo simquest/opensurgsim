@@ -92,6 +92,11 @@ public:
 	void onConnect(const Leap::Controller&) override
 	{
 		SURGSIM_LOG_INFO(m_logger) << "Connected to Leap Motion camera";
+		auto scaffold = m_scaffold.lock();
+		if (scaffold != nullptr)
+		{
+			scaffold->handleConnect();
+		}
 	}
 
 	void onDisconnect(const Leap::Controller&) override
@@ -245,6 +250,20 @@ bool LeapScaffold::unregisterDevice(const LeapDevice* device)
 	}
 
 	return success;
+}
+
+void LeapScaffold::handleConnect()
+{
+	m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_BACKGROUND_FRAMES);
+
+	for (auto& device : m_state->activeDevices)
+	{
+		if (device->deviceObject->isProvidingImages())
+		{
+			m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_IMAGES);
+			break;
+		}
+	}
 }
 
 void LeapScaffold::handleFrame()
