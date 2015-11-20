@@ -25,17 +25,17 @@ namespace SurgSim
 namespace Collision
 {
 
-CompoundShapeDcdContact::CompoundShapeDcdContact(const std::pair<int, int>& types) : m_types(types)
+CompoundShapeContact::CompoundShapeContact(const std::pair<int, int>& types) : m_types(types)
 {
 
 }
 
-std::pair<int, int> CompoundShapeDcdContact::getShapeTypes()
+std::pair<int, int> CompoundShapeContact::getShapeTypes()
 {
 	return m_types;
 }
 
-std::list<std::shared_ptr<Contact>> CompoundShapeDcdContact::doCalculateDcdContact(
+std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
 	const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
 	const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2)
 {

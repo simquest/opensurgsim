@@ -30,7 +30,7 @@ namespace Collision
 class CollisionPair;
 
 /// Class to calculate intersections between Spheres and Planes
-class SpherePlaneDcdContact : public ShapeShapeContactCalculation<Math::SphereShape, Math::PlaneShape>
+class SpherePlaneContact : public ShapeShapeContactCalculation<Math::SphereShape, Math::PlaneShape>
 {
 public:
 	using ContactCalculation::calculateDcdContact;

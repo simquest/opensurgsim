@@ -34,8 +34,8 @@ class ShapeCollisionRepresentation;
 /// Abstract base class to calculate intersections between an Octree and other shapes
 ///
 /// Derived classes handle the calculation for specific shape types (ie
-/// OctreeSphereDcdContact).
-class OctreeDcdContact : public ContactCalculation
+/// OctreeSphereContact).
+class OctreeContact : public ContactCalculation
 {
 protected:
 	/// Do the calculation between an octree node (BoxShape) and the other shape

@@ -28,7 +28,7 @@ namespace Collision
 {
 
 /// Class to calculate intersections between a triangle mesh and a plane
-class TriangleMeshPlaneDcdContact : public ShapeShapeContactCalculation<Math::MeshShape, Math::PlaneShape>
+class TriangleMeshPlaneContact : public ShapeShapeContactCalculation<Math::MeshShape, Math::PlaneShape>
 {
 public:
 	using ContactCalculation::calculateDcdContact;

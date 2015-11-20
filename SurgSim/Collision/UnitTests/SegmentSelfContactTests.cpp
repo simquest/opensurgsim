@@ -37,7 +37,7 @@ namespace SurgSim
 namespace Collision
 {
 
-class MockSegmentCcdSelfContact : public SurgSim::Collision::SegmentCcdSelfContact
+class MockSegmentCcdSelfContact : public SurgSim::Collision::SegmentSelfContact
 {
 public:
 	double maxTimePrecision(
@@ -47,7 +47,7 @@ public:
 		const std::array<SurgSim::Math::Vector3d, 2>& qt1Positions,
 		double effectiveThickness) const
 	{
-		return SegmentCcdSelfContact::maxTimePrecision(pt0Positions, pt1Positions,
+		return SegmentSelfContact::maxTimePrecision(pt0Positions, pt1Positions,
 				qt0Positions, qt1Positions,
 				effectiveThickness);
 	}
@@ -55,7 +55,7 @@ public:
 	bool isSameSegContactPoint(const Math::SegmentMeshShape& segmentShape,
 							   size_t segId1, double s1, size_t segId2, double s2) const
 	{
-		return SegmentCcdSelfContact::isSameSegContactPoint(segmentShape, segId1, s1, segId2, s2);
+		return SegmentSelfContact::isSameSegContactPoint(segmentShape, segId1, s1, segId2, s2);
 	}
 
 	bool findSegSegContact(const Math::SegmentMeshShape& segmentShape,
@@ -63,7 +63,7 @@ public:
 						   double toi, Collision::CollisionDetectionType collisionType,
 						   size_t segId1, double s1, size_t segId2, double s2, double timeEpsilon) const
 	{
-		return SegmentCcdSelfContact::findSegSegContact(
+		return SegmentSelfContact::findSegSegContact(
 				   segmentShape, contacts, toi, collisionType, segId1, s1, segId2, s2, timeEpsilon);
 	}
 
@@ -71,7 +71,7 @@ public:
 							  const SurgSim::Math::Vector3d& pt1,
 							  double threshold) const
 	{
-		return SegmentCcdSelfContact::detectExcessMovement(pt0, pt1, threshold);
+		return SegmentSelfContact::detectExcessMovement(pt0, pt1, threshold);
 	}
 
 	bool removeInvalidCollisions(
@@ -79,14 +79,14 @@ public:
 		const Math::SegmentMeshShape& segmentB,
 		size_t id1, size_t id2) const
 	{
-		return SegmentCcdSelfContact::removeInvalidCollisions(segmentA, segmentB, id1, id2);
+		return SegmentSelfContact::removeInvalidCollisions(segmentA, segmentB, id1, id2);
 	}
 
 	void getUniqueCandidates(
 		const std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
 		std::set<std::pair<size_t, size_t>>* segmentIdList) const
 	{
-		SegmentCcdSelfContact::getUniqueCandidates(intersectionList, segmentIdList);
+		SegmentSelfContact::getUniqueCandidates(intersectionList, segmentIdList);
 	}
 
 	bool detectCollision(
@@ -100,7 +100,7 @@ public:
 		SurgSim::Math::Vector3d* contactPtP,
 		SurgSim::Math::Vector3d* contactPtQ) const
 	{
-		return SegmentCcdSelfContact::detectCollision(pt0Positions, pt1Positions, qt0Positions, qt1Positions,
+		return SegmentSelfContact::detectCollision(pt0Positions, pt1Positions, qt0Positions, qt1Positions,
 				segmentRadius1, segmentRadius2, timePrecision,
 				r, s, t, pToQDir, contactPtP, contactPtQ);
 	}
@@ -195,8 +195,8 @@ public:
 
 TEST_F(SegmentCcdSelfContactTests, Initialization)
 {
-	ASSERT_NO_THROW(SegmentCcdSelfContact selfContact);
-	SegmentCcdSelfContact selfContact;
+	ASSERT_NO_THROW(SegmentSelfContact selfContact);
+	SegmentSelfContact selfContact;
 
 	auto shapeTypes = selfContact.getShapeTypes();
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SEGMENTMESH, shapeTypes.first);

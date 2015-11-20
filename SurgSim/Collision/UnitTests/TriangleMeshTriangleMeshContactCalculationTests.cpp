@@ -86,7 +86,7 @@ void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 	meshBRep->setLocalPose(meshBTransform);
 
 	// Perform collision detection.
-	TriangleMeshTriangleMeshDcdContact calcContact;
+	TriangleMeshTriangleMeshContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
 	calcContact.calculateContact(pair);
 
@@ -476,7 +476,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 		meshBRep->setLocalPose(pose);
 
 		// Perform collision detection.
-		TriangleMeshTriangleMeshDcdContact calcContact;
+		TriangleMeshTriangleMeshContact calcContact;
 		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
 		calcContact.calculateContact(pair);
 

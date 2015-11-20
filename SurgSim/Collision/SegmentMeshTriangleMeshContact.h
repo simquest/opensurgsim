@@ -30,7 +30,7 @@ namespace Collision
 class CollisionPair;
 
 /// Class to calculate intersections between a segment mesh and a triangle mesh
-class SegmentMeshTriangleMeshDcdContact : public ShapeShapeContactCalculation<Math::SegmentMeshShape, Math::MeshShape>
+class SegmentMeshTriangleMeshContact : public ShapeShapeContactCalculation<Math::SegmentMeshShape, Math::MeshShape>
 {
 public:
 	using ContactCalculation::calculateDcdContact;

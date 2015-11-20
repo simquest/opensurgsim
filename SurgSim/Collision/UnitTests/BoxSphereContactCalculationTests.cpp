@@ -52,7 +52,7 @@ void doBoxSphereTest(std::shared_ptr<BoxShape> box,
 	sphereRep->setLocalPose(SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
 	// Perform collision detection.
-	BoxSphereDcdContact calcContact;
+	BoxSphereContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, sphereRep);
 	calcContact.calculateContact(pair);
 

@@ -37,7 +37,7 @@ void doCapsuleSphereTest(double capsuleHeight, double capsuleRadius,
 		makeCapsuleRepresentation(capsuleHeight, capsuleRadius, capsuleQuat, capsulePosition),
 		makeSphereRepresentation(sphereRadius, sphereQuat, spherePosition));
 
-	CapsuleSphereDcdContact calc;
+	CapsuleSphereContact calc;
 	calc.calculateContact(pair);
 	EXPECT_EQ(hasContacts, pair->hasContacts());
 

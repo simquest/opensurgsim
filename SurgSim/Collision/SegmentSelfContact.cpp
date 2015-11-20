@@ -31,7 +31,7 @@ namespace SurgSim
 namespace Collision
 {
 
-SegmentCcdSelfContact::SegmentCcdSelfContact():
+SegmentSelfContact::SegmentSelfContact():
 	m_distanceEpsilon(1.0e-09),
 	m_timeMinPrecisionEpsilon(1.0e-06),
 	m_timeMaxPrecisionEpsilon(1.0e-06),
@@ -41,44 +41,44 @@ SegmentCcdSelfContact::SegmentCcdSelfContact():
 {
 }
 
-std::pair<int, int> SegmentCcdSelfContact::getShapeTypes()
+std::pair<int, int> SegmentSelfContact::getShapeTypes()
 {
 	return std::pair<int, int>(Math::SHAPE_TYPE_SEGMENTMESH, Math::SHAPE_TYPE_SEGMENTMESH);
 }
 
-void SegmentCcdSelfContact::setTimeMinPrecisionEpsilon(double precision)
+void SegmentSelfContact::setTimeMinPrecisionEpsilon(double precision)
 {
 	SURGSIM_ASSERT(precision > 0.0) << "Cannot set a negative min/max time precision.";
 	m_timeMinPrecisionEpsilon = precision;
 }
 
-double SegmentCcdSelfContact::getTimeMinPrecisionEpsilon()
+double SegmentSelfContact::getTimeMinPrecisionEpsilon()
 {
 	return m_timeMinPrecisionEpsilon;
 }
 
-void SegmentCcdSelfContact::setTimeMaxPrecisionEpsilon(double precision)
+void SegmentSelfContact::setTimeMaxPrecisionEpsilon(double precision)
 {
 	SURGSIM_ASSERT(precision > 0.0) << "Cannot set a negative min/max time precision.";
 	m_timeMaxPrecisionEpsilon = precision;
 }
 
-double SegmentCcdSelfContact::getTimeMaxPrecisionEpsilon()
+double SegmentSelfContact::getTimeMaxPrecisionEpsilon()
 {
 	return m_timeMaxPrecisionEpsilon;
 }
 
-void SegmentCcdSelfContact::setDistanceEpsilon(double precision)
+void SegmentSelfContact::setDistanceEpsilon(double precision)
 {
 	m_distanceEpsilon = precision;
 }
 
-double SegmentCcdSelfContact::distanceEpsilon()
+double SegmentSelfContact::distanceEpsilon()
 {
 	return m_distanceEpsilon;
 }
 
-std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateCcdContact(
+std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	const Math::SegmentMeshShape& segmentShape1AtTime0, const Math::RigidTransform3d& segmentPose1AtTime0,
 	const Math::SegmentMeshShape& segmentShape1AtTime1, const Math::RigidTransform3d& segmentPose1AtTime1,
 	const Math::SegmentMeshShape& segmentShape2AtTime0, const Math::RigidTransform3d& segmentPose2AtTime0,
@@ -230,7 +230,7 @@ std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateCcdContact(
 	return contacts;
 }
 
-bool SegmentCcdSelfContact::detectCollision(
+bool SegmentSelfContact::detectCollision(
 	const std::array<Math::Vector3d, 2>& pt0Positions,
 	const std::array<Math::Vector3d, 2>& pt1Positions,
 	const std::array<Math::Vector3d, 2>& qt0Positions,
@@ -322,7 +322,7 @@ bool SegmentCcdSelfContact::detectCollision(
 	return collisionDetected;
 }
 
-void SegmentCcdSelfContact::getUniqueCandidates(
+void SegmentSelfContact::getUniqueCandidates(
 	const std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
 	std::set<std::pair<size_t, size_t>>* segmentIds) const
 {
@@ -354,7 +354,7 @@ void SegmentCcdSelfContact::getUniqueCandidates(
 	}
 }
 
-bool SegmentCcdSelfContact::removeInvalidCollisions(
+bool SegmentSelfContact::removeInvalidCollisions(
 	const Math::SegmentMeshShape& segmentT0,
 	const Math::SegmentMeshShape& segmentT1,
 	size_t id1, size_t id2) const
@@ -399,7 +399,7 @@ bool SegmentCcdSelfContact::removeInvalidCollisions(
 	return false;
 }
 
-bool SegmentCcdSelfContact::detectExcessMovement(const Math::Vector3d& pt0,
+bool SegmentSelfContact::detectExcessMovement(const Math::Vector3d& pt0,
 		const Math::Vector3d& pt1,
 		double threshold) const
 {
@@ -409,7 +409,7 @@ bool SegmentCcdSelfContact::detectExcessMovement(const Math::Vector3d& pt0,
 
 }
 
-bool SegmentCcdSelfContact::findSegSegContact(const Math::SegmentMeshShape& segmentShape,
+bool SegmentSelfContact::findSegSegContact(const Math::SegmentMeshShape& segmentShape,
 		const std::list<std::shared_ptr<Contact>>& contacts,
 		double t, Collision::CollisionDetectionType collisionType, size_t segId1, double s1,
 		size_t segId2, double s2, double timeEpsilon) const
@@ -444,7 +444,7 @@ bool SegmentCcdSelfContact::findSegSegContact(const Math::SegmentMeshShape& segm
 	return false;
 }
 
-bool SegmentCcdSelfContact::isSameSegContactPoint(const Math::SegmentMeshShape& segmentShape,
+bool SegmentSelfContact::isSameSegContactPoint(const Math::SegmentMeshShape& segmentShape,
 		size_t segId1, double s1, size_t segId2, double s2) const
 {
 
@@ -481,7 +481,7 @@ bool SegmentCcdSelfContact::isSameSegContactPoint(const Math::SegmentMeshShape& 
 	return false;
 }
 
-double SegmentCcdSelfContact::maxTimePrecision(
+double SegmentSelfContact::maxTimePrecision(
 	const std::array<Math::Vector3d, 2>& pt0Positions,
 	const std::array<Math::Vector3d, 2>& pt1Positions,
 	const std::array<Math::Vector3d, 2>& qt0Positions,

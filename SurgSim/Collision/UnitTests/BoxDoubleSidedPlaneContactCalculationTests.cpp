@@ -54,7 +54,7 @@ void doBoxDoubleSidedPlaneTest(std::shared_ptr<BoxShape> box,
 	}
 
 	// Perform collision detection.
-	BoxDoubleSidedPlaneDcdContact calcContact;
+	BoxDoubleSidedPlaneContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, planeRep);
 	calcContact.calculateContact(pair);
 

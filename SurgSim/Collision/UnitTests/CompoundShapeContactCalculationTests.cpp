@@ -32,11 +32,11 @@ class CompoundShapeDcdContactTest : public ::testing::Test
 {
 	void SetUp() override
 	{
-		ContactCalculation::registerDcdContactCalculation(std::make_shared<BoxSphereDcdContact>());
-		ContactCalculation::registerDcdContactCalculation(std::make_shared<BoxPlaneDcdContact>());
-		ContactCalculation::registerDcdContactCalculation(std::make_shared<CompoundShapeDcdContact>(
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<BoxSphereContact>());
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<BoxPlaneContact>());
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<CompoundShapeContact>(
 					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_SPHERE)));
-		ContactCalculation::registerDcdContactCalculation(std::make_shared<CompoundShapeDcdContact>(
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<CompoundShapeContact>(
 					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_PLANE)));
 
 	}

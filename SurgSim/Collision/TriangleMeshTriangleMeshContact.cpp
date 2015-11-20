@@ -36,7 +36,7 @@ namespace SurgSim
 namespace Collision
 {
 
-std::pair<int, int> TriangleMeshTriangleMeshDcdContact::getShapeTypes()
+std::pair<int, int> TriangleMeshTriangleMeshContact::getShapeTypes()
 {
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_MESH);
 }
@@ -136,7 +136,7 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 } // namespace
 #endif //SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
 
-std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshDcdContact::calculateDcdContact(
+std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDcdContact(
 									 const Math::MeshShape& meshA,
 									 const Math::RigidTransform3d& meshAPose,
 									 const Math::MeshShape& meshB,

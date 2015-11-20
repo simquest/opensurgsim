@@ -30,7 +30,7 @@ void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool has
 						Vector3d expectedPenetrationPoint0 = Vector3d::Zero(),
 						Vector3d expectedPenetrationPoint1 = Vector3d::Zero())
 {
-	SphereSphereDcdContact calc;
+	SphereSphereContact calc;
 
 	auto sphere1 = std::make_shared<SurgSim::Math::SphereShape>(r0);
 	auto sphereRep1 = std::make_shared<ShapeCollisionRepresentation>("TestSphereShapeCollisionRep1");

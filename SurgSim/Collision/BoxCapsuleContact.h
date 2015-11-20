@@ -29,7 +29,7 @@ namespace Collision
 {
 
 /// Class to calculate intersections between Boxes and Capsules
-class BoxCapsuleDcdContact : public ShapeShapeContactCalculation<Math::BoxShape, Math::CapsuleShape>
+class BoxCapsuleContact : public ShapeShapeContactCalculation<Math::BoxShape, Math::CapsuleShape>
 {
 public:
 	using ContactCalculation::calculateDcdContact;

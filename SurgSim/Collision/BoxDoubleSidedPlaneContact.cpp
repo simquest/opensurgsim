@@ -31,12 +31,12 @@ namespace SurgSim
 {
 namespace Collision
 {
-std::pair<int, int> BoxDoubleSidedPlaneDcdContact::getShapeTypes()
+std::pair<int, int> BoxDoubleSidedPlaneContact::getShapeTypes()
 {
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_DOUBLESIDEDPLANE);
 }
 
-std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneDcdContact::calculateDcdContact(
+std::list<std::shared_ptr<Contact>> BoxDoubleSidedPlaneContact::calculateDcdContact(
 									 const SurgSim::Math::BoxShape& boxShape,
 									 const SurgSim::Math::RigidTransform3d& boxPose,
 									 const SurgSim::Math::DoubleSidedPlaneShape& planeShape,

@@ -24,7 +24,7 @@ namespace SurgSim
 namespace Collision
 {
 
-class OctreePlaneDcdContact : public OctreeDcdContact
+class OctreePlaneContact : public OctreeContact
 {
 public:
 	std::pair<int, int> getShapeTypes() override;
@@ -35,7 +35,7 @@ protected:
 			const SurgSim::Math::RigidTransform3d& otherPose) override;
 
 private:
-	BoxPlaneDcdContact m_calculator;
+	BoxPlaneContact m_calculator;
 };
 
 };

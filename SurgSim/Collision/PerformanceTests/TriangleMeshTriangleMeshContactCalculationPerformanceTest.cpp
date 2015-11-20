@@ -45,7 +45,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationPerformanceTests, IntersectionTes
 		std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 1");
 	meshBRep->setShape(meshB);
 
-	TriangleMeshTriangleMeshDcdContact calcContact;
+	TriangleMeshTriangleMeshContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
 
 	Framework::Timer timer;

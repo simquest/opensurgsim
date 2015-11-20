@@ -188,22 +188,22 @@ void ContactCalculation::initializeTables()
 	}
 
 	// Fill up the Dcd contact calculation table
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::BoxCapsuleDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::BoxDoubleSidedPlaneDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::BoxPlaneDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::BoxSphereDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::CapsuleSphereDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeCapsuleDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeDoubleSidedPlaneDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreePlaneDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeSphereDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SegmentMeshTriangleMeshDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SphereSphereDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SphereDoubleSidedPlaneDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SpherePlaneDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshParticlesDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshPlaneDcdContact>());
-	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshTriangleMeshDcdContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::BoxCapsuleContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::BoxDoubleSidedPlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::BoxPlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::BoxSphereContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::CapsuleSphereContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeCapsuleContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeDoubleSidedPlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreePlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeSphereContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SegmentMeshTriangleMeshContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SphereSphereContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SphereDoubleSidedPlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SpherePlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshParticlesContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshPlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshTriangleMeshContact>());
 
 	const std::array<int, Math::SHAPE_TYPE_COUNT> allshapes =
 	{
@@ -223,12 +223,12 @@ void ContactCalculation::initializeTables()
 
 	for (auto type : allshapes)
 	{
-		ContactCalculation::privateDcdRegister(std::make_shared<Collision::CompoundShapeDcdContact>(
+		ContactCalculation::privateDcdRegister(std::make_shared<Collision::CompoundShapeContact>(
 											   std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, type)));
 	}
 
 	// Fill up the Ccd contact calculation table
-	//ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentCcdSelfContact>());
+	//ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentSelfContact>());
 }
 
 void ContactCalculation::privateDcdRegister(

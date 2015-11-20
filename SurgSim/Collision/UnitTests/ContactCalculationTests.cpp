@@ -64,7 +64,7 @@ TEST(ContactCalculationTests, SwappedPairTest)
 	std::shared_ptr<CollisionPair> pair1 = std::make_shared<CollisionPair>(sphereRep, planeRep);
 	std::shared_ptr<CollisionPair> pair2 = std::make_shared<CollisionPair>(planeRep, sphereRep);
 
-	std::shared_ptr<SpherePlaneDcdContact> calc = std::make_shared<SpherePlaneDcdContact>();
+	std::shared_ptr<SpherePlaneContact> calc = std::make_shared<SpherePlaneContact>();
 
 	EXPECT_NO_THROW(calc->calculateContact(pair1));
 	EXPECT_NO_THROW(calc->calculateContact(pair2));
@@ -75,7 +75,7 @@ TEST(ContactCalculationTests, SwappedShapeTest)
 {
 	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
-	std::shared_ptr<SpherePlaneDcdContact> calc = std::make_shared<SpherePlaneDcdContact>();
+	std::shared_ptr<SpherePlaneContact> calc = std::make_shared<SpherePlaneContact>();
 
 	auto transform = Math::RigidTransform3d::Identity();
 

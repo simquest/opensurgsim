@@ -28,7 +28,7 @@ namespace Collision
 
 class CollisionPair;
 
-/// SegmentCcdSelfContact computes the self collisions among a SegmentMesh under motion at two
+/// SegmentSelfContact computes the self collisions among a SegmentMesh under motion at two
 /// time points parametrized over the time interval [0,1]. An initial phase uses the AABB tree to
 /// select a set of potentially colliding segments from the SegmentMesh. For each of these
 /// candidate segment pairs, the goal is to determine the point of earliest contact should any exist.
@@ -43,11 +43,11 @@ class CollisionPair;
 ///
 /// \sa Interval, LinearMotion, Polynomial, SegmentSegmentCcdIntervalCheck
 ///
-class SegmentCcdSelfContact : public ShapeShapeContactCalculation<Math::SegmentMeshShape, Math::SegmentMeshShape>
+class SegmentSelfContact : public ShapeShapeContactCalculation<Math::SegmentMeshShape, Math::SegmentMeshShape>
 {
 public:
 	/// Constructor.
-	SegmentCcdSelfContact();
+	SegmentSelfContact();
 
 	/// \note This dcd contact calculation is empty by nature (this class only handles segment ccd self-collision)
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(

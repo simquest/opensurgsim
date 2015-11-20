@@ -62,12 +62,12 @@ namespace SurgSim
 namespace Collision
 {
 
-std::pair<int, int> BoxCapsuleDcdContact::getShapeTypes()
+std::pair<int, int> BoxCapsuleContact::getShapeTypes()
 {
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_CAPSULE);
 }
 
-std::list<std::shared_ptr<Contact>> BoxCapsuleDcdContact::calculateDcdContact(
+std::list<std::shared_ptr<Contact>> BoxCapsuleContact::calculateDcdContact(
 									 const SurgSim::Math::BoxShape& boxShape,
 									 const SurgSim::Math::RigidTransform3d& boxPose,
 									 const SurgSim::Math::CapsuleShape& capsuleShape,

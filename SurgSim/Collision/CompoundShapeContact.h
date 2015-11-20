@@ -24,11 +24,11 @@ namespace SurgSim
 namespace Collision
 {
 
-class CompoundShapeDcdContact : public ContactCalculation
+class CompoundShapeContact : public ContactCalculation
 {
 public:
 	/// Constructor
-	explicit CompoundShapeDcdContact(const std::pair<int, int>& types);
+	explicit CompoundShapeContact(const std::pair<int, int>& types);
 
 protected:
 	std::pair<int, int> getShapeTypes() override;

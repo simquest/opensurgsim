@@ -184,7 +184,7 @@ protected:
 			triangleMeshRep->setLocalPose(transform.first * meshShapeTransform);
 
 			// Perform collision detection.
-			SegmentMeshTriangleMeshDcdContact calcContact;
+			SegmentMeshTriangleMeshContact calcContact;
 			std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(segmentMeshRep, triangleMeshRep);
 			calcContact.calculateContact(pair);
 

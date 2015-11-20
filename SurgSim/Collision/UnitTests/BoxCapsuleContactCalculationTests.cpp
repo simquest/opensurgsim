@@ -55,7 +55,7 @@ void doBoxCapsuleTest(std::shared_ptr<BoxShape> box,
 	capsuleRep->setLocalPose(makeRigidTransform(capsuleQuat, capsuleTrans));
 
 	// Perform collision detection.
-	BoxCapsuleDcdContact calcContact;
+	BoxCapsuleContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, capsuleRep);
 	calcContact.calculateContact(pair);
 

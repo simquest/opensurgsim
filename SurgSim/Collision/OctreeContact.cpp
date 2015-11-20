@@ -30,13 +30,13 @@ namespace SurgSim
 namespace Collision
 {
 
-size_t OctreeDcdContact::Vector3dHash::operator()(const SurgSim::Math::Vector3d& id) const
+size_t OctreeContact::Vector3dHash::operator()(const SurgSim::Math::Vector3d& id) const
 {
 	return boost::hash_range(id.data(), id.data() + 3);
 }
 
 
-std::list<std::shared_ptr<Contact>> OctreeDcdContact::doCalculateDcdContact(
+std::list<std::shared_ptr<Contact>> OctreeContact::doCalculateDcdContact(
 	const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
 	const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2)
 {
@@ -50,7 +50,7 @@ std::list<std::shared_ptr<Contact>> OctreeDcdContact::doCalculateDcdContact(
 	return result;
 }
 
-void OctreeDcdContact::calculateContactWithNode(
+void OctreeContact::calculateContactWithNode(
 	std::shared_ptr<const Math::OctreeShape::NodeType> node,
 	Math::RigidTransform3d octreePose,
 	const std::shared_ptr<Math::Shape>& shape,

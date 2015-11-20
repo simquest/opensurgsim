@@ -50,7 +50,7 @@ void doSphereDoubleSidedPlaneTest(std::shared_ptr<SphereShape> sphere,
 	sphereRep->setShape(sphere);
 	sphereRep->setLocalPose(SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
-	SphereDoubleSidedPlaneDcdContact calcNormal;
+	SphereDoubleSidedPlaneContact calcNormal;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
 
 	// Again this replicates the way this is calculated in the contact calculation just with different
@@ -158,7 +158,7 @@ TEST(SphereDoubleSidedPlaneContactCalculationTests, ShouldFail)
 	std::shared_ptr<CollisionPair> pairpp = std::make_shared<CollisionPair>(repp0, repp1);
 	std::shared_ptr<CollisionPair> pairss = std::make_shared<CollisionPair>(reps0, reps1);
 
-	SphereDoubleSidedPlaneDcdContact contact;
+	SphereDoubleSidedPlaneContact contact;
 
 	EXPECT_ANY_THROW(contact.calculateContact(pairpp));
 	EXPECT_ANY_THROW(contact.calculateContact(pairss));

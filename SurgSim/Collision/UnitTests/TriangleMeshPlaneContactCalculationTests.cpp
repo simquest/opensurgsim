@@ -146,7 +146,7 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 	}
 
 	// Perform collision detection.
-	TriangleMeshPlaneDcdContact calcContact;
+	TriangleMeshPlaneContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshRep, planeRep);
 	calcContact.calculateContact(pair);
 

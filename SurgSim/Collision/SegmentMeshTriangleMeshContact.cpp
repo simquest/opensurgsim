@@ -38,12 +38,12 @@ namespace SurgSim
 namespace Collision
 {
 
-std::pair<int, int> SegmentMeshTriangleMeshDcdContact::getShapeTypes()
+std::pair<int, int> SegmentMeshTriangleMeshContact::getShapeTypes()
 {
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_SEGMENTMESH, SurgSim::Math::SHAPE_TYPE_MESH);
 }
 
-std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculateDcdContact(
+std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcdContact(
 									 const Math::SegmentMeshShape& segmentMeshShape,
 									 const Math::RigidTransform3d&,
 									 const Math::MeshShape& triangleMeshShape,

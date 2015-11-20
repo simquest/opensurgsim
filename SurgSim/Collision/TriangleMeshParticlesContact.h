@@ -31,7 +31,7 @@ namespace Collision
 class CollisionPair;
 
 /// Class to calculate intersections between a triangle mesh and particles
-class TriangleMeshParticlesDcdContact : public ShapeShapeContactCalculation<Math::MeshShape, Math::ParticlesShape>
+class TriangleMeshParticlesContact : public ShapeShapeContactCalculation<Math::MeshShape, Math::ParticlesShape>
 {
 public:
 	using ContactCalculation::calculateDcdContact;

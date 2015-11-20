@@ -30,7 +30,7 @@ namespace Collision
 class CollisionPair;
 
 /// Class to calculate intersections between a capsule and a sphere
-class CapsuleSphereDcdContact : public ShapeShapeContactCalculation<Math::CapsuleShape, Math::SphereShape>
+class CapsuleSphereContact : public ShapeShapeContactCalculation<Math::CapsuleShape, Math::SphereShape>
 {
 public:
 	using ContactCalculation::calculateDcdContact;

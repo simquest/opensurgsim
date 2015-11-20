@@ -86,7 +86,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 {
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(collision0, collision1);
 	// Test case setup, create a pair with a contact and set up the physics state with it
-	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
+	SurgSim::Collision::SphereDoubleSidedPlaneContact contactCalculation;
 
 	contactCalculation.calculateContact(pair);
 	ASSERT_TRUE(pair->hasContacts());
@@ -118,7 +118,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 TEST_F(ContactConstraintGenerationTests, CountTest)
 {
 	std::shared_ptr<CollisionPair> pair;
-	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
+	SurgSim::Collision::SphereDoubleSidedPlaneContact contactCalculation;
 
 	pair = std::make_shared<CollisionPair>(collision0, collision1);
 	contactCalculation.calculateContact(pair);
@@ -146,7 +146,7 @@ TEST_F(ContactConstraintGenerationTests, CountTest)
 TEST_F(ContactConstraintGenerationTests, InactivePhysics)
 {
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(collision0, collision1);
-	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
+	SurgSim::Collision::SphereDoubleSidedPlaneContact contactCalculation;
 	contactCalculation.calculateContact(pair);
 	pairs.push_back(pair);
 	state->setCollisionPairs(pairs);
@@ -179,7 +179,7 @@ TEST_F(ContactConstraintGenerationTests, LocalPoses)
 	collision0->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(5.0, 0.0, 0.0)));
 
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(collision0, collision1);
-	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
+	SurgSim::Collision::SphereDoubleSidedPlaneContact contactCalculation;
 
 	contactCalculation.calculateContact(pair);
 	ASSERT_EQ(1u, pair->getContacts().size());
