@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/SegmentSegmentCcdStaticContact.h"
+#include "SurgSim/Math/Scalar.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -150,7 +151,7 @@ bool SegmentSegmentCcdStaticContact::collideStaticPointSegment(
 	*r =  bc.dot(ba) / bcNormSQ;
 
 	// Clamp abscissa
-	*r = std::max(0.0, std::min(1.0, *r));
+	*r = Math::clamp(*r, 0.0, 1.0, 0.0);
 
 	// Compute the closest point of a on [bc]
 	Math::Vector3d closestPtOnBC = Math::interpolate(b, c, *r);
