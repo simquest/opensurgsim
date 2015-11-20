@@ -27,8 +27,8 @@ namespace Math
 {
 
 MlcpGaussSeidelSolver::MlcpGaussSeidelSolver() :
-	m_epsilonConvergence(1e-6),
-	m_contactTolerance(1e-6),
+	m_epsilonConvergence(1e-4),
+	m_contactTolerance(2e-5),
 	m_maxIterations(30),
 	m_numEnforcedAtomicConstraints(0),
 	m_logger(SurgSim::Framework::Logger::getLogger("Math/MlcpGaussSeidelSolver"))
