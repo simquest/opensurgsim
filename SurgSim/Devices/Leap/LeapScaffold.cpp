@@ -261,8 +261,8 @@ void LeapScaffold::handleConnect()
 		if (device->deviceObject->isProvidingImages())
 		{
 			m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_IMAGES);
+			break;
 		}
-		break;
 	}
 }
 
