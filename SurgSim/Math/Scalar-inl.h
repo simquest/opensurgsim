@@ -24,15 +24,15 @@ namespace Math
 {
 
 template <class T>
-void epsilonClamp(T* value, T min, T max, T epsilon)
+T clamp(T value, T min, T max, T epsilon)
 {
-	*value = *value >= (max - epsilon) ? max : (*value <= (min + epsilon) ? min : *value);
+	return (value >= (max - epsilon) ? max : (value <= (min + epsilon) ? min : value));
 }
 
 template <typename T>
-const T CwiseEpsilonClampOp<T>::operator()(const T& x) const
+const T clampOperator<T>::operator()(const T& x) const
 {
-	return  x >= m_sup - m_epsilon ? m_sup : (x <= m_inf + m_epsilon ? m_inf : x);
+	return  clamp(x, m_min, m_max, m_epsilon);
 }
 
 };

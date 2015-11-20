@@ -51,96 +51,78 @@ TEST(ScalarTests, TwoEntriesTests)
 		SCOPED_TRACE("Test < minimum");
 
 		valueInt = 6;
-		Math::epsilonClamp(&valueInt, minInt, maxInt, epsilonInt);
-		EXPECT_EQ(minInt, valueInt);
+		EXPECT_EQ(minInt, Math::clamp(valueInt, minInt, maxInt, epsilonInt));
 
 		valueFloat = 6.0;
-		Math::epsilonClamp(&valueFloat, minFloat, maxFloat, epsilonFloat);
-		EXPECT_FLOAT_EQ(minFloat, valueFloat);
+		EXPECT_FLOAT_EQ(minFloat, Math::clamp(valueFloat, minFloat, maxFloat, epsilonFloat));
 
 		valueDouble = 6.0;
-		Math::epsilonClamp(&valueDouble, minDouble, maxDouble, epsilonDouble);
-		EXPECT_DOUBLE_EQ(minDouble, valueDouble);
+		EXPECT_DOUBLE_EQ(minDouble, Math::clamp(valueDouble, minDouble, maxDouble, epsilonDouble));
 	}
 
 	{
 		SCOPED_TRACE("Test value = minimum + epsilon");
 
 		valueInt = 12;
-		Math::epsilonClamp(&valueInt, minInt, maxInt, epsilonInt);
-		EXPECT_EQ(minInt, valueInt);
+		EXPECT_EQ(minInt, Math::clamp(valueInt, minInt, maxInt, epsilonInt));
 
 		valueFloat = 12.0;
-		Math::epsilonClamp(&valueFloat, minFloat, maxFloat, epsilonFloat);
-		EXPECT_FLOAT_EQ(minFloat, valueFloat);
+		EXPECT_FLOAT_EQ(minFloat, Math::clamp(valueFloat, minFloat, maxFloat, epsilonFloat));
 
 		valueDouble = 12.0;
-		Math::epsilonClamp(&valueDouble, minDouble, maxDouble, epsilonDouble);
-		EXPECT_DOUBLE_EQ(minDouble, valueDouble);
+		EXPECT_DOUBLE_EQ(minDouble, Math::clamp(valueDouble, minDouble, maxDouble, epsilonDouble));
 	}
 
 	{
 		SCOPED_TRACE("Test value > minimum + epsilon");
 
 		valueInt = 13;
-		Math::epsilonClamp(&valueInt, minInt, maxInt, epsilonInt);
-		EXPECT_EQ(13, valueInt);
+		EXPECT_EQ(13, Math::clamp(valueInt, minInt, maxInt, epsilonInt));
 
 		valueFloat = static_cast<float>(12.0 + 1.0e-04);
-		Math::epsilonClamp(&valueFloat, minFloat, maxFloat, epsilonFloat);
-		EXPECT_FLOAT_EQ(static_cast<float>(12.0 + 1.0e-04), valueFloat);
+		EXPECT_FLOAT_EQ(static_cast<float>(12.0 + 1.0e-04), Math::clamp(valueFloat, minFloat, maxFloat, epsilonFloat));
 
 		valueDouble = 12.0 + 1.0e-12;
-		Math::epsilonClamp(&valueDouble, minDouble, maxDouble, epsilonDouble);
-		EXPECT_DOUBLE_EQ(12.0 + 1.0e-12, valueDouble);
+		EXPECT_DOUBLE_EQ(12.0 + 1.0e-12, Math::clamp(valueDouble, minDouble, maxDouble, epsilonDouble));
 	}
 
 	{
 		SCOPED_TRACE("Test > maximum");
 
 		valueInt = 54;
-		Math::epsilonClamp(&valueInt, minInt, maxInt, epsilonInt);
-		EXPECT_EQ(maxInt, valueInt);
+		EXPECT_EQ(maxInt, Math::clamp(valueInt, minInt, maxInt, epsilonInt));
 
 		valueFloat = 54.0;
-		Math::epsilonClamp(&valueFloat, minFloat, maxFloat, epsilonFloat);
-		EXPECT_FLOAT_EQ(maxFloat, valueFloat);
+		EXPECT_FLOAT_EQ(maxFloat, Math::clamp(valueFloat, minFloat, maxFloat, epsilonFloat));
 
 		valueDouble = 54.0;
-		Math::epsilonClamp(&valueDouble, minDouble, maxDouble, epsilonDouble);
-		EXPECT_DOUBLE_EQ(maxDouble, valueDouble);
+		EXPECT_DOUBLE_EQ(maxDouble, Math::clamp(valueDouble, minDouble, maxDouble, epsilonDouble));
 	}
 
 	{
 		SCOPED_TRACE("Test value = maximum - epsilon");
 
 		valueInt = 47;
-		Math::epsilonClamp(&valueInt, minInt, maxInt, epsilonInt);
-		EXPECT_EQ(maxInt, valueInt);
+		EXPECT_EQ(maxInt, Math::clamp(valueInt, minInt, maxInt, epsilonInt));
 
 		valueFloat = 47.0;
-		Math::epsilonClamp(&valueFloat, minFloat, maxFloat, epsilonFloat);
-		EXPECT_FLOAT_EQ(maxFloat, valueFloat);
+		EXPECT_FLOAT_EQ(maxFloat, Math::clamp(valueFloat, minFloat, maxFloat, epsilonFloat));
 
 		valueDouble = 47.0;
-		Math::epsilonClamp(&valueDouble, minDouble, maxDouble, epsilonDouble);
-		EXPECT_DOUBLE_EQ(maxDouble, valueDouble);
+		EXPECT_DOUBLE_EQ(maxDouble, Math::clamp(valueDouble, minDouble, maxDouble, epsilonDouble));
 	}
 
 	{
 		SCOPED_TRACE("Test value < maximum - epsilon");
 
 		valueInt = 46;
-		Math::epsilonClamp(&valueInt, minInt, maxInt, epsilonInt);
-		EXPECT_EQ(46, valueInt);
+		EXPECT_EQ(46, Math::clamp(valueInt, minInt, maxInt, epsilonInt));
 
 		valueFloat = static_cast<float>(47.0 - 1.0e-04);
-		Math::epsilonClamp(&valueFloat, minFloat, maxFloat, epsilonFloat);
-		EXPECT_FLOAT_EQ(static_cast<float>(47.0 - 1.0e-04), valueFloat);
+		EXPECT_FLOAT_EQ(static_cast<float>(47.0 - 1.0e-04), Math::clamp(valueFloat, minFloat, maxFloat, epsilonFloat));
 
 		valueDouble = 47.0 - 1.0e-12;
-		Math::epsilonClamp(&valueDouble, minDouble, maxDouble, epsilonDouble);
-		EXPECT_DOUBLE_EQ(47.0 - 1.0e-12, valueDouble);
+		EXPECT_DOUBLE_EQ(47.0 - 1.0e-12, Math::clamp(valueDouble, minDouble, maxDouble, epsilonDouble));
 	}
 
 	{
@@ -148,18 +130,15 @@ TEST(ScalarTests, TwoEntriesTests)
 
 		valueInt = 36;
 		epsilonInt = 30;
-		Math::epsilonClamp(&valueInt, minInt, maxInt, epsilonInt);
-		EXPECT_EQ(maxInt, valueInt);
+		EXPECT_EQ(maxInt, Math::clamp(valueInt, minInt, maxInt, epsilonInt));
 
 		valueFloat = 36.0;
 		epsilonFloat = 30;
-		Math::epsilonClamp(&valueFloat, minFloat, maxFloat, epsilonFloat);
-		EXPECT_FLOAT_EQ(maxFloat, valueFloat);
+		EXPECT_FLOAT_EQ(maxFloat, Math::clamp(valueFloat, minFloat, maxFloat, epsilonFloat));
 
 		valueDouble = 36.0;
 		epsilonDouble = 30.0;
-		Math::epsilonClamp(&valueDouble, minDouble, maxDouble, epsilonDouble);
-		EXPECT_DOUBLE_EQ(maxDouble, valueDouble);
+		EXPECT_DOUBLE_EQ(maxDouble, Math::clamp(valueDouble, minDouble, maxDouble, epsilonDouble));
 	}
 	{
 		SCOPED_TRACE("Test matrix implementation for all cases ");
@@ -176,26 +155,25 @@ TEST(ScalarTests, TwoEntriesTests)
 		Math::Matrix33d backup = m1;
 		double epsilonDouble = 5.0;
 
-		Math::Matrix33d result = m1.unaryExpr(CwiseEpsilonClampOp<double>(minDouble, maxDouble, epsilonDouble));
+		Math::Matrix33d result = m1.unaryExpr(clampOperator<double>(minDouble, maxDouble, epsilonDouble));
 		for (size_t row = 0; row < 3; ++row)
 		{
 			for (size_t column = 0; column < 3; ++column)
 			{
-				Math::epsilonClamp(&backup.coeffRef(row, column), minDouble, maxDouble, epsilonDouble);
-				EXPECT_DOUBLE_EQ(backup.coeff(row, column), result.coeff(row, column));
+				EXPECT_DOUBLE_EQ(Math::clamp(backup.coeffRef(row, column), minDouble, maxDouble, epsilonDouble),
+								 result.coeff(row, column));
 			}
 		}
 
-		backup = m1;
 		epsilonDouble = 30.0;
 
-		result = m1.unaryExpr(CwiseEpsilonClampOp<double>(minDouble, maxDouble, epsilonDouble));
+		result = m1.unaryExpr(clampOperator<double>(minDouble, maxDouble, epsilonDouble));
 		for (size_t row = 0; row < 3; ++row)
 		{
 			for (size_t column = 0; column < 3; ++column)
 			{
-				Math::epsilonClamp(&backup.coeffRef(row, column), minDouble, maxDouble, epsilonDouble);
-				EXPECT_DOUBLE_EQ(backup.coeff(row, column), result.coeff(row, column));
+				EXPECT_DOUBLE_EQ(Math::clamp(backup.coeffRef(row, column), minDouble, maxDouble, epsilonDouble),
+								 result.coeff(row, column));
 			}
 		}
 	}
