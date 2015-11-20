@@ -95,7 +95,7 @@ private:
 	double m_proximity;
 
 	/// The puncture point highlighting
-	std::shared_ptr<Graphics::OsgAxesRepresentation> m_puncturePoint;
+	std::shared_ptr<Graphics::OsgAxesRepresentation> m_puncture;
 };
 
 

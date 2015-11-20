@@ -75,7 +75,7 @@ double PunctureBehavior::getProximity() const
 
 void PunctureBehavior::update(double dt)
 {
-	if (m_puncturePoint != nullptr)
+	if (m_puncture != nullptr)
 	{
 		return;
 	}
@@ -109,17 +109,17 @@ void PunctureBehavior::update(double dt)
 
 	if (needleDriven)
 	{
-		m_puncturePoint = std::make_shared<Graphics::OsgAxesRepresentation>("Puncture Point");
+		m_puncture = std::make_shared<Graphics::OsgAxesRepresentation>("Puncture Point");
 		Math::Vector3d punctureDirection =
 			m_needleEnd->calculatePosition(0.0) - m_needleEndAdjacentNode->calculatePosition(0.0);
 		Math::Vector3d binormal, tangent;
 		Math::buildOrthonormalBasis(&punctureDirection, &binormal, &tangent);
 		Math::Matrix33d rotation;
 		rotation << punctureDirection, binormal, tangent;
-		m_puncturePoint->setLocalPose(Math::makeRigidTransform(rotation,
+		m_puncture->setLocalPose(Math::makeRigidTransform(rotation,
 			driveContact->penetrationPoints.first.rigidLocalPosition.getValue()));
 
-		m_tissue->getSceneElement()->addComponent(m_puncturePoint);
+		m_tissue->getSceneElement()->addComponent(m_puncture);
 	}
 }
 
