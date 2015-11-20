@@ -17,7 +17,7 @@
 #include <gtest/gtest.h>
 #include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
-#include "SurgSim/Collision/SpherePlaneDcdContact.h"
+#include "SurgSim/Collision/SpherePlaneContact.h"
 
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/PlaneShape.h"

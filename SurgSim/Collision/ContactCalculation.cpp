@@ -19,7 +19,7 @@
 
 #include "SurgSim/Collision/ContactCalculation.h"
 
-#include "SurgSim/Collision/DcdCollision.h"
+#include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/DefaultContactCalculation.h"
 #include "SurgSim/Collision/Representation.h"
 

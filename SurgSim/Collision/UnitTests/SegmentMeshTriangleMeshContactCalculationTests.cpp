@@ -15,7 +15,7 @@
 
 #include <sstream>
 
-#include "SurgSim/Collision/SegmentMeshTriangleMeshDcdContact.h"
+#include "SurgSim/Collision/SegmentMeshTriangleMeshContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"

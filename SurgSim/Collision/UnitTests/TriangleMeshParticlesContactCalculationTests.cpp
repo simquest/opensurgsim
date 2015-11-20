@@ -17,7 +17,7 @@
 #include <unordered_set>
 
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
-#include "SurgSim/Collision/TriangleMeshParticlesDcdContact.h"
+#include "SurgSim/Collision/TriangleMeshParticlesContact.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Geometry.h"

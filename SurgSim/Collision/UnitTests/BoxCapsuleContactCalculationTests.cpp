@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "SurgSim/Collision/BoxCapsuleDcdContact.h"
+#include "SurgSim/Collision/BoxCapsuleContact.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Math/BoxShape.h"

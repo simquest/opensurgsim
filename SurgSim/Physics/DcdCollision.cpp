@@ -17,7 +17,7 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ContactCalculation.h"
-#include "SurgSim/Collision/DcdCollision.h"
+#include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/ThreadPool.h"

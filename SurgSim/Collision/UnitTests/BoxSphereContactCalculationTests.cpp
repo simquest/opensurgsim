@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
-#include "SurgSim/Collision/BoxSphereDcdContact.h"
+#include "SurgSim/Collision/BoxSphereContact.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/SphereShape.h"
 
