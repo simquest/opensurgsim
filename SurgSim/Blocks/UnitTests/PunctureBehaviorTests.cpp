@@ -15,11 +15,13 @@
 
 #include <gtest/gtest.h>
 
-
 #include "SurgSim/Blocks/PunctureBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Physics/Fem1DLocalization.h"
+#include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem2DRepresentation.h"
 
 namespace SurgSim
 {

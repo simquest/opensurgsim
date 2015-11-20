@@ -83,7 +83,6 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculate
 			for (auto j = edgeList.begin(); j != edgeList.end(); ++j)
 			{
 				const auto& verticesSegment = segmentMeshShape.getEdgePositions(*j);
-				penetrationPointCapsuleAxis.setZero();
 
 				// Check if the triangle and capsule intersect.
 				if (SurgSim::Math::calculateContactTriangleCapsule(

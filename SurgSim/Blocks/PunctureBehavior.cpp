@@ -20,20 +20,19 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Physics/SlidingConstraintData.h"
-
-using SurgSim::Math::RigidTransform3d;
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Physics/Fem1DLocalization.h"
+#include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/Fem2DRepresentation.h"
 
 namespace SurgSim
 {
 namespace Blocks
 {
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::PunctureBehavior,
-	PunctureBehavior);
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::PunctureBehavior, PunctureBehavior);
 
 PunctureBehavior::PunctureBehavior(const std::string& name) :
-	SurgSim::Framework::Behavior(name), m_proximity(0.001)
+	Framework::Behavior(name), m_proximity(0.001)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PunctureBehavior, std::shared_ptr<SurgSim::Physics::Fem1DRepresentation>,
 		Suture, getSuture, setSuture);
@@ -41,24 +40,24 @@ PunctureBehavior::PunctureBehavior(const std::string& name) :
 		Tissue, getTissue, setTissue);
 }
 
-void PunctureBehavior::setSuture(std::shared_ptr<Physics::Fem1DRepresentation> suture)
+void PunctureBehavior::setSuture(const std::shared_ptr<Physics::Fem1DRepresentation>& suture)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Cannot set the suture on a behavior that has been initialized";
 	m_suture = suture;
 }
 
-std::shared_ptr<Physics::Fem1DRepresentation> PunctureBehavior::getSuture()
+const std::shared_ptr<Physics::Fem1DRepresentation>& PunctureBehavior::getSuture() const
 {
 	return m_suture;
 }
 
-void PunctureBehavior::setTissue(std::shared_ptr<Physics::Fem2DRepresentation> tissue)
+void PunctureBehavior::setTissue(const std::shared_ptr<Physics::Fem2DRepresentation>& tissue)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Cannot set the tissue on a behavior that has been initialized";
 	m_tissue = tissue;
 }
 
-std::shared_ptr<Physics::Fem2DRepresentation> PunctureBehavior::getTissue()
+const std::shared_ptr<Physics::Fem2DRepresentation>& PunctureBehavior::getTissue() const
 {
 	return m_tissue;
 }
@@ -69,15 +68,14 @@ void PunctureBehavior::setProximity(double proximity)
 	m_proximity = proximity;
 }
 
-/// \return The proximity from the needleEnd, within which a contact is searched for.
-double PunctureBehavior::getProximity()
+double PunctureBehavior::getProximity() const
 {
 	return m_proximity;
 }
 
 void PunctureBehavior::update(double dt)
 {
-	if (m_puncturePoint)
+	if (m_puncturePoint != nullptr)
 	{
 		return;
 	}
@@ -87,28 +85,24 @@ void PunctureBehavior::update(double dt)
 	bool needleDriven = false;
 	std::shared_ptr<Collision::Contact> driveContact;
 	double minimumProximity = m_proximity * m_proximity;
-	if (collisions->find(m_tissue->getCollisionRepresentation()) != collisions->end())
+	auto collisionMap = collisions->find(m_tissue->getCollisionRepresentation());
+	if (collisionMap != collisions->end())
 	{
-		// Suture and tissue collided. Find the collision pair near the needle end.
-		for (auto& collisionMap : *collisions)
+		SURGSIM_ASSERT(collisionMap->first == m_tissue->getCollisionRepresentation());
+
+		// List of contacts between suture and tissue
+		const auto& contacts = collisionMap->second;
+		for (const auto& contact : contacts)
 		{
-			if (collisionMap.first == m_tissue->getCollisionRepresentation())
+			auto& sutureContactLocation = contact->penetrationPoints.first;
+			auto proximityVector =
+				m_needleEnd->calculatePosition(0.0) - sutureContactLocation.rigidLocalPosition.getValue();
+			double proximity = proximityVector.squaredNorm();
+			if (proximity < minimumProximity)
 			{
-				// List of contacts between suture and tissue
-				auto& contacts = collisionMap.second;
-				for (auto& contact : contacts)
-				{
-					auto& sutureContactLocation = contact->penetrationPoints.first;
-					auto proximityVector =
-						m_needleEnd->calculatePosition(0.0) - sutureContactLocation.rigidLocalPosition.getValue();
-					double proximity = proximityVector.squaredNorm();
-					if (proximity < minimumProximity)
-					{
-						needleDriven = true;
-						minimumProximity = proximity;
-						driveContact = contact;
-					}
-				}
+				needleDriven = true;
+				minimumProximity = proximity;
+				driveContact = contact;
 			}
 		}
 	}
@@ -121,14 +115,17 @@ void PunctureBehavior::update(double dt)
 		Math::Vector3d binormal, tangent;
 		Math::buildOrthonormalBasis(&punctureDirection, &binormal, &tangent);
 		Math::Matrix33d rotation;
-		rotation.col(0) = punctureDirection;
-		rotation.col(1) = binormal;
-		rotation.col(2) = tangent;
+		rotation << punctureDirection, binormal, tangent;
 		m_puncturePoint->setLocalPose(Math::makeRigidTransform(rotation,
 			driveContact->penetrationPoints.first.rigidLocalPosition.getValue()));
 
 		m_tissue->getSceneElement()->addComponent(m_puncturePoint);
 	}
+}
+
+int PunctureBehavior::getTargetManagerType() const
+{
+	return Framework::MANAGER_TYPE_PHYSICS;
 }
 
 bool PunctureBehavior::doInitialize()
@@ -142,15 +139,15 @@ bool PunctureBehavior::doWakeUp()
 
 	if (m_suture == nullptr)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
-			getName() + "' must have a suture to do anything.";
+		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Blocks/PunctureBehavior")) <<
+			getFullName() + "' must have a suture to do anything.";
 		result = false;
 	}
 
 	if (m_tissue == nullptr)
 	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
-			getName() + "' must have a tissue to drive the suture into.";
+		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Blocks/PunctureBehavior")) <<
+			getFullName() << "must have a tissue to drive the suture into.";
 		result = false;
 	}
 

@@ -18,21 +18,30 @@
 
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/ObjectFactory.h"
-#include "SurgSim/Graphics/OsgAxesRepresentation.h"
-#include "SurgSim/Physics/Constraint.h"
-#include "SurgSim/Physics/Fem1DLocalization.h"
-#include "SurgSim/Physics/Fem1DRepresentation.h"
-#include "SurgSim/Physics/Fem2DRepresentation.h"
+
 
 namespace SurgSim
 {
+
+namespace Graphics
+{
+class OsgAxesRepresentation;
+}
+
+namespace Physics
+{
+class Fem1DLocalization;
+class Fem1DRepresentation;
+class Fem2DRepresentation;
+}
 
 namespace Blocks
 {
 
 SURGSIM_STATIC_REGISTRATION(PunctureBehavior);
 
-/// Trigger another behavior when this behavior is triggered.
+/// Detect the collision between a specific point in Fem1D and a Fem2D representation. Create a graphics axes to
+/// indicate this point.
 class PunctureBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -43,33 +52,31 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Blocks::PunctureBehavior);
 
 	/// \param	suture The suture whose needle end is the driving element.
-	void setSuture(std::shared_ptr<Physics::Fem1DRepresentation> source);
+	void setSuture(const std::shared_ptr<Physics::Fem1DRepresentation>& source);
 
 	/// \return The suture whose needle end is the driving element.
-	std::shared_ptr<Physics::Fem1DRepresentation> getSuture();
+	const std::shared_ptr<Physics::Fem1DRepresentation>& getSuture() const;
 
 	/// \param tissue The tissue that is to be driving into, by the suture
-	void setTissue(std::shared_ptr<Physics::Fem2DRepresentation> tissue);
+	void setTissue(const std::shared_ptr<Physics::Fem2DRepresentation>& tissue);
 
 	/// \return The tissue that is to be driving into, by the suture
-	std::shared_ptr<Physics::Fem2DRepresentation> getTissue();
+	const std::shared_ptr<Physics::Fem2DRepresentation>& getTissue() const;
 
 	/// \param The proximity from the needleEnd, within which a contact is searched for.
 	void setProximity(double proximity);
 
 	/// \return The proximity from the needleEnd, within which a contact is searched for.
-	double getProximity();
+	double getProximity() const;
 
 	void update(double dt) override;
 
-	int getTargetManagerType() const override { return Framework::MANAGER_TYPE_PHYSICS; }
+	int getTargetManagerType() const override;
 
 protected:
-	/// Initialize the behavior
-	virtual bool doInitialize();
+	bool doInitialize() override;
 
-	/// Wakeup the behavior, which copies the initial pose
-	virtual bool doWakeUp();
+	bool doWakeUp() override;
 
 private:
 	/// The suture whose needle end is the driving element.
