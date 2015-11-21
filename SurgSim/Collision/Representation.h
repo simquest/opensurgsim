@@ -94,17 +94,11 @@ public:
 	/// \return The shape transformed by the pose of this representation
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getPosedShape();
 
-	/// \return the previous posed shape
-	virtual const Math::PosedShape& getPreviousPosedShape() const;
+	/// \return the posed shape motion
+	virtual const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& getPosedShapeMotion() const;
 
-	/// \return the current posed shape
-	virtual const Math::PosedShape& getCurrentPosedShape() const;
-
-	/// \param posedShape the previous posed shape
-	virtual void setPreviousPosedShape(const Math::PosedShape& posedShape);
-
-	/// \param posedShape the current posed shape
-	virtual void setCurrentPosedShape(const Math::PosedShape& posedShape);
+	/// \param posedShape the posed shape motion to be set
+	virtual void setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape);
 
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
@@ -166,11 +160,8 @@ public:
 	void setAllowing(const std::vector<std::string>& fullNames);
 
 protected:
-	/// Invalidate the cached previous posed shape
-	void invalidatePreviousPosedShape();
-
-	/// Invalidate the cached current posed shape
-	void invalidatePosedShape();
+	/// Invalidate the cached posed shape motion
+	void invalidatePosedShapeMotion();
 
 	/// Get the ignored collision representations
 	/// \return The full names of all the ignored collision representations
@@ -197,11 +188,11 @@ private:
 	/// Mutex to lock write access to m_collisions
 	boost::mutex m_collisionsMutex;
 
-	/// Cached posed shapes
-	Math::PosedShape m_previousPosedShape, m_currentPosedShape;
+	/// The shape transformed in space and defined through time, i.e. with 2 differents configurations
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> m_posedShapeMotion;
 
-	/// Mutex to lock write access to m_posedShape
-	mutable boost::mutex m_previousPosedShapeMutex, m_currentPosedShapeMutex;
+	/// Mutex to lock write access to m_posedShapeMotion
+	mutable boost::mutex m_posedShapeMotionMutex;
 
 	/// Ignored collision representations
 	std::unordered_set<std::string> m_ignoring;

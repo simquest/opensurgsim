@@ -84,7 +84,6 @@ void DeformableCollisionRepresentation::update(const double& dt)
 				"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
 			"went inactive because its shape failed to update.";
 	}
-	invalidatePreviousPosedShape();
 
 	// Write current shape
 	if (!updateShapeFromOdeState(physicsRepresentation->getCurrentState(), &m_shape))
@@ -96,7 +95,8 @@ void DeformableCollisionRepresentation::update(const double& dt)
 				"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
 			"went inactive because its shape failed to update.";
 	}
-	invalidatePosedShape();
+
+	invalidatePosedShapeMotion();
 }
 
 bool DeformableCollisionRepresentation::doInitialize()

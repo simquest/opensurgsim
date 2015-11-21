@@ -50,31 +50,30 @@ void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair
 }
 
 std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateDcdContact(
-	const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
-	const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2)
+	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
 {
 	SURGSIM_ASSERT(!m_doAssert)
 			<< "Contact calculation not implemented for pairs with types ("
-			<< shape1->getType() << ", " << shape2->getType() << ").";
+			<< posedShape1.getShape()->getType() << ", " << posedShape2.getShape()->getType() << ").";
 	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
 			<< "Contact calculation not implemented for pairs with types ("
-			<< shape1->getType() << ", " << shape2->getType() << ").";
+			<< posedShape1.getShape()->getType() << ", " << posedShape2.getShape()->getType() << ").";
 	return std::list<std::shared_ptr<Contact>>();
-
 }
 
 std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateCcdContact(
-	const std::shared_ptr<Math::Shape>& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
-	const std::shared_ptr<Math::Shape>& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
-	const std::shared_ptr<Math::Shape>& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
-	const std::shared_ptr<Math::Shape>& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1)
+	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2)
 {
 	SURGSIM_ASSERT(!m_doAssert)
 		<< "Contact calculation not implemented for pairs with types ("
-		<< shape1AtTime0->getType() << ", " << shape2AtTime0->getType() << ").";
+		<< posedShapeMotion1.first.getShape()->getType() << ", "
+		<< posedShapeMotion2.first.getShape()->getType() << ").";
 	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
 		<< "Contact calculation not implemented for pairs with types ("
-		<< shape1AtTime0->getType() << ", " << shape2AtTime0->getType() << ").";
+		<< posedShapeMotion1.first.getShape()->getType() << ", "
+		<< posedShapeMotion2.first.getShape()->getType() << ").";
 	return std::list<std::shared_ptr<Contact>>();
 }
 

@@ -102,13 +102,48 @@ public:
 };
 
 /// PosedShape is a transformed shape with a record of the pose used to transform it.
-struct PosedShape {
+template <class T>
+struct PosedShape
+{
 	PosedShape() {}
-	PosedShape(const std::shared_ptr<Math::Shape>& shape, const Math::RigidTransform3d& pose) :
-		m_shape(shape), m_pose(pose) {}
+	PosedShape(const T& shapeInput, const Math::RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
+	PosedShape(const PosedShape<T>& input) : shape(input.getShape()), pose(input.getPose()) {}
+	PosedShape(PosedShape<T>&& input) : pose(input.getPose()) { std::swap(shape, input.shape); input.shape = nullptr; }
 
-	std::shared_ptr<Math::Shape> m_shape;
-	Math::RigidTransform3d m_pose;
+	PosedShape<T>& operator=(const PosedShape<T>& input)
+	{
+		shape = input.getShape(); // Will that do what we want for shared_ptr ?
+		pose = input.getPose();
+		return *this;
+	}
+
+	PosedShape<T>& operator=(PosedShape<T>&& input)
+	{
+		shape = input.shape;
+		input.shape = nullptr;
+		pose = input.getPose();
+		return *this;
+	}
+
+	void invalidate() { shape = nullptr; }
+	const T& getShape() const { return shape; }
+	const Math::RigidTransform3d& getPose() const { return pose; }
+
+protected:
+	T shape;
+	Math::RigidTransform3d pose;
+};
+
+/// PosedShapeMotion is embedding the motion of a PosedShape, providing a posed shape at 2 different instant.
+template <class T>
+struct PosedShapeMotion : public std::pair<PosedShape<T>, PosedShape<T>>
+{
+	PosedShapeMotion() {}
+	PosedShapeMotion(const PosedShape<T>& posedShapeFirst, const PosedShape<T>& posedShapeSecond)
+	{
+		this->first = posedShapeFirst;
+		this->second = posedShapeSecond;
+	}
 };
 
 }; // Math

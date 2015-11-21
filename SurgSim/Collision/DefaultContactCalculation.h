@@ -48,14 +48,12 @@ private:
 	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 	std::list<std::shared_ptr<Contact>> doCalculateDcdContact(
-		const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
-		const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) override;
+		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2) override;
 
 	std::list<std::shared_ptr<Contact>> doCalculateCcdContact(
-		const std::shared_ptr<Math::Shape>& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
-		const std::shared_ptr<Math::Shape>& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
-		const std::shared_ptr<Math::Shape>& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
-		const std::shared_ptr<Math::Shape>& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) override;
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2) override;
 };
 
 }; // namespace Collision

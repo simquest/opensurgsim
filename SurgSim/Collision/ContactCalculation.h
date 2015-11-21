@@ -52,26 +52,20 @@ public:
 	void calculateContact(std::shared_ptr<CollisionPair> pair);
 
 	/// Calculate the dcd contacts between two posed/transformed shapes
-	/// \param shape1, pose1 The first transformed shape for which to calculate the dcd contacts
-	/// \param shape2, pose2 The second transformed shape for which to calculate the dcd contacts
+	/// \param posedShape1, posedShape2 The two posed shape to consider for this dcd contact calculation
 	/// \return a list of contacts between the two given posed shapes
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(
-		const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
-		const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2);
+		const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1,
+		const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2);
 
 	/// Calculate the ccd contacts between two posed/transformed shapes
-	/// \param shape1AtTime0, pose1AtTim0 The first transformed shape at the begining of the motion
-	/// \param shape1AtTime1, pose1AtTim1 The first transformed shape at the end of the motion
-	/// \param shape2AtTime0, pose2AtTim0 The second transformed shape at the begining of the motion
-	/// \param shape2AtTime1, pose2AtTim1 The second transformed shape at the end of the motion
+	/// \param posedShapeMotion1, posedShapeMotion2 The two posed shape motion to calculate ccd contact for
 	/// \return a list of ccd contacts between the two given shapes
 	/// \note The contact information is related to the end of the time range, so solving these contact will
 	/// \note solve the collision at the end of the time range.
 	std::list<std::shared_ptr<Contact>> calculateCcdContact(
-		const std::shared_ptr<Math::Shape>& shape1AtTime0, const Math::RigidTransform3d& pose1AtTim0,
-		const std::shared_ptr<Math::Shape>& shape1AtTime1, const Math::RigidTransform3d& pose1AtTim1,
-		const std::shared_ptr<Math::Shape>& shape2AtTime0, const Math::RigidTransform3d& pose2AtTim0,
-		const std::shared_ptr<Math::Shape>& shape2AtTime1, const Math::RigidTransform3d& pose2AtTim1);
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion1,
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion2);
 
 	/// Virtual function that returns the shapes that this ContactCalculation class handles.
 	/// \return Return the shape types this class handles.
@@ -100,29 +94,20 @@ private:
 	/// Virtual function receives the call from the public interface, usually will type the
 	/// shapes statically to their known types and then execute a specific contact calculation
 	/// between the two shapes
-	/// \param shape1, pose1 The first posed shape for which to calculate the dcd contacts
-	/// \param shape2, pose2 The second posed shape for which to calculate the dcd contacts
+	/// \param posedShape1, posedShape2 The two posed shapes to calculate dcd contact for
 	/// \return a list of dcd contacts between the two given posed shapes
 	virtual std::list<std::shared_ptr<Contact>> doCalculateDcdContact(
-		const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
-		const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) = 0;
+		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2);
 
 	/// Virtual function receives the call from the public interface, usually will type the
 	/// shapes statically to their known types and then execute a specific contact calculation
 	/// between the two shapes
-	/// \param shape1AtTime0, pose1AtTime0 The first posed shape at the begining of the motion
-	/// \param shape1AtTime1, pose1AtTime1 The first posed shape at the end of the motion
-	/// \param shape2AtTime0, pose2AtTime0 The second posed shape at the begining of the motion
-	/// \param shape2AtTime1, pose2AtTime1 The second posed shape at the end of the motion
-	/// \return a list of contacts between the two given posed shapes motion
+	/// \param posedShapeMotion1, posedShapeMotion2 The two posed shapes motion to calculate ccd contact for
+	/// \return a list of ccd contacts between the two given posed shapes motion
 	virtual std::list<std::shared_ptr<Contact>> doCalculateCcdContact(
-		const std::shared_ptr<Math::Shape>& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
-		const std::shared_ptr<Math::Shape>& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
-		const std::shared_ptr<Math::Shape>& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
-		const std::shared_ptr<Math::Shape>& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1)
-	{
-		return std::list<std::shared_ptr<Contact>>();
-	}
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2);
 
 	/// Statically initialize the tables, used via call once
 	static void initializeTables();

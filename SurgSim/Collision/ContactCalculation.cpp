@@ -15,13 +15,11 @@
 
 #include <thread>
 
-#include "SurgSim/Framework/Log.h"
-
 #include "SurgSim/Collision/ContactCalculation.h"
-
 #include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/DefaultContactCalculation.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
@@ -74,19 +72,19 @@ void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 }
 
 std::list<std::shared_ptr<Contact>> ContactCalculation::calculateDcdContact(
-	const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
-	const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2)
+	const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1,
+	const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2)
 {
 	auto types = getShapeTypes();
-	auto incoming = std::make_pair(shape1->getType(), shape2->getType());
+	auto incoming = std::make_pair(posedShape1.getShape()->getType(), posedShape2.getShape()->getType());
 	if (incoming == types)
 	{
-		return doCalculateDcdContact(shape1, pose1, shape2, pose2);
+		return doCalculateDcdContact(posedShape1, posedShape2);
 	}
 
 	if (incoming.first == types.second && incoming.second == types.first)
 	{
-		auto contacts = doCalculateDcdContact(shape2, pose2, shape1, pose1);
+		auto contacts = doCalculateDcdContact(posedShape2, posedShape1);
 		for (const auto& contact : contacts)
 		{
 			contact->normal = -contact->normal;
@@ -142,25 +140,15 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
 	{
-		contacts = doCalculateDcdContact(
-			shape1, pair->getFirst()->getPose(),
-			shape2, pair->getSecond()->getPose());
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(shape1, pair->getFirst()->getPose());
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(shape2, pair->getSecond()->getPose());
+		contacts = doCalculateDcdContact(posedShape1, posedShape2);
 	}
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
-		Math::PosedShape posedShape1AtTime0, posedShape1AtTime1, posedShape2AtTime0, posedShape2AtTime1;
-
-		posedShape1AtTime0 = pair->getFirst()->getPreviousPosedShape();
-		posedShape1AtTime1 = pair->getFirst()->getCurrentPosedShape();
-
-		posedShape2AtTime0 = pair->getSecond()->getPreviousPosedShape();
-		posedShape2AtTime1 = pair->getSecond()->getCurrentPosedShape();
-
 		contacts = doCalculateCcdContact(
-			posedShape1AtTime0.m_shape, posedShape1AtTime0.m_pose,
-			posedShape1AtTime1.m_shape, posedShape1AtTime1.m_pose,
-			posedShape2AtTime0.m_shape, posedShape2AtTime0.m_pose,
-			posedShape2AtTime1.m_shape, posedShape2AtTime1.m_pose);
+			pair->getFirst()->getPosedShapeMotion(),
+			pair->getSecond()->getPosedShapeMotion());
 	}
 	else
 	{
@@ -173,6 +161,22 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	{
 		pair->addContact(contact);
 	}
+}
+
+std::list<std::shared_ptr<Contact>> ContactCalculation::doCalculateDcdContact(
+	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
+{
+	SURGSIM_FAILURE() << "Not implemented";
+	return std::list<std::shared_ptr<Contact>>();
+}
+
+std::list<std::shared_ptr<Contact>> ContactCalculation::doCalculateCcdContact(
+	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2)
+{
+	SURGSIM_FAILURE() << "Not implemented";
+	return std::list<std::shared_ptr<Contact>>();
 }
 
 void ContactCalculation::initializeTables()
@@ -226,9 +230,6 @@ void ContactCalculation::initializeTables()
 		ContactCalculation::privateDcdRegister(std::make_shared<Collision::CompoundShapeContact>(
 											   std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, type)));
 	}
-
-	// Fill up the Ccd contact calculation table
-	//ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentSelfContact>());
 }
 
 void ContactCalculation::privateDcdRegister(

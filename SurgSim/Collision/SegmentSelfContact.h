@@ -49,16 +49,6 @@ public:
 	/// Constructor.
 	SegmentSelfContact();
 
-	/// \note This dcd contact calculation is empty by nature (this class only handles segment ccd self-collision)
-	std::list<std::shared_ptr<Contact>> calculateDcdContact(
-		const Math::SegmentMeshShape& segmentShape1,
-		const Math::RigidTransform3d& segmentPose1,
-		const Math::SegmentMeshShape& segmentShape2,
-		const Math::RigidTransform3d& segmentPose2) const override
-	{
-		return std::list<std::shared_ptr<Contact>>();
-	}
-
 	std::list<std::shared_ptr<Contact>> calculateCcdContact(
 		const Math::SegmentMeshShape& segmentShape1AtTime0, const Math::RigidTransform3d& segmentPose1AtTime0,
 		const Math::SegmentMeshShape& segmentShape1AtTime1, const Math::RigidTransform3d& segmentPose1AtTime1,
