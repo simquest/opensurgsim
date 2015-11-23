@@ -229,8 +229,8 @@ void blockWithSearch(const DerivedSub& subMatrix, size_t rowStart, size_t column
 		}
 		else
 		{
-			innerFirstElement = matrix->data().searchLowerIndex(
-									innerStartIdInCurrentOuter, innerStartIdInNextOuter - 1, innerStart);
+			innerFirstElement = static_cast<Index>(matrix->data().searchLowerIndex(
+									innerStartIdInCurrentOuter, innerStartIdInNextOuter - 1, innerStart));
 		}
 
 		// Make sure we actually found the 1st element of the block in this outer
