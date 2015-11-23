@@ -77,7 +77,6 @@ void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::share
 	m_posedShapeMotion = posedShapeMotion;
 }
 
-
 const std::shared_ptr<Math::Shape> Representation::getPosedShape()
 {
 	boost::lock_guard<boost::mutex> lock(m_posedShapeMotionMutex);

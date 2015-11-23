@@ -105,25 +105,8 @@ public:
 template <class T>
 struct PosedShape
 {
-	PosedShape() {}
+	PosedShape() { pose = Math::RigidTransform3d::Identity(); }
 	PosedShape(const T& shapeInput, const Math::RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
-	PosedShape(const PosedShape<T>& input) : shape(input.getShape()), pose(input.getPose()) {}
-	PosedShape(PosedShape<T>&& input) : pose(input.getPose()) { std::swap(shape, input.shape); input.shape = nullptr; }
-
-	PosedShape<T>& operator=(const PosedShape<T>& input)
-	{
-		shape = input.getShape(); // Will that do what we want for shared_ptr ?
-		pose = input.getPose();
-		return *this;
-	}
-
-	PosedShape<T>& operator=(PosedShape<T>&& input)
-	{
-		shape = input.shape;
-		input.shape = nullptr;
-		pose = input.getPose();
-		return *this;
-	}
 
 	void invalidate() { shape = nullptr; }
 	const T& getShape() const { return shape; }

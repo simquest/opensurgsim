@@ -136,7 +136,6 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 		shape2 = pair->getSecond()->getPosedShape();
 	}
 
-	// Are we using Dcd or Ccd for this pair ?
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
 	{
@@ -152,9 +151,7 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	}
 	else
 	{
-		using Framework::Logger;
-		SURGSIM_LOG_ONCE(Logger::getLogger("ContactCalculation"), WARNING) <<
-			"Invalid collision detection type, neither discrete nor continuous";
+		SURGSIM_FAILURE() << "Invalid collision detection type, neither discrete nor continuous";
 	}
 
 	for (auto& contact : contacts)

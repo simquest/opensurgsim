@@ -76,10 +76,14 @@ class ShapeShapeContactCalculation : public ContactCalculation
 		auto twoAtTime0 = std::static_pointer_cast<Shape2>(posedShapeMotion2.first.getShape());
 		auto twoAtTime1 = std::static_pointer_cast<Shape2>(posedShapeMotion2.second.getShape());
 
-		SURGSIM_ASSERT(oneAtTime0->getType() == posedShapeMotion1.first.getShape()->getType()) << "Invalid Shape 1";
-		SURGSIM_ASSERT(oneAtTime1->getType() == posedShapeMotion1.second.getShape()->getType()) << "Invalid Shape 1";
-		SURGSIM_ASSERT(twoAtTime0->getType() == posedShapeMotion2.first.getShape()->getType()) << "Invalid Shape 2";
-		SURGSIM_ASSERT(twoAtTime1->getType() == posedShapeMotion2.second.getShape()->getType()) << "Invalid Shape 2";
+		SURGSIM_ASSERT(oneAtTime0->getType() == posedShapeMotion1.first.getShape()->getType()) <<
+			"Invalid Shape 1 detected at time 0";
+		SURGSIM_ASSERT(oneAtTime1->getType() == posedShapeMotion1.second.getShape()->getType()) <<
+			"Invalid Shape 1 detected at time 1";
+		SURGSIM_ASSERT(twoAtTime0->getType() == posedShapeMotion2.first.getShape()->getType()) <<
+			"Invalid Shape 2 detected at time 0";
+		SURGSIM_ASSERT(twoAtTime1->getType() == posedShapeMotion2.second.getShape()->getType()) <<
+			"Invalid Shape 2 detected at time 1";
 
 		return calculateCcdContact(
 			*oneAtTime0, posedShapeMotion1.first.getPose(), *oneAtTime1, posedShapeMotion1.second.getPose(),
