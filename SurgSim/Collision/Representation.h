@@ -95,10 +95,7 @@ public:
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getPosedShape();
 
 	/// \return the posed shape motion
-	virtual const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& getPosedShapeMotion() const;
-
-	/// \param posedShape the posed shape motion to be set
-	virtual void setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape);
+	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& getPosedShapeMotion() const;
 
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
@@ -172,6 +169,9 @@ protected:
 	std::vector<std::string> getAllowing() const;
 
 	void doRetire() override;
+
+	/// \param posedShape the posed shape motion to be set
+	void setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape);
 
 private:
 	/// The type of collision detection
