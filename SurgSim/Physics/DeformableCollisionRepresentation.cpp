@@ -44,25 +44,19 @@ DeformableCollisionRepresentation::~DeformableCollisionRepresentation()
 
 namespace
 {
-bool updateShapeFromOdeState(const std::shared_ptr<Math::OdeState>& odeState,
-	std::shared_ptr<SurgSim::Math::MeshShape>* shape)
+bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::MeshShape* shape)
 {
-	const size_t numNodes = odeState->getNumNodes();
+	const size_t numNodes = odeState.getNumNodes();
 
-	SURGSIM_ASSERT((*shape)->getNumVertices() == numNodes) <<
+	SURGSIM_ASSERT(shape->getNumVertices() == numNodes) <<
 		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 	{
-		(*shape)->setVertexPosition(nodeId, odeState->getPosition(nodeId));
+		shape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
 	}
 
-	if (!(*shape)->update())
-	{
-		return false;
-	}
-
-	return true;
+	return shape->update();
 }
 }
 
@@ -75,25 +69,19 @@ void DeformableCollisionRepresentation::update(const double& dt)
 
 	// Write previous shape ONLY if the collision detection is continuous
 	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS &&
-		!updateShapeFromOdeState(physicsRepresentation->getPreviousState(), &m_previousShape))
+		!updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get()))
 	{
 		setLocalActive(false);
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-			"CollisionRepresentation '" << getName() << "' " <<
-			(getSceneElement() == nullptr ?
-				"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
-			"went inactive because its shape failed to update.";
+			"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
 	}
 
 	// Write current shape
-	if (!updateShapeFromOdeState(physicsRepresentation->getCurrentState(), &m_shape))
+	if (!updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get()))
 	{
 		setLocalActive(false);
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-			"CollisionRepresentation '" << getName() << "' " <<
-			(getSceneElement() == nullptr ?
-				"(of no SceneElement) " : "of SceneElement '" + getSceneElement()->getName() + "' ") <<
-			"went inactive because its shape failed to update.";
+		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+			"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
 	}
 
 	invalidatePosedShapeMotion();
