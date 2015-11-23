@@ -170,14 +170,14 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K,
+					Math::addSubMatrix((coordinate[index1] * coordinate[index2] * K).eval(),
 									   static_cast<SparseMatrix::Index>(nodeId1),
 									   static_cast<SparseMatrix::Index>(nodeId2),
 									   &m_externalGeneralizedStiffness, true);
 				}
 				if (D.size() != 0)
 				{
-					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D,
+					Math::addSubMatrix((coordinate[index1] * coordinate[index2] * D).eval(),
 									   static_cast<SparseMatrix::Index>(nodeId1),
 									   static_cast<SparseMatrix::Index>(nodeId2),
 									   &m_externalGeneralizedDamping, true);

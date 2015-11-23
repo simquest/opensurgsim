@@ -55,8 +55,8 @@ Matrix66d KFormal(const Vector3d p0, const Vector3d p1,
 
 	// Assembly stage in K
 	SurgSim::Math::addSubMatrix(K00, 0, 0, 3, 3, &K);
-	SurgSim::Math::addSubMatrix(-K00, 0, 1, 3, 3, &K);
-	SurgSim::Math::addSubMatrix(-K00, 1, 0, 3, 3, &K);
+	SurgSim::Math::addSubMatrix((-K00).eval(), 0, 1, 3, 3, &K);
+	SurgSim::Math::addSubMatrix((-K00).eval(), 1, 0, 3, 3, &K);
 	SurgSim::Math::addSubMatrix(K00, 1, 1, 3, 3, &K);
 
 	return K;
@@ -73,8 +73,8 @@ Matrix66d DFormal(const Vector3d p0, const Vector3d p1,
 	// Assembly stage in D
 	Matrix66d D = Matrix66d::Zero();
 	SurgSim::Math::addSubMatrix(D00, 0, 0, 3, 3, &D);
-	SurgSim::Math::addSubMatrix(-D00, 0, 1, 3, 3, &D);
-	SurgSim::Math::addSubMatrix(-D00, 1, 0, 3, 3, &D);
+	SurgSim::Math::addSubMatrix((-D00).eval(), 0, 1, 3, 3, &D);
+	SurgSim::Math::addSubMatrix((-D00).eval(), 1, 0, 3, 3, &D);
 	SurgSim::Math::addSubMatrix(D00, 1, 1, 3, 3, &D);
 
 	return D;

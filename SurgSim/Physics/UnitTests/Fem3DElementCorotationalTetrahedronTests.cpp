@@ -348,7 +348,8 @@ void testAddStiffness(MockFem3DElementCorotationalTet* tet,
 	tet->updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_K);
 
 	Matrix expectedK = Matrix::Zero(state.getNumDof(), state.getNumDof());
-	SurgSim::Math::addSubMatrix(scale * tet->getRotatedStiffnessMatrix(state), tet->getNodeIds(), 3, &expectedK);
+	SurgSim::Math::addSubMatrix((scale * tet->getRotatedStiffnessMatrix(state)).eval(), tet->getNodeIds(), 3,
+		&expectedK);
 
 	SparseMatrix K(static_cast<SparseMatrix::Index>(state.getNumDof()),
 				   static_cast<SparseMatrix::Index>(state.getNumDof()));
@@ -378,7 +379,7 @@ void testAddMass(MockFem3DElementCorotationalTet* tet,
 	Eigen::Matrix<double, 12, 12> R12x12 = make12x12(Eigen::Matrix<double, 3, 3>(R));
 
 	Matrix expectedM = Matrix::Zero(state.getNumDof(), state.getNumDof());
-	SurgSim::Math::addSubMatrix(scale * R12x12 * M0 * R12x12.transpose(), tet->getNodeIds(), 3, &expectedM);
+	SurgSim::Math::addSubMatrix((scale * R12x12 * M0 * R12x12.transpose()).eval(), tet->getNodeIds(), 3, &expectedM);
 
 	SparseMatrix M(static_cast<SparseMatrix::Index>(state.getNumDof()),
 				   static_cast<SparseMatrix::Index>(state.getNumDof()));
@@ -410,8 +411,8 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 	Vector expectedF = Vector::Zero(state.getNumDof());
 	Matrix expectedM = Matrix::Zero(state.getNumDof(), state.getNumDof());
 	Matrix expectedK = Matrix::Zero(state.getNumDof(), state.getNumDof());
-	SurgSim::Math::addSubMatrix(tet->getRotatedStiffnessMatrix(state), tet->getNodeIds(), 3, &expectedK);
-	SurgSim::Math::addSubMatrix(R12x12 * M0 * R12x12.transpose(), tet->getNodeIds(), 3, &expectedM);
+	SurgSim::Math::addSubMatrix((tet->getRotatedStiffnessMatrix(state)).eval(), tet->getNodeIds(), 3, &expectedK);
+	SurgSim::Math::addSubMatrix((R12x12 * (M0 * R12x12.transpose())).eval(), tet->getNodeIds(), 3, &expectedM);
 
 	Eigen::Matrix<double, 12, 1> x;
 	SurgSim::Math::getSubVector(state.getPositions(), tet->getNodeIds(), 3, &x);

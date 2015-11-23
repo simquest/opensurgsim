@@ -170,13 +170,13 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K,
+					Math::addSubMatrix((coordinate[index1] * coordinate[index2] * K).eval(),
 									   nodeId1, nodeId2,
 									   &m_externalGeneralizedStiffness, true);
 				}
 				if (D.size() != 0)
 				{
-					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D,
+					Math::addSubMatrix((coordinate[index1] * coordinate[index2] * D).eval(),
 									   nodeId1, nodeId2,
 									   &m_externalGeneralizedDamping, true);
 				}
