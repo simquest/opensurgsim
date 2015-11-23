@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
@@ -33,6 +34,8 @@ public:
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
 	explicit PostUpdate(bool doCopyState = false);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::PostUpdate);
 
 	/// Destructor
 	virtual ~PostUpdate();

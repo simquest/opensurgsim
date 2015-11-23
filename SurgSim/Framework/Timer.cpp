@@ -172,5 +172,11 @@ double Timer::getMinFramePeriod() const
 	return std::min_element(m_frameDurations.cbegin(), m_frameDurations.cend())->count();
 }
 
+bool Timer::isBufferFull() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_sharedMutex);
+	return (m_frameDurations.size() == m_maxNumberOfFrames);
+}
+
 }; // namespace Framework
 }; // namespace SurgSim

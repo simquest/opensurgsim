@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_BUILDMLCP_H
 #define SURGSIM_PHYSICS_BUILDMLCP_H
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
@@ -30,6 +31,8 @@ public:
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
 	explicit BuildMlcp(bool doCopyState = false);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::BuildMlcp);
 
 	/// Destructor
 	virtual ~BuildMlcp();
