@@ -32,8 +32,7 @@ class AabbTreeNode : public TreeNode
 {
 public:
 
-	static Framework::ReuseFactory<AabbTreeNode> m_nodeFactory;
-	static Framework::ReuseFactory<AabbTreeData> m_dataFactory;
+	static Framework::ReuseFactory<AabbTreeNode> m_factory;
 
 	using TreeNode::setData;
 
@@ -87,6 +86,7 @@ public:
 	/// \param [out] result location to receive the results of the call.
 	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result);
 
+	void clear();
 protected:
 
 	bool doAccept(TreeVisitor* visitor) override;

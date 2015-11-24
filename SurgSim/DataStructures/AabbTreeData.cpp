@@ -23,6 +23,8 @@ namespace SurgSim
 namespace DataStructures
 {
 
+Framework::ReuseFactory<AabbTreeData> AabbTreeData::m_factory;
+
 AabbTreeData::AabbTreeData()
 {
 
@@ -71,7 +73,19 @@ bool AabbTreeData::isEqual(const TreeData* data) const
 	return result;
 }
 
-void AabbTreeData::add(const SurgSim::Math::Aabbd aabb, size_t id)
+void AabbTreeData::setItems(const std::list<Item>& items)
+{
+	m_data = items;
+	recalculateAabb();
+}
+
+void AabbTreeData::setItems(std::list<Item>&& items)
+{
+	std::swap(m_data, items);
+	recalculateAabb();
+}
+
+void AabbTreeData::add(const SurgSim::Math::Aabbd& aabb, size_t id)
 {
 	m_aabb.extend(aabb);
 	m_data.emplace_back(aabb, id);
@@ -95,7 +109,8 @@ size_t AabbTreeData::getSize() const
 
 std::shared_ptr<AabbTreeData> AabbTreeData::takeLargerElements()
 {
-	std::shared_ptr<AabbTreeData> result(std::make_shared<AabbTreeData>());
+	std::shared_ptr<AabbTreeData> result(m_factory.getInstance());
+	result->clear();
 
 	int axis;
 	m_aabb.sizes().maxCoeff(&axis);
@@ -123,7 +138,7 @@ std::shared_ptr<AabbTreeData> AabbTreeData::takeLargerElements()
 
 void AabbTreeData::recalculateAabb()
 {
-	m_aabb.setNull();
+	m_aabb.setEmpty();
 	std::for_each(m_data.begin(), m_data.end(), [&](const Item & item)
 	{
 		m_aabb.extend(item.first);
@@ -146,6 +161,11 @@ bool AabbTreeData::hasIntersections(const SurgSim::Math::Aabbd& aabb) const
 	return SurgSim::Math::doAabbIntersect(m_aabb, aabb);
 }
 
+void AabbTreeData::clear()
+{
+	m_data.clear();
+	m_aabb.setEmpty();
+}
 
 }
 }

@@ -23,6 +23,7 @@
 #include <utility>
 #include <list>
 #include <memory>
+#include "../Framework/ReuseFactory.h"
 
 namespace SurgSim
 {
@@ -34,6 +35,8 @@ namespace DataStructures
 class AabbTreeData : public TreeData
 {
 public:
+
+	static Framework::ReuseFactory<AabbTreeData> m_factory;
 
 	typedef std::pair<SurgSim::Math::Aabbd, size_t> Item;
 
@@ -52,11 +55,14 @@ public:
 	/// Destructor
 	~AabbTreeData();
 
+	void setItems(const std::list<Item>& items);
+
+	void setItems(std::list<Item>&& items);
 
 	/// Add an item to the data
 	/// \param aabb the AABB of the item
 	/// \param id an object identifier assigned by the user of this class
-	void add(const SurgSim::Math::Aabbd aabb, size_t id);
+	void add(const SurgSim::Math::Aabbd& aabb, size_t id);
 
 	/// \return the combined AABB of all the contained items
 	const SurgSim::Math::Aabbd& getAabb() const;
@@ -79,6 +85,7 @@ public:
 	/// \return true if the given AABB intersects with the AABB of all contained items.
 	bool hasIntersections(const SurgSim::Math::Aabbd& aabb) const;
 
+	void clear();
 	/// Check all items bounding boxes against the one passed as a parameter and append items that overlap
 	/// to the list given as a parameter
 	/// \param aabb the bounding box being queried

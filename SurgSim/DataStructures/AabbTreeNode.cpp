@@ -23,8 +23,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
-Framework::ReuseFactory<AabbTreeNode> AabbTreeNode::m_nodeFactory;
-Framework::ReuseFactory<AabbTreeData> AabbTreeNode::m_dataFactory;
+Framework::ReuseFactory<AabbTreeNode> AabbTreeNode::m_factory;
 
 AabbTreeNode::AabbTreeNode()
 {
@@ -34,6 +33,8 @@ AabbTreeNode::~AabbTreeNode()
 {
 
 }
+
+
 
 void AabbTreeNode::splitNode(size_t maxNodeData)
 {
@@ -61,10 +62,12 @@ void AabbTreeNode::splitNode(size_t maxNodeData)
 
 		if (getNumChildren() != 2)
 		{
-			leftChild = m_nodeFactory.getInstance();
+			leftChild = m_factory.getInstance();
+			leftChild->clear();
 			addChild(leftChild);
 
-			rightChild = m_nodeFactory.getInstance();
+			rightChild = m_factory.getInstance();
+			rightChild->clear();
 			addChild(rightChild);
 		}
 		else
@@ -126,7 +129,8 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 		auto data = std::static_pointer_cast<AabbTreeData>(getData());
 		if (data == nullptr)
 		{
-			data = m_dataFactory.getInstance();
+			data = AabbTreeData::m_factory.getInstance();
+			data->clear();
 			setData(data);
 		}
 		data->add(aabb, id);
@@ -142,7 +146,9 @@ void AabbTreeNode::setData(const std::list<AabbTreeData::Item>& items, size_t ma
 	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
 	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
 
-	auto data = std::make_shared<AabbTreeData>(items);
+	auto data = AabbTreeData::m_factory.getInstance();
+	data->clear();
+	data->setItems(items);
 	setData(data);
 	splitNode(maxNodeData);
 }
@@ -152,7 +158,9 @@ void AabbTreeNode::setData(std::list<AabbTreeData::Item>&& items, size_t maxNode
 	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
 	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
 
-	auto data = std::make_shared<AabbTreeData>(std::move(items));
+	auto data = AabbTreeData::m_factory.getInstance();
+	data->clear();
+	data->setItems(std::move(items));
 	setData(data);
 	splitNode(maxNodeData);
 }
@@ -167,6 +175,12 @@ void AabbTreeNode::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<
 	auto data = std::static_pointer_cast<AabbTreeData>(getData());
 	SURGSIM_ASSERT(data != nullptr) << "AabbTreeNode data is nullptr.";
 	data->getIntersections(aabb, result);
+}
+
+void AabbTreeNode::clear()
+{
+	m_aabb.setEmpty();
+
 }
 
 }
