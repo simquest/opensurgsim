@@ -52,6 +52,8 @@ void DeformableCollisionRepresentation::update(const double& dt)
 	auto odeState = physicsRepresentation->getCurrentState();
 	const size_t numNodes = odeState->getNumNodes();
 	auto shape = std::dynamic_pointer_cast<DataStructures::VerticesPlain>(m_shape);
+	SURGSIM_ASSERT(shape != nullptr) <<
+		"The shape object is not inherited from DataStructures::VerticesPlain, but should be.";
 
 	SURGSIM_ASSERT(shape->getNumVertices() == numNodes) <<
 		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
@@ -93,6 +95,8 @@ bool DeformableCollisionRepresentation::doWakeUp()
 	SURGSIM_ASSERT(nullptr != state) <<
 		"DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
 	auto shape = std::dynamic_pointer_cast<DataStructures::VerticesPlain>(m_shape);
+	SURGSIM_ASSERT(shape != nullptr) <<
+		"The shape object is not inherited from DataStructures::VerticesPlain, but should be.";
 	SURGSIM_ASSERT(shape->getNumVertices() == state->getNumNodes()) <<
 		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
