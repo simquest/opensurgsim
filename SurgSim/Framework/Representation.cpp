@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,9 +52,10 @@ void Representation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
 
 SurgSim::Math::RigidTransform3d Representation::getPose() const
 {
-	if (getSceneElement() != nullptr)
+	auto element = getSceneElement();
+	if (element != nullptr)
 	{
-		return getSceneElement()->getPose() * getLocalPose();
+		return element->getPose() * getLocalPose();
 	}
 	else
 	{
