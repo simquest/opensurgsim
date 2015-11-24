@@ -144,13 +144,16 @@ public:
 	/// Calculate the contact info.
 	void calculateContact()
 	{
-		bool result =
-			axisAwayFromTriangle() ||
-			axisPerpendicularToTriangle() ||
-			axisTouchingTriangle() ||
-			axisThroughTriangle();
+		if (isIntersecting())
+		{
+			bool result =
+				axisAwayFromTriangle() ||
+				axisPerpendicularToTriangle() ||
+				axisTouchingTriangle() ||
+				axisThroughTriangle();
 
-		SURGSIM_ASSERT(result) << "At this point, there has to be an intersection.";
+			SURGSIM_ASSERT(result) << "At this point, there has to be an intersection.";
+		}
 	}
 
 private:
@@ -197,10 +200,9 @@ private:
 	///		  and axisPerpendicularToTriangle() returned false.
 	bool axisTouchingTriangle()
 	{
-		bool axisJustTouchingTriangle =
-			isPointOnCapsuleAxisEnd(*m_penetrationPointCapsuleAxis) || isPointOnTriangleEdge(*m_penetrationPointTriangle);
-
-		if (axisJustTouchingTriangle)
+		if (m_penetrationPointCapsuleAxis->isApprox(m_cvTop, m_epsilon) ||
+			m_penetrationPointCapsuleAxis->isApprox(m_cvBottom, m_epsilon) ||
+			isPointOnTriangleEdge(*m_penetrationPointTriangle, m_tv0, m_tv1, m_tv2, m_tn))
 		{
 			*m_contactNormal = -m_tn;
 
@@ -210,18 +212,16 @@ private:
 				*m_contactNormal = -m_tn;
 				*m_penetrationPointCapsule = m_cvBottom - m_tn * m_cr;
 				*m_penetrationPointCapsuleAxis = m_cvBottom;
-				*m_penetrationDepth = (m_tv0 - *m_penetrationPointCapsule).dot(m_tn);
 			}
 			else
 			{
 				farthestIntersectionLineCapsule(*m_penetrationPointTriangle, -m_tn,
 					m_penetrationPointCapsule, m_penetrationPointCapsuleAxis);
-
-				*m_penetrationDepth = (*m_penetrationPointCapsule - m_tv0).dot(-m_tn);
 			}
+			*m_penetrationDepth = (m_tv0 - *m_penetrationPointCapsule).dot(m_tn);
 		}
 
-		return axisJustTouchingTriangle;
+		return false;
 	}
 
 	/// This function handles the contact data calculation for the case where there is an intersection between the
@@ -236,6 +236,8 @@ private:
 			return false;
 		}
 
+		// Extruding the triangle along the direction of -tn creates a volume. Clip off the capsule axis that is
+		// outside of this volume.
 		Vector3 v[3] = {m_tv0, m_tv1, m_tv2};
 		Vector3 planeN[4] = {m_tn, (-m_tn.cross(m_tv1 - m_tv0)).normalized(), (-m_tn.cross(m_tv2 - m_tv1)).normalized(),
 			(-m_tn.cross(m_tv0 - m_tv2)).normalized()};
@@ -265,6 +267,7 @@ private:
 		Vector3 center = deepestPoint;
 		Vector3 majorAxis = (triangleEdge * (triangleEdge.dot(m_cAxis)) + m_tn * (m_tn.dot(m_cAxis))).normalized();
 		double majorRadius = farthestIntersectionLineCylinder(center, majorAxis, &deepestPoint);
+		SURGSIM_ASSERT(isValid(majorRadius)) << "The major radius of the ellipse should be a valid number.";
 
 		if (std::abs(majorAxis.dot(triangleEdge)) > m_epsilon)
 		{
@@ -273,6 +276,7 @@ private:
 			// triangleEdge.
 			auto minorAxis = planeN[j].cross(majorAxis);
 			double minorRadius = farthestIntersectionLineCylinder(center, minorAxis);
+			SURGSIM_ASSERT(isValid(minorRadius)) << "The minor radius of the ellipse should be a valid number.";
 
 			EllipseHelper<T, MOpt> ellipseHelper(center, majorAxis, minorAxis, majorRadius, minorRadius);
 			deepestPoint = ellipseHelper.pointWithTangent(triangleEdge);
@@ -292,7 +296,8 @@ private:
 
 			// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
 			Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
-			farthestIntersectionLineCylinder(edgeVertex, -m_tn, &deepestPoint);
+			double d = farthestIntersectionLineCylinder(edgeVertex, -m_tn, &deepestPoint);
+			SURGSIM_ASSERT(isValid(d)) << "There must be a part of the ellipse between the triangle edge at this point";
 		}
 
 		clipPointToCapsuleSurface(&deepestPoint, m_penetrationPointCapsuleAxis);
@@ -305,27 +310,10 @@ private:
 		return true;
 	}
 
-	/// \param point The point which is checked against the capsule axis.
-	/// \return True, if the point is on the capsule axis.
-	bool isPointOnCapsuleAxisEnd(const Vector3& point)
-	{
-		Vector2 bary;
-		Math::barycentricCoordinates(point, m_cvTop, m_cvBottom, &bary);
-		return bary.minCoeff() < m_epsilon;
-	}
-
-	/// \param point The point which is checked against the triangle.
-	/// \return True, if the point is on one of the edges of the triangle.
-	bool isPointOnTriangleEdge(Vector3& point)
-	{
-		Vector3 bary;
-		Math::barycentricCoordinates(point, m_tv0, m_tv1, m_tv2, m_tn, &bary);
-		return bary.minCoeff() < m_epsilon;
-	}
-
 	/// \param lineStart The origin of the line
 	/// \param lineDir Unit directional vector of the line
-	/// \param [out] The point of intersection.
+	/// \param point [out] The point of intersection.
+	/// \return The distance of the point of intersection from the lineStart.
 	double farthestIntersectionLineCylinder(const Vector3& lineStart, const Vector& lineDir, Vector3* point = nullptr)
 	{
 		if (!m_cInverseTransform.hasValue())
@@ -402,7 +390,8 @@ private:
 	void farthestIntersectionLineCapsule(const Vector3& lineStart, const Vector& lineDir,
 		Vector3* point, Vector3*pointOnCapsuleAxis)
 	{
-		farthestIntersectionLineCylinder(lineStart, lineDir, point);
+		double d = farthestIntersectionLineCylinder(lineStart, lineDir, point);
+		SURGSIM_ASSERT(isValid(d)) << "The line should intersect the cylinder at this point in the algorithm";
 		clipPointToCapsuleSurface(point, pointOnCapsuleAxis);
 	}
 
@@ -411,6 +400,7 @@ private:
 	/// \param v The vertices of the triangle.
 	/// \param planeN Normals of the triangle and each of the edge planes.
 	/// \param planeD d from plane equation for the plane of the triangle and each of the edge planes.
+	/// \return The index of the last plane which clips the segment passed in.
 	size_t clipSegmentAgainstTriangle(Vector3* segmentStart, Vector3* segmentEnd, Vector3* v, Vector3* planeN,
 		double* planeD)
 	{
