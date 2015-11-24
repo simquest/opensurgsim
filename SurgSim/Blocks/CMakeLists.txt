@@ -29,7 +29,6 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpring3DRepresentation.cpp
 	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
-	PunctureBehavior.cpp
 	ShadowMapping.cpp
 	SphereElement.cpp
 	TransferParticlesToPointCloudBehavior.cpp
@@ -51,7 +50,6 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpring3DRepresentation.h
 	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
-	PunctureBehavior.h
 	ShadowMapping.h
 	SphereElement.h
 	TransferParticlesToPointCloudBehavior.h
