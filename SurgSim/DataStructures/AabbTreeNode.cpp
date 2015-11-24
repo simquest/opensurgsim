@@ -23,6 +23,9 @@ namespace SurgSim
 namespace DataStructures
 {
 
+Framework::ReuseFactory<AabbTreeNode> AabbTreeNode::m_nodeFactory;
+Framework::ReuseFactory<AabbTreeData> AabbTreeNode::m_dataFactory;
+
 AabbTreeNode::AabbTreeNode()
 {
 }
@@ -58,10 +61,10 @@ void AabbTreeNode::splitNode(size_t maxNodeData)
 
 		if (getNumChildren() != 2)
 		{
-			leftChild = std::make_shared<AabbTreeNode>();
+			leftChild = m_nodeFactory.getInstance();
 			addChild(leftChild);
 
-			rightChild = std::make_shared<AabbTreeNode>();
+			rightChild = m_nodeFactory.getInstance();
 			addChild(rightChild);
 		}
 		else
@@ -123,7 +126,7 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 		auto data = std::static_pointer_cast<AabbTreeData>(getData());
 		if (data == nullptr)
 		{
-			data = std::make_shared<AabbTreeData>();
+			data = m_dataFactory.getInstance();
 			setData(data);
 		}
 		data->add(aabb, id);

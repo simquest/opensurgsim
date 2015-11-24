@@ -20,6 +20,7 @@
 #include "SurgSim/DataStructures/AabbTreeData.h"
 
 #include "SurgSim/Math/Aabb.h"
+#include "../Framework/ReuseFactory.h"
 
 namespace SurgSim
 {
@@ -30,6 +31,9 @@ namespace DataStructures
 class AabbTreeNode : public TreeNode
 {
 public:
+
+	static Framework::ReuseFactory<AabbTreeNode> m_nodeFactory;
+	static Framework::ReuseFactory<AabbTreeData> m_dataFactory;
 
 	using TreeNode::setData;
 
@@ -88,6 +92,7 @@ protected:
 	bool doAccept(TreeVisitor* visitor) override;
 
 private:
+
 
 	/// The internal bounding box for this node, it is used when the node does not have any data
 	SurgSim::Math::Aabbd m_aabb;
