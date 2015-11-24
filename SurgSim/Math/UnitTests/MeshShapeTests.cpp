@@ -26,6 +26,7 @@
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Rigidtransform.h"
 
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMeshPlain;
@@ -410,6 +411,18 @@ TEST_F(MeshShapeTest, DoLoadTest)
 		auto fileName = std::string("Nonexistent file");
 		auto meshShape = std::make_shared<MeshShape>();
 		EXPECT_THROW(meshShape->load("Nonexistent file"), SurgSim::Framework::AssertionFailure);
+	}
+}
+
+TEST_F(MeshShapeTest, UpdateTimingTest)
+{
+	auto meshShape = std::make_shared<MeshShape>();
+	meshShape->load("Geometry/arm_collision.ply");
+
+	for (double i = 0.0; i < 500.0; i += 0.1)
+	{
+		auto transform = makeRigidTranslation(Vector3d(i, i, i));
+		auto shape = meshShape->getTransformed(transform);
 	}
 }
 
