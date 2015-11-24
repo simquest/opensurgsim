@@ -186,6 +186,54 @@ bool isPointInsideTriangle(
 			baryCoords[2] >= -Geometry::ScalarEpsilon);
 }
 
+/// Check if a point is on the edge of a triangle.
+/// \note Use barycentricCoordinates() if you need the coordinates.
+/// Please note that the normal will be calculated each time you use this call, if you are doing more than one
+/// test with the same triangle, precalculate the normal and pass it. Into the other version of this function
+/// \tparam T			Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt		Eigen Matrix options, can usually be inferred.
+/// \param pt			Vertex of the point.
+/// \param tv0, tv1, tv2 Vertices of the triangle, must be in CCW.
+/// \param tn			Normal of the triangle (must be of norm 1 and a,b,c CCW).
+/// \return true if pt lies on the edge of the triangle tv0, tv1, tv2, false otherwise.
+template <class T, int MOpt> inline
+bool isPointOnTriangleEdge(
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tn)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
+	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, tn, &baryCoords);
+	return (result && baryCoords[0] >= -Geometry::ScalarEpsilon &&
+		baryCoords[1] >= -Geometry::ScalarEpsilon &&
+		baryCoords[2] >= -Geometry::ScalarEpsilon &&
+		baryCoords.minCoeff() <= Geometry::ScalarEpsilon);
+}
+
+/// Check if a point is on the edge of a triangle.
+/// \note Use barycentricCoordinates() if you need the coordinates.
+/// \tparam T			Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt		Eigen Matrix options, can usually be inferred.
+/// \param pt			Vertex of the point.
+/// \param tv0, tv1, tv2 Vertices of the triangle, must be in CCW.
+/// \return true if pt lies on the edge of the triangle tv0, tv1, tv2, false otherwise.
+template <class T, int MOpt> inline
+bool isPointOnTriangleEdge(
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
+	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, &baryCoords);
+	return (result && baryCoords[0] >= -Geometry::ScalarEpsilon &&
+		baryCoords[1] >= -Geometry::ScalarEpsilon &&
+		baryCoords[2] >= -Geometry::ScalarEpsilon &&
+		baryCoords.minCoeff() <= Geometry::ScalarEpsilon);
+}
+
 /// Check whether the points are coplanar.
 /// \tparam T			Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt		Eigen Matrix options, can usually be inferred.
