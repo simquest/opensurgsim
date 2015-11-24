@@ -105,7 +105,7 @@ protected:
 	bool calculateNormals();
 
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
+	void updateAabbTree() const;
 
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
@@ -122,7 +122,7 @@ protected:
 
 private:
 	/// The aabb tree used to accelerate collision detection against the mesh
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
+	mutable std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 };
 
 }; // Math

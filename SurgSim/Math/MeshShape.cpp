@@ -48,7 +48,6 @@ MeshShape::MeshShape(const MeshShape& other) :
 	m_volume(other.getVolume()),
 	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
-	updateAabbTree();
 }
 
 const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId) const
@@ -223,10 +222,14 @@ std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose)
 
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree() const
 {
+	if (m_aabbTree == nullptr)
+	{
+		updateAabbTree();
+	}
 	return m_aabbTree;
 }
 
-void MeshShape::updateAabbTree()
+void MeshShape::updateAabbTree() const
 {
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 

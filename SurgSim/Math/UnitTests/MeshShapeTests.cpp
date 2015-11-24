@@ -423,6 +423,7 @@ TEST_F(MeshShapeTest, UpdateTimingTest)
 	{
 		auto transform = makeRigidTranslation(Vector3d(i, i, i));
 		auto shape = meshShape->getTransformed(transform);
+		auto tree = (std::static_pointer_cast<MeshShape>(shape))->getAabbTree();
 	}
 }
 
