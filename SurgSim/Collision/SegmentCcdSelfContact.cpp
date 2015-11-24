@@ -21,6 +21,7 @@
 #include "SurgSim/DataStructures/AabbTreeNode.h"
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/Scalar.h"
 #include "SurgSim/Math/SegmentMeshShape.h"
 
 using SurgSim::DataStructures::Location;
@@ -169,10 +170,8 @@ std::list<std::shared_ptr<Contact>> SegmentCcdSelfContact::calculateContact(
 		{
 			// The segments collide within tolerance, but if the collision is really close to an endpoint
 			// then move it to the start of the segment to aid in removing duplicates.
-			r = (r < rParametricPrecision) ? 0.0 : r;
-			r = (r > (1.0 - rParametricPrecision)) ? 1.0 : r;
-			s = (s < sParametricPrecision) ? 0.0 : s;
-			s = (s > (1.0 - sParametricPrecision)) ? 1.0 : s;
+			r = Math::clamp(r, 0.0, 1.0, rParametricPrecision);
+			s = Math::clamp(s, 0.0, 1.0, sParametricPrecision);
 
 			// When a segment extremity collides, its collision can be detected twice,
 			// as this point is shared between 2 segments! Here, we choose *one* of them to add!

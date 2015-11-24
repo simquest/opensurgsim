@@ -96,16 +96,17 @@ bool LeapDevice::initialize()
 	auto scaffold = LeapScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold != nullptr) << getName() << " initialization failed, cannot get scaffold.";
 
-	if (m_requestedHmdTrackingMode.hasValue())
-	{
-		scaffold->setUseHmdTrackingMode(m_requestedHmdTrackingMode.getValue());
-	}
 	bool registered = false;
 	if (scaffold->registerDevice(this))
 	{
+		if (m_requestedHmdTrackingMode.hasValue())
+		{
+			scaffold->setUseHmdTrackingMode(m_requestedHmdTrackingMode.getValue());
+		}
 		m_scaffold = std::move(scaffold);
 		registered = true;
 	}
+
 	return registered;
 }
 

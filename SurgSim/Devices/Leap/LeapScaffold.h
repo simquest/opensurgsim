@@ -82,6 +82,9 @@ private:
 	/// Handle a new frame of data
 	void handleFrame();
 
+	/// Handle initial connection to SDK
+	void handleConnect();
+
 	/// Update the hand data
 	void updateHandData();
 

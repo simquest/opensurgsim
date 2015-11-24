@@ -13,28 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_COMPONENT_INL_H
-#define SURGSIM_FRAMEWORK_COMPONENT_INL_H
+#ifndef SURGSIM_MATH_SCALAR_INL_H
+#define SURGSIM_MATH_SCALAR_INL_H
 
-
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {
-namespace Framework
+namespace Math
 {
 
-template <class Target, class Source>
-std::shared_ptr<Target> checkAndConvert(std::shared_ptr<Source> incoming, const std::string& expectedTypeName)
+template <class T>
+T clamp(T value, T min, T max, T epsilon)
 {
-	SURGSIM_ASSERT(incoming != nullptr) << "Incoming pointer can't be nullptr";
-	auto result = std::dynamic_pointer_cast<Target>(incoming);
-	SURGSIM_ASSERT(result != nullptr)
-			<< "Expected " << expectedTypeName << " but received " << incoming->getClassName() << " which cannot "
-			<< "be converted, in component " << incoming->getFullName() << ".";
-	return result;
+	return (value >= (max - epsilon) ? max : (value <= (min + epsilon) ? min : value));
+}
+
+template <typename T>
+const T clampOperator<T>::operator()(const T& x) const
+{
+	return  clamp(x, m_min, m_max, m_epsilon);
+}
+
+};
 };
 
-}
-}
+#endif // SURGSIM_MATH_SCALAR_INL_H
 
-#endif

@@ -56,7 +56,7 @@ std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateContac
 									 const Math::RigidTransform3d& pose2)
 {
 	SURGSIM_ASSERT(!m_doAssert)
-			<< "Contact calculation not implemented for pairs with types ("
+			<< "Contact calculation not implemented for shapes with types ("
 			<< shape1->getType() << ", " << shape2->getType() << ").";
 	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
 			<< "Contact calculation not implemented for pairs with types ("
