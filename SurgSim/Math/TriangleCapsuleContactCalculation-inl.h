@@ -219,6 +219,7 @@ private:
 					m_penetrationPointCapsule, m_penetrationPointCapsuleAxis);
 			}
 			*m_penetrationDepth = (m_tv0 - *m_penetrationPointCapsule).dot(m_tn);
+			return true;
 		}
 
 		return false;
