@@ -188,8 +188,6 @@ bool isPointInsideTriangle(
 
 /// Check if a point is on the edge of a triangle.
 /// \note Use barycentricCoordinates() if you need the coordinates.
-/// Please note that the normal will be calculated each time you use this call, if you are doing more than one
-/// test with the same triangle, precalculate the normal and pass it. Into the other version of this function
 /// \tparam T			Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt		Eigen Matrix options, can usually be inferred.
 /// \param pt			Vertex of the point.
@@ -214,6 +212,8 @@ bool isPointOnTriangleEdge(
 
 /// Check if a point is on the edge of a triangle.
 /// \note Use barycentricCoordinates() if you need the coordinates.
+/// Please note that the normal will be calculated each time you use this call, if you are doing more than one
+/// test with the same triangle, precalculate the normal and pass it. Into the other version of this function
 /// \tparam T			Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt		Eigen Matrix options, can usually be inferred.
 /// \param pt			Vertex of the point.
