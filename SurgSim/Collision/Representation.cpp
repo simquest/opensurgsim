@@ -101,8 +101,7 @@ void Representation::invalidatePosedShapeMotion()
 {
 	boost::lock_guard<boost::shared_mutex> lock(m_posedShapeMotionMutex);
 
-	m_posedShapeMotion.first.invalidate();
-	m_posedShapeMotion.second.invalidate();
+	m_posedShapeMotion.invalidate();
 }
 
 SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()

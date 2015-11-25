@@ -127,6 +127,12 @@ struct PosedShapeMotion : public std::pair<PosedShape<T>, PosedShape<T>>
 		this->first = posedShapeFirst;
 		this->second = posedShapeSecond;
 	}
+
+	void invalidate()
+	{
+		this->first.invalidate();
+		this->second.invalidate();
+	}
 };
 
 }; // Math
