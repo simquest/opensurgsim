@@ -15,8 +15,8 @@
 
 #include <thread>
 
-#include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/CcdDcdCollision.h"
+#include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/DefaultContactCalculation.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Log.h"
@@ -231,6 +231,8 @@ void ContactCalculation::initializeTables()
 		ContactCalculation::privateDcdRegister(std::make_shared<Collision::CompoundShapeContact>(
 											   std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, type)));
 	}
+
+	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentSelfContact>());
 }
 
 void ContactCalculation::privateDcdRegister(
