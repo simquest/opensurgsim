@@ -180,7 +180,7 @@ void AabbTreeNode::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<
 void AabbTreeNode::clear()
 {
 	m_aabb.setEmpty();
-
+	TreeNode::clear();
 }
 
 }

@@ -75,6 +75,8 @@ public:
 	/// \return true if this node and the parameter are not equal
 	bool operator!=(const TreeNode& node) const;
 
+	void clear();
+
 protected:
 
 	/// Returns true if the nodes are equal; otherwise, returns false.
