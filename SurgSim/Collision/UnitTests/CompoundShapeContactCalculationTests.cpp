@@ -97,7 +97,8 @@ TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_PLANE];
 	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_PLANE];
 
-	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, basePose), PosedShape(plane, planePose));
+	auto result = calc2->calculateDcdContact(PosedShape(compoundShape->getTransformed(basePose), basePose),
+		PosedShape(plane, planePose));
 
 	std::list<std::shared_ptr<Contact>> expected =
 		calc1->calculateDcdContact(PosedShape(box, basePose * box1Pose), PosedShape(plane, planePose));
