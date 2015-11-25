@@ -54,7 +54,7 @@ std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateDcdCon
 	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
 {
 	SURGSIM_ASSERT(!m_doAssert)
-			<< "Contact calculation not implemented for pairs with types ("
+			<< "Contact calculation not implemented for shapes with types ("
 			<< posedShape1.getShape()->getType() << ", " << posedShape2.getShape()->getType() << ").";
 	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
 			<< "Contact calculation not implemented for pairs with types ("

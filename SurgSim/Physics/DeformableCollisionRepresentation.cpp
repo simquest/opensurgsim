@@ -20,6 +20,7 @@
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/SegmentMeshShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
@@ -44,19 +45,39 @@ DeformableCollisionRepresentation::~DeformableCollisionRepresentation()
 
 namespace
 {
-bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::MeshShape* shape)
+bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shape* shape)
 {
+	bool result = false;
 	const size_t numNodes = odeState.getNumNodes();
 
-	SURGSIM_ASSERT(shape->getNumVertices() == numNodes) <<
-		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
-
-	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
 	{
-		shape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
+		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(shape);
+		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
+		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
+			"The number of nodes in the deformable does not match the number of vertices in the mesh.";
+
+		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+		{
+			meshShape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
+		}
+		result = meshShape->update();
+	}
+	else if (shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
+	{
+		auto meshShape = dynamic_cast<SurgSim::Math::SegmentMeshShape*>(shape);
+		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
+		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
+			"The number of nodes in the deformable does not match the number of vertices in the mesh.";
+
+		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+		{
+			meshShape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
+		}
+		result = meshShape->update();
 	}
 
-	return shape->update();
+	return result;
 }
 }
 
@@ -107,7 +128,10 @@ bool DeformableCollisionRepresentation::doWakeUp()
 	auto state = physicsRepresentation->getCurrentState();
 	SURGSIM_ASSERT(nullptr != state) <<
 		"DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
-	SURGSIM_ASSERT(m_shape->getNumVertices() == state->getNumNodes()) <<
+	auto shape = std::dynamic_pointer_cast<DataStructures::VerticesPlain>(m_shape);
+	SURGSIM_ASSERT(shape != nullptr) <<
+		"The shape object is not inherited from DataStructures::VerticesPlain, but should be.";
+	SURGSIM_ASSERT(shape->getNumVertices() == state->getNumNodes()) <<
 		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	update(0.0);
@@ -122,11 +146,11 @@ int DeformableCollisionRepresentation::getShapeType() const
 
 void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
-	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+		shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
 		<< "Deformable collision shape has to be a mesh.  But what passed in is " << shape->getType();
 
-	auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(shape);
-	m_shape = meshShape;
+	m_shape = shape;
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const

@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Physics/Computation.h"
 
 
@@ -34,6 +35,8 @@ public:
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
 	explicit ParticleCollisionResponse(bool doCopyState = false);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::ParticleCollisionResponse);
 
 protected:
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)

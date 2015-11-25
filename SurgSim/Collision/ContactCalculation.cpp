@@ -93,9 +93,13 @@ std::list<std::shared_ptr<Contact>> ContactCalculation::calculateDcdContact(
 		return contacts;
 	}
 
-	SURGSIM_FAILURE() << "Incorrect shape type for this calculation expected "
-					  << types.first << ", " << types.second
-					  << " received " << incoming.first << ", " << incoming.second << ".";
+	if (types.first != Math::SHAPE_TYPE_NONE && types.second != Math::SHAPE_TYPE_NONE)
+	{
+		SURGSIM_FAILURE() << "Incorrect shape type for this calculation expected "
+						  << types.first << ", " << types.second
+						  << " received " << incoming.first << ", " << incoming.second << ".";
+	}
+
 	return std::list<std::shared_ptr<Contact>>();
 }
 

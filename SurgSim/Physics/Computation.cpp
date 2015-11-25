@@ -35,7 +35,10 @@ Computation::~Computation()
 
 std::shared_ptr<PhysicsManagerState> Computation::update(double dt, const std::shared_ptr<PhysicsManagerState>& state)
 {
-	return std::move(doUpdate(dt,std::move(preparePhysicsState(state))));
+	m_timer.beginFrame();
+	auto newState = doUpdate(dt, preparePhysicsState(state));
+	m_timer.endFrame();
+	return newState;
 }
 
 void Computation::setDoCopyState(bool val)
@@ -46,6 +49,11 @@ void Computation::setDoCopyState(bool val)
 bool Computation::isCopyingState()
 {
 	return m_copyState;
+}
+
+Framework::Timer& Computation::getTimer()
+{
+	return m_timer;
 }
 
 std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std::shared_ptr<PhysicsManagerState>& state)

@@ -813,6 +813,49 @@ TEST_F(GeometryTest, PointInsideTriangleWithoutNormal)
 	EXPECT_FALSE(isPointInsideTriangle(inputPoint, tri.v0, tri.v1, tri.v2));
 }
 
+TEST_F(GeometryTest, PointOnTriangleEdgeWithNormal)
+{
+	EXPECT_TRUE(isPointOnTriangleEdge(tri.v0, tri.v0, tri.v1, tri.v2, tri.n));
+	EXPECT_TRUE(isPointOnTriangleEdge(tri.v1, tri.v0, tri.v1, tri.v2, tri.n));
+	EXPECT_TRUE(isPointOnTriangleEdge(tri.v2, tri.v0, tri.v1, tri.v2, tri.n));
+
+	VectorType inputPoint = tri.v0 + tri.v0v1 * 0.2;
+	EXPECT_TRUE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2, tri.n));
+	inputPoint = tri.v0 + tri.v0v2 * 0.2;
+	EXPECT_TRUE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2, tri.n));
+	inputPoint = tri.v1 + tri.v1v2 * 0.2;
+	EXPECT_TRUE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2, tri.n));
+
+	inputPoint = tri.v0 + tri.v0v1 * 1.5;
+	EXPECT_FALSE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2, tri.n));
+	EXPECT_FALSE(isPointOnTriangleEdge(inputPoint, tri.v1, tri.v1, tri.v2, tri.n));
+
+	inputPoint = tri.v0 + tri.v0v2 * 2 + tri.v0v1 * 2;
+	EXPECT_FALSE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2, tri.n));
+
+}
+
+TEST_F(GeometryTest, PointOnTriangleEdgeWithoutNormal)
+{
+	EXPECT_TRUE(isPointOnTriangleEdge(tri.v0, tri.v0, tri.v1, tri.v2));
+	EXPECT_TRUE(isPointOnTriangleEdge(tri.v1, tri.v0, tri.v1, tri.v2));
+	EXPECT_TRUE(isPointOnTriangleEdge(tri.v2, tri.v0, tri.v1, tri.v2));
+
+	VectorType inputPoint = tri.v0 + tri.v0v1 * 0.2;
+	EXPECT_TRUE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2));
+	inputPoint = tri.v0 + tri.v0v2 * 0.2;
+	EXPECT_TRUE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2));
+	inputPoint = tri.v1 + tri.v1v2 * 0.2;
+	EXPECT_TRUE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2));
+
+	inputPoint = tri.v0 + tri.v0v1 * 1.5;
+	EXPECT_FALSE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2));
+	EXPECT_FALSE(isPointOnTriangleEdge(inputPoint, tri.v1, tri.v1, tri.v2));
+
+	inputPoint = tri.v0 + tri.v0v2 * 2 + tri.v0v1 * 2;
+	EXPECT_FALSE(isPointOnTriangleEdge(inputPoint, tri.v0, tri.v1, tri.v2));
+}
+
 TEST_F(GeometryTest, Coplanarity)
 {
 	struct CoplanarityTestCandidate

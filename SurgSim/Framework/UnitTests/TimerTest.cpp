@@ -56,6 +56,7 @@ TEST(TimerTest, SettingFrames)
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 3);
 	timer->setMaxNumberOfFrames(2);
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 2);
+	EXPECT_TRUE(timer->isBufferFull());
 }
 
 TEST(TimerTest, Comparison)
@@ -92,4 +93,5 @@ TEST(TimerTest, GetWithoutAnyFrames)
 	EXPECT_ANY_THROW(timer->getLastFrameRate());
 	EXPECT_ANY_THROW(timer->getMaxFramePeriod());
 	EXPECT_ANY_THROW(timer->getMinFramePeriod());
+	EXPECT_FALSE(timer->isBufferFull());
 }
