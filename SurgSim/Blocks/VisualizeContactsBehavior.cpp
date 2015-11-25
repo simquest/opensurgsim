@@ -50,27 +50,25 @@ VisualizeContactsBehavior::VisualizeContactsBehavior(const std::string& name):
 	m_vectorField(std::make_shared<OsgVectorFieldRepresentation>(name + std::string("_VectorField")))
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeContactsBehavior, std::shared_ptr<SurgSim::Framework::Component>,
-									  CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
+									  Source, getSource, setSource);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeContactsBehavior, double, VectorFieldScale,
 									  getVectorFieldScale, setVectorFieldScale);
 }
 
-std::shared_ptr<SurgSim::Framework::Component> VisualizeContactsBehavior::getCollisionRepresentation()
+std::shared_ptr<SurgSim::Framework::Component> VisualizeContactsBehavior::getSource()
 {
-	return m_collisionRepresentation;
+	return m_source;
 }
 
-void VisualizeContactsBehavior::setCollisionRepresentation(
-	std::shared_ptr<SurgSim::Framework::Component> collisionRepresentation)
+void VisualizeContactsBehavior::setSource(std::shared_ptr<SurgSim::Framework::Component> source)
 {
-	m_collisionRepresentation = checkAndConvert<Representation>(
-									collisionRepresentation, "SurgSim::Collision::Representation");
+	m_source = checkAndConvert<Representation>(source, "SurgSim::Collision::Representation");
 }
 
 void VisualizeContactsBehavior::update(double dt)
 {
 	std::shared_ptr<const SurgSim::Collision::ContactMapType> collisions =
-		m_collisionRepresentation->getCollisions().safeGet();
+		m_source->getCollisions().safeGet();
 	if (!collisions->empty())
 	{
 		size_t totalContacts = 0;
@@ -96,7 +94,7 @@ void VisualizeContactsBehavior::update(double dt)
 				<< getFullName() << "' must be in a SceneElement.";
 		}
 
-		auto representationPoseFirst = m_collisionRepresentation->getPose();
+		auto representationPoseFirst = m_source->getPose();
 		for (auto it = collisions->cbegin(); it != collisions->cend(); ++it)
 		{
 			auto representationPoseSecond = (*it).first->getPose();
@@ -133,12 +131,18 @@ int VisualizeContactsBehavior::getTargetManagerType() const
 
 bool VisualizeContactsBehavior::doInitialize()
 {
-	SURGSIM_ASSERT(m_collisionRepresentation) << "VisualizeContactsBehavior: no collision representation held.";
 	return true;
 }
 
 bool VisualizeContactsBehavior::doWakeUp()
 {
+	if (m_source == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '"
+			<< getName() << "' must have a source.";
+		return false;
+	}
+
 	auto element = getSceneElement();
 	if (element == nullptr)
 	{

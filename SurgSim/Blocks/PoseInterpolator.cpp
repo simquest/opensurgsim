@@ -118,7 +118,7 @@ void PoseInterpolator::update(double dt)
 		}
 	}
 
-	m_target->setPose(SurgSim::Math::interpolate(m_startingPose, m_endingPose, m_currentTime/m_duration));
+	m_target->setPose(Math::interpolate(m_startingPose, m_endingPose, m_currentTime/m_duration));
 }
 
 void PoseInterpolator::setLoop(bool val)

@@ -13,10 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Representation.h"
+
+#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
+
 
 namespace SurgSim
 {
@@ -24,11 +26,10 @@ namespace Framework
 {
 
 Representation::Representation(const std::string& m_name) :
-	Component(m_name), m_localPose(SurgSim::Math::RigidTransform3d::Identity())
+	Component(m_name), m_localPose(Math::RigidTransform3d::Identity())
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, LocalPose, getLocalPose,
-									  setLocalPose);
-	SURGSIM_ADD_RO_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, Pose, getPose);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, Math::RigidTransform3d, LocalPose, getLocalPose, setLocalPose);
+	SURGSIM_ADD_RO_PROPERTY(Representation, Math::RigidTransform3d, Pose, getPose);
 }
 
 Representation::~Representation()

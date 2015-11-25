@@ -16,13 +16,14 @@
 #ifndef SURGSIM_FRAMEWORK_SCENE_H
 #define SURGSIM_FRAMEWORK_SCENE_H
 
-#include <vector>
+#include <boost/thread/mutex.hpp>
 #include <memory>
 #include <string>
-#include <boost/thread/mutex.hpp>
+#include <vector>
 
-#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/DataStructures/Groups.h"
+#include "SurgSim/Framework/SceneElement.h"
+
 
 namespace YAML
 {
