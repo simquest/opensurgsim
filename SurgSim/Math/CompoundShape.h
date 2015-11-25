@@ -94,6 +94,10 @@ public:
 
 	bool isValid() const override;
 
+	bool isTransformable() const override;
+
+	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const override;
+
 private:
 
 	/// Clears the data for the volume, center and secondMoment so it can be recalculated when needed again

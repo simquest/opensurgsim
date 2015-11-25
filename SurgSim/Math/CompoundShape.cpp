@@ -32,7 +32,6 @@ CompoundShape::CompoundShape()
 
 CompoundShape::~CompoundShape()
 {
-
 }
 
 int CompoundShape::getType() const
@@ -199,6 +198,31 @@ void CompoundShape::clearShapes()
 {
 	WriteLock lock(m_mutex);
 	m_shapes.clear();
+}
+
+bool CompoundShape::isTransformable() const
+{
+	return true;
+}
+
+std::shared_ptr<Shape> CompoundShape::getTransformed(const RigidTransform3d& pose) const
+{
+	auto transformed = std::make_shared<CompoundShape>();
+	for (const auto& shape : m_shapes)
+	{
+		std::shared_ptr<Shape> newShape;
+		RigidTransform3d newPose = pose * shape.second;
+		if (shape.first->isTransformable())
+		{
+			newShape = shape.first->getTransformed(newPose);
+		}
+		else
+		{
+			newShape = shape.first;
+		}
+		transformed->addShape(newShape, newPose);
+	}
+	return transformed;
 }
 
 }
