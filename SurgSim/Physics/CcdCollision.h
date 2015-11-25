@@ -49,6 +49,8 @@ public:
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
 	explicit CcdCollision(bool doCopyState = false);
 
+	SURGSIM_CLASSNAME(SurgSim::Physics::CcdCollision);
+
 	/// Destructor
 	virtual ~CcdCollision();
 
