@@ -57,7 +57,7 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculate
 	double radius = segmentMeshShape.getRadius();
 	double depth = 0.0;
 	Vector3d normal;
-	Vector3d penetrationPointCapsule, penetrationPointTriangle;
+	Vector3d penetrationPointCapsule, penetrationPointTriangle, penetrationPointCapsuleAxis;
 
 	for (const auto& intersection : intersectionList)
 	{
@@ -88,34 +88,31 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshDcdContact::calculate
 				if (SurgSim::Math::calculateContactTriangleCapsule(
 						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
 						verticesSegment[0], verticesSegment[1], radius,
-						&depth, &penetrationPointTriangle, &penetrationPointCapsule, &normal))
+						&depth, &penetrationPointTriangle, &penetrationPointCapsule, &normal,
+						&penetrationPointCapsuleAxis))
 				{
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
-
 					SurgSim::Math::Vector2d barycentricCoordinate2;
-					SurgSim::Math::barycentricCoordinates(penetrationPointCapsule,
-														  verticesSegment[0],
-														  verticesSegment[1],
-														  &barycentricCoordinate2);
+					SurgSim::Math::barycentricCoordinates(penetrationPointCapsuleAxis,
+						verticesSegment[0], verticesSegment[1], &barycentricCoordinate2);
 					penetrationPoints.first.elementMeshLocalCoordinate.setValue(
-						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate2));
-					penetrationPoints.first.rigidLocalPosition.setValue(penetrationPointTriangle);
+						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate2));
+					penetrationPoints.first.rigidLocalPosition.setValue(penetrationPointCapsuleAxis);
 
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
-														  verticesTriangle[0],
-														  verticesTriangle[1],
-														  verticesTriangle[2],
-														  normalTriangle,
-														  &barycentricCoordinate);
+						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
+						&barycentricCoordinate);
+
 					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
-					penetrationPoints.second.rigidLocalPosition.setValue(penetrationPointCapsule);
+					penetrationPoints.second.rigidLocalPosition.setValue(penetrationPointTriangle);
 
 					// Create the contact.
-					contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth),
-									   1.0, Vector3d::Zero(), -normal, penetrationPoints));
+					contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE,
+						std::abs(depth) + (penetrationPointCapsule - penetrationPointCapsuleAxis).dot(normal),
+						1.0, Vector3d::Zero(), -normal, penetrationPoints));
 				}
 			}
 		}
