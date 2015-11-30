@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_CCDCOLLISION_H
-#define SURGSIM_PHYSICS_CCDCOLLISION_H
+#ifndef SURGSIM_PHYSICS_PREPARECOLLISIONPAIRS_H
+#define SURGSIM_PHYSICS_PREPARECOLLISIONPAIRS_H
 
 #include <memory>
 
-#include "SurgSim/Math/Shape.h"
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
@@ -41,29 +41,24 @@ class PhysicsManagerState;
 /// will update the collision pairs accordingly.
 /// \note When a new ContactCalculation type gets implemented, the type needs to be registered with the table
 /// inside of ContactCalculation
-class CcdCollision : public Computation
+class PrepareCollisionPairs : public Computation
 {
 public:
-
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
-	explicit CcdCollision(bool doCopyState = false);
+	explicit PrepareCollisionPairs(bool doCopyState = false);
 
-	SURGSIM_CLASSNAME(SurgSim::Physics::CcdCollision);
+	SURGSIM_CLASSNAME(SurgSim::Physics::PrepareCollisionPairs);
 
 	/// Destructor
-	virtual ~CcdCollision();
+	virtual ~PrepareCollisionPairs();
 
 protected:
-
-	/// Executes the update operation, overridden from Computation.
-	/// \param dt	The time passed.
-	/// \param state The PhysicsManagerState from previous computation.
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
-	override;
+		override;
 };
 
 }; // Physics
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_CCDCOLLISION_H
+#endif // SURGSIM_PHYSICS_PREPARECOLLISIONPAIRS_H
