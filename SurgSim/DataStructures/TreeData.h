@@ -49,6 +49,8 @@ public:
 	/// \return true if the data are equal; otherwise, returns false.
 	bool operator!=(const TreeData& data) const;
 
+	virtual void clear() = 0;
+
 private:
 
 	/// Returns true if the trees are equal; otherwise, returns false.

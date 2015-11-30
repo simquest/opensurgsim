@@ -109,7 +109,10 @@ void TreeNode::accept(TreeVisitor* visitor)
 
 void TreeNode::clear()
 {
-	m_data = nullptr;
+	if (m_data != nullptr)
+	{
+		m_data->clear();
+	}
 	m_children.clear();
 }
 
