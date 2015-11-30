@@ -133,7 +133,7 @@ void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_
 	constraints.clear();
 	for (auto it = m_constraintComponents.cbegin(); it != m_constraintComponents.cend(); ++it)
 	{
-		if ((*it)->isActive && (*it)->getConstraint()->isActive())
+		if ((*it)->isActive() && (*it)->getConstraint()->isActive())
 		{
 			constraints.push_back((*it)->getConstraint());
 		}
