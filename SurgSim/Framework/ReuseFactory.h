@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <stack>
+#include <vector>
 
 namespace SurgSim
 {
@@ -60,7 +61,9 @@ class ReuseFactory
 	friend class Deleter;
 public:
 	/// Constructor. Initially no unused objects are available, so returned instances are new allocations.
-	ReuseFactory() : deleter(this) {}
+	ReuseFactory() : deleter(this)
+	{
+	}
 	/// Destructor. Any remaining unused objects will be deleted.
 	~ReuseFactory() {}
 
@@ -114,7 +117,7 @@ private:
 	}
 
 	/// Stack of objects that are available for reuse.
-	std::stack<std::unique_ptr<T>> m_unusedObjects;
+	std::stack<std::unique_ptr<T>, std::vector<std::unique_ptr<T>>> m_unusedObjects;
 
 	Deleter deleter;
 };
