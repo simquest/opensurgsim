@@ -60,7 +60,7 @@ class ReuseFactory
 	friend class Deleter;
 public:
 	/// Constructor. Initially no unused objects are available, so returned instances are new allocations.
-	ReuseFactory() {}
+	ReuseFactory() : deleter(this) {}
 	/// Destructor. Any remaining unused objects will be deleted.
 	~ReuseFactory() {}
 
@@ -72,11 +72,11 @@ public:
 
 		if (m_unusedObjects.empty())
 		{
-			object = std::shared_ptr<T>(new T(), Deleter(this));
+			object = std::shared_ptr<T>(new T(), deleter);
 		}
 		else
 		{
-			object = std::shared_ptr<T>(m_unusedObjects.top().release(), Deleter(this));
+			object = std::shared_ptr<T>(m_unusedObjects.top().release(), deleter);
 			m_unusedObjects.pop();
 		}
 
@@ -90,6 +90,7 @@ private:
 	public:
 		/// Constructor
 		/// \param factory ReuseFactory with the collection of unused object for reuse.
+
 		explicit Deleter(ReuseFactory* factory) : m_factory(factory)
 		{
 		}
@@ -114,7 +115,11 @@ private:
 
 	/// Stack of objects that are available for reuse.
 	std::stack<std::unique_ptr<T>> m_unusedObjects;
+
+	Deleter deleter;
 };
+
+
 
 };  // namespace Framework
 
