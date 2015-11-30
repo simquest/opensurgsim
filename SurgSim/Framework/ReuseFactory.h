@@ -19,6 +19,7 @@
 #include <memory>
 #include <stack>
 #include <vector>
+#include <boost/thread/mutex.hpp>
 
 namespace SurgSim
 {
@@ -73,6 +74,8 @@ public:
 	{
 		std::shared_ptr<T> object;
 
+		boost::unique_lock<boost::mutex> lock(m_unusedObjectMutex);
+
 		if (m_unusedObjects.empty())
 		{
 			object = std::shared_ptr<T>(new T(), deleter);
@@ -113,11 +116,14 @@ private:
 	/// \param unusedObject Object that is no longer referenced by any shared pointers
 	void addUnused(T* unusedObject)
 	{
+		boost::unique_lock<boost::mutex> lock(m_unusedObjectMutex);
 		m_unusedObjects.push(std::unique_ptr<T>(unusedObject));
 	}
 
 	/// Stack of objects that are available for reuse.
 	std::stack<std::unique_ptr<T>, std::vector<std::unique_ptr<T>>> m_unusedObjects;
+
+	boost::mutex m_unusedObjectMutex;
 
 	Deleter deleter;
 };
