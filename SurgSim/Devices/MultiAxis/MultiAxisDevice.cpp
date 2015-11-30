@@ -40,6 +40,13 @@ MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
 
 	m_filter->setNameForCallback(uniqueName);  // the filter should make callbacks as the entire device
 	addFilter(m_filter);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultiAxisDevice, double, PositionScale,
+									  getPositionScale, setPositionScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultiAxisDevice, double, OrientationScale,
+									  getOrientationScale, setOrientationScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultiAxisDevice, bool, AxisDominance,
+									  isUsingAxisDominance, setAxisDominance);
 }
 
 void MultiAxisDevice::setPositionScale(double scale)
