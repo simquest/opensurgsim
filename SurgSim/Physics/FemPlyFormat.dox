@@ -15,12 +15,12 @@
     property double thetaY  (Optional)
     property double thetaZ  (Optional)
     element 1d_element 7 (Element Definition of the Fem1d)
-    property list uint uint vertex_indices
-    element boundary_condition 
-    property uint vertex_index
-    element radius 1 (radius for all the elements)
+    property list uint uint vertex_indices (Each entry starts with the number of nodes in this element i.e. '2', followed by the nodes' indices)
+    element boundary_condition 3 (Boundary conditions of the Fem1D)
+    property uint vertex_index (Each entry fixes all the degrees of freedom of the given node index)
+    element radius 1 (Radius for all the elements)
     property double value
-    element material 1
+    element material 1 (Physical material properties for all the elements)
     property double mass_density
     property double poisson_ratio
     property double young_modulus
@@ -40,13 +40,13 @@ The ply file for an Fem1d is mostly marked by the `1d_element` element, the `rad
     property double thetaX  (Optional)
     property double thetaY  (Optional)
     property double thetaZ  (Optional)
-    element 2d_element 3
-    property list uint uint vertex_indices
-    element boundary_condition 2
-    property uint vertex_index
-    element thickness 1  (thickness for all elements)
+    element 2d_element 3 (Element Definition of the Fem2d)
+    property list uint uint vertex_indices (each entry starts with the number of nodes in this element i.e. '3', followed by the nodes' indices)
+    element boundary_condition 2 (Boundary conditions of the Fem2D)
+    property uint vertex_index (Each entry fixes all the degrees of freedom of the given node index)
+    element thickness 1 (Thickness for all the elements)
     property double value
-    element material 1
+    element material 1 (Physical material properties for all the elements)
     property double mass_density
     property double poisson_ratio
     property double young_modulus
@@ -63,15 +63,15 @@ The ply file for an Fem2d is indicated by the `2d_element` element, the `thickne
     property double x
     property double y
     property double z
-    element 3d_element 3
-    property list uint uint vertex_indices
-    element boundary_condition 2
-    property uint vertex_index
-    element material 1
+    element 3d_element 3 (Element Definition of the Fem3d)
+    property list uint uint vertex_indices (Each entry starts with the number of nodes in this element i.e. '4' or '8', followed by the nodes' indices)
+    element boundary_condition 2 (Boundary conditions of the Fem3D)
+    property uint vertex_index (Each entry fixes all the degrees of freedom of the given node index)
+    element material 1 (Physical material properties for all the elements)
     property double mass_density
     property double poisson_ratio
     property double young_modulus
     end_header
 
-The ply file for an Fem3d is indicated by the `3d_element` element. Please note that the `vertex` element is compatible with the graphics file format and you should be able to load the fem3d file into a common graphics application. Additionally you can add `face` elements to this file to embed a graphics mesh with the fem mesh. Currently the reader supports tehtrahedral and cuboid elements (4 and 8 indices respectively), it will depend on the actual representation that is being used whether these elements can be mixed within one mesh.
+The ply file for an Fem3d is indicated by the `3d_element` element. Please note that the `vertex` element is compatible with the graphics file format and you should be able to load the fem3d file into a common graphics application. Additionally you can add `face` elements to this file to embed a graphics mesh with the fem mesh. Currently the reader supports tehtrahedral and hexahedral elements (4 and 8 nodes respectively), it will depend on the actual representation that is being used whether these elements can be mixed within one mesh.
 */
