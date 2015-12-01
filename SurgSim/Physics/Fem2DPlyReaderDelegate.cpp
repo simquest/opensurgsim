@@ -42,34 +42,16 @@ std::string Fem2DPlyReaderDelegate::getElementName() const
 
 bool Fem2DPlyReaderDelegate::registerDelegate(PlyReader* reader)
 {
-	// Vertex processing
-	reader->requestElement("vertex",
-						   std::bind(&Fem2DPlyReaderDelegate::beginVertices, this,
-									 std::placeholders::_1, std::placeholders::_2),
-						   std::bind(&Fem2DPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-						   std::bind(&Fem2DPlyReaderDelegate::endVertices, this, std::placeholders::_1));
-	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, x));
-	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, y));
-	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, z));
-
-	if (m_hasRotationDOF)
-	{
-		reader->requestScalarProperty("vertex", "thetaX", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaX));
-		reader->requestScalarProperty("vertex", "thetaY", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaY));
-		reader->requestScalarProperty("vertex", "thetaZ", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, thetaZ));
-	}
+	FemPlyReaderDelegate::registerDelegate(reader);
 
 	// Thickness processing
-
 	reader->requestElement(
 		"thickness",
 		std::bind(
-		&Fem2DPlyReaderDelegate::beginThickness, this, std::placeholders::_1, std::placeholders::_2),
+			&Fem2DPlyReaderDelegate::beginThickness, this, std::placeholders::_1, std::placeholders::_2),
 		nullptr,
 		std::bind(&Fem2DPlyReaderDelegate::endThickness, this, std::placeholders::_1));
 	reader->requestScalarProperty("thickness", "value", PlyReader::TYPE_DOUBLE, 0);
-
-	FemPlyReaderDelegate::registerDelegate(reader);
 
 	return true;
 }
@@ -78,10 +60,6 @@ bool Fem2DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
 	bool result = FemPlyReaderDelegate::fileIsAcceptable(reader);
 
-	// 6DOF processing
-	m_hasRotationDOF = reader.hasProperty("vertex", "thetaX") && reader.hasProperty("vertex", "thetaY") &&
-							  reader.hasProperty("vertex", "thetaZ");
-
 	result = result && reader.hasProperty("thickness", "value");
 
 	return result;
@@ -89,12 +67,15 @@ bool Fem2DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 
 void Fem2DPlyReaderDelegate::endParseFile()
 {
-	for(auto element : m_mesh->getElements())
+	if (!m_hasPerElementMaterial)
 	{
-		element->thickness = m_thickness;
-		element->massDensity = m_materialData.massDensity;
-		element->poissonRatio = m_materialData.poissonRatio;
-		element->youngModulus = m_materialData.youngModulus;
+		for (auto element : m_mesh->getElements())
+		{
+			element->thickness = m_thickness;
+			element->massDensity = m_materialData.massDensity;
+			element->poissonRatio = m_materialData.poissonRatio;
+			element->youngModulus = m_materialData.youngModulus;
+		}
 	}
 	m_mesh->update();
 }
@@ -118,11 +99,19 @@ void Fem2DPlyReaderDelegate::processVertex(const std::string& elementName)
 void Fem2DPlyReaderDelegate::processFemElement(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_elementData.vertexCount == 3) << "Cannot process 2D Element with "
-		<< m_elementData.vertexCount << " vertices.";
+			<< m_elementData.vertexCount << " vertices.";
 
 	auto femElement = std::make_shared<FemElementStructs::FemElement2DParameter>();
 	femElement->nodeIds.resize(m_elementData.vertexCount);
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
+
+	if (m_hasPerElementMaterial)
+	{
+		femElement->massDensity = m_elementData.massDensity;
+		femElement->poissonRatio = m_elementData.poissonRatio;
+		femElement->youngModulus = m_elementData.youngModulus;
+	}
+
 	m_mesh->addElement(femElement);
 }
 
@@ -131,7 +120,7 @@ void* Fem2DPlyReaderDelegate::beginThickness(const std::string& elementName, siz
 	return &m_thickness;
 }
 
-void Fem2DPlyReaderDelegate::endThickness(const std::string &elementName)
+void Fem2DPlyReaderDelegate::endThickness(const std::string& elementName)
 {
 	SURGSIM_ASSERT(SurgSim::Math::isValid(m_thickness)) << "No radius information processed.";
 }

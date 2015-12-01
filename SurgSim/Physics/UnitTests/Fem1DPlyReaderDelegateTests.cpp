@@ -70,5 +70,23 @@ TEST(Fem1DRepresentationReaderTests, DelegateTest)
 	}
 }
 
+TEST(Fem1DRepresentationReaderTests, PerElementMaterial)
+{
+	auto fem = std::make_shared<Fem1D>();
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	fem->load("PlyReaderTests/Fem1DMaterial.ply");
+
+	// Material
+	double value = 1.0;
+	for (size_t i = 0; i < fem->getNumElements(); ++i)
+	{
+		auto element = fem->getElement(i);
+		EXPECT_DOUBLE_EQ(value++, element->massDensity);
+		EXPECT_DOUBLE_EQ(value++, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(value++, element->youngModulus);
+	}
+}
+
 }; // Physics
 }; // SurgSim

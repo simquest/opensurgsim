@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -126,7 +126,25 @@ TEST(Fem3DRepresentationReaderTests, WrongPlyWithRotationDof)
 	auto fem = std::make_shared<Fem3D>();
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
-	ASSERT_THROW(fem->load("PlyReaderTests/Wrong3DFileWithRotationData.ply"), SurgSim::Framework::AssertionFailure);
+	ASSERT_NO_THROW(fem->load("PlyReaderTests/Wrong3DFileWithRotationData.ply"));
+}
+
+TEST(Fem3DRepresentationReaderTests, PerElementMaterial)
+{
+	auto fem = std::make_shared<Fem3D>();
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	fem->load("PlyReaderTests/Fem3DCubeMaterial.ply");
+
+	// Material
+	double value = 1.0;
+	for (size_t i = 0; i < fem->getNumElements(); ++i)
+	{
+		auto element = fem->getElement(i);
+		EXPECT_DOUBLE_EQ(value++, element->massDensity);
+		EXPECT_DOUBLE_EQ(value++, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(value++, element->youngModulus);
+	}
 }
 
 } // Physics

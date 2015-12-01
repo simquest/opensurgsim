@@ -42,8 +42,6 @@ public:
 protected:
 	std::string getElementName() const override;
 
-	bool registerDelegate(PlyReader* reader) override;
-
 	bool fileIsAcceptable(const PlyReader& reader) override;
 
 	void endParseFile() override;
