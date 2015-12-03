@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
-#include "SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h"
+#include "SurgSim/Collision/BoxDoubleSidedPlaneContact.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
@@ -54,7 +54,7 @@ void doBoxDoubleSidedPlaneTest(std::shared_ptr<BoxShape> box,
 	}
 
 	// Perform collision detection.
-	BoxDoubleSidedPlaneDcdContact calcContact;
+	BoxDoubleSidedPlaneContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, planeRep);
 	calcContact.calculateContact(pair);
 

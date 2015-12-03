@@ -17,7 +17,7 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ContactCalculation.h"
-#include "SurgSim/Collision/DcdCollision.h"
+#include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/ThreadPool.h"
@@ -49,7 +49,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	auto threadPool = Framework::Runtime::getThreadPool();
 	std::vector<std::future<void>> tasks;
 
-	const auto& calculations = ContactCalculation::getContactTable();
+	const auto& calculations = ContactCalculation::getDcdContactTable();
 
 	updatePairs(result);
 
@@ -86,6 +86,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
 				{
 					auto pair = std::make_shared<CollisionPair>(*first, *second);
+
 					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
 					{
 						pairs.push_back(std::move(pair));

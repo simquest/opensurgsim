@@ -24,6 +24,7 @@
 
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Math/Shape.h"
 
 
 namespace SurgSim
@@ -93,6 +94,9 @@ public:
 	/// \return The shape transformed by the pose of this representation
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getPosedShape();
 
+	/// \return the posed shape motion
+	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& getPosedShapeMotion() const;
+
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
@@ -153,8 +157,8 @@ public:
 	void setAllowing(const std::vector<std::string>& fullNames);
 
 protected:
-	/// Invalidate the cached posed shape
-	void invalidatePosedShape();
+	/// Invalidate the cached posed shape motion
+	void invalidatePosedShapeMotion();
 
 	/// Get the ignored collision representations
 	/// \return The full names of all the ignored collision representations
@@ -165,6 +169,9 @@ protected:
 	std::vector<std::string> getAllowing() const;
 
 	void doRetire() override;
+
+	/// \param posedShape the posed shape motion to be set
+	void setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape);
 
 private:
 	/// The type of collision detection
@@ -181,14 +188,11 @@ private:
 	/// Mutex to lock write access to m_collisions
 	boost::mutex m_collisionsMutex;
 
-	/// Cached posed shape
-	std::shared_ptr<Math::Shape> m_posedShape;
+	/// The shape transformed in space and defined through time, i.e. with 2 differents configurations
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> m_posedShapeMotion;
 
-	/// Mutex to lock write access to m_posedShape
-	boost::mutex m_posedShapeMutex;
-
-	/// Pose of m_posedShape
-	Math::RigidTransform3d m_posedShapePose;
+	/// Mutex to lock write access to m_posedShapeMotion
+	mutable boost::shared_mutex m_posedShapeMotionMutex;
 
 	/// Ignored collision representations
 	std::unordered_set<std::string> m_ignoring;

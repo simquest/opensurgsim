@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
-#include "SurgSim/Collision/SpherePlaneDcdContact.h"
+#include "SurgSim/Collision/SpherePlaneContact.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/SphereShape.h"
 
@@ -46,7 +46,7 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 	sphereRep->setShape(sphere);
 	sphereRep->setLocalPose(SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
-	SpherePlaneDcdContact calcNormal;
+	SpherePlaneContact calcNormal;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
 
 	// Again this replicates the way this is calculated in the contact calculation just with different
