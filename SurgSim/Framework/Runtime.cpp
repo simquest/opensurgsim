@@ -345,6 +345,8 @@ void Runtime::addComponent(const std::shared_ptr<Component>& component)
 
 void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 {
+	SURGSIM_ASSERT(component != nullptr)
+			<< "Trying to remove a nullptr !";
 	if (m_isRunning)
 	{
 		for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)

@@ -200,7 +200,7 @@ private:
 	/// \return	The shared pointer.
 	std::shared_ptr<Runtime> getSharedPtr();
 	bool m_isRunning;
-	std::vector< std::shared_ptr<ComponentManager> > m_managers;
+	std::vector<std::shared_ptr<ComponentManager>> m_managers;
 	std::shared_ptr<Scene> m_scene;
 	static std::shared_ptr<ApplicationData> m_applicationData;
 
