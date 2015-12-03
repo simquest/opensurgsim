@@ -63,6 +63,9 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 
 		state = std::make_shared<PhysicsManagerState>();
 		state->setRepresentations(representations);
+
+		collision0->update(0.0);
+		collision1->update(0.0);
 	}
 
 	virtual void TearDown()

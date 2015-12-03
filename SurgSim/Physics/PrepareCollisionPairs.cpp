@@ -16,58 +16,56 @@
 #include <vector>
 
 #include "SurgSim/Collision/CollisionPair.h"
-#include "SurgSim/Collision/ContactCalculation.h"
-#include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/ThreadPool.h"
-#include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
-
-using SurgSim::Collision::CollisionPair;
-using SurgSim::Collision::ContactCalculation;
+#include "SurgSim/Physics/PrepareCollisionPairs.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-DcdCollision::DcdCollision(bool doCopyState) :
+PrepareCollisionPairs::PrepareCollisionPairs(bool doCopyState) :
 	Computation(doCopyState)
 {
 }
 
-DcdCollision::~DcdCollision()
+PrepareCollisionPairs::~PrepareCollisionPairs()
 {
 }
 
-std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
+std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
-	auto threadPool = Framework::Runtime::getThreadPool();
-	std::vector<std::future<void>> tasks;
+	auto& representations = result->getActiveCollisionRepresentations();
 
-	const auto& calculations = ContactCalculation::getDcdContactTable();
-
-	for (auto& pair : result->getCollisionPairs())
+	if (representations.size() > 1)
 	{
-		if (pair->getType() == Collision::COLLISION_DETECTION_TYPE_DISCRETE)
+		std::vector<std::shared_ptr<Collision::CollisionPair>> pairs;
+		auto firstEnd = std::end(representations);
+		for (auto first = std::begin(representations); first != firstEnd; ++first)
 		{
-			tasks.push_back(threadPool->enqueue<void>([&calculations, &pair]()
+			for (auto second = first; second != std::end(representations); ++second)
 			{
-				calculations[pair->getFirst()->getShapeType()]
-				[pair->getSecond()->getShapeType()]->calculateContact(pair);
-			}));
-		}
-	}
+				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
+				{
+					auto pair = std::make_shared<Collision::CollisionPair>(*first, *second);
 
-	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.get();});
+					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
+					{
+						pairs.emplace_back(pair);
+					}
+				}
+			}
+		}
+
+		result->setCollisionPairs(pairs);
+	}
 
 	return result;
 }
 
 }; // Physics
 }; // SurgSim
-

@@ -51,8 +51,6 @@ std::shared_ptr<PhysicsManagerState> CcdCollision::doUpdate(
 
 	const auto& calculations = ContactCalculation::getCcdContactTable();
 
-	updatePairs(result);
-
 	for (auto& pair : result->getCollisionPairs())
 	{
 		if (pair->getType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
@@ -68,35 +66,6 @@ std::shared_ptr<PhysicsManagerState> CcdCollision::doUpdate(
 	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.get();});
 
 	return result;
-}
-
-void CcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
-{
-	auto& representations = state->getActiveCollisionRepresentations();
-
-	if (representations.size() > 1)
-	{
-		std::vector<std::shared_ptr<CollisionPair>> pairs;
-		auto firstEnd = std::end(representations);
-		for (auto first = std::begin(representations); first != firstEnd; ++first)
-		{
-			auto second = first;
-			for (; second != std::end(representations); ++second)
-			{
-				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
-				{
-					auto pair = std::make_shared<CollisionPair>(*first, *second);
-
-					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
-					{
-						pairs.push_back(std::move(pair));
-					}
-				}
-			}
-		}
-
-		state->setCollisionPairs(pairs);
-	}
 }
 
 }; // Physics
