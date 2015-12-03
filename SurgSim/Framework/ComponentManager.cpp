@@ -51,6 +51,7 @@ bool ComponentManager::enqueueRemoveComponent(const std::shared_ptr<Component>& 
 {
 	boost::lock_guard<boost::mutex> lock(m_componentMutex);
 	m_componentRemovals.push_back(component);
+	m_elementCache.push_back(component->getSceneElement());
 	return true;
 }
 
@@ -65,9 +66,10 @@ void ComponentManager::processComponents()
 	// This is called from within the update() function, and executeInitialization() is called at startup
 	std::vector<std::shared_ptr<Component>> inflightAdditions;
 	std::vector<std::shared_ptr<Component>> inflightRemovals;
+	std::vector<std::shared_ptr<SceneElement>> inflightElements;
 	std::vector<std::shared_ptr<Component>> actualAdditions;
 
-	copyScheduledComponents(&inflightAdditions, &inflightRemovals);
+	copyScheduledComponents(&inflightAdditions, &inflightRemovals, &inflightElements);
 	actualAdditions.reserve(inflightAdditions.size());
 
 	if (!inflightAdditions.empty())
@@ -110,9 +112,10 @@ bool ComponentManager::executeInitialization()
 	// Now Initialize and and wakeup all the components
 	std::vector<std::shared_ptr<Component>> inflightAdditions;
 	std::vector<std::shared_ptr<Component>> inflightRemovals;
+	std::vector<std::shared_ptr<SceneElement>> inflightElements;
 	std::vector<std::shared_ptr<Component>> actualAdditions;
 
-	copyScheduledComponents(&inflightAdditions, &inflightRemovals);
+	copyScheduledComponents(&inflightAdditions, &inflightRemovals, &inflightElements);
 	actualAdditions.reserve(inflightAdditions.size());
 
 	if (! inflightAdditions.empty())
@@ -143,17 +146,20 @@ bool ComponentManager::executeInitialization()
 
 void ComponentManager::copyScheduledComponents(
 	std::vector<std::shared_ptr<Component>>* inflightAdditions,
-	std::vector<std::shared_ptr<Component>>* inflightRemovals
-)
+	std::vector<std::shared_ptr<Component>>* inflightRemovals,
+	std::vector<std::shared_ptr<SceneElement>>* inflightElements)
 {
 	// Lock for any more additions or removals and then copy to local storage
 	// this will insulate us from the actual add or remove call taking longer than it should
 	boost::lock_guard<boost::mutex> lock(m_componentMutex);
-	*inflightAdditions = std::move(m_componentAdditions);
+	std::swap(m_componentAdditions, *inflightAdditions);
 	m_componentAdditions.clear();
 
-	*inflightRemovals = std::move(m_componentRemovals);
+	std::swap(m_componentRemovals, *inflightRemovals);
 	m_componentRemovals.clear();
+
+	std::swap(m_elementCache, *inflightElements);
+	m_elementCache.clear();
 }
 
 void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
@@ -161,9 +167,10 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 {
 	for (auto it = beginIt; it != endIt; ++it)
 	{
-		tryRemoveComponent(*it, &m_behaviors);
-		executeRemovals(*it);
-		(*it)->retire();
+		if (tryRemoveComponent(*it, &m_behaviors) || executeRemovals(*it))
+		{
+			(*it)->retire();
+		}
 	}
 }
 

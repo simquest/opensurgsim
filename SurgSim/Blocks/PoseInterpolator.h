@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@
 
 #include <memory>
 #include <string>
+
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/DataStructures/OptionalValue.h"
+
 
 namespace SurgSim
 {
@@ -82,7 +84,6 @@ public:
 	/// \return true If the interpolation is doing ping pong.
 	bool isPingPong() const;
 
-	/// Overridden from Behavior
 	void update(double dt) override;
 
 private:
@@ -111,10 +112,8 @@ private:
 	/// Whether to loop
 	bool m_loop;
 
-	/// Overridden from Component
 	bool doWakeUp() override;
 
-	/// Overridden from Component
 	bool doInitialize() override;
 };
 
