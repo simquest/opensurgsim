@@ -39,7 +39,7 @@ namespace Physics
 
 TEST(DcdCollisionTest, ConstructorTest)
 {
-	ASSERT_NO_THROW(std::make_shared<SurgSim::Physics::DcdCollision>(false)); 
+	ASSERT_NO_THROW(std::make_shared<SurgSim::Physics::DcdCollision>(false));
 	ASSERT_NO_THROW(std::make_shared<SurgSim::Physics::DcdCollision>(true));
 }
 
