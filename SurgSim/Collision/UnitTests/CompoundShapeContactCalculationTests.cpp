@@ -15,9 +15,9 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Collision/BoxPlaneDcdContact.h"
-#include "SurgSim/Collision/BoxSphereDcdContact.h"
-#include "SurgSim/Collision/CompoundShapeDcdContact.h"
+#include "SurgSim/Collision/BoxPlaneContact.h"
+#include "SurgSim/Collision/BoxSphereContact.h"
+#include "SurgSim/Collision/CompoundShapeContact.h"
 #include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
@@ -25,6 +25,9 @@
 
 namespace SurgSim
 {
+
+typedef Math::PosedShape<std::shared_ptr<Math::Shape>> PosedShape;
+
 namespace Collision
 {
 
@@ -32,11 +35,11 @@ class CompoundShapeDcdContactTest : public ::testing::Test
 {
 	void SetUp() override
 	{
-		ContactCalculation::registerContactCalculation(std::make_shared<BoxSphereDcdContact>());
-		ContactCalculation::registerContactCalculation(std::make_shared<BoxPlaneDcdContact>());
-		ContactCalculation::registerContactCalculation(std::make_shared<CompoundShapeDcdContact>(
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<BoxSphereContact>());
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<BoxPlaneContact>());
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<CompoundShapeContact>(
 					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_SPHERE)));
-		ContactCalculation::registerContactCalculation(std::make_shared<CompoundShapeDcdContact>(
+		ContactCalculation::registerDcdContactCalculation(std::make_shared<CompoundShapeContact>(
 					std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_PLANE)));
 
 	}
@@ -60,12 +63,12 @@ TEST_F(CompoundShapeDcdContactTest, SingleCube)
 
 	compoundShape->addShape(box);
 
-	auto calc1 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_SPHERE];
-	auto calc2 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_SPHERE];
+	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_SPHERE];
+	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_SPHERE];
 
 
-	auto expected = calc1->calculateContact(box, identity, sphere, transform);
-	auto result = calc2->calculateContact(compoundShape, identity, sphere, transform);
+	auto expected = calc1->calculateDcdContact(PosedShape(box, identity), PosedShape(sphere, transform));
+	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, identity), PosedShape(sphere, transform));
 
 	contactsInfoEqualityTest(expected, result);
 }
@@ -90,15 +93,17 @@ TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 	compoundShape->addShape(box, box1Pose);
 	compoundShape->addShape(box, box2Pose);
 
-	auto calc1 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_PLANE];
-	auto calc2 = ContactCalculation::getContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_PLANE];
+	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_PLANE];
+	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_PLANE];
 
-	auto result = calc2->calculateContact(compoundShape, basePose, plane, identity);
+	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, basePose), PosedShape(plane, identity));
 
 	std::list<std::shared_ptr<Contact>> expected;
 
-	expected.splice(expected.end(), calc1->calculateContact(box, basePose * box1Pose, plane, identity));
-	expected.splice(expected.end(), calc1->calculateContact(box, basePose * box2Pose, plane, identity));
+	expected.splice(expected.end(),
+		calc1->calculateDcdContact(PosedShape(box, basePose * box1Pose), PosedShape(plane, identity)));
+	expected.splice(expected.end(),
+		calc1->calculateDcdContact(PosedShape(box, basePose * box2Pose), PosedShape(plane, identity)));
 
 	contactsInfoEqualityTest(expected, result);
 }

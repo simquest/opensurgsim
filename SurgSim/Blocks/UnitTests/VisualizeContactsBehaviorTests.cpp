@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,8 +44,8 @@ TEST(VisualizeContactsBehaviorTests, SettersGetters)
 	std::string name = "CollisionRepresentation";
 	auto collisionRepresentaiton = std::make_shared<RigidCollisionRepresentation>(name);
 
-	EXPECT_NO_THROW(visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentaiton));
-	EXPECT_EQ(name, visualizeContactsBehavior->getCollisionRepresentation()->getName());
+	EXPECT_NO_THROW(visualizeContactsBehavior->setSource(collisionRepresentaiton));
+	EXPECT_EQ(name, visualizeContactsBehavior->getSource()->getName());
 
 	// Test vector field scale.
 	EXPECT_ANY_THROW(visualizeContactsBehavior->setVectorFieldScale(-1.023));
@@ -60,7 +60,7 @@ TEST(VisualizeContactsBehaviorTests, Serialization)
 	auto visualizeContactsBehavior = std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
 	std::string name = "CollisionRepresentation";
 	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>(name);
-	EXPECT_NO_THROW(visualizeContactsBehavior->setValue("CollisionRepresentation",
+	EXPECT_NO_THROW(visualizeContactsBehavior->setValue("Source",
 		std::static_pointer_cast<SurgSim::Framework::Component>(collisionRepresentation)););
 	double scale = 1.234;
 	EXPECT_NO_THROW(visualizeContactsBehavior->setValue("VectorFieldScale", scale));
@@ -79,7 +79,7 @@ TEST(VisualizeContactsBehaviorTests, Serialization)
 
 	// Verify
 	EXPECT_EQ(name, SurgSim::Framework::convert<std::shared_ptr<SurgSim::Framework::Component>>(
-					newVisualizeContactsBehavior->getValue("CollisionRepresentation"))->getName());
+					newVisualizeContactsBehavior->getValue("Source"))->getName());
 	EXPECT_EQ(scale, SurgSim::Framework::convert<double>(newVisualizeContactsBehavior->getValue("VectorFieldScale")));
 }
 
@@ -97,8 +97,8 @@ TEST(VisualizeContactsBehaviorTests, MultipleInstances)
 
 	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("CollisionRepresentation");
 
-	EXPECT_NO_THROW(visualizeContactsBehavior1->setCollisionRepresentation(collisionRepresentation));
-	EXPECT_NO_THROW(visualizeContactsBehavior2->setCollisionRepresentation(collisionRepresentation));
+	EXPECT_NO_THROW(visualizeContactsBehavior1->setSource(collisionRepresentation));
+	EXPECT_NO_THROW(visualizeContactsBehavior2->setSource(collisionRepresentation));
 
 	EXPECT_TRUE(visualizeContactsBehavior1->initialize(runtime));
 	EXPECT_TRUE(visualizeContactsBehavior2->initialize(runtime));

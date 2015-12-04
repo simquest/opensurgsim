@@ -14,65 +14,65 @@
 # limitations under the License.
 
 set(SURGSIM_COLLISION_SOURCES
-	BoxCapsuleDcdContact.cpp
-	BoxDoubleSidedPlaneDcdContact.cpp
-	BoxPlaneDcdContact.cpp
-	BoxSphereDcdContact.cpp
-	CapsuleSphereDcdContact.cpp
+	BoxCapsuleContact.cpp
+	BoxDoubleSidedPlaneContact.cpp
+	BoxPlaneContact.cpp
+	BoxSphereContact.cpp
+	CapsuleSphereContact.cpp
 	CollisionPair.cpp
-	CompoundShapeDcdContact.cpp
+	CompoundShapeContact.cpp
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
-	OctreeCapsuleDcdContact.cpp
-	OctreeDcdContact.cpp
-	OctreeDoubleSidedPlaneDcdContact.cpp
-	OctreePlaneDcdContact.cpp
-	OctreeSphereDcdContact.cpp
+	OctreeCapsuleContact.cpp
+	OctreeContact.cpp
+	OctreeDoubleSidedPlaneContact.cpp
+	OctreePlaneContact.cpp
+	OctreeSphereContact.cpp
 	Representation.cpp
-	SegmentCcdSelfContact.cpp
-	SegmentMeshTriangleMeshDcdContact.cpp
+	SegmentMeshTriangleMeshContact.cpp
 	SegmentSegmentCcdIntervalCheck.cpp
 	SegmentSegmentCcdMovingContact.cpp
 	SegmentSegmentCcdStaticContact.cpp
+	SegmentSelfContact.cpp
 	ShapeCollisionRepresentation.cpp
-	SphereDoubleSidedPlaneDcdContact.cpp
-	SpherePlaneDcdContact.cpp
-	SphereSphereDcdContact.cpp
-	TriangleMeshParticlesDcdContact.cpp
-	TriangleMeshPlaneDcdContact.cpp
-	TriangleMeshTriangleMeshDcdContact.cpp
+	SphereDoubleSidedPlaneContact.cpp
+	SpherePlaneContact.cpp
+	SphereSphereContact.cpp
+	TriangleMeshParticlesContact.cpp
+	TriangleMeshPlaneContact.cpp
+	TriangleMeshTriangleMeshContact.cpp
 )
 
 set(SURGSIM_COLLISION_HEADERS
-	BoxCapsuleDcdContact.h
-	BoxDoubleSidedPlaneDcdContact.h
-	BoxPlaneDcdContact.h
-	BoxSphereDcdContact.h
-	CapsuleSphereDcdContact.h
+	BoxCapsuleContact.h
+	BoxDoubleSidedPlaneContact.h
+	BoxPlaneContact.h
+	BoxSphereContact.h
+	CapsuleSphereContact.h
+	CcdDcdCollision.h
 	CollisionPair.h
-	CompoundShapeDcdContact.h
+	CompoundShapeContact.h
 	ContactCalculation.h
-	DcdCollision.h
 	DefaultContactCalculation.h
-	OctreeCapsuleDcdContact.h
-	OctreeDcdContact.h
-	OctreeDoubleSidedPlaneDcdContact.h
-	OctreePlaneDcdContact.h
-	OctreeSphereDcdContact.h
+	OctreeCapsuleContact.h
+	OctreeContact.h
+	OctreeDoubleSidedPlaneContact.h
+	OctreePlaneContact.h
+	OctreeSphereContact.h
 	Representation.h
-	SegmentCcdSelfContact.h
-	SegmentMeshTriangleMeshDcdContact.h
+	SegmentMeshTriangleMeshContact.h
 	SegmentSegmentCcdIntervalCheck.h
 	SegmentSegmentCcdMovingContact.h
 	SegmentSegmentCcdStaticContact.h
+	SegmentSelfContact.h
 	ShapeCollisionRepresentation.h
 	ShapeShapeContactCalculation.h
-	SphereDoubleSidedPlaneDcdContact.h
-	SpherePlaneDcdContact.h
-	SphereSphereDcdContact.h
-	TriangleMeshParticlesDcdContact.h
-	TriangleMeshPlaneDcdContact.h
-	TriangleMeshTriangleMeshDcdContact.h
+	SphereDoubleSidedPlaneContact.h
+	SpherePlaneContact.h
+	SphereSphereContact.h
+	TriangleMeshParticlesContact.h
+	TriangleMeshPlaneContact.h
+	TriangleMeshTriangleMeshContact.h
 )
 surgsim_create_library_header(Collision.h "${SURGSIM_COLLISION_HEADERS}")
 

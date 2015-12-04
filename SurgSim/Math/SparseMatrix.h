@@ -189,7 +189,6 @@ void blockWithSearch(const Eigen::Ref<const Matrix>& subMatrix, size_t rowStart,
 {
 	static Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>> operation;
 	static_assert(std::is_same<T, typename Matrix::Scalar>::value, "Both matrices should use the same Scalar type");
-
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
 	SURGSIM_ASSERT(subMatrix.rows() >= static_cast<Matrix::Index>(n)) << "subMatrix doesn't have enough rows";

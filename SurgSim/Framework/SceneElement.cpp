@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest LLC.
+// Copyright 2013-2015, SimQuest LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 
-#include "SurgSim/DataStructures/DataStructuresConvert.h"
 
 namespace SurgSim
 {
@@ -36,10 +36,10 @@ SceneElement::SceneElement(const std::string& name) :
 	m_isInitialized(false),
 	m_isActive(true),
 	/// Local groups for serialization local handling
-	m_groups(new SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>())
+	m_groups(new DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>())
 {
-	m_pose = std::make_shared<SurgSim::Framework::PoseComponent>("Pose");
-	m_pose->setPose(SurgSim::Math::RigidTransform3d::Identity());
+	m_pose = std::make_shared<PoseComponent>("Pose");
+	m_pose->setPose(Math::RigidTransform3d::Identity());
 	m_components[m_pose->getName()] = m_pose;
 }
 
@@ -107,6 +107,23 @@ bool SceneElement::removeComponent(const std::string& name)
 		result = (count == 1);
 	}
 	return result;
+}
+
+void SceneElement::removeComponents()
+{
+	if (!m_components.empty())
+	{
+		auto runtime = getRuntime();
+		SURGSIM_ASSERT(runtime) << "Runtime cannot be expired when removing components from " << getName();
+
+		for (auto it = std::begin(m_components); it != std::end(m_components);  ++it)
+		{
+			it->second->setLocalActive(false);
+			runtime->removeComponent(it->second);
+		}
+
+		m_components.clear();
+	}
 }
 
 std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) const
@@ -298,14 +315,14 @@ bool SceneElement::decode(const YAML::Node& node)
 				if ("SurgSim::Framework::PoseComponent" == nodeIt->begin()->first.as<std::string>())
 				{
 					removeComponent(m_pose);
-					m_pose = nodeIt->as<std::shared_ptr<SurgSim::Framework::PoseComponent>>();
+					m_pose = nodeIt->as<std::shared_ptr<PoseComponent>>();
 					addComponent(m_pose);
 				}
 				else
 				{
 					try
 					{
-						addComponent(nodeIt->as<std::shared_ptr<SurgSim::Framework::Component>>());
+						addComponent(nodeIt->as<std::shared_ptr<Component>>());
 					}
 					catch (YAML::Exception e)
 					{

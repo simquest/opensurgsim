@@ -107,7 +107,8 @@ protected:
 	/// from there to the intermediate inflight queues, after this call, the incoming
 	/// queues will be empty.
 	void copyScheduledComponents(std::vector<std::shared_ptr<Component>>* inflightAdditions,
-								 std::vector<std::shared_ptr<Component>>* inflightRemovals);
+								 std::vector<std::shared_ptr<Component>>* inflightRemovals,
+								 std::vector<std::shared_ptr<SceneElement>>* inflightElements);
 
 	/// Returns this manager's logger
 	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
@@ -120,6 +121,7 @@ protected:
 	/// Contain components scheduled to be added/removed
 	std::vector<std::shared_ptr<Component>> m_componentAdditions;
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
+	std::vector<std::shared_ptr<SceneElement>> m_elementCache;
 	///@}
 
 	/// Collection of behaviors

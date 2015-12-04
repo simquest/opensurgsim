@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
-#include "SurgSim/Collision/BoxSphereDcdContact.h"
+#include "SurgSim/Collision/BoxSphereContact.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/SphereShape.h"
 
@@ -52,7 +52,7 @@ void doBoxSphereTest(std::shared_ptr<BoxShape> box,
 	sphereRep->setLocalPose(SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
 	// Perform collision detection.
-	BoxSphereDcdContact calcContact;
+	BoxSphereContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, sphereRep);
 	calcContact.calculateContact(pair);
 
