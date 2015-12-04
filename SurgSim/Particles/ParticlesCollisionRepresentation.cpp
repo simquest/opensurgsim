@@ -33,7 +33,7 @@ ParticlesCollisionRepresentation::ParticlesCollisionRepresentation(const std::st
 	SurgSim::Collision::Representation(name),
 	m_shape(std::make_shared<SurgSim::Math::ParticlesShape>())
 {
-	m_shape->setRadius(0.005);
+	m_shape->setRadius(0.01);
 }
 
 ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
