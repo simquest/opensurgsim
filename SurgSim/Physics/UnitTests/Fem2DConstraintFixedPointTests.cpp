@@ -214,12 +214,12 @@ TEST(Fem2DConstraintFixedPointTests, BuildMlcpTwoStep)
 
 	Eigen::Matrix<double, 3, 30> H = Eigen::Matrix<double, 3, 30>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
-	SurgSim::Math::addSubMatrix( (0.11 * dt * identity).eval(), 0, 2, 3, 3, &H); // on node 1 (triId 1, nodeId 0)
-	SurgSim::Math::addSubMatrix( (0.02 * dt * identity).eval(), 0, 4, 3, 3, &H); // on node 2 (triId 1, nodeId 1)
-	SurgSim::Math::addSubMatrix( (0.87 * dt * identity).eval(), 0, 6, 3, 3, &H); // on node 3 (triId 1, nodeId 2)
-	SurgSim::Math::addSubMatrix((-0.32 * dt * identity).eval(), 0, 4, 3, 3, &H); // on node 2 (triId 2, nodeId 0)
-	SurgSim::Math::addSubMatrix((-0.50 * dt * identity).eval(), 0, 6, 3, 3, &H); // on node 3 (triId 2, nodeId 1)
-	SurgSim::Math::addSubMatrix((-0.18 * dt * identity).eval(), 0, 8, 3, 3, &H); // on node 4 (triId 2, nodeId 2)
+	SurgSim::Math::addSubMatrix( 0.11 * dt * identity, 0, 2, 3, 3, &H); // This weight is on node 1 (triId 1, nodeId 0)
+	SurgSim::Math::addSubMatrix( 0.02 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 2 (triId 1, nodeId 1)
+	SurgSim::Math::addSubMatrix( 0.87 * dt * identity, 0, 6, 3, 3, &H); // This weight is on node 3 (triId 1, nodeId 2)
+	SurgSim::Math::addSubMatrix(-0.32 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 2 (triId 2, nodeId 0)
+	SurgSim::Math::addSubMatrix(-0.50 * dt * identity, 0, 6, 3, 3, &H); // This weight is on node 3 (triId 2, nodeId 1)
+	SurgSim::Math::addSubMatrix(-0.18 * dt * identity, 0, 8, 3, 3, &H); // This weight is on node 4 (triId 2, nodeId 2)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 }
 

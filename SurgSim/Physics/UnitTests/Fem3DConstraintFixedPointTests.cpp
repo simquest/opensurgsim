@@ -208,14 +208,14 @@ TEST(Fem3DConstraintFixedPointTests, BuildMlcpTwoStep)
 
 	Eigen::Matrix<double, 3, 18> H = Eigen::Matrix<double, 3, 18>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
-	SurgSim::Math::addSubMatrix( (0.11 * dt * identity).eval(), 0, 0, 3, 3, &H); // on node 0 (tetId 2, nodeId 0)
-	SurgSim::Math::addSubMatrix( (0.02 * dt * identity).eval(), 0, 1, 3, 3, &H); // on node 1 (tetId 2, nodeId 1)
-	SurgSim::Math::addSubMatrix( (0.33 * dt * identity).eval(), 0, 4, 3, 3, &H); // on node 4 (tetId 2, nodeId 2)
-	SurgSim::Math::addSubMatrix( (0.54 * dt * identity).eval(), 0, 5, 3, 3, &H); // on node 5 (tetId 2, nodeId 3)
-	SurgSim::Math::addSubMatrix((-0.32 * dt * identity).eval(), 0, 0, 3, 3, &H); // on node 0 (tetId 1, nodeId 0)
-	SurgSim::Math::addSubMatrix((-0.05 * dt * identity).eval(), 0, 1, 3, 3, &H); // on node 1 (tetId 1, nodeId 1)
-	SurgSim::Math::addSubMatrix((-0.14 * dt * identity).eval(), 0, 3, 3, 3, &H); // on node 3 (tetId 1, nodeId 2)
-	SurgSim::Math::addSubMatrix((-0.49 * dt * identity).eval(), 0, 4, 3, 3, &H); // on node 4 (tetId 1, nodeId 3)
+	SurgSim::Math::addSubMatrix( 0.11 * dt * identity, 0, 0, 3, 3, &H); // This weight is on node 0 (tetId 2, nodeId 0)
+	SurgSim::Math::addSubMatrix( 0.02 * dt * identity, 0, 1, 3, 3, &H); // This weight is on node 1 (tetId 2, nodeId 1)
+	SurgSim::Math::addSubMatrix( 0.33 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 4 (tetId 2, nodeId 2)
+	SurgSim::Math::addSubMatrix( 0.54 * dt * identity, 0, 5, 3, 3, &H); // This weight is on node 5 (tetId 2, nodeId 3)
+	SurgSim::Math::addSubMatrix(-0.32 * dt * identity, 0, 0, 3, 3, &H); // This weight is on node 0 (tetId 1, nodeId 0)
+	SurgSim::Math::addSubMatrix(-0.05 * dt * identity, 0, 1, 3, 3, &H); // This weight is on node 1 (tetId 1, nodeId 1)
+	SurgSim::Math::addSubMatrix(-0.14 * dt * identity, 0, 3, 3, 3, &H); // This weight is on node 3 (tetId 1, nodeId 2)
+	SurgSim::Math::addSubMatrix(-0.49 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 4 (tetId 1, nodeId 3)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 }
 

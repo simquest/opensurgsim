@@ -1350,14 +1350,13 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	Eigen::Matrix<double, 18, 18> expected18x18StiffnessMatrix;
 	getExpectedLocalStiffnessMatrix(expected18x18StiffnessMatrix);
 	expectedStiffnessMatrix.setZero();
-	addSubMatrix((R0 * expected18x18StiffnessMatrix * R0.transpose()).eval(), tri->getNodeIds(), 6,
-		&expectedStiffnessMatrix);
+	addSubMatrix(R0 * expected18x18StiffnessMatrix * R0.transpose(), tri->getNodeIds(), 6, &expectedStiffnessMatrix);
 
 	// Assemble manually the expectedMassMatrix
 	Eigen::Matrix<double, 18, 18> expected18x18MassMatrix;
 	getExpectedLocalMassMatrix(expected18x18MassMatrix);
 	expectedMassMatrix.setZero();
-	addSubMatrix((R0 * expected18x18MassMatrix * R0.transpose()).eval(), tri->getNodeIds(), 6, &expectedMassMatrix);
+	addSubMatrix(R0 * expected18x18MassMatrix * R0.transpose(), tri->getNodeIds(), 6, &expectedMassMatrix);
 
 	forceVector.setZero();
 	massMatrix.setZero();

@@ -430,7 +430,7 @@ public:
 		std::shared_ptr<MockFem1DElement> beam = getBeam();
 		const Eigen::Matrix<double, 12, 12>& r = beam->getInitialRotation();
 
-		SurgSim::Math::addSubMatrix((r * in * r.transpose()).eval(), nodeIdsVectorForm, 6, &out);
+		SurgSim::Math::addSubMatrix(r * in * r.transpose(), nodeIdsVectorForm, 6, &out);
 	}
 
 	std::shared_ptr<MockFem1DElement> getBeam()
