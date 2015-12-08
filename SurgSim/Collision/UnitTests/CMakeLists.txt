@@ -32,11 +32,11 @@ set(UNIT_TEST_SOURCES
 	OctreeContactCalculationTests.cpp
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp
-	SegmentCcdSelfContactTests.cpp
 	SegmentMeshTriangleMeshContactCalculationTests.cpp
 	SegmentSegmentCcdIntervalCheckTests.cpp
 	SegmentSegmentCcdMovingContactTests.cpp
 	SegmentSegmentCcdStaticContactTests.cpp
+	SegmentSelfContactTests.cpp
 	ShapeCollisionRepresentationTest.cpp
 	SphereDoubleSidedPlaneContactCalculationTests.cpp
 	SpherePlaneContactCalculationTests.cpp

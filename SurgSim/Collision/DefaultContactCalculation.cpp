@@ -49,20 +49,32 @@ void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair
 			<< pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
 }
 
-std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateContact(
-									 const std::shared_ptr<Math::Shape>& shape1,
-									 const Math::RigidTransform3d& pose1,
-									 const std::shared_ptr<Math::Shape>& shape2,
-									 const Math::RigidTransform3d& pose2)
+std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateDcdContact(
+	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
 {
 	SURGSIM_ASSERT(!m_doAssert)
 			<< "Contact calculation not implemented for shapes with types ("
-			<< shape1->getType() << ", " << shape2->getType() << ").";
+			<< posedShape1.getShape()->getType() << ", " << posedShape2.getShape()->getType() << ").";
 	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
 			<< "Contact calculation not implemented for pairs with types ("
-			<< shape1->getType() << ", " << shape2->getType() << ").";
+			<< posedShape1.getShape()->getType() << ", " << posedShape2.getShape()->getType() << ").";
 	return std::list<std::shared_ptr<Contact>>();
+}
 
+std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateCcdContact(
+	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2)
+{
+	SURGSIM_ASSERT(!m_doAssert)
+		<< "Contact calculation not implemented for pairs with types ("
+		<< posedShapeMotion1.first.getShape()->getType() << ", "
+		<< posedShapeMotion2.first.getShape()->getType() << ").";
+	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
+		<< "Contact calculation not implemented for pairs with types ("
+		<< posedShapeMotion1.first.getShape()->getType() << ", "
+		<< posedShapeMotion2.first.getShape()->getType() << ").";
+	return std::list<std::shared_ptr<Contact>>();
 }
 
 }; // namespace Collision

@@ -101,6 +101,40 @@ public:
 	virtual bool isValid() const = 0;
 };
 
+/// PosedShape is a transformed shape with a record of the pose used to transform it.
+template <class T>
+struct PosedShape
+{
+	PosedShape() { pose = Math::RigidTransform3d::Identity(); }
+	PosedShape(const T& shapeInput, const Math::RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
+
+	void invalidate() { shape = nullptr; }
+	const T& getShape() const { return shape; }
+	const Math::RigidTransform3d& getPose() const { return pose; }
+
+protected:
+	T shape;
+	Math::RigidTransform3d pose;
+};
+
+/// PosedShapeMotion is embedding the motion of a PosedShape, providing a posed shape at 2 different instant.
+template <class T>
+struct PosedShapeMotion : public std::pair<PosedShape<T>, PosedShape<T>>
+{
+	PosedShapeMotion() {}
+	PosedShapeMotion(const PosedShape<T>& posedShapeFirst, const PosedShape<T>& posedShapeSecond)
+	{
+		this->first = posedShapeFirst;
+		this->second = posedShapeSecond;
+	}
+
+	void invalidate()
+	{
+		this->first.invalidate();
+		this->second.invalidate();
+	}
+};
+
 }; // Math
 }; // SurgSim
 

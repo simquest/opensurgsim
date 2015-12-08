@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
-#include "SurgSim/Collision/CapsuleSphereDcdContact.h"
+#include "SurgSim/Collision/CapsuleSphereContact.h"
 #include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/SphereShape.h"
 
@@ -37,7 +37,7 @@ void doCapsuleSphereTest(double capsuleHeight, double capsuleRadius,
 		makeCapsuleRepresentation(capsuleHeight, capsuleRadius, capsuleQuat, capsulePosition),
 		makeSphereRepresentation(sphereRadius, sphereQuat, spherePosition));
 
-	CapsuleSphereDcdContact calc;
+	CapsuleSphereContact calc;
 	calc.calculateContact(pair);
 	EXPECT_EQ(hasContacts, pair->hasContacts());
 

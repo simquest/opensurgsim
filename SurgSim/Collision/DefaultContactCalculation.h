@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ class CollisionPair;
 class DefaultContactCalculation : public ContactCalculation
 {
 public:
-
 	/// Constructor
 	/// \param doAssert If set the calculation will throw an exception if it is executed, this
 	/// 				can be used to detect cases where a  contact calculation is being called
@@ -48,11 +47,13 @@ private:
 
 	void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
-	std::list<std::shared_ptr<Contact>> doCalculateContact(
-										 const std::shared_ptr<Math::Shape>& shape1,
-										 const Math::RigidTransform3d& pose1,
-										 const std::shared_ptr<Math::Shape>& shape2,
-										 const Math::RigidTransform3d& pose2) override;
+	std::list<std::shared_ptr<Contact>> doCalculateDcdContact(
+		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2) override;
+
+	std::list<std::shared_ptr<Contact>> doCalculateCcdContact(
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2) override;
 };
 
 }; // namespace Collision

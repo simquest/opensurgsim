@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -171,7 +171,7 @@ public:
 		Matrix K = m_fem->getK();
 		m_fem->getCurrentState()->applyBoundaryConditionsToMatrix(&K);
 		m_fem->getCurrentState()->applyBoundaryConditionsToVector(&m_F);
-		m_U = K.inverse() * m_F;
+		m_U = K.partialPivLu().solve(m_F);
 	}
 
 	double getUx(size_t nodeId) const
