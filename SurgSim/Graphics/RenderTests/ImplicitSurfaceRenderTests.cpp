@@ -75,7 +75,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
 			Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.01f, 800.0f, 4.0,
-												1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0),
+												1024, Math::Vector4f(0.83, 0.0, 0.0, 1.0),
 												Math::Vector4f(0.4, 0.4, 0.4, 1.0), 10.0f, false);
 
 	for (auto element : surface)
@@ -92,24 +92,24 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	scene->addSceneElement(element);
 
-	auto sphere = std::make_shared<Graphics::OsgSphereRepresentation>("Graphics");
-	sphere->setRadius(0.1);
+//	auto sphere = std::make_shared<Graphics::OsgSphereRepresentation>("Graphics");
+//	sphere->setRadius(0.1);
 
-	auto material = Graphics::buildMaterial("Shaders/material.vert", "Shaders/material.frag");
-	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
-	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(0.4, 0.4, 0.4, 1.0));
-	material->addUniform("float", "shininess");
-	material->setValue("shininess", 10.0f);
-	sphere->setMaterial(material);
+//	auto material = Graphics::buildMaterial("Shaders/material.vert", "Shaders/material.frag");
+//	material->addUniform("vec4", "diffuseColor");
+//	material->setValue("diffuseColor", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
+//	material->addUniform("vec4", "specularColor");
+//	material->setValue("specularColor", Math::Vector4f(0.4, 0.4, 0.4, 1.0));
+//	material->addUniform("float", "shininess");
+//	material->setValue("shininess", 10.0f);
+//	sphere->setMaterial(material);
 
-	element = std::make_shared<Framework::BasicSceneElement>("Sphere");
-	element->setPose(makeRigidTranslation(Math::Vector3d(0.25, 0.0, 0.0)));
-	element->addComponent(sphere);
-	element->addComponent(material);
+//	element = std::make_shared<Framework::BasicSceneElement>("Sphere");
+//	element->setPose(makeRigidTranslation(Math::Vector3d(0.25, 0.0, 0.0)));
+//	element->addComponent(sphere);
+//	element->addComponent(material);
 
-	scene->addSceneElement(element);
+//	scene->addSceneElement(element);
 
 	// Create the point cloud
 	auto mesh = std::make_shared<Graphics::OsgMeshRepresentation>("Mesh");
