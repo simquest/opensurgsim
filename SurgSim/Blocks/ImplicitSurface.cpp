@@ -15,7 +15,9 @@
 
 #include "ImplicitSurface.h"
 
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/TransferPropertiesBehavior.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgLight.h"
@@ -229,6 +231,25 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	material->setValue("specularColor", specularColor);
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", shininess);
+
+	std::string filename;
+	{
+		// The Diffuse environment map
+		Framework::Runtime::getApplicationData()->tryFindFile("OR/or_reflection_diffuse.png", &filename);
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
+		texture->loadImage(filename);
+		material->addUniform("samplerCube", "diffuseEnvMap");
+		material->setValue("diffuseEnvMap", texture);
+	}
+
+	{
+		// The Specular environment map
+		Framework::Runtime::getApplicationData()->tryFindFile("OR/or_reflection_specular.png", &filename);
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
+		texture->loadImage(filename);
+		material->addUniform("samplerCube", "specularEnvMap");
+		material->setValue("specularEnvMap", texture);
+	}
 
 	renderPass->setMaterial(material);
 
