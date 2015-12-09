@@ -103,13 +103,7 @@ public:
 	void setSlidingConstraintAt(const IndexedLocalCoordinate& coord)
 	{
 		m_localization = std::make_shared<Fem1DLocalization>(m_fem, coord);
-		auto position = m_localization->calculatePosition(0.0);
-
-		Vector3d binormal, tangent;
-		SurgSim::Math::buildOrthonormalBasis(&m_slidingDirection, &binormal, &tangent);
-
-		m_constraintData.setPlane1Equation(binormal, -position.dot(binormal));
-		m_constraintData.setPlane2Equation(tangent, -position.dot(tangent));
+		m_constraintData.setSlidingDirection(m_localization->calculatePosition(0.0), m_slidingDirection);
 	}
 
 	Vector3d computeNewPosition(const IndexedLocalCoordinate& coord) const
@@ -173,14 +167,14 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpTest)
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormal1()) + m_constraintData.getD1(),
+	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[0]) + m_constraintData.getDistances()[0],
 		mlcpPhysicsProblem.b[0], epsilon);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormal2()) + m_constraintData.getD2(),
+	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[1]) + m_constraintData.getDistances()[1],
 		mlcpPhysicsProblem.b[1], epsilon);
 
 	Eigen::Matrix<double, 2, 30> H = Eigen::Matrix<double, 2, 30>::Zero();
-	H.block<1, 3>(0, 0) = (dt * m_constraintData.getNormal1()).eval();
-	H.block<1, 3>(1, 0) = (dt * m_constraintData.getNormal2()).eval();
+	H.block<1, 3>(0, 0) = (dt * m_constraintData.getNormals()[0]).eval();
+	H.block<1, 3>(1, 0) = (dt * m_constraintData.getNormals()[1]).eval();
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -212,16 +206,16 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpCoordinateTest)
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormal1()) + m_constraintData.getD1(),
+	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[0]) + m_constraintData.getDistances()[0],
 		mlcpPhysicsProblem.b[0], epsilon);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormal2()) + m_constraintData.getD2(),
+	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[1]) + m_constraintData.getDistances()[1],
 		mlcpPhysicsProblem.b[1], epsilon);
 
 	Eigen::Matrix<double, 2, 30> H = Eigen::Matrix<double, 2, 30>::Zero();
-	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormal1()).eval();
-	H.block<1, 3>(1, 0) = (barycentric[0] * dt * m_constraintData.getNormal2()).eval();
-	H.block<1, 3>(0, 6) = (barycentric[1] * dt * m_constraintData.getNormal1()).eval();
-	H.block<1, 3>(1, 6) = (barycentric[1] * dt * m_constraintData.getNormal2()).eval();
+	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[0]).eval();
+	H.block<1, 3>(1, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[1]).eval();
+	H.block<1, 3>(0, 6) = (barycentric[1] * dt * m_constraintData.getNormals()[0]).eval();
+	H.block<1, 3>(1, 6) = (barycentric[1] * dt * m_constraintData.getNormals()[1]).eval();
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -292,16 +286,16 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpIndiciesTest)
 		SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormal1()) + m_constraintData.getD1(),
+	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[0]) + m_constraintData.getDistances()[0],
 		mlcpPhysicsProblem.b[1], epsilon);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormal2()) + m_constraintData.getD2(),
+	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[1]) + m_constraintData.getDistances()[1],
 		mlcpPhysicsProblem.b[2], epsilon);
 
 	Eigen::Matrix<double, 2, 30> H = Eigen::Matrix<double, 2, 30>::Zero();
-	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormal1()).eval();
-	H.block<1, 3>(1, 0) = (barycentric[0] * dt * m_constraintData.getNormal2()).eval();
-	H.block<1, 3>(0, 6) = (barycentric[1] * dt * m_constraintData.getNormal1()).eval();
-	H.block<1, 3>(1, 6) = (barycentric[1] * dt * m_constraintData.getNormal2()).eval();
+	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[0]).eval();
+	H.block<1, 3>(1, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[1]).eval();
+	H.block<1, 3>(0, 6) = (barycentric[1] * dt * m_constraintData.getNormals()[0]).eval();
+	H.block<1, 3>(1, 6) = (barycentric[1] * dt * m_constraintData.getNormals()[1]).eval();
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H.block(indexOfConstraint, indexOfRepresentation, 2, 30), epsilon);
 

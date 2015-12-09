@@ -46,17 +46,16 @@ void FemConstraintFrictionlessSliding::doBuild(double dt,
 	ConstraintSideSign sign)
 {
 	auto fem = std::static_pointer_cast<FemRepresentation>(localization->getRepresentation());
-	const size_t numDofPerNode = fem->getNumDofPerNode();
-
 	if (!fem->isActive())
 	{
 		return;
 	}
 
+	const size_t numDofPerNode = fem->getNumDofPerNode();
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
 	const SlidingConstraintData& constraintData = static_cast<const SlidingConstraintData&>(data);
-	const Vector3d normal[2] = {constraintData.getNormal1(), constraintData.getNormal2()};
-	double d[2] = {constraintData.getD1(), constraintData.getD2()};
+	const auto normals = constraintData.getNormals();
+	const auto distances = constraintData.getDistances();
 
 	const DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
@@ -70,7 +69,7 @@ void FemConstraintFrictionlessSliding::doBuild(double dt,
 	for (size_t i = 0; i < 2; ++i)
 	{
 		// Update b with new violation
-		double violation = normal[i].dot(globalPosition) + d[i];
+		double violation = normals[i].dot(globalPosition) + distances[i];
 		mlcp->b[indexOfConstraint + i] += violation * scale;
 
 		// Fill the new H.
@@ -78,9 +77,9 @@ void FemConstraintFrictionlessSliding::doBuild(double dt,
 		for (size_t j = 0; j < numNodes; ++j)
 		{
 			auto nodeId = femElement->getNodeId(j);
-			m_newH.insert(numDofPerNode * nodeId + 0) = coord.coordinate[j] * normal[i][0] * scale * dt;
-			m_newH.insert(numDofPerNode * nodeId + 1) = coord.coordinate[j] * normal[i][1] * scale * dt;
-			m_newH.insert(numDofPerNode * nodeId + 2) = coord.coordinate[j] * normal[i][2] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeId + 0) = coord.coordinate[j] * normals[i][0] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeId + 1) = coord.coordinate[j] * normals[i][1] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeId + 2) = coord.coordinate[j] * normals[i][2] * scale * dt;
 		}
 
 		mlcp->updateConstraint(m_newH, fem->getComplianceMatrix() * m_newH.transpose(), indexOfRepresentation,

@@ -78,6 +78,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
 	RigidState.cpp
+	SlidingConstraintData.cpp
 	SolveMlcp.cpp
 	Spring.cpp
 	UpdateCollisionRepresentations.cpp

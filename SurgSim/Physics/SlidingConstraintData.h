@@ -30,82 +30,37 @@ class SlidingConstraintData : public ConstraintData
 {
 public:
 	/// Default constructor
-	SlidingConstraintData() :
-		ConstraintData(), m_d1(0.0), m_d2(0.0)
-	{
-		m_normal1.setZero();
-		m_normal2.setZero();
-	}
+	SlidingConstraintData();
 
-	SlidingConstraintData(const Math::Vector3d& normal1, double d1, const Math::Vector3d& normal2, double d2) :
-		ConstraintData(), m_normal1(normal1), m_d1(d1), m_normal2(normal2), m_d2(d2)
-	{}
+	/// Constructor
+	/// \param point The point through which the sliding direction vector passes.
+	/// \param direction The sliding direction vector.
+	SlidingConstraintData(const SurgSim::Math::Vector3d& point, const SurgSim::Math::Vector3d& direction);
 
 	/// Destructor
-	virtual ~SlidingConstraintData()
-	{
-	}
+	virtual ~SlidingConstraintData();
 
-	/// Sets the plane equation for the first plane
-	/// \param n The plane normal (normalized vector)
-	/// \param d The plane distance to the origin
-	/// \note The plane is defined by { P | n.P + d = 0 }
-	void setPlane1Equation(const SurgSim::Math::Vector3d& n, double d)
-	{
-		m_normal1 = n;
-		m_d1 = d;
-	}
+	/// Calculate the two plane equations based on the given sliding direction.
+	/// \param point The point through which the sliding direction vector passes.
+	/// \param direction The sliding direction vector.
+	void setSlidingDirection(const SurgSim::Math::Vector3d& point, const SurgSim::Math::Vector3d& direction);
 
-	/// \return Normal of plane 1.
-	const SurgSim::Math::Vector3d& getNormal1() const
-	{
-		return m_normal1;
-	}
+	/// \return The normals of the two planes.
+	const std::array<Math::Vector3d, 2>& getNormals() const;
 
-	/// \return d of plane 1.
-	double getD1() const
-	{
-		return m_d1;
-	}
-
-	/// Sets the plane equation for the second plane
-	/// \param n The plane normal (normalized vector)
-	/// \param d The plane distance to the origin
-	/// \note The plane is defined by { P | n.P + d = 0 }
-	void setPlane2Equation(const SurgSim::Math::Vector3d& n, double d)
-	{
-		m_normal2 = n;
-		m_d2 = d;
-	}
-
-	/// \return Normal of plane 2.
-	const SurgSim::Math::Vector3d& getNormal2() const
-	{
-		return m_normal2;
-	}
-
-	/// \return d of plane 2.
-	double getD2() const
-	{
-		return m_d2;
-	}
+	/// \return The distance from origin of the two planes.
+	const std::array<double, 2>& getDistances() const;
 
 private:
-	/// Normal of plane 1.
-	Math::Vector3d m_normal1;
+	/// The normals of the two planes.
+	std::array<Math::Vector3d, 2> m_normals;
 
-	/// d of plane 1.
-	double m_d1;
-
-	/// Normal of plane 1.
-	Math::Vector3d m_normal2;
-
-	/// d of plane 1.
-	double m_d2;
+	/// The distance from origin of the two planes.
+	std::array<double, 2> m_distances;
 };
 
-};  // namespace Physics
+} // namespace Physics
 
-};  // namespace SurgSim
+} // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_SLIDINGCONSTRAINTDATA_H
+#endif // SURGSIM_PHYSICS_SLIDINGCONSTRAINTDATA_H

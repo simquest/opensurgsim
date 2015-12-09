@@ -35,24 +35,18 @@ TEST(SlidingConstraintDataTests, TestSetGet)
 {
 	using SurgSim::DataStructures::Location;
 
+	Vector3d point(1.2, 3.4, 5.6), direction(7.8, 9.8, 7.6);
+	direction.normalize();
+
 	SlidingConstraintData slidingConstraintData;
-	Vector3d n1(1.2, 4.5, 6.7), n2(3.1, 6.3, 8.9);
-	double d1 = 5.566, d2 = 6.777;
-	n1.normalize();
-	n2.normalize();
+	slidingConstraintData.setSlidingDirection(point, direction);
 
-	EXPECT_NEAR(0.0, slidingConstraintData.getD1(), epsilon);
-	EXPECT_TRUE(slidingConstraintData.getNormal1().isZero());
-	EXPECT_NEAR(0.0, slidingConstraintData.getD2(), epsilon);
-	EXPECT_TRUE(slidingConstraintData.getNormal2().isZero());
+	const auto normals = slidingConstraintData.getNormals();
+	const auto distances = slidingConstraintData.getDistances();
 
-	slidingConstraintData.setPlane1Equation(n1, d1);
+	EXPECT_NEAR(0.0, point.dot(normals[0]) + distances[0], epsilon);
+	EXPECT_NEAR(0.0, point.dot(normals[1]) + distances[1], epsilon);
 
-	EXPECT_NEAR(d1, slidingConstraintData.getD1(), epsilon);
-	EXPECT_TRUE(slidingConstraintData.getNormal1().isApprox(n1, epsilon));
-
-	slidingConstraintData.setPlane2Equation(n2, d2);
-
-	EXPECT_NEAR(d2, slidingConstraintData.getD2(), epsilon);
-	EXPECT_TRUE(slidingConstraintData.getNormal2().isApprox(n2, epsilon));
+	EXPECT_NEAR(0.0, direction.dot(normals[0]), epsilon);
+	EXPECT_NEAR(0.0, direction.dot(normals[1]), epsilon);
 }
