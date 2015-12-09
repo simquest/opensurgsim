@@ -16,6 +16,7 @@
 
 set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
+	CcdCollision.cpp
 	ClearCollisions.cpp
 	Computation.cpp
 	Constraint.cpp
@@ -67,6 +68,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
 	PostUpdate.cpp
+	PrepareCollisionPairs.cpp
 	PreUpdate.cpp
 	PublishCollisions.cpp
 	PushResults.cpp
@@ -87,6 +89,7 @@ set(SURGSIM_PHYSICS_SOURCES
 
 set(SURGSIM_PHYSICS_HEADERS
 	BuildMlcp.h
+	CcdCollision.h
 	ClearCollisions.h
 	Computation.h
 	Constraint.h
@@ -147,6 +150,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PostUpdate.h
+	PrepareCollisionPairs.h
 	PreUpdate.h
 	PublishCollisions.h
 	PushResults.h

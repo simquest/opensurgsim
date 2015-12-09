@@ -75,6 +75,7 @@ set(UNIT_TEST_SOURCES
 	PhysicsManagerStateTests.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
+	PrepareCollisionPairsTests.cpp
 	PreUpdateTests.cpp
 	PublishCollisionsTests.cpp
 	PushResultsTests.cpp

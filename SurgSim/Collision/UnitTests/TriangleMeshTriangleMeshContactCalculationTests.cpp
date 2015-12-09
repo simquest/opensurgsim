@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
+#include "SurgSim/Collision/TriangleMeshTriangleMeshContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
@@ -86,7 +86,7 @@ void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 	meshBRep->setLocalPose(meshBTransform);
 
 	// Perform collision detection.
-	TriangleMeshTriangleMeshDcdContact calcContact;
+	TriangleMeshTriangleMeshContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
 	calcContact.calculateContact(pair);
 
@@ -476,7 +476,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdentica
 		meshBRep->setLocalPose(pose);
 
 		// Perform collision detection.
-		TriangleMeshTriangleMeshDcdContact calcContact;
+		TriangleMeshTriangleMeshContact calcContact;
 		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
 		calcContact.calculateContact(pair);
 

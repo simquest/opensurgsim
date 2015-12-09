@@ -144,7 +144,7 @@ SurgSim::Framework::Scene:
               VectorFieldScale: 200
               Id: f7cde302-5c80-4f2b-a80b-a74f55bf15be
               Name: Contacts
-              CollisionRepresentation:
+              Source:
                 SurgSim::Physics::RigidCollisionRepresentation:
                   Name: Collision
                   Id: ec7ac2e2-93b5-46e6-9fda-55b125555092

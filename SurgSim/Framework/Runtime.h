@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 #ifndef SURGSIM_FRAMEWORK_RUNTIME_H
 #define SURGSIM_FRAMEWORK_RUNTIME_H
 
-#include <vector>
+#include <boost/thread/mutex.hpp>
+#include <map>
 #include <memory>
 #include <string>
-#include <map>
+#include <vector>
 
-#include <boost/thread/mutex.hpp>
 
 namespace YAML
 {
@@ -168,11 +168,9 @@ public:
 	/// \return a vector of scene elements with the loaded elements
 	std::vector<std::shared_ptr<SceneElement>> duplicateSceneElements(const std::string& fileName);
 
-
 	/// Write out the whole scene as a file
 	/// \param fileName the name of the scene-file if no path is given, uses the current path of the executable
 	void saveScene(const std::string& fileName) const;
-
 
 private:
 
@@ -202,7 +200,7 @@ private:
 	/// \return	The shared pointer.
 	std::shared_ptr<Runtime> getSharedPtr();
 	bool m_isRunning;
-	std::vector< std::shared_ptr<ComponentManager> > m_managers;
+	std::vector<std::shared_ptr<ComponentManager>> m_managers;
 	std::shared_ptr<Scene> m_scene;
 	static std::shared_ptr<ApplicationData> m_applicationData;
 
