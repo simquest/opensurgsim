@@ -65,21 +65,21 @@ CollisionDetectionType Representation::getSelfCollisionDetectionType() const
 
 const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& Representation::getPosedShapeMotion() const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
+	boost::lock_guard<boost::mutex> lock(m_posedShapeMotionMutex);
 
 	return m_posedShapeMotion;
 }
 
 void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion)
 {
-	boost::lock_guard<boost::shared_mutex> lock(m_posedShapeMotionMutex);
+	boost::lock_guard<boost::mutex> lock(m_posedShapeMotionMutex);
 
 	m_posedShapeMotion = posedShapeMotion;
 }
 
 const std::shared_ptr<Math::Shape> Representation::getPosedShape()
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
+	boost::lock_guard<boost::mutex> lock(m_posedShapeMotionMutex);
 
 	Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
 	Math::RigidTransform3d pose = getPose();
@@ -99,7 +99,7 @@ const std::shared_ptr<Math::Shape> Representation::getPosedShape()
 
 void Representation::invalidatePosedShapeMotion()
 {
-	boost::lock_guard<boost::shared_mutex> lock(m_posedShapeMotionMutex);
+	boost::lock_guard<boost::mutex> lock(m_posedShapeMotionMutex);
 
 	m_posedShapeMotion.invalidate();
 }

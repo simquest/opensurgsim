@@ -192,7 +192,7 @@ private:
 	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> m_posedShapeMotion;
 
 	/// Mutex to lock write access to m_posedShapeMotion
-	mutable boost::shared_mutex m_posedShapeMotionMutex;
+	mutable boost::mutex m_posedShapeMotionMutex;
 
 	/// Ignored collision representations
 	std::unordered_set<std::string> m_ignoring;
