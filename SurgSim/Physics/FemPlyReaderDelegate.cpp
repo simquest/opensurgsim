@@ -48,12 +48,11 @@ bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 								offsetof(ElementData, vertexCount));
 
 	// Vertex processing
-	// Vertex processing
 	reader->requestElement("vertex",
-		std::bind(&FemPlyReaderDelegate::beginVertices, this,
-		std::placeholders::_1, std::placeholders::_2),
-		std::bind(&FemPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-		std::bind(&FemPlyReaderDelegate::endVertices, this, std::placeholders::_1));
+						   std::bind(&FemPlyReaderDelegate::beginVertices, this,
+									 std::placeholders::_1, std::placeholders::_2),
+						   std::bind(&FemPlyReaderDelegate::processVertex, this, std::placeholders::_1),
+						   std::bind(&FemPlyReaderDelegate::endVertices, this, std::placeholders::_1));
 
 	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, x));
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, y));
@@ -100,7 +99,7 @@ bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 			nullptr,
 			std::bind(&FemPlyReaderDelegate::endMaterials, this, std::placeholders::_1));
 		reader->requestScalarProperty(
-			"material","mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
+			"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
 		reader->requestScalarProperty(
 			"material", "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, poissonRatio));
 		reader->requestScalarProperty(
@@ -108,7 +107,7 @@ bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	}
 
 
-		reader->setEndParseFileCallback(std::bind(&FemPlyReaderDelegate::endParseFile, this));
+	reader->setEndParseFileCallback(std::bind(&FemPlyReaderDelegate::endParseFile, this));
 
 	return true;
 }

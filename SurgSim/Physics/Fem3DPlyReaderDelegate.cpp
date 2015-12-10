@@ -43,11 +43,8 @@ bool Fem3DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
 	bool result = FemPlyReaderDelegate::fileIsAcceptable(reader);
 
-	if (m_hasRotationDOF)
-	{
-		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
-				<< "Fem3DPlyReaderDelegate does not support rotational DOF, data will be ignored.";
-	}
+	SURGSIM_ASSERT(!m_hasRotationDOF)
+			<< "Fem3DPlyReaderDelegate does not support rotational DOF, data will be ignored.";
 
 	return result;
 }
