@@ -2,6 +2,8 @@
 \page femplyformat Fem Ply Format
 \relates FemPlyReaderDelegate
 
+The following documents the capabilities of the ply readers for reading fem structures, all subclasses of `FemPlyReaderDelegate`, i.e. `Fem1DPlyReaderDelegate`, `Fem2DPlyReaderDelegate` and `Fem3DPlyReaderDelgate`. When properties are denoted as "Optional" in the following examples it means that you may use or omit this property in the ply header. Whenever the property is used in the header all elements have to supply values for the property.
+
 ### Fem1D
 
     ply
@@ -16,6 +18,9 @@
     property double thetaZ  (Optional)
     element 1d_element 7 (Element Definition of the Fem1d)
     property list uint uint vertex_indices (Each entry starts with the number of nodes in this element i.e. '2', followed by the nodes' indices)
+    property double mass_density  (Optional)
+    property double poisson_ratio (Optional)
+    property double young_modulus (Optional)
     element boundary_condition 3 (Boundary conditions of the Fem1D)
     property uint vertex_index (Each entry fixes all the degrees of freedom of the given node index)
     element radius 1 (Radius for all the elements)
@@ -26,7 +31,7 @@
     property double young_modulus
     end_header
 
-The ply file for an Fem1d is mostly marked by the `1d_element` element, the `radius` and `material` properties are applied to all of the `1d_elements`. Please note that the `vertex` element is compatible with the graphics file format and you should be able to load the fem1d file into a common graphics application.
+The ply file for an Fem1d is mostly marked by the `1d_element` element, the `radius` and `material` properties are applied to all of the `1d_elements`. Please note that the `vertex` element is compatible with the graphics file format and you should be able to load the fem1d file into a common graphics application. Optionally you can assign per element material properties at the `1d_element` level, in this case every element will need to carry material values and the `material` element will be ignored. 
 
 ### Fem2D
 
@@ -42,6 +47,9 @@ The ply file for an Fem1d is mostly marked by the `1d_element` element, the `rad
     property double thetaZ  (Optional)
     element 2d_element 3 (Element Definition of the Fem2d)
     property list uint uint vertex_indices (each entry starts with the number of nodes in this element i.e. '3', followed by the nodes' indices)
+    property double mass_density  (Optional)
+    property double poisson_ratio (Optional)
+    property double young_modulus (Optional)
     element boundary_condition 2 (Boundary conditions of the Fem2D)
     property uint vertex_index (Each entry fixes all the degrees of freedom of the given node index)
     element thickness 1 (Thickness for all the elements)
@@ -52,7 +60,7 @@ The ply file for an Fem1d is mostly marked by the `1d_element` element, the `rad
     property double young_modulus
     end_header
 
-The ply file for an Fem2d is indicated by the `2d_element` element, the `thickness` and `material` properties are applied to all of the `2d_elements`. Please note that the `vertex` element is compatible with the graphics file format and you should be able to load the fem1d file into a common graphics application. Additionally you can add `face` elements to this file to embed a graphics mesh with the fem mesh. Currently the format only supports triangles as elements, this means the 2d_element data must have 3 entries
+The ply file for an Fem2d is indicated by the `2d_element` element, the `thickness` and `material` properties are applied to all of the `2d_elements`. Please note that the `vertex` element is compatible with the graphics file format and you should be able to load the fem1d file into a common graphics application. Additionally you can add `face` elements to this file to embed a graphics mesh with the fem mesh. Currently the format only supports triangles as elements, this means the 2d_element data must have 3 entries. Optionally you can assign per element material properties at the `2d_element` level, in this case every element will need to carry material values and the `material` element will be ignored. 
 
 ### Fem3D
 
@@ -65,6 +73,9 @@ The ply file for an Fem2d is indicated by the `2d_element` element, the `thickne
     property double z
     element 3d_element 3 (Element Definition of the Fem3d)
     property list uint uint vertex_indices (Each entry starts with the number of nodes in this element i.e. '4' or '8', followed by the nodes' indices)
+    property double mass_density  (Optional)
+    property double poisson_ratio (Optional)
+    property double young_modulus (Optional)
     element boundary_condition 2 (Boundary conditions of the Fem3D)
     property uint vertex_index (Each entry fixes all the degrees of freedom of the given node index)
     element material 1 (Physical material properties for all the elements)
@@ -73,5 +84,5 @@ The ply file for an Fem2d is indicated by the `2d_element` element, the `thickne
     property double young_modulus
     end_header
 
-The ply file for an Fem3d is indicated by the `3d_element` element. Please note that the `vertex` element is compatible with the graphics file format and you should be able to load the fem3d file into a common graphics application. Additionally you can add `face` elements to this file to embed a graphics mesh with the fem mesh. Currently the reader supports tehtrahedral and hexahedral elements (4 and 8 nodes respectively), it will depend on the actual representation that is being used whether these elements can be mixed within one mesh.
+The ply file for an Fem3d is indicated by the `3d_element` element. Please note that the `vertex` element is compatible with the graphics file format and you should be able to load the fem3d file into a common graphics application. Additionally you can add `face` elements to this file to embed a graphics mesh with the fem mesh. Currently the reader supports tehtrahedral and hexahedral elements (4 and 8 nodes respectively), it will depend on the actual representation that is being used whether these elements can be mixed within one mesh. Optionally you can assign per element material properties at the `1d_element` level, in this case every element will need to carry material values and the `material` element will be ignored. 
 */
