@@ -44,7 +44,7 @@
 
 using SurgSim::Collision::ContactMapType;
 using SurgSim::Physics::ConstraintImplementation;
-using SurgSim::Physics::Fem3DConstraintFixedPoint;
+using SurgSim::Physics::FemConstraintFixedPoint;
 using SurgSim::Physics::FixedConstraintFixedPoint;
 using SurgSim::Physics::Localization;
 using SurgSim::Physics::RigidConstraintFixedPoint;
