@@ -63,17 +63,40 @@ bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::registerDelegate
 		reader->requestScalarProperty("vertex", "t", PlyReader::TYPE_DOUBLE, offsetof(VertexData, t));
 	}
 
-	// Face Processing
-	reader->requestElement("face",
-						   std::bind(&TriangleMeshPlyReaderDelegate::beginFaces, this,
-									 std::placeholders::_1, std::placeholders::_2),
-						   std::bind(&TriangleMeshPlyReaderDelegate::processFace, this, std::placeholders::_1),
-						   std::bind(&TriangleMeshPlyReaderDelegate::endFaces, this, std::placeholders::_1));
-	reader->requestListProperty("face", "vertex_indices",
-								PlyReader::TYPE_UNSIGNED_INT,
-								offsetof(FaceData, indices),
-								PlyReader::TYPE_UNSIGNED_INT,
-								offsetof(FaceData, edgeCount));
+	m_hasFaces = reader->hasProperty("face", "vertex_indices") && !reader->isScalar("face", "vertex_indices");
+
+	if (m_hasFaces)
+	{
+		// Face Processing
+		reader->requestElement("face",
+							   std::bind(&TriangleMeshPlyReaderDelegate::beginFaces, this,
+										 std::placeholders::_1, std::placeholders::_2),
+							   std::bind(&TriangleMeshPlyReaderDelegate::processFace, this, std::placeholders::_1),
+							   std::bind(&TriangleMeshPlyReaderDelegate::endFaces, this, std::placeholders::_1));
+		reader->requestListProperty("face", "vertex_indices",
+									PlyReader::TYPE_UNSIGNED_INT,
+									offsetof(ListData, indices),
+									PlyReader::TYPE_UNSIGNED_INT,
+									offsetof(ListData, count));
+	}
+
+	bool hasPhysicsEdges = reader->hasProperty("1d_element", "vertex_indices") &&
+						   ! reader->isScalar("1d_element", "vertex_indices");
+
+	if (hasPhysicsEdges)
+	{
+		// Edge Processing
+		reader->requestElement("1d_element",
+							   std::bind(&TriangleMeshPlyReaderDelegate::beginEdges, this,
+										 std::placeholders::_1, std::placeholders::_2),
+							   std::bind(&TriangleMeshPlyReaderDelegate::processEdge, this, std::placeholders::_1),
+							   std::bind(&TriangleMeshPlyReaderDelegate::endEdges, this, std::placeholders::_1));
+		reader->requestListProperty("1d_element", "vertex_indices",
+									PlyReader::TYPE_UNSIGNED_INT,
+									offsetof(ListData, indices),
+									PlyReader::TYPE_UNSIGNED_INT,
+									offsetof(ListData, count));
+	}
 
 	reader->setEndParseFileCallback(std::bind(&TriangleMeshPlyReaderDelegate::endFile, this));
 
@@ -89,8 +112,6 @@ bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::fileIsAcceptable
 	result = result && reader.hasProperty("vertex", "x");
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
-	result = result && reader.hasProperty("face", "vertex_indices");
-	result = result && !reader.isScalar("face", "vertex_indices");
 
 	return result;
 }
@@ -125,15 +146,15 @@ void* SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::beginFaces(
 	const std::string& elementName,
 	size_t faceCount)
 {
-	m_faceData.overrun = 0l;
-	return &m_faceData;
+	m_listData.overrun = 0l;
+	return &m_listData;
 }
 
 template <class M>
 void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processFace(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_faceData.edgeCount == 3) << "Can only process triangle meshes.";
-	std::copy(m_faceData.indices, m_faceData.indices + 3, m_indices.begin());
+	SURGSIM_ASSERT(m_listData.count == 3) << "Can only process triangle meshes.";
+	std::copy(m_listData.indices, m_listData.indices + 3, m_indices.begin());
 
 	typename M::TriangleType triangle(m_indices);
 	m_mesh->addTriangle(triangle);
@@ -142,7 +163,7 @@ void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processFace(cons
 template <class M>
 void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::endFaces(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_faceData.overrun == 0l)
+	SURGSIM_ASSERT(m_listData.overrun == 0l)
 			<< "There was an overrun while reading the face structures, it is likely that data "
 			<< "has become corrupted.";
 }
@@ -157,6 +178,34 @@ template <class M>
 bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::hasTextureCoordinates()
 {
 	return m_hasTextureCoordinates;
+}
+
+template <class M>
+void* SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::beginEdges(const std::string& elementName,
+		size_t edgeCount)
+{
+	m_listData.overrun = 0l;
+	return &m_listData;
+}
+
+
+template <class M>
+void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processEdge(const std::string& elementName)
+{
+	SURGSIM_ASSERT(m_listData.count == 2) << "Edges have to have 2 points.";
+	std::copy(m_listData.indices, m_listData.indices + 2, m_edges.begin());
+
+	typename M::EdgeType edge(m_edges);
+	m_mesh->addEdge(edge);
+}
+
+
+template <class M>
+void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::endEdges(const std::string& elementName)
+{
+	SURGSIM_ASSERT(m_listData.overrun == 0l)
+			<< "There was an overrun while reading the face structures, it is likely that data "
+			<< "has become corrupted.";
 }
 
 

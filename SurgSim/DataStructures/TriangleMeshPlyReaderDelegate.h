@@ -85,6 +85,12 @@ public:
 	/// \param elementName Name of the element.
 	void endFaces(const std::string& elementName);
 
+	void* beginEdges(const std::string& elementName, size_t edgeCount);
+
+	void processEdge(const std::string& elementName);
+
+	void endEdges(const std::string& elementName);
+
 	/// Callback function to finalize processing of the mesh
 	void endFile();
 
@@ -107,24 +113,28 @@ protected:
 	} m_vertexData;
 
 	/// Internal structure, the received for data from the "face" element
-	struct FaceData
+	struct ListData
 	{
-		unsigned int edgeCount;
+		unsigned int count;
 		unsigned int* indices;
 		int64_t overrun; ///< Used to check for buffer overruns
-	} m_faceData;
+	} m_listData;
 
 	/// The mesh that will be created
 	std::shared_ptr<MeshType> m_mesh;
 
 	// Statically allocated index array to receive data for the faces
 	std::array<size_t, 3> m_indices;
+	std::array<size_t, 2> m_edges;
 
 private:
 	/// Set to true if s/t coordinates are found in the .ply file
 	bool m_hasTextureCoordinates;
 
+	/// Set to true if faces are found in the .ply file
+	bool m_hasFaces;
 };
+
 
 };
 };
