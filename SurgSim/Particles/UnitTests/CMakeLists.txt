@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2015, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ set(UNIT_TEST_SOURCES
 	PointGeneratorTests.cpp
 	RandomPointGeneratorTests.cpp
 	RepresentationTests.cpp
+	SinkTests.cpp
 	SphRepresentationTests.cpp
 )
 
@@ -31,8 +32,17 @@ set(UNIT_TEST_HEADERS
 	MockObjects.h
 )
 
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
+
 set(LIBS
+	SurgSimCollision
+	SurgSimFramework
+	SurgSimMath
 	SurgSimParticles
+	SurgSimPhysics
 )
 
 surgsim_add_unit_tests(SurgSimParticlesTest)
