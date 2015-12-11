@@ -29,7 +29,7 @@ uniform samplerCube diffuseEnvMap;
 uniform samplerCube specularEnvMap;
 uniform vec4 diffuseColor;
 uniform vec4 specularColor;
-uniform float diffusePercent = 0.1;
+uniform float diffusePercent = 0.9;
 uniform float specularPercent = 0.1;
 uniform float shininess;
 
@@ -79,6 +79,9 @@ void main(void)
         discard;
     }
 
+	vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
+    float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
+
 	vec4 eyeDir4 = vec4(getEyeSpacePos(vec3(texCoord0, depth)), 1.0);
 
 	vec3 lightDir = (mainCamera.viewMatrix * lightSource.position - eyeDir4).xyz;
@@ -88,19 +91,16 @@ void main(void)
 
     float attenuation = 1.0 / (lightSource.constantAttenuation + lightSource.linearAttenuation*lightDistance + lightSource.quadraticAttenuation*lightDistance*lightDistance);
 
-    vec3 vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).xyz;
-	vec3 vertexSpecularColor = (attenuation * specularColor * lightSource.specular).xyz;
+	vec3 normal = (texture2D(normalMap, texCoord0).xyz * 2.0) - 1.0;
 
-    vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
+	vec3 lightDirNorm = normalize(lightDir);
+	vec3 eyeDirNorm = normalize(eyeDir4.xyz);
+	vec3 normalDirNorm = normalize(normal);
 
-    float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
     vec3 vAmbient = ambientColor.rgb * diffuseColor.rgb;
 
-    vec3 normal = (texture2D(normalMap, texCoord0).xyz * 2.0) - 1.0;
-
-    vec3 lightDirNorm = normalize(lightDir);
-    vec3 eyeDirNorm = normalize(eyeDir4.xyz);
-    vec3 normalDirNorm = normalize(normal);
+	vec3 vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse * shadowAmount).rgb;
+	vec3 vertexSpecularColor = (attenuation * specularColor * lightSource.specular).rgb;
 
     float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
     vec3 vDiffuse = vec3(textureCube(diffuseEnvMap,  normalDirNorm)) * vertexDiffuseColor * diffuse;
@@ -113,7 +113,7 @@ void main(void)
     vec3 vSpecular = vec3(textureCube(specularEnvMap, reflectDir)) * vertexSpecularColor;
 
 	color = mix(color, vSpecular + color, specularPercent) +
-				(specular * specularColor * lightSource.specular * attenuation).rgb;
+				(specular * specularColor * lightSource.specular * attenuation * shadowAmount).rgb;
 
     gl_FragColor.rgb = color;
     gl_FragColor.a = 1.0;
