@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Physics/BuildMlcp.h"
+#include "SurgSim/Physics/CcdCollision.h"
 #include "SurgSim/Physics/ClearCollisions.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
@@ -25,6 +26,7 @@
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/ParticleCollisionResponse.h"
 #include "SurgSim/Physics/PostUpdate.h"
+#include "SurgSim/Physics/PrepareCollisionPairs.h"
 #include "SurgSim/Physics/PreUpdate.h"
 #include "SurgSim/Physics/PublishCollisions.h"
 #include "SurgSim/Physics/PushResults.h"
@@ -59,7 +61,9 @@ bool PhysicsManager::doInitialize()
 	addComputation(std::make_shared<PreUpdate>(copyState));
 	addComputation(std::make_shared<FreeMotion>(copyState));
 	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
+	addComputation(std::make_shared<PrepareCollisionPairs>(copyState));
 	addComputation(std::make_shared<DcdCollision>(copyState));
+	addComputation(std::make_shared<CcdCollision>(copyState));
 	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
 	addComputation(std::make_shared<BuildMlcp>(copyState));
 	addComputation(std::make_shared<SolveMlcp>(copyState));

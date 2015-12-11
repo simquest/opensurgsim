@@ -177,7 +177,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("Contacts");
-	visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentation);
+	visualizeContactsBehavior->setSource(collisionRepresentation);
 	// Note: Since usually the penetration depth of a collision is so small (at the magnitude of mm),
 	// if we use the depth as the length of vector, the vector field will be too small to be seen on the screen.
 	// Thus, we enlarge the vector field by 200 times.

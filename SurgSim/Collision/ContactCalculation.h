@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Math/RigidTransform.h"
-
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -42,26 +41,31 @@ namespace Collision
 class ContactCalculation
 {
 public:
-
 	/// Constructor
 	ContactCalculation();
 
 	/// Destructor
 	virtual ~ContactCalculation();
 
-	/// Calculate the contacts
+	/// Calculate the contacts for a given pair
 	/// \param	pair	A CollisionPair that is under consideration, new contacts will be added to this pair
 	void calculateContact(std::shared_ptr<CollisionPair> pair);
 
-	/// Calculate the contacts between two shapes
-	/// \param shape1, shape2 The shapes for which to calculate the contacts
-	/// \param pose1, pose2 The respective poses for the shapes
-	/// \return a list of contacts between the two given shapes
-	std::list<std::shared_ptr<Contact>> calculateContact(
-										 const std::shared_ptr<Math::Shape>& shape1,
-										 const Math::RigidTransform3d& pose1,
-										 const std::shared_ptr<Math::Shape>& shape2,
-										 const Math::RigidTransform3d& pose2);
+	/// Calculate the dcd contacts between two posed/transformed shapes
+	/// \param posedShape1, posedShape2 The two posed shape to consider for this dcd contact calculation
+	/// \return a list of contacts between the two given posed shapes
+	std::list<std::shared_ptr<Contact>> calculateDcdContact(
+		const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1,
+		const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2);
+
+	/// Calculate the ccd contacts between two posed/transformed shapes
+	/// \param posedShapeMotion1, posedShapeMotion2 The two posed shape motion to calculate ccd contact for
+	/// \return a list of ccd contacts between the two given shapes
+	/// \note The contact information is related to the end of the time range, so solving these contact will
+	/// \note solve the collision at the end of the time range.
+	std::list<std::shared_ptr<Contact>> calculateCcdContact(
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion1,
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion2);
 
 	/// Virtual function that returns the shapes that this ContactCalculation class handles.
 	/// \return Return the shape types this class handles.
@@ -69,13 +73,18 @@ public:
 
 	/// Register an instance of a contact calculation in the table
 	/// \param calculation The calculation to be registered
-	static void registerContactCalculation(const std::shared_ptr<ContactCalculation>& calculation);
+	static void registerDcdContactCalculation(const std::shared_ptr<ContactCalculation>& calculation);
+
+	/// Register an instance of a contact calculation in the table
+	/// \param calculation The calculation to be registered
+	static void registerCcdContactCalculation(const std::shared_ptr<ContactCalculation>& calculation);
 
 	typedef
 	std::array<std::array<std::shared_ptr<ContactCalculation>, Math::SHAPE_TYPE_COUNT>, Math::SHAPE_TYPE_COUNT>
 	TableType;
 
-	static const TableType& getContactTable();
+	static const TableType& getDcdContactTable();
+	static const TableType& getCcdContactTable();
 private:
 
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
@@ -85,29 +94,45 @@ private:
 	/// Virtual function receives the call from the public interface, usually will type the
 	/// shapes statically to their known types and then execute a specific contact calculation
 	/// between the two shapes
-	/// \param shape1, shape2 The shapes for which to calculate the contacts
-	/// \param pose1, pose2 The respective poses for the shapes
-	/// \return a list of contacts between the two given shapes
-	virtual std::list<std::shared_ptr<Contact>> doCalculateContact(
-				const std::shared_ptr<Math::Shape>& shape1, const Math::RigidTransform3d& pose1,
-				const std::shared_ptr<Math::Shape>& shape2, const Math::RigidTransform3d& pose2) = 0;
+	/// \param posedShape1, posedShape2 The two posed shapes to calculate dcd contact for
+	/// \return a list of dcd contacts between the two given posed shapes
+	virtual std::list<std::shared_ptr<Contact>> doCalculateDcdContact(
+		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2);
 
+	/// Virtual function receives the call from the public interface, usually will type the
+	/// shapes statically to their known types and then execute a specific contact calculation
+	/// between the two shapes
+	/// \param posedShapeMotion1, posedShapeMotion2 The two posed shapes motion to calculate ccd contact for
+	/// \return a list of ccd contacts between the two given posed shapes motion
+	virtual std::list<std::shared_ptr<Contact>> doCalculateCcdContact(
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2);
 
-	/// Statically initialize the table, used via call once
-	static void initializeTable();
+	/// Statically initialize the tables, used via call once
+	static void initializeTables();
 
 	///@{
 	/// registration to call at static scope (does not protect the initialization via call_once)
 	/// Mirroring the public functions
-	static void privateRegister(
+	static void privateDcdRegister(
 		const std::shared_ptr<ContactCalculation>& calculation,
 		const std::pair<int, int>& types);
-	static void privateRegister(const std::shared_ptr<ContactCalculation>& calculation);
+	static void privateDcdRegister(const std::shared_ptr<ContactCalculation>& calculation);
 	///@}
 
-	static TableType m_contactCalculations; ///< Static table of contact calculations
-	static std::once_flag m_initializationFlag; ///< Flag used for initialization.
+	///@{
+	/// registration to call at static scope (does not protect the initialization via call_once)
+	/// Mirroring the public functions
+	static void privateCcdRegister(
+		const std::shared_ptr<ContactCalculation>& calculation,
+		const std::pair<int, int>& types);
+	static void privateCcdRegister(const std::shared_ptr<ContactCalculation>& calculation);
+	///@}
 
+	static TableType m_contactDcdCalculations; ///< Static table of Dcd contact calculations
+	static TableType m_contactCcdCalculations; ///< Static table of Ccd contact calculations
+	static std::once_flag m_initializationFlag; ///< Flag used for initialization.
 };
 
 }; // namespace Collision

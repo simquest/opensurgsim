@@ -39,41 +39,26 @@ std::string Fem3DPlyReaderDelegate::getElementName() const
 	return "3d_element";
 }
 
-bool Fem3DPlyReaderDelegate::registerDelegate(PlyReader* reader)
-{
-	// Vertex processing
-	reader->requestElement("vertex",
-						   std::bind(&Fem3DPlyReaderDelegate::beginVertices, this,
-									 std::placeholders::_1, std::placeholders::_2),
-						   std::bind(&Fem3DPlyReaderDelegate::processVertex, this, std::placeholders::_1),
-						   std::bind(&Fem3DPlyReaderDelegate::endVertices, this, std::placeholders::_1));
-	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, x));
-	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, y));
-	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(Vertex6DData, z));
-
-	FemPlyReaderDelegate::registerDelegate(reader);
-
-	return true;
-}
-
 bool Fem3DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 {
 	bool result = FemPlyReaderDelegate::fileIsAcceptable(reader);
 
-	SURGSIM_ASSERT(!reader.hasProperty("vertex", "thetaX") &&
-		!reader.hasProperty("vertex", "thetaY") && !reader.hasProperty("vertex", "thetaZ")) <<
-		"An Fem3d model cannot contain rotational data (only 3 translational degrees of freedom)";
+	SURGSIM_ASSERT(!m_hasRotationDOF)
+			<< "Fem3DPlyReaderDelegate does not support rotational DOF, data will be ignored.";
 
 	return result;
 }
 
 void Fem3DPlyReaderDelegate::endParseFile()
 {
-	for(auto element : m_mesh->getElements())
+	if (!m_hasPerElementMaterial)
 	{
-		element->massDensity = m_materialData.massDensity;
-		element->poissonRatio = m_materialData.poissonRatio;
-		element->youngModulus = m_materialData.youngModulus;
+		for (auto element : m_mesh->getElements())
+		{
+			element->massDensity = m_materialData.massDensity;
+			element->poissonRatio = m_materialData.poissonRatio;
+			element->youngModulus = m_materialData.youngModulus;
+		}
 	}
 
 	m_mesh->update();
@@ -94,6 +79,14 @@ void Fem3DPlyReaderDelegate::processFemElement(const std::string& elementName)
 	auto femElement = std::make_shared<FemElementStructs::FemElement3DParameter>();
 	femElement->nodeIds.resize(m_elementData.vertexCount);
 	std::copy(m_elementData.indices, m_elementData.indices + m_elementData.vertexCount, femElement->nodeIds.data());
+
+	if (m_hasPerElementMaterial)
+	{
+		femElement->massDensity = m_elementData.massDensity;
+		femElement->poissonRatio = m_elementData.poissonRatio;
+		femElement->youngModulus = m_elementData.youngModulus;
+	}
+
 	m_mesh->addElement(femElement);
 }
 
@@ -101,6 +94,7 @@ void Fem3DPlyReaderDelegate::processBoundaryCondition(const std::string& element
 {
 	m_mesh->addBoundaryCondition(static_cast<size_t>(m_boundaryConditionData));
 }
+
 
 } // namespace Physics
 } // namespace SurgSim

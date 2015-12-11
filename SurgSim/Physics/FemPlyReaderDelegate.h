@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2014, SimQuest Solutions Inc.
+// Copyright 2014-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -123,6 +123,8 @@ protected:
 		int64_t overrun; ///< Used to check for buffer overruns
 	} m_materialData;
 
+	bool m_hasPerElementMaterial;
+
 	/// Internal data to receive the fem element
 	struct ElementData
 	{
@@ -132,7 +134,11 @@ protected:
 		unsigned int* indices;
 		unsigned int vertexCount;
 		int64_t overrun2; ///< Used to check for buffer overruns
+		double massDensity;
+		double poissonRatio;
+		double youngModulus;
 	} m_elementData;
+	bool m_hasRotationDOF;
 };
 
 } // namespace Physics

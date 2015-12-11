@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,6 +67,24 @@ TEST(Fem1DRepresentationReaderTests, DelegateTest)
 		EXPECT_DOUBLE_EQ(0.21, element->massDensity);
 		EXPECT_DOUBLE_EQ(0.31, element->poissonRatio);
 		EXPECT_DOUBLE_EQ(0.41, element->youngModulus);
+	}
+}
+
+TEST(Fem1DRepresentationReaderTests, PerElementMaterial)
+{
+	auto fem = std::make_shared<Fem1D>();
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	fem->load("PlyReaderTests/Fem1DMaterial.ply");
+
+	// Material
+	double value = 1.0;
+	for (size_t i = 0; i < fem->getNumElements(); ++i)
+	{
+		auto element = fem->getElement(i);
+		EXPECT_DOUBLE_EQ(value++, element->massDensity);
+		EXPECT_DOUBLE_EQ(value++, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(value++, element->youngModulus);
 	}
 }
 

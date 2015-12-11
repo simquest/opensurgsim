@@ -1,0 +1,30 @@
+ply
+format ascii 1.0
+comment Created by hand
+element vertex 10
+property double x
+property double y
+property double z
+element 3d_element 3
+property list uint uint vertex_indices
+property double mass_density
+property double poisson_ratio
+property double young_modulus
+element boundary_condition 2
+property uint vertex_index
+end_header
+1.000000 1.000000 1.000000
+1.000000 1.000000 -1.000000
+1.000000 -1.000000 1.000000
+1.000000 -1.000000 -1.000000
+-1.000000 -1.000000 -1.000000
+2.000000 2.000000 2.000000
+2.000000 -2.000000 2.000000
+2.000000 2.000000 -2.000000
+2.000000 -2.000000 -2.000000
+-2.000000 -2.000000 -2.000000
+8 0 1 2 3 4 5 6 7 1.0 2.0 3.0 
+8 1 2 4 5 6 7 8 9 4.0 5.0 6.0 
+8 3 4 5 0 2 6 8 7 7.0 8.0 9.0 
+9
+5
