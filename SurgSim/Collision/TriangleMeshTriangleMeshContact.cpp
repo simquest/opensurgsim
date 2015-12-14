@@ -142,11 +142,15 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 									 const Math::MeshShape& meshB,
 									 const Math::RigidTransform3d& meshBPose) const
 {
+	meshATransformed = ContactCalculation::transformedVerticesCache->getOrCreate(meshA, meshAPose);
+	meshBTransformed = ContactCalculation::transformedVerticesCache->getOrCreate(meshB, meshBPose);
+	meshAAabbTree = ContactCalculation::aabbTreeCache->getOrCreate(meshA, meshAPose);
+	meshBAabbTree = ContactCalculation::aabbTreeCache->getOrCreate(meshB, meshBPose);
 
 	std::list<std::shared_ptr<Contact>> contacts;
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= meshA.getAabbTree()->spatialJoin(*(meshB.getAabbTree()));
+		= meshATree->spatialJoin(*(meshBAabbTree));
 
 	double depth = 0.0;
 	Vector3d normal;
@@ -165,23 +169,23 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 
 		for (auto i = triangleListA.begin(); i != triangleListA.end(); ++i)
 		{
-			const Vector3d& normalA = meshA.getNormal(*i);
+			const Vector3d& normalA = meshATransformed.getNormal(*i);
 			if (normalA.isZero())
 			{
 				continue;
 			}
 
-			auto verticesA = meshA.getTrianglePositions(*i);
+			auto verticesA = meshATransformed.getTrianglePositions(*i);
 
 			for (auto j = triangleListB.begin(); j != triangleListB.end(); ++j)
 			{
-				const Vector3d& normalB = meshB.getNormal(*j);
+				const Vector3d& normalB = meshBTransformed.getNormal(*j);
 				if (normalB.isZero())
 				{
 					continue;
 				}
 
-				auto verticesB = meshB.getTrianglePositions(*j);
+				auto verticesB = meshBTransformed.getTrianglePositions(*j);
 
 				// Check if the triangles intersect.
 				if (Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],

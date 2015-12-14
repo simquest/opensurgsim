@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -126,18 +126,6 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	{
 		SURGSIM_ASSERT(secondShapeType == shapeTypes.second) <<
 				"Second Object, wrong type of object" << secondShapeType;
-	}
-
-	std::shared_ptr<Math::Shape> shape1 = pair->getFirst()->getShape();
-	if (shape1->isTransformable())
-	{
-		shape1 = pair->getFirst()->getPosedShape();
-	}
-
-	std::shared_ptr<Math::Shape> shape2 = pair->getSecond()->getShape();
-	if (shape2->isTransformable())
-	{
-		shape2 = pair->getSecond()->getPosedShape();
 	}
 
 	std::list<std::shared_ptr<Contact>> contacts;

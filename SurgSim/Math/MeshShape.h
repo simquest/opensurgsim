@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -85,15 +85,7 @@ public:
 
 	Matrix33d getSecondMomentOfVolume() const override;
 
-	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
-
-	/// Get the AabbTree
-	/// \return The object's associated AabbTree
-	const std::shared_ptr<const SurgSim::DataStructures::AabbTree> getAabbTree() const;
-
 	bool isValid() const override;
-
-	bool isTransformable() const override;
 
 protected:
 	bool doUpdate() override;
@@ -103,9 +95,6 @@ protected:
 	/// \note Normals will be normalized.
 	/// \return true on success, or false if any triangle has an indeterminate normal.
 	bool calculateNormals();
-
-	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
 
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
@@ -119,10 +108,6 @@ protected:
 
 	/// Second moment of volume
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
-
-private:
-	/// The aabb tree used to accelerate collision detection against the mesh
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
 };
 
 }; // Math

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,14 +31,12 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SegmentMeshShape, SegmentM
 SegmentMeshShape::SegmentMeshShape()
 {
 	setRadius(0.0);
-	updateAabbTree();
 }
 
 SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
 	DataStructures::SegmentMeshPlain(other)
 {
 	setRadius(other.m_radius);
-	updateAabbTree();
 }
 
 int SegmentMeshShape::getType() const
@@ -85,54 +83,12 @@ double SegmentMeshShape::getRadius() const
 
 bool SegmentMeshShape::doUpdate()
 {
-	updateAabbTree();
 	return true;
 }
 
 bool SegmentMeshShape::doLoad(const std::string& fileName)
 {
 	return DataStructures::SegmentMeshPlain::doLoad(fileName) && update();
-}
-
-std::shared_ptr<const DataStructures::AabbTree> SegmentMeshShape::getAabbTree() const
-{
-	return m_aabbTree;
-}
-
-std::shared_ptr<Shape> SegmentMeshShape::getTransformed(const RigidTransform3d& pose)
-{
-	auto transformed = std::make_shared<SegmentMeshShape>(*this);
-	transformed->transform(pose);
-	transformed->update();
-	return transformed;
-}
-
-void SegmentMeshShape::updateAabbTree()
-{
-	m_aabbTree = std::make_shared<DataStructures::AabbTree>();
-
-	std::list<DataStructures::AabbTreeData::Item> items;
-
-	auto const& edges = getEdges();
-
-	for (size_t id = 0, count = edges.size(); id < count; ++id)
-	{
-		if (edges[id].isValid)
-		{
-			const auto& vertices = getEdgePositions(id);
-			Aabbd aabb((vertices[0] - m_segmentEndBoundingBoxHalfExtent).eval());
-			aabb.extend((vertices[0] + m_segmentEndBoundingBoxHalfExtent).eval());
-			aabb.extend((vertices[1] - m_segmentEndBoundingBoxHalfExtent).eval());
-			aabb.extend((vertices[1] + m_segmentEndBoundingBoxHalfExtent).eval());
-			items.emplace_back(std::make_pair(std::move(aabb), id));
-		}
-	}
-	m_aabbTree->set(std::move(items));
-}
-
-bool SegmentMeshShape::isTransformable() const
-{
-	return true;
 }
 
 }; // namespace Math

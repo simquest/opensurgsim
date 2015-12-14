@@ -43,7 +43,6 @@ ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
 void ParticlesCollisionRepresentation::update(const double& dt)
 {
 	*m_shape = getParticleRepresentation()->getParticles().unsafeGet();
-	invalidatePosedShapeMotion();
 }
 
 bool ParticlesCollisionRepresentation::doInitialize()

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,7 +48,6 @@ MeshShape::MeshShape(const MeshShape& other) :
 	m_volume(other.getVolume()),
 	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
-	updateAabbTree();
 }
 
 const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId) const
@@ -84,7 +83,6 @@ bool MeshShape::calculateNormals()
 
 bool MeshShape::doUpdate()
 {
-	updateAabbTree();
 	computeVolumeIntegrals();
 	return calculateNormals();
 }
@@ -211,44 +209,6 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 1) = m_secondMomentOfVolume(1, 2);
 	m_secondMomentOfVolume(0, 2) = -(integral[9] - m_volume * m_center.z() * m_center.x());
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
-}
-
-std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose)
-{
-	auto transformed = std::make_shared<MeshShape>(*this);
-	transformed->transform(pose);
-	transformed->update();
-	return transformed;
-}
-
-const std::shared_ptr<const SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree() const
-{
-	return m_aabbTree;
-}
-
-void MeshShape::updateAabbTree()
-{
-	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
-
-	std::list<DataStructures::AabbTreeData::Item> items;
-
-	auto const& triangles = getTriangles();
-
-	for (size_t id = 0, count = triangles.size(); id < count; ++id)
-	{
-		if (triangles[id].isValid)
-		{
-			const auto& vertices = getTrianglePositions(id);
-			Aabbd aabb(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]));
-			items.emplace_back(std::make_pair(std::move(aabb), id));
-		}
-	}
-	m_aabbTree->set(std::move(items));
-}
-
-bool MeshShape::isTransformable() const
-{
-	return true;
 }
 
 }; // namespace Math

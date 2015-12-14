@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -104,8 +104,6 @@ void DeformableCollisionRepresentation::update(const double& dt)
 		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
 			"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
 	}
-
-	invalidatePosedShapeMotion();
 }
 
 bool DeformableCollisionRepresentation::doInitialize()

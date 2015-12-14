@@ -63,47 +63,6 @@ CollisionDetectionType Representation::getSelfCollisionDetectionType() const
 	return m_selfCollisionDetectionType;
 }
 
-const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& Representation::getPosedShapeMotion() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-	return m_posedShapeMotion;
-}
-
-void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion)
-{
-	boost::lock_guard<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-	m_posedShapeMotion = posedShapeMotion;
-}
-
-const std::shared_ptr<Math::Shape> Representation::getPosedShape()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-	Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
-	Math::RigidTransform3d pose = getPose();
-	if (pose.isApprox(identity))
-	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-		m_posedShapeMotion.second= newPosedShape;
-	}
-	else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
-	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
-		m_posedShapeMotion.second = newPosedShape;
-	}
-
-	return m_posedShapeMotion.second.getShape();
-}
-
-void Representation::invalidatePosedShapeMotion()
-{
-	boost::lock_guard<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-	m_posedShapeMotion.invalidate();
-}
-
 SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()
 {
 	return m_collisions;

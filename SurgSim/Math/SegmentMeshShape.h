@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,26 +65,13 @@ public:
 	/// \return The radius of the segments.
 	double getRadius() const;
 
-	/// \return The object's associated AabbTree
-	std::shared_ptr<const DataStructures::AabbTree> getAabbTree() const;
-
-	bool isTransformable() const override;
-
-	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
-
 protected:
 	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;
 
-	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
-
 private:
 	/// Segment radius
 	double m_radius;
-
-	/// The aabb tree used to accelerate collision detection against the mesh
-	std::shared_ptr<DataStructures::AabbTree> m_aabbTree;
 
 	/// Half extent of the AABB of the sphere at one of the segment end.
 	Vector3d m_segmentEndBoundingBoxHalfExtent;

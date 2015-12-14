@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,10 +63,6 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Math::ParticlesShape);
 
-	/// Get the AabbTree
-	/// \return The object's associated AabbTree
-	const std::shared_ptr<const SurgSim::DataStructures::AabbTree> getAabbTree() const;
-
 	/// Set the particles' radius
 	/// \param radius the radius being set to all particles
 	void setRadius(double radius);
@@ -83,19 +79,11 @@ public:
 
 	Matrix33d getSecondMomentOfVolume() const override;
 
-	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
-
 	bool isValid() const override;
-
-	bool isTransformable() const override;
 
 private:
 	bool doUpdate() override;
 
-	/// The aabb tree of the ParticlesShape
-	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
-
-	/// Particles' radius
 	double m_radius;
 
 	/// Volumetric center of particles

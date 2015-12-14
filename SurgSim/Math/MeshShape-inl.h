@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMesh<V, E, T>& other
 {
 	SURGSIM_ASSERT(other.isValid()) << "Invalid mesh";
 
-	updateAabbTree();
 	computeVolumeIntegrals();
 	calculateNormals();
 }

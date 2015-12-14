@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -124,6 +124,9 @@ public:
 	/// \param pose the rigid transform to apply
 	void transform(const Math::RigidTransform3d& pose);
 
+	/// Return the update count, please note that it will silently roll over when the range of size_t has been exceeded
+	size_t getUpdateCount() const;
+
 	/// Compares the mesh with another one (equality)
 	/// \param mesh The Vertices to compare it to
 	/// \return True if the two vertices are equals, False otherwise
@@ -156,6 +159,9 @@ private:
 
 	/// Vertices
 	std::vector<VertexType> m_vertices;
+
+	/// For checking whether the mesh has changed
+	size_t m_updateCount;
 };
 
 typedef Vertices<EmptyData> VerticesPlain;
