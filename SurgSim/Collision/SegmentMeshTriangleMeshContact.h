@@ -39,9 +39,9 @@ public:
 
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::SegmentMeshShape& segmentMeshShape,
-										 const Math::RigidTransform3d&,
+										 const Math::RigidTransform3d& segmentMeshPose,
 										 const Math::MeshShape& triangleMeshShape,
-										 const Math::RigidTransform3d&) const override;
+										 const Math::RigidTransform3d& triangleMeshPose) const override;
 };
 
 }; // namespace Collision

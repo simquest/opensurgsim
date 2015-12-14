@@ -65,9 +65,6 @@ protected:
 	void processBoundaryCondition(const std::string& elementName) override;
 
 private:
-	/// Flag to notify if the ply file provides rotational data for the vertices or not
-	bool m_hasRotationDOF;
-
 	/// Element's radius information
 	double m_radius;
 	/// Element's shear information
@@ -76,6 +73,7 @@ private:
 	/// Fem1D mesh asset to contain the ply file information
 	std::shared_ptr<Fem1D> m_mesh;
 };
+
 
 } // namespace Physics
 } // namespace SurgSim

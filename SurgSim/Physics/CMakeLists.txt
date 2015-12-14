@@ -47,6 +47,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DRepresentation.cpp
 	FemConstraintFixedPoint.cpp
 	FemConstraintFrictionlessContact.cpp
+	FemConstraintFrictionlessSliding.cpp
 	FemElement.cpp
 	FemLocalization.cpp
 	FemPlyReaderDelegate.cpp
@@ -79,6 +80,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
 	RigidState.cpp
+	SlidingConstraintData.cpp
 	SolveMlcp.cpp
 	Spring.cpp
 	UpdateCollisionRepresentations.cpp
@@ -122,6 +124,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentation.h
 	FemConstraintFixedPoint.h
 	FemConstraintFrictionlessContact.h
+	FemConstraintFrictionlessSliding.h
 	FemElement.h
 	FemElement-inl.h
 	FemElementStructs.h
@@ -160,6 +163,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
 	RigidState.h
+	SlidingConstraintData.h
 	SolveMlcp.h
 	Spring.h
 	UpdateCollisionRepresentations.h

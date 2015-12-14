@@ -33,6 +33,7 @@ set(UNIT_TEST_SOURCES
 	EigenGtestAsserts.cpp
 	Fem1DConstraintFixedPointTests.cpp
 	Fem1DConstraintFrictionlessContactTests.cpp
+	Fem1DConstraintFrictionlessSlidingTests.cpp
 	Fem1DElementBeamTests.cpp
 	Fem1DLocalizationTest.cpp
 	Fem1DMechanicalValidationTests.cpp
@@ -40,6 +41,7 @@ set(UNIT_TEST_SOURCES
 	Fem1DRepresentationTests.cpp
 	Fem2DConstraintFixedPointTests.cpp
 	Fem2DConstraintFrictionlessContactTests.cpp
+	Fem2DConstraintFrictionlessSlidingTests.cpp
 	Fem2DElementTriangleTests.cpp
 	Fem2DLocalizationTest.cpp
 	Fem2DMechanicalValidationTests.cpp
@@ -47,6 +49,7 @@ set(UNIT_TEST_SOURCES
 	Fem2DRepresentationTests.cpp
 	Fem3DConstraintFixedPointTests.cpp
 	Fem3DConstraintFrictionlessContactTests.cpp
+	Fem3DConstraintFrictionlessSlidingTests.cpp
 	Fem3DElementCorotationalTetrahedronTests.cpp
 	Fem3DElementCubeTests.cpp
 	Fem3DElementTetrahedronTests.cpp
@@ -83,6 +86,7 @@ set(UNIT_TEST_SOURCES
 	RigidLocalizationTest.cpp
 	RigidRepresentationTest.cpp
 	RigidStateTest.cpp
+	SlidingConstraintDataTests.cpp
 	SolveMlcpTests.cpp
 	UpdateCollisionRepresentationsTest.cpp
 	VirtualToolCouplerTest.cpp

@@ -89,6 +89,7 @@ std::list<std::shared_ptr<Contact>> ContactCalculation::calculateDcdContact(
 		{
 			contact->normal = -contact->normal;
 			contact->force = -contact->force;
+			std::swap(contact->penetrationPoints.first, contact->penetrationPoints.second);
 		}
 		return contacts;
 	}
