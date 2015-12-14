@@ -94,22 +94,22 @@ TEST(ContactCalculationTests, SwappedShapeTest)
 	sphereRep->setLocalPose(transform);
 
 	std::shared_ptr<CollisionPair> pair1 = std::make_shared<CollisionPair>(sphereRep, planeRep);
-	std::shared_ptr<CollisionPair> pair2 = std::make_shared<CollisionPair>(planeRep, sphereRep);
 
 	calc->calculateContact(pair1);
-	calc->calculateContact(pair2);
 
 	auto contacts1 = calc->calculateDcdContact(PosedShape(sphere, transform), PosedShape(plane, transform));
 	auto contacts2 = calc->calculateDcdContact(PosedShape(plane, transform), PosedShape(sphere, transform));
 
 	contactsInfoEqualityTest(pair1->getContacts(), contacts1);
 
-	for (const auto& contact : contacts2)
+	// Contacts2 should be flipped from contacts1
+	for (auto& contact : contacts2)
 	{
 		contact->normal = -contact->normal;
+		std::swap(contact->penetrationPoints.first, contact->penetrationPoints.second);
 	}
 
-	contactsInfoEqualityTest(pair2->getContacts(), contacts2);
+	contactsInfoEqualityTest(contacts1 , contacts2);
 }
 
 }; // namespace Collision
