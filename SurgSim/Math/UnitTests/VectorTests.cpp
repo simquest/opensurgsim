@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector2d,
-						 SurgSim::Math::Vector2f> Vector2Variants;
+		SurgSim::Math::Vector2f> Vector2Variants;
 TYPED_TEST_CASE(Vector2Tests, Vector2Variants);
 
 
@@ -58,7 +58,7 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector3d,
-						 SurgSim::Math::Vector3f> Vector3Variants;
+		SurgSim::Math::Vector3f> Vector3Variants;
 TYPED_TEST_CASE(Vector3Tests, Vector3Variants);
 
 
@@ -71,7 +71,7 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector4d,
-						 SurgSim::Math::Vector4f> Vector4Variants;
+		SurgSim::Math::Vector4f> Vector4Variants;
 TYPED_TEST_CASE(Vector4Tests, Vector4Variants);
 
 
@@ -84,7 +84,7 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector6d,
-	SurgSim::Math::Vector6f> Vector6Variants;
+		SurgSim::Math::Vector6f> Vector6Variants;
 TYPED_TEST_CASE(Vector6Tests, Vector6Variants);
 
 
@@ -104,18 +104,18 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector2d,
-						 SurgSim::Math::Vector2f,
-						 SurgSim::Math::Vector3d,
-						 SurgSim::Math::Vector3f,
-						 SurgSim::Math::Vector4d,
-						 SurgSim::Math::Vector4f,
-						 SurgSim::Math::Vector6d,
-						 SurgSim::Math::Vector6f> AllVectorVariants;
+		SurgSim::Math::Vector2f,
+		SurgSim::Math::Vector3d,
+		SurgSim::Math::Vector3f,
+		SurgSim::Math::Vector4d,
+		SurgSim::Math::Vector4f,
+		SurgSim::Math::Vector6d,
+		SurgSim::Math::Vector6f> AllVectorVariants;
 TYPED_TEST_CASE(AllVectorTests, AllVectorVariants);
 
 typedef ::testing::Types<Eigen::VectorXd,
-						 Eigen::VectorXf,
-						 SurgSim::Math::Vector> AllDynamicVectorVariants;
+		Eigen::VectorXf,
+		SurgSim::Math::Vector> AllDynamicVectorVariants;
 TYPED_TEST_CASE(AllDynamicVectorTests, AllDynamicVectorVariants);
 
 template <class T>
@@ -133,18 +133,18 @@ public:
 };
 
 typedef ::testing::Types<SurgSim::Math::Vector2d,
-						 SurgSim::Math::Vector2f,
-						 SurgSim::Math::Vector3d,
-						 SurgSim::Math::Vector3f,
-						 SurgSim::Math::Vector4d,
-						 SurgSim::Math::Vector4f,
-						 SurgSim::Math::Vector6d,
-						 SurgSim::Math::Vector6f> UnalignedVectorVariants;
+		SurgSim::Math::Vector2f,
+		SurgSim::Math::Vector3d,
+		SurgSim::Math::Vector3f,
+		SurgSim::Math::Vector4d,
+		SurgSim::Math::Vector4f,
+		SurgSim::Math::Vector6d,
+		SurgSim::Math::Vector6f> UnalignedVectorVariants;
 TYPED_TEST_CASE(UnalignedVectorTests, UnalignedVectorVariants);
 
 typedef ::testing::Types<Eigen::VectorXd,
-						 Eigen::VectorXf,
-						 SurgSim::Math::Vector> UnalignedDynamicVectorVariants;
+		Eigen::VectorXf,
+		SurgSim::Math::Vector> UnalignedDynamicVectorVariants;
 TYPED_TEST_CASE(UnalignedDynamicVectorTests, UnalignedDynamicVectorVariants);
 
 
@@ -320,7 +320,7 @@ TYPED_TEST(Vector6Tests, ShiftCommaInitialization)
 	Vector6 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
 	vector << static_cast<T>(1.1), static_cast<T>(1.2), static_cast<T>(1.3), static_cast<T>(1.4),
-		static_cast<T>(1.5), static_cast<T>(1.6);
+		   static_cast<T>(1.5), static_cast<T>(1.6);
 	EXPECT_NEAR(8.1, vector.sum(), 1e-6) << "initialization was incorrect: " << vector;
 }
 
@@ -390,12 +390,13 @@ TYPED_TEST(AllVectorTests, SetFromArray)
 	// This array has more elements than we will need.
 	// The element type must match the vector!
 	const T inputArray[6] = { static_cast<T>(0.1), static_cast<T>(1.2), static_cast<T>(2.3),
-		static_cast<T>(3.4), static_cast<T>(4.5), static_cast<T>(5.6) };
+							  static_cast<T>(3.4), static_cast<T>(4.5), static_cast<T>(5.6)
+							};
 
 	Vector vector(inputArray);
 	for (int i = 0;  i < SIZE; ++i)
 	{
-		EXPECT_NEAR(static_cast<T>(0.1 + i*1.1), vector[i], 1e-6) << i << " wasn't properly initialized.";
+		EXPECT_NEAR(static_cast<T>(0.1 + i * 1.1), vector[i], 1e-6) << i << " wasn't properly initialized.";
 	}
 }
 
@@ -406,7 +407,8 @@ TYPED_TEST(AllVectorTests, YamlConvert)
 	typedef typename TestFixture::Scalar T;
 
 	T testData[6] = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+					  static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+					};
 	Vector original(testData);
 
 	YAML::Node node;
@@ -429,17 +431,19 @@ TYPED_TEST(AllVectorTests, Assign)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArrayA[6]  = { static_cast<T>(6.1), static_cast<T>(6.2), static_cast<T>(6.3),
-		static_cast<T>(6.4), static_cast<T>(6.5), static_cast<T>(6.6) };
+								static_cast<T>(6.4), static_cast<T>(6.5), static_cast<T>(6.6)
+							  };
 	const T inputArrayB[6]  = { static_cast<T>(7.1), static_cast<T>(7.2), static_cast<T>(7.3),
-		static_cast<T>(7.4), static_cast<T>(7.5), static_cast<T>(7.6) };
+								static_cast<T>(7.4), static_cast<T>(7.5), static_cast<T>(7.6)
+							  };
 
 	Vector a(inputArrayA);
 	// sum of the first SIZE elements of inputArrayA
-	double expectedSumA = SIZE * (SIZE*0.05 + 6.05);
+	double expectedSumA = SIZE * (SIZE * 0.05 + 6.05);
 	EXPECT_NEAR(static_cast<T>(expectedSumA), a.sum(), 5e-6);
 	const Vector b(inputArrayB);
 	// sum of the first SIZE elements of inputArrayB
-	double expectedSumB = SIZE * (SIZE*0.05 + 7.05);
+	double expectedSumB = SIZE * (SIZE * 0.05 + 7.05);
 	EXPECT_NEAR(static_cast<T>(expectedSumB), b.sum(), 5e-6);
 	a = b;
 	EXPECT_NEAR(static_cast<T>(expectedSumB), a.sum(), 5e-6);
@@ -455,9 +459,10 @@ TYPED_TEST(AllVectorTests, Negate)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	double expectedSum = SIZE * (SIZE*0.05 + 2.05);
+	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
 	Vector v(inputArray);
 	Vector n = -v;
@@ -472,7 +477,8 @@ TYPED_TEST(AllVectorTests, Add)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
 	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
@@ -490,9 +496,10 @@ TYPED_TEST(AllVectorTests, Subtract)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	double expectedSum = SIZE * (SIZE*0.05 + 2.05);
+	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
 	Vector v(inputArray);
 	Vector w = v - Vector::Ones();
@@ -508,9 +515,10 @@ TYPED_TEST(AllVectorTests, AddTo)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	double expectedSum = SIZE * (SIZE*0.05 + 2.05);
+	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
 	Vector v(inputArray);
 	v += Vector::Ones();
@@ -525,9 +533,10 @@ TYPED_TEST(AllVectorTests, SubtractFrom)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	double expectedSum = SIZE * (SIZE*0.05 + 2.05);
+	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
 	Vector v(inputArray);
 	v -= Vector::Ones();
@@ -542,9 +551,10 @@ TYPED_TEST(AllVectorTests, MultiplyVectorScalar)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	double expectedSum = SIZE * (SIZE*0.05 + 2.05);
+	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
 	Vector v(inputArray);
 	Vector w = v * static_cast<T>(1.23);
@@ -560,9 +570,10 @@ TYPED_TEST(AllVectorTests, MultiplyScalarVector)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	double expectedSum = SIZE * (SIZE*0.05 + 2.05);
+	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
 	Vector v(inputArray);
 	Vector w = static_cast<T>(1.23) * v;
@@ -578,9 +589,10 @@ TYPED_TEST(AllVectorTests, DivideScalar)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	double expectedSum = SIZE * (SIZE*0.05 + 2.05);
+	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
 	Vector v(inputArray);
 	Vector w = v / static_cast<T>(1.23);
@@ -596,9 +608,10 @@ TYPED_TEST(AllVectorTests, ComponentwiseMultiply)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+							   static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+							 };
 	// sum of the squares of the first SIZE elements of inputArray
-	double expectedSumSquares = SIZE * (SIZE * (SIZE*0.03 + 0.885) + 8.695);
+	double expectedSumSquares = SIZE * (SIZE * (SIZE * 0.03 + 0.885) + 8.695);
 
 	Vector v(inputArray);
 	// use the component-wise Eigen matrix operation:
@@ -617,16 +630,17 @@ TYPED_TEST(AllVectorTests, ComponentwiseDivide)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+							   static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+							 };
 
 	Vector v(inputArray);
-	Vector u = static_cast<T>(2)*v;
+	Vector u = static_cast<T>(2) * v;
 	// use the component-wise Eigen matrix operation:
 	Vector w = u.cwiseQuotient(v);
-	EXPECT_NEAR(static_cast<T>(2*SIZE), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(2 * SIZE), w.sum(), 1e-6);
 	// OR, the same thing done via conversion to arrays:
 	w = u.array() / v.array();
-	EXPECT_NEAR(static_cast<T>(2*SIZE), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(2 * SIZE), w.sum(), 1e-6);
 }
 
 /// Dot product.
@@ -637,9 +651,10 @@ TYPED_TEST(AllVectorTests, DotProduct)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+							   static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+							 };
 	// sum of the squares of the first SIZE elements of inputArray
-	double expectedSumSquares = SIZE * (SIZE * (SIZE*0.03 + 0.885) + 8.695);
+	double expectedSumSquares = SIZE * (SIZE * (SIZE * 0.03 + 0.885) + 8.695);
 
 	Vector v(inputArray);
 	EXPECT_NEAR(static_cast<T>(expectedSumSquares), v.dot(v), 1e-6);
@@ -671,9 +686,10 @@ TYPED_TEST(AllVectorTests, OuterProduct)
 	typedef Eigen::Matrix<T, SIZE, SIZE> Matrix;
 
 	const T inputArray[6]  = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+							   static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+							 };
 	// sum of the squares of the first SIZE elements of inputArray
-	double expectedSumSquares = SIZE * (SIZE * (SIZE*0.03 + 0.885) + 8.695);
+	double expectedSumSquares = SIZE * (SIZE * (SIZE * 0.03 + 0.885) + 8.695);
 
 	Vector v(inputArray);
 	// You have to write out the outer product, like this:
@@ -681,7 +697,7 @@ TYPED_TEST(AllVectorTests, OuterProduct)
 
 	// TODO(bert): maybe needs better testing here?
 	Vector u = v / v.squaredNorm();
-	EXPECT_NEAR(static_cast<T>(expectedSumSquares), (m*u).squaredNorm(), 1e-3);
+	EXPECT_NEAR(static_cast<T>(expectedSumSquares), (m * u).squaredNorm(), 1e-3);
 }
 
 /// Euclidean norm and its square.
@@ -692,9 +708,10 @@ TYPED_TEST(AllVectorTests, NormAndSquared)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+							   static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+							 };
 	// sum of the squares of the first SIZE elements of inputArray
-	double expectedSumSquares = SIZE * (SIZE * (SIZE*0.03 + 0.885) + 8.695);
+	double expectedSumSquares = SIZE * (SIZE * (SIZE * 0.03 + 0.885) + 8.695);
 
 	Vector v(inputArray);
 	EXPECT_NEAR(static_cast<T>(expectedSumSquares), v.squaredNorm(), 1e-6);
@@ -709,9 +726,10 @@ TYPED_TEST(AllVectorTests, L1NormAndLInfNorm)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(2.1), static_cast<T>(2.2), static_cast<T>(2.3),
-		static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6) };
+							   static_cast<T>(2.4), static_cast<T>(2.5), static_cast<T>(2.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	double expectedSum = SIZE * (SIZE*0.05 + 2.05);
+	double expectedSum = SIZE * (SIZE * 0.05 + 2.05);
 
 	Vector v(inputArray);
 	Vector w = -v;
@@ -720,8 +738,8 @@ TYPED_TEST(AllVectorTests, L1NormAndLInfNorm)
 	// need to do this in a non-template context.
 	EXPECT_NEAR(static_cast<T>(expectedSum), v.template lpNorm<1>(), 1e-6);
 	EXPECT_NEAR(static_cast<T>(expectedSum), w.template lpNorm<1>(), 1e-6);
-	EXPECT_NEAR(inputArray[SIZE-1], v.template lpNorm<Eigen::Infinity>(), 1e-6);
-	EXPECT_NEAR(inputArray[SIZE-1], w.template lpNorm<Eigen::Infinity>(), 1e-6);
+	EXPECT_NEAR(inputArray[SIZE - 1], v.template lpNorm<Eigen::Infinity>(), 1e-6);
+	EXPECT_NEAR(inputArray[SIZE - 1], w.template lpNorm<Eigen::Infinity>(), 1e-6);
 }
 
 /// Normalization of vectors.
@@ -732,9 +750,10 @@ TYPED_TEST(AllVectorTests, Normalize)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+							   static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+							 };
 	// sum of the squares of the first SIZE elements of inputArray
-	double expectedSumSquares = SIZE * (SIZE * (SIZE*0.03 + 0.885) + 8.695);
+	double expectedSumSquares = SIZE * (SIZE * (SIZE * 0.03 + 0.885) + 8.695);
 
 	Vector v(inputArray);
 	EXPECT_NEAR(sqrt(expectedSumSquares), v.norm(), 1e-6);
@@ -757,11 +776,12 @@ TYPED_TEST(AllVectorTests, MinAndMax)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+							   static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+							 };
 
 	Vector v(inputArray);
 	EXPECT_NEAR(inputArray[0], v.minCoeff(), 1e-6);
-	EXPECT_NEAR(inputArray[SIZE-1], v.maxCoeff(), 1e-6);
+	EXPECT_NEAR(inputArray[SIZE - 1], v.maxCoeff(), 1e-6);
 }
 
 // ==================== SUBVECTORS (EXTENDING/SHRINKING) ====================
@@ -971,10 +991,11 @@ TYPED_TEST(AllVectorTests, HomogeneousExtend)
 	typedef typename TestFixture::Vector Vector;
 	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
-	typedef Eigen::Matrix<T, SIZE+1, 1> HVector;
+	typedef Eigen::Matrix < T, SIZE + 1, 1 > HVector;
 
 	const T inputArray[6]  = { static_cast<T>(10.1), static_cast<T>(10.2), static_cast<T>(10.3),
-		static_cast<T>(10.4), static_cast<T>(10.5), static_cast<T>(10.6) };
+							   static_cast<T>(10.4), static_cast<T>(10.5), static_cast<T>(10.6)
+							 };
 
 	Vector v(inputArray);
 	HVector h = v.homogeneous();
@@ -997,14 +1018,15 @@ TYPED_TEST(AllVectorTests, HomogeneousShrink)
 	typedef Eigen::Matrix<T, SIZE, 1> Vector;
 
 	const T inputArray[6]  = { static_cast<T>(10.1), static_cast<T>(10.2), static_cast<T>(10.3),
-		static_cast<T>(10.4), static_cast<T>(10.5), static_cast<T>(10.6) };
+							   static_cast<T>(10.4), static_cast<T>(10.5), static_cast<T>(10.6)
+							 };
 
 	HVector h(inputArray);
 	h[SIZE] = 2;  // makes calculating expected values simpler =)
 	Vector v = h.hnormalized();
 	for (int i = 0;  i < SIZE;  ++i)
 	{
-		EXPECT_NEAR(inputArray[i]/2, v[i], 1e-6) << "Euclidean form from homogeneous garbled.";
+		EXPECT_NEAR(inputArray[i] / 2, v[i], 1e-6) << "Euclidean form from homogeneous garbled.";
 	}
 }
 
@@ -1020,9 +1042,10 @@ TYPED_TEST(AllVectorTests, TypeCasting)
 	typedef Eigen::Matrix<float,  SIZE, 1> Vectorf;
 
 	const T inputArray[6]  = { static_cast<T>(12.1), static_cast<T>(12.2), static_cast<T>(12.3),
-		static_cast<T>(12.4), static_cast<T>(12.5), static_cast<T>(12.6) };
+							   static_cast<T>(12.4), static_cast<T>(12.5), static_cast<T>(12.6)
+							 };
 	// sum of the first SIZE elements of inputArray
-	T expectedSum = SIZE * (SIZE*static_cast<T>(0.05) + static_cast<T>(12.05));
+	T expectedSum = SIZE * (SIZE * static_cast<T>(0.05) + static_cast<T>(12.05));
 
 	Vector v(inputArray);
 	// Ugh, "template" is required to get this to parse properly.  This is
@@ -1044,7 +1067,8 @@ TYPED_TEST(AllVectorTests, ArrayReadWrite)
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	const T inputArray[6]  = { static_cast<T>(12.1), static_cast<T>(12.2), static_cast<T>(12.3),
-		static_cast<T>(12.4), static_cast<T>(12.5), static_cast<T>(12.6) };
+							   static_cast<T>(12.4), static_cast<T>(12.5), static_cast<T>(12.6)
+							 };
 	T outputArray[6];
 
 	Eigen::Map<const Vector> v_in(inputArray);
@@ -1067,9 +1091,11 @@ TYPED_TEST(AllVectorTests, Interpolate)
 	T epsilon = static_cast<T>(1e-6);
 
 	T prevArray[6]  = { static_cast<T>(3.1), static_cast<T>(3.4), static_cast<T>(3.7),
-		static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6) };
+						static_cast<T>(4.0), static_cast<T>(4.3), static_cast<T>(4.6)
+					  };
 	T nextArray[6]  = { static_cast<T>(7.2), static_cast<T>(0.6), static_cast<T>(4.8),
-		static_cast<T>(5.1), static_cast<T>(8.9), static_cast<T>(1.5) };
+						static_cast<T>(5.1), static_cast<T>(8.9), static_cast<T>(1.5)
+					  };
 	T interpArray[6];
 
 	Vector prev(prevArray);
@@ -1145,20 +1171,20 @@ TYPED_TEST(AllDynamicVectorTests, CanResize)
 
 namespace
 {
-	template <class T>
-	void testScalar(T valueExpected, T value){}
+template <class T>
+void testScalar(T valueExpected, T value) {}
 
-	template <>
-	void testScalar<double>(double valueExpected, double value)
-	{
-		EXPECT_DOUBLE_EQ(valueExpected, value);
-	}
+template <>
+void testScalar<double>(double valueExpected, double value)
+{
+	EXPECT_DOUBLE_EQ(valueExpected, value);
+}
 
-	template <>
-	void testScalar<float>(float valueExpected, float value)
-	{
-		EXPECT_FLOAT_EQ(valueExpected, value);
-	}
+template <>
+void testScalar<float>(float valueExpected, float value)
+{
+	EXPECT_FLOAT_EQ(valueExpected, value);
+}
 };
 
 TYPED_TEST(AllDynamicVectorTests, addSubVector)
@@ -1166,10 +1192,14 @@ TYPED_TEST(AllDynamicVectorTests, addSubVector)
 	typedef typename TestFixture::Vector Vector;
 
 	Vector v, vInit, v2, v2Init;
-	v.resize(18);   v.setRandom();   vInit  = v;
-	v2.resize(18);  v2.setRandom();  v2Init = v2;
+	v.resize(18);
+	v.setRandom();
+	vInit  = v;
+	v2.resize(18);
+	v2.setRandom();
+	v2Init = v2;
 
-	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3,3), 2, 3, &v););
+	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3, 3), 2, 3, &v););
 	EXPECT_TRUE(v2.isApprox(v2Init));
 	EXPECT_FALSE(v.isApprox(vInit));
 	for (int dofId = 0; dofId < 6; dofId++)
@@ -1178,7 +1208,7 @@ TYPED_TEST(AllDynamicVectorTests, addSubVector)
 	}
 	for (int dofId = 6; dofId < 9; dofId++)
 	{
-		testScalar(vInit[dofId] + v2Init[3 + dofId-6], v[dofId]);
+		testScalar(vInit[dofId] + v2Init[3 + dofId - 6], v[dofId]);
 	}
 	for (int dofId = 9; dofId < 18; dofId++)
 	{
@@ -1192,13 +1222,17 @@ TYPED_TEST(AllDynamicVectorTests, addSubVectorBlocks)
 
 	Vector v, vInit, v2, v2Init;
 	std::vector<size_t> nodeIds;
-	v.resize(18);   v.setRandom();   vInit = v;
-	v2.resize(18);  v2.setRandom();  v2Init = v2;
+	v.resize(18);
+	v.setRandom();
+	vInit = v;
+	v2.resize(18);
+	v2.setRandom();
+	v2Init = v2;
 	nodeIds.push_back(1);
 	nodeIds.push_back(3);
 	nodeIds.push_back(5);
 
-	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3,15), nodeIds, 3, &v););
+	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3, 15), nodeIds, 3, &v););
 	EXPECT_TRUE(v2.isApprox(v2Init));
 	EXPECT_FALSE(v.isApprox(vInit));
 	for (int dofId = 0; dofId < 3; dofId++)
@@ -1232,10 +1266,14 @@ TYPED_TEST(AllDynamicVectorTests, setSubVector)
 	typedef typename TestFixture::Vector Vector;
 
 	Vector v, vInit, v2, v2Init;
-	v.resize(18);   v.setRandom();   vInit  = v;
-	v2.resize(18);  v2.setRandom();  v2Init = v2;
+	v.resize(18);
+	v.setRandom();
+	vInit  = v;
+	v2.resize(18);
+	v2.setRandom();
+	v2Init = v2;
 
-	ASSERT_NO_THROW(SurgSim::Math::setSubVector(v2.segment(3,3), 2, 3, &v););
+	ASSERT_NO_THROW(SurgSim::Math::setSubVector(v2.segment(3, 3), 2, 3, &v););
 	EXPECT_TRUE(v2.isApprox(v2Init));
 	EXPECT_FALSE(v.isApprox(vInit));
 	for (int dofId = 0; dofId < 6; dofId++)
@@ -1244,7 +1282,7 @@ TYPED_TEST(AllDynamicVectorTests, setSubVector)
 	}
 	for (int dofId = 6; dofId < 9; dofId++)
 	{
-		testScalar(v2Init[3 + dofId-6], v[dofId]);
+		testScalar(v2Init[3 + dofId - 6], v[dofId]);
 	}
 	for (int dofId = 9; dofId < 18; dofId++)
 	{
@@ -1257,7 +1295,9 @@ TYPED_TEST(AllDynamicVectorTests, getSubVector)
 	typedef typename TestFixture::Vector Vector;
 
 	Vector v, vInit;
-	v.resize(18); v.setRandom(); vInit = v;
+	v.resize(18);
+	v.setRandom();
+	vInit = v;
 
 	Eigen::VectorBlock<Vector> subVector = SurgSim::Math::getSubVector(v, 2, 3);
 	EXPECT_TRUE(v.isApprox(vInit));
@@ -1275,8 +1315,11 @@ TYPED_TEST(AllDynamicVectorTests, getSubVectorBlocks)
 
 	Vector v, vInit, v2;
 	std::vector<size_t> nodeIds;
-	v.resize(18);   v.setRandom();   vInit = v;
-	v2.resize(9);  v2.setZero();
+	v.resize(18);
+	v.setRandom();
+	vInit = v;
+	v2.resize(9);
+	v2.setZero();
 	nodeIds.push_back(1);
 	nodeIds.push_back(3);
 	nodeIds.push_back(5);
@@ -1375,5 +1418,40 @@ TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
 
 		ASSERT_NO_THROW(EXPECT_EQ(true, SurgSim::Math::buildOrthonormalBasis(&i, &j, &k)));
 		testOrthonormalBasis(i, j, k);
+	}
+}
+
+TYPED_TEST(Vector3Tests, robustCrossProduct)
+{
+	typedef typename TestFixture::Vector3 Vector3;
+	typedef typename Vector3::Scalar T;
+	T epsilon = static_cast<T>(1.0e02 * Eigen::NumTraits<T>::dummy_precision());
+
+	Vector3 p0(static_cast<T>(0.0), static_cast<T>(0.0), static_cast<T>(0.2));
+	Vector3 p1(static_cast<T>(0.0), static_cast<T>(0.1), static_cast<T>(0.2));
+
+	std::array<Vector3, 2> p;
+	p[0] = p0;
+	p[1] = p1;
+
+	{
+		SCOPED_TRACE("Safe cross product, p1q0 works.");
+		Vector3 q0(static_cast<T>(0.1), static_cast<T>(0.0), static_cast<T>(0.2));
+		Vector3 q1(static_cast<T>(0.0), static_cast<T>(0.2), static_cast<T>(0.2));
+		std::array<Vector3, 2> q;
+		q[0] = q0;
+		q[1] = q1;
+		EXPECT_TRUE(SurgSim::Math::robustCrossProduct(p, q, epsilon).isApprox(Vector3(static_cast<T>(0.0),
+					static_cast<T>(0.0), static_cast<T>(-1.0)), epsilon));
+	}
+	{
+		SCOPED_TRACE("Safe cross product, p1q0 doesn't work, but p1q1 works.");
+		Vector3 q0(static_cast<T>(0.0), static_cast<T>(0.2), static_cast<T>(0.2));
+		Vector3 q1(static_cast<T>(0.1), static_cast<T>(0.0), static_cast<T>(0.2));
+		std::array<Vector3, 2> q;
+		q[0] = q0;
+		q[1] = q1;
+		EXPECT_TRUE(SurgSim::Math::robustCrossProduct(p, q, epsilon).isApprox(Vector3(static_cast<T>(0.0),
+					static_cast<T>(0.0), static_cast<T>(-1.0)), epsilon));
 	}
 }

@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/Computation.h"
 
@@ -39,8 +40,8 @@ class PhysicsManagerState;
 /// function objects (ContactCalculation) to determine how to calculate a contact between the two
 /// members of each pair, if no specific function exists a default function will be used.
 /// will update the collision pairs accordingly.
-/// \note HS-2013-may-24 Currently handles only RigidRepresentation, all others  will be ignored
-
+/// \note When a new ContactCalculation type gets implemented, the type needs to be registered with the table
+/// inside of ContactCalculation
 class DcdCollision : public Computation
 {
 public:
@@ -48,6 +49,8 @@ public:
 	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
 	explicit DcdCollision(bool doCopyState = false);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::DcdCollision);
 
 	/// Destructor
 	virtual ~DcdCollision();
@@ -58,23 +61,13 @@ protected:
 	/// \param dt	The time passed.
 	/// \param state The PhysicsManagerState from previous computation.
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
-		override;
+	override;
 
 private:
-
-	/// Initializes the table of ContactCalculation objects
-	void populateCalculationTable();
 
 	/// Updates the collision pairs
 	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
 
-	/// Function to populate the m_contactCalculations table for each DcdContact class.
-	void setDcdContactInTable(std::shared_ptr<Collision::ContactCalculation> dcdContact);
-
-	/// Table containing contact calculation, the indices indicate the type of
-	/// the first pair object and the second pair object in order
-	std::shared_ptr<Collision::ContactCalculation> m_contactCalculations[Math::SHAPE_TYPE_COUNT]
-																		[Math::SHAPE_TYPE_COUNT];
 };
 
 }; // Physics

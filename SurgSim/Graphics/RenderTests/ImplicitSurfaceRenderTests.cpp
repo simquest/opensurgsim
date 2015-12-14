@@ -29,8 +29,10 @@
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -54,7 +56,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	std::array<int, 2> dimensions = {1280, 720};
 	viewElement->getView()->setDimensions(dimensions);
 	viewElement->getCamera()->setPerspectiveProjection(45, 1.7, 0.01, 10.0);
-	viewElement->getCamera()->setAmbientColor(Math::Vector4d(0.3, 0.3, 0.3, 1.0));
+	viewElement->getCamera()->setAmbientColor(Math::Vector4d(0.2, 0.2, 0.2, 1.0));
 	viewElement->enableManipulator(true);
 
 
@@ -64,7 +66,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
 	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
-	lightElement->setPose(makeRigidTranslation(Math::Vector3d(1.0, 1.0, 1.0)));
+	lightElement->setPose(makeRigidTranslation(Math::Vector3d(0.5, 0.5, 0.5)));
 	lightElement->addComponent(light);
 	scene->addSceneElement(lightElement);
 
@@ -74,7 +76,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
 			Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.01f, 800.0f, 4.0,
 												1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0),
-												Math::Vector4f(0.4, 0.4, 0.4, 1.0), 10, false);
+												Math::Vector4f(0.4, 0.4, 0.4, 1.0), 10.0f, false);
 
 	for (auto element : surface)
 	{
@@ -90,19 +92,37 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	scene->addSceneElement(element);
 
+	auto sphere = std::make_shared<Graphics::OsgSphereRepresentation>("Graphics");
+	sphere->setRadius(0.1);
+
+	auto material = Graphics::buildMaterial("Shaders/material.vert", "Shaders/material.frag");
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", Math::Vector4f(0.4, 0.4, 0.4, 1.0));
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 10.0f);
+	sphere->setMaterial(material);
+
+	element = std::make_shared<Framework::BasicSceneElement>("Sphere");
+	element->setPose(makeRigidTranslation(Math::Vector3d(0.25, 0.0, 0.0)));
+	element->addComponent(sphere);
+	element->addComponent(material);
+
+	scene->addSceneElement(element);
+
 	// Create the point cloud
 	auto mesh = std::make_shared<Graphics::OsgMeshRepresentation>("Mesh");
 	mesh->loadMesh("Geometry/sphere.ply");
 
 	auto graphics = std::make_shared<Graphics::OsgPointCloudRepresentation>("Cloud");
 
-	graphics->setLocalPose(makeRigidTranslation(Math::Vector3d(0.0, 0.0, 0.0)));
 	for (const auto& vertex : mesh->getMesh()->getVertices())
 	{
 		graphics->getVertices()->addVertex(Graphics::PointCloud::VertexType(vertex));
 	}
 
-	graphics->addGroupReference(Blocks::GROUP_IMPLICIT_SURFACE);
+	graphics->setGroupReference(Blocks::GROUP_IMPLICIT_SURFACE);
 
 	auto sceneElement = std::make_shared<Framework::BasicSceneElement>("PointSprites");
 	sceneElement->addComponent(graphics);
@@ -111,7 +131,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
 	runtime->stop();
 }
 

@@ -17,6 +17,7 @@
 #define SURGSIM_MATH_ODESOLVERLINEAREULERIMPLICIT_H
 
 #include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/SparseMatrix.h"
 
 namespace SurgSim
 {
@@ -45,7 +46,7 @@ public:
 
 private:
 	/// The constant stiffness matrix
-	Matrix m_constantK;
+	SparseMatrix m_constantK;
 
 	/// Has the solver been initialized
 	bool m_initialized;

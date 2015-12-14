@@ -122,10 +122,10 @@ private:
 	DataStructures::DataGroup m_outputData;
 
 	/// The list of input consumers.
-	std::vector<std::shared_ptr<InputConsumerInterface>> m_inputConsumerList;
+	std::vector<std::weak_ptr<InputConsumerInterface>> m_inputConsumerList;
 
 	/// The output producer, if any.
-	std::shared_ptr<OutputProducerInterface> m_outputProducer;
+	std::weak_ptr<OutputProducerInterface> m_outputProducer;
 
 	/// The mutex that protects the consumers and the producer.
 	boost::mutex m_consumerProducerMutex;

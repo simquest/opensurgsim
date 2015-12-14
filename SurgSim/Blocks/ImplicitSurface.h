@@ -31,7 +31,6 @@ static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 /// The rest is done by the graphics system.
 /// All of the elements added are \sa RenderPass elements
 /// \param view the view to pull screen space dimensions from
-/// \param camera the view camera that is used for this pass
 /// \param light the scene light to be used to shade the surface
 /// \param sphereRadius the radius in meters that each point sprite sphere should have
 /// \param sphereScale the scaling factor for the point sprite sphere based on distance from the camera
@@ -46,8 +45,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 			std::shared_ptr<Framework::Component> view,
 			std::shared_ptr<Framework::Component> light,
 			float sphereRadius,
-			float sphereScale,
-			float blurRadius,
+			float sphereScale, float blurRadius,
 			int textureSize,
 			const Math::Vector4f& diffuseColor,
 			const Math::Vector4f& specularColor,

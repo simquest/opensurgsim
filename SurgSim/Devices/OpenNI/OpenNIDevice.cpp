@@ -41,15 +41,22 @@ OpenNIDevice::~OpenNIDevice()
 
 bool OpenNIDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized()) << getName() << "is already initialized, cannot initialize again.";
-	m_scaffold = OpenNIScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(isInitialized()) << getName() << " initialization failed, cannot get scaffold.";
-	return m_scaffold->registerDevice(this);
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
+	auto scaffold = OpenNIScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr);
+
+	bool initialize = false;
+	if (scaffold->registerDevice(this))
+	{
+		m_scaffold = std::move(scaffold);
+		initialize = true;
+	}
+	return initialize;
 }
 
 bool OpenNIDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized()) << getName() << "is not initialized, cannot finalized.";
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool success = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
 	return success;

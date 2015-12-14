@@ -40,6 +40,7 @@ SURGSIM_STATIC_REGISTRATION(NovintDevice);
 ///   | type       | name                  |                                                      |
 ///   | ----       | ----                  | ---                                                  |
 ///   | pose       | "pose"                | %Device pose (units are meters).                     |
+///   | scalar     | "toolDof"             | %7th Dof (e.g., handle open/close angle)             |
 ///   | bool       | "button1"             | %State of the first device button if present.        |
 ///   | bool       | "button2"             | %State of the second device button if present.       |
 ///   | bool       | "button3"             | %State of the third device button if present.        |
@@ -95,10 +96,7 @@ public:
 
 	bool initialize() override;
 
-	bool finalize() override;
-
-	/// Check whether this device is initialized.
-	bool isInitialized() const;
+	bool isInitialized() const override;
 
 	/// Sets the position scale for this device.
 	/// The position scale controls how much the pose changes for a given device translation.
@@ -127,6 +125,8 @@ public:
 
 private:
 	friend class NovintScaffold;
+
+	bool finalize() override;
 
 	///@{
 	/// Used for serializing optional properties

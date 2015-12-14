@@ -298,8 +298,10 @@ TEST_F(MeshShapeTest, TransformTest)
 	auto originalMesh = std::make_shared<MeshShape>(*mesh);
 	auto actualMesh = std::make_shared<MeshShape>(*mesh);
 
+	EXPECT_TRUE(originalMesh->isTransformable());
+
 	RigidTransform3d transform = makeRigidTransform(Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5),
-			Vector3d(8.7, -4.7, -3.1));
+								 Vector3d(8.7, -4.7, -3.1));
 	actualMesh->transform(transform);
 	EXPECT_TRUE(actualMesh->update());
 
@@ -309,7 +311,7 @@ TEST_F(MeshShapeTest, TransformTest)
 	{
 		Vector3d expectedPosition = transform * originalMesh->getVertexPosition(i);
 		ASSERT_TRUE(actualMesh->getVertexPosition(i).isApprox(expectedPosition, epsilon)) <<
-			"Vertex #" << i << " is not as expected, remaining vertices may also be incorrect.";
+				"Vertex #" << i << " is not as expected, remaining vertices may also be incorrect.";
 	}
 
 	Vector3d expectedNormal;
@@ -318,7 +320,7 @@ TEST_F(MeshShapeTest, TransformTest)
 	{
 		expectedNormal = transform.linear() * originalMesh->getTriangle(i).data.normal;
 		ASSERT_TRUE(expectedNormal.isApprox(actualMesh->getTriangle(i).data.normal, epsilon)) <<
-			"Normal #" << i << " is not as expected, remaining normals may also be incorrect.";
+				"Normal #" << i << " is not as expected, remaining normals may also be incorrect.";
 	}
 
 	// Expect indeterminate normals due to numerical precision.

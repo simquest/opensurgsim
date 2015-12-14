@@ -20,6 +20,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	AabbTests.cpp
+	CompoundShapeTests.cpp
 	GeometryTests.cpp
 	IntervalArithmeticTests.cpp
 	KalmanFilterTests.cpp
@@ -40,6 +41,7 @@ set(UNIT_TEST_SOURCES
 	PolynomialRootTests.cpp
 	PolynomialTests.cpp
 	PolynomialValuesTests.cpp
+	ScalarTests.cpp
 	SegmentMeshShapeTests.cpp
 	ShapeTests.cpp
 	SurfaceMeshShapeTests.cpp

@@ -47,9 +47,9 @@ std::shared_ptr<Input::DeviceInterface> createDevice(const std::string& classNam
 /// Loads a single device from the file, the first device that successfully initializes.
 /// The file format should be just a list of DeviceInterfaces
 /// \code
-/// - SurgSim::Device::MultiAxisDevice:
+/// - SurgSim::Devices::MultiAxisDevice:
 ///        Name: element1
-/// - SurgSim::Device::IdentityPoseDevice:
+/// - SurgSim::Devices::IdentityPoseDevice:
 ///        Name: element1
 /// \endcode
 /// \param fileName the filename of the devices to be loaded, needs to be found

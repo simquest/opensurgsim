@@ -41,9 +41,9 @@ using SurgSim::Testing::MockInputOutput;
 // These initialization names should be set to two of the names used in devices.yaml (or be empty strings to just get
 // the first device). The serial number should be a serial number for one of the attached Falcons (or be an empty
 // string to just get the first device.)
-const char* const NOVINT_TEST_DEVICE_NAME = "FALCON_1";
-const char* const NOVINT_TEST_DEVICE_NAME_2 = "FALCON_2";
-const char* const NOVINT_TEST_DEVICE_SERIAL_NUMBER = "14QAVEFF";
+const std::string NOVINT_TEST_DEVICE_NAME = "FALCON_1";
+const std::string NOVINT_TEST_DEVICE_NAME_2 = "FALCON_2";
+const std::string NOVINT_TEST_DEVICE_SERIAL_NUMBER = "14QAVEFF";
 
 TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 {
@@ -76,8 +76,6 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 	const double orientationScale = 2.0;
 	device->setOrientationScale(orientationScale);
 	EXPECT_EQ(orientationScale, device->getOrientationScale());
-
-	EXPECT_TRUE(device->finalize());
 }
 
 TEST(NovintDeviceTest, CreateAndInitializeDeviceBySerialNumber)
@@ -109,8 +107,6 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceBySerialNumber)
 	const double orientationScale = 2.0;
 	device->setOrientationScale(orientationScale);
 	EXPECT_EQ(orientationScale, device->getOrientationScale());
-
-	EXPECT_TRUE(device->finalize());
 }
 
 TEST(NovintDeviceTest, CreateAndInitializeDefaultDevices)
@@ -199,7 +195,7 @@ TEST(NovintDeviceTest, CreateDevicesWithSameSerialNumber)
 		std::shared_ptr<NovintDevice> device2 = std::make_shared<NovintDevice>("Novint2");
 		ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
 		device2->setSerialNumber(NOVINT_TEST_DEVICE_SERIAL_NUMBER);
-		ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate initialization name.";
+		ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate serial number.";
 	}
 }
 
@@ -209,6 +205,8 @@ TEST(NovintDeviceTest, InputConsumer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
+	/// Wait a while for the HDL to initialize and start running the callback.
+	boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 
 	std::shared_ptr<MockInputOutput> consumer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
@@ -223,7 +221,7 @@ TEST(NovintDeviceTest, InputConsumer)
 
 	// Sleep for a second, to see how many times the consumer is invoked.
 	// (A Novint device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(1000));
+	boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
 
@@ -244,6 +242,8 @@ TEST(NovintDeviceTest, OutputProducer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	device->setInitializationName(NOVINT_TEST_DEVICE_NAME);
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
+	/// Wait a while for the HDL to initialize and start running the callback.
+	boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 
 	std::shared_ptr<MockInputOutput> producer = std::make_shared<MockInputOutput>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
@@ -255,7 +255,7 @@ TEST(NovintDeviceTest, OutputProducer)
 
 	// Sleep for a second, to see how many times the producer is invoked.
 	// (A Novint Falcon device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(1000));
+	boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeOutputProducer(producer));
 

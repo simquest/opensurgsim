@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,6 +57,10 @@ public:
 	/// Invokes addSceneElement() for each element in the list.
 	/// \param elements the list of elements to be added.
 	void addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements);
+
+	/// Removes a scene element to the Scene
+	/// \param	element	The element.
+	void removeSceneElement(std::shared_ptr<SceneElement> element);
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.

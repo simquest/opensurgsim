@@ -18,6 +18,7 @@
 set(SURGSIM_MATH_SOURCES
 	BoxShape.cpp
 	CapsuleShape.cpp
+	CompoundShape.cpp
 	CylinderShape.cpp
 	DoubleSidedPlaneShape.cpp
 	GaussLegendreQuadrature.cpp
@@ -53,6 +54,7 @@ set(SURGSIM_MATH_HEADERS
 	Aabb.h
 	BoxShape.h
 	CapsuleShape.h
+	CompoundShape.h
 	CylinderShape.h
 	DoubleSidedPlaneShape.h
 	GaussLegendreQuadrature.h
@@ -105,6 +107,8 @@ set(SURGSIM_MATH_HEADERS
 	PolynomialValues-inl.h
 	Quaternion.h
 	RigidTransform.h
+	Scalar.h
+	Scalar-inl.h
 	SegmentMeshShape.h
 	SegmentMeshShape-inl.h
 	Shape.h

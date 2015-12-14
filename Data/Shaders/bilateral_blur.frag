@@ -40,29 +40,29 @@ const float weights[7] = float[](
 void main(void)
 {
     float depth = texture2D(texture, texCoord0).x;
-    float result = 0;
-    float normalization = 0;
+    float result = 0.0;
+    float normalization = 0.0;
 
-    for (int i = 0; i < 7; i++)
-    {
-        float sample = texture2D(texture, taps[i]).x;
-        float gaussian = weights[i];
-
-        float closeness = distance(sample, depth); // length(vec3(1,1,1));
-
-        if(closeness < 0.4)
+        for (int i = 0; i < 7; i++)
         {
-            float sampleWeight = exp(-closeness * closeness) * gaussian;
+            float sample = texture2D(texture, taps[i]).x;
+            float gaussian = weights[i];
 
-            result += sample * sampleWeight;
-            normalization += sampleWeight;
+            float closeness = distance(sample, depth); // length(vec3(1,1,1));
+
+            if(closeness < 0.6)
+            {
+                float sampleWeight = exp(-closeness * closeness) * gaussian;
+
+                result += sample * sampleWeight;
+                normalization += sampleWeight;
+            }
+            else
+            {
+                result += depth * gaussian;
+                normalization += gaussian;
+            }
         }
-        else
-        {
-            result += depth * gaussian;
-            normalization += gaussian;
-        }
-    }
 
 	gl_FragDepth = result / normalization;
 }

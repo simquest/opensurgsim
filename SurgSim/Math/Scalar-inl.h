@@ -13,22 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEM2DCONSTRAINTFRICTIONLESSCONTACT_H
-#define SURGSIM_PHYSICS_FEM2DCONSTRAINTFRICTIONLESSCONTACT_H
+#ifndef SURGSIM_MATH_SCALAR_INL_H
+#define SURGSIM_MATH_SCALAR_INL_H
 
-#include "SurgSim/Physics/Fem2DLocalization.h"
-#include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {
-
-namespace Physics
+namespace Math
 {
 
-typedef FemConstraintFrictionlessContact<Fem2DLocalization> Fem2DConstraintFrictionlessContact;
+template <class T>
+T clamp(T value, T min, T max, T epsilon)
+{
+	return (value >= (max - epsilon) ? max : (value <= (min + epsilon) ? min : value));
+}
 
-}; // namespace Physics
+template <typename T>
+const T clampOperator<T>::operator()(const T& x) const
+{
+	return  clamp(x, m_min, m_max, m_epsilon);
+}
 
-}; // namespace SurgSim
+};
+};
 
-#endif // SURGSIM_PHYSICS_FEM2DCONSTRAINTFRICTIONLESSCONTACT_H
+#endif // SURGSIM_MATH_SCALAR_INL_H
+

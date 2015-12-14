@@ -135,7 +135,7 @@ public:
 	/// \return The pose of this Emitter
 	virtual SurgSim::Math::RigidTransform3d getPose() const;
 
-protected:
+private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 

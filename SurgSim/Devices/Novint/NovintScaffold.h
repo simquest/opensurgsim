@@ -17,8 +17,8 @@
 #define SURGSIM_DEVICES_NOVINT_NOVINTSCAFFOLD_H
 
 #include <memory>
+#include <string>
 
-#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
@@ -27,7 +27,6 @@ namespace Devices
 {
 
 class NovintDevice;
-
 
 /// A class that manages Novint Falcon devices.
 ///
@@ -43,10 +42,6 @@ public:
 
 	/// Destructor.
 	~NovintScaffold();
-
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all NovintDevice and Novint7DofDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
@@ -68,7 +63,7 @@ private:
 
 	friend class NovintDevice;
 
-	/// Registers the specified device object.
+	/// Registers the specified device object, and starts the servo loop if necessary.
 	/// If successful, the device object will become connected to an unused controller.
 	///
 	/// \param device The device object to be used, which should have a unique name.
@@ -91,11 +86,6 @@ private:
 	/// \param initializationName The initialization name (from the configuration file).
 	/// \return Shared pointer to Handle, or nullptr if not found.
 	std::shared_ptr<NovintScaffold::Handle> findHandleByInitializationName(const std::string& initializationName);
-
-	/// Finalizes a single device, destroying the necessary HDAL resources.
-	/// \param [in,out] info	The device data.
-	/// \return	true on success.
-	bool finalizeDeviceState(DeviceData* info);
 
 	/// Updates the device information for a single device's input.
 	/// \param info	The device data.
@@ -130,45 +120,24 @@ private:
 	/// \param info The device data
 	void setInputData(DeviceData* info);
 
-	/// Initializes the HDAL SDK.
-	/// \return true on success.
-	bool initializeSdk();
-
 	/// Gets the map from name to serial number.
 	/// \return The map.
 	std::map<std::string, std::string> getNameMap();
 
 	/// Creates a NovintScaffold::Handle for each device connected when the first registerDevice is called.
-	void createAllHandles();
-
-	/// Finalizes (de-initializes) the HDAL SDK.
-	/// \return true on success.
-	bool finalizeSdk();
+	/// \return True if there are device handles created; false otherwise.
+	bool createAllHandles();
 
 	/// Destroys all the initialized handles.
 	void destroyAllHandles();
 
+	/// Store the handle if it is valid.
+	/// \return true If handle is valid and stored; false, otherwise.
+	bool storeHandleIfValid(const std::shared_ptr<Handle>& handle, const std::string& serial);
+
 	/// Executes the operations for a single haptic frame.
 	/// Should only be called from the context of a HDAL callback.
-	/// \return true on success.
-	bool runHapticFrame();
-
-	/// Creates the haptic loop callback.
-	/// \return true on success.
-	bool createHapticLoop();
-
-	/// Destroys the haptic loop callback.
-	/// Should be called while NOT holding the internal device list mutex, to prevent deadlock.
-	/// \return true on success.
-	bool destroyHapticLoop();
-
-	/// Starts the HDAL scheduler.
-	/// \return	true on success.
-	bool startScheduler();
-
-	/// Stops the HDAL scheduler.
-	/// \return	true on success.
-	bool stopScheduler();
+	void runHapticFrame();
 
 	/// Gets the gravity compensation flag for the current device.
 	/// \param info	The device data.
@@ -195,23 +164,6 @@ private:
 	/// \return	true if it succeeds, false if it fails.
 	bool setGravityCompensation(const DeviceData* info, bool gravityCompensationState);
 
-	/// Check for HDAL errors, display them, and signal fatal errors.
-	/// Exactly equivalent to <code>checkForFatalError(false, message)</code>.
-	/// \param message An additional descriptive message.
-	/// \return true if there was a fatal error; false if everything is OK.
-	bool checkForFatalError(const char* message);
-
-	/// Check for HDAL errors, display them, and signal fatal errors.
-	/// Exactly equivalent to <code>checkForFatalError(message) || previousError</code>, but less nasty to read.
-	/// \param previousError	True if a previous error has occurred.
-	/// \param message	An additional descriptive message.
-	/// \return	true if there was a fatal error or if previousError is true; false if everything is OK.
-	bool checkForFatalError(bool previousError, const char* message)
-	{
-		bool newError = checkForFatalError(message);
-		return previousError || newError;
-	}
-
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 
@@ -224,9 +176,6 @@ private:
 	/// \param device A pointer to the device.
 	/// \param scale The multiplicative factor to apply to the rotation angles.
 	void setOrientationScale(const NovintDevice* device, double scale);
-
-	/// Logger used by the scaffold and all devices.
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;

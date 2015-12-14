@@ -27,7 +27,7 @@ namespace Devices
 SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::KeyboardDevice, KeyboardDevice);
 
 KeyboardDevice::KeyboardDevice(const std::string& deviceName) :
-	SurgSim::Input::CommonDevice(deviceName, KeyboardScaffold::buildDeviceInputData())
+	Input::CommonDevice(deviceName, KeyboardScaffold::buildDeviceInputData())
 {
 }
 
@@ -41,23 +41,24 @@ KeyboardDevice::~KeyboardDevice()
 
 bool KeyboardDevice::initialize()
 {
-	SURGSIM_ASSERT(!isInitialized());
-
-	m_scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(m_scaffold);
-
-	m_scaffold->registerDevice(this);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
-
-	return true;
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
+	auto scaffold = KeyboardScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold != nullptr);
+	bool registered = false;
+	if (scaffold->registerDevice(this))
+	{
+		m_scaffold = std::move(scaffold);
+		registered = true;
+	}
+	return registered;
 }
 
 bool KeyboardDevice::finalize()
 {
-	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
+	bool unregistered = m_scaffold->unregisterDevice();
 	m_scaffold.reset();
-	return true;
+	return unregistered;
 }
 
 bool KeyboardDevice::isInitialized() const

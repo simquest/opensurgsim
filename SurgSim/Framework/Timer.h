@@ -87,6 +87,9 @@ public:
 	/// \return The minimum duration across all the stored frames.  Asserts if there are no frames.
 	double getMinFramePeriod() const;
 
+	/// \return true if the frame buffer is full.
+	bool isBufferFull() const;
+
 private:
 	/// The Clock used by the Timer class.
 	typedef boost::chrono::steady_clock TimerClock;

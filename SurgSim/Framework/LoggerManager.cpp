@@ -63,6 +63,7 @@ void LoggerManager::setThreshold(int threshold)
 void LoggerManager::setThreshold(const std::string& path, int threshold)
 {
 	boost::lock_guard<boost::mutex> lock(m_mutex);
+	m_thresholds.push_back(std::make_pair(path, threshold));
 	for (auto it = m_loggers.cbegin(); it != m_loggers.cend(); ++it)
 	{
 		if (boost::istarts_with(it->first, path))
@@ -96,6 +97,14 @@ std::shared_ptr<Logger> LoggerManager::getLogger(const std::string& name)
 	{
 		result = std::make_shared<Logger>(Logger(name, m_defaultOutput));
 		result->setThreshold(m_globalThreshold);
+
+		for (const auto& subgroupThreshold : m_thresholds)
+		{
+			if (boost::istarts_with(name, subgroupThreshold.first))
+			{
+				result->setThreshold(subgroupThreshold.second);
+			}
+		}
 		m_loggers[name] = result;
 	}
 	return result;

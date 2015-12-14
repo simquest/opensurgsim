@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,10 +35,6 @@ namespace SurgSim
 {
 namespace Collision
 {
-
-TriangleMeshTriangleMeshDcdContact::TriangleMeshTriangleMeshDcdContact()
-{
-}
 
 std::pair<int, int> TriangleMeshTriangleMeshDcdContact::getShapeTypes()
 {
@@ -140,13 +136,17 @@ void assertIsCorrectNormalAndDepth(const Vector3d& normal,
 } // namespace
 #endif //SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
 
-void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshDcdContact::calculateContact(
+									 const Math::MeshShape& meshA,
+									 const Math::RigidTransform3d& meshAPose,
+									 const Math::MeshShape& meshB,
+									 const Math::RigidTransform3d& meshBPose) const
 {
-	auto meshA = std::static_pointer_cast<MeshShape>(pair->getFirst()->getPosedShape());
-	auto meshB = std::static_pointer_cast<MeshShape>(pair->getSecond()->getPosedShape());
+
+	std::list<std::shared_ptr<Contact>> contacts;
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= meshA->getAabbTree()->spatialJoin(*meshB->getAabbTree());
+		= meshA.getAabbTree()->spatialJoin(*(meshB.getAabbTree()));
 
 	double depth = 0.0;
 	Vector3d normal;
@@ -165,26 +165,26 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 
 		for (auto i = triangleListA.begin(); i != triangleListA.end(); ++i)
 		{
-			const Vector3d& normalA = meshA->getNormal(*i);
+			const Vector3d& normalA = meshA.getNormal(*i);
 			if (normalA.isZero())
 			{
 				continue;
 			}
 
-			auto verticesA = meshA->getTrianglePositions(*i);
+			auto verticesA = meshA.getTrianglePositions(*i);
 
 			for (auto j = triangleListB.begin(); j != triangleListB.end(); ++j)
 			{
-				const Vector3d& normalB = meshB->getNormal(*j);
+				const Vector3d& normalB = meshB.getNormal(*j);
 				if (normalB.isZero())
 				{
 					continue;
 				}
 
-				auto verticesB = meshB->getTrianglePositions(*j);
+				auto verticesB = meshB.getTrianglePositions(*j);
 
 				// Check if the triangles intersect.
-				if (SurgSim::Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
+				if (Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
 						verticesB[0], verticesB[1], verticesB[2],
 						normalA, normalB, &depth,
 						&penetrationPointA, &penetrationPointB,
@@ -205,25 +205,26 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
 					Vector3d barycentricCoordinate;
-					SurgSim::Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
-														  normalA, &barycentricCoordinate);
+					Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
+												 normalA, &barycentricCoordinate);
 					penetrationPoints.first.triangleMeshLocalCoordinate.setValue(
-						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
-					SurgSim::Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
-														  normalB, &barycentricCoordinate);
+						DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
+					Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
+												 normalB, &barycentricCoordinate);
 					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
-						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
+						DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
 
-					penetrationPoints.first.rigidLocalPosition.setValue(
-						pair->getFirst()->getPose().inverse() * penetrationPointA);
-					penetrationPoints.second.rigidLocalPosition.setValue(
-						pair->getSecond()->getPose().inverse() * penetrationPointB);
+					penetrationPoints.first.rigidLocalPosition.setValue(meshAPose.inverse() * penetrationPointA);
+					penetrationPoints.second.rigidLocalPosition.setValue(meshBPose.inverse() * penetrationPointB);
 
-					pair->addDcdContact(std::abs(depth), normal, penetrationPoints);
+					contacts.emplace_back(std::make_shared<Contact>(
+											  COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth), 1.0,
+											  Vector3d::Zero(), normal, penetrationPoints));
 				}
 			}
 		}
 	}
+	return contacts;
 }
 
 }; // namespace Collision

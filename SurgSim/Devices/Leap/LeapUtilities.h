@@ -13,23 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_COLLISIONDETECTIONTYPE_H
-#define SURGSIM_COLLISION_COLLISIONDETECTIONTYPE_H
+#ifndef SURGSIM_DEVICES_LEAP_LEAPUTILITIES_H
+#define SURGSIM_DEVICES_LEAP_LEAPUTILITIES_H
+
+#include "SurgSim/DataStructures/DataGroup.h"
+
 
 namespace SurgSim
 {
-namespace Collision
+namespace Devices
 {
 
-enum CollisionDetectionType
-{
-	COLLISION_DETECTION_TYPE_INVALID = -1,
-	COLLISION_DETECTION_TYPE_DISCRETE = 0,
-	COLLISION_DETECTION_TYPE_CONTINUOUS,
-	COLLISION_DETECTION_TYPE_COUNT
+/// Correct an infrared image from the LeapDevice, given its distortion callibration map
+/// \param image The distorted infrared image
+/// \param distortion The distortion callibration map
+/// \return The corrected infrared image
+DataStructures::DataGroup::ImageType undistortLeapImage(const DataStructures::DataGroup::ImageType& image,
+		const DataStructures::DataGroup::ImageType& distortion);
+
+};
 };
 
-} // namespace Collision
-} // namespace SurgSim
+#endif //SURGSIM_DEVICES_LEAP_LEAPUTILITIES_H
 
-#endif // SURGSIM_COLLISION_COLLISIONDETECTIONTYPE_H

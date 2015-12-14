@@ -18,13 +18,11 @@
 #include "SurgSim/Blocks/MassSpring3DRepresentation.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
-#include "SurgSim/Physics/Fem1DConstraintFixedPoint.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
-#include "SurgSim/Physics/Fem2DConstraintFixedPoint.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
-#include "SurgSim/Physics/Fem3DConstraintFixedPoint.h"
-#include "SurgSim/Physics/Fem3DConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FemConstraintFixedPoint.h"
+#include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedConstraintFixedPoint.h"
 #include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
@@ -48,6 +46,8 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 
 	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFrictionlessContact>());
 	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFrictionlessContact>());
+	addImplementation(typeid(Fem1DRepresentation), std::make_shared<Fem1DConstraintFrictionlessContact>());
+	addImplementation(typeid(Fem2DRepresentation), std::make_shared<Fem2DConstraintFrictionlessContact>());
 	addImplementation(typeid(Fem3DRepresentation), std::make_shared<Fem3DConstraintFrictionlessContact>());
 	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFixedPoint>());
 	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFixedPoint>());

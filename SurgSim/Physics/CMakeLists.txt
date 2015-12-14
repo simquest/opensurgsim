@@ -28,25 +28,24 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableCollisionRepresentation.cpp
 	DeformableRepresentation.cpp
 	Fem1D.cpp
-	Fem1DConstraintFixedPoint.cpp
 	Fem1DElementBeam.cpp
 	Fem1DLocalization.cpp
 	Fem1DPlyReaderDelegate.cpp
 	Fem1DRepresentation.cpp
 	Fem2D.cpp
-	Fem2DConstraintFixedPoint.cpp
 	Fem2DElementTriangle.cpp
 	Fem2DLocalization.cpp
 	Fem2DPlyReaderDelegate.cpp
 	Fem2DRepresentation.cpp
 	Fem3D.cpp
-	Fem3DConstraintFixedPoint.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
 	Fem3DLocalization.cpp
 	Fem3DPlyReaderDelegate.cpp
 	Fem3DRepresentation.cpp
+	FemConstraintFixedPoint.cpp
+	FemConstraintFrictionlessContact.cpp
 	FemElement.cpp
 	FemLocalization.cpp
 	FemPlyReaderDelegate.cpp
@@ -102,30 +101,24 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem.h
 	Fem-inl.h
 	Fem1D.h
-	Fem1DConstraintFixedPoint.h
-	Fem1DConstraintFrictionlessContact.h
 	Fem1DElementBeam.h
 	Fem1DLocalization.h
 	Fem1DPlyReaderDelegate.h
 	Fem1DRepresentation.h
 	Fem2D.h
-	Fem2DConstraintFixedPoint.h
-	Fem2DConstraintFrictionlessContact.h
 	Fem2DElementTriangle.h
 	Fem2DLocalization.h
 	Fem2DPlyReaderDelegate.h
 	Fem2DRepresentation.h
 	Fem3D.h
-	Fem3DConstraintFixedPoint.h
-	Fem3DConstraintFrictionlessContact.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h
 	Fem3DLocalization.h
 	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
+	FemConstraintFixedPoint.h
 	FemConstraintFrictionlessContact.h
-	FemConstraintFrictionlessContact-inl.h
 	FemElement.h
 	FemElement-inl.h
 	FemElementStructs.h

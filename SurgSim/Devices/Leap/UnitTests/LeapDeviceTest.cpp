@@ -159,7 +159,9 @@ TEST(LeapDeviceTest, InputConsumer)
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 120);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("left"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("left_distortion"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("right"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.images().hasEntry("right_distortion"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("pose"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("ThumbProximal"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasEntry("ThumbIntermediate"));
@@ -215,27 +217,15 @@ TEST(LeapDeviceTest, AccessibleTest)
 {
 	std::shared_ptr<LeapDevice> device = std::make_shared<LeapDevice>("TestLeap");
 
-	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getValue<HandType>("HandType"));
 
-	device->setValue("HandType", "Left");
-	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
+	device->setValue("HandType", HANDTYPE_LEFT);
+	EXPECT_EQ(HANDTYPE_LEFT, device->getValue<HandType>("HandType"));
 	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
 
-	EXPECT_NO_THROW(device->setValue("HandType", "Invalid"));
-	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
-	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
-
-	EXPECT_NO_THROW(device->setValue("HandType", "right"));
-	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
+	EXPECT_NO_THROW(device->setValue("HandType", HANDTYPE_RIGHT));
+	EXPECT_EQ(HANDTYPE_RIGHT, device->getValue<HandType>("HandType"));
 	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
-
-	EXPECT_NO_THROW(device->setValue("HandType", "Invalid"));
-	EXPECT_EQ("Right", device->getValue<std::string>("HandType"));
-	EXPECT_EQ(HANDTYPE_RIGHT, device->getHandType());
-
-	EXPECT_NO_THROW(device->setValue("HandType", "LEFT"));
-	EXPECT_EQ("Left", device->getValue<std::string>("HandType"));
-	EXPECT_EQ(HANDTYPE_LEFT, device->getHandType());
 }
 
 };

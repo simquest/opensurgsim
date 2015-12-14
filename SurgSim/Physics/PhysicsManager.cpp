@@ -59,9 +59,7 @@ bool PhysicsManager::doInitialize()
 	addComputation(std::make_shared<PreUpdate>(copyState));
 	addComputation(std::make_shared<FreeMotion>(copyState));
 	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
-	addComputation(std::make_shared<ClearCollisions>(copyState));
 	addComputation(std::make_shared<DcdCollision>(copyState));
-	addComputation(std::make_shared<PublishCollisions>(copyState));
 	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
 	addComputation(std::make_shared<BuildMlcp>(copyState));
 	addComputation(std::make_shared<SolveMlcp>(copyState));
@@ -124,6 +122,29 @@ bool PhysicsManager::doUpdate(double dt)
 	for (const auto& computation : m_computations)
 	{
 		stateList.push_back(computation->update(dt, stateList.back()));
+	}
+
+	if (m_logger->getThreshold() <= SURGSIM_LOG_LEVEL(DEBUG))
+	{
+		if (m_computations.front()->getTimer().isBufferFull())
+		{
+			double totalTime = 0.0;
+			for (const auto& computation : m_computations)
+			{
+				totalTime += computation->getTimer().getAverageFramePeriod();
+			}
+			const size_t newFrames = static_cast<size_t>(10.0 / std::max(totalTime, dt));
+			for (const auto& computation : m_computations)
+			{
+				auto& timer = computation->getTimer();
+				const double period = timer.getAverageFramePeriod();
+				SURGSIM_LOG_DEBUG(m_logger) << std::fixed << std::setprecision(0) <<
+					computation->getClassName() << " \taverage duration " << 1e6 * period << " us (max " <<
+					1e6 * timer.getMaxFramePeriod() << " us), " << 100.0 * period / totalTime << "% of Physics.";
+				timer.setMaxNumberOfFrames(newFrames);
+				timer.start();
+			}
+		}
 	}
 
 	m_finalState.set(*(stateList.back()));

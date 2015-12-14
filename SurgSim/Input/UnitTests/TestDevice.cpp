@@ -16,21 +16,30 @@
 #include "SurgSim/Input/UnitTests/TestDevice.h"
 
 TestDevice::TestDevice(const std::string& uniqueName) :
-	CommonDevice(uniqueName, buildInputData())
+	CommonDevice(uniqueName, buildInputData()),
+	m_initialized(false)
 {
-
 }
 
 // required by the DeviceInterface API
 bool TestDevice::initialize()
 {
+	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
+	m_initialized = true;
 	return true;
 }
 
 // required by the DeviceInterface API
 bool TestDevice::finalize()
 {
+	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
+	m_initialized = false;
 	return true;
+}
+
+bool TestDevice::isInitialized() const
+{
+	return m_initialized;
 }
 
 // expose the pushInput method to the world

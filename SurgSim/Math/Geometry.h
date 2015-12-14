@@ -57,6 +57,33 @@ static const double ScalarEpsilon = 1e-10;
 
 }
 
+/// Calculate the barycentric coordinates of a point with respect to a line segment.
+/// \tparam T Floating point type of the calculation, can usually be inferred.
+/// \tparam MOpt Eigen Matrix options, can usually be inferred.
+/// \param pt Vertex of the point.
+/// \param sv0, sv1 Vertices of the line segment.
+/// \param [out] coordinates Barycentric coordinates.
+/// \return bool true on success, false if two or more if the line segment is considered degenerate
+/// \note The point need not be on the line segment, in which case, the barycentric coordinate of the projection
+/// is calculated.
+template <class T, int MOpt> inline
+bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+							const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+							const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+							Eigen::Matrix<T, 2, 1, MOpt>* coordinates)
+{
+	const Eigen::Matrix<T, 3, 1, MOpt> line = sv1 - sv0;
+	const T length2 = line.squaredNorm();
+	if (length2 < Geometry::SquaredDistanceEpsilon)
+	{
+		coordinates->setConstant((std::numeric_limits<double>::quiet_NaN()));
+		return false;
+	}
+	(*coordinates)[1] = (pt - sv0).dot(line) / length2;
+	(*coordinates)[0] = static_cast<T>(1) - (*coordinates)[1];
+	return true;
+}
+
 /// Calculate the barycentric coordinates of a point with respect to a triangle.
 /// \pre The normal must be unit length
 /// \pre The triangle vertices must be in counter clockwise order in respect to the normal
@@ -67,7 +94,7 @@ static const double ScalarEpsilon = 1e-10;
 /// \param tn Normal of the triangle (yes must be of norm 1 and a,b,c CCW).
 /// \param [out] coordinates Barycentric coordinates.
 /// \return bool true on success, false if two or more if the triangle is considered degenerate
-template <class T,int MOpt> inline
+template <class T, int MOpt> inline
 bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
 							const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
 							const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
@@ -75,15 +102,15 @@ bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
 							const Eigen::Matrix<T, 3, 1, MOpt>& tn,
 							Eigen::Matrix<T, 3, 1, MOpt>* coordinates)
 {
-	const T signedTriAreaX2 = ((tv1-tv0).cross(tv2-tv0)).dot(tn);
+	const T signedTriAreaX2 = ((tv1 - tv0).cross(tv2 - tv0)).dot(tn);
 	if (signedTriAreaX2 < Geometry::SquaredDistanceEpsilon)
 	{
 		// SQ_ASSERT_WARNING(false, "Cannot compute barycentric coords (degenetrate triangle), assigning center");
 		coordinates->setConstant((std::numeric_limits<double>::quiet_NaN()));
 		return false;
 	}
-	(*coordinates)[0] = ((tv1-pt).cross(tv2-pt)).dot(tn) / signedTriAreaX2;
-	(*coordinates)[1] = ((tv2-pt).cross(tv0-pt)).dot(tn) / signedTriAreaX2;
+	(*coordinates)[0] = ((tv1 - pt).cross(tv2 - pt)).dot(tn) / signedTriAreaX2;
+	(*coordinates)[1] = ((tv2 - pt).cross(tv0 - pt)).dot(tn) / signedTriAreaX2;
 	(*coordinates)[2] = 1 - (*coordinates)[0] - (*coordinates)[1];
 	return true;
 }
@@ -106,7 +133,7 @@ bool barycentricCoordinates(
 	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
 	Eigen::Matrix<T, 3, 1, MOpt>* coordinates)
 {
-	const Eigen::Matrix<T, 3, 1, MOpt> tn = (tv1-tv0).cross(tv2-tv0);
+	const Eigen::Matrix<T, 3, 1, MOpt> tn = (tv1 - tv0).cross(tv2 - tv0);
 	return barycentricCoordinates(pt, tv0, tv1, tv2, tn, coordinates);
 }
 
@@ -189,17 +216,17 @@ T distancePointLine(
 	// The lines is parametrized by:
 	//		q = v0 + lambda0 * (v1-v0)
 	// and we solve for pq.v01 = 0;
-	Eigen::Matrix<T, 3, 1, MOpt> v01 = v1-v0;
+	Eigen::Matrix<T, 3, 1, MOpt> v01 = v1 - v0;
 	T v01_norm2 = v01.squaredNorm();
 	if (v01_norm2 <= Geometry::SquaredDistanceEpsilon)
 	{
 		*result = v0; // closest point is either
-		T pv_norm2 = (pt-v0).squaredNorm();
+		T pv_norm2 = (pt - v0).squaredNorm();
 		return sqrt(pv_norm2);
 	}
-	T lambda = (v01).dot(pt-v0);
-	*result = v0 + lambda*v01/v01_norm2;
-	return (*result-pt).norm();
+	T lambda = (v01).dot(pt - v0);
+	*result = v0 + lambda * v01 / v01_norm2;
+	return (*result - pt).norm();
 }
 
 /// Point segment distance, if the projection of the closest point is not within the segments, the
@@ -217,14 +244,14 @@ T distancePointSegment(
 	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
 	Eigen::Matrix<T, 3, 1, MOpt>* result)
 {
-	Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1-sv0;
+	Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1 - sv0;
 	T v01Norm2 = v01.squaredNorm();
 	if (v01Norm2 <= Geometry::SquaredDistanceEpsilon)
 	{
 		*result = sv0; // closest point is either
-		return (pt-sv0).norm();
+		return (pt - sv0).norm();
 	}
-	T lambda = v01.dot(pt-sv0);
+	T lambda = v01.dot(pt - sv0);
 	if (lambda <= 0)
 	{
 		*result = sv0;
@@ -235,9 +262,9 @@ T distancePointSegment(
 	}
 	else
 	{
-		*result = sv0 + lambda*v01/v01Norm2;
+		*result = sv0 + lambda * v01 / v01Norm2;
 	}
-	return (*result-pt).norm();
+	return (*result - pt).norm();
 }
 
 /// Determine the distance between two lines
@@ -266,7 +293,7 @@ T distanceLineLine(
 	//		p1 = l1v0 + lambda1 * (l1v1-l1v0)
 	// and we solve for p0p1 perpendicular to both lines
 	T lambda0, lambda1;
-	Eigen::Matrix<T, 3, 1, MOpt> l0v01 = l0v1-l0v0;
+	Eigen::Matrix<T, 3, 1, MOpt> l0v01 = l0v1 - l0v0;
 	T a = l0v01.squaredNorm();
 	if (a <= Geometry::SquaredDistanceEpsilon)
 	{
@@ -274,7 +301,7 @@ T distanceLineLine(
 		*pt0 = l0v0;
 		return distancePointSegment(l0v0, l1v0, l1v1, pt1);
 	}
-	Eigen::Matrix<T, 3, 1, MOpt> l1v01 = l1v1-l1v0;
+	Eigen::Matrix<T, 3, 1, MOpt> l1v01 = l1v1 - l1v0;
 	T b = -l0v01.dot(l1v01);
 	T c = l1v01.squaredNorm();
 	if (c <= Geometry::SquaredDistanceEpsilon)
@@ -283,10 +310,10 @@ T distanceLineLine(
 		*pt1 = l1v0;
 		return distancePointSegment(l1v0, l0v0, l0v1, pt0);
 	}
-	Eigen::Matrix<T, 3, 1, MOpt> l0v0_l1v0 = l0v0-l1v0;
+	Eigen::Matrix<T, 3, 1, MOpt> l0v0_l1v0 = l0v0 - l1v0;
 	T d = l0v01.dot(l0v0_l1v0);
 	T e = -l1v01.dot(l0v0_l1v0);
-	T ratio = a*c-b*b;
+	T ratio = a * c - b * b;
 	if (std::abs(ratio) <= Geometry::ScalarEpsilon)
 	{
 		// parallel case
@@ -297,12 +324,12 @@ T distanceLineLine(
 	{
 		// non-parallel case
 		T inv_ratio = T(1) / ratio;
-		lambda0 = (b*e - c*d) * inv_ratio;
-		lambda1 = (b*d - a*e) * inv_ratio;
+		lambda0 = (b * e - c * d) * inv_ratio;
+		lambda1 = (b * d - a * e) * inv_ratio;
 	}
 	*pt0 = l0v0 + lambda0 * l0v01;
 	*pt1 = l1v0 + lambda1 * l1v01;
-	return ((*pt0)-(*pt1)).norm();
+	return ((*pt0) - (*pt1)).norm();
 }
 
 
@@ -325,8 +352,8 @@ T distanceSegmentSegment(
 	const Eigen::Matrix<T, 3, 1, MOpt>& s1v1,
 	Eigen::Matrix<T, 3, 1, MOpt>* pt0,
 	Eigen::Matrix<T, 3, 1, MOpt>* pt1,
-	T *s0t = nullptr,
-	T *s1t = nullptr)
+	T* s0t = nullptr,
+	T* s1t = nullptr)
 {
 	// Based on the outline of http://www.geometrictools.com/Documentation/DistanceLine3Line3.pdf, also refer to
 	// http://geomalgorithms.com/a07-_distance.html for a geometric interpretation
@@ -334,7 +361,7 @@ T distanceSegmentSegment(
 	//		p0 = l0v0 + s * (l0v1-l0v0), with s between 0 and 1
 	//		p1 = l1v0 + t * (l1v1-l1v0), with t between 0 and 1
 	// We are minimizing Q(s, t) = as*as + 2bst + ct*ct + 2ds + 2et + f,
-	Eigen::Matrix<T, 3, 1, MOpt> s0v01 = s0v1-s0v0;
+	Eigen::Matrix<T, 3, 1, MOpt> s0v01 = s0v1 - s0v0;
 	T a = s0v01.squaredNorm();
 	if (a <= Geometry::SquaredDistanceEpsilon)
 	{
@@ -342,7 +369,7 @@ T distanceSegmentSegment(
 		*pt0 = s0v0;
 		return distancePointSegment<T>(s0v0, s1v0, s1v1, pt1);
 	}
-	Eigen::Matrix<T, 3, 1, MOpt> s1v01 = s1v1-s1v0;
+	Eigen::Matrix<T, 3, 1, MOpt> s1v01 = s1v1 - s1v0;
 	T b = -s0v01.dot(s1v01);
 	T c = s1v01.squaredNorm();
 	if (c <= Geometry::SquaredDistanceEpsilon)
@@ -351,11 +378,11 @@ T distanceSegmentSegment(
 		*pt1 = s1v1;
 		return distancePointSegment<T>(s1v0, s0v0, s0v1, pt0);
 	}
-	Eigen::Matrix<T, 3, 1, MOpt> tempLine = s0v0-s1v0;
+	Eigen::Matrix<T, 3, 1, MOpt> tempLine = s0v0 - s1v0;
 	T d = s0v01.dot(tempLine);
 	T e = -s1v01.dot(tempLine);
-	T ratio = a*c-b*b;
-	T s,t; // parametrization variables (do not initialize)
+	T ratio = a * c - b * b;
+	T s, t; // parametrization variables (do not initialize)
 	int region = -1;
 	T tmp;
 	// Non-parallel case
@@ -375,8 +402,8 @@ T distanceSegmentSegment(
 		//	6	|	7	|	8
 		//		|		|
 		//
-		s = b*e-c*d;
-		t = b*d-a*e;
+		s = b * e - c * d;
+		t = b * d - a * e;
 		if (s >= 0)
 		{
 			if (s <= ratio)
@@ -438,149 +465,149 @@ T distanceSegmentSegment(
 		edge_type edge = edge_invalid;
 		switch (region)
 		{
-		case 0:
-			// Global minimum inside [0,1] [0,1]
-			s /= ratio;
-			t /= ratio;
-			edge = edge_skip;
-			break;
-		case 1:
-			edge = s1;
-			break;
-		case 2:
-			// Q_s(1,1)/2 = a+b+d
-			if (a+b+d > 0)
-			{
-				edge = t1;
-			}
-			else
-			{
+			case 0:
+				// Global minimum inside [0,1] [0,1]
+				s /= ratio;
+				t /= ratio;
+				edge = edge_skip;
+				break;
+			case 1:
 				edge = s1;
-			}
-			break;
-		case 3:
-			edge = t1;
-			break;
-		case 4:
-			// Q_s(0,1)/2 = b+d
-			if (b+d > 0)
-			{
-				edge = s0;
-			}
-			else
-			{
+				break;
+			case 2:
+				// Q_s(1,1)/2 = a+b+d
+				if (a + b + d > 0)
+				{
+					edge = t1;
+				}
+				else
+				{
+					edge = s1;
+				}
+				break;
+			case 3:
 				edge = t1;
-			}
-			break;
-		case 5:
-			edge = s0;
-			break;
-		case 6:
-			// Q_s(0,0)/2 = d
-			if (d > 0)
-			{
+				break;
+			case 4:
+				// Q_s(0,1)/2 = b+d
+				if (b + d > 0)
+				{
+					edge = s0;
+				}
+				else
+				{
+					edge = t1;
+				}
+				break;
+			case 5:
 				edge = s0;
-			}
-			else
-			{
+				break;
+			case 6:
+				// Q_s(0,0)/2 = d
+				if (d > 0)
+				{
+					edge = s0;
+				}
+				else
+				{
+					edge = t0;
+				}
+				break;
+			case 7:
 				edge = t0;
-			}
-			break;
-		case 7:
-			edge = t0;
-			break;
-		case 8:
-			// Q_s(1,0)/2 = a+d
-			if (a+d > 0)
-			{
-				edge = t0;
-			}
-			else
-			{
-				edge = s1;
-			}
-			break;
-		default:
-			break;
+				break;
+			case 8:
+				// Q_s(1,0)/2 = a+d
+				if (a + d > 0)
+				{
+					edge = t0;
+				}
+				else
+				{
+					edge = s1;
+				}
+				break;
+			default:
+				break;
 		}
 		switch (edge)
 		{
-		case s0:
-			// F(t) = Q(0,t), F?(t) = 2*(e+c*t)
-			// F?(T) = 0 when T = -e/c, then clamp between 0 and 1 (c always >= 0)
-			s = 0;
-			tmp = e;
-			if (tmp > 0)
-			{
-				t = 0;
-			}
-			else if (-tmp > c)
-			{
-				t = 1;
-			}
-			else
-			{
-				t = -tmp/c;
-			}
-			break;
-		case s1:
-			// F(t) = Q(1,t), F?(t) = 2*((b+e)+c*t)
-			// F?(T) = 0 when T = -(b+e)/c, then clamp between 0 and 1 (c always >= 0)
-			s = 1;
-			tmp = b+e;
-			if (tmp > 0)
-			{
-				t = 0;
-			}
-			else if (-tmp > c)
-			{
-				t = 1;
-			}
-			else
-			{
-				t = -tmp/c;
-			}
-			break;
-		case t0:
-			// F(s) = Q(s,0), F?(s) = 2*(d+a*s) =>
-			// F?(S) = 0 when S = -d/a, then clamp between 0 and 1 (a always >= 0)
-			t = 0;
-			tmp = d;
-			if (tmp > 0)
-			{
+			case s0:
+				// F(t) = Q(0,t), F?(t) = 2*(e+c*t)
+				// F?(T) = 0 when T = -e/c, then clamp between 0 and 1 (c always >= 0)
 				s = 0;
-			}
-			else if (-tmp > a)
-			{
+				tmp = e;
+				if (tmp > 0)
+				{
+					t = 0;
+				}
+				else if (-tmp > c)
+				{
+					t = 1;
+				}
+				else
+				{
+					t = -tmp / c;
+				}
+				break;
+			case s1:
+				// F(t) = Q(1,t), F?(t) = 2*((b+e)+c*t)
+				// F?(T) = 0 when T = -(b+e)/c, then clamp between 0 and 1 (c always >= 0)
 				s = 1;
-			}
-			else
-			{
-				s = -tmp/a;
-			}
-			break;
-		case t1:
-			// F(s) = Q(s,1), F?(s) = 2*(b+d+a*s) =>
-			// F?(S) = 0 when S = -(b+d)/a, then clamp between 0 and 1  (a always >= 0)
-			t = 1;
-			tmp = b+d;
-			if (tmp > 0)
-			{
-				s = 0;
-			}
-			else if (-tmp > a)
-			{
-				s = 1;
-			}
-			else
-			{
-				s = -tmp/a;
-			}
-			break;
-		case edge_skip:
-			break;
-		default:
-			break;
+				tmp = b + e;
+				if (tmp > 0)
+				{
+					t = 0;
+				}
+				else if (-tmp > c)
+				{
+					t = 1;
+				}
+				else
+				{
+					t = -tmp / c;
+				}
+				break;
+			case t0:
+				// F(s) = Q(s,0), F?(s) = 2*(d+a*s) =>
+				// F?(S) = 0 when S = -d/a, then clamp between 0 and 1 (a always >= 0)
+				t = 0;
+				tmp = d;
+				if (tmp > 0)
+				{
+					s = 0;
+				}
+				else if (-tmp > a)
+				{
+					s = 1;
+				}
+				else
+				{
+					s = -tmp / a;
+				}
+				break;
+			case t1:
+				// F(s) = Q(s,1), F?(s) = 2*(b+d+a*s) =>
+				// F?(S) = 0 when S = -(b+d)/a, then clamp between 0 and 1  (a always >= 0)
+				t = 1;
+				tmp = b + d;
+				if (tmp > 0)
+				{
+					s = 0;
+				}
+				else if (-tmp > a)
+				{
+					s = 1;
+				}
+				else
+				{
+					s = -tmp / a;
+				}
+				break;
+			case edge_skip:
+				break;
+			default:
+				break;
 		}
 	}
 	else
@@ -598,21 +625,21 @@ T distanceSegmentSegment(
 			else if (-d <= a)
 			{
 				// s-segment 0 end-point in the middle of the t 0-1 segment, get distance
-				s = -d/a;
+				s = -d / a;
 				t = 0;
 			}
 			else
 			{
 				// s-segment 1 is definitely closer
 				s = 1;
-				tmp = a+d;
+				tmp = a + d;
 				if (-tmp >= b)
 				{
 					t = 1;
 				}
 				else
 				{
-					t = -tmp/b;
+					t = -tmp / b;
 				}
 			}
 		}
@@ -628,7 +655,7 @@ T distanceSegmentSegment(
 			else if (d <= 0)
 			{
 				// mid-0
-				s = -d/a;
+				s = -d / a;
 				t = 0;
 			}
 			else
@@ -641,7 +668,7 @@ T distanceSegmentSegment(
 				}
 				else
 				{
-					t = -d/b;
+					t = -d / b;
 				}
 			}
 		}
@@ -653,7 +680,7 @@ T distanceSegmentSegment(
 		*s0t = s;
 		*s1t = t;
 	}
-	return ((*pt1)-(*pt0)).norm();
+	return ((*pt1) - (*pt0)).norm();
 }
 
 /// Calculate the normal distance of a point from a triangle, the resulting point will be on the edge of the triangle
@@ -678,8 +705,8 @@ T distancePointTriangle(
 	// The triangle is parametrized by:
 	//		t: tv0 + s * (tv1-tv0) + t * (tv2-tv0) , with s and t between 0 and 1
 	// We are minimizing Q(s, t) = as*as + 2bst + ct*ct + 2ds + 2et + f,
-	Eigen::Matrix<T, 3, 1, MOpt> tv01 = tv1-tv0;
-	Eigen::Matrix<T, 3, 1, MOpt> tv02 = tv2-tv0;
+	Eigen::Matrix<T, 3, 1, MOpt> tv01 = tv1 - tv0;
+	Eigen::Matrix<T, 3, 1, MOpt> tv02 = tv2 - tv0;
 	T a = tv01.squaredNorm();
 	if (a <= Geometry::SquaredDistanceEpsilon)
 	{
@@ -699,15 +726,15 @@ T distancePointTriangle(
 		// Degenerate edge 3
 		return distancePointSegment<T>(pt, tv0, tv1, result);
 	}
-	Eigen::Matrix<T, 3, 1, MOpt> tv0pv0 = tv0-pt;
+	Eigen::Matrix<T, 3, 1, MOpt> tv0pv0 = tv0 - pt;
 	T d = tv01.dot(tv0pv0);
 	T e = tv02.dot(tv0pv0);
-	T ratio = a*c-b*b;
-	T s = b*e-c*d;
-	T t = b*d-a*e;
+	T ratio = a * c - b * b;
+	T s = b * e - c * d;
+	T t = b * d - a * e;
 	// Determine region (inside-outside triangle)
 	int region = -1;
-	if (s+t <= ratio)
+	if (s + t <= ratio)
 	{
 		if (s < 0)
 		{
@@ -764,112 +791,112 @@ T distancePointTriangle(
 	edge_type edge = edge_invalid;
 	switch (region)
 	{
-	case 0:
-		// Global minimum inside [0,1] [0,1]
-		numer = T(1) / ratio;
-		s *= numer;
-		t *= numer;
-		edge = edge_skip;
-		break;
-	case 1:
-		edge = s1t1;
-		break;
-	case 2:
-		// Grad(Q(0,1)).(0,-1)/2 = -c-e
-		// Grad(Q(0,1)).(1,-1)/2 = b=d-c-e
-		tmp0 = b+d;
-		tmp1 = c+e;
-		if (tmp1 > tmp0)
-		{
+		case 0:
+			// Global minimum inside [0,1] [0,1]
+			numer = T(1) / ratio;
+			s *= numer;
+			t *= numer;
+			edge = edge_skip;
+			break;
+		case 1:
 			edge = s1t1;
-		}
-		else
-		{
+			break;
+		case 2:
+			// Grad(Q(0,1)).(0,-1)/2 = -c-e
+			// Grad(Q(0,1)).(1,-1)/2 = b=d-c-e
+			tmp0 = b + d;
+			tmp1 = c + e;
+			if (tmp1 > tmp0)
+			{
+				edge = s1t1;
+			}
+			else
+			{
+				edge = s0;
+			}
+			break;
+		case 3:
 			edge = s0;
-		}
-		break;
-	case 3:
-		edge = s0;
-		break;
-	case 4:
-		// Grad(Q(0,0)).(0,1)/2 = e
-		// Grad(Q(0,0)).(1,0)/2 = d
-		if (e >= d)
-		{
+			break;
+		case 4:
+			// Grad(Q(0,0)).(0,1)/2 = e
+			// Grad(Q(0,0)).(1,0)/2 = d
+			if (e >= d)
+			{
+				edge = t0;
+			}
+			else
+			{
+				edge = s0;
+			}
+			break;
+		case 5:
 			edge = t0;
-		}
-		else
-		{
-			edge = s0;
-		}
-		break;
-	case 5:
-		edge = t0;
-		break;
-	case 6:
-		// Grad(Q(1,0)).(-1,0)/2 = -a-d
-		// Grad(Q(1,0)).(-1,1)/2 = -a-d+b+e
-		tmp0 = -a-d;
-		tmp1 = -a-d+b+e;
-		if (tmp1 > tmp0)
-		{
-			edge = t0;
-		}
-		else
-		{
-			edge = s1t1;
-		}
-		break;
-	default:
-		break;
+			break;
+		case 6:
+			// Grad(Q(1,0)).(-1,0)/2 = -a-d
+			// Grad(Q(1,0)).(-1,1)/2 = -a-d+b+e
+			tmp0 = -a - d;
+			tmp1 = -a - d + b + e;
+			if (tmp1 > tmp0)
+			{
+				edge = t0;
+			}
+			else
+			{
+				edge = s1t1;
+			}
+			break;
+		default:
+			break;
 	}
 	switch (edge)
 	{
-	case s0:
-		// F(t) = Q(0, t), F'(t)=0 when -e/c = 0
-		s = 0;
-		if (e >= 0)
-		{
+		case s0:
+			// F(t) = Q(0, t), F'(t)=0 when -e/c = 0
+			s = 0;
+			if (e >= 0)
+			{
+				t = 0;
+			}
+			else
+			{
+				t = (-e >= c ? 1 : -e / c);
+			}
+			break;
+		case t0:
+			// F(s) = Q(s, 0), F'(s)=0 when -d/a = 0
 			t = 0;
-		}
-		else
-		{
-			t = (-e >= c ? 1 : -e/c);
-		}
-		break;
-	case t0:
-		// F(s) = Q(s, 0), F'(s)=0 when -d/a = 0
-		t = 0;
-		if (d >= 0)
-		{
-			s = 0;
-		}
-		else
-		{
-			s = (-d >= a ? 1 : -d/a);
-		}
-		break;
-	case s1t1:
-		// F(s) = Q(s, 1-s), F'(s) = 0 when (c+e-b-d)/(a-2b+c) = 0 (denom = || tv01-tv02 ||^2 always > 0)
-		numer = c+e-b-d;
-		if (numer <= 0)
-		{
-			s = 0;
-		}
-		else
-		{
-			denom = a-2*b+c;
-			s = (numer >= denom ? 1 : numer / denom);
-		}
-		t = 1-s;
-		break;
-	case edge_skip:
-		break;
-	default:
-		break;
+			if (d >= 0)
+			{
+				s = 0;
+			}
+			else
+			{
+				s = (-d >= a ? 1 : -d / a);
+			}
+			break;
+		case s1t1:
+			// F(s) = Q(s, 1-s), F'(s) = 0 when (c+e-b-d)/(a-2b+c) = 0 (denom = || tv01-tv02 ||^2 always > 0)
+			numer = c + e - b - d;
+			if (numer <= 0)
+			{
+				s = 0;
+			}
+			else
+			{
+				denom = a - 2 * b + c;
+				s = (numer >= denom ? 1 : numer / denom);
+			}
+			t = 1 - s;
+			break;
+		case edge_skip:
+			break;
+		default:
+			break;
 	}
 	*result = tv0 + s * tv01 + t * tv02;
-	return ((*result)-pt).norm();
+	return ((*result) - pt).norm();
 }
 
 /// Calculate the intersection of a line segment with a triangle
@@ -897,12 +924,12 @@ bool doesCollideSegmentTriangle(
 	Eigen::Matrix<T, 3, 1, MOpt>* result)
 {
 	// Triangle edges vectors
-	Eigen::Matrix<T, 3, 1, MOpt> u = tv1-tv0;
-	Eigen::Matrix<T, 3, 1, MOpt> v = tv2-tv0;
+	Eigen::Matrix<T, 3, 1, MOpt> u = tv1 - tv0;
+	Eigen::Matrix<T, 3, 1, MOpt> v = tv2 - tv0;
 
 	// Ray direction vector
-	Eigen::Matrix<T, 3, 1, MOpt> dir = sv1-sv0;
-	Eigen::Matrix<T, 3, 1, MOpt> w0 = sv0-tv0;
+	Eigen::Matrix<T, 3, 1, MOpt> dir = sv1 - sv0;
+	Eigen::Matrix<T, 3, 1, MOpt> w0 = sv0 - tv0;
 	T a = -tn.dot(w0);
 	T b = tn.dot(dir);
 
@@ -915,12 +942,12 @@ bool doesCollideSegmentTriangle(
 		{
 			// Ray lies in triangle plane
 			Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
-			for (int i=0; i<2; ++i)
+			for (int i = 0; i < 2; ++i)
 			{
-				barycentricCoordinates((i==0?sv0:sv1), tv0, tv1, tv2, tn, &baryCoords);
+				barycentricCoordinates((i == 0 ? sv0 : sv1), tv0, tv1, tv2, tn, &baryCoords);
 				if (baryCoords[0] >= 0 && baryCoords[1] >= 0 && baryCoords[2] >= 0)
 				{
-					*result = (i==0)?sv0:sv1;
+					*result = (i == 0) ? sv0 : sv1;
 					return true;
 				}
 			}
@@ -942,7 +969,7 @@ bool doesCollideSegmentTriangle(
 		return false;
 	}
 	//Ray comes toward triangle but isn't long enough to reach it
-	if (r > 1+Geometry::DistanceEpsilon)
+	if (r > 1 + Geometry::DistanceEpsilon)
 	{
 		return false;
 	}
@@ -993,7 +1020,7 @@ T distancePointPlane(
 	Eigen::Matrix<T, 3, 1, MOpt>* result)
 {
 	T dist = n.dot(pt) + d;
-	*result = pt - n*dist;
+	*result = pt - n * dist;
 	return dist;
 }
 
@@ -1027,9 +1054,9 @@ T distanceSegmentPlane(
 	Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1 - sv0;
 	if (std::abs(n.dot(v01)) <= Geometry::AngularEpsilon)
 	{
-		*closestPointSegment = (sv0 + sv1)*T(0.5);
+		*closestPointSegment = (sv0 + sv1) * T(0.5);
 		dist0 = n.dot(*closestPointSegment) + d;
-		*planeIntersectionPoint = *closestPointSegment - dist0*n;
+		*planeIntersectionPoint = *closestPointSegment - dist0 * n;
 		return (std::abs(dist0) < Geometry::DistanceEpsilon ? 0 : dist0);
 	}
 	// Both on the same side
@@ -1038,21 +1065,21 @@ T distanceSegmentPlane(
 		if (std::abs(dist0) < std::abs(dist1))
 		{
 			*closestPointSegment = sv0;
-			*planeIntersectionPoint = sv0 - dist0*n;
+			*planeIntersectionPoint = sv0 - dist0 * n;
 			return dist0;
 		}
 		else
 		{
 			*closestPointSegment = sv1;
-			*planeIntersectionPoint = sv1 - dist1*n;
+			*planeIntersectionPoint = sv1 - dist1 * n;
 			return dist1;
 		}
 	}
 	// Segment cutting through
 	else
 	{
-		Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1-sv0;
-		T lambda= (-d-sv0.dot(n)) / v01.dot(n);
+		Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1 - sv0;
+		T lambda = (-d - sv0.dot(n)) / v01.dot(n);
 		*planeIntersectionPoint = sv0 + lambda * v01;
 		*closestPointSegment = *planeIntersectionPoint;
 		return 0;
@@ -1084,9 +1111,9 @@ T distanceTrianglePlane(
 	Eigen::Matrix<T, 3, 1, MOpt>* planeProjectionPoint)
 {
 	Eigen::Matrix<T, 3, 1, MOpt> distances(n.dot(tv0) + d, n.dot(tv1) + d, n.dot(tv2) + d);
-	Eigen::Matrix<T, 3, 1, MOpt> t01 = tv1-tv0;
-	Eigen::Matrix<T, 3, 1, MOpt> t02 = tv2-tv0;
-	Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2-tv1;
+	Eigen::Matrix<T, 3, 1, MOpt> t01 = tv1 - tv0;
+	Eigen::Matrix<T, 3, 1, MOpt> t02 = tv2 - tv0;
+	Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2 - tv1;
 
 	closestPointTriangle->setConstant((std::numeric_limits<double>::quiet_NaN()));
 	planeProjectionPoint->setConstant((std::numeric_limits<double>::quiet_NaN()));
@@ -1114,7 +1141,7 @@ T distanceTrianglePlane(
 			}
 			else
 			{
-				Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2-tv1;
+				Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2 - tv1;
 				*planeProjectionPoint = tv1 + (-d - n.dot(tv1)) / n.dot(t12) * t12;
 			}
 		}
@@ -1133,18 +1160,18 @@ T distanceTrianglePlane(
 	distances.cwiseAbs().minCoeff(&index);
 	switch (index)
 	{
-	case 0: //distances[0] is closest
-		*closestPointTriangle = tv0;
-		*planeProjectionPoint = tv0 - n * distances[0];
-		return distances[0];
-	case 1: //distances[1] is closest
-		*closestPointTriangle = tv1;
-		*planeProjectionPoint = tv1 - n * distances[1];
-		return distances[1];
-	case 2: //distances[2] is closest
-		*closestPointTriangle = tv2;
-		*planeProjectionPoint = tv2 - n * distances[2];
-		return distances[2];
+		case 0: //distances[0] is closest
+			*closestPointTriangle = tv0;
+			*planeProjectionPoint = tv0 - n * distances[0];
+			return distances[0];
+		case 1: //distances[1] is closest
+			*closestPointTriangle = tv1;
+			*planeProjectionPoint = tv1 - n * distances[1];
+			return distances[1];
+		case 2: //distances[2] is closest
+			*closestPointTriangle = tv2;
+			*planeProjectionPoint = tv2 - n * distances[2];
+			return distances[2];
 	}
 
 	return std::numeric_limits<T>::quiet_NaN();
@@ -1177,7 +1204,7 @@ bool doesIntersectPlanePlane(
 		return false; // planes disjoint
 	}
 	// Compute common point
-	*pt0 = (pd1*pn0-pd0*pn1).cross(lineDir) / lineDirNorm2;
+	*pt0 = (pd1 * pn0 - pd0 * pn1).cross(lineDir) / lineDirNorm2;
 	*pt1 = *pt0 + lineDir;
 	return true;
 }
@@ -1237,7 +1264,7 @@ T distanceSegmentTriangle(
 	T d = -n.dot(tv0);
 	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
 	// Degenerate case: Line and triangle plane parallel
-	const Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1-sv0;
+	const Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1 - sv0;
 	const T v01DotTn = n.dot(v01);
 	if (std::abs(v01DotTn) <= Geometry::AngularEpsilon)
 	{
@@ -1262,7 +1289,7 @@ T distanceSegmentTriangle(
 	// Line and triangle plane *not* parallel: check cut through case only, the rest will be check later
 	else
 	{
-		T lambda = -n.dot(sv0-tv0) / v01DotTn;
+		T lambda = -n.dot(sv0 - tv0) / v01DotTn;
 		if (lambda >= 0 && lambda <= 1)
 		{
 			*segmentPoint = *trianglePoint = sv0 + lambda * v01;
@@ -1298,26 +1325,26 @@ T distanceSegmentTriangle(
 	(distances << dst01, dst02, dst12, dstPtTri0, dstPtTri1).finished().minCoeff(&minIndex);
 	switch (minIndex)
 	{
-	case 0:
-		*segmentPoint = segColPt01;
-		*trianglePoint = triColPt01;
-		return dst01;
-	case 1:
-		*segmentPoint = segColPt02;
-		*trianglePoint = triColPt02;
-		return dst02;
-	case 2:
-		*segmentPoint = segColPt12;
-		*trianglePoint = triColPt12;
-		return dst12;
-	case 3:
-		*segmentPoint = sv0;
-		*trianglePoint = ptTriCol0;
-		return dstPtTri0;
-	case 4:
-		*segmentPoint = sv1;
-		*trianglePoint = ptTriCol1;
-		return dstPtTri1;
+		case 0:
+			*segmentPoint = segColPt01;
+			*trianglePoint = triColPt01;
+			return dst01;
+		case 1:
+			*segmentPoint = segColPt02;
+			*trianglePoint = triColPt02;
+			return dst02;
+		case 2:
+			*segmentPoint = segColPt12;
+			*trianglePoint = triColPt12;
+			return dst12;
+		case 3:
+			*segmentPoint = sv0;
+			*trianglePoint = ptTriCol0;
+			return dstPtTri0;
+		case 4:
+			*segmentPoint = sv1;
+			*trianglePoint = ptTriCol1;
+			return dstPtTri1;
 	}
 
 	// Invalid ...
@@ -1351,9 +1378,9 @@ T distanceTriangleTriangle(
 	T minDst = std::numeric_limits<T>::max();
 	T currDst = 0;
 	Eigen::Matrix<T, 3, 1, MOpt> segPt, triPt;
-	Eigen::Matrix<T, 3, 1, MOpt> n0 = (t0v1-t0v0).cross(t0v2-t0v0);
+	Eigen::Matrix<T, 3, 1, MOpt> n0 = (t0v1 - t0v0).cross(t0v2 - t0v0);
 	n0.normalize();
-	Eigen::Matrix<T, 3, 1, MOpt> n1 = (t1v1-t1v0).cross(t1v2-t1v0);
+	Eigen::Matrix<T, 3, 1, MOpt> n1 = (t1v1 - t1v0).cross(t1v2 - t1v0);
 	n1.normalize();
 	currDst = distanceSegmentTriangle(t0v0, t0v1, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
 	if (currDst < minDst)
@@ -1412,7 +1439,7 @@ void intersectionsSegmentBox(
 	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
 	const Eigen::AlignedBox<T, 3>& box,
-	std::vector<Eigen::Matrix<T, 3, 1, MOpt> >* intersections)
+	std::vector<Eigen::Matrix<T, 3, 1, MOpt>>* intersections)
 {
 	Eigen::Array<T, 3, 1, MOpt> v01 = sv1 - sv0;
 	Eigen::Array<bool, 3, 1, MOpt> parallelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
@@ -1505,6 +1532,26 @@ bool doesIntersectBoxCapsule(
 		break;
 	}
 	return doesIntersect;
+}
+
+/// Helper method to determine the nearest point between a point and a line.
+/// \tparam T the numeric data type used for the vector argument. Can usually be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the vector argument. Can be deduced.
+/// \param point is the point under consideration.
+/// \param segment0 one point on the line
+/// \param segment1 second point on the line
+/// \return the closest point on the line through the segment to the point under test
+template <class T, int VOpt>
+Eigen::Matrix<T, 3, 1, VOpt> nearestPointOnLine(const Eigen::Matrix<T, 3, 1, VOpt>& point,
+		const Eigen::Matrix<T, 3, 1, VOpt>& segment0, const Eigen::Matrix<T, 3, 1, VOpt>& segment1)
+{
+	auto pointToSegmentStart = segment0 - point;
+	auto segmentDirection = segment1 - segment0;
+	auto squaredNorm = segmentDirection.squaredNorm();
+	SURGSIM_ASSERT(squaredNorm != 0.0) << "Line is defined by two collocated points.";
+	auto distance = -pointToSegmentStart.dot(segmentDirection) / squaredNorm;
+	auto p0Proj = segment0 + distance * segmentDirection;
+	return p0Proj;
 }
 
 /// Check if the two triangles intersect using separating axis test.

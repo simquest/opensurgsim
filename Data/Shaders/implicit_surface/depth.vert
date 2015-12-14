@@ -21,10 +21,11 @@
 
 #version 120
 
+// These are 'free' uniforms to be set for this shader, they won't be provided by OSS
 uniform float sphereRadius;
 uniform float sphereScale;
 
-/// Main Camera Matrices
+// Main Camera Matrices
 struct MainCamera
 {
 	mat4 viewMatrix;
@@ -35,8 +36,10 @@ struct MainCamera
 
 uniform MainCamera mainCamera;
 
+// OSS provided uniform
 uniform mat4 modelMatrix;
 
+// Outgoing values
 varying vec3 eyeSpacePos;
 
 void main(void)

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,31 +31,25 @@ namespace SurgSim
 namespace Collision
 {
 
-CapsuleSphereDcdContact::CapsuleSphereDcdContact()
-{
-}
-
 std::pair<int, int> CapsuleSphereDcdContact::getShapeTypes()
 {
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_CAPSULE, SurgSim::Math::SHAPE_TYPE_SPHERE);
 }
 
-void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+std::list<std::shared_ptr<Contact>> CapsuleSphereDcdContact::calculateContact(
+									 const Math::CapsuleShape& capsule, const Math::RigidTransform3d& capsulePose,
+									 const Math::SphereShape& sphere, const Math::RigidTransform3d& spherePose) const
 {
-	std::shared_ptr<Representation> representationCapsule(pair->getFirst());
-	std::shared_ptr<Representation> representationSphere(pair->getSecond());
+	std::list<std::shared_ptr<Contact>> contacts;
 
-	std::shared_ptr<CapsuleShape> capsule(std::static_pointer_cast<CapsuleShape>(representationCapsule->getShape()));
-	std::shared_ptr<SphereShape> sphere(std::static_pointer_cast<SphereShape>(representationSphere->getShape()));
-
-	Vector3d sphereCenter(representationSphere->getPose().translation());
-	Vector3d globalTop(representationCapsule->getPose() * capsule->topCenter());
-	Vector3d globalBottom(representationCapsule->getPose() * capsule->bottomCenter());
+	Vector3d sphereCenter(spherePose.translation());
+	Vector3d globalTop(capsulePose * capsule.topCenter());
+	Vector3d globalBottom(capsulePose * capsule.bottomCenter());
 	Vector3d result;
 
 	double dist =
 		SurgSim::Math::distancePointSegment(sphereCenter, globalTop, globalBottom, &result);
-	double distThreshold = capsule->getRadius() + sphere->getRadius();
+	double distThreshold = capsule.getRadius() + sphere.getRadius();
 
 	if (dist < distThreshold)
 	{
@@ -66,12 +60,16 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 
 		std::pair<Location, Location> penetrationPoints;
 		penetrationPoints.first.rigidLocalPosition.setValue(
-			representationCapsule->getPose().inverse() * (result - normal * capsule->getRadius()));
+			capsulePose.inverse() * (result - normal * capsule.getRadius()));
 		penetrationPoints.second.rigidLocalPosition.setValue(
-			representationSphere->getPose().inverse() * (sphereCenter + normal * sphere->getRadius()));
+			spherePose.inverse() * (sphereCenter + normal * sphere.getRadius()));
 
-		pair->addDcdContact(depth, normal, penetrationPoints);
+		contacts.emplace_back(std::make_shared<Contact>(
+								  COLLISION_DETECTION_TYPE_DISCRETE, depth, 1.0,
+								  Vector3d::Zero(), normal, penetrationPoints));
 	}
+
+	return contacts;
 }
 
 }; // namespace Collision

@@ -28,7 +28,6 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::RigidTransform3d;
-using SurgSim::Math::Vector3d;
 
 
 namespace
@@ -86,13 +85,18 @@ class LeapScaffold::Listener : public Leap::Listener
 public:
 	Listener() :
 		m_scaffold(LeapScaffold::getOrCreateSharedInstance()),
-		m_logger(Framework::Logger::getLogger("Leap"))
+		m_logger(Framework::Logger::getLogger("Devices/Leap"))
 	{
 	}
 
 	void onConnect(const Leap::Controller&) override
 	{
 		SURGSIM_LOG_INFO(m_logger) << "Connected to Leap Motion camera";
+		auto scaffold = m_scaffold.lock();
+		if (scaffold != nullptr)
+		{
+			scaffold->handleConnect();
+		}
 	}
 
 	void onDisconnect(const Leap::Controller&) override
@@ -146,7 +150,7 @@ struct LeapScaffold::StateData
 
 LeapScaffold::LeapScaffold() :
 	m_state(new StateData),
-	m_logger(Framework::Logger::getLogger("Leap"))
+	m_logger(Framework::Logger::getLogger("Devices/Leap"))
 {
 }
 
@@ -248,6 +252,20 @@ bool LeapScaffold::unregisterDevice(const LeapDevice* device)
 	return success;
 }
 
+void LeapScaffold::handleConnect()
+{
+	m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_BACKGROUND_FRAMES);
+
+	for (auto& device : m_state->activeDevices)
+	{
+		if (device->deviceObject->isProvidingImages())
+		{
+			m_state->controller.setPolicy(Leap::Controller::PolicyFlag::POLICY_IMAGES);
+			break;
+		}
+	}
+}
+
 void LeapScaffold::handleFrame()
 {
 	updateHandData();
@@ -324,6 +342,10 @@ void LeapScaffold::updateImageData()
 		typedef DataStructures::DataGroup::ImageType ImageType;
 		ImageType leftImage(images[0].width(), images[0].height(), 1, images[0].data());
 		ImageType rightImage(images[1].width(), images[1].height(), 1, images[1].data());
+		ImageType leftDistortion(images[0].distortionWidth() / 2, images[0].distortionHeight(), 2,
+				images[0].distortion());
+		ImageType rightDistortion(images[1].distortionWidth() / 2, images[1].distortionHeight(), 2,
+				images[1].distortion());
 
 		// scale values to 0..1
 		leftImage.getAsVector() *= (1.0f / 255.0f);
@@ -335,6 +357,8 @@ void LeapScaffold::updateImageData()
 			{
 				device->deviceObject->getInputData().images().set("left", leftImage);
 				device->deviceObject->getInputData().images().set("right", rightImage);
+				device->deviceObject->getInputData().images().set("left_distortion", leftDistortion);
+				device->deviceObject->getInputData().images().set("right_distortion", rightDistortion);
 			}
 			else
 			{
@@ -367,6 +391,8 @@ DataStructures::DataGroup LeapScaffold::buildDeviceInputData()
 
 	builder.addImage("left");
 	builder.addImage("right");
+	builder.addImage("left_distortion");
+	builder.addImage("right_distortion");
 
 	builder.addPose("pose");
 	builder.addPose("ThumbProximal");
