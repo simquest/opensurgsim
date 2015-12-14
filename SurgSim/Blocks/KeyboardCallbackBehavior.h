@@ -32,7 +32,7 @@ namespace Blocks
 {
 SURGSIM_STATIC_REGISTRATION(KeyboardCallbackBehavior);
 
-/// This behavior will call the callback function registered when the registered key is pressed.
+/// This behavior will call the registered callback function when the registered key is pressed.
 class KeyboardCallbackBehavior : public Framework::Behavior
 {
 public:
@@ -81,7 +81,7 @@ private:
 	/// Record if any key is pressed in last update() call.
 	bool m_keyPressedLastUpdate;
 
-	/// The registered key, when which is pressed, the registered callback in this behavior will be called.
+	/// The registered key, when pressed, the registered callback will be called.
 	int m_actionKey;
 
 	/// Callback function.
