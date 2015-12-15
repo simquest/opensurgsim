@@ -22,14 +22,21 @@
 
 template <class M>
 SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::TriangleMeshPlyReaderDelegate() :
-	m_mesh(std::make_shared<M>())
+	m_mesh(std::make_shared<M>()),
+	m_hasTextureCoordinates(false),
+	m_hasFaces(false),
+	m_hasEdges(false)
+
 {
 
 }
 
 template <class M>
 SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::TriangleMeshPlyReaderDelegate(std::shared_ptr<M> mesh) :
-	m_mesh(mesh)
+	m_mesh(mesh),
+	m_hasTextureCoordinates(false),
+	m_hasFaces(false),
+	m_hasEdges(false)
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "The mesh cannot be null.";
 	mesh->clear();
@@ -63,7 +70,6 @@ bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::registerDelegate
 		reader->requestScalarProperty("vertex", "t", PlyReader::TYPE_DOUBLE, offsetof(VertexData, t));
 	}
 
-	m_hasFaces = reader->hasProperty("face", "vertex_indices") && !reader->isScalar("face", "vertex_indices");
 
 	if (m_hasFaces)
 	{
@@ -80,10 +86,8 @@ bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::registerDelegate
 									offsetof(ListData, count));
 	}
 
-	bool hasPhysicsEdges = reader->hasProperty("1d_element", "vertex_indices") &&
-						   ! reader->isScalar("1d_element", "vertex_indices");
 
-	if (hasPhysicsEdges)
+	if (m_hasEdges)
 	{
 		// Edge Processing
 		reader->requestElement("1d_element",
@@ -108,10 +112,17 @@ bool SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::fileIsAcceptable
 {
 	bool result = true;
 
+	m_hasFaces = reader.hasProperty("face", "vertex_indices") &&
+				 !reader.isScalar("face", "vertex_indices");
+
+	m_hasEdges = reader.hasProperty("1d_element", "vertex_indices") &&
+				 !reader.isScalar("1d_element", "vertex_indices");
+
 	// Shortcut test if one fails ...
 	result = result && reader.hasProperty("vertex", "x");
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
+	result = result && (m_hasFaces || m_hasEdges);
 
 	return result;
 }

@@ -106,7 +106,7 @@ private:
 
 template<>
 std::string SurgSim::DataStructures::SegmentMesh<MockVertexData, MockEdgeData>
-	::TriangleMesh::m_className = "MockSegmentMesh";
+::TriangleMesh::m_className = "MockSegmentMesh";
 
 class SegmentMeshTest : public ::testing::Test
 {
@@ -136,13 +136,13 @@ public:
 		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d position(positionDistribution(generator), positionDistribution(generator),
-				positionDistribution(generator));
+							  positionDistribution(generator));
 			testPositions.push_back(position);
 
 			if (printPositions)
 			{
 				std::cout << "\t" << i << ": (" << position.x() << ", " << position.y() << ", " << position.z()
-					<< ")\n";
+						  << ")\n";
 			}
 		}
 
@@ -155,7 +155,7 @@ public:
 		for (size_t i = 0; i < numVertices; ++i)
 		{
 			Vector3d normal(normalDistribution(generator), normalDistribution(generator),
-				normalDistribution(generator));
+							normalDistribution(generator));
 			normal.normalize();
 			testNormals.push_back(normal);
 
@@ -540,4 +540,27 @@ TEST_F(SegmentMeshTest, AssertingFunctions)
 	EXPECT_THROW(mesh.removeTriangle(0), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(mesh.getTrianglePositions(0), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(mesh.doClearTriangles(), SurgSim::Framework::AssertionFailure);
+}
+
+TEST_F(SegmentMeshTest, LoadMesh)
+{
+	auto mesh = std::make_shared<SegmentMeshPlain>();
+	SurgSim::Framework::ApplicationData data("config.txt");
+
+	mesh->load("SegmentMeshTest/segmentmesh.ply", data);
+
+	ASSERT_EQ(4u, mesh->getNumVertices());
+	ASSERT_EQ(3u, mesh->getNumEdges());
+
+	auto edge = mesh->getEdge(0);
+	ASSERT_EQ(0u, edge.verticesId[0]);
+	ASSERT_EQ(1u, edge.verticesId[1]);
+
+	edge = mesh->getEdge(1);
+	ASSERT_EQ(1u, edge.verticesId[0]);
+	ASSERT_EQ(2u, edge.verticesId[1]);
+
+	edge = mesh->getEdge(2);
+	ASSERT_EQ(2u, edge.verticesId[0]);
+	ASSERT_EQ(3u, edge.verticesId[1]);
 }

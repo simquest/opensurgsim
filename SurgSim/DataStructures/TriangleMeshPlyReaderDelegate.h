@@ -133,6 +133,9 @@ private:
 
 	/// Set to true if faces are found in the .ply file
 	bool m_hasFaces;
+
+	/// Set to true if edges are found in the .ply file
+	bool m_hasEdges;
 };
 
 
