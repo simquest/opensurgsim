@@ -105,50 +105,50 @@ found on each dependency's homepage. When we know of reliable pre-built Windows 
 Required Dependencies
 ---------------------
 
-* Boost  
-  Homepage: http://www.boost.org/  
-  Modules: chrono, date_time, filesystem, program_options, system, thread   
-  Minimum Version: 1.54  
-  Windows Binaries: http://sourceforge.net/projects/boost/files/boost-binaries/  
+**Boost**<br>
+Homepage: http://www.boost.org/<br>
+Modules: chrono, date_time, filesystem, program_options, system, thread<br>
+Minimum Version: 1.54<br>
+Windows Binaries: http://sourceforge.net/projects/boost/files/boost-binaries/  
 
-* CMake  
-  Homepage: http://www.cmake.org/  
-  Minimum Version: 2.8  
+**CMake**<br>
+Homepage: http://www.cmake.org/<br>
+Minimum Version: 2.8  
 
-* Eigen  
-  Homepage: http://eigen.tuxfamily.org/  
-  Minimum Version: 3.2.1 (GNU/Linux)  
-  Minimum Version: 3.2.3 (Windows)  
+**Eigen**<br>
+Homepage: http://eigen.tuxfamily.org/<br>
+Minimum Version: 3.2.1 (GNU/Linux)<br>
+Minimum Version: 3.2.3 (Windows)  
 
-* Git  
-  Homepage: http://www.git-scm.com/  
-  Minimum Version: 1.7.9  
+**Git**<br>
+Homepage: http://www.git-scm.com/<br>
+Minimum Version: 1.7.9  
 
-* OpenSceneGraph  
-  Homepage: http://www.openscenegraph.org/  
-  Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation  
-  Minimum Version: 3.2.0  
+**OpenSceneGraph**<br>
+Homepage: http://www.openscenegraph.org/<br>
+Modules: osg, osgViewer, osgText, osgUtil, osgDB, osgGA, osgAnimation<br>
+Minimum Version: 3.2.0  
   
-* yaml-cpp  
-  Homepage: https://github.com/jbeder/yaml-cpp  
-  Minimum Version: 0.5.2  
+**yaml-cpp**<br>
+Homepage: https://github.com/jbeder/yaml-cpp<br>
+Minimum Version: 0.5.2  
 
 Optional Dependencies
 ---------------------
 
-* Doxygen  
-  Homepage: http://doxygen.org/  
-  Minimum Version: 1.8  
+**Doxygen**<br>
+Homepage: http://doxygen.org/<br>
+Minimum Version: 1.8
 
-* FreeGlut  
-  Homepage: http://freeglut.sourceforge.net/  
-  Minimum Version: 2.6.0  
+**FreeGlut**<br>
+Homepage: http://freeglut.sourceforge.net/<br>
+Minimum Version: 2.6.0
 
-* Google Mock  
-  Homepage: https://code.google.com/p/googlemock/  
-  Minimum Version: 1.7.0  
+**Google Mock**<br>
+Homepage: https://code.google.com/p/googlemock/<br>
+Minimum Version: 1.7.0
 
-* MathJax  
-  Homepage: http://www.mathjax.org/  
-  Minimum Version: 2.4  
+**MathJax**<br>
+Homepage: http://www.mathjax.org/<br>
+Minimum Version: 2.4
 
