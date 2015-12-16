@@ -1,0 +1,8 @@
+[submodule "Modules/burrhole"]
+	path = Modules/burrhole
+	url = git@git.assembla.com:burrhole.git
+	branch = Oct-9-2015-Burrhole-Master-Quiz-PDF-Without-Installer
+[submodule "Modules/SimQuest"]
+	path = Modules/SimQuest
+	url = git@git.assembla.com:simquest.modules.git
+	branch = burrhole-branches/Sep-8-2015-SimQuest-Master-Without-Installer
