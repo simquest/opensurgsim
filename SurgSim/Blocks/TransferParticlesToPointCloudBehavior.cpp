@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation>
 
 void TransferParticlesToPointCloudBehavior::update(double dt)
 {
-	*m_target->getVertices() = m_source->getParticles();
+	*m_target->getVertices() = *m_source->getParticles().safeGet();
 }
 
 bool TransferParticlesToPointCloudBehavior::doInitialize()

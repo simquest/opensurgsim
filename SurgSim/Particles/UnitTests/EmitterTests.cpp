@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -173,21 +173,21 @@ TEST(EmitterTest, Update)
 	ASSERT_TRUE(particleSystem->wakeUp());
 
 	emitter->update(0.1);
-	EXPECT_EQ(1, particleSystem->getParticles().getNumVertices());
+	EXPECT_EQ(1, particleSystem->getParticles().unsafeGet().getNumVertices());
 
 	emitter->update(0.05);
-	EXPECT_EQ(1, particleSystem->getParticles().getNumVertices());
+	EXPECT_EQ(1, particleSystem->getParticles().unsafeGet().getNumVertices());
 	emitter->update(0.05);
-	EXPECT_EQ(2, particleSystem->getParticles().getNumVertices());
+	EXPECT_EQ(2, particleSystem->getParticles().unsafeGet().getNumVertices());
 
 	emitter->update(0.9);
-	EXPECT_EQ(10, particleSystem->getParticles().getNumVertices());
+	EXPECT_EQ(10, particleSystem->getParticles().unsafeGet().getNumVertices());
 	emitter->update(0.2);
-	EXPECT_EQ(10, particleSystem->getParticles().getNumVertices())
+	EXPECT_EQ(10, particleSystem->getParticles().unsafeGet().getNumVertices())
 		<< "Particles should not have been added, the particle system should have reached its maximum.";
 
 	particleSystem->update(1.0);
-	auto particles = particleSystem->getParticles().getVertices();
+	auto particles = particleSystem->getParticles().unsafeGet().getVertices();
 	ASSERT_EQ(10, particles.size());
 	for (auto particle : particles)
 	{
@@ -231,19 +231,19 @@ TEST(EmitterTest, PosedUpdate)
 
 	emitter->update(1.0);
 	EXPECT_TRUE(emitter->getPose().isApprox(Math::RigidTransform3d::Identity()));
-	ASSERT_EQ(1, particleSystem->getParticles().getNumVertices());
+	ASSERT_EQ(1, particleSystem->getParticles().unsafeGet().getNumVertices());
 
 	emitter->setLocalPose(pose1);
 	emitter->update(1.0);
 	EXPECT_TRUE(emitter->getPose().isApprox(pose1));
-	ASSERT_EQ(2, particleSystem->getParticles().getNumVertices());
+	ASSERT_EQ(2, particleSystem->getParticles().unsafeGet().getNumVertices());
 
 	element->setPose(pose2);
 	emitter->update(1.0);
 	EXPECT_TRUE(emitter->getPose().isApprox(pose2 * pose1));
-	ASSERT_EQ(3, particleSystem->getParticles().getNumVertices());
+	ASSERT_EQ(3, particleSystem->getParticles().unsafeGet().getNumVertices());
 
-	auto particles = particleSystem->getParticles().getVertices();
+	auto particles = particleSystem->getParticles().unsafeGet().getVertices();
 	EXPECT_GT(sphere->getRadius(), particles[0].position.norm());
 	EXPECT_GT(sphere->getRadius(), (pose1.inverse() * particles[1].position).norm());
 	EXPECT_GT(sphere->getRadius(), ((pose2 * pose1).inverse() * particles[2].position).norm());
