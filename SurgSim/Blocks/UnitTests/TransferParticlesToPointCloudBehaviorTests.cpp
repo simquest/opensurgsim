@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,17 +27,16 @@
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Particles/SphRepresentation.h"
+#include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
-using SurgSim::Blocks::TransferParticlesToPointCloudBehavior;
-using SurgSim::Framework::BasicSceneElement;
-using SurgSim::Framework::BehaviorManager;
-using SurgSim::Framework::Runtime;
-using SurgSim::Graphics::OsgBoxRepresentation;
-using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
-using SurgSim::Particles::SphRepresentation;
-using SurgSim::Physics::RigidRepresentation;
+
+
+namespace SurgSim
+{
+namespace Blocks
+{
 
 TEST(TransferParticlesToPointCloudBehaviorTests, ConstructorTest)
 {
@@ -46,39 +45,39 @@ TEST(TransferParticlesToPointCloudBehaviorTests, ConstructorTest)
 
 TEST(TransferParticlesToPointCloudBehaviorTests, SetGetSourceTest)
 {
-	auto particles  = std::make_shared<SphRepresentation>("Particles");
-	auto rigid = std::make_shared<RigidRepresentation>("Rigid");
+	auto particles  = std::make_shared<Particles::SphRepresentation>("Particles");
+	auto rigid = std::make_shared<Physics::RigidRepresentation>("Rigid");
 	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
 
-	EXPECT_THROW(behavior->setSource(nullptr), SurgSim::Framework::AssertionFailure);
-	EXPECT_THROW(behavior->setSource(rigid), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(behavior->setSource(nullptr), Framework::AssertionFailure);
+	EXPECT_THROW(behavior->setSource(rigid), Framework::AssertionFailure);
 	EXPECT_NO_THROW(behavior->setSource(particles));
 	EXPECT_EQ(particles, behavior->getSource());
 }
 
 TEST(TransferParticlesToPointCloudBehaviorTests, SetGetTargetTest)
 {
-	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("OsgMesh");
-	auto graphicsBox = std::make_shared<OsgBoxRepresentation>("OsgBox");
+	auto pointCloud = std::make_shared<Graphics::OsgPointCloudRepresentation>("OsgMesh");
+	auto graphicsBox = std::make_shared<Graphics::OsgBoxRepresentation>("OsgBox");
 	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
 
-	EXPECT_THROW(behavior->setTarget(nullptr), SurgSim::Framework::AssertionFailure);
-	EXPECT_THROW(behavior->setTarget(graphicsBox), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(behavior->setTarget(nullptr), Framework::AssertionFailure);
+	EXPECT_THROW(behavior->setTarget(graphicsBox), Framework::AssertionFailure);
 	EXPECT_NO_THROW(behavior->setTarget(pointCloud));
 	EXPECT_EQ(pointCloud, behavior->getTarget());
 }
 
 TEST(TransferParticlesToPointCloudBehaviorTests, WakeUpTest)
 {
-	auto runtime = std::make_shared<Runtime>("config.txt");
+	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
 
-	auto particles = std::make_shared<SphRepresentation>("Particles");
+	auto particles = std::make_shared<Particles::SphRepresentation>("Particles");
 	particles->setMassPerParticle(1.0);
 	particles->setDensity(1.0);
 	particles->setGasStiffness(1.0);
 	particles->setKernelSupport(1.0);
 
-	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+	auto pointCloud = std::make_shared<Graphics::OsgPointCloudRepresentation>("Graphics");
 
 	{
 		auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
@@ -111,65 +110,70 @@ TEST(TransferParticlesToPointCloudBehaviorTests, WakeUpTest)
 
 TEST(TransferParticlesToPointCloudBehaviorTests, UpdateTest)
 {
-	auto runtime = std::make_shared<Runtime>("config.txt");
-	auto behaviorManager = std::make_shared<BehaviorManager>();
-	runtime->addManager(behaviorManager);
+	auto runtime = std::make_shared<Framework::Runtime>();
+	runtime->addManager(std::make_shared<Framework::BehaviorManager>());
+	runtime->addManager(std::make_shared<Physics::PhysicsManager>());
 
-	auto scene = runtime->getScene();
-	auto sceneElement = std::make_shared<BasicSceneElement>("scene element");
-	auto particles = std::make_shared<SphRepresentation>("Particles");
-	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
-	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+	auto sceneElement = std::make_shared<Framework::BasicSceneElement>("Element");
+
+	auto particles = std::make_shared<Particles::SphRepresentation>("Particles");
 	particles->setMaxParticles(10);
 	particles->setMassPerParticle(1.0);
 	particles->setDensity(1.0);
 	particles->setGasStiffness(1.0);
 	particles->setKernelSupport(1.0);
-	behavior->setSource(particles);
-	behavior->setTarget(pointCloud);
-	sceneElement->addComponent(behavior);
-	sceneElement->addComponent(particles);
-	sceneElement->addComponent(pointCloud);
-	scene->addSceneElement(sceneElement);
-
 	for (size_t particleId = 0; particleId < 10; particleId++)
 	{
 		particles->addParticle(Vector3d(static_cast<double>(particleId), 0.0, 0.0), Vector3d::Zero(), 100000);
 	}
+	sceneElement->addComponent(particles);
 
-	// Test doInitialize(), doWakeUP()
-	EXPECT_NO_THROW(runtime->start());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	auto pointCloud = std::make_shared<Graphics::OsgPointCloudRepresentation>("Graphics");
+	sceneElement->addComponent(pointCloud);
 
-	auto& allParticles = particles->getParticles();
-	auto target = pointCloud->getVertices();
-	ASSERT_NE(0, target->getNumVertices());
-	ASSERT_NE(0, allParticles.getNumVertices());
+	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
+	behavior->setSource(particles);
+	behavior->setTarget(pointCloud);
+	sceneElement->addComponent(behavior);
 
-	size_t nodeId = 0;
-	for (; nodeId < allParticles.getNumVertices(); nodeId++)
+	auto scene = runtime->getScene();
+	scene->addSceneElement(sceneElement);
+
+	particles->update(0.1);
+	behavior->update(0.1);
+	auto sourceVertices = particles->getParticles().safeGet()->getVertices();
+	auto targetVertices = pointCloud->getVertices()->getVertices();
+	ASSERT_EQ(sourceVertices.size(), targetVertices.size());
+
+	auto sourceVertex = sourceVertices.begin();
+	auto targetVertex = targetVertices.begin();
+	for (; sourceVertex != sourceVertices.end(); ++sourceVertex, ++targetVertex)
 	{
-		EXPECT_TRUE(allParticles.getVertex(nodeId).position.isApprox(target->getVertex(nodeId).position));
+		EXPECT_TRUE(sourceVertex->position.isApprox(targetVertex->position));
 	}
 
-	// Test TransferParticlesToGraphicsBehavior::update()
-	allParticles.getVertices().pop_back();
-	allParticles.getVertices().pop_back();
-	behavior->update(1.0);
+	particles->removeParticle(0);
+	particles->removeParticle(1);
+	particles->update(0.1);
+	behavior->update(0.1);
 
-	for (nodeId = 0; nodeId < allParticles.getNumVertices(); nodeId++)
+	sourceVertices = particles->getParticles().safeGet()->getVertices();
+	targetVertices = pointCloud->getVertices()->getVertices();
+	ASSERT_EQ(sourceVertices.size(), targetVertices.size());
+
+	sourceVertex = sourceVertices.begin();
+	targetVertex = targetVertices.begin();
+	for (; sourceVertex != sourceVertices.end(); ++sourceVertex, ++targetVertex)
 	{
-		EXPECT_TRUE(allParticles.getVertex(nodeId).position.isApprox(target->getVertex(nodeId).position));
+		EXPECT_TRUE(sourceVertex->position.isApprox(targetVertex->position));
 	}
-
-	runtime->stop();
 }
 
 TEST(TransferParticlesToPointCloudBehaviorTests, SerializationTest)
 {
-	std::shared_ptr<SurgSim::Framework::Component> particles = std::make_shared<SphRepresentation>("Particles");
-	std::shared_ptr<SurgSim::Framework::Component> pointCloud =
-		std::make_shared<OsgPointCloudRepresentation>("GraphicsMesh");
+	std::shared_ptr<Framework::Component> particles = std::make_shared<Particles::SphRepresentation>("Particles");
+	std::shared_ptr<Framework::Component> pointCloud =
+		std::make_shared<Graphics::OsgPointCloudRepresentation>("Graphics");
 
 	auto behavior = std::make_shared<TransferParticlesToPointCloudBehavior>("Behavior");
 
@@ -177,20 +181,20 @@ TEST(TransferParticlesToPointCloudBehaviorTests, SerializationTest)
 	EXPECT_NO_THROW(behavior->setValue("Target", pointCloud));
 
 	YAML::Node node;
-	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*behavior));
+	ASSERT_NO_THROW(node = YAML::convert<Framework::Component>::encode(*behavior));
 	EXPECT_EQ(1u, node.size());
 
 	YAML::Node data = node["SurgSim::Blocks::TransferParticlesToPointCloudBehavior"];
 	EXPECT_EQ(5u, data.size());
 
 	std::shared_ptr<TransferParticlesToPointCloudBehavior> newBehavior;
-	std::shared_ptr<SurgSim::Framework::Component> nodeAsComponent =
-		node.as<std::shared_ptr<SurgSim::Framework::Component>>();
+	std::shared_ptr<Framework::Component> nodeAsComponent = node.as<std::shared_ptr<Framework::Component>>();
 	ASSERT_NO_THROW(newBehavior = std::dynamic_pointer_cast<TransferParticlesToPointCloudBehavior>(nodeAsComponent));
 
 	EXPECT_EQ("SurgSim::Blocks::TransferParticlesToPointCloudBehavior", newBehavior->getClassName());
-	EXPECT_NE(nullptr,
-		newBehavior->getValue<std::shared_ptr<SurgSim::Particles::Representation>>("Source"));
-	EXPECT_NE(nullptr,
-		newBehavior->getValue<std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation>>("Target"));
+	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<Particles::Representation>>("Source"));
+	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<Graphics::PointCloudRepresentation>>("Target"));
 }
+
+}; // namespace Blocks
+}; // namespace SurgSim

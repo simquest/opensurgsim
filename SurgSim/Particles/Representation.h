@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,8 @@
 #ifndef SURGSIM_PARTICLES_REPRESENTATION_H
 #define SURGSIM_PARTICLES_REPRESENTATION_H
 
-#include <boost/thread.hpp>
-#include <list>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Representation.h"
@@ -70,13 +67,14 @@ public:
 	/// \return True if the particle was successfully added, false otherwise
 	bool addParticle(const Math::Vector3d& position, const Math::Vector3d& velocity, double lifetime);
 
-	/// Get the particles
-	/// \return The particles
-	Particles& getParticles();
+	/// Remove a particle
+	/// \note The particle will be removed during the next update
+	/// \param index of the particle
+	void removeParticle(size_t index);
 
-	/// Get the particles, const version
-	/// \return The particles
-	const Particles& getParticles() const;
+	/// Get the particles
+	/// \return The particles in a BufferedValue
+	SurgSim::DataStructures::BufferedValue<Particles>& getParticles();
 
 	/// Update the particle system
 	/// \param dt The time step.
@@ -108,8 +106,8 @@ protected:
 	/// Maximum amount of particles allowed in this particle system.
 	size_t m_maxParticles;
 
-	/// List of particles.
-	Particles m_particles;
+	/// BufferedValue of particles.
+	SurgSim::DataStructures::BufferedValue<Particles> m_particles;
 
 	/// Logger used by the particle system.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;

@@ -23,6 +23,7 @@ set(SURGSIM_PARTICLES_SOURCES
 	RandomPointGenerator.cpp
 	RandomSpherePointGenerator.cpp
 	Representation.cpp
+	Sink.cpp
 	SphRepresentation.cpp
 )
 
@@ -37,6 +38,7 @@ set(SURGSIM_PARTICLES_HEADERS
 	RandomPointGenerator.h
 	RandomSpherePointGenerator.h
 	Representation.h
+	Sink.h
 	SphRepresentation.h
 )
 

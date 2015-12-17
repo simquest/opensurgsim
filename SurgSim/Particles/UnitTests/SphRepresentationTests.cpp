@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -163,10 +163,10 @@ TEST(SphRepresentationTest, DoUpdate1ParticleTest)
 	sph->initialize(runtime);
 
 	sph->addParticle(Math::Vector3d::Zero(), Math::Vector3d::Zero(), 10);
-	EXPECT_EQ(1u, sph->getParticles().getNumVertices());
+	EXPECT_EQ(1u, sph->getParticles().unsafeGet().getNumVertices());
 
 	EXPECT_NO_THROW(sph->update(dt));
-	auto& particles = sph->getParticles().getVertices();
+	auto particles = sph->getParticles().safeGet()->getVertices();
 	EXPECT_EQ(1u, particles.size());
 	EXPECT_DOUBLE_EQ(0.0, particles[0].position[0]);
 	EXPECT_GT(0.0, particles[0].position[1]);
@@ -202,13 +202,13 @@ std::shared_ptr<SphRepresentation> set2ParticlesInteracting(double h, double dis
 
 	sph->addParticle(Math::Vector3d::Zero(), Math::Vector3d::Zero(), 10);
 	sph->addParticle(Math::Vector3d(distance, 0.0, 0.0), Math::Vector3d::Zero(), 10);
-	EXPECT_EQ(2u, sph->getParticles().getNumVertices());
+	EXPECT_EQ(2u, sph->getParticles().unsafeGet().getNumVertices());
 
 	EXPECT_NO_THROW(sph->update(dt));
 
-	EXPECT_EQ(2u, sph->getParticles().getNumVertices());
+	EXPECT_EQ(2u, sph->getParticles().unsafeGet().getNumVertices());
 	size_t index = 0;
-	for (auto particle : sph->getParticles().getVertices())
+	for (auto particle : sph->getParticles().unsafeGet().getVertices())
 	{
 		std::string scope = "Particle "+boost::to_string(index);
 		SCOPED_TRACE(scope);
@@ -233,7 +233,7 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesNotInteractingTest)
 	double distance = 10.0 * h; // Far from their radius of influence
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto& particles = sph->getParticles().getVertices();
+	auto& particles = sph->getParticles().unsafeGet().getVertices();
 	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
 	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
 	double finalDistance = (particles[0].position - particles[1].position).norm();
@@ -249,7 +249,7 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesAttractingTest)
 	double distance = h * 3.0 / 4.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto& particles = sph->getParticles().getVertices();
+	auto& particles = sph->getParticles().unsafeGet().getVertices();
 	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
 	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
 	double finalDistance = (particles[0].position - particles[1].position).norm();
@@ -265,7 +265,7 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesRetractingTest)
 	double distance = h * 1.0 / 4.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto& particles = sph->getParticles().getVertices();
+	auto& particles = sph->getParticles().unsafeGet().getVertices();
 	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
 	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
 	double finalDistance = (particles[0].position - particles[1].position).norm();
@@ -281,7 +281,7 @@ TEST(SphRepresentationTest, DoUpdate2ParticlesInEquilibriumTest)
 	double distance = h / 2.0;
 	auto sph = set2ParticlesInteracting(h, distance);
 
-	auto& particles = sph->getParticles().getVertices();
+	auto& particles = sph->getParticles().unsafeGet().getVertices();
 	EXPECT_DOUBLE_EQ(particles[0].position[1], particles[1].position[1]);
 	EXPECT_DOUBLE_EQ(particles[0].data.velocity[1], particles[1].data.velocity[1]);
 	double finalDistance = (particles[0].position - particles[1].position).norm();
