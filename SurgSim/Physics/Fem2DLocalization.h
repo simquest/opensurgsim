@@ -46,6 +46,8 @@ public:
 	/// \param	representation	The representation.
 	/// \return	true if valid representation, false if not.
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
+
+	DataStructures::Location createLocationForGlobalPosition(const Math::Vector3d& globalPosition) override;
 };
 
 } // namespace Physics

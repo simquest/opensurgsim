@@ -15,6 +15,8 @@
 
 #include "SurgSim/Physics/Fem2DLocalization.h"
 
+#include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -42,6 +44,26 @@ bool Fem2DLocalization::isValidRepresentation(std::shared_ptr<Representation> re
 
 	// Allows to reset the representation to nullptr ...
 	return (femRepresentation != nullptr || representation == nullptr);
+}
+
+DataStructures::Location Fem2DLocalization::createLocationForGlobalPosition(
+	const Math::Vector3d& globalPosition)
+{
+	auto femRepresentation = std::static_pointer_cast<Fem2DRepresentation>(getRepresentation());
+	auto position = getLocalPosition();
+	auto femElement = femRepresentation->getFemElement(position.index);
+	auto nodeIds = femElement->getNodeIds();
+	std::vector<Math::Vector3d> nodePositions;
+	for (auto nodeId : nodeIds)
+	{
+		nodePositions.push_back(femRepresentation->getCurrentState()->getPosition(nodeId));
+	}
+
+	DataStructures::Location location;
+	Math::Vector3d bary;
+	Math::barycentricCoordinates(globalPosition, nodePositions[0], nodePositions[1], nodePositions[2], &bary);
+	location.triangleMeshLocalCoordinate = DataStructures::IndexedLocalCoordinate(position.index, bary);
+	return location;
 }
 
 } // namespace Physics

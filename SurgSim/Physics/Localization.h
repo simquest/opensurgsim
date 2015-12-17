@@ -24,6 +24,11 @@
 namespace SurgSim
 {
 
+namespace DataStructures
+{
+struct Location;
+}
+
 namespace Physics
 {
 
@@ -45,35 +50,27 @@ public:
 
 	/// Sets the representation
 	/// \param representation The representation on which the localization is defined
-	void setRepresentation(std::shared_ptr<Representation> representation)
-	{
-		if (isValidRepresentation(representation))
-		{
-			m_representation = representation;
-		}
-		else
-		{
-			SURGSIM_ASSERT(false) << "Unexpected representation type" << std::endl;
-		}
-	}
+	void setRepresentation(std::shared_ptr<Representation> representation);
 
 	/// Gets the representation
 	/// \return The representation on which the localization is defined, nullptr if none has been defined
-	std::shared_ptr<Representation> getRepresentation() const
-	{
-		return m_representation;
-	}
+	std::shared_ptr<Representation> getRepresentation() const;
 
 	/// Calculates the global position of this localization
 	/// \param time The time in [0..1] at which the position should be calculated
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
-	SurgSim::Math::Vector3d calculatePosition(double time = 1.0)
-	{
-		return doCalculatePosition(time);
-	}
+	SurgSim::Math::Vector3d calculatePosition(double time = 1.0);
 
 	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation);
+
+	/// Create a location for the given global position.
+	/// \param globalPosition The global position for which location is to be created.
+	/// \return The newly created location.
+	virtual DataStructures::Location createLocationForGlobalPosition(const Math::Vector3d& globalPosition);
+
+	/// \param direction Move this localization along this direction in this representation
+	virtual void moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd);
 
 private:
 	/// Calculates the global position of this localization
@@ -81,12 +78,13 @@ private:
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
 	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) = 0;
+
 	/// The representation on which the localization is defined
 	std::shared_ptr<Representation> m_representation;
 };
 
-};  // namespace Physics
+} // namespace Physics
 
-};  // namespace SurgSim
+} // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_LOCALIZATION_H
+#endif // SURGSIM_PHYSICS_LOCALIZATION_H
