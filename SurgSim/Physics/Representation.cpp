@@ -129,6 +129,13 @@ std::shared_ptr<ConstraintImplementation> Representation::getConstraintImplement
 	return implementation;
 }
 
+Math::Vector3d Representation::calculatePosition(const DataStructures::Location& location)
+{
+	SURGSIM_FAILURE() << "Physics::Representation::calculatePosition(const Location&) is not implemented for " <<
+		getFullName();
+	return Math::Vector3d::Zero();
+}
+
 void Representation::driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	if (isDrivingSceneElementPose())

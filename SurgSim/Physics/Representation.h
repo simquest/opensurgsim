@@ -126,6 +126,11 @@ public:
 	/// \return A contact constraint implementation or nullptr.
 	std::shared_ptr<ConstraintImplementation> getConstraintImplementation(SurgSim::Physics::ConstraintType type);
 
+	/// Calculate the global position for a given location.
+	/// \param location The location for which the global position is to be created.
+	/// \return The global position corresponding to the given location.
+	virtual Math::Vector3d calculatePosition(const DataStructures::Location& location);
+
 protected:
 	/// Set the number of degrees of freedom
 	/// \param numDof The number of degrees of freedom
