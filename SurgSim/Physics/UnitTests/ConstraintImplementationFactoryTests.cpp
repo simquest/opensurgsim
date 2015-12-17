@@ -52,6 +52,12 @@ TEST(ConstraintImplementationFactoryTest, GetImplementationTest)
 		!= nullptr);
 	EXPECT_TRUE(factory.getImplementation(typeid(Fem3DRepresentation), FIXED_3DPOINT)
 		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(Fem1DRepresentation), FRICTIONLESS_SLIDING)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(Fem2DRepresentation), FRICTIONLESS_SLIDING)
+		!= nullptr);
+	EXPECT_TRUE(factory.getImplementation(typeid(Fem3DRepresentation), FRICTIONLESS_SLIDING)
+		!= nullptr);
 
 	EXPECT_TRUE(factory.getImplementation(typeid(MassSpringRepresentation), FRICTIONLESS_3DCONTACT)
 		!= nullptr);
