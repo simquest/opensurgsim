@@ -161,10 +161,10 @@ public:
 /// block 1st element. <br>
 /// It supposes: <br>
 /// + that the SparseMatrix already contains all the elements within the block (no insertion necessary) <br>
-/// + that both the SparseMatrix and the 'subMatrix' are using the same Scalar type <br>
+/// + that both the SparseMatrix and the 'subMatrix' are using the same Scalar type, double. <br>
 /// This function will not change anything to the structure of the SparseMatrix, only change the values of the
 /// corresponding coefficients.
-/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \tparam Opt, Index Type parameters defining the output matrix type SparseMatrix<double, Opt, Index>
 /// \param subMatrix The sub matrix that will be copied into the SparseMatrix block
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param n, m The block size (Derived may be bigger but cannot be smaller in both dimension)
@@ -181,14 +181,13 @@ public:
 /// (x0[xx]x) -> The block must already contain all the coefficients but these rows and columns may <br>
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
-template <typename T, int Opt, typename Index>
+template <int Opt, typename Index>
 void blockWithSearch(const Eigen::Ref<const Matrix>& subMatrix, size_t rowStart, size_t columnStart, size_t n, size_t m,
-					 Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					 void (Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>>::*op)
-					 (T*, size_t, size_t, size_t, const Matrix&, size_t))
+					 Eigen::SparseMatrix<double, Opt, Index>* matrix,
+					 void (Operation<Matrix, Eigen::SparseMatrix<double, Opt, Index>>::*op)
+					 (double*, size_t, size_t, size_t, const Matrix&, size_t))
 {
-	static Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>> operation;
-	static_assert(std::is_same<T, typename Matrix::Scalar>::value, "Both matrices should use the same Scalar type");
+	static Operation<Matrix, Eigen::SparseMatrix<double, Opt, Index>> operation;
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
 	SURGSIM_ASSERT(subMatrix.rows() >= static_cast<Matrix::Index>(n)) << "subMatrix doesn't have enough rows";
@@ -198,7 +197,7 @@ void blockWithSearch(const Eigen::Ref<const Matrix>& subMatrix, size_t rowStart,
 	SURGSIM_ASSERT(matrix->cols() >= static_cast<Index>(columnStart + m)) << "The block is out of range in matrix";
 	SURGSIM_ASSERT(matrix->valuePtr() != nullptr) << "The matrix is not initialized correctly, null pointer to values";
 
-	T* ptr = matrix->valuePtr();
+	double* ptr = matrix->valuePtr();
 	const Index* innerIndices = matrix->innerIndexPtr();
 	const Index* outerIndices = matrix->outerIndexPtr();
 
@@ -248,10 +247,10 @@ void blockWithSearch(const Eigen::Ref<const Matrix>& subMatrix, size_t rowStart,
 /// Runs a given operation on a SparseMatrix block(i, j, n, m) from a (n x m) 'subMatrix' with searching for the
 /// block 1st element. <br>
 /// It supposes: <br>
-/// + that both the SparseMatrix and the 'subMatrix' are using the same Scalar type <br>
+/// + that both the SparseMatrix and the 'subMatrix' are using the same Scalar type, double. <br>
 /// This function can be used to initialize the form of a sparse matrix as it will add entries when appropriate
 /// entries do not exist.
-/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \tparam Opt, Index Type parameters defining the output matrix type SparseMatrix<double, Opt, Index>
 /// \param subMatrix The sub matrix that will be copied into the SparseMatrix block
 /// \param rowStart, columnStart The row and column indices to indicate where the block in the SparseMatrix starts
 /// \param[in,out] matrix The sparse matrix in which the block needs to be set by 'subMatrix'
@@ -267,13 +266,12 @@ void blockWithSearch(const Eigen::Ref<const Matrix>& subMatrix, size_t rowStart,
 /// (x0[xx]x) -> The block must already contain all the coefficients but these rows and columns may <br>
 /// (0x[xx]0) -> contains more coefficients before and after the block. <br>
 /// (xx 00 x) <br>
-template <typename T, int Opt, typename Index>
+template <int Opt, typename Index>
 void blockOperation(const Eigen::Ref<const Matrix>& subMatrix, size_t rowStart, size_t columnStart,
-					Eigen::SparseMatrix<T, Opt, Index>* matrix,
-					void (Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>>::*op)(T*, const T&))
+					Eigen::SparseMatrix<double, Opt, Index>* matrix,
+					void (Operation<Matrix, Eigen::SparseMatrix<double, Opt, Index>>::*op)(double*, const double&))
 {
-	static Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>> operation;
-	static_assert(std::is_same<T, typename Matrix::Scalar>::value, "Both matrices should use the same Scalar type");
+	static Operation<Matrix, Eigen::SparseMatrix<double, Opt, Index>> operation;
 	SURGSIM_ASSERT(nullptr != matrix) << "Invalid recipient matrix, nullptr found";
 
 	Index n = static_cast<Index>(subMatrix.rows());
@@ -287,61 +285,61 @@ void blockOperation(const Eigen::Ref<const Matrix>& subMatrix, size_t rowStart, 
 		{
 			(operation.*op)(
 				&matrix->coeffRef(static_cast<Index>(rowStart) + row, static_cast<Index>(columnStart) + column),
-				static_cast<T>(subMatrix(row, column)));
+				subMatrix(row, column));
 		}
 	}
 }
 
 /// Helper method to add a sub-matrix into a matrix, for the sake of clarity
-/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \tparam Opt, Index Type parameters defining the output matrix type SparseMatrix<double, Opt, Index>
 /// \param subMatrix The sub-matrix
 /// \param blockIdRow, blockIdCol The block indices in matrix
 /// \param[in,out] matrix The matrix to add the sub-matrix into
 /// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
 /// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
 /// \note This is a specialization of addSubMatrix for sparse matrices.
-template <typename T, int Opt, typename Index>
+template <int Opt, typename Index>
 void addSubMatrix(const Eigen::Ref<const Matrix>& subMatrix, size_t blockIdRow, size_t blockIdCol,
-				  Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true)
+				  Eigen::SparseMatrix<double, Opt, Index>* matrix, bool initialize = true)
 {
 	if (initialize)
 	{
 		blockOperation(subMatrix, static_cast<size_t>(subMatrix.rows() * blockIdRow),
 					   static_cast<size_t>(subMatrix.cols() * blockIdCol), matrix,
-					   &Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>>::add);
+					   &Operation<Matrix, Eigen::SparseMatrix<double, Opt, Index>>::add);
 	}
 	else
 	{
 		blockWithSearch(subMatrix, static_cast<size_t>(subMatrix.rows() * blockIdRow),
 						static_cast<size_t>(subMatrix.cols() * blockIdCol),
 						static_cast<size_t>(subMatrix.rows()), static_cast<size_t>(subMatrix.cols()), matrix,
-						&Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>>::add);
+						&Operation<Matrix, Eigen::SparseMatrix<double, Opt, Index>>::add);
 	}
 }
 
 /// Helper method to assign a sub-matrix into a matrix, for the sake of clarity
-/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+/// \tparam Opt, Index Type parameters defining the output matrix type SparseMatrix<double, Opt, Index>
 /// \param subMatrix The sub-matrix
 /// \param blockIdRow, blockIdCol The block indices in matrix
 /// \param[in,out] matrix The matrix to assign the sub-matrix into
 /// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
 /// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
-template <typename T, int Opt, typename Index>
+template <int Opt, typename Index>
 void assignSubMatrix(const Eigen::Ref<const Matrix>& subMatrix, size_t blockIdRow, size_t blockIdCol,
-					 Eigen::SparseMatrix<T, Opt, Index>* matrix, bool initialize = true)
+					 Eigen::SparseMatrix<double, Opt, Index>* matrix, bool initialize = true)
 {
 	if (initialize)
 	{
 		blockOperation(subMatrix, (subMatrix.rows() * blockIdRow),
 					   (subMatrix.cols() * blockIdCol), matrix,
-					   &Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>>::assign);
+					   &Operation<Matrix, Eigen::SparseMatrix<double, Opt, Index>>::assign);
 	}
 	else
 	{
 		blockWithSearch(subMatrix, (subMatrix.rows() * blockIdRow),
 						(subMatrix.cols() * blockIdCol),
 						subMatrix.rows(), subMatrix.cols(), matrix,
-						&Operation<Matrix, Eigen::SparseMatrix<T, Opt, Index>>::assign);
+						&Operation<Matrix, Eigen::SparseMatrix<double, Opt, Index>>::assign);
 	}
 }
 
