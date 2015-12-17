@@ -99,12 +99,12 @@ static std::shared_ptr<Fem1DRepresentation> getFem1d(const std::string &name,
 
 TEST(Fem1DConstraintFixedPointTests, Constructor)
 {
-	ASSERT_NO_THROW({ Fem1DConstraintFixedPoint constraint; });
+	ASSERT_NO_THROW({ FemConstraintFixedPoint constraint; });
 }
 
 TEST(Fem1DConstraintFixedPointTests, Constants)
 {
-	Fem1DConstraintFixedPoint constraint;
+	FemConstraintFixedPoint constraint;
 
 	EXPECT_EQ(SurgSim::Physics::FIXED_3DPOINT, constraint.getConstraintType());
 	EXPECT_EQ(3u, constraint.getNumDof());
@@ -115,11 +115,11 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcpBasic)
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem. It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
-	Fem1DConstraintFixedPoint constraint;
+	FemConstraintFixedPoint constraint;
 
 	Vector3d actual;
 
-	// Setup parameters for Fem1DConstraintFixedPoint::build
+	// Setup parameters for FemConstraintFixedPoint::build
 	auto localization = std::make_shared<Fem1DLocalization>(getFem1d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(1.0, 0.0)));
 
@@ -149,11 +149,11 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcp)
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
-	Fem1DConstraintFixedPoint constraint;
+	FemConstraintFixedPoint constraint;
 
 	Vector3d actual;
 
-	// Setup parameters for Fem1DConstraintFixedPoint::build
+	// Setup parameters for FemConstraintFixedPoint::build
 	auto localization = std::make_shared<Fem1DLocalization>(getFem1d("representation"),
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(0.3, 0.7)));
 
@@ -184,12 +184,12 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcpTwoStep)
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem. It assumes
 	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
 	// necessary to supply a realistic C.  It only checks H and b.
-	Fem1DConstraintFixedPoint constraint;
+	FemConstraintFixedPoint constraint;
 
 	Vector3d actual;
 	Vector3d desired;
 
-	// Setup parameters for Fem3DConstraintFixedPoint::build
+	// Setup parameters for FemConstraintFixedPoint::build
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(24, 3, 1);
 
 	ConstraintData emptyConstraint;

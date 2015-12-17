@@ -32,7 +32,7 @@
 using SurgSim::DataStructures::IndexedLocalCoordinate;
 using SurgSim::Framework::Runtime;
 using SurgSim::Physics::Fem2DRepresentation;
-using SurgSim::Physics::Fem2DConstraintFrictionlessSliding;
+using SurgSim::Physics::FemConstraintFrictionlessSliding;
 using SurgSim::Physics::Fem2DLocalization;
 using SurgSim::Physics::Fem2DElementTriangle;
 using SurgSim::Physics::MlcpPhysicsProblem;
@@ -137,13 +137,13 @@ TEST_F(Fem2DConstraintFrictionlessSlidingTests, ConstructorTest)
 {
 	ASSERT_NO_THROW(
 	{
-		Fem2DConstraintFrictionlessSliding femContact;
+		FemConstraintFrictionlessSliding femContact;
 	});
 }
 
 TEST_F(Fem2DConstraintFrictionlessSlidingTests, ConstraintConstantsTest)
 {
-	auto implementation = std::make_shared<Fem2DConstraintFrictionlessSliding>();
+	auto implementation = std::make_shared<FemConstraintFrictionlessSliding>();
 
 	EXPECT_EQ(SurgSim::Physics::FRICTIONLESS_SLIDING, implementation->getConstraintType());
 	EXPECT_EQ(2u, implementation->getNumDof());
@@ -153,7 +153,7 @@ TEST_F(Fem2DConstraintFrictionlessSlidingTests, BuildMlcpTest)
 {
 	// This test verifies the build mlcp function works for a simple case.
 
-	auto implementation = std::make_shared<Fem2DConstraintFrictionlessSliding>();
+	auto implementation = std::make_shared<FemConstraintFrictionlessSliding>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 2, 1);
@@ -191,7 +191,7 @@ TEST_F(Fem2DConstraintFrictionlessSlidingTests, BuildMlcpTest)
 TEST_F(Fem2DConstraintFrictionlessSlidingTests, BuildMlcpCoordinateTest)
 {
 	// This test verifies the build mlcp function works for a more complicated case with different nodes.
-	auto implementation = std::make_shared<Fem2DConstraintFrictionlessSliding>();
+	auto implementation = std::make_shared<FemConstraintFrictionlessSliding>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 2, 1);
@@ -234,7 +234,7 @@ TEST_F(Fem2DConstraintFrictionlessSlidingTests, BuildMlcpCoordinateTest)
 TEST_F(Fem2DConstraintFrictionlessSlidingTests, BuildMlcpIndiciesTest)
 {
 	// This test verifies the build mlcp function works given a hypothetical, preexisting mlcp problem.
-	auto implementation = std::make_shared<Fem2DConstraintFrictionlessSliding>();
+	auto implementation = std::make_shared<FemConstraintFrictionlessSliding>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, 3, 2);
