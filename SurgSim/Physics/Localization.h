@@ -69,7 +69,8 @@ public:
 	/// \return The newly created location.
 	virtual DataStructures::Location createLocationForGlobalPosition(const Math::Vector3d& globalPosition);
 
-	/// \param direction Move this localization along this direction in this representation
+	/// \param point Move this localization closest to this point
+	/// \param hasReachedEnd [out] Flag to set, when the localization reaches the end of the representation.
 	virtual void moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd);
 
 private:
