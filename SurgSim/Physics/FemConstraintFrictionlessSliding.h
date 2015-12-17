@@ -48,12 +48,6 @@ private:
 		ConstraintSideSign sign) override;
 };
 
-typedef FemConstraintFrictionlessSliding Fem1DConstraintFrictionlessSliding;
-
-typedef FemConstraintFrictionlessSliding Fem2DConstraintFrictionlessSliding;
-
-typedef FemConstraintFrictionlessSliding Fem3DConstraintFrictionlessSliding;
-
 }; // namespace Physics
 
 }; // namespace SurgSim

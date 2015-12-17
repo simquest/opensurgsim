@@ -33,7 +33,7 @@ using SurgSim::DataStructures::IndexedLocalCoordinate;
 using SurgSim::Framework::Runtime;
 using SurgSim::Physics::ContactConstraintData;
 using SurgSim::Physics::Fem1DRepresentation;
-using SurgSim::Physics::Fem1DConstraintFrictionlessContact;
+using SurgSim::Physics::FemConstraintFrictionlessContact;
 using SurgSim::Physics::Fem1DLocalization;
 using SurgSim::Physics::Fem1DElementBeam;
 using SurgSim::Physics::MlcpPhysicsProblem;
@@ -142,13 +142,13 @@ TEST_F(Fem1DConstraintFrictionlessContactTests, ConstructorTest)
 {
 	ASSERT_NO_THROW(
 	{
-		Fem1DConstraintFrictionlessContact femContact;
+		FemConstraintFrictionlessContact femContact;
 	});
 }
 
 TEST_F(Fem1DConstraintFrictionlessContactTests, ConstraintConstantsTest)
 {
-	auto implementation = std::make_shared<Fem1DConstraintFrictionlessContact>();
+	auto implementation = std::make_shared<FemConstraintFrictionlessContact>();
 
 	EXPECT_EQ(SurgSim::Physics::FRICTIONLESS_3DCONTACT, implementation->getConstraintType());
 	EXPECT_EQ(1u, implementation->getNumDof());
@@ -158,7 +158,7 @@ TEST_F(Fem1DConstraintFrictionlessContactTests, BuildMlcpTest)
 {
 	// This test verifies the build mlcp function works for a simple case.
 
-	auto implementation = std::make_shared<Fem1DConstraintFrictionlessContact>();
+	auto implementation = std::make_shared<FemConstraintFrictionlessContact>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 1, 1);
@@ -193,7 +193,7 @@ TEST_F(Fem1DConstraintFrictionlessContactTests, BuildMlcpCoordinateTest)
 {
 	// This test verifies the build mlcp function works for a more complicated case with different nodes.
 
-	auto implementation = std::make_shared<Fem1DConstraintFrictionlessContact>();
+	auto implementation = std::make_shared<FemConstraintFrictionlessContact>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 1, 1);
@@ -238,7 +238,7 @@ TEST_F(Fem1DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 {
 	// This test verifies the build mlcp function works given a hypothetical, preexisting mlcp problem.
 
-	auto implementation = std::make_shared<Fem1DConstraintFrictionlessContact>();
+	auto implementation = std::make_shared<FemConstraintFrictionlessContact>();
 
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, 2, 1);
