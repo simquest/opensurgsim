@@ -35,8 +35,6 @@
 #include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/FemConstraintFixedPoint.h"
-#include "SurgSim/Physics/FixedConstraintFixedPoint.h"
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidConstraintFixedPoint.h"
@@ -44,8 +42,6 @@
 
 using SurgSim::Collision::ContactMapType;
 using SurgSim::Physics::ConstraintImplementation;
-using SurgSim::Physics::FemConstraintFixedPoint;
-using SurgSim::Physics::FixedConstraintFixedPoint;
 using SurgSim::Physics::Localization;
 using SurgSim::Physics::RigidConstraintFixedPoint;
 using SurgSim::Framework::checkAndConvert;
