@@ -34,7 +34,7 @@ KeyboardCallbackBehavior::KeyboardCallbackBehavior(const std::string& name) :
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardCallbackBehavior, std::shared_ptr<SurgSim::Framework::Component>,
 										InputComponent, getInputComponent, setInputComponent);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardCallbackBehavior, int, ActionKey, getKey, setKey);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KeyboardCallbackBehavior, int, ActionKey, getKey, registerKey);
 }
 
 void KeyboardCallbackBehavior::setInputComponent(std::shared_ptr<Framework::Component> inputComponent)
@@ -48,7 +48,7 @@ std::shared_ptr<Input::InputComponent> KeyboardCallbackBehavior::getInputCompone
 	return m_inputComponent;
 }
 
-void KeyboardCallbackBehavior::registerKey(Devices::KeyCode key)
+void KeyboardCallbackBehavior::registerKey(int key)
 {
 	m_actionKey = key;
 }
@@ -85,11 +85,6 @@ bool KeyboardCallbackBehavior::doWakeUp()
 		result = false;
 	}
 	return result;
-}
-
-void KeyboardCallbackBehavior::setKey(int key)
-{
-	m_actionKey = key;
 }
 
 int KeyboardCallbackBehavior::getKey() const

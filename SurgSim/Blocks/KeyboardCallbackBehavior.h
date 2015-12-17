@@ -54,7 +54,7 @@ public:
 
 	/// Register a key, so that when such key is pressed, this behavior will call the callback.
 	/// \param key The controlling key.
-	void registerKey(Devices::KeyCode key);
+	void registerKey(int key);
 
 	/// Register a callback function.
 	/// This function will be called when the registered key is pressed.
@@ -64,11 +64,6 @@ public:
 	void update(double dt) override;
 
 protected:
-	/// Set the controlling key.
-	/// \param key The key to trigger the callback.
-	/// \note This is used for serialization only.
-	void setKey(int key);
-
 	/// \return The key which will make this behavior to call the callback.
 	/// \note This is used for serialization only.
 	int getKey() const;
