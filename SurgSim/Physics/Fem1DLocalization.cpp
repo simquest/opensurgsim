@@ -78,7 +78,7 @@ void Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool *hasReac
 	double newDistanceToPoint = (newPointOnLine - point).norm();
 	currentPointOnLine = newPointOnLine;
 	bool setCoordinates = false;
-	
+
 	while (newDistanceToPoint < currentDistanceToPoint)
 	{
 		setCoordinates = true;

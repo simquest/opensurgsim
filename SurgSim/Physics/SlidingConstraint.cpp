@@ -62,11 +62,11 @@ void SlidingConstraint::doBuild(double dt,
 	Math::Vector3d slidingDirection =
 		m_localizations.second->getRepresentation()->calculatePosition(m_directionEnd) - pointOfConstraint;
 	m_slidingConstraintData->setSlidingDirection(pointOfConstraint, slidingDirection);
-	
+
 	// Update the representation0's localization (representation1's remains the same).
 	bool hasReachedEnd = false;
 	m_localizations.first->moveClosestTo(pointOfConstraint, &hasReachedEnd);
-	
+
 	if (hasReachedEnd)
 	{
 		setActive(false);

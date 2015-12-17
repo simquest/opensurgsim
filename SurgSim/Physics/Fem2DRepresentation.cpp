@@ -275,7 +275,7 @@ Math::Vector3d Fem2DRepresentation::calculatePosition(const DataStructures::Loca
 		SURGSIM_FAILURE() << "Cannot calculate position without a mesh-based location (node, triangle or element).";
 		return Math::Vector3d::Zero();
 	}
-	
+
 	Math::Vector3d position = Math::Vector3d::Zero();
 	auto femElement = getFemElement(indexedCoordinate.index);
 	auto nodeIds = femElement->getNodeIds();
