@@ -17,7 +17,6 @@
 
 #include <string>
 
-#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -219,11 +218,4 @@ TEST(RepresentationTest, ConstraintTest)
 	// Test the getConstraintImplementation
 	EXPECT_TRUE(representation->getConstraintImplementation(implementation->getConstraintType())
 		!= nullptr);
-}
-
-TEST(RepresentationTest, CalculatePosition)
-{
-	auto representation = std::make_shared<MockRigidRepresentation>("rep");
-	SurgSim::DataStructures::Location location;
-	EXPECT_THROW(representation->calculatePosition(location), SurgSim::Framework::AssertionFailure);
 }

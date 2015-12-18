@@ -78,8 +78,6 @@ public:
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
 
-	Math::Vector3d calculatePosition(const DataStructures::Location& location) override;
-
 protected:
 	void transformState(std::shared_ptr<SurgSim::Math::OdeState> state,
 			const SurgSim::Math::RigidTransform3d& transform) override;

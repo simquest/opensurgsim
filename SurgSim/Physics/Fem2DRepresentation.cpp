@@ -255,40 +255,6 @@ std::shared_ptr<Localization> Fem2DRepresentation::createLocalization(const Data
 	return nullptr;
 }
 
-Math::Vector3d Fem2DRepresentation::calculatePosition(const DataStructures::Location& location)
-{
-	DataStructures::IndexedLocalCoordinate indexedCoordinate;
-	if (location.nodeMeshLocalCoordinate.hasValue())
-	{
-		indexedCoordinate = location.nodeMeshLocalCoordinate.getValue();
-	}
-	else if (location.triangleMeshLocalCoordinate.hasValue())
-	{
-		indexedCoordinate = location.triangleMeshLocalCoordinate.getValue();
-	}
-	else if (location.elementMeshLocalCoordinate.hasValue())
-	{
-		indexedCoordinate = location.elementMeshLocalCoordinate.getValue();
-	}
-	else
-	{
-		SURGSIM_FAILURE() << "Cannot calculate position without a mesh-based location (node, triangle or element).";
-		return Math::Vector3d::Zero();
-	}
-
-	Math::Vector3d position = Math::Vector3d::Zero();
-	auto femElement = getFemElement(indexedCoordinate.index);
-	auto nodeIds = femElement->getNodeIds();
-	SURGSIM_ASSERT(nodeIds.size() == indexedCoordinate.coordinate.size()) << "The number of nodes does not match the "
-		<< "coordinate size";
-	size_t i = 0;
-	for (auto nodeId : nodeIds)
-	{
-		position += indexedCoordinate.coordinate[i++] * getCurrentState()->getPosition(nodeId);
-	}
-	return position;
-}
-
 void Fem2DRepresentation::transformState(std::shared_ptr<Math::OdeState> state,
 										 const Math::RigidTransform3d& transform)
 {
