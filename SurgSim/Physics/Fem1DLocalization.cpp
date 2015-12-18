@@ -45,66 +45,65 @@ bool Fem1DLocalization::isValidRepresentation(std::shared_ptr<Representation> re
 	return (femRepresentation != nullptr || representation == nullptr);
 }
 
-void Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd)
+bool Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool* hasReachedEnd)
 {
+	if (hasReachedEnd != nullptr)
+	{
+		*hasReachedEnd = false;
+	}
+	bool moved = false;
+
 	auto femRepresentation = std::static_pointer_cast<FemRepresentation>(getRepresentation());
 	auto position = getLocalPosition();
 	auto femElement = femRepresentation->getFemElement(position.index);
-	auto nodeIds = femElement->getNodeIds();
-	std::vector<Math::Vector3d> nodePositions;
-	for (auto nodeId : nodeIds)
-	{
-		nodePositions.push_back(femRepresentation->getCurrentState()->getPosition(nodeId));
-	}
-
-	auto currentNodePosition = position.coordinate[0] * nodePositions[0] + position.coordinate[1] * nodePositions[1];
+	const auto& nodeIds = femElement->getNodeIds();
+	std::array<Math::Vector3d, 2> nodePositions = {femRepresentation->getCurrentState()->getPosition(nodeIds[0]),
+		femRepresentation->getCurrentState()->getPosition(nodeIds[1])};
+	
+	Math::Vector3d currentNodePosition =
+		position.coordinate[0] * nodePositions[0] + position.coordinate[1] * nodePositions[1];
 	std::array<Math::Vector3d, 2> nodeDirection = {nodePositions[0] - currentNodePosition,
 		nodePositions[1] - currentNodePosition};
 	Math::Vector3d direction = point - currentNodePosition;
 
-	size_t i = 0, j = 1;
-	int increment[2] = {-1, 1};
-	size_t elementEnds[2] = {0, femRepresentation->getNumFemElements() - 1};
-	if (nodeDirection[i].dot(direction) < nodeDirection[j].dot(direction))
+	int increment = -1;
+	if (nodeDirection[0].dot(direction) < nodeDirection[1].dot(direction))
 	{
-		i = 1;
-		j = 0;
+		increment = 1;
 	}
 
 	// Moving toward nodeIds[i] till the closest point to 'point' is reached.
 	double currentDistanceToPoint = (currentNodePosition - point).norm();
 	Math::Vector3d currentPointOnLine, newPointOnLine;
-	Math::distancePointSegment(point, nodePositions[i], nodePositions[j], &newPointOnLine);
+	Math::distancePointSegment(point, nodePositions[0], nodePositions[1], &newPointOnLine);
 	double newDistanceToPoint = (newPointOnLine - point).norm();
 	currentPointOnLine = newPointOnLine;
-	bool setCoordinates = false;
 
 	while (newDistanceToPoint < currentDistanceToPoint)
 	{
-		setCoordinates = true;
+		moved = true;
 		currentDistanceToPoint = newDistanceToPoint;
 		currentPointOnLine = newPointOnLine;
-		auto index = position.index + increment[i];
+		auto index = position.index + increment;
 		if (index >= 0 && index < femRepresentation->getNumFemElements())
 		{
 			position.index = index;
 			auto femElement = femRepresentation->getFemElement(position.index);
-			auto nodeIds = femElement->getNodeIds();
-			std::vector<Math::Vector3d> nodePositionsLocal;
-			for (auto nodeId : nodeIds)
-			{
-				nodePositionsLocal.push_back(femRepresentation->getCurrentState()->getPosition(nodeId));
-			}
-			Math::distancePointSegment(point, nodePositionsLocal[i], nodePositionsLocal[j], &newPointOnLine);
+			const auto&  nodeIds = femElement->getNodeIds();
+			std::array<Math::Vector3d, 2> nodePositionsLocal =
+			{femRepresentation->getCurrentState()->getPosition(nodeIds[0]),
+			femRepresentation->getCurrentState()->getPosition(nodeIds[1])};
+			
+			Math::distancePointSegment(point, nodePositionsLocal[0], nodePositionsLocal[1], &newPointOnLine);
 			newDistanceToPoint = (newPointOnLine - point).norm();
 			if (newDistanceToPoint >= currentDistanceToPoint)
 			{
-				position.index -= increment[i];
+				position.index -= increment;
 			}
 			else
 			{
-				nodePositions[i] = nodePositionsLocal[i];
-				nodePositions[j] = nodePositionsLocal[j];
+				nodePositions[0] = nodePositionsLocal[0];
+				nodePositions[1] = nodePositionsLocal[1];
 			}
 		}
 		else
@@ -113,18 +112,23 @@ void Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool *hasReac
 		}
 	}
 
-	if (setCoordinates)
+	if (moved)
 	{
 		Math::Vector2d bary;
-		Math::barycentricCoordinates(currentPointOnLine, nodePositions[i], nodePositions[j], &bary);
-		position.coordinate[i] = bary[0];
-		position.coordinate[j] = bary[1];
-		if (position.index == elementEnds[i])
+		Math::barycentricCoordinates(currentPointOnLine, nodePositions[0], nodePositions[1], &bary);
+		position.coordinate[0] = bary[0];
+		position.coordinate[1] = bary[1];
+		if (hasReachedEnd != nullptr)
 		{
-			*hasReachedEnd = std::abs(position.coordinate[i] - 1.0) < Math::Geometry::DistanceEpsilon;
+			*hasReachedEnd =
+				(increment > 0 && position.index == femRepresentation->getNumFemElements() - 1 &&
+				 std::abs(position.coordinate[1] - 1.0) < Math::Geometry::DistanceEpsilon) ||
+				(position.index == 0 && std::abs(position.coordinate[0] - 1.0) < Math::Geometry::DistanceEpsilon);
 		}
 		setLocalPosition(position);
 	}
+
+	return moved;
 }
 
 } // namespace Physics

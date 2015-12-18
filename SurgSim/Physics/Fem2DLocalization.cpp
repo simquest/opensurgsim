@@ -46,24 +46,25 @@ bool Fem2DLocalization::isValidRepresentation(std::shared_ptr<Representation> re
 	return (femRepresentation != nullptr || representation == nullptr);
 }
 
-DataStructures::Location Fem2DLocalization::createLocationForGlobalPosition(
-	const Math::Vector3d& globalPosition)
+Math::RigidTransform3d Fem2DLocalization::getTransform()
 {
 	auto femRepresentation = std::static_pointer_cast<Fem2DRepresentation>(getRepresentation());
 	auto position = getLocalPosition();
-	auto femElement = femRepresentation->getFemElement(position.index);
-	auto nodeIds = femElement->getNodeIds();
-	std::vector<Math::Vector3d> nodePositions;
-	for (auto nodeId : nodeIds)
-	{
-		nodePositions.push_back(femRepresentation->getCurrentState()->getPosition(nodeId));
-	}
+	auto femElement = femRepresentation->getFemElement(getLocalPosition().index);
+	const auto& nodeIds = femElement->getNodeIds();
+	std::array<Math::Vector3d, 3> nodePositions =
+		{femRepresentation->getCurrentState()->getPosition(nodeIds[0]),
+		 femRepresentation->getCurrentState()->getPosition(nodeIds[1]),
+		 femRepresentation->getCurrentState()->getPosition(nodeIds[2])};
 
-	DataStructures::Location location;
-	Math::Vector3d bary;
-	Math::barycentricCoordinates(globalPosition, nodePositions[0], nodePositions[1], nodePositions[2], &bary);
-	location.triangleMeshLocalCoordinate = DataStructures::IndexedLocalCoordinate(position.index, bary);
-	return location;
+	Math::Vector3d edge, normal, binormal;
+	edge = (nodePositions[1] - nodePositions[0]).normalized();
+	normal = (nodePositions[2] - nodePositions[0]).cross(edge).normalized();
+	binormal = edge.cross(normal);
+	Math::Matrix33d rotation;
+	rotation << edge, normal, binormal;
+	
+	return Math::makeRigidTransform(rotation, (nodePositions[0] + nodePositions[1] + nodePositions[2]) / 3.0);
 }
 
 } // namespace Physics

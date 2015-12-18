@@ -63,7 +63,7 @@ private:
 	std::shared_ptr<SlidingConstraintData> m_slidingConstraintData;
 
 	/// The end of the sliding direction, local to the representation1.
-	DataStructures::Location m_directionEnd;
+	Math::Vector3d m_directionEnd;
 };
 
 };  // namespace Physics

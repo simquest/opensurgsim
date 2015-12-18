@@ -42,8 +42,8 @@ SlidingConstraint::SlidingConstraint(ConstraintType constraintType,
 	SURGSIM_ASSERT(m_slidingConstraintData != nullptr) <<
 		"The data sent in for the sliding constraint is not of type SlidingConstraintData.";
 
-	auto directionEnd = m_localizations.second->calculatePosition() + slidingDirection;
-	m_directionEnd = m_localizations.second->createLocationForGlobalPosition(directionEnd);
+	Math::Vector3d directionEnd = m_localizations.second->calculatePosition() + slidingDirection;
+	m_directionEnd = m_localizations.second->getTransform().inverse() * directionEnd;
 }
 
 SlidingConstraint::~SlidingConstraint()
@@ -59,8 +59,7 @@ void SlidingConstraint::doBuild(double dt,
 {
 	// Update the SlidingConstraintData
 	Math::Vector3d pointOfConstraint = m_localizations.second->calculatePosition();
-	Math::Vector3d slidingDirection =
-		m_localizations.second->getRepresentation()->calculatePosition(m_directionEnd) - pointOfConstraint;
+	Math::Vector3d slidingDirection = m_localizations.second->getTransform() * m_directionEnd - pointOfConstraint;
 	m_slidingConstraintData->setSlidingDirection(pointOfConstraint, slidingDirection);
 
 	// Update the representation0's localization (representation1's remains the same).

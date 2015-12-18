@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
@@ -64,14 +65,13 @@ public:
 
 	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation);
 
-	/// Create a location for the given global position.
-	/// \param globalPosition The global position for which location is to be created.
-	/// \return The newly created location.
-	virtual DataStructures::Location createLocationForGlobalPosition(const Math::Vector3d& globalPosition);
+	/// \return The rigid transform of the localization.
+	virtual Math::RigidTransform3d getTransform();
 
 	/// \param point Move this localization closest to this point
 	/// \param hasReachedEnd [out] Flag to set, when the localization reaches the end of the representation.
-	virtual void moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd);
+	/// \return Whether the localization was moved or not.
+	virtual bool moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd);
 
 private:
 	/// Calculates the global position of this localization

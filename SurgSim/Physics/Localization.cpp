@@ -63,17 +63,17 @@ bool Localization::isValidRepresentation(std::shared_ptr<Representation> represe
 	return true;
 }
 
-DataStructures::Location Localization::createLocationForGlobalPosition(
-	const Math::Vector3d& globalPosition)
+Math::RigidTransform3d Localization::getTransform()
 {
-	SURGSIM_FAILURE() << "Localization::createLocationForGlobalPosition() is not implemented for " <<
+	SURGSIM_FAILURE() << "Localization::getTransform() is not implemented for " <<
 		getRepresentation()->getFullName();
-	return DataStructures::Location();
+	return Math::RigidTransform3d();
 }
 
-void Localization::moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd)
+bool Localization::moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd)
 {
 	SURGSIM_FAILURE() << "Localization::moveClosestTo() is not implemented for " << getRepresentation()->getFullName();
+	return false;
 }
 
 }
