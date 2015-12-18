@@ -63,7 +63,7 @@ Math::RigidTransform3d Fem2DLocalization::getTransform()
 	binormal = edge.cross(normal);
 	Math::Matrix33d rotation;
 	rotation << edge, normal, binormal;
-	
+
 	return Math::makeRigidTransform(rotation, (nodePositions[0] + nodePositions[1] + nodePositions[2]) / 3.0);
 }
 

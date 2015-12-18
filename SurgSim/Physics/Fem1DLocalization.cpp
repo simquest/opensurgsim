@@ -59,7 +59,7 @@ bool Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool* hasReac
 	const auto& nodeIds = femElement->getNodeIds();
 	std::array<Math::Vector3d, 2> nodePositions = {femRepresentation->getCurrentState()->getPosition(nodeIds[0]),
 		femRepresentation->getCurrentState()->getPosition(nodeIds[1])};
-	
+
 	Math::Vector3d currentNodePosition =
 		position.coordinate[0] * nodePositions[0] + position.coordinate[1] * nodePositions[1];
 	std::array<Math::Vector3d, 2> nodeDirection = {nodePositions[0] - currentNodePosition,
@@ -93,7 +93,7 @@ bool Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool* hasReac
 			std::array<Math::Vector3d, 2> nodePositionsLocal =
 			{femRepresentation->getCurrentState()->getPosition(nodeIds[0]),
 			femRepresentation->getCurrentState()->getPosition(nodeIds[1])};
-			
+
 			Math::distancePointSegment(point, nodePositionsLocal[0], nodePositionsLocal[1], &newPointOnLine);
 			newDistanceToPoint = (newPointOnLine - point).norm();
 			if (newDistanceToPoint >= currentDistanceToPoint)
