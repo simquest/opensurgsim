@@ -137,7 +137,7 @@ public:
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockWithSearch<T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m,\
+			EXPECT_THROW((blockWithSearch<Opt, I>(sub, m_rowId, m_columnId, m_n, m_m,\
 						  nullptr, &Operation<Matrix, Eigen::SparseMatrix<T, Opt, I>>::assign)),\
 						  SurgSim::Framework::AssertionFailure);
 
@@ -183,7 +183,7 @@ public:
 		else
 		{
 			// No recipient specified
-			EXPECT_THROW((blockWithSearch<T, Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr,\
+			EXPECT_THROW((blockWithSearch<Opt, I>(sub, m_rowId, m_columnId, m_n, m_m, nullptr,\
 						  &Operation<Matrix, Eigen::SparseMatrix<T, Opt, I>>::add)),\
 						  SurgSim::Framework::AssertionFailure);
 
