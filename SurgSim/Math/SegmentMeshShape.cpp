@@ -30,7 +30,7 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SegmentMeshShape, SegmentM
 
 SegmentMeshShape::SegmentMeshShape()
 {
-	setRadius(0.0);
+	setRadius(0.001);
 	updateAabbTree();
 }
 
@@ -115,7 +115,7 @@ void SegmentMeshShape::updateAabbTree()
 
 	auto const& edges = getEdges();
 
-	for (size_t id = 0, count = edges.size(); id < count; ++id)
+	for (size_t id = 0; id < edges.size(); ++id)
 	{
 		if (edges[id].isValid)
 		{
@@ -124,7 +124,7 @@ void SegmentMeshShape::updateAabbTree()
 			aabb.extend((vertices[0] + m_segmentEndBoundingBoxHalfExtent).eval());
 			aabb.extend((vertices[1] - m_segmentEndBoundingBoxHalfExtent).eval());
 			aabb.extend((vertices[1] + m_segmentEndBoundingBoxHalfExtent).eval());
-			items.emplace_back(std::make_pair(std::move(aabb), id));
+			items.emplace_back(aabb, id);
 		}
 	}
 	m_aabbTree->set(std::move(items));
