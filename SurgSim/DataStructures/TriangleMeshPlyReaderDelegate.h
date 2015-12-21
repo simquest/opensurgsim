@@ -124,8 +124,8 @@ protected:
 	std::shared_ptr<MeshType> m_mesh;
 
 	// Statically allocated index array to receive data for the faces
-	std::array<size_t, 3> m_indices;
-	std::array<size_t, 2> m_edges;
+	std::array<size_t, 3> m_face;
+	std::array<size_t, 2> m_edge;
 
 private:
 	/// Set to true if s/t coordinates are found in the .ply file

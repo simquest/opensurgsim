@@ -165,9 +165,9 @@ template <class M>
 void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processFace(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_listData.count == 3) << "Can only process triangle meshes.";
-	std::copy(m_listData.indices, m_listData.indices + 3, m_indices.begin());
+	std::copy(m_listData.indices, m_listData.indices + 3, m_face.begin());
 
-	typename M::TriangleType triangle(m_indices);
+	typename M::TriangleType triangle(m_face);
 	m_mesh->addTriangle(triangle);
 }
 
@@ -204,9 +204,9 @@ template <class M>
 void SurgSim::DataStructures::TriangleMeshPlyReaderDelegate<M>::processEdge(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_listData.count == 2) << "Edges have to have 2 points.";
-	std::copy(m_listData.indices, m_listData.indices + 2, m_edges.begin());
+	std::copy(m_listData.indices, m_listData.indices + 2, m_edge.begin());
 
-	typename M::EdgeType edge(m_edges);
+	typename M::EdgeType edge(m_edge);
 	m_mesh->addEdge(edge);
 }
 
