@@ -126,10 +126,11 @@ void LinearSpring::addDamping(const OdeState& state, Math::SparseMatrix* D, doub
 	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   D, false);
-	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Matrix33d negativeDe = -De;
+	Math::addSubMatrix(negativeDe, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   D, false);
-	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(negativeDe, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   D, false);
 	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
@@ -158,10 +159,11 @@ void LinearSpring::addStiffness(const OdeState& state, Math::SparseMatrix* K, do
 	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   K, false);
-	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Matrix33d negativeKe = -Ke;
+	Math::addSubMatrix(negativeKe, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   K, false);
-	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(negativeKe, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   K, false);
 	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
@@ -194,10 +196,11 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Math::SparseMatrix* 
 	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   K, false);
-	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Matrix33d negativeKe = -Ke;
+	Math::addSubMatrix(negativeKe, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   K, false);
-	Math::addSubMatrix(-Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(negativeKe, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   K, false);
 	Math::addSubMatrix(Ke, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
@@ -208,10 +211,11 @@ void LinearSpring::addFDK(const OdeState& state, Vector* F, Math::SparseMatrix* 
 	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   D, false);
-	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
+	Matrix33d negativeDe = -De;
+	Math::addSubMatrix(negativeDe, static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   D, false);
-	Math::addSubMatrix(-De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
+	Math::addSubMatrix(negativeDe, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
 					   static_cast<SparseMatrix::Index>(m_nodeIds[0]),
 					   D, false);
 	Math::addSubMatrix(De, static_cast<SparseMatrix::Index>(m_nodeIds[1]),
