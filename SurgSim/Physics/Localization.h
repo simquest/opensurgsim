@@ -65,8 +65,11 @@ public:
 
 	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation);
 
-	/// \return The rigid transform of the localization.
-	virtual Math::RigidTransform3d getTransform();
+	/// Find a pose that the localization is represented with respect to.
+	/// In the case of a rigid representation, the pose of the representation is the pose returned. In case of a fem
+	/// representation, the pose is calculated from the fem element which this localization is a part of.
+	/// \return The pose that the localization is represented with respect to.
+	virtual Math::RigidTransform3d getElementPose();
 
 	/// \param point Move this localization closest to this point
 	/// \param hasReachedEnd [out] Flag to set, when the localization reaches the end of the representation.

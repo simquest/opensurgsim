@@ -63,9 +63,9 @@ bool Localization::isValidRepresentation(std::shared_ptr<Representation> represe
 	return true;
 }
 
-Math::RigidTransform3d Localization::getTransform()
+Math::RigidTransform3d Localization::getElementPose()
 {
-	SURGSIM_FAILURE() << "Localization::getTransform() is not implemented for " <<
+	SURGSIM_FAILURE() << "Localization::getElementPose() is not implemented for " <<
 		getRepresentation()->getFullName();
 	return Math::RigidTransform3d();
 }

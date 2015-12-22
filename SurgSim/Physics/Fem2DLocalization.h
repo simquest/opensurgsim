@@ -47,7 +47,7 @@ public:
 	/// \return	true if valid representation, false if not.
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
 
-	Math::RigidTransform3d getTransform() override;
+	Math::RigidTransform3d getElementPose() override;
 };
 
 } // namespace Physics

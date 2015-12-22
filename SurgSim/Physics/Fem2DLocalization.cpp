@@ -46,7 +46,7 @@ bool Fem2DLocalization::isValidRepresentation(std::shared_ptr<Representation> re
 	return (femRepresentation != nullptr || representation == nullptr);
 }
 
-Math::RigidTransform3d Fem2DLocalization::getTransform()
+Math::RigidTransform3d Fem2DLocalization::getElementPose()
 {
 	auto femRepresentation = std::static_pointer_cast<Fem2DRepresentation>(getRepresentation());
 	auto position = getLocalPosition();
