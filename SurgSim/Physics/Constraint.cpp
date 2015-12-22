@@ -32,11 +32,13 @@ Constraint::Constraint(ConstraintType constraintType,
 	const SurgSim::DataStructures::Location& location0,
 	std::shared_ptr<Representation> representation1,
 	const SurgSim::DataStructures::Location& location1)
+	: m_active(true)
 {
 	m_mlcpMap[FIXED_3DPOINT] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
 	m_mlcpMap[FIXED_3DROTATION_VECTOR] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
 	m_mlcpMap[FRICTIONAL_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT;
 	m_mlcpMap[FRICTIONLESS_3DCONTACT] = Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	m_mlcpMap[FRICTIONLESS_SLIDING] = Math::MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT;
 	setInformation(constraintType, data, representation0, location0, representation1, location1);
 }
 
@@ -104,8 +106,13 @@ void Constraint::build(double dt,
 
 bool Constraint::isActive()
 {
-	return m_localizations.first->getRepresentation()->isActive() &&
+	return m_active && m_localizations.first->getRepresentation()->isActive() &&
 		   m_localizations.second->getRepresentation()->isActive();
+}
+
+void Constraint::setActive(bool flag)
+{
+	m_active = flag;
 }
 
 void Constraint::doBuild(double dt,

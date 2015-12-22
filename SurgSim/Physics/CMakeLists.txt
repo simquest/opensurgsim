@@ -80,6 +80,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
 	RigidState.cpp
+	SlidingConstraint.cpp
 	SlidingConstraintData.cpp
 	SolveMlcp.cpp
 	Spring.cpp
@@ -163,6 +164,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
 	RigidState.h
+	SlidingConstraint.h
 	SlidingConstraintData.h
 	SolveMlcp.h
 	Spring.h

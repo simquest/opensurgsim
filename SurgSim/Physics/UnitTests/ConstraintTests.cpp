@@ -214,6 +214,21 @@ TEST_F(ConstraintTests, TestGetNumDof)
 	}
 }
 
+TEST_F(ConstraintTests, SetActive)
+{
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
+	m_n.setZero();
+	m_n[1] = -1.0;
+	m_constraintData->setPlaneEquation(m_n, m_d);
+	m_constraint = std::make_shared<Constraint>(type, m_constraintData,
+		m_fixed, m_locFixedPlane,
+		m_rigid, m_locRigidSphere);
+
+	EXPECT_TRUE(m_constraint->isActive());
+	m_constraint->setActive(false);
+	EXPECT_FALSE(m_constraint->isActive());
+}
+
 // Test case: Rigid sphere at (0 0 0) with radius 0.01 colliding with Fixed plane Y=0
 // Contact location on the rigid sphere is (0 -0.01 0)
 // Contact location on the fixed plane is (0 0 0)
