@@ -17,6 +17,7 @@ add_subdirectory(DeviceFilters)
 add_subdirectory(IdentityPoseDevice)
 add_subdirectory(Keyboard)
 add_subdirectory(Mouse)
+add_subdirectory(ReplayPoseDevice)
 
 set(OPTIONAL_DEVICES
 	LabJack
@@ -31,7 +32,7 @@ set(OPTIONAL_DEVICES
 	TrackIR
 )
 
-set(DEVICE_LIBRARIES "SurgSimDeviceFilters;IdentityPoseDevice;KeyboardDevice;MouseDevice")
+set(DEVICE_LIBRARIES "SurgSimDeviceFilters;IdentityPoseDevice;KeyboardDevice;MouseDevice;ReplayPoseDevice;")
 set(DEVICE_DOCUMENTATION devices.dox)
 foreach(DEVICE ${OPTIONAL_DEVICES})
 	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
