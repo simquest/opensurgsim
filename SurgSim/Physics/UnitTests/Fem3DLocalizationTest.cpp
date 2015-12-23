@@ -181,5 +181,19 @@ TEST_F(Fem3DLocalizationTest, IsValidRepresentation)
 	ASSERT_FALSE(localization.isValidRepresentation(std::make_shared<Fem2DRepresentation>("fem2d")));
 }
 
+TEST_F(Fem3DLocalizationTest, ElementPose)
+{
+	Fem3DLocalization localization(m_fem, m_validLocalPosition);
+	EXPECT_THROW(localization.getElementPose(), SurgSim::Framework::AssertionFailure);
+}
+
+TEST_F(Fem3DLocalizationTest, MoveClosestTo)
+{
+	Fem3DLocalization localization(m_fem, m_validLocalPosition);
+	bool flag = false;
+	EXPECT_THROW(localization.moveClosestTo(SurgSim::Math::Vector3d::Zero(), &flag),
+		SurgSim::Framework::AssertionFailure);
+}
+
 } // namespace SurgSim
 } // namespace Physics

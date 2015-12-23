@@ -103,5 +103,51 @@ TEST (MassSpringLocalizationTest, IsValidRepresentationTest)
 	EXPECT_FALSE(localization.isValidRepresentation(std::make_shared<RigidRepresentation>("rigidRepresentation")));
 }
 
+TEST(MassSpringLocalizationTest, ElementPose)
+{
+	// Create the mass spring
+	auto massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
+	std::vector<Vector3d> extremities;
+	extremities.push_back(Vector3d(0,0,0));
+	extremities.push_back(Vector3d(1,0,0));
+	std::vector<size_t> boundaryConditions;
+	massSpring->init1D(
+		extremities,
+		boundaryConditions,
+		0.1, // total mass (in Kg)
+		100.0, // Stiffness stretching
+		0.0, // Damping stretching
+		10.0, // Stiffness bending
+		0.0); // Damping bending
+
+	MassSpringLocalization localization = MassSpringLocalization(massSpring);
+
+	EXPECT_THROW(localization.getElementPose(), SurgSim::Framework::AssertionFailure);
+}
+
+TEST(MassSpringLocalizationTest, MoveClosestTo)
+{
+	// Create the mass spring
+	auto massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
+	std::vector<Vector3d> extremities;
+	extremities.push_back(Vector3d(0,0,0));
+	extremities.push_back(Vector3d(1,0,0));
+	std::vector<size_t> boundaryConditions;
+	massSpring->init1D(
+		extremities,
+		boundaryConditions,
+		0.1, // total mass (in Kg)
+		100.0, // Stiffness stretching
+		0.0, // Damping stretching
+		10.0, // Stiffness bending
+		0.0); // Damping bending
+
+	MassSpringLocalization localization = MassSpringLocalization(massSpring);
+
+	bool flag = false;
+	EXPECT_THROW(localization.moveClosestTo(SurgSim::Math::Vector3d::Zero(), &flag),
+		SurgSim::Framework::AssertionFailure);
+}
+
 };  //  namespace Physics
 };  //  namespace SurgSim

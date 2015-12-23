@@ -136,5 +136,50 @@ TEST_F(Fem2DLocalizationTest, IsValidRepresentation)
 	ASSERT_FALSE(localization.isValidRepresentation(std::make_shared<Fem3DRepresentation>("fem3d")));
 }
 
+TEST_F(Fem2DLocalizationTest, ElementPose)
+{
+	SurgSim::Math::RigidTransform3d pose0, pose1;
+	SurgSim::Math::Vector3d edge0(1.0, 0.0, 0.0);
+	SurgSim::Math::Vector3d edge1 = SurgSim::Math::Vector3d(1.0, 1.0, 0.0).normalized();
+	SurgSim::Math::Vector3d normal(0.0, 0.0, 1.0);
+	SurgSim::Math::Vector3d binormal0 = edge0.cross(normal);
+	SurgSim::Math::Vector3d binormal1 = edge1.cross(normal);
+	SurgSim::Math::Matrix33d rotation;
+	rotation << edge0, normal, binormal0;
+	pose0 = SurgSim::Math::makeRigidTransform(rotation, SurgSim::Math::Vector3d(0.0, -1.0 / 3.0, 0.0));
+	rotation << edge1, normal, binormal1;
+	pose1 = SurgSim::Math::makeRigidTransform(rotation, SurgSim::Math::Vector3d(0.0, 1.0 / 3.0, 0.0));
+
+	{
+		SurgSim::DataStructures::IndexedLocalCoordinate testPosition1;
+		testPosition1.index = 0;
+		testPosition1.coordinate = SurgSim::Math::Vector::Zero(3);
+		testPosition1.coordinate[0] = 0.5;
+		testPosition1.coordinate[1] = 0.5;
+		Fem2DLocalization testLocalization1(m_fem, testPosition1);
+		auto pose = testLocalization1.getElementPose();
+		EXPECT_TRUE(pose0.isApprox(pose));
+	}
+
+	{
+		SurgSim::DataStructures::IndexedLocalCoordinate testPosition1;
+		testPosition1.index = 1;
+		testPosition1.coordinate = SurgSim::Math::Vector::Zero(3);
+		testPosition1.coordinate[0] = 0.5;
+		testPosition1.coordinate[1] = 0.5;
+		Fem2DLocalization testLocalization1(m_fem, testPosition1);
+		auto pose = testLocalization1.getElementPose();
+		EXPECT_TRUE(pose1.isApprox(pose));
+	}
+}
+
+TEST_F(Fem2DLocalizationTest, MoveClosestTo)
+{
+	Fem2DLocalization localization(m_fem, m_validLocalPosition);
+	bool flag = false;
+	EXPECT_THROW(localization.moveClosestTo(SurgSim::Math::Vector3d::Zero(), &flag),
+		SurgSim::Framework::AssertionFailure);
+}
+
 } // namespace SurgSim
 } // namespace Physics

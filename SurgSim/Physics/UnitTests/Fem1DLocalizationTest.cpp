@@ -137,5 +137,58 @@ TEST_F(Fem1DLocalizationTest, IsValidRepresentation)
 	ASSERT_FALSE(localization.isValidRepresentation(std::make_shared<Fem3DRepresentation>("fem3d")));
 }
 
+TEST_F(Fem1DLocalizationTest, ElementPose)
+{
+	Fem1DLocalization localization(m_fem, m_validLocalPosition);
+	EXPECT_THROW(localization.getElementPose(), SurgSim::Framework::AssertionFailure);
+}
+
+TEST_F(Fem1DLocalizationTest, MoveClosestTo)
+{
+	Fem1DLocalization localization(m_fem, m_validLocalPosition);
+
+	{
+		SurgSim::DataStructures::IndexedLocalCoordinate testPosition1;
+		testPosition1.index = 1;
+		testPosition1.coordinate = SurgSim::Math::Vector::Zero(2);
+		testPosition1.coordinate[0] = 0.5;
+		testPosition1.coordinate[1] = 0.5;
+		Fem1DLocalization testLocalization1(m_fem, testPosition1);
+
+		bool hasReachedEnd = false;
+		EXPECT_TRUE(localization.moveClosestTo(testLocalization1.calculatePosition(), &hasReachedEnd));
+		EXPECT_FALSE(hasReachedEnd);
+		EXPECT_TRUE(localization.calculatePosition().isApprox(testLocalization1.calculatePosition()));
+	}
+
+	{
+		SurgSim::DataStructures::IndexedLocalCoordinate testPosition1;
+		testPosition1.index = 0;
+		testPosition1.coordinate = SurgSim::Math::Vector::Zero(2);
+		testPosition1.coordinate[0] = 0.1;
+		testPosition1.coordinate[1] = 0.9;
+		Fem1DLocalization testLocalization1(m_fem, testPosition1);
+
+		bool hasReachedEnd = false;
+		EXPECT_TRUE(localization.moveClosestTo(testLocalization1.calculatePosition(), &hasReachedEnd));
+		EXPECT_FALSE(hasReachedEnd);
+		EXPECT_TRUE(localization.calculatePosition().isApprox(testLocalization1.calculatePosition()));
+	}
+
+	{
+		SurgSim::DataStructures::IndexedLocalCoordinate testPosition1;
+		testPosition1.index = 0;
+		testPosition1.coordinate = SurgSim::Math::Vector::Zero(2);
+		testPosition1.coordinate[0] = 1.0;
+		testPosition1.coordinate[1] = 0.0;
+		Fem1DLocalization testLocalization1(m_fem, testPosition1);
+
+		bool hasReachedEnd = false;
+		EXPECT_TRUE(localization.moveClosestTo(testLocalization1.calculatePosition(), &hasReachedEnd));
+		EXPECT_TRUE(hasReachedEnd);
+		EXPECT_TRUE(localization.calculatePosition().isApprox(testLocalization1.calculatePosition()));
+	}
+}
+
 } // namespace SurgSim
 } // namespace Physics
