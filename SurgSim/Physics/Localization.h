@@ -19,10 +19,16 @@
 #include <memory>
 
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+struct Location;
+}
 
 namespace Physics
 {
@@ -45,35 +51,30 @@ public:
 
 	/// Sets the representation
 	/// \param representation The representation on which the localization is defined
-	void setRepresentation(std::shared_ptr<Representation> representation)
-	{
-		if (isValidRepresentation(representation))
-		{
-			m_representation = representation;
-		}
-		else
-		{
-			SURGSIM_ASSERT(false) << "Unexpected representation type" << std::endl;
-		}
-	}
+	void setRepresentation(std::shared_ptr<Representation> representation);
 
 	/// Gets the representation
 	/// \return The representation on which the localization is defined, nullptr if none has been defined
-	std::shared_ptr<Representation> getRepresentation() const
-	{
-		return m_representation;
-	}
+	std::shared_ptr<Representation> getRepresentation() const;
 
 	/// Calculates the global position of this localization
 	/// \param time The time in [0..1] at which the position should be calculated
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
-	SurgSim::Math::Vector3d calculatePosition(double time = 1.0)
-	{
-		return doCalculatePosition(time);
-	}
+	SurgSim::Math::Vector3d calculatePosition(double time = 1.0);
 
 	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation);
+
+	/// Find a pose that the localization is represented with respect to.
+	/// In the case of a rigid representation, the pose of the representation is the pose returned. In case of a fem
+	/// representation, the pose is calculated from the fem element which this localization is a part of.
+	/// \return The pose that the localization is represented with respect to.
+	virtual Math::RigidTransform3d getElementPose();
+
+	/// \param point Move this localization closest to this point
+	/// \param hasReachedEnd [out] Flag to set, when the localization reaches the end of the representation.
+	/// \return Whether the localization was moved or not.
+	virtual bool moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd);
 
 private:
 	/// Calculates the global position of this localization
@@ -81,12 +82,13 @@ private:
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
 	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) = 0;
+
 	/// The representation on which the localization is defined
 	std::shared_ptr<Representation> m_representation;
 };
 
-};  // namespace Physics
+} // namespace Physics
 
-};  // namespace SurgSim
+} // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_LOCALIZATION_H
+#endif // SURGSIM_PHYSICS_LOCALIZATION_H
