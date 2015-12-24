@@ -78,7 +78,7 @@ void clearFakeRecord(const std::string& fileName)
 {
 	if (exist(fileName))
 	{
-		remove(fileName.c_str());
+		std::remove(fileName.c_str());
 	}
 }
 }
