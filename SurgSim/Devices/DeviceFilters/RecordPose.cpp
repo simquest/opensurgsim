@@ -30,7 +30,7 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::RecordPose, 
 RecordPose::RecordPose(const std::string& name) :
 	DeviceFilter(name),
 	m_cumulativeTime(0),
-	m_fileName("ReplayPoseDevice.bin")
+	m_fileName("ReplayPoseDevice.txt")
 {
 	m_timer.setMaxNumberOfFrames(1);
 	m_timer.start();
@@ -47,7 +47,7 @@ RecordPose::~RecordPose()
 void RecordPose::setFilename(const std::string& fileName)
 {
 	m_fileName = fileName;
-	m_outputFile.open(m_fileName, std::ios::binary | std::ios::out | std::ios::trunc);
+	m_outputFile.open(m_fileName, std::ios::out | std::ios::trunc);
 	SURGSIM_LOG_IF(!m_outputFile.is_open(), SurgSim::Framework::Logger::getLogger("Devices/RecordPose"), WARNING) <<
 		"File " << m_fileName << " could not be open to record device pose";
 }

@@ -48,10 +48,10 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	explicit ReplayPoseDevice(const std::string& uniqueName);
 
-	/// \return The filename from which the input poses are read (default is 'ReplayPoseDevice.bin')
+	/// \return The filename from which the input poses are read (default is 'ReplayPoseDevice.txt')
 	const std::string getFileName() const;
 
-	/// \param fileName from which the input poses will be read
+	/// \param fileName from which the input poses will be read (default is 'ReplayPoseDevice.txt')
 	void setFileName(const std::string& fileName);
 
 	/// \return The rate (in Hz) at which the device is running (1KHz is the default)

@@ -44,7 +44,7 @@ void createFakeRecord(const std::string& fileName, double rate)
 	timer.setMaxNumberOfFrames(1);
 	timer.start();
 
-	std::ofstream f(fileName, std::ios::binary | std::ios::out | std::ios::trunc);
+	std::ofstream f(fileName, std::ios::out | std::ios::trunc);
 
 	timer.endFrame();
 	double cumulativeTime = timer.getLastFramePeriod();

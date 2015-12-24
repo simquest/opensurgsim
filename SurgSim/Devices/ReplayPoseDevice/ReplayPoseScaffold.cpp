@@ -118,7 +118,7 @@ private:
 
 		std::ifstream inputFile;
 
-		inputFile.open(fileName, std::ios::binary | std::ios::in);
+		inputFile.open(fileName, std::ios::in);
 
 		if (!inputFile.is_open())
 		{

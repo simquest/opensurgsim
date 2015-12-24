@@ -40,10 +40,10 @@ public:
 	/// Desctructor
 	~RecordPose();
 
-	/// \param fileName The filename to record the pose/time to (default is 'ReplayPoseDevice.bin')
+	/// \param fileName The filename to record the pose/time to (default is 'ReplayPoseDevice.txt')
 	void setFilename(const std::string& fileName);
 
-	/// \return The filename where the pose/time are recorded (default is 'ReplayPoseDevice.bin')
+	/// \return The filename where the pose/time are recorded (default is 'ReplayPoseDevice.txt')
 	const std::string& getFilename() const;
 
 	SURGSIM_CLASSNAME(SurgSim::Devices::RecordPose);
