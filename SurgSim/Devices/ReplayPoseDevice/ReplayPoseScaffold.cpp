@@ -131,7 +131,7 @@ private:
 			double timeStamp;
 			Math::RigidTransform3d pose;
 			inputFile >> timeStamp >> pose.matrix();
-			m_motion.push_back(std::make_pair(timeStamp, pose));
+			m_motion.emplace_back(timeStamp, pose);
 		}
 		SURGSIM_LOG_INFO(logger) << "Loaded " << m_motion.size() << " timestamps";
 		if (m_motion.size() >= 1)
