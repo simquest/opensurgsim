@@ -42,10 +42,9 @@ public:
 	/// Destructor
 	virtual ~Fem1DLocalization();
 
-	/// Query if 'representation' is valid representation.
-	/// \param	representation	The representation.
-	/// \return	true if valid representation, false if not.
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
+
+	bool moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd) override;
 };
 
 } // namespace Physics

@@ -36,8 +36,8 @@ std::pair<int, int> CompoundShapeContact::getShapeTypes()
 }
 
 std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
+									 const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+									 const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
 {
 	typedef Math::PosedShape<std::shared_ptr<Math::Shape>> PosedShape;
 
@@ -49,8 +49,9 @@ std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
 	const auto& compoundShape = std::static_pointer_cast<Math::CompoundShape>(posedShape1.getShape());
 
 	SURGSIM_ASSERT(compoundShape->getType() == posedShape1.getShape()->getType()) <<
-		"Invalid static cast to compound shape";
+			"Invalid static cast to compound shape";
 
+	size_t index = 0;
 	for (const auto& subShape : compoundShape->getShapes())
 	{
 		const auto& calculation = calculations[subShape.first->getType()][posedShape2.getShape()->getType()];
@@ -61,19 +62,18 @@ std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
 		{
 			auto pose = posedShape1.getPose() * subShape.second;
 			localContacts = calculation->calculateDcdContact(
-				PosedShape(subShape.first->getTransformed(pose), pose),
-				posedShape2);
+								PosedShape(subShape.first->getTransformed(pose), pose), posedShape2);
 		}
 		else
 		{
 			localContacts = calculation->calculateDcdContact(
-				PosedShape(subShape.first, posedShape1.getPose() * subShape.second),
-				posedShape2);
+								PosedShape(subShape.first, posedShape1.getPose() * subShape.second), posedShape2);
 		}
 
 		for (auto& contact : localContacts)
 		{
 			auto& locations = contact->penetrationPoints.first;
+			locations.index = index;
 			if (locations.rigidLocalPosition.hasValue())
 			{
 				locations.rigidLocalPosition.setValue(subShape.second * locations.rigidLocalPosition.getValue());
@@ -81,6 +81,7 @@ std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
 		}
 
 		contacts.splice(contacts.end(), localContacts);
+		index++;
 	}
 	return contacts;
 

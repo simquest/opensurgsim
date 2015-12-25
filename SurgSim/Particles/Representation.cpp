@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,12 +40,13 @@ Representation::~Representation()
 
 bool Representation::doInitialize()
 {
+	m_particles.publish();
 	return true;
 }
 
 void Representation::setMaxParticles(size_t maxParticles)
 {
-	m_particles.getVertices().reserve(maxParticles);
+	m_particles.unsafeGet().getVertices().reserve(maxParticles);
 	m_maxParticles = maxParticles;
 }
 
@@ -54,12 +55,7 @@ size_t Representation::getMaxParticles() const
 	return m_maxParticles;
 }
 
-Particles& Representation::getParticles()
-{
-	return m_particles;
-}
-
-const Particles& Representation::getParticles() const
+SurgSim::DataStructures::BufferedValue<Particles>& Representation::getParticles()
 {
 	return m_particles;
 }
@@ -67,7 +63,7 @@ const Particles& Representation::getParticles() const
 bool Representation::addParticle(const Particle& particle)
 {
 	bool result;
-	auto& particles = m_particles.getVertices();
+	auto& particles = m_particles.unsafeGet().getVertices();
 	if (particles.size() < m_maxParticles)
 	{
 		particles.push_back(particle);
@@ -89,9 +85,15 @@ bool Representation::addParticle(const Math::Vector3d& position, const Math::Vec
 	return addParticle(Particle(position, data));
 }
 
+void Representation::removeParticle(size_t index)
+{
+	auto& particles = m_particles.unsafeGet().getVertices();
+	particles.at(index).data.lifetime = 0.0;
+}
+
 void Representation::update(double dt)
 {
-	auto& particles = m_particles.getVertices();
+	auto& particles = m_particles.unsafeGet().getVertices();
 	auto particle = particles.begin();
 	auto newEnd = particles.end();
 	while (particle != newEnd)
@@ -113,6 +115,7 @@ void Representation::update(double dt)
 	{
 		SURGSIM_LOG_WARNING(m_logger) << "Particle System " << getName() << " failed to update.";
 	}
+	m_particles.publish();
 }
 
 void Representation::handleCollisions(double dt)

@@ -65,8 +65,6 @@ protected:
 	void processBoundaryCondition(const std::string& elementName) override;
 
 private:
-	/// Flag to notify if the ply file provides rotational data for the vertices or not
-	bool m_hasRotationDOF;
 
 	/// Element's thickness information
 	double m_thickness;

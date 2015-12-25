@@ -99,12 +99,12 @@ bool FemRepresentation::doInitialize()
 		}
 	}
 
-	typedef Eigen::SparseMatrix<double>::Index Index;
+	typedef SparseMatrix::Index Index;
 
 	// Precompute the sparsity pattern for the global arrays.
-	m_M.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
-	m_D.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
-	m_K.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	m_M.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
+	m_D.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
+	m_K.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
 		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode() * (*femElement)->getNumNodes(),
@@ -125,7 +125,8 @@ bool FemRepresentation::doInitialize()
 		// Rotation matrix allocation and creation of the sparse matrix pattern.
 		m_complianceWarpingTransformation.resize(numDof, numDof);
 		// n columns with numDofPerNode non-zero elements each
-		m_complianceWarpingTransformation.reserve(Eigen::VectorXi::Constant(numDof, numDofPerNode));
+		m_complianceWarpingTransformation.reserve(
+			Eigen::Matrix<Index, Eigen::Dynamic, 1>::Constant(numDof, numDofPerNode));
 
 		auto logger = SurgSim::Framework::Logger::getLogger("Physics/FemRepresentation");
 		SURGSIM_LOG_IF(numDofPerNode % 3 != 0, logger, SEVERE) << "Using compliance warping with representation " <<
