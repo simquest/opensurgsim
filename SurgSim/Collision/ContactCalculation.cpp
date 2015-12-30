@@ -129,24 +129,11 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 				"Second Object, wrong type of object" << secondShapeType;
 	}
 
-	std::shared_ptr<Math::Shape> shape1 = pair->getFirst()->getShape();
-	if (shape1->isTransformable())
-	{
-		shape1 = pair->getFirst()->getPosedShape();
-	}
-
-	std::shared_ptr<Math::Shape> shape2 = pair->getSecond()->getShape();
-	if (shape2->isTransformable())
-	{
-		shape2 = pair->getSecond()->getPosedShape();
-	}
-
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
 	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(shape1, pair->getFirst()->getPose());
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(shape2, pair->getSecond()->getPose());
-		contacts = doCalculateDcdContact(posedShape1, posedShape2);
+		contacts = doCalculateDcdContact(pair->getFirst()->getPosedShapeMotion().second,
+			pair->getSecond()->getPosedShapeMotion().second);
 	}
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{

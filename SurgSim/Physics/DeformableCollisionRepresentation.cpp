@@ -105,7 +105,16 @@ void DeformableCollisionRepresentation::update(const double& dt)
 			"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
 	}
 
-	invalidatePosedShapeMotion();
+	auto posedShapeMotion = getPosedShapeMotion();
+	const auto& pose = getPose();
+	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
+	{
+		// This isn't the right pose.
+		posedShapeMotion.first =
+			Math::PosedShape<std::shared_ptr<Math::Shape>>(m_previousShape, pose);
+	}
+	posedShapeMotion.second = Math::PosedShape<std::shared_ptr<Math::Shape>>(m_shape, pose);
+	setPosedShapeMotion(posedShapeMotion);
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
@@ -117,14 +126,14 @@ bool DeformableCollisionRepresentation::doInitialize()
 		{
 			auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
 			SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
-			m_previousShape = std::make_shared<SurgSim::Math::Shape>(*meshShape);
+			m_previousShape = std::make_shared<SurgSim::Math::MeshShape>(*meshShape);
 			result = true;
 		}
 		else if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
 		{
 			auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::SegmentMeshShape>(m_shape);
 			SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
-			m_previousShape = std::make_shared<SurgSim::Math::Shape>(*meshShape);
+			m_previousShape = std::make_shared<SurgSim::Math::SegmentMeshShape>(*meshShape);
 			result = true;
 		}
 		else

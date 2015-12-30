@@ -32,7 +32,7 @@ bool Shape::isTransformable() const
 	return false;
 }
 
-std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose)
+std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose) const
 {
 	SURGSIM_FAILURE() << "getTransformed not implemented for " << getClassName();
 	return nullptr;

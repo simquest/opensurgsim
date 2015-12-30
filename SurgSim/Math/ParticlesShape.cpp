@@ -115,7 +115,7 @@ bool ParticlesShape::doUpdate()
 	return true;
 }
 
-std::shared_ptr<Shape> ParticlesShape::getTransformed(const RigidTransform3d& pose)
+std::shared_ptr<Shape> ParticlesShape::getTransformed(const RigidTransform3d& pose) const
 {
 	auto transformed = std::make_shared<ParticlesShape>(*this);
 	transformed->transform(pose);

@@ -86,7 +86,7 @@ const std::shared_ptr<Math::Shape> Representation::getPosedShape()
 	if (pose.isApprox(identity))
 	{
 		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-		m_posedShapeMotion.second= newPosedShape;
+		m_posedShapeMotion.second = newPosedShape;
 	}
 	else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
 	{
@@ -125,6 +125,21 @@ bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 
 void Representation::update(const double& dt)
 {
+	const auto& shape = getShape();
+	const auto& pose = getPose();
+	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
+	if (shape->isTransformable())
+	{
+		m_posedShapeMotion.second = Math::PosedShape<std::shared_ptr<Math::Shape>>(shape->getTransformed(pose), pose);
+	}
+	else
+	{
+		m_posedShapeMotion.second = Math::PosedShape<std::shared_ptr<Math::Shape>>(shape, pose);
+	}
+	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
+	{
+		m_posedShapeMotion.first = m_posedShapeMotion.second;
+	}
 }
 
 bool Representation::ignore(const std::string& fullName)
