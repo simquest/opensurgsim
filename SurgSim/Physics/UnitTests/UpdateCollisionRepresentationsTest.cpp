@@ -41,29 +41,40 @@ TEST(UpdateCollisionRepresentationsTest, Update)
 {
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
 
-	// Create two collision representations.
+	// Create collision representations.
 	auto collision1 = std::make_shared<MockCollisionRepresentation>("Collision1");
 	auto collision2 = std::make_shared<MockCollisionRepresentation>("Collision2");
+	auto collision3 = std::make_shared<MockCollisionRepresentation>("Collision3");
 
 	// Setup the state.
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> collisions;
 	collisions.push_back(collision1);
 	collisions.push_back(collision2);
+	collisions.push_back(collision3);
 	state->setCollisionRepresentations(collisions);
+
+	// Setup collision pairs.
+	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> pairs;
+	auto pair = std::make_shared<SurgSim::Collision::CollisionPair>(collision1, collision2);
+	pairs.push_back(pair);
+	state->setCollisionPairs(pairs);
 
 	// Test the m_numberOfTimesUpdateCalled before calling update().
 	EXPECT_EQ(0, collision1->getNumberOfTimesUpdateCalled());
 	EXPECT_EQ(0, collision2->getNumberOfTimesUpdateCalled());
+	EXPECT_EQ(0, collision3->getNumberOfTimesUpdateCalled());
 
 	// Set the local active flags.
 	collision1->setLocalActive(true);
 	collision2->setLocalActive(false);
+	collision3->setLocalActive(true);
 
-	// Test compuation.update()
+	// Test computation.update()
 	SurgSim::Physics::UpdateCollisionRepresentations computation(false);
 	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);
 
-	// Test the m_numberOfTimesUpdateCalled before calling update().
+	// Test the m_numberOfTimesUpdateCalled after calling update().
 	EXPECT_EQ(1, collision1->getNumberOfTimesUpdateCalled());
 	EXPECT_EQ(0, collision2->getNumberOfTimesUpdateCalled());
+	EXPECT_EQ(0, collision3->getNumberOfTimesUpdateCalled());
 }

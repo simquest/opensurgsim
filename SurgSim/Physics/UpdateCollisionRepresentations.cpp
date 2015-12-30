@@ -39,12 +39,23 @@ std::shared_ptr<PhysicsManagerState> SurgSim::Physics::UpdateCollisionRepresenta
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 
+	auto& collisionPairs = state->getCollisionPairs();
+	std::unordered_set<Collision::Representation*> colliding;
+	for (auto& pair : collisionPairs)
+	{
+		colliding.emplace(pair->getFirst().get());
+		colliding.emplace(pair->getSecond().get());
+	}
+
 	auto threadPool = Framework::Runtime::getThreadPool();
 	std::vector<std::future<void>> tasks;
 	auto& representations = result->getActiveCollisionRepresentations();
 	for (auto& representation : representations)
 	{
-		tasks.push_back(threadPool->enqueue<void>([dt, &representation]() { representation->update(dt); }));
+		if (colliding.count(representation.get()) > 0)
+		{
+			tasks.push_back(threadPool->enqueue<void>([dt, &representation]() { representation->update(dt); }));
+		}
 	}
 	for (auto& task : tasks)
 	{
