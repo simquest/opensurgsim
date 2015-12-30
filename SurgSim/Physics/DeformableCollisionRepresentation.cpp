@@ -113,7 +113,26 @@ bool DeformableCollisionRepresentation::doInitialize()
 	bool result = false;
 	if (nullptr != m_shape && m_shape->isValid())
 	{
-		result = true;
+		if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+		{
+			auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(m_shape);
+			SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
+			m_previousShape = std::make_shared<SurgSim::Math::Shape>(*meshShape);
+			result = true;
+		}
+		else if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
+		{
+			auto meshShape = std::dynamic_pointer_cast<SurgSim::Math::SegmentMeshShape>(m_shape);
+			SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
+			m_previousShape = std::make_shared<SurgSim::Math::Shape>(*meshShape);
+			result = true;
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+				"CollisionRepresentation '" << getFullName() <<
+				"' has a shape of type " << m_shape->getType() << ", which is neither MeshShape nor SegmentMeshShape.";
+		}
 	}
 
 	return result;
