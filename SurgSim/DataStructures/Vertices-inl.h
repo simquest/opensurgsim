@@ -27,13 +27,13 @@ namespace DataStructures
 {
 
 template <class VertexData>
-Vertices<VertexData>::Vertices()
+Vertices<VertexData>::Vertices() : m_updateCount(0)
 {
 }
 
 template <class VertexData>
 template <class V>
-Vertices<VertexData>::Vertices(const Vertices<V>& other)
+Vertices<VertexData>::Vertices(const Vertices<V>& other) : m_updateCount(other.getUpdateCount())
 {
 	m_vertices.reserve(other.getVertices().size());
 	for (auto& otherVertex : other.getVertices())
@@ -67,6 +67,7 @@ Vertices<VertexData>& Vertices<VertexData>::operator=(const Vertices<V>& other)
 	{
 		addVertex(VertexType(*otherVertex));
 	}
+	m_updateCount = other.getUpdateCount();
 
 	return *this;
 }
@@ -79,13 +80,27 @@ Vertices<VertexData>::~Vertices()
 template <class VertexData>
 void Vertices<VertexData>::clear()
 {
+	m_updateCount = 0;
 	doClear();
 }
 
 template <class VertexData>
 bool Vertices<VertexData>::update()
 {
+	++m_updateCount;
 	return doUpdate();
+}
+
+template <class VertexData>
+size_t Vertices<VertexData>::getUpdateCount() const
+{
+	return m_updateCount;
+}
+
+template <class VertexData>
+void Vertices<VertexData>::setUpdateCount(size_t count)
+{
+	m_updateCount = count;
 }
 
 template <class VertexData>

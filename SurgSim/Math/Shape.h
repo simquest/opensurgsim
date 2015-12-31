@@ -99,6 +99,10 @@ public:
 	/// Check if the shape is valid
 	/// \return True if shape is valid; Otherwise, false.
 	virtual bool isValid() const = 0;
+
+	/// Get the version number, which can be used to see if the shape has changed.
+	/// \return The version number.
+	virtual size_t getVersion() const;
 };
 
 /// PosedShape is a transformed shape with a record of the pose used to transform it.

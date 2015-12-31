@@ -95,6 +95,8 @@ public:
 
 	bool isTransformable() const override;
 
+	size_t getVersion() const override;
+
 protected:
 	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;

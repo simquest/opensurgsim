@@ -124,6 +124,9 @@ public:
 	/// \param pose the rigid transform to apply
 	void transform(const Math::RigidTransform3d& pose);
 
+	/// \return The update count. Note that it will silently roll over when the range of size_t has been exceeded.
+	size_t getUpdateCount() const;
+
 	/// Compares the mesh with another one (equality)
 	/// \param mesh The Vertices to compare it to
 	/// \return True if the two vertices are equals, False otherwise
@@ -144,6 +147,9 @@ protected:
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
 	virtual bool isEqual(const Vertices& mesh) const;
 
+	/// \param count The update count.
+	void setUpdateCount(size_t count);
+
 private:
 	/// Clear mesh to return to an empty state (no vertices).
 	virtual void doClear();
@@ -156,6 +162,9 @@ private:
 
 	/// Vertices
 	std::vector<VertexType> m_vertices;
+
+	/// For checking whether the mesh has changed
+	size_t m_updateCount;
 };
 
 typedef Vertices<EmptyData> VerticesPlain;

@@ -22,12 +22,10 @@ namespace SurgSim
 namespace Math
 {
 
-CompoundShape::CompoundShape()
+CompoundShape::CompoundShape() : m_version(0)
 {
-	{
-		typedef std::vector<SubShape> PropertyType;
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Math::CompoundShape, PropertyType, Shapes, getShapes, setShapes);
-	}
+	typedef std::vector<SubShape> PropertyType;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Math::CompoundShape, PropertyType, Shapes, getShapes, setShapes);
 }
 
 CompoundShape::~CompoundShape()
@@ -130,6 +128,7 @@ void CompoundShape::invalidateData()
 	m_volume.invalidate();
 	m_center.invalidate();
 	m_secondMoment.invalidate();
+	++m_version;
 }
 
 size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose)
@@ -221,8 +220,19 @@ std::shared_ptr<Shape> CompoundShape::getTransformed(const RigidTransform3d& pos
 			newShape = shape.first;
 		}
 		transformed->addShape(newShape, newPose);
+		transformed->setVersion(m_version);
 	}
 	return transformed;
+}
+
+size_t CompoundShape::getVersion() const
+{
+	return m_version;
+}
+
+void CompoundShape::setVersion(size_t version)
+{
+	m_version = version;
 }
 
 }

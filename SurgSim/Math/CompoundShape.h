@@ -98,6 +98,12 @@ public:
 
 	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const override;
 
+	size_t getVersion() const override;
+
+protected:
+	/// \param version The version to set.
+	void setVersion(size_t version);
+
 private:
 
 	/// Clears the data for the volume, center and secondMoment so it can be recalculated when needed again
@@ -119,6 +125,9 @@ private:
 	mutable DataStructures::OptionalValue<double> m_volume;
 	mutable DataStructures::OptionalValue<Matrix33d> m_secondMoment;
 	///@}
+
+	/// For checking whether the shape has changed
+	size_t m_version;
 
 };
 

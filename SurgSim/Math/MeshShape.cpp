@@ -218,6 +218,7 @@ std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose) c
 	auto transformed = std::make_shared<MeshShape>(*this);
 	transformed->transform(pose);
 	transformed->update();
+	transformed->setUpdateCount(getUpdateCount());
 	return transformed;
 }
 
@@ -248,6 +249,11 @@ void MeshShape::updateAabbTree()
 bool MeshShape::isTransformable() const
 {
 	return true;
+}
+
+size_t MeshShape::getVersion() const
+{
+	return getUpdateCount();
 }
 
 }; // namespace Math

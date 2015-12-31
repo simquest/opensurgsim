@@ -47,7 +47,11 @@ std::string Shape::getClassName() const
 	return "SurgSim::Math::Shape";
 }
 
-
+size_t Shape::getVersion() const
+{
+	SURGSIM_FAILURE() << "getVersion not implemented for " << getClassName();
+	return 0;
+}
 
 } // namespace Math
 } // namespace SurgSim

@@ -130,7 +130,13 @@ void Representation::update(const double& dt)
 	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
 	if (shape->isTransformable())
 	{
-		m_posedShapeMotion.second = Math::PosedShape<std::shared_ptr<Math::Shape>>(shape->getTransformed(pose), pose);
+		if ((m_posedShapeMotion.second.getShape() == nullptr) ||
+			(shape->getVersion() != m_posedShapeMotion.second.getShape()->getVersion()) ||
+			(!pose.isApprox(m_posedShapeMotion.second.getPose())))
+		{
+			m_posedShapeMotion.second =
+				Math::PosedShape<std::shared_ptr<Math::Shape>>(shape->getTransformed(pose), pose);
+		}
 	}
 	else
 	{
