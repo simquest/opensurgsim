@@ -30,7 +30,7 @@ uniform samplerCube specularEnvMap;
 uniform vec4 diffuseColor;
 uniform vec4 specularColor;
 uniform float diffusePercent = 0.9;
-uniform float specularPercent = 0.9;
+uniform float specularPercent = 0.1;
 uniform float shininess;
 
 // Main Camera Matrices
