@@ -148,33 +148,3 @@ TEST_F(RigidLocalizationTest, FixedRepresentation)
 	EXPECT_TRUE(localization.getLocalPosition().isApprox(position, epsilon));
 	EXPECT_FALSE(localization.calculatePosition().isApprox(origin, epsilon));
 }
-
-TEST_F(RigidLocalizationTest, ElementPose)
-{
-	// Create the rigid body
-	auto fixedRepresentation = std::make_shared<MockFixedRepresentation>();
-
-	// Activate the rigid body and setup its initial pose
-	fixedRepresentation->setLocalActive(true);
-	fixedRepresentation->getCurrentState().setPose(m_initialTransformation);
-
-	RigidLocalization localization = RigidLocalization(fixedRepresentation);
-
-	EXPECT_THROW(localization.getElementPose(), SurgSim::Framework::AssertionFailure);
-}
-
-TEST_F(RigidLocalizationTest, MoveClosestTo)
-{
-	// Create the rigid body
-	auto fixedRepresentation = std::make_shared<MockFixedRepresentation>();
-
-	// Activate the rigid body and setup its initial pose
-	fixedRepresentation->setLocalActive(true);
-	fixedRepresentation->getCurrentState().setPose(m_initialTransformation);
-
-	RigidLocalization localization = RigidLocalization(fixedRepresentation);
-
-	bool flag = false;
-	EXPECT_THROW(localization.moveClosestTo(SurgSim::Math::Vector3d::Zero(), &flag),
-		SurgSim::Framework::AssertionFailure);
-}

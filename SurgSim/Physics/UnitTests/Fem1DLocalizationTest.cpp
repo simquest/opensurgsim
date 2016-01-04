@@ -137,12 +137,6 @@ TEST_F(Fem1DLocalizationTest, IsValidRepresentation)
 	ASSERT_FALSE(localization.isValidRepresentation(std::make_shared<Fem3DRepresentation>("fem3d")));
 }
 
-TEST_F(Fem1DLocalizationTest, ElementPose)
-{
-	Fem1DLocalization localization(m_fem, m_validLocalPosition);
-	EXPECT_THROW(localization.getElementPose(), SurgSim::Framework::AssertionFailure);
-}
-
 TEST_F(Fem1DLocalizationTest, MoveClosestTo)
 {
 	Fem1DLocalization localization(m_fem, m_validLocalPosition);

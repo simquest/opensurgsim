@@ -173,13 +173,5 @@ TEST_F(Fem2DLocalizationTest, ElementPose)
 	}
 }
 
-TEST_F(Fem2DLocalizationTest, MoveClosestTo)
-{
-	Fem2DLocalization localization(m_fem, m_validLocalPosition);
-	bool flag = false;
-	EXPECT_THROW(localization.moveClosestTo(SurgSim::Math::Vector3d::Zero(), &flag),
-		SurgSim::Framework::AssertionFailure);
-}
-
 } // namespace SurgSim
 } // namespace Physics
