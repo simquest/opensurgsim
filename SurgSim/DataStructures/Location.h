@@ -144,7 +144,7 @@ template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
 		const SurgSim::DataStructures::IndexedLocalCoordinate& val)
 {
-	out << val.index << ":" << val.coordinate.transpose();
+	out << "[ " << val.index << " : " << val.coordinate.transpose() << " ]";
 	return out;
 }
 
