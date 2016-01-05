@@ -92,6 +92,43 @@ struct ReplayPoseScaffold::DeviceData
 		m_timer.start();
 	}
 
+	/// Retrieve the pose for the given time stamp "m_timestamp"
+	/// \return The requested pose, Identity if none could be loaded
+	Math::RigidTransform3d getPose()
+	{
+		if (m_motion.size() == 0)
+		{
+			return Math::RigidTransform3d::Identity();
+		}
+
+		if (m_motion.size() == 1 || (m_index == 0 && m_timestamp <= m_motion[0].first))
+		{
+			return m_motion[0].second;
+		}
+
+		while (m_motion.size() > m_index && m_timestamp > m_motion[m_index].first)
+		{
+			m_index++;
+		}
+
+		// Requesting a timestamp over the higher limit recorded in the file
+		if (m_motion.size() <= m_index)
+		{
+			return m_motion[m_motion.size() - 1].second;
+		}
+
+		// Are we requesting exactly the timestamp we just indexed
+		if (m_timestamp == m_motion[m_index].first)
+		{
+			return m_motion[m_index].second;
+		}
+
+		// Otherwise, we need to interpolate between the index and the previous index
+		double range = m_motion[m_index].first - m_motion[m_index - 1].first;
+		double time = (m_timestamp - m_motion[m_index - 1].first) / range;
+		return Math::interpolate(m_motion[m_index - 1].second, m_motion[m_index].second, time);
+	}
+
 	/// Device object managed by this scaffold.
 	ReplayPoseDevice* const deviceObject;
 
@@ -202,47 +239,12 @@ bool ReplayPoseScaffold::updateDevice(ReplayPoseScaffold::DeviceData* info)
 	info->m_timer.markFrame();
 	info->m_timestamp += info->m_timer.getLastFramePeriod();
 
-	Math::RigidTransform3d pose = getPoseAtTimeStamp(info);
+	Math::RigidTransform3d pose = info->getPose();
 	inputData.poses().set(DataStructures::Names::POSE, pose);
 
 	m_device->deviceObject->pushInput();
 
 	return true;
-}
-
-Math::RigidTransform3d ReplayPoseScaffold::getPoseAtTimeStamp(ReplayPoseScaffold::DeviceData* info)
-{
-	if (info->m_motion.size() == 0)
-	{
-		return Math::RigidTransform3d::Identity();
-	}
-
-	if (info->m_motion.size() == 1 || (info->m_index == 0 && info->m_timestamp <= info->m_motion[0].first))
-	{
-		return info->m_motion[0].second;
-	}
-
-	while (info->m_motion.size() > info->m_index && info->m_timestamp > info->m_motion[info->m_index].first)
-	{
-		info->m_index++;
-	}
-
-	// Requesting a timestamp over the higher limit recorded in the file
-	if (info->m_motion.size() <= info->m_index)
-	{
-		return info->m_motion[info->m_motion.size() - 1].second;
-	}
-
-	// Are we requesting exactly the timestamp we just indexed
-	if (info->m_timestamp == info->m_motion[info->m_index].first)
-	{
-		return info->m_motion[info->m_index].second;
-	}
-
-	// Otherwise, we need to interpolate between the index and the previous index
-	double range = info->m_motion[info->m_index].first - info->m_motion[info->m_index - 1].first;
-	double time = (info->m_timestamp - info->m_motion[info->m_index - 1].first) / range;
-	return Math::interpolate(info->m_motion[info->m_index - 1].second, info->m_motion[info->m_index].second, time);
 }
 
 DataStructures::DataGroup ReplayPoseScaffold::buildDeviceInputData()

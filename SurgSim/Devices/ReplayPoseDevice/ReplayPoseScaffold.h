@@ -71,11 +71,6 @@ private:
 	/// \return	True on success.
 	bool updateDevice(ReplayPoseScaffold::DeviceData* info);
 
-	/// Retrieve the pose for a given time stamp stored in the info data structure
-	/// \param [in,out] info The structure indicating the timestamp requested and storing current pose information
-	/// \return The requested pose, Identity if none could be loaded
-	Math::RigidTransform3d getPoseAtTimeStamp(ReplayPoseScaffold::DeviceData* info);
-
 	/// Builds the data layout for the application input (i.e. device output).
 	static DataStructures::DataGroup buildDeviceInputData();
 
