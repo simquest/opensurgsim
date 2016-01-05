@@ -86,9 +86,9 @@ struct ReplayPoseScaffold::DeviceData
 {
 	/// Constructor
 	/// \param device Device to be managed by this scaffold
-	explicit DeviceData(ReplayPoseDevice* device) : deviceObject(device), m_timestamp(0), m_index(0)
+	explicit DeviceData(ReplayPoseDevice* device) : deviceObject(device), m_timestamp(0), m_index(0), m_fileLoaded(false)
 	{
-		loadFile(deviceObject->getFileName());
+		m_fileLoaded = loadFile(deviceObject->getFileName());
 		m_timer.start();
 	}
 
@@ -144,16 +144,22 @@ struct ReplayPoseScaffold::DeviceData
 	/// Index of the latest pose used
 	size_t m_index;
 
+	/// Valid file loaded successfully
+	bool m_fileLoaded;
+
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
 	DeviceData(const DeviceData&) /*= delete*/;
 	DeviceData& operator=(const DeviceData&) /*= delete*/;
 
-	void loadFile(const std::string& fileName)
+	/// \param fileName the file to be open and loaded
+	/// \return True if the file was loaded successfully, False otherwise
+	bool loadFile(const std::string& fileName)
 	{
 		auto logger = Framework::Logger::getLogger("Devices/ReplayPoseScaffold");
 
 		std::ifstream inputFile;
+		bool result = true;
 
 		inputFile.open(fileName, std::ios::in);
 
@@ -161,25 +167,30 @@ private:
 		{
 			SURGSIM_LOG_WARNING(logger) << "Could not find or open the file " << fileName <<
 				"; Replay will use Identity pose";
+			result = false;
+		}
+		else
+		{
+			while (!inputFile.eof())
+			{
+				double timeStamp;
+				Math::RigidTransform3d pose;
+				inputFile >> timeStamp >> pose.matrix();
+				m_motion.emplace_back(timeStamp, pose);
+			}
+			SURGSIM_LOG_INFO(logger) << "Loaded " << m_motion.size() << " timestamps";
+			if (m_motion.size() >= 1)
+			{
+				SURGSIM_LOG_INFO(logger) << "The loaded timestamps cover a range of " <<
+					m_motion[m_motion.size() - 1].first - m_motion[0].first << " second(s)";
+			}
+			SURGSIM_LOG_IF(m_motion.size() == 0, logger, WARNING) <<
+				"No poses could be properly loaded, Identity pose will be used";
+
+			inputFile.close();
 		}
 
-		while (!inputFile.eof())
-		{
-			double timeStamp;
-			Math::RigidTransform3d pose;
-			inputFile >> timeStamp >> pose.matrix();
-			m_motion.emplace_back(timeStamp, pose);
-		}
-		SURGSIM_LOG_INFO(logger) << "Loaded " << m_motion.size() << " timestamps";
-		if (m_motion.size() >= 1)
-		{
-			SURGSIM_LOG_INFO(logger) << "The loaded timestamps cover a range of " <<
-				m_motion[m_motion.size() - 1].first - m_motion[0].first << " second(s)";
-		}
-		SURGSIM_LOG_IF(m_motion.size() == 0, logger, WARNING) <<
-			"No poses could be properly loaded, Identity pose will be used";
-
-		inputFile.close();
+		return result;
 	}
 };
 
@@ -191,6 +202,11 @@ bool ReplayPoseScaffold::registerDevice(ReplayPoseDevice* device)
 	if (m_device == nullptr)
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Failed to create a DeviceData";
+		return false;
+	}
+	if (!m_device->m_fileLoaded)
+	{
+		SURGSIM_LOG_CRITICAL(m_logger) << "Failed to load the file to replay";
 		return false;
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "Registered device " << device->getName();
