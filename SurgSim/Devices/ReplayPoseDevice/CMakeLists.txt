@@ -37,8 +37,11 @@ surgsim_add_library(
 	"${REPLAY_POSE_DEVICE_HEADERS}"
 )
 
-set(LIBS 
+set(LIBS
+	SurgSimDataStructures
+	SurgSimFramework
 	SurgSimInput
+	SurgSimMath
 )
 
 target_link_libraries(ReplayPoseDevice ${LIBS}
