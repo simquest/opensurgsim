@@ -68,8 +68,6 @@ bool ReplayPoseDevice::initialize()
 	std::shared_ptr<ReplayPoseScaffold> scaffold = ReplayPoseScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
-	scaffold->setRate(m_rate);
-
 	if (!scaffold->registerDevice(this))
 	{
 		return false;

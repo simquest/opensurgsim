@@ -168,6 +168,11 @@ bool ReplayPoseScaffold::registerDevice(ReplayPoseDevice* device)
 		success = isInitialized();
 	}
 
+	if (success)
+	{
+		setRate(device->getRate());
+	}
+
 	return success;
 }
 
