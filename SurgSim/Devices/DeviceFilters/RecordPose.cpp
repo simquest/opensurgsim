@@ -76,7 +76,7 @@ void RecordPose::filterInput(const std::string& device, const DataGroup& dataToF
 		m_cumulativeTime += m_timer.getLastFramePeriod();
 		// We back up the time along with the pose to make sure we can replay the motion real-time, no matter
 		// which rate it is recorded and replayed.
-		m_outputFile << m_cumulativeTime << pose.matrix();
+		m_outputFile << m_cumulativeTime << std::endl << pose.matrix() << std::endl;
 	}
 }
 
