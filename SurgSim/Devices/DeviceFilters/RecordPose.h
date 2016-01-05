@@ -40,11 +40,14 @@ public:
 	/// Desctructor
 	~RecordPose();
 
-	/// \param fileName The filename to record the pose/time to (default is 'ReplayPoseDevice.txt')
+	/// \param fileName The filename to record the pose/time to (default is empty string)
 	void setFilename(const std::string& fileName);
 
-	/// \return The filename where the pose/time are recorded (default is 'ReplayPoseDevice.txt')
+	/// \return The filename where the pose/time are recorded (default is empty string)
 	const std::string& getFilename() const;
+
+	/// \return True if the DeviceFilter is properly initialized, i.e. if the file exists and has open successfully.
+	bool initialize() override;
 
 	SURGSIM_CLASSNAME(SurgSim::Devices::RecordPose);
 
