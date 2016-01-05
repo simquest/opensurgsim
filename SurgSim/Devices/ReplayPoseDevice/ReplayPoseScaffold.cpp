@@ -47,8 +47,6 @@ namespace SurgSim
 namespace Devices
 {
 
-class ReplayPoseDevice;
-
 ReplayPoseScaffold::ReplayPoseScaffold() :
 	Framework::BasicThread("ReplayPoseScaffold"),
 	m_logger(Framework::Logger::getLogger("Devices/ReplayPoseScaffold"))
@@ -238,14 +236,8 @@ bool ReplayPoseScaffold::unregisterDevice()
 	}
 
 	m_device.reset();
-	if (m_device == nullptr)
-	{
-		SURGSIM_LOG_DEBUG(m_logger) << "Unregistered device";
-		return true;
-	}
-	SURGSIM_LOG_DEBUG(m_logger) << "There is no device to unregister.";
-
-	return false;
+	SURGSIM_LOG_DEBUG(m_logger) << "Unregistered device";
+	return true;
 }
 
 bool ReplayPoseScaffold::updateDevice(ReplayPoseScaffold::DeviceData* info)
