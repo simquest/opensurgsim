@@ -27,7 +27,8 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::ReplayPoseDe
 
 ReplayPoseDevice::ReplayPoseDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, ReplayPoseScaffold::buildDeviceInputData()),
-	m_fileName("ReplayPoseDevice.txt")
+	m_fileName("ReplayPoseDevice.txt"),
+	m_rate(1000.0)
 {
 }
 
