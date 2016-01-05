@@ -58,10 +58,10 @@ void createFakeRecord(const std::string& fileName, double rate)
 	do
 	{
 		auto pose = SurgSim::Math::interpolate(poseStart, poseEnd, cumulativeTime);
-		f << cumulativeTime << " " << pose.matrix() << std::endl;
+		f << cumulativeTime << std::endl << pose.matrix() << std::endl;
 		cumulativeTime += deltaTime;
 	} while (cumulativeTime < 1.0);
-	f << "1.0 " << poseEnd.matrix() << std::endl;
+	f << "1.0" << std::endl << poseEnd.matrix() << std::endl;
 
 	f.close();
 }
@@ -87,6 +87,47 @@ TEST(ReplayPoseDeviceTest, Name)
 {
 	auto device = std::make_shared<ReplayPoseDevice>("FakeReplayDevice");
 	EXPECT_EQ("FakeReplayDevice", device->getName());
+}
+
+TEST(ReplayPoseDeviceTest, Filename)
+{
+	std::string fileName("FakeRecord.txt");
+	createFakeRecord(fileName, 30);
+
+	auto device = std::make_shared<ReplayPoseDevice>("FakeReplayDevice");
+	EXPECT_EQ(0, device->getFileName().compare("ReplayPoseDevice.txt"));
+	EXPECT_NO_THROW(device->setFileName(fileName));
+	EXPECT_EQ(0, device->getFileName().compare(fileName));
+
+	EXPECT_TRUE(device->initialize());
+
+	clearFakeRecord(fileName);
+	EXPECT_THROW(device->setFileName(fileName), SurgSim::Framework::AssertionFailure);
+}
+
+TEST(ReplayPoseDeviceTest, Initialize)
+{
+	std::string fileName("FakeRecord.txt");
+	clearFakeRecord(fileName);
+
+	{
+		SCOPED_TRACE("Missing filename");
+		auto device = std::make_shared<ReplayPoseDevice>("FakeReplayDevice");
+		device->setFileName(fileName);
+		EXPECT_FALSE(device->initialize()); // Missing the setFilename call, no file open
+		EXPECT_FALSE(device->isInitialized());
+	}
+	{
+		SCOPED_TRACE("Success");
+		createFakeRecord(fileName, 30);
+
+		auto device = std::make_shared<ReplayPoseDevice>("FakeReplayDevice");
+		device->setFileName(fileName);
+		EXPECT_TRUE(device->initialize());
+		EXPECT_TRUE(device->isInitialized());
+
+		clearFakeRecord(fileName);
+	}
 }
 
 TEST(ReplayPoseDeviceTest, Factory)
