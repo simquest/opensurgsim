@@ -55,30 +55,34 @@ const std::string& RecordPose::getFileName() const
 	return m_fileName;
 }
 
-bool RecordPose::initialize()
+void RecordPose::initializeInput(const std::string& device, const DataStructures::DataGroup& inputData)
 {
-	SURGSIM_ASSERT(!isInitialized()) << getName() << " already initialized.";
-
-	m_outputFile.open(m_fileName, std::ios::out | std::ios::trunc);
-	SURGSIM_LOG_IF(!m_outputFile.is_open(), SurgSim::Framework::Logger::getLogger("Devices/RecordPose"), WARNING) <<
-		"File " << m_fileName << " could not be open to record device pose";
-	m_initialized = m_outputFile.is_open();
-
-	return m_initialized;
+	if (!m_outputFile.is_open())
+	{
+		m_outputFile.open(m_fileName, std::ios::out | std::ios::trunc);
+		if (!m_outputFile.is_open())
+		{
+			SURGSIM_LOG_IF(!m_outputFile.is_open(), Framework::Logger::getLogger("Devices/RecordPose"), WARNING) <<
+				"File " << m_fileName << " could not be open to record device pose";
+		}
+	}
 }
 
 void RecordPose::filterInput(const std::string& device, const DataGroup& dataToFilter, DataGroup* result)
 {
 	*result = dataToFilter;
 
-	RigidTransform3d pose;
-	if (dataToFilter.poses().get(DataStructures::Names::POSE, &pose))
+	if (m_outputFile.is_open())
 	{
-		m_timer.markFrame();
-		m_cumulativeTime += m_timer.getLastFramePeriod();
-		// We back up the time along with the pose to make sure we can replay the motion real-time, no matter
-		// which rate it is recorded and replayed.
-		m_outputFile << m_cumulativeTime << std::endl << pose.matrix() << std::endl;
+		RigidTransform3d pose;
+		if (dataToFilter.poses().get(DataStructures::Names::POSE, &pose))
+		{
+			m_timer.markFrame();
+			m_cumulativeTime += m_timer.getLastFramePeriod();
+			// We back up the time along with the pose to make sure we can replay the motion real-time, no matter
+			// which rate it is recorded and replayed.
+			m_outputFile << m_cumulativeTime << std::endl << pose.matrix() << std::endl;
+		}
 	}
 }
 

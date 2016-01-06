@@ -46,8 +46,7 @@ public:
 	/// \return The filename where the pose/time are recorded (default is empty string)
 	const std::string& getFileName() const;
 
-	/// \return True if the DeviceFilter is properly initialized, i.e. if the file exists and has open successfully.
-	bool initialize() override;
+	void initializeInput(const std::string& device, const DataStructures::DataGroup& inputData) override;
 
 	SURGSIM_CLASSNAME(SurgSim::Devices::RecordPose);
 
