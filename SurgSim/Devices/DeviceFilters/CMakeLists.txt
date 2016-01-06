@@ -27,6 +27,7 @@ set(DEVICE_FILTERS_SOURCES
 	ForceScale.cpp
 	PoseIntegrator.cpp
 	PoseTransform.cpp
+	RecordPose.cpp
 )
 
 set(DEVICE_FILTERS_HEADERS
@@ -35,6 +36,7 @@ set(DEVICE_FILTERS_HEADERS
 	ForceScale.h
 	PoseIntegrator.h
 	PoseTransform.h
+	RecordPose.h
 )
 
 set(DEVICE_HEADERS ${DEVICE_HEADERS}
@@ -43,6 +45,7 @@ set(DEVICE_HEADERS ${DEVICE_HEADERS}
 	DeviceFilters/ForceScale.h #NOLINT
 	DeviceFilters/PoseIntegrator.h #NOLINT
 	DeviceFilters/PoseTransform.h #NOLINT
+	DeviceFilters/RecordPose.h #NOLINT
 	PARENT_SCOPE)
 
 surgsim_add_library(
