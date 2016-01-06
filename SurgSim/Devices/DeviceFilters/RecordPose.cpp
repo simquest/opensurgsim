@@ -29,8 +29,10 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::RecordPose, 
 
 RecordPose::RecordPose(const std::string& name) :
 	DeviceFilter(name),
+	m_fileName("ReplayPoseDevice.txt"),
 	m_cumulativeTime(0)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RecordPose, std::string, FileName, getFileName, setFileName);
 	m_timer.setMaxNumberOfFrames(1);
 	m_timer.start();
 }
@@ -43,12 +45,12 @@ RecordPose::~RecordPose()
 	}
 }
 
-void RecordPose::setFilename(const std::string& fileName)
+void RecordPose::setFileName(const std::string& fileName)
 {
 	m_fileName = fileName;
 }
 
-const std::string& RecordPose::getFilename() const
+const std::string& RecordPose::getFileName() const
 {
 	return m_fileName;
 }

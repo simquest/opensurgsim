@@ -30,6 +30,8 @@ ReplayPoseDevice::ReplayPoseDevice(const std::string& uniqueName) :
 	m_fileName("ReplayPoseDevice.txt"),
 	m_rate(1000.0)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ReplayPoseDevice, std::string, FileName, getFileName, setFileName);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ReplayPoseDevice, double, Rate, getRate, setRate);
 }
 
 ReplayPoseDevice::~ReplayPoseDevice()

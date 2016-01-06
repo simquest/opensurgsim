@@ -41,10 +41,10 @@ public:
 	~RecordPose();
 
 	/// \param fileName The filename to record the pose/time to (default is empty string)
-	void setFilename(const std::string& fileName);
+	void setFileName(const std::string& fileName);
 
 	/// \return The filename where the pose/time are recorded (default is empty string)
-	const std::string& getFilename() const;
+	const std::string& getFileName() const;
 
 	/// \return True if the DeviceFilter is properly initialized, i.e. if the file exists and has open successfully.
 	bool initialize() override;
