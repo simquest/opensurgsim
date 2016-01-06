@@ -114,8 +114,6 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 	return previousCamera;
 }
 std::shared_ptr<Graphics::RenderPass> createDepthPass(
-		std::shared_ptr<Framework::TransferPropertiesBehavior> copier,
-		std::shared_ptr<Graphics::Camera> camera,
 		float sphereRadius,
 		float sphereScale,
 		int textureSize,
@@ -143,7 +141,7 @@ std::shared_ptr<Graphics::RenderPass> createDepthPass(
 	material->setValue("sphereScale", sphereScale);
 	renderPass->setMaterial(material);
 
-	if(true)
+	if(debug)
 	{
 		renderPass->showDepthTarget(0, 0, 256, 256);
 	}
@@ -208,8 +206,6 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	auto renderCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(renderPass->getCamera());
 	renderCamera->setAmbientColor(camera->getAmbientColor());
 	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, dimensions[0], 0, dimensions[1]);
-	//renderCamera->setOrthogonalProjection(0, textureSize, 0, textureSize, -1.0, 1.0);
-	//copier->connect(view, "DimensionsDouble", renderCamera, "ViewportSize");
 	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
 	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
@@ -253,44 +249,11 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 
 	renderPass->setMaterial(material);
 
-//	if(isStereo)
-//	{
-//		renderCamera->setRenderGroupReference("LeftShadingPass");
-//		renderCamera->getOsgNode()->setNodeMask(0x1);
-
-//		auto rightCamera = std::make_shared<Graphics::OsgCamera>("RightCamera");
-//		rightCamera->setAmbientColor(renderCamera->getAmbientColor());
-//		rightCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, dimensions[0], 0, dimensions[1]);
-//		rightCamera->setRenderGroupReference("RightShadingPass");
-//		rightCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-//		rightCamera->getOsgCamera()->setClearMask(GL_NONE);
-//		rightCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
-//		rightCamera->getOsgNode()->setNodeMask(0x2);
-
-//		renderPass->addComponent(rightCamera);
-//		rightCamera->setMaterial(material);
-
-//		auto graphicsLeft = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics Left");
-//		graphicsLeft->setSize(dimensions[0], dimensions[1]);
-//		graphicsLeft->setGroupReference("LeftShadingPass");
-//		graphicsLeft->setLocation(0, 0);
-//		graphicsLeft->getOsgNode()->setNodeMask(0x1);
-//		renderPass->addComponent(graphicsLeft);
-
-//		auto graphicsRight = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics Right");
-//		graphicsRight->setSize(dimensions[0], dimensions[1]);
-//		graphicsRight->setGroupReference("RightShadingPass");
-//		graphicsRight->setLocation(0, 0);
-//		renderPass->addComponent(graphicsRight);
-//	}
-//	else
-//	{
-		auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics");
-		graphics->setSize(dimensions[0], dimensions[1]);
-		graphics->setLocation(0, 0);
-		graphics->setGroupReference("ImplicitSurfaceShadingPass");
-		renderPass->addComponent(graphics);
-//	}
+	auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics");
+	graphics->setSize(dimensions[0], dimensions[1]);
+	graphics->setLocation(0, 0);
+	graphics->setGroupReference("ImplicitSurfaceShadingPass");
+	renderPass->addComponent(graphics);
 
 	return renderPass;
 }
@@ -319,7 +282,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> result;
 
-	auto depthPass = createDepthPass(copier, osgCamera, sphereRadius, sphereScale, textureSize, showDebug);
+	auto depthPass = createDepthPass(sphereRadius, sphereScale, textureSize, showDebug);
 
 	auto blurPass = createBlurPass(depthPass, textureSize, blurRadius, &result, showDebug);
 
