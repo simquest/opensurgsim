@@ -32,3 +32,4 @@ void main(void)
 
 	texCoord0 = gl_MultiTexCoord0.xy;
 }
+

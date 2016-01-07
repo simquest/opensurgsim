@@ -21,6 +21,19 @@
 
 #version 120
 
+/// Main Camera Matrices
+struct MainCamera
+{
+	mat4 viewMatrix;
+	mat4 inverseViewMatrix;
+	mat4 projectionMatrix;
+	mat4 inverseProjectionMatrix;
+};
+
+uniform MainCamera mainCamera;
+
+uniform mat4 modelMatrix;
+
 void main(void)
 {
 	gl_TexCoord[0] = gl_MultiTexCoord0;
