@@ -63,30 +63,45 @@ CollisionDetectionType Representation::getSelfCollisionDetectionType() const
 	return m_selfCollisionDetectionType;
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> Representation::getPosedShape()
+const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& Representation::getPosedShapeMotion() const
 {
-	boost::lock_guard<boost::mutex> lock(m_posedShapeMutex);
+	boost::shared_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
 
-	Math::RigidTransform3d pose = getPose();
-	if (pose.isApprox(Math::RigidTransform3d::Identity()))
-	{
-		m_posedShape = getShape();
-		m_posedShapePose = Math::RigidTransform3d::Identity();
-	}
-	else if (m_posedShape == nullptr || !pose.isApprox(m_posedShapePose))
-	{
-		m_posedShape = getShape()->getTransformed(pose);
-		m_posedShapePose = pose;
-	}
-
-	return m_posedShape;
+	return m_posedShapeMotion;
 }
 
-void Representation::invalidatePosedShape()
+void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion)
 {
-	boost::lock_guard<boost::mutex> lock(m_posedShapeMutex);
+	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
 
-	m_posedShape = nullptr;
+	m_posedShapeMotion = posedShapeMotion;
+}
+
+const std::shared_ptr<Math::Shape> Representation::getPosedShape()
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
+
+	Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
+	Math::RigidTransform3d pose = getPose();
+	if (pose.isApprox(identity))
+	{
+		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
+		m_posedShapeMotion.second= newPosedShape;
+	}
+	else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
+	{
+		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
+		m_posedShapeMotion.second = newPosedShape;
+	}
+
+	return m_posedShapeMotion.second.getShape();
+}
+
+void Representation::invalidatePosedShapeMotion()
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
+
+	m_posedShapeMotion.invalidate();
 }
 
 SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()

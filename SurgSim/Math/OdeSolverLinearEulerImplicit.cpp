@@ -55,7 +55,7 @@ void OdeSolverLinearEulerImplicit::solve(double dt, const OdeState& currentState
 		m_equation.updateFMDK(currentState, ODEEQUATIONUPDATE_F);
 
 		Vector f = m_equation.getF();
-		f -= m_constantK * currentState.getVelocities() * dt;
+		f -= m_constantK * (currentState.getVelocities() * dt);
 		Vector deltaV = m_equation.applyCompliance(currentState, f);
 
 		newState->getVelocities() = currentState.getVelocities() + deltaV;

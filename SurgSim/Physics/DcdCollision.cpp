@@ -17,7 +17,7 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ContactCalculation.h"
-#include "SurgSim/Collision/DcdCollision.h"
+#include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/ThreadPool.h"
@@ -49,9 +49,7 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	auto threadPool = Framework::Runtime::getThreadPool();
 	std::vector<std::future<void>> tasks;
 
-	const auto& calculations = ContactCalculation::getContactTable();
-
-	updatePairs(result);
+	const auto& calculations = ContactCalculation::getDcdContactTable();
 
 	for (auto& pair : result->getCollisionPairs())
 	{
@@ -68,34 +66,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	std::for_each(tasks.begin(), tasks.end(), [](std::future<void>& p){p.get();});
 
 	return result;
-}
-
-void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
-{
-	auto& representations = state->getActiveCollisionRepresentations();
-
-	if (representations.size() > 1)
-	{
-		std::vector<std::shared_ptr<CollisionPair>> pairs;
-		auto firstEnd = std::end(representations);
-		for (auto first = std::begin(representations); first != firstEnd; ++first)
-		{
-			auto second = first;
-			for (; second != std::end(representations); ++second)
-			{
-				if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
-				{
-					auto pair = std::make_shared<CollisionPair>(*first, *second);
-					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
-					{
-						pairs.push_back(std::move(pair));
-					}
-				}
-			}
-		}
-
-		state->setCollisionPairs(pairs);
-	}
 }
 
 }; // Physics

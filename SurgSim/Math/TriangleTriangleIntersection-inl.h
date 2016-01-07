@@ -157,9 +157,9 @@ bool doesIntersectTriangleTriangle(
 
 	return !(std::abs(s1[0] - s1[1]) <= DistanceEpsilon || std::abs(s2[0] - s2[1]) <= DistanceEpsilon) &&
 		   !(s1[0] <= (s2[0] + DistanceEpsilon) && s1[0] <= (s2[1] + DistanceEpsilon) &&
-		     s1[1] <= (s2[0] + DistanceEpsilon) && s1[1] <= (s2[1] + DistanceEpsilon)) &&
+			 s1[1] <= (s2[0] + DistanceEpsilon) && s1[1] <= (s2[1] + DistanceEpsilon)) &&
 		   !(s1[0] >= (s2[0] - DistanceEpsilon) && s1[0] >= (s2[1] - DistanceEpsilon) &&
-		     s1[1] >= (s2[0] - DistanceEpsilon) && s1[1] >= (s2[1] - DistanceEpsilon));
+			 s1[1] >= (s2[0] - DistanceEpsilon) && s1[1] >= (s2[1] - DistanceEpsilon));
 }
 
 

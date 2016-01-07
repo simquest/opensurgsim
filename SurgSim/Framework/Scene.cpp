@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest LLC.
+// Copyright 2013-2016, SimQuest LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
 
 #include "SurgSim/Framework/Scene.h"
 
+#include <boost/thread/locks.hpp>
+#include <set>
+#include <utility>
+#include <vector>
+#include <yaml-cpp/yaml.h>
+
+#include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/Log.h"
 
-#include <utility>
-#include <set>
-#include <vector>
-#include <boost/thread/locks.hpp>
-
-#include <yaml-cpp/yaml.h>
 
 namespace SurgSim
 {
@@ -35,7 +35,8 @@ namespace Framework
 
 Scene::Scene(std::weak_ptr<Runtime> runtime) :
 	m_runtime(runtime),
-	m_groups(new GroupsType())
+	m_groups(new GroupsType()),
+	m_logger(Framework::Logger::getLogger("Framework/Scene"))
 {
 	SURGSIM_ASSERT(!m_runtime.expired()) << "Can't create scene with empty runtime.";
 }
@@ -50,12 +51,11 @@ Scene::~Scene()
 
 void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 {
-	SURGSIM_ASSERT(!m_runtime.expired()) << "Runtime pointer is expired, cannot add SceneElement to Scene.";
+	auto runtime = getRuntime();
+	SURGSIM_ASSERT(runtime) << "Runtime pointer is expired, cannot add SceneElement to Scene.";
 
 	std::string name = element->getName();
 	element->setScene(getSharedPtr());
-
-	std::shared_ptr<Runtime> runtime = m_runtime.lock();
 	element->setRuntime(runtime);
 
 	if (element->initialize())
@@ -68,37 +68,29 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 	}
 }
 
+void Scene::removeSceneElement(std::shared_ptr<SceneElement> element)
+{
+	element->setActive(false);
+	element->removeComponents();
+
+	boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
+	auto found = std::find(m_elements.begin(),  m_elements.end(), element);
+	if (found != m_elements.end())
+	{
+		m_elements.erase(found);
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(m_logger)
+			<< "Could not find element '" << element->getName() << "' in Scene, unable to remove";
+	}
+}
+
 void Scene::addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements)
 {
 	for (auto element : elements)
 	{
 		addSceneElement(element);
-	}
-}
-
-void Scene::removeSceneElement(std::shared_ptr<SceneElement> element)
-{
-	bool found;
-	{
-		boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
-		auto it = std::find(m_elements.begin(),  m_elements.end(), element);
-		found = it != m_elements.end();
-		if (found)
-		{
-			m_elements.erase(it);
-		}
-		else
-		{
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
-					<< "Could not find element '" << element->getName() << "' in Scene, unable to remove";
-		}
-	}
-	if (found)
-	{
-		for (auto& component : element->getComponents())
-		{
-			element->removeComponent(component);
-		}
 	}
 }
 
@@ -191,14 +183,13 @@ std::shared_ptr<Component> Scene::getComponent(const std::string& elementName, c
 		result = element->getComponent(componentName);
 		if (result == nullptr)
 		{
-			SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
+			SURGSIM_LOG_INFO(m_logger)
 					<< "Could not find component '" << componentName << "' in Element '" << elementName << "'.";
 		}
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("Framework/Scene"))
-				<< "Could not find element '" << elementName << "'.";
+		SURGSIM_LOG_INFO(m_logger) << "Could not find element '" << elementName << "'.";
 	}
 	return result;
 }

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -243,7 +243,7 @@ void SphRepresentation::computeAcceleration(double dt)
 
 void SphRepresentation::computeVelocityAndPosition(double dt)
 {
-	auto& particles = m_particles.getVertices();
+	auto& particles = m_particles.unsafeGet().getVertices();
 	for (size_t i = 0; i < particles.size(); i++)
 	{
 		particles[i].data.velocity += dt * m_acceleration[i];
@@ -255,7 +255,7 @@ void SphRepresentation::computeNeighbors()
 {
 	m_grid->reset();
 
-	auto&  particles = m_particles.getVertices();
+	auto&  particles = m_particles.unsafeGet().getVertices();
 	for (size_t i = 0; i < particles.size(); i++)
 	{
 		m_grid->addElement(i, particles[i].position);
@@ -264,7 +264,7 @@ void SphRepresentation::computeNeighbors()
 
 void SphRepresentation::computeDensityAndPressureField()
 {
-	auto& particles = m_particles.getVertices();
+	auto& particles = m_particles.unsafeGet().getVertices();
 	for (size_t i = 0; i < particles.size(); i++)
 	{
 		// Calculate the particle's density
@@ -284,7 +284,7 @@ void SphRepresentation::computeNormalField()
 {
 	SurgSim::Math::Vector3d normalI;
 	SurgSim::Math::Vector3d gradient;
-	auto& particles = m_particles.getVertices();
+	auto& particles = m_particles.unsafeGet().getVertices();
 	for (size_t i = 0; i < particles.size(); i++)
 	{
 		// Calculate the particle's normal (gradient of the color field)
@@ -300,7 +300,7 @@ void SphRepresentation::computeNormalField()
 
 void SphRepresentation::computeAccelerations()
 {
-	auto& particles = m_particles.getVertices();
+	auto& particles = m_particles.unsafeGet().getVertices();
 	for (size_t i = 0; i < particles.size(); i++)
 	{
 		m_acceleration[i] = SurgSim::Math::Vector3d::Zero();
@@ -356,6 +356,7 @@ void SphRepresentation::computeAccelerations()
 bool SphRepresentation::doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions)
 {
 	const Math::RigidTransform3d inversePose = getPose().inverse();
+	auto& particles = m_particles.unsafeGet().getVertices();
 
 	for (auto& collision : collisions)
 	{
@@ -363,7 +364,7 @@ bool SphRepresentation::doHandleCollisions(double dt, const SurgSim::Collision::
 		{
 			Math::Vector3d normal = inversePose.linear() * contact->normal;
 			size_t index = contact->penetrationPoints.first.index.getValue();
-			auto& particle = m_particles.getVertices()[index];
+			auto& particle = particles[index];
 
 			double velocityAlongNormal = particle.data.velocity.dot(normal);
 			double forceIntensity = m_stiffness * contact->depth - m_damping * velocityAlongNormal;

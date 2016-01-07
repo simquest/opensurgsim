@@ -15,6 +15,8 @@
 
 #include "SurgSim/Physics/Fem2DLocalization.h"
 
+#include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
@@ -42,6 +44,27 @@ bool Fem2DLocalization::isValidRepresentation(std::shared_ptr<Representation> re
 
 	// Allows to reset the representation to nullptr ...
 	return (femRepresentation != nullptr || representation == nullptr);
+}
+
+Math::RigidTransform3d Fem2DLocalization::getElementPose()
+{
+	auto femRepresentation = std::static_pointer_cast<Fem2DRepresentation>(getRepresentation());
+	auto position = getLocalPosition();
+	auto femElement = femRepresentation->getFemElement(getLocalPosition().index);
+	const auto& nodeIds = femElement->getNodeIds();
+	std::array<Math::Vector3d, 3> nodePositions =
+		{femRepresentation->getCurrentState()->getPosition(nodeIds[0]),
+		 femRepresentation->getCurrentState()->getPosition(nodeIds[1]),
+		 femRepresentation->getCurrentState()->getPosition(nodeIds[2])};
+
+	Math::Vector3d edge, normal, binormal;
+	edge = (nodePositions[1] - nodePositions[0]).normalized();
+	normal = (nodePositions[2] - nodePositions[0]).cross(edge).normalized();
+	binormal = edge.cross(normal);
+	Math::Matrix33d rotation;
+	rotation << edge, normal, binormal;
+
+	return Math::makeRigidTransform(rotation, (nodePositions[0] + nodePositions[1] + nodePositions[2]) / 3.0);
 }
 
 } // namespace Physics

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
+#include "SurgSim/Collision/TriangleMeshTriangleMeshContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
@@ -45,7 +45,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationPerformanceTests, IntersectionTes
 		std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 1");
 	meshBRep->setShape(meshB);
 
-	TriangleMeshTriangleMeshDcdContact calcContact;
+	TriangleMeshTriangleMeshContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
 
 	Framework::Timer timer;

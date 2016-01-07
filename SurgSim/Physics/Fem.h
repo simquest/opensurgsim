@@ -27,7 +27,7 @@ namespace Physics
 
 /// Base class for a data structure for holding FEM mesh data of different dimensions
 ///
-/// Fem itself should not be used directly itself as it contains no overrde for doLoad since the implementation is
+/// Fem itself should not be used directly itself as it contains no override for doLoad since the implementation is
 /// dependent on the dimension of the FEM you are trying to load. Each dimension overrides the doLoad function present
 /// in Asset using its own version of an FemPlyReaderDelegate. Each dimension supports loading both linear and
 /// corotational models.

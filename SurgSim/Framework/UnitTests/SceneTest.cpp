@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include "MockObjects.h"  //NOLINT
+
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
-
+#include "SurgSim/Framework/UnitTests/MockObjects.h"
 #include "SurgSim/Testing/Utilities.h"
+
 
 namespace SurgSim
 {
@@ -69,8 +70,6 @@ TEST(SceneTest, AddAndTestScene)
 	EXPECT_EQ(scene, element->getScene());
 }
 
-
-
 TEST(SceneTest, TryFind)
 {
 	auto runtime = std::make_shared<Runtime>();
@@ -94,6 +93,20 @@ TEST(SceneTest, TryFind)
 
 	EXPECT_EQ(nullptr, scene->getComponent("element1", "xxx"));
 	EXPECT_EQ(nullptr, scene->getComponent("xxx", "component0"));
+}
+
+TEST(SceneTest, Removal)
+{
+	auto runtime(std::make_shared<Runtime>());
+	std::shared_ptr<Scene> scene = runtime->getScene();
+
+	scene->addSceneElement(std::make_shared<MockSceneElement>("element1"));
+	scene->addSceneElement(std::make_shared<MockSceneElement>("element2"));
+	scene->addSceneElement(std::make_shared<MockSceneElement>("element3"));
+
+	EXPECT_EQ(3L, scene->getSceneElements().size());
+	EXPECT_NO_THROW(scene->removeSceneElement(scene->getSceneElement("element1")));
+	EXPECT_EQ(2L, scene->getSceneElements().size());
 }
 
 TEST(SceneTest, CheckForExpiredRuntime)

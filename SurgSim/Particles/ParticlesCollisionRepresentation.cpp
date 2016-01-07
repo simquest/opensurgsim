@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ ParticlesCollisionRepresentation::ParticlesCollisionRepresentation(const std::st
 	SurgSim::Collision::Representation(name),
 	m_shape(std::make_shared<SurgSim::Math::ParticlesShape>())
 {
-	m_shape->setRadius(0.005);
+	m_shape->setRadius(0.01);
 }
 
 ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
@@ -42,8 +42,8 @@ ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
 
 void ParticlesCollisionRepresentation::update(const double& dt)
 {
-	*m_shape = getParticleRepresentation()->getParticles();
-	invalidatePosedShape();
+	*m_shape = getParticleRepresentation()->getParticles().unsafeGet();
+	invalidatePosedShapeMotion();
 }
 
 bool ParticlesCollisionRepresentation::doInitialize()

@@ -102,7 +102,10 @@ public:
 	/// \return Whether this constraint is active.
 	bool isActive();
 
-private:
+	/// \param flag Whether this constraint is active.
+	void setActive(bool flag);
+
+protected:
 	/// Constraint-MLCP mapping
 	std::array<Math::MlcpConstraintType, NUM_CONSTRAINT_TYPES> m_mlcpMap;
 
@@ -132,6 +135,9 @@ private:
 		size_t indexOfRepresentation0,
 		size_t indexOfRepresentation1,
 		size_t indexOfConstraint);
+
+	/// Flag to indicate whether this constraint is active or not.
+	bool m_active;
 };
 
 };  // namespace Physics

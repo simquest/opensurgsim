@@ -32,6 +32,12 @@ RawMultiAxisDevice::RawMultiAxisDevice(const std::string& uniqueName) :
 	m_orientationScale(defaultOrientationScale()),
 	m_useAxisDominance(false)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RawMultiAxisDevice, double, PositionScale,
+									  getPositionScale, setPositionScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RawMultiAxisDevice, double, OrientationScale,
+									  getOrientationScale, setOrientationScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RawMultiAxisDevice, bool, AxisDominance,
+									  isUsingAxisDominance, setAxisDominance);
 }
 
 

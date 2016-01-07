@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,20 +51,16 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Blocks::VisualizeContactsBehavior);
 
-	/// Used for serialization.
+	/// Get the source of the contacts
 	/// \return The collision representation whose contacts will be visualized.
-	std::shared_ptr<SurgSim::Framework::Component> getCollisionRepresentation();
+	std::shared_ptr<SurgSim::Framework::Component> getSource();
 
-	/// Used for serialization.
-	/// \param	collisionRepresentation The collision representation whose contacts will be visualized.
-	void setCollisionRepresentation(std::shared_ptr<SurgSim::Framework::Component> collisionRepresentation);
+	/// Set the source of the contacts
+	/// \param source The collision representation whose contacts will be visualized.
+	void setSource(std::shared_ptr<SurgSim::Framework::Component> source);
 
-	/// Update the behavior, show vector field for contacts if there is any.
-	/// \param dt	The length of time (seconds) between update calls.
 	void update(double dt) override;
 
-	/// Return the type of manager that should be responsible for this behavior
-	/// \return An integer indicating which manger should be responsible for this behavior.
 	int getTargetManagerType() const override;
 
 	/// \return The scale of the vector field.
@@ -75,19 +71,13 @@ public:
 	void setVectorFieldScale(double scale);
 
 protected:
-	/// Initialize this behavior
-	/// \return True on success, otherwise false.
-	/// \note In current implementation, this method always returns "true".
 	bool doInitialize() override;
 
-	/// Wakeup this behavior
-	/// \return True on success, otherwise false.
-	/// \note In current implementation, this method always returns "true".
 	bool doWakeUp() override;
 
 private:
 	/// The collision representation to get contacts for visualizing.
-	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
+	std::shared_ptr<SurgSim::Collision::Representation> m_source;
 
 	/// The osg vector field for visualizing contacts on collision representation
 	std::shared_ptr<SurgSim::Graphics::VectorFieldRepresentation> m_vectorField;

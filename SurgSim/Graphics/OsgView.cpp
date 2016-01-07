@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 
 #include "SurgSim/Graphics/OsgView.h"
 
+#include <osg/DisplaySettings>
+#include <osgViewer/ViewerEventHandlers>
 
 #include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
 #include "SurgSim/Devices/Keyboard/OsgKeyboardHandler.h"
@@ -33,13 +35,6 @@
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-#include <osgViewer/ViewerEventHandlers>
-#include <osg/DisplaySettings>
-
-
-using SurgSim::Graphics::OsgCamera;
-using SurgSim::Graphics::OsgView;
-using SurgSim::Framework::checkAndConvert;
 
 namespace
 {
@@ -81,8 +76,8 @@ OsgView::OsgView(const std::string& name) : View(name),
 	m_areWindowSettingsDirty(false),
 	m_view(new osgViewer::View()),
 	m_osgMapUniforms(false),
-	m_manipulatorPosition(SurgSim::Math::Vector3d(0.0, 0.0, -3.0)),
-	m_manipulatorLookat(SurgSim::Math::Vector3d::Zero()),
+	m_manipulatorPosition(Math::Vector3d(0.0, 0.0, -3.0)),
+	m_manipulatorLookat(Math::Vector3d::Zero()),
 	m_keyboardEnabled(false),
 	m_mouseEnabled(false)
 {
@@ -96,9 +91,9 @@ OsgView::OsgView(const std::string& name) : View(name),
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, CameraManipulatorEnabled,
 									  isManipulatorEnabled, enableManipulator);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, SurgSim::Math::Vector3d, CameraPosition,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, Math::Vector3d, CameraPosition,
 									  getManipulatorPosition, setManipulatorPosition);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, SurgSim::Math::Vector3d, CameraLookAt,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, Math::Vector3d, CameraLookAt,
 									  getManipulatorLookAt, setManipulatorLookAt);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, OsgMapUniforms, getOsgMapsUniforms, setOsgMapsUniforms);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, KeyboardDeviceEnabled,
@@ -173,7 +168,7 @@ bool OsgView::isWindowBorderEnabled() const
 
 void OsgView::setCamera(std::shared_ptr<SurgSim::Framework::Component> camera)
 {
-	auto osgCamera = checkAndConvert<OsgCamera>(camera, "SurgSim::Graphics::OsgCamera");
+	auto osgCamera = Framework::checkAndConvert<OsgCamera>(camera, "SurgSim::Graphics::OsgCamera");
 
 	View::setCamera(camera);
 	m_view->setCamera(osgCamera->getOsgCamera());
@@ -210,7 +205,16 @@ void OsgView::update(double dt)
 	{
 		auto matrix = m_view->getCameraManipulator()->getMatrix();
 		auto pose = Math::RigidTransform3d(fromOsg(matrix));
-		getSceneElement()->setPose(pose);
+		auto element = getSceneElement();
+		if (element != nullptr)
+		{
+			element->setPose(pose);
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger()) << getFullName()
+				<< " is not in a SceneElement, unable to set the SceneElement pose with the camera manipulator.";
+		}
 	}
 }
 
@@ -298,7 +302,7 @@ void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
 				<< "Could not find Shaders/osg_statshandler.vert, the osg stats "
 				<< "display will probably not work correctly.";
 		success = false;
@@ -310,7 +314,7 @@ void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
 				<< "Could not find Shaders/osg_statshandler.frag, the osg stats "
 				<< "display will probably not work correctly.";
 		success = false;
@@ -353,12 +357,10 @@ void SurgSim::Graphics::OsgView::enableManipulator(bool val)
 {
 	if (m_manipulator == nullptr)
 	{
-		m_manipulator = new SurgSim::Graphics::OsgTrackballZoomManipulator();
+		m_manipulator = new OsgTrackballZoomManipulator();
 		// Set a default position
-		m_manipulator->setTransformation(
-			SurgSim::Graphics::toOsg(m_manipulatorPosition),
-			SurgSim::Graphics::toOsg(m_manipulatorLookat),
-			osg::Vec3d(0.0f, 1.0f, 0.0f));
+		m_manipulator->setTransformation(toOsg(m_manipulatorPosition), toOsg(m_manipulatorLookat),
+				osg::Vec3d(0.0f, 1.0f, 0.0f));
 	}
 
 	if (val)
@@ -386,7 +388,7 @@ void SurgSim::Graphics::OsgView::enableKeyboardDevice(bool val)
 
 	std::shared_ptr<SurgSim::Input::CommonDevice> keyboardDevice = getKeyboardDevice();
 	osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle =
-		std::static_pointer_cast<SurgSim::Devices::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
+		std::static_pointer_cast<Devices::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
 	if (val)
 	{
 		getOsgView()->addEventHandler(keyboardHandle);
@@ -408,7 +410,7 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getKey
 {
 	if (m_keyboardDevice == nullptr)
 	{
-		m_keyboardDevice = std::make_shared<SurgSim::Devices::KeyboardDevice>("Keyboard");
+		m_keyboardDevice = std::make_shared<Devices::KeyboardDevice>("Keyboard");
 		if (!m_keyboardDevice->isInitialized())
 		{
 			m_keyboardDevice->initialize();
@@ -425,9 +427,9 @@ void SurgSim::Graphics::OsgView::enableMouseDevice(bool val)
 		return;
 	}
 
-	std::shared_ptr<SurgSim::Input::CommonDevice> mouseDevice = getMouseDevice();
+	std::shared_ptr<Input::CommonDevice> mouseDevice = getMouseDevice();
 	osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler =
-		std::static_pointer_cast<SurgSim::Devices::MouseDevice>(mouseDevice)->getMouseHandler();
+		std::static_pointer_cast<Devices::MouseDevice>(mouseDevice)->getMouseHandler();
 	if (val)
 	{
 		getOsgView()->addEventHandler(mouseHandler);
@@ -449,7 +451,7 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgView::getMou
 {
 	if (m_mouseDevice == nullptr)
 	{
-		m_mouseDevice = std::make_shared<SurgSim::Devices::MouseDevice>("Mouse");
+		m_mouseDevice = std::make_shared<Devices::MouseDevice>("Mouse");
 		if (!m_mouseDevice->isInitialized())
 		{
 			m_mouseDevice->initialize();
@@ -467,10 +469,8 @@ void SurgSim::Graphics::OsgView::setManipulatorParameters(const SurgSim::Math::V
 
 	if (m_manipulator != nullptr)
 	{
-		m_manipulator->setTransformation(
-			SurgSim::Graphics::toOsg(m_manipulatorPosition),
-			SurgSim::Graphics::toOsg(m_manipulatorLookat),
-			osg::Vec3d(0.0f, 1.0f, 0.0f));
+		m_manipulator->setTransformation(toOsg(m_manipulatorPosition), toOsg(m_manipulatorLookat),
+				osg::Vec3d(0.0f, 1.0f, 0.0f));
 	}
 }
 

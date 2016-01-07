@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ TEST(SceneElementTest, AddAndAccessComponents)
 	EXPECT_EQ(nullptr, fetched);
 }
 
-TEST(SceneElementTest, RemoveComponents)
+TEST(SceneElementTest, RemoveComponent)
 {
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
@@ -139,6 +139,32 @@ TEST(SceneElementTest, RemoveComponents)
 
 	EXPECT_TRUE(element->removeComponent(component1));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent1"));
+	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_EQ(0, manager->getComponents().size());
+
+	runtime->stop();
+}
+
+TEST(SceneElementTest, RemoveComponents)
+{
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+
+	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
+	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
+
+	EXPECT_TRUE(element->addComponent(component1));
+	EXPECT_TRUE(element->addComponent(component2));
+
+	runtime->addManager(manager);
+	runtime->getScene()->addSceneElement(element);
+	runtime->start(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_EQ(2, manager->getComponents().size());
+
+	element->removeComponents();
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
 	EXPECT_EQ(0, manager->getComponents().size());

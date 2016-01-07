@@ -62,12 +62,6 @@ protected:
 	/// \param state The PhysicsManagerState from previous computation.
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 	override;
-
-private:
-
-	/// Updates the collision pairs
-	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
-
 };
 
 }; // Physics

@@ -17,7 +17,7 @@
 #include <gtest/gtest.h>
 #include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
-#include "SurgSim/Collision/SpherePlaneDcdContact.h"
+#include "SurgSim/Collision/SpherePlaneContact.h"
 
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/PlaneShape.h"
@@ -37,6 +37,9 @@ using SurgSim::Math::SphereShape;
 
 namespace SurgSim
 {
+
+typedef Math::PosedShape<std::shared_ptr<Math::Shape>> PosedShape;
+
 namespace Collision
 {
 
@@ -64,7 +67,7 @@ TEST(ContactCalculationTests, SwappedPairTest)
 	std::shared_ptr<CollisionPair> pair1 = std::make_shared<CollisionPair>(sphereRep, planeRep);
 	std::shared_ptr<CollisionPair> pair2 = std::make_shared<CollisionPair>(planeRep, sphereRep);
 
-	std::shared_ptr<SpherePlaneDcdContact> calc = std::make_shared<SpherePlaneDcdContact>();
+	std::shared_ptr<SpherePlaneContact> calc = std::make_shared<SpherePlaneContact>();
 
 	EXPECT_NO_THROW(calc->calculateContact(pair1));
 	EXPECT_NO_THROW(calc->calculateContact(pair2));
@@ -75,12 +78,12 @@ TEST(ContactCalculationTests, SwappedShapeTest)
 {
 	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
-	std::shared_ptr<SpherePlaneDcdContact> calc = std::make_shared<SpherePlaneDcdContact>();
+	std::shared_ptr<SpherePlaneContact> calc = std::make_shared<SpherePlaneContact>();
 
 	auto transform = Math::RigidTransform3d::Identity();
 
-	ASSERT_NO_THROW(calc->calculateContact(sphere, transform, plane, transform));
-	ASSERT_NO_THROW(calc->calculateContact(plane, transform, sphere, transform));
+	ASSERT_NO_THROW(calc->calculateDcdContact(PosedShape(sphere, transform), PosedShape(plane, transform)));
+	ASSERT_NO_THROW(calc->calculateDcdContact(PosedShape(plane, transform), PosedShape(sphere, transform)));
 
 	auto planeRep = std::make_shared<ShapeCollisionRepresentation>("Plane Shape");
 	planeRep->setShape(plane);
@@ -91,22 +94,22 @@ TEST(ContactCalculationTests, SwappedShapeTest)
 	sphereRep->setLocalPose(transform);
 
 	std::shared_ptr<CollisionPair> pair1 = std::make_shared<CollisionPair>(sphereRep, planeRep);
-	std::shared_ptr<CollisionPair> pair2 = std::make_shared<CollisionPair>(planeRep, sphereRep);
 
 	calc->calculateContact(pair1);
-	calc->calculateContact(pair2);
 
-	auto contacts1 = calc->calculateContact(sphere, transform, plane, transform);
-	auto contacts2 = calc->calculateContact(plane, transform, sphere, transform);
+	auto contacts1 = calc->calculateDcdContact(PosedShape(sphere, transform), PosedShape(plane, transform));
+	auto contacts2 = calc->calculateDcdContact(PosedShape(plane, transform), PosedShape(sphere, transform));
 
 	contactsInfoEqualityTest(pair1->getContacts(), contacts1);
 
-	for (const auto& contact : contacts2)
+	// Contacts2 should be flipped from contacts1
+	for (auto& contact : contacts2)
 	{
 		contact->normal = -contact->normal;
+		std::swap(contact->penetrationPoints.first, contact->penetrationPoints.second);
 	}
 
-	contactsInfoEqualityTest(pair2->getContacts(), contacts2);
+	contactsInfoEqualityTest(contacts1 , contacts2);
 }
 
 }; // namespace Collision

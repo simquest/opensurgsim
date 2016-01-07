@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "SurgSim/Collision/BoxCapsuleDcdContact.h"
+#include "SurgSim/Collision/BoxCapsuleContact.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Math/BoxShape.h"
@@ -55,7 +55,7 @@ void doBoxCapsuleTest(std::shared_ptr<BoxShape> box,
 	capsuleRep->setLocalPose(makeRigidTransform(capsuleQuat, capsuleTrans));
 
 	// Perform collision detection.
-	BoxCapsuleDcdContact calcContact;
+	BoxCapsuleContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, capsuleRep);
 	calcContact.calculateContact(pair);
 

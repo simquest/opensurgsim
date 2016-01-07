@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 #ifndef SURGSIM_FRAMEWORK_SCENE_H
 #define SURGSIM_FRAMEWORK_SCENE_H
 
-#include <vector>
+#include <boost/thread/mutex.hpp>
 #include <memory>
 #include <string>
-#include <boost/thread/mutex.hpp>
+#include <vector>
 
-#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/DataStructures/Groups.h"
+#include "SurgSim/Framework/SceneElement.h"
+
 
 namespace YAML
 {
@@ -34,6 +35,7 @@ namespace SurgSim
 namespace Framework
 {
 
+class Logger;
 class Runtime;
 
 /// Scene. Basic Container for SceneElements
@@ -51,16 +53,16 @@ public:
 	~Scene();
 
 	/// Adds a scene element to the Scene, the SceneElement will have its initialize() function called.
-	/// \param	element	The element.
+	/// \param element The element.
 	void addSceneElement(std::shared_ptr<SceneElement> element);
+
+	/// Removes a scene element from the Scene
+	/// \param element The element.
+	void removeSceneElement(std::shared_ptr<SceneElement> element);
 
 	/// Invokes addSceneElement() for each element in the list.
 	/// \param elements the list of elements to be added.
 	void addSceneElements(std::vector<std::shared_ptr<SceneElement>> elements);
-
-	/// Removes a scene element to the Scene
-	/// \param	element	The element.
-	void removeSceneElement(std::shared_ptr<SceneElement> element);
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
@@ -105,6 +107,8 @@ private:
 	mutable boost::mutex m_sceneElementsMutex;
 
 	std::shared_ptr<GroupsType> m_groups;
+
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 }; // namespace Framework

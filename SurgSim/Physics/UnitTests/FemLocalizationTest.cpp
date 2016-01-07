@@ -224,5 +224,19 @@ TEST_F(FemLocalizationTest, CalculatePositionTest)
 	EXPECT_TRUE(Vector3d(-0.05, 1.0, -0.95).isApprox(localization->calculatePosition(), epsilon));
 }
 
+TEST_F(FemLocalizationTest, ElementPose)
+{
+	FemLocalization localization(m_fem, m_validLocalPosition);
+	EXPECT_THROW(localization.getElementPose(), SurgSim::Framework::AssertionFailure);
+}
+
+TEST_F(FemLocalizationTest, MoveClosestTo)
+{
+	FemLocalization localization(m_fem, m_validLocalPosition);
+	bool flag = false;
+	EXPECT_THROW(localization.moveClosestTo(SurgSim::Math::Vector3d::Zero(), &flag),
+		SurgSim::Framework::AssertionFailure);
+}
+
 } // namespace SurgSim
 } // namespace Physics

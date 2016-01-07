@@ -15,7 +15,7 @@
 
 #include <sstream>
 
-#include "SurgSim/Collision/SegmentMeshTriangleMeshDcdContact.h"
+#include "SurgSim/Collision/SegmentMeshTriangleMeshContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
@@ -184,7 +184,7 @@ protected:
 			triangleMeshRep->setLocalPose(transform.first * meshShapeTransform);
 
 			// Perform collision detection.
-			SegmentMeshTriangleMeshDcdContact calcContact;
+			SegmentMeshTriangleMeshContact calcContact;
 			std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(segmentMeshRep, triangleMeshRep);
 			calcContact.calculateContact(pair);
 
