@@ -76,7 +76,9 @@ void main()
 	float specular = temp / (shininess - temp * shininess + temp);
 
 	color = mix(color, mappedSpecularColor + color, specularPercent) + 
-			(specular * specularColor * lightSource.specular * attenuation * shadowAmount).rgb;
+			(specular * specularColor * lightSource.specular * attenuation).rgb;
+
+	color *= shadowAmount;
 
 	gl_FragColor.rgb = color;
 	gl_FragColor.a = 1.0;
