@@ -456,7 +456,17 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase33)
 	MockCapsule c(Vector3d(0, -4, -1), Vector3d(0, -5 + 1e-9, 0), 1e-9);
 
 	testTriangleCapsuleContactCalculation(
-		TriangleCapsuleTestCase("Failing test 1", t, c, true, false, Vector3d(), Vector3d()));
+		TriangleCapsuleTestCase("Failing test 2", t, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase34)
+{
+	MockTriangle t(Vector3d(0005.55605,0087.7003,-0047.2398), Vector3d(0000.110703,0113.919,-0039.387),
+		Vector3d(-0005.57197,0087.8735,-0047.1883));
+	MockCapsule c(Vector3d(0,0115.5,-0045.), Vector3d(0,0110.,-0040.), 0000.1);
+
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("Failing test 3", t, c, true, false, Vector3d(), Vector3d()));
 }
 
 }

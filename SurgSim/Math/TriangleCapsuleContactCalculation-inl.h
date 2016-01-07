@@ -126,7 +126,9 @@ public:
 		m_epsilon = static_cast<T>(Geometry::DistanceEpsilon);
 		m_distance = distanceSegmentTriangle(cv0, cv1, m_tv0, m_tv1, m_tv2, m_tn,
 			m_penetrationPointCapsuleAxis, m_penetrationPointTriangle);
-		m_cAxis = (m_cvBottom - m_cvTop).normalized();
+		m_cAxis = m_cvBottom - m_cvTop;
+		m_cLength = m_cAxis.norm();
+		m_cAxis = m_cAxis / m_cLength;
 		if (m_cAxis.dot(tn) > 0.0)
 		{
 			m_cvTop = cv1;
@@ -225,6 +227,18 @@ private:
 		return false;
 	}
 
+	bool checkIfPointInsideTriangle(const Vector3& pt)
+	{
+		Vector3 proj = pt + m_tn * ((pt - m_tv0).dot(m_tn));
+		bool res1 = SurgSim::Math::isPointInsideTriangle(proj, m_tv0, m_tv1, m_tv2, m_tn);
+		Vector3 result;
+		double d = SurgSim::Math::distancePointLine(pt, m_cvTop, m_cvBottom, &result);
+		bool res2 = std::abs(d - m_cr) < 1e-10;
+		double r = SurgSim::Math::distancePointSegment(pt, m_cvTop, m_cvBottom, &result);
+		bool res3 = std::abs(r - m_cr) < 1e-10;
+		return res1 && res2 && res3;
+	}
+
 	/// This function handles the contact data calculation for the case where there is an intersection between the
 	/// capsule and the triangle, and the capsule axis goes through the triangle.
 	/// \return True, if the axis of the capsule goes through the triangle. Also calculates the contact info.
@@ -247,7 +261,8 @@ private:
 		auto segmentEnd = m_cvBottom;
 
 		size_t j = clipSegmentAgainstTriangle(&segmentStart, &segmentEnd, v, planeN, planeD);
-
+		checkIfPointInsideTriangle(segmentEnd);
+		checkIfPointInsideTriangle(segmentStart);
 		if (j == 0)
 		{
 			*m_contactNormal = -m_tn;
@@ -269,7 +284,9 @@ private:
 		Vector3 majorAxis = (triangleEdge * (triangleEdge.dot(m_cAxis)) + m_tn * (m_tn.dot(m_cAxis))).normalized();
 		double majorRadius = farthestIntersectionLineCylinder(center, majorAxis, &deepestPoint);
 		SURGSIM_ASSERT(isValid(majorRadius)) << "The major radius of the ellipse should be a valid number.";
+		checkIfPointInsideTriangle(deepestPoint);
 
+		double dotProd = majorAxis.dot(triangleEdge);
 		if (std::abs(majorAxis.dot(triangleEdge)) > m_epsilon)
 		{
 			// majorApex is not the deepest point because the ellipse is angled. The deepest point is between majorApex
@@ -281,6 +298,10 @@ private:
 
 			EllipseHelper<T, MOpt> ellipseHelper(center, majorAxis, minorAxis, majorRadius, minorRadius);
 			deepestPoint = ellipseHelper.pointWithTangent(triangleEdge);
+			checkIfPointInsideTriangle(deepestPoint);
+			Vector3 proj = deepestPoint - m_tn * ((deepestPoint - m_tv0).dot(m_tn));
+			farthestIntersectionLineCapsule(proj, -m_tn, &deepestPoint, m_penetrationPointCapsuleAxis);
+			checkIfPointInsideTriangle(deepestPoint);
 		}
 
 		// Project deepestPoint on the triangle edge to make sure it is within the edge.
@@ -297,11 +318,10 @@ private:
 
 			// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
 			Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
-			double d = farthestIntersectionLineCylinder(edgeVertex, -m_tn, &deepestPoint);
+			double d = farthestIntersectionLineCapsule(edgeVertex, -m_tn, &deepestPoint, m_penetrationPointCapsuleAxis);
 			SURGSIM_ASSERT(isValid(d)) << "There must be a part of the ellipse between the triangle edge at this point";
+			checkIfPointInsideTriangle(deepestPoint);
 		}
-
-		clipPointToCapsuleSurface(&deepestPoint, m_penetrationPointCapsuleAxis);
 
 		*m_contactNormal = -m_tn;
 		*m_penetrationPointCapsule = deepestPoint;
@@ -315,19 +335,18 @@ private:
 	/// \param lineDir Unit directional vector of the line
 	/// \param point [out] The point of intersection.
 	/// \return The distance of the point of intersection from the lineStart.
-	double farthestIntersectionLineCylinder(const Vector3& lineStart, const Vector& lineDir, Vector3* point = nullptr)
+	double farthestIntersectionLineCylinder(const Vector3& lineStart, const Vector3& lineDir, Vector3* point = nullptr)
 	{
 		if (!m_cInverseTransform.hasValue())
 		{
 			Vector3 j, k;
 			SurgSim::Math::buildOrthonormalBasis(&m_cAxis, &j, &k);
 
-			RigidTransform3 transform;
-			transform.translation() = m_cvTop;
-			transform.linear().col(0) = m_cAxis;
-			transform.linear().col(1) = j;
-			transform.linear().col(2) = k;
-			m_cInverseTransform = transform.inverse();
+			m_cTransform.translation() = m_cvTop;
+			m_cTransform.linear().col(0) = m_cAxis;
+			m_cTransform.linear().col(1) = j;
+			m_cTransform.linear().col(2) = k;
+			m_cInverseTransform = m_cTransform.inverse();
 		}
 
 		// Transform the problem in the cylinder space to solve the local cylinder equation y^2 + z^2 = r^2
@@ -370,30 +389,66 @@ private:
 		return d;
 	}
 
-	/// \param point [in,out] The point which is to be clipped.
-	/// \param pointOnCapsuleAxis [out] The recalculated point on the capsule axis.
-	void clipPointToCapsuleSurface(Vector3* point, Vector3* pointOnCapsuleAxis)
-	{
-		// Clip 'point' to be on the surface of the capsule.
-		Vector3 pointOnAxis;
-		double d = SurgSim::Math::distancePointSegment(*point, m_cvTop, m_cvBottom, &pointOnAxis);
-		if (std::abs(d - m_cr) > m_epsilon)
-		{
-			*point = pointOnAxis + (*point - pointOnAxis).normalized() * m_cr;
-			*pointOnCapsuleAxis = pointOnAxis;
-		}
-	}
-
 	/// \param lineStart The start of the line segment
 	/// \param lineDir The direction of the line segment
 	/// \param point [in,out] The point which is to be clipped.
 	/// \param pointOnCapsuleAxis [out] The recalculated point on the capsule axis.
-	void farthestIntersectionLineCapsule(const Vector3& lineStart, const Vector& lineDir,
-		Vector3* point, Vector3*pointOnCapsuleAxis)
+	/// \return The distance of the point of intersection from the lineStart.
+	double farthestIntersectionLineCapsule(const Vector3& lineStart, const Vector& lineDir,
+		Vector3* point, Vector3* pointOnCapsuleAxis)
 	{
+		checkIfPointInsideTriangle(lineStart);
+
+		// Transform the problem in the capsule space to solve the local capsule equation:
+		// case 1: x^2 + y^2 + z^2 = r^2				| x < 0
+		// case 2: y^2 + z^2 = r^2						| 0 < x < length
+		// case 3: (x - length)^2 + y^2 + z^2 = r^2		| x > length
+		// Point should be on the line, P + t.(D)
+
+		// case 2:
 		double d = farthestIntersectionLineCylinder(lineStart, lineDir, point);
-		SURGSIM_ASSERT(isValid(d)) << "The line should intersect the cylinder at this point in the algorithm";
-		clipPointToCapsuleSurface(point, pointOnCapsuleAxis);
+		SURGSIM_ASSERT(isValid(d));
+		*point = lineStart + lineDir * d;
+		checkIfPointInsideTriangle(*point);
+		auto const start = (m_cInverseTransform.getValue() * lineStart).eval();
+
+		// case 1 and 3:
+		// => ((P + t.D).x - l)^2 + (P + t.D).y^2 + (P + tD).z^2 = r^2
+		// => Px^2 + t^2.Dx^2 + l^2 + 2.Px.t.Dx - 2.t.Dx.l - 2.Px.l +
+		//    Py^2 + t^2.Dy^2 + 2.Py.t.Dy + Pz^2 + t^2.Dz^2 + 2.Pz.t.Dz = r^2
+		// => t^2.(Dx^2 + Dy^2 + Dz^2) + t.(2.Px.Dx + 2.Py.Dy + 2.Pz.Dz - 2.Dx.l) +
+		//    (Px^2 + Py^2 + Pz^2 + l^2 - 2.Px.l - r^2) = 0
+		// Let a = (Dx^2 + Dy^2 + Dz^2), b = (2.Px.Dx + 2.Py.Dy + 2.Pz.Dz - 2.Dx.l),
+		//     c = (Px^2 + Py^2 + Pz^2 + l^2 - 2.Px.l - r^2):
+		double x = ((*point) - m_cvTop).dot(m_cAxis);
+		if (x <= 0.0 || x >= m_cLength)
+		{
+			x = (x <= 0.0) ? 0.0 : m_cLength;
+
+			auto const P = (m_cInverseTransform.getValue() * lineStart).eval();
+			auto const D = (m_cInverseTransform.getValue().linear() * lineDir).eval();
+
+			T a = D[0] * D[0] + D[1] * D[1] + D[2] * D[2];
+			T b = static_cast<T>(2) * (P[0] * D[0] + P[1] * D[1] + P[2] * D[2] - D[0] * x);
+			T c = (P[0] * P[0] + P[1] * P[1] + P[2] * P[2] + x * x - static_cast<T>(2) * P[0] * x - m_cr * m_cr);
+
+			// => t^2.a + t.b + c = 0, whose solution is:
+			// (-b +/- sqrt(b^2 - 4*a*c))/2*a
+			T bb4ac = b * b - static_cast<T>(4) * a * c;
+
+			if (bb4ac < 0.0 && bb4ac >= -Geometry::ScalarEpsilon)
+			{
+				bb4ac = 0.0;
+			}
+
+			// We have two solutions. We want the smaller value.
+			d = (-b / (static_cast<T>(2) * a)) - std::abs(std::sqrt(bb4ac) / (static_cast<T>(2) * a));
+			SURGSIM_ASSERT(isValid(d));
+			*point = lineStart + lineDir * d;
+		}
+
+		*pointOnCapsuleAxis = m_cTransform * Vector3(x, 0.0, 0.0);
+		return d;
 	}
 
 	/// \param segmentStart [in,out] The start of the line segment
@@ -442,9 +497,9 @@ private:
 
 	/// Triangle vertices and normal.
 	Vector3 m_tv0, m_tv1, m_tv2, m_tn;
-	/// Capsule ends, axis and radius.
+	/// Capsule ends, axis , radius and length.
 	Vector3 m_cvTop, m_cvBottom, m_cAxis;
-	double m_cr;
+	double m_cr, m_cLength;
 	/// Distance between triangle and capsule
 	double m_distance;
 	/// Contact info
@@ -454,6 +509,7 @@ private:
 	Vector3* m_contactNormal;
 	Vector3* m_penetrationPointCapsuleAxis;
 	/// The inverse transform of the capsule
+	RigidTransform3 m_cTransform;
 	SurgSim::DataStructures::OptionalValue<RigidTransform3> m_cInverseTransform;
 	/// epsilon
 	T m_epsilon;
