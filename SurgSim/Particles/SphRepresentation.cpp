@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -305,7 +305,7 @@ void SphRepresentation::computeAccelerations()
 			if (rSquaredNorm < m_hSquared)
 			{
 				// Pressure force
-				const double rNorm = std::sqrt(rSquaredNorm);
+				const double rNorm = std::max(std::sqrt(rSquaredNorm), 0.0001);
 				const Math::Vector3d gradient = r * m_kernelSpikyGradient * (m_h - rNorm) * (m_h -rNorm) / rNorm;
 				Math::Vector3d f = (-(m_pressure[i] + m_pressure[j]) / (2.0 * m_density[i])) * gradient;
 
