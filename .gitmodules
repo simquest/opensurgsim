@@ -1,3 +1,7 @@
 [submodule "Modules/ARDemo"]
 	path = Modules/ARDemo
 	url = git@git.assembla.com:simquest.ardemo.git
+[submodule "Modules/SimQuest"]
+	path = Modules/SimQuest
+	url = git@git.assembla.com:simquest.modules.git
+	branch = feature/GUI
