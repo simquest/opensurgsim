@@ -74,7 +74,6 @@ protected:
 protected:
 	bool finalize() override;
 
-private:
 	/// true if initialized and not finalized.
 	bool m_initialized;
 };
