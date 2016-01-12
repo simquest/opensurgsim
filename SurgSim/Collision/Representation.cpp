@@ -150,6 +150,29 @@ bool Representation::ignore(const std::shared_ptr<Representation>& representatio
 	return ignore(fullName);
 }
 
+bool Representation::allow(const std::string& fullName)
+{
+	if (!m_ignoring.empty())
+	{
+		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger())
+			<< "Collision Representation named " << getName() << " can not allow " << fullName
+			<< ". You can only set what representations to ignore or allow, not both.";
+		return false;
+	}
+	else
+	{
+		return m_allowing.insert(fullName).second;
+	}
+}
+
+bool Representation::allow(const std::shared_ptr<Representation>& representation)
+{
+	std::string fullName = representation->getFullName();
+	SURGSIM_LOG_IF(representation->getSceneElement() == nullptr, Framework::Logger::getDefaultLogger(), WARNING)
+		<< "Allowing " << fullName << " may not work. It is not in a scene element yet, so its full name is unknown.";
+	return allow(fullName);
+}
+
 void Representation::setIgnoring(const std::vector<std::string>& fullNames)
 {
 	if (!m_allowing.empty())

@@ -220,6 +220,7 @@ TEST_F(RepresentationTest, Ignoring)
 	std::vector<std::string> allowing;
 	allowing.push_back("Invalid");
 	sphereRep->setAllowing(allowing);
+	EXPECT_FALSE(sphereRep->allow("Invalid"));
 	EXPECT_TRUE(sphereRep->isIgnoring("Test"));
 	EXPECT_TRUE(sphereRep->isIgnoring("Element/PlaneShape"));
 	EXPECT_FALSE(sphereRep->isIgnoring("Invalid"));
@@ -235,10 +236,12 @@ TEST_F(RepresentationTest, Allowing)
 	allowing.push_back("CollideWith1");
 	allowing.push_back("CollideWith2");
 	sphereRep->setAllowing(allowing);
+	sphereRep->allow("CollideWith3");
 
 	EXPECT_TRUE(sphereRep->isIgnoring("Other"));
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith2"));
+	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith3"));
 
 	EXPECT_FALSE(sphereRep->ignore("CollideWith1"));
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
