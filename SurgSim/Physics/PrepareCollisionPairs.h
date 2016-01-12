@@ -56,6 +56,10 @@ public:
 protected:
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 		override;
+
+private:
+	/// The time since the collision pairs were last logged.
+	double m_timeSinceLog;
 };
 
 }; // Physics

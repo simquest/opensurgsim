@@ -26,7 +26,8 @@ namespace Physics
 {
 
 PrepareCollisionPairs::PrepareCollisionPairs(bool doCopyState) :
-	Computation(doCopyState)
+	Computation(doCopyState),
+	m_timeSinceLog(0.0)
 {
 }
 
@@ -62,8 +63,42 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 		}
 
 		result->setCollisionPairs(pairs);
-	}
 
+		auto logger = Framework::Logger::getLogger("Physics/PrepareCollisionPairs");
+		if (logger->getThreshold() <= SURGSIM_LOG_LEVEL(DEBUG))
+		{
+			m_timeSinceLog += dt;
+			if (m_timeSinceLog > 5.0)
+			{
+				m_timeSinceLog = 0.0;
+				typedef std::pair<std::string, std::string> PairType;
+				std::vector<PairType> names;
+				for (auto& pair : pairs)
+				{
+					std::string first = pair->getFirst()->getFullName();
+					std::string second = pair->getSecond()->getFullName();
+					if (first < second)
+					{
+						names.emplace_back(first, second);
+					}
+					else
+					{
+						names.emplace_back(second, first);
+					}
+				}
+				std::sort(names.begin(), names.end(), [](PairType i, PairType j)
+					{
+						return (i.first < j.first) || ((i.first == j.first) && (i.second < j.second));
+					});
+				std::string message = "All collision pairs for testing:\n";
+				for (auto& name : names)
+				{
+					message += "\t" + name.first + " : " + name.second + "\n";
+				}
+				SURGSIM_LOG_DEBUG(logger) << message;
+			}
+		}
+	}
 	return result;
 }
 
