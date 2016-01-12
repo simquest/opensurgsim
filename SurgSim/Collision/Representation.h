@@ -132,6 +132,20 @@ public:
 	/// \param representation The collision representation to ignore
 	bool ignore(const std::shared_ptr<Representation>& representation);
 
+	/// Set a collision representation to allow
+	/// Only collisions with "allowed" collision representation will be detected
+	/// \note This method conflicts with ignore/setIgnoring. You can only set what
+	/// representations to ignore or allow collisions with, not both.
+	/// \param fullName The full name of the collision representation to allow
+	bool allow(const std::string& fullName);
+
+	/// Set a collision representation to allow
+	/// Only collisions with "allowed" collision representation will be detected
+	/// \note This method conflicts with ignore/setIgnoring. You can only set what
+	/// representations to ignore or allow collisions with, not both.
+	/// \param representation The collision representation to allow
+	bool allow(const std::shared_ptr<Representation>& representation);
+
 	/// Set the collision representations to ignore
 	/// Collisions with these collision representation will not be detected
 	/// \note This method conflicts with setAllowing. You can only set what
