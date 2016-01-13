@@ -208,6 +208,9 @@ TEST_F(RepresentationTest, Ignoring)
 	EXPECT_TRUE(planeRep->isIgnoring("Test"));
 	EXPECT_TRUE(planeRep->isIgnoring("Element/SphereShape"));
 	EXPECT_FALSE(planeRep->isIgnoring("Invalid"));
+	EXPECT_FALSE(planeRep->isAllowing("Test"));
+	EXPECT_FALSE(planeRep->isAllowing("Element/SphereShape"));
+	EXPECT_TRUE(planeRep->isAllowing("Invalid"));
 
 	std::vector<std::string> newExclusions;
 	newExclusions.push_back("Test");
@@ -216,6 +219,9 @@ TEST_F(RepresentationTest, Ignoring)
 	EXPECT_TRUE(sphereRep->isIgnoring("Test"));
 	EXPECT_TRUE(sphereRep->isIgnoring("Element/PlaneShape"));
 	EXPECT_FALSE(sphereRep->isIgnoring("Invalid"));
+	EXPECT_FALSE(sphereRep->isAllowing("Test"));
+	EXPECT_FALSE(sphereRep->isAllowing("Element/PlaneShape"));
+	EXPECT_TRUE(sphereRep->isAllowing("Invalid"));
 
 	std::vector<std::string> allowing;
 	allowing.push_back("Invalid");
@@ -224,6 +230,9 @@ TEST_F(RepresentationTest, Ignoring)
 	EXPECT_TRUE(sphereRep->isIgnoring("Test"));
 	EXPECT_TRUE(sphereRep->isIgnoring("Element/PlaneShape"));
 	EXPECT_FALSE(sphereRep->isIgnoring("Invalid"));
+	EXPECT_FALSE(sphereRep->isAllowing("Test"));
+	EXPECT_FALSE(sphereRep->isAllowing("Element/PlaneShape"));
+	EXPECT_TRUE(sphereRep->isAllowing("Invalid"));
 }
 
 TEST_F(RepresentationTest, Allowing)
@@ -231,6 +240,9 @@ TEST_F(RepresentationTest, Allowing)
 	EXPECT_FALSE(sphereRep->isIgnoring("Other"));
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith2"));
+	EXPECT_TRUE(sphereRep->isAllowing("Other"));
+	EXPECT_TRUE(sphereRep->isAllowing("CollideWith1"));
+	EXPECT_TRUE(sphereRep->isAllowing("CollideWith2"));
 
 	std::vector<std::string> allowing;
 	allowing.push_back("CollideWith1");
@@ -242,9 +254,14 @@ TEST_F(RepresentationTest, Allowing)
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith2"));
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith3"));
+	EXPECT_FALSE(sphereRep->isAllowing("Other"));
+	EXPECT_TRUE(sphereRep->isAllowing("CollideWith1"));
+	EXPECT_TRUE(sphereRep->isAllowing("CollideWith2"));
+	EXPECT_TRUE(sphereRep->isAllowing("CollideWith3"));
 
 	EXPECT_FALSE(sphereRep->ignore("CollideWith1"));
 	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
+	EXPECT_TRUE(sphereRep->isAllowing("CollideWith1"));
 }
 
 TEST_F(RepresentationTest, SerializationTest)
