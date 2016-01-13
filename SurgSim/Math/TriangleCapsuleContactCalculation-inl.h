@@ -406,7 +406,6 @@ private:
 		double d = farthestIntersectionLineCylinder(lineStart, lineDir, point);
 		SURGSIM_ASSERT(isValid(d));
 		*point = lineStart + lineDir * d;
-		auto const start = (m_cInverseTransform.getValue() * lineStart).eval();
 
 		// case 1 and 3:
 		// => ((P + t.D).x - l)^2 + (P + t.D).y^2 + (P + tD).z^2 = r^2
