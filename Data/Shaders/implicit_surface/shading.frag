@@ -112,8 +112,8 @@ void main(void)
 	vec3 reflectDir = reflect(eyeDirNorm, normalDirNorm);
     vec3 vSpecular = vec3(textureCube(specularEnvMap, reflectDir)) * vertexSpecularColor;
 
-	color = mix(color, vSpecular + color, specularPercent) +
-				(specular * specularColor * lightSource.specular * attenuation * shadowAmount).rgb;
+	color = mix(color, vSpecular + color, specularPercent) * shadowAmount +
+				(specular * specularColor * lightSource.specular * attenuation).rgb * shadowAmount;
 
     gl_FragColor.rgb = color;
     gl_FragColor.a = 1.0;

@@ -203,7 +203,9 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	const Math::Vector4f& diffuseColor,
 	const Math::Vector4f& specularColor,
 	const std::string diffuseEnvMap,
+	float diffusePct,
 	const std::string specularEnvMap,
+	float specularPct,
 	float shininess)
 {
 	std::array<int, 2> dimensions = view->getDimensions();
@@ -239,20 +241,24 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	std::string filename;
 	{
 		// The Diffuse environment map
-		Framework::Runtime::getApplicationData()->tryFindFile(diffuseEnvMap, &filename);
+		filename = Framework::Runtime::getApplicationData()->findFile(diffuseEnvMap);
 		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "diffuseEnvMap");
 		material->setValue("diffuseEnvMap", texture);
+		material->addUniform("float", "diffusePercent");
+		material->setValue("diffusePercent", diffusePct);
 	}
 
 	{
 		// The Specular environment map
-		Framework::Runtime::getApplicationData()->tryFindFile(specularEnvMap, &filename);
+		filename = Framework::Runtime::getApplicationData()->findFile(specularEnvMap);
 		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "specularEnvMap");
 		material->setValue("specularEnvMap", texture);
+		material->addUniform("float", "specularPercent");
+		material->setValue("specularPercent", specularPct);
 	}
 
 	renderPass->setMaterial(material);
@@ -276,7 +282,9 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 			const Math::Vector4f& diffuseColor,
 			const Math::Vector4f& specularColor,
 			const std::string diffuseEnvMap,
+			float diffusePct,
 			const std::string specularEnvMap,
+			float specularPct,
 			float shininess,
 			bool showDebug)
 {
@@ -303,7 +311,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 									blurPass->getRenderTarget()->getDepthTarget(),
 									normalPass->getRenderTarget()->getColorTarget(0),
 									diffuseColor, specularColor,
-									diffuseEnvMap, specularEnvMap, shininess);
+									diffuseEnvMap, diffusePct, specularEnvMap, specularPct, shininess);
 
 	depthPass->addComponent(copier);
 

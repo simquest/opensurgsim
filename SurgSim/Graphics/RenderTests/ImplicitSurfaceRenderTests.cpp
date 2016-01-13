@@ -57,6 +57,9 @@ class ImplicitSurfaceRenderTests : public RenderTest
 
 TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 {
+	Math::Vector4f diffuseColor = {0.83, 0.0, 0.0, 1.0};
+	Math::Vector4f specularColor = {0.8, 0.8, 0.8, 1.0};
+
 	std::array<int, 2> dimensions = {1280, 720};
 	viewElement->getView()->setDimensions(dimensions);
 	viewElement->getCamera()->setPerspectiveProjection(45, 1.7, 0.01, 10.0);
@@ -93,18 +96,11 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
 	lightElement->addComponent(axes);
 
-	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
-			Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.01f, 800.0f, 4.0,
-												1024, Math::Vector4f(0.83, 0.0, 0.0, 1.0),
-												Math::Vector4f(0.8, 0.8, 0.8, 1.0),
-												"Textures/CubeMap_reflection_diffuse.png",
-												"Textures/CubeMap_reflection_specular.png",
-												100.0f, false);
-
-	for (auto element : surface)
-	{
-		scene->addSceneElement(element);
-	}
+	scene->addSceneElements(Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.01f, 800.0f, 4.0,
+												1024, diffuseColor, specularColor,
+												"Textures/CubeMap_reflection_diffuse.png", 0.9,
+												"Textures/CubeMap_reflection_specular.png", 0.1,
+												100.0f, false));
 
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
@@ -120,9 +116,9 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	auto material = Graphics::buildMaterial("Shaders/material.vert", "Shaders/material.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(0.83, 0.0, 0.0, 1.0));
+	material->setValue("diffuseColor", diffuseColor);
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(0.8, 0.8, 0.8, 1.0));
+	material->setValue("specularColor", specularColor);
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 	sphere->setMaterial(material);

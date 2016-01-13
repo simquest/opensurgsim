@@ -50,7 +50,9 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 			const Math::Vector4f& diffuseColor,
 			const Math::Vector4f& specularColor,
 			const std::string diffuseEnvMap,
+			float diffusePct,
 			const std::string specularEnvMap,
+			float specularPct,
 			float shininess,
 			bool showDebug);
 
