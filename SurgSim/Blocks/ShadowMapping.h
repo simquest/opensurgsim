@@ -55,6 +55,10 @@ static const std::string GROUP_SHADOW_RECEIVER = "Shadowed";
 /// \param shadowTextureSize the size of shadowTexture pass and the blur textures
 /// \param lightCameraProjection parameters for an orthogonal projection that will be used to render the scene from
 ///        the lights point of view, needs to be set so it encompasses all the shadow casters and receivers
+/// \param bias the bias to be used when determining something is in shadow or not, increasing this can help remove
+///        sharp edges at glancing angles
+/// \param intensity the general intensity of the shadow, 1 means everything in shadow will be black, 0 means there
+///        won't be any shadows at all
 /// \param useBlur whether to blur the output of the light map pass, this will remove some of the blockiness of the
 ///        shadows
 /// \param blurRadius sampling radius for the blur pass
@@ -66,6 +70,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 			int shadowTextureSize,
 			std::array<double, 6> lightCameraProjection,
 			double bias,
+			double intensity,
 			bool useBlur,
 			double blurRadius,
 			bool showDebug);
