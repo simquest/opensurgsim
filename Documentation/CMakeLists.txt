@@ -28,10 +28,7 @@ find_program(DOXYGEN_DOT_EXECUTABLE
 
 find_package(Doxygen REQUIRED)
 
-set(SURGSIM_DOCUMENTATION_EXCLUDE_LIST
-	*/UnitTests/*
-	*/RenderTests/*
-	*/PerformanceTests/*
+set(SURGSIM_DOCUMENTATION_EXCLUDE_LIST "*/UnitTests/* */RenderTests/* */PerformanceTests/*"
 	CACHE STRING "Directories and files to ignore when generating documentation")
 mark_as_advanced(SURGSIM_DOCUMENTATION_EXCLUDE_LIST)
 
