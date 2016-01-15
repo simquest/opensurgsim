@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#version 120
+
 /// \file dns_mapping_material.frag
 /// Phong material with diffuse, shadow and normal map
 
@@ -22,6 +24,8 @@ uniform sampler2D normalMap;
 uniform sampler2D shadowMap;
 
 uniform float shininess;
+
+uniform float normalCorrection = -1.0;
 
 /// Oss supplied values
 struct LightSource {
@@ -52,7 +56,7 @@ void main(void)
 	float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
 
 	vec3 normalDir = texture2D(normalMap, texCoord0).rgb * 2.0 - 1.0;
-	normalDir.g = -normalDir.g;
+	normalDir.g =  normalCorrection * normalDir.g;
     
 	vec3 lightDirNorm = normalize(lightDir);
 	vec3 eyeDirNorm = normalize(eyeDir);
