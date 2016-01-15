@@ -233,6 +233,14 @@ TEST_F(RepresentationTest, Ignoring)
 	EXPECT_FALSE(sphereRep->isAllowing("Test"));
 	EXPECT_FALSE(sphereRep->isAllowing("Element/PlaneShape"));
 	EXPECT_TRUE(sphereRep->isAllowing("Invalid"));
+
+	EXPECT_TRUE(sphereRep->undoIgnore("Test"));
+	EXPECT_FALSE(sphereRep->isIgnoring("Test"));
+	EXPECT_FALSE(sphereRep->undoIgnore("Test"));
+
+	EXPECT_TRUE(planeRep->undoIgnore(sphereRep));
+	EXPECT_FALSE(planeRep->isIgnoring("Element/SphereShape"));
+	EXPECT_FALSE(planeRep->undoIgnore(sphereRep));
 }
 
 TEST_F(RepresentationTest, Allowing)

@@ -150,6 +150,36 @@ bool Representation::ignore(const std::shared_ptr<Representation>& representatio
 	return ignore(representation->getFullName());
 }
 
+bool Representation::undoIgnore(const std::string& fullName)
+{
+	if (!m_allowing.empty())
+	{
+		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger())
+			<< "Collision Representation named " << getName() << " can not undo the ignoring of " << fullName
+			<< ". You can only set what representations to ignore or allow, not both.";
+		return false;
+	}
+	else
+	{
+		auto found = m_ignoring.find(fullName);
+		if (found != m_ignoring.end())
+		{
+			m_ignoring.erase(found);
+			return true;
+		}
+		return false;
+	}
+}
+
+bool Representation::undoIgnore(const std::shared_ptr<Representation>& representation)
+{
+	std::string fullName = representation->getFullName();
+	SURGSIM_LOG_IF(representation->getSceneElement() == nullptr, Framework::Logger::getDefaultLogger(), WARNING)
+		<< "Undoing of ignoring " << fullName
+		<< " may not work. It is not in a scene element yet, so its full name is unknown.";
+	return undoIgnore(fullName);
+}
+
 bool Representation::allow(const std::string& fullName)
 {
 	if (m_ignoring.empty())
