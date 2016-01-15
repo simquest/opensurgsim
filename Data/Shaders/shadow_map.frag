@@ -12,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#version 120
 
 /// \file shadow_map.frag
 /// Calculate a shadow map that can be used for modulating the color of each
@@ -25,6 +26,10 @@
 /// it is not
 uniform sampler2D depthMap;
 
+/// Changes Intensity of the shadow default is all black 
+uniform float oneMinusIntensity = 0.0;
+
+uniform float bias = 0.0005;
 
 /// The coordinates of the fragment in the space of the projected depth map
 varying vec4 lightCoord;
@@ -34,7 +39,7 @@ void main(void)
 	// Calculate texture coordinates from incoming point
 	vec3 lightCoord3 = (lightCoord.xyz / lightCoord.w) * vec3(0.5) + vec3(0.5);
 
-	float depth = texture2D(depthMap, lightCoord3.xy);
+	float depth = texture2D(depthMap, lightCoord3.xy).x;
 
-	gl_FragColor = vec4(depth + 0.0005 > lightCoord3.z || lightCoord3.z > 1.0 ? 0.0 : 1.0);
+	gl_FragColor = vec4(depth + bias > lightCoord3.z || lightCoord3.z > 1.0 ? 0.0 : 1.0 * oneMinusIntensity);
 }

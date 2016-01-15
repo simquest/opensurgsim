@@ -150,7 +150,7 @@ std::shared_ptr<Graphics::RenderPass> createLightMapPass(int textureSize, bool d
 /// Create the pass that renders shadowed pixels into the scene,
 /// the identifier  GROUPD_SHADOW_RECEIVER is used in all graphics objects to mark them
 /// as used in this pass
-std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, bool debug)
+std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, double bias, double intensity, bool debug)
 {
 	auto pass = std::make_shared<Graphics::RenderPass>(GROUP_SHADOW_RECEIVER);
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 1, false);
@@ -163,6 +163,12 @@ std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, bool 
 	auto material = Graphics::buildMaterial("Shaders/shadow_map.vert", "Shaders/shadow_map.frag");
 	material->getProgram()->setGlobalScope(true);
 	pass->setMaterial(material);
+
+	material->addUniform("float", "bias");
+	material->setValue("bias", static_cast<float>(bias));
+
+	material->addUniform("float", "oneMinusIntensity");
+	material->setValue("oneMinusIntensity", static_cast<float>(1 - intensity));
 
 	if (debug)
 	{
@@ -179,6 +185,8 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 			int depthTextureSize,
 			int shadowTextureSize,
 			std::array<double, 6> lightCameraProjection,
+			double bias,
+			double intensity,
 			bool useBlur,
 			double blurRadius,
 			bool showDebug)
@@ -209,7 +217,7 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createShadowMapping(
 	// to the light map pass
 	copier->connect(osgLight, "Pose", lightMapPass->getPoseComponent(), "Pose");
 
-	auto shadowMapPass = createShadowMapPass(shadowTextureSize, showDebug);
+	auto shadowMapPass = createShadowMapPass(shadowTextureSize, bias, intensity, showDebug);
 	result.push_back(shadowMapPass);
 
 	shadowMapPass->getMaterial()->addUniform("mat4", "lightViewMatrix");
