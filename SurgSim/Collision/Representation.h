@@ -23,6 +23,7 @@
 #include <unordered_set>
 
 #include "SurgSim/DataStructures/BufferedValue.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Math/Shape.h"
 
@@ -125,6 +126,13 @@ public:
 	/// \param fullName The full name of the collision representation to ignore
 	bool ignore(const std::string& fullName);
 
+	/// Set a collision representation which was ignored to not be ignored anymore
+	/// Collisions with this collision representation will be detected
+	/// \note This method conflicts with setAllowing. You can only set what
+	/// representations to ignore or allow collisions with, not both.
+	/// \param fullName The full name of the collision representation to ignore
+	bool undoIgnore(const std::string& fullName);
+
 	/// Set a collision representation to ignore
 	/// Collisions with this collision representation will not be detected
 	/// \note This method conflicts with setAllowing. You can only set what
@@ -132,19 +140,12 @@ public:
 	/// \param representation The collision representation to ignore
 	bool ignore(const std::shared_ptr<Representation>& representation);
 
-	/// Set a collision representation to allow
-	/// Only collisions with "allowed" collision representation will be detected
-	/// \note This method conflicts with ignore/setIgnoring. You can only set what
+	/// Set a collision representation which was ignored to not be ignored anymore
+	/// Collisions with this collision representation will be detected
+	/// \note This method conflicts with setAllowing. You can only set what
 	/// representations to ignore or allow collisions with, not both.
-	/// \param fullName The full name of the collision representation to allow
-	bool allow(const std::string& fullName);
-
-	/// Set a collision representation to allow
-	/// Only collisions with "allowed" collision representation will be detected
-	/// \note This method conflicts with ignore/setIgnoring. You can only set what
-	/// representations to ignore or allow collisions with, not both.
-	/// \param representation The collision representation to allow
-	bool allow(const std::shared_ptr<Representation>& representation);
+	/// \param representation The collision representation to ignore
+	bool undoIgnore(const std::shared_ptr<Representation>& representation);
 
 	/// Set the collision representations to ignore
 	/// Collisions with these collision representation will not be detected
@@ -163,12 +164,36 @@ public:
 	/// return True if the collision representation is being ignored
 	bool isIgnoring(const std::shared_ptr<Representation>& representation) const;
 
+	/// Set a collision representation to allow
+	/// Only collisions with "allowed" collision representation will be detected
+	/// \note This method conflicts with ignore/setIgnoring. You can only set what
+	/// representations to ignore or allow collisions with, not both.
+	/// \param fullName The full name of the collision representation to allow
+	bool allow(const std::string& fullName);
+
+	/// Set a collision representation to allow
+	/// Only collisions with "allowed" collision representation will be detected
+	/// \note This method conflicts with ignore/setIgnoring. You can only set what
+	/// representations to ignore or allow collisions with, not both.
+	/// \param representation The collision representation to allow
+	bool allow(const std::shared_ptr<Representation>& representation);
+
 	/// Set the only collision representations to allow collisions with
 	/// Only Collisions with these collision representation will be detected
 	/// \note This method conflicts with ignore and setIgnoring. You can only set what
 	/// representations to ignore or allow collisions with, not both.
 	/// \param fullNames The collision representations (given by full name) to allow
 	void setAllowing(const std::vector<std::string>& fullNames);
+
+	/// Is the collision representation being allowed
+	/// \param fullName The full name of the collision representation to check
+	/// return True if the collision representation is being allowed
+	bool isAllowing(const std::string& fullName) const;
+
+	/// Is the collision representation being allowed
+	/// \param representation The collision representation to check
+	/// return True if the collision representation is being allowed
+	bool isAllowing(const std::shared_ptr<Representation>& representation) const;
 
 protected:
 	/// Invalidate the cached posed shape motion
@@ -186,6 +211,8 @@ protected:
 
 	/// \param posedShape the posed shape motion to be set
 	void setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape);
+
+	std::shared_ptr<Framework::Logger> m_logger;
 
 private:
 	/// The type of collision detection
