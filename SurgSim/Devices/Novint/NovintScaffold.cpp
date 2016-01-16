@@ -678,17 +678,17 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		{
 			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Left-handed.";
 			info->isDeviceRollAxisReversed = true;
-			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = -75. * M_PI / 180.;
-			info->eulerAngleOffsetPitch = -50. * M_PI / 180.;
+			info->eulerAngleOffsetRoll = 0.37;
+			info->eulerAngleOffsetYaw = 1.57 + 0.79;//-75. * M_PI / 180.;
+			info->eulerAngleOffsetPitch = 0;//-50. * M_PI / 180.;
 		}
 		else
 		{
-			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is right-handed.";
+			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Right-handed.";
 			info->isDeviceRollAxisReversed = false;
-			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = +75. * M_PI / 180.;
-			info->eulerAngleOffsetPitch = +50. * M_PI / 180.;
+			info->eulerAngleOffsetRoll = -1.43;
+			info->eulerAngleOffsetYaw = 0;//(+75. * M_PI / 180.) - 1.3;
+			info->eulerAngleOffsetPitch = 1.57 - 1.07;//+50. * M_PI / 180.;
 		}
 	}
 	return result;
@@ -767,11 +767,16 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			const double rollOffset = (index == 0) ? 1.98 : 1.82;
 			angles[3] = m_state->auxiliaryData[index].second - rollOffset;
 		}
-
 		// The zero values are NOT the home orientation.
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+		if (info->isDeviceRollAxisReversed)
+		{
+			info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
+			info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
+		}
+		//std::cout << info->deviceObject->getName() << " " << angles[0] << " " << angles[1] << " " << angles[2] << " " << info->jointAngles.transpose() << std::endl;
 
 		/* HW-Nov-12-2015
 		   Testing on Nov 10, 2015 shows that 
