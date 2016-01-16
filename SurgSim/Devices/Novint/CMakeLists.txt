@@ -26,19 +26,23 @@ set(LIBS
 	${Boost_LIBRARIES}
 	${NOVINTHDALSDK_LIBRARIES}
 	${YAML_CPP_LIBRARIES}
+	C:/simquest/osg_dll/osg_64.lib
 )
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${NOVINTHDALSDK_INCLUDE_DIR}"
+	"C:/simquest/osg_dll"
 )
 
 set(NOVINT_DEVICE_SOURCES
+	NovintAuxiliaryThread.cpp
 	NovintDevice.cpp
 	NovintScaffold.cpp
 )
 
 set(NOVINT_DEVICE_HEADERS
+	NovintAuxiliaryThread.h
 	NovintDevice.h
 	NovintScaffold.h
 )

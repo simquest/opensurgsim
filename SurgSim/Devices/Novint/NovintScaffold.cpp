@@ -27,6 +27,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Devices/Novint/NovintAuxiliaryThread.h"
 #include "SurgSim/Devices/Novint/NovintDevice.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Clock.h"
@@ -346,6 +347,8 @@ public:
 	/// Initialize the state.
 	StateData() : isApiInitialized(false), logger(Framework::Logger::getLogger("Devices/Novint"))
 	{
+		auxiliaryData[0] = std::pair<double, double>(0, 0);
+		auxiliaryData[1] = std::pair<double, double>(0, 0);
 	}
 
 	/// True if the API has been initialized (and not finalized).
@@ -353,6 +356,8 @@ public:
 
 	/// Wrapper for the haptic loop callback handle.
 	std::unique_ptr<Callback> callback;
+
+	std::unique_ptr<NovintAuxiliaryThread> auxiliaryThread;
 
 	/// The registered devices.
 	std::list<std::unique_ptr<DeviceData>> registeredDevices;
@@ -379,6 +384,9 @@ public:
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> logger;
 
+	std::array<std::pair<double, double>, 2> auxiliaryData;
+	boost::mutex auxiliaryMutex;
+
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
 	StateData(const StateData&) /*= delete*/;
@@ -404,6 +412,15 @@ NovintScaffold::NovintScaffold() : m_state(new StateData)
 		}
 	}
 	m_state->timer.setMaxNumberOfFrames(5000);
+
+	// Must initialize the auxiliary grips first.
+	std::unique_ptr<NovintAuxiliaryThread> auxiliaryThread(new NovintAuxiliaryThread(this));
+	auxiliaryThread->setRate(2000);
+	auxiliaryThread->start();
+	while (!auxiliaryThread->isInitialized())
+	{
+	}
+	m_state->auxiliaryThread = std::move(auxiliaryThread);
 
 	// The canonical HDAL approach (Programmer's Guide, section 4.7 Multiple devices) is:
 	// 1) hdlInitXXXX on all devices that will be used by this application,
@@ -444,6 +461,12 @@ NovintScaffold::NovintScaffold() : m_state(new StateData)
 
 NovintScaffold::~NovintScaffold()
 {
+	if (m_state->auxiliaryThread != nullptr)
+	{
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
+		m_state->auxiliaryThread->stop();
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
+	}
 	if (m_state->isApiInitialized)
 	{
 		// The HDAL seems to do bad things (and the CRT complains) if we uninitialize the device too soon.
@@ -736,6 +759,14 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		double angles[4];
 		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
 		fatalError = fatalError || isFatalError("hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
+
+		{
+			boost::lock_guard<boost::mutex> lock(m_state->auxiliaryMutex);
+			const int index = (info->isDeviceRollAxisReversed) ? 1 : 0;
+			angles[0] = m_state->auxiliaryData[index].first;
+			const double rollOffset = (index == 0) ? 1.98 : 1.82;
+			angles[3] = m_state->auxiliaryData[index].second - rollOffset;
+		}
 
 		// The zero values are NOT the home orientation.
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
@@ -1245,6 +1276,13 @@ std::shared_ptr<NovintScaffold> NovintScaffold::getOrCreateSharedInstance()
 {
 	static Framework::SharedInstance<NovintScaffold> sharedInstance;
 	return sharedInstance.get();
+}
+
+void NovintScaffold::setAuxiliary(int grip, double roll, double toolDof)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->auxiliaryMutex);
+	SURGSIM_ASSERT((grip == 0) || (grip == 1)) << "Bad grip for setAuxiliary: " << grip;
+	m_state->auxiliaryData[grip] = std::pair<double, double>(roll, toolDof);
 }
 
 };  // namespace Devices
