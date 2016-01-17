@@ -26,27 +26,17 @@ uniform sampler2D texture;
 /// Texture coordinates for sampling
 varying vec2 taps[7];
 
-/// Fixed weights for blur
-const float weights[7] = float[](
-    0.04779035227281,
-    0.11086490165864,
-    0.21078608625031,
-    0.26111731963647,
-    0.21078608625031,
-    0.11086490165864,
-    0.04779035227281);
-
 void main(void) 
 {	
     vec4 sampledValue = vec4(0.0);
     
-    sampledValue += weights[0] * texture2D(texture, taps[0]);
-    sampledValue += weights[1] * texture2D(texture, taps[1]);
-    sampledValue += weights[2] * texture2D(texture, taps[2]);
-    sampledValue += weights[3] * texture2D(texture, taps[3]);
-    sampledValue += weights[4] * texture2D(texture, taps[4]);
-    sampledValue += weights[5] * texture2D(texture, taps[5]);
-    sampledValue += weights[6] * texture2D(texture, taps[6]);
+    sampledValue += 0.04779035227281 * texture2D(texture, taps[0]);
+    sampledValue += 0.11086490165864 * texture2D(texture, taps[1]);
+    sampledValue += 0.21078608625031 * texture2D(texture, taps[2]);
+    sampledValue += 0.26111731963647 * texture2D(texture, taps[3]);
+    sampledValue += 0.21078608625031 * texture2D(texture, taps[4]);
+    sampledValue += 0.11086490165864 * texture2D(texture, taps[5]);
+    sampledValue += 0.04779035227281 * texture2D(texture, taps[6]);
     
 	gl_FragColor.rgba = sampledValue;
 }
