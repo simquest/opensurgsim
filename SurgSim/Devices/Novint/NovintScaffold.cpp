@@ -135,7 +135,7 @@ public:
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 				"No error during initializing device " <<
 				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
-				"', but an invalid handle returned.\nIs a Novint device plugged in?";
+				"', but an invalid handle returned. Is a Novint device plugged in?";
 		}
 		else
 		{
@@ -892,6 +892,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	{
 		Vector3d torque = Vector3d::Zero();
 		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
+		if (info->isDeviceRollAxisReversed)
+		{
+			torque[0] = -torque[0];
+			torque[2] = -torque[2];
+		}
 
 		if (havespringJacobian)
 		{
@@ -981,8 +986,8 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// pitch axis: torque = 95.92 mNm when command = 2000
 		const double pitchTorqueScale = axisTorqueMax / 95.92e-3;
 
-		info->torque[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
-									   axisTorqueMin, axisTorqueMax);
+		info->torque[0] = 0;//clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
+							//		   axisTorqueMin, axisTorqueMax);
 		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
