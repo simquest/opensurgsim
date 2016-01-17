@@ -965,12 +965,12 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
 		const double axisTorqueMin = -2000;
 		const double axisTorqueMax = +2000;
-		// roll axis:  torque = 17.6 mNm  when command = 2000 (but flipped in left grip!)
-		const double rollTorqueScale  = axisTorqueMax / 17.6e-3;
-		// yaw axis:   torque = 47.96 mNm when command = 2000
-		const double yawTorqueScale   = axisTorqueMax / 47.96e-3;
-		// pitch axis: torque = 47.96 mNm when command = 2000
-		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
+		// roll axis:  torque = 41.97 mNm  when command = 2000 (but flipped in left grip!)
+		const double rollTorqueScale  = axisTorqueMax / 41.97e-3;
+		// yaw axis:   torque = 95.92 mNm when command = 2000
+		const double yawTorqueScale   = axisTorqueMax / 95.92e-3;
+		// pitch axis: torque = 95.92 mNm when command = 2000
+		const double pitchTorqueScale = axisTorqueMax / 95.92e-3;
 
 		info->torque[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
 									   axisTorqueMin, axisTorqueMax);
@@ -980,7 +980,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[3] = 0;
 
-		if (info->isDeviceRollAxisReversed)  // commence swearing.
+		if (info->isDeviceRollAxisReversed)
 		{
 			info->torque[0] = -info->torque[0];
 		}
