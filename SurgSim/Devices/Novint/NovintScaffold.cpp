@@ -134,7 +134,7 @@ public:
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 				"No error during initializing device " <<
 				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
-				"', but an invalid handle returned.\nIs a Novint device plugged in?";
+				"', but an invalid handle returned. Is a Novint device plugged in?";
 		}
 		else
 		{
@@ -650,22 +650,21 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 			// HDL reported an error.  An error message was already logged.
 			return false;
 		}
+		info->eulerAngleOffsetRoll = 0.0;
 		bool leftHanded = ((gripStatus[1] & 0x01) != 0);
 		if (leftHanded)
 		{
 			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Left-handed.";
 			info->isDeviceRollAxisReversed = true;
-			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = -75. * M_PI / 180.;
-			info->eulerAngleOffsetPitch = -50. * M_PI / 180.;
+			info->eulerAngleOffsetYaw = 2.7;
+			info->eulerAngleOffsetPitch = 0;
 		}
 		else
 		{
-			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is right-handed.";
+			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Right-handed.";
 			info->isDeviceRollAxisReversed = false;
-			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = +75. * M_PI / 180.;
-			info->eulerAngleOffsetPitch = +50. * M_PI / 180.;
+			info->eulerAngleOffsetYaw = 0.3;
+			info->eulerAngleOffsetPitch = 0.5;
 		}
 	}
 	return result;
@@ -735,6 +734,11 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+		if (info->isDeviceRollAxisReversed)
+		{
+			info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
+			info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
+		}
 
 		/* HW-Nov-12-2015
 		   Testing on Nov 10, 2015 shows that 
@@ -847,6 +851,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	{
 		Vector3d torque = Vector3d::Zero();
 		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
+		if (info->isDeviceRollAxisReversed)
+		{
+			torque[0] = -torque[0];
+			torque[2] = -torque[2];
+		}
 
 		if (havespringJacobian)
 		{
@@ -929,22 +938,22 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
 		const double axisTorqueMin = -2000;
 		const double axisTorqueMax = +2000;
-		// roll axis:  torque = 17.6 mNm  when command = 2000 (but flipped in left grip!)
-		const double rollTorqueScale  = axisTorqueMax / 17.6e-3;
-		// yaw axis:   torque = 47.96 mNm when command = 2000
-		const double yawTorqueScale   = axisTorqueMax / 47.96e-3;
-		// pitch axis: torque = 47.96 mNm when command = 2000
-		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
+		// roll axis:  torque = 41.97 mNm  when command = 2000 (but flipped in left grip!)
+		const double rollTorqueScale  = axisTorqueMax / 41.97e-3;
+		// yaw axis:   torque = 95.92 mNm when command = 2000
+		const double yawTorqueScale   = axisTorqueMax / 95.92e-3;
+		// pitch axis: torque = 95.92 mNm when command = 2000
+		const double pitchTorqueScale = axisTorqueMax / 95.92e-3;
 
-		info->torque[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
-									   axisTorqueMin, axisTorqueMax);
+		info->torque[0] = 0;//clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
+							//		   axisTorqueMin, axisTorqueMax);
 		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[3] = 0;
 
-		if (info->isDeviceRollAxisReversed)  // commence swearing.
+		if (info->isDeviceRollAxisReversed)
 		{
 			info->torque[0] = -info->torque[0];
 		}
