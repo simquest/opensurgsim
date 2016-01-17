@@ -255,6 +255,7 @@ struct NovintScaffold::DeviceData
 		isDeviceHomed(false),
 		isDeviceHeld(false),
 		isDevice7Dof(device->is7DofDevice()),
+		maxForce(device->getMaxForce()),
 		isDeviceRollAxisReversed(false),
 		eulerAngleOffsetRoll(0.0),
 		eulerAngleOffsetYaw(0.0),
@@ -302,6 +303,8 @@ struct NovintScaffold::DeviceData
 	bool isDeviceHeld;
 	/// True if this is a 7DoF device.
 	bool isDevice7Dof;
+	/// The maximum force magnitude (in Newtons) to send to the device.
+	double maxForce;
 	/// True if the roll axis of a 7DoF device has reverse polarity because the device is left-handed.
 	bool isDeviceRollAxisReversed;
 
@@ -523,7 +526,8 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 		return false;   // message already printed
 	}
 	m_state->registeredDevices.emplace_back(std::move(info));
-	SURGSIM_LOG_INFO(m_state->logger) << "Device " << device->getName() << " initialized.";
+	SURGSIM_LOG_INFO(m_state->logger) << "Device " << device->getName() << " initialized.  Maximum force " <<
+		m_state->registeredDevices.back()->maxForce << " Newtons.";
 
 	return true;
 }
@@ -689,6 +693,11 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 	}
 
 	// Set the force command (in newtons).
+	const double norm = info->force.norm();
+	if (norm > info->maxForce)
+	{
+		info->force = info->force.normalized() * info->maxForce;
+	}
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
 	fatalError = fatalError || isFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
 

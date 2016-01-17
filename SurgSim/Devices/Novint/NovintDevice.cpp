@@ -29,13 +29,14 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::NovintDevice
 
 NovintDevice::NovintDevice(const std::string& uniqueName) :
 	Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
-	m_positionScale(1.0), m_orientationScale(1.0), m_7DofDevice(false)
+	m_positionScale(1.0), m_orientationScale(1.0), m_7DofDevice(false), m_maxForce(8.9)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, OptionalValue<std::string>, InitializationName,
 		getOptionalInitializationName, setOptionalInitializationName);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, OptionalValue<std::string>, SerialNumber,
 		getOptionalSerialNumber, setOptionalSerialNumber);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, bool, 7DofDevice, is7DofDevice, set7DofDevice);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, MaxForce, getMaxForce, setMaxForce);
 }
 
 NovintDevice::~NovintDevice()
@@ -149,6 +150,19 @@ void NovintDevice::set7DofDevice(bool val)
 bool NovintDevice::is7DofDevice() const
 {
 	return m_7DofDevice;
+}
+
+void NovintDevice::setMaxForce(double force)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Cannot setMaxForce after the device named " << getName() << " has been initialized.";
+	SURGSIM_ASSERT(force >= 0.0) << "Cannot set a negative maximum force magnitude on device named " << getName();
+	m_maxForce = force;
+}
+
+double NovintDevice::getMaxForce() const
+{
+	return m_maxForce;
 }
 
 const OptionalValue<std::string>& NovintDevice::getOptionalInitializationName() const
