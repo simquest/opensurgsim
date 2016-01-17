@@ -712,6 +712,12 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 	}
 
 	// Set the force command (in newtons).
+	const double norm = info->force.norm();
+	const double maxForce = 20.0;
+	if (norm > maxForce)
+	{
+		info->force = info->force.normalized() * maxForce;
+	}
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
 	fatalError = fatalError || isFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
