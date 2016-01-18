@@ -49,7 +49,8 @@ DeformableRepresentation::DeformableRepresentation(const std::string& name) :
 	SurgSim::Math::OdeEquation(),
 	m_numDofPerNode(0),
 	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT),
-	m_linearSolver(SurgSim::Math::LINEARSOLVER_LU)
+	m_linearSolver(SurgSim::Math::LINEARSOLVER_LU),
+	m_correctionLimit(-1.0)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableRepresentation, SurgSim::Math::IntegrationScheme, IntegrationScheme,
 									  getIntegrationScheme, setIntegrationScheme);
@@ -57,6 +58,8 @@ DeformableRepresentation::DeformableRepresentation(const std::string& name) :
 									  getLinearSolver, setLinearSolver);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableRepresentation, std::shared_ptr<SurgSim::Collision::Representation>,
 									  CollisionRepresentation, getCollisionRepresentation, setCollisionRepresentation);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableRepresentation, double,
+									  CorrectionLimit, getCorrectionLimit, setCorrectionLimit);
 }
 
 DeformableRepresentation::~DeformableRepresentation()
@@ -245,6 +248,18 @@ void DeformableRepresentation::afterUpdate(double dt)
 	}
 }
 
+void DeformableRepresentation::setCorrectionLimit(double limit)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Cannot set the correction limit of a DeformableRepresentation named " << getFullName() << " after it has been initialized";
+	m_correctionLimit = limit;
+}
+
+double DeformableRepresentation::getCorrectionLimit()
+{
+	return m_correctionLimit;
+}
+
 void DeformableRepresentation::applyCorrection(double dt,
 		const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
@@ -253,8 +268,15 @@ void DeformableRepresentation::applyCorrection(double dt,
 		return;
 	}
 
-	m_currentState->getPositions() += deltaVelocity * dt;
-	m_currentState->getVelocities() += deltaVelocity;
+	if ((m_correctionLimit < 0.0) || (deltaVelocity.cwiseAbs().maxCoeff() <= m_correctionLimit))
+	{
+		m_currentState->getPositions() += deltaVelocity * dt;
+		m_currentState->getVelocities() += deltaVelocity;
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(m_logger) << getFullName() << " ignoring too-big correction. " << deltaVelocity.cwiseAbs().maxCoeff() << " > " << m_correctionLimit;
+	}
 
 	if (!m_currentState->isValid())
 	{
