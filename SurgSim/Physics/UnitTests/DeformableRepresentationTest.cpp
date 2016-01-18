@@ -163,6 +163,10 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	}
 	setLinearSolver(SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT);
 
+	EXPECT_LT(getCorrectionLimit(), 0.0);
+	setCorrectionLimit(103.0);
+	EXPECT_NEAR(103.0, getCorrectionLimit(), 1e-9);
+
 	initialize(std::make_shared<SurgSim::Framework::Runtime>());
 
 	EXPECT_NE(nullptr, getOdeSolver());
@@ -399,6 +403,13 @@ TEST_F(DeformableRepresentationTest, ApplyCorrectionTest)
 	EXPECT_TRUE(nextX.isApprox(previousX + dv * dt, epsilon));
 	EXPECT_TRUE(nextV.isApprox(previousV + dv, epsilon));
 
+	// Test correction limit
+	object.setCorrectionLimit(0.5);
+	object.applyCorrection(dt, dv.segment(0, object.getNumDof()));
+	EXPECT_TRUE(nextX.isApprox(object.getCurrentState()->getPositions(), epsilon));
+	EXPECT_TRUE(nextV.isApprox(object.getCurrentState()->getVelocities(), epsilon));
+	object.setCorrectionLimit(-1.0);
+
 	// Test with an invalid state
 	dv(0) = std::numeric_limits<double>::infinity();
 	EXPECT_TRUE(object.isActive());
@@ -535,6 +546,7 @@ TEST_F(DeformableRepresentationTest, SerializationTest)
 		std::shared_ptr<SurgSim::Collision::Representation> deformableCollisionRepresentation =
 			std::make_shared<DeformableCollisionRepresentation>("DeformableCollisionRepresentation");
 		deformableRepresentation->setValue("CollisionRepresentation", deformableCollisionRepresentation);
+		deformableRepresentation->setCorrectionLimit(16.8);
 
 		YAML::Node node;
 		ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*deformableRepresentation));
@@ -542,7 +554,7 @@ TEST_F(DeformableRepresentationTest, SerializationTest)
 		EXPECT_EQ(1u, node.size());
 
 		YAML::Node data = node["SurgSim::Physics::MockDeformableRepresentation"];
-		EXPECT_EQ(10u, data.size());
+		EXPECT_EQ(11u, data.size());
 
 		std::shared_ptr<MockDeformableRepresentation> newRepresentation;
 		newRepresentation = std::dynamic_pointer_cast<MockDeformableRepresentation>
@@ -559,5 +571,6 @@ TEST_F(DeformableRepresentationTest, SerializationTest)
 		EXPECT_EQ(newRepresentation, newDeformableCollisionRepresentation->getDeformableRepresentation());
 		EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
 				  newRepresentation->getValue<SurgSim::Math::IntegrationScheme>("IntegrationScheme"));
+		EXPECT_NEAR(deformableRepresentation->getCorrectionLimit(), newRepresentation->getCorrectionLimit(), 1e-9);
 	}
 }

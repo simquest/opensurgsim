@@ -138,6 +138,18 @@ public:
 
 	void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
+	/// Set the maximum allowable change in the velocity due to the MLCP/constraints.
+	/// If the absolute value of the correction for any degree of freedom is greater than this value,
+	/// then the entire correction is discarded.  By default, there is no limit.
+	/// \param limit The maximum allowed change in velocity of a single degree of freedom.
+	///		Any negative value indicates no limit.
+	/// \note This would work better as an OptionalValue
+	void setCorrectionLimit(double limit);
+
+	/// \return The maximum allowed change in velocity of a single degree of freedom.
+	///		Any negative value indicates no limit.
+	double getCorrectionLimit();
+
 protected:
 	bool doInitialize() override;
 	bool doWakeUp() override;
@@ -189,6 +201,9 @@ private:
 
 	/// NO assignment operator
 	DeformableRepresentation& operator =(const DeformableRepresentation&);
+
+	/// If positive, the maximum allowable change in the velocity due to the MLCP/constraints.
+	double m_correctionLimit;
 };
 
 }; // namespace Physics
