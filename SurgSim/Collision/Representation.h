@@ -57,7 +57,7 @@ enum CollisionDetectionType : SURGSIM_ENUM_TYPE;
 /// is a nullptr or a has gone out of scope ASSERT's will be triggered.
 /// Collision with other representations will be updated by CollisionPair::addContact() and
 /// be cleared every time DcdCollision::updatePair() makes a new CollisionPair.
-class Representation : public SurgSim::Framework::Representation
+	class Representation : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
@@ -121,15 +121,13 @@ public:
 
 	/// Set a collision representation to ignore
 	/// Collisions with this collision representation will not be detected
-	/// \note This method conflicts with setAllowing. You can only set what
-	/// representations to ignore or allow collisions with, not both.
+	/// This acts as the opposite of allow if the representation that is passed here was previously added via allow()
 	/// \param fullName The full name of the collision representation to ignore
 	bool ignore(const std::string& fullName);
 
 	/// Set a collision representation to ignore
 	/// Collisions with this collision representation will not be detected
-	/// \note This method conflicts with setAllowing. You can only set what
-	/// representations to ignore or allow collisions with, not both.
+	/// This acts as the opposite of allow if the representation that is passed here was previously added via allow()
 	/// \param representation The collision representation to ignore
 	bool ignore(const std::shared_ptr<Representation>& representation);
 
@@ -159,15 +157,21 @@ public:
 
 	/// Set a collision representation to allow
 	/// Only collisions with "allowed" collision representation will be detected
-	/// \note This method conflicts with ignore/setIgnoring. You can only set what
-	/// representations to ignore or allow collisions with, not both.
+	/// If the the representation is currently being "ignored" then it will be removed from that state and
+	/// collisions will be allowed again.
+	/// \note When both the allow and ignore lists are empty calling allow may cause a change of behavior that
+	/// might not be wanted (i.e. the representation will go from colliding with all others to just colliding with
+	/// one other representation). This might be caused by trying to revert an "ignore" that has already been reversed.
 	/// \param representation The collision representation to allow
 	bool allow(const std::shared_ptr<Representation>& representation);
 
-	/// Set the only collision representations to allow collisions with
-	/// Only Collisions with these collision representation will be detected
-	/// \note This method conflicts with ignore and setIgnoring. You can only set what
-	/// representations to ignore or allow collisions with, not both.
+	/// Set a collision representation to allow
+	/// Only collisions with "allowed" collision representation will be detected
+	/// If the the representation is currently being "ignored" then it will be removed from that state and
+	/// collisions will be allowed again.
+	/// \note When both the allow and ignore lists are empty calling allow may cause a change of behavior that
+	/// might not be wanted (i.e. the representation will go from colliding with all others to just colliding with
+	/// one other representation). This might be caused by trying to revert an "ignore" that has already been reversed.
 	/// \param fullNames The collision representations (given by full name) to allow
 	void setAllowing(const std::vector<std::string>& fullNames);
 
@@ -232,10 +236,10 @@ private:
 }; // namespace SurgSim
 
 SURGSIM_SERIALIZABLE_ENUM(SurgSim::Collision::CollisionDetectionType,
-	(COLLISION_DETECTION_TYPE_NONE)
-	(COLLISION_DETECTION_TYPE_DISCRETE)
-	(COLLISION_DETECTION_TYPE_CONTINUOUS)
-	(MAX_COLLISION_DETECTION_TYPES)
-)
+						  (COLLISION_DETECTION_TYPE_NONE)
+						  (COLLISION_DETECTION_TYPE_DISCRETE)
+						  (COLLISION_DETECTION_TYPE_CONTINUOUS)
+						  (MAX_COLLISION_DETECTION_TYPES)
+						 )
 
 #endif
