@@ -90,6 +90,11 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 			auto contacts = pair->getContacts();
 			for (auto& contact : contacts)
 			{
+				if (!contact->active)
+				{
+					continue;
+				}
+
 				std::pair<std::shared_ptr<Location>, std::shared_ptr<Location>> locations;
 
 				locations.first = makeLocation(physicsRepresentations.first, collisionRepresentations.first,
