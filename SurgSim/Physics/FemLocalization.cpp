@@ -103,7 +103,8 @@ SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time)
 	const SurgSim::Math::Vector& naturalCoordinate = m_position.coordinate;
 
 	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
-	SURGSIM_ASSERT(femElement->isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 2.";
+	SURGSIM_ASSERT(femElement->isValidCoordinate(naturalCoordinate)) <<
+		"Invalid naturalCoordinate (" << naturalCoordinate.transpose() << ")";
 	const Math::Vector& currentVelocities = femRepresentation->getCurrentState()->getVelocities();
 	const Math::Vector& previousVelocities = femRepresentation->getPreviousState()->getVelocities();
 

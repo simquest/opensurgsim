@@ -86,22 +86,24 @@ SurgSim::Math::Vector3d RigidLocalization::doCalculateVelocity(double time)
 	SURGSIM_ASSERT(rigidRepresentation != nullptr) << "RigidRepresentation is null, it was probably not" <<
 		" initialized";
 
+	auto& previousR = rigidRepresentation->getPreviousState().getPose().linear();
+	auto& currentR = rigidRepresentation->getCurrentState().getPose().linear();
+
 	if (time == 0.0)
 	{
-		// V(P) = v + w.cross(GP)
-		return rigidRepresentation->getPreviousState().getLinearVelocity() + 
-			rigidRepresentation->getPreviousState().getAngularVelocity().cross(rigidRepresentation->getPreviousState().getPose().linear() * m_position);
+		return rigidRepresentation->getPreviousState().getLinearVelocity() +
+			rigidRepresentation->getPreviousState().getAngularVelocity().cross(previousR * m_position);
 	}
 	else if (time == 1.0)
 	{
 		return rigidRepresentation->getCurrentState().getLinearVelocity() +
-			rigidRepresentation->getCurrentState().getAngularVelocity().cross(rigidRepresentation->getCurrentState().getPose().linear() * m_position);
+			rigidRepresentation->getCurrentState().getAngularVelocity().cross(currentR * m_position);
 	}
 
 	Math::Vector3d currentVelocity = rigidRepresentation->getCurrentState().getLinearVelocity() +
-		rigidRepresentation->getCurrentState().getAngularVelocity().cross(rigidRepresentation->getCurrentState().getPose().linear() * m_position);
+		rigidRepresentation->getCurrentState().getAngularVelocity().cross(currentR * m_position);
 	Math::Vector3d previousVelocity = rigidRepresentation->getPreviousState().getLinearVelocity() +
-		rigidRepresentation->getPreviousState().getAngularVelocity().cross(rigidRepresentation->getPreviousState().getPose().linear() * m_position);
+		rigidRepresentation->getPreviousState().getAngularVelocity().cross(previousR * m_position);
 
 	return currentVelocity * time + previousVelocity * (1.0 - time);
 }
