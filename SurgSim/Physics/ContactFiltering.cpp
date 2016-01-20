@@ -64,6 +64,8 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 
 		for (auto& contact : pair->getContacts())
 		{
+			// By the contact definition, normal is pointing "in" to body1.
+			// Moving body1 by normal * depth would solve the contact with body2.
 			Math::Vector3d normal = contact->normal;
 			auto loc1 = physicsRepresentations.first->createLocalization(contact->penetrationPoints.first);
 			auto loc2 = physicsRepresentations.second->createLocalization(contact->penetrationPoints.second);
@@ -79,24 +81,13 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 			}
 			relativeVelocity /= relativeVelocityNorm;
 
-			// Filter contacts that are opposite to the motion
-			double criteria = normal.dot(relativeVelocity);
-			if (criteria < 0.0)
-			{
-				contact->active = false;
-				SURGSIM_LOG(m_logger, DEBUG) << "Contact filtered [normal.relativeVelocity = " <<
-					criteria << "] < 0 (opposite to the motion)" << std::endl <<
-					" > normal = " << normal.transpose() << std::endl <<
-					" > relativeVelocity = " << relativeVelocity.transpose() << std::endl;
-			}
-
-			// Filter contact that are too orthogonal to the motion and would produce inconsitant forces wrt motion
-			criteria = std::abs(normal.dot(relativeVelocity));
-			if (criteria < std::cos(5 * M_PI / 12.0))
+			// Filter contacts that are too orthogonal to the motion and would produce inconsitant forces wrt motion
+			double criteria = std::abs(normal.dot(relativeVelocity));
+			if (criteria < std::cos(M_PI / 3.0))
 			{
 				contact->active = false;
 				SURGSIM_LOG(m_logger, DEBUG) << "Contact filtered [|normal.relativeVelocity| = "<<
-					criteria << "] < cos(5*PI/12) = " << std::cos(5 * M_PI / 12.0) << std::endl <<
+					criteria << "] < cos(PI/3) = " << std::cos(M_PI / 3.0) << std::endl <<
 					" > normal = " << normal.transpose() << std::endl <<
 					" > relativeVelocity = " << relativeVelocity.transpose() << std::endl;
 			}
