@@ -57,6 +57,11 @@ Math::Vector3d Localization::calculatePosition(double time)
 	return doCalculatePosition(time);
 }
 
+Math::Vector3d Localization::calculateVelocity(double time)
+{
+	return doCalculateVelocity(time);
+}
+
 bool Localization::isValidRepresentation(std::shared_ptr<Representation> representation)
 {
 	// Localization base class does not care about the type

@@ -72,6 +72,30 @@ SurgSim::Math::Vector3d MassSpringLocalization::doCalculatePosition(double time)
 	return SurgSim::Math::interpolate(previousPoint, currentPoint, time);
 }
 
+SurgSim::Math::Vector3d MassSpringLocalization::doCalculateVelocity(double time)
+{
+	std::shared_ptr<MassSpringRepresentation> massSpringRepresentation =
+		std::static_pointer_cast<MassSpringRepresentation>(getRepresentation());
+
+	SURGSIM_ASSERT(massSpringRepresentation != nullptr) << "MassSpringRepresentation is null, it was probably not" <<
+		" initialized";
+	SURGSIM_ASSERT((0.0 <= time) && (time <= 1.0)) << "Time must be between 0.0 and 1.0 inclusive";
+
+	if (time == 0.0)
+	{
+		return massSpringRepresentation->getPreviousState()->getPosition(m_nodeID);
+	}
+	else if (time == 1.0)
+	{
+		return massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
+	}
+
+	const SurgSim::Math::Vector3d& currentPoint = massSpringRepresentation->getCurrentState()->getVelocity(m_nodeID);
+	const SurgSim::Math::Vector3d& previousPoint = massSpringRepresentation->getPreviousState()->getVelocity(m_nodeID);
+
+	return SurgSim::Math::interpolate(previousPoint, currentPoint, time);
+}
+
 bool MassSpringLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
 {
 

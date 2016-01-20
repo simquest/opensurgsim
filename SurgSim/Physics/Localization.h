@@ -63,6 +63,12 @@ public:
 	/// \note time can useful when dealing with CCD
 	SurgSim::Math::Vector3d calculatePosition(double time = 1.0);
 
+	/// Calculates the global velocity of this localization
+	/// \param time The time in [0..1] at which the velocity should be calculated
+	/// \return The global velocity of the localization at the requested time
+	/// \note time can useful when dealing with CCD
+	SurgSim::Math::Vector3d calculateVelocity(double time = 1.0);
+
 	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation);
 
 	/// Find a pose that the localization is represented with respect to.
@@ -82,6 +88,12 @@ private:
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
 	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) = 0;
+
+	/// Calculates the global velocity of this localization
+	/// \param time The time in [0..1] at which the velocity should be calculated
+	/// \return The global velocity of the localization at the requested time
+	/// \note time can useful when dealing with CCD
+	virtual SurgSim::Math::Vector3d doCalculateVelocity(double time) = 0;
 
 	/// The representation on which the localization is defined
 	std::shared_ptr<Representation> m_representation;

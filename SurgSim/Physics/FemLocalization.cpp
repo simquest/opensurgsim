@@ -88,6 +88,44 @@ SurgSim::Math::Vector3d FemLocalization::doCalculatePosition(double time)
 	return previousPosition + time * (currentPosition - previousPosition);
 }
 
+SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time)
+{
+	using SurgSim::Math::Vector3d;
+
+	auto femRepresentation = std::static_pointer_cast<FemRepresentation>(getRepresentation());
+
+	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
+		" initialized";
+
+	Vector3d currentVelocity(0.0, 0.0, 0.0);
+	Vector3d previousVelocity(0.0, 0.0, 0.0);
+
+	const SurgSim::Math::Vector& naturalCoordinate = m_position.coordinate;
+
+	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
+	SURGSIM_ASSERT(femElement->isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 2.";
+	const Math::Vector& currentVelocities = femRepresentation->getCurrentState()->getVelocities();
+	const Math::Vector& previousVelocities = femRepresentation->getPreviousState()->getVelocities();
+
+	auto& nodeIds = femElement->getNodeIds();
+	for (int i = 0; i < 2; i++)
+	{
+		currentVelocity += naturalCoordinate(i) * Math::getSubVector(currentVelocities, nodeIds[i], 6).segment<3>(0);
+		previousVelocity += naturalCoordinate(i) * Math::getSubVector(previousVelocities, nodeIds[i], 6).segment<3>(0);
+	}
+
+	if (time == 0.0)
+	{
+		return previousVelocity;
+	}
+	else if (time == 1.0)
+	{
+		return currentVelocity;
+	}
+
+	return previousVelocity + time * (currentVelocity - previousVelocity);
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

@@ -70,6 +70,8 @@ private:
 	/// \note The time parameter can useful when dealing with Continuous Collision Detection.
 	SurgSim::Math::Vector3d doCalculatePosition(double time) override;
 
+	SurgSim::Math::Vector3d doCalculateVelocity(double time) override;
+
 	/// Node defining the localization.
 	size_t m_nodeID;
 };

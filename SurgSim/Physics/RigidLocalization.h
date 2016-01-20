@@ -61,6 +61,8 @@ private:
 	/// \note time can useful when dealing with CCD.
 	SurgSim::Math::Vector3d doCalculatePosition(double time);
 
+	SurgSim::Math::Vector3d doCalculateVelocity(double time);
+
 	/// 3D position in local coordinates.
 	SurgSim::Math::Vector3d m_position;
 };

@@ -55,6 +55,8 @@ public:
 private:
 	SurgSim::Math::Vector3d doCalculatePosition(double time) override;
 
+	SurgSim::Math::Vector3d doCalculateVelocity(double time) override;
+
 	/// Barycentric position in local coordinates
 	SurgSim::DataStructures::IndexedLocalCoordinate m_position;
 };
