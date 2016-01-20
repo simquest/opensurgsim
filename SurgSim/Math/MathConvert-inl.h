@@ -28,65 +28,34 @@ const std::string serializeLogger = "Serialization";
 };
 
 SURGSIM_DOUBLE_SPECIALIZATION
-template <typename Type, int Rows, int MOpt>
-YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, 1, MOpt>>::encode(
-	const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs)
-{
-	Node node;
-	node.SetStyle(YAML::EmitterStyle::Flow);
-	for (int i = 0; i < rhs.size(); ++i)
-	{
-		node.push_back(rhs[i]);
-	}
-
-	return node;
-}
-
-SURGSIM_DOUBLE_SPECIALIZATION
-template <class Type, int Rows, int MOpt>
-bool YAML::convert<typename Eigen::Matrix<Type, Rows, 1, MOpt>>::decode(
-	const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs) //NOLINT
-{
-	if (! node.IsSequence() || node.size() != Rows)
-	{
-		return false;
-	}
-
-	for (unsigned i = 0; i < node.size(); ++i)
-	{
-		try
-		{
-			rhs[i] = node[i].as<Type>();
-		}
-		catch (YAML::RepresentationException)
-		{
-			rhs[i] = std::numeric_limits<Type>::quiet_NaN();
-
-			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-			SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
-		}
-	}
-	return true;
-}
-
-SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int Rows, int Cols, int MOpt>
 YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode(
-	const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs)
+			const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs)
 {
 	YAML::Node node;
 	node.SetStyle(YAML::EmitterStyle::Flow);
-	for (int row = 0; row < Rows; ++row)
+	if (Cols == 1)
 	{
-		YAML::Node rowNode;
-		for (int col = 0; col < Cols; ++col)
+		for (int i = 0; i < rhs.size(); ++i)
 		{
-			rowNode.push_back(rhs.row(row)[col]);
+			node.push_back(rhs(i, 0));
 		}
-		node.push_back(rowNode);
+	}
+	else
+	{
+		for (int row = 0; row < Rows; ++row)
+		{
+			YAML::Node rowNode;
+			for (int col = 0; col < Cols; ++col)
+			{
+				rowNode.push_back(rhs.row(row)[col]);
+			}
+			node.push_back(rowNode);
+		}
 	}
 	return node;
 }
+
 
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int Rows, int Cols, int MOpt>
@@ -99,24 +68,44 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 		return false;
 	}
 
-	for (size_t row = 0; row < node.size(); ++row)
+	if (Cols == 1)
 	{
-		YAML::Node rowNode = node[row];
-		if (!rowNode.IsSequence() || node.size() != Cols)
-		{
-			return false;
-		}
-		for (size_t col = 0; col < rowNode.size(); ++col)
+		for (unsigned i = 0; i < node.size(); ++i)
 		{
 			try
 			{
-				rhs.row(row)[col] = rowNode[col].as<Type>();
+				rhs(i, 0) = node[i].as<Type>();
 			}
 			catch (YAML::RepresentationException)
 			{
-				rhs.row(row)[col] = std::numeric_limits<Type>::quiet_NaN();
+				rhs(i, 0) = std::numeric_limits<Type>::quiet_NaN();
+
 				auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
 				SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
+			}
+		}
+	}
+	else
+	{
+		for (size_t row = 0; row < node.size(); ++row)
+		{
+			YAML::Node rowNode = node[row];
+			if (!rowNode.IsSequence() || node.size() != Cols)
+			{
+				return false;
+			}
+			for (size_t col = 0; col < rowNode.size(); ++col)
+			{
+				try
+				{
+					rhs.row(row)[col] = rowNode[col].as<Type>();
+				}
+				catch (YAML::RepresentationException)
+				{
+					rhs.row(row)[col] = std::numeric_limits<Type>::quiet_NaN();
+					auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
+					SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
+				}
 			}
 		}
 	}
@@ -126,7 +115,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int QOpt>
 YAML::Node YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::encode(
-	const typename Eigen::Quaternion<Type, QOpt>& rhs)
+			const typename Eigen::Quaternion<Type, QOpt>& rhs)
 {
 	return Node(convert<typename Eigen::Matrix<Type, 4, 1, QOpt>>::encode(rhs.coeffs()));
 }
@@ -134,8 +123,8 @@ YAML::Node YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::encode(
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int QOpt>
 bool YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::decode(
-	const Node& node,
-	typename Eigen::Quaternion<Type, QOpt>& rhs) //NOLINT
+			const Node& node,
+			typename Eigen::Quaternion<Type, QOpt>& rhs) //NOLINT
 {
 	bool result = false;
 	if (node.IsSequence() && node.size() == 4)
@@ -157,7 +146,7 @@ bool YAML::convert<typename Eigen::Quaternion<Type, QOpt>>::decode(
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int Dim, int TMode, int TOptions>
 YAML::Node YAML::convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(
-	const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
+			const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
 {
 	typedef typename Eigen::Transform<Type, Dim, TMode, TOptions>::LinearMatrixType LinearMatrixType;
 	LinearMatrixType linear(rhs.linear());
@@ -203,7 +192,7 @@ bool YAML::convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>::decod
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type>
 YAML::Node YAML::convert<typename Eigen::AngleAxis<Type>>::encode(
-	const typename Eigen::AngleAxis<Type>& rhs)
+			const typename Eigen::AngleAxis<Type>& rhs)
 {
 	Node node;
 	node.SetStyle(EmitterStyle::Flow);
@@ -215,8 +204,8 @@ YAML::Node YAML::convert<typename Eigen::AngleAxis<Type>>::encode(
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type>
 bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
-	const Node& node,
-	typename Eigen::AngleAxis<Type>& rhs) //NOLINT
+			const Node& node,
+			typename Eigen::AngleAxis<Type>& rhs) //NOLINT
 {
 	bool result = false;
 	if (node.IsMap() && node["Angle"].IsDefined() && node["Axis"].IsDefined())
