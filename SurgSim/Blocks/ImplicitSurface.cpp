@@ -241,7 +241,8 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	std::string filename;
 	{
 		// The Diffuse environment map
-		filename = Framework::Runtime::getApplicationData()->findFile(diffuseEnvMap);
+		SURGSIM_ASSERT(Framework::Runtime::getApplicationData()->tryFindFile(diffuseEnvMap, &filename))
+				<< "Could not load diffuse environment map " << diffuseEnvMap;
 		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "diffuseEnvMap");
@@ -252,7 +253,8 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 
 	{
 		// The Specular environment map
-		filename = Framework::Runtime::getApplicationData()->findFile(specularEnvMap);
+		SURGSIM_ASSERT(Framework::Runtime::getApplicationData()->tryFindFile(specularEnvMap, &filename))
+				<< "Could not load specular environment map " << specularEnvMap;
 		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "specularEnvMap");
