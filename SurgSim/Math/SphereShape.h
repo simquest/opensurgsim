@@ -66,9 +66,11 @@ protected:
 	/// \param radius	The sphere radius
 	void setRadius(double radius);
 
+	void updateAabb();
 private:
 	/// Sphere radius
 	double m_radius;
+
 };
 
 }; // Math

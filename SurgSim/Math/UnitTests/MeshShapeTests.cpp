@@ -149,6 +149,7 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 
 	MeshShape emptyMeshShape;
 	EXPECT_TRUE(emptyMeshShape.isValid());
+	EXPECT_TRUE(emptyMeshShape.getAabb().isEmpty());
 }
 
 TEST_F(MeshShapeTest, ValidMeshTest)
@@ -184,6 +185,7 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 			TriangleMeshPlain::VertexType vertex(point);
 			meshShape->addVertex(vertex);
 		}
+
 
 		EXPECT_TRUE(meshShape->isValid());
 	}
@@ -287,6 +289,8 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 		EXPECT_TRUE(tree->getAabb().contains(makeAabb(
 				vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position)));
 	}
+
+	EXPECT_TRUE(meshShape->getAabb().isApprox(tree->getAabb()));
 }
 
 TEST_F(MeshShapeTest, TransformTest)

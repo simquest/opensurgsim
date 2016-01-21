@@ -21,6 +21,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Aabb.h"
+#include "SurgSim/Datastructures/OptionalValue.h"
 
 namespace SurgSim
 {
@@ -99,6 +101,12 @@ public:
 	/// Check if the shape is valid
 	/// \return True if shape is valid; Otherwise, false.
 	virtual bool isValid() const = 0;
+
+	/// \return the bounding box for the shape
+	virtual const Math::Aabbd getBoundingBox() const;
+
+protected:
+	Math::Aabbd m_aabb;
 };
 
 /// PosedShape is a transformed shape with a record of the pose used to transform it.

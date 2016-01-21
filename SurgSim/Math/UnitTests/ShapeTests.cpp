@@ -24,22 +24,16 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
 
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Matrix33d;
-
-using SurgSim::Math::BoxShape;
-using SurgSim::Math::CapsuleShape;
-using SurgSim::Math::CylinderShape;
-using SurgSim::Math::DoubleSidedPlaneShape;
-using SurgSim::Math::OctreeShape;
-using SurgSim::Math::PlaneShape;
-using SurgSim::Math::Shape;
-using SurgSim::Math::SphereShape;
 
 namespace
 {
 const double epsilon = 1e-10;
 }
+
+namespace SurgSim
+{
+namespace Math
+{
 
 class ShapeTest : public ::testing::Test
 {
@@ -144,11 +138,15 @@ TEST_F(ShapeTest, Sphere)
 	Vector3d center = sphere.getCenter();
 	Matrix33d inertia = sphere.getSecondMomentOfVolume() * m_rho;
 
+	Math::Aabbd aabb(Vector3d(-m_radius, -m_radius, -m_radius));
+	aabb.extend(Vector3d(m_radius, m_radius, m_radius));
+
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(sphere.isValid());
 	EXPECT_FALSE(sphere.isTransformable());
+	EXPECT_TRUE(aabb.isApprox(sphere.getAabb()));
 }
 
 TEST_F(ShapeTest, BoxSerializationTest)
@@ -232,10 +230,14 @@ TEST_F(ShapeTest, Box)
 	Vector3d center = box.getCenter();
 	Matrix33d inertia = box.getSecondMomentOfVolume() * m_rho;
 
+	Aabbd aabb(size / 2.0);
+	aabb.extend(-(size / 2.0));
+
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_FALSE(box.isTransformable());
+	EXPECT_TRUE(aabb.isApprox(box.getAabb()));
 }
 
 TEST_F(ShapeTest, CylinderSerializationTest)
@@ -315,12 +317,15 @@ TEST_F(ShapeTest, Cylinder)
 	double volume = cylinder.getVolume();
 	Vector3d center = cylinder.getCenter();
 	Matrix33d inertia = cylinder.getSecondMomentOfVolume() * m_rho;
+	Aabbd aabb(Vector3d(-m_radius, -m_length / 2.0, -m_radius));
+	aabb.extend(Vector3d(m_radius, m_length / 2.0, m_radius));
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(cylinder.isValid());
 	EXPECT_FALSE(cylinder.isTransformable());
+	EXPECT_TRUE(aabb.isApprox(cylinder.getAabb()));
 }
 
 TEST_F(ShapeTest, CapsuleSerializationTest)
@@ -408,11 +413,16 @@ TEST_F(ShapeTest, Capsule)
 	Vector3d center = capsule.getCenter();
 	Matrix33d inertia = capsule.getSecondMomentOfVolume() * m_rho;
 
+	Aabbd aabb(Vector3d(-m_radius, -m_length / 2.0 - m_radius, -m_radius));
+	aabb.extend(Vector3d(m_radius, m_length / 2.0 + m_radius, m_radius));
+
+
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(capsule.isValid());
 	EXPECT_FALSE(capsule.isTransformable());
+	EXPECT_TRUE(aabb.isApprox(capsule.getAabb()));
 }
 
 TEST_F(ShapeTest, DoubleSidedPlaneShapeSerializationTest)
@@ -464,6 +474,9 @@ TEST_F(ShapeTest, DoubleSidedPlaneShape)
 	EXPECT_TRUE(doubleSidedPlaneShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
 	EXPECT_TRUE(doubleSidedPlaneShape.isValid());
 	EXPECT_FALSE(doubleSidedPlaneShape.isTransformable());
+
+	// There is no sense to trying to build the Bounding box here
+	EXPECT_TRUE(doubleSidedPlaneShape.getAabb().isEmpty());
 }
 
 
@@ -527,6 +540,7 @@ TEST_F(ShapeTest, OctreeShape)
 		EXPECT_THROW(shape.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
 		EXPECT_EQ(fileName, shape.getOctree()->getFileName());
 		EXPECT_TRUE(shape.isValid());
+		EXPECT_TRUE(shape.getOctree()->getBoundingBox().isApprox(shape.getAabb()));
 	}
 
 	{
@@ -602,4 +616,9 @@ TEST_F(ShapeTest, PlaneShape)
 	EXPECT_TRUE(planeShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
 	EXPECT_TRUE(planeShape.isValid());
 	EXPECT_FALSE(planeShape.isTransformable());
+	EXPECT_TRUE(planeShape.getAabb().isEmpty());
+}
+
+
+}
 }

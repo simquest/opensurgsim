@@ -80,7 +80,26 @@ Eigen::AlignedBox<Scalar, Dim> makeAabb(
 	return result;
 }
 
+/// Rotate the extrema of the aabb, note that that will extend the size of the box
+/// \tparam Scalar numeric type
+/// \tparam Dim dimension of the space to be used
+/// \param transform The Rigidtransform to use
+/// \param aabb the aabb to transform
+/// \return the transformed aabb
+template <class Scalar, int Dim>
+Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim, Eigen::Isometry>& transform,
+		const Eigen::AlignedBox<Scalar, Dim>& aabb)
+{
+	if (aabb.isEmpty())
+	{
+		return aabb;
+	}
+
+	Eigen::AlignedBox<Scalar, Dim> result(transform * aabb.max());
+	result.extend(transform * aabb.min());
+	return result;
 }
 }
 
+}
 #endif

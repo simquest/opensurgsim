@@ -87,7 +87,7 @@ const std::shared_ptr<Math::Shape> Representation::getPosedShape()
 	if (pose.isApprox(identity))
 	{
 		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-		m_posedShapeMotion.second= newPosedShape;
+		m_posedShapeMotion.second = newPosedShape;
 	}
 	else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
 	{
@@ -240,6 +240,12 @@ void Representation::doRetire()
 	m_collisions.unsafeGet().clear();
 	m_collisions.publish();
 	Framework::Representation::doRetire();
+}
+
+Math::Aabbd Representation::getBoundingBox() const
+{
+	SURGSIM_ASSERT(getShape() != nullptr);
+	return Math::transformAabb(getPose(), getShape()->getAabb());
 }
 
 }; // namespace Collision

@@ -83,7 +83,7 @@ protected:
 	/// Set the capsule radius (i.e. cylinder/spheres radius)
 	/// \param radius	The capsule radius (in m)
 	void setRadius(double radius);
-
+	void updateAabb();
 private:
 	/// Capsule length
 	double m_length;

@@ -94,6 +94,8 @@ public:
 
 	bool isValid() const override;
 
+	const Math::Aabbd getBoundingBox() const override;
+
 private:
 
 	/// Clears the data for the volume, center and secondMoment so it can be recalculated when needed again
@@ -114,6 +116,7 @@ private:
 	mutable DataStructures::OptionalValue<Vector3d> m_center;
 	mutable DataStructures::OptionalValue<double> m_volume;
 	mutable DataStructures::OptionalValue<Matrix33d> m_secondMoment;
+	mutable DataStructures::OptionalValue<Math::Aabbd> m_localAabb;
 	///@}
 
 };

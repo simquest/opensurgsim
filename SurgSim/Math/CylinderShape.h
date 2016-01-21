@@ -77,6 +77,9 @@ protected:
 	void setRadius(double radius);
 
 private:
+
+	void updateAabb();
+
 	/// The cylinder length
 	double m_length;
 

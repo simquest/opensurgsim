@@ -19,6 +19,7 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/PrepareCollisionPairs.h"
+#include "SurgSim/Math/Aabb.h"
 
 namespace SurgSim
 {
@@ -38,6 +39,7 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
+	static size_t i = 0;
 	std::shared_ptr<PhysicsManagerState> result = state;
 	auto& representations = result->getActiveCollisionRepresentations();
 
@@ -53,9 +55,9 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 				{
 					auto pair = std::make_shared<Collision::CollisionPair>(*first, *second);
 
-					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
+					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE && pair->mayIntersect())
 					{
-						pairs.emplace_back(pair);
+						pairs.push_back(pair);
 					}
 				}
 			}
