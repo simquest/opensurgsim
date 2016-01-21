@@ -88,7 +88,7 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 			if (criteria < std::cos(M_PI / 3.0))
 			{
 				contact->active = false;
-				SURGSIM_LOG(m_logger, DEBUG) << "Contact filtered [|normal.relativeVelocity| = "<<
+				SURGSIM_LOG_DEBUG(m_logger) << "Contact filtered [|normal.relativeVelocity| = "<<
 					criteria << "] < cos(PI/3) = " << std::cos(M_PI / 3.0) << std::endl <<
 					" > normal = " << normal.transpose() << std::endl <<
 					" > relativeVelocity = " << relativeVelocity.transpose() << std::endl;
