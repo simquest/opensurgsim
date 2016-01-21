@@ -42,6 +42,17 @@ public:
 	/// Destructor
 	virtual ~ContactFiltering();
 
+	/// \param angleLimit The limit angle from which the contacts are filtered
+	/// \note Noting 'n' the contact normal and 'v' the relative velocity
+	/// \note A contact is filtered if |n.v| < cos(angleLimit)
+	void setAngleLimit(double angleLimit);
+
+	/// \return The limit angle (between the contact normal and the relative velocity) from which the contacts are filtered
+	/// \note Noting 'n' the contact normal and 'v' the relative velocity
+	/// \note A contact is filtered if |n.v| < cos(angleLimit)
+	/// \note Default is PI/2, which means no contacts are filtered
+	double getAngleLimit() const;
+
 protected:
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 	override;
@@ -49,6 +60,9 @@ protected:
 private:
 	/// The logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// Angle limit (between contact normal and relative velocity) at which contacts get filtered
+	double m_angleLimit;
 
 };
 

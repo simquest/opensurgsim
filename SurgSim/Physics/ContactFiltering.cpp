@@ -28,13 +28,23 @@ namespace SurgSim
 namespace Physics
 {
 
-ContactFiltering::ContactFiltering(bool doCopyState) : Computation(doCopyState)
+ContactFiltering::ContactFiltering(bool doCopyState) : Computation(doCopyState), m_angleLimit(M_PI_2)
 {
 	m_logger = SurgSim::Framework::Logger::getLogger("ContactFiltering");
 }
 
 ContactFiltering::~ContactFiltering()
 {
+}
+
+void ContactFiltering::setAngleLimit(double angleLimit)
+{
+	m_angleLimit = angleLimit;
+}
+
+double ContactFiltering::getAngleLimit() const
+{
+	return m_angleLimit;
 }
 
 std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
@@ -85,11 +95,11 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 
 			// Filter contacts that are too orthogonal to the motion and would produce inconsitant forces wrt motion
 			double criteria = std::abs(normal.dot(relativeVelocity));
-			if (criteria < std::cos(M_PI / 3.0))
+			if (criteria < std::cos(m_angleLimit))
 			{
 				contact->active = false;
 				SURGSIM_LOG_DEBUG(m_logger) << "Contact filtered [|normal.relativeVelocity| = "<<
-					criteria << "] < cos(PI/3) = " << std::cos(M_PI / 3.0) << std::endl <<
+					criteria << "] < cos(" << m_angleLimit << ") = " << std::cos(m_angleLimit) << std::endl <<
 					" > normal = " << normal.transpose() << std::endl <<
 					" > relativeVelocity = " << relativeVelocity.transpose() << std::endl;
 			}
