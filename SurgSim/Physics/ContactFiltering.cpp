@@ -15,9 +15,10 @@
 
 #include <vector>
 
+#include "SurgSim/Physics/ContactFiltering.h"
+
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Physics/ContactFiltering.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
 using SurgSim::Collision::CollisionPair;
