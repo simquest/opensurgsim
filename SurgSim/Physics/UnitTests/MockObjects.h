@@ -160,6 +160,21 @@ private:
 		return SurgSim::Math::interpolate(previousPoint, currentPoint, time);
 	}
 
+	SurgSim::Math::Vector3d doCalculateVelocity(double time) override
+	{
+		std::shared_ptr<DeformableRepresentation> defRepresentation =
+			std::static_pointer_cast<DeformableRepresentation>(getRepresentation());
+
+		SURGSIM_ASSERT(defRepresentation != nullptr) << "Deformable Representation is null, it was probably not" <<
+			" initialized";
+		SURGSIM_ASSERT((0.0 <= time) && (time <= 1.0)) << "Time must be between 0.0 and 1.0 inclusive";
+
+		const SurgSim::Math::Vector3d& currentVelocity = defRepresentation->getCurrentState()->getVelocity(m_nodeID);
+		const SurgSim::Math::Vector3d& previousVelocity = defRepresentation->getPreviousState()->getVelocity(m_nodeID);
+
+		return SurgSim::Math::interpolate(previousVelocity, currentVelocity, time);
+	}
+
 	size_t m_nodeID;
 };
 
@@ -389,6 +404,8 @@ private:
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
 	SurgSim::Math::Vector3d doCalculatePosition(double time) override;
+
+	SurgSim::Math::Vector3d doCalculateVelocity(double time) override;
 };
 
 class MockConstraintImplementation : public ConstraintImplementation

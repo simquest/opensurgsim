@@ -562,6 +562,10 @@ Vector3d MockLocalization::doCalculatePosition(double time)
 	return SurgSim::Math::Vector3d::Zero();
 }
 
+Vector3d MockLocalization::doCalculateVelocity(double time)
+{
+	return SurgSim::Math::Vector3d::Zero();
+}
 
 SurgSim::Physics::ConstraintType MockConstraintImplementation::getConstraintType() const
 {
