@@ -27,7 +27,7 @@
 uniform sampler2D depthMap;
 
 /// Changes Intensity of the shadow default is all black 
-uniform float oneMinusIntensity = 0.0;
+uniform float intensity = 1.0;
 
 uniform float bias = 0.0005;
 
@@ -41,5 +41,5 @@ void main(void)
 
 	float depth = texture2D(depthMap, lightCoord3.xy).x;
 
-	gl_FragColor = vec4(depth + bias > lightCoord3.z || lightCoord3.z > 1.0 ? 0.0 : 1.0 * oneMinusIntensity);
+	gl_FragColor = vec4(depth + bias > lightCoord3.z || lightCoord3.z > 1.0 ? 0.0 : intensity);
 }
