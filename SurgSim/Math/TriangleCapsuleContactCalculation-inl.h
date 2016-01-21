@@ -286,7 +286,7 @@ private:
 			Vector3 result;
 			if (std::abs(distancePointSegment(deepestPoint, m_cvTop, m_cvBottom, &result) - m_cr) > m_epsilon)
 			{
-				// The deepest point in not on the capsule, which means that the capsule end (the sphere) is
+				// The deepest point is not on the capsule, which means that the capsule end (the sphere) is
 				// intersecting the triangle edge plane (planeN[j], planeD[j]). The intersection between them is a
 				// circle. Define a 2D co-ordinate system with the origin at edgeVertices[0], the x-axis as
 				// triangleEdge, and the y-axis as tn. Transforming the circle to this 2D co-ordinate system, creates a
@@ -294,6 +294,9 @@ private:
 				Vector3 origin = edgeVertices[0], xAxis = triangleEdge, yAxis = m_tn, zAxis = planeN[j];
 				
 				double sphereCenterToXYPlane = (m_cvBottom - origin).dot(zAxis);
+				SURGSIM_ASSERT(m_cr + m_epsilon >= sphereCenterToXYPlane)
+					<< "The sphere center is too far from the triangle edge plane.";
+
 				double circleRadius = std::sqrt(m_cr * m_cr - sphereCenterToXYPlane * sphereCenterToXYPlane);
 				SURGSIM_ASSERT(isValid(circleRadius))
 					<< "The radius of the circle of intersection between the sphere and the plane is invalid.";
@@ -393,27 +396,34 @@ private:
 	/// \param point [in,out] The point which is to be clipped.
 	/// \param pointOnCapsuleAxis [out] The recalculated point on the capsule axis.
 	/// \return The distance of the point of intersection from the lineStart.
+	/// \note Asserts when there is no intersection.
 	double farthestIntersectionLineCapsule(const Vector3& lineStart, const Vector& lineDir,
 		Vector3* point, Vector3* pointOnCapsuleAxis)
 	{
-		// Transform the problem in the capsule space to solve the local capsule equation:
-		// case 1: x^2 + y^2 + z^2 = r^2				| x < 0
-		// case 2: y^2 + z^2 = r^2						| 0 < x < length
-		// case 3: (x - length)^2 + y^2 + z^2 = r^2		| x > length
+		// Transform the problem into the capsule space to solve the local capsule equation. The capsule coordinate
+		// system has its origin on one the capsule ends (m_cvTop), the x axis is along the capsule axis (m_cAxis), and
+		// the y and z axes are any orthogonal vectors to the capsule axis. The equation of the capsule can be written
+		// as the following:
+		// x^2 + y^2 + z^2 = r^2				| x < 0				------ [1]
+		// y^2 + z^2 = r^2						| 0 < x < length	------ [2]
+		// (x - length)^2 + y^2 + z^2 = r^2		| x > length		------ [3]
 		// Point should be on the line, P + t.(D)
 
-		// case 2:
+		// First find the intersection with an infinite cylinder centered around the capsule axis.
 		double d = farthestIntersectionLineCylinder(lineStart, lineDir, point);
 		SURGSIM_ASSERT(isValid(d));
 		*point = lineStart + lineDir * d;
 
-		// case 1 and 3:
-		// => ((P + t.D).x - l)^2 + (P + t.D).y^2 + (P + tD).z^2 = r^2
+		// When x <0 or x > length, the equation of the capsule is that of the sphere (from equations [1] and [3]). So,
+		// the intersection between the line (P + t.D) and the sphere is calculated as below. Here l is the length of
+		// the capsule.
+		// => ((P + t.D).x - l)^2 + (P + t.D).y^2 + (P + t.D).z^2 = r^2
 		// => Px^2 + t^2.Dx^2 + l^2 + 2.Px.t.Dx - 2.t.Dx.l - 2.Px.l +
 		//    Py^2 + t^2.Dy^2 + 2.Py.t.Dy + Pz^2 + t^2.Dz^2 + 2.Pz.t.Dz = r^2
 		// => t^2.(Dx^2 + Dy^2 + Dz^2) + t.(2.Px.Dx + 2.Py.Dy + 2.Pz.Dz - 2.Dx.l) +
 		//    (Px^2 + Py^2 + Pz^2 + l^2 - 2.Px.l - r^2) = 0
-		// Let a = (Dx^2 + Dy^2 + Dz^2), b = (2.Px.Dx + 2.Py.Dy + 2.Pz.Dz - 2.Dx.l),
+		// Let a = (Dx^2 + Dy^2 + Dz^2),
+		//     b = (2.Px.Dx + 2.Py.Dy + 2.Pz.Dz - 2.Dx.l),
 		//     c = (Px^2 + Py^2 + Pz^2 + l^2 - 2.Px.l - r^2):
 		double x = ((*point) - m_cvTop).dot(m_cAxis);
 		if (x <= 0.0 || x >= m_cLength)
@@ -437,7 +447,7 @@ private:
 			}
 
 			// We have two solutions. We want the smaller value.
-			d = (-b / (static_cast<T>(2) * a)) - std::abs(std::sqrt(bb4ac) / (static_cast<T>(2) * a));
+			d = (-b - std::abs(std::sqrt(bb4ac))) / (static_cast<T>(2) * a);
 			SURGSIM_ASSERT(isValid(d));
 			*point = lineStart + lineDir * d;
 		}
