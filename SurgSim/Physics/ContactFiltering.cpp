@@ -68,9 +68,10 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 			// By the contact definition, normal is pointing "in" to body1.
 			// Moving body1 by normal * depth would solve the contact with body2.
 			Math::Vector3d normal = contact->normal;
-			auto loc1 = physicsRepresentations.first->createLocalization(contact->penetrationPoints.first);
-			auto loc2 = physicsRepresentations.second->createLocalization(contact->penetrationPoints.second);
-			Math::Vector3d velocity1 = loc1->calculateVelocity(), velocity2 = loc2->calculateVelocity();
+			auto localization1 = physicsRepresentations.first->createLocalization(contact->penetrationPoints.first);
+			auto localization2 = physicsRepresentations.second->createLocalization(contact->penetrationPoints.second);
+			Math::Vector3d velocity1 = localization1->calculateVelocity();
+			Math::Vector3d velocity2 = localization2->calculateVelocity();
 			Math::Vector3d relativeVelocity = (velocity2 - velocity1);
 
 			// If the relative velocity is small, it means that the motion is not strong enough to drive the
