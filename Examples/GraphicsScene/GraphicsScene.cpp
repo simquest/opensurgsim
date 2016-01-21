@@ -324,6 +324,8 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime, bool useS
 						4096,
 						1024,
 						lightProjection,
+						0.0005,
+						0.8,
 						true,
 						8.0,
 						false);
