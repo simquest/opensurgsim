@@ -73,13 +73,14 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 			continue;
 		}
 
-		for (auto& contact : pair->getContacts())
+		auto& contacts = pair->getContacts();
+		for (auto& contactIterator = contacts.begin(); contactIterator != contacts.end();)
 		{
 			// By the contact definition, normal is pointing "in" to body1.
 			// Moving body1 by normal * depth would solve the contact with body2.
-			Math::Vector3d normal = contact->normal;
-			auto localization1 = physicsRepresentations.first->createLocalization(contact->penetrationPoints.first);
-			auto localization2 = physicsRepresentations.second->createLocalization(contact->penetrationPoints.second);
+			Math::Vector3d normal = (*contactIterator)->normal;
+			auto localization1 = physicsRepresentations.first->createLocalization((*contactIterator)->penetrationPoints.first);
+			auto localization2 = physicsRepresentations.second->createLocalization((*contactIterator)->penetrationPoints.second);
 			Math::Vector3d velocity1 = localization1->calculateVelocity();
 			Math::Vector3d velocity2 = localization2->calculateVelocity();
 			Math::Vector3d relativeVelocity = (velocity2 - velocity1);
@@ -89,6 +90,7 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 			double relativeVelocityNorm = relativeVelocity.norm();
 			if (relativeVelocityNorm < 1e-4)
 			{
+				contactIterator++;
 				continue;
 			}
 			relativeVelocity /= relativeVelocityNorm;
@@ -97,11 +99,15 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 			double criteria = std::abs(normal.dot(relativeVelocity));
 			if (criteria < std::cos(m_angleLimit))
 			{
-				contact->active = false;
+				contactIterator = contacts.erase(contactIterator);
 				SURGSIM_LOG_DEBUG(m_logger) << "Contact filtered [|normal.relativeVelocity| = "<<
 					criteria << "] < cos(" << m_angleLimit << ") = " << std::cos(m_angleLimit) << std::endl <<
 					" > normal = " << normal.transpose() << std::endl <<
 					" > relativeVelocity = " << relativeVelocity.transpose() << std::endl;
+			}
+			else
+			{
+				contactIterator++;
 			}
 		}
 	}
