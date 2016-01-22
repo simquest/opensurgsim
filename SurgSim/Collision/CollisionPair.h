@@ -43,7 +43,7 @@ struct Contact
 			const SurgSim::Math::Vector3d& newNormal,
 			const std::pair<SurgSim::DataStructures::Location,
 			SurgSim::DataStructures::Location>& newPenetrationPoints) :
-		active(true), type(newType), depth(newDepth), time(newTime), contact(newContact),
+		type(newType), depth(newDepth), time(newTime), contact(newContact),
 		normal(newNormal), penetrationPoints(newPenetrationPoints), force(SurgSim::Math::Vector3d::Zero())
 	{
 	}
@@ -52,10 +52,8 @@ struct Contact
 		auto complimentary = std::make_shared<Contact>(type, depth, time, contact,
 							 -normal, std::make_pair(penetrationPoints.second, penetrationPoints.first));
 		complimentary->force = -force;
-		complimentary->active = active;
 		return complimentary;
 	}
-	bool active;										///< Flag specifying if this contact is active or not (filtered)
 	CollisionDetectionType type;						///< What collision algorithm class was used to get the contact
 	double depth;										///< What is the penetration depth for the representation
 	double time;										///< What is the time of the collision, CCD only
