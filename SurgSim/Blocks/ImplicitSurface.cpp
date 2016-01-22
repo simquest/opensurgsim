@@ -15,7 +15,10 @@
 
 #include "ImplicitSurface.h"
 
+#include "SurgSim/Blocks/GraphicsUtilities.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/TransferPropertiesBehavior.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgLight.h"
@@ -199,6 +202,10 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	std::shared_ptr<Graphics::Texture> normalMap,
 	const Math::Vector4f& diffuseColor,
 	const Math::Vector4f& specularColor,
+	const std::string diffuseEnvMap,
+	float diffusePct,
+	const std::string specularEnvMap,
+	float specularPct,
 	float shininess)
 {
 	std::array<int, 2> dimensions = view->getDimensions();
@@ -229,6 +236,32 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	material->setValue("specularColor", specularColor);
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", shininess);
+	Blocks::enable2DTexture(material, "shadowMap", Graphics::SHADOW_TEXTURE_UNIT, "Textures/black.png");
+
+	std::string filename;
+	{
+		// The Diffuse environment map
+		SURGSIM_ASSERT(Framework::Runtime::getApplicationData()->tryFindFile(diffuseEnvMap, &filename))
+				<< "Could not load diffuse environment map " << diffuseEnvMap;
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
+		texture->loadImage(filename);
+		material->addUniform("samplerCube", "diffuseEnvMap");
+		material->setValue("diffuseEnvMap", texture);
+		material->addUniform("float", "diffusePercent");
+		material->setValue("diffusePercent", diffusePct);
+	}
+
+	{
+		// The Specular environment map
+		SURGSIM_ASSERT(Framework::Runtime::getApplicationData()->tryFindFile(specularEnvMap, &filename))
+				<< "Could not load specular environment map " << specularEnvMap;
+		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
+		texture->loadImage(filename);
+		material->addUniform("samplerCube", "specularEnvMap");
+		material->setValue("specularEnvMap", texture);
+		material->addUniform("float", "specularPercent");
+		material->setValue("specularPercent", specularPct);
+	}
 
 	renderPass->setMaterial(material);
 
@@ -250,6 +283,10 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 			int textureSize,
 			const Math::Vector4f& diffuseColor,
 			const Math::Vector4f& specularColor,
+			const std::string diffuseEnvMap,
+			float diffusePct,
+			const std::string specularEnvMap,
+			float specularPct,
 			float shininess,
 			bool showDebug)
 {
@@ -275,7 +312,8 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 	auto shadingPass = createShadingPass(copier, graphicsView, osgCamera, osgLight,
 									blurPass->getRenderTarget()->getDepthTarget(),
 									normalPass->getRenderTarget()->getColorTarget(0),
-									diffuseColor, specularColor, shininess);
+									diffuseColor, specularColor,
+									diffuseEnvMap, diffusePct, specularEnvMap, specularPct, shininess);
 
 	depthPass->addComponent(copier);
 

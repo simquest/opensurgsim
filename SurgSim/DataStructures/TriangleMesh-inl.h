@@ -179,7 +179,8 @@ const typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType&
 TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangle(size_t id) const
 {
 	auto const& triangle = m_triangles[id];
-	SURGSIM_ASSERT(triangle.isValid) << "Attempted to access invalid or deleted triangle.";
+	SURGSIM_ASSERT(triangle.isValid)
+			<< "Attempted to access invalid or deleted triangle " << id << " have " << getNumTriangles();
 	return triangle;
 }
 
