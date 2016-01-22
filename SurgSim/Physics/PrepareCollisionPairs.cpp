@@ -17,6 +17,7 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/PrepareCollisionPairs.h"
 
@@ -27,7 +28,8 @@ namespace Physics
 
 PrepareCollisionPairs::PrepareCollisionPairs(bool doCopyState) :
 	Computation(doCopyState),
-	m_timeSinceLog(0.0)
+	m_timeSinceLog(0.0),
+	m_logger(Framework::Logger::getLogger("Physics/PrepareCollisionPairs"))
 {
 }
 
@@ -64,8 +66,7 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 
 		result->setCollisionPairs(pairs);
 
-		auto logger = Framework::Logger::getLogger("Physics/PrepareCollisionPairs");
-		if (logger->getThreshold() <= SURGSIM_LOG_LEVEL(DEBUG))
+		if (m_logger->getThreshold() <= SURGSIM_LOG_LEVEL(DEBUG))
 		{
 			m_timeSinceLog += dt;
 			if (m_timeSinceLog > 5.0)
@@ -73,7 +74,7 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 				m_timeSinceLog = 0.0;
 				typedef std::pair<std::string, std::string> PairType;
 				std::vector<PairType> names;
-				for (auto& pair : pairs)
+				for (const auto& pair : pairs)
 				{
 					std::string first = pair->getFirst()->getFullName();
 					std::string second = pair->getSecond()->getFullName();
@@ -86,16 +87,16 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 						names.emplace_back(second, first);
 					}
 				}
-				std::sort(names.begin(), names.end(), [](PairType i, PairType j)
+				std::sort(names.begin(), names.end(), [](const PairType& i, const PairType& j)
 					{
 						return (i.first < j.first) || ((i.first == j.first) && (i.second < j.second));
 					});
 				std::string message = "All collision pairs for testing:\n";
-				for (auto& name : names)
+				for (const auto& name : names)
 				{
 					message += "\t" + name.first + " : " + name.second + "\n";
 				}
-				SURGSIM_LOG_DEBUG(logger) << message;
+				SURGSIM_LOG_DEBUG(m_logger) << message;
 			}
 		}
 	}

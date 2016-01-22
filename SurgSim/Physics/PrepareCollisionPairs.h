@@ -29,6 +29,11 @@ namespace Collision
 class ContactCalculation;
 }
 
+namespace Framework
+{
+class Logger;
+}
+
 namespace Physics
 {
 class PhysicsManagerState;
@@ -60,6 +65,9 @@ protected:
 private:
 	/// The time since the collision pairs were last logged.
 	double m_timeSinceLog;
+
+	/// The logger.
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 }; // Physics
