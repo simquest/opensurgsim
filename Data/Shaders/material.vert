@@ -26,12 +26,12 @@ uniform mat4 viewMatrix;
 uniform vec4 ambientColor;
 
 struct LightSource {
-	vec4 diffuse; 
-	vec4 specular; 
-	vec4 position; 
-	float constantAttenuation; 
-	float linearAttenuation; 
-	float quadraticAttenuation;	
+	vec4 diffuse;
+	vec4 specular;
+	vec4 position;
+	float constantAttenuation;
+	float linearAttenuation;
+	float quadraticAttenuation;
 };
 
 uniform LightSource lightSource;
@@ -53,25 +53,25 @@ void main(void)
 {
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 	clipCoord = gl_Position;
-	
+
 	vec4 eyeDir4 = gl_ModelViewMatrix * gl_Vertex;
-	eyeDir = eyeDir4.xyz;	
-    
+	eyeDir = eyeDir4.xyz;
+
 	texCoord0 = gl_MultiTexCoord0.xy;
-	
+
 	lightDir = ( viewMatrix * lightSource.position  - eyeDir4).xyz;
     float lightDistance = length(lightDir);
 	lightDir = normalize(lightDir);
-	
+
     float eyeDistance = length(eyeDir);
 	eyeDir = normalize(eyeDir);
-    
+
     normalDir = normalize(gl_NormalMatrix * gl_Normal);
-    
+
     float attenuation = 1.0 / (lightSource.constantAttenuation + lightSource.linearAttenuation*lightDistance + lightSource.quadraticAttenuation*lightDistance*lightDistance);
-		
-    vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).xyz;	
+
+    vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).xyz;
 	vertexSpecularColor = (attenuation * specularColor * lightSource.specular).xyz;
 
-	vertexAmbientColor = ambientColor.xyz * diffuseColor;
-} 
+	vertexAmbientColor = ambientColor.xyz * diffuseColor.xyz;
+}
