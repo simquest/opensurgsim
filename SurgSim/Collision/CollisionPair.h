@@ -146,9 +146,9 @@ public:
 	/// \return	true if swapped, false if not.
 	bool isSwapped() const;
 
-	/// \return whether the two represenation might have an intersection
+	/// \return whether the two represenations might have an intersection
 	/// \note The bounding boxes are taken, if the bounding box is empty it is always considered for collision
-	bool mayCollide() const;
+	bool mayIntersect() const;
 
 private:
 	/// Pair of objects that are colliding

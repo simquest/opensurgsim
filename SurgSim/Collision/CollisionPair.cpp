@@ -153,7 +153,7 @@ bool CollisionPair::isSwapped() const
 	return m_isSwapped;
 }
 
-bool CollisionPair::mayCollide() const
+bool CollisionPair::mayIntersect() const
 {
 	const auto& one = m_representations.first->getBoundingBox();
 	const auto& two = m_representations.second->getBoundingBox();

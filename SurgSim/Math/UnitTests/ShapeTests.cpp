@@ -146,7 +146,7 @@ TEST_F(ShapeTest, Sphere)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(sphere.isValid());
 	EXPECT_FALSE(sphere.isTransformable());
-	EXPECT_TRUE(aabb.isApprox(sphere.getAabb()));
+	EXPECT_TRUE(aabb.isApprox(sphere.getBoundingBox()));
 }
 
 TEST_F(ShapeTest, BoxSerializationTest)
@@ -237,7 +237,7 @@ TEST_F(ShapeTest, Box)
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_FALSE(box.isTransformable());
-	EXPECT_TRUE(aabb.isApprox(box.getAabb()));
+	EXPECT_TRUE(aabb.isApprox(box.getBoundingBox()));
 }
 
 TEST_F(ShapeTest, CylinderSerializationTest)
@@ -325,7 +325,7 @@ TEST_F(ShapeTest, Cylinder)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(cylinder.isValid());
 	EXPECT_FALSE(cylinder.isTransformable());
-	EXPECT_TRUE(aabb.isApprox(cylinder.getAabb()));
+	EXPECT_TRUE(aabb.isApprox(cylinder.getBoundingBox()));
 }
 
 TEST_F(ShapeTest, CapsuleSerializationTest)
@@ -422,7 +422,7 @@ TEST_F(ShapeTest, Capsule)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(capsule.isValid());
 	EXPECT_FALSE(capsule.isTransformable());
-	EXPECT_TRUE(aabb.isApprox(capsule.getAabb()));
+	EXPECT_TRUE(aabb.isApprox(capsule.getBoundingBox()));
 }
 
 TEST_F(ShapeTest, DoubleSidedPlaneShapeSerializationTest)
@@ -476,7 +476,7 @@ TEST_F(ShapeTest, DoubleSidedPlaneShape)
 	EXPECT_FALSE(doubleSidedPlaneShape.isTransformable());
 
 	// There is no sense to trying to build the Bounding box here
-	EXPECT_TRUE(doubleSidedPlaneShape.getAabb().isEmpty());
+	EXPECT_TRUE(doubleSidedPlaneShape.getBoundingBox().isEmpty());
 }
 
 
@@ -540,7 +540,7 @@ TEST_F(ShapeTest, OctreeShape)
 		EXPECT_THROW(shape.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
 		EXPECT_EQ(fileName, shape.getOctree()->getFileName());
 		EXPECT_TRUE(shape.isValid());
-		EXPECT_TRUE(shape.getOctree()->getBoundingBox().isApprox(shape.getAabb()));
+		EXPECT_TRUE(shape.getOctree()->getBoundingBox().isApprox(shape.getBoundingBox()));
 	}
 
 	{
@@ -616,7 +616,7 @@ TEST_F(ShapeTest, PlaneShape)
 	EXPECT_TRUE(planeShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
 	EXPECT_TRUE(planeShape.isValid());
 	EXPECT_FALSE(planeShape.isTransformable());
-	EXPECT_TRUE(planeShape.getAabb().isEmpty());
+	EXPECT_TRUE(planeShape.getBoundingBox().isEmpty());
 }
 
 

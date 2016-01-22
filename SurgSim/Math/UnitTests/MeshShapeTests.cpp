@@ -149,7 +149,7 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 
 	MeshShape emptyMeshShape;
 	EXPECT_TRUE(emptyMeshShape.isValid());
-	EXPECT_TRUE(emptyMeshShape.getAabb().isEmpty());
+	EXPECT_TRUE(emptyMeshShape.getBoundingBox().isEmpty());
 }
 
 TEST_F(MeshShapeTest, ValidMeshTest)
@@ -290,7 +290,7 @@ TEST_F(MeshShapeTest, CreateAabbTreeTest)
 				vertices[ids[0]].position, vertices[ids[1]].position, vertices[ids[2]].position)));
 	}
 
-	EXPECT_TRUE(meshShape->getAabb().isApprox(tree->getAabb()));
+	EXPECT_TRUE(meshShape->getBoundingBox().isApprox(tree->getAabb()));
 }
 
 TEST_F(MeshShapeTest, TransformTest)

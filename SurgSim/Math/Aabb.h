@@ -90,13 +90,23 @@ template <class Scalar, int Dim>
 Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim, Eigen::Isometry>& transform,
 		const Eigen::AlignedBox<Scalar, Dim>& aabb)
 {
+	static std::array<Eigen::AlignedBox<Scalar, Dim>::CornerType, 8> corners =
+	{
+		Eigen::AlignedBox<Scalar, Dim>::BottomLeftFloor, Eigen::AlignedBox<Scalar, Dim>::BottomRightFloor,
+		Eigen::AlignedBox<Scalar, Dim>::TopLeftFloor, Eigen::AlignedBox<Scalar, Dim>::TopRightFloor,
+		Eigen::AlignedBox<Scalar, Dim>::BottomLeftCeil, Eigen::AlignedBox<Scalar, Dim>::BottomRightCeil,
+		Eigen::AlignedBox<Scalar, Dim>::TopLeftCeil, Eigen::AlignedBox<Scalar, Dim>::TopRightCeil,
+	};
 	if (aabb.isEmpty())
 	{
 		return aabb;
 	}
 
-	Eigen::AlignedBox<Scalar, Dim> result(transform * aabb.max());
-	result.extend(transform * aabb.min());
+	Eigen::AlignedBox<Scalar, Dim> result;
+	std::for_each(corners.cbegin(), corners.cend(), [&result, &aabb](Eigen::AlignedBox<Scalar, Dim>::CornerType c)
+	{
+		result.extend(aabb.corner(c));
+	});
 	return result;
 }
 }
