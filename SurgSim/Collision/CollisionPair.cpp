@@ -131,7 +131,7 @@ void CollisionPair::updateRepresentations()
 	}
 }
 
-const std::list<std::shared_ptr<Contact>>& CollisionPair::getContacts() const
+std::list<std::shared_ptr<Contact>>& CollisionPair::getContacts()
 {
 	return m_contacts;
 }
