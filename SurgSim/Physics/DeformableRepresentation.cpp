@@ -249,8 +249,8 @@ void DeformableRepresentation::afterUpdate(double dt)
 
 void DeformableRepresentation::setCorrectionLimit(double limit)
 {
-	SURGSIM_ASSERT(!isInitialized()) <<
-		"Cannot set the correction limit of a DeformableRepresentation named " << getFullName() << " after it has been initialized";
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot set the correction limit of a DeformableRepresentation named " <<
+		getFullName() << " after it has been initialized";
 	m_correctionLimit = limit;
 }
 
