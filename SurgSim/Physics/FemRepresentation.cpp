@@ -128,9 +128,8 @@ bool FemRepresentation::doInitialize()
 		m_complianceWarpingTransformation.reserve(
 			Eigen::Matrix<Index, Eigen::Dynamic, 1>::Constant(numDof, numDofPerNode));
 
-		auto logger = SurgSim::Framework::Logger::getLogger("Physics/FemRepresentation");
-		SURGSIM_LOG_IF(numDofPerNode % 3 != 0, logger, SEVERE) << "Using compliance warping with representation " <<
-						getName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
+		SURGSIM_LOG_IF(numDofPerNode % 3 != 0, m_logger, SEVERE) << "Using compliance warping with representation " <<
+						getFullName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
 
 		// Use a mask of 1 to setup the sparse matrix pattern
 		for (Index nodeId = 0; nodeId < static_cast<Index>(m_initialState->getNumNodes()); ++nodeId)
@@ -250,8 +249,7 @@ void FemRepresentation::update(double dt)
 
 	if (!m_currentState->isValid())
 	{
-		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-				<< getName() << " deactivated :" << std::endl
+		SURGSIM_LOG(m_logger, DEBUG) << getFullName() << " deactivated :" << std::endl
 				<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
 				<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
 

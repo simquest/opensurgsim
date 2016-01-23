@@ -197,8 +197,7 @@ void RigidRepresentation::beforeUpdate(double dt)
 {
 	RigidRepresentationBase::beforeUpdate(dt);
 
-	SURGSIM_LOG_IF(!m_parametersValid,
-				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getFullName() <<
+	SURGSIM_LOG_IF(!m_parametersValid, m_logger, WARNING) << getFullName() <<
 						   " deactivated in beforeUpdate because parameters are not valid." << std::endl;
 	if (!m_parametersValid)
 	{
@@ -213,8 +212,7 @@ void RigidRepresentation::update(double dt)
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
-	SURGSIM_LOG_IF(!m_parametersValid,
-				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+	SURGSIM_LOG_IF(!m_parametersValid, m_logger, WARNING) << getName() <<
 						   " deactivated in update because parameters are not valid." << std::endl;
 	if (!m_parametersValid)
 	{
@@ -294,7 +292,7 @@ void RigidRepresentation::update(double dt)
 	condition &= qNorm != 0.0;
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
-	SURGSIM_LOG_IF(!condition, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+	SURGSIM_LOG_IF(!condition, m_logger, WARNING) << getName() <<
 			" deactivated and reset because:" << std::endl <<
 			"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
 			"dG=(" << dG[0] << "," << dG[1] << "," << dG[2] << "), " <<
@@ -317,8 +315,7 @@ void RigidRepresentation::afterUpdate(double dt)
 
 	RigidRepresentationBase::afterUpdate(dt);
 
-	SURGSIM_LOG_IF(!m_parametersValid,
-				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+	SURGSIM_LOG_IF(!m_parametersValid, m_logger, WARNING) << getName() <<
 						   " deactivated in afterUpdate because parameters are not valid." << std::endl;
 	if (!m_parametersValid)
 	{
@@ -342,8 +339,7 @@ void RigidRepresentation::applyCorrection(double dt,
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
-	SURGSIM_LOG_IF(!m_parametersValid,
-				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+	SURGSIM_LOG_IF(!m_parametersValid, m_logger, WARNING) << getName() <<
 						   " deactivated in applyCorrection because parameters are not valid." << std::endl;
 	if (!m_parametersValid)
 	{
@@ -386,7 +382,7 @@ void RigidRepresentation::applyCorrection(double dt,
 	bool condition = SurgSim::Math::isValid(G);
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
-	SURGSIM_LOG_IF(!condition, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+	SURGSIM_LOG_IF(!condition, m_logger, WARNING) << getName() <<
 			" deactivated and reset in applyCorrection because:" << std::endl <<
 			"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
 			"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
@@ -408,8 +404,7 @@ SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 
 void RigidRepresentation::computeComplianceMatrix(double dt)
 {
-	SURGSIM_LOG_IF(!m_parametersValid,
-				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+	SURGSIM_LOG_IF(!m_parametersValid, m_logger, WARNING) << getName() <<
 						   " deactivated in computComplianceMatrix because parameters are not valid." <<
 						   std::endl;
 	if (!m_parametersValid)

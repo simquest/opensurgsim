@@ -216,8 +216,7 @@ void DeformableRepresentation::update(double dt)
 
 	if (!m_currentState->isValid())
 	{
-		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-				<< getName() << " deactivated :" << std::endl
+		SURGSIM_LOG(m_logger, DEBUG) << getFullName() << " deactivated :" << std::endl
 				<< "position=(" << m_currentState->getPositions().transpose() << ")" << std::endl
 				<< "velocity=(" << m_currentState->getVelocities().transpose() << ")" << std::endl;
 
@@ -275,13 +274,13 @@ void DeformableRepresentation::applyCorrection(double dt,
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_logger) << getFullName() << " ignoring too-big correction. " << deltaVelocity.cwiseAbs().maxCoeff() << " > " << m_correctionLimit;
+		SURGSIM_LOG_WARNING(m_logger) << getFullName() << " ignoring too-big correction. " <<
+			deltaVelocity.cwiseAbs().maxCoeff() << " > " << m_correctionLimit;
 	}
 
 	if (!m_currentState->isValid())
 	{
-		SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-				<< getName() << " deactivated :" << std::endl
+		SURGSIM_LOG(m_logger, DEBUG) << getFullName() << " deactivated :" << std::endl
 				<< "position=(" << m_currentState->getPositions() << ")" << std::endl
 				<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
@@ -291,8 +290,7 @@ void DeformableRepresentation::applyCorrection(double dt,
 
 void DeformableRepresentation::deactivateAndReset()
 {
-	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
-			<< getName() << " deactivated and reset:" << std::endl
+	SURGSIM_LOG(m_logger, DEBUG) << getName() << " deactivated and reset:" << std::endl
 			<< "position=(" << m_currentState->getPositions() << ")" << std::endl
 			<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl;
 
@@ -379,7 +377,7 @@ bool DeformableRepresentation::doInitialize()
 		m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearRungeKutta4>(this);
 		break;
 	default:
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+		SURGSIM_LOG_WARNING(m_logger)
 			<< "Ode solver (integration scheme) not initialized, the integration scheme is invalid";
 		return false;
 	}
@@ -394,8 +392,7 @@ bool DeformableRepresentation::doInitialize()
 		m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSparseSolveAndInverseCG>());
 		break;
 	default:
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "Linear solver not initialized, the linear solver is invalid";
+		SURGSIM_LOG_WARNING(m_logger) << "Linear solver not initialized, the linear solver is invalid";
 		return false;
 	}
 
@@ -408,8 +405,7 @@ bool DeformableRepresentation::doWakeUp()
 	if (sceneElement != nullptr)
 	{
 		bool isIdentity = sceneElement->getPose().isApprox(SurgSim::Math::RigidTransform3d::Identity());
-		auto logger = SurgSim::Framework::Logger::getLogger("Physics");
-		SURGSIM_LOG_IF(!isIdentity, logger, WARNING) <<
+		SURGSIM_LOG_IF(!isIdentity, m_logger, WARNING) <<
 			"SceneElement '" << sceneElement->getName() << "' pose has been changed in between initialize() " <<
 			"and wakeUp() which can produce unrealistic behavior for the DeformableRepresentation '" <<
 			getName() << "'";

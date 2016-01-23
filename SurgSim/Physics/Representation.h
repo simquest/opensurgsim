@@ -146,7 +146,7 @@ protected:
 	void driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Logger for this class.
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+	std::shared_ptr<Framework::Logger> m_logger;
 
 private:
 	/// NO copy constructor
