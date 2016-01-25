@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ template <class Scalar, int Dim>
 Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim, Eigen::Isometry>& transform,
 		const Eigen::AlignedBox<Scalar, Dim>& aabb)
 {
-	static std::array<Eigen::AlignedBox<Scalar, Dim>::CornerType, 8> corners =
+	static std::array<typename Eigen::AlignedBox<Scalar, Dim>::CornerType, 8> corners =
 	{
 		Eigen::AlignedBox<Scalar, Dim>::BottomLeftFloor, Eigen::AlignedBox<Scalar, Dim>::BottomRightFloor,
 		Eigen::AlignedBox<Scalar, Dim>::TopLeftFloor, Eigen::AlignedBox<Scalar, Dim>::TopRightFloor,
@@ -103,10 +103,11 @@ Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim,
 	}
 
 	Eigen::AlignedBox<Scalar, Dim> result;
-	std::for_each(corners.cbegin(), corners.cend(), [&result, &aabb](Eigen::AlignedBox<Scalar, Dim>::CornerType c)
-	{
-		result.extend(aabb.corner(c));
-	});
+	std::for_each(corners.cbegin(), corners.cend(),
+			[&result, &aabb](typename Eigen::AlignedBox<Scalar, Dim>::CornerType c)
+			{
+				result.extend(aabb.corner(c));
+			});
 	return result;
 }
 }

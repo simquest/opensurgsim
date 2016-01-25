@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Rigidtransform.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
