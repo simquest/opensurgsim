@@ -27,6 +27,7 @@ namespace Collision
 
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
+	m_logger(Framework::Logger::getLogger("Collision/Representation")),
 	m_collisionDetectionType(COLLISION_DETECTION_TYPE_DISCRETE),
 	m_selfCollisionDetectionType(COLLISION_DETECTION_TYPE_NONE)
 {
@@ -150,42 +151,59 @@ void Representation::update(const double& dt)
 
 bool Representation::ignore(const std::string& fullName)
 {
-	if (!m_allowing.empty())
-	{
-		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger())
-			<< "Collision Representation named " << getName() << " can not ignore " << fullName
-			<< ". You can only set what representations to ignore or allow, not both.";
-		return false;
-	}
-	else
+	if (m_allowing.empty())
 	{
 		return m_ignoring.insert(fullName).second;
 	}
+	SURGSIM_LOG_SEVERE(m_logger) << getFullName() << " cannot ignore " << fullName
+		<< ". You can only set what representations to ignore or allow, not both.";
+	return false;
 }
 
 bool Representation::ignore(const std::shared_ptr<Representation>& representation)
 {
-	std::string fullName = representation->getFullName();
-	SURGSIM_LOG_IF(representation->getSceneElement() == nullptr, Framework::Logger::getDefaultLogger(), WARNING)
-		<< "Ignoring " << fullName << " may not work. It is not in a scene element yet, so its full name is unknown.";
-	return ignore(fullName);
+	if (representation->getSceneElement() == nullptr)
+	{
+		SURGSIM_LOG_WARNING(m_logger) << getFullName() << " cannot ignore " << representation->getName() <<
+			", which is not in a scene element.";
+		return false;
+	}
+	return ignore(representation->getFullName());
+}
+
+bool Representation::allow(const std::string& fullName)
+{
+	if (m_ignoring.empty())
+	{
+		return m_allowing.insert(fullName).second;
+	}
+	SURGSIM_LOG_SEVERE(m_logger) << getFullName() << " cannot allow " << fullName
+		<< ". You can only set what representations to ignore or allow, not both.";
+	return false;
+}
+
+bool Representation::allow(const std::shared_ptr<Representation>& representation)
+{
+	if (representation->getSceneElement() == nullptr)
+	{
+		SURGSIM_LOG_WARNING(m_logger) << getFullName() << " cannot allow " << representation->getName() <<
+			", which is not in a scene element.";
+		return false;
+	}
+	return allow(representation->getFullName());
 }
 
 void Representation::setIgnoring(const std::vector<std::string>& fullNames)
 {
-	if (!m_allowing.empty())
+	if (m_allowing.empty())
 	{
-		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger())
-			<< "Collision Representation named " << getName() << " can not ignore other representations. "
-			<< "You can only set what representations to ignore or allow, not both.";
+		m_ignoring.clear();
+		std::copy(fullNames.cbegin(), fullNames.cend(), std::inserter(m_ignoring, m_ignoring.begin()));
 	}
 	else
 	{
-		m_ignoring.clear();
-		for (auto& fullName : fullNames)
-		{
-			ignore(fullName);
-		}
+		SURGSIM_LOG_SEVERE(m_logger) << getFullName() << " cannot use setIgnoring. "
+			<< "You can only set what representations to ignore or allow, not both.";
 	}
 }
 
@@ -196,14 +214,11 @@ std::vector<std::string> Representation::getIgnoring() const
 
 bool Representation::isIgnoring(const std::string& fullName) const
 {
-	if (!m_allowing.empty())
-	{
-		return m_allowing.find(fullName) == m_allowing.end();
-	}
-	else
+	if (m_allowing.empty())
 	{
 		return m_ignoring.find(fullName) != m_ignoring.end();
 	}
+	return m_allowing.find(fullName) == m_allowing.end();
 }
 
 bool Representation::isIgnoring(const std::shared_ptr<Representation>& representation) const
@@ -211,21 +226,28 @@ bool Representation::isIgnoring(const std::shared_ptr<Representation>& represent
 	return isIgnoring(representation->getFullName());
 }
 
+bool Representation::isAllowing(const std::string& fullName) const
+{
+	return !isIgnoring(fullName);
+}
+
+bool Representation::isAllowing(const std::shared_ptr<Representation>& representation) const
+{
+	return isAllowing(representation->getFullName());
+}
+
+
 void Representation::setAllowing(const std::vector<std::string>& fullNames)
 {
-	if (!m_ignoring.empty())
+	if (m_ignoring.empty())
 	{
-		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger())
-			<< "Collision Representation named " << getName() << " cannot use setAllowing. "
-			<< "You can only set what representations to ignore or allow, not both.";
+		m_allowing.clear();
+		std::copy(fullNames.cbegin(), fullNames.cend(), std::inserter(m_allowing, m_allowing.begin()));
 	}
 	else
 	{
-		m_allowing.clear();
-		for (auto& fullName : fullNames)
-		{
-			m_allowing.insert(fullName);
-		}
+		SURGSIM_LOG_SEVERE(m_logger) << getFullName() << " cannot use setAllowing. "
+			<< "You can only set what representations to ignore or allow, not both.";
 	}
 }
 

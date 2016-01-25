@@ -18,9 +18,9 @@
 
 #include <vector>
 
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -50,11 +50,11 @@ public:
 	/// \param other The location to be copied while constructing.
 	Location(const Location& other)
 		: rigidLocalPosition(other.rigidLocalPosition),
-		octreeNodePath(other.octreeNodePath),
-		index(other.index),
-		triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
-		nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
-		elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
+		  octreeNodePath(other.octreeNodePath),
+		  index(other.index),
+		  triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
+		  nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
+		  elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
 	{}
 
 	/// Constructor for rigid local position
@@ -83,12 +83,20 @@ public:
 	/// \param meshType the type of location (a node, a triangle or an element)
 	Location(const SurgSim::DataStructures::IndexedLocalCoordinate& localCoordinate, Type meshType)
 	{
-		switch(meshType)
+		switch (meshType)
 		{
-		case NODE: nodeMeshLocalCoordinate.setValue(localCoordinate); break;
-		case TRIANGLE: triangleMeshLocalCoordinate.setValue(localCoordinate); break;
-		case ELEMENT: elementMeshLocalCoordinate.setValue(localCoordinate); break;
-		default: SURGSIM_FAILURE() << "Unknown location"; break;
+			case NODE:
+				nodeMeshLocalCoordinate.setValue(localCoordinate);
+				break;
+			case TRIANGLE:
+				triangleMeshLocalCoordinate.setValue(localCoordinate);
+				break;
+			case ELEMENT:
+				elementMeshLocalCoordinate.setValue(localCoordinate);
+				break;
+			default:
+				SURGSIM_FAILURE() << "Unknown location";
+				break;
 		}
 	}
 
@@ -99,6 +107,59 @@ public:
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> nodeMeshLocalCoordinate;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> elementMeshLocalCoordinate;
 };
+
+
+template <typename charT, typename traits, typename T>
+std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
+		const SurgSim::DataStructures::OptionalValue<T>& val)
+{
+	if (val.hasValue())
+	{
+		out << val.getValue();
+	}
+	else
+	{
+		out << "<empty>";
+	}
+	return out;
+}
+
+template <typename charT, typename traits>
+std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
+		const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val)
+{
+	if (val.hasValue())
+	{
+		out << val.getValue().transpose();
+	}
+	else
+	{
+		out << "<empty>";
+	}
+	return out;
+}
+
+
+template <typename charT, typename traits>
+std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
+		const SurgSim::DataStructures::IndexedLocalCoordinate& val)
+{
+	out << "[ " << val.index << " : " << val.coordinate.transpose() << " ]";
+	return out;
+}
+
+
+template <typename charT, typename traits>
+std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
+		const Location& loc)
+{
+	out << "RigidLocal: " << loc.rigidLocalPosition << std::endl;
+	out << "TriangleMeshLocal: " << loc.triangleMeshLocalCoordinate << std::endl;
+	out << "NodeMeshLocal: " << loc.nodeMeshLocalCoordinate << std::endl;
+	out << "ElementMesh: " << loc.elementMeshLocalCoordinate << std::endl;
+	out << "Index: " << loc.index << std::endl;
+	return out;
+}
 
 }; // namespace DataStructures
 }; // namespace SurgSim
