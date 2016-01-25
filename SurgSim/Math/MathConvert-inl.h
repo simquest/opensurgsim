@@ -32,21 +32,22 @@ template <class Type, int Rows, int Cols, int MOpt>
 YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode(
 			const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs)
 {
+	typedef Eigen::Matrix<Type, Rows, Cols, MOpt>::Index Index;
 	YAML::Node node;
 	node.SetStyle(YAML::EmitterStyle::Flow);
 	if (Cols == 1)
 	{
-		for (int i = 0; i < rhs.size(); ++i)
+		for (Index i = 0; i < rhs.size(); ++i)
 		{
 			node.push_back(rhs(i, 0));
 		}
 	}
 	else
 	{
-		for (int row = 0; row < Rows; ++row)
+		for (size_t row = 0; row < Rows; ++row)
 		{
 			YAML::Node rowNode;
-			for (int col = 0; col < Cols; ++col)
+			for (size_t col = 0; col < Cols; ++col)
 			{
 				rowNode.push_back(rhs.row(row)[col]);
 			}
@@ -70,7 +71,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 
 	if (Cols == 1)
 	{
-		for (unsigned i = 0; i < node.size(); ++i)
+		for (size_t i = 0; i < node.size(); ++i)
 		{
 			try
 			{
@@ -81,7 +82,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 				rhs(i, 0) = std::numeric_limits<Type>::quiet_NaN();
 
 				auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-				SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
+				SURGSIM_LOG(logger, WARNING) << "Bad conversion using #NaN value " << node;
 			}
 		}
 	}
@@ -104,7 +105,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 				{
 					rhs.row(row)[col] = std::numeric_limits<Type>::quiet_NaN();
 					auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-					SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
+					SURGSIM_LOG(logger, WARNING) << "Bad conversion using #NaN value " << node;
 				}
 			}
 		}
@@ -218,7 +219,7 @@ bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
 		{
 			rhs.angle() = std::numeric_limits<Type>::quiet_NaN();
 			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-			SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
+			SURGSIM_LOG(logger, WARNING) << "Bad conversion using #NaN value " << node;
 		}
 		result = convert<typename Eigen::Matrix<Type, 3, 1>>::decode(node["Axis"], rhs.axis());
 	}
