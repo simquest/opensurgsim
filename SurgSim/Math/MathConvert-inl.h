@@ -32,7 +32,7 @@ template <class Type, int Rows, int Cols, int MOpt>
 YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode(
 			const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs)
 {
-	typedef Eigen::Matrix<Type, Rows, Cols, MOpt>::Index Index;
+	typedef typename Eigen::Matrix<Type, Rows, Cols, MOpt>::Index Index;
 	YAML::Node node;
 	node.SetStyle(YAML::EmitterStyle::Flow);
 	if (Cols == 1)
