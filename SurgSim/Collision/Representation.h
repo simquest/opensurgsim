@@ -150,8 +150,11 @@ public:
 
 	/// Set a collision representation to allow
 	/// Only collisions with "allowed" collision representation will be detected
-	/// \note This method conflicts with ignore/setIgnoring. You can only set what
-	/// representations to ignore or allow collisions with, not both.
+	/// If the the representation is currently being "ignored" then it will be removed from that state and
+	/// collisions will be allowed again.
+	/// \note When both the allow and ignore lists are empty calling allow may cause a change of behavior that
+	/// might not be wanted (i.e. the representation will go from colliding with all others to just colliding with
+	/// one other representation). This might be caused by trying to revert an "ignore" that has already been reversed.
 	/// \param fullName The full name of the collision representation to allow
 	bool allow(const std::string& fullName);
 
@@ -165,13 +168,10 @@ public:
 	/// \param representation The collision representation to allow
 	bool allow(const std::shared_ptr<Representation>& representation);
 
-	/// Set a collision representation to allow
-	/// Only collisions with "allowed" collision representation will be detected
-	/// If the the representation is currently being "ignored" then it will be removed from that state and
-	/// collisions will be allowed again.
-	/// \note When both the allow and ignore lists are empty calling allow may cause a change of behavior that
-	/// might not be wanted (i.e. the representation will go from colliding with all others to just colliding with
-	/// one other representation). This might be caused by trying to revert an "ignore" that has already been reversed.
+	/// Set the only collision representations to allow collisions with
+	/// Only Collisions with these collision representation will be detected
+	/// \note This method conflicts with ignore and setIgnoring. You can only set what
+	/// representations to ignore or allow collisions with, not both.
 	/// \param fullNames The collision representations (given by full name) to allow
 	void setAllowing(const std::vector<std::string>& fullNames);
 
