@@ -82,7 +82,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 				rhs(i, 0) = std::numeric_limits<Type>::quiet_NaN();
 
 				auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-				SURGSIM_LOG(logger, WARNING) << "Bad conversion using #NaN value " << node;
+				SURGSIM_LOG(logger, WARNING) << "Bad conversion, using #NaN value. For node: " << node;
 			}
 		}
 	}
@@ -105,7 +105,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 				{
 					rhs.row(row)[col] = std::numeric_limits<Type>::quiet_NaN();
 					auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-					SURGSIM_LOG(logger, WARNING) << "Bad conversion using #NaN value " << node;
+					SURGSIM_LOG(logger, WARNING) << "Bad conversion, using #NaN value. For node: " << node;
 				}
 			}
 		}
@@ -219,7 +219,7 @@ bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
 		{
 			rhs.angle() = std::numeric_limits<Type>::quiet_NaN();
 			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
-			SURGSIM_LOG(logger, WARNING) << "Bad conversion using #NaN value " << node;
+			SURGSIM_LOG(logger, WARNING) << "Bad conversion, using #NaN value. For node: " << node;
 		}
 		result = convert<typename Eigen::Matrix<Type, 3, 1>>::decode(node["Axis"], rhs.axis());
 	}
