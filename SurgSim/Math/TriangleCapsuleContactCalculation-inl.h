@@ -28,61 +28,46 @@ namespace Math
 namespace TriangleCapsuleContactCalculation
 {
 
-/// Class used to find the point on (positive X side of) ellipse with the given slope.
+/// Find the point on (positive X side of) ellipse parallel to the given tangent.
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param tangent The given tangent to this ellipse, whose corresponding point is to be found
+/// \param center Center of the ellipse.
+/// \param majorAxis, minorAxis The major/minor axes of the ellipse, both of unit length
+/// \param majorRadius, minorRadius Major/minor radii of the ellipse
+/// \note majorAxis and minorAxis are assumed to be orthogonal to each other.
+/// \return The point on the ellipse (in positive x direction) which has the given tangent.
 template <class T, int MOpt>
-class EllipseHelper
+Eigen::Matrix<T, 3, 1, MOpt> pointWithTangentOnEllipse(const Eigen::Matrix<T, 3, 1, MOpt>& center,
+													   const Eigen::Matrix<T, 3, 1, MOpt>& majorAxis,
+													   const Eigen::Matrix<T, 3, 1, MOpt>& minorAxis,
+													   const double majorRadius, const double minorRadius,
+													   const Eigen::Matrix<T, 3, 1, MOpt>& tangent)
 {
-	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
-	typedef Eigen::Transform<T, 3, Eigen::Isometry> RigidTransform3;
+	Eigen::Transform<T, 3, Eigen::Isometry> transform;
+	transform.translation() = center;
+	transform.linear().col(0) = majorAxis;
+	transform.linear().col(1) = minorAxis;
+	transform.linear().col(2) = majorAxis.cross(minorAxis);
 
-public:
-	/// \param center Center of the ellipse.
-	/// \param majorAxis, minorAxis The major/minor axes of the ellipse, both of unit length
-	/// \param majorRadius, minorRadius Major/minor radii of the ellipse
-	/// \note majorAxis and minorAxis are assumed to be orthogonal to each other.
-	EllipseHelper(const Vector3& center, const Vector3& majorAxis, const Vector3& minorAxis, const double majorRadius,
-		const double minorRadius) : a(majorRadius), b(minorRadius)
-	{
-		m_transform.translation() = center;
-		m_transform.linear().col(0) = majorAxis;
-		m_transform.linear().col(1) = minorAxis;
-		m_transform.linear().col(2) = majorAxis.cross(minorAxis);
-		m_inverseTransform = m_transform.inverse();
-	}
+	// tangent in local coordinates.
+	Eigen::Matrix<T, 3, 1, MOpt> localTangent = transform.inverse().linear() * tangent;
 
-	/// \param tangent The given tangent to this ellipse, whose corresponding point is to be found
-	/// \return The point on the ellipse (in positive x direction) which has the given tangent.
-	Vector3 pointWithTangent(const Vector3& tangent)
-	{
-		// tangent in local coordinates.
-		Vector localTangent = m_inverseTransform.linear() * tangent;
+	// Slope of this tangent
+	T m = localTangent[1] / localTangent[0];
 
-		// Slope of this tangent
-		T m = localTangent[1] / localTangent[0];
+	// Ellipse equation: x*x/a*a + y*y/b*b = 1
+	// Rewriting ellipse equation in the form, y = f(x): y = sqrt(a*a - x*x) * b / a
+	// Slope of ellipse: y' = -x*b*b/a*a*y
+	// This slope is equal to the slope of the localTangent. So, we can solve for x and y.
+	T x = std::sqrt((m * m * majorRadius * majorRadius * majorRadius * majorRadius) /
+					(minorRadius * minorRadius + m * m * majorRadius * majorRadius));
+	T y = (minorRadius / majorRadius) *
+		std::sqrt(majorRadius * majorRadius - x * x) * ((m > 0.0) ? -1.0 : 1.0);
 
-		// Ellipse equation: x*x/a*a + y*y/b*b = 1
-		// Rewriting ellipse equation in the form, y = f(x): y = sqrt(a*a - x*x) * b / a
-		// Slope of ellipse: y' = -x*b*b/a*a*y
-		// This slope is equal to the slope of the localTangent. So, we can solve for x and y.
-		T x = std::sqrt((m * m * a * a * a * a) / (b * b + m * m * a * a));
-		T y = (b / a) * std::sqrt(a * a - x * x) * ((m > 0.0) ? -1.0 : 1.0);
-
-		// Transforming this point into world coordinates.
-		return m_transform * Vector3(x, y, static_cast<T>(0));
-	}
-
-private:
-	/// Major radius of the ellipse
-	double a;
-	/// Minor radius of the ellipse
-	double b;
-	/// Transform local ellipse coordinates to world coordinates
-	RigidTransform3 m_transform;
-	/// Transform world coordinates to local coordinates
-	RigidTransform3 m_inverseTransform;
-};
+	// Transforming this point into world coordinates.
+	return transform * Eigen::Matrix<T, 3, 1, MOpt>(x, y, static_cast<T>(0));
+}
 
 /// Class used to find the intersection between a triangle and a capsule.
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
@@ -100,32 +85,17 @@ public:
 	/// \param tn Normal of the triangle, should be normalized.
 	/// \param cv0,cv1 Ends of the capsule axis.
 	/// \param cr Capsule radius.
-	/// \param [out] penetrationDepth The depth of penetration.
-	/// \param [out] penetrationPointTriangle The contact point on triangle.
-	/// \param [out] penetrationPointCapsule The contact point on capsule.
-	/// \param [out] contactNormal The contact normal that points from capsule to triangle.
-	/// \param [out] penetrationPointCapsuleAxis The point on the capsule axis closest to the triangle.
 	TriangleCapsuleContactCalculation(
 		const Vector3& tv0, const Vector3& tv1, const Vector3& tv2,
 		const Vector3& tn,
 		const Vector3& cv0, const Vector3& cv1,
-		double cr,
-		T* penetrationDepth,
-		Vector3* penetrationPointTriangle,
-		Vector3* penetrationPointCapsule,
-		Vector3* contactNormal,
-		Vector3* penetrationPointCapsuleAxis)
+		double cr)
 		: m_tv0(tv0), m_tv1(tv1), m_tv2(tv2), m_tn(tn),
-		  m_cvTop(cv0), m_cvBottom(cv1), m_cr(cr),
-		  m_penetrationDepth(penetrationDepth),
-		  m_penetrationPointTriangle(penetrationPointTriangle),
-		  m_penetrationPointCapsule(penetrationPointCapsule),
-		  m_contactNormal(contactNormal),
-		  m_penetrationPointCapsuleAxis(penetrationPointCapsuleAxis)
+		  m_cvTop(cv0), m_cvBottom(cv1), m_cr(cr)
 	{
 		m_epsilon = static_cast<T>(Geometry::DistanceEpsilon);
 		m_distance = distanceSegmentTriangle(cv0, cv1, m_tv0, m_tv1, m_tv2, m_tn,
-			m_penetrationPointCapsuleAxis, m_penetrationPointTriangle);
+			&m_penetrationPointCapsuleAxis, &m_penetrationPointTriangle);
 		m_cAxis = m_cvBottom - m_cvTop;
 		m_cLength = m_cAxis.norm();
 		m_cAxis = m_cAxis / m_cLength;
@@ -144,7 +114,13 @@ public:
 	}
 
 	/// Calculate the contact info.
-	void calculateContact()
+	/// \param [out] penetrationDepth The depth of penetration.
+	/// \param [out] penetrationPointTriangle The contact point on triangle.
+	/// \param [out] penetrationPointCapsule The contact point on capsule.
+	/// \param [out] contactNormal The contact normal that points from capsule to triangle.
+	/// \param [out] penetrationPointCapsuleAxis The point on the capsule axis closest to the triangle.
+	void calculateContact(T* penetrationDepth, Vector3* penetrationPointTriangle, Vector3* penetrationPointCapsule,
+		Vector3* contactNormal, Vector3* penetrationPointCapsuleAxis)
 	{
 		if (isIntersecting())
 		{
@@ -155,6 +131,12 @@ public:
 				axisThroughTriangle();
 
 			SURGSIM_ASSERT(result) << "At this point, there has to be an intersection.";
+
+			*penetrationDepth = m_penetrationDepth;
+			*penetrationPointTriangle = m_penetrationPointTriangle;
+			*penetrationPointCapsule = m_penetrationPointCapsule;
+			*contactNormal = m_contactNormal;
+			*penetrationPointCapsuleAxis = m_penetrationPointCapsuleAxis;
 		}
 	}
 
@@ -167,10 +149,10 @@ private:
 	{
 		if (m_distance > m_epsilon)
 		{
-			*m_contactNormal = *m_penetrationPointTriangle - *m_penetrationPointCapsuleAxis;
-			m_contactNormal->normalize();
-			*m_penetrationPointCapsule = *m_penetrationPointCapsuleAxis + (*m_contactNormal * m_cr);
-			*m_penetrationDepth = m_cr - m_distance;
+			m_contactNormal = m_penetrationPointTriangle - m_penetrationPointCapsuleAxis;
+			m_contactNormal.normalize();
+			m_penetrationPointCapsule = m_penetrationPointCapsuleAxis + (m_contactNormal * m_cr);
+			m_penetrationDepth = m_cr - m_distance;
 			return true;
 		}
 
@@ -185,10 +167,10 @@ private:
 	{
 		if (std::abs(m_cAxis.dot(m_tn) + 1.0) < m_epsilon)
 		{
-			*m_penetrationPointCapsule = m_cvBottom - m_tn * m_cr;
-			*m_penetrationPointCapsuleAxis = m_cvBottom;
-			*m_contactNormal = -m_tn;
-			*m_penetrationDepth = (m_tv0 - *m_penetrationPointCapsule).dot(m_tn);
+			m_penetrationPointCapsule = m_cvBottom - m_tn * m_cr;
+			m_penetrationPointCapsuleAxis = m_cvBottom;
+			m_contactNormal = -m_tn;
+			m_penetrationDepth = (m_tv0 - m_penetrationPointCapsule).dot(m_tn);
 			return true;
 		}
 
@@ -202,25 +184,25 @@ private:
 	///		  and axisPerpendicularToTriangle() returned false.
 	bool axisTouchingTriangle()
 	{
-		if (m_penetrationPointCapsuleAxis->isApprox(m_cvTop, m_epsilon) ||
-			m_penetrationPointCapsuleAxis->isApprox(m_cvBottom, m_epsilon) ||
-			isPointOnTriangleEdge(*m_penetrationPointTriangle, m_tv0, m_tv1, m_tv2, m_tn))
+		if (m_penetrationPointCapsuleAxis.isApprox(m_cvTop, m_epsilon) ||
+			m_penetrationPointCapsuleAxis.isApprox(m_cvBottom, m_epsilon) ||
+			isPointOnTriangleEdge(m_penetrationPointTriangle, m_tv0, m_tv1, m_tv2, m_tn))
 		{
-			*m_contactNormal = -m_tn;
+			m_contactNormal = -m_tn;
 
 			auto projectionCvBottom = (m_cvBottom + m_tn * (m_tv0 - m_cvBottom).dot(m_tn)).eval();
 			if (SurgSim::Math::isPointInsideTriangle(projectionCvBottom, m_tv0, m_tv1, m_tv2, m_tn))
 			{
-				*m_contactNormal = -m_tn;
-				*m_penetrationPointCapsule = m_cvBottom - m_tn * m_cr;
-				*m_penetrationPointCapsuleAxis = m_cvBottom;
+				m_contactNormal = -m_tn;
+				m_penetrationPointCapsule = m_cvBottom - m_tn * m_cr;
+				m_penetrationPointCapsuleAxis = m_cvBottom;
 			}
 			else
 			{
-				farthestIntersectionLineCapsule(*m_penetrationPointTriangle, -m_tn,
-					m_penetrationPointCapsule, m_penetrationPointCapsuleAxis);
+				farthestIntersectionLineCapsule(m_penetrationPointTriangle, -m_tn,
+					&m_penetrationPointCapsule, &m_penetrationPointCapsuleAxis);
 			}
-			*m_penetrationDepth = (m_tv0 - *m_penetrationPointCapsule).dot(m_tn);
+			m_penetrationDepth = (m_tv0 - m_penetrationPointCapsule).dot(m_tn);
 			return true;
 		}
 
@@ -252,11 +234,11 @@ private:
 
 		if (j == 0)
 		{
-			*m_contactNormal = -m_tn;
-			*m_penetrationPointCapsule = m_cvBottom - m_tn * m_cr;
-			*m_penetrationDepth = (m_tv0 - *m_penetrationPointCapsule).dot(m_tn);
-			*m_penetrationPointCapsuleAxis = m_cvBottom;
-			*m_penetrationPointTriangle = *m_penetrationPointCapsule + m_tn * *m_penetrationDepth;
+			m_contactNormal = -m_tn;
+			m_penetrationPointCapsule = m_cvBottom - m_tn * m_cr;
+			m_penetrationDepth = (m_tv0 - m_penetrationPointCapsule).dot(m_tn);
+			m_penetrationPointCapsuleAxis = m_cvBottom;
+			m_penetrationPointTriangle = m_penetrationPointCapsule + m_tn * m_penetrationDepth;
 			return true;
 		}
 
@@ -281,8 +263,8 @@ private:
 			double minorRadius = farthestIntersectionLineCylinder(center, minorAxis);
 			SURGSIM_ASSERT(isValid(minorRadius)) << "The minor radius of the ellipse should be a valid number.";
 
-			EllipseHelper<T, MOpt> ellipseHelper(center, majorAxis, minorAxis, majorRadius, minorRadius);
-			deepestPoint = ellipseHelper.pointWithTangent(triangleEdge);
+			deepestPoint = pointWithTangentOnEllipse(center, majorAxis, minorAxis, majorRadius, minorRadius,
+				triangleEdge);
 			Vector3 result;
 			if (std::abs(distancePointSegment(deepestPoint, m_cvTop, m_cvBottom, &result) - m_cr) > m_epsilon)
 			{
@@ -321,14 +303,14 @@ private:
 
 			// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
 			Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
-			double d = farthestIntersectionLineCapsule(edgeVertex, -m_tn, &deepestPoint, m_penetrationPointCapsuleAxis);
+			double d = farthestIntersectionLineCapsule(edgeVertex, -m_tn, &deepestPoint, &m_penetrationPointCapsuleAxis);
 			SURGSIM_ASSERT(isValid(d)) << "There must be a part of the ellipse between the triangle edge at this point";
 		}
 
-		*m_contactNormal = -m_tn;
-		*m_penetrationPointCapsule = deepestPoint;
-		*m_penetrationDepth = -m_tn.dot(deepestPoint - m_tv0);
-		*m_penetrationPointTriangle = deepestPoint + m_tn * (*m_penetrationDepth);
+		m_contactNormal = -m_tn;
+		m_penetrationPointCapsule = deepestPoint;
+		m_penetrationDepth = -m_tn.dot(deepestPoint - m_tv0);
+		m_penetrationPointTriangle = deepestPoint + m_tn * (m_penetrationDepth);
 
 		return true;
 	}
@@ -500,19 +482,31 @@ private:
 		return j;
 	}
 
+	///@{
 	/// Triangle vertices and normal.
-	Vector3 m_tv0, m_tv1, m_tv2, m_tn;
+	Vector3 m_tv0;
+	Vector3 m_tv1;
+	Vector3 m_tv2;
+	Vector3 m_tn;
+	///@}
+	///@{
 	/// Capsule ends, axis , radius and length.
-	Vector3 m_cvTop, m_cvBottom, m_cAxis;
-	double m_cr, m_cLength;
+	Vector3 m_cvTop;
+	Vector3 m_cvBottom;
+	Vector3 m_cAxis;
+	double m_cr;
+	double m_cLength;
+	///@}
 	/// Distance between triangle and capsule
 	double m_distance;
+	///@{
 	/// Contact info
-	T* m_penetrationDepth;
-	Vector3* m_penetrationPointTriangle;
-	Vector3* m_penetrationPointCapsule;
-	Vector3* m_contactNormal;
-	Vector3* m_penetrationPointCapsuleAxis;
+	T m_penetrationDepth;
+	Vector3 m_penetrationPointTriangle;
+	Vector3 m_penetrationPointCapsule;
+	Vector3 m_contactNormal;
+	Vector3 m_penetrationPointCapsuleAxis;
+	///@}
 	/// The inverse transform of the capsule
 	RigidTransform3 m_cTransform;
 	SurgSim::DataStructures::OptionalValue<RigidTransform3> m_cInverseTransform;
@@ -537,12 +531,12 @@ bool calculateContactTriangleCapsule(
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsuleAxis)
 {
 	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<T, MOpt>
-		calc(tv0, tv1, tv2, tn, cv0, cv1, cr, penetrationDepth, penetrationPointTriangle, penetrationPointCapsule,
-			 contactNormal, penetrationPointCapsuleAxis);
+		calc(tv0, tv1, tv2, tn, cv0, cv1, cr);
 
 	if (calc.isIntersecting())
 	{
-		calc.calculateContact();
+		calc.calculateContact(penetrationDepth, penetrationPointTriangle, penetrationPointCapsule,
+			contactNormal, penetrationPointCapsuleAxis);
 		return true;
 	}
 
