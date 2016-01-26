@@ -274,7 +274,7 @@ private:
 				// triangleEdge, and the y-axis as tn. Transforming the circle to this 2D co-ordinate system, creates a
 				// circle of radius, r, with its center at x, y. Now the deepest point on this circle is (x, y - r).
 				Vector3 origin = edgeVertices[0], xAxis = triangleEdge, yAxis = m_tn, zAxis = planeN[j];
-				
+
 				double sphereCenterToXYPlane = (m_cvBottom - origin).dot(zAxis);
 				SURGSIM_ASSERT(m_cr + m_epsilon >= sphereCenterToXYPlane)
 					<< "The sphere center is too far from the triangle edge plane.";
@@ -303,7 +303,8 @@ private:
 
 			// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
 			Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
-			double d = farthestIntersectionLineCapsule(edgeVertex, -m_tn, &deepestPoint, &m_penetrationPointCapsuleAxis);
+			double d =
+				farthestIntersectionLineCapsule(edgeVertex, -m_tn, &deepestPoint, &m_penetrationPointCapsuleAxis);
 			SURGSIM_ASSERT(isValid(d)) << "There must be a part of the ellipse between the triangle edge at this point";
 		}
 
