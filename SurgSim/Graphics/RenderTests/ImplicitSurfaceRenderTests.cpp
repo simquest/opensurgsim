@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "SurgSim/Blocks/ImplicitSurface.h"
+#include "SurgSim/Blocks/PoseInterpolator.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Component.h"
@@ -39,6 +40,9 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRigidTranslation;
 
 namespace SurgSim
@@ -53,12 +57,31 @@ class ImplicitSurfaceRenderTests : public RenderTest
 
 TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 {
+	Math::Vector4f diffuseColor = {0.83f, 0.0f, 0.0f, 1.0f};
+	Math::Vector4f specularColor = {0.8f, 0.8f, 0.8f, 1.0f};
+
 	std::array<int, 2> dimensions = {1280, 720};
 	viewElement->getView()->setDimensions(dimensions);
 	viewElement->getCamera()->setPerspectiveProjection(45, 1.7, 0.01, 10.0);
 	viewElement->getCamera()->setAmbientColor(Math::Vector4d(0.2, 0.2, 0.2, 1.0));
-	viewElement->enableManipulator(true);
 
+	auto interpolator = std::make_shared<Blocks::PoseInterpolator>("Interpolator");
+	RigidTransform3d from = makeRigidTransform(
+								Vector3d(0.5, 0.0, -0.5),
+								Vector3d(0.0, 0.0, 0.0),
+								Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d to = makeRigidTransform(
+							  Vector3d(-0.5, 0.0, -0.5),
+							  Vector3d(0.0, 0.0, 0.0),
+							  Vector3d(0.0, 1.0, 0.0));
+	interpolator->setTarget(viewElement);
+	interpolator->setStartingPose(from);
+	interpolator->setDuration(5.0);
+	interpolator->setEndingPose(to);
+	interpolator->setPingPong(true);
+
+	viewElement->setPose(from);
+	viewElement->addComponent(interpolator);
 
 	auto light = std::make_shared<Graphics::OsgLight>("Light");
 	light->setDiffuseColor(Math::Vector4d(1.0, 1.0, 1.0, 1.0));
@@ -73,15 +96,11 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
 	lightElement->addComponent(axes);
 
-	std::vector<std::shared_ptr<Framework::SceneElement>> surface =
-			Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.01f, 800.0f, 4.0,
-												1024, Math::Vector4f(0.3, 0.0, 0.05, 1.0),
-												Math::Vector4f(0.4, 0.4, 0.4, 1.0), 10.0f, false);
-
-	for (auto element : surface)
-	{
-		scene->addSceneElement(element);
-	}
+	scene->addSceneElements(Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.01f, 800.0f, 4.0,
+												1024, diffuseColor, specularColor,
+												"Textures/CubeMap_reflection_diffuse.png", 0.9,
+												"Textures/CubeMap_reflection_specular.png", 0.1,
+												100.0f, false));
 
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
@@ -97,9 +116,9 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	auto material = Graphics::buildMaterial("Shaders/material.vert", "Shaders/material.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(0.3, 0.0, 0.05, 1.0));
+	material->setValue("diffuseColor", diffuseColor);
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(0.4, 0.4, 0.4, 1.0));
+	material->setValue("specularColor", specularColor);
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 	sphere->setMaterial(material);
