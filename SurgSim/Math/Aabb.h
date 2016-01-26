@@ -104,9 +104,9 @@ Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim,
 
 	Eigen::AlignedBox<Scalar, Dim> result;
 	std::for_each(corners.cbegin(), corners.cend(),
-			[&result, &aabb](typename Eigen::AlignedBox<Scalar, Dim>::CornerType c)
+			[&result, &aabb, &transform](typename Eigen::AlignedBox<Scalar, Dim>::CornerType c)
 			{
-				result.extend(aabb.corner(c));
+				result.extend(transform * aabb.corner(c));
 			});
 	return result;
 }
