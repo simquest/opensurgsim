@@ -126,6 +126,11 @@ bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 
 void Representation::update(const double& dt)
 {
+	const auto& shape = getShape();
+	const auto& pose = getPose();
+	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
+	m_posedShapeMotion.second = Math::PosedShape<std::shared_ptr<Math::Shape>>(shape, pose);
+	m_posedShapeMotion.first = m_posedShapeMotion.second;
 }
 
 bool Representation::ignore(const std::string& fullName)
