@@ -84,7 +84,6 @@ bool ReplayPoseDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized()) << getName() << " is not initialized, cannot finalize.";
 	bool ok = m_scaffold->unregisterDevice();
-	m_scaffold->stop();
 	m_scaffold.reset();
 	return ok;
 }
