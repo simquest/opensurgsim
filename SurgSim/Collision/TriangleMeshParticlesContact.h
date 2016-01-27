@@ -36,12 +36,11 @@ class TriangleMeshParticlesContact : public ShapeShapeContactCalculation<Math::M
 public:
 	using ContactCalculation::calculateDcdContact;
 
-	/// \note poses are ignored for this calculation
 	std::list<std::shared_ptr<Contact>> calculateDcdContact(
 										 const Math::MeshShape& mesh,
-										 const Math::RigidTransform3d&,
+										 const Math::RigidTransform3d& meshPose,
 										 const Math::ParticlesShape& particles,
-										 const Math::RigidTransform3d&) const override;
+										 const Math::RigidTransform3d& particlesPose) const override;
 
 	std::pair<int, int> getShapeTypes() override;
 

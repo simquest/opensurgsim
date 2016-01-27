@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -142,11 +142,13 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 									 const Math::MeshShape& meshB,
 									 const Math::RigidTransform3d& meshBPose) const
 {
+	auto meshATransformed = getCachedShape(meshA, meshAPose);;
+	auto meshBTransformed = getCachedShape(meshB, meshBPose);;
 
 	std::list<std::shared_ptr<Contact>> contacts;
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= meshA.getAabbTree()->spatialJoin(*(meshB.getAabbTree()));
+		= meshATransformed->getAabbTree()->spatialJoin(*(meshBTransformed->getAabbTree()));
 
 	double depth = 0.0;
 	Vector3d normal;
@@ -165,23 +167,23 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 
 		for (auto i = triangleListA.begin(); i != triangleListA.end(); ++i)
 		{
-			const Vector3d& normalA = meshA.getNormal(*i);
+			const Vector3d& normalA = meshATransformed->getNormal(*i);
 			if (normalA.isZero())
 			{
 				continue;
 			}
 
-			auto verticesA = meshA.getTrianglePositions(*i);
+			auto verticesA = meshATransformed->getTrianglePositions(*i);
 
 			for (auto j = triangleListB.begin(); j != triangleListB.end(); ++j)
 			{
-				const Vector3d& normalB = meshB.getNormal(*j);
+				const Vector3d& normalB = meshBTransformed->getNormal(*j);
 				if (normalB.isZero())
 				{
 					continue;
 				}
 
-				auto verticesB = meshB.getTrianglePositions(*j);
+				auto verticesB = meshBTransformed->getTrianglePositions(*j);
 
 				// Check if the triangles intersect.
 				if (Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],

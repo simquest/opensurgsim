@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -76,26 +76,6 @@ void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::share
 	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
 
 	m_posedShapeMotion = posedShapeMotion;
-}
-
-const std::shared_ptr<Math::Shape> Representation::getPosedShape()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-	Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
-	Math::RigidTransform3d pose = getPose();
-	if (pose.isApprox(identity))
-	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-		m_posedShapeMotion.second = newPosedShape;
-	}
-	else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
-	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
-		m_posedShapeMotion.second = newPosedShape;
-	}
-
-	return m_posedShapeMotion.second.getShape();
 }
 
 void Representation::invalidatePosedShapeMotion()

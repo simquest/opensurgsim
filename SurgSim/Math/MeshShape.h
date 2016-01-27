@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -85,15 +85,11 @@ public:
 
 	Matrix33d getSecondMomentOfVolume() const override;
 
-	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
-
 	/// Get the AabbTree
 	/// \return The object's associated AabbTree
 	const std::shared_ptr<const SurgSim::DataStructures::AabbTree> getAabbTree() const;
 
 	bool isValid() const override;
-
-	bool isTransformable() const override;
 
 protected:
 	bool doUpdate() override;

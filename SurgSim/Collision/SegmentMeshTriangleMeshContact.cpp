@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,12 +49,14 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 									 const Math::MeshShape& triangleMeshShape,
 									 const Math::RigidTransform3d& triangleMeshPose) const
 {
+	auto segmentMeshTransformed = getCachedShape(segmentMeshShape, segmentMeshPose);
+	auto triangleMeshTransformed = getCachedShape(triangleMeshShape, triangleMeshPose);
 	std::list<std::shared_ptr<Contact>> contacts;
 
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= segmentMeshShape.getAabbTree()->spatialJoin(*triangleMeshShape.getAabbTree());
+		= segmentMeshTransformed->getAabbTree()->spatialJoin(*triangleMeshTransformed->getAabbTree());
 
-	double radius = segmentMeshShape.getRadius();
+	double radius = segmentMeshTransformed->getRadius();
 	double depth = 0.0;
 	Vector3d normal;
 	Vector3d penetrationPointCapsule, penetrationPointTriangle, penetrationPointCapsuleAxis;
@@ -72,17 +74,17 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 
 		for (auto i = triangleList.begin(); i != triangleList.end(); ++i)
 		{
-			const Vector3d& normalTriangle = triangleMeshShape.getNormal(*i);
+			const Vector3d& normalTriangle = triangleMeshTransformed->getNormal(*i);
 			if (normalTriangle.isZero())
 			{
 				continue;
 			}
 
-			const auto& verticesTriangle = triangleMeshShape.getTrianglePositions(*i);
+			const auto& verticesTriangle = triangleMeshTransformed->getTrianglePositions(*i);
 
 			for (auto j = edgeList.begin(); j != edgeList.end(); ++j)
 			{
-				const auto& verticesSegment = segmentMeshShape.getEdgePositions(*j);
+				const auto& verticesSegment = segmentMeshTransformed->getEdgePositions(*j);
 
 				// Check if the triangle and capsule intersect.
 				if (SurgSim::Math::calculateContactTriangleCapsule(

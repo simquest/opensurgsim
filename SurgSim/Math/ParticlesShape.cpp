@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -115,22 +115,9 @@ bool ParticlesShape::doUpdate()
 	return true;
 }
 
-std::shared_ptr<Shape> ParticlesShape::getTransformed(const RigidTransform3d& pose)
-{
-	auto transformed = std::make_shared<ParticlesShape>(*this);
-	transformed->transform(pose);
-	transformed->update();
-	return transformed;
-}
-
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::getAabbTree() const
 {
 	return m_aabbTree;
-}
-
-bool ParticlesShape::isTransformable() const
-{
-	return true;
 }
 
 };

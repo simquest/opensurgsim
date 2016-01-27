@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -99,14 +99,6 @@ std::shared_ptr<const DataStructures::AabbTree> SegmentMeshShape::getAabbTree() 
 	return m_aabbTree;
 }
 
-std::shared_ptr<Shape> SegmentMeshShape::getTransformed(const RigidTransform3d& pose)
-{
-	auto transformed = std::make_shared<SegmentMeshShape>(*this);
-	transformed->transform(pose);
-	transformed->update();
-	return transformed;
-}
-
 void SegmentMeshShape::updateAabbTree()
 {
 	m_aabbTree = std::make_shared<DataStructures::AabbTree>();
@@ -128,11 +120,6 @@ void SegmentMeshShape::updateAabbTree()
 		}
 	}
 	m_aabbTree->set(std::move(items));
-}
-
-bool SegmentMeshShape::isTransformable() const
-{
-	return true;
 }
 
 }; // namespace Math

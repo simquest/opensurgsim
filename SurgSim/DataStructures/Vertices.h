@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,6 +82,11 @@ public:
 	/// \return true on success.
 	bool update();
 
+	/// Get the version of the vertices
+	/// This number is incremented during every update call
+	/// \return The version number
+	size_t getVersion() const;
+
 	/// Adds a vertex to the mesh.
 	/// Recommend that subclasses with a specific purpose (such as for use in collision detection), have a
 	/// createVertex(position, other data...) method which performs any checking desired and sets up the vertex data
@@ -156,6 +161,8 @@ private:
 
 	/// Vertices
 	std::vector<VertexType> m_vertices;
+
+	size_t m_version;
 };
 
 typedef Vertices<EmptyData> VerticesPlain;

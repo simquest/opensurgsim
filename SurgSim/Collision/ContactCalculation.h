@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #ifndef SURGSIM_COLLISION_CONTACTCALCULATION_H
 #define SURGSIM_COLLISION_CONTACTCALCULATION_H
 
+#include <boost/circular_buffer.hpp>
 #include <memory>
 #include <mutex>
 
@@ -33,6 +34,89 @@ class Shape;
 
 namespace Collision
 {
+
+class ShapeCache
+{
+public:
+	ShapeCache() :
+		m_cache(10)
+	{
+	};
+
+	template<class T>
+	std::shared_ptr<T> get(const T& shape, const Math::RigidTransform3d& pose)
+	{
+		{
+			boost::shared_lock<boost::shared_mutex> readLock(m_mutex);
+			if (shape.getVersion() == m_cachedVersion)
+			{
+				for (auto& item : m_cache)
+				{
+					if (item.first.isApprox(pose))
+					{
+						return std::static_pointer_cast<T>(item.second);
+					}
+				}
+			}
+		}
+
+		{
+			boost::unique_lock<boost::shared_mutex> writeLock(m_mutex);
+			if (shape.getVersion() == m_cachedVersion)
+			{
+				for (auto& item : m_cache)
+				{
+					if (item.first.isApprox(pose))
+					{
+						return std::static_pointer_cast<T>(item.second);
+					}
+				}
+			}
+
+			auto transformed = std::make_shared<T>(shape);
+			if (!pose.isApprox(Math::RigidTransform3d::Identity()))
+			{
+				transformed->transform(pose);
+				transformed->update();
+			}
+
+			if (shape.getVersion() != m_cachedVersion)
+			{
+				m_cachedVersion = shape.getVersion();
+				m_cache.clear();
+			}
+
+			m_cache.push_back(std::make_pair(pose, transformed));
+			return std::static_pointer_cast<T>(transformed);
+		}
+	};
+
+private:
+	boost::shared_mutex m_mutex;
+	boost::circular_buffer<std::pair<Math::RigidTransform3d, std::shared_ptr<Math::Shape>>> m_cache;
+	size_t m_cachedVersion;
+};
+
+
+template<class T>
+static std::shared_ptr<T> getCachedShape(const T& shape, const Math::RigidTransform3d& pose)
+{
+	static std::unordered_map<const Math::Shape*, ShapeCache> cache;
+	static boost::shared_mutex mutex;
+
+	{
+		boost::shared_lock<boost::shared_mutex> readLock(mutex);
+		auto item = cache.find(&shape);
+		if (item != cache.end())
+		{
+			return item->second.get(shape, pose);
+		}
+	}
+	{
+		boost::unique_lock<boost::shared_mutex> writeLock(mutex);
+		return cache[&shape].get(shape, pose);
+	}
+}
 
 /// Base class responsible for calculating contact data between two objects.
 /// It is used for determining whether two objects intersect. If there is

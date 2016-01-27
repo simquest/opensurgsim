@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -213,14 +213,6 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
-std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose)
-{
-	auto transformed = std::make_shared<MeshShape>(*this);
-	transformed->transform(pose);
-	transformed->update();
-	return transformed;
-}
-
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree() const
 {
 	return m_aabbTree;
@@ -244,11 +236,6 @@ void MeshShape::updateAabbTree()
 		}
 	}
 	m_aabbTree->set(std::move(items));
-}
-
-bool MeshShape::isTransformable() const
-{
-	return true;
 }
 
 }; // namespace Math

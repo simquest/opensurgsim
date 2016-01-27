@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,17 +43,18 @@ std::pair<int, int> TriangleMeshParticlesContact::getShapeTypes()
 
 std::list<std::shared_ptr<Contact>> TriangleMeshParticlesContact::calculateDcdContact(
 									 const Math::MeshShape& mesh,
-									 const Math::RigidTransform3d&,
+									 const Math::RigidTransform3d& meshPose,
 									 const Math::ParticlesShape& particles,
-									 const Math::RigidTransform3d&) const
+									 const Math::RigidTransform3d& particlesPose) const
 {
-
+	auto meshTransformed = getCachedShape(mesh, meshPose);
+	auto particlesTransformed = getCachedShape(particles, particlesPose);
 	std::list<std::shared_ptr<Contact>> contacts;
 	Vector3d closestPoint;
 	Vector3d coordinates;
-	const double particleRadius = particles.getRadius();
+	const double particleRadius = particlesTransformed->getRadius();
 
-	auto intersections = mesh.getAabbTree()->spatialJoin(*particles.getAabbTree());
+	auto intersections = meshTransformed->getAabbTree()->spatialJoin(*particlesTransformed->getAabbTree());
 	for (auto& intersection : intersections)
 	{
 		std::list<size_t> candidateTriangles;
@@ -62,7 +63,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshParticlesContact::calculateDcdCo
 		intersection.second->getIntersections(intersection.first->getAabb(), &candidateParticles);
 		for (auto& triangle : candidateTriangles)
 		{
-			const Vector3d& normal = mesh.getNormal(triangle);
+			const Vector3d& normal = meshTransformed->getNormal(triangle);
 			if (normal.isZero())
 			{
 				continue;
@@ -70,8 +71,8 @@ std::list<std::shared_ptr<Contact>> TriangleMeshParticlesContact::calculateDcdCo
 
 			for (auto& particle : candidateParticles)
 			{
-				const Vector3d& particlePosition = particles.getVertexPosition(particle);
-				auto vertices = mesh.getTrianglePositions(triangle);
+				const Vector3d& particlePosition = particlesTransformed->getVertexPosition(particle);
+				auto vertices = meshTransformed->getTrianglePositions(triangle);
 				double distance = distancePointTriangle(particlePosition, vertices[0], vertices[1], vertices[2],
 														&closestPoint);
 				if (distance < particleRadius)

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,13 +27,15 @@ namespace DataStructures
 {
 
 template <class VertexData>
-Vertices<VertexData>::Vertices()
+Vertices<VertexData>::Vertices() :
+	m_version(0)
 {
 }
 
 template <class VertexData>
 template <class V>
-Vertices<VertexData>::Vertices(const Vertices<V>& other)
+Vertices<VertexData>::Vertices(const Vertices<V>& other) :
+	m_version(0)
 {
 	m_vertices.reserve(other.getVertices().size());
 	for (auto& otherVertex : other.getVertices())
@@ -85,7 +87,14 @@ void Vertices<VertexData>::clear()
 template <class VertexData>
 bool Vertices<VertexData>::update()
 {
+	m_version++;
 	return doUpdate();
+}
+
+template <class VertexData>
+size_t Vertices<VertexData>::getVersion() const
+{
+	return m_version;
 }
 
 template <class VertexData>

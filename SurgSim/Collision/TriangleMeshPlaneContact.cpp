@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshPlaneContact::calculateDcdContac
 									 const Math::RigidTransform3d& meshPose,
 									 const Math::PlaneShape& plane, const Math::RigidTransform3d& planePose) const
 {
+	auto meshTransformed = getCachedShape(mesh, meshPose);
 	std::list<std::shared_ptr<Contact>> contacts;
 
 	// Transform the plane normal to Mesh co-ordinate system.
@@ -50,7 +51,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshPlaneContact::calculateDcdContac
 
 	double d;
 	Vector3d normal;
-	for (auto& vertex : mesh.getVertices())
+	for (auto& vertex : meshTransformed->getVertices())
 	{
 		d = planeNormal.dot(vertex.position) + planeD;
 		if (d < SurgSim::Math::Geometry::DistanceEpsilon)

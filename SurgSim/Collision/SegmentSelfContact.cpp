@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -86,9 +86,12 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	const Math::SegmentMeshShape& segmentShape2AtTime1, const Math::RigidTransform3d& segmentPose2AtTime1) const
 {
 
-	const Math::SegmentMeshShape& segmentShape1 = segmentShape1AtTime0;
+	auto segmentShape1Transformed = getCachedShape(segmentShape1AtTime0, segmentPose1AtTime0);
+	auto segmentShape2Transformed = getCachedShape(segmentShape1AtTime1, segmentPose1AtTime1);
+
+	const Math::SegmentMeshShape& segmentShape1 = *segmentShape1Transformed;
 	const Math::RigidTransform3d& segmentPose1 = segmentPose1AtTime0;
-	const Math::SegmentMeshShape& segmentShape2 = segmentShape1AtTime1;
+	const Math::SegmentMeshShape& segmentShape2 = *segmentShape2Transformed;
 	const Math::RigidTransform3d& segmentPose2 = segmentPose1AtTime1;
 
 	SURGSIM_ASSERT(segmentShape1.getNumEdges() == segmentShape2.getNumEdges()) <<
