@@ -63,6 +63,11 @@ public:
 		getSubVector(x, 1, 6).segment<3>(0) = Vector3d( 0.0,  1.0, -1.0);
 		getSubVector(x, 2, 6).segment<3>(0) = Vector3d(-1.0,  1.0,  0.0);
 
+		auto& v = state->getVelocities();
+		getSubVector(v, 0, 6).segment<3>(0) = Vector3d(0.0, 0.0, 0.0);
+		getSubVector(v, 1, 6).segment<3>(0) = Vector3d(0.0, 1.0, -1.0);
+		getSubVector(v, 2, 6).segment<3>(0) = Vector3d(-1.0, 1.0, 0.0);
+
 		// Define Beams
 		{
 			std::array<size_t, 2> nodes = {{0, 1}};
@@ -226,6 +231,46 @@ TEST_F(FemLocalizationTest, CalculatePositionTest)
 	// Out-Of-Range assertions
 	EXPECT_THROW(localization->calculatePosition(-0.01), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(localization->calculatePosition(1.01), SurgSim::Framework::AssertionFailure);
+}
+
+TEST_F(FemLocalizationTest, CalculateVelocityTest)
+{
+	using SurgSim::Math::Vector;
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::Vector2d;
+
+	auto localization = std::make_shared<FemLocalization>(m_fem, m_validLocalPosition);
+
+	// Test beam 1: nodes 0, 1
+	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector2d(1.0, 0.0)));
+	EXPECT_TRUE(Vector3d(0.0, 0.0, 0.0).isApprox(localization->calculateVelocity(), epsilon));
+
+	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector2d(0.0, 1.0)));
+	EXPECT_TRUE(Vector3d(0.0, 1.0, -1.0).isApprox(localization->calculateVelocity(), epsilon));
+
+	// Test beam 2: nodes 0, 1
+	localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector2d(1.0, 0.0)));
+	EXPECT_TRUE(Vector3d(0.0, 1.0, -1.0).isApprox(localization->calculateVelocity(), epsilon));
+
+	localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector2d(0.0, 1.0)));
+	EXPECT_TRUE(Vector3d(-1.0, 1.0, 0.0).isApprox(localization->calculateVelocity(), epsilon));
+
+	// Advanced tests
+	localization->setLocalPosition(IndexedLocalCoordinate(0u, Vector2d(0.31, 0.69)));
+	//   0.31 * ( 0.0, 0.0, 0.0) => ( 0.0, 0.0,  0.0 )
+	// + 0.69 * ( 0.0, 1.0,-1.0) => ( 0.0, 0.69,-0.69)
+	//                            = ( 0.0, 0.69,-0.69)
+	EXPECT_TRUE(Vector3d(0.0, 0.69, -0.69).isApprox(localization->calculateVelocity(), epsilon));
+
+	localization->setLocalPosition(IndexedLocalCoordinate(1u, Vector2d(0.95, 0.05)));
+	//   0.95 * ( 0.0, 1.0,-1.0) => ( 0.0,  0.95,-0.95)
+	// + 0.05 * (-1.0, 1.0, 0.0) => (-0.05, 0.05, 0.0 )
+	//                            = (-0.05, 1.0, -0.95)
+	EXPECT_TRUE(Vector3d(-0.05, 1.0, -0.95).isApprox(localization->calculateVelocity(), epsilon));
+
+	// Out-Of-Range assertions
+	EXPECT_THROW(localization->calculateVelocity(-0.01), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(localization->calculateVelocity(1.01), SurgSim::Framework::AssertionFailure);
 }
 
 TEST_F(FemLocalizationTest, ElementPose)

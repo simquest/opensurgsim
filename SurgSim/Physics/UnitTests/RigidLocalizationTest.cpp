@@ -99,7 +99,7 @@ TEST_F(RigidLocalizationTest, SetGetRepresentation)
 	EXPECT_EQ(nullptr, rigidRepresentationLoc.getRepresentation());
 }
 
-TEST_F(RigidLocalizationTest, GetPositionTest)
+TEST_F(RigidLocalizationTest, CalculatePosition)
 {
 	// Create the rigid body
 	std::shared_ptr<MockRigidRepresentation> rigidRepresentation =
@@ -128,6 +128,34 @@ TEST_F(RigidLocalizationTest, GetPositionTest)
 	EXPECT_THROW(localization.calculatePosition(1.01), SurgSim::Framework::AssertionFailure);
 }
 
+TEST_F(RigidLocalizationTest, CalculateVelocity)
+{
+	// Create the rigid body
+	std::shared_ptr<MockRigidRepresentation> rigidRepresentation =
+		std::make_shared<MockRigidRepresentation>();
+
+	// Activate the rigid body and setup its initial pose
+	rigidRepresentation->setLocalActive(true);
+	rigidRepresentation->getCurrentState().setPose(m_initialTransformation);
+
+	RigidLocalization localization = RigidLocalization(rigidRepresentation);
+	ASSERT_EQ(rigidRepresentation, localization.getRepresentation());
+
+	SurgSim::Math::Vector3d origin = m_initialTransformation.translation();
+	SurgSim::Math::Vector3d zero = SurgSim::Math::Vector3d::Zero();
+	localization.setLocalPosition(zero);
+	EXPECT_TRUE(localization.getLocalPosition().isZero(epsilon));
+	EXPECT_TRUE(localization.calculatePosition().isApprox(origin, epsilon));
+
+	SurgSim::Math::Vector3d position = SurgSim::Math::Vector3d::Random();
+	localization.setLocalPosition(position);
+	EXPECT_TRUE(localization.getLocalPosition().isApprox(position, epsilon));
+	EXPECT_FALSE(localization.calculatePosition().isApprox(origin, epsilon));
+
+	// Out-Of-Range assertions
+	EXPECT_THROW(localization.calculateVelocity(-0.01), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(localization.calculateVelocity(1.01), SurgSim::Framework::AssertionFailure);
+}
 
 TEST_F(RigidLocalizationTest, FixedRepresentation)
 {

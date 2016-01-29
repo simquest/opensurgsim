@@ -46,7 +46,7 @@ TEST (MassSpringLocalizationTest, ConstructorTest)
 	});
 }
 
-TEST (MassSpringLocalizationTest, SetGetRepresentation)
+TEST (MassSpringLocalizationTest, SetGetRepresentationTest)
 {
 	MassSpringLocalization localization;
 	auto massSpring = std::make_shared<MassSpringRepresentation>("MassSpringRepresentation");
@@ -60,7 +60,7 @@ TEST (MassSpringLocalizationTest, SetGetRepresentation)
 	EXPECT_EQ(nullptr, localization.getRepresentation());
 }
 
-TEST (MassSpringLocalizationTest, GetPositionTest)
+TEST (MassSpringLocalizationTest, CalculatePositionTest)
 {
 	using SurgSim::Math::Vector3d;
 
@@ -92,6 +92,45 @@ TEST (MassSpringLocalizationTest, GetPositionTest)
 	// Out-Of-Range assertions
 	EXPECT_THROW(localization.calculatePosition(-0.01), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(localization.calculatePosition(1.01), SurgSim::Framework::AssertionFailure);
+}
+
+TEST(MassSpringLocalizationTest, CalculateVelocityTest)
+{
+	using SurgSim::Math::Vector3d;
+
+	// Create the mass spring
+	auto massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
+	std::vector<Vector3d> extremities;
+	extremities.push_back(Vector3d(0, 0, 0));
+	extremities.push_back(Vector3d(1, 0, 0));
+	std::vector<size_t> boundaryConditions;
+	massSpring->init1D(
+		extremities,
+		boundaryConditions,
+		0.1, // total mass (in Kg)
+		100.0, // Stiffness stretching
+		0.0, // Damping stretching
+		10.0, // Stiffness bending
+		0.0); // Damping bending
+
+	auto state = std::make_shared<Math::OdeState>(*massSpring->getInitialState());
+	state->getVelocities().segment<3>(0) = Vector3d(0, 0, 0);
+	state->getVelocities().segment<3>(3) = Vector3d(1, 0, 0);
+	massSpring->setInitialState(state);
+
+	MassSpringLocalization localization = MassSpringLocalization(massSpring);
+
+	localization.setLocalNode(0);
+	ASSERT_EQ(0u, localization.getLocalNode());
+	ASSERT_TRUE(localization.calculateVelocity().isZero(epsilon));
+
+	localization.setLocalNode(1);
+	ASSERT_EQ(1u, localization.getLocalNode());
+	ASSERT_TRUE(localization.calculateVelocity().isApprox(Vector3d(1.0, 0.0, 0.0), epsilon));
+
+	// Out-Of-Range assertions
+	EXPECT_THROW(localization.calculateVelocity(-0.01), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(localization.calculateVelocity(1.01), SurgSim::Framework::AssertionFailure);
 }
 
 TEST (MassSpringLocalizationTest, IsValidRepresentationTest)
