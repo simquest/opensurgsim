@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2015, SimQuest Solutions Inc.
+// Copyright 2015-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -128,7 +128,7 @@ TEST(SinkTest, Update)
 	EXPECT_EQ(1, particleSystem->getParticles().safeGet()->getNumVertices());
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	runtime->stop();
 
 	EXPECT_EQ(0, particleSystem->getParticles().safeGet()->getNumVertices());
