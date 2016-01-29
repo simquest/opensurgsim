@@ -118,7 +118,6 @@ TEST(ReplayPoseDeviceTest, Initialize)
 		device->setFileName(fileName);
 		EXPECT_FALSE(device->initialize()); // Missing the setFilename call, no file open
 		EXPECT_FALSE(device->isInitialized());
-		boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
 	}
 	{
 		SCOPED_TRACE("Success");
@@ -130,7 +129,6 @@ TEST(ReplayPoseDeviceTest, Initialize)
 		EXPECT_TRUE(device->isInitialized());
 
 		clearFakeRecord(fileName);
-		boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
 	}
 }
 

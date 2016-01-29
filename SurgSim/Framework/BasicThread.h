@@ -160,6 +160,9 @@ private:
 	boost::thread m_thisThread;
 	boost::chrono::duration<double> m_period;
 	std::shared_ptr<Barrier> m_startupBarrier;
+	
+	// Protects the start and stop functions so on can only execute once the other is done
+	boost::mutex m_mutexStartStop;
 
 	bool m_isIdle;
 	bool m_isInitialized;
