@@ -174,8 +174,8 @@ void AddInputConsumerRecordXHzReplayYHz(double rateRecord, double rateReplay)
 
 	// Check the number of invocations.
 	EXPECT_EQ(1, consumer->m_numTimesInitializedInput);
-	EXPECT_GE(consumer->m_numTimesReceivedInput, rateReplay * 0.8); // rateReplay@ 1000Hz => lower limit@ 800Hz
-	EXPECT_LE(consumer->m_numTimesReceivedInput, rateReplay * 1.2); // rateReplay@ 1000Hz => higher limit@ 1200Hz
+	EXPECT_GE(consumer->m_numTimesReceivedInput, rateReplay * 0.7); // rateReplay@ 1000Hz => lower limit@ 700Hz
+	EXPECT_LE(consumer->m_numTimesReceivedInput, rateReplay * 1.3); // rateReplay@ 1000Hz => higher limit@ 1300Hz
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::Names::POSE));
 
