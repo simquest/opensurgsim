@@ -48,7 +48,7 @@ const size_t& MassSpringLocalization::getLocalNode() const
 	return m_nodeID;
 }
 
-SurgSim::Math::Vector3d MassSpringLocalization::doCalculatePosition(double time)
+SurgSim::Math::Vector3d MassSpringLocalization::doCalculatePosition(double time) const
 {
 	std::shared_ptr<MassSpringRepresentation> massSpringRepresentation =
 		std::static_pointer_cast<MassSpringRepresentation>(getRepresentation());
@@ -72,7 +72,7 @@ SurgSim::Math::Vector3d MassSpringLocalization::doCalculatePosition(double time)
 	return SurgSim::Math::interpolate(previousPoint, currentPoint, time);
 }
 
-SurgSim::Math::Vector3d MassSpringLocalization::doCalculateVelocity(double time)
+SurgSim::Math::Vector3d MassSpringLocalization::doCalculateVelocity(double time) const
 {
 	std::shared_ptr<MassSpringRepresentation> massSpringRepresentation =
 		std::static_pointer_cast<MassSpringRepresentation>(getRepresentation());

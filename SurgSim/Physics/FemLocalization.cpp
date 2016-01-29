@@ -58,7 +58,7 @@ const SurgSim::DataStructures::IndexedLocalCoordinate& FemLocalization::getLocal
 	return m_position;
 }
 
-SurgSim::Math::Vector3d FemLocalization::doCalculatePosition(double time)
+SurgSim::Math::Vector3d FemLocalization::doCalculatePosition(double time) const
 {
 	using SurgSim::Math::Vector3d;
 
@@ -88,7 +88,7 @@ SurgSim::Math::Vector3d FemLocalization::doCalculatePosition(double time)
 	return previousPosition + time * (currentPosition - previousPosition);
 }
 
-SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time)
+SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
 {
 	using SurgSim::Math::Vector3d;
 

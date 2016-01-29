@@ -59,9 +59,9 @@ private:
 	/// \param time The time in [0..1] at which the position should be calculated.
 	/// \return The global position of the localization at the requested time.
 	/// \note time can useful when dealing with CCD.
-	SurgSim::Math::Vector3d doCalculatePosition(double time);
+	SurgSim::Math::Vector3d doCalculatePosition(double time) const;
 
-	SurgSim::Math::Vector3d doCalculateVelocity(double time);
+	SurgSim::Math::Vector3d doCalculateVelocity(double time) const;
 
 	/// 3D position in local coordinates.
 	SurgSim::Math::Vector3d m_position;

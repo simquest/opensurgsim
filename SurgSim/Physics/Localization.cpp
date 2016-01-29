@@ -52,12 +52,12 @@ std::shared_ptr<Representation> Localization::getRepresentation() const
 	return m_representation;
 }
 
-Math::Vector3d Localization::calculatePosition(double time)
+Math::Vector3d Localization::calculatePosition(double time) const
 {
 	return doCalculatePosition(time);
 }
 
-Math::Vector3d Localization::calculateVelocity(double time)
+Math::Vector3d Localization::calculateVelocity(double time) const
 {
 	return doCalculateVelocity(time);
 }

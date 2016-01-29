@@ -557,12 +557,12 @@ MockLocalization::MockLocalization(std::shared_ptr<Representation> representatio
 {
 }
 
-Vector3d MockLocalization::doCalculatePosition(double time)
+Vector3d MockLocalization::doCalculatePosition(double time) const
 {
 	return SurgSim::Math::Vector3d::Zero();
 }
 
-Vector3d MockLocalization::doCalculateVelocity(double time)
+Vector3d MockLocalization::doCalculateVelocity(double time) const
 {
 	return SurgSim::Math::Vector3d::Zero();
 }

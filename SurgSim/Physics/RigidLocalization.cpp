@@ -49,7 +49,7 @@ const SurgSim::Math::Vector3d& RigidLocalization::getLocalPosition() const
 	return m_position;
 }
 
-SurgSim::Math::Vector3d RigidLocalization::doCalculatePosition(double time)
+SurgSim::Math::Vector3d RigidLocalization::doCalculatePosition(double time) const
 {
 	std::shared_ptr<RigidRepresentationBase> rigidRepresentation =
 		std::static_pointer_cast<RigidRepresentationBase>(getRepresentation());
@@ -78,7 +78,7 @@ SurgSim::Math::Vector3d RigidLocalization::doCalculatePosition(double time)
 	return pose * m_position;
 }
 
-SurgSim::Math::Vector3d RigidLocalization::doCalculateVelocity(double time)
+SurgSim::Math::Vector3d RigidLocalization::doCalculateVelocity(double time) const
 {
 	std::shared_ptr<RigidRepresentationBase> rigidRepresentation =
 		std::static_pointer_cast<RigidRepresentationBase>(getRepresentation());
