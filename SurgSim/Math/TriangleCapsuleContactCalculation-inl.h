@@ -348,14 +348,14 @@ private:
 		T b = static_cast<T>(2) * (P[1] * D[1] + P[2] * D[2]);
 		T c = (P[1] * P[1] + P[2] * P[2] - m_cr * m_cr);
 
-		T bb4ac = b * b - static_cast<T>(4) * a * c;
+		T discriminant = b * b - static_cast<T>(4) * a * c;
 
-		if (bb4ac < 0.0)
+		if (discriminant < 0.0)
 		{
 			// Cannot use a sqrt on a negative number. Push it to zero if it is small.
-			if (bb4ac >= -Geometry::ScalarEpsilon)
+			if (discriminant >= -Geometry::ScalarEpsilon)
 			{
-				bb4ac = 0.0;
+				discriminant = 0.0;
 			}
 			else
 			{
@@ -364,7 +364,7 @@ private:
 		}
 
 		// We have two solutions. We want the larger value.
-		double d = (-b / (static_cast<T>(2) * a)) + std::abs(std::sqrt(bb4ac) / (static_cast<T>(2) * a));
+		double d = (-b / (static_cast<T>(2) * a)) + std::abs(std::sqrt(discriminant) / (static_cast<T>(2) * a));
 		SURGSIM_ASSERT(isValid(d));
 		if (point != nullptr)
 		{
@@ -422,15 +422,15 @@ private:
 
 			// => t^2.a + t.b + c = 0, whose solution is:
 			// (-b +/- sqrt(b^2 - 4*a*c))/2*a
-			T bb4ac = b * b - static_cast<T>(4) * a * c;
+			T discriminant = b * b - static_cast<T>(4) * a * c;
 
-			if (bb4ac < 0.0 && bb4ac >= -Geometry::ScalarEpsilon)
+			if (discriminant < 0.0 && discriminant >= -Geometry::ScalarEpsilon)
 			{
-				bb4ac = 0.0;
+				discriminant = 0.0;
 			}
 
 			// We have two solutions. We want the smaller value.
-			d = (-b - std::abs(std::sqrt(bb4ac))) / (static_cast<T>(2) * a);
+			d = (-b - std::abs(std::sqrt(discriminant))) / (static_cast<T>(2) * a);
 			SURGSIM_ASSERT(isValid(d));
 			*point = lineStart + lineDir * d;
 		}
@@ -508,8 +508,9 @@ private:
 	Vector3 m_contactNormal;
 	Vector3 m_penetrationPointCapsuleAxis;
 	///@}
-	/// The inverse transform of the capsule
+	/// The transform of the capsule
 	RigidTransform3 m_cTransform;
+	/// The inverse transform of the capsule
 	SurgSim::DataStructures::OptionalValue<RigidTransform3> m_cInverseTransform;
 	/// epsilon
 	T m_epsilon;
