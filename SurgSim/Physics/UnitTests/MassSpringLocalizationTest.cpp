@@ -88,6 +88,10 @@ TEST (MassSpringLocalizationTest, GetPositionTest)
 	localization.setLocalNode(1);
 	ASSERT_EQ(1u, localization.getLocalNode());
 	ASSERT_TRUE(localization.calculatePosition().isApprox(Vector3d(1.0, 0.0, 0.0), epsilon));
+
+	// Out-Of-Range assertions
+	EXPECT_THROW(localization.calculatePosition(-0.01), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(localization.calculatePosition(1.01), SurgSim::Framework::AssertionFailure);
 }
 
 TEST (MassSpringLocalizationTest, IsValidRepresentationTest)

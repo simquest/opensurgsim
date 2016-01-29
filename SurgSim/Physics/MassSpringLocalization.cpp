@@ -55,7 +55,6 @@ SurgSim::Math::Vector3d MassSpringLocalization::doCalculatePosition(double time)
 
 	SURGSIM_ASSERT(massSpringRepresentation != nullptr) << "MassSpringRepresentation is null, it was probably not" <<
 		" initialized";
-	SURGSIM_ASSERT((0.0 <= time) && (time <= 1.0)) << "Time must be between 0.0 and 1.0 inclusive";
 
 	if (time == 0.0)
 	{
@@ -79,7 +78,6 @@ SurgSim::Math::Vector3d MassSpringLocalization::doCalculateVelocity(double time)
 
 	SURGSIM_ASSERT(massSpringRepresentation != nullptr) << "MassSpringRepresentation is null, it was probably not" <<
 		" initialized";
-	SURGSIM_ASSERT((0.0 <= time) && (time <= 1.0)) << "Time must be between 0.0 and 1.0 inclusive";
 
 	if (time == 0.0)
 	{

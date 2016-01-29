@@ -222,6 +222,10 @@ TEST_F(FemLocalizationTest, CalculatePositionTest)
 	// + 0.05 * (-1.0, 1.0, 0.0) => (-0.05, 0.05, 0.0 )
 	//                            = (-0.05, 1.0, -0.95)
 	EXPECT_TRUE(Vector3d(-0.05, 1.0, -0.95).isApprox(localization->calculatePosition(), epsilon));
+
+	// Out-Of-Range assertions
+	EXPECT_THROW(localization->calculatePosition(-0.01), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(localization->calculatePosition(1.01), SurgSim::Framework::AssertionFailure);
 }
 
 TEST_F(FemLocalizationTest, ElementPose)

@@ -54,11 +54,15 @@ std::shared_ptr<Representation> Localization::getRepresentation() const
 
 Math::Vector3d Localization::calculatePosition(double time) const
 {
+	SURGSIM_ASSERT(time >= 0.0 && time <= 1.0) << "Invalid time " << time << " out-of-range [0..1]";
+
 	return doCalculatePosition(time);
 }
 
 Math::Vector3d Localization::calculateVelocity(double time) const
 {
+	SURGSIM_ASSERT(time >= 0.0 && time <= 1.0) << "Invalid time " << time << " out-of-range [0..1]";
+
 	return doCalculateVelocity(time);
 }
 

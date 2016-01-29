@@ -122,6 +122,10 @@ TEST_F(RigidLocalizationTest, GetPositionTest)
 	localization.setLocalPosition(position);
 	EXPECT_TRUE(localization.getLocalPosition().isApprox(position, epsilon));
 	EXPECT_FALSE(localization.calculatePosition().isApprox(origin, epsilon));
+
+	// Out-Of-Range assertions
+	EXPECT_THROW(localization.calculatePosition(-0.01), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(localization.calculatePosition(1.01), SurgSim::Framework::AssertionFailure);
 }
 
 
