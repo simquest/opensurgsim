@@ -77,6 +77,35 @@ void RigidCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape
 	m_shape = shape;
 }
 
+void RigidCollisionRepresentation::update(const double& time)
+{
+	using Math::PosedShape;
+	using Math::PosedShapeMotion;
+	using Math::Shape;
+
+	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
+	{
+		Math::RigidTransform3d previousPose;
+		Math::RigidTransform3d currentPose;
+		{
+			auto physicsRepresentation = m_physicsRepresentation.lock();
+			SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+				"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+			const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
+			const Math::RigidTransform3d& physicsPreviousPose = physicsRepresentation->getPreviousState().getPose();
+
+			previousPose = physicsPreviousPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+			currentPose = physicsCurrentPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+		}
+
+		PosedShape<std::shared_ptr<Shape>> posedShape1(getShape()->getTransformed(previousPose), previousPose);
+		PosedShape<std::shared_ptr<Shape>> posedShape2(getShape()->getTransformed(currentPose), currentPose);
+		PosedShapeMotion<std::shared_ptr<Shape>> posedShapeMotion(posedShape1, posedShape2);
+
+		setPosedShapeMotion(posedShapeMotion);
+	}
+}
+
 SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 {
 	auto physicsRepresentation = m_physicsRepresentation.lock();
