@@ -124,7 +124,7 @@ bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
 /// \param pt Vertex of the point.
 /// \param tv0, tv1, tv2 Vertices of the triangle.
 /// \param [out] coordinates The Barycentric coordinates.
-/// \return bool true on success, false if two or more if the triangle is considered degenerate
+/// \return bool true on success, false if the triangle is considered degenerate
 template <class T, int MOpt> inline
 bool barycentricCoordinates(
 	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
