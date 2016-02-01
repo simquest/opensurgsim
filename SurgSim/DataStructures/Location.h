@@ -50,11 +50,11 @@ public:
 	/// \param other The location to be copied while constructing.
 	Location(const Location& other)
 		: rigidLocalPosition(other.rigidLocalPosition),
-		  octreeNodePath(other.octreeNodePath),
-		  index(other.index),
-		  triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
-		  nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
-		  elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
+		octreeNodePath(other.octreeNodePath),
+		index(other.index),
+		triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
+		nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
+		elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
 	{}
 
 	/// Constructor for rigid local position
@@ -85,19 +85,85 @@ public:
 	{
 		switch (meshType)
 		{
-			case NODE:
-				nodeMeshLocalCoordinate.setValue(localCoordinate);
-				break;
-			case TRIANGLE:
-				triangleMeshLocalCoordinate.setValue(localCoordinate);
-				break;
-			case ELEMENT:
-				elementMeshLocalCoordinate.setValue(localCoordinate);
-				break;
-			default:
-				SURGSIM_FAILURE() << "Unknown location";
-				break;
+		case NODE:
+			nodeMeshLocalCoordinate.setValue(localCoordinate);
+			break;
+		case TRIANGLE:
+			triangleMeshLocalCoordinate.setValue(localCoordinate);
+			break;
+		case ELEMENT:
+			elementMeshLocalCoordinate.setValue(localCoordinate);
+			break;
+		default:
+			SURGSIM_FAILURE() << "Unknown location";
+			break;
 		}
+	}
+
+	bool isApprox(const Location& other, double precision = std::numeric_limits<double>::epsilon())
+	{
+		bool result = false;
+
+		if (rigidLocalPosition.hasValue())
+		{
+			if (other.rigidLocalPosition.hasValue() &&
+				(rigidLocalPosition.getValue().isZero(precision) &&
+					other.rigidLocalPosition.getValue().isZero(precision)) ||
+				(rigidLocalPosition.getValue().isApprox(other.rigidLocalPosition.getValue(), precision)))
+			{
+				result = true;
+			}
+		}
+		else if (octreeNodePath.hasValue())
+		{
+			if (other.octreeNodePath.hasValue() && octreeNodePath.getValue() == other.octreeNodePath.getValue())
+			{
+				result = true;
+			}
+		}
+		else if (index.hasValue())
+		{
+			if (other.index.hasValue() && index.getValue() == other.index.getValue())
+			{
+				result = true;
+			}
+		}
+		else if (triangleMeshLocalCoordinate.hasValue())
+		{
+			if (other.triangleMeshLocalCoordinate.hasValue() &&
+				triangleMeshLocalCoordinate.getValue().index == other.triangleMeshLocalCoordinate.getValue().index &&
+				triangleMeshLocalCoordinate.getValue().coordinate.isApprox(
+					other.triangleMeshLocalCoordinate.getValue().coordinate, precision))
+			{
+				result = true;
+			}
+		}
+		else if (nodeMeshLocalCoordinate.hasValue())
+		{
+			if (other.nodeMeshLocalCoordinate.hasValue() &&
+				nodeMeshLocalCoordinate.getValue().index == other.nodeMeshLocalCoordinate.getValue().index &&
+				nodeMeshLocalCoordinate.getValue().coordinate.isApprox(
+					other.nodeMeshLocalCoordinate.getValue().coordinate, precision))
+			{
+				result = true;
+			}
+		}
+		else if (elementMeshLocalCoordinate.hasValue())
+		{
+			if (other.elementMeshLocalCoordinate.hasValue() &&
+				elementMeshLocalCoordinate.getValue().index == other.elementMeshLocalCoordinate.getValue().index &&
+				elementMeshLocalCoordinate.getValue().coordinate.isApprox(
+					other.elementMeshLocalCoordinate.getValue().coordinate, precision))
+			{
+				result = true;
+			}
+		}
+		else
+		{
+			SURGSIM_FAILURE() << "Invalid location type";
+		}
+
+		return result;
 	}
 
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
@@ -111,7 +177,7 @@ public:
 
 template <typename charT, typename traits, typename T>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
-		const SurgSim::DataStructures::OptionalValue<T>& val)
+	const SurgSim::DataStructures::OptionalValue<T>& val)
 {
 	if (val.hasValue())
 	{
@@ -126,7 +192,7 @@ std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits
 
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
-		const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val)
+	const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val)
 {
 	if (val.hasValue())
 	{
@@ -142,7 +208,7 @@ std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits
 
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
-		const SurgSim::DataStructures::IndexedLocalCoordinate& val)
+	const SurgSim::DataStructures::IndexedLocalCoordinate& val)
 {
 	out << "[ " << val.index << " : " << val.coordinate.transpose() << " ]";
 	return out;
@@ -151,7 +217,7 @@ std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits
 
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
-		const Location& loc)
+	const Location& loc)
 {
 	out << "RigidLocal: " << loc.rigidLocalPosition << std::endl;
 	out << "TriangleMeshLocal: " << loc.triangleMeshLocalCoordinate << std::endl;
