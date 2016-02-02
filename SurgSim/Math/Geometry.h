@@ -133,13 +133,14 @@ bool barycentricCoordinates(
 	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
 	Eigen::Matrix<T, 3, 1, MOpt>* coordinates)
 {
-	const Eigen::Matrix<T, 3, 1, MOpt> tn = (tv1 - tv0).cross(tv2 - tv0);
+	Eigen::Matrix<T, 3, 1, MOpt> tn = (tv1 - tv0).cross(tv2 - tv0);
 	double norm = tn.norm();
 	if (norm < Geometry::DistanceEpsilon)
 	{
 		coordinates->setConstant((std::numeric_limits<double>::quiet_NaN()));
 		return false;
 	}
+	tn /= norm;
 	return barycentricCoordinates(pt, tv0, tv1, tv2, tn, coordinates);
 }
 
