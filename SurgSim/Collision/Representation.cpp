@@ -34,9 +34,9 @@ Representation::Representation(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Ignore, getIgnoring, setIgnoring);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Allow, getAllowing, setAllowing);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, CollisionDetectionType, CollisionDetectionType,
-			getCollisionDetectionType, setCollisionDetectionType);
+									  getCollisionDetectionType, setCollisionDetectionType);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, CollisionDetectionType, SelfCollisionDetectionType,
-			getSelfCollisionDetectionType, setSelfCollisionDetectionType);
+									  getSelfCollisionDetectionType, setSelfCollisionDetectionType);
 }
 
 Representation::~Representation()
@@ -151,13 +151,28 @@ void Representation::update(const double& dt)
 
 bool Representation::ignore(const std::string& fullName)
 {
+
+	bool result = false;
 	if (m_allowing.empty())
 	{
-		return m_ignoring.insert(fullName).second;
+		result = m_ignoring.insert(fullName).second;
 	}
-	SURGSIM_LOG_SEVERE(m_logger) << getFullName() << " cannot ignore " << fullName
-		<< ". You can only set what representations to ignore or allow, not both.";
-	return false;
+	else
+	{
+		auto found = m_allowing.find(fullName);
+		if (found != m_allowing.end())
+		{
+			m_allowing.erase(found);
+			result = true;
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(m_logger)
+					<< getFullName() << " Trying to un-allow" << fullName << " but it wasn't found.";
+		}
+	}
+
+	return result;
 }
 
 bool Representation::ignore(const std::shared_ptr<Representation>& representation)
@@ -165,7 +180,7 @@ bool Representation::ignore(const std::shared_ptr<Representation>& representatio
 	if (representation->getSceneElement() == nullptr)
 	{
 		SURGSIM_LOG_WARNING(m_logger) << getFullName() << " cannot ignore " << representation->getName() <<
-			", which is not in a scene element.";
+									  ", which is not in a scene element.";
 		return false;
 	}
 	return ignore(representation->getFullName());
@@ -173,13 +188,26 @@ bool Representation::ignore(const std::shared_ptr<Representation>& representatio
 
 bool Representation::allow(const std::string& fullName)
 {
+	bool result = false;
 	if (m_ignoring.empty())
 	{
-		return m_allowing.insert(fullName).second;
+		result = m_allowing.insert(fullName).second;
 	}
-	SURGSIM_LOG_SEVERE(m_logger) << getFullName() << " cannot allow " << fullName
-		<< ". You can only set what representations to ignore or allow, not both.";
-	return false;
+	else
+	{
+		auto found = m_ignoring.find(fullName);
+		if (found != m_ignoring.end())
+		{
+			m_ignoring.erase(found);
+			result = true;
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(m_logger)
+					<< getFullName() << " Trying un-ignore" << fullName << " but it wasn't found.";
+		}
+	}
+	return result;
 }
 
 bool Representation::allow(const std::shared_ptr<Representation>& representation)
@@ -187,7 +215,7 @@ bool Representation::allow(const std::shared_ptr<Representation>& representation
 	if (representation->getSceneElement() == nullptr)
 	{
 		SURGSIM_LOG_WARNING(m_logger) << getFullName() << " cannot allow " << representation->getName() <<
-			", which is not in a scene element.";
+									  ", which is not in a scene element.";
 		return false;
 	}
 	return allow(representation->getFullName());
@@ -203,7 +231,7 @@ void Representation::setIgnoring(const std::vector<std::string>& fullNames)
 	else
 	{
 		SURGSIM_LOG_SEVERE(m_logger) << getFullName() << " cannot use setIgnoring. "
-			<< "You can only set what representations to ignore or allow, not both.";
+									 << "You can only set what representations to ignore or allow, not both.";
 	}
 }
 
@@ -247,7 +275,7 @@ void Representation::setAllowing(const std::vector<std::string>& fullNames)
 	else
 	{
 		SURGSIM_LOG_SEVERE(m_logger) << getFullName() << " cannot use setAllowing. "
-			<< "You can only set what representations to ignore or allow, not both.";
+									 << "You can only set what representations to ignore or allow, not both.";
 	}
 }
 
