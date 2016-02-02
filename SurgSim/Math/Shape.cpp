@@ -53,5 +53,10 @@ size_t Shape::getVersion() const
 	return 0;
 }
 
+const Math::Aabbd Shape::getBoundingBox() const
+{
+	return m_aabb;
+}
+
 } // namespace Math
 } // namespace SurgSim

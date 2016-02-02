@@ -25,6 +25,7 @@ CylinderShape::CylinderShape(double length, double radius) : m_length(length), m
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderShape, double, Radius, getRadius, setRadius);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderShape, double, Length, getLength, setLength);
+	updateAabb();
 }
 
 int CylinderShape::getType() const
@@ -46,11 +47,20 @@ double CylinderShape::getRadius() const
 void CylinderShape::setLength(double length)
 {
 	m_length = length;
+	updateAabb();
 }
 
 void CylinderShape::setRadius(double radius)
 {
 	m_radius = radius;
+	updateAabb();
+}
+
+void CylinderShape::updateAabb()
+{
+	m_aabb.setEmpty();
+	m_aabb.extend(Vector3d(-m_radius, -m_length / 2.0, -m_radius));
+	m_aabb.extend(Vector3d(m_radius, m_length / 2.0, m_radius));
 }
 
 double CylinderShape::getVolume() const

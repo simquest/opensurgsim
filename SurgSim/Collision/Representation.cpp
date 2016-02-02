@@ -291,5 +291,11 @@ void Representation::doRetire()
 	Framework::Representation::doRetire();
 }
 
+Math::Aabbd Representation::getBoundingBox() const
+{
+	SURGSIM_ASSERT(getShape() != nullptr);
+	return Math::transformAabb(getPose(), getShape()->getBoundingBox());
+}
+
 }; // namespace Collision
 }; // namespace SurgSim

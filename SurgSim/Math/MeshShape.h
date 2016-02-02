@@ -99,6 +99,7 @@ public:
 
 protected:
 	bool doUpdate() override;
+
 	bool doLoad(const std::string& fileName) override;
 
 	/// Calculate normals for all triangles.

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Aabb.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 
 namespace SurgSim
 {
@@ -103,6 +105,12 @@ public:
 	/// Get the version number, which can be used to see if the shape has changed.
 	/// \return The version number.
 	virtual size_t getVersion() const;
+
+	/// \return the bounding box for the shape
+	virtual const Math::Aabbd getBoundingBox() const;
+
+protected:
+	Math::Aabbd m_aabb;
 };
 
 /// PosedShape is a transformed shape with a record of the pose used to transform it.

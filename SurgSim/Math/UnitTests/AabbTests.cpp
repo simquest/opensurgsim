@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
@@ -67,6 +68,23 @@ TEST(AabbdTests, makeAabb)
 	Vector3d three(1.0, 1.0, 1.0);
 	Aabbd aabb(makeAabb(one, two, three));
 	Aabbd expected(Vector3d(-1.0, -1.0, -1.0), Vector3d(1.0, 1.0, 1.0));
+	EXPECT_TRUE(expected.isApprox(aabb));
+}
+
+TEST(AabbdTest, rotateAabb)
+{
+	Vector3d one(1.0, 2.0, 3.0);
+	Vector3d two(-6.0, -4.0, -3.0);
+
+	RigidTransform3d transform = makeRigidTransform(Quaterniond(0.0, 1.0, 0.0, 0.0), Vector3d(1.0, 2.0, 3.0));
+
+	Aabbd expected(transform * one);
+	expected.extend(transform * two);
+
+	Aabbd aabb(one);
+	aabb.extend(two);
+
+	aabb = transformAabb(transform, aabb);
 	EXPECT_TRUE(expected.isApprox(aabb));
 }
 

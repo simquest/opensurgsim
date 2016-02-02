@@ -23,6 +23,7 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::DoubleSidedPlaneShape, Dou
 
 DoubleSidedPlaneShape::DoubleSidedPlaneShape()
 {
+	m_aabb.setEmpty();
 }
 
 int DoubleSidedPlaneShape::getType() const

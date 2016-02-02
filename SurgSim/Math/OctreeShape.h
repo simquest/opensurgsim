@@ -81,6 +81,8 @@ public:
 
 	void loadOctree(const std::string& filePath);
 
+	const Math::Aabbd getBoundingBox() const override;
+
 private:
 
 	/// \param node the OctreeNode to check

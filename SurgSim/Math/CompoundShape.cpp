@@ -123,11 +123,29 @@ bool CompoundShape::isValid() const
 	return true;
 }
 
+const Math::Aabbd CompoundShape::getBoundingBox() const
+{
+	ReadLock lock(m_mutex);
+	if (!m_localAabb.hasValue())
+	{
+		UpgradeLock write(lock);
+		Math::Aabbd result;
+		for (const auto& subShape : m_shapes)
+		{
+			result.extend(Math::transformAabb(subShape.second, subShape.first->getBoundingBox()));
+		}
+		m_localAabb.setValue(result);
+	}
+
+	return *m_localAabb;
+}
+
 void CompoundShape::invalidateData()
 {
 	m_volume.invalidate();
 	m_center.invalidate();
 	m_secondMoment.invalidate();
+	m_localAabb.invalidate();
 	++m_version;
 }
 

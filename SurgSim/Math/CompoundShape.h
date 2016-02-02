@@ -94,6 +94,8 @@ public:
 
 	bool isValid() const override;
 
+	const Math::Aabbd getBoundingBox() const override;
+
 	bool isTransformable() const override;
 
 	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const override;
@@ -124,6 +126,7 @@ private:
 	mutable DataStructures::OptionalValue<Vector3d> m_center;
 	mutable DataStructures::OptionalValue<double> m_volume;
 	mutable DataStructures::OptionalValue<Matrix33d> m_secondMoment;
+	mutable DataStructures::OptionalValue<Math::Aabbd> m_localAabb;
 	///@}
 
 	/// For checking whether the shape has changed

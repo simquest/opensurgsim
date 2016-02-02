@@ -25,8 +25,8 @@
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/Shape.h"
-
 
 namespace SurgSim
 {
@@ -184,6 +184,8 @@ public:
 	/// \param representation The collision representation to check
 	/// return True if the collision representation is being allowed
 	bool isAllowing(const std::shared_ptr<Representation>& representation) const;
+
+	Math::Aabbd getBoundingBox() const;
 
 protected:
 	/// Invalidate the cached posed shape motion
