@@ -104,59 +104,44 @@ public:
 	{
 		bool result = false;
 
-		if (rigidLocalPosition.hasValue())
+		if (rigidLocalPosition.hasValue() && other.rigidLocalPosition.hasValue())
 		{
-			if (other.rigidLocalPosition.hasValue() &&
-				(rigidLocalPosition.getValue().isZero(precision) &&
-					other.rigidLocalPosition.getValue().isZero(precision)) ||
-				(rigidLocalPosition.getValue().isApprox(other.rigidLocalPosition.getValue(), precision)))
-			{
-				result = true;
-			}
+			auto const& vector1 = rigidLocalPosition.getValue();
+			auto const& vector2 = other.rigidLocalPosition.getValue();
+
+			result = (vector1.isZero(precision) && vector2.isZero(precision)) || vector1.isApprox(vector2, precision);
 		}
-		else if (octreeNodePath.hasValue())
+		else if (octreeNodePath.hasValue() && other.octreeNodePath.hasValue())
 		{
-			if (other.octreeNodePath.hasValue() && octreeNodePath.getValue() == other.octreeNodePath.getValue())
-			{
-				result = true;
-			}
+			result = (octreeNodePath.getValue() == other.octreeNodePath.getValue());
 		}
-		else if (index.hasValue())
+		else if (index.hasValue() && other.index.hasValue())
 		{
-			if (other.index.hasValue() && index.getValue() == other.index.getValue())
-			{
-				result = true;
-			}
+			result = (index.getValue() == other.index.getValue());
 		}
-		else if (triangleMeshLocalCoordinate.hasValue())
+		else if (triangleMeshLocalCoordinate.hasValue() && other.triangleMeshLocalCoordinate.hasValue())
 		{
-			if (other.triangleMeshLocalCoordinate.hasValue() &&
-				triangleMeshLocalCoordinate.getValue().index == other.triangleMeshLocalCoordinate.getValue().index &&
-				triangleMeshLocalCoordinate.getValue().coordinate.isApprox(
-					other.triangleMeshLocalCoordinate.getValue().coordinate, precision))
-			{
-				result = true;
-			}
+			auto const& triangle1 = triangleMeshLocalCoordinate.getValue();
+			auto const& triangle2 = other.triangleMeshLocalCoordinate.getValue();
+
+			result = (triangle1.index == triangle2.index) &&
+				triangle1.coordinate.isApprox(triangle2.coordinate, precision);
 		}
-		else if (nodeMeshLocalCoordinate.hasValue())
+		else if (nodeMeshLocalCoordinate.hasValue() && other.nodeMeshLocalCoordinate.hasValue())
 		{
-			if (other.nodeMeshLocalCoordinate.hasValue() &&
-				nodeMeshLocalCoordinate.getValue().index == other.nodeMeshLocalCoordinate.getValue().index &&
-				nodeMeshLocalCoordinate.getValue().coordinate.isApprox(
-					other.nodeMeshLocalCoordinate.getValue().coordinate, precision))
-			{
-				result = true;
-			}
+			auto const& node1= nodeMeshLocalCoordinate.getValue();
+			auto const& node2= other.nodeMeshLocalCoordinate.getValue();
+
+			result = (node1.index == node2.index) &&
+				node1.coordinate.isApprox(node2.coordinate, precision);
 		}
-		else if (elementMeshLocalCoordinate.hasValue())
+		else if (elementMeshLocalCoordinate.hasValue() && other.elementMeshLocalCoordinate.hasValue())
 		{
-			if (other.elementMeshLocalCoordinate.hasValue() &&
-				elementMeshLocalCoordinate.getValue().index == other.elementMeshLocalCoordinate.getValue().index &&
-				elementMeshLocalCoordinate.getValue().coordinate.isApprox(
-					other.elementMeshLocalCoordinate.getValue().coordinate, precision))
-			{
-				result = true;
-			}
+			auto const& element1 = elementMeshLocalCoordinate.getValue();
+			auto const& element2 = other.elementMeshLocalCoordinate.getValue();
+
+			result = (element1.index == element2.index) &&
+				element1.coordinate.isApprox(element2.coordinate, precision);
 		}
 		else
 		{
