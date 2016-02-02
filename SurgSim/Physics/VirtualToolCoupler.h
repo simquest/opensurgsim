@@ -69,7 +69,10 @@ public:
 	/// \return Input Component to get the pose from
 	const std::shared_ptr<SurgSim::Framework::Component> getInput();
 
-	/// Set the Input Component
+	/// Set the Input Component.
+	/// The force calculations rely upon pose and velocity.  If the input DataGroup does not contain a pose, no forces
+	/// will be calculated.  If the input DataGroup does not contain linear velocity or angular velocity, they will
+	/// be estimated.
 	/// \param input Input Component to get the pose from
 	void setInput(const std::shared_ptr<SurgSim::Framework::Component> input);
 
@@ -274,6 +277,9 @@ private:
 
 	/// Whether or not the VTC sends forces and torques to the output device (if any) only when the tool is colliding.
 	bool m_hapticOutputOnlyWhenColliding;
+
+	/// The previous input pose.
+	SurgSim::Math::RigidTransform3d m_previousInputPose;
 
 	///@{
 	/// Cached DataGroup indices.

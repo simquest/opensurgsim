@@ -438,8 +438,13 @@ TEST_F(VirtualToolCouplerTest, SetHapticOutputOnlyWhenColliding)
 	auto input = std::make_shared<Testing::MockInputComponent>("input");
 	DataStructures::DataGroupBuilder builder;
 	builder.addPose(DataStructures::Names::POSE);
+	// The VTC only provides the Jacobians if it gets input velocities.
+	builder.addVector(DataStructures::Names::LINEAR_VELOCITY);
+	builder.addVector(DataStructures::Names::ANGULAR_VELOCITY);
 	DataStructures::DataGroup inputData = builder.createData();
 	inputData.poses().set(DataStructures::Names::POSE, RigidTransform3d::Identity());
+	inputData.vectors().set(DataStructures::Names::LINEAR_VELOCITY, Vector3d::Identity());
+	inputData.vectors().set(DataStructures::Names::ANGULAR_VELOCITY, Vector3d::Identity());
 	input->setData(inputData);
 	virtualToolCoupler->setInput(input);
 	auto output = std::make_shared<Input::OutputComponent>("output");
