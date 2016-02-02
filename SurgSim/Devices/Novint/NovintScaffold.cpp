@@ -135,7 +135,7 @@ public:
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 				"No error during initializing device " <<
 				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
-				"', but an invalid handle returned.\nIs a Novint device plugged in?";
+				"', but an invalid handle returned. Is a Novint device plugged in?";
 		}
 		else
 		{
