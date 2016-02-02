@@ -27,6 +27,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Devices/Novint/NovintAuxiliaryThread.h"
 #include "SurgSim/Devices/Novint/NovintDevice.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Clock.h"
@@ -134,7 +135,7 @@ public:
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 				"No error during initializing device " <<
 				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
-				"', but an invalid handle returned.\nIs a Novint device plugged in?";
+				"', but an invalid handle returned. Is a Novint device plugged in?";
 		}
 		else
 		{
@@ -346,6 +347,8 @@ public:
 	/// Initialize the state.
 	StateData() : isApiInitialized(false), logger(Framework::Logger::getLogger("Devices/Novint"))
 	{
+		auxiliaryData[0] = std::pair<double, double>(0, 0);
+		auxiliaryData[1] = std::pair<double, double>(0, 0);
 	}
 
 	/// True if the API has been initialized (and not finalized).
@@ -353,6 +356,8 @@ public:
 
 	/// Wrapper for the haptic loop callback handle.
 	std::unique_ptr<Callback> callback;
+
+	std::unique_ptr<NovintAuxiliaryThread> auxiliaryThread;
 
 	/// The registered devices.
 	std::list<std::unique_ptr<DeviceData>> registeredDevices;
@@ -379,6 +384,9 @@ public:
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> logger;
 
+	std::array<std::pair<double, double>, 2> auxiliaryData;
+	boost::mutex auxiliaryMutex;
+
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
 	StateData(const StateData&) /*= delete*/;
@@ -404,6 +412,15 @@ NovintScaffold::NovintScaffold() : m_state(new StateData)
 		}
 	}
 	m_state->timer.setMaxNumberOfFrames(5000);
+
+	// Must initialize the auxiliary grips first.
+	std::unique_ptr<NovintAuxiliaryThread> auxiliaryThread(new NovintAuxiliaryThread(this));
+	auxiliaryThread->setRate(2000);
+	auxiliaryThread->start();
+	while (!auxiliaryThread->isInitialized())
+	{
+	}
+	m_state->auxiliaryThread = std::move(auxiliaryThread);
 
 	// The canonical HDAL approach (Programmer's Guide, section 4.7 Multiple devices) is:
 	// 1) hdlInitXXXX on all devices that will be used by this application,
@@ -444,6 +461,12 @@ NovintScaffold::NovintScaffold() : m_state(new StateData)
 
 NovintScaffold::~NovintScaffold()
 {
+	if (m_state->auxiliaryThread != nullptr)
+	{
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
+		m_state->auxiliaryThread->stop();
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
+	}
 	if (m_state->isApiInitialized)
 	{
 		// The HDAL seems to do bad things (and the CRT complains) if we uninitialize the device too soon.
@@ -655,17 +678,17 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		{
 			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Left-handed.";
 			info->isDeviceRollAxisReversed = true;
-			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = -75. * M_PI / 180.;
-			info->eulerAngleOffsetPitch = -50. * M_PI / 180.;
+			info->eulerAngleOffsetRoll = 0.37;
+			info->eulerAngleOffsetYaw = 1.57 + 0.79;//-75. * M_PI / 180.;
+			info->eulerAngleOffsetPitch = 0;//-50. * M_PI / 180.;
 		}
 		else
 		{
-			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is right-handed.";
+			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Right-handed.";
 			info->isDeviceRollAxisReversed = false;
-			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = +75. * M_PI / 180.;
-			info->eulerAngleOffsetPitch = +50. * M_PI / 180.;
+			info->eulerAngleOffsetRoll = -1.43;
+			info->eulerAngleOffsetYaw = 0;//(+75. * M_PI / 180.) - 1.3;
+			info->eulerAngleOffsetPitch = 1.57 - 1.07;//+50. * M_PI / 180.;
 		}
 	}
 	return result;
@@ -689,6 +712,12 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 	}
 
 	// Set the force command (in newtons).
+	const double norm = info->force.norm();
+	const double maxForce = 20.0;
+	if (norm > maxForce)
+	{
+		info->force = info->force.normalized() * maxForce;
+	}
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
 	fatalError = fatalError || isFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
@@ -731,10 +760,23 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
 		fatalError = fatalError || isFatalError("hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
 
+		{
+			boost::lock_guard<boost::mutex> lock(m_state->auxiliaryMutex);
+			const int index = (info->isDeviceRollAxisReversed) ? 1 : 0;
+			angles[0] = m_state->auxiliaryData[index].first;
+			const double rollOffset = (index == 0) ? 1.98 : 1.82;
+			angles[3] = m_state->auxiliaryData[index].second - rollOffset;
+		}
 		// The zero values are NOT the home orientation.
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+		if (info->isDeviceRollAxisReversed)
+		{
+			info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
+			info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
+		}
+		//std::cout << info->deviceObject->getName() << " " << angles[0] << " " << angles[1] << " " << angles[2] << " " << info->jointAngles.transpose() << std::endl;
 
 		/* HW-Nov-12-2015
 		   Testing on Nov 10, 2015 shows that 
@@ -847,6 +889,12 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	{
 		Vector3d torque = Vector3d::Zero();
 		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
+		torque[1] = -torque[1];
+		if (!info->isDeviceRollAxisReversed)
+		{
+			torque[0] = -torque[0];
+			torque[2] = -torque[2];
+		}
 
 		if (havespringJacobian)
 		{
@@ -929,22 +977,22 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
 		const double axisTorqueMin = -2000;
 		const double axisTorqueMax = +2000;
-		// roll axis:  torque = 17.6 mNm  when command = 2000 (but flipped in left grip!)
-		const double rollTorqueScale  = axisTorqueMax / 17.6e-3;
-		// yaw axis:   torque = 47.96 mNm when command = 2000
-		const double yawTorqueScale   = axisTorqueMax / 47.96e-3;
-		// pitch axis: torque = 47.96 mNm when command = 2000
-		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
+		// roll axis:  torque = 41.97 mNm  when command = 2000 (but flipped in left grip!)
+		const double rollTorqueScale  = axisTorqueMax / 41.97e-3;
+		// yaw axis:   torque = 95.92 mNm when command = 2000
+		const double yawTorqueScale   = axisTorqueMax / 95.92e-3;
+		// pitch axis: torque = 95.92 mNm when command = 2000
+		const double pitchTorqueScale = axisTorqueMax / 95.92e-3;
 
-		info->torque[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
-									   axisTorqueMin, axisTorqueMax);
+		info->torque[0] = 0;//clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
+							//		   axisTorqueMin, axisTorqueMax);
 		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[3] = 0;
 
-		if (info->isDeviceRollAxisReversed)  // commence swearing.
+		if (info->isDeviceRollAxisReversed)
 		{
 			info->torque[0] = -info->torque[0];
 		}
@@ -1239,6 +1287,13 @@ std::shared_ptr<NovintScaffold> NovintScaffold::getOrCreateSharedInstance()
 {
 	static Framework::SharedInstance<NovintScaffold> sharedInstance;
 	return sharedInstance.get();
+}
+
+void NovintScaffold::setAuxiliary(int grip, double roll, double toolDof)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->auxiliaryMutex);
+	SURGSIM_ASSERT((grip == 0) || (grip == 1)) << "Bad grip for setAuxiliary: " << grip;
+	m_state->auxiliaryData[grip] = std::pair<double, double>(roll, toolDof);
 }
 
 };  // namespace Devices
