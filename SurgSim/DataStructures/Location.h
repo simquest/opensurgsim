@@ -121,27 +121,15 @@ public:
 		}
 		else if (triangleMeshLocalCoordinate.hasValue() && other.triangleMeshLocalCoordinate.hasValue())
 		{
-			auto const& triangle1 = triangleMeshLocalCoordinate.getValue();
-			auto const& triangle2 = other.triangleMeshLocalCoordinate.getValue();
-
-			result = (triangle1.index == triangle2.index) &&
-				triangle1.coordinate.isApprox(triangle2.coordinate, precision);
+			result = triangleMeshLocalCoordinate.getValue().isApprox(other.triangleMeshLocalCoordinate.getValue());
 		}
 		else if (nodeMeshLocalCoordinate.hasValue() && other.nodeMeshLocalCoordinate.hasValue())
 		{
-			auto const& node1= nodeMeshLocalCoordinate.getValue();
-			auto const& node2= other.nodeMeshLocalCoordinate.getValue();
-
-			result = (node1.index == node2.index) &&
-				node1.coordinate.isApprox(node2.coordinate, precision);
+			result = nodeMeshLocalCoordinate.getValue().isApprox(other.nodeMeshLocalCoordinate.getValue());
 		}
 		else if (elementMeshLocalCoordinate.hasValue() && other.elementMeshLocalCoordinate.hasValue())
 		{
-			auto const& element1 = elementMeshLocalCoordinate.getValue();
-			auto const& element2 = other.elementMeshLocalCoordinate.getValue();
-
-			result = (element1.index == element2.index) &&
-				element1.coordinate.isApprox(element2.coordinate, precision);
+			result = elementMeshLocalCoordinate.getValue().isApprox(other.elementMeshLocalCoordinate.getValue());
 		}
 		else
 		{
