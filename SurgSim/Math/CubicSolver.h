@@ -58,6 +58,28 @@ int findRoots(const T& a, const T& b, const T& c, T* roots)
 	return 2;
 }
 
+/// Evaluate a cubic equation
+/// \tparam T The equation coefficient type
+/// \param a, b, c, d The cubic equation coefficient as \f$ax^3 + bx^2 + cx + d\f$
+/// \param x The value to evaluate the polynomial at
+/// \return The polynomial evaluation at \f$x\f$, i.e. \f$ax^3 + bx^2 + cx + d\f$
+template <class T>
+T evaluatePolynomial(const T& a, const T& b, const T& c, const T& d, const T& x)
+{
+	return d + x * (c + x * (b + x * a));
+}
+
+/// Evaluate the derivative of a cubic equation
+/// \tparam T The equation coefficient type
+/// \param a, b, c, d The cubic equation coefficient as \f$ax^3 + bx^2 + cx + d\f$
+/// \param x The value to evaluate the polynomial at
+/// \return The polynomial derivative evaluation at \f$x\f$, i.e. \f$3ax^2 + 2bx + c\f$
+template <class T>
+T evaluatePolynomialDerivative(const T& a, const T& b, const T& c, const T& d, const T& x)
+{
+	return c + x * (static_cast<T>(2) * b + x * static_cast<T>(3) * a);
+}
+
 }; // Math
 }; // SurgSim
 
