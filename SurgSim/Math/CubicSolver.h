@@ -80,6 +80,52 @@ T evaluatePolynomialDerivative(const T& a, const T& b, const T& c, const T& d, c
 	return c + x * (static_cast<T>(2) * b + x * static_cast<T>(3) * a);
 }
 
+/// Find the root of a cubic equation in a given range
+/// \tparam T The equation coefficient type
+/// \param a, b, c, d The cubic equation coefficient as \f$ax^3 + bx^2 + cx + d\f$
+/// \param min, max The range to look into
+/// \return The root
+/// \note This function supposes that the polynomial is monotonic on the range
+/// \note \f$[min\ldotp\ldotp\ldotp\ldotpmax]\f$ and has a solution
+template <class T>
+T findRootInRange(const T& a, const T& b, const T& c, const T& d, T min, T max)
+{
+	T Pmin = evaluatePolynomial(a, b, c, d, min);
+	if (std::abs(Pmin) < 1e-15)
+	{
+		return min;
+	}
+
+	T Pmax = evaluatePolynomial(a, b, c, d, max);
+	if (std::abs(Pmax) < 1e-15)
+	{
+		return max;
+	}
+
+	while (max - min > 1e-15)
+	{
+		T middle = (max + min) * 0.5;
+		T Pmiddle = evaluatePolynomial(a, b, c, d, middle);
+		if (std::abs(Pmiddle) < 1e-15)
+		{
+			return middle;
+		}
+
+		if (std::signbit(Pmin) == std::signbit(Pmiddle))
+		{
+			min = middle;
+			Pmin = Pmiddle;
+		}
+		else
+		{
+			max = middle;
+			Pmax = Pmiddle;
+		}
+	}
+
+	return (max + min) * 0.5;
+}
+
 }; // Math
 }; // SurgSim
 
