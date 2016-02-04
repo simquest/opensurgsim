@@ -29,6 +29,11 @@ namespace Collision
 class ContactCalculation;
 }
 
+namespace Framework
+{
+class Logger;
+}
+
 namespace Physics
 {
 class PhysicsManagerState;
@@ -56,6 +61,13 @@ public:
 protected:
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 		override;
+
+private:
+	/// The time since the collision pairs were last logged.
+	double m_timeSinceLog;
+
+	/// The logger.
+	std::shared_ptr<Framework::Logger> m_logger;
 };
 
 }; // Physics
