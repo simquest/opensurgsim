@@ -144,11 +144,14 @@ T findRootInRange(const T& a, const T& b, const T& c, const T& d, T min, T max)
 ///   P(x) &=& ax^3 + bx^2 + cx + d \\ \text{}
 ///   P'(x) &=& 3ax^2 + 2bx + c \Rightarrow \Delta = (2b)^2 - 4(3a)(c) = 4(b^2 - 3ac)
 ///  \end{array}
+///  \\ \text{}
+///  \left\{
 ///  \begin{array}{ll}
 ///   \Delta < 0 & \text{P is monotonic, P' is always the same sign, the sign of P'(0) = sign(c)} \\ \text{}
 ///   \Delta = 0 & \text{P is monotonic with an inflection point, P' is always the same sign, except at P'(root) = 0} \\ \text{}
 ///   \Delta > 0 & \text{P is monotonic on 3 separate intervals}
 ///  \end{array}
+///  \right.
 /// \f]
 template <class T>
 bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T* root)
@@ -164,8 +167,9 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 	if (isZero(a))
 	{
 		T roots[2];
-		root[0] = static_cast<T>(2);
 		int nRoots = findRoots(b, c, d, roots);
+
+		root[0] = static_cast<T>(2);
 		for (int i = 0; i < nRoots; ++i)
 		{
 			if (roots[i] >= 0.0 && roots[i] <= 1.0 && roots[i] < root[0])
