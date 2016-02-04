@@ -185,6 +185,23 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 
 	if (isZero(delta))
 	{
+		// P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
+		// Therefore P is monotonic (ascending or descending) and has 1 unique root over ]-Inf +Inf[
+
+		T P0 = d;// evaluatePolynomial(a, b, c, d, static_cast<T>(0));
+		T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
+		if (isZero(P1))
+		{
+			root[0] = static_cast<T>(1);
+			return true;
+		}
+
+		// P0 and P1 cannot be zero at this stage, so they both have a clear sign
+		if (std::signbit(P0) != std::signbit(P1))
+		{
+			root[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
+			return true;
+		}
 	}
 	else if (delta < 0.0)
 	{
