@@ -180,6 +180,35 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 		return root[0] != static_cast<T>(2);
 	}
 
+	// General case, let's analyze the derivative...first we calculate the discriminant:
+	T delta = static_cast<T>(4) * (b * b - static_cast<T>(3) * a * c);
+
+	if (isZero(delta))
+	{
+	}
+	else if (delta < 0.0)
+	{
+		// If the discriminant is negative, P' has always the same sign, the sign of P'(0) (i.e. sign(c))
+		// Therefore P is monotonic (stricly ascending or descending) and has 1 unique root over ]-Inf +Inf[
+
+		T P0 = d;// evaluatePolynomial(a, b, c, d, static_cast<T>(0));
+		T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
+		if (isZero(P1))
+		{
+			root[0] = static_cast<T>(1);
+			return true;
+		}
+
+		// P0 and P1 cannot be zero at this stage, so they both have a clear sign
+		if (std::signbit(P0) != std::signbit(P1))
+		{
+			root[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
+			return true;
+		}
+	}
+	else
+	{ }
+
 	return false;
 }
 
