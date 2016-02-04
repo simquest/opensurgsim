@@ -88,18 +88,18 @@ TEST(BasicThreadTest, RunTimeManagement)
 	std::shared_ptr<Barrier> barrier = std::make_shared<Barrier>(2);
 	EXPECT_FALSE(m.didInitialize);
 	EXPECT_FALSE(m.didStartUp);
+	EXPECT_FALSE(m.isRunning());	
 	m.start(barrier);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_TRUE(m.isRunning());	
 	EXPECT_TRUE(m.didInitialize);
 	EXPECT_FALSE(m.didStartUp);
 	barrier->wait(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	EXPECT_TRUE(m.didInitialize);
 	EXPECT_TRUE(m.didStartUp);
-	EXPECT_FALSE(m.isRunning());
 	barrier->wait(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-	EXPECT_TRUE(m.isRunning());
 
 	m.stop();
 }

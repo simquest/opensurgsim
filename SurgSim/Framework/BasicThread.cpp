@@ -86,6 +86,8 @@ bool BasicThread::startUp()
 
 void BasicThread::start(std::shared_ptr<Barrier> startupBarrier, bool isSynchronized)
 {
+	boost::unique_lock<boost::mutex> lock(m_mutexStartStop);
+
 	m_startupBarrier = startupBarrier;
 	m_stopExecution = false;
 	m_isRunning = false;
@@ -94,6 +96,7 @@ void BasicThread::start(std::shared_ptr<Barrier> startupBarrier, bool isSynchron
 	// Start the thread with a reference to this
 	// prevents making a copy
 	m_thisThread = boost::thread(boost::ref(*this));
+	m_isRunning = true;
 }
 
 boost::thread& BasicThread::getThread()
@@ -106,6 +109,7 @@ void BasicThread::operator()()
 	bool success = executeInitialization();
 	if (! success)
 	{
+		m_isRunning = false;
 		return;
 	}
 
@@ -116,7 +120,6 @@ void BasicThread::operator()()
 	boost::chrono::duration<double> totalSleepTime(0.0);
 	Clock::time_point start;
 
-	m_isRunning = true;
 	m_timer.start();
 	while (m_isRunning && !m_stopExecution)
 	{
@@ -186,6 +189,8 @@ void BasicThread::operator()()
 
 void BasicThread::stop()
 {
+	boost::unique_lock<boost::mutex> lock(m_mutexStartStop);
+
 	m_stopExecution = true;
 
 	if (! m_isSynchronous)
