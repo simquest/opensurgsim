@@ -75,7 +75,7 @@ bool ReplayPoseScaffold::doStartUp() { return true; }
 
 bool ReplayPoseScaffold::doUpdate(double dt)
 {
-	boost::unique_lock<boost::mutex> scoped_lock(m_deviceLock);
+	boost::unique_lock<boost::mutex> scopedLock(m_deviceLock);
 
 	SURGSIM_ASSERT(m_device != nullptr) << "DeviceData not properly allocated";
 
@@ -231,7 +231,7 @@ bool ReplayPoseScaffold::registerDevice(ReplayPoseDevice* device)
 
 bool ReplayPoseScaffold::unregisterDevice()
 {
-	boost::unique_lock<boost::mutex> scoped_lock(m_deviceLock);
+	boost::unique_lock<boost::mutex> scopedLock(m_deviceLock);
 
 	// #threadsafety After unregistering, another thread could be in the process of registering.
 	if (isRunning())
