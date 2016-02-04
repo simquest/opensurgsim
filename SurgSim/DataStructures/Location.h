@@ -100,6 +100,45 @@ public:
 		}
 	}
 
+	bool isApprox(const Location& other, double precision = std::numeric_limits<double>::epsilon())
+	{
+		bool result = false;
+
+		if (rigidLocalPosition.hasValue() && other.rigidLocalPosition.hasValue())
+		{
+			auto const& vector1 = rigidLocalPosition.getValue();
+			auto const& vector2 = other.rigidLocalPosition.getValue();
+
+			result = (vector1.isZero(precision) && vector2.isZero(precision)) || vector1.isApprox(vector2, precision);
+		}
+		else if (octreeNodePath.hasValue() && other.octreeNodePath.hasValue())
+		{
+			result = (octreeNodePath.getValue() == other.octreeNodePath.getValue());
+		}
+		else if (index.hasValue() && other.index.hasValue())
+		{
+			result = (index.getValue() == other.index.getValue());
+		}
+		else if (triangleMeshLocalCoordinate.hasValue() && other.triangleMeshLocalCoordinate.hasValue())
+		{
+			result = triangleMeshLocalCoordinate.getValue().isApprox(other.triangleMeshLocalCoordinate.getValue());
+		}
+		else if (nodeMeshLocalCoordinate.hasValue() && other.nodeMeshLocalCoordinate.hasValue())
+		{
+			result = nodeMeshLocalCoordinate.getValue().isApprox(other.nodeMeshLocalCoordinate.getValue());
+		}
+		else if (elementMeshLocalCoordinate.hasValue() && other.elementMeshLocalCoordinate.hasValue())
+		{
+			result = elementMeshLocalCoordinate.getValue().isApprox(other.elementMeshLocalCoordinate.getValue());
+		}
+		else
+		{
+			SURGSIM_FAILURE() << "Invalid location type";
+		}
+
+		return result;
+	}
+
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
 	SurgSim::DataStructures::OptionalValue<size_t> index;

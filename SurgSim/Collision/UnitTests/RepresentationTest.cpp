@@ -212,6 +212,14 @@ TEST_F(RepresentationTest, Ignoring)
 	EXPECT_FALSE(planeRep->isAllowing("Element/SphereShape"));
 	EXPECT_TRUE(planeRep->isAllowing("Invalid"));
 
+	// Remove and add Test back from the ignoring list
+	EXPECT_TRUE(planeRep->allow("Test"));
+	EXPECT_FALSE(planeRep->isIgnoring("Test"));
+	EXPECT_FALSE(planeRep->allow("Test"));
+	EXPECT_TRUE(planeRep->ignore("Test"));
+	EXPECT_TRUE(planeRep->isIgnoring("Test"));
+
+
 	std::vector<std::string> newExclusions;
 	newExclusions.push_back("Test");
 	newExclusions.push_back("Element/PlaneShape");
@@ -259,9 +267,14 @@ TEST_F(RepresentationTest, Allowing)
 	EXPECT_TRUE(sphereRep->isAllowing("CollideWith2"));
 	EXPECT_TRUE(sphereRep->isAllowing("CollideWith3"));
 
-	EXPECT_FALSE(sphereRep->ignore("CollideWith1"));
-	EXPECT_FALSE(sphereRep->isIgnoring("CollideWith1"));
+
+	/// CollideWith1 is will be removed from the 'allowing'
+	EXPECT_TRUE(sphereRep->ignore("CollideWith1"));
+	EXPECT_TRUE(sphereRep->isIgnoring("CollideWith1"));
+	EXPECT_FALSE(sphereRep->isAllowing("CollideWith1"));
+	EXPECT_TRUE(sphereRep->allow("CollideWith1"));
 	EXPECT_TRUE(sphereRep->isAllowing("CollideWith1"));
+
 }
 
 TEST_F(RepresentationTest, SerializationTest)
@@ -280,16 +293,16 @@ TEST_F(RepresentationTest, SerializationTest)
 
 	std::shared_ptr<Representation> decodedSphereRep;
 	ASSERT_NO_THROW(decodedSphereRep = std::dynamic_pointer_cast<Representation>(
-				node.as<std::shared_ptr<Framework::Component>>()));
+										   node.as<std::shared_ptr<Framework::Component>>()));
 
 	ASSERT_NE(nullptr, decodedSphereRep);
 	EXPECT_TRUE(decodedSphereRep->isIgnoring("Test"));
 	EXPECT_TRUE(decodedSphereRep->isIgnoring("Element/PlaneShape"));
 	EXPECT_EQ(COLLISION_DETECTION_TYPE_CONTINUOUS,
-			sphereRep->getValue<CollisionDetectionType>("CollisionDetectionType"));
+			  sphereRep->getValue<CollisionDetectionType>("CollisionDetectionType"));
 	EXPECT_EQ(COLLISION_DETECTION_TYPE_CONTINUOUS, sphereRep->getCollisionDetectionType());
 	EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE,
-			sphereRep->getValue<CollisionDetectionType>("SelfCollisionDetectionType"));
+			  sphereRep->getValue<CollisionDetectionType>("SelfCollisionDetectionType"));
 	EXPECT_EQ(COLLISION_DETECTION_TYPE_DISCRETE, sphereRep->getSelfCollisionDetectionType());
 }
 

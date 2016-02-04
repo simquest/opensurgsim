@@ -167,8 +167,8 @@ std::shared_ptr<Graphics::RenderPass> createShadowMapPass(int textureSize, doubl
 	material->addUniform("float", "bias");
 	material->setValue("bias", static_cast<float>(bias));
 
-	material->addUniform("float", "oneMinusIntensity");
-	material->setValue("oneMinusIntensity", static_cast<float>(1 - intensity));
+	material->addUniform("float", "intensity");
+	material->setValue("intensity", static_cast<float>(intensity));
 
 	if (debug)
 	{

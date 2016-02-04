@@ -83,5 +83,5 @@ void main(void)
 		
     vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).xyz;	
 	vertexSpecularColor = (attenuation * specularColor * lightSource.specular).xyz;
-	vertexAmbientColor = ambientColor * diffuseColor;
+	vertexAmbientColor = (ambientColor * diffuseColor).xyz;
 } 

@@ -256,10 +256,10 @@ TEST_F(GeometryTest, BaryCentricWithoutNormal)
 	EXPECT_TRUE(eigenEqual(VectorType(0.2, 0.25, 0.55), outputPoint));
 
 	// Degenerate
-	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v1, tri.v1, tri.v2, &outputPoint));
+	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v0, tri.v0, tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenAllNan(outputPoint));
 
-	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v0, tri.v0, tri.v2, &outputPoint));
+	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v0, tri.v1, tri.v1, &outputPoint));
 	EXPECT_TRUE(eigenAllNan(outputPoint));
 
 	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v2, tri.v1, tri.v2, &outputPoint));
