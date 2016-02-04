@@ -16,10 +16,18 @@
 #ifndef SURGSIM_MATH_CUBIC_SOLVER_H
 #define SURGSIM_MATH_CUBIC_SOLVER_H
 
+#include <limits>
+
 namespace SurgSim
 {
 namespace Math
 {
+
+template <class T>
+T isZero(const T& a)
+{
+	return std::abs(a) <= std::numeric_limits<T>::epsilon();
+}
 
 /// Find the roots of a quadratic equation
 /// \tparam T The equation coefficient type
@@ -30,10 +38,10 @@ template <class T>
 int findRoots(const T& a, const T& b, const T& c, T* roots)
 {
 	// Degenerate case? Not a quadratic equation, but linear
-	if (std::abs(a) <= 1e-15)
+	if (isZero(a))
 	{
 		// Degenerate case? Not a linear equation
-		if (std::abs(b) <= 1e-15)
+		if (isZero(b))
 		{
 			return 0;
 		}
@@ -42,7 +50,7 @@ int findRoots(const T& a, const T& b, const T& c, T* roots)
 	}
 
 	T delta = b * b - static_cast<T>(4.0) * a * c;
-	if (std::abs(delta) < 1e-15)
+	if (isZero(delta))
 	{
 		roots[0] = -b / (static_cast<T>(2.0) * a);
 		return 1;
@@ -80,33 +88,33 @@ T evaluatePolynomialDerivative(const T& a, const T& b, const T& c, const T& d, c
 	return c + x * (static_cast<T>(2) * b + x * static_cast<T>(3) * a);
 }
 
-/// Find the root of a cubic equation in a given range
+/// Find the root of a cubic equation in a given range using a dichotomic search
 /// \tparam T The equation coefficient type
 /// \param a, b, c, d The cubic equation coefficient as \f$ax^3 + bx^2 + cx + d\f$
-/// \param min, max The range to look into
+/// \param min, max The range to look into (\f$min <= max\f$)
 /// \return The root
-/// \note This function supposes that the polynomial is monotonic on the range
-/// \note \f$[min\ldotp\ldotp\ldotp\ldotpmax]\f$ and has a solution
+/// \note This function supposes that the polynomial is monotonic in the range \f$[min \ldotp\ldotp max]\f$
+/// \note and has a solution.
 template <class T>
 T findRootInRange(const T& a, const T& b, const T& c, const T& d, T min, T max)
 {
 	T Pmin = evaluatePolynomial(a, b, c, d, min);
-	if (std::abs(Pmin) < 1e-15)
+	if (isZero(Pmin))
 	{
 		return min;
 	}
 
 	T Pmax = evaluatePolynomial(a, b, c, d, max);
-	if (std::abs(Pmax) < 1e-15)
+	if (isZero(Pmax))
 	{
 		return max;
 	}
 
-	while (max - min > 1e-15)
+	while (max - min > std::numeric_limits<T>::epsilon())
 	{
 		T middle = (max + min) * 0.5;
 		T Pmiddle = evaluatePolynomial(a, b, c, d, middle);
-		if (std::abs(Pmiddle) < 1e-15)
+		if (isZero(Pmiddle))
 		{
 			return middle;
 		}
@@ -124,6 +132,51 @@ T findRootInRange(const T& a, const T& b, const T& c, const T& d, T min, T max)
 	}
 
 	return (max + min) * 0.5;
+}
+
+/// Find the smallest root in range \f$[0 \ldotp\ldotp 1]\f$ of a cubic equation
+/// \tparam T The equation coefficient type
+/// \param a, b, c, d The cubic equation coefficient as \f$ax^3 + bx^2 + cx + d\f$
+/// \param[out] root The smallest root in \f$[0 \ldotp\ldotp 1]\f$ if any
+/// \return True if a root was found, False otherwise
+/// \f[
+///  \begin{array}{lll}
+///   P(x) &=& ax^3 + bx^2 + cx + d \\ \text{}
+///   P'(x) &=& 3ax^2 + 2bx + c \Rightarrow \Delta = (2b)^2 - 4(3a)(c) = 4(b^2 - 3ac)
+///  \end{array}
+///  \begin{array}{ll}
+///   \Delta < 0 & \text{P is monotonic, P' is always the same sign, the sign of P'(0) = sign(c)} \\ \text{}
+///   \Delta = 0 & \text{P is monotonic with an inflection point, P' is always the same sign, except at P'(root) = 0} \\ \text{}
+///   \Delta > 0 & \text{P is monotonic on 3 separate intervals}
+///  \end{array}
+/// \f]
+template <class T>
+bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T* root)
+{
+	// Is 0 a root? P(0)=d=0?
+	if (isZero(d))
+	{
+		root[0] = 0.0;
+		return 1;
+	}
+
+	// Is degenerate?
+	if (isZero(a))
+	{
+		T roots[2];
+		root[0] = static_cast<T>(2);
+		int nRoots = findRoots(b, c, d, roots);
+		for (int i = 0; i < nRoots; ++i)
+		{
+			if (roots[i] >= 0.0 && roots[i] <= 1.0 && roots[i] < root[0])
+			{
+				root[0] = roots[i];
+			}
+		}
+		return root[0] != static_cast<T>(2);
+	}
+
+	return false;
 }
 
 }; // Math
