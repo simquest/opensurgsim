@@ -889,8 +889,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	{
 		Vector3d torque = Vector3d::Zero();
 		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
-		torque[1] = -torque[1];
-		if (!info->isDeviceRollAxisReversed)
+		if (info->isDeviceRollAxisReversed)
 		{
 			torque[0] = -torque[0];
 			torque[2] = -torque[2];
