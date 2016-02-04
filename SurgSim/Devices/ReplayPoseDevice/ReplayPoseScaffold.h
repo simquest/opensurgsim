@@ -16,9 +16,8 @@
 #ifndef SURGSIM_DEVICES_REPLAYPOSEDEVICE_REPLAYPOSESCAFFOLD_H
 #define SURGSIM_DEVICES_REPLAYPOSEDEVICE_REPLAYPOSESCAFFOLD_H
 
-#include <memory>
-
 #include <boost/thread/mutex.hpp>
+#include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/BasicThread.h"
