@@ -68,7 +68,10 @@ public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
 	typedef ::SurgSim::Math::Matrix33d Matrix33d;
 
-	// Destructor
+	/// Constructor
+	Shape();
+
+	/// Destructor
 	virtual ~Shape();
 
 	/// \return the type of shape
@@ -103,7 +106,7 @@ public:
 	virtual bool isValid() const = 0;
 
 	/// \return the bounding box for the shape
-	virtual const Math::Aabbd getBoundingBox() const;
+	virtual const Math::Aabbd& getBoundingBox() const;
 
 protected:
 	Math::Aabbd m_aabb;
@@ -113,12 +116,24 @@ protected:
 template <class T>
 struct PosedShape
 {
-	PosedShape() { pose = Math::RigidTransform3d::Identity(); }
+	PosedShape()
+	{
+		pose = Math::RigidTransform3d::Identity();
+	}
 	PosedShape(const T& shapeInput, const Math::RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
 
-	void invalidate() { shape = nullptr; }
-	const T& getShape() const { return shape; }
-	const Math::RigidTransform3d& getPose() const { return pose; }
+	void invalidate()
+	{
+		shape = nullptr;
+	}
+	const T& getShape() const
+	{
+		return shape;
+	}
+	const Math::RigidTransform3d& getPose() const
+	{
+		return pose;
+	}
 
 protected:
 	T shape;

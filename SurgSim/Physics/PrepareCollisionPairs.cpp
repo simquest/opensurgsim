@@ -42,7 +42,6 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
-	static size_t i = 0;
 	std::shared_ptr<PhysicsManagerState> result = state;
 	auto& representations = result->getActiveCollisionRepresentations();
 

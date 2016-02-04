@@ -89,7 +89,7 @@ public:
 
 	bool isTransformable() const override;
 
-	const Math::Aabbd getBoundingBox() const override;
+	const Math::Aabbd& getBoundingBox() const override;
 
 private:
 	bool doUpdate() override;

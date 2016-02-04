@@ -23,7 +23,6 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::PlaneShape, PlaneShape);
 
 PlaneShape::PlaneShape()
 {
-	m_aabb.setEmpty();
 }
 
 int PlaneShape::getType() const

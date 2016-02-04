@@ -126,7 +126,7 @@ bool CompoundShape::isValid() const
 	return true;
 }
 
-const Math::Aabbd CompoundShape::getBoundingBox() const
+const Math::Aabbd& CompoundShape::getBoundingBox() const
 {
 	ReadLock lock(m_mutex);
 	if (!m_localAabb.hasValue())

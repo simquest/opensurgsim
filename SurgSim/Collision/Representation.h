@@ -185,6 +185,7 @@ public:
 	/// return True if the collision representation is being allowed
 	bool isAllowing(const std::shared_ptr<Representation>& representation) const;
 
+	/// \return the Bounding box for this object
 	Math::Aabbd getBoundingBox() const;
 
 protected:

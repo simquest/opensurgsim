@@ -37,7 +37,6 @@ OctreeShape::OctreeShape() :
 		setOctree);
 
 	SURGSIM_ADD_SETTER(OctreeShape, std::string, OctreeFileName, loadOctree);
-	m_aabb.setEmpty();
 }
 
 OctreeShape::~OctreeShape()
@@ -103,7 +102,7 @@ bool OctreeShape::isValid() const
 	return isValid(m_rootNode);
 }
 
-const Math::Aabbd OctreeShape::getBoundingBox() const
+const Math::Aabbd& OctreeShape::getBoundingBox() const
 {
 	if (m_rootNode != nullptr)
 	{

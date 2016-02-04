@@ -23,6 +23,11 @@ namespace SurgSim
 namespace Math
 {
 
+Shape::Shape()
+{
+	m_aabb.setEmpty();
+}
+
 Shape::~Shape()
 {
 }
@@ -47,7 +52,7 @@ std::string Shape::getClassName() const
 	return "SurgSim::Math::Shape";
 }
 
-const Math::Aabbd Shape::getBoundingBox() const
+const Math::Aabbd& Shape::getBoundingBox() const
 {
 	return m_aabb;
 }

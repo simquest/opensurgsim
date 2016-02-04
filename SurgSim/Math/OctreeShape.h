@@ -81,7 +81,7 @@ public:
 
 	void loadOctree(const std::string& filePath);
 
-	const Math::Aabbd getBoundingBox() const override;
+	const Math::Aabbd& getBoundingBox() const override;
 
 private:
 

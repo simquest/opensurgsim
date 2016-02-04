@@ -94,11 +94,12 @@ public:
 
 	bool isValid() const override;
 
-	const Math::Aabbd getBoundingBox() const override;
+	const Math::Aabbd& getBoundingBox() const override;
 
 private:
 
-	/// Clears the data for the volume, center and secondMoment so it can be recalculated when needed again
+	/// Clears the data for the volume, center and secondMoment and aabb
+	/// so it can be recalculated when needed again
 	void invalidateData();
 
 	std::vector<SubShape> m_shapes;
