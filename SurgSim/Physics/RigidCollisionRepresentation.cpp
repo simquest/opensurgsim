@@ -98,24 +98,20 @@ void RigidCollisionRepresentation::update(const double& time)
 			currentPose = physicsCurrentPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
 		}
 
-		std::shared_ptr<Shape> shape1 = getShape();
-		Math::RigidTransform3d shape1Pose = Math::RigidTransform3d::Identity();
-		if (shape1->isTransformable())
+		std::shared_ptr<Shape> previousShape = getShape();
+		if (previousShape->isTransformable())
 		{
-			shape1 = getShape()->getTransformed(previousPose);
-			shape1Pose = previousPose;
+			previousShape = getShape()->getTransformed(previousPose);
 		}
 
-		std::shared_ptr<Shape> shape2 = getShape();
-		Math::RigidTransform3d shape2Pose = Math::RigidTransform3d::Identity();
-		if (shape2->isTransformable())
+		std::shared_ptr<Shape> currentShape = getShape();
+		if (currentShape->isTransformable())
 		{
-			shape2 = getShape()->getTransformed(currentPose);
-			shape2Pose = previousPose;
+			currentShape = getShape()->getTransformed(currentPose);
 		}
 
-		PosedShape<std::shared_ptr<Shape>> posedShape1(shape1, shape1Pose);
-		PosedShape<std::shared_ptr<Shape>> posedShape2(shape2, shape2Pose);
+		PosedShape<std::shared_ptr<Shape>> posedShape1(previousShape, previousPose);
+		PosedShape<std::shared_ptr<Shape>> posedShape2(currentShape, currentPose);
 		PosedShapeMotion<std::shared_ptr<Shape>> posedShapeMotion(posedShape1, posedShape2);
 
 		setPosedShapeMotion(posedShapeMotion);
