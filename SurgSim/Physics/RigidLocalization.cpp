@@ -57,13 +57,11 @@ SurgSim::Math::Vector3d RigidLocalization::doCalculatePosition(double time) cons
 	SURGSIM_ASSERT(rigidRepresentation != nullptr) << "RigidRepresentation is null, it was probably not" <<
 		" initialized";
 
-	// 'time' is a factor of the time step (which is the inverse of the physics thread rate)
-	// For that reason, we knowingly choose a factor not so small of 1-e6.
-	if (time <= 1e-6)
+	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return rigidRepresentation->getPreviousState().getPose() * m_position;
 	}
-	else if (time >= 1.0 - 1e-6)
+	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return rigidRepresentation->getCurrentState().getPose() * m_position;
 	}
@@ -91,14 +89,12 @@ SurgSim::Math::Vector3d RigidLocalization::doCalculateVelocity(double time) cons
 	auto& previousR = rigidRepresentation->getPreviousState().getPose().linear();
 	auto& currentR = rigidRepresentation->getCurrentState().getPose().linear();
 
-	// 'time' is a factor of the time step (which is the inverse of the physics thread rate)
-	// For that reason, we knowingly choose a factor not so small of 1-e6.
-	if (time <= 1e-6)
+	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return rigidRepresentation->getPreviousState().getLinearVelocity() +
 			rigidRepresentation->getPreviousState().getAngularVelocity().cross(previousR * m_position);
 	}
-	else if (time >= 1.0 - 1e-6)
+	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return rigidRepresentation->getCurrentState().getLinearVelocity() +
 			rigidRepresentation->getCurrentState().getAngularVelocity().cross(currentR * m_position);

@@ -56,13 +56,11 @@ SurgSim::Math::Vector3d MassSpringLocalization::doCalculatePosition(double time)
 	SURGSIM_ASSERT(massSpringRepresentation != nullptr) << "MassSpringRepresentation is null, it was probably not" <<
 		" initialized";
 
-	// 'time' is a factor of the time step (which is the inverse of the physics thread rate)
-	// For that reason, we knowingly choose a factor not so small of 1-e6.
-	if (time <= 1e-6)
+	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return massSpringRepresentation->getPreviousState()->getPosition(m_nodeID);
 	}
-	else if (time >= 1.0 - 1e-6)
+	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
 	}
@@ -81,13 +79,11 @@ SurgSim::Math::Vector3d MassSpringLocalization::doCalculateVelocity(double time)
 	SURGSIM_ASSERT(massSpringRepresentation != nullptr) << "MassSpringRepresentation is null, it was probably not" <<
 		" initialized";
 
-	// 'time' is a factor of the time step (which is the inverse of the physics thread rate)
-	// For that reason, we knowingly choose a factor not so small of 1-e6.
-	if (time <= 1e-6)
+	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return massSpringRepresentation->getPreviousState()->getVelocity(m_nodeID);
 	}
-	else if (time >= 1.0 - 1e-6)
+	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return massSpringRepresentation->getCurrentState()->getVelocity(m_nodeID);
 	}
