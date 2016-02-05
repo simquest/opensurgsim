@@ -37,6 +37,10 @@ protected:
 		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
 		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2) override;
 
+	//std::list<std::shared_ptr<Contact>> doCalculateCcdContact(
+	//	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+	//	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2) override;
+
 	/// Local shape types for this instance, these can be set to match the expected shapes
 	std::pair<int, int> m_types;
 

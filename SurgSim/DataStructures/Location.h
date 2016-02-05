@@ -50,11 +50,11 @@ public:
 	/// \param other The location to be copied while constructing.
 	Location(const Location& other)
 		: rigidLocalPosition(other.rigidLocalPosition),
-		  octreeNodePath(other.octreeNodePath),
-		  index(other.index),
-		  triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
-		  nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
-		  elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
+		octreeNodePath(other.octreeNodePath),
+		index(other.index),
+		triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
+		nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
+		elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
 	{}
 
 	/// Constructor for rigid local position
@@ -85,18 +85,18 @@ public:
 	{
 		switch (meshType)
 		{
-			case NODE:
-				nodeMeshLocalCoordinate.setValue(localCoordinate);
-				break;
-			case TRIANGLE:
-				triangleMeshLocalCoordinate.setValue(localCoordinate);
-				break;
-			case ELEMENT:
-				elementMeshLocalCoordinate.setValue(localCoordinate);
-				break;
-			default:
-				SURGSIM_FAILURE() << "Unknown location";
-				break;
+		case NODE:
+			nodeMeshLocalCoordinate.setValue(localCoordinate);
+			break;
+		case TRIANGLE:
+			triangleMeshLocalCoordinate.setValue(localCoordinate);
+			break;
+		case ELEMENT:
+			elementMeshLocalCoordinate.setValue(localCoordinate);
+			break;
+		default:
+			SURGSIM_FAILURE() << "Unknown location";
+			break;
 		}
 	}
 
@@ -150,7 +150,7 @@ public:
 
 template <typename charT, typename traits, typename T>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
-		const SurgSim::DataStructures::OptionalValue<T>& val)
+	const SurgSim::DataStructures::OptionalValue<T>& val)
 {
 	if (val.hasValue())
 	{
@@ -165,7 +165,7 @@ std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits
 
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
-		const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val)
+	const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& val)
 {
 	if (val.hasValue())
 	{
@@ -181,7 +181,7 @@ std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits
 
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
-		const SurgSim::DataStructures::IndexedLocalCoordinate& val)
+	const SurgSim::DataStructures::IndexedLocalCoordinate& val)
 {
 	out << "[ " << val.index << " : " << val.coordinate.transpose() << " ]";
 	return out;
@@ -190,7 +190,7 @@ std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits
 
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
-		const Location& loc)
+	const Location& loc)
 {
 	out << "RigidLocal: " << loc.rigidLocalPosition << std::endl;
 	out << "TriangleMeshLocal: " << loc.triangleMeshLocalCoordinate << std::endl;

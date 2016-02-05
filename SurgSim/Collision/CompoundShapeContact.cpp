@@ -84,8 +84,59 @@ std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
 		index++;
 	}
 	return contacts;
-
 }
+//
+//std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateCcdContact(
+//	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+//	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2)
+//{
+//	typedef Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> PosedShapeMotion;
+//
+//	std::list<std::shared_ptr<Contact>> contacts;
+//
+//	const auto& calculations = ContactCalculation::getCcdContactTable();
+//
+//	// Shape1 is compound shape
+//	const auto& compoundShape = std::static_pointer_cast<Math::CompoundShape>(posedShapeMotion1.firstgetShape());
+//
+//	SURGSIM_ASSERT(compoundShape->getType() == posedShape1.getShape()->getType()) <<
+//		"Invalid static cast to compound shape";
+//
+//	size_t index = 0;
+//	for (const auto& subShape : compoundShape->getShapes())
+//	{
+//		const auto& calculation = calculations[subShape.first->getType()][posedShape2.getShape()->getType()];
+//
+//		std::list<std::shared_ptr<Contact>> localContacts;
+//
+//		if (subShape.first->isTransformable())
+//		{
+//			auto pose = posedShape1.getPose() * subShape.second;
+//			localContacts = calculation->calculateDcdContact(
+//				PosedShape(subShape.first->getTransformed(pose), pose), posedShape2);
+//		}
+//		else
+//		{
+//			localContacts = calculation->calculateDcdContact(
+//				PosedShape(subShape.first, posedShape1.getPose() * subShape.second), posedShape2);
+//		}
+//
+//		for (auto& contact : localContacts)
+//		{
+//			auto& locations = contact->penetrationPoints.first;
+//			locations.index = index;
+//			if (locations.rigidLocalPosition.hasValue())
+//			{
+//				locations.rigidLocalPosition.setValue(subShape.second * locations.rigidLocalPosition.getValue());
+//			}
+//		}
+//
+//		contacts.splice(contacts.end(), localContacts);
+//		index++;
+//	}
+//
+//	return contacts;
+//}
 
 }
 }

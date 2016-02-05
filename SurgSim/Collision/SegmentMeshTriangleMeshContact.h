@@ -42,6 +42,12 @@ public:
 										 const Math::RigidTransform3d& segmentMeshPose,
 										 const Math::MeshShape& triangleMeshShape,
 										 const Math::RigidTransform3d& triangleMeshPose) const override;
+
+	std::list<std::shared_ptr<Contact>> calculateCcdContact(
+		const Math::SegmentMeshShape& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
+		const Math::SegmentMeshShape& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
+		const Math::MeshShape& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
+		const Math::MeshShape& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) const override;
 };
 
 }; // namespace Collision

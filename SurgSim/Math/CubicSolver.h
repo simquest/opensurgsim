@@ -17,6 +17,9 @@
 #define SURGSIM_MATH_CUBIC_SOLVER_H
 
 #include <limits>
+#include <vector>
+
+#include "SurgSim/Math/IntervalArithmetic.h"
 
 namespace SurgSim
 {
@@ -157,7 +160,8 @@ template <class T>
 bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T* root)
 {
 	// Is 0 a root? P(0)=d=0?
-	if (isZero(d))
+	T P0 = d;// evaluatePolynomial(a, b, c, d, static_cast<T>(0));
+	if (isZero(P0))
 	{
 		root[0] = 0.0;
 		return 1;
@@ -188,7 +192,6 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 		// P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
 		// Therefore P is monotonic (ascending or descending) and has 1 unique root over ]-Inf +Inf[
 
-		T P0 = d;// evaluatePolynomial(a, b, c, d, static_cast<T>(0));
 		T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
 		if (isZero(P1))
 		{
@@ -208,7 +211,6 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 		// If the discriminant is negative, P' has always the same sign, the sign of P'(0) (i.e. sign(c))
 		// Therefore P is monotonic (stricly ascending or descending) and has 1 unique root over ]-Inf +Inf[
 
-		T P0 = d;// evaluatePolynomial(a, b, c, d, static_cast<T>(0));
 		T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
 		if (isZero(P1))
 		{
@@ -224,7 +226,56 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 		}
 	}
 	else
-	{ }
+	{
+		// If the discriminant is positive, P'(x) has 2 roots {x0, x1}, which define 3 separate intervals to
+		// study ]-Inf x0[, [x0 x1] and ]x1 +Inf[
+		T tmp = std::sqrt(delta / 4.0);
+		T scale = static_cast<T>(1) / (static_cast<T>(3) * a);
+		T x0 = (-b - tmp) * scale;
+		T x1 = (-b + tmp) * scale;
+
+		Interval<T> intervalx0x1(x0, x1);
+		Interval<T> interval01(static_cast<T>(0), static_cast<T>(1));
+
+		if (!intervalx0x1.overlapsWith(interval01))
+		{
+			// If there is no overlap, the interval [0..1] is isolated into a monotonic interval
+
+			T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
+			if (isZero(P1))
+			{
+				root[0] = static_cast<T>(1);
+				return true;
+			}
+
+			// P0 and P1 cannot be zero at this stage, so they both have a clear sign
+			if (std::signbit(P0) != std::signbit(P1))
+			{
+				root[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
+				return true;
+			}
+		}
+		else
+		{
+			// Build the monotonic intervals within [0..1] to be analyzed one by one
+			std::vector<T> interval01;
+
+			interval01.push_back(static_cast<T>(0));
+			if (x0 > static_cast<T>(0) && x0 < static_cast<T>(1))
+			{
+				interval01.push_back(x0);
+			}
+			if (x1 > static_cast<T>(0) && x1 < static_cast<T>(1))
+			{
+				interval01.push_back(x1);
+			}
+			interval01.push_back(static_cast<T>(1));
+
+			for (auto interval: interval01)
+
+
+		}
+	}
 
 	return false;
 }
