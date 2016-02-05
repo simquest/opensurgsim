@@ -55,7 +55,7 @@ SURGSIM_STATIC_REGISTRATION(VirtualToolCoupler);
 ///		Colgate, J. Edward, Michael C. Stanley, and J. Michael Brown. "Issues in the haptic display of tool use."
 ///		Intelligent Robots and Systems 95.'Human Robot Interaction and Cooperative Robots',
 ///		Proceedings. 1995 IEEE/RSJ International Conference on. Vol. 3. IEEE, 1995.
-class VirtualToolCoupler : public SurgSim::Framework::Behavior
+class VirtualToolCoupler : public Framework::Behavior
 {
 public:
 	/// Constructor
@@ -67,28 +67,28 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Physics::VirtualToolCoupler);
 
 	/// \return Input Component to get the pose from
-	const std::shared_ptr<SurgSim::Framework::Component> getInput();
+	const std::shared_ptr<Framework::Component> getInput();
 
 	/// Set the Input Component.
 	/// The force calculations rely upon pose and velocity.  If the input DataGroup does not contain a pose, no forces
 	/// will be calculated.  If the input DataGroup does not contain linear velocity or angular velocity, they will
 	/// be estimated.
 	/// \param input Input Component to get the pose from
-	void setInput(const std::shared_ptr<SurgSim::Framework::Component> input);
+	void setInput(const std::shared_ptr<Framework::Component> input);
 
 	/// \return Output Component to send forces and torques
-	const std::shared_ptr<SurgSim::Framework::Component> getOutput();
+	const std::shared_ptr<Framework::Component> getOutput();
 
 	/// Set the Output Component (if any)
 	/// \param output Output Component to send forces and torques
-	void setOutput(const std::shared_ptr<SurgSim::Framework::Component> output);
+	void setOutput(const std::shared_ptr<Framework::Component> output);
 
 	/// \return Rigid Representation that provides state and receives external forces and torques
-	const std::shared_ptr<SurgSim::Framework::Component> getRepresentation();
+	const std::shared_ptr<Framework::Component> getRepresentation();
 
 	/// Set the Physics Representation which follows the input
 	/// \param rigid Rigid Representation that provides state and receives external forces and torques
-	void setRepresentation(const std::shared_ptr<SurgSim::Framework::Component> rigid);
+	void setRepresentation(const std::shared_ptr<Framework::Component> rigid);
 
 	/// Get whether or not the haptic forces should be provided only during collisions.
 	/// \return false if the VTC forces and torques are sent to the output device (if any) at all times.  true if
@@ -105,7 +105,7 @@ public:
 
 	/// Set the name of the pose entry in the input DataGroup
 	/// \param    poseName Name of the pose data in the input to transfer
-	void setPoseName(const std::string& poseName = SurgSim::DataStructures::Names::POSE);
+	void setPoseName(const std::string& poseName = DataStructures::Names::POSE);
 
 	void update(double dt) override;
 
@@ -149,11 +149,11 @@ public:
 	/// If this value is not provided, the point of attachment will be automatically
 	/// set to the Representation's center of mass.
 	/// \param attachment The attachment point in the Representations local coordinate frame
-	void overrideAttachmentPoint(const SurgSim::Math::Vector3d& attachment);
+	void overrideAttachmentPoint(const Math::Vector3d& attachment);
 
 	/// Get the point of attachment on the Representation
 	/// \return The attachment point in the Representations local coordinate frame
-	const SurgSim::Math::Vector3d& getAttachmentPoint();
+	const Math::Vector3d& getAttachmentPoint();
 
 	/// Enable/disable torques that simulate inertia.  This setting only has an effect if the attachment point is not
 	/// the mass center.
@@ -173,78 +173,77 @@ protected:
 	int getTargetManagerType() const override;
 
 	/// \return The DataGroup to be sent to the device via the OutputComponent.
-	virtual SurgSim::DataStructures::DataGroup buildOutputData();
+	virtual DataStructures::DataGroup buildOutputData();
 
 	/// Used for Serialization.
 	/// \param linearStiffness The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
-	void setOptionalLinearStiffness(const SurgSim::DataStructures::OptionalValue<double>& linearStiffness);
+	void setOptionalLinearStiffness(const DataStructures::OptionalValue<double>& linearStiffness);
 
 	/// Used for Serialization.
 	/// \return The OptionalValue object containing the stiffness of the vtc in linear mode (in N·m-1)
-	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearStiffness() const;
+	const DataStructures::OptionalValue<double>& getOptionalLinearStiffness() const;
 
 	/// Used for Serialization.
 	/// \param linearDamping The OptionalValue object containing the damping of the vtc in linear
 	/// mode (in N·s·m-1 or Kg·s-1)
-	void setOptionalLinearDamping(const SurgSim::DataStructures::OptionalValue<double>& linearDamping);
+	void setOptionalLinearDamping(const DataStructures::OptionalValue<double>& linearDamping);
 
 	/// Used for Serialization.
 	/// \return The OptionalValue object containing the damping of the vtc in linear mode (in N·s·m-1 or Kg·s-1)
-	const SurgSim::DataStructures::OptionalValue<double>& getOptionalLinearDamping() const;
+	const DataStructures::OptionalValue<double>& getOptionalLinearDamping() const;
 
 	/// Used for Serialization.
 	/// \param angularStiffness The OptionalValue object containing the stiffness of the vtc in angular
 	/// mode (in N·m rad-1)
-	void setOptionalAngularStiffness(const SurgSim::DataStructures::OptionalValue<double>& angularStiffness);
+	void setOptionalAngularStiffness(const DataStructures::OptionalValue<double>& angularStiffness);
 
 	/// Used for Serialization.
 	/// \return The OptionalValue object containing the stiffness of the vtc in angular mode (in N·m rad-1)
-	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularStiffness() const;
+	const DataStructures::OptionalValue<double>& getOptionalAngularStiffness() const;
 
 	/// Used for Serialization.
 	/// \param angularDamping The OptionalValue object containing the damping of the vtc in angular
 	/// mode (in N·m·s·rad-1)
-	void setOptionalAngularDamping(const SurgSim::DataStructures::OptionalValue<double>& angularDamping);
+	void setOptionalAngularDamping(const DataStructures::OptionalValue<double>& angularDamping);
 
 	/// Used for Serialization.
 	/// \return The OptionalValue object containing the damping of the vtc in angular mode (in N·m·s·rad-1)
-	const SurgSim::DataStructures::OptionalValue<double>& getOptionalAngularDamping() const;
+	const DataStructures::OptionalValue<double>& getOptionalAngularDamping() const;
 
 	/// Used for Serialization.
 	/// \param attachmentPoint The OptionalValue object containing the attachment point.
-	void setOptionalAttachmentPoint(
-			const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& attachmentPoint);
+	void setOptionalAttachmentPoint(const DataStructures::OptionalValue<Math::Vector3d>& attachmentPoint);
 
 	/// Used for Serialization.
 	/// \return The OptionalValue object containing the attachment point.
-	const SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d>& getOptionalAttachmentPoint() const;
+	const DataStructures::OptionalValue<Math::Vector3d>& getOptionalAttachmentPoint() const;
 
 	/// User supplied Vtc stiffness parameter in linear mode (in N·m-1)
-	SurgSim::DataStructures::OptionalValue<double> m_optionalLinearStiffness;
+	DataStructures::OptionalValue<double> m_optionalLinearStiffness;
 
 	/// User supplied Vtc damping parameter in linear mode (in N·s·m-1 or Kg·s-1)
-	SurgSim::DataStructures::OptionalValue<double> m_optionalLinearDamping;
+	DataStructures::OptionalValue<double> m_optionalLinearDamping;
 
 	/// User supplied Vtc stiffness parameter in angular mode (in N·m rad-1)
-	SurgSim::DataStructures::OptionalValue<double> m_optionalAngularStiffness;
+	DataStructures::OptionalValue<double> m_optionalAngularStiffness;
 
 	/// User supplied Vtc damping parameter in angular mode (in N·m·s·rad-1)
-	SurgSim::DataStructures::OptionalValue<double> m_optionalAngularDamping;
+	DataStructures::OptionalValue<double> m_optionalAngularDamping;
 
 	/// User supplied attachment point
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> m_optionalAttachmentPoint;
+	DataStructures::OptionalValue<Math::Vector3d> m_optionalAttachmentPoint;
 
 	/// The DataGroup to output
-	SurgSim::DataStructures::DataGroup m_outputData;
+	DataStructures::DataGroup m_outputData;
 
 	/// The input component.
-	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
+	std::shared_ptr<Input::InputComponent> m_input;
 
 	/// The output component.
-	std::shared_ptr<SurgSim::Input::OutputComponent> m_output;
+	std::shared_ptr<Input::OutputComponent> m_output;
 
 private:
-	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
+	std::shared_ptr<RigidRepresentation> m_rigid;
 	std::string m_poseName;
 
 	/// Used Vtc stiffness parameter in linear mode (in N·m-1)
@@ -266,20 +265,20 @@ private:
 	double m_outputTorqueScaling;
 
 	/// The input's point of attachment in the local frame, i.e., the same frame in which the mass center is defined.
-	SurgSim::Math::Vector3d m_localAttachmentPoint;
+	Math::Vector3d m_localAttachmentPoint;
 
 	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
 	/// input point is not the mass center.
 	bool m_calculateInertialTorques;
 
 	/// The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+	std::shared_ptr<Framework::Logger> m_logger;
 
 	/// Whether or not the VTC sends forces and torques to the output device (if any) only when the tool is colliding.
 	bool m_hapticOutputOnlyWhenColliding;
 
 	/// The previous input pose.
-	SurgSim::Math::RigidTransform3d m_previousInputPose;
+	Math::RigidTransform3d m_previousInputPose;
 
 	///@{
 	/// Cached DataGroup indices.
