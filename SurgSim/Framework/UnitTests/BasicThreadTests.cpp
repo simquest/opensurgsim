@@ -88,10 +88,10 @@ TEST(BasicThreadTest, RunTimeManagement)
 	std::shared_ptr<Barrier> barrier = std::make_shared<Barrier>(2);
 	EXPECT_FALSE(m.didInitialize);
 	EXPECT_FALSE(m.didStartUp);
-	EXPECT_FALSE(m.isRunning());	
+	EXPECT_FALSE(m.isRunning());
 	m.start(barrier);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-	EXPECT_TRUE(m.isRunning());	
+	EXPECT_TRUE(m.isRunning());
 	EXPECT_TRUE(m.didInitialize);
 	EXPECT_FALSE(m.didStartUp);
 	barrier->wait(true);
@@ -248,7 +248,7 @@ TEST(BasicThreadTest, SwitchSyncOnThread)
 	// Take one step, count should be just on less than last count
 	barrier->wait(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-	EXPECT_EQ(count-1, m.count);
+	EXPECT_EQ(count - 1, m.count);
 
 	count = count - 1;
 	m.setSynchronous(false);
@@ -273,7 +273,7 @@ TEST(BasicThreadTest, RealTimings)
 	MockThread m;
 	m.start(nullptr);
 
-	while(m.getCpuTime() < 1e-6);
+	while (m.getCpuTime() < 1e-6);
 	EXPECT_GT(m.getCpuTime(), 1e-6);
 	EXPECT_GT(m.getUpdateCount(), 0u);
 
@@ -290,7 +290,7 @@ TEST(BasicThreadTest, RealTimings)
 	// Resume the thread loop update.
 	m.setIdle(false);
 
-	while(m.getCpuTime() < 1e-6);
+	while (m.getCpuTime() < 1e-6);
 	EXPECT_GT(m.getCpuTime(), 1e-6);
 	EXPECT_GT(m.getUpdateCount(), 0u);
 
@@ -320,7 +320,8 @@ TEST_F(BasicThreadDeathTest, DestructLiveThread)
 	::testing::FLAGS_gtest_death_test_style = "threadsafe";
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
-	ASSERT_DEATH_IF_SUPPORTED({
+	ASSERT_DEATH_IF_SUPPORTED(
+	{
 		SurgSim::Framework::AssertMessage::setFailureBehaviorToDeath();
 		m.reset();
 	}, "");
