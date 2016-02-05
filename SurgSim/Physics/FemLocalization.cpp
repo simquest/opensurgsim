@@ -85,7 +85,7 @@ SurgSim::Math::Vector3d FemLocalization::doCalculatePosition(double time) const
 		return currentPosition;
 	}
 
-	return previousPosition + time * (currentPosition - previousPosition);
+	return Math::interpolate(previousPosition, currentPosition, time);
 }
 
 SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
@@ -124,7 +124,7 @@ SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
 		return currentVelocity;
 	}
 
-	return previousVelocity + time * (currentVelocity - previousVelocity);
+	return Math::interpolate(previousVelocity, currentVelocity, time);
 }
 
 } // namespace Physics

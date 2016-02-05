@@ -105,7 +105,7 @@ SurgSim::Math::Vector3d RigidLocalization::doCalculateVelocity(double time) cons
 	Math::Vector3d previousVelocity = rigidRepresentation->getPreviousState().getLinearVelocity() +
 		rigidRepresentation->getPreviousState().getAngularVelocity().cross(previousR * m_position);
 
-	return currentVelocity * time + previousVelocity * (1.0 - time);
+	return Math::interpolate(previousVelocity, currentVelocity, time);
 }
 
 bool RigidLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
