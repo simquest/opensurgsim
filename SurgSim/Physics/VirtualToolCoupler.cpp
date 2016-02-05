@@ -58,6 +58,7 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_calculateInertialTorques(false),
 	m_logger(SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")),
 	m_hapticOutputOnlyWhenColliding(false),
+	m_previousInputPose(Math::RigidTransform3d::Identity()),
 	m_poseIndex(-1),
 	m_linearVelocityIndex(-1),
 	m_angularVelocityIndex(-1),
@@ -139,20 +140,42 @@ void VirtualToolCoupler::setPoseName(const std::string& poseName)
 
 void VirtualToolCoupler::update(double dt)
 {
-	SurgSim::DataStructures::DataGroup inputData;
+	DataStructures::DataGroup inputData;
 	m_input->getData(&inputData);
 	inputData.poses().cacheIndex(m_poseName, &m_poseIndex);
-	inputData.vectors().cacheIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &m_linearVelocityIndex);
-	inputData.vectors().cacheIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &m_angularVelocityIndex);
+	inputData.vectors().cacheIndex(DataStructures::Names::LINEAR_VELOCITY, &m_linearVelocityIndex);
+	if (m_linearVelocityIndex < 0)
+	{
+		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not " <<
+			"contain a linear velocity vector named " << DataStructures::Names::LINEAR_VELOCITY <<
+			", so it will be estimated.";
+	}
+	inputData.vectors().cacheIndex(DataStructures::Names::ANGULAR_VELOCITY, &m_angularVelocityIndex);
+	if (m_angularVelocityIndex < 0)
+	{
+		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not " <<
+			"contain an angular velocity vector named " << DataStructures::Names::ANGULAR_VELOCITY <<
+			") so it will be estimated.";
+	}
 
 	RigidTransform3d inputPose;
 	if (inputData.poses().get(m_poseIndex, &inputPose))
 	{
 		Vector3d inputLinearVelocity(Vector3d::Zero());
-		inputData.vectors().get(m_linearVelocityIndex, &inputLinearVelocity);
+		const bool gotInputLinearVelocity = inputData.vectors().get(m_linearVelocityIndex, &inputLinearVelocity);
+		if (!gotInputLinearVelocity)
+		{
+			inputLinearVelocity = (inputPose.translation() - m_previousInputPose.translation()) / dt;
+		}
 
 		Vector3d inputAngularVelocity(Vector3d::Zero());
-		inputData.vectors().get(m_angularVelocityIndex, &inputAngularVelocity);
+		const bool gotInputAngularVelocity = inputData.vectors().get(m_angularVelocityIndex, &inputAngularVelocity);
+		if (!gotInputAngularVelocity)
+		{
+			Math::computeRotationVector(inputPose, m_previousInputPose, &inputAngularVelocity);
+			inputAngularVelocity /= dt;
+		}
+		m_previousInputPose = inputPose;
 
 		RigidTransform3d inputAlignment = m_input->getLocalPose();
 		inputPose = inputAlignment * inputPose;
@@ -214,8 +237,16 @@ void VirtualToolCoupler::update(double dt)
 			{
 				m_outputData.vectors().set(m_forceIndex, outputAlignmentUnScaled * (-force));
 				m_outputData.vectors().set(m_torqueIndex, outputAlignmentUnScaled * (-torque));
-				m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
-				m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
+				if (gotInputLinearVelocity && gotInputAngularVelocity)
+				{
+					m_outputData.matrices().set(m_springJacobianIndex, -generalizedStiffness);
+					m_outputData.matrices().set(m_damperJacobianIndex, -generalizedDamping);
+				}
+				else
+				{
+					m_outputData.matrices().reset(m_springJacobianIndex);
+					m_outputData.matrices().reset(m_damperJacobianIndex);
+				}
 			}
 			else
 			{
@@ -225,8 +256,23 @@ void VirtualToolCoupler::update(double dt)
 				m_outputData.matrices().reset(m_damperJacobianIndex);
 			}
 
-			m_outputData.vectors().set(m_inputLinearVelocityIndex, outputAlignment.linear() * inputLinearVelocity);
-			m_outputData.vectors().set(m_inputAngularVelocityIndex, outputAlignmentUnScaled * inputAngularVelocity);
+			if (gotInputLinearVelocity)
+			{
+				m_outputData.vectors().set(m_inputLinearVelocityIndex, outputAlignment.linear() * inputLinearVelocity);
+			}
+			else
+			{
+				m_outputData.vectors().reset(m_inputLinearVelocityIndex);
+			}
+
+			if (gotInputAngularVelocity)
+			{
+				m_outputData.vectors().set(m_inputAngularVelocityIndex, outputAlignmentUnScaled * inputAngularVelocity);
+			}
+			else
+			{
+				m_outputData.vectors().reset(m_inputAngularVelocityIndex);
+			}
 			m_outputData.poses().set(m_inputPoseIndex, outputAlignment * inputPose);
 			m_output->setData(m_outputData);
 		}
