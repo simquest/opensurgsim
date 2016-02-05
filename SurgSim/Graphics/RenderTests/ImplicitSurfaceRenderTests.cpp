@@ -57,8 +57,8 @@ class ImplicitSurfaceRenderTests : public RenderTest
 
 TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 {
-	Math::Vector4f diffuseColor = {0.83f, 0.0f, 0.0f, 1.0f};
-	Math::Vector4f specularColor = {0.8f, 0.8f, 0.8f, 1.0f};
+	Math::Vector4f diffuseColor(0.83f, 0.0f, 0.0f, 1.0f);
+	Math::Vector4f specularColor(0.8f, 0.8f, 0.8f, 1.0f);
 
 	std::array<int, 2> dimensions = {1280, 720};
 	viewElement->getView()->setDimensions(dimensions);
