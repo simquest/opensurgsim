@@ -133,5 +133,17 @@ bool ParticlesShape::isTransformable() const
 	return true;
 }
 
+const Math::Aabbd& ParticlesShape::getBoundingBox() const
+{
+	if (m_aabbTree != nullptr)
+	{
+		return m_aabbTree->getAabb();
+	}
+	else
+	{
+		return m_aabb;
+	}
+}
+
 };
 };

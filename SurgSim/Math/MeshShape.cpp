@@ -244,12 +244,15 @@ void MeshShape::updateAabbTree()
 		}
 	}
 	m_aabbTree->set(std::move(items));
+
+	m_aabb = m_aabbTree->getAabb();
 }
 
 bool MeshShape::isTransformable() const
 {
 	return true;
 }
+
 
 }; // namespace Math
 }; // namespace SurgSim

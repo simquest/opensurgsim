@@ -25,8 +25,8 @@
 #include "SurgSim/DataStructures/BufferedValue.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/Shape.h"
-
 
 namespace SurgSim
 {
@@ -57,7 +57,7 @@ enum CollisionDetectionType : SURGSIM_ENUM_TYPE;
 /// is a nullptr or a has gone out of scope ASSERT's will be triggered.
 /// Collision with other representations will be updated by CollisionPair::addContact() and
 /// be cleared every time DcdCollision::updatePair() makes a new CollisionPair.
-	class Representation : public SurgSim::Framework::Representation
+class Representation : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
@@ -185,6 +185,9 @@ public:
 	/// return True if the collision representation is being allowed
 	bool isAllowing(const std::shared_ptr<Representation>& representation) const;
 
+	/// \return the Bounding box for this object
+	Math::Aabbd getBoundingBox() const;
+
 protected:
 	/// Invalidate the cached posed shape motion
 	void invalidatePosedShapeMotion();
@@ -239,7 +242,6 @@ SURGSIM_SERIALIZABLE_ENUM(SurgSim::Collision::CollisionDetectionType,
 						  (COLLISION_DETECTION_TYPE_NONE)
 						  (COLLISION_DETECTION_TYPE_DISCRETE)
 						  (COLLISION_DETECTION_TYPE_CONTINUOUS)
-						  (MAX_COLLISION_DETECTION_TYPES)
-						 )
+						  (MAX_COLLISION_DETECTION_TYPES))
 
 #endif
