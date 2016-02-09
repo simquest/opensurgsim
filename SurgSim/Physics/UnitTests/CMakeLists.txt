@@ -15,12 +15,14 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
+	${gmock_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
 	ClearCollisionsTests.cpp
 	ComputationTests.cpp
+	ComputationGroupTest.cpp
 	ConstraintComponentTests.cpp
 	ConstraintImplementationFactoryTests.cpp
 	ConstraintImplementationTests.cpp
