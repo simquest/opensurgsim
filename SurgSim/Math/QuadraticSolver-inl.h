@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_QUADRATICSOLVER_INL_H
 #define SURGSIM_MATH_QUADRATICSOLVER_INL_H
 
+#include <cmath>
 #include <limits>
 
 namespace SurgSim

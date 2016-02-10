@@ -16,6 +16,7 @@
 #ifndef SURGSIM_MATH_CUBICSOLVER_INL_H
 #define SURGSIM_MATH_CUBICSOLVER_INL_H
 
+#include <cmath>
 #include <limits>
 #include <vector>
 
