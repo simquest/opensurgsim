@@ -55,6 +55,8 @@ set(SURGSIM_MATH_HEADERS
 	BoxShape.h
 	CapsuleShape.h
 	CompoundShape.h
+	CubicSolver.h
+	CubicSolver-inl.h
 	CylinderShape.h
 	DoubleSidedPlaneShape.h
 	GaussLegendreQuadrature.h
@@ -105,6 +107,8 @@ set(SURGSIM_MATH_HEADERS
 	PolynomialRoots-inl.h
 	PolynomialValues.h
 	PolynomialValues-inl.h
+	QuadraticSolver.h
+	QuadraticSolver-inl.h
 	Quaternion.h
 	RigidTransform.h
 	Scalar.h
