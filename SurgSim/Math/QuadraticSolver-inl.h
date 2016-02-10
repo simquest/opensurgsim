@@ -45,7 +45,7 @@ bool isZero(const T& a)
 template <class T>
 int findRoots(const T& a, const T& b, const T& c, T* roots)
 {
-	using namespace QuadraticSolver;
+	using QuadraticSolver::isZero;
 
 	// Degenerate case? Not a quadratic equation, but linear
 	if (isZero(a))

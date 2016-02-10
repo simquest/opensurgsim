@@ -100,7 +100,8 @@ TEST(CubicSolverTests, DerivativeNullDeterminantCases)
 
 TEST(CubicSolverTests, DerivativeNegativeDeterminantCases)
 {
-	using namespace CubicSolver;
+	using CubicSolver::evaluatePolynomial;
+	using CubicSolver::isZero;
 
 	double roots[3];
 	bool found;
@@ -129,7 +130,8 @@ TEST(CubicSolverTests, DerivativeNegativeDeterminantCases)
 
 TEST(CubicSolverTests, DerivativePositiveDeterminantCases)
 {
-	using namespace CubicSolver;
+	using CubicSolver::evaluatePolynomial;
+	using CubicSolver::isZero;
 
 	double roots[3];
 	bool found;

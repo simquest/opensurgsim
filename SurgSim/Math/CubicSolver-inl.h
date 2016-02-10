@@ -111,7 +111,9 @@ T findRootInRange(const T& a, const T& b, const T& c, const T& d, T min, T max)
 template <class T>
 bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T* root)
 {
-	using namespace CubicSolver;
+	using CubicSolver::isZero;
+	using CubicSolver::evaluatePolynomial;
+	using CubicSolver::findRootInRange;
 
 	// Is 0 a root? P(0)=d=0?
 	T P0 = d; // evaluatePolynomial(a, b, c, d, static_cast<T>(0));
