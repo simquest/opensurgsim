@@ -232,7 +232,6 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 			}
 			interval01.push_back(Interval<T>(lastValue, static_cast<T>(1)));
 
-			bool found = false;
 			for (auto interval : interval01)
 			{
 				T Pmin = evaluatePolynomial(a, b, c, d, interval.getMin());
