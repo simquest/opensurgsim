@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Math
 {
 
-namespace
+namespace CubicSolver
 {
 /// \tparam T The scalar type
 /// \param a The scalar to test
@@ -105,11 +105,13 @@ T findRootInRange(const T& a, const T& b, const T& c, const T& d, T min, T max)
 
 	return (max + min) * 0.5;
 }
-}; // anonymous namespace
+}; // namespace CubicSolver
 
 template <class T>
 bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T* root)
 {
+	using namespace CubicSolver;
+
 	// Is 0 a root? P(0)=d=0?
 	T P0 = d; // evaluatePolynomial(a, b, c, d, static_cast<T>(0));
 	if (isZero(P0))

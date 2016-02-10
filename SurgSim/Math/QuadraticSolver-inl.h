@@ -23,7 +23,7 @@ namespace SurgSim
 namespace Math
 {
 
-namespace
+namespace QuadraticSolver
 {
 /// \tparam T The scalar type
 /// \param a The scalar to test
@@ -33,7 +33,7 @@ bool isZero(const T& a)
 {
 	return std::abs(a) <= std::numeric_limits<T>::epsilon();
 }
-}; // anonymous namespace
+}; // namespace QuadraticSolver
 
 // warning C4723: potential divide by 0
 #pragma warning(disable : 4723)
@@ -41,6 +41,8 @@ bool isZero(const T& a)
 template <class T>
 int findRoots(const T& a, const T& b, const T& c, T* roots)
 {
+	using namespace QuadraticSolver;
+
 	// Degenerate case? Not a quadratic equation, but linear
 	if (isZero(a))
 	{
