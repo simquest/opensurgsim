@@ -231,23 +231,23 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 			bool found = false;
 			for (auto interval : interval01)
 			{
-				T Pmin = evaluatePolynomial(a, b, c, d, interval.first);
+				T Pmin = evaluatePolynomial(a, b, c, d, interval.getMin());
 				if (isZero(Pmin))
 				{
-					root[0] = interval.first;
+					root[0] = interval.getMin();
 					return true;
 				}
 
-				T Pmax = evaluatePolynomial(a, b, c, d, interval.second);
+				T Pmax = evaluatePolynomial(a, b, c, d, interval.getMax());
 				if (isZero(Pmax))
 				{
-					root[0] = interval.second;
+					root[0] = interval.getMax();
 					return true;
 				}
 
 				if (std::signbit(Pmin) != std::signbit(Pmax))
 				{
-					root[0] = findRootInRange(a, b, c, d, interval.first, interval.second);
+					root[0] = findRootInRange(a, b, c, d, interval.getMin(), interval.getMax());
 					return true;
 				}
 			}
