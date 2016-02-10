@@ -85,14 +85,14 @@ TEST(CubicSolverTests, DerivativeNullDeterminantCases)
 	bool found;
 
 	{
-		SCOPED_TRACE("P(x) = -x^3 + 3x^2 - 3x + 1 = 0 => P'(x) = -3x^2 + 6x - 3 => discriminant = 36 - 4*(-3)*(-3) = 0");
+		SCOPED_TRACE("P(x) = -x^3 + 3x^2 - 3x + 1 = 0 => P'(x) = -3x^2 + 6x - 3 => discriminant = 36 - 4*(3)*(3) = 0");
 		EXPECT_NO_THROW(found = findSmallestRootInRange01(-1.0, 3.0, -3.0, 1.0, roots));
 		EXPECT_EQ(true, found);
 		EXPECT_DOUBLE_EQ(1.0, roots[0]);
 	}
 
 	{
-		SCOPED_TRACE("P(x) = -x^3 + 3x^2 - 3x - 2 = 0 => P'(x) = -3x^2 + 6x - 3 => discriminant = 36 - 4*(-3)*(-3) = 0");
+		SCOPED_TRACE("P(x) = -x^3 + 3x^2 - 3x - 2 = 0 => P'(x) = -3x^2 + 6x - 3 => discriminant = 36 - 4*(3)*(3) = 0");
 		EXPECT_NO_THROW(found = findSmallestRootInRange01(-1.0, 3.0, -3.0, -2.0, roots));
 		EXPECT_EQ(false, found);
 	}
