@@ -157,7 +157,8 @@ template <class T>
 bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T* root)
 {
 	// Is 0 a root? P(0)=d=0?
-	if (isZero(d))
+	T P0 = d; // evaluatePolynomial(a, b, c, d, static_cast<T>(0));
+	if (isZero(P0))
 	{
 		root[0] = 0.0;
 		return 1;
@@ -188,7 +189,6 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 		// P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
 		// Therefore P is monotonic (ascending or descending) and has 1 unique root over ]-Inf +Inf[
 
-		T P0 = d;// evaluatePolynomial(a, b, c, d, static_cast<T>(0));
 		T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
 		if (isZero(P1))
 		{
@@ -208,7 +208,6 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 		// If the discriminant is negative, P' has always the same sign, the sign of P'(0) (i.e. sign(c))
 		// Therefore P is monotonic (stricly ascending or descending) and has 1 unique root over ]-Inf +Inf[
 
-		T P0 = d;// evaluatePolynomial(a, b, c, d, static_cast<T>(0));
 		T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
 		if (isZero(P1))
 		{
