@@ -33,7 +33,7 @@ namespace CubicSolver
 /// \param a The scalar to test
 /// \return True if the scalar a is 0 or close to 0 (within epsilon defined by the type T)
 template <class T>
-T isZero(const T& a)
+bool isZero(const T& a)
 {
 	return std::abs(a) <= std::numeric_limits<T>::epsilon();
 }
