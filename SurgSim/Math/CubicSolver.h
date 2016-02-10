@@ -95,7 +95,7 @@ T evaluatePolynomialDerivative(const T& a, const T& b, const T& c, const T& d, c
 /// \param min, max The range to look into (\f$min <= max\f$)
 /// \return The root
 /// \note This function supposes that the polynomial is monotonic in the range \f$[min \ldotp\ldotp max]\f$
-/// \note and has a solution.
+/// \note and has a solution (i.e. P(min) * P(max) < 0)
 template <class T>
 T findRootInRange(const T& a, const T& b, const T& c, const T& d, T min, T max)
 {
