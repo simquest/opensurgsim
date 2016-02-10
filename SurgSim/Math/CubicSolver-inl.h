@@ -186,6 +186,10 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 		T scale = static_cast<T>(1) / (static_cast<T>(3) * a);
 		T x0 = (-b - tmp) * scale;
 		T x1 = (-b + tmp) * scale;
+		if (x0 > x1)
+		{
+			std::swap(x0, x1);
+		}
 		// Note that x0 < x1 and x0 != x1 as delta != 0
 
 		Interval<T> intervalx0x1(x0, x1);
