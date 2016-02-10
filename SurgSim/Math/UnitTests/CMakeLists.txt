@@ -21,6 +21,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	AabbTests.cpp
 	CompoundShapeTests.cpp
+	CubicSolverTests.cpp
 	GeometryTests.cpp
 	IntervalArithmeticTests.cpp
 	KalmanFilterTests.cpp
