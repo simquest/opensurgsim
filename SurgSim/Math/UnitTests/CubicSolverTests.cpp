@@ -47,21 +47,21 @@ TEST(CubicSolverTests, DegenerateCases)
 		SCOPED_TRACE("0.x^3 + x^2 + 0x + 0 = 0 (1 solution on R: 0, 1 on [0..1])");
 		EXPECT_NO_THROW(found = findSmallestRootInRange01(0.0, 1.0, 0.0, 0.0, roots));
 		EXPECT_EQ(true, found);
-		EXPECT_EQ(0.0, roots[0]);
+		EXPECT_DOUBLE_EQ(0.0, roots[0]);
 	}
 
 	{
 		SCOPED_TRACE("0.x^3 + x^2 + x - 2 = 0 (2 solutions on R: -2 and 1, 1 on [0..1])");
 		EXPECT_NO_THROW(found = findSmallestRootInRange01(0.0, 1.0, 1.0, -2.0, roots));
 		EXPECT_EQ(true, found);
-		EXPECT_EQ(1.0, roots[0]);
+		EXPECT_DOUBLE_EQ(1.0, roots[0]);
 	}
 
 	{
 		SCOPED_TRACE("0.x^3 + 2x^2 + x - 1 = 0 (2 solutions on R: -1 and 0.5, 1 on [0..1])");
 		EXPECT_NO_THROW(found = findSmallestRootInRange01(0.0, 2.0, 1.0, -1.0, roots));
 		EXPECT_EQ(true, found);
-		EXPECT_EQ(0.5, roots[0]);
+		EXPECT_DOUBLE_EQ(0.5, roots[0]);
 	}
 
 };

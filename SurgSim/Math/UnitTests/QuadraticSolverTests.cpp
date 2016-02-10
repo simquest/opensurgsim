@@ -41,14 +41,14 @@ TEST(QuadraticSolverTests, DegenerateCases)
 		SCOPED_TRACE("Not quadratic, not linear, all solutions: 0.x^2 + 0.x + 0 = 0");
 		EXPECT_NO_THROW(numberOfRoots = findRoots(0.0, 0.0, 0.0, roots));
 		EXPECT_EQ(1, numberOfRoots);
-		EXPECT_EQ(0.0, roots[0]);
+		EXPECT_DOUBLE_EQ(0.0, roots[0]);
 	}
 
 	{
 		SCOPED_TRACE("Not quadratic, linear: 0.x^2 + 3.0.x + 2.0 = 0");
 		EXPECT_NO_THROW(numberOfRoots = findRoots(0.0, 3.0, 2.0, roots));
 		EXPECT_EQ(1, numberOfRoots);
-		EXPECT_EQ(-2.0 / 3.0, roots[0]);
+		EXPECT_DOUBLE_EQ(-2.0 / 3.0, roots[0]);
 	}
 };
 
@@ -61,14 +61,14 @@ TEST(QuadraticSolverTests, NullDeterminantCases)
 		SCOPED_TRACE("x^2 = 0 => determinant = 0*0 - 4*1*0 = 0");
 		EXPECT_NO_THROW(numberOfRoots = findRoots(1.0, 0.0, 0.0, roots));
 		EXPECT_EQ(1, numberOfRoots);
-		EXPECT_EQ(0.0, roots[0]);
+		EXPECT_DOUBLE_EQ(0.0, roots[0]);
 	}
 
 	{
 		SCOPED_TRACE("3x^2 + 6x + 3 = 0 => determinant = 6*6 - 4*3*3 = 0");
 		EXPECT_NO_THROW(numberOfRoots = findRoots(3.0, 6.0, 3.0, roots));
 		EXPECT_EQ(1, numberOfRoots);
-		EXPECT_EQ(-1.0, roots[0]);
+		EXPECT_DOUBLE_EQ(-1.0, roots[0]);
 	}
 
 	{
@@ -78,7 +78,7 @@ TEST(QuadraticSolverTests, NullDeterminantCases)
 		double b = sqrt(4.0 * a * c);
 		EXPECT_NO_THROW(numberOfRoots = findRoots(a, b, c, roots));
 		EXPECT_EQ(1, numberOfRoots);
-		EXPECT_EQ(-b / (2.0 * a), roots[0]);
+		EXPECT_DOUBLE_EQ(-b / (2.0 * a), roots[0]);
 	}
 };
 
@@ -112,8 +112,8 @@ TEST(QuadraticSolverTests, PositiveDeterminantCases)
 		SCOPED_TRACE("2x^2 + x - 1 = 0 => determinant = 1 + 8 = 9");
 		EXPECT_NO_THROW(numberOfRoots = findRoots(2.0, 1.0, -1.0, roots));
 		EXPECT_EQ(2, numberOfRoots);
-		EXPECT_EQ(-1.0, roots[0]); // The roots are ordered from lower to higher
-		EXPECT_EQ(0.5, roots[1]);
+		EXPECT_DOUBLE_EQ(-1.0, roots[0]); // The roots are ordered from lower to higher
+		EXPECT_DOUBLE_EQ(0.5, roots[1]);
 	}
 
 	{
@@ -124,8 +124,8 @@ TEST(QuadraticSolverTests, PositiveDeterminantCases)
 		EXPECT_NO_THROW(numberOfRoots = findRoots(a, b, c, roots));
 		EXPECT_EQ(2, numberOfRoots);
 		double delta = b * b - 4.0 * a * c;
-		EXPECT_EQ((-b - std::sqrt(delta)) / (2.0 * a), roots[0]);
-		EXPECT_EQ((-b + std::sqrt(delta)) / (2.0 * a), roots[1]);
+		EXPECT_DOUBLE_EQ((-b - std::sqrt(delta)) / (2.0 * a), roots[0]);
+		EXPECT_DOUBLE_EQ((-b + std::sqrt(delta)) / (2.0 * a), roots[1]);
 	}
 };
 
