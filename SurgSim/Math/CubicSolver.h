@@ -17,6 +17,9 @@
 #define SURGSIM_MATH_CUBIC_SOLVER_H
 
 #include <limits>
+#include <vector>
+
+#include "SurgSim/Math/IntervalArithmetic.h"
 
 namespace SurgSim
 {
@@ -224,7 +227,80 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 		}
 	}
 	else
-	{ }
+	{
+		// If the discriminant is positive, P'(x) has 2 roots {x0, x1}, which define 3 separate intervals to
+		// study ]-Inf x0[, [x0 x1] and ]x1 +Inf[
+		T tmp = std::sqrt(delta / 4.0);
+		T scale = static_cast<T>(1) / (static_cast<T>(3) * a);
+		T x0 = (-b - tmp) * scale;
+		T x1 = (-b + tmp) * scale;
+		// Note that x0 < x1 and x0 != x1 as delta != 0
+
+		Interval<T> intervalx0x1(x0, x1);
+		Interval<T> interval01(static_cast<T>(0), static_cast<T>(1));
+
+		if (!intervalx0x1.overlapsWith(interval01))
+		{
+			// If there is no overlap, the interval [0..1] is isolated on one of the monotonic interval ]-Inf x0[
+			// ]x1 +Inf[, therefore it contains at most 1 root
+
+			T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
+			if (isZero(P1))
+			{
+				root[0] = static_cast<T>(1);
+				return true;
+			}
+
+			// P0 and P1 cannot be zero at this stage, so they both have a clear sign
+			if (std::signbit(P0) != std::signbit(P1))
+			{
+				root[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
+				return true;
+			}
+		}
+		else
+		{
+			// Build the monotonic intervals within [0..1] to be analyzed one by one
+			std::vector<Interval<T>> interval01;
+
+			T lastValue = static_cast<T>(0);
+			if (x0 > static_cast<T>(0) && x0 < static_cast<T>(1))
+			{
+				interval01.push_back(Interval<T>(lastValue, x0));
+				lastValue = x0;
+			}
+			if (x1 > static_cast<T>(0) && x1 < static_cast<T>(1))
+			{
+				interval01.push_back(Interval<T>(lastValue, x1));
+				lastValue = x1;
+			}
+			interval01.push_back(Interval<T>(lastValue, static_cast<T>(1)));
+
+			bool found = false;
+			for (auto interval : interval01)
+			{
+				T Pmin = evaluatePolynomial(a, b, c, d, interval.first);
+				if (isZero(Pmin))
+				{
+					root[0] = interval.first;
+					return true;
+				}
+
+				T Pmax = evaluatePolynomial(a, b, c, d, interval.second);
+				if (isZero(Pmax))
+				{
+					root[0] = interval.second;
+					return true;
+				}
+
+				if (std::signbit(Pmin) != std::signbit(Pmax))
+				{
+					root[0] = findRootInRange(a, b, c, d, interval.first, interval.second);
+					return true;
+				}
+			}
+		}
+	}
 
 	return false;
 }
