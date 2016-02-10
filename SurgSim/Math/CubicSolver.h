@@ -61,8 +61,9 @@ int findRoots(const T& a, const T& b, const T& c, T* roots)
 	}
 
 	T tmp = std::sqrt(delta);
-	roots[0] = (-b - tmp) / (static_cast<T>(2.0) * a);
-	roots[1] = (-b + tmp) / (static_cast<T>(2.0) * a);
+	T scale = 1.0 / (static_cast<T>(2.0) * a);
+	roots[0] = (-b - tmp) * scale;
+	roots[1] = (-b + tmp) * scale;
 	return 2;
 }
 
