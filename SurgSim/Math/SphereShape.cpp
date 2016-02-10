@@ -24,6 +24,7 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SphereShape, SphereShape);
 SphereShape::SphereShape(double radius) : m_radius(radius)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphereShape, double, Radius, getRadius, setRadius);
+	updateAabb();
 }
 
 int SphereShape::getType() const
@@ -39,6 +40,14 @@ double SphereShape::getRadius() const
 void SphereShape::setRadius(double radius)
 {
 	m_radius = radius;
+	updateAabb();
+}
+
+void SphereShape::updateAabb()
+{
+	m_aabb.setEmpty();
+	m_aabb.extend(Vector3d(-m_radius, -m_radius, -m_radius));
+	m_aabb.extend(Vector3d(m_radius, m_radius, m_radius));
 }
 
 double SphereShape::getVolume() const
@@ -68,6 +77,7 @@ bool SphereShape::isValid() const
 {
 	return m_radius >= 0;
 }
+
 
 }; // namespace Math
 }; // namespace SurgSim

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Aabb.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 
 namespace SurgSim
 {
@@ -66,7 +68,10 @@ public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
 	typedef ::SurgSim::Math::Matrix33d Matrix33d;
 
-	// Destructor
+	/// Constructor
+	Shape();
+
+	/// Destructor
 	virtual ~Shape();
 
 	/// \return the type of shape
@@ -99,18 +104,36 @@ public:
 	/// Check if the shape is valid
 	/// \return True if shape is valid; Otherwise, false.
 	virtual bool isValid() const = 0;
+
+	/// \return the bounding box for the shape
+	virtual const Math::Aabbd& getBoundingBox() const;
+
+protected:
+	Math::Aabbd m_aabb;
 };
 
 /// PosedShape is a transformed shape with a record of the pose used to transform it.
 template <class T>
 struct PosedShape
 {
-	PosedShape() { pose = Math::RigidTransform3d::Identity(); }
+	PosedShape()
+	{
+		pose = Math::RigidTransform3d::Identity();
+	}
 	PosedShape(const T& shapeInput, const Math::RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
 
-	void invalidate() { shape = nullptr; }
-	const T& getShape() const { return shape; }
-	const Math::RigidTransform3d& getPose() const { return pose; }
+	void invalidate()
+	{
+		shape = nullptr;
+	}
+	const T& getShape() const
+	{
+		return shape;
+	}
+	const Math::RigidTransform3d& getPose() const
+	{
+		return pose;
+	}
 
 protected:
 	T shape;

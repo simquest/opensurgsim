@@ -95,23 +95,31 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 					std::pair<Location, Location> penetrationPoints;
 					SurgSim::Math::Vector2d barycentricCoordinate2;
 					SurgSim::Math::barycentricCoordinates(penetrationPointCapsuleAxis,
-														  verticesSegment[0], verticesSegment[1], &barycentricCoordinate2);
+														  verticesSegment[0],
+														  verticesSegment[1],
+														  &barycentricCoordinate2);
 					penetrationPoints.first.elementMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate2));
-					penetrationPoints.first.rigidLocalPosition.setValue(segmentMeshPose.inverse() *penetrationPointCapsuleAxis);
+					penetrationPoints.first.rigidLocalPosition.setValue(
+						segmentMeshPose.inverse() *penetrationPointCapsuleAxis);
 
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
-														  verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
+														  verticesTriangle[0],
+														  verticesTriangle[1],
+														  verticesTriangle[2],
+														  normalTriangle,
 														  &barycentricCoordinate);
 
 					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
-					penetrationPoints.second.rigidLocalPosition.setValue(triangleMeshPose.inverse() * penetrationPointTriangle);
+					penetrationPoints.second.rigidLocalPosition.setValue(
+						triangleMeshPose.inverse() * penetrationPointTriangle);
 
 					// Create the contact.
 					contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE,
-									   std::abs(depth) + (penetrationPointCapsule - penetrationPointCapsuleAxis).dot(normal),
+									   std::abs(depth) +
+									   (penetrationPointCapsule - penetrationPointCapsuleAxis).dot(normal),
 									   1.0, Vector3d::Zero(), -normal, penetrationPoints));
 				}
 			}
