@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/ComputationGroup.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
 namespace SurgSim
 {
@@ -37,20 +38,25 @@ std::shared_ptr<PhysicsManagerState> ComputationGroup::doUpdate(
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	boost::unique_lock<boost::mutex> lock(m_computationsMutex);
-
-	size_t i = 0;
-	bool exitLoop = false;
+	m_iterations = 0;
+	bool keepRunning = true;
 	auto lastState = state;
-	for (;;)
+	while (keepRunning)
 	{
+		++m_iterations;
 		for (const auto& computation : m_computations)
 		{
 			lastState = computation->update(dt, lastState);
+			if (lastState->shouldAbortLoop())
+			{
+				lastState->setAbortLoop(false);
+				keepRunning = false;
+				break;
+			}
 		}
-
-		if (endLoop())
+		if (keepRunning && endIteration())
 		{
-			break;
+			keepRunning = false;
 		}
 	}
 	return lastState;
@@ -63,9 +69,21 @@ void ComputationGroup::addComputation(const std::shared_ptr<Computation>& comput
 	m_computations.push_back(computation);
 }
 
-bool ComputationGroup::endLoop()
+bool ComputationGroup::endIteration()
 {
 	return true;
+}
+
+std::vector<std::shared_ptr<Computation>> ComputationGroup::getComputations() const
+{
+	boost::unique_lock<boost::mutex> lock(m_computationsMutex);
+	return m_computations;
+}
+
+void ComputationGroup::setComputations(const std::vector<std::shared_ptr<Computation>>& val)
+{
+	boost::unique_lock<boost::mutex> lock(m_computationsMutex);
+	m_computations = val;
 }
 
 }

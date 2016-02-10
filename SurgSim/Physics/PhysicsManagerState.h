@@ -175,6 +175,9 @@ public:
 	/// \param constraintsMapping The constraints mapping (mapping between the constraints and the mlcp)
 	void setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping);
 
+	bool shouldAbortLoop() const;
+
+	void setAbortLoop(bool val);
 private:
 
 	///@{
@@ -227,6 +230,8 @@ private:
 
 	/// Mlcp solution for this Physics Manager State
 	MlcpPhysicsSolution m_mlcpPhysicsSolution;
+
+	bool m_abortLoop;
 };
 
 }; // Physics

@@ -45,9 +45,9 @@ public:
 	MockGroup(bool val) : ComputationGroup(val)
 	{
 		testing::DefaultValue<State>::Set(std::make_shared<SurgSim::Physics::PhysicsManagerState>());
-		ON_CALL(*this, endLoop()).WillByDefault(testing::Return(true));
+		ON_CALL(*this, endIteration()).WillByDefault(testing::Return(true));
 	}
-	MOCK_METHOD0(endLoop, bool(void));
+	MOCK_METHOD0(endIteration, bool(void));
 };
 
 
@@ -77,7 +77,7 @@ TEST(ComputationGroupTest, RunOnce)
 	computation->addComputation(mock);
 
 	EXPECT_CALL(*mock, doUpdate(0.0, _));
-	EXPECT_CALL(*computation, endLoop());
+	EXPECT_CALL(*computation, endIteration());
 
 	computation->update(0.0, state);
 }
@@ -94,9 +94,36 @@ TEST(ComputationGroupTest, MultiplesRunMultiples)
 	computation->addComputation(mock);
 
 	EXPECT_CALL(*mock, doUpdate(_, _)).Times(4);
-	EXPECT_CALL(*computation, endLoop()).Times(2).WillOnce(Return(false)).WillOnce(Return(true));
+	EXPECT_CALL(*computation, endIteration()).Times(2).WillOnce(Return(false)).WillOnce(Return(true));
 
 	computation->update(0.0, state);
+}
+
+TEST(ComputationGroupTest, AbortInTheMiddle)
+{
+	using ::testing::_;
+	using ::testing::Return;
+	std::vector<std::shared_ptr<Computation>> computations;
+	auto state = std::make_shared<PhysicsManagerState>();
+	auto state2 = std::make_shared<PhysicsManagerState>();
+	state2->setAbortLoop(true);
+	auto computation = std::make_shared<MockGroup>(false);
+	auto mock = std::make_shared<MockComputation>(false);
+	computations.push_back(mock);
+	computations.push_back(mock);
+
+	computation->setComputations(computations);
+
+	EXPECT_CALL(*mock, doUpdate(_, _)).Times(3)
+	.WillOnce(Return(state))
+	.WillOnce(Return(state))
+	.WillOnce(Return(state2));
+
+	EXPECT_CALL(*computation, endIteration()).WillOnce(Return(false));
+
+	computation->update(0.0, state);
+
+	ASSERT_FALSE(state2->shouldAbortLoop());
 }
 }
 }
