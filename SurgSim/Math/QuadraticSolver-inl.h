@@ -37,7 +37,10 @@ bool isZero(const T& a)
 }; // namespace QuadraticSolver
 
 // warning C4723: potential divide by 0
-#pragma warning(disable : 4723)
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4723)
+#endif
 
 template <class T>
 int findRoots(const T& a, const T& b, const T& c, T* roots)
@@ -82,6 +85,10 @@ int findRoots(const T& a, const T& b, const T& c, T* roots)
 	roots[1] = (-b + tmp) * scale;
 	return 2;
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 }; // Math
 }; // SurgSim
