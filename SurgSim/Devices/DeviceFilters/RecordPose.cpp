@@ -29,8 +29,8 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::RecordPose, 
 
 RecordPose::RecordPose(const std::string& name) :
 	DeviceFilter(name),
-	m_fileName("ReplayPoseDevice.txt"),
-	m_cumulativeTime(0)
+	m_cumulativeTime(0),
+	m_fileName("ReplayPoseDevice.txt")
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RecordPose, std::string, FileName, getFileName, setFileName);
 	m_timer.setMaxNumberOfFrames(1);

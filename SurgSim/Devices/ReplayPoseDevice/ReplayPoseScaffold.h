@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DEVICES_REPLAYPOSEDEVICE_REPLAYPOSESCAFFOLD_H
 #define SURGSIM_DEVICES_REPLAYPOSEDEVICE_REPLAYPOSESCAFFOLD_H
 
+#include <boost/thread/mutex.hpp>
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
@@ -76,6 +77,9 @@ private:
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<Framework::Logger> m_logger;
+
+	/// The ReplayPose device locking mechanism
+	boost::mutex m_deviceLock;
 
 	/// The ReplayPose device managed by this scaffold
 	std::unique_ptr<DeviceData> m_device;

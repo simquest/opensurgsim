@@ -25,6 +25,7 @@ BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ) :
 	m_size(Vector3d(sizeX, sizeY, sizeZ))
 {
 	calculateVertices();
+	updateAabb();
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeX, getSizeX, setSizeX);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeY, getSizeY, setSizeY);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeZ, getSizeZ, setSizeZ);
@@ -59,16 +60,19 @@ double BoxShape::getSizeZ() const
 void BoxShape::setSizeX(double sizeX)
 {
 	m_size[0] = sizeX;
+	updateAabb();
 }
 
 void BoxShape::setSizeY(double sizeY)
 {
 	m_size[1] = sizeY;
+	updateAabb();
 }
 
 void BoxShape::setSizeZ(double sizeZ)
 {
 	m_size[2] = sizeZ;
+	updateAabb();
 }
 
 double BoxShape::getVolume() const
@@ -89,8 +93,8 @@ SurgSim::Math::Matrix33d BoxShape::getSecondMomentOfVolume() const
 	const double coef = 1.0 / 12.0 * volume;
 	Matrix33d inertia = Matrix33d::Zero();
 	inertia.diagonal() = coef * Vector3d(sizeSquared[1] + sizeSquared[2],
-										sizeSquared[0] + sizeSquared[2],
-										sizeSquared[0] + sizeSquared[1]);
+										 sizeSquared[0] + sizeSquared[2],
+										 sizeSquared[0] + sizeSquared[1]);
 	return inertia;
 }
 
@@ -106,18 +110,28 @@ const std::array<Vector3d, 8>& BoxShape::getVertices() const
 
 void BoxShape::calculateVertices()
 {
-	static const std::array<Vector3d, 8> multiplier = {{Vector3d(-0.5, -0.5, -0.5),
-														Vector3d(-0.5, -0.5,  0.5),
-														Vector3d(-0.5,  0.5,  0.5),
-														Vector3d(-0.5,  0.5, -0.5),
-														Vector3d( 0.5, -0.5, -0.5),
-														Vector3d( 0.5, -0.5,  0.5),
-														Vector3d( 0.5,  0.5,  0.5),
-														Vector3d( 0.5,  0.5, -0.5)}};
-	for(int i = 0; i < 8; ++i)
+	static const std::array<Vector3d, 8> multiplier = {{
+			Vector3d(-0.5, -0.5, -0.5),
+			Vector3d(-0.5, -0.5,  0.5),
+			Vector3d(-0.5,  0.5,  0.5),
+			Vector3d(-0.5,  0.5, -0.5),
+			Vector3d(0.5, -0.5, -0.5),
+			Vector3d(0.5, -0.5,  0.5),
+			Vector3d(0.5,  0.5,  0.5),
+			Vector3d(0.5,  0.5, -0.5)
+		}
+	};
+	for (int i = 0; i < 8; ++i)
 	{
 		m_vertices[i] = m_size.array() * multiplier[i].array();
 	}
+}
+
+void BoxShape::updateAabb()
+{
+	m_aabb.setEmpty();
+	m_aabb.extend(-(m_size / 2.0));
+	m_aabb.extend(m_size / 2.0);
 }
 
 bool BoxShape::isValid() const

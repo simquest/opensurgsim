@@ -69,12 +69,20 @@ std::shared_ptr<ReplayPoseScaffold> ReplayPoseScaffold::getOrCreateSharedInstanc
 	return sharedInstance.get();
 }
 
-bool ReplayPoseScaffold::doInitialize() { return true; }
+bool ReplayPoseScaffold::doInitialize()
+{
+	return true;
+}
 
-bool ReplayPoseScaffold::doStartUp() { return true; }
+bool ReplayPoseScaffold::doStartUp()
+{
+	return true;
+}
 
 bool ReplayPoseScaffold::doUpdate(double dt)
 {
+	boost::unique_lock<boost::mutex> scopedLock(m_deviceLock);
+
 	SURGSIM_ASSERT(m_device != nullptr) << "DeviceData not properly allocated";
 
 	return updateDevice(m_device.get());
@@ -84,7 +92,11 @@ struct ReplayPoseScaffold::DeviceData
 {
 	/// Constructor
 	/// \param device Device to be managed by this scaffold
-	explicit DeviceData(ReplayPoseDevice* device) : deviceObject(device), m_timestamp(0), m_index(0), m_fileLoaded(false)
+	explicit DeviceData(ReplayPoseDevice* device) :
+		deviceObject(device),
+		m_timestamp(0),
+		m_index(0),
+		m_fileLoaded(false)
 	{
 		m_fileLoaded = loadFile(deviceObject->getFileName());
 		m_timer.start();
@@ -164,7 +176,7 @@ private:
 		if (!inputFile.is_open())
 		{
 			SURGSIM_LOG_WARNING(logger) << "Could not find or open the file " << fileName <<
-				"; Replay will use Identity pose";
+										"; Replay will use Identity pose";
 			result = false;
 		}
 		else
@@ -180,10 +192,10 @@ private:
 			if (m_motion.size() >= 1)
 			{
 				SURGSIM_LOG_INFO(logger) << "The loaded timestamps cover a range of " <<
-					m_motion[m_motion.size() - 1].first - m_motion[0].first << " second(s)";
+										 m_motion[m_motion.size() - 1].first - m_motion[0].first << " second(s)";
 			}
 			SURGSIM_LOG_IF(m_motion.size() == 0, logger, WARNING) <<
-				"No poses could be properly loaded, Identity pose will be used";
+					"No poses could be properly loaded, Identity pose will be used";
 
 			inputFile.close();
 		}
@@ -229,6 +241,8 @@ bool ReplayPoseScaffold::registerDevice(ReplayPoseDevice* device)
 
 bool ReplayPoseScaffold::unregisterDevice()
 {
+	boost::unique_lock<boost::mutex> scopedLock(m_deviceLock);
+
 	// #threadsafety After unregistering, another thread could be in the process of registering.
 	if (isRunning())
 	{

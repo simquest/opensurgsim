@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2015, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 #ifndef SURGSIM_PARTICLES_SPHREPRESENTATION_H
 #define SURGSIM_PARTICLES_SPHREPRESENTATION_H
 
+#include <Eigen/Core>
 #include <vector>
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Particles/Representation.h"
+
 
 namespace SurgSim
 {
@@ -150,35 +152,34 @@ protected:
 
 	bool doHandleCollisions(double dt, const SurgSim::Collision::ContactMapType& collisions) override;
 
-	/// Compute the particles' acceleration given a time step dt
-	/// \param dt The time step to advance the simulation too
-	/// \note This method stores the accelerations in the state.
-	void computeAcceleration(double dt);
-
 	/// Compute the particles' velocity and position given a time step dt
 	/// \param dt The time step to advance the simulation too
 	/// \note This method integrates the ODE equation of the SPH, computing velocities and positions from the
 	/// \note accelerations and storing them in the state. Therefore computeAcceleration(dt) should be called before.
 	void computeVelocityAndPosition(double dt);
 
-	std::vector<SurgSim::Math::Vector3d> m_normal;  		///< Particles' normal
-	std::vector<SurgSim::Math::Vector3d> m_acceleration;	///< Particles' acceleration
-	std::vector<double> m_density;                  		///< Particles' density
-	std::vector<double> m_pressure;                 		///< Particles' pressure
-	std::vector<double> m_mass;                     		///< Particles' mass
-	double m_massPerParticle;                       ///< Mass per particle (determine the density of particle per m3)
+	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor> m_normal;			///< Particles' normal
+	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor> m_acceleration;	///< Particles' acceleration
+	Math::Vector m_density;                  		///< Particles' density
+	Math::Vector m_pressure;                 		///< Particles' pressure
+	double m_mass;                       			///< Mass per particle (determine the density of particle per m3)
 	double m_densityReference;                      ///< Density of the reference gas
 	double m_gasStiffness;                          ///< Stiffness of the gas considered
 	double m_surfaceTension;                        ///< Surface tension
 	double m_stiffness;                             ///< Collision stiffness
 	double m_damping;                               ///< Collision damping
 	double m_friction;                              ///< Collision sliding friction coefficient
-
 	SurgSim::Math::Vector3d m_gravity;              ///< 3D Gravity vector
 	double m_viscosity;                             ///< Viscosity coefficient
 
 	/// Kernels parameter (support length and its powers)
-	double m_h, m_hPower2, m_hPower3, m_hPower5, m_hPower6, m_hPower9;
+	double m_h;
+	double m_hSquared;
+	double m_kernelPoly6;
+	double m_kernelPoly6Gradient;
+	double m_kernelSpikyGradient;
+	double m_kernelViscosityLaplacian;
+	double m_kernelPoly6Laplacian;
 
 	/// Grid acceleration to evaluate the kernels locally (storing the particles' index)
 	std::shared_ptr<SurgSim::DataStructures::Grid<size_t, 3>> m_grid;
@@ -196,45 +197,6 @@ private:
 	/// Compute the Sph accelerations
 	void computeAccelerations();
 
-	/// Kernel poly6
-	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
-	/// \return The kernel poly6 evaluated with rij and m_h
-	double kernelPoly6(const SurgSim::Math::Vector3d& rij);
-
-	/// Kernel poly6's gradient
-	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
-	/// \return The kernel poly6's gradient evaluated with rij and m_h
-	SurgSim::Math::Vector3d kernelPoly6Gradient(const SurgSim::Math::Vector3d& rij);
-
-	/// Kernel poly6's laplacian
-	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
-	/// \return The kernel poly6's laplacian evaluated with rij and m_h
-	double kernelPoly6Laplacian(const SurgSim::Math::Vector3d& rij);
-
-	/// Kernel spiky
-	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
-	/// \return The kernel spiky evaluated with rij and m_h
-	double kernelSpiky(const SurgSim::Math::Vector3d& rij);
-
-	/// Kernel spiky's gradient
-	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
-	/// \return The kernel spiky's gradient evaluated with rij and m_h
-	SurgSim::Math::Vector3d kernelSpikyGradient(const SurgSim::Math::Vector3d& rij);
-
-	/// Kernel viscosity
-	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
-	/// \return The kernel viscosity evaluated with rij and m_h
-	double kernelViscosity(const SurgSim::Math::Vector3d& rij);
-
-	/// Kernel viscosity's gradient
-	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
-	/// \return The kernel viscosity's gradient evaluated with rij and m_h
-	SurgSim::Math::Vector3d kernelViscosityGradient(const SurgSim::Math::Vector3d& rij);
-
-	/// Kernel viscosity's laplacian
-	/// \param rij The vector between the 2 particles considered \f$r_i - r_j\f$
-	/// \return The kernel viscosity's laplacian evaluated with rij and m_h
-	double kernelViscosityLaplacian(const SurgSim::Math::Vector3d& rij);
 };
 
 };  // namespace Particles

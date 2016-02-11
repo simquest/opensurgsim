@@ -102,5 +102,17 @@ bool OctreeShape::isValid() const
 	return isValid(m_rootNode);
 }
 
+const Math::Aabbd& OctreeShape::getBoundingBox() const
+{
+	if (m_rootNode != nullptr)
+	{
+		return m_rootNode->getBoundingBox();
+	}
+	else
+	{
+		return m_aabb;
+	}
+}
+
 }; // namespace Math
 }; // namespace SurgSim

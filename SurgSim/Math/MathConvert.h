@@ -53,15 +53,6 @@ struct convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
 	static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs); //NOLINT
 };
 
-/// Specialization for Eigen Row Vectors, which are the type that Vector2x, Vector3x use
-SURGSIM_DOUBLE_SPECIALIZATION
-template <class Type, int Rows, int MOpt>
-struct convert <typename Eigen::Matrix<Type, Rows, 1, MOpt>>
-{
-	static Node encode(const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
-	static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs); //NOLINT
-};
-
 /// Specialization of convert for Eigen::Quaternion
 SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int QOpt>

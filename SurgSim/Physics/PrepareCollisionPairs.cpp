@@ -17,8 +17,10 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/PrepareCollisionPairs.h"
+#include "SurgSim/Math/Aabb.h"
 
 namespace SurgSim
 {
@@ -26,7 +28,9 @@ namespace Physics
 {
 
 PrepareCollisionPairs::PrepareCollisionPairs(bool doCopyState) :
-	Computation(doCopyState)
+	Computation(doCopyState),
+	m_timeSinceLog(0.0),
+	m_logger(Framework::Logger::getLogger("Physics/PrepareCollisionPairs"))
 {
 }
 
@@ -53,17 +57,50 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 				{
 					auto pair = std::make_shared<Collision::CollisionPair>(*first, *second);
 
-					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE)
+					if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE && pair->mayIntersect())
 					{
-						pairs.emplace_back(pair);
+						pairs.push_back(pair);
 					}
 				}
 			}
 		}
 
 		result->setCollisionPairs(pairs);
-	}
 
+		if (m_logger->getThreshold() <= SURGSIM_LOG_LEVEL(DEBUG))
+		{
+			m_timeSinceLog += dt;
+			if (m_timeSinceLog > 5.0)
+			{
+				m_timeSinceLog = 0.0;
+				typedef std::pair<std::string, std::string> PairType;
+				std::vector<PairType> names;
+				for (const auto& pair : pairs)
+				{
+					std::string first = pair->getFirst()->getFullName();
+					std::string second = pair->getSecond()->getFullName();
+					if (first < second)
+					{
+						names.emplace_back(first, second);
+					}
+					else
+					{
+						names.emplace_back(second, first);
+					}
+				}
+				std::sort(names.begin(), names.end(), [](const PairType& i, const PairType& j)
+					{
+						return (i.first < j.first) || ((i.first == j.first) && (i.second < j.second));
+					});
+				std::string message = "All collision pairs for testing:\n";
+				for (const auto& name : names)
+				{
+					message += "\t" + name.first + " : " + name.second + "\n";
+				}
+				SURGSIM_LOG_DEBUG(m_logger) << message;
+			}
+		}
+	}
 	return result;
 }
 
