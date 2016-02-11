@@ -117,6 +117,6 @@ TEST(OsgOctreeRepresentationTests, SerializationTest)
 	EXPECT_TRUE(newOsgOctree->getOctreeShape()->isValid());
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, newOctree->getType());
 	EXPECT_THROW(newOctree->getVolume(), SurgSim::Framework::AssertionFailure);
-	EXPECT_TRUE((newOctree->getCenter() - Vector3d::Zero()).isZero());
+	EXPECT_TRUE(newOctree->getCenter().isZero());
 	EXPECT_THROW(newOctree->getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
 }

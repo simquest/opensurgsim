@@ -41,6 +41,7 @@ ParticlesShape::ParticlesShape(const ParticlesShape& other) :
 	m_volume(other.getVolume()),
 	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
+	m_pose = other.getPose();
 }
 
 int ParticlesShape::getType() const

@@ -38,6 +38,7 @@ SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
 	DataStructures::SegmentMeshPlain(other)
 {
 	setRadius(other.m_radius);
+	m_pose = other.getPose();
 	updateAabbTree();
 }
 

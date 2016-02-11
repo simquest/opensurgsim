@@ -57,7 +57,6 @@ double CompoundShape::getVolume() const
 	return *m_volume;
 }
 
-
 Vector3d CompoundShape::getCenter() const
 {
 	ReadLock lock(m_mutex);
@@ -71,7 +70,7 @@ Vector3d CompoundShape::getCenter() const
 			for (const auto& shape : m_shapes)
 			{
 				double volume = shape.first->getVolume();
-				result += shape.second * (shape.first->getCenter()) * volume;
+				result += shape.second * shape.first->getCenter() * volume;
 				total += volume;
 			}
 			result /= total;
@@ -154,6 +153,7 @@ void CompoundShape::invalidateData()
 size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose)
 {
 	WriteLock lock(m_mutex);
+	shape->setPose(m_pose * pose);
 	m_shapes.emplace_back(shape, pose);
 	invalidateData();
 	return m_shapes.size() - 1;
@@ -163,6 +163,10 @@ void CompoundShape::setShapes(const std::vector<SubShape>& shapes)
 {
 	WriteLock lock(m_mutex);
 	m_shapes = shapes;
+	for (auto& shape : m_shapes)
+	{
+		shape.first->setPose(m_pose * shape.second);
+	}
 	invalidateData();
 }
 
@@ -194,16 +198,28 @@ void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
 	for (auto& shape : m_shapes)
 	{
 		shape.second = poses[i++];
+		shape.first->setPose(m_pose * shape.second);
 	}
 	invalidateData();
 }
 
+void CompoundShape::setPose(const RigidTransform3d& pose)
+{
+	WriteLock lock(m_mutex);
+	Shape::setPose(pose);
+	for (auto& shape : m_shapes)
+	{
+		shape.first->setPose(pose * shape.second);
+	}
+	invalidateData();
+}
 
 void CompoundShape::setPose(size_t index, const RigidTransform3d& pose)
 {
 	WriteLock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
 	m_shapes[index].second = pose;
+	m_shapes[index].first->setPose(m_pose * pose);
 	invalidateData();
 }
 

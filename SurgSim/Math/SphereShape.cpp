@@ -55,11 +55,6 @@ double SphereShape::getVolume() const
 	return 4.0 / 3.0 * M_PI * m_radius * m_radius * m_radius;
 }
 
-SurgSim::Math::Vector3d SphereShape::getCenter() const
-{
-	return Vector3d(0.0, 0.0, 0.0);
-}
-
 SurgSim::Math::Matrix33d SphereShape::getSecondMomentOfVolume() const
 {
 	const double volume = getVolume();

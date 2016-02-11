@@ -60,6 +60,8 @@ public:
 	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
 	const std::shared_ptr<Shape>& getShape(size_t index) const;
 
+	using Shape::getPose;
+
 	/// \return the pose of a specific shape
 	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
 	RigidTransform3d getPose(size_t index) const;
@@ -68,6 +70,8 @@ public:
 	/// \param poses array of poses to be copied to each shape
 	/// \throws SurgSimm::AssertialFailure if the size of poses.size() != getNumShapes()
 	void setPoses(const std::vector<RigidTransform3d>& poses);
+
+	void setPose(const RigidTransform3d& pose) override;
 
 	/// Set the pose for the specified shape
 	/// \param index index of the target shape

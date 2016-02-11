@@ -107,7 +107,7 @@ public:
 
 	/// Get the shape used internally for physical parameters computation
 	/// \return The shape used for calculation, nullptr if none exist
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const;
+	std::shared_ptr<Math::Shape> getShape() const;
 
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
@@ -147,7 +147,7 @@ protected:
 	/// Angular damping parameter (in N.m.s.rad-1)
 	double m_angularDamping;
 
-	/// Mass-center of the object
+	/// The local mass-center of the object
 	SurgSim::Math::Vector3d m_massCenter;
 
 	/// Inertia matrix in local coordinates

@@ -16,10 +16,8 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/PoseComponent.h"
-#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
-#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
@@ -52,7 +50,6 @@ RigidRepresentationBase::RigidRepresentationBase(const std::string& name) :
 									  getAngularDamping, setAngularDamping);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidRepresentationBase, std::shared_ptr<SurgSim::Math::Shape>, Shape,
 									  getShape, setShape);
-
 }
 
 RigidRepresentationBase::~RigidRepresentationBase()
@@ -120,7 +117,7 @@ const RigidState& RigidRepresentationBase::getPreviousState() const
 std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(
 	const SurgSim::DataStructures::Location& location)
 {
-	return std::move(createTypedLocalization<RigidLocalization>(location));
+	return createTypedLocalization<RigidLocalization>(location);
 }
 
 void RigidRepresentationBase::setDensity(double rho)
@@ -178,7 +175,7 @@ void RigidRepresentationBase::setShape(const std::shared_ptr<SurgSim::Math::Shap
 	}
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> RigidRepresentationBase::getShape() const
+std::shared_ptr<SurgSim::Math::Shape> RigidRepresentationBase::getShape() const
 {
 	return m_shape;
 }

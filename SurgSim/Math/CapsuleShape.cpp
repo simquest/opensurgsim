@@ -64,11 +64,6 @@ double CapsuleShape::getVolume() const
 	return localCylinderVolume + localSphereVolume;
 }
 
-SurgSim::Math::Vector3d CapsuleShape::getCenter() const
-{
-	return Vector3d(0.0, 0.0, 0.0);
-}
-
 SurgSim::Math::Vector3d CapsuleShape::topCenter() const
 {
 	return Vector3d(0.0, m_length / 2.0, 0.0);

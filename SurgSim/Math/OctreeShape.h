@@ -59,10 +59,6 @@ public:
 	/// \return The volume of the shape (in m-3)
 	double getVolume() const override;
 
-	/// Get the volumetric center of the shape
-	/// \return The center of the shape
-	Vector3d getCenter() const override;
-
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
@@ -82,6 +78,8 @@ public:
 	void loadOctree(const std::string& filePath);
 
 	const Math::Aabbd& getBoundingBox() const override;
+
+	void setPose(const RigidTransform3d& pose) override;
 
 private:
 

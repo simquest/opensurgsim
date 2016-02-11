@@ -30,15 +30,6 @@ namespace SurgSim
 namespace Math
 {
 
-/// Type defining the shape direction for certain templatized shape
-/// (i.e. CylinderShape and CapsuleShape)
-typedef enum
-{
-	SHAPE_DIRECTION_AXIS_X = 0,
-	SHAPE_DIRECTION_AXIS_Y = 1,
-	SHAPE_DIRECTION_AXIS_Z = 2
-} ShapeDirection;
-
 /// Fixed List of enums for the available Shape types, do not explicitly assign values, ShapeCount is
 /// used to determine the number of actual shape types
 typedef enum
@@ -62,12 +53,9 @@ typedef enum
 /// Generic rigid shape class defining a shape
 /// \note This class gives the ability to analyze the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
-class Shape : virtual public SurgSim::Framework::Accessible, public Framework::FactoryBase<Shape>
+class Shape : virtual public Framework::Accessible, public Framework::FactoryBase<Shape>
 {
 public:
-	typedef ::SurgSim::Math::Vector3d Vector3d;
-	typedef ::SurgSim::Math::Matrix33d Matrix33d;
-
 	/// Constructor
 	Shape();
 
@@ -81,9 +69,9 @@ public:
 	/// \return The volume of the shape (in m-3)
 	virtual double getVolume() const = 0;
 
-	/// Get the volumetric center of the shape
+	/// Get the volumetric center of the shape, in local space.
 	/// \return The center of the shape
-	virtual Vector3d getCenter() const = 0;
+	virtual Vector3d getCenter() const;
 
 	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
@@ -106,10 +94,17 @@ public:
 	virtual bool isValid() const = 0;
 
 	/// \return the bounding box for the shape
-	virtual const Math::Aabbd& getBoundingBox() const;
+	virtual const Aabbd& getBoundingBox() const;
+
+	/// \note This will alter any calculations that use the pose, so those need to be re-calculated.
+	virtual void setPose(const RigidTransform3d& pose);
+
+	const RigidTransform3d& getPose() const;
 
 protected:
-	Math::Aabbd m_aabb;
+	RigidTransform3d m_pose;
+
+	Aabbd m_aabb;
 };
 
 /// PosedShape is a transformed shape with a record of the pose used to transform it.
@@ -118,9 +113,9 @@ struct PosedShape
 {
 	PosedShape()
 	{
-		pose = Math::RigidTransform3d::Identity();
+		pose = RigidTransform3d::Identity();
 	}
-	PosedShape(const T& shapeInput, const Math::RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
+	PosedShape(const T& shapeInput, const RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
 
 	void invalidate()
 	{
@@ -130,14 +125,14 @@ struct PosedShape
 	{
 		return shape;
 	}
-	const Math::RigidTransform3d& getPose() const
+	const RigidTransform3d& getPose() const
 	{
 		return pose;
 	}
 
 protected:
 	T shape;
-	Math::RigidTransform3d pose;
+	RigidTransform3d pose;
 };
 
 /// PosedShapeMotion is embedding the motion of a PosedShape, providing a posed shape at 2 different instant.

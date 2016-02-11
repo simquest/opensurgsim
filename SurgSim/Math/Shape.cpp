@@ -15,21 +15,28 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
-
 namespace Math
 {
 
-Shape::Shape()
+Shape::Shape() :
+	m_pose(RigidTransform3d::Identity())
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Shape, RigidTransform3d, Pose, getPose, setPose);
 	m_aabb.setEmpty();
 }
 
 Shape::~Shape()
 {
+}
+
+Vector3d Shape::getCenter() const
+{
+	return Vector3d::Zero();
 }
 
 bool Shape::isTransformable() const
@@ -46,15 +53,25 @@ std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose)
 /// Get class name
 std::string Shape::getClassName() const
 {
-	SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+	SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger()) <<
 			"getClassName() called on Math::Shape base class, this is wrong" <<
 			" in almost all cases, this means there is a class that does not have getClassName() defined.";
 	return "SurgSim::Math::Shape";
 }
 
-const Math::Aabbd& Shape::getBoundingBox() const
+const Aabbd& Shape::getBoundingBox() const
 {
 	return m_aabb;
+}
+
+void Shape::setPose(const RigidTransform3d& pose)
+{
+	m_pose = pose;
+}
+
+const RigidTransform3d& Shape::getPose() const
+{
+	return m_pose;
 }
 
 } // namespace Math

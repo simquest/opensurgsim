@@ -80,11 +80,6 @@ double BoxShape::getVolume() const
 	return m_size[0] * m_size[1] * m_size[2];
 }
 
-SurgSim::Math::Vector3d BoxShape::getCenter() const
-{
-	return Vector3d(0.0, 0.0, 0.0);
-}
-
 SurgSim::Math::Matrix33d BoxShape::getSecondMomentOfVolume() const
 {
 	const double volume = getVolume();

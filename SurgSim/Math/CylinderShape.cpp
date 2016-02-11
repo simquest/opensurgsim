@@ -68,11 +68,6 @@ double CylinderShape::getVolume() const
 	return M_PI * m_radius * m_radius * m_length;
 }
 
-SurgSim::Math::Vector3d CylinderShape::getCenter() const
-{
-	return Vector3d(0.0, 0.0, 0.0);
-}
-
 SurgSim::Math::Matrix33d CylinderShape::getSecondMomentOfVolume() const
 {
 	const double volume = getVolume();

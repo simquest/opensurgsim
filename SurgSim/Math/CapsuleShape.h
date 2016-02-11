@@ -53,10 +53,6 @@ public:
 	/// \return The volume of the shape (in m-3)
 	double getVolume() const override;
 
-	/// Get the volumetric center of the shape
-	/// \return The center of the shape
-	Vector3d getCenter() const override;
-
 	/// Return the center of the top sphere of the internal cylinder
 	/// \return The top center of the sphere of the capsule
 	Vector3d topCenter() const;

@@ -65,11 +65,6 @@ double OctreeShape::getVolume() const
 	return 0.0;
 }
 
-Vector3d OctreeShape::getCenter() const
-{
-	return Vector3d::Zero();
-}
-
 Matrix33d OctreeShape::getSecondMomentOfVolume() const
 {
 	SURGSIM_FAILURE() << "OctreeShape::getSecondMomentOfVolume not implemented";
@@ -100,6 +95,11 @@ bool OctreeShape::isValid(std::shared_ptr<NodeType> node) const
 bool OctreeShape::isValid() const
 {
 	return isValid(m_rootNode);
+}
+
+void OctreeShape::setPose(const RigidTransform3d& pose)
+{
+	SURGSIM_ASSERT(pose.isApprox(RigidTransform3d::Identity())) << "OctreeShape can only have an Identity pose.";
 }
 
 const Math::Aabbd& OctreeShape::getBoundingBox() const
