@@ -97,8 +97,8 @@ bool areCoplanarSegmentsIntersectingAtGivenTime(
 /// \param C, D The 2nd segment motion (each point's motion is from first to second)
 /// \param[out] timeOfImpact The time of impact within [0..1] if an collision is found
 /// \param[out] s0p1Factor, s1p1Factor The barycentric coordinate of the contact point on the 2 segments
-/// i.e. ContactPoint(timeOfImpact) = A(timeOfImpact) + s0p1Factor.AB(timeOfImpact) 
-/// i.e. ContactPoint(timeOfImpact) = C(timeOfImpact) + s1p1Factor.CD(timeOfImpact) 
+/// i.e. ContactPoint(timeOfImpact) = A(timeOfImpact) + s0p1Factor.AB(timeOfImpact)
+/// i.e. ContactPoint(timeOfImpact) = C(timeOfImpact) + s1p1Factor.CD(timeOfImpact)
 /// \return True if the given segment/segment motions intersect, False otherwise
 /// \note Simple cubic-solver https://graphics.stanford.edu/courses/cs468-02-winter/Papers/Collisions_vetements.pdf
 /// \note Optimized method http://www.robotics.sei.ecnu.edu.cn/CCDLY/GMOD15.pdf
