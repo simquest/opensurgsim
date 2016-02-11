@@ -42,6 +42,13 @@ struct IndexedLocalCoordinate
 
 	/// Coordinates with respect to the entity identified by the index.
 	SurgSim::Math::Vector coordinate;
+
+	/// Comparison method 'isApprox'
+	/// \param other The other IndexedLocalCoordinate to compare it to
+	/// \param precision The precision with which to compare
+	/// \return True if the two IndexedLocalCoordinate are equal within precision, False otherwise
+	bool isApprox(const IndexedLocalCoordinate& other, double precision = std::numeric_limits<double>::epsilon())
+		const;
 };
 
 } // namespace DataStructures

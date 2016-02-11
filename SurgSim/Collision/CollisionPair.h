@@ -146,6 +146,10 @@ public:
 	/// \return	true if swapped, false if not.
 	bool isSwapped() const;
 
+	/// \return whether the two represenations might have an intersection
+	/// \note The bounding boxes are taken, if the bounding box is empty it is always considered for collision
+	bool mayIntersect() const;
+
 private:
 	/// Pair of objects that are colliding
 	std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>> m_representations;

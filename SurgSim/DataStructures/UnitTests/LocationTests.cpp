@@ -193,6 +193,97 @@ TEST(LocationTests, Constructor)
 	}
 }
 
+TEST(LocationTests, IsApprox)
+{
+	double epsilon = 1e-15;
+
+	{
+		SCOPED_TRACE("Rigid location");
+		Location rigidLocationOnes(Math::Vector3d::Ones());
+		Location rigidLocationZero(Math::Vector3d::Zero());
+		Location rigidLocationAlmostOnes(Math::Vector3d(1.0, 1.0, 1 + epsilon * 0.5));
+		Location rigidLocationAlmostZero(Math::Vector3d(0.0, 0.0, epsilon * 0.5));
+
+		EXPECT_FALSE(rigidLocationOnes.isApprox(rigidLocationZero, epsilon));
+		EXPECT_TRUE(rigidLocationOnes.isApprox(rigidLocationOnes, epsilon));
+		EXPECT_TRUE(rigidLocationOnes.isApprox(rigidLocationAlmostOnes, epsilon));
+		EXPECT_FALSE(rigidLocationOnes.isApprox(rigidLocationAlmostZero, epsilon));
+
+		EXPECT_TRUE(rigidLocationZero.isApprox(rigidLocationZero, epsilon));
+		EXPECT_FALSE(rigidLocationZero.isApprox(rigidLocationOnes, epsilon));
+		EXPECT_FALSE(rigidLocationZero.isApprox(rigidLocationAlmostOnes, epsilon));
+		EXPECT_TRUE(rigidLocationZero.isApprox(rigidLocationAlmostZero, epsilon));
+	}
+
+	{
+		SCOPED_TRACE("Octree location");
+		std::array<int, 3> path1 = {{0, 1, 2}};
+		std::array<int, 3> path2 = {{2, 1, 0}};
+		Location octreeLocation1(OctreePath(path1.begin(), path1.end()));
+		Location octreeLocation2(OctreePath(path2.begin(), path2.end()));
+
+		EXPECT_TRUE(octreeLocation1.isApprox(octreeLocation1));
+		EXPECT_TRUE(octreeLocation2.isApprox(octreeLocation2));
+		EXPECT_FALSE(octreeLocation1.isApprox(octreeLocation2));
+	}
+
+	{
+		SCOPED_TRACE("Index location");
+		Location indexLocationOne(1);
+		Location indexLocationZero(0);
+
+		EXPECT_TRUE(indexLocationOne.isApprox(indexLocationOne));
+		EXPECT_TRUE(indexLocationZero.isApprox(indexLocationZero));
+		EXPECT_FALSE(indexLocationZero.isApprox(indexLocationOne));
+	}
+
+	{
+		SCOPED_TRACE("TriangleMesh location");
+		auto vector001 = Math::Vector(3); vector001 << 0, 0, 1;
+		auto vector100 = Math::Vector(3); vector100 << 1, 0, 0;
+		auto vector010 = Math::Vector(3); vector010 << 0, 1, 1;
+		IndexedLocalCoordinate triangleBarycentricCoord11(9, vector001);
+		IndexedLocalCoordinate triangleBarycentricCoord12(9, vector100);
+		IndexedLocalCoordinate triangleBarycentricCoord2(0, vector010);
+		Location triangleMeshLocation11(triangleBarycentricCoord11, Location::TRIANGLE);
+		Location triangleMeshLocation12(triangleBarycentricCoord12, Location::TRIANGLE);
+		Location triangleMeshLocation2(triangleBarycentricCoord2, Location::TRIANGLE);
+
+		EXPECT_TRUE(triangleMeshLocation11.isApprox(triangleMeshLocation11));
+		EXPECT_FALSE(triangleMeshLocation11.isApprox(triangleMeshLocation12));
+		EXPECT_FALSE(triangleMeshLocation11.isApprox(triangleMeshLocation2));
+	}
+
+	{
+		SCOPED_TRACE("Element location");
+		auto vector01 = Math::Vector(2); vector01 << 0, 1;
+		auto vector10 = Math::Vector(2); vector10 << 1, 0;
+		IndexedLocalCoordinate triangleBarycentricCoord11(9, vector01);
+		IndexedLocalCoordinate triangleBarycentricCoord12(9, vector10);
+		IndexedLocalCoordinate triangleBarycentricCoord2(0, vector10);
+		Location triangleMeshLocation11(triangleBarycentricCoord11, Location::ELEMENT);
+		Location triangleMeshLocation12(triangleBarycentricCoord12, Location::ELEMENT);
+		Location triangleMeshLocation2(triangleBarycentricCoord2, Location::ELEMENT);
+
+		EXPECT_TRUE(triangleMeshLocation11.isApprox(triangleMeshLocation11));
+		EXPECT_FALSE(triangleMeshLocation11.isApprox(triangleMeshLocation12));
+		EXPECT_FALSE(triangleMeshLocation11.isApprox(triangleMeshLocation2));
+	}
+
+	{
+		SCOPED_TRACE("Node location");
+		Math::Vector v;
+		IndexedLocalCoordinate triangleBarycentricCoord1(9, v);
+		IndexedLocalCoordinate triangleBarycentricCoord2(0, v);
+		Location triangleMeshLocation1(triangleBarycentricCoord1, Location::NODE);
+		Location triangleMeshLocation2(triangleBarycentricCoord2, Location::NODE);
+
+		EXPECT_TRUE(triangleMeshLocation1.isApprox(triangleMeshLocation1));
+		EXPECT_FALSE(triangleMeshLocation1.isApprox(triangleMeshLocation2));
+		EXPECT_TRUE(triangleMeshLocation2.isApprox(triangleMeshLocation2));
+	}
+}
+
 }; // namespace DataStructures
 
 }; // namespace SurgSim

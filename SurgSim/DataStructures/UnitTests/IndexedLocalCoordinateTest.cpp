@@ -61,5 +61,33 @@ TEST(IndexedLocalCoordinateTest, IndexedLocalCoordinate)
 	}
 }
 
+TEST(IndexedLocalCoordinateTest, IsApprox)
+{
+	using SurgSim::Math::Vector3d;
+	double epsilon = 1e-12;
+
+	IndexedLocalCoordinate null6(6u, Vector3d::Zero());
+	IndexedLocalCoordinate almostNull6(6u, Vector3d(0.0, 0.0, epsilon / 2.0));
+	IndexedLocalCoordinate null5(5u, Vector3d::Zero());
+	IndexedLocalCoordinate almostNull5(5u, Vector3d(0.0, 0.0, epsilon / 2.0));
+
+	EXPECT_TRUE(null6.isApprox(null6, epsilon));
+	EXPECT_TRUE(null6.isApprox(almostNull6, epsilon));
+	EXPECT_FALSE(null6.isApprox(null5, epsilon));
+	EXPECT_FALSE(null6.isApprox(almostNull5, epsilon));
+
+	IndexedLocalCoordinate one6(6u, Vector3d::Ones());
+	IndexedLocalCoordinate almostOne6(6u, Vector3d::Ones() + Vector3d(0.0, 0.0, epsilon / 2.0));
+	IndexedLocalCoordinate one5(5u, Vector3d::Ones());
+	IndexedLocalCoordinate two6(6u, Vector3d::Constant(2.0));
+	IndexedLocalCoordinate three7(7u, Vector3d::Constant(3.0));
+
+	EXPECT_TRUE(one6.isApprox(one6, epsilon));
+	EXPECT_TRUE(one6.isApprox(almostOne6, epsilon));
+	EXPECT_FALSE(one6.isApprox(one5, epsilon));
+	EXPECT_FALSE(one6.isApprox(two6, epsilon));
+	EXPECT_FALSE(one6.isApprox(three7, epsilon));
+}
+
 } // namespace Collision
 } // namespace SurgSim

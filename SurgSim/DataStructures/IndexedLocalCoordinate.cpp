@@ -30,6 +30,13 @@ IndexedLocalCoordinate::IndexedLocalCoordinate(size_t index, const SurgSim::Math
 {
 }
 
+bool IndexedLocalCoordinate::isApprox(const IndexedLocalCoordinate& other, double precision) const
+{
+	return (index == other.index) &&
+		((coordinate.isZero(precision) && other.coordinate.isZero(precision)) ||
+			coordinate.isApprox(other.coordinate, precision));
+}
+
 } // namespace DataStructures
 
 } // namespace SurgSim

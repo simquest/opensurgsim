@@ -25,6 +25,7 @@ CapsuleShape::CapsuleShape(double length, double radius) : m_length(length), m_r
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleShape, double, Radius, getRadius, setRadius);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleShape, double, Length, getLength, setLength);
+	updateAabb();
 }
 
 int CapsuleShape::getType() const
@@ -45,11 +46,13 @@ double CapsuleShape::getRadius() const
 void CapsuleShape::setLength(double length)
 {
 	m_length = length;
+	updateAabb();
 }
 
 void CapsuleShape::setRadius(double radius)
 {
 	m_radius = radius;
+	updateAabb();
 }
 
 double CapsuleShape::getVolume() const
@@ -78,8 +81,8 @@ SurgSim::Math::Vector3d CapsuleShape::bottomCenter() const
 
 SurgSim::Math::Matrix33d CapsuleShape::getSecondMomentOfVolume() const
 {
-	const double &r = m_radius;
-	const double &l = m_length;
+	const double& r = m_radius;
+	const double& l = m_length;
 	const double r2 = r * r;
 	const double l2 = l * l;
 	const double cylinderVolume = M_PI * (r2) * l;
@@ -119,6 +122,13 @@ SurgSim::Math::Matrix33d CapsuleShape::getSecondMomentOfVolume() const
 bool CapsuleShape::isValid() const
 {
 	return (m_length >= 0) && (m_radius >= 0);
+}
+
+void CapsuleShape::updateAabb()
+{
+	m_aabb.setEmpty();
+	m_aabb.extend(Vector3d(-m_radius, -m_length / 2.0 - m_radius, -m_radius));
+	m_aabb.extend(Vector3d(m_radius, m_length / 2.0 + m_radius, m_radius));
 }
 
 }; // namespace Math
