@@ -89,12 +89,31 @@ void DeformableCollisionRepresentation::update(const double& dt)
 		"Physics::Representation or the Physics::Representation has expired.";
 
 	// Write previous shape ONLY if the collision detection is continuous
-	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS &&
-		!updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get()))
+	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
-		setLocalActive(false);
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-			"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
+		if (m_previousShape == nullptr)
+		{
+			if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+			{
+				m_previousShape = std::make_shared<Math::MeshShape>(*std::dynamic_pointer_cast<Math::MeshShape>(m_shape));
+			}
+			else if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
+			{
+				m_previousShape = std::make_shared<Math::SegmentMeshShape>(*std::dynamic_pointer_cast<Math::SegmentMeshShape>(m_shape));
+			}
+			else
+			{
+				SURGSIM_FAILURE() << "Invalid type, should be MeshShape("<< SurgSim::Math::SHAPE_TYPE_MESH <<
+					") or SegmentMeshShape("<< SurgSim::Math::SHAPE_TYPE_SEGMENTMESH<<"), but it is " <<
+					m_shape->getType();
+			}
+		}
+		if (!updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get()))
+		{
+			setLocalActive(false);
+			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
+		}
 	}
 
 	// Write current shape
