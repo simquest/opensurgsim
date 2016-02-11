@@ -94,19 +94,16 @@ void RigidCollisionRepresentation::update(const double& time)
 			const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
 			const Math::RigidTransform3d& physicsPreviousPose = physicsRepresentation->getPreviousState().getPose();
 
-			previousPose = physicsPreviousPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
-			currentPose = physicsCurrentPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+			Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+			previousPose = physicsPreviousPose * transform;
+			currentPose = physicsCurrentPose * transform;
 		}
 
 		std::shared_ptr<Shape> previousShape = getShape();
-		if (previousShape->isTransformable())
+		std::shared_ptr<Shape> currentShape = getShape();
+		if (getShape()->isTransformable())
 		{
 			previousShape = getShape()->getTransformed(previousPose);
-		}
-
-		std::shared_ptr<Shape> currentShape = getShape();
-		if (currentShape->isTransformable())
-		{
 			currentShape = getShape()->getTransformed(currentPose);
 		}
 
