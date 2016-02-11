@@ -76,18 +76,16 @@ SurgSim::Math::Vector3d FemLocalization::doCalculatePosition(double time) const
 	previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
 		m_position.coordinate);
 
-	// 'time' is a factor of the time step (which is the inverse of the physics thread rate)
-	// For that reason, we knowingly choose a factor not so small of 1-e6.
-	if (time <= 1e-6)
+	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return previousPosition;
 	}
-	else if (time >= 1.0 - 1e-6)
+	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return currentPosition;
 	}
 
-	return previousPosition + time * (currentPosition - previousPosition);
+	return Math::interpolate(previousPosition, currentPosition, time);
 }
 
 SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
@@ -117,18 +115,16 @@ SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
 		previousVelocity += naturalCoordinate(i) * Math::getSubVector(previousVelocities, nodeIds[i], 6).segment<3>(0);
 	}
 
-	// 'time' is a factor of the time step (which is the inverse of the physics thread rate)
-	// For that reason, we knowingly choose a factor not so small of 1-e6.
-	if (time <= 1e-6)
+	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return previousVelocity;
 	}
-	else if (time >= 1.0 - 1e-6)
+	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return currentVelocity;
 	}
 
-	return previousVelocity + time * (currentVelocity - previousVelocity);
+	return Math::interpolate(previousVelocity, currentVelocity, time);
 }
 
 } // namespace Physics
