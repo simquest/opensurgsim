@@ -234,6 +234,7 @@ void ContactCalculation::initializeTables()
 	}
 
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentSelfContact>());
+	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentMeshTriangleMeshContact>());
 }
 
 void ContactCalculation::privateDcdRegister(
