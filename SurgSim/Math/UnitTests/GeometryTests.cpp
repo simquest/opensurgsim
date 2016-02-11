@@ -1675,5 +1675,79 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 	}
 }
 
+TEST_F(GeometryTest, CcdIntersectionsSegmentSegment)
+{
+	SizeType time, s0p1Factor, s1p1Factor;
+
+	{
+		SCOPED_TRACE("No intersection");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 0.0, 4.0));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.0, 0.1, 4.0), VectorType(0.0, 1.1, 8.0));
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(0.0, 1.1, 6.0), VectorType(0.0, 2.1, 54.0));
+		EXPECT_FALSE(calculateCcdContactSegmentSegment(A, B, C, D, &time, &s0p1Factor, &s1p1Factor));
+	}
+
+	{
+		SCOPED_TRACE("Intersection at t=0");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 0.0, 4.0));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.0, 1.0, -2.0), VectorType(0.0, 2.0, -3.5));
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(0.0, 1.0, -10.0));
+		EXPECT_TRUE(calculateCcdContactSegmentSegment(A, B, C, D, &time, &s0p1Factor, &s1p1Factor));
+		EXPECT_DOUBLE_EQ(0.0, time);
+		EXPECT_DOUBLE_EQ(0.0, s0p1Factor);
+		EXPECT_DOUBLE_EQ(1.0, s1p1Factor);
+	}
+
+	{
+		SCOPED_TRACE("Intersection at t=0.5");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.1, 0.0, 1.0), VectorType(-0.1, 0.0, -1.0));
+		// A(0.5) = 0.0 0.0 0.0
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 3.0, -2.0));
+		// B(0.5) = 1.5 1.5 0.0
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(-0.3, 2.0, -2.0), VectorType(0.3, 1.0, 2.0));
+		// C(0.5) = 0.0 1.5 0.0
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(1.7, 1.0, -1.0), VectorType(1.3, -1.0, 1.0));
+		// D(0.5) = 1.5 0.0 0.0
+		// At time 0.5, the segments AB and CD are coplanar and intersect exactly in their middle
+		EXPECT_TRUE(calculateCcdContactSegmentSegment(A, B, C, D, &time, &s0p1Factor, &s1p1Factor));
+		EXPECT_NEAR(0.5, time, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.5, s0p1Factor, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.5, s1p1Factor, Math::Geometry::ScalarEpsilon);
+	}
+
+	{
+		SCOPED_TRACE("Intersection at t=0.5");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.4, 0.0, 1.0), VectorType(0.6, 0.0, -1.0));
+		// A(0.5) = 0.5 0.0 0.0
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 3.0, -2.0));
+		// B(0.5) = 1.5 1.5 0.0
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(-0.3, 2.0, -2.0), VectorType(0.3, 1.0, 2.0));
+		// C(0.5) = 0.0 1.5 0.0
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(1.7, 1.0, -1.0), VectorType(1.3, -1.0, 1.0));
+		// D(0.5) = 1.5 0.0 0.0
+		// At time 0.5, the segments AB and CD are coplanar and intersect at P:
+		// P = A + 0.4 AB = (0.5 0.0 0.0) + 0.4 (1.0 1.5 0.0)  = (0.9 0.6 0.0)
+		// P = C + 0.6 CD = (0.0 1.5 0.0) + 0.6 (1.5 -1.5 0.0) = (0.9 0.6 0.0)
+		EXPECT_TRUE(calculateCcdContactSegmentSegment(A, B, C, D, &time, &s0p1Factor, &s1p1Factor));
+		EXPECT_NEAR(0.5, time, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.4, s0p1Factor, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.6, s1p1Factor, Math::Geometry::ScalarEpsilon);
+	}
+
+	{
+		SCOPED_TRACE("Intersection at t=1");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 1.24), VectorType(2.0, 0.0, 3.0));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.0, 1.0, -2.0), VectorType(2.0, 0.0, 3.0));
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(0.1, 1.0, 1.1), VectorType(0.0, 1.0, -1.54));
+		EXPECT_TRUE(calculateCcdContactSegmentSegment(A, B, C, D, &time, &s0p1Factor, &s1p1Factor));
+		EXPECT_DOUBLE_EQ(1.0, time);
+		EXPECT_DOUBLE_EQ(1.0, s0p1Factor);
+		EXPECT_DOUBLE_EQ(0.0, s1p1Factor);
+	}
+}
+
 }; // namespace Math
 }; // namespace SurgSim
