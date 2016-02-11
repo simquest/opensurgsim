@@ -101,6 +101,7 @@ set(SURGSIM_MATH_HEADERS
 	ParticlesShape.h
 	ParticlesShape-inl.h
 	PlaneShape.h
+	PointTriangleCcdContactCalculation-inl.h
 	Polynomial.h
 	Polynomial-inl.h
 	PolynomialRoots.h
