@@ -231,10 +231,10 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 			}
 
 			double earliestTimeOfImpact = std::numeric_limits<double>::max();
-			double segmentAlpha;                //!< Barycentric coordinates of P in triangle P0P1
-												//!< P = P0 + segmentAlpha.P0P1
-			double triangleAlpha, triangleBeta; //!< Barycentric coordinates of P in triangle ABC
-												//!< P = A + triangleAlpha.AB + triangleBeta.AC
+			double segmentAlpha = -1.0;  //!< Barycentric coordinates of P in the segment sv0sv1
+										  //!< P = sv0 + segmentAlpha.sv0sv1
+			double triangleAlpha = -1.0;  //!< Barycentric coordinates of P in triangle tv0tv1tv2
+			double triangleBeta = -1.0;   //!< P = tv0 + triangleAlpha.tv0tv1 + triangleBeta.tv0tv2
 
 			// Check collision at time t = 0
 			Math::Vector3d pt;
