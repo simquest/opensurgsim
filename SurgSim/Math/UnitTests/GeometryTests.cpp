@@ -1749,5 +1749,60 @@ TEST_F(GeometryTest, CcdIntersectionsSegmentSegment)
 	}
 }
 
+TEST_F(GeometryTest, CcdIntersectionsPointTriangle)
+{
+	SizeType time, tv01Factor, tv02Factor;
+
+	{
+		SCOPED_TRACE("No intersection");
+		std::pair<VectorType, VectorType> P = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 0.0, 4.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(0.0, 0.1, 4.0), VectorType(0.0, 1.1, 8.0));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.0, 1.1, 6.0), VectorType(0.0, 2.1, 54.0));
+		EXPECT_FALSE(calculateCcdContactPointTriangle(P, A, B, C, &time, &tv01Factor, &tv02Factor));
+	}
+
+	{
+		SCOPED_TRACE("Intersection at t=0");
+		std::pair<VectorType, VectorType> P = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 0.0, 4.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(0.0, 1.0, -2.0), VectorType(0.0, 2.0, -3.5));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(0.0, 1.0, -10.0));
+		EXPECT_TRUE(calculateCcdContactPointTriangle(P, A, B, C, &time, &tv01Factor, &tv02Factor));
+		EXPECT_DOUBLE_EQ(0.0, time);
+		EXPECT_DOUBLE_EQ(0.0, tv01Factor);
+		EXPECT_DOUBLE_EQ(1.0, tv02Factor);
+	}
+
+	{
+		SCOPED_TRACE("Intersection at t=0.5");
+		std::pair<VectorType, VectorType> P = std::make_pair(VectorType(1.1, 0.0, 1.0), VectorType(0.9, 2.0, -1.0));
+		// P(0.5) = 1.0 1.0 0.0
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 3.0, -2.0));
+		// A(0.5) = 1.5 1.5 0.0
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(-0.3, 2.0, -2.0), VectorType(0.3, 1.0, 2.0));
+		// B(0.5) = 0.0 1.5 0.0
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(1.7, 1.0, -1.0), VectorType(1.3, -1.0, 1.0));
+		// C(0.5) = 1.5 0.0 0.0
+		// At time 0.5, all 4 points are coplanar and P is inside ABC with the barycentric coordinates (1/3 1/3 1/3)
+		EXPECT_TRUE(calculateCcdContactPointTriangle(P, A, B, C, &time, &tv01Factor, &tv02Factor));
+		EXPECT_NEAR(0.5, time, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(1.0 / 3.0, tv01Factor, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(1.0 / 3.0, tv01Factor, Math::Geometry::ScalarEpsilon);
+	}
+
+	{
+		SCOPED_TRACE("Intersection at t=1");
+		std::pair<VectorType, VectorType> P = std::make_pair(VectorType(1.0, 0.0, 1.24), VectorType(2.0, 0.0, 3.0));
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(0.0, 1.0, -2.0), VectorType(2.0, 0.0, 3.0));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.1, 1.0, 1.1), VectorType(0.0, 1.0, -1.54));
+		EXPECT_TRUE(calculateCcdContactPointTriangle(P, A, B, C, &time, &tv01Factor, &tv02Factor));
+		EXPECT_DOUBLE_EQ(1.0, time);
+		EXPECT_DOUBLE_EQ(1.0, tv01Factor);
+		EXPECT_DOUBLE_EQ(0.0, tv02Factor);
+	}
+}
+
 }; // namespace Math
 }; // namespace SurgSim
