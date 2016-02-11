@@ -87,7 +87,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 				continue;
 			}
 
-			auto contacts = pair->getContacts();
+			const auto& contacts = pair->getContacts();
 			for (auto& contact : contacts)
 			{
 				std::pair<std::shared_ptr<Location>, std::shared_ptr<Location>> locations;

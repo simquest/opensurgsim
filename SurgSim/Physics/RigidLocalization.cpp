@@ -49,7 +49,7 @@ const SurgSim::Math::Vector3d& RigidLocalization::getLocalPosition() const
 	return m_position;
 }
 
-SurgSim::Math::Vector3d RigidLocalization::doCalculatePosition(double time)
+SurgSim::Math::Vector3d RigidLocalization::doCalculatePosition(double time) const
 {
 	std::shared_ptr<RigidRepresentationBase> rigidRepresentation =
 		std::static_pointer_cast<RigidRepresentationBase>(getRepresentation());
@@ -57,11 +57,11 @@ SurgSim::Math::Vector3d RigidLocalization::doCalculatePosition(double time)
 	SURGSIM_ASSERT(rigidRepresentation != nullptr) << "RigidRepresentation is null, it was probably not" <<
 		" initialized";
 
-	if (time == 0.0)
+	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return rigidRepresentation->getPreviousState().getPose() * m_position;
 	}
-	else if (time == 1.0)
+	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return rigidRepresentation->getCurrentState().getPose() * m_position;
 	}
@@ -76,6 +76,36 @@ SurgSim::Math::Vector3d RigidLocalization::doCalculatePosition(double time)
 	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::interpolate(previousPose, currentPose, time);
 
 	return pose * m_position;
+}
+
+SurgSim::Math::Vector3d RigidLocalization::doCalculateVelocity(double time) const
+{
+	std::shared_ptr<RigidRepresentationBase> rigidRepresentation =
+		std::static_pointer_cast<RigidRepresentationBase>(getRepresentation());
+
+	SURGSIM_ASSERT(rigidRepresentation != nullptr) << "RigidRepresentation is null, it was probably not" <<
+		" initialized";
+
+	auto& previousR = rigidRepresentation->getPreviousState().getPose().linear();
+	auto& currentR = rigidRepresentation->getCurrentState().getPose().linear();
+
+	if (time <= std::numeric_limits<double>::epsilon())
+	{
+		return rigidRepresentation->getPreviousState().getLinearVelocity() +
+			rigidRepresentation->getPreviousState().getAngularVelocity().cross(previousR * m_position);
+	}
+	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
+	{
+		return rigidRepresentation->getCurrentState().getLinearVelocity() +
+			rigidRepresentation->getCurrentState().getAngularVelocity().cross(currentR * m_position);
+	}
+
+	Math::Vector3d currentVelocity = rigidRepresentation->getCurrentState().getLinearVelocity() +
+		rigidRepresentation->getCurrentState().getAngularVelocity().cross(currentR * m_position);
+	Math::Vector3d previousVelocity = rigidRepresentation->getPreviousState().getLinearVelocity() +
+		rigidRepresentation->getPreviousState().getAngularVelocity().cross(previousR * m_position);
+
+	return Math::interpolate(previousVelocity, currentVelocity, time);
 }
 
 bool RigidLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)

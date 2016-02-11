@@ -68,7 +68,9 @@ private:
 	/// state (1.0).
 	/// \return The global position of the localization using an interpolation between the previous and current states.
 	/// \note The time parameter can useful when dealing with Continuous Collision Detection.
-	SurgSim::Math::Vector3d doCalculatePosition(double time) override;
+	SurgSim::Math::Vector3d doCalculatePosition(double time) const override;
+
+	SurgSim::Math::Vector3d doCalculateVelocity(double time) const override;
 
 	/// Node defining the localization.
 	size_t m_nodeID;
