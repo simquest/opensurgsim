@@ -124,7 +124,10 @@ void DeformableCollisionRepresentation::update(const double& dt)
 			"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
 	}
 
-	invalidatePosedShapeMotion();
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_previousShape, Math::RigidTransform3d::Identity());
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeSecond(m_shape, Math::RigidTransform3d::Identity());
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeSecond);
+	setPosedShapeMotion(posedShapeMotion);
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
