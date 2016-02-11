@@ -1775,9 +1775,9 @@ bool calculateContactTriangleCapsule(
 }; // namespace SurgSim
 
 
+#include "SurgSim/Math/SegmentSegmentCcdContactCalculation-inl.h"
 #include "SurgSim/Math/TriangleCapsuleContactCalculation-inl.h"
 #include "SurgSim/Math/TriangleTriangleIntersection-inl.h"
 #include "SurgSim/Math/TriangleTriangleContactCalculation-inl.h"
-
 
 #endif

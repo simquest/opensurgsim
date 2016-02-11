@@ -115,6 +115,7 @@ set(SURGSIM_MATH_HEADERS
 	Scalar-inl.h
 	SegmentMeshShape.h
 	SegmentMeshShape-inl.h
+	SegmentSegmentCcdContactCalculation-inl.h
 	Shape.h
 	Shapes.h
 	SparseMatrix.h
