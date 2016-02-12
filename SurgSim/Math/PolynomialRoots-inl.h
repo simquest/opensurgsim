@@ -105,6 +105,10 @@ void solve(const T& a, const T& b, const T& c, const T& epsilon, int* numRoots, 
 		T sqrtDiscriminant = sqrt(discriminant);
 		(*roots)[0] = (-b - sqrtDiscriminant) / (2 * a);
 		(*roots)[1] = (-b + sqrtDiscriminant) / (2 * a);
+		if ((*roots)[0] > (*roots)[1])
+		{
+			std::swap((*roots)[0], (*roots)[1]);
+		}
 	}
 	else if (discriminant > -epsilon)
 	{
