@@ -111,43 +111,8 @@ bool calculateCcdContactSegmentSegment(
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& D,
 	T* timeOfImpact, T* s0p1Factor, T* s1p1Factor)
 {
-	/// Let's define the following:
-	/// A(t) = A0 + t * VA with VA = A1 - A0
-	/// Similarily for B(t), C(t) and D(t)
-	/// Therefore we have AB(t) = B(t) - A(t) = B(0) + t * VB - A(0) - t * VA
-	///                         = AB(0) + t * [VB - VA] = AB(0) + t * VAB
-	///
-	/// A collision happens at the time where all 4 points are coplanar. Moreover, at this time of impact t,
-	/// the segments AB(t) and CD(t) should intersect.
-	///
-	/// [AB(t).cross(CD(t))].AC(t) = 0 means that the 4 points are coplanar, so potentially intersecting.
-	/// We develop this equation to clearly formulate the resulting cubic equation:
-	///
-	/// [AB(0).cross(CD(0)) + t*AB(0).cross(VCD) + t*VAB.cross(CD(0)) + t^2*VAB.cross(VCD)] . [AC(0) + t * VAC] = 0
-	/// t^0 * [[AB(0).cross(CD(0))].AC(0)] +
-	/// t^1 * [[AB(0).cross(CD(0))].VAC + [AB(0).cross(VCD)].AC(0) + [VAB.cross(CD(0))].AC(0)] +
-	/// t^2 * [[AB(0).cross(VCD)].VAC + [VAB.cross(CD(0))].VAC + [VAB.cross(VCD)].AC(0)] +
-	/// t^3 * [[VAB.cross(VCD)].VAC] = 0
-	Eigen::Matrix<T, 3, 1, MOpt> AB0 = B.first - A.first;
-	Eigen::Matrix<T, 3, 1, MOpt> AC0 = C.first - A.first;
-	Eigen::Matrix<T, 3, 1, MOpt> CD0 = D.first - C.first;
-	Eigen::Matrix<T, 3, 1, MOpt> VA = (A.second - A.first);
-	Eigen::Matrix<T, 3, 1, MOpt> VC = (C.second - C.first);
-	Eigen::Matrix<T, 3, 1, MOpt> VAB = (B.second - B.first) - VA;
-	Eigen::Matrix<T, 3, 1, MOpt> VAC = VC - VA;
-	Eigen::Matrix<T, 3, 1, MOpt> VCD = (D.second - D.first) - VC;
-	T a0 = AB0.cross(CD0).dot(AC0);
-	T a1 = AB0.cross(CD0).dot(VAC) + (AB0.cross(VCD) + VAB.cross(CD0)).dot(AC0);
-	T a2 = (AB0.cross(VCD) + VAB.cross(CD0)).dot(VAC) + VAB.cross(VCD).dot(AC0);
-	T a3 = VAB.cross(VCD).dot(VAC);
-
-	T roots[3];
-	int numberOfRoots = findRootsInRange01(a3, a2, a1, a0, roots);
-	if (numberOfRoots == 0)
-	{
-		// The segments AB and CD are never in the same plane, so the 2 primitives never intersect
-		return false;
-	}
+	std::array<T, 3> roots;
+	int numberOfRoots = timesOfCoplanarityInRange01(A, B, C, D, &roots);
 
 	// The roots are all in [0..1] and ordered ascendingly
 	for (int rootId = 0; rootId < numberOfRoots; ++rootId)
