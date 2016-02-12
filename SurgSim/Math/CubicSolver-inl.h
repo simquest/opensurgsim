@@ -102,15 +102,14 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 	}
 
 	// General case, let's analyze the derivative...first we calculate the discriminant:
-	T determinant = static_cast<T>(4) * (p.getCoefficient(2) * p.getCoefficient(2) -
-		static_cast<T>(3) * p.getCoefficient(3) * p.getCoefficient(1));
+	T discriminant = p.derivative().discriminant();
 
-	if (determinant < 0.0 || isNearZero(determinant, std::numeric_limits<T>::epsilon()))
+	if (discriminant < 0.0 || isNearZero(discriminant, std::numeric_limits<T>::epsilon()))
 	{
-		// If delta = 0, P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
+		// If discriminant = 0, P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
 		// Therefore P is monotonic (ascending or descending) and has 1 unique root over ]-Inf +Inf[
 		//
-		// If delta < 0, P' is never null and has always the same sign, the sign of P'(0) (i.e. sign(c))
+		// If discriminant < 0, P' is never null and has always the same sign, the sign of P'(0) (i.e. sign(c))
 		// Therefore P is monotonic (stricly ascending or descending) and has 1 unique root over ]-Inf +Inf[
 
 		T p0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
@@ -136,9 +135,9 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 	}
 	else
 	{
-		// If the discriminant is positive, P'(x) has 2 roots {x0, x1}, which define 3 separate intervals to
-		// study ]-Inf x0[, [x0 x1] and ]x1 +Inf[
-		T tmp = std::sqrt(determinant / 4.0);
+		// If discriminant > 0, P' has 2 roots {x0, x1} which define 3 separate intervals to study:
+		// ]-Inf x0[, [x0 x1] and ]x1 +Inf[
+		T tmp = std::sqrt(discriminant / 4.0);
 		T scale = static_cast<T>(1) / (static_cast<T>(3) * p.getCoefficient(3));
 		T x0 = (-p.getCoefficient(2) - tmp) * scale;
 		T x1 = (-p.getCoefficient(2) + tmp) * scale;
