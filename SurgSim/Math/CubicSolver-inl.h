@@ -109,76 +109,67 @@ T findRootInRange(const T& a, const T& b, const T& c, const T& d, T min, T max)
 }; // namespace CubicSolver
 
 template <class T>
-bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T* root)
+int findRootsInRange01(const T& a, const T& b, const T& c, const T& d, T* roots)
 {
 	using CubicSolver::isZero;
 	using CubicSolver::evaluatePolynomial;
 	using CubicSolver::findRootInRange;
 
-	// Is 0 a root? P(0)=d=0?
-	T P0 = d; // evaluatePolynomial(a, b, c, d, static_cast<T>(0));
-	if (isZero(P0))
-	{
-		root[0] = 0.0;
-		return 1;
-	}
+	int numberOfRoots = 0;
 
 	// Is degenerate?
 	if (isZero(a))
 	{
-		T roots[2];
-		int nRoots = findRoots(b, c, d, roots);
+		T rootsQuadratic[2];
+		int nRoots = findRoots(b, c, d, rootsQuadratic);
 
-		root[0] = static_cast<T>(2);
 		for (int i = 0; i < nRoots; ++i)
 		{
-			if (roots[i] >= 0.0 && roots[i] <= 1.0 && roots[i] < root[0])
+			if (rootsQuadratic[i] >= 0.0 && rootsQuadratic[i] <= 1.0)
 			{
-				root[0] = roots[i];
+				roots[numberOfRoots++] = rootsQuadratic[i];
 			}
 		}
-		return root[0] != static_cast<T>(2);
+
+		// Make sure they are ordered ascendingly
+		if (numberOfRoots == 2 && roots[0] > roots[1])
+		{
+			std::swap(roots[0], roots[1]);
+		}
+
+		return numberOfRoots;
 	}
 
 	// General case, let's analyze the derivative...first we calculate the discriminant:
 	T delta = static_cast<T>(4) * (b * b - static_cast<T>(3) * a * c);
 
-	if (isZero(delta))
+	if (delta < 0.0 || isZero(delta))
 	{
-		// P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
+		// If delta = 0, P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
 		// Therefore P is monotonic (ascending or descending) and has 1 unique root over ]-Inf +Inf[
-
-		T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
-		if (isZero(P1))
-		{
-			root[0] = static_cast<T>(1);
-			return true;
-		}
-
-		// P0 and P1 cannot be zero at this stage, so they both have a clear sign
-		if (std::signbit(P0) != std::signbit(P1))
-		{
-			root[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
-			return true;
-		}
-	}
-	else if (delta < 0.0)
-	{
-		// If the discriminant is negative, P' has always the same sign, the sign of P'(0) (i.e. sign(c))
+		//
+		// If delta < 0, P' is never null and has always the same sign, the sign of P'(0) (i.e. sign(c))
 		// Therefore P is monotonic (stricly ascending or descending) and has 1 unique root over ]-Inf +Inf[
 
+		T P0 = d; // evaluatePolynomial(a, b, c, d, static_cast<T>(0));
+		if (isZero(P0))
+		{
+			roots[0] = 0.0;
+			return 1;
+		}
+
 		T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
 		if (isZero(P1))
 		{
-			root[0] = static_cast<T>(1);
-			return true;
+			roots[0] = static_cast<T>(1);
+			return 1;
 		}
 
 		// P0 and P1 cannot be zero at this stage, so they both have a clear sign
 		if (std::signbit(P0) != std::signbit(P1))
 		{
-			root[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
-			return true;
+			roots[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
+			return 1;
 		}
 	}
 	else
@@ -203,18 +194,25 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 			// If there is no overlap, the interval [0..1] is isolated on one of the monotonic interval ]-Inf x0[
 			// ]x1 +Inf[, therefore it contains at most 1 root
 
+			T P0 = d; // evaluatePolynomial(a, b, c, d, static_cast<T>(0));
+			if (isZero(P0))
+			{
+				roots[0] = 0.0;
+				return 1;
+			}
+
 			T P1 = evaluatePolynomial(a, b, c, d, static_cast<T>(1));
 			if (isZero(P1))
 			{
-				root[0] = static_cast<T>(1);
-				return true;
+				roots[0] = static_cast<T>(1);
+				return 1;
 			}
 
 			// P0 and P1 cannot be zero at this stage, so they both have a clear sign
 			if (std::signbit(P0) != std::signbit(P1))
 			{
-				root[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
-				return true;
+				roots[0] = findRootInRange(a, b, c, d, static_cast<T>(0), static_cast<T>(1));
+				return 1;
 			}
 		}
 		else
@@ -237,30 +235,29 @@ bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T
 
 			for (auto interval : interval01)
 			{
+				// On each interval, only 1 root can be found
 				T Pmin = evaluatePolynomial(a, b, c, d, interval.getMin());
 				if (isZero(Pmin))
 				{
-					root[0] = interval.getMin();
-					return true;
+					roots[numberOfRoots++] = interval.getMin();
 				}
-
-				T Pmax = evaluatePolynomial(a, b, c, d, interval.getMax());
-				if (isZero(Pmax))
+				else
 				{
-					root[0] = interval.getMax();
-					return true;
-				}
-
-				if (std::signbit(Pmin) != std::signbit(Pmax))
-				{
-					root[0] = findRootInRange(a, b, c, d, interval.getMin(), interval.getMax());
-					return true;
+					T Pmax = evaluatePolynomial(a, b, c, d, interval.getMax());
+					if (isZero(Pmax))
+					{
+						roots[numberOfRoots++] = interval.getMax();
+					}
+					else if (std::signbit(Pmin) != std::signbit(Pmax))
+					{
+						roots[numberOfRoots++] = findRootInRange(a, b, c, d, interval.getMin(), interval.getMax());
+					}
 				}
 			}
 		}
 	}
 
-	return false;
+	return numberOfRoots;
 }
 
 }; // Math
