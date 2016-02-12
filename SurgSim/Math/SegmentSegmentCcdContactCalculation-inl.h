@@ -36,8 +36,8 @@ namespace Math
 /// \param[out] barycentricCoordinates The barycentric coordinates of the intersection in AB(t) and CD(t)
 /// i.e. P(t) = A + barycentricCoordinates[0].AB(t) = C + barycentricCoordinates[1].CD
 /// \return True if AB(t) is intersecting CD(t), False otherwise
-bool areCoplanarSegmentsIntersectingAtGivenTime(
 template <class T, int MOpt>
+bool areSegmentsIntersecting(
 	T time,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& A,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& B,
@@ -153,7 +153,7 @@ bool calculateCcdContactSegmentSegment(
 	for (int rootId = 0; rootId < numberOfRoots; ++rootId)
 	{
 		Eigen::Matrix<T, 2, 1, MOpt> barycentricCoordinates;
-		if (areCoplanarSegmentsIntersectingAtGivenTime(roots[rootId], A, B, C, D, &barycentricCoordinates))
+		if (areSegmentsIntersecting(roots[rootId], A, B, C, D, &barycentricCoordinates))
 		{
 			// The segments AB and CD are coplanar at time t, and they intersect
 			*timeOfImpact = roots[rootId];

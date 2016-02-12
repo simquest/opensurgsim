@@ -34,8 +34,8 @@ namespace Math
 /// \param A, B, C The triangle points motion (from first to second)
 /// \param[out] barycentricCoordinates The barycentric coordinates of P(t) in ABC(t)
 /// \return true if P(t) is inside the triangle ABC(t)
-bool isCoplanarPointInsideTriangleAtGivenTime(
 template <class T, int MOpt>
+bool isPointInsideTriangle(
 	T time,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& P,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& A,
@@ -134,7 +134,7 @@ bool calculateCcdContactPointTriangle(
 	for (int rootId = 0; rootId < numberOfRoots; ++rootId)
 	{
 		Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
-		if (isCoplanarPointInsideTriangleAtGivenTime(roots[rootId], P, A, B, C, &baryCoords))
+		if (isPointInsideTriangle(roots[rootId], P, A, B, C, &baryCoords))
 		{
 			// The point P is in the triangle plane at time t, and is inside the triangle
 			*timeOfImpact = roots[rootId];
