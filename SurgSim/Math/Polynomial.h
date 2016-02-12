@@ -182,6 +182,10 @@ public:
 	/// \param a2 coefficient of the 2 degree term
 	Polynomial(const T& a0, const T& a1, const T& a2);
 
+	/// Evaluate the discriminant of a quadratic polynomial
+	/// \return the discriminant (b^2 - a4c)
+	T discriminant() const;
+
 	/// Evaluate the polynomial at a point
 	/// \param x point at which to evaluate the polynomial
 	/// \return the value of the polynomial at x
