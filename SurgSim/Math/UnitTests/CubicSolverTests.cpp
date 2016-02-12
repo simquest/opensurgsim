@@ -102,8 +102,6 @@ TEST(CubicSolverTests, DerivativeNullDeterminantCases)
 
 TEST(CubicSolverTests, DerivativeNegativeDeterminantCases)
 {
-	using CubicSolver::isZero;
-
 	double roots[3];
 	int numberOfRoots;
 
@@ -126,14 +124,12 @@ TEST(CubicSolverTests, DerivativeNegativeDeterminantCases)
 		EXPECT_EQ(1, numberOfRoots);
 		EXPECT_TRUE(roots[0] >= 0.0 && roots[0] <= 1.0);
 		double eval = p.evaluate(roots[0]);
-		EXPECT_TRUE(isZero(eval)) << "P(" << roots[0] << ") = " << eval;
+		EXPECT_TRUE(isNearZero(eval)) << "P(" << roots[0] << ") = " << eval;
 	}
 };
 
 TEST(CubicSolverTests, DerivativePositiveDeterminantCases)
 {
-	using CubicSolver::isZero;
-
 	double roots[3];
 	int numberOfRoots;
 
@@ -160,7 +156,7 @@ TEST(CubicSolverTests, DerivativePositiveDeterminantCases)
 		EXPECT_EQ(1, numberOfRoots);
 		EXPECT_TRUE(roots[0] >= 0.0 && roots[0] <= 1.0);
 		double eval = p.evaluate(roots[0]);
-		EXPECT_TRUE(isZero(eval)) << "P(" << roots[0] << ") = " << eval;
+		EXPECT_TRUE(isNearZero(eval)) << "P(" << roots[0] << ") = " << eval;
 	}
 
 	{
@@ -179,9 +175,9 @@ TEST(CubicSolverTests, DerivativePositiveDeterminantCases)
 		EXPECT_TRUE(roots[1] >= 0.0 && roots[1] <= 1.0);
 		EXPECT_TRUE(roots[1] > roots[0]);
 		double eval = p.evaluate(roots[0]);
-		EXPECT_TRUE(isZero(eval, 1e-15)) << "P(" << roots[0] << ") = " << eval;
+		EXPECT_TRUE(isNearZero(eval)) << "P(" << roots[0] << ") = " << eval;
 		eval = p.evaluate(roots[1]);
-		EXPECT_TRUE(isZero(eval, 1e-15)) << "P(" << roots[1] << ") = " << eval;
+		EXPECT_TRUE(isNearZero(eval)) << "P(" << roots[1] << ") = " << eval;
 	}
 };
 

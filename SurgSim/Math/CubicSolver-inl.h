@@ -30,16 +30,6 @@ namespace Math
 
 namespace CubicSolver
 {
-/// \tparam T The scalar type
-/// \param a The scalar to test
-/// \param epsilon The precision to use for this test
-/// \return True if the scalar a is 0 or close to 0 (within epsilon)
-template <class T>
-bool isZero(const T& a, const T& epsilon = std::numeric_limits<T>::epsilon())
-{
-	return std::abs(a) <= epsilon;
-}
-
 /// Find the root of a cubic equation in a given range using a dichotomic search
 /// \tparam T The equation coefficient type
 /// \param p The cubic polynomial \f$ax^3 + bx^2 + cx + d\f$
@@ -51,13 +41,13 @@ template <class T>
 T findRootInRange(const Polynomial<T, 3>& p, T min, T max)
 {
 	T Pmin = p.evaluate(min);
-	if (isZero(Pmin))
+	if (isNearZero(Pmin, std::numeric_limits<T>::epsilon()))
 	{
 		return min;
 	}
 
 	T Pmax = p.evaluate(max);
-	if (isZero(Pmax))
+	if (isNearZero(Pmax, std::numeric_limits<T>::epsilon()))
 	{
 		return max;
 	}
@@ -66,7 +56,7 @@ T findRootInRange(const Polynomial<T, 3>& p, T min, T max)
 	{
 		T middle = (max + min) * 0.5;
 		T Pmiddle = p.evaluate(middle);
-		if (isZero(Pmiddle))
+		if (isNearZero(Pmiddle, std::numeric_limits<T>::epsilon()))
 		{
 			return middle;
 		}
@@ -90,13 +80,12 @@ T findRootInRange(const Polynomial<T, 3>& p, T min, T max)
 template <class T>
 int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 {
-	using CubicSolver::isZero;
 	using CubicSolver::findRootInRange;
 
 	int numberOfRoots = 0;
 
 	// Is degenerate?
-	if (isZero(p.getCoefficient(3)))
+	if (isNearZero(p.getCoefficient(3), std::numeric_limits<T>::epsilon()))
 	{
 		Polynomial<T, 2> quadratic(p.getCoefficient(0), p.getCoefficient(1), p.getCoefficient(2));
 		PolynomialRoots<T, 2> quadraticRoots(quadratic, std::numeric_limits<T>::epsilon());
@@ -116,7 +105,7 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 	T delta = static_cast<T>(4) * (p.getCoefficient(2) * p.getCoefficient(2) -
 		static_cast<T>(3) * p.getCoefficient(3) * p.getCoefficient(1));
 
-	if (delta < 0.0 || isZero(delta))
+	if (delta < 0.0 || isNearZero(delta, std::numeric_limits<T>::epsilon()))
 	{
 		// If delta = 0, P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
 		// Therefore P is monotonic (ascending or descending) and has 1 unique root over ]-Inf +Inf[
@@ -125,14 +114,14 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 		// Therefore P is monotonic (stricly ascending or descending) and has 1 unique root over ]-Inf +Inf[
 
 		T P0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
-		if (isZero(P0))
+		if (isNearZero(P0, std::numeric_limits<T>::epsilon()))
 		{
 			roots[0] = 0.0;
 			return 1;
 		}
 
 		T P1 = p.evaluate(static_cast<T>(1));
-		if (isZero(P1))
+		if (isNearZero(P1, std::numeric_limits<T>::epsilon()))
 		{
 			roots[0] = static_cast<T>(1);
 			return 1;
@@ -168,14 +157,14 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 			// ]x1 +Inf[, therefore it contains at most 1 root
 
 			T P0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
-			if (isZero(P0))
+			if (isNearZero(P0, std::numeric_limits<T>::epsilon()))
 			{
 				roots[0] = 0.0;
 				return 1;
 			}
 
 			T P1 = p.evaluate(static_cast<T>(1));
-			if (isZero(P1))
+			if (isNearZero(P1, std::numeric_limits<T>::epsilon()))
 			{
 				roots[0] = static_cast<T>(1);
 				return 1;
@@ -210,14 +199,14 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 			{
 				// On each interval, only 1 root can be found
 				T Pmin = p.evaluate(interval.getMin());
-				if (isZero(Pmin))
+				if (isNearZero(Pmin, std::numeric_limits<T>::epsilon()))
 				{
 					roots[numberOfRoots++] = interval.getMin();
 				}
 				else
 				{
 					T Pmax = p.evaluate(interval.getMax());
-					if (isZero(Pmax))
+					if (isNearZero(Pmax, std::numeric_limits<T>::epsilon()))
 					{
 						roots[numberOfRoots++] = interval.getMax();
 					}
