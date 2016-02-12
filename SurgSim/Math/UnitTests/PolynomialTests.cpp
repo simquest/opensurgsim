@@ -31,6 +31,16 @@ namespace Math
 namespace
 {
 double epsilon = 1.0e-10;
+
+template <int degree>
+void checkDiscriminant(Polynomial<double, degree>* poly, double expected)
+{
+}
+template <>
+void checkDiscriminant(Polynomial<double, 2>* poly, double expected)
+{
+	EXPECT_DOUBLE_EQ(expected, poly->discriminant());
+}
 }
 
 class PolynomialUtilityTests : public ::testing::Test
@@ -231,16 +241,6 @@ public:
 			EXPECT_TRUE(poly1->isNearZero(epsilon));
 		}
 	}
-
-	template <int degree>
-	void checkDiscriminant(Polynomial<double, degree>* poly, double expected)
-	{
-	}
-	template <>
-	void checkDiscriminant(Polynomial<double, 2>* poly, double expected)
-	{
-		EXPECT_DOUBLE_EQ(expected, poly->discriminant());
-	}
 };
 
 template <typename T>
@@ -299,19 +299,19 @@ TYPED_TEST(PolynomialTests, DiscriminantTests)
 		SCOPED_TRACE("0 + 1x + 2x^2");
 		this->setPolynomialFromOffset(0, &poly1);
 		// discriminant = 1 - 4*0 = 1
-		this->checkDiscriminant(&poly1, 1.0);
+		checkDiscriminant(&poly1, 1.0);
 	}
 	{
 		SCOPED_TRACE("1 + 2x + 3x^2");
 		this->setPolynomialFromOffset(1, &poly1);
 		// discriminant = 4 - 4*3 = -8
-		this->checkDiscriminant(&poly1, -8.0);
+		checkDiscriminant(&poly1, -8.0);
 	}
 	{
 		SCOPED_TRACE("2 + 3x + 4x^2");
 		this->setPolynomialFromOffset(2, &poly1);
 		// discriminant = 9 - 4*8 = -23
-		this->checkDiscriminant(&poly1, -23.0);
+		checkDiscriminant(&poly1, -23.0);
 	}
 };
 
