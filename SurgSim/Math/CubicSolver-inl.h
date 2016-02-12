@@ -78,7 +78,7 @@ T findRootInRange(const Polynomial<T, 3>& p, T min, T max)
 }; // namespace CubicSolver
 
 template <class T>
-int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
+int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 {
 	using CubicSolver::findRootInRange;
 
@@ -94,7 +94,7 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 		{
 			if (quadraticRoots[i] >= 0.0 && quadraticRoots[i] <= 1.0)
 			{
-				roots[numberOfRoots++] = quadraticRoots[i];
+				(*roots)[numberOfRoots++] = quadraticRoots[i];
 			}
 		}
 
@@ -116,21 +116,21 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 		T P0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
 		if (isNearZero(P0, std::numeric_limits<T>::epsilon()))
 		{
-			roots[0] = 0.0;
+			(*roots)[0] = 0.0;
 			return 1;
 		}
 
 		T P1 = p.evaluate(static_cast<T>(1));
 		if (isNearZero(P1, std::numeric_limits<T>::epsilon()))
 		{
-			roots[0] = static_cast<T>(1);
+			(*roots)[0] = static_cast<T>(1);
 			return 1;
 		}
 
 		// P0 and P1 cannot be zero at this stage, so they both have a clear sign
 		if (std::signbit(P0) != std::signbit(P1))
 		{
-			roots[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
+			(*roots)[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
 			return 1;
 		}
 	}
@@ -159,21 +159,21 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 			T P0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
 			if (isNearZero(P0, std::numeric_limits<T>::epsilon()))
 			{
-				roots[0] = 0.0;
+				(*roots)[0] = 0.0;
 				return 1;
 			}
 
 			T P1 = p.evaluate(static_cast<T>(1));
 			if (isNearZero(P1, std::numeric_limits<T>::epsilon()))
 			{
-				roots[0] = static_cast<T>(1);
+				(*roots)[0] = static_cast<T>(1);
 				return 1;
 			}
 
 			// P0 and P1 cannot be zero at this stage, so they both have a clear sign
 			if (std::signbit(P0) != std::signbit(P1))
 			{
-				roots[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
+				(*roots)[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
 				return 1;
 			}
 		}
@@ -201,18 +201,18 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 				T Pmin = p.evaluate(interval.getMin());
 				if (isNearZero(Pmin, std::numeric_limits<T>::epsilon()))
 				{
-					roots[numberOfRoots++] = interval.getMin();
+					(*roots)[numberOfRoots++] = interval.getMin();
 				}
 				else
 				{
 					T Pmax = p.evaluate(interval.getMax());
 					if (isNearZero(Pmax, std::numeric_limits<T>::epsilon()))
 					{
-						roots[numberOfRoots++] = interval.getMax();
+						(*roots)[numberOfRoots++] = interval.getMax();
 					}
 					else if (std::signbit(Pmin) != std::signbit(Pmax))
 					{
-						roots[numberOfRoots++] = findRootInRange(p, interval.getMin(), interval.getMax());
+						(*roots)[numberOfRoots++] = findRootInRange(p, interval.getMin(), interval.getMax());
 					}
 				}
 			}

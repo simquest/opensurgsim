@@ -26,7 +26,7 @@ namespace Math
 /// Find all roots in range \f$[0 \ldotp\ldotp 1]\f$ of a cubic equation
 /// \tparam T The equation coefficient type
 /// \param polynomial The cubic polynomial \f$ax^3 + bx^2 + cx + d\f$
-/// \param[out] roots All roots ordered ascendingly in \f$[0 \ldotp\ldotp 1]\f$ if any
+/// \param[out] roots All roots ordered ascendingly in \f$[0 \ldotp\ldotp 1]\f$ if any (3 max)
 /// \return The number of roots found in \f$[0 \ldotp\ldotp 1]\f$ and saved in roots.
 /// \f[
 ///  \begin{array}{lll}
@@ -44,7 +44,7 @@ namespace Math
 ///  \right.
 /// \f]
 template <class T>
-int findRootsInRange01(const Polynomial<T, 3>& polynomial, T* roots);
+int findRootsInRange01(const Polynomial<T, 3>& polynomial, std::array<T, 3>* roots);
 
 }; // Math
 }; // SurgSim
