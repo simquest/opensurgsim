@@ -21,6 +21,7 @@
 #include <Eigen/Geometry>
 
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/Polynomial.h"
 #include "SurgSim/Math/Vector.h"
 
 /// \file Geometry.h a collection of functions that calculation geometric properties of various basic geometric shapes.
@@ -1813,13 +1814,7 @@ int timesOfCoplanarityInRange01(
 	T a2 = (AB0.cross(VCD) + VAB.cross(CD0)).dot(VAC) + VAB.cross(VCD).dot(AC0);
 	T a3 = VAB.cross(VCD).dot(VAC);
 
-	T roots[3];
-	int numberOfRoots = findRootsInRange01(a3, a2, a1, a0, roots);
-	for (int i = 0; i < numberOfRoots; ++i)
-	{
-		(*timesOfCoplanarity)[i] = roots[i];
-	}
-	return numberOfRoots;
+	return findRootsInRange01(Polynomial<T, 3>(a0, a1, a2, a3), timesOfCoplanarity);
 }
 
 }; // namespace Math
