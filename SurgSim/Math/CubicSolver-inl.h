@@ -32,11 +32,12 @@ namespace CubicSolver
 {
 /// \tparam T The scalar type
 /// \param a The scalar to test
-/// \return True if the scalar a is 0 or close to 0 (within epsilon defined by the type T)
+/// \param epsilon The precision to use for this test
+/// \return True if the scalar a is 0 or close to 0 (within epsilon)
 template <class T>
-bool isZero(const T& a)
+bool isZero(const T& a, const T& epsilon = std::numeric_limits<T>::epsilon())
 {
-	return std::abs(a) <= std::numeric_limits<T>::epsilon();
+	return std::abs(a) <= epsilon;
 }
 
 /// Evaluate a cubic equation

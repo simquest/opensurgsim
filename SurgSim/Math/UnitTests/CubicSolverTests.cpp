@@ -66,18 +66,18 @@ TEST(CubicSolverTests, DegenerateCases)
 
 };
 
-//TEST(CubicSolverTests, dNullCase)
-//{
-//	double roots[3];
-//	int numberOfRoots;
-//
-//	{
-//		SCOPED_TRACE("x^3 + x^2 + x + 0 = 0");
-//		EXPECT_NO_THROW(numberOfRoots = findRootsInRange01(1.0, 1.0, 1.0, 0.0, roots));
-//		EXPECT_EQ(1, numberOfRoots);
-//		EXPECT_DOUBLE_EQ(0.0, roots[0]);
-//	}
-//}
+TEST(CubicSolverTests, dNullCase)
+{
+	double roots[3];
+	int numberOfRoots;
+
+	{
+		SCOPED_TRACE("x^3 + x^2 + x + 0 = 0");
+		EXPECT_NO_THROW(numberOfRoots = findRootsInRange01(1.0, 1.0, 1.0, 0.0, roots));
+		EXPECT_EQ(1, numberOfRoots);
+		EXPECT_DOUBLE_EQ(0.0, roots[0]);
+	}
+}
 
 TEST(CubicSolverTests, DerivativeNullDeterminantCases)
 {
@@ -159,6 +159,26 @@ TEST(CubicSolverTests, DerivativePositiveDeterminantCases)
 		EXPECT_TRUE(roots[0] >= 0.0 && roots[0] <= 1.0);
 		double eval = evaluatePolynomial(-1.0, 1.0, 1.0, -0.5, roots[0]);
 		EXPECT_TRUE(isZero(eval)) << "P(" << roots[0] << ") = " << eval;
+	}
+
+	{
+		// From a real use case of point/triangle continuous collision detection
+		SCOPED_TRACE("P(x) = 7.84x^3 - 37.08x^2 + 19.5x - 1.46 = 0 => P'(x) = 23.52x^2 - 74.16x + 19.5");
+		// P' has 2 roots: x1 = (74.16 - 60.540445984482142729500176673066) / 47.04 = 0.2895313353639000270089248156236
+		//             and x2 = (74.16 + 60.540445984482142729500176673066) / 47.04 = 2.8635298891258958913584221231519
+		// P is monotonic in 3 intervals [-Inf x1[, [x1 x2] and ]x2 +Inf[
+		// P'(0) > 0         ; P'(x1) = 0         ; P'(1) = -31.14     ; P'(x2) = 0
+		// P(0) = -1.46 < 0  ; P (x1) = 1.26 > 0  ; P (1) = -11.2 < 0  ; P(x2) = -65.58
+		// Therefore P is monotonic and has a solution in [0..x1] and [x1 1]
+		EXPECT_NO_THROW(numberOfRoots = findRootsInRange01(7.84, -37.08, 19.5, -1.46, roots));
+		EXPECT_EQ(2, numberOfRoots);
+		EXPECT_TRUE(roots[0] >= 0.0 && roots[0] <= 1.0);
+		EXPECT_TRUE(roots[1] >= 0.0 && roots[1] <= 1.0);
+		EXPECT_TRUE(roots[1] > roots[0]);
+		double eval = evaluatePolynomial(7.84, -37.08, 19.5, -1.46, roots[0]);
+		EXPECT_TRUE(isZero(eval, 1e-15)) << "P(" << roots[0] << ") = " << eval;
+		eval = evaluatePolynomial(7.84, -37.08, 19.5, -1.46, roots[1]);
+		EXPECT_TRUE(isZero(eval, 1e-15)) << "P(" << roots[1] << ") = " << eval;
 	}
 };
 
