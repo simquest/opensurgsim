@@ -54,6 +54,14 @@ struct Contact
 		complimentary->force = -force;
 		return complimentary;
 	}
+	bool operator==(const Contact& contact) const
+	{
+		return type == contact.type &&
+			std::abs(time - contact.time) < 1e-8 &&
+			penetrationPoints.first.isApprox(contact.penetrationPoints.first) &&
+			penetrationPoints.second.isApprox(contact.penetrationPoints.second) &&
+			normal.isApprox(contact.normal);
+	}
 	CollisionDetectionType type;						///< What collision algorithm class was used to get the contact
 	double depth;										///< What is the penetration depth for the representation
 	double time;										///< What is the time of the collision, CCD only

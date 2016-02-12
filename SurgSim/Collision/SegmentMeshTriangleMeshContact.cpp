@@ -137,12 +137,7 @@ bool isThisContactADuplicate(
 {
 	for (const auto& contact : contacts)
 	{
-		// Same type? time? location? and normal?
-		if (contact->type == newContact->type &&
-			std::abs(contact->time - newContact->time) < 1e-8 &&
-			contact->penetrationPoints.first.isApprox(newContact->penetrationPoints.first) &&
-			contact->penetrationPoints.second.isApprox(newContact->penetrationPoints.second) &&
-			contact->normal.isApprox(newContact->normal))
+		if (*newContact == *contact)
 		{
 			return true;
 		}
