@@ -16,7 +16,6 @@
 #ifndef SURGSIM_MATH_CUBICSOLVER_INL_H
 #define SURGSIM_MATH_CUBICSOLVER_INL_H
 
-#include <cmath>
 #include <limits>
 #include <vector>
 
@@ -61,7 +60,7 @@ T findRootInRange(const Polynomial<T, 3>& p, T min, T max)
 			return middle;
 		}
 
-		if (std::signbit(pMin) == std::signbit(pMiddle))
+		if (pMin * pMiddle > 0)
 		{
 			min = middle;
 			pMin = pMiddle;
@@ -127,7 +126,7 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 		}
 
 		// P0 and P1 cannot be zero at this stage, so they both have a clear sign
-		if (std::signbit(p0) != std::signbit(p1))
+		if (p0 * p1 < 0)
 		{
 			(*roots)[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
 			return 1;
@@ -170,7 +169,7 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 			}
 
 			// P0 and P1 cannot be zero at this stage, so they both have a clear sign
-			if (std::signbit(p0) != std::signbit(p1))
+			if (p0 * p1 < 0)
 			{
 				(*roots)[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
 				return 1;
@@ -209,7 +208,7 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 					{
 						(*roots)[numberOfRoots++] = interval.getMax();
 					}
-					else if (std::signbit(pMin) != std::signbit(pMax))
+					else if (pMin * pMax < 0)
 					{
 						(*roots)[numberOfRoots++] = findRootInRange(p, interval.getMin(), interval.getMax());
 					}
