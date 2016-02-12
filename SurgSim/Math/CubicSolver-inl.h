@@ -40,14 +40,14 @@ namespace CubicSolver
 template <class T>
 T findRootInRange(const Polynomial<T, 3>& p, T min, T max)
 {
-	T Pmin = p.evaluate(min);
-	if (isNearZero(Pmin, std::numeric_limits<T>::epsilon()))
+	T pMin = p.evaluate(min);
+	if (isNearZero(pMin, std::numeric_limits<T>::epsilon()))
 	{
 		return min;
 	}
 
-	T Pmax = p.evaluate(max);
-	if (isNearZero(Pmax, std::numeric_limits<T>::epsilon()))
+	T pMax = p.evaluate(max);
+	if (isNearZero(pMax, std::numeric_limits<T>::epsilon()))
 	{
 		return max;
 	}
@@ -55,21 +55,21 @@ T findRootInRange(const Polynomial<T, 3>& p, T min, T max)
 	while (max - min > std::numeric_limits<T>::epsilon())
 	{
 		T middle = (max + min) * 0.5;
-		T Pmiddle = p.evaluate(middle);
-		if (isNearZero(Pmiddle, std::numeric_limits<T>::epsilon()))
+		T pMiddle = p.evaluate(middle);
+		if (isNearZero(pMiddle, std::numeric_limits<T>::epsilon()))
 		{
 			return middle;
 		}
 
-		if (std::signbit(Pmin) == std::signbit(Pmiddle))
+		if (std::signbit(pMin) == std::signbit(pMiddle))
 		{
 			min = middle;
-			Pmin = Pmiddle;
+			pMin = pMiddle;
 		}
 		else
 		{
 			max = middle;
-			Pmax = Pmiddle;
+			pMax = pMiddle;
 		}
 	}
 
@@ -113,22 +113,22 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 		// If delta < 0, P' is never null and has always the same sign, the sign of P'(0) (i.e. sign(c))
 		// Therefore P is monotonic (stricly ascending or descending) and has 1 unique root over ]-Inf +Inf[
 
-		T P0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
-		if (isNearZero(P0, std::numeric_limits<T>::epsilon()))
+		T p0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
+		if (isNearZero(p0, std::numeric_limits<T>::epsilon()))
 		{
 			(*roots)[0] = 0.0;
 			return 1;
 		}
 
-		T P1 = p.evaluate(static_cast<T>(1));
-		if (isNearZero(P1, std::numeric_limits<T>::epsilon()))
+		T p1 = p.evaluate(static_cast<T>(1));
+		if (isNearZero(p1, std::numeric_limits<T>::epsilon()))
 		{
 			(*roots)[0] = static_cast<T>(1);
 			return 1;
 		}
 
 		// P0 and P1 cannot be zero at this stage, so they both have a clear sign
-		if (std::signbit(P0) != std::signbit(P1))
+		if (std::signbit(p0) != std::signbit(p1))
 		{
 			(*roots)[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
 			return 1;
@@ -156,22 +156,22 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 			// If there is no overlap, the interval [0..1] is isolated on one of the monotonic interval ]-Inf x0[
 			// ]x1 +Inf[, therefore it contains at most 1 root
 
-			T P0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
-			if (isNearZero(P0, std::numeric_limits<T>::epsilon()))
+			T p0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
+			if (isNearZero(p0, std::numeric_limits<T>::epsilon()))
 			{
 				(*roots)[0] = 0.0;
 				return 1;
 			}
 
-			T P1 = p.evaluate(static_cast<T>(1));
-			if (isNearZero(P1, std::numeric_limits<T>::epsilon()))
+			T p1 = p.evaluate(static_cast<T>(1));
+			if (isNearZero(p1, std::numeric_limits<T>::epsilon()))
 			{
 				(*roots)[0] = static_cast<T>(1);
 				return 1;
 			}
 
 			// P0 and P1 cannot be zero at this stage, so they both have a clear sign
-			if (std::signbit(P0) != std::signbit(P1))
+			if (std::signbit(p0) != std::signbit(p1))
 			{
 				(*roots)[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
 				return 1;
@@ -198,19 +198,19 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 			for (auto interval : interval01)
 			{
 				// On each interval, only 1 root can be found
-				T Pmin = p.evaluate(interval.getMin());
-				if (isNearZero(Pmin, std::numeric_limits<T>::epsilon()))
+				T pMin = p.evaluate(interval.getMin());
+				if (isNearZero(pMin, std::numeric_limits<T>::epsilon()))
 				{
 					(*roots)[numberOfRoots++] = interval.getMin();
 				}
 				else
 				{
-					T Pmax = p.evaluate(interval.getMax());
-					if (isNearZero(Pmax, std::numeric_limits<T>::epsilon()))
+					T pMax = p.evaluate(interval.getMax());
+					if (isNearZero(pMax, std::numeric_limits<T>::epsilon()))
 					{
 						(*roots)[numberOfRoots++] = interval.getMax();
 					}
-					else if (std::signbit(Pmin) != std::signbit(Pmax))
+					else if (std::signbit(pMin) != std::signbit(pMax))
 					{
 						(*roots)[numberOfRoots++] = findRootInRange(p, interval.getMin(), interval.getMax());
 					}
