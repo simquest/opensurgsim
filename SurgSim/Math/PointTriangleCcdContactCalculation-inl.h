@@ -34,8 +34,8 @@ namespace Math
 /// \param A, B, C The triangle points motion (from first to second)
 /// \param[out] barycentricCoordinates The barycentric coordinates of P(t) in ABC(t)
 /// \return true if P(t) is inside the triangle ABC(t)
-template <class T, int MOpt> inline
-bool isCoplanarPointInsideTriangleAtGivenTime(
+template <class T, int MOpt>
+bool isPointInsideTriangle(
 	T time,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& P,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& A,
@@ -103,12 +103,12 @@ bool calculateCcdContactPointTriangle(
 	/// [AP(0) + t*VAP] . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] = 0
 	/// AP(0) . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] +
 	///   t*VAP . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] = 0
-	/// AP(0).AB(0).cross(AC(0)) + t  *AP(0).AB(0).cross(VAC) + t  *AP(0).VAB.cross(AC(0)) + t^2*AP(0).VAB.cross(VAC) +
-	///   t*VAP.AB(0).cross(AC(0)) + t^2*  VAP.AB(0).cross(VAC) + t^2*VAP.VAB.cross(AC(0)) + t^3*  VAP.VAB.cross(VAC)=0
-	/// t^0 * AP(0).AB(0).cross(AC(0)) +
-	/// t^1 * [AP(0).AB(0).cross(VAC) + AP(0).VAB.cross(AC(0)) + VAP.AB(0).cross(AC(0))] +
-	/// t^2 * [AP(0).VAB.cross(VAC) + VAP.AB(0).cross(VAC) + VAP.VAB.cross(AC(0))] +
-	/// t^3 * [VAP.VAB.cross(VAC)] = 0
+	/// AP(0).AB(0).cross(AC(0)) + t*AP(0).AB(0).cross(VAC) + t*AP(0).VAB.cross(AC(0)) + t^2*AP(0).VAB.cross(VAC) +
+	///   t*VAP.AB(0).cross(AC(0)) + t^2*VAP.AB(0).cross(VAC) + t^2*VAP.VAB.cross(AC(0)) + t^3*VAP.VAB.cross(VAC) = 0
+	/// t^0 * [AP(0).AB(0).cross(AC(0))] +
+	///   t^1 * [AP(0).AB(0).cross(VAC) + AP(0).VAB.cross(AC(0)) + VAP.AB(0).cross(AC(0))] +
+	///   t^2 * [AP(0).VAB.cross(VAC) + VAP.AB(0).cross(VAC) + VAP.VAB.cross(AC(0))] +
+	///   t^3 * [VAP.VAB.cross(VAC)] = 0
 	Eigen::Matrix<T, 3, 1, MOpt> AP0 = P.first - A.first;
 	Eigen::Matrix<T, 3, 1, MOpt> AB0 = B.first - A.first;
 	Eigen::Matrix<T, 3, 1, MOpt> AC0 = C.first - A.first;
@@ -122,30 +122,36 @@ bool calculateCcdContactPointTriangle(
 	T a2 = AP0.dot(VAB.cross(VAC)) + VAP.dot(AB0.cross(VAC) + VAB.cross(AC0));
 	T a3 = VAP.dot(VAB.cross(VAC));
 
-	bool found = findSmallestRootInRange01(a3, a2, a1, a0, timeOfImpact);
-	if (!found)
+	T roots[3];
+	int numberOfRoots = findRootsInRange01(a3, a2, a1, a0, roots);
+	if (numberOfRoots == 0)
 	{
 		// The point P is never in the triangle plane, so the 2 primitives never intersect
 		return false;
 	}
 
-	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
-	if (!isCoplanarPointInsideTriangleAtGivenTime(*timeOfImpact, P, A, B, C, &baryCoords))
+	// The roots are all in [0..1] and ordered ascendingly
+	for (int rootId = 0; rootId < numberOfRoots; ++rootId)
 	{
-		// The point P is in the triangle plane at time t, but it is not inside the triangle
-		return false;
+		Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
+		if (isPointInsideTriangle(roots[rootId], P, A, B, C, &baryCoords))
+		{
+			// The point P is in the triangle plane at time t, and is inside the triangle
+			*timeOfImpact = roots[rootId];
+			*tv01Param = baryCoords[1];
+			*tv02Param = baryCoords[2];
+
+			// None of these assertion should be necessary, but just to double check
+			SURGSIM_ASSERT(*timeOfImpact >= 0.0 && *timeOfImpact <= 1.0);
+			SURGSIM_ASSERT(*tv01Param >= 0.0);
+			SURGSIM_ASSERT(*tv02Param >= 0.0);
+			SURGSIM_ASSERT(*tv01Param + *tv02Param <= 1.0);
+
+			return true;
+		}
 	}
 
-	*tv01Param = baryCoords[1];
-	*tv02Param = baryCoords[2];
-
-	// None of these assertion should be necessary, but just to double check
-	SURGSIM_ASSERT(*timeOfImpact >= 0.0 && *timeOfImpact <= 1.0);
-	SURGSIM_ASSERT(*tv01Param >= 0.0);
-	SURGSIM_ASSERT(*tv02Param >= 0.0);
-	SURGSIM_ASSERT(*tv01Param + *tv02Param <= 1.0);
-
-	return true;
+	return false;
 }
 
 }; // namespace Math

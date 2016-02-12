@@ -36,8 +36,8 @@ namespace Math
 /// \param[out] barycentricCoordinates The barycentric coordinates of the intersection in AB(t) and CD(t)
 /// i.e. P(t) = A + barycentricCoordinates[0].AB(t) = C + barycentricCoordinates[1].CD
 /// \return True if AB(t) is intersecting CD(t), False otherwise
-template <class T, int MOpt> inline
-bool areCoplanarSegmentsIntersectingAtGivenTime(
+template <class T, int MOpt>
+bool areSegmentsIntersecting(
 	T time,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& A,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& B,
@@ -141,29 +141,35 @@ bool calculateCcdContactSegmentSegment(
 	T a2 = (AB0.cross(VCD) + VAB.cross(CD0)).dot(VAC) + VAB.cross(VCD).dot(AC0);
 	T a3 = VAB.cross(VCD).dot(VAC);
 
-	bool found = findSmallestRootInRange01(a3, a2, a1, a0, timeOfImpact);
-	if (!found)
+	T roots[3];
+	int numberOfRoots = findRootsInRange01(a3, a2, a1, a0, roots);
+	if (numberOfRoots == 0)
 	{
 		// The segments AB and CD are never in the same plane, so the 2 primitives never intersect
 		return false;
 	}
 
-	Eigen::Matrix<T, 2, 1, MOpt> barycentricCoordinates;
-	if (!areCoplanarSegmentsIntersectingAtGivenTime(*timeOfImpact, A, B, C, D, &barycentricCoordinates))
+	// The roots are all in [0..1] and ordered ascendingly
+	for (int rootId = 0; rootId < numberOfRoots; ++rootId)
 	{
-		// The segments AB and CD are coplanar at time t, but they don't intersect
-		return false;
+		Eigen::Matrix<T, 2, 1, MOpt> barycentricCoordinates;
+		if (areSegmentsIntersecting(roots[rootId], A, B, C, D, &barycentricCoordinates))
+		{
+			// The segments AB and CD are coplanar at time t, and they intersect
+			*timeOfImpact = roots[rootId];
+			*s0p1Factor = barycentricCoordinates[0];
+			*s1p1Factor = barycentricCoordinates[1];
+
+			// None of these assertion should be necessary, but just to double check
+			SURGSIM_ASSERT(*timeOfImpact >= 0.0 && *timeOfImpact <= 1.0);
+			SURGSIM_ASSERT(*s0p1Factor >= 0.0 && *s0p1Factor <= 1.0);
+			SURGSIM_ASSERT(*s1p1Factor >= 0.0 && *s1p1Factor <= 1.0);
+
+			return true;
+		}
 	}
 
-	*s0p1Factor = barycentricCoordinates[0];
-	*s1p1Factor = barycentricCoordinates[1];
-
-	// None of these assertion should be necessary, but just to double check
-	SURGSIM_ASSERT(*timeOfImpact >= 0.0 && *timeOfImpact <= 1.0);
-	SURGSIM_ASSERT(*s0p1Factor >= 0.0 && *s0p1Factor <= 1.0);
-	SURGSIM_ASSERT(*s1p1Factor >= 0.0 && *s1p1Factor <= 1.0);
-
-	return true;
+	return false;
 }
 
 }; // namespace Math

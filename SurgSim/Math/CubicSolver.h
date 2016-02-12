@@ -21,11 +21,11 @@ namespace SurgSim
 namespace Math
 {
 
-/// Find the smallest root in range \f$[0 \ldotp\ldotp 1]\f$ of a cubic equation
+/// Find all roots in range \f$[0 \ldotp\ldotp 1]\f$ of a cubic equation
 /// \tparam T The equation coefficient type
 /// \param a, b, c, d The cubic equation coefficient as \f$ax^3 + bx^2 + cx + d\f$
-/// \param[out] root The smallest root in \f$[0 \ldotp\ldotp 1]\f$ if any
-/// \return True if a root was found, False otherwise
+/// \param[out] roots All roots ordered ascendingly in \f$[0 \ldotp\ldotp 1]\f$ if any
+/// \return The number of roots found in \f$[0 \ldotp\ldotp 1]\f$ and saved in roots.
 /// \f[
 ///  \begin{array}{lll}
 ///   P(x) &=& ax^3 + bx^2 + cx + d \\ \text{}
@@ -42,7 +42,7 @@ namespace Math
 ///  \right.
 /// \f]
 template <class T>
-bool findSmallestRootInRange01(const T& a, const T& b, const T& c, const T& d, T* root);
+int findRootsInRange01(const T& a, const T& b, const T& c, const T& d, T* roots);
 
 }; // Math
 }; // SurgSim
