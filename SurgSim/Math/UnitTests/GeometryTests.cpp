@@ -1737,6 +1737,25 @@ TEST_F(GeometryTest, CcdIntersectionsSegmentSegment)
 	}
 
 	{
+		SCOPED_TRACE("Intersection at t=0.5 (2 cubic roots in [0..1]: 0.0899 (no collision) and 0.5 (collision))");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.4, 0.8, 1.0), VectorType(0.8, 1.0, -1.0));
+		// A(0.5) = 0.6 0.9 0.0
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 3.0, -2.0));
+		// B(0.5) = 1.5 1.5 0.0
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(-0.3, 2.0, -2.0), VectorType(0.3, 1.0, 2.0));
+		// C(0.5) = 0.0 1.5 0.0
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(1.7, 1.0, -1.0), VectorType(1.3, -1.0, 1.0));
+		// D(0.5) = 1.5 0.0 0.0
+		// At time 0.5, all 4 points are coplanar and AB/CD intersect:
+		// P = A +   0*AB = (0.6 0.9 0.0)
+		// P = C + 0.4*CD = (0.0 1.5 0.0) + 0.4 (1.5 -1.5 0.0) = (0.6 0.9 0.0)
+		EXPECT_TRUE(calculateCcdContactSegmentSegment(A, B, C, D, &time, &s0p1Factor, &s1p1Factor));
+		EXPECT_NEAR(0.5, time, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.0, s0p1Factor, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.4, s1p1Factor, Math::Geometry::ScalarEpsilon);
+	}
+
+	{
 		SCOPED_TRACE("Intersection at t=1");
 		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
 		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 1.24), VectorType(2.0, 0.0, 3.0));
@@ -1789,6 +1808,24 @@ TEST_F(GeometryTest, CcdIntersectionsPointTriangle)
 		EXPECT_NEAR(0.5, time, Math::Geometry::ScalarEpsilon);
 		EXPECT_NEAR(1.0 / 3.0, tv01Factor, Math::Geometry::ScalarEpsilon);
 		EXPECT_NEAR(1.0 / 3.0, tv01Factor, Math::Geometry::ScalarEpsilon);
+	}
+
+	{
+		SCOPED_TRACE("Intersection at t=0.5 (2 cubic roots in [0..1]: 0.0899 (no collision) and 0.5 (collision))");
+		std::pair<VectorType, VectorType> P = std::make_pair(VectorType(0.4, 0.8, 1.0), VectorType(0.8, 1.0, -1.0));
+		// P(0.5) = 0.6 0.9 0.0
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 3.0, -2.0));
+		// A(0.5) = 1.5 1.5 0.0
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(-0.3, 2.0, -2.0), VectorType(0.3, 1.0, 2.0));
+		// B(0.5) = 0.0 1.5 0.0
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(1.7, 1.0, -1.0), VectorType(1.3, -1.0, 1.0));
+		// C(0.5) = 1.5 0.0 0.0
+		// At time 0.5, all 4 points are coplanar and P is inside ABC with the barycentric coordinates (0 0.6 0.4)
+		// P = A + 0.6 AB + 0.4 AC = (1.5 1.5 0.0) + 0.6 (-1.5 0.0 0.0) + 0.4 (0.0 -1.5 0.0) = (0.6 0.9 0.0)
+		EXPECT_TRUE(calculateCcdContactPointTriangle(P, A, B, C, &time, &tv01Factor, &tv02Factor));
+		EXPECT_NEAR(0.5, time, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.6, tv01Factor, Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.4, tv02Factor, Math::Geometry::ScalarEpsilon);
 	}
 
 	{
