@@ -102,10 +102,10 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 	}
 
 	// General case, let's analyze the derivative...first we calculate the discriminant:
-	T delta = static_cast<T>(4) * (p.getCoefficient(2) * p.getCoefficient(2) -
+	T determinant = static_cast<T>(4) * (p.getCoefficient(2) * p.getCoefficient(2) -
 		static_cast<T>(3) * p.getCoefficient(3) * p.getCoefficient(1));
 
-	if (delta < 0.0 || isNearZero(delta, std::numeric_limits<T>::epsilon()))
+	if (determinant < 0.0 || isNearZero(determinant, std::numeric_limits<T>::epsilon()))
 	{
 		// If delta = 0, P'(-b/3a) = 0, and P'(x) has the same sign anywhere else
 		// Therefore P is monotonic (ascending or descending) and has 1 unique root over ]-Inf +Inf[
@@ -138,7 +138,7 @@ int findRootsInRange01(const Polynomial<T, 3>& p, T* roots)
 	{
 		// If the discriminant is positive, P'(x) has 2 roots {x0, x1}, which define 3 separate intervals to
 		// study ]-Inf x0[, [x0 x1] and ]x1 +Inf[
-		T tmp = std::sqrt(delta / 4.0);
+		T tmp = std::sqrt(determinant / 4.0);
 		T scale = static_cast<T>(1) / (static_cast<T>(3) * p.getCoefficient(3));
 		T x0 = (-p.getCoefficient(2) - tmp) * scale;
 		T x1 = (-p.getCoefficient(2) + tmp) * scale;
