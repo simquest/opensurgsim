@@ -42,7 +42,6 @@ set(UNIT_TEST_SOURCES
 	PolynomialRootTests.cpp
 	PolynomialTests.cpp
 	PolynomialValuesTests.cpp
-	QuadraticSolverTests.cpp
 	ScalarTests.cpp
 	SegmentMeshShapeTests.cpp
 	ShapeTests.cpp

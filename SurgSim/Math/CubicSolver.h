@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 #ifndef SURGSIM_MATH_CUBICSOLVER_H
 #define SURGSIM_MATH_CUBICSOLVER_H
 
+#include "SurgSim/Math/Polynomial.h"
+
 namespace SurgSim
 {
 namespace Math
@@ -23,8 +25,8 @@ namespace Math
 
 /// Find all roots in range \f$[0 \ldotp\ldotp 1]\f$ of a cubic equation
 /// \tparam T The equation coefficient type
-/// \param a, b, c, d The cubic equation coefficient as \f$ax^3 + bx^2 + cx + d\f$
-/// \param[out] roots All roots ordered ascendingly in \f$[0 \ldotp\ldotp 1]\f$ if any
+/// \param polynomial The cubic polynomial \f$ax^3 + bx^2 + cx + d\f$
+/// \param[out] roots All roots ordered ascendingly in \f$[0 \ldotp\ldotp 1]\f$ if any (3 max)
 /// \return The number of roots found in \f$[0 \ldotp\ldotp 1]\f$ and saved in roots.
 /// \f[
 ///  \begin{array}{lll}
@@ -42,7 +44,7 @@ namespace Math
 ///  \right.
 /// \f]
 template <class T>
-int findRootsInRange01(const T& a, const T& b, const T& c, const T& d, T* roots);
+int findRootsInRange01(const Polynomial<T, 3>& polynomial, std::array<T, 3>* roots);
 
 }; // Math
 }; // SurgSim

@@ -108,8 +108,6 @@ set(SURGSIM_MATH_HEADERS
 	PolynomialRoots-inl.h
 	PolynomialValues.h
 	PolynomialValues-inl.h
-	QuadraticSolver.h
-	QuadraticSolver-inl.h
 	Quaternion.h
 	RigidTransform.h
 	Scalar.h

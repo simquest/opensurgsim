@@ -271,6 +271,12 @@ Polynomial<T, 2>::Polynomial(const T& a0, const T& a1, const T& a2) : m_a0(a0), 
 }
 
 template <class T>
+T Polynomial<T, 2>::discriminant() const
+{
+	return m_a1 * m_a1 - static_cast<T>(4) * m_a0 * m_a2;
+}
+
+template <class T>
 T Polynomial<T, 2>::evaluate(const T& x) const
 {
 	return (m_a2 * x + m_a1) * x + m_a0;

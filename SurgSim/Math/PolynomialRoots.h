@@ -57,6 +57,7 @@ public:
 	/// \param i is the number of the root to return
 	/// \return the value of the ith root
 	/// \exception if there is no root of rank i
+	/// \note The roots are ordered ascendingly, so PolynomialRootsCommon[0] < PolynomialRootsCommon[1] < ...
 	T operator[](int i) const;
 
 private:
@@ -73,7 +74,7 @@ protected:
 	/// The number of roots available for the polynomial, or DEGENERATE if there are infinite roots
 	int m_numRoots;
 
-	/// An array of up to N roots for a degree N polynomial
+	/// An array of up to N roots for a degree N polynomial ordered ascendingly
 	std::array<T, N> m_roots;
 };
 
@@ -108,7 +109,7 @@ public:
 /// \param b coefficient of the constant term
 /// \param epsilon tolerance parameter for determining the number of valid, unique roots
 /// \param numRoots [out] number of roots calculated, or DEGENERATE if there are infinitely many
-/// \param roots [out] array containing the calculated roots
+/// \param roots [out] array containing the calculated roots ordered ascendingly
 /// \exception if there are more than N roots
 template <typename T, int N>
 void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T, N>* roots);
@@ -121,7 +122,7 @@ void solve(const T& a, const T& b, const T& epsilon, int* numRoots, std::array<T
 /// \param c coefficient of the constant term
 /// \param epsilon tolerance parameter for determining the number of valid, unique roots
 /// \param numRoots [out] number of roots calculated, or DEGENERATE if there are infinitely many
-/// \param roots [out] array containing the calculated roots
+/// \param roots [out] array containing the calculated roots ordered ascendingly
 /// \exception if there are more than N roots
 template <typename T, int N>
 void solve(const T& a, const T& b, const T& c, const T& epsilon, int* numRoots, std::array<T, N>* roots);
