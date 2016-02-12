@@ -178,23 +178,23 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 		}
 		else
 		{
-			// Build the monotonic intervals within [0..1] to be analyzed one by one
-			std::vector<Interval<T>> interval01;
+			// Build the monotonic intervals partitioning [0..1] to be analyzed one by one
+			std::vector<Interval<T>> intervalsPartitioning01;
 
 			T lastValue = static_cast<T>(0);
 			if (x0 > static_cast<T>(0) && x0 < static_cast<T>(1))
 			{
-				interval01.push_back(Interval<T>(lastValue, x0));
+				intervalsPartitioning01.push_back(Interval<T>(lastValue, x0));
 				lastValue = x0;
 			}
 			if (x1 > static_cast<T>(0) && x1 < static_cast<T>(1))
 			{
-				interval01.push_back(Interval<T>(lastValue, x1));
+				intervalsPartitioning01.push_back(Interval<T>(lastValue, x1));
 				lastValue = x1;
 			}
-			interval01.push_back(Interval<T>(lastValue, static_cast<T>(1)));
+			intervalsPartitioning01.push_back(Interval<T>(lastValue, static_cast<T>(1)));
 
-			for (auto interval : interval01)
+			for (auto interval : intervalsPartitioning01)
 			{
 				// On each interval, only 1 root can be found
 				T pMin = p.evaluate(interval.getMin());
