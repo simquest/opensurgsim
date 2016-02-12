@@ -36,8 +36,8 @@ namespace Math
 /// \param[out] barycentricCoordinates The barycentric coordinates of the intersection in AB(t) and CD(t)
 /// i.e. P(t) = A + barycentricCoordinates[0].AB(t) = C + barycentricCoordinates[1].CD
 /// \return True if AB(t) is intersecting CD(t), False otherwise
-template <class T, int MOpt> inline
 bool areCoplanarSegmentsIntersectingAtGivenTime(
+template <class T, int MOpt>
 	T time,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& A,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& B,

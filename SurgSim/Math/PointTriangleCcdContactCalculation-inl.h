@@ -34,8 +34,8 @@ namespace Math
 /// \param A, B, C The triangle points motion (from first to second)
 /// \param[out] barycentricCoordinates The barycentric coordinates of P(t) in ABC(t)
 /// \return true if P(t) is inside the triangle ABC(t)
-template <class T, int MOpt> inline
 bool isCoplanarPointInsideTriangleAtGivenTime(
+template <class T, int MOpt>
 	T time,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& P,
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& A,
