@@ -1675,6 +1675,69 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 	}
 }
 
+TEST_F(GeometryTest, TimesOfCoplanarity)
+{
+	std::array<SizeType, 3> times;
+
+	{
+		SCOPED_TRACE("No coplanarity case in [0..1]");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 0.0, 4.0));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.0, 0.1, 10.0), VectorType(0.0, 1.1, 10.0));
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(0.0, 1.1, 10.0), VectorType(0.0, 2.1, 10.0));
+		EXPECT_EQ(0, (timesOfCoplanarityInRange01<double, Vector3d::Options>(A, B, C, D, &times)));
+	}
+
+	{
+		SCOPED_TRACE("1 case of coplanarity at time 0");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 0.0, 4.0));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.0, 1.0, -2.0), VectorType(0.0, 2.0, -3.5));
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(0.0, 1.0, -10.0));
+		EXPECT_EQ(1, (timesOfCoplanarityInRange01<double, Vector3d::Options>(A, B, C, D, &times)));
+		EXPECT_DOUBLE_EQ(0.0, times[0]);
+	}
+
+	{
+		SCOPED_TRACE("1 case of coplanarity at time 0.5");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.1, 0.0, 1.0), VectorType(-0.1, 0.0, -1.0));
+		// A(0.5) = 0.0 0.0 0.0
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 3.0, -2.0));
+		// B(0.5) = 1.5 1.5 0.0
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(-0.3, 2.0, -2.0), VectorType(0.3, 1.0, 2.0));
+		// C(0.5) = 0.0 1.5 0.0
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(1.7, 1.0, -1.0), VectorType(1.3, -1.0, 1.0));
+		// D(0.5) = 1.5 0.0 0.0
+		EXPECT_EQ(1, (timesOfCoplanarityInRange01<double, Vector3d::Options>(A, B, C, D, &times)));
+		EXPECT_NEAR(0.5, times[0], Math::Geometry::ScalarEpsilon);
+	}
+
+	{
+		SCOPED_TRACE("2 cases of coplanarity at times 0.089971778657590915 and 0.5");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.4, 0.8, 1.0), VectorType(0.8, 1.0, -1.0));
+		// A(0.5) = 0.6 0.9 0.0
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 2.0), VectorType(2.0, 3.0, -2.0));
+		// B(0.5) = 1.5 1.5 0.0
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(-0.3, 2.0, -2.0), VectorType(0.3, 1.0, 2.0));
+		// C(0.5) = 0.0 1.5 0.0
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(1.7, 1.0, -1.0), VectorType(1.3, -1.0, 1.0));
+		// D(0.5) = 1.5 0.0 0.0
+		EXPECT_EQ(2, (timesOfCoplanarityInRange01<double, Vector3d::Options>(A, B, C, D, &times)));
+		EXPECT_NEAR(0.089971778657590915, times[0], Math::Geometry::ScalarEpsilon);
+		EXPECT_NEAR(0.5, times[1], Math::Geometry::ScalarEpsilon);
+	}
+
+	{
+		SCOPED_TRACE("1 case of coplanarity at time 1");
+		std::pair<VectorType, VectorType> A = std::make_pair(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 0.0, 1.0));
+		std::pair<VectorType, VectorType> B = std::make_pair(VectorType(1.0, 0.0, 1.24), VectorType(2.0, 0.0, 3.0));
+		std::pair<VectorType, VectorType> C = std::make_pair(VectorType(0.0, 1.0, -2.0), VectorType(2.0, 0.0, 3.0));
+		std::pair<VectorType, VectorType> D = std::make_pair(VectorType(0.1, 1.0, 1.1), VectorType(0.0, 1.0, -1.54));
+		EXPECT_EQ(1, (timesOfCoplanarityInRange01<double, Vector3d::Options>(A, B, C, D, &times)));
+		EXPECT_NEAR(1.0, times[0], Math::Geometry::ScalarEpsilon);
+	}
+}
+
 TEST_F(GeometryTest, CcdIntersectionsSegmentSegment)
 {
 	SizeType time, s0p1Factor, s1p1Factor;

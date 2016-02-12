@@ -104,6 +104,19 @@ TEST(PolynomialRootsTest, PolynomialDegree2Roots)
 	EXPECT_NEAR(-4.0, quadraticPolyRoots[0], epsilon);
 	EXPECT_NEAR(1.0, quadraticPolyRoots[1], epsilon);
 	EXPECT_THROW(quadraticPolyRoots[2], SurgSim::Framework::AssertionFailure);
+
+	// Quadratic (ascending order => coefficient of higher order < 0)
+	// Discriminant = 49 => 2 roots that should be ordered this way:
+	// (-9 - 7) / -4 = 4
+	// (-9 + 7) / -4 = 1/2
+	// But will be reordered to be in ascending order
+	SurgSim::Math::Polynomial<double, 2> quadraticPolyOrdered(-4.0, 9.0, -2.0);
+	PolynomialRoots<double, 2>quadraticPolyOrderedRoots(quadraticPolyOrdered, 1.0e-09);
+	EXPECT_FALSE(quadraticPolyOrderedRoots.isDegenerate());
+	EXPECT_EQ(2, quadraticPolyOrderedRoots.getNumRoots());
+	EXPECT_NEAR(0.5, quadraticPolyOrderedRoots[0], epsilon);
+	EXPECT_NEAR(4.0, quadraticPolyOrderedRoots[1], epsilon);
+	EXPECT_THROW(quadraticPolyOrderedRoots[2], SurgSim::Framework::AssertionFailure);
 };
 
 }; // namespace Math

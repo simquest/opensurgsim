@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ bool isPointInsideTriangle(
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param P the point motion (from first to second) to calculate the ccd with
 /// \param A, B, C The triangle points motion (from first to second) to calculate the ccd with
-/// \param[out] timeOfImpact The time of impact within [0..1] if an collision is found
+/// \param[out] timeOfImpact The time of impact within [0..1] if a collision is found
 /// \param[out] tv01Param, tv02Param The barycentric coordinate of the contact point in the triangle
 /// i.e. ContactPoint(timeOfImpact) = A(timeOfImpact) + tv01Param.AB(timeOfImpact) + tv02Param.AC(timeOfImpact)
 /// \return True if the given point/triangle motions intersect, False otherwise
@@ -88,47 +88,8 @@ bool calculateCcdContactPointTriangle(
 	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& C,
 	T* timeOfImpact, T* tv01Param, T* tv02Param)
 {
-	/// Let's define the following:
-	/// P(t) = P0 + t * VP with VP = P1 - P0
-	/// Similarily for A(t), B(t) and C(t)
-	/// Therefore we have AP(t) = P(t) - A(t) = P(0) + t * VP - A(0) - t * VA
-	///                         = AP(0) + t * [VP - VA] = AP(0) + t * VAP
-	///
-	/// A collision happens at the time where all 4 points are coplanar. Moreover, at this time of impact t,
-	/// the point P(t) should be within the triangle ABC(t).
-	///
-	/// AP(t).[AB(t).cross(AC(t))] = 0 means that the 4 points are coplanar, so potentially intersecting.
-	/// We develop this equation to clearly formulate the resulting cubic equation:
-	///
-	/// [AP(0) + t*VAP] . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] = 0
-	/// AP(0) . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] +
-	///   t*VAP . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] = 0
-	/// AP(0).AB(0).cross(AC(0)) + t*AP(0).AB(0).cross(VAC) + t*AP(0).VAB.cross(AC(0)) + t^2*AP(0).VAB.cross(VAC) +
-	///   t*VAP.AB(0).cross(AC(0)) + t^2*VAP.AB(0).cross(VAC) + t^2*VAP.VAB.cross(AC(0)) + t^3*VAP.VAB.cross(VAC) = 0
-	/// t^0 * [AP(0).AB(0).cross(AC(0))] +
-	///   t^1 * [AP(0).AB(0).cross(VAC) + AP(0).VAB.cross(AC(0)) + VAP.AB(0).cross(AC(0))] +
-	///   t^2 * [AP(0).VAB.cross(VAC) + VAP.AB(0).cross(VAC) + VAP.VAB.cross(AC(0))] +
-	///   t^3 * [VAP.VAB.cross(VAC)] = 0
-	Eigen::Matrix<T, 3, 1, MOpt> AP0 = P.first - A.first;
-	Eigen::Matrix<T, 3, 1, MOpt> AB0 = B.first - A.first;
-	Eigen::Matrix<T, 3, 1, MOpt> AC0 = C.first - A.first;
-	Eigen::Matrix<T, 3, 1, MOpt> VA = (A.second - A.first);
-	Eigen::Matrix<T, 3, 1, MOpt> VAP = (P.second - P.first) - VA;
-	Eigen::Matrix<T, 3, 1, MOpt> VAB = (B.second - B.first) - VA;
-	Eigen::Matrix<T, 3, 1, MOpt> VAC = (C.second - C.first) - VA;
-
-	T a0 = AP0.dot(AB0.cross(AC0));
-	T a1 = AP0.dot(AB0.cross(VAC) + VAB.cross(AC0)) + VAP.dot(AB0.cross(AC0));
-	T a2 = AP0.dot(VAB.cross(VAC)) + VAP.dot(AB0.cross(VAC) + VAB.cross(AC0));
-	T a3 = VAP.dot(VAB.cross(VAC));
-
-	T roots[3];
-	int numberOfRoots = findRootsInRange01(a3, a2, a1, a0, roots);
-	if (numberOfRoots == 0)
-	{
-		// The point P is never in the triangle plane, so the 2 primitives never intersect
-		return false;
-	}
+	std::array<T, 3> roots;
+	int numberOfRoots = timesOfCoplanarityInRange01(P, A, B, C, &roots);
 
 	// The roots are all in [0..1] and ordered ascendingly
 	for (int rootId = 0; rootId < numberOfRoots; ++rootId)
