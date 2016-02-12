@@ -103,12 +103,12 @@ bool calculateCcdContactPointTriangle(
 	/// [AP(0) + t*VAP] . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] = 0
 	/// AP(0) . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] +
 	///   t*VAP . [AB(0).cross(AC(0) + t*VAC) + t*VAB.cross(AC(0) + t*VAC)] = 0
-	/// AP(0).AB(0).cross(AC(0)) + t  *AP(0).AB(0).cross(VAC) + t  *AP(0).VAB.cross(AC(0)) + t^2*AP(0).VAB.cross(VAC) +
-	///   t*VAP.AB(0).cross(AC(0)) + t^2*  VAP.AB(0).cross(VAC) + t^2*VAP.VAB.cross(AC(0)) + t^3*  VAP.VAB.cross(VAC)=0
-	/// t^0 * AP(0).AB(0).cross(AC(0)) +
-	/// t^1 * [AP(0).AB(0).cross(VAC) + AP(0).VAB.cross(AC(0)) + VAP.AB(0).cross(AC(0))] +
-	/// t^2 * [AP(0).VAB.cross(VAC) + VAP.AB(0).cross(VAC) + VAP.VAB.cross(AC(0))] +
-	/// t^3 * [VAP.VAB.cross(VAC)] = 0
+	/// AP(0).AB(0).cross(AC(0)) + t*AP(0).AB(0).cross(VAC) + t*AP(0).VAB.cross(AC(0)) + t^2*AP(0).VAB.cross(VAC) +
+	///   t*VAP.AB(0).cross(AC(0)) + t^2*VAP.AB(0).cross(VAC) + t^2*VAP.VAB.cross(AC(0)) + t^3*VAP.VAB.cross(VAC) = 0
+	/// t^0 * [AP(0).AB(0).cross(AC(0))] +
+	///   t^1 * [AP(0).AB(0).cross(VAC) + AP(0).VAB.cross(AC(0)) + VAP.AB(0).cross(AC(0))] +
+	///   t^2 * [AP(0).VAB.cross(VAC) + VAP.AB(0).cross(VAC) + VAP.VAB.cross(AC(0))] +
+	///   t^3 * [VAP.VAB.cross(VAC)] = 0
 	Eigen::Matrix<T, 3, 1, MOpt> AP0 = P.first - A.first;
 	Eigen::Matrix<T, 3, 1, MOpt> AB0 = B.first - A.first;
 	Eigen::Matrix<T, 3, 1, MOpt> AC0 = C.first - A.first;
