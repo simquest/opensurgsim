@@ -182,12 +182,12 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 			std::vector<Interval<T>> intervalsPartitioning01;
 
 			T lastValue = static_cast<T>(0);
-			if (x0 > static_cast<T>(0) && x0 < static_cast<T>(1))
+			if (x0 > static_cast<T>(0))
 			{
 				intervalsPartitioning01.emplace_back(lastValue, x0);
 				lastValue = x0;
 			}
-			if (x1 > static_cast<T>(0) && x1 < static_cast<T>(1))
+			if (x1 < static_cast<T>(1))
 			{
 				intervalsPartitioning01.emplace_back(lastValue, x1);
 				lastValue = x1;
