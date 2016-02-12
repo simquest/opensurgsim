@@ -73,7 +73,7 @@ bool isPointInsideTriangle(
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param P the point motion (from first to second) to calculate the ccd with
 /// \param A, B, C The triangle points motion (from first to second) to calculate the ccd with
-/// \param[out] timeOfImpact The time of impact within [0..1] if an collision is found
+/// \param[out] timeOfImpact The time of impact within [0..1] if a collision is found
 /// \param[out] tv01Param, tv02Param The barycentric coordinate of the contact point in the triangle
 /// i.e. ContactPoint(timeOfImpact) = A(timeOfImpact) + tv01Param.AB(timeOfImpact) + tv02Param.AC(timeOfImpact)
 /// \return True if the given point/triangle motions intersect, False otherwise
