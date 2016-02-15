@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,6 +68,11 @@ public:
 	/// \return the value of the polynomial at x
 	T evaluate(const T& x) const;
 
+	/// Evaluate the polynomial at a point
+	/// \param x point at which to evaluate the polynomial
+	/// \return the value of the polynomial at x
+	T operator()(const T& x) const;
+
 	/// @{
 	/// Standard arithmetic operators extended to intervals
 	T& operator[](const size_t i);
@@ -124,6 +129,11 @@ public:
 	/// \param x point at which to evaluate the polynomial
 	/// \return the value of the polynomial at x
 	T evaluate(const T& x) const;
+
+	/// Evaluate the polynomial at a point
+	/// \param x point at which to evaluate the polynomial
+	/// \return the value of the polynomial at x
+	T operator()(const T& x) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
@@ -191,6 +201,11 @@ public:
 	/// \return the value of the polynomial at x
 	T evaluate(const T& x) const;
 
+	/// Evaluate the polynomial at a point
+	/// \param x point at which to evaluate the polynomial
+	/// \return the value of the polynomial at x
+	T operator()(const T& x) const;
+
 	/// @{
 	/// Standard arithmetic operators extended to intervals
 	T& operator[](const size_t i);
@@ -254,6 +269,11 @@ public:
 	/// \param x point at which to evaluate the polynomial
 	/// \return the value of the polynomial at x
 	T evaluate(const T& x) const;
+
+	/// Evaluate the polynomial at a point
+	/// \param x point at which to evaluate the polynomial
+	/// \return the value of the polynomial at x
+	T operator()(const T& x) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals

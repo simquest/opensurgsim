@@ -16,72 +16,26 @@
 #ifndef SURGSIM_MATH_CUBICSOLVER_INL_H
 #define SURGSIM_MATH_CUBICSOLVER_INL_H
 
+#include <boost/math/tools/roots.hpp>
 #include <limits>
 #include <vector>
 
 #include "SurgSim/Math/IntervalArithmetic.h"
 #include "SurgSim/Math/PolynomialRoots.h"
 
+using boost::math::tools::bisect;
+
+
 namespace SurgSim
 {
 namespace Math
 {
 
-namespace CubicSolver
-{
-/// Find the root of a cubic equation in a given range using a dichotomic search
-/// \tparam T The equation coefficient type
-/// \param p The cubic polynomial \f$ax^3 + bx^2 + cx + d\f$
-/// \param min, max The range to look into (\f$min <= max\f$)
-/// \return The root
-/// \note This function supposes that the polynomial is monotonic in the range \f$[min \ldotp\ldotp max]\f$
-/// \note and has a solution (i.e. P(min) * P(max) < 0)
-template <class T>
-T findRootInRange(const Polynomial<T, 3>& p, T min, T max)
-{
-	T pMin = p.evaluate(min);
-	if (isNearZero(pMin, std::numeric_limits<T>::epsilon()))
-	{
-		return min;
-	}
-
-	T pMax = p.evaluate(max);
-	if (isNearZero(pMax, std::numeric_limits<T>::epsilon()))
-	{
-		return max;
-	}
-
-	while (max - min > std::numeric_limits<T>::epsilon())
-	{
-		T middle = (max + min) * 0.5;
-		T pMiddle = p.evaluate(middle);
-		if (isNearZero(pMiddle, std::numeric_limits<T>::epsilon()))
-		{
-			return middle;
-		}
-
-		if (pMin * pMiddle > 0)
-		{
-			min = middle;
-			pMin = pMiddle;
-		}
-		else
-		{
-			max = middle;
-			pMax = pMiddle;
-		}
-	}
-
-	return (max + min) * 0.5;
-}
-}; // namespace CubicSolver
-
 template <class T>
 int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 {
-	using CubicSolver::findRootInRange;
-
 	int numberOfRoots = 0;
+	boost::math::tools::eps_tolerance<T> tolerance(std::numeric_limits<T>::digits - 3);
 
 	// Is degenerate?
 	if (isNearZero(p.getCoefficient(3), std::numeric_limits<T>::epsilon()))
@@ -128,7 +82,8 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 		// P0 and P1 cannot be zero at this stage, so they both have a clear sign
 		if (p0 * p1 < 0)
 		{
-			(*roots)[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
+			auto bracket = bisect(p, static_cast<T>(0), static_cast<T>(1), tolerance);
+			(*roots)[0] = (bracket.first + bracket.second) * 0.5;
 			return 1;
 		}
 	}
@@ -171,7 +126,8 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 			// P0 and P1 cannot be zero at this stage, so they both have a clear sign
 			if (p0 * p1 < 0)
 			{
-				(*roots)[0] = findRootInRange(p, static_cast<T>(0), static_cast<T>(1));
+				auto bracket = bisect(p, static_cast<T>(0), static_cast<T>(1), tolerance);
+				(*roots)[0] = (bracket.first + bracket.second) * 0.5;
 				return 1;
 			}
 		}
@@ -210,7 +166,8 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 					}
 					else if (pMin * pMax < 0)
 					{
-						(*roots)[numberOfRoots++] = findRootInRange(p, interval.getMin(), interval.getMax());
+						auto bracket = bisect(p, interval.getMin(), interval.getMax(), tolerance);
+						(*roots)[numberOfRoots++] = (bracket.first + bracket.second) * 0.5;
 					}
 				}
 			}
