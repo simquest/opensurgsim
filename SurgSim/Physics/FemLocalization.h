@@ -53,7 +53,9 @@ public:
 	const SurgSim::DataStructures::IndexedLocalCoordinate& getLocalPosition() const;
 
 private:
-	SurgSim::Math::Vector3d doCalculatePosition(double time) override;
+	SurgSim::Math::Vector3d doCalculatePosition(double time) const override;
+
+	SurgSim::Math::Vector3d doCalculateVelocity(double time) const override;
 
 	/// Barycentric position in local coordinates
 	SurgSim::DataStructures::IndexedLocalCoordinate m_position;
