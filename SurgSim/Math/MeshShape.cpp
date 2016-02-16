@@ -46,7 +46,8 @@ MeshShape::MeshShape(const MeshShape& other) :
 	::TriangleMesh(other),
 	m_center(other.getCenter()),
 	m_volume(other.getVolume()),
-	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume()),
+	m_initialVertices(other.getInitialVertices())
 {
 	updateAabbTree();
 }
@@ -251,6 +252,30 @@ void MeshShape::updateAabbTree()
 bool MeshShape::isTransformable() const
 {
 	return true;
+}
+
+void MeshShape::setPose(const RigidTransform3d& pose)
+{
+	auto& vertices = getVertices();
+	const size_t numVertices = vertices.size();
+	const auto& initialVertices = m_initialVertices.getVertices();
+	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+		"MeshShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
+		" vertices, vs initially " << initialVertices.size() << " vertices.";
+	for (size_t i = 0; i < numVertices; ++i)
+	{
+		vertices[i].position = pose * initialVertices[i].position;
+	}
+}
+
+void MeshShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
+{
+	m_initialVertices = vertices;
+}
+
+const DataStructures::Vertices<DataStructures::EmptyData>& MeshShape::getInitialVertices() const
+{
+	return m_initialVertices;
 }
 
 

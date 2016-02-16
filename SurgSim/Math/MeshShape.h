@@ -95,6 +95,18 @@ public:
 
 	bool isTransformable() const override;
 
+	/// Replace the current vertex positions with the initial positions transformed by a pose.
+	/// \param pose The pose of the shape.
+	void setPose(const RigidTransform3d& pose);
+
+	/// Set the initial Vertices.
+	/// \param vertices The initial vertices.
+	void setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices);
+
+	/// Get the initial Vertices.
+	/// \return The initial Vertices.
+	const DataStructures::Vertices<DataStructures::EmptyData>& getInitialVertices() const;
+
 protected:
 	bool doUpdate() override;
 
@@ -120,6 +132,9 @@ protected:
 
 	/// Second moment of volume
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
+
+	/// The initial vertex positions.
+	DataStructures::Vertices<DataStructures::EmptyData> m_initialVertices;
 
 private:
 	/// The aabb tree used to accelerate collision detection against the mesh

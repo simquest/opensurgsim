@@ -53,7 +53,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Particles::ParticlesCollisionRepresentation);
 
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	std::shared_ptr<Math::Shape> getShape() const override;
 
 	int getShapeType() const override;
 

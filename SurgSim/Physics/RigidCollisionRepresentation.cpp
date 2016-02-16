@@ -57,7 +57,7 @@ int RigidCollisionRepresentation::getShapeType() const
 	return getShape()->getType();
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> RigidCollisionRepresentation::getShape() const
 {
 	if (m_shape != nullptr)
 	{

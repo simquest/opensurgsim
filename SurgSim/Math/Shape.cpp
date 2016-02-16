@@ -43,7 +43,6 @@ std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose)
 	return nullptr;
 }
 
-/// Get class name
 std::string Shape::getClassName() const
 {
 	SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<

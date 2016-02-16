@@ -39,8 +39,10 @@ ParticlesShape::ParticlesShape(const ParticlesShape& other) :
 	m_radius(other.getRadius()),
 	m_center(other.getCenter()),
 	m_volume(other.getVolume()),
-	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume()),
+	m_initialVertices(other.getInitialVertices())
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
 }
 
 int ParticlesShape::getType() const
@@ -143,6 +145,30 @@ const Math::Aabbd& ParticlesShape::getBoundingBox() const
 	{
 		return m_aabb;
 	}
+}
+
+void ParticlesShape::setPose(const RigidTransform3d& pose)
+{
+	auto& vertices = getVertices();
+	const size_t numVertices = vertices.size();
+	const auto& initialVertices = m_initialVertices.getVertices();
+	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+		"ParticlesShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
+		" vertices, vs initially " << initialVertices.size() << " vertices.";
+	for (size_t i = 0; i < numVertices; ++i)
+	{
+		vertices[i].position = pose * initialVertices[i].position;
+	}
+}
+
+void ParticlesShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
+{
+	m_initialVertices = vertices;
+}
+
+const DataStructures::Vertices<DataStructures::EmptyData>& ParticlesShape::getInitialVertices() const
+{
+	return m_initialVertices;
 }
 
 };
