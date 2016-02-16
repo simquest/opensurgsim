@@ -57,7 +57,7 @@ public:
 	/// \return the computations used by this class
 	std::vector<std::shared_ptr<Computation>> getComputations() const;
 
-	/// \param set the computations used by this class
+	/// \param val set the computations used by this class
 	void setComputations(const std::vector<std::shared_ptr<Computation>>& val);
 
 	/// \return the number of iterations that have passed

@@ -179,7 +179,7 @@ public:
 	bool shouldAbortGroup() const;
 
 	/// Set whether to abort the current grouped computation
-	/// \param set to true to signal to an above computation to abort
+	/// \param val set to true to signal to an above computation to abort
 	void setAbortGroup(bool val);
 private:
 
