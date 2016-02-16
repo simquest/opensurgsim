@@ -44,11 +44,12 @@ MeshShape::MeshShape() :
 MeshShape::MeshShape(const MeshShape& other) :
 	DataStructures::TriangleMesh<DataStructures::EmptyData, DataStructures::EmptyData, DataStructures::NormalData>
 	::TriangleMesh(other),
+	Shape(other.getPose()),
 	m_center(other.getCenter()),
 	m_volume(other.getVolume()),
-	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume()),
+	m_initialVertices(other.getInitialVertices())
 {
-	m_pose = other.getPose();
 	updateAabbTree();
 }
 
@@ -85,6 +86,10 @@ bool MeshShape::calculateNormals()
 
 bool MeshShape::doUpdate()
 {
+	if (m_initialVertices.getVertices().size() == 0)
+	{
+		setInitialVertices(*this);
+	}
 	updateAabbTree();
 	computeVolumeIntegrals();
 	return calculateNormals();
@@ -214,12 +219,9 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
-std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose)
+std::shared_ptr<Shape> MeshShape::getCopy() const
 {
-	auto transformed = std::make_shared<MeshShape>(*this);
-	transformed->transform(pose);
-	transformed->update();
-	return transformed;
+	return std::make_shared<MeshShape>(*this);
 }
 
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> MeshShape::getAabbTree() const
@@ -249,9 +251,32 @@ void MeshShape::updateAabbTree()
 	m_aabb = m_aabbTree->getAabb();
 }
 
-bool MeshShape::isTransformable() const
+void MeshShape::setPose(const RigidTransform3d& pose)
 {
-	return true;
+	if (!pose.isApprox(m_pose))
+	{
+		m_pose = pose;
+		auto& vertices = getVertices();
+		const size_t numVertices = vertices.size();
+		const auto& initialVertices = m_initialVertices.getVertices();
+		SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+			"MeshShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
+			" vertices, vs initially " << initialVertices.size();
+		for (size_t i = 0; i < numVertices; ++i)
+		{
+			vertices[i].position = m_pose * initialVertices[i].position;
+		}
+	}
+}
+
+void MeshShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
+{
+	m_initialVertices = vertices;
+}
+
+const DataStructures::Vertices<DataStructures::EmptyData>& MeshShape::getInitialVertices() const
+{
+	return m_initialVertices;
 }
 
 

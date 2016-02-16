@@ -32,8 +32,6 @@ class ShapeShapeContactCalculation : public ContactCalculation
 {
 	/// Virtual function to be overridden, this provides the typed contact calculation between two shapes
 	/// it takes two shapes and their respective poses, and will return the contacts between those two shapes
-	/// for shapes that return true for isTransformable(), the calculation may ignore the pose passed in the
-	/// function.
 	virtual std::list<std::shared_ptr<Contact>> calculateDcdContact(
 		const Shape1& shape1, const Math::RigidTransform3d& pose1,
 		const Shape2& shape2, const Math::RigidTransform3d& pose2) const

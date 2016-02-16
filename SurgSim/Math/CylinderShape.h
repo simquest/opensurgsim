@@ -36,6 +36,8 @@ public:
 	/// \param radius The cylinder radius (in m)
 	explicit CylinderShape(double length = 0.0, double radius = 0.0);
 
+	explicit CylinderShape(const CylinderShape& other);
+
 	SURGSIM_CLASSNAME(SurgSim::Math::CylinderShape);
 
 	/// \return the type of the shape
@@ -60,6 +62,8 @@ public:
 
 	/// \return True if length and radius are bigger than or equal to 0; Otherwise, false.
 	bool isValid() const override;
+
+	std::shared_ptr<Shape> getCopy() const override;
 
 protected:
 	// Setters in 'protected' sections are for serialization purpose only.

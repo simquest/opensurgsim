@@ -34,6 +34,8 @@ public:
 	/// \param radius The sphere radius (in m)
 	explicit SphereShape(double radius = 0.0);
 
+	explicit SphereShape(const SphereShape& other);
+
 	SURGSIM_CLASSNAME(SurgSim::Math::SphereShape);
 
 	/// \return the type of the shape
@@ -54,6 +56,8 @@ public:
 
 	/// \return True if radius is bigger than or equal to 0; Otherwise, false.
 	bool isValid() const override;
+
+	std::shared_ptr<Shape> getCopy() const override;
 
 protected:
 	// Setters in 'protected' sections are for serialization purpose only.

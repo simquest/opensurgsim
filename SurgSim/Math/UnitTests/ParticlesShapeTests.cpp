@@ -68,8 +68,6 @@ TEST(ParticlesShapeTests, DefaultProperties)
 	EXPECT_FALSE(isValid(particles.getCenter()));
 	EXPECT_TRUE(particles.getSecondMomentOfVolume().isZero());
 	EXPECT_NE(nullptr, particles.getAabbTree());
-
-	EXPECT_TRUE(particles.isTransformable());
 }
 
 TEST(ParticlesShapeTests, SetGetRadius)

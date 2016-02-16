@@ -25,6 +25,11 @@ PlaneShape::PlaneShape()
 {
 }
 
+PlaneShape::PlaneShape(const PlaneShape& other) :
+	Shape(other.getPose())
+{
+}
+
 int PlaneShape::getType() const
 {
 	return SHAPE_TYPE_PLANE;
@@ -53,6 +58,11 @@ SurgSim::Math::Vector3d PlaneShape::getNormal() const
 bool PlaneShape::isValid() const
 {
 	return true;
+}
+
+std::shared_ptr<Shape> PlaneShape::getCopy() const
+{
+	return std::make_shared<PlaneShape>(*this);
 }
 
 }; // namespace Math

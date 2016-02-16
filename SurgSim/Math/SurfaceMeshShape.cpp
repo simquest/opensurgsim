@@ -34,6 +34,12 @@ SurfaceMeshShape::SurfaceMeshShape() : m_thickness(1e-2)
 {
 }
 
+SurfaceMeshShape::SurfaceMeshShape(const SurfaceMeshShape& other) :
+	MeshShape(other),
+	m_thickness(other.getThickness())
+{
+}
+
 int SurfaceMeshShape::getType() const
 {
 	return SHAPE_TYPE_SURFACEMESH;
@@ -143,6 +149,16 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 bool SurfaceMeshShape::isValid() const
 {
 	return (m_thickness > 1e-5) && isValid();
+}
+
+std::shared_ptr<Shape> SurfaceMeshShape::getCopy() const
+{
+	return std::make_shared<SurfaceMeshShape>(*this);
+}
+
+double SurfaceMeshShape::getThickness() const
+{
+	return m_thickness;
 }
 
 }; // namespace Math

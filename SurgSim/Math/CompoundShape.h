@@ -37,6 +37,8 @@ public:
 	/// Constructor
 	CompoundShape();
 
+	explicit CompoundShape(const CompoundShape& other);
+
 	/// Destructor
 	~CompoundShape();
 
@@ -58,7 +60,7 @@ public:
 
 	/// \return a specific shape
 	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
-	const std::shared_ptr<Shape>& getShape(size_t index) const;
+	std::shared_ptr<Shape>& getShape(size_t index) const;
 
 	using Shape::getPose;
 
@@ -99,6 +101,8 @@ public:
 	bool isValid() const override;
 
 	const Math::Aabbd& getBoundingBox() const override;
+
+	std::shared_ptr<Shape> getCopy() const override;
 
 private:
 

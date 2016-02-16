@@ -39,6 +39,20 @@ OctreeShape::OctreeShape() :
 	SURGSIM_ADD_SETTER(OctreeShape, std::string, OctreeFileName, loadOctree);
 }
 
+OctreeShape::OctreeShape(const OctreeShape& other) :
+	Shape(other.getPose()),
+	m_rootNode(std::make_shared<NodeType>(*other.getOctree()))
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(
+		SurgSim::Math::OctreeShape,
+		std::shared_ptr<SurgSim::Framework::Asset>,
+		Octree,
+		getOctree,
+		setOctree);
+
+	SURGSIM_ADD_SETTER(OctreeShape, std::string, OctreeFileName, loadOctree);
+}
+
 OctreeShape::~OctreeShape()
 {
 }
@@ -71,7 +85,7 @@ Matrix33d OctreeShape::getSecondMomentOfVolume() const
 	return Matrix33d::Zero();
 }
 
-std::shared_ptr<OctreeShape::NodeType> OctreeShape::getOctree()
+std::shared_ptr<OctreeShape::NodeType> OctreeShape::getOctree() const
 {
 	return m_rootNode;
 }
@@ -112,6 +126,11 @@ const Math::Aabbd& OctreeShape::getBoundingBox() const
 	{
 		return m_aabb;
 	}
+}
+
+std::shared_ptr<Shape> OctreeShape::getCopy() const
+{
+	return std::make_shared<OctreeShape>(*this);
 }
 
 }; // namespace Math

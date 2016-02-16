@@ -41,7 +41,6 @@ Representation::Representation(const std::string& name) :
 
 Representation::~Representation()
 {
-
 }
 
 void Representation::setCollisionDetectionType(CollisionDetectionType type)
@@ -67,41 +66,18 @@ CollisionDetectionType Representation::getSelfCollisionDetectionType() const
 const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& Representation::getPosedShapeMotion() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
 	return m_posedShapeMotion;
 }
 
 void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
 	m_posedShapeMotion = posedShapeMotion;
-}
-
-const std::shared_ptr<Math::Shape> Representation::getPosedShape()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-	Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
-	Math::RigidTransform3d pose = getPose();
-	if (pose.isApprox(identity))
-	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-		m_posedShapeMotion.second = newPosedShape;
-	}
-	else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
-	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
-		m_posedShapeMotion.second = newPosedShape;
-	}
-
-	return m_posedShapeMotion.second.getShape();
 }
 
 void Representation::invalidatePosedShapeMotion()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
 	m_posedShapeMotion.invalidate();
 }
 
@@ -114,7 +90,6 @@ void Representation::addContact(const std::shared_ptr<Representation>& other,
 								const std::shared_ptr<SurgSim::Collision::Contact>& contact)
 {
 	boost::lock_guard<boost::mutex> lock(m_collisionsMutex);
-
 	m_collisions.unsafeGet()[other].push_back(contact);
 }
 
@@ -126,11 +101,18 @@ bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 
 void Representation::update(const double& dt)
 {
+	getShape()->setPose(getPose());
+	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
+	{
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(getShape(), getShape()->getPose());
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(getShape(), getShape()->getPose());
+		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape1, posedShape2);
+		setPosedShapeMotion(posedShapeMotion);
+	}
 }
 
 bool Representation::ignore(const std::string& fullName)
 {
-
 	bool result = false;
 	if (m_allowing.empty())
 	{
@@ -243,7 +225,6 @@ bool Representation::isAllowing(const std::shared_ptr<Representation>& represent
 	return isAllowing(representation->getFullName());
 }
 
-
 void Representation::setAllowing(const std::vector<std::string>& fullNames)
 {
 	if (m_ignoring.empty())
@@ -273,7 +254,7 @@ void Representation::doRetire()
 Math::Aabbd Representation::getBoundingBox() const
 {
 	SURGSIM_ASSERT(getShape() != nullptr);
-	return Math::transformAabb(getPose(), getShape()->getBoundingBox());
+	return getShape()->getBoundingBox();
 }
 
 }; // namespace Collision

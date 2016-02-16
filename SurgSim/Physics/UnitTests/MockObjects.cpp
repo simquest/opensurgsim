@@ -657,7 +657,7 @@ int MockCollisionRepresentation::getShapeType() const
 	return -1;
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> MockCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> MockCollisionRepresentation::getShape() const
 {
 	return nullptr;
 }

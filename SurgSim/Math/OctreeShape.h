@@ -49,6 +49,8 @@ public:
 	template<class T>
 	explicit OctreeShape(const SurgSim::DataStructures::OctreeNode<T>& node);
 
+	explicit OctreeShape(const OctreeShape& other);
+
 	/// Destructor
 	virtual ~OctreeShape();
 
@@ -66,7 +68,7 @@ public:
 
 	/// Get the root node
 	/// \return the octree root node of this shape
-	std::shared_ptr<NodeType> getOctree();
+	std::shared_ptr<NodeType> getOctree() const;
 
 	/// Set the root node
 	/// \param node the octree root node of this shape
@@ -80,6 +82,8 @@ public:
 	const Math::Aabbd& getBoundingBox() const override;
 
 	void setPose(const RigidTransform3d& pose) override;
+
+	std::shared_ptr<Shape> getCopy() const override;
 
 private:
 

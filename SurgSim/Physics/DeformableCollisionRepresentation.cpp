@@ -105,7 +105,13 @@ void DeformableCollisionRepresentation::update(const double& dt)
 			"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
 	}
 
-	invalidatePosedShapeMotion();
+	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
+	{
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(m_previousShape, m_previousShape->getPose());
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(m_shape, m_shape->getPose());
+		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape1, posedShape2);
+		setPosedShapeMotion(posedShapeMotion);
+	}
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
@@ -151,9 +157,10 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 		<< "Deformable collision shape has to be a mesh.  But what passed in is " << shape->getType();
 
 	m_shape = shape;
+	m_previousShape = m_shape->getCopy();
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> DeformableCollisionRepresentation::getShape() const
 {
 	return m_shape;
 }

@@ -68,9 +68,17 @@ public:
 	/// \return The object's associated AabbTree
 	std::shared_ptr<const DataStructures::AabbTree> getAabbTree() const;
 
-	bool isTransformable() const override;
+	std::shared_ptr<Shape> getCopy() const override;
 
-	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
+	void setPose(const RigidTransform3d& pose) override;
+
+	/// Set the initial Vertices.
+	/// \param vertices The initial vertices.
+	void setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices);
+
+	/// Get the initial Vertices.
+	/// \return The initial Vertices.
+	const DataStructures::Vertices<DataStructures::EmptyData>& getInitialVertices() const;
 
 protected:
 	bool doUpdate() override;
@@ -78,6 +86,9 @@ protected:
 
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	void updateAabbTree();
+
+	/// The initial vertex positions.
+	DataStructures::Vertices<DataStructures::EmptyData> m_initialVertices;
 
 private:
 	/// Segment radius

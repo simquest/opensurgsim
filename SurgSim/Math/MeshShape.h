@@ -85,7 +85,7 @@ public:
 
 	Matrix33d getSecondMomentOfVolume() const override;
 
-	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
+	std::shared_ptr<Shape> getCopy() const override;
 
 	/// Get the AabbTree
 	/// \return The object's associated AabbTree
@@ -93,7 +93,15 @@ public:
 
 	bool isValid() const override;
 
-	bool isTransformable() const override;
+	void setPose(const RigidTransform3d& pose) override;
+
+	/// Set the initial Vertices.
+	/// \param vertices The initial vertices.
+	void setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices);
+
+	/// Get the initial Vertices.
+	/// \return The initial Vertices.
+	const DataStructures::Vertices<DataStructures::EmptyData>& getInitialVertices() const;
 
 protected:
 	bool doUpdate() override;
@@ -120,6 +128,9 @@ protected:
 
 	/// Second moment of volume
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
+
+	/// The initial vertex positions.
+	DataStructures::Vertices<DataStructures::EmptyData> m_initialVertices;
 
 private:
 	/// The aabb tree used to accelerate collision detection against the mesh

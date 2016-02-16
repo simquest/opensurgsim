@@ -145,7 +145,6 @@ TEST_F(ShapeTest, Sphere)
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(sphere.isValid());
-	EXPECT_FALSE(sphere.isTransformable());
 	EXPECT_TRUE(aabb.isApprox(sphere.getBoundingBox()));
 }
 
@@ -236,7 +235,6 @@ TEST_F(ShapeTest, Box)
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
-	EXPECT_FALSE(box.isTransformable());
 	EXPECT_TRUE(aabb.isApprox(box.getBoundingBox()));
 }
 
@@ -324,7 +322,6 @@ TEST_F(ShapeTest, Cylinder)
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(cylinder.isValid());
-	EXPECT_FALSE(cylinder.isTransformable());
 	EXPECT_TRUE(aabb.isApprox(cylinder.getBoundingBox()));
 }
 
@@ -421,7 +418,6 @@ TEST_F(ShapeTest, Capsule)
 	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 	EXPECT_TRUE(capsule.isValid());
-	EXPECT_FALSE(capsule.isTransformable());
 	EXPECT_TRUE(aabb.isApprox(capsule.getBoundingBox()));
 }
 
@@ -473,7 +469,6 @@ TEST_F(ShapeTest, DoubleSidedPlaneShape)
 	EXPECT_NEAR(0.0, doubleSidedPlaneShape.getD(), epsilon);
 	EXPECT_TRUE(doubleSidedPlaneShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
 	EXPECT_TRUE(doubleSidedPlaneShape.isValid());
-	EXPECT_FALSE(doubleSidedPlaneShape.isTransformable());
 
 	// There is no sense to trying to build the Bounding box here
 	EXPECT_TRUE(doubleSidedPlaneShape.getBoundingBox().isEmpty());
@@ -615,7 +610,6 @@ TEST_F(ShapeTest, PlaneShape)
 	EXPECT_NEAR(0.0, planeShape.getD(), epsilon);
 	EXPECT_TRUE(planeShape.getNormal().isApprox(Vector3d(0.0, 1.0, 0.0)));
 	EXPECT_TRUE(planeShape.isValid());
-	EXPECT_FALSE(planeShape.isTransformable());
 	EXPECT_TRUE(planeShape.getBoundingBox().isEmpty());
 }
 

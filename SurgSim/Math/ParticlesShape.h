@@ -83,13 +83,21 @@ public:
 
 	Matrix33d getSecondMomentOfVolume() const override;
 
-	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
+	std::shared_ptr<Shape> getCopy() const override;
 
 	bool isValid() const override;
 
-	bool isTransformable() const override;
-
 	const Math::Aabbd& getBoundingBox() const override;
+
+	void setPose(const RigidTransform3d& pose) override;
+
+	/// Set the initial Vertices.
+	/// \param vertices The initial vertices.
+	void setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices);
+
+	/// Get the initial Vertices.
+	/// \return The initial Vertices.
+	const DataStructures::Vertices<DataStructures::EmptyData>& getInitialVertices() const;
 
 private:
 	bool doUpdate() override;
@@ -108,6 +116,9 @@ private:
 
 	/// Second moment of volume
 	Matrix33d m_secondMomentOfVolume;
+
+	/// The initial vertex positions.
+	DataStructures::Vertices<DataStructures::EmptyData> m_initialVertices;
 };
 
 };

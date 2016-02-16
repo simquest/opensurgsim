@@ -34,6 +34,8 @@ public:
 	/// Constructor
 	DoubleSidedPlaneShape();
 
+	explicit DoubleSidedPlaneShape(const DoubleSidedPlaneShape& other);
+
 	SURGSIM_CLASSNAME(SurgSim::Math::DoubleSidedPlaneShape);
 
 	/// \return the type of the shape
@@ -59,6 +61,8 @@ public:
 	/// A DoubleSidedPlaneShape is always valid.
 	/// \return True.
 	bool isValid() const override;
+
+	std::shared_ptr<Shape> getCopy() const override;
 };
 
 }; // Math

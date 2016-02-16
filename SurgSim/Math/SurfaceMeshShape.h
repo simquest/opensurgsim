@@ -65,6 +65,8 @@ public:
 		const SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>& mesh,
 		double thickness = 1e-2);
 
+	explicit SurfaceMeshShape(const SurfaceMeshShape& other);
+
 	SURGSIM_CLASSNAME(SurgSim::Math::SurfaceMeshShape);
 
 	/// \return the type of the shape
@@ -74,6 +76,10 @@ public:
 	/// to avoid formal and numerical issues).
 	/// \return True if this shape contains a valid mesh and thickness is at least 1e-5; Otherwise, false.
 	bool isValid() const override;
+
+	std::shared_ptr<Shape> getCopy() const override;
+
+	double getThickness() const;
 
 protected:
 	/// Compute useful volume integrals based on the triangle mesh, which

@@ -30,6 +30,13 @@ Shape::Shape() :
 	m_aabb.setEmpty();
 }
 
+Shape::Shape(const RigidTransform3d& pose) :
+	m_pose(pose)
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Shape, RigidTransform3d, Pose, getPose, setPose);
+	m_aabb.setEmpty();
+}
+
 Shape::~Shape()
 {
 }
@@ -37,17 +44,6 @@ Shape::~Shape()
 Vector3d Shape::getCenter() const
 {
 	return Vector3d::Zero();
-}
-
-bool Shape::isTransformable() const
-{
-	return false;
-}
-
-std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "getTransformed not implemented for " << getClassName();
-	return nullptr;
 }
 
 /// Get class name

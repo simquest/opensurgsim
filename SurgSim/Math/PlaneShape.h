@@ -40,6 +40,8 @@ public:
 	/// Constructor: No members to initialize.
 	PlaneShape();
 
+	explicit PlaneShape(const PlaneShape& other);
+
 	SURGSIM_CLASSNAME(SurgSim::Math::PlaneShape);
 
 	/// \return the type of the shape
@@ -65,6 +67,8 @@ public:
 	/// A PlaneShape is always valid.
 	/// \return True.
 	bool isValid() const override;
+
+	std::shared_ptr<Shape> getCopy() const override;
 };
 
 }; // Math

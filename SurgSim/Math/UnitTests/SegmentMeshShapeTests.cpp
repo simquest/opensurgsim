@@ -76,8 +76,6 @@ TEST_F(SegmentMeshShapeTest, ValidTest)
 	EXPECT_TRUE(shape.isValid());
 	shape.setRadius(SurgSim::Math::Geometry::DistanceEpsilon / 2.0);
 	EXPECT_FALSE(shape.isValid());
-
-	EXPECT_TRUE(shape.isTransformable());
 }
 
 TEST_F(SegmentMeshShapeTest, AabbTest)
@@ -100,8 +98,9 @@ TEST_F(SegmentMeshShapeTest, TransformTest)
 	std::shared_ptr<SegmentMeshShape> shape = std::make_shared<SegmentMeshShape>(*mesh, 3.0);
 
 	// Transform into a new mesh
-	auto newShape = std::dynamic_pointer_cast<SegmentMeshShape>(shape->getTransformed(
-		makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(0.0, 1.0, 0.0)), Vector3d(0.0, 10.0, 0.0))));
+	auto newShape = std::dynamic_pointer_cast<SegmentMeshShape>(shape->getCopy());
+	newShape->setPose(
+		makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(0.0, 1.0, 0.0)), Vector3d(0.0, 10.0, 0.0)));
 
 	EXPECT_TRUE(Vector3d(-10.0, 0.0, 10.0).isApprox(newShape->getVertex(0).position));
 	EXPECT_TRUE(Vector3d(0.0, 10.0, 0.0).isApprox(newShape->getVertex(1).position));

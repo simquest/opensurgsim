@@ -27,6 +27,14 @@ SphereShape::SphereShape(double radius) : m_radius(radius)
 	updateAabb();
 }
 
+SphereShape::SphereShape(const SphereShape& other) :
+	Shape(other.getPose()),
+	m_radius(other.getRadius())
+{
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphereShape, double, Radius, getRadius, setRadius);
+	updateAabb();
+}
+
 int SphereShape::getType() const
 {
 	return SHAPE_TYPE_SPHERE;
@@ -73,6 +81,10 @@ bool SphereShape::isValid() const
 	return m_radius >= 0;
 }
 
+std::shared_ptr<Shape> SphereShape::getCopy() const
+{
+	return std::make_shared<SphereShape>(*this);
+}
 
 }; // namespace Math
 }; // namespace SurgSim

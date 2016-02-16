@@ -25,6 +25,11 @@ DoubleSidedPlaneShape::DoubleSidedPlaneShape()
 {
 }
 
+DoubleSidedPlaneShape::DoubleSidedPlaneShape(const DoubleSidedPlaneShape& other) :
+	Shape(other.getPose())
+{
+}
+
 int DoubleSidedPlaneShape::getType() const
 {
 	return SHAPE_TYPE_DOUBLESIDEDPLANE;
@@ -53,6 +58,11 @@ SurgSim::Math::Vector3d DoubleSidedPlaneShape::getNormal() const
 bool DoubleSidedPlaneShape::isValid() const
 {
 	return true;
+}
+
+std::shared_ptr<Shape> DoubleSidedPlaneShape::getCopy() const
+{
+	return std::make_shared<DoubleSidedPlaneShape>(*this);
 }
 
 }; // namespace Math

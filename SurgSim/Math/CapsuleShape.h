@@ -36,6 +36,8 @@ public:
 	/// \param radius The capsule radius (i.e. of the cylinder/spheres) (in m)
 	explicit CapsuleShape(double length = 0.0, double radius = 0.0);
 
+	explicit CapsuleShape(const CapsuleShape& other);
+
 	SURGSIM_CLASSNAME(SurgSim::Math::CapsuleShape);
 
 	/// \return the type of the shape
@@ -68,6 +70,8 @@ public:
 
 	/// \return True if length and radius are bigger than or equal to 0; Otherwise, false.
 	bool isValid() const override;
+
+	std::shared_ptr<Shape> getCopy() const override;
 
 protected:
 	// Setters in 'protected' sections are for serialization purpose only.

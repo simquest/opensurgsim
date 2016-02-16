@@ -35,13 +35,15 @@ ParticlesShape::ParticlesShape(double radius) :
 
 ParticlesShape::ParticlesShape(const ParticlesShape& other) :
 	DataStructures::Vertices<DataStructures::EmptyData>(other),
+	Shape(other.getPose()),
 	m_aabbTree(other.m_aabbTree),
 	m_radius(other.getRadius()),
 	m_center(other.getCenter()),
 	m_volume(other.getVolume()),
-	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume()),
+	m_initialVertices(other.getInitialVertices())
 {
-	m_pose = other.getPose();
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
 }
 
 int ParticlesShape::getType() const
@@ -81,6 +83,11 @@ void ParticlesShape::setRadius(double radius)
 
 bool ParticlesShape::doUpdate()
 {
+	if (m_initialVertices.getVertices().size() == 0)
+	{
+		setInitialVertices(*this);
+	}
+
 	const double numParticles = static_cast<double>(getVertices().size());
 	const Vector3d radius = Vector3d::Constant(m_radius);
 
@@ -116,22 +123,14 @@ bool ParticlesShape::doUpdate()
 	return true;
 }
 
-std::shared_ptr<Shape> ParticlesShape::getTransformed(const RigidTransform3d& pose)
+std::shared_ptr<Shape> ParticlesShape::getCopy() const
 {
-	auto transformed = std::make_shared<ParticlesShape>(*this);
-	transformed->transform(pose);
-	transformed->update();
-	return transformed;
+	return std::make_shared<ParticlesShape>(*this);
 }
 
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::getAabbTree() const
 {
 	return m_aabbTree;
-}
-
-bool ParticlesShape::isTransformable() const
-{
-	return true;
 }
 
 const Math::Aabbd& ParticlesShape::getBoundingBox() const
@@ -144,6 +143,34 @@ const Math::Aabbd& ParticlesShape::getBoundingBox() const
 	{
 		return m_aabb;
 	}
+}
+
+void ParticlesShape::setPose(const RigidTransform3d& pose)
+{
+	if (!pose.isApprox(m_pose))
+	{
+		m_pose = pose;
+		auto& vertices = getVertices();
+		const size_t numVertices = vertices.size();
+		const auto& initialVertices = m_initialVertices.getVertices();
+		SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+			"ParticlesShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
+			" vertices, vs initially " << initialVertices.size();
+		for (size_t i = 0; i < numVertices; ++i)
+		{
+			vertices[i].position = m_pose * initialVertices[i].position;
+		}
+	}
+}
+
+void ParticlesShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
+{
+	m_initialVertices = vertices;
+}
+
+const DataStructures::Vertices<DataStructures::EmptyData>& ParticlesShape::getInitialVertices() const
+{
+	return m_initialVertices;
 }
 
 };

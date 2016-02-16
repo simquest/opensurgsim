@@ -37,6 +37,8 @@ public:
 	/// \param sizeX, sizeY, sizeZ the box sizes in all 3 directions (in m)
 	explicit BoxShape(double sizeX = 0.0, double sizeY = 0.0, double sizeZ = 0.0);
 
+	explicit BoxShape(const BoxShape& other);
+
 	SURGSIM_CLASSNAME(SurgSim::Math::BoxShape);
 
 	/// \return the type of the shape
@@ -78,6 +80,8 @@ public:
 
 	/// \return True if size along X, Y, Z are bigger than or equal to 0; Otherwise, false.
 	bool isValid() const override;
+
+	std::shared_ptr<Shape> getCopy() const override;
 
 protected:
 	// Setters in 'protected' sections are for serialization purpose only.

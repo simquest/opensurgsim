@@ -190,7 +190,7 @@ TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 	collisionRepresentation->update(dt);
 
-	auto actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape());
+	auto actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getShape());
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 
@@ -200,7 +200,7 @@ TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
 	collisionRepresentation->setLocalPose(transform);
 	collisionRepresentation->update(dt);
 
-	actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape());
+	actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getShape());
 	expectedMesh->transform(transform);
 	expectedMesh->update();
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());

@@ -56,19 +56,8 @@ std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
 	{
 		const auto& calculation = calculations[subShape.first->getType()][posedShape2.getShape()->getType()];
 
-		std::list<std::shared_ptr<Contact>> localContacts;
-
-		if (subShape.first->isTransformable())
-		{
-			auto pose = posedShape1.getPose() * subShape.second;
-			localContacts = calculation->calculateDcdContact(
-								PosedShape(subShape.first->getTransformed(pose), pose), posedShape2);
-		}
-		else
-		{
-			localContacts = calculation->calculateDcdContact(
-								PosedShape(subShape.first, posedShape1.getPose() * subShape.second), posedShape2);
-		}
+		std::list<std::shared_ptr<Contact>> localContacts = calculation->calculateDcdContact(
+							PosedShape(subShape.first, posedShape1.getPose() * subShape.second), posedShape2);
 
 		for (auto& contact : localContacts)
 		{

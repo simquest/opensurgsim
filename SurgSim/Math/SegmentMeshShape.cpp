@@ -35,10 +35,11 @@ SegmentMeshShape::SegmentMeshShape()
 }
 
 SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
-	DataStructures::SegmentMeshPlain(other)
+	DataStructures::SegmentMeshPlain(other),
+	Shape(other.getPose()),
+	m_initialVertices(other.getInitialVertices())
 {
 	setRadius(other.m_radius);
-	m_pose = other.getPose();
 	updateAabbTree();
 }
 
@@ -86,6 +87,10 @@ double SegmentMeshShape::getRadius() const
 
 bool SegmentMeshShape::doUpdate()
 {
+	if (m_initialVertices.getVertices().size() == 0)
+	{
+		setInitialVertices(*this);
+	}
 	updateAabbTree();
 	return true;
 }
@@ -100,12 +105,9 @@ std::shared_ptr<const DataStructures::AabbTree> SegmentMeshShape::getAabbTree() 
 	return m_aabbTree;
 }
 
-std::shared_ptr<Shape> SegmentMeshShape::getTransformed(const RigidTransform3d& pose)
+std::shared_ptr<Shape> SegmentMeshShape::getCopy() const
 {
-	auto transformed = std::make_shared<SegmentMeshShape>(*this);
-	transformed->transform(pose);
-	transformed->update();
-	return transformed;
+	return std::make_shared<SegmentMeshShape>(*this);
 }
 
 void SegmentMeshShape::updateAabbTree()
@@ -131,9 +133,32 @@ void SegmentMeshShape::updateAabbTree()
 	m_aabbTree->set(std::move(items));
 }
 
-bool SegmentMeshShape::isTransformable() const
+void SegmentMeshShape::setPose(const RigidTransform3d& pose)
 {
-	return true;
+	if (!pose.isApprox(m_pose))
+	{
+		m_pose = pose;
+		auto& vertices = getVertices();
+		const size_t numVertices = vertices.size();
+		const auto& initialVertices = m_initialVertices.getVertices();
+		SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+			"SegmentMeshShape cannot update vertices' positions because of mismatched size: currently " <<
+			numVertices << " vertices, vs initially " << initialVertices.size();
+		for (size_t i = 0; i < numVertices; ++i)
+		{
+			vertices[i].position = m_pose * initialVertices[i].position;
+		}
+	}
+}
+
+void SegmentMeshShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
+{
+	m_initialVertices = vertices;
+}
+
+const DataStructures::Vertices<DataStructures::EmptyData>& SegmentMeshShape::getInitialVertices() const
+{
+	return m_initialVertices;
 }
 
 }; // namespace Math

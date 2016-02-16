@@ -59,6 +59,8 @@ public:
 	/// Constructor
 	Shape();
 
+	explicit Shape(const RigidTransform3d& pose);
+
 	/// Destructor
 	virtual ~Shape();
 
@@ -78,13 +80,9 @@ public:
 	/// \return The 3x3 symmetric second moment matrix
 	virtual Matrix33d getSecondMomentOfVolume() const = 0;
 
-	/// \return true if the the shape can be transformed
-	virtual bool isTransformable() const;
-
-	/// Get a copy of this shape with an applied rigid transform
-	/// \param pose The pose to transform the shape by
-	/// \return the posed shape
-	virtual std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose);
+	/// Get a copy of this shape
+	/// \return The shape
+	virtual std::shared_ptr<Shape> getCopy() const = 0;
 
 	/// Get class name
 	virtual std::string getClassName() const;

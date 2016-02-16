@@ -25,7 +25,8 @@ namespace Math
 template <class VertexData, class EdgeData>
 SegmentMeshShape::SegmentMeshShape(
 	const SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
-	double radius) : SurgSim::DataStructures::SegmentMeshPlain(mesh)
+	double radius) : SurgSim::DataStructures::SegmentMeshPlain(mesh),
+	m_initialVertices(mesh)
 {
 	setRadius(radius);
 	updateAabbTree();

@@ -30,6 +30,21 @@ CompoundShape::CompoundShape()
 	}
 }
 
+CompoundShape::CompoundShape(const CompoundShape& other) :
+	Shape(other.getPose())
+{
+	const auto& subShapes = other.getShapes();
+	for (const auto& subShape : subShapes)
+	{
+		addShape(subShape.first->getCopy(), subShape.second);
+	}
+
+	{
+		typedef std::vector<SubShape> PropertyType;
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Math::CompoundShape, PropertyType, Shapes, getShapes, setShapes);
+	}
+}
+
 CompoundShape::~CompoundShape()
 {
 
@@ -134,7 +149,7 @@ const Math::Aabbd& CompoundShape::getBoundingBox() const
 		Math::Aabbd result;
 		for (const auto& subShape : m_shapes)
 		{
-			result.extend(Math::transformAabb(subShape.second, subShape.first->getBoundingBox()));
+			result.extend(subShape.first->getBoundingBox());
 		}
 		m_localAabb.setValue(result);
 	}
@@ -176,7 +191,7 @@ const std::vector<CompoundShape::SubShape>& CompoundShape::getShapes() const
 	return m_shapes;
 }
 
-const std::shared_ptr<Shape>& CompoundShape::getShape(size_t index) const
+std::shared_ptr<Shape>& CompoundShape::getShape(size_t index) const
 {
 	ReadLock lock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
@@ -205,13 +220,16 @@ void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
 
 void CompoundShape::setPose(const RigidTransform3d& pose)
 {
-	WriteLock lock(m_mutex);
-	Shape::setPose(pose);
-	for (auto& shape : m_shapes)
+	if (!pose.isApprox(m_pose))
 	{
-		shape.first->setPose(pose * shape.second);
+		WriteLock lock(m_mutex);
+		m_pose = pose;
+		for (auto& shape : m_shapes)
+		{
+			shape.first->setPose(pose * shape.second);
+		}
+		invalidateData();
 	}
-	invalidateData();
 }
 
 void CompoundShape::setPose(size_t index, const RigidTransform3d& pose)
@@ -233,6 +251,11 @@ void CompoundShape::clearShapes()
 {
 	WriteLock lock(m_mutex);
 	m_shapes.clear();
+}
+
+std::shared_ptr<Shape> CompoundShape::getCopy() const
+{
+	return std::make_shared<CompoundShape>(*this);
 }
 
 }

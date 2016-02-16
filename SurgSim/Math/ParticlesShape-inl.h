@@ -24,7 +24,8 @@ namespace Math
 
 template <class V>
 ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<V>& other) :
-	DataStructures::Vertices<DataStructures::EmptyData>(other)
+	DataStructures::Vertices<DataStructures::EmptyData>(other),
+	m_initialVertices(other)
 {
 	update();
 }
@@ -33,6 +34,7 @@ template <class V>
 ParticlesShape& ParticlesShape::operator=(const SurgSim::DataStructures::Vertices<V>& other)
 {
 	DataStructures::Vertices<DataStructures::EmptyData>::operator=(other);
+	setInitialVertices(other);
 	update();
 	return *this;
 }

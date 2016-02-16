@@ -28,6 +28,16 @@ CylinderShape::CylinderShape(double length, double radius) : m_length(length), m
 	updateAabb();
 }
 
+CylinderShape::CylinderShape(const CylinderShape& other) :
+	Shape(other.getPose()),
+	m_length(other.getLength()),
+	m_radius(other.getRadius())
+{
+	updateAabb();
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderShape, double, Radius, getRadius, setRadius);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderShape, double, Length, getLength, setLength);
+}
+
 int CylinderShape::getType() const
 {
 	return SHAPE_TYPE_CYLINDER;
@@ -87,6 +97,11 @@ SurgSim::Math::Matrix33d CylinderShape::getSecondMomentOfVolume() const
 bool CylinderShape::isValid() const
 {
 	return (m_length >= 0) && (m_radius >= 0);
+}
+
+std::shared_ptr<Shape> CylinderShape::getCopy() const
+{
+	return std::make_shared<CylinderShape>(*this);
 }
 
 }; // namespace Math

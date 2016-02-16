@@ -28,6 +28,16 @@ CapsuleShape::CapsuleShape(double length, double radius) : m_length(length), m_r
 	updateAabb();
 }
 
+CapsuleShape::CapsuleShape(const CapsuleShape& other) :
+	Shape(other.getPose()),
+	m_length(other.getLength()),
+	m_radius(other.getRadius())
+{
+	updateAabb();
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleShape, double, Radius, getRadius, setRadius);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleShape, double, Length, getLength, setLength);
+}
+
 int CapsuleShape::getType() const
 {
 	return SHAPE_TYPE_CAPSULE;
@@ -124,6 +134,11 @@ void CapsuleShape::updateAabb()
 	m_aabb.setEmpty();
 	m_aabb.extend(Vector3d(-m_radius, -m_length / 2.0 - m_radius, -m_radius));
 	m_aabb.extend(Vector3d(m_radius, m_length / 2.0 + m_radius, m_radius));
+}
+
+std::shared_ptr<Shape> CapsuleShape::getCopy() const
+{
+	return std::make_shared<CapsuleShape>(*this);
 }
 
 }; // namespace Math

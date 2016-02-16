@@ -57,7 +57,7 @@ void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math:
 	update(0.0);
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> ShapeCollisionRepresentation::getShape() const
 {
 	return m_shape;
 }
@@ -69,7 +69,12 @@ bool ShapeCollisionRepresentation::doInitialize()
 		SURGSIM_ASSERT(m_shape->isValid()) <<
 			"An invalid MeshShape is used in this ShapeCollisionRepresentation.";
 	}
+	return true;
+}
 
+bool ShapeCollisionRepresentation::doWakeUp()
+{
+	m_shape->setPose(getPose());
 	return true;
 }
 

@@ -31,6 +31,16 @@ BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeZ, getSizeZ, setSizeZ);
 }
 
+BoxShape::BoxShape(const BoxShape& other) :
+	Shape(other.getPose()),
+	m_size(other.getSize()),
+	m_vertices(other.getVertices())
+{
+	updateAabb();
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeX, getSizeX, setSizeX);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeY, getSizeY, setSizeY);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxShape, double, SizeZ, getSizeZ, setSizeZ);
+}
 
 int BoxShape::getType() const
 {
@@ -132,6 +142,11 @@ void BoxShape::updateAabb()
 bool BoxShape::isValid() const
 {
 	return (m_size.minCoeff() >= 0);
+}
+
+std::shared_ptr<Shape> BoxShape::getCopy() const
+{
+	return std::make_shared<BoxShape>(*this);
 }
 
 }; // namespace Math

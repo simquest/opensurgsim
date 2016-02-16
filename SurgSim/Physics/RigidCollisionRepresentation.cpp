@@ -41,6 +41,18 @@ RigidCollisionRepresentation::~RigidCollisionRepresentation()
 {
 }
 
+bool RigidCollisionRepresentation::doWakeUp()
+{
+	if (m_shape == nullptr)
+	{
+		auto physicsRepresentation = m_physicsRepresentation.lock();
+		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+		setShape(physicsRepresentation->getShape());
+	}
+	return m_shape != nullptr;
+}
+
 void RigidCollisionRepresentation::setRigidRepresentation(
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation)
 {
@@ -54,63 +66,43 @@ std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> RigidCollisionReprese
 
 int RigidCollisionRepresentation::getShapeType() const
 {
-	return getShape()->getType();
+	return m_shape->getType();
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> RigidCollisionRepresentation::getShape() const
 {
-	if (m_shape != nullptr)
-	{
-		return m_shape;
-	}
-	else
-	{
-		auto physicsRepresentation = m_physicsRepresentation.lock();
-		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
-				"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-		return physicsRepresentation->getShape();
-	}
+	return m_shape;
 }
 
 void RigidCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
+	SURGSIM_ASSERT(shape != nullptr) << "Cannot set nullptr shape on " << getFullName();
 	m_shape = shape;
+	m_previousShape = shape->getCopy();
 }
 
 void RigidCollisionRepresentation::update(const double& time)
 {
-	using Math::PosedShape;
-	using Math::PosedShapeMotion;
-	using Math::Shape;
+	Math::RigidTransform3d physicsPreviousPose;
+	Math::RigidTransform3d physicsCurrentPose;
+	Math::RigidTransform3d transform;
+	{
+		auto physicsRepresentation = m_physicsRepresentation.lock();
+		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+			"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+		physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
+		physicsPreviousPose = physicsRepresentation->getPreviousState().getPose();
+		transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+	}
+
+	m_shape->setPose(physicsCurrentPose * transform);
 
 	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
-		Math::RigidTransform3d previousPose;
-		Math::RigidTransform3d currentPose;
-		{
-			auto physicsRepresentation = m_physicsRepresentation.lock();
-			SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
-				"PhysicsRepresentation went out of scope for Collision Representation " << getName();
-			const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
-			const Math::RigidTransform3d& physicsPreviousPose = physicsRepresentation->getPreviousState().getPose();
-
-			Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
-			previousPose = physicsPreviousPose * transform;
-			currentPose = physicsCurrentPose * transform;
-		}
-
-		std::shared_ptr<Shape> previousShape = getShape();
-		std::shared_ptr<Shape> currentShape = getShape();
-		if (getShape()->isTransformable())
-		{
-			previousShape = getShape()->getTransformed(previousPose);
-			currentShape = getShape()->getTransformed(currentPose);
-		}
-
-		PosedShape<std::shared_ptr<Shape>> posedShape1(previousShape, previousPose);
-		PosedShape<std::shared_ptr<Shape>> posedShape2(currentShape, currentPose);
-		PosedShapeMotion<std::shared_ptr<Shape>> posedShapeMotion(posedShape1, posedShape2);
-
+		m_previousShape->setPose(physicsPreviousPose * transform);
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(m_previousShape, m_previousShape->getPose());
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(m_shape, m_shape->getPose());
+		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape1, posedShape2);
 		setPosedShapeMotion(posedShapeMotion);
 	}
 }

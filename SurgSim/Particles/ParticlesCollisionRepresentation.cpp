@@ -43,7 +43,13 @@ ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
 void ParticlesCollisionRepresentation::update(const double& dt)
 {
 	*m_shape = getParticleRepresentation()->getParticles().unsafeGet();
-	invalidatePosedShapeMotion();
+	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
+	{
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(m_shape, m_shape->getPose());
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(m_shape, m_shape->getPose());
+		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape1, posedShape2);
+		setPosedShapeMotion(posedShapeMotion);
+	}
 }
 
 bool ParticlesCollisionRepresentation::doInitialize()
@@ -72,7 +78,7 @@ int ParticlesCollisionRepresentation::getShapeType() const
 	return m_shape->getType();
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> ParticlesCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> ParticlesCollisionRepresentation::getShape() const
 {
 	return m_shape;
 }
