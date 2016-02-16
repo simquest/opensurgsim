@@ -129,11 +129,12 @@ bool CapsuleShape::isValid() const
 	return (m_length >= 0) && (m_radius >= 0);
 }
 
-void CapsuleShape::updateAabb()
+void CapsuleShape::updateAabb() const
 {
-	m_aabb.setEmpty();
-	m_aabb.extend(Vector3d(-m_radius, -m_length / 2.0 - m_radius, -m_radius));
-	m_aabb.extend(Vector3d(m_radius, m_length / 2.0 + m_radius, m_radius));
+	Aabbd aabb;
+	aabb.extend(Vector3d(-m_radius, -m_length / 2.0 - m_radius, -m_radius));
+	aabb.extend(Vector3d(m_radius, m_length / 2.0 + m_radius, m_radius));
+	m_aabb = transformAabb(m_pose, aabb);
 }
 
 std::shared_ptr<Shape> CapsuleShape::getCopy() const

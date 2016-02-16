@@ -15,6 +15,7 @@
 
 #include "SurgSim/Math/OctreeShape.h"
 
+#include <boost/thread/lock_guard.hpp>
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
@@ -116,21 +117,24 @@ void OctreeShape::setPose(const RigidTransform3d& pose)
 	SURGSIM_ASSERT(pose.isApprox(RigidTransform3d::Identity())) << "OctreeShape can only have an Identity pose.";
 }
 
-const Math::Aabbd& OctreeShape::getBoundingBox() const
+Aabbd OctreeShape::getBoundingBox() const
 {
-	if (m_rootNode != nullptr)
-	{
-		return m_rootNode->getBoundingBox();
-	}
-	else
-	{
-		return m_aabb;
-	}
+	boost::lock_guard<boost::mutex> lock(m_aabbMutex);
+	updateAabb();
+	return m_aabb;
 }
 
 std::shared_ptr<Shape> OctreeShape::getCopy() const
 {
 	return std::make_shared<OctreeShape>(*this);
+}
+
+void OctreeShape::updateAabb() const
+{
+	if (m_rootNode != nullptr)
+	{
+		m_aabb = m_rootNode->getBoundingBox();
+	}
 }
 
 }; // namespace Math

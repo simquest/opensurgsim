@@ -47,7 +47,6 @@ CompoundShape::CompoundShape(const CompoundShape& other) :
 
 CompoundShape::~CompoundShape()
 {
-
 }
 
 int CompoundShape::getType() const
@@ -140,13 +139,13 @@ bool CompoundShape::isValid() const
 	return true;
 }
 
-const Math::Aabbd& CompoundShape::getBoundingBox() const
+Aabbd CompoundShape::getBoundingBox() const
 {
 	ReadLock lock(m_mutex);
 	if (!m_localAabb.hasValue())
 	{
 		UpgradeLock write(lock);
-		Math::Aabbd result;
+		Aabbd result;
 		for (const auto& subShape : m_shapes)
 		{
 			result.extend(subShape.first->getBoundingBox());
@@ -191,7 +190,7 @@ const std::vector<CompoundShape::SubShape>& CompoundShape::getShapes() const
 	return m_shapes;
 }
 
-std::shared_ptr<Shape>& CompoundShape::getShape(size_t index) const
+const std::shared_ptr<Shape>& CompoundShape::getShape(size_t index) const
 {
 	ReadLock lock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
@@ -256,6 +255,11 @@ void CompoundShape::clearShapes()
 std::shared_ptr<Shape> CompoundShape::getCopy() const
 {
 	return std::make_shared<CompoundShape>(*this);
+}
+
+void CompoundShape::updateAabb() const
+{
+	m_aabb = getBoundingBox();
 }
 
 }

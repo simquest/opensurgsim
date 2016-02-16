@@ -15,6 +15,7 @@
 
 #include "SurgSim/Math/ParticlesShape.h"
 
+#include <boost/thread/lock_guard.hpp>
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeData.h"
 
@@ -119,6 +120,10 @@ bool ParticlesShape::doUpdate()
 
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 	m_aabbTree->set(std::move(items));
+	{
+		boost::lock_guard<boost::mutex> lock(m_aabbMutex);
+		updateAabb();
+	}
 
 	return true;
 }
@@ -128,21 +133,29 @@ std::shared_ptr<Shape> ParticlesShape::getCopy() const
 	return std::make_shared<ParticlesShape>(*this);
 }
 
+void ParticlesShape::updateAabbTree()
+{
+	std::list<DataStructures::AabbTreeData::Item> items;
+	const Vector3d radius = Vector3d::Constant(m_radius);
+	size_t id = 0;
+	for (auto const& vertex : getVertices())
+	{
+		SurgSim::Math::Aabbd aabb(vertex.position - radius, vertex.position + radius);
+		items.emplace_back(std::make_pair(std::move(aabb), id));
+		++id;
+	}
+
+	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
+	m_aabbTree->set(std::move(items));
+	{
+		boost::lock_guard<boost::mutex> lock(m_aabbMutex);
+		updateAabb();
+	}
+}
+
 const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::getAabbTree() const
 {
 	return m_aabbTree;
-}
-
-const Math::Aabbd& ParticlesShape::getBoundingBox() const
-{
-	if (m_aabbTree != nullptr)
-	{
-		return m_aabbTree->getAabb();
-	}
-	else
-	{
-		return m_aabb;
-	}
 }
 
 void ParticlesShape::setPose(const RigidTransform3d& pose)
@@ -160,6 +173,7 @@ void ParticlesShape::setPose(const RigidTransform3d& pose)
 		{
 			vertices[i].position = m_pose * initialVertices[i].position;
 		}
+		updateAabbTree();
 	}
 }
 
@@ -171,6 +185,14 @@ void ParticlesShape::setInitialVertices(const DataStructures::Vertices<DataStruc
 const DataStructures::Vertices<DataStructures::EmptyData>& ParticlesShape::getInitialVertices() const
 {
 	return m_initialVertices;
+}
+
+void ParticlesShape::updateAabb() const
+{
+	if (m_aabbTree != nullptr)
+	{
+		m_aabb = m_aabbTree->getAabb();
+	}
 }
 
 };

@@ -102,8 +102,7 @@ private:
 	/// Function that calculates the box vertices.
 	void calculateVertices();
 
-	/// Update the local aabb for this box
-	void updateAabb();
+	void updateAabb() const override;
 
 	/// The box sizes along the 3 axis respectively {X,Y,Z}
 	Vector3d m_size;

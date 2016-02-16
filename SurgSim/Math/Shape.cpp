@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/thread/lock_guard.hpp>
+
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/MathConvert.h"
@@ -55,14 +57,20 @@ std::string Shape::getClassName() const
 	return "SurgSim::Math::Shape";
 }
 
-const Aabbd& Shape::getBoundingBox() const
+Aabbd Shape::getBoundingBox() const
 {
+	boost::lock_guard<boost::mutex> lock(m_aabbMutex);
 	return m_aabb;
 }
 
 void Shape::setPose(const RigidTransform3d& pose)
 {
-	m_pose = pose;
+	if (!m_pose.isApprox(pose))
+	{
+		boost::lock_guard<boost::mutex> lock(m_aabbMutex);
+		m_pose = pose;
+		updateAabb();
+	}
 }
 
 const RigidTransform3d& Shape::getPose() const

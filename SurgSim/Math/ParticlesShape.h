@@ -87,8 +87,6 @@ public:
 
 	bool isValid() const override;
 
-	const Math::Aabbd& getBoundingBox() const override;
-
 	void setPose(const RigidTransform3d& pose) override;
 
 	/// Set the initial Vertices.
@@ -101,6 +99,11 @@ public:
 
 private:
 	bool doUpdate() override;
+
+	void updateAabb() const override;
+
+	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void updateAabbTree();
 
 	/// The aabb tree of the ParticlesShape
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;

@@ -135,6 +135,8 @@ protected:
 private:
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
+	
+	void updateAabb() const override;
 };
 
 }; // Math

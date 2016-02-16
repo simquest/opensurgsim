@@ -51,11 +51,11 @@ void SphereShape::setRadius(double radius)
 	updateAabb();
 }
 
-void SphereShape::updateAabb()
+void SphereShape::updateAabb() const
 {
 	m_aabb.setEmpty();
-	m_aabb.extend(Vector3d(-m_radius, -m_radius, -m_radius));
-	m_aabb.extend(Vector3d(m_radius, m_radius, m_radius));
+	m_aabb.extend(Vector3d(-m_radius, -m_radius, -m_radius) + m_pose.translation());
+	m_aabb.extend(Vector3d(m_radius, m_radius, m_radius) + m_pose.translation());
 }
 
 double SphereShape::getVolume() const

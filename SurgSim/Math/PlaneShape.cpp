@@ -65,5 +65,9 @@ std::shared_ptr<Shape> PlaneShape::getCopy() const
 	return std::make_shared<PlaneShape>(*this);
 }
 
+void PlaneShape::updateAabb() const
+{
+}
+
 }; // namespace Math
 }; // namespace SurgSim

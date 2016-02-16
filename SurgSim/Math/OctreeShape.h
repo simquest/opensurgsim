@@ -79,13 +79,14 @@ public:
 
 	void loadOctree(const std::string& filePath);
 
-	const Math::Aabbd& getBoundingBox() const override;
+	Aabbd getBoundingBox() const override;
 
 	void setPose(const RigidTransform3d& pose) override;
 
 	std::shared_ptr<Shape> getCopy() const override;
 
 private:
+	void updateAabb() const override;
 
 	/// \param node the OctreeNode to check
 	/// \return True if the bounding box is bigger than or equal to 0; Otherwise, false.

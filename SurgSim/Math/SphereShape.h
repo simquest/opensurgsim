@@ -66,8 +66,9 @@ protected:
 	/// \param radius	The sphere radius
 	void setRadius(double radius);
 
-	void updateAabb();
 private:
+	void updateAabb() const override;
+
 	/// Sphere radius
 	double m_radius;
 

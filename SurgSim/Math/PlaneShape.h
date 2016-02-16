@@ -69,6 +69,9 @@ public:
 	bool isValid() const override;
 
 	std::shared_ptr<Shape> getCopy() const override;
+
+private:
+	void updateAabb() const override;
 };
 
 }; // Math

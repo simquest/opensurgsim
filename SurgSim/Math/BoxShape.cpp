@@ -132,11 +132,12 @@ void BoxShape::calculateVertices()
 	}
 }
 
-void BoxShape::updateAabb()
+void BoxShape::updateAabb() const
 {
-	m_aabb.setEmpty();
-	m_aabb.extend(-(m_size / 2.0));
-	m_aabb.extend(m_size / 2.0);
+	Aabbd aabb;
+	aabb.extend(-m_size / 2.0);
+	aabb.extend(m_size / 2.0);
+	m_aabb = transformAabb(m_pose, aabb);
 }
 
 bool BoxShape::isValid() const

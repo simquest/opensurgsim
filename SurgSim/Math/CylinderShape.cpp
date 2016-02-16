@@ -66,11 +66,12 @@ void CylinderShape::setRadius(double radius)
 	updateAabb();
 }
 
-void CylinderShape::updateAabb()
+void CylinderShape::updateAabb() const
 {
-	m_aabb.setEmpty();
-	m_aabb.extend(Vector3d(-m_radius, -m_length / 2.0, -m_radius));
-	m_aabb.extend(Vector3d(m_radius, m_length / 2.0, m_radius));
+	Aabbd aabb;
+	aabb.extend(Vector3d(-m_radius, -m_length / 2.0, -m_radius));
+	aabb.extend(Vector3d(m_radius, m_length / 2.0, m_radius));
+	m_aabb = transformAabb(m_pose, aabb);
 }
 
 double CylinderShape::getVolume() const

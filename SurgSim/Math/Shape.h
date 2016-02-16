@@ -16,6 +16,8 @@
 #ifndef SURGSIM_MATH_SHAPE_H
 #define SURGSIM_MATH_SHAPE_H
 
+#include <boost/thread/mutex.hpp>
+
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Matrix.h"
@@ -92,7 +94,7 @@ public:
 	virtual bool isValid() const = 0;
 
 	/// \return the bounding box for the shape
-	virtual const Aabbd& getBoundingBox() const;
+	virtual Aabbd getBoundingBox() const;
 
 	/// \note This will alter any calculations that use the pose, so those need to be re-calculated.
 	virtual void setPose(const RigidTransform3d& pose);
@@ -100,9 +102,16 @@ public:
 	const RigidTransform3d& getPose() const;
 
 protected:
+	/// Update the local aabb.
+	/// \note The mutex should be locked in the calling code.
+	virtual void updateAabb() const = 0;
+
+	/// The mutex that protects the aabb.
+	mutable boost::mutex m_aabbMutex;
+
 	RigidTransform3d m_pose;
 
-	Aabbd m_aabb;
+	mutable Aabbd m_aabb;
 };
 
 /// PosedShape is a transformed shape with a record of the pose used to transform it.

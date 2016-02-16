@@ -83,8 +83,10 @@ protected:
 	/// Set the capsule radius (i.e. cylinder/spheres radius)
 	/// \param radius	The capsule radius (in m)
 	void setRadius(double radius);
-	void updateAabb();
+
 private:
+	void updateAabb() const override;
+
 	/// Capsule length
 	double m_length;
 

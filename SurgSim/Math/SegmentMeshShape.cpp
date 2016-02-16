@@ -16,6 +16,7 @@
 
 #include "SurgSim/Math/SegmentMeshShape.h"
 
+#include <boost/thread/lock_guard.hpp>
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeData.h"
 #include "SurgSim/Framework/Log.h"
@@ -131,6 +132,10 @@ void SegmentMeshShape::updateAabbTree()
 		}
 	}
 	m_aabbTree->set(std::move(items));
+	{
+		boost::lock_guard<boost::mutex> lock(m_aabbMutex);
+		updateAabb();
+	}
 }
 
 void SegmentMeshShape::setPose(const RigidTransform3d& pose)
@@ -148,6 +153,7 @@ void SegmentMeshShape::setPose(const RigidTransform3d& pose)
 		{
 			vertices[i].position = m_pose * initialVertices[i].position;
 		}
+		updateAabbTree();
 	}
 }
 
@@ -159,6 +165,14 @@ void SegmentMeshShape::setInitialVertices(const DataStructures::Vertices<DataStr
 const DataStructures::Vertices<DataStructures::EmptyData>& SegmentMeshShape::getInitialVertices() const
 {
 	return m_initialVertices;
+}
+
+void SegmentMeshShape::updateAabb() const
+{
+	if (m_aabbTree != nullptr)
+	{
+		m_aabb = m_aabbTree->getAabb();
+	}
 }
 
 }; // namespace Math

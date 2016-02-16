@@ -65,5 +65,9 @@ std::shared_ptr<Shape> DoubleSidedPlaneShape::getCopy() const
 	return std::make_shared<DoubleSidedPlaneShape>(*this);
 }
 
+void DoubleSidedPlaneShape::updateAabb() const
+{
+}
+
 }; // namespace Math
 }; // namespace SurgSim

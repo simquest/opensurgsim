@@ -77,8 +77,7 @@ protected:
 	void setRadius(double radius);
 
 private:
-
-	void updateAabb();
+	void updateAabb() const override;
 
 	/// The cylinder length
 	double m_length;

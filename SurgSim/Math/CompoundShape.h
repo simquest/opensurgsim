@@ -60,7 +60,7 @@ public:
 
 	/// \return a specific shape
 	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
-	std::shared_ptr<Shape>& getShape(size_t index) const;
+	const std::shared_ptr<Shape>& getShape(size_t index) const;
 
 	using Shape::getPose;
 
@@ -100,7 +100,7 @@ public:
 
 	bool isValid() const override;
 
-	const Math::Aabbd& getBoundingBox() const override;
+	Aabbd getBoundingBox() const override;
 
 	std::shared_ptr<Shape> getCopy() const override;
 
@@ -109,6 +109,8 @@ private:
 	/// Clears the data for the volume, center and secondMoment and aabb
 	/// so it can be recalculated when needed again
 	void invalidateData();
+
+	void updateAabb() const override;
 
 	std::vector<SubShape> m_shapes;
 

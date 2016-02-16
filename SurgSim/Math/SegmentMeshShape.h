@@ -91,6 +91,8 @@ protected:
 	DataStructures::Vertices<DataStructures::EmptyData> m_initialVertices;
 
 private:
+	void updateAabb() const override;
+
 	/// Segment radius
 	double m_radius;
 
