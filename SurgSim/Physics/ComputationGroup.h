@@ -60,11 +60,15 @@ public:
 	/// \param set the computations used by this class
 	void setComputations(const std::vector<std::shared_ptr<Computation>>& val);
 
-private:
+	/// \return the number of iterations that have passed
+	size_t getIterations();
 
+private:
 	size_t m_iterations;
-	std::vector<std::shared_ptr<Computation>> m_computations;
+
 	mutable boost::mutex m_computationsMutex;
+
+	std::vector<std::shared_ptr<Computation>> m_computations;
 
 
 };

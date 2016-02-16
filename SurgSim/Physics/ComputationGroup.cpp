@@ -47,17 +47,15 @@ std::shared_ptr<PhysicsManagerState> ComputationGroup::doUpdate(
 		for (const auto& computation : m_computations)
 		{
 			lastState = computation->update(dt, lastState);
-			if (lastState->shouldAbortLoop())
+			if (lastState->shouldAbortGroup())
 			{
-				lastState->setAbortLoop(false);
+				lastState->setAbortGroup(false);
 				keepRunning = false;
 				break;
 			}
 		}
-		if (keepRunning && endIteration())
-		{
-			keepRunning = false;
-		}
+
+		keepRunning = keepRunning && !endIteration();
 	}
 	return lastState;
 }
@@ -84,6 +82,11 @@ void ComputationGroup::setComputations(const std::vector<std::shared_ptr<Computa
 {
 	boost::unique_lock<boost::mutex> lock(m_computationsMutex);
 	m_computations = val;
+}
+
+size_t ComputationGroup::getIterations()
+{
+	return m_iterations;
 }
 
 }

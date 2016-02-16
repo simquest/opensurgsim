@@ -175,9 +175,12 @@ public:
 	/// \param constraintsMapping The constraints mapping (mapping between the constraints and the mlcp)
 	void setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping);
 
-	bool shouldAbortLoop() const;
+	/// \return whether to abort a grouped computation by the calling group
+	bool shouldAbortGroup() const;
 
-	void setAbortLoop(bool val);
+	/// Set whether to abort the current grouped computation
+	/// \param set to true to signal to an above computation to abort
+	void setAbortGroup(bool val);
 private:
 
 	///@{
@@ -231,7 +234,7 @@ private:
 	/// Mlcp solution for this Physics Manager State
 	MlcpPhysicsSolution m_mlcpPhysicsSolution;
 
-	bool m_abortLoop;
+	bool m_abortGroup;
 };
 
 }; // Physics

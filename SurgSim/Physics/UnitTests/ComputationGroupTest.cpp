@@ -106,7 +106,7 @@ TEST(ComputationGroupTest, AbortInTheMiddle)
 	std::vector<std::shared_ptr<Computation>> computations;
 	auto state = std::make_shared<PhysicsManagerState>();
 	auto state2 = std::make_shared<PhysicsManagerState>();
-	state2->setAbortLoop(true);
+	state2->setAbortGroup(true);
 	auto computation = std::make_shared<MockGroup>(false);
 	auto mock = std::make_shared<MockComputation>(false);
 	computations.push_back(mock);
@@ -123,7 +123,7 @@ TEST(ComputationGroupTest, AbortInTheMiddle)
 
 	computation->update(0.0, state);
 
-	ASSERT_FALSE(state2->shouldAbortLoop());
+	ASSERT_FALSE(state2->shouldAbortGroup());
 }
 }
 }

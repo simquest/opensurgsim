@@ -27,7 +27,7 @@ namespace Physics
 {
 
 PhysicsManagerState::PhysicsManagerState() :
-	m_abortLoop(false)
+	m_abortGroup(false)
 {
 
 }
@@ -226,14 +226,14 @@ void PhysicsManagerState::setConstraintsMapping(const MlcpMapping<Constraint>& c
 	m_constraintsIndexMapping = constraintsMapping;
 }
 
-bool PhysicsManagerState::shouldAbortLoop() const
+bool PhysicsManagerState::shouldAbortGroup() const
 {
-	return m_abortLoop;
+	return m_abortGroup;
 }
 
-void PhysicsManagerState::setAbortLoop(bool val)
+void PhysicsManagerState::setAbortGroup(bool val)
 {
-	m_abortLoop = val;
+	m_abortGroup = val;
 }
 
 }; // Physics
