@@ -82,6 +82,7 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 	else
 	{
 		// Build the monotonic intervals partitioning [0..1] to be analyzed one by one
+		// #performance HS-2016-feb-17 Test with boost::static_vector as this gets used by the CCD
 		std::vector<Interval<T>> intervals;
 
 		T lastValue = static_cast<T>(0);

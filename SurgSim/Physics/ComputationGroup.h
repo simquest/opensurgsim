@@ -34,7 +34,7 @@ class ComputationGroup : public Computation
 {
 public:
 	/// Constructor
-	ComputationGroup(bool copyState);
+	explicit ComputationGroup(bool copyState);
 
 	/// Destructor
 	~ComputationGroup();
