@@ -134,7 +134,7 @@ public:
 	void updateRepresentations();
 
 	/// \return	All the contacts.
-	const std::list<std::shared_ptr<Contact>>& getContacts() const;
+	std::list<std::shared_ptr<Contact>>& getContacts();
 
 	/// Reset clear the list of contacts, invalidating all the contacts
 	void clearContacts();

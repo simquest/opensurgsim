@@ -26,7 +26,8 @@ namespace SurgSim
 namespace Physics
 {
 
-PhysicsManagerState::PhysicsManagerState()
+PhysicsManagerState::PhysicsManagerState() :
+	m_abortGroup(false)
 {
 
 }
@@ -70,9 +71,9 @@ const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getActi
 	return m_activeRepresentations;
 }
 
-const std::unordered_map<
-	std::shared_ptr<SurgSim::Collision::Representation>,
-	std::shared_ptr<SurgSim::Physics::Representation>>&
+const std::unordered_map <
+std::shared_ptr<SurgSim::Collision::Representation>,
+	std::shared_ptr<SurgSim::Physics::Representation >>&
 	PhysicsManagerState::getCollisionToPhysicsMap() const
 {
 	return m_collisionsToPhysicsMap;
@@ -85,7 +86,7 @@ void PhysicsManagerState::setCollisionRepresentations(
 }
 
 const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
-	PhysicsManagerState::getCollisionRepresentations()
+		PhysicsManagerState::getCollisionRepresentations()
 {
 	return m_collisionRepresentations;
 }
@@ -97,7 +98,7 @@ void PhysicsManagerState::setActiveCollisionRepresentations(
 }
 
 const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
-	PhysicsManagerState::getActiveCollisionRepresentations()
+		PhysicsManagerState::getActiveCollisionRepresentations()
 {
 	return m_activeCollisionRepresentations;
 }
@@ -223,6 +224,16 @@ const MlcpMapping<Constraint>& PhysicsManagerState::getConstraintsMapping() cons
 void PhysicsManagerState::setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping)
 {
 	m_constraintsIndexMapping = constraintsMapping;
+}
+
+bool PhysicsManagerState::shouldAbortGroup() const
+{
+	return m_abortGroup;
+}
+
+void PhysicsManagerState::setAbortGroup(bool val)
+{
+	m_abortGroup = val;
 }
 
 }; // Physics
