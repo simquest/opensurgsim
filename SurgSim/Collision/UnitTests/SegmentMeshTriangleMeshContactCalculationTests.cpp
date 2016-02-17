@@ -172,6 +172,7 @@ protected:
 		for (const auto& transform : m_transforms)
 		{
 			SCOPED_TRACE("Scenario: " + scenario + ", for transform: " + transform.second);
+			std::cout << "Scenario: " + scenario + ", for transform: " + transform.second << std::endl;
 
 			std::shared_ptr<ShapeCollisionRepresentation> segmentMeshRep =
 				std::make_shared<ShapeCollisionRepresentation>("Collision Mesh - Segment");
@@ -182,6 +183,8 @@ protected:
 				std::make_shared<ShapeCollisionRepresentation>("Collision Mesh - Triangle");
 			triangleMeshRep->setShape(meshShape);
 			triangleMeshRep->setLocalPose(transform.first * meshShapeTransform);
+			std::cout << "segment pose:\n" << segmentMeshShape->getPose().matrix() << std::endl;
+			std::cout << "mesh pose:\n" << meshShape->getPose().matrix() << std::endl;
 
 			// Perform collision detection.
 			SegmentMeshTriangleMeshContact calcContact;
@@ -216,6 +219,7 @@ protected:
 
 				// Applying this correction to the two shapes should remove all intersections.
 				segmentMeshRep->setLocalPose(correctionTransform * transform.first * segmentMeshShapeTransform);
+				segmentMeshRep->update(0.0);
 
 				// Perform collision detection.
 				std::shared_ptr<CollisionPair> pair2 = std::make_shared<CollisionPair>(segmentMeshRep, triangleMeshRep);

@@ -98,7 +98,7 @@ TEST_F(ShapeTest, SphereSerializationTest)
 
 		ASSERT_TRUE(node["SurgSim::Math::SphereShape"].IsDefined());
 		auto data = node["SurgSim::Math::SphereShape"];
-		EXPECT_EQ(1u, data.size());
+		EXPECT_EQ(2u, data.size());
 
 		std::shared_ptr<SphereShape> sphereShape;
 		ASSERT_NO_THROW(sphereShape = std::dynamic_pointer_cast<SphereShape>(node.as<std::shared_ptr<Shape>>()));
@@ -182,7 +182,7 @@ TEST_F(ShapeTest, BoxSerializationTest)
 
 		ASSERT_TRUE(node["SurgSim::Math::BoxShape"].IsDefined());
 		auto data = node["SurgSim::Math::BoxShape"];
-		EXPECT_EQ(3u, data.size());
+		EXPECT_EQ(4u, data.size());
 
 		std::shared_ptr<BoxShape> boxShape;
 		ASSERT_NO_THROW(boxShape = std::dynamic_pointer_cast<BoxShape>(node.as<std::shared_ptr<Shape>>()));
@@ -269,7 +269,7 @@ TEST_F(ShapeTest, CylinderSerializationTest)
 
 		ASSERT_TRUE(node["SurgSim::Math::CylinderShape"].IsDefined());
 		auto data = node["SurgSim::Math::CylinderShape"];
-		EXPECT_EQ(2u, data.size());
+		EXPECT_EQ(3u, data.size());
 
 		std::shared_ptr<CylinderShape> cylinderShape;
 		ASSERT_NO_THROW(cylinderShape = std::dynamic_pointer_cast<CylinderShape>(node.as<std::shared_ptr<Shape>>()));
@@ -356,7 +356,7 @@ TEST_F(ShapeTest, CapsuleSerializationTest)
 
 		ASSERT_TRUE(node["SurgSim::Math::CapsuleShape"].IsDefined());
 		auto data = node["SurgSim::Math::CapsuleShape"];
-		EXPECT_EQ(2u, data.size());
+		EXPECT_EQ(3u, data.size());
 
 		std::shared_ptr<CapsuleShape> capsuleShape;
 		ASSERT_NO_THROW(capsuleShape = std::dynamic_pointer_cast<CapsuleShape>(node.as<std::shared_ptr<Shape>>()));
@@ -447,7 +447,7 @@ TEST_F(ShapeTest, DoubleSidedPlaneShapeSerializationTest)
 
 		ASSERT_TRUE(node["SurgSim::Math::DoubleSidedPlaneShape"].IsDefined());
 		auto data = node["SurgSim::Math::DoubleSidedPlaneShape"];
-		EXPECT_EQ(0u, data.size()); // DoubleSidedPlaneShape has no serialized property .
+		EXPECT_EQ(1u, data.size());
 
 		std::shared_ptr<DoubleSidedPlaneShape> doubleSidedPlaneShape;
 		ASSERT_NO_THROW(doubleSidedPlaneShape =
@@ -589,7 +589,7 @@ TEST_F(ShapeTest, PlaneShapeSerializationTest)
 
 		ASSERT_TRUE(node["SurgSim::Math::PlaneShape"].IsDefined());
 		auto data = node["SurgSim::Math::PlaneShape"];
-		EXPECT_EQ(0u, data.size()); //PlaneShape has no serialized property.
+		EXPECT_EQ(1u, data.size());
 
 		std::shared_ptr<PlaneShape> planeShape;
 		ASSERT_NO_THROW(planeShape = std::dynamic_pointer_cast<PlaneShape>(node.as<std::shared_ptr<Shape>>()));

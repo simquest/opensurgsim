@@ -133,7 +133,7 @@ TEST(ParticlesShapeTests, Serialization)
 
 		ASSERT_TRUE(node["SurgSim::Math::ParticlesShape"].IsDefined());
 		auto data = node["SurgSim::Math::ParticlesShape"];
-		EXPECT_EQ(1u, data.size());
+		EXPECT_EQ(2u, data.size());
 
 		std::shared_ptr<ParticlesShape> particlesShape;
 		ASSERT_NO_THROW(particlesShape = std::dynamic_pointer_cast<ParticlesShape>(node.as<std::shared_ptr<Shape>>()));
