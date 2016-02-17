@@ -39,6 +39,7 @@ public:
 	/// \param data The data for this constraint.
 	/// \param representation0, representation1 Both representations in this constraint.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
+	/// \param slidingDirection The direction of sliding.
 	SlidingConstraint(
 		ConstraintType constraintType,
 		std::shared_ptr<ConstraintData> data,
