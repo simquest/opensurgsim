@@ -35,20 +35,16 @@ size_t OctreeContact::Vector3dHash::operator()(const SurgSim::Math::Vector3d& id
 }
 
 
-std::list<std::shared_ptr<Contact>> OctreeContact::doCalculateDcdContact(
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
+std::list<std::shared_ptr<Contact>> OctreeContact::doCalculateDcdContact(const std::shared_ptr<Math::Shape>& shape1,
+	const std::shared_ptr<Math::Shape>& shape2)
 {
-	SURGSIM_ASSERT(posedShape1.getShape()->getType() == Math::SHAPE_TYPE_OCTREE) <<
-		"Octree Contact needs an OctreeShape.";
+	SURGSIM_ASSERT(shape1->getType() == Math::SHAPE_TYPE_OCTREE) << "Octree Contact needs an OctreeShape.";
 
 	SurgSim::DataStructures::OctreePath nodePath;
 	std::list<std::shared_ptr<Contact>> result;
-	std::shared_ptr<Math::OctreeShape> shape = std::static_pointer_cast<Math::OctreeShape>(posedShape1.getShape());
+	std::shared_ptr<Math::OctreeShape> shape = std::static_pointer_cast<Math::OctreeShape>(shape1);
 
-	calculateContactWithNode(shape->getOctree(), posedShape1.getPose(),
-		posedShape2.getShape(), posedShape2.getPose(), &nodePath, &result);
-
+	calculateContactWithNode(shape->getOctree(), shape1->getPose(), shape2, shape2->getPose(), &nodePath, &result);
 	return result;
 }
 

@@ -114,49 +114,14 @@ protected:
 	mutable Aabbd m_aabb;
 };
 
-/// PosedShape is a transformed shape with a record of the pose used to transform it.
-template <class T>
-struct PosedShape
+/// ShapeMotion provides a shape at 2 different poses.
+struct ShapeMotion : public std::pair<std::shared_ptr<Shape>, std::shared_ptr<Shape>>
 {
-	PosedShape()
+	ShapeMotion() {}
+	ShapeMotion(const std::shared_ptr<Shape>& first, const std::shared_ptr<Shape>& second)
 	{
-		pose = RigidTransform3d::Identity();
-	}
-	PosedShape(const T& shapeInput, const RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
-
-	void invalidate()
-	{
-		shape = nullptr;
-	}
-	const T& getShape() const
-	{
-		return shape;
-	}
-	const RigidTransform3d& getPose() const
-	{
-		return pose;
-	}
-
-protected:
-	T shape;
-	RigidTransform3d pose;
-};
-
-/// PosedShapeMotion is embedding the motion of a PosedShape, providing a posed shape at 2 different instant.
-template <class T>
-struct PosedShapeMotion : public std::pair<PosedShape<T>, PosedShape<T>>
-{
-	PosedShapeMotion() {}
-	PosedShapeMotion(const PosedShape<T>& posedShapeFirst, const PosedShape<T>& posedShapeSecond)
-	{
-		this->first = posedShapeFirst;
-		this->second = posedShapeSecond;
-	}
-
-	void invalidate()
-	{
-		this->first.invalidate();
-		this->second.invalidate();
+		this->first = first;
+		this->second = second;
 	}
 };
 

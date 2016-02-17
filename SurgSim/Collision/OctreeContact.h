@@ -48,9 +48,8 @@ protected:
 				const SurgSim::Math::Shape& otherShape, const SurgSim::Math::RigidTransform3d& otherPose) = 0;
 
 private:
-	std::list<std::shared_ptr<Contact>> doCalculateDcdContact(
-		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2) override;
+	std::list<std::shared_ptr<Contact>> doCalculateDcdContact(const std::shared_ptr<Math::Shape>& shape1,
+		const std::shared_ptr<Math::Shape>& shape2) override;
 
 	/// Calculate the collision between a specific octree node and a shape
 	/// This function will check for contact between the node and shape. If

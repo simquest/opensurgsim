@@ -71,20 +71,19 @@ void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 	doCalculateContact(pair);
 }
 
-std::list<std::shared_ptr<Contact>> ContactCalculation::calculateDcdContact(
-	const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1,
-	const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2)
+std::list<std::shared_ptr<Contact>> ContactCalculation::calculateDcdContact(const std::shared_ptr<Math::Shape>& shape1,
+	const std::shared_ptr<Math::Shape>& shape2)
 {
 	auto types = getShapeTypes();
-	auto incoming = std::make_pair(posedShape1.getShape()->getType(), posedShape2.getShape()->getType());
+	auto incoming = std::make_pair(shape1->getType(), shape2->getType());
 	if (incoming == types)
 	{
-		return doCalculateDcdContact(posedShape1, posedShape2);
+		return doCalculateDcdContact(shape1, shape2);
 	}
 
 	if (incoming.first == types.second && incoming.second == types.first)
 	{
-		auto contacts = doCalculateDcdContact(posedShape2, posedShape1);
+		auto contacts = doCalculateDcdContact(shape2, shape1);
 		for (const auto& contact : contacts)
 		{
 			contact->normal = -contact->normal;
@@ -132,17 +131,11 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
 	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(pair->getFirst()->getShape(),
-			pair->getFirst()->getPose());
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(pair->getSecond()->getShape(),
-			pair->getSecond()->getPose());
-		contacts = doCalculateDcdContact(posedShape1, posedShape2);
+		contacts = doCalculateDcdContact(pair->getFirst()->getShape(), pair->getSecond()->getShape());
 	}
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
-		contacts = doCalculateCcdContact(
-			pair->getFirst()->getPosedShapeMotion(),
-			pair->getSecond()->getPosedShapeMotion());
+		contacts = doCalculateCcdContact(pair->getFirst()->getShapeMotion(), pair->getSecond()->getShapeMotion());
 	}
 	else
 	{
@@ -156,16 +149,15 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 }
 
 std::list<std::shared_ptr<Contact>> ContactCalculation::doCalculateDcdContact(
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
+	const std::shared_ptr<Math::Shape>& shape1,
+	const std::shared_ptr<Math::Shape>& shape2)
 {
 	SURGSIM_FAILURE() << "Not implemented";
 	return std::list<std::shared_ptr<Contact>>();
 }
 
-std::list<std::shared_ptr<Contact>> ContactCalculation::doCalculateCcdContact(
-	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
-	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2)
+std::list<std::shared_ptr<Contact>> ContactCalculation::doCalculateCcdContact(const Math::ShapeMotion& shapeMotion1,
+	const Math::ShapeMotion& shapeMotion2)
 {
 	SURGSIM_FAILURE() << "Not implemented";
 	return std::list<std::shared_ptr<Contact>>();

@@ -38,8 +38,6 @@ using SurgSim::Math::SphereShape;
 namespace SurgSim
 {
 
-typedef Math::PosedShape<std::shared_ptr<Math::Shape>> PosedShape;
-
 namespace Collision
 {
 
@@ -81,9 +79,11 @@ TEST(ContactCalculationTests, SwappedShapeTest)
 	std::shared_ptr<SpherePlaneContact> calc = std::make_shared<SpherePlaneContact>();
 
 	auto transform = Math::RigidTransform3d::Identity();
+	sphere->setPose(transform);
+	plane->setPose(transform);
 
-	ASSERT_NO_THROW(calc->calculateDcdContact(PosedShape(sphere, transform), PosedShape(plane, transform)));
-	ASSERT_NO_THROW(calc->calculateDcdContact(PosedShape(plane, transform), PosedShape(sphere, transform)));
+	ASSERT_NO_THROW(calc->calculateDcdContact(sphere, plane));
+	ASSERT_NO_THROW(calc->calculateDcdContact(plane, sphere));
 
 	auto planeRep = std::make_shared<ShapeCollisionRepresentation>("Plane Shape");
 	planeRep->setShape(plane);
@@ -97,8 +97,8 @@ TEST(ContactCalculationTests, SwappedShapeTest)
 
 	calc->calculateContact(pair1);
 
-	auto contacts1 = calc->calculateDcdContact(PosedShape(sphere, transform), PosedShape(plane, transform));
-	auto contacts2 = calc->calculateDcdContact(PosedShape(plane, transform), PosedShape(sphere, transform));
+	auto contacts1 = calc->calculateDcdContact(sphere, plane);
+	auto contacts2 = calc->calculateDcdContact(plane, sphere);
 
 	contactsInfoEqualityTest(pair1->getContacts(), contacts1);
 

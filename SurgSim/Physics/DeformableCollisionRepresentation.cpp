@@ -107,10 +107,7 @@ void DeformableCollisionRepresentation::update(const double& dt)
 
 	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(m_previousShape, m_previousShape->getPose());
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(m_shape, m_shape->getPose());
-		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape1, posedShape2);
-		setPosedShapeMotion(posedShapeMotion);
+		setShapeMotion(Math::ShapeMotion(m_previousShape, m_shape));
 	}
 }
 

@@ -50,30 +50,28 @@ void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair
 }
 
 std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateDcdContact(
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
+	const std::shared_ptr<Math::Shape>& shape1,
+	const std::shared_ptr<Math::Shape>& shape2)
 {
 	SURGSIM_ASSERT(!m_doAssert)
 			<< "Contact calculation not implemented for shapes with types ("
-			<< posedShape1.getShape()->getType() << ", " << posedShape2.getShape()->getType() << ").";
+			<< shape1->getType() << ", " << shape2->getType() << ").";
 	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
 			<< "Contact calculation not implemented for pairs with types ("
-			<< posedShape1.getShape()->getType() << ", " << posedShape2.getShape()->getType() << ").";
+			<< shape1->getType() << ", " << shape2->getType() << ").";
 	return std::list<std::shared_ptr<Contact>>();
 }
 
 std::list<std::shared_ptr<Contact>> DefaultContactCalculation::doCalculateCcdContact(
-	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
-	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2)
+	const Math::ShapeMotion& shapeMotion1,
+	const Math::ShapeMotion& shapeMotion2)
 {
 	SURGSIM_ASSERT(!m_doAssert)
-		<< "Contact calculation not implemented for pairs with types ("
-		<< posedShapeMotion1.first.getShape()->getType() << ", "
-		<< posedShapeMotion2.first.getShape()->getType() << ").";
+		<< "Contact calculation not implemented for pairs with types (" << shapeMotion1.first->getType() << ", "
+		<< shapeMotion2.first->getType() << ").";
 	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
-		<< "Contact calculation not implemented for pairs with types ("
-		<< posedShapeMotion1.first.getShape()->getType() << ", "
-		<< posedShapeMotion2.first.getShape()->getType() << ").";
+		<< "Contact calculation not implemented for pairs with types (" << shapeMotion1.first->getType() << ", "
+		<< shapeMotion2.first->getType() << ").";
 	return std::list<std::shared_ptr<Contact>>();
 }
 

@@ -36,28 +36,20 @@ std::pair<int, int> CompoundShapeContact::getShapeTypes()
 }
 
 std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
-									 const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-									 const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
+									 const std::shared_ptr<Math::Shape>& shape1,
+									 const std::shared_ptr<Math::Shape>& shape2)
 {
-	typedef Math::PosedShape<std::shared_ptr<Math::Shape>> PosedShape;
-
 	std::list<std::shared_ptr<Contact>> contacts;
-
 	const auto& calculations = ContactCalculation::getDcdContactTable();
+	const auto& compoundShape = std::static_pointer_cast<Math::CompoundShape>(shape1);
 
-	// Shape1 is compound shape
-	const auto& compoundShape = std::static_pointer_cast<Math::CompoundShape>(posedShape1.getShape());
-
-	SURGSIM_ASSERT(compoundShape->getType() == posedShape1.getShape()->getType()) <<
-			"Invalid static cast to compound shape";
+	SURGSIM_ASSERT(compoundShape->getType() == shape1->getType()) << "Invalid static cast to compound shape";
 
 	size_t index = 0;
 	for (const auto& subShape : compoundShape->getShapes())
 	{
-		const auto& calculation = calculations[subShape.first->getType()][posedShape2.getShape()->getType()];
-
-		std::list<std::shared_ptr<Contact>> localContacts = calculation->calculateDcdContact(
-							PosedShape(subShape.first, posedShape1.getPose() * subShape.second), posedShape2);
+		const auto& calculation = calculations[subShape.first->getType()][shape2->getType()];
+		std::list<std::shared_ptr<Contact>> localContacts = calculation->calculateDcdContact(subShape.first, shape2);
 
 		for (auto& contact : localContacts)
 		{
@@ -73,7 +65,6 @@ std::list<std::shared_ptr<Contact>> CompoundShapeContact::doCalculateDcdContact(
 		index++;
 	}
 	return contacts;
-
 }
 
 }

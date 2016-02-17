@@ -92,7 +92,7 @@ public:
 	virtual std::shared_ptr<Math::Shape> getShape() const = 0;
 
 	/// \return the posed shape motion
-	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& getPosedShapeMotion() const;
+	const Math::ShapeMotion& getShapeMotion() const;
 
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
@@ -185,8 +185,8 @@ public:
 	Math::Aabbd getBoundingBox() const;
 
 protected:
-	/// Invalidate the cached posed shape motion
-	void invalidatePosedShapeMotion();
+	/// Invalidate the cached shape motion
+	void invalidateShapeMotion();
 
 	/// Get the ignored collision representations
 	/// \return The full names of all the ignored collision representations
@@ -198,8 +198,8 @@ protected:
 
 	void doRetire() override;
 
-	/// \param posedShape the posed shape motion to be set
-	void setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape);
+	/// \param shape The shape motion to be set
+	void setShapeMotion(const Math::ShapeMotion& shape);
 
 	std::shared_ptr<Framework::Logger> m_logger;
 
@@ -219,10 +219,10 @@ private:
 	boost::mutex m_collisionsMutex;
 
 	/// The shape transformed in space and defined through time, i.e. with 2 differents configurations
-	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> m_posedShapeMotion;
+	Math::ShapeMotion m_shapeMotion;
 
-	/// Mutex to lock write access to m_posedShapeMotion
-	mutable boost::shared_mutex m_posedShapeMotionMutex;
+	/// Mutex to lock write access to m_shapeMotion
+	mutable boost::shared_mutex m_shapeMotionMutex;
 
 	/// Ignored collision representations
 	std::unordered_set<std::string> m_ignoring;

@@ -63,22 +63,16 @@ CollisionDetectionType Representation::getSelfCollisionDetectionType() const
 	return m_selfCollisionDetectionType;
 }
 
-const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& Representation::getPosedShapeMotion() const
+const Math::ShapeMotion& Representation::getShapeMotion() const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-	return m_posedShapeMotion;
+	boost::shared_lock<boost::shared_mutex> lock(m_shapeMotionMutex);
+	return m_shapeMotion;
 }
 
-void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion)
+void Representation::setShapeMotion(const Math::ShapeMotion& shapeMotion)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-	m_posedShapeMotion = posedShapeMotion;
-}
-
-void Representation::invalidatePosedShapeMotion()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-	m_posedShapeMotion.invalidate();
+	boost::unique_lock<boost::shared_mutex> lock(m_shapeMotionMutex);
+	m_shapeMotion = shapeMotion;
 }
 
 SurgSim::DataStructures::BufferedValue<ContactMapType>& Representation::getCollisions()
@@ -104,10 +98,7 @@ void Representation::update(const double& dt)
 	getShape()->setPose(getPose());
 	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(getShape(), getShape()->getPose());
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(getShape(), getShape()->getPose());
-		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape1, posedShape2);
-		setPosedShapeMotion(posedShapeMotion);
+		setShapeMotion(Math::ShapeMotion(getShape(), getShape()->getCopy()));
 	}
 }
 

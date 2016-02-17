@@ -26,8 +26,6 @@
 namespace SurgSim
 {
 
-typedef Math::PosedShape<std::shared_ptr<Math::Shape>> PosedShape;
-
 namespace Collision
 {
 
@@ -58,17 +56,16 @@ TEST_F(CompoundShapeDcdContactTest, SingleCube)
 
 	auto compoundShape = std::make_shared<Math::CompoundShape>();
 
-	Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
 	Math::RigidTransform3d transform = Math::makeRigidTranslation(Math::Vector3d(0.25, 0.25, 0.25));
+	sphere->setPose(transform);
 
 	compoundShape->addShape(box);
 
 	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_SPHERE];
 	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_SPHERE];
 
-
-	auto expected = calc1->calculateDcdContact(PosedShape(box, identity), PosedShape(sphere, transform));
-	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, identity), PosedShape(sphere, transform));
+	auto expected = calc1->calculateDcdContact(box, sphere);
+	auto result = calc2->calculateDcdContact(compoundShape, sphere);
 
 	contactsInfoEqualityTest(expected, result);
 }
@@ -89,21 +86,22 @@ TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 						Vector3d(0.0, 1.0, 0.0));
 
 	auto compoundShape = std::make_shared<Math::CompoundShape>();
-
+	compoundShape->setPose(basePose);
 	compoundShape->addShape(box, box1Pose);
 	compoundShape->addShape(box, box2Pose);
 
 	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_PLANE];
 	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_PLANE];
 
-	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, basePose), PosedShape(plane, identity));
+	auto result = calc2->calculateDcdContact(compoundShape, plane);
 
 	std::list<std::shared_ptr<Contact>> expected;
 
-	expected.splice(expected.end(),
-		calc1->calculateDcdContact(PosedShape(box, basePose * box1Pose), PosedShape(plane, identity)));
-	expected.splice(expected.end(),
-		calc1->calculateDcdContact(PosedShape(box, basePose * box2Pose), PosedShape(plane, identity)));
+	box->setPose(basePose * box1Pose);
+	expected.splice(expected.end(), calc1->calculateDcdContact(box, plane));
+
+	box->setPose(basePose * box2Pose);
+	expected.splice(expected.end(), calc1->calculateDcdContact(box, plane));
 
 	contactsInfoEqualityTest(expected, result);
 }

@@ -51,41 +51,35 @@ class ShapeShapeContactCalculation : public ContactCalculation
 	}
 
 	/// Overrides the dcd contact calculation to go from untyped shapes to the typed shapes
-	std::list<std::shared_ptr<Contact>> doCalculateDcdContact(
-		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2) override
+	std::list<std::shared_ptr<Contact>> doCalculateDcdContact(const std::shared_ptr<Math::Shape>& shape1,
+		const std::shared_ptr<Math::Shape>& shape2) override
 	{
-		auto one = std::static_pointer_cast<Shape1>(posedShape1.getShape());
-		auto two = std::static_pointer_cast<Shape2>(posedShape2.getShape());
+		auto one = std::static_pointer_cast<Shape1>(shape1);
+		auto two = std::static_pointer_cast<Shape2>(shape2);
 
-		SURGSIM_ASSERT(one->getType() == posedShape1.getShape()->getType()) << "Invalid Shape 1";
-		SURGSIM_ASSERT(two->getType() == posedShape2.getShape()->getType()) << "Invalid Shape 2";
+		SURGSIM_ASSERT(one->getType() == shape1->getType()) << "Invalid Shape 1";
+		SURGSIM_ASSERT(two->getType() == shape2->getType()) << "Invalid Shape 2";
 
-		return calculateDcdContact(*one, posedShape1.getPose(), *two, posedShape2.getPose());
+		return calculateDcdContact(*one, shape1->getPose(), *two, shape2->getPose());
 	}
 
 	/// Overrides the ccd contact calculation to go from untyped shapes to the typed shapes
-	std::list<std::shared_ptr<Contact>> doCalculateCcdContact(
-		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
-		const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2) override
+	std::list<std::shared_ptr<Contact>> doCalculateCcdContact(const Math::ShapeMotion& shapeMotion1,
+		const Math::ShapeMotion& shapeMotion2) override
 	{
-		auto oneAtTime0 = std::static_pointer_cast<Shape1>(posedShapeMotion1.first.getShape());
-		auto oneAtTime1 = std::static_pointer_cast<Shape1>(posedShapeMotion1.second.getShape());
-		auto twoAtTime0 = std::static_pointer_cast<Shape2>(posedShapeMotion2.first.getShape());
-		auto twoAtTime1 = std::static_pointer_cast<Shape2>(posedShapeMotion2.second.getShape());
+		auto oneAtTime0 = std::static_pointer_cast<Shape1>(shapeMotion1.first);
+		auto oneAtTime1 = std::static_pointer_cast<Shape1>(shapeMotion1.second);
+		auto twoAtTime0 = std::static_pointer_cast<Shape2>(shapeMotion2.first);
+		auto twoAtTime1 = std::static_pointer_cast<Shape2>(shapeMotion2.second);
 
-		SURGSIM_ASSERT(oneAtTime0->getType() == posedShapeMotion1.first.getShape()->getType()) <<
-			"Invalid Shape 1 detected at time 0";
-		SURGSIM_ASSERT(oneAtTime1->getType() == posedShapeMotion1.second.getShape()->getType()) <<
-			"Invalid Shape 1 detected at time 1";
-		SURGSIM_ASSERT(twoAtTime0->getType() == posedShapeMotion2.first.getShape()->getType()) <<
-			"Invalid Shape 2 detected at time 0";
-		SURGSIM_ASSERT(twoAtTime1->getType() == posedShapeMotion2.second.getShape()->getType()) <<
-			"Invalid Shape 2 detected at time 1";
+		SURGSIM_ASSERT(oneAtTime0->getType() == shapeMotion1.first->getType()) << "Invalid Shape 1 detected at time 0";
+		SURGSIM_ASSERT(oneAtTime1->getType() == shapeMotion1.second->getType()) << "Invalid Shape 1 detected at time 1";
+		SURGSIM_ASSERT(twoAtTime0->getType() == shapeMotion2.first->getType()) << "Invalid Shape 2 detected at time 0";
+		SURGSIM_ASSERT(twoAtTime1->getType() == shapeMotion2.second->getType()) << "Invalid Shape 2 detected at time 1";
 
 		return calculateCcdContact(
-			*oneAtTime0, posedShapeMotion1.first.getPose(), *oneAtTime1, posedShapeMotion1.second.getPose(),
-			*twoAtTime0, posedShapeMotion2.first.getPose(), *twoAtTime1, posedShapeMotion2.second.getPose());
+			*oneAtTime0, oneAtTime0->getPose(), *oneAtTime1, oneAtTime1->getPose(),
+			*twoAtTime0, twoAtTime0->getPose(), *twoAtTime1, twoAtTime1->getPose());
 	}
 };
 
