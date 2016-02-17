@@ -220,7 +220,7 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 			triangleAabb.extend(tv2.first);
 			triangleAabb.extend(tv2.second);
 
-			if (!segmentAabb.intersects(triangleAabb))
+			if (!SurgSim::Math::doAabbIntersect(segmentAabb, triangleAabb))
 			{
 				continue;
 			}
