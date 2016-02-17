@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,6 +48,12 @@ template <class T>
 T Polynomial<T, 0>::evaluate(const T& x) const
 {
 	return m_a0;
+}
+
+template <class T>
+T Polynomial<T, 0>::operator()(const T& x) const
+{
+	return evaluate(x);
 }
 
 template <class T>
@@ -142,6 +148,12 @@ template <class T>
 T Polynomial<T, 1>::evaluate(const T& x) const
 {
 	return m_a1 * x + m_a0;
+}
+
+template <class T>
+T Polynomial<T, 1>::operator()(const T& x) const
+{
+	return evaluate(x);
 }
 
 template <class T>
@@ -280,6 +292,12 @@ template <class T>
 T Polynomial<T, 2>::evaluate(const T& x) const
 {
 	return (m_a2 * x + m_a1) * x + m_a0;
+}
+
+template <class T>
+T Polynomial<T, 2>::operator()(const T& x) const
+{
+	return evaluate(x);
 }
 
 template <class T>
@@ -437,6 +455,12 @@ template <class T>
 T Polynomial<T, 3>::evaluate(const T& x) const
 {
 	return ((m_a3 * x + m_a2) * x + m_a1) * x + m_a0;
+}
+
+template <class T>
+T Polynomial<T, 3>::operator()(const T& x) const
+{
+	return evaluate(x);
 }
 
 template <class T>
