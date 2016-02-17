@@ -206,6 +206,7 @@ private:
 
 bool ReplayPoseScaffold::registerDevice(ReplayPoseDevice* device)
 {
+	boost::unique_lock<boost::mutex> scopedLock(m_deviceLock);
 	SURGSIM_ASSERT(m_device == nullptr) << "Can't register two ReplayPoseDevice.";
 
 	m_device.reset(new ReplayPoseScaffold::DeviceData(device));
@@ -241,14 +242,14 @@ bool ReplayPoseScaffold::registerDevice(ReplayPoseDevice* device)
 
 bool ReplayPoseScaffold::unregisterDevice()
 {
-	boost::unique_lock<boost::mutex> scopedLock(m_deviceLock);
 
-	// #threadsafety After unregistering, another thread could be in the process of registering.
 	if (isRunning())
 	{
 		stop();
 	}
 
+	// #threadsafety After unregistering, another thread could be in the process of registering.
+	boost::unique_lock<boost::mutex> scopedLock(m_deviceLock);
 	m_device.reset();
 	SURGSIM_LOG_DEBUG(m_logger) << "Unregistered device";
 	return true;
