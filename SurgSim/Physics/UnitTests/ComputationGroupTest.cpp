@@ -28,7 +28,7 @@ typedef std::shared_ptr<SurgSim::Physics::PhysicsManagerState> State;
 class MockComputation : public SurgSim::Physics::Computation
 {
 public:
-	MockComputation(bool val) : Computation(val)
+	explicit MockComputation(bool val) : Computation(val)
 	{
 		testing::DefaultValue<State>::Set(std::make_shared<SurgSim::Physics::PhysicsManagerState>());
 	};
@@ -42,7 +42,7 @@ public:
 class MockGroup : public SurgSim::Physics::ComputationGroup
 {
 public:
-	MockGroup(bool val) : ComputationGroup(val)
+	explicit MockGroup(bool val) : ComputationGroup(val)
 	{
 		testing::DefaultValue<State>::Set(std::make_shared<SurgSim::Physics::PhysicsManagerState>());
 		ON_CALL(*this, endIteration()).WillByDefault(testing::Return(true));
