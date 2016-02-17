@@ -106,7 +106,7 @@ bool calculateCcdContactPointTriangle(
 			SURGSIM_ASSERT(*timeOfImpact >= 0.0 && *timeOfImpact <= 1.0);
 			SURGSIM_ASSERT(*tv01Param >= 0.0);
 			SURGSIM_ASSERT(*tv02Param >= 0.0);
-			SURGSIM_ASSERT(*tv01Param + *tv02Param <= 1.0);
+			SURGSIM_ASSERT(*tv01Param + *tv02Param <= 1.0 + Geometry::ScalarEpsilon);
 
 			return true;
 		}
