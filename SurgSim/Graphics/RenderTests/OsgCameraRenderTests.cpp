@@ -200,6 +200,61 @@ TEST_F(OsgCameraRenderTests, Resize)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 }
 
+TEST_F(OsgCameraRenderTests, MultipleRenderGroups)
+{
+	std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
+	camera->addRenderGroupReference("Right");
+
+	auto leftCamera = std::make_shared<Graphics::OsgCamera>("LeftCamera");
+	leftCamera->setRenderGroupReference(Representation::DefaultGroupName);
+	leftCamera->addRenderGroupReference("Left");
+	leftCamera->setRenderOrder(Camera::RENDER_ORDER_PRE_RENDER, 0);
+
+	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, false);
+	leftCamera->setRenderTarget(renderTarget);
+
+	viewElement->addComponent(leftCamera);
+
+	auto quad = makeQuad("Quad", dimensions[0]/2, dimensions[1]/2, 0, 0);
+	quad->setTexture(leftCamera->getRenderTarget()->getColorTarget(0));
+	viewElement->addComponent(quad);
+
+	// Left camera only
+	auto graphics = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
+	graphics->setSizeXYZ(0.1, 0.1, 0.1);
+	graphics->setGroupReference("Left");
+
+	auto element = std::make_shared<Framework::BasicSceneElement>("CubeLeft");
+	element->addComponent(graphics);
+	element->setPose(Math::makeRigidTranslation(Vector3d(-0.2, 0.0, -0.5)));
+
+	scene->addSceneElement(element);
+
+	// Right camera only
+	graphics = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
+	graphics->setSizeXYZ(0.1, 0.1, 0.1);
+	graphics->setGroupReference("Right");
+
+	element = std::make_shared<Framework::BasicSceneElement>("CubeRight");
+	element->addComponent(graphics);
+	element->setPose(Math::makeRigidTranslation(Vector3d(0.2, 0.0, -0.5)));
+
+	scene->addSceneElement(element);
+
+	// Both cameras
+	graphics = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
+	graphics->setSizeXYZ(0.1, 0.1, 0.1);
+
+	element = std::make_shared<Framework::BasicSceneElement>("CubeBoth");
+	element->addComponent(graphics);
+	element->setPose(Math::makeRigidTranslation(Vector3d(0.0, 0.0, -0.5)));
+
+	scene->addSceneElement(element);
+
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+}
+
 }; // namespace Graphics
 }; // namespace SurgSim
 

@@ -207,6 +207,24 @@ bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	}
 }
 
+bool OsgCamera::setRenderGroups(std::vector<std::shared_ptr<Group>> groups)
+{
+	for (auto group : groups)
+	{
+		std::vector<std::string> groupReferences = Camera::getRenderGroupReferences();
+		SURGSIM_ASSERT(std::find(groupReferences.begin(), groupReferences.end(), group->getName()) != groupReferences.end())
+			<< "Trying to set the wrong group in the camera with group name <" << group->getName() << ">.";
+
+		std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
+		if (osgGroup && Graphics::Camera::addRenderGroup(group))
+		{
+			m_materialProxy->addChild(osgGroup->getOsgGroup());
+		}
+	}
+
+	return true;
+}
+
 void OsgCamera::setLocalActive(bool val)
 {
 	Component::setLocalActive(val);
