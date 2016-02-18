@@ -203,21 +203,17 @@ TEST_F(OsgCameraRenderTests, Resize)
 TEST_F(OsgCameraRenderTests, MultipleRenderGroups)
 {
 	std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
-	camera->addRenderGroupReference("Right");
+	camera->setRenderGroupReference("Left");
 
-	auto leftCamera = std::make_shared<Graphics::OsgCamera>("LeftCamera");
-	leftCamera->setRenderGroupReference(Representation::DefaultGroupName);
-	leftCamera->addRenderGroupReference("Left");
-	leftCamera->setRenderOrder(Camera::RENDER_ORDER_PRE_RENDER, 0);
+	auto rightElement = std::make_shared<Graphics::OsgViewElement>("RighViewElement");
+	rightElement->getView()->setDimensions(dimensions);
 
-	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(dimensions[0], dimensions[1], 1.0, 1, false);
-	leftCamera->setRenderTarget(renderTarget);
+	auto rightCamera = std::make_shared<Graphics::OsgCamera>("RightCamera");
+	rightCamera->setGroupReference(Representation::DefaultGroupName);
+	rightCamera->addRenderGroupReference("Right");
+	rightElement->getView()->setCamera(rightCamera);
 
-	viewElement->addComponent(leftCamera);
-
-	auto quad = makeQuad("Quad", dimensions[0]/2, dimensions[1]/2, 0, 0);
-	quad->setTexture(leftCamera->getRenderTarget()->getColorTarget(0));
-	viewElement->addComponent(quad);
+	scene->addSceneElement(rightElement);
 
 	// Left camera only
 	auto graphics = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
