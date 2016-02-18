@@ -36,13 +36,13 @@ include_directories(
 )
 
 set(NOVINT_DEVICE_SOURCES
-	NovintAuxiliaryThread.cpp
+	NovintAncillaryThread.cpp
 	NovintDevice.cpp
 	NovintScaffold.cpp
 )
 
 set(NOVINT_DEVICE_HEADERS
-	NovintAuxiliaryThread.h
+	NovintAncillaryThread.h
 	NovintDevice.h
 	NovintScaffold.h
 )

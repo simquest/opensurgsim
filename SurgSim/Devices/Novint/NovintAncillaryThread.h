@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_NOVINT_NOVINTAUXILIARYTHREAD_H
-#define SURGSIM_DEVICES_NOVINT_NOVINTAUXILIARYTHREAD_H
+#ifndef SURGSIM_DEVICES_NOVINT_NOVINTANCILLARYTHREAD_H
+#define SURGSIM_DEVICES_NOVINT_NOVINTANCILLARYTHREAD_H
 
 #include <memory>
 
@@ -26,13 +26,13 @@ namespace SurgSim
 namespace Devices
 {
 
-/// A class implementing the thread context for communicating with the Novint auxiliary grip.
-class NovintAuxiliaryThread : public SurgSim::Framework::BasicThread
+/// A class implementing the thread context for communicating with the Novint ancillary grip.
+class NovintAncillaryThread : public SurgSim::Framework::BasicThread
 {
 public:
-	explicit NovintAuxiliaryThread(NovintScaffold* scaffold);
+	explicit NovintAncillaryThread(NovintScaffold* scaffold);
 
-	virtual ~NovintAuxiliaryThread();
+	virtual ~NovintAncillaryThread();
 
 protected:
 	bool doInitialize() override;
@@ -50,4 +50,4 @@ private:
 };  // namespace Devices
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_NOVINT_NOVINTAUXILIARYTHREAD_H
+#endif  // SURGSIM_DEVICES_NOVINT_NOVINTANCILLARYTHREAD_H
