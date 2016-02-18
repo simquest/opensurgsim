@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,6 +68,11 @@ public:
 	/// \return the value of the polynomial at x
 	T evaluate(const T& x) const;
 
+	/// Evaluate the polynomial at a point
+	/// \param x point at which to evaluate the polynomial
+	/// \return the value of the polynomial at x
+	T operator()(const T& x) const;
+
 	/// @{
 	/// Standard arithmetic operators extended to intervals
 	T& operator[](const size_t i);
@@ -124,6 +129,11 @@ public:
 	/// \param x point at which to evaluate the polynomial
 	/// \return the value of the polynomial at x
 	T evaluate(const T& x) const;
+
+	/// Evaluate the polynomial at a point
+	/// \param x point at which to evaluate the polynomial
+	/// \return the value of the polynomial at x
+	T operator()(const T& x) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
@@ -182,10 +192,19 @@ public:
 	/// \param a2 coefficient of the 2 degree term
 	Polynomial(const T& a0, const T& a1, const T& a2);
 
+	/// Evaluate the discriminant of a quadratic polynomial
+	/// \return the discriminant (b^2 - a4c)
+	T discriminant() const;
+
 	/// Evaluate the polynomial at a point
 	/// \param x point at which to evaluate the polynomial
 	/// \return the value of the polynomial at x
 	T evaluate(const T& x) const;
+
+	/// Evaluate the polynomial at a point
+	/// \param x point at which to evaluate the polynomial
+	/// \return the value of the polynomial at x
+	T operator()(const T& x) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
@@ -250,6 +269,11 @@ public:
 	/// \param x point at which to evaluate the polynomial
 	/// \return the value of the polynomial at x
 	T evaluate(const T& x) const;
+
+	/// Evaluate the polynomial at a point
+	/// \param x point at which to evaluate the polynomial
+	/// \return the value of the polynomial at x
+	T operator()(const T& x) const;
 
 	/// @{
 	/// Standard arithmetic operators extended to intervals
