@@ -202,16 +202,15 @@ TEST_F(OsgCameraRenderTests, Resize)
 
 TEST_F(OsgCameraRenderTests, MultipleRenderGroups)
 {
-	std::array<int, 2> dimensions = viewElement->getView()->getDimensions();
+	std::array<int, 2> dimensions = { 400, 400 };
+	viewElement->getView()->setDimensions(dimensions);
 	camera->setRenderGroupReference("Left");
 
+	std::array<int, 2> position = { 500, 100 };
 	auto rightElement = std::make_shared<Graphics::OsgViewElement>("RighViewElement");
 	rightElement->getView()->setDimensions(dimensions);
-
-	auto rightCamera = std::make_shared<Graphics::OsgCamera>("RightCamera");
-	rightCamera->setGroupReference(Representation::DefaultGroupName);
-	rightCamera->addRenderGroupReference("Right");
-	rightElement->getView()->setCamera(rightCamera);
+	rightElement->getView()->setPosition(position);
+	rightElement->getCamera()->addRenderGroupReference("Right");
 
 	scene->addSceneElement(rightElement);
 
