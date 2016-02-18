@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Novint/NovintAuxiliaryThread.h"
+#include "SurgSim/Devices/Novint/NovintAncillaryThread.h"
 
 #include <osg_interface.h>
 
@@ -23,15 +23,15 @@ namespace SurgSim
 {
 namespace Devices
 {
-NovintAuxiliaryThread::NovintAuxiliaryThread(NovintScaffold* scaffold) :
-	BasicThread("Devices/NovintAuxiliaryThread"),
+NovintAncillaryThread::NovintAncillaryThread(NovintScaffold* scaffold) :
+	BasicThread("Devices/NovintAncillaryThread"),
 	m_scaffold(scaffold),
 	m_left(true),
 	m_right(true)
 {
 }
 
-NovintAuxiliaryThread::~NovintAuxiliaryThread()
+NovintAncillaryThread::~NovintAncillaryThread()
 {
 	if (m_left)
 	{
@@ -43,30 +43,30 @@ NovintAuxiliaryThread::~NovintAuxiliaryThread()
 	}
 }
 
-bool NovintAuxiliaryThread::doInitialize()
+bool NovintAncillaryThread::doInitialize()
 {
 	bool result = true;
 	if (m_left)
 	{
 		SURGSIM_ASSERT(osgConnectToGrip(OSG_GRIP_LEFT_HAND, true, -1) == OSG_OK) <<
-			"NovintAuxiliaryThread failed to find the left-hand grip.";
+			"NovintAncillaryThread failed to find the left-hand grip.";
 		m_grips.push_back(OSG_GRIP_LEFT_HAND);
 	}
 	if (m_right)
 	{
 		SURGSIM_ASSERT(osgConnectToGrip(OSG_GRIP_RIGHT_HAND, true, -1) == OSG_OK) <<
-			"NovintAuxiliaryThread failed to find the right-hand grip.";
+			"NovintAncillaryThread failed to find the right-hand grip.";
 		m_grips.push_back(OSG_GRIP_RIGHT_HAND);
 	}
 	return result;
 }
 
-bool NovintAuxiliaryThread::doStartUp()
+bool NovintAncillaryThread::doStartUp()
 {
 	return true;
 }
 
-bool NovintAuxiliaryThread::doUpdate(double dt)
+bool NovintAncillaryThread::doUpdate(double dt)
 {
 	for (int grip : m_grips)
 	{
@@ -75,7 +75,7 @@ bool NovintAuxiliaryThread::doUpdate(double dt)
 		if ((osgGetRollAngleInRadians(grip, roll) == OSG_OK) &&
 			(osgGetGrasperAngleInRadians(grip, toolDof) == OSG_OK))
 		{
-			m_scaffold->setAuxiliary(grip, roll, toolDof);
+			m_scaffold->setAncillary(grip, roll, toolDof);
 		}
 		else
 		{

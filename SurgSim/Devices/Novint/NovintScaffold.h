@@ -48,7 +48,7 @@ public:
 	/// \return the scaffold object.
 	static std::shared_ptr<NovintScaffold> getOrCreateSharedInstance();
 
-	void setAuxiliary(int grip, double roll, double toolDof);
+	void setAncillary(int grip, double roll, double toolDof);
 
 private:
 	NovintScaffold(const NovintScaffold&) /*= delete*/;
