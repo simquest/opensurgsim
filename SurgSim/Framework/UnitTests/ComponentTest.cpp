@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -486,7 +486,9 @@ TEST(ComponentTests, SetActiveTest)
 	EXPECT_FALSE(component->getValue<bool>("IsActive"));
 
 	auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("SceneElement");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	sceneElement->addComponent(component);
+	runtime->getScene()->addSceneElement(sceneElement);
 	EXPECT_TRUE(sceneElement->isActive());
 
 	// An inactive component in an active SceneElement is 'inactive'.
@@ -529,6 +531,7 @@ TEST(ComponentTests, SetActiveTest)
 	decodedComponent = nullptr;
 	auto decodedSceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Decoded");
 	decodedSceneElement->decode(node);
+	runtime->getScene()->addSceneElement(decodedSceneElement);
 	EXPECT_FALSE(decodedSceneElement->isActive());
 	decodedComponent = decodedSceneElement->getComponent("Component");
 	EXPECT_NE(nullptr, decodedComponent->getSceneElement());

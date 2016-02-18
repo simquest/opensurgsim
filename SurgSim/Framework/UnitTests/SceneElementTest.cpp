@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/PoseComponent.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -70,18 +71,20 @@ TEST(SceneElementTest, AddAndTestComponents)
 	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
 	std::shared_ptr<MockSceneElement> element = std::make_shared<MockSceneElement>();
 	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>("TestComponent");
+	runtime->addManager(manager);
 
 	EXPECT_TRUE(element->addComponent(component));
 
-	// SceneElement should be set after add
+	// Scene and SceneElement in Component will not be set until initialization.
+	EXPECT_NE(component->getScene(), element->getScene());
+	EXPECT_NE(component->getSceneElement(), element);
+
+	// Scene and SceneElement should be set after add
+	runtime->getScene()->addSceneElement(element);
+	EXPECT_EQ(component->getScene(), element->getScene());
 	EXPECT_EQ(component->getSceneElement(), element);
 
-	// Scene in Component will not be set until initialization.
-	EXPECT_NE(component->getScene(), element->getScene());
-
 	// Verify the component made it to the manager
-	runtime->addManager(manager);
-	runtime->getScene()->addSceneElement(element);
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
 	ASSERT_EQ(1, manager->getComponents().size());

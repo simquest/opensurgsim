@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
@@ -206,7 +207,6 @@ TEST(EmitterTest, PosedUpdate)
 
 	auto particleSystem = std::make_shared<MockParticleSystem>("ParticleSystem");
 	particleSystem->setMaxParticles(10);
-	particleSystem->initialize(runtime);
 
 	auto emitter = std::make_shared<Emitter>("Emitter");
 	emitter->setShape(sphere);
@@ -215,11 +215,11 @@ TEST(EmitterTest, PosedUpdate)
 	emitter->setRate(1.0);
 	emitter->setLifetimeRange(std::make_pair(5.0, 10.0));
 	emitter->setVelocityRange(std::make_pair(Vector3d::Ones(), Vector3d::Constant(2.0)));
-	emitter->initialize(runtime);
 
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Element");
 	element->addComponent(particleSystem);
 	element->addComponent(emitter);
+	runtime->getScene()->addSceneElement(element);
 
 	ASSERT_TRUE(emitter->wakeUp());
 	ASSERT_TRUE(particleSystem->wakeUp());

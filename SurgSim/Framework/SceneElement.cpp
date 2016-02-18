@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest LLC.
+// Copyright 2013-2016, SimQuest LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,7 +69,6 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 
 		if (result)
 		{
-			component->setSceneElement(getSharedPtr());
 			m_components[component->getName()] = component;
 		}
 	}
@@ -164,6 +163,7 @@ bool SceneElement::initialize()
 
 bool SceneElement::initializeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
+	component->setSceneElement(getSharedPtr());
 	component->setScene(m_scene);
 	return component->initialize(getRuntime());
 }
