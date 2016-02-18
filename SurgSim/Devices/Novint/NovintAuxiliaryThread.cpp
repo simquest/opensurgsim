@@ -33,6 +33,14 @@ NovintAuxiliaryThread::NovintAuxiliaryThread(NovintScaffold* scaffold) :
 
 NovintAuxiliaryThread::~NovintAuxiliaryThread()
 {
+	if (m_left)
+	{
+		osgDisconnectFromGrip(OSG_GRIP_LEFT_HAND);
+	}
+	if (m_right)
+	{
+		osgDisconnectFromGrip(OSG_GRIP_RIGHT_HAND);
+	}
 }
 
 bool NovintAuxiliaryThread::doInitialize()
@@ -40,12 +48,14 @@ bool NovintAuxiliaryThread::doInitialize()
 	bool result = true;
 	if (m_left)
 	{
-		SURGSIM_ASSERT(osgConnectToGrip(OSG_GRIP_LEFT_HAND) == OSG_OK) << "NovintAuxiliaryThread failed to find the left-hand grip.";
+		SURGSIM_ASSERT(osgConnectToGrip(OSG_GRIP_LEFT_HAND, true, -1) == OSG_OK) <<
+			"NovintAuxiliaryThread failed to find the left-hand grip.";
 		m_grips.push_back(OSG_GRIP_LEFT_HAND);
 	}
 	if (m_right)
 	{
-		SURGSIM_ASSERT(osgConnectToGrip(OSG_GRIP_RIGHT_HAND) == OSG_OK) << "NovintAuxiliaryThread failed to find the right-hand grip.";
+		SURGSIM_ASSERT(osgConnectToGrip(OSG_GRIP_RIGHT_HAND, true, -1) == OSG_OK) <<
+			"NovintAuxiliaryThread failed to find the right-hand grip.";
 		m_grips.push_back(OSG_GRIP_RIGHT_HAND);
 	}
 	return result;
@@ -69,7 +79,7 @@ bool NovintAuxiliaryThread::doUpdate(double dt)
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint/AuxiliaryThread")) << "osgGetRollAngleInRadians reported error for grip " << grip;
+			SURGSIM_LOG_SEVERE(m_logger) << "osgGetRollAngleInRadians reported error for grip " << grip;
 			return false;
 		}
 	}
