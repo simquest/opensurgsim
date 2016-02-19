@@ -42,49 +42,65 @@ int CompoundShape::getType() const
 
 double CompoundShape::getVolume() const
 {
-	ReadLock lock(m_mutex);
-	if (!m_volume.hasValue())
 	{
-		UpgradeLock write(lock);
-		double volume = 0.0;
-
-		for (const auto& shape : m_shapes)
+		ReadLock lock(m_mutex);
+		if (m_volume.hasValue())
 		{
-			volume += (shape.first)->getVolume();
+			return *m_volume;
 		}
-		m_volume = volume;
 	}
-	return *m_volume;
+
+	{
+		WriteLock lock(m_mutex);
+		if (!m_volume.hasValue())
+		{
+			double volume = 0.0;
+
+			for (const auto& shape : m_shapes)
+			{
+				volume += (shape.first)->getVolume();
+			}
+			m_volume = volume;
+		}
+		return *m_volume;
+	}
 }
 
 
 Vector3d CompoundShape::getCenter() const
 {
-	ReadLock lock(m_mutex);
-	if (!m_center.hasValue())
 	{
-		UpgradeLock write(lock);
-		Vector3d result = Vector3d::Zero();
-		if (m_shapes.size() > 0)
+		ReadLock lock(m_mutex);
+		if (m_center.hasValue())
 		{
-			double total = 0.0;
-			for (const auto& shape : m_shapes)
-			{
-				double volume = shape.first->getVolume();
-				result += shape.second * (shape.first->getCenter()) * volume;
-				total += volume;
-			}
-			result /= total;
-
-			// We have it, write the total volume as well ...
-			m_volume = total;
+			return *m_center;
 		}
-		m_center = result;
 	}
 
-	return *m_center;
-}
+	{
+		WriteLock lock(m_mutex);
+		if (!m_center.hasValue())
+		{
+			Vector3d result = Vector3d::Zero();
+			if (m_shapes.size() > 0)
+			{
+				double total = 0.0;
+				for (const auto& shape : m_shapes)
+				{
+					double volume = shape.first->getVolume();
+					result += shape.second * (shape.first->getCenter()) * volume;
+					total += volume;
+				}
+				result /= total;
 
+				// We have it, write the total volume as well ...
+				m_volume = total;
+			}
+			m_center = result;
+		}
+		return *m_center;
+	}
+}
 
 Matrix33d CompoundShape::getSecondMomentOfVolume() const
 {
@@ -92,32 +108,37 @@ Matrix33d CompoundShape::getSecondMomentOfVolume() const
 	// this might freeze up
 	auto center = getCenter();
 
-	ReadLock lock(m_mutex);
-
-	if (!m_secondMoment.hasValue())
 	{
-		Matrix33d result = Matrix33d::Zero();
-
-		UpgradeLock write(lock);
-
-		if (m_shapes.size() > 0)
+		ReadLock lock(m_mutex);
+		if (m_secondMoment.hasValue())
 		{
-			for (const auto& subShape : m_shapes)
-			{
-				const auto& shape = subShape.first;
-				const auto& pose = subShape.second;
-				const auto& r = pose.linear();
-				Matrix33d skew = makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
-				Matrix33d inertia =
-					r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
-
-				result += inertia;
-			}
-
+			return *m_secondMoment;
 		}
-		m_secondMoment = result;
 	}
-	return *m_secondMoment;
+
+	{
+		WriteLock lock(m_mutex);
+		if (!m_secondMoment.hasValue())
+		{
+			Matrix33d result = Matrix33d::Zero();
+			if (m_shapes.size() > 0)
+			{
+				for (const auto& subShape : m_shapes)
+				{
+					const auto& shape = subShape.first;
+					const auto& pose = subShape.second;
+					const auto& r = pose.linear();
+					Matrix33d skew = makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
+					Matrix33d inertia =
+						r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
+
+					result += inertia;
+				}
+			}
+			m_secondMoment = result;
+		}
+		return *m_secondMoment;
+	}
 }
 
 
@@ -128,19 +149,27 @@ bool CompoundShape::isValid() const
 
 const Math::Aabbd& CompoundShape::getBoundingBox() const
 {
-	ReadLock lock(m_mutex);
-	if (!m_localAabb.hasValue())
 	{
-		UpgradeLock write(lock);
-		Math::Aabbd result;
-		for (const auto& subShape : m_shapes)
+		ReadLock lock(m_mutex);
+		if (m_localAabb.hasValue())
 		{
-			result.extend(Math::transformAabb(subShape.second, subShape.first->getBoundingBox()));
+			return *m_localAabb;
 		}
-		m_localAabb.setValue(result);
 	}
 
-	return *m_localAabb;
+	{
+		WriteLock lock(m_mutex);
+		if (!m_localAabb.hasValue())
+		{
+			Math::Aabbd result;
+			for (const auto& subShape : m_shapes)
+			{
+				result.extend(Math::transformAabb(subShape.second, subShape.first->getBoundingBox()));
+			}
+			m_localAabb.setValue(result);
+		}
+		return *m_localAabb;
+	}
 }
 
 void CompoundShape::invalidateData()
@@ -217,6 +246,7 @@ void CompoundShape::clearShapes()
 {
 	WriteLock lock(m_mutex);
 	m_shapes.clear();
+	invalidateData();
 }
 
 }
