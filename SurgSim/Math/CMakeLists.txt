@@ -101,6 +101,7 @@ set(SURGSIM_MATH_HEADERS
 	ParticlesShape.h
 	ParticlesShape-inl.h
 	PlaneShape.h
+	PointTriangleCcdContactCalculation-inl.h
 	Polynomial.h
 	Polynomial-inl.h
 	PolynomialRoots.h
@@ -113,6 +114,7 @@ set(SURGSIM_MATH_HEADERS
 	Scalar-inl.h
 	SegmentMeshShape.h
 	SegmentMeshShape-inl.h
+	SegmentSegmentCcdContactCalculation-inl.h
 	Shape.h
 	Shapes.h
 	SparseMatrix.h
