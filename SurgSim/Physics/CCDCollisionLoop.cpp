@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,17 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gmock/gmock.h>
+#include "SurgSim/Physics/CcdCollisionLoop.h"
+#include "SurgSim/Physics/CcdCollision.h"
 
-#include "SurgSim/Framework/Logger.h"
-#include "SurgSim/Framework/LogOutput.h"
-
-int main(int argc, char** argv)
+namespace SurgSim
 {
-	//Disable logging during tests
-	std::shared_ptr<SurgSim::Framework::LoggerManager> loggerManager;
-	loggerManager = SurgSim::Framework::Logger::getLoggerManager();
-	//loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
-	testing::InitGoogleMock(&argc, argv);
-	return RUN_ALL_TESTS();
+
+namespace Physics
+{
+
+CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
+	ComputationGroup(copyState)
+{
+	addComputation(std::make_shared<CcdCollision>(copyState));
+}
+
+CcdCollisionLoop::~CcdCollisionLoop()
+{
+
+}
+
+
+bool CcdCollisionLoop::endIteration()
+{
+	return true;
+}
+
+}
 }

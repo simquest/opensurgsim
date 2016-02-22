@@ -18,6 +18,7 @@
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Physics/BuildMlcp.h"
 #include "SurgSim/Physics/CcdCollision.h"
+#include "SurgSim/Physics/CcdCollisionLoop.h"
 #include "SurgSim/Physics/ClearCollisions.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
@@ -63,7 +64,7 @@ bool PhysicsManager::doInitialize()
 	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
 	addComputation(std::make_shared<PrepareCollisionPairs>(copyState));
 	addComputation(std::make_shared<DcdCollision>(copyState));
-	addComputation(std::make_shared<CcdCollision>(copyState));
+	addComputation(std::make_shared<CcdCollisionLoop>(copyState));
 	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
 	addComputation(std::make_shared<BuildMlcp>(copyState));
 	addComputation(std::make_shared<SolveMlcp>(copyState));
@@ -143,8 +144,8 @@ bool PhysicsManager::doUpdate(double dt)
 				auto& timer = computation->getTimer();
 				const double period = timer.getAverageFramePeriod();
 				SURGSIM_LOG_DEBUG(m_logger) << std::fixed << std::setprecision(0) <<
-					computation->getClassName() << " \taverage duration " << 1e6 * period << " us (max " <<
-					1e6 * timer.getMaxFramePeriod() << " us), " << 100.0 * period / totalTime << "% of Physics.";
+											computation->getClassName() << " \taverage duration " << 1e6 * period << " us (max " <<
+											1e6 * timer.getMaxFramePeriod() << " us), " << 100.0 * period / totalTime << "% of Physics.";
 				timer.setMaxNumberOfFrames(newFrames);
 				timer.start();
 			}

@@ -17,6 +17,7 @@
 set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
 	CcdCollision.cpp
+	CcdCollisionLoop.cpp
 	ClearCollisions.cpp
 	Computation.cpp
 	ComputationGroup.cpp
@@ -92,6 +93,7 @@ set(SURGSIM_PHYSICS_SOURCES
 set(SURGSIM_PHYSICS_HEADERS
 	BuildMlcp.h
 	CcdCollision.h
+	CcdCollisionLoop.h
 	ClearCollisions.h
 	Computation.h
 	ComputationGroup.h
