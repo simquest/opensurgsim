@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/VerticesShape.h"
 
 namespace SurgSim
 {
@@ -33,7 +34,7 @@ SURGSIM_STATIC_REGISTRATION(SegmentMeshShape);
 /// But, unlike MeshShape, the mesh does not have any triangle topology. It only consists of edges.
 ///
 /// \sa MeshShape
-class SegmentMeshShape : public Shape, public DataStructures::SegmentMeshPlain
+class SegmentMeshShape : public VerticesShape, public DataStructures::SegmentMeshPlain
 {
 public:
 	/// Constructor
@@ -68,21 +69,9 @@ public:
 	/// \return The object's associated AabbTree
 	std::shared_ptr<const DataStructures::AabbTree> getAabbTree() const;
 
-	bool isTransformable() const override;
-
 	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
 
-	/// Replace the current vertex positions with the initial positions transformed by a pose.
-	/// \param pose The pose of the shape.
-	void setPose(const RigidTransform3d& pose);
-
-	/// Set the initial Vertices.
-	/// \param vertices The initial vertices.
-	void setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices);
-
-	/// Get the initial Vertices.
-	/// \return The initial Vertices.
-	const DataStructures::Vertices<DataStructures::EmptyData>& getInitialVertices() const;
+	void setPose(const RigidTransform3d& pose) override;
 
 protected:
 	bool doUpdate() override;
@@ -90,9 +79,6 @@ protected:
 
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	void updateAabbTree();
-
-	/// The initial vertex positions.
-	DataStructures::Vertices<DataStructures::EmptyData> m_initialVertices;
 
 private:
 	/// Segment radius

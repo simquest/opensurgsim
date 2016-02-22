@@ -46,9 +46,9 @@ MeshShape::MeshShape(const MeshShape& other) :
 	::TriangleMesh(other),
 	m_center(other.getCenter()),
 	m_volume(other.getVolume()),
-	m_secondMomentOfVolume(other.getSecondMomentOfVolume()),
-	m_initialVertices(other.getInitialVertices())
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
+	setInitialVertices(other.getInitialVertices());
 	updateAabbTree();
 }
 
@@ -249,11 +249,6 @@ void MeshShape::updateAabbTree()
 	m_aabb = m_aabbTree->getAabb();
 }
 
-bool MeshShape::isTransformable() const
-{
-	return true;
-}
-
 void MeshShape::setPose(const RigidTransform3d& pose)
 {
 	auto& vertices = getVertices();
@@ -267,17 +262,6 @@ void MeshShape::setPose(const RigidTransform3d& pose)
 		vertices[i].position = pose * initialVertices[i].position;
 	}
 }
-
-void MeshShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
-{
-	m_initialVertices = vertices;
-}
-
-const DataStructures::Vertices<DataStructures::EmptyData>& MeshShape::getInitialVertices() const
-{
-	return m_initialVertices;
-}
-
 
 }; // namespace Math
 }; // namespace SurgSim

@@ -35,10 +35,10 @@ SegmentMeshShape::SegmentMeshShape()
 }
 
 SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
-	DataStructures::SegmentMeshPlain(other),
-	m_initialVertices(other.getInitialVertices())
+	DataStructures::SegmentMeshPlain(other)
 {
 	setRadius(other.m_radius);
+	setInitialVertices(other.getInitialVertices());
 	updateAabbTree();
 }
 
@@ -131,11 +131,6 @@ void SegmentMeshShape::updateAabbTree()
 	m_aabbTree->set(std::move(items));
 }
 
-bool SegmentMeshShape::isTransformable() const
-{
-	return true;
-}
-
 void SegmentMeshShape::setPose(const RigidTransform3d& pose)
 {
 	auto& vertices = getVertices();
@@ -148,16 +143,6 @@ void SegmentMeshShape::setPose(const RigidTransform3d& pose)
 	{
 		vertices[i].position = pose * initialVertices[i].position;
 	}
-}
-
-void SegmentMeshShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
-{
-	m_initialVertices = vertices;
-}
-
-const DataStructures::Vertices<DataStructures::EmptyData>& SegmentMeshShape::getInitialVertices() const
-{
-	return m_initialVertices;
 }
 
 }; // namespace Math

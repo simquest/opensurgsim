@@ -39,10 +39,10 @@ ParticlesShape::ParticlesShape(const ParticlesShape& other) :
 	m_radius(other.getRadius()),
 	m_center(other.getCenter()),
 	m_volume(other.getVolume()),
-	m_secondMomentOfVolume(other.getSecondMomentOfVolume()),
-	m_initialVertices(other.getInitialVertices())
+	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
+	setInitialVertices(other.getInitialVertices());
 }
 
 int ParticlesShape::getType() const
@@ -130,11 +130,6 @@ const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::g
 	return m_aabbTree;
 }
 
-bool ParticlesShape::isTransformable() const
-{
-	return true;
-}
-
 const Math::Aabbd& ParticlesShape::getBoundingBox() const
 {
 	if (m_aabbTree != nullptr)
@@ -159,16 +154,6 @@ void ParticlesShape::setPose(const RigidTransform3d& pose)
 	{
 		vertices[i].position = pose * initialVertices[i].position;
 	}
-}
-
-void ParticlesShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
-{
-	m_initialVertices = vertices;
-}
-
-const DataStructures::Vertices<DataStructures::EmptyData>& ParticlesShape::getInitialVertices() const
-{
-	return m_initialVertices;
 }
 
 };

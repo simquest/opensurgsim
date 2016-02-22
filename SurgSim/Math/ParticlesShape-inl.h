@@ -24,10 +24,10 @@ namespace Math
 
 template <class V>
 ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<V>& other) :
-	DataStructures::Vertices<DataStructures::EmptyData>(other),
-	m_initialVertices(other)
+	DataStructures::Vertices<DataStructures::EmptyData>(other)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
+	setInitialVertices(*this);
 	update();
 }
 
@@ -36,7 +36,7 @@ ParticlesShape& ParticlesShape::operator=(const SurgSim::DataStructures::Vertice
 {
 	DataStructures::Vertices<DataStructures::EmptyData>::operator=(other);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
-	setInitialVertices(DataStructures::Vertices<DataStructures::EmptyData>(other));
+	setInitialVertices(*this);
 	update();
 	return *this;
 }

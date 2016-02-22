@@ -25,11 +25,11 @@ namespace Math
 template <class V, class E, class T>
 MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMesh<V, E, T>& other) :
 	SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData,
-	SurgSim::DataStructures::NormalData>::TriangleMesh(other),
-	m_initialVertices(other)
+	SurgSim::DataStructures::NormalData>::TriangleMesh(other)
 {
 	SURGSIM_ASSERT(other.isValid()) << "Invalid mesh";
 
+	setInitialVertices(other);
 	updateAabbTree();
 	computeVolumeIntegrals();
 	calculateNormals();
