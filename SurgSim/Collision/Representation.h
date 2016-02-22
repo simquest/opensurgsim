@@ -57,7 +57,7 @@ enum CollisionDetectionType : SURGSIM_ENUM_TYPE;
 /// is a nullptr or a has gone out of scope ASSERT's will be triggered.
 /// Collision with other representations will be updated by CollisionPair::addContact() and
 /// be cleared every time DcdCollision::updatePair() makes a new CollisionPair.
-class Representation : public SurgSim::Framework::Representation
+	class Representation : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
@@ -118,6 +118,10 @@ public:
 	/// Update the representation.
 	/// \param dt the time passed from the last update.
 	virtual void update(const double& dt);
+
+	virtual void updateDcdData();
+	virtual void updateCcdData();
+	virtual void updateShapeData();
 
 	/// Set a collision representation to ignore
 	/// Collisions with this collision representation will not be detected

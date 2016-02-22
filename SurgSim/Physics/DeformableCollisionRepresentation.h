@@ -68,11 +68,13 @@ public:
 
 	int getShapeType() const override;
 
-	void update(const double& dt) override;
-
 private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
+
+	virtual void updateDcdData() override;
+
+	virtual void updateCcdData() override;
 
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::Shape> m_shape, m_previousShape;

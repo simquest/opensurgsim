@@ -70,7 +70,7 @@ public:
 	/// \return	The physics representation.
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> getRigidRepresentation();
 
-	void update(const double& dt) override;
+	void updateCcdData() override;
 
 private:
 	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;

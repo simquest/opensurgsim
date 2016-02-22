@@ -55,7 +55,7 @@ bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shap
 		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(shape);
 		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
 		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
-			"The number of nodes in the deformable does not match the number of vertices in the mesh.";
+				"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 		{
@@ -68,7 +68,7 @@ bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shap
 		auto meshShape = dynamic_cast<SurgSim::Math::SegmentMeshShape*>(shape);
 		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
 		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
-			"The number of nodes in the deformable does not match the number of vertices in the mesh.";
+				"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 		{
@@ -79,55 +79,6 @@ bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shap
 
 	return result;
 }
-}
-
-void DeformableCollisionRepresentation::update(const double& dt)
-{
-	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
-		"Failed to update.  The DeformableCollisionRepresentation either was not attached to a "
-		"Physics::Representation or the Physics::Representation has expired.";
-
-	// Write previous shape ONLY if the collision detection is continuous
-	if (getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
-	{
-		if (m_previousShape == nullptr)
-		{
-			if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
-			{
-				m_previousShape = std::make_shared<Math::MeshShape>(*std::dynamic_pointer_cast<Math::MeshShape>(m_shape));
-			}
-			else if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
-			{
-				m_previousShape = std::make_shared<Math::SegmentMeshShape>(*std::dynamic_pointer_cast<Math::SegmentMeshShape>(m_shape));
-			}
-			else
-			{
-				SURGSIM_FAILURE() << "Invalid type, should be MeshShape("<< SurgSim::Math::SHAPE_TYPE_MESH <<
-					") or SegmentMeshShape("<< SurgSim::Math::SHAPE_TYPE_SEGMENTMESH<<"), but it is " <<
-					m_shape->getType();
-			}
-		}
-		if (!updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get()))
-		{
-			setLocalActive(false);
-			SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
-		}
-	}
-
-	// Write current shape
-	if (!updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get()))
-	{
-		setLocalActive(false);
-		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-			"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
-	}
-
-	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_previousShape, Math::RigidTransform3d::Identity());
-	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeSecond(m_shape, Math::RigidTransform3d::Identity());
-	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeSecond);
-	setPosedShapeMotion(posedShapeMotion);
 }
 
 bool DeformableCollisionRepresentation::doInitialize()
@@ -145,16 +96,16 @@ bool DeformableCollisionRepresentation::doWakeUp()
 {
 	auto physicsRepresentation = m_deformable.lock();
 	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
-		"The Physics::Representation referred by this DeformableCollisionRepresentation has expired.";
+			"The Physics::Representation referred by this DeformableCollisionRepresentation has expired.";
 
 	auto state = physicsRepresentation->getCurrentState();
 	SURGSIM_ASSERT(nullptr != state) <<
-		"DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
+									 "DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
 	auto shape = std::dynamic_pointer_cast<DataStructures::VerticesPlain>(m_shape);
 	SURGSIM_ASSERT(shape != nullptr) <<
-		"The shape object is not inherited from DataStructures::VerticesPlain, but should be.";
+									 "The shape object is not inherited from DataStructures::VerticesPlain, but should be.";
 	SURGSIM_ASSERT(shape->getNumVertices() == state->getNumNodes()) <<
-		"The number of nodes in the deformable does not match the number of vertices in the mesh.";
+			"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	update(0.0);
 	return true;
@@ -169,8 +120,8 @@ int DeformableCollisionRepresentation::getShapeType() const
 void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
 	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
-		shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
-		<< "Deformable collision shape has to be a mesh.  But what passed in is " << shape->getType();
+				   shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
+			<< "Deformable collision shape has to be a mesh.  But what passed in is " << shape->getType();
 
 	m_shape = shape;
 }
@@ -187,14 +138,76 @@ void DeformableCollisionRepresentation::setDeformableRepresentation(
 }
 
 const std::shared_ptr<SurgSim::Physics::DeformableRepresentation>
-	DeformableCollisionRepresentation::getDeformableRepresentation() const
+DeformableCollisionRepresentation::getDeformableRepresentation() const
 {
 	auto physicsRepresentation = m_deformable.lock();
 	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
-		"Failed to get the deformable representation.  The DeformableCollisionRepresentation either was not "
-		"attached to a Physics::Representation or the Physics::Representation has expired.";
+			"Failed to get the deformable representation.  The DeformableCollisionRepresentation either was not "
+			"attached to a Physics::Representation or the Physics::Representation has expired.";
 
 	return physicsRepresentation;
+}
+
+void DeformableCollisionRepresentation::updateDcdData()
+{
+	auto physicsRepresentation = m_deformable.lock();
+	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
+			"Failed to update. The DeformableCollisionRepresentation either was not attached to a "
+			"Physics::Representation or the Physics::Representation has expired.";
+
+	// Write current shape
+	if (!updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get()))
+	{
+		setLocalActive(false);
+		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
+	}
+}
+
+void DeformableCollisionRepresentation::updateCcdData()
+{
+	auto physicsRepresentation = m_deformable.lock();
+	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
+			"Failed to update. The DeformableCollisionRepresentation either was not attached to a "
+			"Physics::Representation or the Physics::Representation has expired.";
+
+	if (m_previousShape == nullptr)
+	{
+		if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+		{
+			m_previousShape = std::make_shared<Math::MeshShape>(*std::dynamic_pointer_cast<Math::MeshShape>(m_shape));
+		}
+		else if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
+		{
+			m_previousShape = std::make_shared<Math::SegmentMeshShape>(*std::dynamic_pointer_cast<Math::SegmentMeshShape>(m_shape));
+		}
+		else
+		{
+			SURGSIM_FAILURE() << "Invalid type, should be MeshShape(" << SurgSim::Math::SHAPE_TYPE_MESH <<
+							  ") or SegmentMeshShape(" << SurgSim::Math::SHAPE_TYPE_SEGMENTMESH << "), but it is " <<
+							  m_shape->getType();
+		}
+	}
+	if (!updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get()))
+	{
+		setLocalActive(false);
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
+	}
+
+
+	// Write current shape
+	if (!updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get()))
+	{
+		setLocalActive(false);
+		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
+	}
+
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_previousShape, Math::RigidTransform3d::Identity());
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeSecond(m_shape, Math::RigidTransform3d::Identity());
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeSecond);
+	setPosedShapeMotion(posedShapeMotion);
 }
 
 } // namespace Physics

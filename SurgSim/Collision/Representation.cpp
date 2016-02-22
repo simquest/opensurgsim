@@ -126,6 +126,15 @@ bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 
 void Representation::update(const double& dt)
 {
+	updateShapeData();
+	if (getCollisionDetectionType() == SurgSim::Collision::COLLISION_DETECTION_TYPE_DISCRETE)
+	{
+		updateDcdData();
+	}
+	else
+	{
+		updateCcdData();
+	}
 }
 
 bool Representation::ignore(const std::string& fullName)
@@ -274,6 +283,21 @@ Math::Aabbd Representation::getBoundingBox() const
 {
 	SURGSIM_ASSERT(getShape() != nullptr);
 	return Math::transformAabb(getPose(), getShape()->getBoundingBox());
+}
+
+void Representation::updateDcdData()
+{
+
+}
+
+void Representation::updateCcdData()
+{
+
+}
+
+void Representation::updateShapeData()
+{
+
 }
 
 }; // namespace Collision
