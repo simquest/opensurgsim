@@ -16,6 +16,7 @@
 #include "SurgSim/Graphics/Camera.h"
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
+#include "Group.h"
 
 namespace SurgSim
 {
@@ -27,8 +28,8 @@ Camera::Camera(const std::string& name) : Representation(name)
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::Matrix44d, ProjectionMatrix,
 									  getProjectionMatrix, setProjectionMatrix);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, std::string, RenderGroupReference,
-									  getRenderGroupReference, setRenderGroupReference);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, std::vector<std::string>, RenderGroupReferences,
+									  getRenderGroupReferences, setRenderGroupReferences);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::Vector4d, AmbientColor,
 									  getAmbientColor, setAmbientColor);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, bool, MainCamera, isMainCamera, setMainCamera);
@@ -71,12 +72,14 @@ Camera::Camera(const std::string& name) : Representation(name)
 
 void Camera::setRenderGroupReference(const std::string& name)
 {
-	removeGroupReference(name);
-	addRenderGroupReference(name);
+	std::vector<std::string> references;
+	references.push_back(name);
+	setRenderGroupReferences(references);
 }
 
-void Camera::setRenderGroupReferenes(std::vector<std::string> names)
+void Camera::setRenderGroupReferences(const std::vector<std::string>& names)
 {
+	m_renderGroupReferences.clear();
 	for (const auto& name : names)
 	{
 		removeGroupReference(name);
@@ -84,32 +87,31 @@ void Camera::setRenderGroupReferenes(std::vector<std::string> names)
 	}
 }
 
-std::string Camera::getRenderGroupReference() const
-{
-	return m_renderGroupReference.front();
-}
-
 std::vector<std::string> Camera::getRenderGroupReferences() const
 {
-	return m_renderGroupReference;
+	return m_renderGroupReferences;
 }
 
 void Camera::addRenderGroupReference(const std::string& name)
 {
-	m_renderGroupReference.push_back(name);
+	if (std::find(m_renderGroupReferences.begin(), m_renderGroupReferences.end(), name) == m_renderGroupReferences.end())
+	{
+		m_renderGroupReferences.push_back(name);
+	}
 }
 
 bool Camera::setRenderGroup(std::shared_ptr<Group> group)
 {
-	m_group.clear();
-	addRenderGroup(group);
+	std::vector<std::shared_ptr<Group>> groups;
+	groups.push_back(group);
+	setRenderGroups(groups);
 	return true;
 }
 
-bool Camera::setRenderGroups(std::vector<std::shared_ptr<Group>> groups)
+bool Camera::setRenderGroups(const std::vector<std::shared_ptr<Group>>& groups)
 {
-	m_group.clear();
-	for (auto group : groups)
+	m_renderGroups.clear();
+	for (const auto& group : groups)
 	{
 		addRenderGroup(group);
 	}
@@ -118,24 +120,26 @@ bool Camera::setRenderGroups(std::vector<std::shared_ptr<Group>> groups)
 
 bool Camera::addRenderGroup(std::shared_ptr<Group> group)
 {
-	m_group.push_back(group);
-	return true;
-}
-
-std::shared_ptr<Group> Camera::getRenderGroup() const
-{
-	return m_group.front();
+	if (std::find(m_renderGroups.begin(), m_renderGroups.end(), group) == m_renderGroups.end())
+	{
+		m_renderGroups.push_back(group);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 std::vector<std::shared_ptr<Group>> Camera::getRenderGroups() const
 {
-	return m_group;
+	return m_renderGroups;
 }
 
 bool Camera::addGroupReference(const std::string& name)
 {
 	bool result = false;
-	if (std::find(m_renderGroupReference.begin(), m_renderGroupReference.end(), name) != m_renderGroupReference.end())
+	if (std::find(m_renderGroupReferences.begin(), m_renderGroupReferences.end(), name) == m_renderGroupReferences.end())
 	{
 		result = Representation::addGroupReference(name);
 	}
@@ -167,7 +171,7 @@ std::array<int, 4> Camera::getViewport() const
 
 bool Camera::doInitialize()
 {
-	SURGSIM_ASSERT(!m_renderGroupReference.empty())
+	SURGSIM_ASSERT(!m_renderGroupReferences.empty())
 			<< "Can't have a camera without a RenderGroupReference.";
 	return true;
 }

@@ -71,13 +71,9 @@ public:
 
 	/// Set the collections of group references that this camera wants to use for rendering.
 	/// \param names Vector of names of the groups used for rendering
-	void setRenderGroupReferenes(std::vector<std::string> names);
+	void setRenderGroupReferences(const std::vector<std::string>& names);
 
-	/// Gets the name of the first rendergroup used for rendering
-	/// \return The name of the group to be used for rendering
-	std::string getRenderGroupReference() const;
-
-	/// Gets the collection of names of rendergroups used for rendering
+	/// Gets the collection of names of render groups used for rendering
 	/// \return Vector of names of the groups used for rendering
 	std::vector<std::string> getRenderGroupReferences() const;
 
@@ -95,16 +91,11 @@ public:
 	/// Sets the representation groups that will be seen by this camera.
 	/// \param groups Vector of groups of representations
 	/// \return True if it succeeded, false if it failed
-	virtual bool setRenderGroups(std::vector<std::shared_ptr<Group>> groups);
+	virtual bool setRenderGroups(const std::vector<std::shared_ptr<Group>>& groups);
 
 	/// Add a group of representations that will seen by this camera.
 	/// \param group Group of representations
 	virtual bool addRenderGroup(std::shared_ptr<Group> group);
-
-	/// Gets the first group of representations that will be seen by this camera.
-	/// Only the representations in this group will be rendered when this camera's view is rendered.
-	/// \return	Group of representations
-	std::shared_ptr<Group> getRenderGroup() const;
 
 	/// Gets all groups of representations that will be seen by this camera.
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
@@ -219,11 +210,11 @@ private:
 
 	/// Group of representations that this camera sees
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
-	std::vector<std::shared_ptr<Group>> m_group;
+	std::vector<std::shared_ptr<Group>> m_renderGroups;
 
 	/// The names of the groups that the camera wants to use for rendering, the graphics manager will actually assign
 	/// this group
-	std::vector<std::string> m_renderGroupReference;
+	std::vector<std::string> m_renderGroupReferences;
 };
 
 };  // namespace Graphics

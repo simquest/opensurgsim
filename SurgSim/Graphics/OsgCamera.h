@@ -65,7 +65,7 @@ public:
 
 	bool setRenderGroup(std::shared_ptr<Group> group) override;
 
-	bool setRenderGroups(std::vector<std::shared_ptr<Group>> groups);
+	bool setRenderGroups(const std::vector<std::shared_ptr<Group>>& groups) override;
 
 	void setLocalActive(bool val) override;
 

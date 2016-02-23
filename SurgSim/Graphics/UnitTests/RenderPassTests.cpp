@@ -36,7 +36,8 @@ TEST(RenderPassTests, InitTest)
 	EXPECT_NE(nullptr, renderPass->getCamera());
 	EXPECT_NE(nullptr, renderPass->getMaterial());
 	EXPECT_EQ(renderPass->getCamera()->getMaterial(), renderPass->getMaterial());
-	EXPECT_EQ(renderPass->getCamera()->getRenderGroupReference(), renderPass->getName());
+	auto references = renderPass->getCamera()->getRenderGroupReferences();
+	EXPECT_TRUE(std::find(references.begin(), references.end(), renderPass->getName()) != references.end());
 
 }
 

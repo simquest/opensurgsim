@@ -187,29 +187,18 @@ OsgCamera::OsgCamera(const std::string& name) :
 	m_camera->getOrCreateStateSet()->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS, osg::StateAttribute::ON);
 }
 
-bool OsgCamera::setRenderGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
+bool OsgCamera::setRenderGroup(std::shared_ptr<Group> group)
 {
-
-	SURGSIM_ASSERT(group->getName() == Camera::getRenderGroupReference())
-			<< "Trying to set the wrong group in the camera. getRenderGroupName() returns <"
-			<< Camera::getRenderGroupReference() << "> group->getName() is <" << group->getName() << ">.";
-
-	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
-	if (osgGroup && SurgSim::Graphics::Camera::setRenderGroup(group))
-	{
-		m_materialProxy->removeChildren(0, m_camera->getNumChildren());  /// Remove any previous group
-		m_materialProxy->addChild(osgGroup->getOsgGroup());
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	std::vector<std::shared_ptr<Group>> groups;
+	groups.push_back(group);
+	return  setRenderGroups(groups);
 }
 
-bool OsgCamera::setRenderGroups(std::vector<std::shared_ptr<Group>> groups)
+bool OsgCamera::setRenderGroups(const std::vector<std::shared_ptr<Group>>& groups)
 {
-	for (auto group : groups)
+	bool result = true;
+	m_materialProxy->removeChildren(0, m_camera->getNumChildren());
+	for (const auto& group : groups)
 	{
 		std::vector<std::string> groupReferences = Camera::getRenderGroupReferences();
 		SURGSIM_ASSERT(std::find(groupReferences.begin(), groupReferences.end(), group->getName()) != groupReferences.end())
@@ -220,9 +209,13 @@ bool OsgCamera::setRenderGroups(std::vector<std::shared_ptr<Group>> groups)
 		{
 			m_materialProxy->addChild(osgGroup->getOsgGroup());
 		}
+		else
+		{
+			result = false;
+		}
 	}
 
-	return true;
+	return result;
 }
 
 void OsgCamera::setLocalActive(bool val)
