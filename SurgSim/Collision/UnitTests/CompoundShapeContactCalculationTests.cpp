@@ -53,8 +53,8 @@ class CompoundShapeDcdContactTest : public ::testing::Test
 // results as colliding a compound representation
 TEST_F(CompoundShapeDcdContactTest, SingleCube)
 {
-	auto box = std::make_shared<Math::BoxShape>();
-	auto sphere = std::make_shared<Math::SphereShape>();
+	auto box = std::make_shared<Math::BoxShape>(1.0, 1.0, 1.0);
+	auto sphere = std::make_shared<Math::SphereShape>(1.0);
 
 	auto compoundShape = std::make_shared<Math::CompoundShape>();
 
@@ -66,19 +66,20 @@ TEST_F(CompoundShapeDcdContactTest, SingleCube)
 	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_SPHERE];
 	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_SPHERE];
 
-
 	auto expected = calc1->calculateDcdContact(PosedShape(box, identity), PosedShape(sphere, transform));
 	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, identity), PosedShape(sphere, transform));
+	ASSERT_EQ(1, expected.size());
 
 	contactsInfoEqualityTest(expected, result);
 }
 
 TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 {
-	auto box = std::make_shared<Math::BoxShape>();
+	auto box = std::make_shared<Math::BoxShape>(1.0, 1.0, 1.0);
 	auto plane = std::make_shared<Math::PlaneShape>();
 
-	Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
+	auto planePose = Math::makeRigidTransform(Math::makeRotationQuaternion(0.01, Vector3d::UnitX().eval()),
+		Vector3d::Zero());
 	auto basePose = Math::makeRigidTranslation(Math::Vector3d(0.0, 0.01, 0.0));
 	auto box1Pose = Math::makeRigidTransform(
 						Math::makeRotationQuaternion(0.01, Vector3d(0.01, 0.01, 0.01)),
@@ -86,7 +87,7 @@ TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 
 	auto box2Pose = Math::makeRigidTransform(
 						Math::makeRotationQuaternion(-0.01, Vector3d(0.01, 0.01, 0.01)),
-						Vector3d(0.0, 1.0, 0.0));
+						Vector3d(0.0, -1.0, 0.0));
 
 	auto compoundShape = std::make_shared<Math::CompoundShape>();
 
@@ -96,14 +97,24 @@ TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 	auto calc1 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_BOX][Math::SHAPE_TYPE_PLANE];
 	auto calc2 = ContactCalculation::getDcdContactTable()[Math::SHAPE_TYPE_COMPOUNDSHAPE][Math::SHAPE_TYPE_PLANE];
 
-	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, basePose), PosedShape(plane, identity));
+	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, basePose), PosedShape(plane, planePose));
 
-	std::list<std::shared_ptr<Contact>> expected;
+	std::list<std::shared_ptr<Contact>> expected =
+		calc1->calculateDcdContact(PosedShape(box, basePose * box1Pose), PosedShape(plane, planePose));
+	for (auto& contact : expected)
+	{
+		contact->penetrationPoints.first.rigidLocalPosition.setValue(box1Pose *
+			contact->penetrationPoints.first.rigidLocalPosition.getValue());
+	}
 
-	expected.splice(expected.end(),
-		calc1->calculateDcdContact(PosedShape(box, basePose * box1Pose), PosedShape(plane, identity)));
-	expected.splice(expected.end(),
-		calc1->calculateDcdContact(PosedShape(box, basePose * box2Pose), PosedShape(plane, identity)));
+	auto box2Expected = calc1->calculateDcdContact(PosedShape(box, basePose * box2Pose), PosedShape(plane, planePose));
+	for (auto& contact : box2Expected)
+	{
+		contact->penetrationPoints.first.rigidLocalPosition.setValue(box2Pose *
+			contact->penetrationPoints.first.rigidLocalPosition.getValue());
+	}
+	expected.splice(expected.end(), box2Expected);
+	ASSERT_EQ(12, expected.size());
 
 	contactsInfoEqualityTest(expected, result);
 }
