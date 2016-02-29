@@ -261,6 +261,7 @@ void MeshShape::setPose(const RigidTransform3d& pose)
 	{
 		vertices[i].position = pose * initialVertices[i].position;
 	}
+	calculateNormals();
 }
 
 }; // namespace Math

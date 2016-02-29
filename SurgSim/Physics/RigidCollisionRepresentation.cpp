@@ -113,6 +113,27 @@ void RigidCollisionRepresentation::update(const double& time)
 
 		setPosedShapeMotion(posedShapeMotion);
 	}
+	else
+	{
+		auto verticesShape = std::dynamic_pointer_cast<Math::VerticesShape>(m_shape);
+		if (verticesShape != nullptr)
+		{
+			Math::RigidTransform3d currentPose;
+			{
+				auto physicsRepresentation = m_physicsRepresentation.lock();
+				SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+					"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+				const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
+				Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+				currentPose = physicsCurrentPose * transform;
+			}
+			verticesShape->setPose(currentPose);
+
+			PosedShape<std::shared_ptr<Shape>> posedShape(verticesShape, currentPose);
+			PosedShapeMotion<std::shared_ptr<Shape>> posedShapeMotion(posedShape, posedShape);
+			setPosedShapeMotion(posedShapeMotion);
+		}
+	}
 }
 
 SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
