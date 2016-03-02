@@ -38,7 +38,7 @@ SegmentSelfContact::SegmentSelfContact():
 	m_timeMaxPrecisionEpsilon(1.0e-06),
 	m_maxMovementThreshold(0.1),
 	m_useSegmentThickness(true),
-	m_logger(Framework::Logger::getLogger("CCDMovingContactLog"))
+	m_logger(Framework::Logger::getLogger("SegmentSelfContact"))
 {
 }
 

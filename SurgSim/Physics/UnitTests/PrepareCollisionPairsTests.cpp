@@ -190,5 +190,28 @@ TEST_F(PrepareCollisionPairsTest, IgnoreNoneTypeCollisions)
 	ASSERT_EQ(0u, newState->getCollisionPairs().size());
 }
 
+TEST_F(PrepareCollisionPairsTest, SelfCollisionPair)
+{
+	sphere2->setPose(Math::makeRigidTransform(Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.5)));
+	sphere2Collision->setSelfCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_DISCRETE);
+
+	prepareState();
+	std::shared_ptr<PhysicsManagerState> newState = computation->update(1.0, state);
+	ASSERT_EQ(2u, newState->getCollisionPairs().size());
+}
+
+// Check for a bug fix in PrepareCollisionPairs where Scenes with 1 representation did not check for self collision
+TEST_F(PrepareCollisionPairsTest, SingleSelfCollisionPair)
+{
+	physicsRepresentations.pop_back();
+	collisionRepresentations.pop_back();
+	sphere1->setPose(Math::makeRigidTransform(Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.5)));
+	sphere1Collision->setSelfCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_DISCRETE);
+
+	prepareState();
+	std::shared_ptr<PhysicsManagerState> newState = computation->update(1.0, state);
+	ASSERT_EQ(1u, newState->getCollisionPairs().size());
+}
+
 };
 };
