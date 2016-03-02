@@ -297,7 +297,7 @@ void Representation::updateCcdData()
 
 void Representation::updateShapeData()
 {
-
+	//getPosedShape();
 }
 
 }; // namespace Collision

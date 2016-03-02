@@ -13,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/CcdCollisionLoop.h"
-#include "SurgSim/Physics/CcdCollision.h"
-#include "SurgSim/Physics/UpdateCcdData.h"
-#include "SurgSim/Physics/ContactConstraintGeneration.h"
+#ifndef SURGSIM_PHYSICS_UPDATECOLLISIONDATA_H
+#define SURGSIM_PHYSICS_UPDATECOLLISIONDATA_H
+
+#include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
 {
@@ -24,23 +25,25 @@ namespace SurgSim
 namespace Physics
 {
 
-CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
-	ComputationGroup(copyState)
+class UpdateCollisionData : public Computation
 {
-	addComputation(std::make_shared<UpdateCcdData>(copyState));
-	addComputation(std::make_shared<CcdCollision>(copyState));
+public:
+	/// Constructor
+	explicit UpdateCollisionData(bool copyState);
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::UpdateCollisionData);
+
+	/// Destructor
+	~UpdateCollisionData();
+
+	std::shared_ptr<PhysicsManagerState>
+	doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state) override;
+
+private:
+
+};
+
+}
 }
 
-CcdCollisionLoop::~CcdCollisionLoop()
-{
-
-}
-
-
-bool CcdCollisionLoop::endIteration()
-{
-	return true;
-}
-
-}
-}
+#endif

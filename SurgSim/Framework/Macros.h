@@ -44,4 +44,6 @@
 #define SURGSIM_DOUBLE_SPECIALIZATION
 #endif
 
+#define SURGSIM_CLASS(x) #x
+
 #endif

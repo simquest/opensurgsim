@@ -76,6 +76,8 @@ private:
 
 	virtual void updateCcdData() override;
 
+	virtual void updateShapeData() override;
+
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::Shape> m_shape, m_previousShape;
 

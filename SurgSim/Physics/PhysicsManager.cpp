@@ -24,16 +24,18 @@
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/FreeMotion.h"
-#include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/ParticleCollisionResponse.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/PostUpdate.h"
-#include "SurgSim/Physics/PrepareCollisionPairs.h"
 #include "SurgSim/Physics/PreUpdate.h"
+#include "SurgSim/Physics/PrepareCollisionPairs.h"
 #include "SurgSim/Physics/PublishCollisions.h"
 #include "SurgSim/Physics/PushResults.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/SolveMlcp.h"
+#include "SurgSim/Physics/UpdateCollisionData.h"
 #include "SurgSim/Physics/UpdateCollisionRepresentations.h"
+#include "SurgSim/Physics/UpdateDcdData.h"
 
 namespace SurgSim
 {
@@ -61,10 +63,11 @@ bool PhysicsManager::doInitialize()
 	bool copyState = false;
 	addComputation(std::make_shared<PreUpdate>(copyState));
 	addComputation(std::make_shared<FreeMotion>(copyState));
-	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
+	addComputation(std::make_shared<UpdateCollisionData>(copyState));
 	addComputation(std::make_shared<PrepareCollisionPairs>(copyState));
-	addComputation(std::make_shared<DcdCollision>(copyState));
 	addComputation(std::make_shared<CcdCollisionLoop>(copyState));
+	addComputation(std::make_shared<UpdateDcdData>(copyState));
+	addComputation(std::make_shared<DcdCollision>(copyState));
 	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
 	addComputation(std::make_shared<BuildMlcp>(copyState));
 	addComputation(std::make_shared<SolveMlcp>(copyState));

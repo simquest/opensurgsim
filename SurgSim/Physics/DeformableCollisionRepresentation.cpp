@@ -148,6 +148,24 @@ DeformableCollisionRepresentation::getDeformableRepresentation() const
 	return physicsRepresentation;
 }
 
+
+void DeformableCollisionRepresentation::updateShapeData()
+{
+	auto physicsRepresentation = m_deformable.lock();
+	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
+			"Failed to update. The DeformableCollisionRepresentation either was not attached to a "
+			"Physics::Representation or the Physics::Representation has expired.";
+
+	// Write current shape
+	if (!updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get()))
+	{
+		setLocalActive(false);
+		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
+				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
+	}
+}
+
+
 void DeformableCollisionRepresentation::updateDcdData()
 {
 	auto physicsRepresentation = m_deformable.lock();
@@ -162,6 +180,9 @@ void DeformableCollisionRepresentation::updateDcdData()
 		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
 				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
 	}
+
+	// execute getPosedShape here ...
+	getPosedShape();
 }
 
 void DeformableCollisionRepresentation::updateCcdData()
