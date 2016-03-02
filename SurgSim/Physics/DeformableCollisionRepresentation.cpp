@@ -168,21 +168,8 @@ void DeformableCollisionRepresentation::updateShapeData()
 
 void DeformableCollisionRepresentation::updateDcdData()
 {
-	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
-			"Failed to update. The DeformableCollisionRepresentation either was not attached to a "
-			"Physics::Representation or the Physics::Representation has expired.";
-
-	// Write current shape
-	if (!updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get()))
-	{
-		setLocalActive(false);
-		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
-	}
-
-	// execute getPosedShape here ...
-	getPosedShape();
+	// HS-2-Mar-2016
+	// #todo should only have to build the AABB tree here
 }
 
 void DeformableCollisionRepresentation::updateCcdData()
@@ -229,6 +216,10 @@ void DeformableCollisionRepresentation::updateCcdData()
 	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeSecond(m_shape, Math::RigidTransform3d::Identity());
 	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeSecond);
 	setPosedShapeMotion(posedShapeMotion);
+
+	// HS-2-Mar-2016
+	// #todo Add AABB tree for the posedShapeMotion (i.e. that is the tree where each bounding box consists of the
+	// corresponding elements from posedShape1 and posedShape2
 }
 
 } // namespace Physics

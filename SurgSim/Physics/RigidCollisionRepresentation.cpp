@@ -86,6 +86,20 @@ SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 	return physicsPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
 }
 
+void RigidCollisionRepresentation::updateShapeData()
+{
+	// All we want to do is to transform the shape into the current pose
+	getPosedShape();
+}
+
+
+void RigidCollisionRepresentation::updateDcdData()
+{
+	// HS-2-Mar-2016
+	// #todo need to trigger the aabb tree build/update here
+}
+
+
 void RigidCollisionRepresentation::updateCcdData()
 {
 	using Math::PosedShape;
@@ -119,7 +133,13 @@ void RigidCollisionRepresentation::updateCcdData()
 	PosedShapeMotion<std::shared_ptr<Shape>> posedShapeMotion(posedShape1, posedShape2);
 
 	setPosedShapeMotion(posedShapeMotion);
+
+	// HS-2-Mar-2016
+	// #todo Add AABB tree for the posedShapeMotion (i.e. that is the tree where each bounding box consists of the
+	// corresponding elements from posedShape1 and posedShape2
+
 }
+
 
 }; // namespace Collision
 }; // namespace SurgSim

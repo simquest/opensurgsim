@@ -70,6 +70,8 @@ public:
 	/// \return	The physics representation.
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> getRigidRepresentation();
 
+	void updateShapeData() override;
+	void updateDcdData() override;
 	void updateCcdData() override;
 
 private:
