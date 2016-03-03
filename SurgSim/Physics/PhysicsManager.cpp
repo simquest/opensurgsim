@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Physics/BuildMlcp.h"
 #include "SurgSim/Physics/CcdCollision.h"
-#include "SurgSim/Physics/ClearCollisions.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/DcdCollision.h"
@@ -28,7 +27,6 @@
 #include "SurgSim/Physics/PostUpdate.h"
 #include "SurgSim/Physics/PrepareCollisionPairs.h"
 #include "SurgSim/Physics/PreUpdate.h"
-#include "SurgSim/Physics/PublishCollisions.h"
 #include "SurgSim/Physics/PushResults.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/SolveMlcp.h"
