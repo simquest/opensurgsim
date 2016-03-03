@@ -104,9 +104,8 @@ private:
 
 	std::vector<SubShape> m_shapes;
 
-	typedef boost::upgrade_lock<boost::shared_mutex> ReadLock;
+	typedef boost::shared_lock<boost::shared_mutex> ReadLock;
 	typedef boost::unique_lock<boost::shared_mutex> WriteLock;
-	typedef boost::upgrade_to_unique_lock<boost::shared_mutex> UpgradeLock;
 
 	mutable boost::shared_mutex m_mutex;
 
