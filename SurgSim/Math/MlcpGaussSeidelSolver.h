@@ -79,11 +79,12 @@ public:
 	void setEpsilonConvergence(double precision);
 
 	/// \return The contact tolerance.
-	double getContactTolerance() const;
+	std::pair<double, double> getContactTolerance() const;
 
-	/// Set the contact tolerance.
+	/// Set the contact tolerance.  The greater value will be used to determine if the solution has succeeded.
+	/// The lesser value will be used to terminate the iterations early.
 	/// \param tolerance The contact tolerance.
-	void setContactTolerance(double tolerance);
+	void setContactTolerance(std::pair<double, double> tolerance);
 
 	/// \return The max number of iterations.
 	size_t getMaxIterations() const;
@@ -105,7 +106,7 @@ private:
 									  const std::vector<MlcpConstraintType>& constraintsType,
 									  double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES],
 									  double* convergenceCriteria,
-									  bool* validSignorini);
+									  bool* validSignorini, bool* tighterSignorini);
 
 	void doOneIteration(size_t problemSize, const MlcpProblem::Matrix& A,
 						const MlcpProblem::Vector& b,
@@ -125,8 +126,9 @@ private:
 	/// The precision.
 	double m_epsilonConvergence;
 
-	/// The contact tolerance.
-	double m_contactTolerance;
+	/// The contact tolerance.  The greater value will be used to determine if the solution has succeeded.
+	/// The lesser value will be used to terminate the iterations early.
+	std::pair<double, double> m_contactTolerance;
 
 	/// The maximum number of iterations
 	size_t m_maxIterations;

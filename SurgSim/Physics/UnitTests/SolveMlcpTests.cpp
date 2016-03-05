@@ -50,8 +50,9 @@ static void testMlcp(const std::string& filename, double contactTolerance, doubl
 	std::shared_ptr<SolveMlcp> solveMlcpComputation = std::make_shared<SolveMlcp>(false);
 	double dt = 1e-3;
 
-	solveMlcpComputation->setContactTolerance(contactTolerance);
-	EXPECT_NEAR(contactTolerance, solveMlcpComputation->getContactTolerance(), 1e-10);
+	solveMlcpComputation->setContactTolerance(std::pair<double, double>(contactTolerance, contactTolerance));
+	EXPECT_NEAR(contactTolerance, solveMlcpComputation->getContactTolerance().first, 1e-10);
+	EXPECT_NEAR(contactTolerance, solveMlcpComputation->getContactTolerance().second, 1e-10);
 	solveMlcpComputation->setPrecision(solverPrecision);
 	EXPECT_NEAR(solverPrecision, solveMlcpComputation->getPrecision(), 1e-10);
 	solveMlcpComputation->setMaxIterations(maxIteration);

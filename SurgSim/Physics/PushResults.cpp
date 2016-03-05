@@ -38,7 +38,7 @@ std::shared_ptr<PhysicsManagerState>
 	// Compute the global dof displacement correction from the constraints forces (result of the MLCP)
 	// correction = CHt . lambda
 	const Eigen::VectorXd& lambda = result->getMlcpSolution().x;
-	if (lambda.size() == 0)
+	if ((lambda.size() == 0) || !result->getMlcpSolution().validConvergence)
 	{
 		return state;
 	}

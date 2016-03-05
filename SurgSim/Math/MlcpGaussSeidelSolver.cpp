@@ -28,7 +28,7 @@ namespace Math
 
 MlcpGaussSeidelSolver::MlcpGaussSeidelSolver() :
 	m_epsilonConvergence(1e-4),
-	m_contactTolerance(2e-5),
+	m_contactTolerance(2e-5, 2e-5),
 	m_maxIterations(30),
 	m_numEnforcedAtomicConstraints(0),
 	m_logger(SurgSim::Framework::Logger::getLogger("Math/MlcpGaussSeidelSolver"))
@@ -38,7 +38,7 @@ MlcpGaussSeidelSolver::MlcpGaussSeidelSolver() :
 MlcpGaussSeidelSolver::MlcpGaussSeidelSolver(double epsilonConvergence, double contactTolerance,
 		size_t maxIterations) :
 	m_epsilonConvergence(epsilonConvergence),
-	m_contactTolerance(contactTolerance),
+	m_contactTolerance(contactTolerance, contactTolerance),
 	m_maxIterations(maxIterations),
 	m_numEnforcedAtomicConstraints(0),
 	m_logger(SurgSim::Framework::Logger::getLogger("Math/MlcpGaussSeidelSolver"))
@@ -59,14 +59,18 @@ void MlcpGaussSeidelSolver::setEpsilonConvergence(double precision)
 	m_epsilonConvergence = precision;
 }
 
-double MlcpGaussSeidelSolver::getContactTolerance() const
+std::pair<double, double> MlcpGaussSeidelSolver::getContactTolerance() const
 {
 	return m_contactTolerance;
 }
 
-void MlcpGaussSeidelSolver::setContactTolerance(double tolerance)
+void MlcpGaussSeidelSolver::setContactTolerance(std::pair<double, double> tolerance)
 {
 	m_contactTolerance = tolerance;
+	if (m_contactTolerance.first < m_contactTolerance.second)
+	{
+		std::swap(m_contactTolerance.first, m_contactTolerance.second);
+	}
 }
 
 size_t MlcpGaussSeidelSolver::getMaxIterations() const
@@ -98,12 +102,14 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	*iteration = 0;
 	*validSignorini = true;
 
+	bool meetsTighterSignorini = true;
+
 	calculateConvergenceCriteria(problemSize, A, b, initialGuessAndSolution,
 								 constraintsType, initialConstraintConvergenceCriteria, initialConvergenceCriteria,
-								 validSignorini);
+								 validSignorini, &meetsTighterSignorini);
 
 	// If it is already converged, fill the output and return true.
-	if (*initialConvergenceCriteria <= m_epsilonConvergence && *validSignorini)
+	if (*initialConvergenceCriteria <= m_epsilonConvergence && meetsTighterSignorini)
 	{
 		*validConvergence = true;
 		*convergenceCriteria = *initialConvergenceCriteria;
@@ -117,7 +123,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 
 		calculateConvergenceCriteria(problemSize, A, b, initialGuessAndSolution,
 									 constraintsType, constraintConvergenceCriteria, convergenceCriteria,
-									 validSignorini);
+									 validSignorini, &meetsTighterSignorini);
 		++(*iteration);
 
 		// If we have an incredibly high convergence criteria value, the displacements are going to be very large,
@@ -131,9 +137,10 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 			break;
 		}
 	}
-	while ((!(*validSignorini) || (*convergenceCriteria > m_epsilonConvergence)) && *iteration < m_maxIterations);
+	while ((!meetsTighterSignorini || (*convergenceCriteria > m_epsilonConvergence)) && (*iteration < m_maxIterations));
 
-	*validConvergence = SurgSim::Math::isValid(*convergenceCriteria) && *convergenceCriteria <= 1.0;
+	*validConvergence = isValid(*convergenceCriteria) && *convergenceCriteria <= m_epsilonConvergence &&
+		*validSignorini;
 
 	SURGSIM_LOG_IF(*convergenceCriteria >= sqrt(m_epsilonConvergence), m_logger, WARNING) <<
 			"Convergence criteria (" << *convergenceCriteria << ") is greater than " << sqrt(m_epsilonConvergence) <<
@@ -146,7 +153,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	SURGSIM_LOG_IF(!(*validSignorini), m_logger, WARNING) <<
 		"Signorini not verified after " << *iteration << " Gauss Seidel iterations.";
 
-	return (SurgSim::Math::isValid(*convergenceCriteria) && *convergenceCriteria <= m_epsilonConvergence);
+	return *validConvergence;
 }
 
 
@@ -156,7 +163,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 		const std::vector<MlcpConstraintType>& constraintsType,
 		double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES],
 		double* convergenceCriteria,
-		bool* validSignorini)
+		bool* validSignorini, bool* meetsTighterSignorini)
 {
 	// Calculate initial convergence criteria.
 	for (size_t constraint = 0; constraint < MLCP_NUM_CONSTRAINT_TYPES; ++constraint)
@@ -165,6 +172,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 	}
 	*convergenceCriteria = 0.0;
 	*validSignorini = true;
+	*meetsTighterSignorini = true;
 
 	size_t currentAtomicIndex = 0;
 	const size_t nbConstraints = constraintsType.size();
@@ -216,12 +224,14 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 			{
 				const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
 				// Enforce orthogonality condition
-				if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
-					(initialGuessAndSolution[currentAtomicIndex] > m_epsilonConvergence &&
-					 violation > m_contactTolerance))
-				{
-					*validSignorini = false;
-				}
+				*validSignorini = *validSignorini && isValid(violation) &&
+					(violation >= -m_contactTolerance.first) &&
+					((initialGuessAndSolution[currentAtomicIndex] <= m_epsilonConvergence) ||
+					violation <= m_contactTolerance.first);
+				*meetsTighterSignorini = *meetsTighterSignorini && isValid(violation) &&
+					(violation >= -m_contactTolerance.second) &&
+					((initialGuessAndSolution[currentAtomicIndex] <= m_epsilonConvergence) ||
+					violation <= m_contactTolerance.second);
 				currentAtomicIndex += 1;
 				break;
 			}
@@ -230,12 +240,14 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 			{
 				const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
 				// Enforce orthogonality condition
-				if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
-					(initialGuessAndSolution[currentAtomicIndex] > m_epsilonConvergence &&
-					 violation > m_contactTolerance))
-				{
-					*validSignorini = false;
-				}
+				*validSignorini = *validSignorini && isValid(violation) &&
+					(violation >= -m_contactTolerance.first) &&
+					((initialGuessAndSolution[currentAtomicIndex] <= m_epsilonConvergence) ||
+					violation <= m_contactTolerance.first);
+				*meetsTighterSignorini = *meetsTighterSignorini && isValid(violation) &&
+					(violation >= -m_contactTolerance.second) &&
+					((initialGuessAndSolution[currentAtomicIndex] <= m_epsilonConvergence) ||
+					violation <= m_contactTolerance.second);
 				currentAtomicIndex += 3;
 				break;
 			}
@@ -713,10 +725,10 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 										   std::endl << "\t with initial violation b=(" << b[currentAtomicIndex] <<
 										   ") " << std::endl <<
 										   "\t with final   violation b-Ax=(" << violation << ") ";
-				if (violation < -m_contactTolerance)
+				if (violation < -m_contactTolerance.first)
 				{
 					SURGSIM_LOG_INFO(m_logger) << "\t  => normal violation = " << violation <<
-											   " < -m_contactTolerance => Signorini not verified yet !";
+											   " < -contactTolerance => Signorini not verified yet !";
 				}
 				SURGSIM_LOG_INFO(m_logger) << "\t force=(" << initialGuessAndSolution[currentAtomicIndex]  << ")";
 				currentAtomicIndex += 1;
@@ -733,7 +745,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 										   b.segment<3>(currentAtomicIndex).transpose() << ")" <<
 										   std::endl << "\t with final   violation b-Ax=(" <<
 										   violation.transpose() << ")";
-				if (violation[0] < -m_contactTolerance)
+				if (violation[0] < -m_contactTolerance.first)
 				{
 					SURGSIM_LOG_INFO(m_logger) << "\t  => normal violation = " << violation[0] <<
 											   " < -contactTolerance => Signorini not verified yet !";
