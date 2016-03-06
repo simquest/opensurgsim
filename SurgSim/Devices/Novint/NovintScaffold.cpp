@@ -256,6 +256,7 @@ struct NovintScaffold::DeviceData
 		isDeviceHeld(false),
 		isDevice7Dof(device->is7DofDevice()),
 		maxForce(device->getMaxForce()),
+		antigrav(device->getAntigrav()),
 		isDeviceRollAxisReversed(false),
 		eulerAngleOffsetRoll(0.0),
 		eulerAngleOffsetYaw(0.0),
@@ -305,6 +306,8 @@ struct NovintScaffold::DeviceData
 	bool isDevice7Dof;
 	/// The maximum force magnitude (in Newtons) to send to the device.
 	double maxForce;
+	/// The constant force added to all forces sent to the device (in Newtons).
+	Vector3d antigrav;
 	/// True if the roll axis of a 7DoF device has reverse polarity because the device is left-handed.
 	bool isDeviceRollAxisReversed;
 
@@ -526,8 +529,9 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 		return false;   // message already printed
 	}
 	m_state->registeredDevices.emplace_back(std::move(info));
-	SURGSIM_LOG_INFO(m_state->logger) << "Device " << device->getName() << " initialized.  Maximum force " <<
-		m_state->registeredDevices.back()->maxForce << " Newtons.";
+	SURGSIM_LOG_INFO(m_state->logger) << "Device " << device->getName() << " initialized.  Maximum force is " <<
+		m_state->registeredDevices.back()->maxForce << " Newtons. Antigrav is (" <<
+		m_state->registeredDevices.back()->antigrav.transpose() << ") Newtons";
 
 	return true;
 }
@@ -814,6 +818,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
 	const DataGroup& outputData = info->deviceObject->getOutputData();
 	outputData.vectors().get(DataStructures::Names::FORCE, &(info->force));
+	info->force += info->antigrav;
 
 	// If the springJacobian was provided, multiply with the change in position since the output data was set,
 	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.

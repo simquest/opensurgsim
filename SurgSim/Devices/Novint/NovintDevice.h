@@ -132,12 +132,22 @@ public:
 	/// \return The maximum force (in Newtons) that can be sent to the device.
 	double getMaxForce() const;
 
+	/// Set a constant force that gets added to all forces sent to the hardware.
+	/// \param antigrav The anti-gravity force in Newtons.
+	void setAntigrav(Math::Vector3d antigrav);
+
+	/// \return The constant force that gets added to all forces sent to the hardware (in Newtons).
+	Math::Vector3d getAntigrav() const;
+
 protected:
 	/// True if the device is 7Dof, false if the device is 3Dof.
 	bool m_7DofDevice;
 
 	/// The maximum force magnitude (in Newtons) that should be sent to the hardware.
 	double m_maxForce;
+
+	/// The anti-gravity force in Newtons.
+	Math::Vector3d m_antigrav;
 
 private:
 	friend class NovintScaffold;
