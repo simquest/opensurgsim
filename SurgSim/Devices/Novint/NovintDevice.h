@@ -132,6 +132,13 @@ public:
 	/// \return The maximum force (in Newtons) that can be sent to the device.
 	double getMaxForce() const;
 
+protected:
+	/// True if the device is 7Dof, false if the device is 3Dof.
+	bool m_7DofDevice;
+
+	/// The maximum force magnitude (in Newtons) that should be sent to the hardware.
+	double m_maxForce;
+
 private:
 	friend class NovintScaffold;
 
@@ -158,12 +165,6 @@ private:
 	double m_positionScale;
 	/// Scale factor for the orientation axes; stored locally before the device is initialized.
 	double m_orientationScale;
-
-	/// True if the device is 7Dof, false if the device is 3Dof.
-	bool m_7DofDevice;
-
-	/// The maximum force magnitude (in Newtons) that should be sent to the hardware.
-	double m_maxForce;
 };
 
 };  // namespace Devices

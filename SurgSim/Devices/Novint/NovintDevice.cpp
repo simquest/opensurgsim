@@ -36,6 +36,8 @@ NovintDevice::NovintDevice(const std::string& uniqueName) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, OptionalValue<std::string>, SerialNumber,
 		getOptionalSerialNumber, setOptionalSerialNumber);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, bool, 7DofDevice, is7DofDevice, set7DofDevice);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, PositionScale, getPositionScale, setPositionScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, OrientationScale, getOrientationScale, setOrientationScale);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, MaxForce, getMaxForce, setMaxForce);
 }
 
