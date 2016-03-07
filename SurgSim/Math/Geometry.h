@@ -21,6 +21,7 @@
 #include <Eigen/Geometry>
 
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/Polynomial.h"
 #include "SurgSim/Math/Vector.h"
 
 /// \file Geometry.h a collection of functions that calculation geometric properties of various basic geometric shapes.
@@ -1771,13 +1772,59 @@ bool calculateContactTriangleCapsule(
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPointCapsuleAxis);
 
+/// Test when 4 points are coplanar in the range [0..1] given their linear motion
+/// \tparam T The scalar type
+/// \tparam MOpt The matrix options
+/// \param A, B, C, D the 4 point' motion (each has a pair from -> to)
+/// \param[out] timesOfCoplanarity The normalized times (in [0..1]) at which the 4 points are coplanar
+/// \return The number of times the 4 points are coplanar throughout their motion in [0..1]
+template <class T, int MOpt>
+int timesOfCoplanarityInRange01(
+	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& A,
+	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& B,
+	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& C,
+	const std::pair<Eigen::Matrix<T, 3, 1, MOpt>, Eigen::Matrix<T, 3, 1, MOpt>>& D,
+	std::array<T, 3>* timesOfCoplanarity)
+{
+	/// Let's define the following:
+	/// A(t) = A0 + t * VA with VA = A1 - A0
+	/// Similarily for B(t), C(t) and D(t)
+	/// Therefore we have AB(t) = B(t) - A(t) = B(0) + t * VB - A(0) - t * VA
+	///                         = AB(0) + t * [VB - VA] = AB(0) + t * VAB
+	///
+	/// The 4 points ABCD are coplanar are time t if they verify:
+	/// [AB(t).cross(CD(t))].AC(t) = 0
+	/// We develop this equation to clearly formulate the resulting cubic equation:
+	///
+	/// [AB(0).cross(CD(0)) + t*AB(0).cross(VCD) + t*VAB.cross(CD(0)) + t^2*VAB.cross(VCD)] . [AC(0) + t * VAC] = 0
+	/// t^0 * [[AB(0).cross(CD(0))].AC(0)] +
+	/// t^1 * [[AB(0).cross(CD(0))].VAC + [AB(0).cross(VCD)].AC(0) + [VAB.cross(CD(0))].AC(0)] +
+	/// t^2 * [[AB(0).cross(VCD)].VAC + [VAB.cross(CD(0))].VAC + [VAB.cross(VCD)].AC(0)] +
+	/// t^3 * [[VAB.cross(VCD)].VAC] = 0
+	Eigen::Matrix<T, 3, 1, MOpt> AB0 = B.first - A.first;
+	Eigen::Matrix<T, 3, 1, MOpt> AC0 = C.first - A.first;
+	Eigen::Matrix<T, 3, 1, MOpt> CD0 = D.first - C.first;
+	Eigen::Matrix<T, 3, 1, MOpt> VA = (A.second - A.first);
+	Eigen::Matrix<T, 3, 1, MOpt> VC = (C.second - C.first);
+	Eigen::Matrix<T, 3, 1, MOpt> VAB = (B.second - B.first) - VA;
+	Eigen::Matrix<T, 3, 1, MOpt> VAC = VC - VA;
+	Eigen::Matrix<T, 3, 1, MOpt> VCD = (D.second - D.first) - VC;
+	T a0 = AB0.cross(CD0).dot(AC0);
+	T a1 = AB0.cross(CD0).dot(VAC) + (AB0.cross(VCD) + VAB.cross(CD0)).dot(AC0);
+	T a2 = (AB0.cross(VCD) + VAB.cross(CD0)).dot(VAC) + VAB.cross(VCD).dot(AC0);
+	T a3 = VAB.cross(VCD).dot(VAC);
+
+	return findRootsInRange01(Polynomial<T, 3>(a0, a1, a2, a3), timesOfCoplanarity);
+}
+
 }; // namespace Math
 }; // namespace SurgSim
 
 
+#include "SurgSim/Math/PointTriangleCcdContactCalculation-inl.h"
+#include "SurgSim/Math/SegmentSegmentCcdContactCalculation-inl.h"
 #include "SurgSim/Math/TriangleCapsuleContactCalculation-inl.h"
 #include "SurgSim/Math/TriangleTriangleIntersection-inl.h"
 #include "SurgSim/Math/TriangleTriangleContactCalculation-inl.h"
-
 
 #endif
