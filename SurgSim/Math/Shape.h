@@ -96,7 +96,7 @@ public:
 	/// Get a copy of this shape with an applied rigid transform
 	/// \param pose The pose to transform the shape by
 	/// \return the posed shape
-	virtual std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose);
+	virtual std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const;
 
 	/// Get class name
 	virtual std::string getClassName() const;

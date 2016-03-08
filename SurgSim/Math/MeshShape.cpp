@@ -213,7 +213,7 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
 }
 
-std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose)
+std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose) const
 {
 	auto transformed = std::make_shared<MeshShape>(*this);
 	transformed->transform(pose);
@@ -238,9 +238,8 @@ void MeshShape::updateAabbTree()
 	{
 		if (triangles[id].isValid)
 		{
-			const auto& vertices = getTrianglePositions(id);
-			Aabbd aabb(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]));
-			items.emplace_back(std::make_pair(std::move(aabb), id));
+			auto vertices = getTrianglePositions(id);
+			items.emplace_back(SurgSim::Math::makeAabb(vertices[0], vertices[1], vertices[2]), id);
 		}
 	}
 	m_aabbTree->set(std::move(items));
