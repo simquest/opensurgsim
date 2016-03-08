@@ -329,12 +329,26 @@ TEST(OsgCameraTests, MultipleRenderGroups)
 	EXPECT_EQ(0, camera->getRenderGroupReferences().size());
 
 	camera->addRenderGroupReference("Group1");
-    camera->addRenderGroupReference("Group2");
-    EXPECT_EQ(2, camera->getRenderGroupReferences().size());
+	camera->addRenderGroupReference("Group2");
+	EXPECT_EQ(2, camera->getRenderGroupReferences().size());
 
-    std::vector<std::string> references = { "Group3", "Group4", "Group5" };
-    camera->setRenderGroupReferences(references);
+	std::vector<std::string> references = { "Group3", "Group4", "Group5" };
+	camera->setRenderGroupReferences(references);
 	EXPECT_EQ(3, camera->getRenderGroupReferences().size());
+
+	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group3"));
+	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group4"));
+	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group5"));
+
+	std::vector<std::shared_ptr<Group>> groups;
+	camera->getOsgCamera()->removeChildren(0, 1);
+	for (auto reference : { "Group6", "Group7", "Group8" })
+	{
+		camera->addRenderGroupReference(reference);
+		groups.push_back(std::make_shared<Graphics::OsgGroup>(reference));
+	}
+	camera->setRenderGroups(groups);
+	EXPECT_EQ(groups.size(), camera->getRenderGroups().size());
 }
 
 }  // namespace Graphics
