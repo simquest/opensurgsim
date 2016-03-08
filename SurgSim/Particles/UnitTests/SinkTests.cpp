@@ -104,6 +104,7 @@ TEST(SinkTest, Update)
 	auto element = std::make_shared<Framework::BasicSceneElement>("Element");
 
 	auto particleCollision = std::make_shared<ParticlesCollisionRepresentation>("Particle Collision");
+	particleCollision->setParticleRadius(0.01);
 	element->addComponent(particleCollision);
 
 	auto particleSystem = std::make_shared<MockParticleSystem>("ParticleSystem");
@@ -123,12 +124,14 @@ TEST(SinkTest, Update)
 	sink->setCollisionRepresentation(sinkCollision);
 	element->addComponent(sink);
 
-	particleSystem->addParticle(Math::Vector3d::UnitY(), Math::Vector3d::Zero(), 10);
+	particleSystem->addParticle(Math::Vector3d(0.0, 1.009, 0.0), Math::Vector3d::Zero(), 10);
 	runtime->getScene()->addSceneElement(element);
 	EXPECT_EQ(1, particleSystem->getParticles().safeGet()->getNumVertices());
 
-	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	runtime->start(true);
+	runtime->step();
+	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 	runtime->stop();
 
 	EXPECT_EQ(0, particleSystem->getParticles().safeGet()->getNumVertices());
