@@ -100,7 +100,7 @@ public:
 		}
 	}
 
-	bool isApprox(const Location& other, double precision = std::numeric_limits<double>::epsilon())
+	bool isApprox(const Location& other, double precision = std::numeric_limits<double>::epsilon()) const
 	{
 		bool result = false;
 
