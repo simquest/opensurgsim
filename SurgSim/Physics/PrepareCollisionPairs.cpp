@@ -47,10 +47,10 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 
 	std::vector<std::shared_ptr<Collision::CollisionPair>> pairs;
 
-	auto firstEnd = std::end(representations);
-	for (auto first = std::begin(representations); first != firstEnd; ++first)
+	auto end = std::end(representations);
+	for (auto first = std::begin(representations); first != end; ++first)
 	{
-		for (auto second = first; second != std::end(representations); ++second)
+		for (auto second = first; second != end; ++second)
 		{
 			if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
 			{

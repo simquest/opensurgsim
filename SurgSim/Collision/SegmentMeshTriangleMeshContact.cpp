@@ -33,6 +33,25 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::SegmentMeshShape;
 using SurgSim::Math::Vector3d;
 
+
+namespace SegmentMeshTriangleMesh
+{
+bool isThisContactADuplicate(
+	const std::shared_ptr<SurgSim::Collision::Contact>& newContact,
+	const std::list<std::shared_ptr<SurgSim::Collision::Contact>>& contacts)
+{
+	for (const auto& contact : contacts)
+	{
+		if (*newContact == *contact)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+}
 namespace SurgSim
 {
 namespace Collision
@@ -101,7 +120,7 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 					penetrationPoints.first.elementMeshLocalCoordinate.setValue(
 						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate2));
 					penetrationPoints.first.rigidLocalPosition.setValue(
-						segmentMeshPose.inverse() *penetrationPointCapsuleAxis);
+						segmentMeshPose.inverse() * penetrationPointCapsuleAxis);
 
 					Vector3d barycentricCoordinate;
 					SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
@@ -129,29 +148,11 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 	return contacts;
 }
 
-namespace SegmentMeshTriangleMesh
-{
-bool isThisContactADuplicate(
-	const std::shared_ptr<Contact>& newContact,
-	const std::list<std::shared_ptr<Contact>>& contacts)
-{
-	for (const auto& contact : contacts)
-	{
-		if (*newContact == *contact)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-} // namespace SegmentMeshTriangleMeshContact
-
 std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcdContact(
-	const Math::SegmentMeshShape& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
-	const Math::SegmentMeshShape& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
-	const Math::MeshShape& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
-	const Math::MeshShape& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) const
+									 const Math::SegmentMeshShape& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
+									 const Math::SegmentMeshShape& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
+									 const Math::MeshShape& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
+									 const Math::MeshShape& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) const
 {
 	using SegmentMeshTriangleMesh::isThisContactADuplicate;
 	using Math::calculateCcdContactSegmentSegment;
@@ -159,9 +160,13 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 
 	std::list<std::shared_ptr<Contact>> contacts;
 
-	// A SegmentMeshShape can only come from a DeformableRepresentation, therefore it is in global space (no pose)
-	SURGSIM_ASSERT(pose1AtTime0.isApprox(Math::RigidTransform3d::Identity()));
-	SURGSIM_ASSERT(pose1AtTime1.isApprox(Math::RigidTransform3d::Identity()));
+	// This code is not tested for SegmentMeshes on Rigids, warn the user !
+	SURGSIM_LOG_ONCE_IF(! pose1AtTime0.isApprox(Math::RigidTransform3d::Identity()) &&
+						! pose1AtTime1.isApprox(Math::RigidTransform3d::Identity()),
+						SurgSim::Framework::Logger::getLogger("Collision"), SEVERE)
+			<< "It looks like you're using the SegmentMesh with a rigid object under CCD, the "
+			<< "SegmentMeshTriangleMeshContact is not tested for this case.";
+
 
 	SURGSIM_ASSERT(shape1AtTime0.getNumEdges() > 0);
 	SURGSIM_ASSERT(shape1AtTime0.getNumEdges() == shape1AtTime1.getNumEdges());
@@ -174,16 +179,16 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 		auto edgeT1 = shape1AtTime1.getEdge(edgeId);
 
 		SURGSIM_ASSERT(edgeT0.verticesId == edgeT1.verticesId) << "Edges are different:\n" <<
-			"(" << edgeT0.verticesId[0] << "," << edgeT0.verticesId[1] << ")\n" <<
-			"(" << edgeT1.verticesId[0] << "," << edgeT1.verticesId[1] << ")\n" <<
-			"edgeT0.valid = " << edgeT0.isValid << "\nedgeT1.valid = " << edgeT1.isValid;
+				"(" << edgeT0.verticesId[0] << "," << edgeT0.verticesId[1] << ")\n" <<
+				"(" << edgeT1.verticesId[0] << "," << edgeT1.verticesId[1] << ")\n" <<
+				"edgeT0.valid = " << edgeT0.isValid << "\nedgeT1.valid = " << edgeT1.isValid;
 
 		std::pair<Math::Vector3d, Math::Vector3d> sv0 = std::make_pair(
-			shape1AtTime0.getVertexPosition(edgeT0.verticesId[0]),
-			shape1AtTime1.getVertexPosition(edgeT1.verticesId[0]));
+					shape1AtTime0.getVertexPosition(edgeT0.verticesId[0]),
+					shape1AtTime1.getVertexPosition(edgeT1.verticesId[0]));
 		std::pair<Math::Vector3d, Math::Vector3d> sv1 = std::make_pair(
-			shape1AtTime0.getVertexPosition(edgeT0.verticesId[1]),
-			shape1AtTime1.getVertexPosition(edgeT1.verticesId[1]));
+					shape1AtTime0.getVertexPosition(edgeT0.verticesId[1]),
+					shape1AtTime1.getVertexPosition(edgeT1.verticesId[1]));
 		Math::Aabbd segmentAabb;
 		segmentAabb.extend(sv0.first);
 		segmentAabb.extend(sv0.second);
@@ -196,21 +201,21 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 			auto triangleT1 = shape2AtTime1.getTriangle(triangleId);
 
 			SURGSIM_ASSERT(triangleT0.verticesId == triangleT1.verticesId) << "Triangles are different:\n" <<
-				"(" << triangleT0.verticesId[0] << "," << triangleT0.verticesId[1] << "," <<
-				triangleT0.verticesId[2] << ")\n" <<
-				"(" << triangleT1.verticesId[0] << "," << triangleT1.verticesId[1] << "," <<
-				triangleT1.verticesId[2] << ")\n" <<
-				"triangleT0.valid = " << triangleT0.isValid << "\ntriangleT1.valid = " << triangleT1.isValid;
+					"(" << triangleT0.verticesId[0] << "," << triangleT0.verticesId[1] << "," <<
+					triangleT0.verticesId[2] << ")\n" <<
+					"(" << triangleT1.verticesId[0] << "," << triangleT1.verticesId[1] << "," <<
+					triangleT1.verticesId[2] << ")\n" <<
+					"triangleT0.valid = " << triangleT0.isValid << "\ntriangleT1.valid = " << triangleT1.isValid;
 
 			std::pair<Math::Vector3d, Math::Vector3d> tv0 = std::make_pair(
-				shape2AtTime0.getVertexPosition(triangleT0.verticesId[0]),
-				shape2AtTime1.getVertexPosition(triangleT1.verticesId[0]));
+						shape2AtTime0.getVertexPosition(triangleT0.verticesId[0]),
+						shape2AtTime1.getVertexPosition(triangleT1.verticesId[0]));
 			std::pair<Math::Vector3d, Math::Vector3d> tv1 = std::make_pair(
-				shape2AtTime0.getVertexPosition(triangleT0.verticesId[1]),
-				shape2AtTime1.getVertexPosition(triangleT1.verticesId[1]));
+						shape2AtTime0.getVertexPosition(triangleT0.verticesId[1]),
+						shape2AtTime1.getVertexPosition(triangleT1.verticesId[1]));
 			std::pair<Math::Vector3d, Math::Vector3d> tv2 = std::make_pair(
-				shape2AtTime0.getVertexPosition(triangleT0.verticesId[2]),
-				shape2AtTime1.getVertexPosition(triangleT1.verticesId[2]));
+						shape2AtTime0.getVertexPosition(triangleT0.verticesId[2]),
+						shape2AtTime1.getVertexPosition(triangleT1.verticesId[2]));
 
 			Math::Aabbd triangleAabb;
 			triangleAabb.extend(tv0.first);
@@ -227,7 +232,7 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 
 			double earliestTimeOfImpact = std::numeric_limits<double>::max();
 			double segmentAlpha = -1.0;  //!< Barycentric coordinates of P in the segment sv0sv1
-										  //!< P = sv0 + segmentAlpha.sv0sv1
+			//!< P = sv0 + segmentAlpha.sv0sv1
 			double triangleAlpha = -1.0;  //!< Barycentric coordinates of P in triangle tv0tv1tv2
 			double triangleBeta = -1.0;   //!< P = tv0 + triangleAlpha.tv0tv1 + triangleBeta.tv0tv2
 
@@ -237,29 +242,29 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 			if (tn.norm() < Math::Geometry::DistanceEpsilon)
 			{
 				SURGSIM_LOG_WARNING(Framework::Logger::getLogger("SegmentMeshTriangleMeshContact")) <<
-					"The triangle mesh contains a degenerate triangle (null normal)";
+						"The triangle mesh contains a degenerate triangle (null normal)";
 			}
 			tn.normalize();
 			if (Math::doesCollideSegmentTriangle<Math::Vector3d::Scalar, Math::Vector3d::Options>(
-				sv0.first, sv1.first,
-				tv0.first, tv1.first, tv2.first,
-				tn,
-				&pt))
+					sv0.first, sv1.first,
+					tv0.first, tv1.first, tv2.first,
+					tn,
+					&pt))
 			{
 				Math::Vector2d baryCoordSegment;
 				Math::Vector3d baryCoordTriangle;
 				if (!Math::barycentricCoordinates(pt, sv0.first, sv1.first, &baryCoordSegment))
 				{
 					SURGSIM_LOG_WARNING(Framework::Logger::getLogger("SegmentMeshTriangleMeshContact")) <<
-						"[t=0] Could not deduce the barycentric coordinate of (" << pt.transpose() <<
-						") in the segment (" << sv0.first.transpose() << ")  (" << sv1.first.transpose() << ")";
+							"[t=0] Could not deduce the barycentric coordinate of (" << pt.transpose() <<
+							") in the segment (" << sv0.first.transpose() << ")  (" << sv1.first.transpose() << ")";
 				}
 				if (!Math::barycentricCoordinates(pt, tv0.first, tv1.first, tv2.first, &baryCoordTriangle))
 				{
 					SURGSIM_LOG_WARNING(Framework::Logger::getLogger("SegmentMeshTriangleMeshContact")) <<
-						"[t=0] Could not deduce the barycentric coordinate of (" << pt.transpose() <<
-						") in the triangle (" << tv0.first.transpose() << ")  (" << tv1.first.transpose() <<
-						") (" << tv2.first.transpose() << ")";
+							"[t=0] Could not deduce the barycentric coordinate of (" << pt.transpose() <<
+							") in the triangle (" << tv0.first.transpose() << ")  (" << tv1.first.transpose() <<
+							") (" << tv2.first.transpose() << ")";
 				}
 				earliestTimeOfImpact = 0.0;
 				segmentAlpha = baryCoordSegment[1];
@@ -338,44 +343,15 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 			}
 
 			SURGSIM_ASSERT(segmentAlpha >= 0.0 && segmentAlpha <= 1.0) <<
-				"earliestTimeOfImpact = " << earliestTimeOfImpact <<
-				"; segmentAlpha = " << segmentAlpha;
+					"earliestTimeOfImpact = " << earliestTimeOfImpact <<
+					"; segmentAlpha = " << segmentAlpha;
 			SURGSIM_ASSERT(triangleAlpha >= 0.0 && triangleBeta >= 0.0 && triangleAlpha + triangleBeta <= 1.0) <<
-				"earliestTimeOfImpact = " << earliestTimeOfImpact <<
-				"; triangleAlpha = " << triangleAlpha <<
-				"; triangleBeta = " << triangleBeta <<
-				"; triangleAlpha + triangleBeta = " << triangleAlpha + triangleBeta;
+					"earliestTimeOfImpact = " << earliestTimeOfImpact <<
+					"; triangleAlpha = " << triangleAlpha <<
+					"; triangleBeta = " << triangleBeta <<
+					"; triangleAlpha + triangleBeta = " << triangleAlpha + triangleBeta;
 
-			//// Look for the contact information at t=0 (with interpenetration, contact normal,...)
-			//std::cout << "Seg[" << edgeId << "]/Tri[" << triangleId << "]" << " penetration depth ";
-			//{
-			//	Math::Vector3d S = Math::interpolate(sv0.first, sv1.first, segmentAlpha);
-			//	Math::Vector3d T0T1 = tv1.first - tv0.first;
-			//	Math::Vector3d T0T2 = tv2.first - tv0.first;
-			//	Math::Vector3d T = tv0.first + triangleAlpha * T0T1 + triangleBeta * T0T2;
-			//	Math::Vector3d Tn = T0T1.cross(T0T2).normalized();
-			//	double penetrationAtT0 = (S - T).dot(Tn);
-			//	std::cout << "[t=0; " << penetrationAtT0 << "]";
-			//}
 
-			//{
-			//	Math::Vector3d S = Math::interpolate(
-			//		Math::interpolate(sv0.first, sv0.second, earliestTimeOfImpact),
-			//		Math::interpolate(sv1.first, sv1.second, earliestTimeOfImpact), segmentAlpha);
-
-			//	auto T0 = Math::interpolate(tv0.first, tv0.second, earliestTimeOfImpact);
-			//	auto T1 = Math::interpolate(tv1.first, tv1.second, earliestTimeOfImpact);
-			//	auto T2 = Math::interpolate(tv2.first, tv2.second, earliestTimeOfImpact);
-			//	Math::Vector3d T0T1 = T1 - T0;
-			//	Math::Vector3d T0T2 = T2 - T0;
-			//	Math::Vector3d T = T0 + triangleAlpha * T0T1 + triangleBeta * T0T2;
-			//	Math::Vector3d Tn = T0T1.cross(T0T2).normalized();
-			//	double penetrationAtTimeOfImpact = (S - T).dot(Tn);
-			//	std::cout << "[t=" << earliestTimeOfImpact << "; " << penetrationAtTimeOfImpact << "]";
-			//}
-
-			// At this point, we found a valid collision.
-			// Let's build a contact with violation, normal and contact point information at t = 1
 			Math::Vector3d T, Tn;
 			double penentrationDepthAtT1;
 			{
@@ -406,16 +382,16 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 			locationTriangle.rigidLocalPosition = pose2AtTime1.inverse() * T;
 
 			auto contact = std::make_shared<Contact>(
-				COLLISION_DETECTION_TYPE_CONTINUOUS,
-				penentrationDepthAtT1,
-				earliestTimeOfImpact,
-				T,
-				Tn,
-				std::make_pair(locationSegment, locationTriangle));
+							   COLLISION_DETECTION_TYPE_CONTINUOUS,
+							   penentrationDepthAtT1,
+							   earliestTimeOfImpact,
+							   T,
+							   Tn,
+							   std::make_pair(locationSegment, locationTriangle));
 
 			if (!isThisContactADuplicate(contact, contacts))
 			{
-				contacts.push_back(contact);
+				contacts.push_back(std::move(contact));
 			}
 		}
 	}

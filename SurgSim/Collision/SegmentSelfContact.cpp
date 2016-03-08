@@ -38,7 +38,7 @@ SegmentSelfContact::SegmentSelfContact():
 	m_timeMaxPrecisionEpsilon(1.0e-06),
 	m_maxMovementThreshold(0.1),
 	m_useSegmentThickness(true),
-	m_logger(Framework::Logger::getLogger("SegmentSelfContact"))
+	m_logger(Framework::Logger::getLogger("Collision/SegmentSelfContact"))
 {
 }
 
@@ -218,8 +218,6 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 				contacts.emplace_back(std::make_shared<Contact>(
 										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, depth, t,
 										  contactPoint, normal, penetrationPoints));
-				SURGSIM_LOG_WARNING(m_logger)
-						<<  "Detected contact between " << id1 << " and " << id2 << " at " << t;
 			}
 		}
 		else
