@@ -38,7 +38,7 @@ SegmentSelfContact::SegmentSelfContact():
 	m_timeMaxPrecisionEpsilon(1.0e-06),
 	m_maxMovementThreshold(0.1),
 	m_useSegmentThickness(true),
-	m_logger(Framework::Logger::getLogger("CCDMovingContactLog"))
+	m_logger(Framework::Logger::getLogger("Collision/SegmentSelfContact"))
 {
 }
 
@@ -80,10 +80,10 @@ double SegmentSelfContact::distanceEpsilon()
 }
 
 std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
-	const Math::SegmentMeshShape& segmentShape1AtTime0, const Math::RigidTransform3d& segmentPose1AtTime0,
-	const Math::SegmentMeshShape& segmentShape1AtTime1, const Math::RigidTransform3d& segmentPose1AtTime1,
-	const Math::SegmentMeshShape& segmentShape2AtTime0, const Math::RigidTransform3d& segmentPose2AtTime0,
-	const Math::SegmentMeshShape& segmentShape2AtTime1, const Math::RigidTransform3d& segmentPose2AtTime1) const
+									 const Math::SegmentMeshShape& segmentShape1AtTime0, const Math::RigidTransform3d& segmentPose1AtTime0,
+									 const Math::SegmentMeshShape& segmentShape1AtTime1, const Math::RigidTransform3d& segmentPose1AtTime1,
+									 const Math::SegmentMeshShape& segmentShape2AtTime0, const Math::RigidTransform3d& segmentPose2AtTime0,
+									 const Math::SegmentMeshShape& segmentShape2AtTime1, const Math::RigidTransform3d& segmentPose2AtTime1) const
 {
 
 	const Math::SegmentMeshShape& segmentShape1 = segmentShape1AtTime0;
