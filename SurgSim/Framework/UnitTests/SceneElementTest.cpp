@@ -76,13 +76,13 @@ TEST(SceneElementTest, AddAndTestComponents)
 	EXPECT_TRUE(element->addComponent(component));
 
 	// Scene and SceneElement in Component will not be set until initialization.
-	EXPECT_NE(component->getScene(), element->getScene());
-	EXPECT_NE(component->getSceneElement(), element);
+	EXPECT_EQ(nullptr, component->getScene());
+	EXPECT_EQ(nullptr, component->getSceneElement());
 
 	// Scene and SceneElement should be set after add
 	runtime->getScene()->addSceneElement(element);
-	EXPECT_EQ(component->getScene(), element->getScene());
-	EXPECT_EQ(component->getSceneElement(), element);
+	EXPECT_EQ(element->getScene(), component->getScene());
+	EXPECT_EQ(element, component->getSceneElement());
 
 	// Verify the component made it to the manager
 	runtime->start(true);
