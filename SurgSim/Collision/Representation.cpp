@@ -82,8 +82,8 @@ const std::shared_ptr<Math::Shape> Representation::getPosedShape()
 {
 	if (getShape()->isTransformable())
 	{
-		// HS-3-mar-2016 This is still being used by all representations it will be superceded by local update functionality
-		// After ryans merge request goes in
+		// HS-3-mar-2016 This is still being used by all representations it will be superceded by
+		// local update functionality after ryans merge request goes in
 		// #todo get rid of this in favor of transforming the mesh shape
 		boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
 

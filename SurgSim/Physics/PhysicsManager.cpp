@@ -146,9 +146,10 @@ bool PhysicsManager::doUpdate(double dt)
 			{
 				auto& timer = computation->getTimer();
 				const double period = timer.getAverageFramePeriod();
-				SURGSIM_LOG_DEBUG(m_logger) << std::fixed << std::setprecision(0) <<
-											computation->getClassName() << " \taverage duration " << 1e6 * period << " us (max " <<
-											1e6 * timer.getMaxFramePeriod() << " us), " << 100.0 * period / totalTime << "% of Physics.";
+				SURGSIM_LOG_DEBUG(m_logger)
+						<< std::fixed << std::setprecision(0)
+						<< computation->getClassName() << " \taverage duration " << 1e6 * period << " us (max "
+						<< 1e6 * timer.getMaxFramePeriod() << " us), " << 100.0 * period / totalTime << "% of Physics.";
 				timer.setMaxNumberOfFrames(newFrames);
 				timer.start();
 			}

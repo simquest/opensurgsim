@@ -119,9 +119,14 @@ public:
 	/// \param dt the time passed from the last update.
 	virtual void update(const double& dt);
 
-	virtual void updateDcdData();
-	virtual void updateCcdData();
+	/// Update the basic Shape's state from the physics state, so that the bounding box can correctly be determined
 	virtual void updateShapeData();
+
+	/// Update the data (the shape) in preparation for a DCD contact calculation
+	virtual void updateDcdData();
+
+	/// Update the data (the motionShape) in preparation for a CCD contact calcuation
+	virtual void updateCcdData();
 
 	/// Set a collision representation to ignore
 	/// Collisions with this collision representation will not be detected

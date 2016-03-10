@@ -95,17 +95,17 @@ bool DeformableCollisionRepresentation::doInitialize()
 bool DeformableCollisionRepresentation::doWakeUp()
 {
 	auto physicsRepresentation = m_deformable.lock();
-	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
-			"The Physics::Representation referred by this DeformableCollisionRepresentation has expired.";
+	SURGSIM_ASSERT(nullptr != physicsRepresentation)
+			<< "The Physics::Representation referred by this DeformableCollisionRepresentation has expired.";
 
 	auto state = physicsRepresentation->getCurrentState();
-	SURGSIM_ASSERT(nullptr != state) <<
-									 "DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
+	SURGSIM_ASSERT(nullptr != state)
+			<< "DeformableRepresentation " << physicsRepresentation->getName() << " holds an empty OdeState.";
 	auto shape = std::dynamic_pointer_cast<DataStructures::VerticesPlain>(m_shape);
-	SURGSIM_ASSERT(shape != nullptr) <<
-									 "The shape object is not inherited from DataStructures::VerticesPlain, but should be.";
-	SURGSIM_ASSERT(shape->getNumVertices() == state->getNumNodes()) <<
-			"The number of nodes in the deformable does not match the number of vertices in the mesh.";
+	SURGSIM_ASSERT(shape != nullptr)
+			<< "The shape object is not inherited from DataStructures::VerticesPlain, but should be.";
+	SURGSIM_ASSERT(shape->getNumVertices() == state->getNumNodes())
+			<< "The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
 	update(0.0);
 	return true;
@@ -187,7 +187,8 @@ void DeformableCollisionRepresentation::updateCcdData()
 		}
 		else if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
 		{
-			m_previousShape = std::make_shared<Math::SegmentMeshShape>(*std::dynamic_pointer_cast<Math::SegmentMeshShape>(m_shape));
+			m_previousShape =
+				std::make_shared<Math::SegmentMeshShape>(*std::dynamic_pointer_cast<Math::SegmentMeshShape>(m_shape));
 		}
 		else
 		{

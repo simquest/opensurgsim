@@ -98,7 +98,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 std::shared_ptr<SurgSim::Framework::SceneElement> createMeshSphere()
 {
-	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, 0.025, 0.0));
+	SurgSim::Math::RigidTransform3d pose =
+		SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, 0.025, 0.0));
 
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("RigidMesh");
 	element->setPose(pose);
