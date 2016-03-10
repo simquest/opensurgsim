@@ -197,7 +197,7 @@ bool OsgCamera::setRenderGroups(const std::vector<std::shared_ptr<Group>>& group
 {
 	bool result = false;
 	m_materialProxy->removeChildren(0, m_materialProxy->getNumChildren());
-	for (const auto &group : groups)
+	for (const auto& group : groups)
 	{
 		std::vector<std::string> groupReferences = Camera::getRenderGroupReferences();
 		SURGSIM_ASSERT(std::find(groupReferences.begin(), groupReferences.end(),

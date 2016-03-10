@@ -332,7 +332,10 @@ TEST(OsgCameraTests, MultipleRenderGroups)
 	camera->addRenderGroupReference("Group2");
 	EXPECT_EQ(2, camera->getRenderGroupReferences().size());
 
-	std::vector<std::string> references = { "Group3", "Group4", "Group5" };
+	std::vector<std::string> references;
+	references.push_back("Group3");
+	references.push_back("Group4");
+	references.push_back("Group5");
 	camera->setRenderGroupReferences(references);
 	EXPECT_EQ(3, camera->getRenderGroupReferences().size());
 
@@ -342,7 +345,10 @@ TEST(OsgCameraTests, MultipleRenderGroups)
 
 	std::vector<std::shared_ptr<Group>> groups;
 	camera->getOsgCamera()->removeChildren(0, 1);
-	for (auto reference : { "Group6", "Group7", "Group8" })
+	references.push_back("Group6");
+	references.push_back("Group7");
+	references.push_back("Group8");
+	for (auto reference : references)
 	{
 		camera->addRenderGroupReference(reference);
 		groups.push_back(std::make_shared<Graphics::OsgGroup>(reference));
