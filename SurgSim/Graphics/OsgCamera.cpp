@@ -196,7 +196,7 @@ bool OsgCamera::setRenderGroup(std::shared_ptr<Group> group)
 bool OsgCamera::setRenderGroups(const std::vector<std::shared_ptr<Group>>& groups)
 {
 	bool result = false;
-	m_materialProxy->removeChildren(0, m_materialProxy->getNumChildren());
+	int numChildren = m_materialProxy->getNumChildren();
 	for (const auto& group : groups)
 	{
 		std::vector<std::string> groupReferences = Camera::getRenderGroupReferences();
@@ -219,6 +219,7 @@ bool OsgCamera::setRenderGroups(const std::vector<std::shared_ptr<Group>>& group
 
 	if (result)
 	{
+		m_materialProxy->removeChildren(0, numChildren);
 		result = Graphics::Camera::setRenderGroups(groups);
 	}
 
