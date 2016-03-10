@@ -98,11 +98,11 @@ TEST_F(ParticlesCollisionRepresentationTest, UpdateAndInitializationTest)
 	EXPECT_TRUE(m_particleCollisionRepresentation->wakeUp());
 
 	EXPECT_NO_THROW(m_particleRepresentation->update(1.0));
-	EXPECT_NO_THROW(m_particleCollisionRepresentation->update(1.0));
+	EXPECT_NO_THROW(m_particleCollisionRepresentation->updateShapeData());
 	EXPECT_EQ(1u, shape->getNumVertices());
 
 	EXPECT_NO_THROW(m_particleRepresentation->update(1.0));
-	EXPECT_NO_THROW(m_particleCollisionRepresentation->update(1.0));
+	EXPECT_NO_THROW(m_particleCollisionRepresentation->updateShapeData());
 	EXPECT_EQ(0u, shape->getNumVertices());
 }
 

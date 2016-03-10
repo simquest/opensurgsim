@@ -57,7 +57,7 @@ public:
 
 	int getShapeType() const override;
 
-	void update(const double& dt) override;
+	void updateShapeData() override;
 
 	/// Sets the particle representation this collision representation is connected
 	/// \param representation The paticle representation

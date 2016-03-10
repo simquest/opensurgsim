@@ -26,17 +26,17 @@
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
-#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
-#include "../../Graphics/OsgSphereRepresentation.h"
-#include "../../Math/SphereShape.h"
 
 using SurgSim::Math::Vector3d;
 
