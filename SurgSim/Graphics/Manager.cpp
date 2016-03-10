@@ -90,7 +90,12 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 		auto camera = std::dynamic_pointer_cast<Camera>(representation);
 		if (camera != nullptr)
 		{
-			camera->setRenderGroup(getOrCreateGroup(camera->getRenderGroupReference()));
+			std::vector<std::shared_ptr<Group>> groups;
+			for (auto reference : camera->getRenderGroupReferences())
+			{
+				groups.push_back(getOrCreateGroup(reference));
+			}
+			camera->setRenderGroups(groups);
 		}
 
 		auto light = std::dynamic_pointer_cast<Light>(representation);

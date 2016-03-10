@@ -70,7 +70,7 @@ TEST(OsgCameraTests, InitTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()))) <<
 			"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
 
-	EXPECT_EQ(nullptr, camera->getRenderGroup());
+	EXPECT_EQ(0, camera->getRenderGroups().size());
 }
 
 TEST(OsgCameraTests, OsgNodesTest)
@@ -116,22 +116,23 @@ TEST(OsgCameraTests, GroupTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
+	camera->addRenderGroupReference("test group");
 
-	EXPECT_EQ(nullptr, camera->getRenderGroup());
+	EXPECT_EQ(0, camera->getRenderGroups().size());
 
 	/// Adding an OsgGroup should succeed
-	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>(camera->getRenderGroupReference());
+	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>(camera->getRenderGroupReferences().front());
 	std::shared_ptr<Group> group = osgGroup;
 	EXPECT_TRUE(camera->setRenderGroup(group));
-	EXPECT_EQ(group, camera->getRenderGroup());
+	EXPECT_EQ(group, camera->getRenderGroups().front());
 
 	/// Check that the OSG node of the group is added to the OSG camera correctly
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
 
 	/// Adding a group that does not derive from OsgGroup should fail
-	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>(camera->getRenderGroupReference());
+	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>(camera->getRenderGroupReferences().front());
 	EXPECT_FALSE(camera->setRenderGroup(mockGroup));
-	EXPECT_EQ(group, camera->getRenderGroup());
+	EXPECT_EQ(group, camera->getRenderGroups().front());
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
 }
 
@@ -319,6 +320,41 @@ TEST(OsgCameraTests, Viewport)
 	camera->setValue("Viewport", original);
 	result = camera->getValue<std::array<int, 4>>("Viewport");
 	EXPECT_EQ(original, result);
+}
+
+TEST(OsgCameraTests, MultipleRenderGroups)
+{
+	std::shared_ptr<OsgCamera> camera = std::make_shared<OsgCamera>("TestOsgCamera");
+
+	EXPECT_EQ(0, camera->getRenderGroupReferences().size());
+
+	camera->addRenderGroupReference("Group1");
+	camera->addRenderGroupReference("Group2");
+	EXPECT_EQ(2, camera->getRenderGroupReferences().size());
+
+	std::vector<std::string> references;
+	references.push_back("Group3");
+	references.push_back("Group4");
+	references.push_back("Group5");
+	camera->setRenderGroupReferences(references);
+	EXPECT_EQ(3, camera->getRenderGroupReferences().size());
+
+	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group3"));
+	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group4"));
+	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group5"));
+
+	std::vector<std::shared_ptr<Group>> groups;
+	camera->getOsgCamera()->removeChildren(0, 1);
+	references.push_back("Group6");
+	references.push_back("Group7");
+	references.push_back("Group8");
+	for (auto reference : references)
+	{
+		camera->addRenderGroupReference(reference);
+		groups.push_back(std::make_shared<Graphics::OsgGroup>(reference));
+	}
+	camera->setRenderGroups(groups);
+	EXPECT_EQ(groups.size(), camera->getRenderGroups().size());
 }
 
 }  // namespace Graphics

@@ -69,9 +69,17 @@ public:
 	/// \param name Name of the group to be used for rendering
 	void setRenderGroupReference(const std::string& name);
 
-	/// Gets the name of the rendergroup used for rendering
-	/// \return The name of the group to be used for rendering
-	std::string getRenderGroupReference() const;
+	/// Set the collections of group references that this camera wants to use for rendering.
+	/// \param names Vector of names of the groups used for rendering
+	void setRenderGroupReferences(const std::vector<std::string>& names);
+
+	/// Gets the collection of names of render groups used for rendering
+	/// \return Vector of names of the groups used for rendering
+	std::vector<std::string> getRenderGroupReferences() const;
+
+	/// Adds a single group reference to the collection of group references for rendering
+	/// \param name Name of the group to be used for rendering
+	void addRenderGroupReference(const std::string& name);
 
 	/// Sets the group of representations that will be seen by this camera.
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
@@ -80,10 +88,19 @@ public:
 	/// \return	True if it succeeded, false if it failed
 	virtual bool setRenderGroup(std::shared_ptr<Group> group);
 
-	/// Gets the group of representations that will be seen by this camera.
+	/// Sets the representation groups that will be seen by this camera.
+	/// \param groups Vector of groups of representations
+	/// \return True if it succeeded, false if it failed
+	virtual bool setRenderGroups(const std::vector<std::shared_ptr<Group>>& groups);
+
+	/// Add a group of representations that will seen by this camera.
+	/// \param group Group of representations
+	virtual bool addRenderGroup(std::shared_ptr<Group> group);
+
+	/// Gets all groups of representations that will be seen by this camera.
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
-	/// \return	Group of representations
-	std::shared_ptr<Group> getRenderGroup() const;
+	/// \return	Vector of groups of representations
+	std::vector<std::shared_ptr<Group>> getRenderGroups() const;
 
 	/// Gets the view matrix of the camera
 	/// \return	View matrix
@@ -107,7 +124,7 @@ public:
 	virtual void getViewport(int* x, int* y, int* width, int* height) const  = 0;
 
 	/// Sets the width and height of the viewport
-	/// \param dimensions size of the viewport in screen sapce
+	/// \param dimensions size of the viewport in screen space
 	virtual void setViewportSize(std::array<double, 2> dimensions) = 0;
 
 	/// Gets the dimensions of the viewport
@@ -193,11 +210,11 @@ private:
 
 	/// Group of representations that this camera sees
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
-	std::shared_ptr<Group> m_group;
+	std::vector<std::shared_ptr<Group>> m_renderGroups;
 
-	/// The name of the group that the camera wants to use for rendering, the graphics manager will actually assign
+	/// The names of the groups that the camera wants to use for rendering, the graphics manager will actually assign
 	/// this group
-	std::string m_renderGroupReference;
+	std::vector<std::string> m_renderGroupReferences;
 };
 
 };  // namespace Graphics
