@@ -123,6 +123,32 @@ public:
 	/// \return	true if 7 degree of freedom device, false if not.
 	virtual bool is7DofDevice() const;
 
+	/// Set the maximum force that can be sent to the device. Higher force values will be scaled to this magnitude.
+	/// Generally Falcons are robust enough that commanding excessive forces will not cause a problem,
+	/// but in-development systems may overheat if over-driven.
+	/// \param force The maximum force magnitude (in Newtons) that will be sent to the hardware.
+	void setMaxForce(double force);
+
+	/// \return The maximum force (in Newtons) that can be sent to the device.
+	double getMaxForce() const;
+
+	/// Set a constant force that gets added to all forces sent to the hardware.
+	/// \param antigrav The anti-gravity force in Newtons.
+	void setAntigrav(Math::Vector3d antigrav);
+
+	/// \return The constant force that gets added to all forces sent to the hardware (in Newtons).
+	Math::Vector3d getAntigrav() const;
+
+protected:
+	/// True if the device is 7Dof, false if the device is 3Dof.
+	bool m_7DofDevice;
+
+	/// The maximum force magnitude (in Newtons) that should be sent to the hardware.
+	double m_maxForce;
+
+	/// The anti-gravity force in Newtons.
+	Math::Vector3d m_antigrav;
+
 private:
 	friend class NovintScaffold;
 
@@ -149,9 +175,6 @@ private:
 	double m_positionScale;
 	/// Scale factor for the orientation axes; stored locally before the device is initialized.
 	double m_orientationScale;
-
-	/// True if the device is 7Dof, false if the device is 3Dof.
-	bool m_7DofDevice;
 };
 
 };  // namespace Devices

@@ -134,7 +134,7 @@ public:
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 				"No error during initializing device " <<
 				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
-				"', but an invalid handle returned.\nIs a Novint device plugged in?";
+				"', but an invalid handle returned. Is a Novint device plugged in?";
 		}
 		else
 		{
@@ -255,6 +255,8 @@ struct NovintScaffold::DeviceData
 		isDeviceHomed(false),
 		isDeviceHeld(false),
 		isDevice7Dof(device->is7DofDevice()),
+		maxForce(device->getMaxForce()),
+		antigrav(device->getAntigrav()),
 		isDeviceRollAxisReversed(false),
 		eulerAngleOffsetRoll(0.0),
 		eulerAngleOffsetYaw(0.0),
@@ -302,6 +304,10 @@ struct NovintScaffold::DeviceData
 	bool isDeviceHeld;
 	/// True if this is a 7DoF device.
 	bool isDevice7Dof;
+	/// The maximum force magnitude (in Newtons) to send to the device.
+	double maxForce;
+	/// The constant force added to all forces sent to the device (in Newtons).
+	Vector3d antigrav;
 	/// True if the roll axis of a 7DoF device has reverse polarity because the device is left-handed.
 	bool isDeviceRollAxisReversed;
 
@@ -523,7 +529,9 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 		return false;   // message already printed
 	}
 	m_state->registeredDevices.emplace_back(std::move(info));
-	SURGSIM_LOG_INFO(m_state->logger) << "Device " << device->getName() << " initialized.";
+	SURGSIM_LOG_INFO(m_state->logger) << "Device " << device->getName() << " initialized.  Maximum force is " <<
+		m_state->registeredDevices.back()->maxForce << " Newtons. Antigrav is (" <<
+		m_state->registeredDevices.back()->antigrav.transpose() << ") Newtons";
 
 	return true;
 }
@@ -650,22 +658,21 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 			// HDL reported an error.  An error message was already logged.
 			return false;
 		}
+		info->eulerAngleOffsetRoll = 0.0;
 		bool leftHanded = ((gripStatus[1] & 0x01) != 0);
 		if (leftHanded)
 		{
 			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Left-handed.";
 			info->isDeviceRollAxisReversed = true;
-			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = -75. * M_PI / 180.;
-			info->eulerAngleOffsetPitch = -50. * M_PI / 180.;
+			info->eulerAngleOffsetYaw = 2.7;
+			info->eulerAngleOffsetPitch = 0;
 		}
 		else
 		{
-			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is right-handed.";
+			SURGSIM_LOG_DEBUG(m_state->logger) << "'" << info->initializationName << "' is Right-handed.";
 			info->isDeviceRollAxisReversed = false;
-			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = +75. * M_PI / 180.;
-			info->eulerAngleOffsetPitch = +50. * M_PI / 180.;
+			info->eulerAngleOffsetYaw = 0.3;
+			info->eulerAngleOffsetPitch = 0.5;
 		}
 	}
 	return result;
@@ -689,6 +696,11 @@ bool NovintScaffold::updateDeviceOutput(DeviceData* info, bool pulledOutput)
 	}
 
 	// Set the force command (in newtons).
+	const double norm = info->force.norm();
+	if (norm > info->maxForce)
+	{
+		info->force = info->force.normalized() * info->maxForce;
+	}
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
 	fatalError = fatalError || isFatalError("hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
@@ -735,6 +747,11 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+		if (info->isDeviceRollAxisReversed)
+		{
+			info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
+			info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
+		}
 
 		/* HW-Nov-12-2015
 		   Testing on Nov 10, 2015 shows that 
@@ -801,6 +818,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
 	const DataGroup& outputData = info->deviceObject->getOutputData();
 	outputData.vectors().get(DataStructures::Names::FORCE, &(info->force));
+	info->force += info->antigrav;
 
 	// If the springJacobian was provided, multiply with the change in position since the output data was set,
 	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
@@ -847,6 +865,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	{
 		Vector3d torque = Vector3d::Zero();
 		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
+		if (info->isDeviceRollAxisReversed)
+		{
+			torque[0] = -torque[0];
+			torque[2] = -torque[2];
+		}
 
 		if (havespringJacobian)
 		{
@@ -929,22 +952,21 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
 		const double axisTorqueMin = -2000;
 		const double axisTorqueMax = +2000;
-		// roll axis:  torque = 17.6 mNm  when command = 2000 (but flipped in left grip!)
-		const double rollTorqueScale  = axisTorqueMax / 17.6e-3;
-		// yaw axis:   torque = 47.96 mNm when command = 2000
-		const double yawTorqueScale   = axisTorqueMax / 47.96e-3;
-		// pitch axis: torque = 47.96 mNm when command = 2000
-		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
+		// roll axis:  torque = 41.97 mNm  when command = 2000 (but flipped in left grip!)
+		const double rollTorqueScale  = axisTorqueMax / 41.97e-3;
+		// yaw axis:   torque = 95.92 mNm when command = 2000
+		const double yawTorqueScale   = axisTorqueMax / 95.92e-3;
+		// pitch axis: torque = 95.92 mNm when command = 2000
+		const double pitchTorqueScale = axisTorqueMax / 95.92e-3;
 
-		info->torque[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
-									   axisTorqueMin, axisTorqueMax);
+		info->torque[0] = 0;  // Roll torque currently disabled because the roll sensor is too jittery.
 		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[3] = 0;
 
-		if (info->isDeviceRollAxisReversed)  // commence swearing.
+		if (info->isDeviceRollAxisReversed)
 		{
 			info->torque[0] = -info->torque[0];
 		}
