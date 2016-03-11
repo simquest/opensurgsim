@@ -959,8 +959,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// pitch axis: torque = 95.92 mNm when command = 2000
 		const double pitchTorqueScale = axisTorqueMax / 95.92e-3;
 
-		info->torque[0] = 0;//clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
-							//		   axisTorqueMin, axisTorqueMax);
+		info->torque[0] = 0;  // Roll torque currently disabled because the roll sensor is too jittery.
 		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
