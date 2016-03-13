@@ -42,7 +42,7 @@ std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt,
 
 	// lambda
 	const Eigen::VectorXd& lambda = result->getMlcpSolution().x;
-	if (lambda.size() == 0)
+	if ((lambda.size() == 0) || !result->getMlcpSolution().validConvergence)
 	{
 		return result;
 	}
@@ -92,12 +92,12 @@ double SolveMlcp::getPrecision() const
 	return m_gaussSeidelSolver.getEpsilonConvergence();
 }
 
-void SolveMlcp::setContactTolerance(double epsilon)
+void SolveMlcp::setContactTolerance(std::pair<double, double> epsilon)
 {
 	m_gaussSeidelSolver.setContactTolerance(epsilon);
 }
 
-double SolveMlcp::getContactTolerance() const
+std::pair<double, double> SolveMlcp::getContactTolerance() const
 {
 	return m_gaussSeidelSolver.getContactTolerance();
 }

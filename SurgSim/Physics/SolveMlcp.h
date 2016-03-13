@@ -56,13 +56,14 @@ public:
 	/// \return The precision.
 	double getPrecision() const;
 
-	/// Set the contact tolerance for the MLCP solver.
+	/// Set the contact tolerance for the MLCP solver. The greater value will be used to determine if the solution
+	/// has succeeded. The lesser value will be used to terminate the iterations early.
 	/// \param epsilon The contact tolerance.
-	void setContactTolerance(double epsilon);
+	void setContactTolerance(std::pair<double, double> epsilon);
 
 	/// Get the contact tolerance for the MLCP solver.
 	/// \return The contact tolerance.
-	double getContactTolerance() const;
+	std::pair<double, double> getContactTolerance() const;
 
 protected:
 
