@@ -20,6 +20,7 @@ include_directories(
 set(SURGSIM_GRAPHICS_SOURCES
 	Camera.cpp
 	CurveRepresentation.cpp
+	DecalBehavior.cpp
 	Group.cpp
 	Manager.cpp
 	Mesh.cpp
@@ -81,6 +82,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	CapsuleRepresentation.h
 	CurveRepresentation.h
 	CylinderRepresentation.h
+	DecalBehavior.h
 	Font.h
 	Group.h
 	Light.h
