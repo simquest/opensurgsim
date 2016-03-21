@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
@@ -100,8 +101,9 @@ TEST(VisualizeContactsBehaviorTests, MultipleInstances)
 	EXPECT_NO_THROW(visualizeContactsBehavior1->setSource(collisionRepresentation));
 	EXPECT_NO_THROW(visualizeContactsBehavior2->setSource(collisionRepresentation));
 
-	EXPECT_TRUE(visualizeContactsBehavior1->initialize(runtime));
-	EXPECT_TRUE(visualizeContactsBehavior2->initialize(runtime));
+	runtime->getScene()->addSceneElement(sceneElement);
+	EXPECT_TRUE(visualizeContactsBehavior1->isInitialized());
+	EXPECT_TRUE(visualizeContactsBehavior2->isInitialized());
 
 	EXPECT_TRUE(visualizeContactsBehavior1->wakeUp());
 	EXPECT_TRUE(visualizeContactsBehavior2->wakeUp());

@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
 	CcdCollision.cpp
 	CcdCollisionLoop.cpp
-	ClearCollisions.cpp
 	Computation.cpp
 	ComputationGroup.cpp
 	Constraint.cpp
@@ -72,7 +71,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	PostUpdate.cpp
 	PrepareCollisionPairs.cpp
 	PreUpdate.cpp
-	PublishCollisions.cpp
 	PushResults.cpp
 	Representation.cpp
 	RigidCollisionRepresentation.cpp
@@ -97,7 +95,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	BuildMlcp.h
 	CcdCollision.h
 	CcdCollisionLoop.h
-	ClearCollisions.h
 	Computation.h
 	ComputationGroup.h
 	Constraint.h
@@ -160,7 +157,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	PostUpdate.h
 	PrepareCollisionPairs.h
 	PreUpdate.h
-	PublishCollisions.h
 	PushResults.h
 	Representation.h
 	RigidCollisionRepresentation.h

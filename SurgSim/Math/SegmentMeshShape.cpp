@@ -99,7 +99,7 @@ std::shared_ptr<const DataStructures::AabbTree> SegmentMeshShape::getAabbTree() 
 	return m_aabbTree;
 }
 
-std::shared_ptr<Shape> SegmentMeshShape::getTransformed(const RigidTransform3d& pose)
+std::shared_ptr<Shape> SegmentMeshShape::getTransformed(const RigidTransform3d& pose) const
 {
 	auto transformed = std::make_shared<SegmentMeshShape>(*this);
 	transformed->transform(pose);

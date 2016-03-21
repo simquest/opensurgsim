@@ -70,7 +70,7 @@ public:
 
 	bool isTransformable() const override;
 
-	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) override;
+	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const override;
 
 protected:
 	bool doUpdate() override;

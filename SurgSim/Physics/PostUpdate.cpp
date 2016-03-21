@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ std::shared_ptr<PhysicsManagerState> PostUpdate::doUpdate(
 
 	{
 		// Clear the collisions
-		auto const& representations = result->getActiveCollisionRepresentations();
+		auto const& representations = result->getCollisionRepresentations();
 
 		for (auto& representation : representations)
 		{

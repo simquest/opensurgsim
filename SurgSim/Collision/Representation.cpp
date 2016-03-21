@@ -78,7 +78,7 @@ void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::share
 	m_posedShapeMotion = posedShapeMotion;
 }
 
-const std::shared_ptr<Math::Shape> Representation::getPosedShape()
+std::shared_ptr<Math::Shape> Representation::getPosedShape()
 {
 	if (getShape()->isTransformable())
 	{

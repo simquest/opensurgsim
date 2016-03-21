@@ -72,7 +72,7 @@ public:
 
 	/// Query to find all pairs of intersecting nodes between two aabb r-trees.
 	/// \param otherTree The other tree to compare against
-	/// return The list of all pairs of intersecting nodes
+	/// \return The list of all pairs of intersecting nodes
 	std::list<TreeNodePairType> spatialJoin(const AabbTree& otherTree) const;
 
 	/// Query to find all pairs of intersecting nodes between two aabb r-trees.

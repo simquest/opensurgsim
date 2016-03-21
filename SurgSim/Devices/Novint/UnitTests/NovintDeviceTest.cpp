@@ -63,10 +63,15 @@ TEST(NovintDeviceTest, CreateAndInitializeDeviceByName)
 	EXPECT_FALSE(device->isInitialized());
 	EXPECT_EQ("TestFalcon", device->getName());
 
+	EXPECT_NEAR(8.9, device->getMaxForce(), 1e-9);
+	EXPECT_NO_THROW(device->setMaxForce(20.0));
+	EXPECT_NEAR(20.0, device->getMaxForce(), 1e-9);
+
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 	ASSERT_TRUE(device->isInitialized());
 	ASSERT_ANY_THROW(device->initialize()) << "Initialized the same device twice.";
 	ASSERT_ANY_THROW(device->setInitializationName("OtherName"));
+	ASSERT_ANY_THROW(device->setMaxForce(20.0)) << "Set maximum force after initialization.";
 	EXPECT_EQ("TestFalcon", device->getName());
 
 	const double positionScale = 2.0;
@@ -296,4 +301,8 @@ TEST(NovintDeviceTest, AccessibleTest)
 	ASSERT_FALSE(device->is7DofDevice());
 	EXPECT_NO_THROW(device->setValue("7DofDevice", true));
 	EXPECT_TRUE(device->is7DofDevice());
+
+	EXPECT_NEAR(8.9, device->getMaxForce(), 1e-9);
+	EXPECT_NO_THROW(device->setValue("MaxForce", 20.0));
+	EXPECT_NEAR(20.0, device->getMaxForce(), 1e-9);
 }

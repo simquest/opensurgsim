@@ -200,6 +200,56 @@ TEST_F(OsgCameraRenderTests, Resize)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 }
 
+TEST_F(OsgCameraRenderTests, MultipleRenderGroups)
+{
+	std::array<int, 2> dimensions = { 400, 400 };
+	viewElement->getView()->setDimensions(dimensions);
+	camera->setRenderGroupReference("Left");
+
+	std::array<int, 2> position = { 500, 100 };
+	auto rightElement = std::make_shared<Graphics::OsgViewElement>("RighViewElement");
+	rightElement->getView()->setDimensions(dimensions);
+	rightElement->getView()->setPosition(position);
+	rightElement->getCamera()->addRenderGroupReference("Right");
+
+	scene->addSceneElement(rightElement);
+
+	// Left camera only
+	auto graphics = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
+	graphics->setSizeXYZ(0.1, 0.1, 0.1);
+	graphics->setGroupReference("Left");
+
+	auto element = std::make_shared<Framework::BasicSceneElement>("CubeLeft");
+	element->addComponent(graphics);
+	element->setPose(Math::makeRigidTranslation(Vector3d(-0.2, 0.0, -0.5)));
+
+	scene->addSceneElement(element);
+
+	// Right camera only
+	graphics = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
+	graphics->setSizeXYZ(0.1, 0.1, 0.1);
+	graphics->setGroupReference("Right");
+
+	element = std::make_shared<Framework::BasicSceneElement>("CubeRight");
+	element->addComponent(graphics);
+	element->setPose(Math::makeRigidTranslation(Vector3d(0.2, 0.0, -0.5)));
+
+	scene->addSceneElement(element);
+
+	// Both cameras
+	graphics = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
+	graphics->setSizeXYZ(0.1, 0.1, 0.1);
+
+	element = std::make_shared<Framework::BasicSceneElement>("CubeBoth");
+	element->addComponent(graphics);
+	element->setPose(Math::makeRigidTranslation(Vector3d(0.0, 0.0, -0.5)));
+
+	scene->addSceneElement(element);
+
+	runtime->start();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+}
+
 }; // namespace Graphics
 }; // namespace SurgSim
 
