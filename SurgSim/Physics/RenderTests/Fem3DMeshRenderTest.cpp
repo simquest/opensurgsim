@@ -115,7 +115,6 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMeshSphere()
 	element->addComponent(rigid);
 
 	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
-	//collision->setCollisionDetectionType(SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
 	rigid->setCollisionRepresentation(collision);
 	collision->setShape(shape);
 	element->addComponent(collision);
