@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -129,9 +129,9 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 				"Second Object, wrong type of object" << secondShapeType;
 	}
 
-	auto& shape1 = pair->getFirst()->getPosedShape();
+	std::shared_ptr<Math::Shape> shape1 = pair->getFirst()->getPosedShape();
 
-	auto& shape2 = pair->getSecond()->getPosedShape();
+	std::shared_ptr<Math::Shape> shape2 = pair->getSecond()->getPosedShape();
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
