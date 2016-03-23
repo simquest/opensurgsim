@@ -356,7 +356,7 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcd
 					"earliestTimeOfImpact = " << earliestTimeOfImpact <<
 					"; segmentAlpha = " << segmentAlpha;
 			SURGSIM_ASSERT(triangleAlpha >= -epsilon && triangleBeta >= -epsilon &&
-						   triangleAlpha + triangleBeta <= (1.0 + epsilon)) <<
+						   triangleAlpha + triangleBeta <= (1.0 + epsilon + epsilon)) <<
 				"earliestTimeOfImpact = " << earliestTimeOfImpact <<
 				"; triangleAlpha = " << triangleAlpha <<
 				"; triangleBeta = " << triangleBeta <<
