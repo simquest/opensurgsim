@@ -125,8 +125,10 @@ public:
 	/// Update the data (the shape) in preparation for a DCD contact calculation
 	virtual void updateDcdData();
 
-	/// Update the data (the motionShape) in preparation for a CCD contact calcuation
-	virtual void updateCcdData();
+	/// Update the data (the motionShape) in preparation for a CCD contact calcul  ation
+	/// \param toi the last time of impact, the representation is responsible for managing
+	/// the time intervals correctly
+	virtual void updateCcdData(double interval);
 
 	/// Set a collision representation to ignore
 	/// Collisions with this collision representation will not be detected

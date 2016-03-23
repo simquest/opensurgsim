@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SegmentMeshShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
@@ -172,7 +173,7 @@ void DeformableCollisionRepresentation::updateDcdData()
 	// #todo should only have to build the AABB tree here
 }
 
-void DeformableCollisionRepresentation::updateCcdData()
+void DeformableCollisionRepresentation::updateCcdData(double interval)
 {
 	auto physicsRepresentation = m_deformable.lock();
 	SURGSIM_ASSERT(nullptr != physicsRepresentation) <<
@@ -181,14 +182,10 @@ void DeformableCollisionRepresentation::updateCcdData()
 
 	if (m_previousShape == nullptr)
 	{
-		if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+		if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+			m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
 		{
-			m_previousShape = std::make_shared<Math::MeshShape>(*std::dynamic_pointer_cast<Math::MeshShape>(m_shape));
-		}
-		else if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
-		{
-			m_previousShape =
-				std::make_shared<Math::SegmentMeshShape>(*std::dynamic_pointer_cast<Math::SegmentMeshShape>(m_shape));
+			m_previousShape = m_shape->getTransformed(Math::RigidTransform3d::Identity());
 		}
 		else
 		{
@@ -197,6 +194,8 @@ void DeformableCollisionRepresentation::updateCcdData()
 							  m_shape->getType();
 		}
 	}
+
+	physicsRepresentation->interpolatePreviousState(interval);
 	if (!updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get()))
 	{
 		setLocalActive(false);

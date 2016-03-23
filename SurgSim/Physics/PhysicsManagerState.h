@@ -175,6 +175,19 @@ public:
 	/// \param constraintsMapping The constraints mapping (mapping between the constraints and the mlcp)
 	void setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping);
 
+	/// Set the time of impact
+	/// \param toi the time of impact for CCD
+	void setTimeOfImpact(double toi)
+	{
+		m_toi = toi;
+	}
+
+	/// \return the last time of impact when a CCD calculation ran
+	double getTimeOfImpact()
+	{
+		return m_toi;
+	}
+
 	/// \return whether to abort a grouped computation by the calling group
 	bool shouldAbortGroup() const;
 
@@ -235,6 +248,7 @@ private:
 	MlcpPhysicsSolution m_mlcpPhysicsSolution;
 
 	bool m_abortGroup;
+	double m_toi;
 };
 
 }; // Physics

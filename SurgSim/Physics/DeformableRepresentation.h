@@ -69,6 +69,8 @@ public:
 
 	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const;
 
+	virtual void interpolatePreviousState(double t);
+
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation
 	size_t getNumDofPerNode() const;
@@ -137,6 +139,8 @@ public:
 	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
 	void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
+
 
 protected:
 	bool doInitialize() override;

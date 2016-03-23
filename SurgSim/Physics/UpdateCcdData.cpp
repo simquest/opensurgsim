@@ -41,7 +41,7 @@ UpdateCcdData::~UpdateCcdData()
 
 
 std::shared_ptr<PhysicsManagerState> UpdateCcdData::doUpdate(
-	const double& dt,
+	const double& interval,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
@@ -63,9 +63,9 @@ std::shared_ptr<PhysicsManagerState> UpdateCcdData::doUpdate(
 
 	for (auto& representation : representations)
 	{
-		tasks.push_back(threadPool->enqueue<void>([dt, &representation]()
+		tasks.push_back(threadPool->enqueue<void>([interval, &representation]()
 		{
-			representation->updateCcdData();
+			representation->updateCcdData(interval);
 		}));
 	}
 

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -148,6 +148,8 @@ public:
 	/// Check if this state is numerically valid
 	/// \return True if all positions and velocities are valid numerical values, False otherwise
 	virtual bool isValid() const;
+
+	OdeState interpolate(const OdeState& other, double t);
 
 private:
 	/// Default public copy constructor and assignment operator are being used on purpose

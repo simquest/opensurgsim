@@ -21,12 +21,25 @@
 namespace SurgSim
 {
 
+namespace Collision
+{
+class CollisionPair;
+}
 namespace Physics
 {
 
-class CcdCollisionLoop : public ComputationGroup
+class CcdCollision;
+class UpdateCcdData;
+class ContactConstraintGeneration;
+class BuildMlcp;
+class SolveMlcp;
+class PushResults;
+
+class CcdCollisionLoop : public Computation
 {
 public:
+	friend class CcdCollisionLoopTest_FilterContacts_Test;
+
 	/// Constructor
 	explicit CcdCollisionLoop(bool copyState);
 
@@ -35,10 +48,25 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::CcdCollisionLoop);
 
-	bool endIteration() override;
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
+			const std::shared_ptr<PhysicsManagerState>& state) override;
 
 private:
+	///@{
+	/// Computations
+	std::unique_ptr<CcdCollision> m_ccdCollision;
+	std::unique_ptr<UpdateCcdData> m_updateCcdData;
+	std::unique_ptr<ContactConstraintGeneration> m_constraintGeneration;
+	std::unique_ptr<BuildMlcp> m_buildMlcp;
+	std::unique_ptr<SolveMlcp> m_solveMlcp;
+	std::unique_ptr<PushResults> m_pushResults;
 
+	size_t m_maxIterations;
+	double m_timeEpsilon;
+
+	bool filterContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+						double epsilon,
+						double* currentToi);
 };
 
 }
