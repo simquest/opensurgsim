@@ -233,8 +233,11 @@ OdeState OdeState::interpolate(
 	double t)
 {
 	auto result = OdeState(*this);
-	result.m_v += (other.m_v - m_v) * t;
-	result.m_x += (other.m_x - m_x) * t;
+	if (t != 0)
+	{
+		result.m_v += (other.m_v - m_v) * t;
+		result.m_x += (other.m_x - m_x) * t;
+	}
 	return result;
 }
 

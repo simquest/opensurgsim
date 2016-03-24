@@ -62,7 +62,7 @@ private:
 	std::unique_ptr<PushResults> m_pushResults;
 
 	size_t m_maxIterations;
-	double m_timeEpsilon;
+	double m_epsilonFactor;
 
 	bool filterContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 						double epsilon,

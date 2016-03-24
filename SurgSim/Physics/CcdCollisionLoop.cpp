@@ -42,7 +42,7 @@ CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
 	m_solveMlcp(new SolveMlcp(copyState)),
 	m_pushResults(new PushResults(copyState)),
 	m_maxIterations(20),
-	m_timeEpsilon(1e-6)
+	m_epsilonFactor(100)
 {
 }
 
@@ -80,20 +80,24 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 	double toi = 0.0;
 	double localToi = 0.0;
 
+	std::cout << "--------Iteration Start " << std::endl;
 
 	size_t totalContacts = 0;
 
 	while (--iterations > 0)
 	{
+
 		localDt = dt * (1 - toi);
+		double epsilon = 1.0 / ((1 - toi) * m_epsilonFactor);
+
 		// #todo ??? backup Possible contacts from DCD
 		lastState = m_updateCcdData->update(localToi, lastState); // state interpolation is triggered in here
 		lastState = m_ccdCollision->update(localDt, lastState);
 
-		//std::cout << ccdPairs[0]->getContacts()->size() << std::endl;
+		std::cout << ccdPairs[0]->getContacts().size() << std::endl;
 
 		// Find the first impact and filter all contacts beyond a given epsilon
-		if (!filterContacts(ccdPairs, m_timeEpsilon, &localToi))
+		if (!filterContacts(ccdPairs, epsilon, &localToi))
 		{
 			break;
 		}
@@ -119,11 +123,11 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 
 	if (iterations == 0)
 	{
-		std::cout << "Maxed out iterations ... " << std::endl;
+		std::cout << "----- Maxed out iterations ... " << std::endl;
 	}
 	else if (iterations < m_maxIterations - 1)
 	{
-		std::cout << "Resolved after " << m_maxIterations - iterations << std::endl;
+		std::cout << "----- Resolved after " << m_maxIterations - iterations << std::endl;
 	}
 
 	return lastState;
