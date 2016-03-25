@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Math/CompoundShape.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Math/Shapes.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -200,6 +201,37 @@ TEST_F(CompoundShapeTest, Properties)
 	EXPECT_EQ(2u, result.size());
 	EXPECT_TRUE(transform2.isApprox(result[1].second));
 
+}
+
+TEST_F(CompoundShapeTest, Serialization)
+{
+	std::shared_ptr<Shape> shape;
+	ASSERT_NO_THROW(shape = Shape::getFactory().create("SurgSim::Math::CompoundShape"));
+	std::vector<CompoundShape::SubShape> shapes;
+	shapes.emplace_back(shape1, transform1);
+	shapes.emplace_back(shape2, transform2);
+	shape->setValue("Shapes", shapes);
+	EXPECT_TRUE(shape->isValid());
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = shape);
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(1u, node.size());
+
+	ASSERT_TRUE(node["SurgSim::Math::CompoundShape"].IsDefined());
+	auto data = node["SurgSim::Math::CompoundShape"];
+	EXPECT_EQ(1u, data.size());
+
+	std::shared_ptr<CompoundShape> compoundShape;
+	ASSERT_NO_THROW(compoundShape = std::dynamic_pointer_cast<CompoundShape>(node.as<std::shared_ptr<Shape>>()));
+	EXPECT_EQ("SurgSim::Math::CompoundShape", compoundShape->getClassName());
+	EXPECT_TRUE(compoundShape->isValid());
+
+	// Check de-serialized data
+	std::vector<CompoundShape::SubShape> result;
+	ASSERT_NO_THROW(result = compoundShape->getValue<std::vector<CompoundShape::SubShape>>("Shapes"));
+	EXPECT_EQ(2u, result.size());
+	EXPECT_TRUE(transform2.isApprox(result[1].second));
 }
 
 }
