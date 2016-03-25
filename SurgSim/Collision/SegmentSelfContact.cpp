@@ -80,10 +80,14 @@ double SegmentSelfContact::distanceEpsilon()
 }
 
 std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
-									 const Math::SegmentMeshShape& segmentShape1AtTime0, const Math::RigidTransform3d& segmentPose1AtTime0,
-									 const Math::SegmentMeshShape& segmentShape1AtTime1, const Math::RigidTransform3d& segmentPose1AtTime1,
-									 const Math::SegmentMeshShape& segmentShape2AtTime0, const Math::RigidTransform3d& segmentPose2AtTime0,
-									 const Math::SegmentMeshShape& segmentShape2AtTime1, const Math::RigidTransform3d& segmentPose2AtTime1) const
+									 const Math::SegmentMeshShape& segmentShape1AtTime0,
+									 const Math::RigidTransform3d& segmentPose1AtTime0,
+									 const Math::SegmentMeshShape& segmentShape1AtTime1,
+									 const Math::RigidTransform3d& segmentPose1AtTime1,
+									 const Math::SegmentMeshShape& segmentShape2AtTime0,
+									 const Math::RigidTransform3d& segmentPose2AtTime0,
+									 const Math::SegmentMeshShape& segmentShape2AtTime1,
+									 const Math::RigidTransform3d& segmentPose2AtTime1) const
 {
 
 	const Math::SegmentMeshShape& segmentShape1 = segmentShape1AtTime0;

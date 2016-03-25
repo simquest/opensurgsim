@@ -26,11 +26,17 @@
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem3DPlyReaderDelegate.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -53,6 +59,13 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	fem->loadFem(filename);
 	fem->setIntegrationScheme(integrationScheme);
 	sceneElement->addComponent(fem);
+
+	auto collision = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("Collision");
+	auto shape = std::make_shared<SurgSim::Math::MeshShape>();
+	shape->load(filename);
+	collision->setShape(shape);
+	fem->setCollisionRepresentation(collision);
+	sceneElement->addComponent(collision);
 
 	// Add the graphics mesh used to display the Fem3d
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("fem graphics");
@@ -83,8 +96,74 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	return sceneElement;
 }
 
+std::shared_ptr<SurgSim::Framework::SceneElement> createMeshSphere()
+{
+	SurgSim::Math::RigidTransform3d pose =
+		SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, 0.025, 0.0));
+
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("RigidMesh");
+	element->setPose(pose);
+
+	auto shape = std::make_shared<SurgSim::Math::MeshShape>();
+	shape->load("Geometry/sphere0_025.ply");
+
+	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("Physics");
+	rigid->setIsGravityEnabled(true);
+	// http://www.engineeringtoolbox.com/wood-density-d_40.html
+	rigid->setDensity(5800.0); // Cedar of Lebanon wood density 5800.0 Kg/m-3
+	rigid->setShape(shape);
+	element->addComponent(rigid);
+
+	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
+	rigid->setCollisionRepresentation(collision);
+	collision->setShape(shape);
+	element->addComponent(collision);
+
+	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> osgRepresentation =
+		std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Graphics");
+	osgRepresentation->setShape(shape);
+	element->addComponent(osgRepresentation);
+
+	return element;
+}
+
+std::shared_ptr<SurgSim::Framework::SceneElement> createShapeSphere()
+{
+	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, 0.05, 0.0));
+
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Sphere");
+	element->setPose(pose);
+
+	auto physics  = std::make_shared<RigidRepresentation>("Physics");
+	physics->setDensity(5800.0);
+	auto shape = std::make_shared<SurgSim::Math::SphereShape>(0.025);
+	physics->setShape(shape);
+	element->addComponent(physics);
+
+	auto collision = std::make_shared<RigidCollisionRepresentation>("Collision");
+	physics->setCollisionRepresentation(collision);
+	element->addComponent(collision);
+
+	auto graphics = std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("Graphics");
+	graphics->setRadius(shape->getRadius());
+	element->addComponent(graphics);
+
+	return element;
+}
+
 TEST_F(RenderTests, SimulatedWoundRenderTest)
 {
+	runtime->getScene()->addSceneElement(createFemSceneElement("Fem",
+										 "Geometry/wound_deformable.ply",
+										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT));
+
+	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 5000.0);
+}
+
+TEST_F(RenderTests, Fem3dMeshCollision)
+{
+	runtime->getScene()->addSceneElement(createMeshSphere());
+
 	runtime->getScene()->addSceneElement(createFemSceneElement("Fem",
 										 "Geometry/wound_deformable.ply",
 										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT));

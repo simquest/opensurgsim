@@ -86,7 +86,7 @@ TEST_F(DeformableCollisionRepresentationTest, MeshTest)
 {
 	m_deformableCollisionRepresentation->setShape(m_meshShape);
 	auto actualShape = std::dynamic_pointer_cast<SurgSim::Math::MeshShape>(
-			m_deformableCollisionRepresentation->getShape());
+						   m_deformableCollisionRepresentation->getShape());
 	ASSERT_NE(nullptr, actualShape);
 	EXPECT_EQ(m_meshShape->getNumVertices(), actualShape->getNumVertices());
 	EXPECT_EQ(m_meshShape->getNumEdges(), actualShape->getNumEdges());
@@ -123,8 +123,6 @@ TEST_F(DeformableCollisionRepresentationTest, SerializationTest)
 
 TEST_F(DeformableCollisionRepresentationTest, UpdateAndInitializationTest)
 {
-	EXPECT_ANY_THROW(m_deformableCollisionRepresentation->update(0.0));
-
 	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Fem3DRepresentation");
 	fem3DRepresentation->loadFem(m_filename);
 
@@ -138,14 +136,14 @@ TEST_F(DeformableCollisionRepresentationTest, UpdateAndInitializationTest)
 	m_deformableCollisionRepresentation->setShape(m_meshShape);
 	EXPECT_NO_THROW(m_deformableCollisionRepresentation->initialize(m_runtime));
 	EXPECT_NO_THROW(m_deformableCollisionRepresentation->wakeUp());
-	EXPECT_NO_THROW(m_deformableCollisionRepresentation->update(0.0));
+	EXPECT_NO_THROW(m_deformableCollisionRepresentation->updateShapeData());
 	EXPECT_TRUE(m_deformableCollisionRepresentation->isActive());
 
 	// The MeshShape fails to update due to the normal calculation, making the collision rep inactive
 	auto state = fem3DRepresentation->getCurrentState();
 	state->getPositions().setConstant(0.0);
 	fem3DRepresentation->setInitialState(state);
-	EXPECT_NO_THROW(m_deformableCollisionRepresentation->update(0.0));
+	EXPECT_NO_THROW(m_deformableCollisionRepresentation->updateShapeData());
 	EXPECT_FALSE(m_deformableCollisionRepresentation->isActive());
 }
 

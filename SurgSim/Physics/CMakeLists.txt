@@ -17,6 +17,7 @@
 set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
 	CcdCollision.cpp
+	CcdCollisionLoop.cpp
 	Computation.cpp
 	ComputationGroup.cpp
 	Constraint.cpp
@@ -83,13 +84,17 @@ set(SURGSIM_PHYSICS_SOURCES
 	SlidingConstraintData.cpp
 	SolveMlcp.cpp
 	Spring.cpp
+	UpdateCcdData.cpp
+	UpdateCollisionData.cpp
 	UpdateCollisionRepresentations.cpp
+	UpdateDcdData.cpp
 	VirtualToolCoupler.cpp
 )
 
 set(SURGSIM_PHYSICS_HEADERS
 	BuildMlcp.h
 	CcdCollision.h
+	CcdCollisionLoop.h
 	Computation.h
 	ComputationGroup.h
 	Constraint.h
@@ -166,7 +171,10 @@ set(SURGSIM_PHYSICS_HEADERS
 	SlidingConstraintData.h
 	SolveMlcp.h
 	Spring.h
+	UpdateCcdData.h
+	UpdateCollisionData.h
 	UpdateCollisionRepresentations.h
+	UpdateDcdData.h
 	VirtualToolCoupler.h
 )
 surgsim_create_library_header(Physics.h "${SURGSIM_PHYSICS_HEADERS}")

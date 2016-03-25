@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -72,8 +72,8 @@ void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 }
 
 std::list<std::shared_ptr<Contact>> ContactCalculation::calculateDcdContact(
-	const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1,
-	const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2)
+									 const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1,
+									 const Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2)
 {
 	auto types = getShapeTypes();
 	auto incoming = std::make_pair(posedShape1.getShape()->getType(), posedShape2.getShape()->getType());
@@ -129,17 +129,9 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 				"Second Object, wrong type of object" << secondShapeType;
 	}
 
-	std::shared_ptr<Math::Shape> shape1 = pair->getFirst()->getShape();
-	if (shape1->isTransformable())
-	{
-		shape1 = pair->getFirst()->getPosedShape();
-	}
+	std::shared_ptr<Math::Shape> shape1 = pair->getFirst()->getPosedShape();
 
-	std::shared_ptr<Math::Shape> shape2 = pair->getSecond()->getShape();
-	if (shape2->isTransformable())
-	{
-		shape2 = pair->getSecond()->getPosedShape();
-	}
+	std::shared_ptr<Math::Shape> shape2 = pair->getSecond()->getPosedShape();
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
@@ -151,8 +143,8 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
 		contacts = doCalculateCcdContact(
-			pair->getFirst()->getPosedShapeMotion(),
-			pair->getSecond()->getPosedShapeMotion());
+					   pair->getFirst()->getPosedShapeMotion(),
+					   pair->getSecond()->getPosedShapeMotion());
 	}
 	else
 	{
@@ -166,16 +158,16 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 }
 
 std::list<std::shared_ptr<Contact>> ContactCalculation::doCalculateDcdContact(
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-	const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
+									 const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+									 const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2)
 {
 	SURGSIM_FAILURE() << "Not implemented";
 	return std::list<std::shared_ptr<Contact>>();
 }
 
 std::list<std::shared_ptr<Contact>> ContactCalculation::doCalculateCcdContact(
-	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
-	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2)
+									 const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion1,
+									 const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShapeMotion2)
 {
 	SURGSIM_FAILURE() << "Not implemented";
 	return std::list<std::shared_ptr<Contact>>();
@@ -230,7 +222,7 @@ void ContactCalculation::initializeTables()
 	for (auto type : allshapes)
 	{
 		ContactCalculation::privateDcdRegister(std::make_shared<Collision::CompoundShapeContact>(
-											   std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, type)));
+				std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, type)));
 	}
 
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentSelfContact>());
