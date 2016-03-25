@@ -18,7 +18,7 @@
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 #include <gtest/gtest.h>
-#include "../../Math/Vector.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Datastructures/Location.h"
 
 namespace SurgSim
@@ -40,9 +40,9 @@ TEST(CcdCollisionLoopTest, FilterContacts)
 
 	EXPECT_FALSE(computation->filterContacts(pairs, 0.0, &toi));
 
+	// Check that we find the toi correctly
 	pair->addCcdContact(0.0, 0.1, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
 						std::make_pair(location, location));
-
 	EXPECT_TRUE(computation->filterContacts(pairs, 0.0, &toi));
 	EXPECT_DOUBLE_EQ(0.1, toi);
 	EXPECT_EQ(1u, pair->getContacts().size());
@@ -50,21 +50,63 @@ TEST(CcdCollisionLoopTest, FilterContacts)
 	pair->addCcdContact(0.0, 0.2, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
 						std::make_pair(location, location));
 
+	// Check that we filter everything after the toi
+	toi = 0.0;
 	EXPECT_EQ(2u, pair->getContacts().size());
 	EXPECT_TRUE(computation->filterContacts(pairs, 0.0, &toi));
 	EXPECT_DOUBLE_EQ(0.1, toi);
 	EXPECT_EQ(1u, pair->getContacts().size());
 
+	// Advance the toi correctly from the 0.1 and keep both contacts
 	pair->addCcdContact(0.0, 0.2, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
+						std::make_pair(location, location));
+	EXPECT_TRUE(computation->filterContacts(pairs, 0.0, &toi));
+	EXPECT_DOUBLE_EQ(0.2, toi);
+	EXPECT_EQ(2u, pair->getContacts().size());
+
+
+	// Advance the toi correctly keep one contact and discard the other
+	pair->addCcdContact(0.0, 0.3, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
 						std::make_pair(location, location));
 
 	pair->addCcdContact(0.0, 0.5, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
 						std::make_pair(location, location));
 
+	EXPECT_EQ(4u, pair->getContacts().size());
+	EXPECT_TRUE(computation->filterContacts(pairs, 0.0, &toi));
+	EXPECT_DOUBLE_EQ(0.3, toi);
 	EXPECT_EQ(3u, pair->getContacts().size());
-	EXPECT_TRUE(computation->filterContacts(pairs, 0.15, &toi));
-	EXPECT_DOUBLE_EQ(0.25, toi);
+}
+
+TEST(CcdCollisionLoopTest, FilterContactsWithEpsilon)
+{
+	double toi;
+	auto rep1 = std::make_shared<RigidCollisionRepresentation>("One");
+	rep1->setSelfCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
+	auto pair = std::make_shared<Collision::CollisionPair>(rep1, rep1);
+
+	auto computation = std::make_shared<CcdCollisionLoop>(false);
+	DataStructures::Location location;
+	std::vector<std::shared_ptr<Collision::CollisionPair>> pairs(1, pair);
+
+	// Check that we find the toi correctly
+	pair->addCcdContact(0.0, 0.1, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
+						std::make_pair(location, location));
+	pair->addCcdContact(0.0, 0.2, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
+						std::make_pair(location, location));
+	pair->addCcdContact(0.0, 0.3, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
+						std::make_pair(location, location));
+	EXPECT_TRUE(computation->filterContacts(pairs, 0.11, &toi));
+	// toi should be 0.1 + 0.11 i.e. toi + epsilon
+	EXPECT_DOUBLE_EQ(0.21, toi);
 	EXPECT_EQ(2u, pair->getContacts().size());
+
+	pair->addCcdContact(0.0, 0.3, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
+						std::make_pair(location, location));
+	EXPECT_TRUE(computation->filterContacts(pairs, 0.11, &toi));
+	// toi should be 0.3 + 0.11 i.e. toi + epsilon
+	EXPECT_DOUBLE_EQ(0.41, toi);
+	EXPECT_EQ(3u, pair->getContacts().size());
 }
 
 }

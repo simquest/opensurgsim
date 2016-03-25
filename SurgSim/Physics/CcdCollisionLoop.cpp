@@ -42,7 +42,7 @@ CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
 	m_solveMlcp(new SolveMlcp(copyState)),
 	m_pushResults(new PushResults(copyState)),
 	m_maxIterations(20),
-	m_epsilonFactor(100)
+	m_epsilonFactor(1000)
 {
 }
 
@@ -110,11 +110,6 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 		// set toi to the correct value as a percentage of dt
 		toi += (1.0 - toi) * localToi;
 
-		std::for_each(ccdPairs.begin(), ccdPairs.end(), [](const std::shared_ptr<Collision::CollisionPair>& p)
-		{
-			p->clearContacts();
-		});
-
 		if (toi > 1.0)
 		{
 			break;
@@ -146,9 +141,12 @@ bool CcdCollisionLoop::filterContacts(
 	for (const auto& pair : ccdPairs)
 	{
 		std::for_each(pair->getContacts().begin(),
-					  pair->getContacts().end(), [&toi](const std::shared_ptr<Collision::Contact>& contact)
+					  pair->getContacts().end(), [&toi, currentToi](const std::shared_ptr<Collision::Contact>& contact)
 		{
-			toi = std::min<double>(toi, contact->time);
+			if (contact->time > *currentToi)
+			{
+				toi = std::min<double>(toi, contact->time);
+			}
 		});
 	}
 

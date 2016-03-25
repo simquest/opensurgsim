@@ -38,7 +38,6 @@ class PushResults;
 class CcdCollisionLoop : public Computation
 {
 public:
-	friend class CcdCollisionLoopTest_FilterContacts_Test;
 
 	/// Constructor
 	explicit CcdCollisionLoop(bool copyState);
@@ -50,6 +49,12 @@ public:
 
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
 			const std::shared_ptr<PhysicsManagerState>& state) override;
+
+	///@{
+	/// Test access
+	friend class CcdCollisionLoopTest_FilterContacts_Test;
+	friend class CcdCollisionLoopTest_FilterContactsWithEpsilon_Test;
+	///@}
 
 private:
 	///@{
