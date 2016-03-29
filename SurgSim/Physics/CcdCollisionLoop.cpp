@@ -94,7 +94,7 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 		lastState = m_updateCcdData->update(localToi, lastState); // state interpolation is triggered in here
 		lastState = m_ccdCollision->update(localDt, lastState);
 
-		std::cout << ccdPairs[0]->getContacts().size() << std::endl;
+		//std::cout << ccdPairs[0]->getContacts().size() << std::endl;
 
 		// Find the first impact and filter all contacts beyond a given epsilon
 		if (!filterContacts(ccdPairs, epsilon, &localToi))
@@ -123,6 +123,10 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 	else if (iterations < m_maxIterations - 1)
 	{
 		std::cout << "----- Resolved after " << m_maxIterations - iterations << std::endl;
+	}
+	else
+	{
+		std::cout << "--------Iteration End " << std::endl;
 	}
 
 	return lastState;
