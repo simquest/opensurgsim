@@ -72,7 +72,20 @@ OsgVectorFieldRepresentation::~OsgVectorFieldRepresentation()
 
 void OsgVectorFieldRepresentation::doUpdate(double dt)
 {
-	std::vector<Vertex<VectorFieldData>> vertices = m_vectorField->getVertices();
+	VectorField vectorField;
+	if (m_writeBuffer.tryTakeChanged(&vectorField))
+	{
+		privateUpdate(vectorField.getVertices());
+	}
+	else
+	{
+		/// #threadsafety This update is through the shared datastructure, not threadsafe
+		privateUpdate(m_vectorField->getVertices());
+	}
+}
+
+void OsgVectorFieldRepresentation::privateUpdate(const std::vector<DataStructures::Vertex<VectorFieldData>>& vertices)
+{
 	size_t count = vertices.size();
 
 	if (0 != count)
@@ -105,7 +118,7 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 			(*m_vertexData)[2 * i] = SurgSim::Graphics::toOsg(vertices[i].position);
 			// Ending location of vector
 			(*m_vertexData)[2 * i + 1] = SurgSim::Graphics::toOsg(vertices[i].position) +
-				SurgSim::Graphics::toOsg(vertices[i].data.direction) * m_scale;
+										 SurgSim::Graphics::toOsg(vertices[i].data.direction) * m_scale;
 
 			m_drawPoints->at(i) = (2 * i);
 		}
@@ -124,7 +137,7 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 		}
 		else
 		{
-			(*m_colors)[0]= osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			(*m_colors)[0] = osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
 			m_lineGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 			m_pointGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 		}
@@ -134,7 +147,12 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 	}
 }
 
-std::shared_ptr< SurgSim::Graphics::VectorField > OsgVectorFieldRepresentation::getVectorField() const
+void OsgVectorFieldRepresentation::updateVectorField(const SurgSim::Graphics::VectorField& vectorfield)
+{
+	m_writeBuffer.set(vectorfield);
+}
+
+std::shared_ptr<SurgSim::Graphics::VectorField> OsgVectorFieldRepresentation::getVectorField() const
 {
 	return m_vectorField;
 }
