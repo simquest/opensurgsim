@@ -36,6 +36,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	TransferPhysicsToGraphicsMeshBehavior.cpp
 	TransferPhysicsToPointCloudBehavior.cpp
 	TransferPhysicsToVerticesBehavior.cpp
+	VisualizeConstraints.cpp
 	VisualizeContactsBehavior.cpp
 )
 
@@ -58,6 +59,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	TransferPhysicsToGraphicsMeshBehavior.h
 	TransferPhysicsToPointCloudBehavior.h
 	TransferPhysicsToVerticesBehavior.h
+	VisualizeConstraints.h
 	VisualizeContactsBehavior.h
 )
 surgsim_create_library_header(Blocks.h "${SURGSIM_BLOCKS_HEADERS}")
