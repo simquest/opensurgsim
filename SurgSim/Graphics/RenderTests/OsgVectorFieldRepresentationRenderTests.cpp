@@ -130,11 +130,12 @@ protected:
 
 TEST_F(OsgVectorFieldRepresentationRenderTests, AddVectors)
 {
-	auto vectorRepresentation = std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
+	auto vectorRepresentation = std::make_shared<OsgVectorFieldRepresentation>("VectorField");
 	auto points = makeStartingPoints();
 	auto colors = makeStartingColors();
 	auto vectors = makeVectors(points, colors);
-	auto vectorField = vectorRepresentation->getVectorField();
+
+	SurgSim::Graphics::VectorField vectorField;
 
 	vectorRepresentation->setLocalPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 	viewElement->addComponent(vectorRepresentation);
@@ -149,7 +150,8 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, AddVectors)
 	auto v = std::begin(vectors);
 	for (; it != std::end(points); ++it, ++v)
 	{
-		vectorField->addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));
+		vectorField.addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));
+		vectorRepresentation->updateVectorField(vectorField);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	}
 }

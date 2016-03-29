@@ -42,7 +42,10 @@ public:
 
 	/// Gets the vector field
 	/// \return The vector field
-	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const = 0;
+	virtual std::shared_ptr<SurgSim::Graphics::VectorField> getVectorField() const = 0;
+
+	/// Updates the vector field in a threadsafe manner
+	virtual void updateVectorField(const SurgSim::Graphics::VectorField& vectorfield) = 0;
 
 	/// Sets vector line width
 	/// \param	width	Width of vector line

@@ -22,6 +22,8 @@ namespace SurgSim
 namespace Math
 {
 
+SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::CompoundShape, CompoundShape);
+
 CompoundShape::CompoundShape()
 {
 	{
