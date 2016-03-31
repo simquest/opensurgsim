@@ -31,7 +31,7 @@ SegmentMesh<VertexData, EdgeData>::SegmentMesh()
 
 template <class VertexData, class EdgeData>
 SegmentMesh<VertexData, EdgeData>::SegmentMesh(
-const SegmentMesh<VertexData, EdgeData>& other) :
+	const SegmentMesh<VertexData, EdgeData>& other) :
 	TriangleMeshType(other)
 {
 }
@@ -84,7 +84,7 @@ size_t SegmentMesh<VertexData, EdgeData>::getNumTriangles() const
 
 template <class VertexData, class EdgeData>
 const std::vector<typename SegmentMesh<VertexData, EdgeData>::TriangleType>&
-	SegmentMesh<VertexData, EdgeData>::getTriangles() const
+SegmentMesh<VertexData, EdgeData>::getTriangles() const
 {
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return TriangleMeshType::getTriangles();
@@ -92,7 +92,7 @@ const std::vector<typename SegmentMesh<VertexData, EdgeData>::TriangleType>&
 
 template <class VertexData, class EdgeData>
 std::vector<typename SegmentMesh<VertexData, EdgeData>::TriangleType>&
-	SegmentMesh<VertexData, EdgeData>::getTriangles()
+SegmentMesh<VertexData, EdgeData>::getTriangles()
 {
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return TriangleMeshType::getTriangles();
@@ -100,7 +100,7 @@ std::vector<typename SegmentMesh<VertexData, EdgeData>::TriangleType>&
 
 template <class VertexData, class EdgeData>
 const typename SegmentMesh<VertexData, EdgeData>::TriangleType&
-	SegmentMesh<VertexData, EdgeData>::getTriangle(size_t id) const
+SegmentMesh<VertexData, EdgeData>::getTriangle(size_t id) const
 {
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return TriangleMeshType::getTriangle(id);
@@ -108,7 +108,7 @@ const typename SegmentMesh<VertexData, EdgeData>::TriangleType&
 
 template <class VertexData, class EdgeData>
 typename SegmentMesh<VertexData, EdgeData>::TriangleType&
-	SegmentMesh<VertexData, EdgeData>::getTriangle(size_t id)
+SegmentMesh<VertexData, EdgeData>::getTriangle(size_t id)
 {
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	return TriangleMeshType::getTriangle(id);
@@ -122,16 +122,18 @@ void SegmentMesh<VertexData, EdgeData>::removeTriangle(size_t id)
 
 template <class VertexData, class EdgeData>
 std::array<SurgSim::Math::Vector3d, 3>
-	SegmentMesh<VertexData, EdgeData>::getTrianglePositions(size_t id) const
+SegmentMesh<VertexData, EdgeData>::getTrianglePositions(size_t id) const
 {
 	using SurgSim::Math::Vector3d;
 	SURGSIM_FAILURE() << "No triangles present in segment mesh.";
 	std::array<Vector3d, 3> result =
-	{{
-		Vector3d::Zero(),
-		Vector3d::Zero(),
-		Vector3d::Zero()
-	}};
+	{
+		{
+			Vector3d::Zero(),
+			Vector3d::Zero(),
+			Vector3d::Zero()
+		}
+	};
 	return result;
 }
 
@@ -147,6 +149,86 @@ void SegmentMesh<VertexData, EdgeData>::doClear()
 	TriangleMeshType::doClearEdges();
 	TriangleMeshType::doClearVertices();
 }
+
+template <class VertexData, class EdgeData>
+void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::createDefaultEdges()
+{
+	doClearEdges();
+	for (size_t i = 0; i < getNumVertices() - 1; ++i)
+	{
+		std::array<size_t, 2> vertices = { i, i + 1 };
+		EdgeType edge(vertices);
+		addEdge(edge);
+	}
+}
+
+
+template <class VertexData, class EdgeData>
+void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool addPhysics)
+{
+	std::fstream out(fileName, std::ios::out);
+
+	if (out.is_open())
+	{
+		out << "ply" << std::endl;
+		out << "format ascii 1.0" << std::endl;
+		out << "comment Created by OpenSurgSim, www.opensurgsim.org" << std::endl;
+		out << "element vertex " << getNumVertices() << std::endl;
+		out << "property float x\nproperty float y\nproperty float z" << std::endl;
+		if (addPhysics)
+		{
+			out << "element 1d_element " << getNumEdges() << std::endl;
+			out << "property list uint uint vertex_indices" << std::endl;
+			out << "element radius 1" << std::endl;
+			out << "property double value" << std::endl;
+			out << "element material 1" << std::endl;
+			out << "property double mass_density"  << std::endl;
+			out << "property double poisson_ratio" << std::endl;
+			out << "property double young_modulus" << std::endl;
+			out << "element boundary_condition 0" << std::endl;
+			out << "property uint vertex_index" << std::endl;
+		}
+		else
+		{
+			out << "element edge " << getNumEdges() << std::endl;
+			out << "property uint vertex1" << std::endl;
+			out << "property uint vertex2" << std::endl;
+		}
+		out << "end_header" << std::endl;
+		for (const auto& vertex : getVertices())
+		{
+			out << vertex.position[0] << " " << vertex.position[1] << " " << vertex.position[2] << std::endl;
+		}
+
+		for (const auto& edge : getEdges())
+		{
+			if (addPhysics)
+			{
+				out << "2 ";
+			}
+			out << edge.verticesId[0] << " " << edge.verticesId[1] << std::endl;
+		}
+		if (addPhysics)
+		{
+			out << "0.001" << std::endl;
+			out << "900.0 0.45 1.75e9" << std::endl; // Prolene
+		}
+
+		if (out.bad())
+		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
+					<< "There was a problem writing " << fileName;
+		}
+
+		out.close();
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
+				<< "Could not open " << fileName << " for writing.";
+	}
+}
+
 
 }  // namespace DataStructures
 }  // namespace SurgSim
