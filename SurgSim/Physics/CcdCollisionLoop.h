@@ -24,6 +24,7 @@ namespace SurgSim
 namespace Collision
 {
 class CollisionPair;
+struct Contact;
 }
 namespace Physics
 {
@@ -34,6 +35,7 @@ class ContactConstraintGeneration;
 class BuildMlcp;
 class SolveMlcp;
 class PushResults;
+class PhysicsManager;
 
 class CcdCollisionLoop : public Computation
 {
@@ -56,6 +58,8 @@ public:
 	friend class CcdCollisionLoopTest_FilterContactsWithEpsilon_Test;
 	///@}
 
+	PhysicsManager* manager;
+
 private:
 	///@{
 	/// Computations
@@ -72,6 +76,14 @@ private:
 	bool filterContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 						double epsilon,
 						double* currentToi);
+
+	void backupContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+						std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+	void restoreContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+						 std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+	void printContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
+	void assert_no_contacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
+	void clearContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
 };
 
 }

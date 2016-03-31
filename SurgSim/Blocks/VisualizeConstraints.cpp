@@ -131,7 +131,7 @@ void VisualizeConstraintsBehavior::update(double dt)
 
 int VisualizeConstraintsBehavior::getTargetManagerType() const
 {
-	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
+	return SurgSim::Framework::MANAGER_TYPE_GRAPHICS;
 }
 
 bool VisualizeConstraintsBehavior::doInitialize()
