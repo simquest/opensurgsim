@@ -72,6 +72,15 @@ public:
 	SegmentMesh<VertexData, EdgeData>& operator=(
 		SegmentMesh<VertexData, EdgeData>&& other);
 
+	/// Creates edges for all vertices in the mesh connecting all the points in order
+	/// \note This will clear all the current edges
+	void createDefaultEdges();
+
+	/// Save the current structure to a ply file
+	/// \param filename Name of the file for writing
+	/// \param asPhysics Format the file to be used as a physics file
+	void save(const std::string& fileName, bool asPhyics = true);
+
 	///@{
 	/// Functions that need to assert, because they deal with triangles.
 	size_t addTriangle(const TriangleType& triangle);
