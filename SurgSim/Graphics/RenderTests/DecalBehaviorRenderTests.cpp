@@ -78,7 +78,7 @@ TEST_F(DecalBehaviorRenderTests, InitTest)
 	auto texture = std::make_shared<Graphics::OsgTexture2d>();
 	auto path = applicationData->findFile("Textures/CheckerBoard.png");
 	texture->loadImage(path);
-	// Need to create RGBA Image object and set that as texture (or else face copying within behavior)
+	// Need to create RGBA Image object and set that as texture (or load empty texture)
 	material->addUniform("sampler2D", "decalTexture");
 	material->setValue("decalTexture", texture);
 

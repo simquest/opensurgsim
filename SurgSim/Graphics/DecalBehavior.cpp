@@ -72,8 +72,8 @@ void DecalBehavior::update(double dt)
 	// Get texture coordinate of vertex with mesh->getVertex(id).data.texture
 	int width, height;
 	m_texture->getSize(&width, &height);
-	s += 1.0f;
-	t += 1.0f;
+	s += 0.005f;
+	t += 0.003f;
 
 	if (s > 1.0f)
 	{
@@ -92,10 +92,11 @@ void DecalBehavior::update(double dt)
 
 	// Need to implement a generic method to get the image data from the texture as an Image class
 	auto data = m_texture->getOsgTexture2d()->getImage()->data();
-	unsigned char* ptr = &data[(coordinateY * width * 3) + (coordinateX * 3)];
-	*(ptr) = 75;
-	*(ptr++) = 15;
-	*(ptr++) = 25;
+	unsigned char* ptr = &data[(coordinateY * width * 4) + (coordinateX * 4)];
+	*(ptr++) = m_color[0];
+	*(ptr++) = m_color[1];
+	*(ptr++) = m_color[2];
+	*(ptr++) = m_color[3];
 
 	// Should this be additive to what already exists to the image data or overwrite?
 
