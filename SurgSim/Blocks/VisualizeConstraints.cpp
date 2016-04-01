@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Blocks/VisualizeConstraints.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
@@ -25,26 +27,35 @@ namespace SurgSim
 namespace Blocks
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::VisualizeConstraintsBehavior,
+				 VisualizeConstraintsBehavior);
 
 VisualizeConstraintsBehavior::VisualizeConstraintsBehavior(const std::string& name) : Behavior(name)
 {
-
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeConstraintsBehavior, FieldsType, VectorFields,
+									  getVectorFields, setVectorFields);
 }
 
-void VisualizeConstraintsBehavior::setVectorField(SurgSim::Physics::ConstraintGroupType constraintType,
-		std::shared_ptr<SurgSim::Graphics::VectorFieldRepresentation> vectorField)
+void VisualizeConstraintsBehavior::setVectorField(Physics::ConstraintGroupType constraintType,
+		const std::shared_ptr<Framework::Component>& vectorField)
 {
-	m_gfxVectorField[constraintType] = vectorField;
+	SURGSIM_ASSERT(constraintType < Physics::CONSTRAINT_GROUP_TYPE_COUNT) << "Invalid constraint type";
+
+	auto converted = Framework::checkAndConvert<Graphics::VectorFieldRepresentation>(
+						 vectorField, "SurgSim::Graphics::VectorFieldRepresentation");
+
+	boost::lock_guard<boost::mutex> lock(m_graphicsMutex);
+	m_graphics[constraintType] = converted;
 }
 
 void VisualizeConstraintsBehavior::update(double dt)
 {
-	using SurgSim::DataStructures::Vertices;
-	using SurgSim::Graphics::VectorFieldData;
-	using SurgSim::Physics::ConstraintGroupType;
-	using SurgSim::Physics::ContactConstraintData;
+	using DataStructures::Vertices;
+	using Graphics::VectorFieldData;
+	using Physics::ConstraintGroupType;
+	using Physics::ContactConstraintData;
 
-	SurgSim::Physics::PhysicsManagerState state;
+	Physics::PhysicsManagerState state;
 	auto manager = m_manager.lock();
 	if (manager == nullptr)
 	{
@@ -58,11 +69,12 @@ void VisualizeConstraintsBehavior::update(double dt)
 		return;
 	}
 
-	SurgSim::Math::MlcpSolution::Vector& x = state.getMlcpSolution().x;
+	Math::MlcpSolution::Vector& x = state.getMlcpSolution().x;
 	if (state.getMlcpProblem().getSize() != static_cast<size_t>(x.size()))
 	{
-		std::cout << "mlcp solution size = " << x.size() << " while mlcp problem size = " <<
-				  state.getMlcpProblem().getSize() << std::endl;
+		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
+				<< "mlcp solution size = " << x.size() << " while mlcp problem size = "
+				<< state.getMlcpProblem().getSize() << std::endl;
 		return;
 	}
 
@@ -72,41 +84,41 @@ void VisualizeConstraintsBehavior::update(double dt)
 	}
 
 	// For each constraint type...
-	size_t constraintTypeEnd = static_cast<int>(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_COUNT);
+	size_t constraintTypeEnd = static_cast<int>(Physics::CONSTRAINT_GROUP_TYPE_COUNT);
 
-	std::map<int, SurgSim::Graphics::VectorField> vectorFields;
+	std::map<int, Graphics::VectorField> vectorFields;
 
 	for (size_t constraintType = 0; constraintType < constraintTypeEnd; constraintType++)
 	{
 		ConstraintGroupType constraintGroupType = static_cast<ConstraintGroupType>(constraintType);
-		const std::vector<std::shared_ptr<SurgSim::Physics::Constraint>>& constraints =
+		const std::vector<std::shared_ptr<Physics::Constraint>>& constraints =
 					state.getConstraintGroup(constraintType);
 
 		// For each constraint of that type...
 		for (auto it = constraints.begin(); it != constraints.end(); it++)
 		{
 			// Let's gather the application point and the force vector...
-			SurgSim::Math::Vector3d force = SurgSim::Math::Vector3d::Zero();
-			SurgSim::Math::Vector3d point = (*it)->getLocalizations().first->calculatePosition();
+			Math::Vector3d force = Math::Vector3d::Zero();
+			Math::Vector3d point = (*it)->getLocalizations().first->calculatePosition();
 
 			int mlcpConstraintIndex = state.getConstraintsMapping().getValue((*it).get());
-			SurgSim::Math::Vector4d color = SurgSim::Math::Vector4d::Zero();
+			Math::Vector4d color = Math::Vector4d::Zero();
 
 			switch ((*it)->getType())
 			{
-				case SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT:
+				case Math::MLCP_BILATERAL_3D_CONSTRAINT:
 					{
 						force = x.segment(mlcpConstraintIndex, 3);
-						color = SurgSim::Math::Vector4d(0.9, 0.9, 0.9, 1);
+						color = Math::Vector4d(0.9, 0.9, 0.9, 1);
 					}
 					break;
-				case SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
+				case Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 					{
-						const SurgSim::Math::Vector3d& forceNormal =
+						const Math::Vector3d& forceNormal =
 							std::static_pointer_cast<ContactConstraintData>((*it)->getData())->getNormal();
 						double forceNormalIntensity = x[mlcpConstraintIndex];
 						force = forceNormal * forceNormalIntensity;
-						color = SurgSim::Math::Vector4d(0.9, 0.0, 0.0, 1);
+						color = Math::Vector4d(0.9, 0.0, 0.0, 1);
 					}
 					break;
 				default:
@@ -122,8 +134,8 @@ void VisualizeConstraintsBehavior::update(double dt)
 		}
 	}
 
-	// Update the graphics this will clear all the places where there haven't been constraints
-	for (const auto& graphics : m_gfxVectorField)
+	boost::lock_guard<boost::mutex> lock(m_graphicsMutex);
+	for (const auto& graphics : m_graphics)
 	{
 		graphics.second->updateVectorField(vectorFields[graphics.first]);
 	}
@@ -131,12 +143,12 @@ void VisualizeConstraintsBehavior::update(double dt)
 
 int VisualizeConstraintsBehavior::getTargetManagerType() const
 {
-	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
+	return Framework::MANAGER_TYPE_GRAPHICS;
 }
 
 bool VisualizeConstraintsBehavior::doInitialize()
 {
-	m_manager = getRuntime()->getManager<SurgSim::Physics::PhysicsManager>();
+	m_manager = getRuntime()->getManager<Physics::PhysicsManager>();
 	return !m_manager.expired();
 }
 
@@ -145,18 +157,36 @@ bool VisualizeConstraintsBehavior::doWakeUp()
 	return true;
 }
 
+void VisualizeConstraintsBehavior::setVectorFields(const FieldsType& fields)
+{
+	for (const auto& field : fields)
+	{
+		setVectorField(static_cast<Physics::ConstraintGroupType>(field.first), field.second);
+	}
+}
+
+SurgSim::Blocks::VisualizeConstraintsBehavior::FieldsType VisualizeConstraintsBehavior::getVectorFields() const
+{
+	FieldsType result;
+	for (const auto& field : m_graphics)
+	{
+		result.push_back(field);
+	}
+	return result;
+}
+
 VisualizeConstraints::VisualizeConstraints(const std::string& name) : BasicSceneElement(name)
 {
 	auto visualizer = std::make_shared<VisualizeConstraintsBehavior>("Visualizer");
 	addComponent(visualizer);
 	{
 		auto vectors = std::make_shared<Graphics::OsgVectorFieldRepresentation>("Contact");
-		visualizer->setVectorField(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, vectors);
+		visualizer->setVectorField(Physics::CONSTRAINT_GROUP_TYPE_CONTACT, vectors);
 		addComponent(vectors);
 	}
 	{
 		auto vectors = std::make_shared<Graphics::OsgVectorFieldRepresentation>("Scene");
-		visualizer->setVectorField(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_SCENE, vectors);
+		visualizer->setVectorField(Physics::CONSTRAINT_GROUP_TYPE_SCENE, vectors);
 		addComponent(vectors);
 	}
 }
