@@ -27,6 +27,10 @@ namespace SurgSim
 namespace Graphics
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component,
+				 SurgSim::Graphics::OsgVectorFieldRepresentation,
+				 OsgVectorFieldRepresentation);
+
 using SurgSim::DataStructures::Vertex;
 
 OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& name) :
@@ -35,6 +39,11 @@ OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& na
 	OsgRepresentation(name),
 	m_scale(0.1)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgVectorFieldRepresentation, double, LineWidth, getLineWidth, setLineWidth);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgVectorFieldRepresentation, double, Scale, getScale, setScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgVectorFieldRepresentation, double, PointSize, getPointSize, setPointSize);
+
+
 	m_vectorField = std::make_shared<SurgSim::Graphics::VectorField>();
 	m_vertexData = new osg::Vec3Array;
 	m_lineGeometry = new osg::Geometry;

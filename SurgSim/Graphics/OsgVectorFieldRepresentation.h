@@ -31,6 +31,8 @@ namespace SurgSim
 namespace Graphics
 {
 
+SURGSIM_STATIC_REGISTRATION(OsgVectorFieldRepresentation);
+
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4250)
@@ -45,6 +47,8 @@ public:
 	explicit OsgVectorFieldRepresentation(const std::string& name);
 	/// Destructor
 	~OsgVectorFieldRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgVectorFieldRepresentation);
 
 	std::shared_ptr<SurgSim::Graphics::VectorField> getVectorField() const override;
 
