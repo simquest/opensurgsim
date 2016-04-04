@@ -16,6 +16,7 @@
 #include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
 
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/SegmentMeshShape.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemLocalization.h"
@@ -59,6 +60,15 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
 	Vector3d globalPosition = localization->calculatePosition();
+
+	{
+		auto segmentShape =
+			std::dynamic_pointer_cast<Math::SegmentMeshShape>(fem->getCollisionRepresentation()->getShape());
+		if (segmentShape != nullptr)
+		{
+			globalPosition += n * (segmentShape->getRadius() * scale);
+		}
+	}
 
 	// Update b with new violation
 	double violation = n.dot(globalPosition);
