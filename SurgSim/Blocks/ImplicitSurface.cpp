@@ -17,7 +17,6 @@
 
 #include "SurgSim/Blocks/GraphicsUtilities.h"
 #include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/TransferPropertiesBehavior.h"
 #include "SurgSim/Graphics/OsgCamera.h"
@@ -49,10 +48,10 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 	{
 		auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceHorizontalBlurPass");
 		renderPass->getCamera()->setOrthogonalProjection(0, textureSize, 0, textureSize, -1.0, 1.0);
-		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 		auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 0, true);
 		renderPass->setRenderTarget(renderTarget);
+		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 		auto material = Graphics::buildMaterial("Shaders/gauss_blur_horizontal.vert", "Shaders/bilateral_blur.frag");
 		material->addUniform("sampler2D", "texture");
@@ -82,10 +81,10 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 	{
 		auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceVerticalBlurPass");
 		renderPass->getCamera()->setOrthogonalProjection(0, textureSize, 0, textureSize, -1.0, 1.0);
-		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 		auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 0, true);
 		renderPass->setRenderTarget(renderTarget);
+		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 		auto material = Graphics::buildMaterial("Shaders/gauss_blur_vertical.vert", "Shaders/bilateral_blur.frag");
 		material->addUniform("sampler2D", "texture");
@@ -114,8 +113,6 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 	return previousCamera;
 }
 std::shared_ptr<Graphics::RenderPass> createDepthPass(
-		std::shared_ptr<Framework::TransferPropertiesBehavior> copier,
-		std::shared_ptr<Graphics::Camera> camera,
 		float sphereRadius,
 		float sphereScale,
 		int textureSize,
@@ -123,13 +120,10 @@ std::shared_ptr<Graphics::RenderPass> createDepthPass(
 {
 	auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceDepthPass");
 	renderPass->getCamera()->setRenderGroupReference(GROUP_IMPLICIT_SURFACE);
-	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
-
-	copier->connect(camera, "Pose", renderPass->getCamera(), "LocalPose");
-	copier->connect(camera, "ProjectionMatrix", renderPass->getCamera() , "ProjectionMatrix");
 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 0, true);
 	renderPass->setRenderTarget(renderTarget);
+	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
 
 	auto material = Graphics::buildMaterial("Shaders/implicit_surface/depth.vert",
 											"Shaders/implicit_surface/depth.frag");
@@ -162,10 +156,10 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 {
 	auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceNormalPass");
 	renderPass->getCamera()->setOrthogonalProjection(0, textureSize, 0, textureSize, -1.0, 1.0);
-	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureSize, textureSize, 1.0, 1, false);
 	renderPass->setRenderTarget(renderTarget);
+	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 	auto material = Graphics::buildMaterial("Shaders/implicit_surface/normal.vert",
 											"Shaders/implicit_surface/normal.frag");
@@ -194,7 +188,6 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 }
 
 std::shared_ptr<Graphics::RenderPass> createShadingPass(
-	std::shared_ptr<Framework::TransferPropertiesBehavior> copier,
 	std::shared_ptr<Graphics::View> view,
 	std::shared_ptr<Graphics::Camera> camera,
 	std::shared_ptr<Graphics::Light> light,
@@ -215,7 +208,6 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	auto renderCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(renderPass->getCamera());
 	renderCamera->setAmbientColor(camera->getAmbientColor());
 	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, dimensions[0], 0, dimensions[1]);
-	copier->connect(view, "DimensionsDouble", renderCamera, "ViewportSize");
 	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
 	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
@@ -302,14 +294,14 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> result;
 
-	auto depthPass = createDepthPass(copier, osgCamera, sphereRadius, sphereScale, textureSize, showDebug);
+	auto depthPass = createDepthPass(sphereRadius, sphereScale, textureSize, showDebug);
 
 	auto blurPass = createBlurPass(depthPass, textureSize, blurRadius, &result, showDebug);
 
 	auto normalPass = createNormalPass(osgCamera, blurPass->getRenderTarget()->getDepthTarget(),
 									   textureSize, showDebug);
 
-	auto shadingPass = createShadingPass(copier, graphicsView, osgCamera, osgLight,
+	auto shadingPass = createShadingPass(graphicsView, osgCamera, osgLight,
 									blurPass->getRenderTarget()->getDepthTarget(),
 									normalPass->getRenderTarget()->getColorTarget(0),
 									diffuseColor, specularColor,
