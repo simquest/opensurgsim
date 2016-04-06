@@ -29,7 +29,6 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 	ply.c
 	PlyReader.cpp
 	SegmentMesh.cpp
-	SegmentMeshPlyReaderDelegate.cpp
 	Tree.cpp
 	TreeData.cpp
 	TreeNode.cpp
@@ -76,7 +75,6 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	SegmentEmptyData.h
 	SegmentMesh.h
 	SegmentMesh-inl.h
-	SegmentMeshPlyReaderDelegate.h
 	TetrahedronMesh.h
 	TetrahedronMesh-inl.h
 	Tree.h

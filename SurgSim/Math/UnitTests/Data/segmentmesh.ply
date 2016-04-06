@@ -1,0 +1,21 @@
+ply
+format ascii 1.0
+comment Created by hand
+element vertex 4
+property double x
+property double y
+property double z
+element 1d_element 3
+property list uint uint vertex_indices
+element radius 1
+property double value
+end_header
+1 2 3
+4 5 6
+7 8 9
+11 11 12
+2	0	1
+2	1	2
+2	2	3
+1.234
+
