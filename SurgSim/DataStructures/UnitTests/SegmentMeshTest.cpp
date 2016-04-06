@@ -553,7 +553,7 @@ TEST_F(SegmentMeshTest, CreateDefaultedges)
 
 	mesh.createDefaultEdges();
 	EXPECT_EQ(9, mesh.getNumEdges());
-	for (int i = 0; i < mesh.getNumEdges(); ++i)
+	for (size_t i = 0; i < mesh.getNumEdges(); ++i)
 	{
 		EXPECT_EQ(i, mesh.getEdge(i).verticesId[0]);
 		EXPECT_EQ(i + 1, mesh.getEdge(i).verticesId[1]);
