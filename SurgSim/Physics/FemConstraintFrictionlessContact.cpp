@@ -39,12 +39,12 @@ FemConstraintFrictionlessContact::~FemConstraintFrictionlessContact()
 }
 
 void FemConstraintFrictionlessContact::doBuild(double dt,
-											   const ConstraintData& data,
-											   const std::shared_ptr<Localization>& localization,
-											   MlcpPhysicsProblem* mlcp,
-											   size_t indexOfRepresentation,
-											   size_t indexOfConstraint,
-											   ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 	std::shared_ptr<FemRepresentation> fem
 		= std::static_pointer_cast<FemRepresentation>(localization->getRepresentation());
@@ -66,7 +66,7 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 			std::dynamic_pointer_cast<Math::SegmentMeshShape>(fem->getCollisionRepresentation()->getShape());
 		if (segmentShape != nullptr)
 		{
-			globalPosition += n * (segmentShape->getRadius() * scale);
+			globalPosition -= n * (segmentShape->getRadius() * scale);
 		}
 	}
 
@@ -101,7 +101,7 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 	}
 
 	mlcp->updateConstraint(m_newH, fem->getComplianceMatrix() * m_newH.transpose(), indexOfRepresentation,
-		indexOfConstraint);
+						   indexOfConstraint);
 }
 
 SurgSim::Physics::ConstraintType FemConstraintFrictionlessContact::getConstraintType() const
