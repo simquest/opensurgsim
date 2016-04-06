@@ -219,9 +219,10 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 				auto contactPoint = 0.5 * (contactP + contactQ);
 				auto depth = ((contactP - contactQ).dot(normal) > 0.0) ?
 							 (contactP - contactQ).norm() : -(contactP - contactQ).norm();
+				std::cout << "depth: " << depth;
 				contacts.emplace_back(std::make_shared<Contact>(
 										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, depth, t,
-										  contactPoint, -normal, penetrationPoints));
+										  contactPoint, normal, penetrationPoints));
 			}
 		}
 		else
