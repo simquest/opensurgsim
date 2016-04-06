@@ -77,9 +77,10 @@ public:
 	void createDefaultEdges();
 
 	/// Save the current structure to a ply file
-	/// \param filename Name of the file for writing
-	/// \param asPhysics Format the file to be used as a physics file
-	void save(const std::string& fileName, bool asPhyics = true);
+	/// \param fileName Name of the file for writing
+	/// \param asPhysics Format the file to be used as a physics file, otherwise the file will be ply format
+	/// with 'edge' as the edge element
+	void save(const std::string& fileName, bool asPhysics = true);
 
 	///@{
 	/// Functions that need to assert, because they deal with triangles.

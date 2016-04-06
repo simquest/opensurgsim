@@ -164,7 +164,7 @@ void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::createDefaultEd
 
 
 template <class VertexData, class EdgeData>
-void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool addPhysics)
+void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool asPhysics)
 {
 	std::fstream out(fileName, std::ios::out);
 
@@ -175,7 +175,7 @@ void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std:
 		out << "comment Created by OpenSurgSim, www.opensurgsim.org" << std::endl;
 		out << "element vertex " << getNumVertices() << std::endl;
 		out << "property float x\nproperty float y\nproperty float z" << std::endl;
-		if (addPhysics)
+		if (asPhysics)
 		{
 			out << "element 1d_element " << getNumEdges() << std::endl;
 			out << "property list uint uint vertex_indices" << std::endl;
@@ -202,13 +202,13 @@ void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std:
 
 		for (const auto& edge : getEdges())
 		{
-			if (addPhysics)
+			if (asPhysics)
 			{
 				out << "2 ";
 			}
 			out << edge.verticesId[0] << " " << edge.verticesId[1] << std::endl;
 		}
-		if (addPhysics)
+		if (asPhysics)
 		{
 			out << "0.001" << std::endl;
 			out << "900.0 0.45 1.75e9" << std::endl; // Prolene

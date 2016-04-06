@@ -40,8 +40,14 @@ public:
 	/// Destructor
 	~SegmentMeshShapePlyReaderDelegate();
 
+	/// Delegate function to begin radius processing
+	/// \param element the name of the element being processed 'radius' in this case, it is ignored
+	/// \param value the number of radius entries should be == 1
+	/// \return the address for ply to deposit the radius data
 	void* beginRadius(const std::string& element, size_t value);
 
+	/// Callback function to process the radius
+	/// \param element the name of element being processed 'radius' in this case, it is ignored
 	void processRadius(const std::string& element);
 
 	bool registerDelegate(DataStructures::PlyReader* reader) override;

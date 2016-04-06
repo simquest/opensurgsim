@@ -62,7 +62,8 @@ bool SegmentMeshShapePlyReaderDelegate::registerDelegate(DataStructures::PlyRead
 		reader->requestElement("radius",
 							   std::bind(&SegmentMeshShapePlyReaderDelegate::beginRadius, this,
 										 std::placeholders::_1, std::placeholders::_2),
-							   std::bind(&SegmentMeshShapePlyReaderDelegate::processRadius, this, std::placeholders::_1),
+							   std::bind(&SegmentMeshShapePlyReaderDelegate::processRadius,
+										 this, std::placeholders::_1),
 							   nullptr);
 		reader->requestScalarProperty("radius", "value", DataStructures::PlyReader::TYPE_DOUBLE, 0);
 	}
