@@ -41,7 +41,7 @@ CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
 	m_buildMlcp(new BuildMlcp(copyState)),
 	m_solveMlcp(new SolveMlcp(copyState)),
 	m_pushResults(new PushResults(copyState)),
-	m_maxIterations(20),
+	m_maxIterations(5),
 	m_epsilonFactor(1000)
 {
 }
@@ -94,41 +94,32 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 
 	while (--iterations > 0)
 	{
-
-		localDt = dt * (1 - toi);
+		toi += (1.0 - toi) * localToi;
 		double epsilon = 1.0 / ((1 - toi) * m_epsilonFactor);
 
-		// #todo ??? backup Possible contacts from DCD
-		// Still I am seeing all the new contacts being created with times of 0 ... that is strange
 		lastState = m_updateCcdData->update(localToi, lastState); // state interpolation is triggered in here
-		lastState = m_ccdCollision->update(localDt, lastState);
+		lastState = m_ccdCollision->update(dt, lastState);
 
-		printContacts(ccdPairs);
+		//printContacts(ccdPairs);
 
 		// Find the first impact and filter all contacts beyond a given epsilon
-		if (!filterContacts(ccdPairs, epsilon, &localToi) || localToi <= epsilon)
+		if (!filterContacts(ccdPairs, epsilon, &localToi))
 		{
 			break;
 		}
-		restoreContacts(ccdPairs, &oldContacts);
-
-		std::cout << localToi << std::endl;
-
-		lastState = m_constraintGeneration->update(localDt, lastState);
-		lastState = m_buildMlcp->update(localDt, lastState);
-		lastState = m_solveMlcp->update(localDt, lastState);
-		lastState = m_pushResults->update(localDt, lastState);
 
 		// set toi to the correct value as a percentage of dt
-		toi += (1.0 - toi) * localToi;
+
+		lastState = m_constraintGeneration->update(dt, lastState);
+		lastState = m_buildMlcp->update(dt, lastState);
+		lastState = m_solveMlcp->update(dt, lastState);
+		lastState = m_pushResults->update(dt, lastState);
+
 
 		if (toi > 1.0)
 		{
 			break;
 		}
-		doSleep = true;
-
-		backupContacts(ccdPairs, &oldContacts);
 	}
 
 	if (iterations == 0)
@@ -160,7 +151,7 @@ bool CcdCollisionLoop::filterContacts(
 	for (const auto& pair : ccdPairs)
 	{
 		std::for_each(pair->getContacts().begin(),
-					  pair->getContacts().end(), [&toi, currentToi](const std::shared_ptr<Collision::Contact>& contact)
+					  pair->getContacts().end(), [&toi](const std::shared_ptr<Collision::Contact>& contact)
 		{
 			toi = std::min<double>(toi, contact->time);
 		});

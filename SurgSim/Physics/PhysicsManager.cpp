@@ -67,9 +67,9 @@ bool PhysicsManager::doInitialize()
 	addComputation(std::make_shared<UpdateDcdData>(copyState));
 	addComputation(std::make_shared<DcdCollision>(copyState));
 	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
-	addComputation(std::make_shared<BuildMlcp>(copyState));
-	addComputation(std::make_shared<SolveMlcp>(copyState));
-	addComputation(std::make_shared<PushResults>(copyState));
+// 	addComputation(std::make_shared<BuildMlcp>(copyState));
+// 	addComputation(std::make_shared<SolveMlcp>(copyState));
+// 	addComputation(std::make_shared<PushResults>(copyState));
 	addComputation(std::make_shared<ParticleCollisionResponse>(copyState));
 	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
 	addComputation(std::make_shared<PostUpdate>(copyState));
