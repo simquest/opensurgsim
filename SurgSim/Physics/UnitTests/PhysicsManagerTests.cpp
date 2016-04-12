@@ -141,6 +141,34 @@ TEST_F(PhysicsManagerTest, AddRemoveParticleRepresentation)
 	EXPECT_TRUE(testDoRemoveComponent(representation2));
 }
 
+TEST_F(PhysicsManagerTest, SetComputations)
+{
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	runtime->addManager(physicsManager);
+	EXPECT_NO_THROW(physicsManager->setComputations(createDcdPipeline()));
+	EXPECT_NO_THROW(runtime->start());
+	EXPECT_ANY_THROW(physicsManager->setComputations(createDcdPipeline()));
+}
+
+TEST_F(PhysicsManagerTest, RunCcd)
+{
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	runtime->addManager(physicsManager);
+	EXPECT_NO_THROW(physicsManager->setComputations(createCcdPipeline()));
+	EXPECT_NO_THROW(runtime->start());
+	EXPECT_NO_THROW(runtime->stop());
+}
+
+TEST_F(PhysicsManagerTest, RunDcd)
+{
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	runtime->addManager(physicsManager);
+	EXPECT_NO_THROW(physicsManager->setComputations(createDcdPipeline()));
+	EXPECT_NO_THROW(runtime->start());
+	EXPECT_NO_THROW(runtime->stop());
+}
+
+
 }; // namespace Physics
 }; // namespace SurgSim
 

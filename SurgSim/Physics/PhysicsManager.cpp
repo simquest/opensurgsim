@@ -58,28 +58,23 @@ int PhysicsManager::getType() const
 
 bool PhysicsManager::doInitialize()
 {
-	bool copyState = false;
-	addComputation(std::make_shared<PreUpdate>(copyState));
-	addComputation(std::make_shared<FreeMotion>(copyState));
-	addComputation(std::make_shared<UpdateCollisionData>(copyState));
-	addComputation(std::make_shared<PrepareCollisionPairs>(copyState));
-	addComputation(std::make_shared<CcdCollisionLoop>(copyState));
-	addComputation(std::make_shared<UpdateDcdData>(copyState));
-	addComputation(std::make_shared<DcdCollision>(copyState));
-	addComputation(std::make_shared<ContactConstraintGeneration>(copyState));
-// 	addComputation(std::make_shared<BuildMlcp>(copyState));
-// 	addComputation(std::make_shared<SolveMlcp>(copyState));
-// 	addComputation(std::make_shared<PushResults>(copyState));
-	addComputation(std::make_shared<ParticleCollisionResponse>(copyState));
-	addComputation(std::make_shared<UpdateCollisionRepresentations>(copyState));
-	addComputation(std::make_shared<PostUpdate>(copyState));
-
+	if (m_computations.size() == 0)
+	{
+		setComputations(createDcdPipeline(false));
+	}
 	return true;
 }
 
 void PhysicsManager::addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation)
 {
+	SURGSIM_ASSERT(!isInitialized()) << "Can't reconfigure the physics manager after it has been initialized";
 	m_computations.push_back(computation);
+}
+
+void PhysicsManager::setComputations(std::vector<std::shared_ptr<Physics::Computation>> computations)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Can't reconfigure the physics manager after it has been initialized";
+	m_computations = computations;
 }
 
 bool PhysicsManager::doStartUp()
@@ -173,6 +168,43 @@ void PhysicsManager::doBeforeStop()
 	// Call up the class hierarchy
 	ComponentManager::doBeforeStop();
 }
+
+std::vector<std::shared_ptr<Physics::Computation>> createDcdPipeline(bool copyState)
+{
+	// When updating this don't forget to update the documentation for this function
+	std::vector<std::shared_ptr<Physics::Computation>> result;
+	result.push_back(std::make_shared<PreUpdate>(copyState));
+	result.push_back(std::make_shared<FreeMotion>(copyState));
+	result.push_back(std::make_shared<UpdateCollisionData>(copyState));
+	result.push_back(std::make_shared<PrepareCollisionPairs>(copyState));
+	result.push_back(std::make_shared<UpdateDcdData>(copyState));
+	result.push_back(std::make_shared<DcdCollision>(copyState));
+	result.push_back(std::make_shared<ContactConstraintGeneration>(copyState));
+	result.push_back(std::make_shared<BuildMlcp>(copyState));
+	result.push_back(std::make_shared<SolveMlcp>(copyState));
+	result.push_back(std::make_shared<PushResults>(copyState));
+	result.push_back(std::make_shared<ParticleCollisionResponse>(copyState));
+	result.push_back(std::make_shared<UpdateCollisionRepresentations>(copyState));
+	result.push_back(std::make_shared<PostUpdate>(copyState));
+
+	return result;
+}
+
+std::vector<std::shared_ptr<Physics::Computation>> createCcdPipeline(bool copyState)
+{
+	// When updating this don't forget to update the documentation for this function
+	std::vector<std::shared_ptr<Physics::Computation>> result;
+	result.push_back(std::make_shared<PreUpdate>(copyState));
+	result.push_back(std::make_shared<FreeMotion>(copyState));
+	result.push_back(std::make_shared<UpdateCollisionData>(copyState));
+	result.push_back(std::make_shared<PrepareCollisionPairs>(copyState));
+	result.push_back(std::make_shared<CcdCollisionLoop>(copyState));
+	result.push_back(std::make_shared<UpdateCollisionRepresentations>(copyState));
+	result.push_back(std::make_shared<PostUpdate>(copyState));
+
+	return result;
+}
+
 
 }; // Physics
 }; // SurgSim
