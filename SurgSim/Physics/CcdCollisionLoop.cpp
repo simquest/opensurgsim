@@ -157,17 +157,16 @@ bool CcdCollisionLoop::filterContacts(
 void CcdCollisionLoop::printContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs)
 {
 	std::stringstream out;
-
+	size_t contactCount = 0;
 	for (const auto& pair : ccdPairs)
 	{
-
-		out << "Contacts : " << pair->getContacts().size() << std::endl;
 		for (const auto& contact : pair->getContacts())
 		{
 			out << *contact;
+			contactCount++;
 		}
 	}
-	SURGSIM_LOG_DEBUG(m_logger) << out.str();
+	SURGSIM_LOG_IF(contactCount != 0, m_logger, DEBUG) << "Contacts: " << contactCount << std::endl << out.str();
 }
 
 void CcdCollisionLoop::clearContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs)
