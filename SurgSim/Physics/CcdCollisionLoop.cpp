@@ -41,8 +41,8 @@ CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
 	m_buildMlcp(new BuildMlcp(copyState)),
 	m_solveMlcp(new SolveMlcp(copyState)),
 	m_pushResults(new PushResults(copyState)),
-	m_maxIterations(5),
-	m_epsilonFactor(1000)
+	m_maxIterations(20),
+	m_epsilonFactor(100)
 {
 }
 
@@ -91,7 +91,6 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 
 	std::vector<std::list<std::shared_ptr<Collision::Contact>>> oldContacts;
 
-
 	while (--iterations > 0)
 	{
 		toi += (1.0 - toi) * localToi;
@@ -100,7 +99,8 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 		lastState = m_updateCcdData->update(localToi, lastState); // state interpolation is triggered in here
 		lastState = m_ccdCollision->update(dt, lastState);
 
-		//printContacts(ccdPairs);
+// 		std::cout << "--- Iteration " << m_maxIterations - iterations << std::endl;
+// 		printContacts(ccdPairs);
 
 		// Find the first impact and filter all contacts beyond a given epsilon
 		if (!filterContacts(ccdPairs, epsilon, &localToi))
@@ -108,18 +108,17 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 			break;
 		}
 
-		// set toi to the correct value as a percentage of dt
-
 		lastState = m_constraintGeneration->update(dt, lastState);
 		lastState = m_buildMlcp->update(dt, lastState);
 		lastState = m_solveMlcp->update(dt, lastState);
 		lastState = m_pushResults->update(dt, lastState);
 
-
 		if (toi > 1.0)
 		{
 			break;
 		}
+
+		clearContacts(ccdPairs);
 	}
 
 	if (iterations == 0)
