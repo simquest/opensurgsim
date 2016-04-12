@@ -54,7 +54,7 @@ CcdCollisionLoop::~CcdCollisionLoop()
 std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state)
 {
-	static bool doSleep;
+	static bool doSleep = false;
 
 	if (doSleep)
 	{
