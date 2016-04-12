@@ -21,6 +21,11 @@
 namespace SurgSim
 {
 
+namespace Framework
+{
+class Logger;
+}
+
 namespace Collision
 {
 class CollisionPair;
@@ -69,21 +74,32 @@ private:
 	std::unique_ptr<BuildMlcp> m_buildMlcp;
 	std::unique_ptr<SolveMlcp> m_solveMlcp;
 	std::unique_ptr<PushResults> m_pushResults;
+	///@}
 
-	size_t m_maxIterations;
+	size_t m_maxIterations; ///< maximum number of iterations to run
+
+	/// epsilon as a fraction of dt, i.e. if this is 100, the epsilon will be dt/100
+	/// during the iteration epsilon will be scaled to remain dt/100 as it pertains to the ever shrinking interval
+	/// that is the iterations intervall
 	double m_epsilonFactor;
 
+	/// Takes all the contacts from ccdPairs, finds the first contact wrt contact time and removes all contacts
+	/// with contact time greater than the first contact time + epsilon
+	/// \param ccdPairs the list of pairs that should be checked for contacts
+	/// \param epsilon the epsilon to be added to the first toi for filtering
+	/// \param [out] currentToi the earliest contact time found in ccdPairs + epsilon
+	/// \return true if there were any contacts found in ccdPairs
 	bool filterContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 						double epsilon,
 						double* currentToi);
 
-	void backupContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
-						std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
-	void restoreContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
-						 std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
 	void printContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
-	void assert_no_contacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
+
+	/// remove all the contacts from ccdPairs
+	/// \param ccdPairs list of pairs for removal
 	void clearContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
+
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 }

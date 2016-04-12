@@ -42,7 +42,8 @@ CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
 	m_solveMlcp(new SolveMlcp(copyState)),
 	m_pushResults(new PushResults(copyState)),
 	m_maxIterations(20),
-	m_epsilonFactor(100)
+	m_epsilonFactor(100),
+	m_logger(SurgSim::Framework::Logger::getLogger("Physics/CCDCollisionLoop"))
 {
 }
 
@@ -54,13 +55,6 @@ CcdCollisionLoop::~CcdCollisionLoop()
 std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state)
 {
-	static bool doSleep = false;
-
-	if (doSleep)
-	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	}
-
 	auto lastState = state;
 	size_t iterations = m_maxIterations;
 
@@ -68,15 +62,11 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 	std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs;
 	ccdPairs.reserve(collisionPairs.size());
 
-	std::unordered_set<Collision::Representation*> representations;
-
 	std::copy_if(collisionPairs.cbegin(), collisionPairs.cend(), std::back_inserter(ccdPairs),
-				 [&representations](const std::shared_ptr<Collision::CollisionPair>& p)
+				 [](const std::shared_ptr<Collision::CollisionPair>& p)
 	{
 		if (p->getType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)
 		{
-			representations.insert(p->getFirst().get());
-			representations.insert(p->getSecond().get());
 			return true;
 		}
 		return false;
@@ -87,10 +77,6 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 	double toi = 0.0;
 	double localToi = 0.0;
 
-	std::cout << "--------Iteration Start " << std::endl;
-
-	std::vector<std::list<std::shared_ptr<Collision::Contact>>> oldContacts;
-
 	while (--iterations > 0)
 	{
 		toi += (1.0 - toi) * localToi;
@@ -99,8 +85,10 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 		lastState = m_updateCcdData->update(localToi, lastState); // state interpolation is triggered in here
 		lastState = m_ccdCollision->update(dt, lastState);
 
-// 		std::cout << "--- Iteration " << m_maxIterations - iterations << std::endl;
-// 		printContacts(ccdPairs);
+		if (m_logger->getThreshold() <= SurgSim::Framework::LOG_LEVEL_DEBUG)
+		{
+			printContacts(ccdPairs);
+		}
 
 		// Find the first impact and filter all contacts beyond a given epsilon
 		if (!filterContacts(ccdPairs, epsilon, &localToi))
@@ -113,26 +101,15 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 		lastState = m_solveMlcp->update(dt, lastState);
 		lastState = m_pushResults->update(dt, lastState);
 
+		clearContacts(ccdPairs);
+
 		if (toi > 1.0)
 		{
 			break;
 		}
-
-		clearContacts(ccdPairs);
 	}
 
-	if (iterations == 0)
-	{
-		std::cout << "----- Maxed out iterations ... " << std::endl;
-	}
-	else if (iterations < m_maxIterations - 1)
-	{
-		std::cout << "----- Resolved after " << m_maxIterations - iterations << std::endl;
-	}
-	else
-	{
-		std::cout << "--------Iteration End " << std::endl;
-	}
+	SURGSIM_LOG_IF(iterations == 0, m_logger, WARNING) << "Maxed out iterations (" << m_maxIterations << ")";
 
 	return lastState;
 }
@@ -177,51 +154,20 @@ bool CcdCollisionLoop::filterContacts(
 	return true;
 }
 
-void CcdCollisionLoop::backupContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
-									  std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts)
-{
-	for (auto& pair : ccdPairs)
-	{
-		oldContacts->emplace_back(pair->getContacts());
-		pair->getContacts().clear();
-	}
-}
-
-void CcdCollisionLoop::restoreContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
-									   std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts)
-{
-	if (oldContacts->size() == 0)
-	{
-		return;
-	}
-
-	SURGSIM_ASSERT(oldContacts->size() == ccdPairs.size());
-	for (int i = 0; i < oldContacts->size(); ++i)
-	{
-		auto& newContacts = ccdPairs[i]->getContacts();
-		newContacts.splice(newContacts.end(), std::move(oldContacts->at(i)));
-	}
-	oldContacts->clear();
-}
-
 void CcdCollisionLoop::printContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs)
 {
+	std::stringstream out;
+
 	for (const auto& pair : ccdPairs)
 	{
-		std::cout << "Contacts : " << pair->getContacts().size() << std::endl;
+
+		out << "Contacts : " << pair->getContacts().size() << std::endl;
 		for (const auto& contact : pair->getContacts())
 		{
-			std::cout << *contact;
+			out << *contact;
 		}
 	}
-}
-
-void CcdCollisionLoop::assert_no_contacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs)
-{
-	for (const auto& pair : ccdPairs)
-	{
-		SURGSIM_ASSERT(pair->getContacts().size() == 0);
-	}
+	SURGSIM_LOG_DEBUG(m_logger) << out.str();
 }
 
 void CcdCollisionLoop::clearContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs)
