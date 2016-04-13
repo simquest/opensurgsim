@@ -118,10 +118,10 @@ public:
 										   double toi)
 	{
 		std::pair<Location, Location> penetrationPoints;
-		Math::Vector2d parametricCoordinateP(r, 1.0 - r);
+		Math::Vector2d parametricCoordinateP(1.0 - r, r);
 		penetrationPoints.first.elementMeshLocalCoordinate.setValue(
 			SurgSim::DataStructures::IndexedLocalCoordinate(seg1, parametricCoordinateP));
-		Math::Vector2d parametricCoordinateQ(s, 1.0 - s);
+		Math::Vector2d parametricCoordinateQ(1.0 - s, s);
 		penetrationPoints.second.elementMeshLocalCoordinate.setValue(
 			SurgSim::DataStructures::IndexedLocalCoordinate(seg2, parametricCoordinateQ));
 
@@ -558,17 +558,17 @@ TEST_F(SegmentCcdSelfContactTests, CalculateContact)
 		transformQ.translate(Vector3d(3.0, 4.0, 5.0));
 
 		auto collisionList = m_selfContact.calculateCcdContact(
-			*shapeT0, transformP,
-			*shapeT1, transformQ,
-			*shapeT0, transformP,  // unused for self-collision
-			*shapeT1, transformQ); // unused for self-collision
+								 *shapeT0, transformP,
+								 *shapeT1, transformQ,
+								 *shapeT0, transformP,  // unused for self-collision
+								 *shapeT1, transformQ); // unused for self-collision
 
 		EXPECT_EQ(1, collisionList.size());
 		std::shared_ptr<Collision::Contact> contacted = *(collisionList.begin());
 		EXPECT_EQ(CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, contacted->type);
 		EXPECT_GT(2.0 * m_selfContact.getTimeMinPrecisionEpsilon(), std::abs(contacted->time - 0.4375));
 		EXPECT_GT(1.0e-08, contacted->contact.norm());
-		EXPECT_GT(1.0e-04, (contacted->normal.normalized() - Vector3d(0.0, 0.0, -1.0)).norm());
+		EXPECT_GT(1.0e-04, (contacted->normal.normalized() - Vector3d(0.0, 0.0, 1.0)).norm());
 		auto contactP = contacted->penetrationPoints.first.rigidLocalPosition.getValue();
 		EXPECT_TRUE((contactP.isApprox(transformP.inverse() *
 									   (contacted->contact + Vector3d(0.0, 0.0, 0.0001)), 1.0e-06)));

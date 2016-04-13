@@ -421,8 +421,8 @@ bool SegmentSelfContact::findSegSegContact(const Math::SegmentMeshShape& segment
 	{
 		auto existingSegId1 = contact->penetrationPoints.first.elementMeshLocalCoordinate.getValue().index;
 		auto existingSegId2 = contact->penetrationPoints.second.elementMeshLocalCoordinate.getValue().index;
-		auto existingS1 = contact->penetrationPoints.first.elementMeshLocalCoordinate.getValue().coordinate[0];
-		auto existingS2 = contact->penetrationPoints.second.elementMeshLocalCoordinate.getValue().coordinate[0];
+		auto existingS1 = contact->penetrationPoints.first.elementMeshLocalCoordinate.getValue().coordinate[1];
+		auto existingS2 = contact->penetrationPoints.second.elementMeshLocalCoordinate.getValue().coordinate[1];
 
 		// Check for same object type and same time. The test for same objectID was
 		// removed as it did not appear to be used (all find segment calls set that
