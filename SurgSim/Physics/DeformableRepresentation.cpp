@@ -76,8 +76,8 @@ void DeformableRepresentation::resetState()
 
 void DeformableRepresentation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
 {
-	SURGSIM_ASSERT(!isInitialized()) <<
-									 "Cannot set the local pose of a DeformableRepresentation after it has been initialized";
+	SURGSIM_ASSERT(!isInitialized())
+			<< "Cannot set the local pose of a DeformableRepresentation after it has been initialized";
 
 	Representation::setLocalPose(pose);
 }

@@ -64,7 +64,7 @@ public:
 
 	void doUpdate(double dt) override;
 
-	virtual void updateVectorField(const SurgSim::Graphics::VectorField& vectorfield) override;
+	void updateVectorField(const SurgSim::Graphics::VectorField& vectorfield) override;
 
 private:
 	void privateUpdate(const std::vector<DataStructures::Vertex<VectorFieldData>>& vertices);

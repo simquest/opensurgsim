@@ -54,7 +54,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::CcdCollisionLoop);
 
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
+	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
 			const std::shared_ptr<PhysicsManagerState>& state) override;
 
 	///@{
