@@ -64,9 +64,9 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 	{
 		auto segmentShape =
 			std::dynamic_pointer_cast<Math::SegmentMeshShape>(fem->getCollisionRepresentation()->getShape());
-		double radius = segmentShape->getRadius() + 1e-4;
 		if (segmentShape != nullptr)
 		{
+			double radius = segmentShape->getRadius() + 1e-4;
 			globalPosition -= n * (radius * scale);
 		}
 	}
