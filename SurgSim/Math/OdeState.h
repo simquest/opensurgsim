@@ -149,6 +149,10 @@ public:
 	/// \return True if all positions and velocities are valid numerical values, False otherwise
 	virtual bool isValid() const;
 
+	/// Returns the linear interpolated ODE state between this and other at parameter t
+	/// \param other the end point for the linear interpolation
+	/// \param t the interpolation time
+	/// \return the interpolated state = this + (other - this) * t;
 	OdeState interpolate(const OdeState& other, double t);
 
 private:
