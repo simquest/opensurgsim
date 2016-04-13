@@ -18,7 +18,7 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
-	DecalBehaviorRenderTests.cpp
+    PaintBehaviorRenderTests.cpp
 	ImplicitSurfaceRenderTests.cpp
 	OsgBoxRepresentationRenderTests.cpp
 	OsgCameraRenderTests.cpp

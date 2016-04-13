@@ -40,15 +40,16 @@ void main(void)
 	vec3 eyeDirNorm = normalize(eyeDir);
 	vec3 normalDirNorm = normalize(normalDir);
 
+    vec4 decal = texture2D(decalTexture, texCoord0);
+
 	float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
-	vec3 vDiffuse = vertexDiffuseColor * diffuse;
+	vec3 vDiffuse = mix(vertexDiffuseColor * diffuse, decal.rgb, decal.a);
 
     float temp = max(dot(reflect(lightDirNorm, normalDirNorm), eyeDirNorm), 0.0);
     float specular = temp / (shininess - temp * shininess + temp);
  	vec3 vSpecular = vertexSpecularColor * specular;
 
 	vec4 color = vec4(vertexAmbientColor + vDiffuse + vSpecular, 1.0);
-    vec4 decal = texture2D(decalTexture, texCoord0);
 
-	gl_FragColor = mix(color, decal, decal.a);
+	gl_FragColor = color;
 }

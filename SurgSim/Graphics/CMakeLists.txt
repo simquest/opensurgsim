@@ -20,7 +20,6 @@ include_directories(
 set(SURGSIM_GRAPHICS_SOURCES
 	Camera.cpp
 	CurveRepresentation.cpp
-	DecalBehavior.cpp
 	Group.cpp
 	Manager.cpp
 	Mesh.cpp
@@ -63,6 +62,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	PaintBehavior.cpp
 	PointCloudRepresentation.cpp
 	RenderPass.cpp
 	Representation.cpp
@@ -82,7 +82,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	CapsuleRepresentation.h
 	CurveRepresentation.h
 	CylinderRepresentation.h
-	DecalBehavior.h
 	Font.h
 	Group.h
 	Light.h
@@ -148,6 +147,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgVectorFieldRepresentation.h
 	OsgView.h
 	OsgViewElement.h
+	PaintBehavior.h
 	PlaneRepresentation.h
 	PointCloudRepresentation.h
 	Program.h

@@ -22,7 +22,7 @@
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgTexture2d.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
-#include "SurgSim/Graphics/DecalBehavior.h"
+#include "SurgSim/Graphics/PaintBehavior.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -37,12 +37,12 @@ namespace SurgSim
 namespace Graphics
 {
 
-class DecalBehaviorRenderTests : public RenderTest
+class PaintBehaviorRenderTests : public RenderTest
 {
 
 };
 
-TEST_F(DecalBehaviorRenderTests, InitTest)
+TEST_F(PaintBehaviorRenderTests, InitTest)
 {
 	//viewElement->getCamera()->setLocalPose(makeRigidTranslation(Math::Vector3d(0.0, 0.0, 0.25)));
 	viewElement->enableManipulator(true);
@@ -92,11 +92,23 @@ TEST_F(DecalBehaviorRenderTests, InitTest)
 	collision->setShape(meshShape);
 	element->addComponent(collision);
 
-	auto decalBehavior = std::make_shared<Graphics::DecalBehavior>("Decals");
-	decalBehavior->setPainter(collisionRepresentation);
-	decalBehavior->setTexture(texture);
-	decalBehavior->setDecalColor(Math::Vector4f(0.8, 0.0, 1.0, 0.3));
-	element->addComponent(decalBehavior);
+	auto paintBehavior = std::make_shared<Graphics::PaintBehavior>("Decals");
+	paintBehavior->setRepresentation(graphics);
+	paintBehavior->setPainter(collisionRepresentation);
+	paintBehavior->setTexture(texture);
+	paintBehavior->setPaintColor(Math::Vector4d(1.0, 0.0, 0.0, 1.0));
+
+	std::vector<DataStructures::IndexedLocalCoordinate> coords;
+	for (int i = 0; i < 3; i++)
+	{
+		Math::Vector coord(1);
+		coord << 0.5;
+		DataStructures::IndexedLocalCoordinate localCoordinate(100 + i, coord);
+		coords.push_back(localCoordinate);
+	}
+	paintBehavior->setPaintCoordinate(coords);
+
+	element->addComponent(paintBehavior);
 
 	scene->addSceneElement(element);
 
