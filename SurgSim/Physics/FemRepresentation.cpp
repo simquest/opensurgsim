@@ -49,6 +49,12 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, FemElementType,
 									  getFemElementType, setFemElementType);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, double, RayleighDampingMass,
+									  getRayleighDampingMass, setRayleighDampingMass);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, double, RayleighDampingStiffness,
+									  getRayleighDampingStiffness, setRayleighDampingStiffness);
 }
 
 FemRepresentation::~FemRepresentation()
