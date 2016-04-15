@@ -64,10 +64,9 @@ public:
 	/// \return all the vector fields used in this behavior
 	FieldsType getVectorFields() const;
 
-
 	void update(double dt) override;
 
-	int getTargetManagerType()const  override;
+	int getTargetManagerType() const  override;
 
 private:
 

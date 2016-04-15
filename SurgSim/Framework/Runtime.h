@@ -68,7 +68,7 @@ public:
 	/// \return All the managers from the runtime
 	std::vector<std::weak_ptr<ComponentManager>> getManagers() const;
 
-	/// \return Specific manager
+	/// \return The first manager of type T that is found nullptr otherwise
 	template <class T>
 	std::shared_ptr<T> getManager() const;
 
