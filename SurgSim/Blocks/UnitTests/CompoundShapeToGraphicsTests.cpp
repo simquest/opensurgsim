@@ -14,15 +14,17 @@
 // limitations under the License.
 
 #include "SurgSim/Blocks/CompoundShapeToGraphics.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/CompoundShape.h"
 #include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
-#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
-#include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/BasicSceneElement.h"
-#include "SurgSim/Framework/Scene.h"
 
 #include <gtest/gtest.h>
 
@@ -40,18 +42,20 @@ TEST(CompoundShapeToGraphicsTests, Init)
 TEST(CompoundShapeToGraphicsTests, SetShape)
 {
 	auto shape = std::make_shared<Math::CompoundShape>();
-
 	auto behavior = std::make_shared<CompoundShapeToGraphics>("Copier");
 
 	EXPECT_EQ(nullptr, behavior->getShape());
 	EXPECT_NO_THROW(behavior->setShape(shape));
 	EXPECT_EQ(shape, behavior->getShape());
+
+	// With shape set, setting Source will fail.
+	auto physics = std::make_shared<Physics::FixedRepresentation>("Physics");
+	EXPECT_ANY_THROW(behavior->setSource(physics));
 }
 
 TEST(CompoundShapeToGraphicsTests, SetSource)
 {
 	auto behavior = std::make_shared<CompoundShapeToGraphics>("Copier");
-
 	auto physics = std::make_shared<Physics::FixedRepresentation>("Physics");
 	auto collisions = std::make_shared<Collision::ShapeCollisionRepresentation>("Physics");
 	auto graphics = std::make_shared<Graphics::OsgSceneryRepresentation>("Graphics");
@@ -61,13 +65,21 @@ TEST(CompoundShapeToGraphicsTests, SetSource)
 	EXPECT_NO_THROW(behavior->setSource(collisions));
 	EXPECT_EQ(collisions, behavior->getSource());
 	EXPECT_ANY_THROW(behavior->setSource(graphics));
+
+	// With Source being set, setting Shape will fail.
+	auto shape = std::make_shared<Math::CompoundShape>();
+	EXPECT_ANY_THROW(behavior->setShape(shape));
 }
 
 TEST(CompoundShapeToGraphicsTests, Serialization)
 {
-	auto behavior = std::make_shared<CompoundShapeToGraphics>("Copier");
-
+	std::shared_ptr<SurgSim::Framework::Component> behavior;
+	EXPECT_NO_THROW(
+		behavior =
+		SurgSim::Framework::Component::getFactory().create("SurgSim::Blocks::CompoundShapeToGraphics", "newCopier"));
+	auto behavior2 = std::make_shared<CompoundShapeToGraphics>("Copier");
 	auto graphics = std::make_shared<Graphics::OsgSceneryRepresentation>("Graphics");
+	std::shared_ptr<Math::Shape> compoundShape = std::make_shared<Math::CompoundShape>();
 	std::shared_ptr<Framework::Component> physics = std::make_shared<Physics::FixedRepresentation>("Physics");
 
 	std::vector<std::shared_ptr<Framework::Component>> targets;
@@ -77,9 +89,24 @@ TEST(CompoundShapeToGraphicsTests, Serialization)
 
 	EXPECT_NO_THROW(behavior->setValue("Targets", targets));
 	EXPECT_NO_THROW(behavior->setValue("Source", physics));
+	EXPECT_NO_THROW(behavior2->setValue("Targets", targets));
+	EXPECT_NO_THROW(behavior2->setValue("Shape", compoundShape));
 
 	EXPECT_EQ(3u, behavior->getValue<std::vector<std::shared_ptr<Framework::Component>>>("Targets").size());
 	EXPECT_EQ(physics, behavior->getValue<std::shared_ptr<Framework::Component>>("Source"));
+	EXPECT_EQ(compoundShape, behavior2->getValue<std::shared_ptr<Math::CompoundShape>>("Shape"));
+
+	YAML::Node node;
+	// Shape is not set on 'behavior', serialization should fail.
+	EXPECT_ANY_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*behavior));
+	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*behavior2));
+	EXPECT_EQ(6u, node[behavior2->getClassName()].size());
+
+	std::shared_ptr<SurgSim::Blocks::CompoundShapeToGraphics> newBehavior;
+	EXPECT_NO_THROW(newBehavior = std::dynamic_pointer_cast<SurgSim::Blocks::CompoundShapeToGraphics>(
+															node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+	EXPECT_EQ(3u, newBehavior->getValue<std::vector<std::shared_ptr<Framework::Component>>>("Targets").size());
+	EXPECT_NE(nullptr, newBehavior->getValue<std::shared_ptr<Math::CompoundShape>>("Shape"));
 }
 
 TEST(CompoundShapeToGraphicsTests, SetGraphics)
@@ -138,6 +165,7 @@ TEST(CompoundShapeToGraphicsTests, SetSourceWithInvalidShape)
 	auto collision = std::make_shared<Collision::ShapeCollisionRepresentation>("Collisions");
 
 	auto shape = std::make_shared<Math::BoxShape>();
+	EXPECT_ANY_THROW(behavior->setShape(shape));
 
 	collision->setShape(shape);
 	behavior->setSource(collision);

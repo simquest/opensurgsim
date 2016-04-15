@@ -38,6 +38,7 @@ class Representation;
 namespace Math
 {
 class CompoundShape;
+class Shape;
 }
 
 namespace Blocks
@@ -69,7 +70,7 @@ public:
 
 	/// Sets the shape to be used for synchronization
 	/// \param shape The shape to be used
-	void setShape(const std::shared_ptr<Math::CompoundShape>& shape);
+	void setShape(const std::shared_ptr<Math::Shape>& shape);
 
 	/// Sets the source component, the components needs to provide a shape and that shape needs to be a compound shape
 	/// \param component The component to be used as a shape source
