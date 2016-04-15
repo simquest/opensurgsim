@@ -16,8 +16,10 @@
 #ifndef SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 
+#include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/VectorFieldRepresentation.h"
+#include "SurgSim/Graphics/VectorField.h"
 
 #include <osg/Array>
 #include <osg/Geometry>
@@ -28,6 +30,8 @@ namespace SurgSim
 {
 namespace Graphics
 {
+
+SURGSIM_STATIC_REGISTRATION(OsgVectorFieldRepresentation);
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -44,39 +48,36 @@ public:
 	/// Destructor
 	~OsgVectorFieldRepresentation();
 
-	/// Gets the vector field
-	/// \return The vector field
-	std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const override;
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgVectorFieldRepresentation);
 
-	/// Sets vector line width
-	/// \param	width	Width of vector line
+	std::shared_ptr<SurgSim::Graphics::VectorField> getVectorField() const override;
+
 	void setLineWidth(double width) override;
-	/// Gets line width
-	/// \return	The line width
 	double getLineWidth() const override;
 
-	/// Sets the scale to be applied to all vectors
-	/// \param scale The scale
 	void setScale(double scale) override;
-	/// Gets the scale applied to all vectors
-	/// \return The scale
 	double getScale() const override;
 
 	/// Sets the size of point indicating the starting of vector
 	/// \param size	Size of starting point of a vector
 	virtual void setPointSize(double size);
+
 	/// Gets the size of starting point of a vector
 	/// \return The size of starting point of a vector
 	virtual	double getPointSize() const;
 
-	/// Executes the update operation
-	/// \param	dt	The time step
 	void doUpdate(double dt) override;
 
+	void updateVectorField(const VectorField& vectorfield) override;
+
 private:
+	void privateUpdate(const std::vector<DataStructures::Vertex<VectorFieldData>>& vertices);
+
 	/// Vector Field holds a list of vertices/points (X,Y,Z) in 3D space
 	/// Each point is associated with a vector and an optional color
 	std::shared_ptr<SurgSim::Graphics::VectorField> m_vectorField;
+
+	SurgSim::Framework::LockedContainer<VectorField> m_writeBuffer;
 
 	/// OSG vertex data structure
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;

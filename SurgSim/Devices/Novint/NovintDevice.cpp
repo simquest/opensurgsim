@@ -30,7 +30,11 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::NovintDevice
 
 NovintDevice::NovintDevice(const std::string& uniqueName) :
 	Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
-	m_positionScale(1.0), m_orientationScale(1.0), m_7DofDevice(false), m_maxForce(8.9), m_antigrav(Math::Vector3d::Zero())
+	m_positionScale(1.0), 
+	m_orientationScale(1.0), 
+	m_7DofDevice(false), 
+	m_maxForce(8.9), 
+	m_antigrav(Math::Vector3d::Zero())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, OptionalValue<std::string>, InitializationName,
 		getOptionalInitializationName, setOptionalInitializationName);

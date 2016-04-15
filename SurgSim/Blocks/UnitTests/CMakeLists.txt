@@ -31,6 +31,7 @@ set(UNIT_TEST_SOURCES
 	TransferParticlesToPointCloudBehaviorTests.cpp
 	TransferPhysicsToGraphicsMeshBehaviorTests.cpp
 	TransferPhysicsToPointCloudBehaviorTests.cpp
+	VisualizeConstraintsTest.cpp
 	VisualizeContactsBehaviorTests.cpp
 )
 
