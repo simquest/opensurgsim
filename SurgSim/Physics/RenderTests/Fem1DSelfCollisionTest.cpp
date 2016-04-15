@@ -38,7 +38,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& 
 	physics->setFemElementType("SurgSim::Physics::Fem1DElementBeam");
 	physics->setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
 	physics->loadFem(filename);
-	physics->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT);
+	physics->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT);
 	physics->setLinearSolver(SurgSim::Math::LINEARSOLVER_LU);
 	physics->setRayleighDampingMass(5.0);
 	physics->setRayleighDampingStiffness(0.001);
@@ -83,6 +83,7 @@ class Fem1DSelfCollisionTest : public SurgSim::Physics::RenderTests
 
 TEST_F(Fem1DSelfCollisionTest, SimpleLoop)
 {
+	/// This uses a linear model, any large rotations won't exhibit normal behavior
 	auto axes = std::make_shared<SurgSim::Framework::BasicSceneElement>("Axes");
 	axes->addComponent(std::make_shared<Graphics::OsgAxesRepresentation>("Axes"));
 	scene->addSceneElement(axes);
@@ -93,7 +94,7 @@ TEST_F(Fem1DSelfCollisionTest, SimpleLoop)
 
 	SurgSim::Math::Vector3d cameraPosition(0.5, 0.0, 0.5);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	double miliseconds = 50000000.0;
+	double miliseconds = 50000.0;
 
 	runTest(cameraPosition, cameraLookAt, miliseconds);
 }
