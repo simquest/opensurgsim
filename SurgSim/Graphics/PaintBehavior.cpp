@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2015, SimQuest Solutions Inc.
+// Copyright 2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,25 +22,20 @@ namespace SurgSim
 namespace Graphics
 {
 PaintBehavior::PaintBehavior(const std::string& name) :
-	Framework::Behavior(name), m_s(0.0), m_t(0.0), m_width(0), m_height(0)
+	Framework::Behavior(name),
+	m_width(0),
+	m_height(0)
 {
 }
 
-void PaintBehavior::setPainter(std::shared_ptr<Collision::Representation> painter)
+void PaintBehavior::setRepresentation(std::shared_ptr<Framework::Component> representation)
 {
-	m_painter = painter;
+	m_representation = Framework::checkAndConvert<Graphics::OsgMeshRepresentation>(representation,
+																				   "SurgSim::Graphics::Representation");
 }
 
-std::shared_ptr<Collision::Representation> PaintBehavior::getPainter() const
+std::shared_ptr<Graphics::OsgMeshRepresentation> PaintBehavior::getRepresentation() const
 {
-	return m_painter;
-}
-
-void PaintBehavior::setRepresentation(std::shared_ptr<Graphics::OsgMeshRepresentation> representation) {
-	m_representation = representation;
-}
-
-std::shared_ptr<Graphics::OsgMeshRepresentation> PaintBehavior::getRepresentation() const {
 	return m_representation;
 }
 
@@ -65,66 +60,79 @@ Math::Vector4d PaintBehavior::getPaintColor() const
 }
 
 void PaintBehavior::setPaintCoordinate(std::vector<DataStructures::IndexedLocalCoordinate> coordinates) {
-	auto vertex1 = m_representation->getMesh()->getVertex(coordinates[0].index);
-	auto vertex2 = m_representation->getMesh()->getVertex(coordinates[1].index);
-	auto vertex3 = m_representation->getMesh()->getVertex(coordinates[2].index);
-	Math::Vector2d uv = vertex1.data.texture.getValue() * coordinates[0].coordinate[0] +
-						   vertex2.data.texture.getValue() * coordinates[1].coordinate[0] +
-						   vertex3.data.texture.getValue() * coordinates[2].coordinate[0];
-	m_s = uv[0];
-	m_t = uv[1];
+	auto mesh = m_representation->getMesh();
+	for (size_t i = 0; i < coordinates.size(); i++)
+	{
+		auto vertex1 = mesh->getVertex(mesh->getTriangle(coordinates[i].index).verticesId[0]);
+		auto vertex2 = mesh->getVertex(mesh->getTriangle(coordinates[i].index).verticesId[1]);
+		auto vertex3 = mesh->getVertex(mesh->getTriangle(coordinates[i].index).verticesId[2]);
+		Math::Vector2d uv = vertex1.data.texture.getValue() * coordinates[i].coordinate[0] +
+							vertex2.data.texture.getValue() * coordinates[i].coordinate[1] +
+							vertex3.data.texture.getValue() * coordinates[i].coordinate[2];
+		m_paintCoordinates.push_back(uv);
+	}
 }
 
 bool PaintBehavior::doInitialize()
 {
-	SURGSIM_ASSERT(m_representation != nullptr) << "You must provide a graphics representation to pain into.";
-	SURGSIM_ASSERT(m_painter != nullptr) << "You must provide a collision representation that will paint the decals.";
-	SURGSIM_ASSERT(m_texture != nullptr) << "You must provide a texture to paint decals onto.";
+	return true;
+}
+
+bool PaintBehavior::doWakeUp()
+{
+	if (m_representation == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger()) << getClassName() << " named " << getName() <<
+									 " does not have a graphics representation to paint into";
+		return false;
+	}
+
+	if (m_texture == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger()) << getClassName() << " named " << getName() <<
+									 " does not have a texture to paint onto";
+		return false;
+	}
 
 	m_texture->getOsgTexture2d()->setSourceFormat(GL_RGBA);
 	m_texture->getOsgTexture2d()->setSourceType(GL_BYTE);
+	m_texture->getOsgTexture2d()->dirtyTextureObject();
 
 	m_texture->getSize(&m_width, &m_height);
 
 	return true;
 }
 
-bool PaintBehavior::doWakeUp()
-{
-	return true;
-}
-
 void PaintBehavior::update(double dt)
 {
-	m_s += 0.005f;
-	m_t += 0.003f;
+	for (Math::Vector2d uv : m_paintCoordinates) {
 
-	if (m_s > 1.0f)
-	{
-		m_s -= 1.0f;
+		double s = uv[0];
+		double t = uv[1];
+
+
+		if (s > 1.0f) {
+			s = 1.0f;
+		}
+
+		if (t > 1.0f) {
+			t = 1.0f;
+		}
+
+		size_t coordinateX = static_cast<size_t>(s * m_width);
+		size_t coordinateY = static_cast<size_t>(t * m_height);
+
+		int numChannels = 4;
+
+		auto data = m_texture->getOsgTexture2d()->getImage()->data();
+		Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (coordinateY * m_width * numChannels) +
+																	 (coordinateX * numChannels));
+		pixel = (m_color * 255).template cast<unsigned char>();
+
+		m_texture->getOsgTexture2d()->dirtyTextureObject();
+
+		m_paintCoordinates.clear();
 	}
-
-	if (m_t > 1.0f)
-	{
-		m_t -= 1.0f;
-	}
-
-	unsigned coordinateX = (unsigned)(m_s * m_width);
-	unsigned coordinateY = (unsigned)(m_t * m_height);
-
-	int numChannels = m_texture->getOsgTexture2d()->getImage()->getPixelSizeInBits() / 8;
-
-	auto data = m_texture->getOsgTexture2d()->getImage()->data();
-	unsigned char* ptr = &data[(coordinateY * m_width * numChannels) + (coordinateX * numChannels)];
-	*(ptr++) = (unsigned char)(m_color[0] * 255);
-	*(ptr++) = (unsigned char)(m_color[1] * 255);
-	*(ptr++) = (unsigned char)(m_color[2] * 255);
-	if (numChannels == 4)
-	{
-		*(ptr++) = (unsigned char)(m_color[3] * 255);
-	}
-
-	m_texture->getOsgTexture2d()->getImage()->dirty();
 }
 
 

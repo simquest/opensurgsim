@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2015, SimQuest Solutions Inc.
+// Copyright 2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Framework/Behavior.h"
-#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -28,36 +30,48 @@ namespace SurgSim
 namespace Graphics
 {
 
-/// Component class to add to an element to allow it to receive staining
+/// Behavior class to allow a specified scene element to receive painting effects
 class PaintBehavior : public Framework::Behavior
 {
 public:
 	explicit PaintBehavior(const std::string& name);
 
-	void setPainter(std::shared_ptr<Collision::Representation> painter);
-	std::shared_ptr<Collision::Representation> getPainter() const;
+	/// Sets graphics representation being painted on
+	/// \param representation Graphics representation pointer
+	void setRepresentation(std::shared_ptr<Framework::Component> representation);
 
-	void setRepresentation(std::shared_ptr<Graphics::OsgMeshRepresentation> representation);
+	/// Gets graphics representation being painted on
+	/// \return Shared pointer to a graphics representation
 	std::shared_ptr<Graphics::OsgMeshRepresentation> getRepresentation() const;
 
+	/// Sets the texture layer to paint onto
+	/// \param texture 2d texture from graphics representation
 	void setTexture(std::shared_ptr<Graphics::OsgTexture2d> texture);
+
+	/// Gets 2d texture that is being painted on
+	/// \return Shared pointer to 2d texture
 	std::shared_ptr<Graphics::OsgTexture2d> getTexture() const;
 
+	/// Sets color of the paint
+	/// \param color RGBA color in [0-1] range
 	void setPaintColor(Math::Vector4d color);
+
+	/// Gets color of the paint
+	/// \return Vector4d representation of RGBA color in [0-1] range
 	Math::Vector4d getPaintColor() const;
 
+	/// Sets collection of local triangle coordinates to paint on during next update
+	/// \param coordinate Standard vector of IndexedLocalCoordinates
 	void setPaintCoordinate(std::vector<DataStructures::IndexedLocalCoordinate> coordinate);
 
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
-	void update(double dt);
+	void update(double dt) override;
 
 private:
 
-	/// Representation to filter for to trigger staining
-	std::shared_ptr<Collision::Representation> m_painter;
-
+	/// Graphics representation of the mesh to apply behavior to
 	std::shared_ptr<Graphics::OsgMeshRepresentation> m_representation;
 
 	/// Image data of the texture to be used as the decal layer
@@ -66,11 +80,14 @@ private:
 	/// Color to use for decal painting
 	Math::Vector4d m_color;
 
-	double m_s;
-	double m_t;
-	int m_width;
-	int m_height;
+	/// Collection of UV texture coordinates to paint to on next update
+	std::vector<Math::Vector2d> m_paintCoordinates;
 
+	/// Width of assigned texture
+	int m_width;
+
+	/// Height of assigned texture
+	int m_height;
 };
 
 } // Graphics

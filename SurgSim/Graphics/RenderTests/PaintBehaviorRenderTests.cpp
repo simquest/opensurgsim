@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -27,10 +28,10 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
-using SurgSim::Math::RigidTransform3d;
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRigidTranslation;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -44,7 +45,6 @@ class PaintBehaviorRenderTests : public RenderTest
 
 TEST_F(PaintBehaviorRenderTests, InitTest)
 {
-	//viewElement->getCamera()->setLocalPose(makeRigidTranslation(Math::Vector3d(0.0, 0.0, 0.25)));
 	viewElement->enableManipulator(true);
 
 	auto light = std::make_shared<Graphics::OsgLight>("Light");
@@ -56,12 +56,6 @@ TEST_F(PaintBehaviorRenderTests, InitTest)
 	lightElement->setPose(makeRigidTranslation(Math::Vector3d(2.0, 2.0, 2.0)));
 	lightElement->addComponent(light);
 	scene->addSceneElement(lightElement);
-
-	const std::string fileName = "Geometry/staple_collision.ply";
-	auto mesh = std::make_shared<DataStructures::TriangleMeshPlain>();
-	auto meshShape = std::make_shared<Math::MeshShape>(*mesh);
-	auto collisionRepresentation = std::make_shared<Collision::ShapeCollisionRepresentation>("Collision");
-	collisionRepresentation->setShape(meshShape);
 	
 	auto element = std::make_shared<Framework::BasicSceneElement>("Cube");
 	auto graphics = std::make_shared<Graphics::OsgMeshRepresentation>("Graphics");
@@ -87,23 +81,17 @@ TEST_F(PaintBehaviorRenderTests, InitTest)
 	element->addComponent(graphics);
 	element->addComponent(material);
 
-	auto collision = std::make_shared<Collision::ShapeCollisionRepresentation>("Collision");
-	meshShape = std::make_shared<Math::MeshShape>(*(graphics->getMesh()));
-	collision->setShape(meshShape);
-	element->addComponent(collision);
-
 	auto paintBehavior = std::make_shared<Graphics::PaintBehavior>("Decals");
 	paintBehavior->setRepresentation(graphics);
-	paintBehavior->setPainter(collisionRepresentation);
 	paintBehavior->setTexture(texture);
 	paintBehavior->setPaintColor(Math::Vector4d(1.0, 0.0, 0.0, 1.0));
 
 	std::vector<DataStructures::IndexedLocalCoordinate> coords;
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 25; i++)
 	{
-		Math::Vector coord(1);
-		coord << 0.5;
-		DataStructures::IndexedLocalCoordinate localCoordinate(100 + i, coord);
+		Math::Vector coord(3);
+		coord << 0.5, 0.5, 0.5;
+		DataStructures::IndexedLocalCoordinate localCoordinate(50 + i, coord);
 		coords.push_back(localCoordinate);
 	}
 	paintBehavior->setPaintCoordinate(coords);

@@ -18,7 +18,6 @@ include_directories (
 )
 
 set(UNIT_TEST_SOURCES
-    PaintBehaviorRenderTests.cpp
 	ImplicitSurfaceRenderTests.cpp
 	OsgBoxRepresentationRenderTests.cpp
 	OsgCameraRenderTests.cpp
@@ -39,6 +38,7 @@ set(UNIT_TEST_SOURCES
 	OsgTextRepresentationRenderTests.cpp
 	OsgVectorFieldRepresentationRenderTests.cpp
 	OsgViewElementRenderTests.cpp
+	PaintBehaviorRenderTests.cpp
 	RenderTest.cpp
 )
 
