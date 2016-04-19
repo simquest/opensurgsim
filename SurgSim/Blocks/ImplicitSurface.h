@@ -35,8 +35,6 @@ static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 /// \param sphereRadius the radius in meters that each point sprite sphere should have
 /// \param sphereScale the scaling factor for the point sprite sphere based on distance from the camera
 /// \param blurRadius sampling radius for the blur pass
-/// \param textureSize the size of the render textures, not including the final pass that takes the size of the
-///			screen
 /// \param diffuseColor the color to use for the final surface shading
 /// \param specularColor the color to use for the specular highlight on the surface
 /// \param diffuseEnvMap the cube map to use for the diffuse environmental mapping
@@ -51,7 +49,6 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 			float sphereRadius,
 			float sphereScale,
 			float blurRadius,
-			int textureSize,
 			const Math::Vector4f& diffuseColor,
 			const Math::Vector4f& specularColor,
 			const std::string diffuseEnvMap,
