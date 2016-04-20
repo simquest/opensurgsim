@@ -79,7 +79,6 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 
 	while (--iterations > 0)
 	{
-		toi += (1.0 - toi) * localToi;
 		double epsilon = 1.0 / ((1 - toi) * m_epsilonFactor);
 
 		lastState = m_updateCcdData->update(localToi, lastState); // state interpolation is triggered in here
@@ -103,8 +102,11 @@ std::shared_ptr<SurgSim::Physics::PhysicsManagerState> CcdCollisionLoop::doUpdat
 
 		clearContacts(ccdPairs);
 
+		toi += (1.0 - toi) * localToi;
 		if (toi > 1.0)
 		{
+			SURGSIM_LOG_SEVERE(m_logger) << "Calculated toi is greater than the parametric upper bound of 1.0 (" <<
+										 toi << ")" << std::endl;
 			break;
 		}
 	}
@@ -139,13 +141,11 @@ bool CcdCollisionLoop::filterContacts(
 		return false;
 	}
 
-	toi += epsilon;
-
 	for (const auto& pair : ccdPairs)
 	{
-		pair->getContacts().remove_if([toi](const std::shared_ptr<Collision::Contact>& contact)
+		pair->getContacts().remove_if([toi, epsilon](const std::shared_ptr<Collision::Contact>& contact)
 		{
-			return contact->time > toi;
+			return contact->time > toi + epsilon;
 		});
 	}
 

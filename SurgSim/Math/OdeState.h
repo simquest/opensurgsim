@@ -153,6 +153,8 @@ public:
 	/// \param other the end point for the linear interpolation
 	/// \param t the interpolation time
 	/// \return the interpolated state = this + (other - this) * t;
+	/// \note All dof are independently linearly interpolated (This will not work correctly
+	/// on rotation vectors where a slerp will be required.)
 	OdeState interpolate(const OdeState& other, double t);
 
 private:

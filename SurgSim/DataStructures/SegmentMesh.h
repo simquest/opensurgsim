@@ -72,7 +72,7 @@ public:
 	SegmentMesh<VertexData, EdgeData>& operator=(
 		SegmentMesh<VertexData, EdgeData>&& other);
 
-	/// Creates edges for all vertices in the mesh connecting all the points in order
+	/// Creates edges for all vertices in the mesh connecting all the points consecutively
 	/// \note This will clear all the current edges
 	void createDefaultEdges();
 
