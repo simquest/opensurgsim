@@ -324,3 +324,17 @@ TEST(RuntimeTest, ManagerAccess)
 	managers = runtime->getManagers();
 	EXPECT_EQ(2L, managers.size());
 }
+
+TEST(RuntimeTest, TypedManagerAccess)
+{
+	auto runtime = std::make_shared<Runtime>();
+	auto manager1 = std::make_shared<MockManager>();
+
+	runtime->addManager(manager1);
+
+	auto manager = runtime->getManager<MockManager>();
+	EXPECT_EQ(manager1, manager);
+
+	auto impossible = runtime->getManager<Runtime>();
+	EXPECT_EQ(nullptr, impossible);
+}

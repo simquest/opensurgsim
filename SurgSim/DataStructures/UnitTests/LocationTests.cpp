@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,13 +32,11 @@ TEST(LocationTests, Constructor)
 	octreeNodePath.push_back(3);
 	size_t index(3);
 	SurgSim::DataStructures::IndexedLocalCoordinate triangleMeshLocalCoordinate(1, SurgSim::Math::Vector2d(4.0, 5.0));
-	SurgSim::DataStructures::IndexedLocalCoordinate nodeMeshLocalCoordinate(1, SurgSim::Math::Vector());
 	SurgSim::DataStructures::IndexedLocalCoordinate elementMeshLocalCoordinate(1, SurgSim::Math::Vector4d::Ones());
 
 	EXPECT_NO_THROW({Location location(rigidLocalPosition);});
 	EXPECT_NO_THROW({Location location(octreeNodePath);});
 	EXPECT_NO_THROW({Location location(index);});
-	EXPECT_NO_THROW({Location location(nodeMeshLocalCoordinate, SurgSim::DataStructures::Location::NODE);});
 	EXPECT_NO_THROW({Location location(triangleMeshLocalCoordinate, SurgSim::DataStructures::Location::TRIANGLE);});
 	EXPECT_NO_THROW({Location location(elementMeshLocalCoordinate, SurgSim::DataStructures::Location::ELEMENT);});
 	EXPECT_THROW({Location location(elementMeshLocalCoordinate,\
@@ -53,7 +51,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location.octreeNodePath.hasValue());
 		EXPECT_FALSE(location.index.hasValue());
 		EXPECT_FALSE(location.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_FALSE(location.elementMeshLocalCoordinate.hasValue());
 
 		EXPECT_TRUE(location.rigidLocalPosition.getValue().isApprox(rigidLocalPosition));
@@ -63,7 +60,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location1.octreeNodePath.hasValue());
 		EXPECT_FALSE(location1.index.hasValue());
 		EXPECT_FALSE(location1.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location1.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_FALSE(location1.elementMeshLocalCoordinate.hasValue());
 
 		EXPECT_TRUE(location1.rigidLocalPosition.getValue().isApprox(rigidLocalPosition));
@@ -78,7 +74,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_TRUE(location.octreeNodePath.hasValue());
 		EXPECT_FALSE(location.index.hasValue());
 		EXPECT_FALSE(location.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_FALSE(location.elementMeshLocalCoordinate.hasValue());
 
 		Location location1(location);
@@ -86,7 +81,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_TRUE(location1.octreeNodePath.hasValue());
 		EXPECT_FALSE(location1.index.hasValue());
 		EXPECT_FALSE(location1.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location1.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_FALSE(location1.elementMeshLocalCoordinate.hasValue());
 
 		EXPECT_EQ(octreeNodePath, location1.octreeNodePath.getValue());
@@ -101,7 +95,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location.octreeNodePath.hasValue());
 		EXPECT_TRUE(location.index.hasValue());
 		EXPECT_FALSE(location.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_FALSE(location.elementMeshLocalCoordinate.hasValue());
 
 		Location location1(location);
@@ -109,7 +102,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location1.octreeNodePath.hasValue());
 		EXPECT_TRUE(location1.index.hasValue());
 		EXPECT_FALSE(location1.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location1.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_FALSE(location1.elementMeshLocalCoordinate.hasValue());
 
 		EXPECT_EQ(index, location1.index.getValue());
@@ -122,7 +114,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location.octreeNodePath.hasValue());
 		EXPECT_FALSE(location.index.hasValue());
 		EXPECT_TRUE(location.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_FALSE(location.elementMeshLocalCoordinate.hasValue());
 
 		EXPECT_EQ(triangleMeshLocalCoordinate.index, location.triangleMeshLocalCoordinate.getValue().index);
@@ -134,35 +125,11 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location1.octreeNodePath.hasValue());
 		EXPECT_FALSE(location1.index.hasValue());
 		EXPECT_TRUE(location1.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location1.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_FALSE(location1.elementMeshLocalCoordinate.hasValue());
 
 		EXPECT_EQ(triangleMeshLocalCoordinate.index, location1.triangleMeshLocalCoordinate.getValue().index);
 		EXPECT_TRUE(location1.triangleMeshLocalCoordinate.getValue().coordinate.isApprox(\
 			triangleMeshLocalCoordinate.coordinate));
-	}
-
-	{
-		SCOPED_TRACE("Using node mesh local coordinate");
-		Location location(nodeMeshLocalCoordinate, SurgSim::DataStructures::Location::NODE);
-		EXPECT_FALSE(location.rigidLocalPosition.hasValue());
-		EXPECT_FALSE(location.octreeNodePath.hasValue());
-		EXPECT_FALSE(location.index.hasValue());
-		EXPECT_FALSE(location.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_TRUE(location.nodeMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location.elementMeshLocalCoordinate.hasValue());
-
-		EXPECT_EQ(nodeMeshLocalCoordinate.index, location.nodeMeshLocalCoordinate.getValue().index);
-
-		Location location1(location);
-		EXPECT_FALSE(location1.rigidLocalPosition.hasValue());
-		EXPECT_FALSE(location1.octreeNodePath.hasValue());
-		EXPECT_FALSE(location1.index.hasValue());
-		EXPECT_FALSE(location1.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_TRUE(location1.nodeMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location1.elementMeshLocalCoordinate.hasValue());
-
-		EXPECT_EQ(nodeMeshLocalCoordinate.index, location1.nodeMeshLocalCoordinate.getValue().index);
 	}
 
 	{
@@ -172,7 +139,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location.octreeNodePath.hasValue());
 		EXPECT_FALSE(location.index.hasValue());
 		EXPECT_FALSE(location.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_TRUE(location.elementMeshLocalCoordinate.hasValue());
 
 		EXPECT_EQ(elementMeshLocalCoordinate.index, location.elementMeshLocalCoordinate.getValue().index);
@@ -184,7 +150,6 @@ TEST(LocationTests, Constructor)
 		EXPECT_FALSE(location1.octreeNodePath.hasValue());
 		EXPECT_FALSE(location1.index.hasValue());
 		EXPECT_FALSE(location1.triangleMeshLocalCoordinate.hasValue());
-		EXPECT_FALSE(location1.nodeMeshLocalCoordinate.hasValue());
 		EXPECT_TRUE(location1.elementMeshLocalCoordinate.hasValue());
 
 		EXPECT_EQ(elementMeshLocalCoordinate.index, location1.elementMeshLocalCoordinate.getValue().index);
@@ -268,19 +233,6 @@ TEST(LocationTests, IsApprox)
 		EXPECT_TRUE(triangleMeshLocation11.isApprox(triangleMeshLocation11));
 		EXPECT_FALSE(triangleMeshLocation11.isApprox(triangleMeshLocation12));
 		EXPECT_FALSE(triangleMeshLocation11.isApprox(triangleMeshLocation2));
-	}
-
-	{
-		SCOPED_TRACE("Node location");
-		Math::Vector v;
-		IndexedLocalCoordinate triangleBarycentricCoord1(9, v);
-		IndexedLocalCoordinate triangleBarycentricCoord2(0, v);
-		Location triangleMeshLocation1(triangleBarycentricCoord1, Location::NODE);
-		Location triangleMeshLocation2(triangleBarycentricCoord2, Location::NODE);
-
-		EXPECT_TRUE(triangleMeshLocation1.isApprox(triangleMeshLocation1));
-		EXPECT_FALSE(triangleMeshLocation1.isApprox(triangleMeshLocation2));
-		EXPECT_TRUE(triangleMeshLocation2.isApprox(triangleMeshLocation2));
 	}
 }
 

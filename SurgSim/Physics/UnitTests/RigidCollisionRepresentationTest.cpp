@@ -171,7 +171,7 @@ TEST_F(RigidCollisionRepresentationTest, SerializationTest)
 	}
 }
 
-TEST_F(RigidCollisionRepresentationTest, MeshUpdateTest)
+TEST_F(RigidCollisionRepresentationTest, GetPosedShape)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 

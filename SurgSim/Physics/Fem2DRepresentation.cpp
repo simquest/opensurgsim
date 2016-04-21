@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -194,11 +194,9 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 }
 
 
-std::shared_ptr<Localization> Fem2DRepresentation::createNodeLocalization(
-	const DataStructures::IndexedLocalCoordinate& location)
+std::shared_ptr<Localization> Fem2DRepresentation::createNodeLocalization(size_t nodeId)
 {
 	DataStructures::IndexedLocalCoordinate coordinate;
-	size_t nodeId = location.index;
 
 	SURGSIM_ASSERT(nodeId >= 0 && nodeId < getCurrentState()->getNumNodes()) << "Invalid node id";
 
@@ -234,20 +232,20 @@ std::shared_ptr<Localization> Fem2DRepresentation::createElementLocalization(
 
 std::shared_ptr<Localization> Fem2DRepresentation::createLocalization(const DataStructures::Location& location)
 {
-	if (location.nodeMeshLocalCoordinate.hasValue())
+	if (location.index.hasValue())
 	{
-		return createNodeLocalization(location.nodeMeshLocalCoordinate.getValue());
+		return createNodeLocalization(*location.index);
 	}
 	else if (location.triangleMeshLocalCoordinate.hasValue())
 	{
 		// In the 2d case, elements are triangles, so Locations of type triangleMesh and elementMesh refer to the same
 		// mesh. The distinction between an element and a triangle is mostly useful in the 3d case to separate the
 		// surface from the volume.
-		return createElementLocalization(location.triangleMeshLocalCoordinate.getValue());
+		return createElementLocalization(*location.triangleMeshLocalCoordinate);
 	}
 	else if (location.elementMeshLocalCoordinate.hasValue())
 	{
-		return createElementLocalization(location.elementMeshLocalCoordinate.getValue());
+		return createElementLocalization(*location.elementMeshLocalCoordinate);
 	}
 
 	SURGSIM_FAILURE() << "Localization cannot be created without a mesh-based location (node, triangle or element).";

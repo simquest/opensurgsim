@@ -68,7 +68,11 @@ public:
 
 	int getShapeType() const override;
 
-	void update(const double& dt) override;
+	void updateDcdData() override;
+
+	void updateCcdData() override;
+
+	void updateShapeData() override;
 
 private:
 	bool doInitialize() override;

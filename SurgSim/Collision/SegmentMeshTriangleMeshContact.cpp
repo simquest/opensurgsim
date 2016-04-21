@@ -149,11 +149,15 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 	return contacts;
 }
 
-std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateCcdContact(
-									 const Math::SegmentMeshShape& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
-									 const Math::SegmentMeshShape& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
-									 const Math::MeshShape& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
-									 const Math::MeshShape& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) const
+std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdContact(
+									 const Math::SegmentMeshShape& shape1AtTime0,
+									 const Math::RigidTransform3d& pose1AtTime0,
+									 const Math::SegmentMeshShape& shape1AtTime1,
+									 const Math::RigidTransform3d& pose1AtTime1,
+									 const Math::MeshShape& shape2AtTime0,
+									 const Math::RigidTransform3d& pose2AtTime0,
+									 const Math::MeshShape& shape2AtTime1,
+									 const Math::RigidTransform3d& pose2AtTime1) const
 {
 	using SegmentMeshTriangleMesh::isThisContactADuplicate;
 	using Math::calculateCcdContactSegmentSegment;
