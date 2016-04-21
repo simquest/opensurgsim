@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -238,9 +238,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 	{
 		SCOPED_TRACE("Invalid node");
 
-		SurgSim::DataStructures::Location location(
-			SurgSim::DataStructures::IndexedLocalCoordinate(1000, Vector()),
-			SurgSim::DataStructures::Location::NODE);
+		SurgSim::DataStructures::Location location(1000);
 		std::shared_ptr<SurgSim::Physics::Localization> localization;
 		EXPECT_THROW(localization = m_fem->createLocalization(location), SurgSim::Framework::AssertionFailure);
 	}
@@ -249,9 +247,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 	{
 		SCOPED_TRACE("Valid node");
 
-		SurgSim::DataStructures::Location location(
-			SurgSim::DataStructures::IndexedLocalCoordinate(0, Vector()),
-			SurgSim::DataStructures::Location::NODE);
+		SurgSim::DataStructures::Location location(0);
 		std::shared_ptr<SurgSim::Physics::Fem3DLocalization> localization;
 		EXPECT_NO_THROW(localization =
 			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DLocalization>(
