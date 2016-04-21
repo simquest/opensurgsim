@@ -60,6 +60,14 @@ public:
 	/// \return Vector4d representation of RGBA color in [0-1] range
 	Math::Vector4d getPaintColor() const;
 
+	/// Sets radius of paint splat
+	/// \param  radius Radius in texture coordinate range [0-1]
+	void setRadius(double radius);
+
+	/// Gets radius of paint splat
+	/// \return Radius in texture coordinate range [0-1]
+	double getRadius() const;
+
 	/// Sets collection of local triangle coordinates to paint on during next update
 	/// \param coordinate Standard vector of IndexedLocalCoordinates
 	void setPaintCoordinate(std::vector<DataStructures::IndexedLocalCoordinate> coordinate);
@@ -70,6 +78,10 @@ public:
 	void update(double dt) override;
 
 private:
+
+	void buildBrush(double radius);
+
+	void buildAntiAliasedBrush(double radius);
 
 	/// Graphics representation of the mesh to apply behavior to
 	std::shared_ptr<Graphics::OsgMeshRepresentation> m_representation;
@@ -88,6 +100,20 @@ private:
 
 	/// Height of assigned texture
 	int m_height;
+
+	/// Width of brush
+	int m_brushWidth;
+
+	/// Height of brush
+	int m_brushHeight;
+
+	int m_brushOffsetX;
+	int m_brushOffsetY;
+
+	/// Radius of brush
+	double m_radius;
+
+	double* m_brush;
 };
 
 } // Graphics

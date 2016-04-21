@@ -24,7 +24,8 @@ namespace Graphics
 PaintBehavior::PaintBehavior(const std::string& name) :
 	Framework::Behavior(name),
 	m_width(0),
-	m_height(0)
+	m_height(0),
+	m_radius(0)
 {
 }
 
@@ -59,7 +60,8 @@ Math::Vector4d PaintBehavior::getPaintColor() const
 	return m_color;
 }
 
-void PaintBehavior::setPaintCoordinate(std::vector<DataStructures::IndexedLocalCoordinate> coordinates) {
+void PaintBehavior::setPaintCoordinate(std::vector<DataStructures::IndexedLocalCoordinate> coordinates)
+{
 	auto mesh = m_representation->getMesh();
 	for (size_t i = 0; i < coordinates.size(); i++)
 	{
@@ -94,18 +96,27 @@ bool PaintBehavior::doWakeUp()
 		return false;
 	}
 
+	if (m_radius <= 0.0 || m_radius > 1.0)
+	{
+		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger()) << getClassName() << " named " << getName() <<
+									" does not have a radius set";
+	}
+
 	m_texture->getOsgTexture2d()->setSourceFormat(GL_RGBA);
 	m_texture->getOsgTexture2d()->setSourceType(GL_BYTE);
 	m_texture->getOsgTexture2d()->dirtyTextureObject();
 
 	m_texture->getSize(&m_width, &m_height);
 
+	buildBrush(getRadius());
+
 	return true;
 }
 
 void PaintBehavior::update(double dt)
 {
-	for (Math::Vector2d uv : m_paintCoordinates) {
+	for (Math::Vector2d uv : m_paintCoordinates)
+	{
 
 		double s = uv[0];
 		double t = uv[1];
@@ -125,9 +136,27 @@ void PaintBehavior::update(double dt)
 		int numChannels = 4;
 
 		auto data = m_texture->getOsgTexture2d()->getImage()->data();
-		Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (coordinateY * m_width * numChannels) +
-																	 (coordinateX * numChannels));
-		pixel = (m_color * 255).template cast<unsigned char>();
+
+		for (size_t x = 0; x < m_brushWidth; x++)
+		{
+			for (size_t y = 0; y < m_brushHeight; y++)
+			{
+				if (m_brush[x * m_brushHeight + y] > 0.0f)
+				{
+					size_t i = coordinateX + m_brushOffsetX + x;
+					size_t j = coordinateY + m_brushOffsetY + y;
+					if (i >= 0 && i < m_width && j >= 0 && j < m_height)
+					{
+						Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (j * m_width + i) * numChannels);
+						pixel = (m_brush[x * m_brushHeight + y] * m_color * 255).template cast<unsigned char>();
+					}
+				}
+			}
+		}
+
+//		Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (coordinateY * m_width * numChannels) +
+//																	 (coordinateX * numChannels));
+//		pixel = (m_color * 255).template cast<unsigned char>();
 
 		m_texture->getOsgTexture2d()->dirtyTextureObject();
 
@@ -135,6 +164,83 @@ void PaintBehavior::update(double dt)
 	}
 }
 
+void PaintBehavior::setRadius(double radius)
+{
+	if (radius > 0.0 && radius < 1.0)
+	{
+		m_radius = radius;
+	}
+}
+
+double PaintBehavior::getRadius() const {
+	return m_radius;
+}
+
+void PaintBehavior::buildBrush(double radius) {
+	m_brushWidth = static_cast<int>(ceil(2 * radius * m_width));
+	m_brushHeight = static_cast<int>(ceil(2 * radius * m_height));
+
+	int centerX = m_brushWidth / 2;
+	int centerY = m_brushHeight / 2;
+
+	m_brushOffsetX = -1 * centerX;
+	m_brushOffsetY = -1 * centerY;
+
+	m_brush = new double[m_brushWidth * m_brushHeight];
+
+	for (int i = 0; i < m_brushWidth; i++)
+	{
+		for (int j = 0; j < m_brushHeight; j++)
+		{
+			double mag = (i - centerX * i - centerX) + (j - centerY * j - centerY);
+			if (sqrt(mag) < m_brushWidth / 2.0)
+			{
+				m_brush[i * m_brushHeight + j] = 1.0;
+			}
+			else
+			{
+				m_brush[i * m_brushHeight + j] = 0.0;
+			}
+		}
+	}
+}
+
+void PaintBehavior::buildAntiAliasedBrush(double radius) {
+	static const double sqrt2Half = 0.7071067811865475;
+	double dist;
+	m_brushWidth = static_cast<int>(ceil(2 * radius * m_width));
+	m_brushHeight = static_cast<int>(ceil(2 * radius * m_height));
+
+	int centerX = m_brushWidth / 2;
+	int centerY = m_brushHeight / 2;
+
+	m_brushOffsetX = -1 * centerX;
+	m_brushOffsetY = -1 * centerY;
+
+	m_brush = new double[m_brushWidth * m_brushHeight];
+
+	for (int i = 0; i < m_brushWidth; i++)
+	{
+		for (int j = 0; j < m_brushHeight; j++)
+		{
+			double mag = (i - centerX) * (i - centerX) + (j - centerY) * (j - centerY);
+			dist = (m_brushWidth / 2) - sqrt(mag);
+			dist /= m_brushWidth / 2;
+			if (dist > sqrt2Half)
+			{
+				m_brush[i * m_brushHeight + j] = 1.0;
+			}
+			else if (dist < 0.0)
+			{
+				m_brush[i * m_brushHeight + j] = 0.0;
+			}
+			else
+			{
+				m_brush[i * m_brushHeight + j] = sqrt(2) * dist;
+			}
+		}
+	}
+}
 
 } // Graphics
 } // SurgSim
