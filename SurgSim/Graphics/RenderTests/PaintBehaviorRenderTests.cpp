@@ -22,8 +22,8 @@
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgTexture2d.h"
-#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Graphics/PaintBehavior.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -84,11 +84,11 @@ TEST_F(PaintBehaviorRenderTests, InitTest)
 	auto paintBehavior = std::make_shared<Graphics::PaintBehavior>("Decals");
 	paintBehavior->setRepresentation(graphics);
 	paintBehavior->setTexture(texture);
-	paintBehavior->setRadius(0.25);
+	paintBehavior->setRadius(0.15);
 	paintBehavior->setPaintColor(Math::Vector4d(1.0, 0.0, 0.0, 1.0));
 
 	std::vector<DataStructures::IndexedLocalCoordinate> coords;
-	for (int i = 0; i < 10; i++)
+	for (size_t i = 0; i < 10; i++)
 	{
 		Math::Vector coord(3);
 		coord << 0.5, 0.5, 0.5;

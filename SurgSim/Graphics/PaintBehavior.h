@@ -54,7 +54,7 @@ public:
 
 	/// Sets color of the paint
 	/// \param color RGBA color in [0-1] range
-	void setPaintColor(Math::Vector4d color);
+	void setPaintColor(const Math::Vector4d& color);
 
 	/// Gets color of the paint
 	/// \return Vector4d representation of RGBA color in [0-1] range
@@ -70,7 +70,7 @@ public:
 
 	/// Sets collection of local triangle coordinates to paint on during next update
 	/// \param coordinate Standard vector of IndexedLocalCoordinates
-	void setPaintCoordinate(std::vector<DataStructures::IndexedLocalCoordinate> coordinate);
+	void setPaintCoordinate(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinate);
 
 	bool doInitialize() override;
 	bool doWakeUp() override;

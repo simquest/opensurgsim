@@ -50,7 +50,7 @@ std::shared_ptr<Graphics::OsgTexture2d> PaintBehavior::getTexture() const
 	return m_texture;
 }
 
-void PaintBehavior::setPaintColor(Math::Vector4d color)
+void PaintBehavior::setPaintColor(const Math::Vector4d &color)
 {
 	m_color = color;
 }
@@ -60,17 +60,17 @@ Math::Vector4d PaintBehavior::getPaintColor() const
 	return m_color;
 }
 
-void PaintBehavior::setPaintCoordinate(std::vector<DataStructures::IndexedLocalCoordinate> coordinates)
+void PaintBehavior::setPaintCoordinate(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinates)
 {
 	auto mesh = m_representation->getMesh();
-	for (size_t i = 0; i < coordinates.size(); i++)
+	for (auto coordinate : coordinates)
 	{
-		auto vertex1 = mesh->getVertex(mesh->getTriangle(coordinates[i].index).verticesId[0]);
-		auto vertex2 = mesh->getVertex(mesh->getTriangle(coordinates[i].index).verticesId[1]);
-		auto vertex3 = mesh->getVertex(mesh->getTriangle(coordinates[i].index).verticesId[2]);
-		Math::Vector2d uv = vertex1.data.texture.getValue() * coordinates[i].coordinate[0] +
-							vertex2.data.texture.getValue() * coordinates[i].coordinate[1] +
-							vertex3.data.texture.getValue() * coordinates[i].coordinate[2];
+		auto vertex1 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[0]);
+		auto vertex2 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[1]);
+		auto vertex3 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[2]);
+		Math::Vector2d uv = vertex1.data.texture.getValue() * coordinate.coordinate[0] +
+							vertex2.data.texture.getValue() * coordinate.coordinate[1] +
+							vertex3.data.texture.getValue() * coordinate.coordinate[2];
 		m_paintCoordinates.push_back(uv);
 	}
 }
@@ -100,6 +100,7 @@ bool PaintBehavior::doWakeUp()
 	{
 		SURGSIM_LOG_SEVERE(Framework::Logger::getDefaultLogger()) << getClassName() << " named " << getName() <<
 									" does not have a radius set";
+		return false;
 	}
 
 	m_texture->getOsgTexture2d()->setSourceFormat(GL_RGBA);
@@ -122,12 +123,22 @@ void PaintBehavior::update(double dt)
 		double t = uv[1];
 
 
-		if (s > 1.0f) {
+		if (s > 1.0f)
+		{
 			s = 1.0f;
 		}
+		else if (s < 0.0f)
+		{
+			s = 0.0f;
+		}
 
-		if (t > 1.0f) {
+		if (t > 1.0f)
+		{
 			t = 1.0f;
+		}
+		else if (t < 0.0f)
+		{
+			t = 0.0f;
 		}
 
 		size_t coordinateX = static_cast<size_t>(s * m_width);
@@ -154,12 +165,7 @@ void PaintBehavior::update(double dt)
 			}
 		}
 
-//		Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (coordinateY * m_width * numChannels) +
-//																	 (coordinateX * numChannels));
-//		pixel = (m_color * 255).template cast<unsigned char>();
-
 		m_texture->getOsgTexture2d()->dirtyTextureObject();
-
 		m_paintCoordinates.clear();
 	}
 }
@@ -192,7 +198,7 @@ void PaintBehavior::buildBrush(double radius) {
 	{
 		for (int j = 0; j < m_brushHeight; j++)
 		{
-			double mag = (i - centerX * i - centerX) + (j - centerY * j - centerY);
+			double mag = ((i - centerX) * (i - centerX)) + ((j - centerY) * (j - centerY));
 			if (sqrt(mag) < m_brushWidth / 2.0)
 			{
 				m_brush[i * m_brushHeight + j] = 1.0;
