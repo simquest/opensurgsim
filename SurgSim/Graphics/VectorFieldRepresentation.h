@@ -24,6 +24,7 @@ namespace SurgSim
 namespace Graphics
 {
 
+
 /// Graphic representation of a vector field
 /// Each point/location, i.e. (X,Y,Z), in the vector field is associated with a vector and an optional color
 class VectorFieldRepresentation : public virtual Representation
@@ -45,6 +46,7 @@ public:
 	virtual std::shared_ptr<SurgSim::Graphics::VectorField> getVectorField() const = 0;
 
 	/// Updates the vector field in a threadsafe manner
+	/// \param vectorfield the new data
 	virtual void updateVectorField(const SurgSim::Graphics::VectorField& vectorfield) = 0;
 
 	/// Sets vector line width

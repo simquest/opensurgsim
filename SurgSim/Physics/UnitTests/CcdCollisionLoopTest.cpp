@@ -81,7 +81,7 @@ TEST(CcdCollisionLoopTest, FilterContactsWithEpsilon)
 						std::make_pair(location, location));
 	EXPECT_TRUE(computation->filterContacts(pairs, 0.11, &toi));
 	// toi should be 0.1 + 0.11 i.e. toi + epsilon
-	EXPECT_DOUBLE_EQ(0.21, toi);
+	EXPECT_DOUBLE_EQ(0.1, toi);
 	EXPECT_EQ(2u, pair->getContacts().size());
 }
 
