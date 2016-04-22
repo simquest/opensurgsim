@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace DataStructures
 struct Location
 {
 public:
-	enum Type {NODE, TRIANGLE, ELEMENT};
+	enum Type {TRIANGLE, ELEMENT};
 
 	/// Default constructor
 	Location()
@@ -53,7 +53,6 @@ public:
 		  octreeNodePath(other.octreeNodePath),
 		  index(other.index),
 		  triangleMeshLocalCoordinate(other.triangleMeshLocalCoordinate),
-		  nodeMeshLocalCoordinate(other.nodeMeshLocalCoordinate),
 		  elementMeshLocalCoordinate(other.elementMeshLocalCoordinate)
 	{}
 
@@ -85,9 +84,6 @@ public:
 	{
 		switch (meshType)
 		{
-			case NODE:
-				nodeMeshLocalCoordinate.setValue(localCoordinate);
-				break;
 			case TRIANGLE:
 				triangleMeshLocalCoordinate.setValue(localCoordinate);
 				break;
@@ -123,10 +119,6 @@ public:
 		{
 			result = triangleMeshLocalCoordinate.getValue().isApprox(other.triangleMeshLocalCoordinate.getValue());
 		}
-		else if (nodeMeshLocalCoordinate.hasValue() && other.nodeMeshLocalCoordinate.hasValue())
-		{
-			result = nodeMeshLocalCoordinate.getValue().isApprox(other.nodeMeshLocalCoordinate.getValue());
-		}
 		else if (elementMeshLocalCoordinate.hasValue() && other.elementMeshLocalCoordinate.hasValue())
 		{
 			result = elementMeshLocalCoordinate.getValue().isApprox(other.elementMeshLocalCoordinate.getValue());
@@ -143,7 +135,6 @@ public:
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::OctreePath> octreeNodePath;
 	SurgSim::DataStructures::OptionalValue<size_t> index;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> triangleMeshLocalCoordinate;
-	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> nodeMeshLocalCoordinate;
 	SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> elementMeshLocalCoordinate;
 };
 
@@ -192,11 +183,10 @@ template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
 		const Location& loc)
 {
-	out << "RigidLocal: " << loc.rigidLocalPosition << std::endl;
-	out << "TriangleMeshLocal: " << loc.triangleMeshLocalCoordinate << std::endl;
-	out << "NodeMeshLocal: " << loc.nodeMeshLocalCoordinate << std::endl;
 	out << "ElementMesh: " << loc.elementMeshLocalCoordinate << std::endl;
 	out << "Index: " << loc.index << std::endl;
+	out << "RigidLocal: " << loc.rigidLocalPosition << std::endl;
+	out << "TriangleMeshLocal: " << loc.triangleMeshLocalCoordinate << std::endl;
 	return out;
 }
 

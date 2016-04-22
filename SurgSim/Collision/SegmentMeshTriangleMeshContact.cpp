@@ -36,6 +36,7 @@ using SurgSim::Math::Vector3d;
 
 namespace SegmentMeshTriangleMesh
 {
+
 bool isThisContactADuplicate(
 	const std::shared_ptr<SurgSim::Collision::Contact>& newContact,
 	const std::list<std::shared_ptr<SurgSim::Collision::Contact>>& contacts)
@@ -161,6 +162,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 	using SegmentMeshTriangleMesh::isThisContactADuplicate;
 	using Math::calculateCcdContactSegmentSegment;
 	using Math::calculateCcdContactPointTriangle;
+	double epsilon = Math::Geometry::DistanceEpsilon;
 
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -249,6 +251,8 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 						"The triangle mesh contains a degenerate triangle (null normal)";
 			}
 			tn.normalize();
+			bool segmentSegmentCcdFound = false;
+
 			if (Math::doesCollideSegmentTriangle<Math::Vector3d::Scalar, Math::Vector3d::Options>(
 					sv0.first, sv1.first,
 					tv0.first, tv1.first, tv2.first,
@@ -270,6 +274,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 							") in the triangle (" << tv0.first.transpose() << ")  (" << tv1.first.transpose() <<
 							") (" << tv2.first.transpose() << ")";
 				}
+				segmentSegmentCcdFound = false;
 				earliestTimeOfImpact = 0.0;
 				segmentAlpha = baryCoordSegment[1];
 				triangleAlpha = baryCoordTriangle[1];
@@ -286,6 +291,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 				{
 					if (timeOfImpact < earliestTimeOfImpact)
 					{
+						segmentSegmentCcdFound = true;
 						earliestTimeOfImpact = timeOfImpact;
 						segmentAlpha = sFactor;
 						triangleAlpha = tFactor;
@@ -297,6 +303,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 				{
 					if (timeOfImpact < earliestTimeOfImpact)
 					{
+						segmentSegmentCcdFound = true;
 						earliestTimeOfImpact = timeOfImpact;
 						segmentAlpha = sFactor;
 						triangleAlpha = 1.0 - tFactor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
@@ -308,6 +315,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 				{
 					if (timeOfImpact < earliestTimeOfImpact)
 					{
+						segmentSegmentCcdFound = true;
 						earliestTimeOfImpact = timeOfImpact;
 						segmentAlpha = sFactor;
 						triangleAlpha = 0.0; // P = P0 + P0P2.(1 - tFactor)
@@ -321,6 +329,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 				{
 					if (timeOfImpact < earliestTimeOfImpact)
 					{
+						segmentSegmentCcdFound = false;
 						earliestTimeOfImpact = timeOfImpact;
 						segmentAlpha = 0.0;
 						triangleAlpha = u;
@@ -332,6 +341,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 				{
 					if (timeOfImpact < earliestTimeOfImpact)
 					{
+						segmentSegmentCcdFound = false;
 						earliestTimeOfImpact = timeOfImpact;
 						segmentAlpha = 1.0;
 						triangleAlpha = u;
@@ -346,14 +356,15 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 				continue;
 			}
 
-			SURGSIM_ASSERT(segmentAlpha >= 0.0 && segmentAlpha <= 1.0) <<
+			SURGSIM_ASSERT(segmentAlpha >= -epsilon && segmentAlpha <= (1.0 + epsilon)) <<
 					"earliestTimeOfImpact = " << earliestTimeOfImpact <<
 					"; segmentAlpha = " << segmentAlpha;
-			SURGSIM_ASSERT(triangleAlpha >= 0.0 && triangleBeta >= 0.0 && triangleAlpha + triangleBeta <= 1.0) <<
-					"earliestTimeOfImpact = " << earliestTimeOfImpact <<
-					"; triangleAlpha = " << triangleAlpha <<
-					"; triangleBeta = " << triangleBeta <<
-					"; triangleAlpha + triangleBeta = " << triangleAlpha + triangleBeta;
+			SURGSIM_ASSERT(triangleAlpha >= -epsilon && triangleBeta >= -epsilon &&
+						   triangleAlpha + triangleBeta <= (1.0 + epsilon + epsilon)) <<
+				"earliestTimeOfImpact = " << earliestTimeOfImpact <<
+				"; triangleAlpha = " << triangleAlpha <<
+				"; triangleBeta = " << triangleBeta <<
+				"; triangleAlpha + triangleBeta = " << triangleAlpha + triangleBeta;
 
 
 			Math::Vector3d T, Tn;
@@ -363,7 +374,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 				Math::Vector3d T0T1 = tv1.second - tv0.second;
 				Math::Vector3d T0T2 = tv2.second - tv0.second;
 				T = tv0.second + triangleAlpha * T0T1 + triangleBeta * T0T2;
-				Tn = T0T1.cross(T0T2).normalized();
+				Tn = (segmentSegmentCcdFound) ? (T - S).normalized() : T0T1.cross(T0T2).normalized();
 				penentrationDepthAtT1 = (S - T).dot(Tn);
 			}
 
