@@ -30,10 +30,11 @@ SegmentMeshShapePlyReaderDelegate::SegmentMeshShapePlyReaderDelegate() :
 SegmentMeshShapePlyReaderDelegate::SegmentMeshShapePlyReaderDelegate(
 	const std::shared_ptr<Math::SegmentMeshShape>& shape) :
 	TriangleMeshPlyReaderDelegate<Math::SegmentMeshShape>(shape),
+	m_hasRadius(false),
 	m_radius(0.0),
 	m_shape(shape)
 {
-	SURGSIM_ASSERT(m_shape != nullptr);
+	SURGSIM_ASSERT(m_shape != nullptr) << "Shape can't be nullptr.";
 }
 
 SegmentMeshShapePlyReaderDelegate::~SegmentMeshShapePlyReaderDelegate()
@@ -49,7 +50,6 @@ void* SegmentMeshShapePlyReaderDelegate::beginRadius(const std::string&, size_t 
 
 void SegmentMeshShapePlyReaderDelegate::processRadius(const std::string&)
 {
-	std::cout << "RADIUS " << m_radius;
 	m_shape->setRadius(m_radius);
 }
 

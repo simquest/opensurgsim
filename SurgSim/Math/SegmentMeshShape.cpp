@@ -105,7 +105,7 @@ bool SegmentMeshShape::doLoad(const std::string& fileName)
 	if (!reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "The input file '" << fileName << "' does not have the property required by triangle mesh.";
+				<< "The input file '" << fileName << "' does not have the property required by segment mesh.";
 		return false;
 	}
 

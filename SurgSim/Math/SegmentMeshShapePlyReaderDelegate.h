@@ -16,9 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_SEGMENTMESHPLYREADERDELEGATE_H
 #define SURGSIM_DATASTRUCTURES_SEGMENTMESHPLYREADERDELEGATE_H
 
-#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
-#include "SurgSim/DataStructures/SegmentMesh.h"
 #include "SurgSim/Math/SegmentMeshShape.h"
 
 

@@ -164,7 +164,12 @@ void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::createDefaultEd
 
 
 template <class VertexData, class EdgeData>
-void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool asPhysics)
+bool save(const std::string& fileName,
+		  bool asPhysics,
+		  double radius,
+		  double massDensity,
+		  double poissonRatio,
+		  double youngsModulus)
 {
 	std::fstream out(fileName, std::ios::out);
 
@@ -210,8 +215,8 @@ void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std:
 		}
 		if (asPhysics)
 		{
-			out << "0.001" << std::endl;
-			out << "900.0 0.45 1.75e9" << std::endl; // Prolene
+			out << radius << std::endl;
+			out << massDensity << " " poissonRatio << " " << youngsModulus << std::endl;
 		}
 
 		if (out.bad())
@@ -226,7 +231,9 @@ void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std:
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
 				<< "Could not open " << fileName << " for writing.";
+		return false;
 	}
+	return true;
 }
 
 

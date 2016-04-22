@@ -80,7 +80,17 @@ public:
 	/// \param fileName Name of the file for writing
 	/// \param asPhysics Format the file to be used as a physics file, otherwise the file will be ply format
 	/// with 'edge' as the edge element
-	void save(const std::string& fileName, bool asPhysics = true);
+	/// \param radius if asPhysics is true, this will be used as the radius for the ply file
+	/// \param massDensity if asPhysics is true, this will be used as the massDensity for the ply file
+	/// \param poissonRatio if asPhysics is true, this will be used as the poissonRatio for the ply file
+	/// \param youngsModulus if asPhysics is true, this will be used as the youngsModulus for the ply file
+	/// \return true if the file was written successfully
+	bool save(const std::string& fileName,
+			  bool asPhysics = true,
+			  double radius = 0.0001,
+			  double massDensity = 900,
+			  double poissonRatio = 0.45,
+			  double youngsModulus = 1.75e9);
 
 	///@{
 	/// Functions that need to assert, because they deal with triangles.
