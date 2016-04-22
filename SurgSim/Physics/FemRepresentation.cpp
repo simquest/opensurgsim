@@ -226,6 +226,50 @@ void FemRepresentation::update(double dt)
 		return;
 	}
 
+	//static double intensity = 0.0;
+	//static int stage = 0;
+	//if (stage == 0)
+	//{
+	//	intensity += 50.0;
+	//	if (intensity > 20000.0)
+	//	{
+	//		stage++;
+	//	}
+	//}
+	//else if (stage == 1)
+	//{
+	//	//static int counter = 0;
+	//	//counter++;
+	//	//if (counter > 10) stage++;
+	//	stage++;
+	//}
+	//else if (stage == 2)
+	//{
+	//	intensity -= 100.0;
+	//	if (intensity < 0.0)
+	//	{
+	//		stage++;
+	//	}
+	//}
+	//else if (stage == 3)
+	//{
+	//}
+	//m_hasExternalGeneralizedForce = true;
+	//// Bottom plane, middle point.
+	//// Example with num subpoints = 5
+	//// Reaching proper middle plane Z: node offset 7*7*3
+	//// Reaching proper bottom plane Y: node offset 0
+	//// Reaching proper middle node X: node offset 3
+	//m_externalGeneralizedForce[3 * (7 * 7 * 3 + 3) + 1] = intensity;
+	//m_externalGeneralizedForce[3 * (7 * 7 * 2 + 2) + 1] = intensity;
+	//m_externalGeneralizedForce[3 * (7 * 7 * 2 + 3) + 1] = intensity;
+	//m_externalGeneralizedForce[3 * (7 * 7 * 2 + 4) + 1] = intensity;
+	//m_externalGeneralizedForce[3 * (7 * 7 * 3 + 2) + 1] = intensity;
+	//m_externalGeneralizedForce[3 * (7 * 7 * 3 + 4) + 1] = intensity;
+	//m_externalGeneralizedForce[3 * (7 * 7 * 4 + 2) + 1] = intensity;
+	//m_externalGeneralizedForce[3 * (7 * 7 * 4 + 3) + 1] = intensity;
+	//m_externalGeneralizedForce[3 * (7 * 7 * 4 + 4) + 1] = intensity;
+
 	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
 											  "Ode solver has not been set yet. Did you call beforeUpdate() ?";
 	SURGSIM_ASSERT(m_initialState != nullptr) <<
