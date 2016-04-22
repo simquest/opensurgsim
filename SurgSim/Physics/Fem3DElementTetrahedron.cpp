@@ -72,11 +72,14 @@ Fem3DElementTetrahedron::Fem3DElementTetrahedron(std::shared_ptr<FemElementStruc
 
 void Fem3DElementTetrahedron::initializeMembers()
 {
+	m_deltaPlastic.setZero();
 	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 }
 
 void Fem3DElementTetrahedron::doUpdateFMDK(const Math::OdeState& state, int options)
 {
+	static double limit = 0.3;
+
 	if (options & Math::ODEEQUATIONUPDATE_F)
 	{
 		Eigen::Matrix<double, 12, 1> x;
@@ -85,7 +88,34 @@ void Fem3DElementTetrahedron::doUpdateFMDK(const Math::OdeState& state, int opti
 		// K.(x - x0) = Fext
 		// 0 = Fext + Fint     with Fint = -K.(x - x0)
 		getSubVector(state.getPositions(), m_nodeIds, 3, &x);
-		m_f = -m_K * (x - m_x0);
+		//m_f = -m_K * (x - m_x0);
+
+		//// Detailled calculation (in global space for this element type (i.e. the strain is defined directly in global space, no rotation is needed):
+		////m_f = -m_restVolume * m_strain.transpose() * m_Em * m_strain * (x - m_x0);
+
+		//// m_strain * (x - m_x0) gives the strain of the element
+		//// Introducing plasticity simply adjust this term with a potential plastic term: m_strain * (x - m_x0) - m_deltaPlastic
+
+		////// Calculating the strain (taking into account any plasticity already existing).
+		////Eigen::Matrix<double, 6, 1> strain = m_strain * (x - m_x0);
+		////// Adjusting the plasticity of the element
+		////for (int i = 0; i < 6; i++)
+		////{
+		////	if (strain[i] > limit) strain[i] = limit;
+		////	if (strain[i] < -limit) strain[i] = -limit;
+		////}
+		////m_f = -m_restVolume * m_strain.transpose() * m_Em * strain;
+
+		Eigen::Matrix<double, 6, 1> strain = m_strain * (x - m_x0) -m_deltaPlastic;
+
+		// Adjusting the plasticity of the element
+		for (int i = 0; i < 6; i++)
+		{
+			if (strain[i] > limit) m_deltaPlastic[i] += strain[i] - limit;
+			if (strain[i] < -limit) m_deltaPlastic[i] += strain[i] + limit;
+		}
+
+		m_f = -m_restVolume * m_strain.transpose() * m_Em * (m_strain * (x - m_x0) - m_deltaPlastic);
 	}
 }
 

@@ -119,6 +119,8 @@ protected:
 	Eigen::Matrix<double, 6, 12> m_strain;
 	/// Stress matrix
 	Eigen::Matrix<double, 6, 12> m_stress;
+
+	Eigen::Matrix<double, 6, 1> m_deltaPlastic;
 };
 
 } // namespace Physics
