@@ -151,6 +151,17 @@ protected:
 	/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki.
 	/// Shape functions are \f$f_i(x, y) = a_i + b_i.x + c_i.y\f$, here we store \f$(a_i, b_i, c_i)\f$ on each row.
 	SurgSim::Math::Matrix33d m_membraneShapeFunctionsParameters;
+	Matrix36Type m_membraneStrainDisplacement; // Useful to calculate the strain to handle plastic deformation
+	Matrix33Type m_membraneElasticMaterial;
+	Matrix66Type m_membraneKLocal; 
+	Math::Vector3d m_membraneLocalPlasticStrain; // Membrane local plastic strain
+
+	std::array<Matrix39Type, 3> m_strainDisplacementAtGaussPoint;
+	Matrix33Type m_plateElasticMaterial;
+	Matrix99Type m_plateKLocal;
+	Math::Vector3d m_plateLocalPlasticStrain; // Plate local plastic strain
+
+	Eigen::Matrix<double, 18, 18> m_R0;
 
 	// Thin-plate (bending/twisting) specific data structure
 	// DOF simulated: (z, thetaX, thetaY)

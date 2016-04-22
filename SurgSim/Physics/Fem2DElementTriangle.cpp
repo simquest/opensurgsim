@@ -93,6 +93,9 @@ void Fem2DElementTriangle::initializeMembers()
 	m_restArea = 0.0;
 	m_thickness = 0.0;
 
+	m_membraneLocalPlasticStrain.setZero();
+	m_plateLocalPlasticStrain.setZero();
+
 	// 6 dof per node (x, y, z, thetaX, thetaY, thetaZ)
 	setNumDofPerNode(6);
 }
@@ -110,6 +113,11 @@ void Fem2DElementTriangle::initialize(const SurgSim::Math::OdeState& state)
 
 	// Store the rest rotation in m_initialRotation
 	m_initialRotation = computeRotation(state);
+	m_R0.setZero();
+	for (int i = 0; i < 6; i++)
+	{
+		m_R0.block<3, 3>(3 * i, 3 * i) = m_initialRotation;
+	}
 
 	// computeShapeFunctionsParameters needs the initial rotation and
 	// is required to compute the stiffness and mass matrices
@@ -185,7 +193,7 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 {
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	// Compute the membrane local strain-displacement matrix
-	Matrix36Type membraneStrainDisplacement = Matrix36Type::Zero();
+	m_membraneStrainDisplacement = Matrix36Type::Zero();
 	for (size_t i = 0; i < 3; ++i)
 	{
 		// Noting f(x,y) the membrane shape function, the displacement is:
@@ -193,43 +201,42 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 		// The strain is E=(Exx , Eyy , Exy)
 		// Exx = dux/dx = df0/dx.u0x + df1/dx.u1x + df2/dx.u2x
 		//                dfi/dx = bi
-		membraneStrainDisplacement(0, 2 * i) = m_membraneShapeFunctionsParameters(i, 1);
+		m_membraneStrainDisplacement(0, 2 * i) = m_membraneShapeFunctionsParameters(i, 1);
 		// Eyy = duy/dy = df0/dy.u0y + df1/dy.u1y + df2/dy.u2y
 		//                dfi/dy = ci
-		membraneStrainDisplacement(1, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 2);
+		m_membraneStrainDisplacement(1, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 2);
 		// Exy = dux/dy + duy/dx =
 		// (df0/dy.u0x + df0/dx.u0y) + (df1/dy.u1x + df1/dx.u1y) + (df2/dy.u2x + df2/dx.u2y)
-		membraneStrainDisplacement(2, 2 * i) = m_membraneShapeFunctionsParameters(i, 2);
-		membraneStrainDisplacement(2, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 1);
+		m_membraneStrainDisplacement(2, 2 * i) = m_membraneShapeFunctionsParameters(i, 2);
+		m_membraneStrainDisplacement(2, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 1);
 	}
 	// Membrane material stiffness coming from Hooke Law (isotropic material)
-	Matrix33Type membraneElasticMaterial;
-	membraneElasticMaterial.setIdentity();
-	membraneElasticMaterial(2, 2) = 0.5 * (1.0 - m_nu);
-	membraneElasticMaterial(0, 1) = m_nu;
-	membraneElasticMaterial(1, 0) = m_nu;
-	membraneElasticMaterial *= m_E / (1.0 - m_nu * m_nu);
+	m_membraneElasticMaterial.setIdentity();
+	m_membraneElasticMaterial(2, 2) = 0.5 * (1.0 - m_nu);
+	m_membraneElasticMaterial(0, 1) = m_nu;
+	m_membraneElasticMaterial(1, 0) = m_nu;
+	m_membraneElasticMaterial *= m_E / (1.0 - m_nu * m_nu);
 	// Membrane local stiffness matrix = integral(strain:stress)
-	Matrix66Type membraneKLocal =
-			membraneStrainDisplacement.transpose() * membraneElasticMaterial * membraneStrainDisplacement;
-	membraneKLocal *= m_thickness * m_restArea;
+	m_membraneKLocal =
+		m_membraneStrainDisplacement.transpose() * m_membraneElasticMaterial * m_membraneStrainDisplacement;
+	m_membraneKLocal *= m_thickness * m_restArea;
 
 	// Thin-plate part from "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
 	// Thin-plate material stiffness coming from Hooke Law (isotropic material)
-	Matrix33Type plateElasticMaterial = membraneElasticMaterial;
-	plateElasticMaterial *= m_thickness * m_thickness * m_thickness / 12.0;
+	m_plateElasticMaterial = m_membraneElasticMaterial;
+	m_plateElasticMaterial *= m_thickness * m_thickness * m_thickness / 12.0;
 	// Thin-Plate stiffness matrix evaluation using a 3 point Gauss quadrature for exact integration (quadratic terms)
-	Matrix99Type plateKLocal = Matrix99Type::Zero();
+	m_plateKLocal = Matrix99Type::Zero();
 	for (size_t pointId = 0; pointId < 3; ++pointId)
 	{
 		const double xi = gaussQuadrature2DTriangle3Points[pointId].coordinateXi;
 		const double eta = gaussQuadrature2DTriangle3Points[pointId].coordinateEta;
 		const double weight = gaussQuadrature2DTriangle3Points[pointId].weight;
 
-		Matrix39Type strainDisplacementAtGaussPoint = batozStrainDisplacement(xi , eta);
-		plateKLocal += ((2.0 * m_restArea) * 0.5 * weight) *
-					   strainDisplacementAtGaussPoint.transpose() * plateElasticMaterial *
-					   strainDisplacementAtGaussPoint;
+		m_strainDisplacementAtGaussPoint[pointId] = batozStrainDisplacement(xi , eta);
+		m_plateKLocal += ((2.0 * m_restArea) * 0.5 * weight) *
+					   m_strainDisplacementAtGaussPoint[pointId].transpose() * m_plateElasticMaterial *
+					   m_strainDisplacementAtGaussPoint[pointId];
 	}
 
 	// Assemble shell stiffness as combination of membrane (Ux Uy) and plate stiffnesses (Uz ThetaX ThetaY)
@@ -241,11 +248,11 @@ void Fem2DElementTriangle::computeLocalStiffness(const SurgSim::Math::OdeState& 
 		for (size_t column = 0; column < 3; ++column)
 		{
 			// Membrane part
-			localStiffnessMatrix->block<2, 2>(6 * row, 6 * column) = membraneKLocal.block<2 , 2>(2 * row , 2 * column);
+			localStiffnessMatrix->block<2, 2>(6 * row, 6 * column) = m_membraneKLocal.block<2 , 2>(2 * row , 2 * column);
 
 			// Thin-plate part
 			localStiffnessMatrix->block<3, 3>(6 * row + 2, 6 * column + 2) =
-					plateKLocal.block<3, 3>(3 * row, 3 * column);
+				m_plateKLocal.block<3, 3>(3 * row, 3 * column);
 		}
 	}
 }
@@ -332,15 +339,67 @@ SurgSim::Math::Vector Fem2DElementTriangle::computeNaturalCoordinate(
 
 void Fem2DElementTriangle::doUpdateFMDK(const Math::OdeState& state, int options)
 {
+	static double elasticityLimitElongation = 0.08;
+
 	if (options & Math::ODEEQUATIONUPDATE_F)
 	{
 		Eigen::Matrix<double, 18, 1> x;
-
+		getSubVector(state.getPositions(), m_nodeIds, 6, &x);
 		// K.U = F_ext
 		// K.(x - x0) = F_ext
 		// 0 = F_ext + F_int, with F_int = -K.(x - x0)
-		getSubVector(state.getPositions(), m_nodeIds, 6, &x);
-		m_f = -m_K * (x - m_x0);
+		//m_f = -m_K * (x - m_x0);
+
+		// To handle the plasticity properly, we need to go down to the local strain (membrane and plate) and treat them individually.
+		Eigen::Matrix<double, 18, 1> Uglobal = x - m_x0;
+		Eigen::Matrix<double, 18, 1> Ulocal = m_R0.transpose() * Uglobal;
+
+		Eigen::Matrix<double, 6, 1> localMembraneU;
+		localMembraneU  << Ulocal[0], Ulocal[1], Ulocal[6], Ulocal[7], Ulocal[12], Ulocal[13];
+		Math::Vector3d localMembraneStrain = m_membraneStrainDisplacement * localMembraneU;
+		for (int i = 0; i < 3; i++)
+		{
+			if (localMembraneStrain[i] - m_membraneLocalPlasticStrain[i] - elasticityLimitElongation > 0.0)
+			{
+				m_membraneLocalPlasticStrain[i] += localMembraneStrain[i] - m_membraneLocalPlasticStrain[i] - elasticityLimitElongation;
+			}
+			if (localMembraneStrain[i] - m_membraneLocalPlasticStrain[i] + elasticityLimitElongation < 0.0)
+			{
+				m_membraneLocalPlasticStrain[i] += localMembraneStrain[i] - m_membraneLocalPlasticStrain[i] + elasticityLimitElongation;
+			}
+		}
+		Math::Vector6d localMembraneForce = -m_thickness * m_restArea * m_membraneStrainDisplacement.transpose() * m_membraneElasticMaterial * (localMembraneStrain - m_membraneLocalPlasticStrain);
+
+		Eigen::Matrix<double, 9, 1> localPlateU;
+		localPlateU << Ulocal[2], Ulocal[3], Ulocal[4], Ulocal[8], Ulocal[9], Ulocal[10], Ulocal[14], Ulocal[15], Ulocal[16];
+		Eigen::Matrix<double, 9, 1> localPlateForce = Eigen::Matrix<double, 9, 1>::Zero();
+		for (int i = 0; i < 3; i++)
+		{
+			const double weight = gaussQuadrature2DTriangle3Points[i].weight;
+			Math::Vector3d localPlateStrain = m_strainDisplacementAtGaussPoint[i] * localPlateU;
+			for (int i = 0; i < 3; i++)
+			{
+				if (localPlateStrain[i] - m_plateLocalPlasticStrain[i] - elasticityLimitElongation > 0.0)
+				{
+					m_plateLocalPlasticStrain[i] += localPlateStrain[i] - m_plateLocalPlasticStrain[i] - elasticityLimitElongation;
+				}
+				if (localPlateStrain[i] - m_plateLocalPlasticStrain[i] + elasticityLimitElongation < 0.0)
+				{
+					m_plateLocalPlasticStrain[i] += localPlateStrain[i] - m_plateLocalPlasticStrain[i] + elasticityLimitElongation;
+				}
+			}
+			localPlateForce  += - (0.5 * weight) * (2.0 * m_restArea) * m_strainDisplacementAtGaussPoint[i].transpose() * m_plateElasticMaterial * (localPlateStrain - m_plateLocalPlasticStrain);
+		}
+
+		Eigen::Matrix<double, 18, 1> localForce;
+		for (int i = 0; i < 3; i++)
+		{
+			localForce.segment<2>(6 * i) = localMembraneForce.segment<2>(2 * i);
+			localForce.segment<3>(6 * i + 2) = localPlateForce.segment<3>(3 * i);
+			localForce[6 * i + 5] = 0.0;
+		}
+
+		m_f = m_R0 * localForce;
 	}
 }
 
