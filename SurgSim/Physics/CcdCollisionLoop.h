@@ -93,7 +93,11 @@ private:
 						double epsilon,
 						double* currentToi);
 
-	void printContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
+	void backupContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+						std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+	void restoreContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+						 std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+	void printContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs);
 
 	/// remove all the contacts from ccdPairs
 	/// \param ccdPairs list of pairs for removal

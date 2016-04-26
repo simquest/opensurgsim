@@ -228,9 +228,7 @@ bool OdeState::isValid() const
 	return isValid(getPositions().sum()) && isValid(getVelocities().sum());
 }
 
-OdeState OdeState::interpolate(
-	const OdeState& other,
-	double t)
+OdeState OdeState::interpolate(const OdeState& other, double t) const
 {
 	auto result = OdeState(*this);
 	if (t != 0)

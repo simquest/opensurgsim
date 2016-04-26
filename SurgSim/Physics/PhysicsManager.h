@@ -53,7 +53,8 @@ class Computation;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
-/// The PhysicsManager pipelin can be configured, we
+/// The PhysicsManager pipeline can be configured, using the
+/// addComputation/setComputaton method.
 class PhysicsManager : public SurgSim::Framework::ComponentManager
 {
 public:
@@ -74,7 +75,7 @@ public:
 
 	/// Add a computation to the list of computations to perform each update
 	/// \note The computations will be run in order they were added. This can't be done after initialization
-	/// \param computation The Computation to add
+	/// \param computation The Computation to add.
 	void addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation);
 
 	/// Set a group of computations, the computations will be run in the order in the vector
@@ -89,6 +90,7 @@ protected:
 
 	/// Initialize the Physics Manager
 	/// Derived class(es) should override this method to have a customized list of computations.
+	/// \note Current default is to only use DCD contacts
 	/// \sa SurgSim::Physics::Computation
 	bool doInitialize() override;
 

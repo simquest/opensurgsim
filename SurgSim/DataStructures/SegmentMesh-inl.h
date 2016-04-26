@@ -151,7 +151,7 @@ void SegmentMesh<VertexData, EdgeData>::doClear()
 }
 
 template <class VertexData, class EdgeData>
-void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::createDefaultEdges()
+void SegmentMesh<VertexData, EdgeData>::createDefaultEdges()
 {
 	doClearEdges();
 	for (size_t i = 0; i < getNumVertices() - 1; ++i)
@@ -164,7 +164,7 @@ void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::createDefaultEd
 
 
 template <class VertexData, class EdgeData>
-void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool addPhysics)
+void SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool addPhysics)
 {
 	std::fstream out(fileName, std::ios::out);
 

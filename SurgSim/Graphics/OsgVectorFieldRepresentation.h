@@ -50,7 +50,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgVectorFieldRepresentation);
 
-	std::shared_ptr<SurgSim::Graphics::VectorField> getVectorField() const override;
+	std::shared_ptr<VectorField> getVectorField() const override;
 
 	void setLineWidth(double width) override;
 	double getLineWidth() const override;
