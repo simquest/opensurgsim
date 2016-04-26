@@ -83,17 +83,25 @@ private:
 	/// that is the iterations intervall
 	double m_epsilonFactor;
 
-	/// Takes all the contacts from ccdPairs, finds the first contact wrt contact time and removes all contacts
-	/// with contact time greater than the first contact time + epsilon
+	/// Takes all the contacts from ccdPairs, finds the first contact wrt contact time
 	/// \param ccdPairs the list of pairs that should be checked for contacts
-	/// \param epsilon the epsilon to be added to the first toi for filtering
-	/// \param [out] currentToi the earliest contact time found in ccdPairs + epsilon
+	/// \param [out] currentTimeOfmpact the earliest contact time found in ccdPairs + epsilon
 	/// \return true if there were any contacts found in ccdPairs
-	bool filterContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
-						double epsilon,
-						double* currentToi);
+	bool findEarliestContact(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+							 double* currentTimeOfImpact);
 
-	void printContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
+	/// Removes all contacts with contact time greater than the first contact time + epsilon
+	/// \param ccdPairs the list of pairs that should be checked for contacts
+	/// \param epsilon the epsilon to be added to the first contactTime for filtering
+	void filterLaterContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+							 double epsilon,
+							 double contactTime);
+
+	void backupContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+						std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+	void restoreContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+						 std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+	void printContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs);
 
 	/// remove all the contacts from ccdPairs
 	/// \param ccdPairs list of pairs for removal

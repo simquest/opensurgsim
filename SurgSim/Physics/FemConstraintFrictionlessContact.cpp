@@ -30,7 +30,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemConstraintFrictionlessContact::FemConstraintFrictionlessContact()
+FemConstraintFrictionlessContact::FemConstraintFrictionlessContact(): m_mlcpNumericalPrecision(1.0e-04)
 {
 }
 
@@ -66,10 +66,11 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 		if (rep != nullptr)
 		{
 			auto segmentShape =
-				std::dynamic_pointer_cast<Math::SegmentMeshShape>(fem->getCollisionRepresentation()->getShape());
+				std::dynamic_pointer_cast<Math::SegmentMeshShape>(rep->getShape());
 			if (segmentShape != nullptr)
 			{
-				double radius = segmentShape->getRadius() + 1e-4;
+
+				double radius = segmentShape->getRadius() + m_mlcpNumericalPrecision;
 				globalPosition -= n * (radius * scale);
 			}
 		}

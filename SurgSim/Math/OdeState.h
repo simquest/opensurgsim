@@ -155,7 +155,7 @@ public:
 	/// \return the interpolated state = this + (other - this) * t;
 	/// \note All dof are independently linearly interpolated (This will not work correctly
 	/// on rotation vectors where a slerp will be required.)
-	OdeState interpolate(const OdeState& other, double t);
+	OdeState interpolate(const OdeState& other, double t) const;
 
 private:
 	/// Default public copy constructor and assignment operator are being used on purpose

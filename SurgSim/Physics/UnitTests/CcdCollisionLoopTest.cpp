@@ -38,13 +38,14 @@ TEST(CcdCollisionLoopTest, FilterContacts)
 	DataStructures::Location location;
 	std::vector<std::shared_ptr<Collision::CollisionPair>> pairs(1, pair);
 
-	EXPECT_FALSE(computation->filterContacts(pairs, 0.0, &toi));
+	EXPECT_FALSE(computation->findEarliestContact(pairs, &toi));
 
 	// Check that we find the toi correctly
 	pair->addCcdContact(0.0, 0.1, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
 						std::make_pair(location, location));
-	EXPECT_TRUE(computation->filterContacts(pairs, 0.0, &toi));
+	EXPECT_TRUE(computation->findEarliestContact(pairs, &toi));
 	EXPECT_DOUBLE_EQ(0.1, toi);
+	computation->filterLaterContacts(pairs, 0.0, toi);
 	EXPECT_EQ(1u, pair->getContacts().size());
 
 	pair->addCcdContact(0.0, 0.2, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
@@ -56,7 +57,8 @@ TEST(CcdCollisionLoopTest, FilterContacts)
 	// Check that we filter everything after the toi
 	toi = 0.0;
 	EXPECT_EQ(3u, pair->getContacts().size());
-	EXPECT_TRUE(computation->filterContacts(pairs, 0.0, &toi));
+	EXPECT_TRUE(computation->findEarliestContact(pairs, &toi));
+	computation->filterLaterContacts(pairs, 0.0, toi);
 	EXPECT_DOUBLE_EQ(0.1, toi);
 	EXPECT_EQ(1u, pair->getContacts().size());
 }
@@ -79,7 +81,8 @@ TEST(CcdCollisionLoopTest, FilterContactsWithEpsilon)
 						std::make_pair(location, location));
 	pair->addCcdContact(0.0, 0.3, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
 						std::make_pair(location, location));
-	EXPECT_TRUE(computation->filterContacts(pairs, 0.11, &toi));
+	EXPECT_TRUE(computation->findEarliestContact(pairs, &toi));
+	computation->filterLaterContacts(pairs, 0.11, toi);
 	// toi should be 0.1 + 0.11 i.e. toi + epsilon
 	EXPECT_DOUBLE_EQ(0.1, toi);
 	EXPECT_EQ(2u, pair->getContacts().size());

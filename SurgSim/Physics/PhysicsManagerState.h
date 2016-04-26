@@ -247,7 +247,10 @@ private:
 	/// Mlcp solution for this Physics Manager State
 	MlcpPhysicsSolution m_mlcpPhysicsSolution;
 
+	/// Flag for the abort group case
 	bool m_abortGroup;
+
+	/// last time of impact for a CCD calculation
 	double m_toi;
 };
 

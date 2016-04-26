@@ -28,6 +28,7 @@ namespace Physics
 class FemConstraintFrictionlessContact: public ConstraintImplementation
 {
 public:
+
 	/// Constructor
 	FemConstraintFrictionlessContact();
 
@@ -46,6 +47,12 @@ private:
 				 size_t indexOfRepresentation,
 				 size_t indexOfConstraint,
 				 ConstraintSideSign sign) override;
+
+	/// \note accounts for the mlcp precision, so that the contact point
+	/// is not floating around the solution plane (with a precision of +-e due to the
+	/// mlcp, but floating above this plane, so the contact is actually verified at the end)
+	double m_mlcpNumericalPrecision;
+
 };
 
 }; // namespace Physics
