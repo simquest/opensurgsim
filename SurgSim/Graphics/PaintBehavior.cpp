@@ -172,7 +172,7 @@ void PaintBehavior::buildBrush(double radius) {
 	m_brushOffsetX = -1 * centerX;
 	m_brushOffsetY = -1 * centerY;
 
-	m_brush = new double[m_brushWidth * m_brushHeight];
+	m_brush.resize(m_brushWidth, m_brushHeight);
 
 	for (int i = 0; i < m_brushWidth; i++)
 	{
@@ -181,11 +181,11 @@ void PaintBehavior::buildBrush(double radius) {
 			double mag = ((i - centerX) * (i - centerX)) + ((j - centerY) * (j - centerY));
 			if (sqrt(mag) < m_brushWidth / 2.0)
 			{
-				m_brush[i * m_brushHeight + j] = 1.0;
+				m_brush(i * m_brushHeight + j) = 1.0;
 			}
 			else
 			{
-				m_brush[i * m_brushHeight + j] = 0.0;
+				m_brush(i * m_brushHeight + j) = 0.0;
 			}
 		}
 	}
@@ -203,7 +203,7 @@ void PaintBehavior::buildAntiAliasedBrush(double radius) {
 	m_brushOffsetX = -1 * centerX;
 	m_brushOffsetY = -1 * centerY;
 
-	m_brush = new double[m_brushWidth * m_brushHeight];
+	m_brush.resize(m_brushWidth, m_brushHeight);
 
 	for (int i = 0; i < m_brushWidth; i++)
 	{
@@ -214,15 +214,15 @@ void PaintBehavior::buildAntiAliasedBrush(double radius) {
 			dist /= m_brushWidth / 2;
 			if (dist > sqrt2Half)
 			{
-				m_brush[i * m_brushHeight + j] = 1.0;
+				m_brush(i * m_brushHeight + j) = 1.0;
 			}
 			else if (dist < 0.0)
 			{
-				m_brush[i * m_brushHeight + j] = 0.0;
+				m_brush(i * m_brushHeight + j) = 0.0;
 			}
 			else
 			{
-				m_brush[i * m_brushHeight + j] = sqrt(2) * dist;
+				m_brush(i * m_brushHeight + j) = sqrt(2) * dist;
 			}
 		}
 	}
@@ -265,14 +265,14 @@ void PaintBehavior::paint(Math::Vector2d coordinates) {
 	{
 		for (size_t y = 0; y < m_brushHeight; y++)
 		{
-			if (m_brush[x * m_brushHeight + y] > 0.0f)
+			if (m_brush(x * m_brushHeight + y) > 0.0f)
 			{
 				size_t i = static_cast<size_t>(coordinates[0] + m_brushOffsetX + x);
 				size_t j = static_cast<size_t>(coordinates[1] + m_brushOffsetY + y);
 				if (i >= 0 && i < m_width && j >= 0 && j < m_height)
 				{
 					Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (j * m_width + i) * numChannels);
-					pixel = (m_brush[x * m_brushHeight + y] * m_color * 255).template cast<unsigned char>();
+					pixel = (m_brush(x * m_brushHeight + y) * m_color * 255).template cast<unsigned char>();
 				}
 			}
 		}

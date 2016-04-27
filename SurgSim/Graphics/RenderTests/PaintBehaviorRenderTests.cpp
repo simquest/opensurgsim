@@ -46,7 +46,7 @@ class PaintBehaviorRenderTests : public RenderTest
 
 TEST_F(PaintBehaviorRenderTests, InitTest)
 {
-	viewElement->getCamera()->setLocalPose(makeRigidTransform(Math::Vector3d(0.0, 0.25, 0.0),
+	viewElement->getCamera()->setLocalPose(makeRigidTransform(Math::Vector3d(0.0, 0.2, 0.0),
 															  Math::Vector3d(0.0, 0.0, 0.0),
 															  Math::Vector3d(0.0, 0.0, -1.0)));
 	viewElement->getCamera()->setAmbientColor(Math::Vector4d(0.2, 0.2, 0.2, 1.0));

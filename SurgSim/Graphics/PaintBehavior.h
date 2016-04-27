@@ -25,6 +25,7 @@
 #include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
@@ -123,7 +124,7 @@ private:
 	/// Radius of brush
 	double m_radius;
 
-	double* m_brush;
+	Math::Matrix m_brush;
 
 	std::mutex m_mutex;
 };
