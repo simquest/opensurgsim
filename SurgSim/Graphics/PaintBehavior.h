@@ -16,6 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_PAINT_BEHAVIOR_H
 #define SURGSIM_GRAPHICS_PAINT_BEHAVIOR_H
 
+#include <mutex>
+
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -54,11 +56,11 @@ public:
 
 	/// Sets color of the paint
 	/// \param color RGBA color in [0-1] range
-	void setPaintColor(const Math::Vector4d& color);
+	void setColor(const Math::Vector4d& color);
 
 	/// Gets color of the paint
 	/// \return Vector4d representation of RGBA color in [0-1] range
-	Math::Vector4d getPaintColor() const;
+	Math::Vector4d getColor() const;
 
 	/// Sets radius of paint splat
 	/// \param  radius Radius in texture coordinate range [0-1]
@@ -70,7 +72,7 @@ public:
 
 	/// Sets collection of local triangle coordinates to paint on during next update
 	/// \param coordinate Standard vector of IndexedLocalCoordinates
-	void setPaintCoordinate(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinate);
+	void setCoordinates(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinate);
 
 	bool doInitialize() override;
 	bool doWakeUp() override;
@@ -79,9 +81,17 @@ public:
 
 private:
 
+	/// Builds paint brush at the set radius size
 	void buildBrush(double radius);
 
+	/// Builds an antialiased brush at the set radius size
 	void buildAntiAliasedBrush(double radius);
+
+	/// Convert texture uv coordinates to pixel coordinates
+	Math::Vector2d toPixel(Math::Vector2d uv);
+
+	/// Apply paint brush to texture at specified texture coordinates
+	void paint(Math::Vector2d coordinates);
 
 	/// Graphics representation of the mesh to apply behavior to
 	std::shared_ptr<Graphics::OsgMeshRepresentation> m_representation;
@@ -114,6 +124,8 @@ private:
 	double m_radius;
 
 	double* m_brush;
+
+	std::mutex m_mutex;
 };
 
 } // Graphics

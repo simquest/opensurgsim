@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <math.h>
+
 #include "SurgSim/DataStructures/Image.h"
 #include "SurgSim/Graphics/PaintBehavior.h"
 
@@ -50,18 +52,19 @@ std::shared_ptr<Graphics::OsgTexture2d> PaintBehavior::getTexture() const
 	return m_texture;
 }
 
-void PaintBehavior::setPaintColor(const Math::Vector4d &color)
+void PaintBehavior::setColor(const Math::Vector4d& color)
 {
 	m_color = color;
 }
 
-Math::Vector4d PaintBehavior::getPaintColor() const
+Math::Vector4d PaintBehavior::getColor() const
 {
 	return m_color;
 }
 
-void PaintBehavior::setPaintCoordinate(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinates)
+void PaintBehavior::setCoordinates(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinates)
 {
+	std::unique_lock<std::mutex> lock(m_mutex);
 	auto mesh = m_representation->getMesh();
 	for (auto coordinate : coordinates)
 	{
@@ -105,9 +108,24 @@ bool PaintBehavior::doWakeUp()
 
 	m_texture->getOsgTexture2d()->setSourceFormat(GL_RGBA);
 	m_texture->getOsgTexture2d()->setSourceType(GL_BYTE);
+
 	m_texture->getOsgTexture2d()->dirtyTextureObject();
 
 	m_texture->getSize(&m_width, &m_height);
+
+	for (size_t i = 0; i < m_width; i++)
+	{
+		for (size_t j = 0; j < m_height; j++)
+		{
+			auto data = m_texture->getOsgTexture2d()->getImage()->data();
+			auto ptr = data + (j * m_width + i) * 4;
+			*(ptr++) = 0;
+			*(ptr++) = 0;
+			*(ptr++) = 0;
+			*(ptr++) = 0;
+		}
+	}
+	m_texture->getOsgTexture2d()->dirtyTextureObject();
 
 	buildBrush(getRadius());
 
@@ -116,57 +134,19 @@ bool PaintBehavior::doWakeUp()
 
 void PaintBehavior::update(double dt)
 {
-	for (Math::Vector2d uv : m_paintCoordinates)
+	std::vector<Math::Vector2d> newCoordinates;
 	{
+		std::unique_lock<std::mutex> lock(m_mutex);
+		std::swap(newCoordinates, m_paintCoordinates);
+	}
 
-		double s = uv[0];
-		double t = uv[1];
+	for (Math::Vector2d uv : newCoordinates)
+	{
+		Math::Vector2d xy = toPixel(uv);
 
-
-		if (s > 1.0f)
-		{
-			s = 1.0f;
-		}
-		else if (s < 0.0f)
-		{
-			s = 0.0f;
-		}
-
-		if (t > 1.0f)
-		{
-			t = 1.0f;
-		}
-		else if (t < 0.0f)
-		{
-			t = 0.0f;
-		}
-
-		size_t coordinateX = static_cast<size_t>(s * m_width);
-		size_t coordinateY = static_cast<size_t>(t * m_height);
-
-		int numChannels = 4;
-
-		auto data = m_texture->getOsgTexture2d()->getImage()->data();
-
-		for (size_t x = 0; x < m_brushWidth; x++)
-		{
-			for (size_t y = 0; y < m_brushHeight; y++)
-			{
-				if (m_brush[x * m_brushHeight + y] > 0.0f)
-				{
-					size_t i = coordinateX + m_brushOffsetX + x;
-					size_t j = coordinateY + m_brushOffsetY + y;
-					if (i >= 0 && i < m_width && j >= 0 && j < m_height)
-					{
-						Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (j * m_width + i) * numChannels);
-						pixel = (m_brush[x * m_brushHeight + y] * m_color * 255).template cast<unsigned char>();
-					}
-				}
-			}
-		}
+		paint(xy);
 
 		m_texture->getOsgTexture2d()->dirtyTextureObject();
-		m_paintCoordinates.clear();
 	}
 }
 
@@ -243,6 +223,57 @@ void PaintBehavior::buildAntiAliasedBrush(double radius) {
 			else
 			{
 				m_brush[i * m_brushHeight + j] = sqrt(2) * dist;
+			}
+		}
+	}
+}
+
+Math::Vector2d PaintBehavior::toPixel(Math::Vector2d uv) {
+	double s = uv[0];
+	double t = uv[1];
+
+	if (s > 1.0f)
+	{
+		s = 1.0f;
+	}
+	else if (s < 0.0f)
+	{
+		s = 0.0f;
+	}
+
+	if (t > 1.0f)
+	{
+		t = 1.0f;
+	}
+	else if (t < 0.0f)
+	{
+		t = 0.0f;
+	}
+
+	Math::Vector2d xy;
+	xy << round(s * m_width), round(t * m_height);
+
+	return xy;
+}
+
+void PaintBehavior::paint(Math::Vector2d coordinates) {
+	int numChannels = 4;
+
+	auto data = m_texture->getOsgTexture2d()->getImage()->data();
+
+	for (size_t x = 0; x < m_brushWidth; x++)
+	{
+		for (size_t y = 0; y < m_brushHeight; y++)
+		{
+			if (m_brush[x * m_brushHeight + y] > 0.0f)
+			{
+				size_t i = static_cast<size_t>(coordinates[0] + m_brushOffsetX + x);
+				size_t j = static_cast<size_t>(coordinates[1] + m_brushOffsetY + y);
+				if (i >= 0 && i < m_width && j >= 0 && j < m_height)
+				{
+					Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (j * m_width + i) * numChannels);
+					pixel = (m_brush[x * m_brushHeight + y] * m_color * 255).template cast<unsigned char>();
+				}
 			}
 		}
 	}
