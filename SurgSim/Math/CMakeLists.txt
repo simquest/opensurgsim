@@ -18,6 +18,7 @@
 set(SURGSIM_MATH_SOURCES
 	BoxShape.cpp
 	CapsuleShape.cpp
+	CatmullRom.cpp
 	CompoundShape.cpp
 	CylinderShape.cpp
 	DoubleSidedPlaneShape.cpp
@@ -54,6 +55,7 @@ set(SURGSIM_MATH_HEADERS
 	Aabb.h
 	BoxShape.h
 	CapsuleShape.h
+	CatmullRom.h
 	CompoundShape.h
 	CubicSolver.h
 	CubicSolver-inl.h

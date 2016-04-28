@@ -26,69 +26,8 @@
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/OsgConversions.h"
-
-namespace
-{
-
-void retrievePoints(
-	const SurgSim::DataStructures::VerticesPlain& points,
-	std::vector<SurgSim::Math::Vector3d>* result)
-{
-	SURGSIM_ASSERT(points.getNumVertices() >= 2) << "Cannot apply CatmullRom with less than 2 points";
-	result->clear();
-	result->reserve(points.getNumVertices() + 2);
-
-	// Interpolate the 1st point (ghost) as the symmetric of P1 from P0: P-1 = P0 + P1P0
-	result->push_back(2.0 * points.getVertexPosition(0) - points.getVertexPosition(1));
-	for (size_t i = 0; i < points.getNumVertices(); ++i)
-	{
-		result->push_back(points.getVertexPosition(i));
-	}
-	// Interpolate the last point (ghost) as the symmetric of Pn-1 from Pn: Pn+1 = Pn + Pn-1Pn
-	result->push_back(2.0 * points.getVertexPosition(points.getNumVertices() - 1) -
-					  points.getVertexPosition(points.getNumVertices() - 2));
-
-}
-
-void computePoints(int subdivisions,
-				   const std::vector<SurgSim::Math::Vector3d>& controlPoints,
-				   std::vector<SurgSim::Math::Vector3d>* points,
-				   double tau = 0.4)
-{
-	size_t numPoints = controlPoints.size();
-	double stepsize = 1.0 / static_cast<double>(subdivisions);
-	size_t pointIndex = 0;
-	while (pointIndex < numPoints - 3)
-	{
-		std::array<SurgSim::Math::Vector3d, 4> p =
-		{
-			controlPoints[pointIndex] ,
-			controlPoints[pointIndex + 1],
-			controlPoints[pointIndex + 2],
-			controlPoints[pointIndex + 3]
-		};
-
-		double abscissa = 0.0;
-		while (abscissa < 1.0)
-		{
-			double abcissaSquared = abscissa * abscissa;
-			double abcissaCubed = abcissaSquared * abscissa;
-
-			SurgSim::Math::Vector3d result =
-				p[1] +
-				abscissa * (tau * (p[2] - p[0])) +
-				abcissaSquared * (2.0 * tau * p[0] + (tau - 3.0) * p[1] + (3.0 - 2.0 * tau) * p[2] - tau * p[3]) +
-				abcissaCubed * (-tau * p[0] + (2.0 - tau) * p[1] + (tau - 2.0) * p[2] + tau * p[3]);
-
-			points->push_back(std::move(result));
-
-			abscissa += stepsize;
-		}
-		++pointIndex;
-	}
-}
-
-}
+#include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/CatmullRom.h"
 
 namespace SurgSim
 {
@@ -175,14 +114,14 @@ void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain&
 {
 	const double stepsize = 1.0 / (m_subdivision + 1);
 
-	retrievePoints(controlPoints, &m_controlPoints);
+	Math::CatmullRom::extendControlPoints(controlPoints, &m_controlPoints);
 
 	size_t numPoints = static_cast<size_t>(static_cast<double>(m_controlPoints.size() - 3) / stepsize);
 
 	m_vertices.clear();
 	m_vertices.reserve(numPoints);
 
-	computePoints(getSubdivisions(), m_controlPoints, &m_vertices, getTension());
+	Math::CatmullRom::interpolate(getSubdivisions(), m_controlPoints, &m_vertices, getTension());
 
 	size_t vertexCount = m_vertices.size();
 	if (m_vertexData->size() != vertexCount)
