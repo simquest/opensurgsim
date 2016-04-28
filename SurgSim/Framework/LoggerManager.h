@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 #ifndef SURGSIM_FRAMEWORK_LOGGERMANAGER_H
 #define SURGSIM_FRAMEWORK_LOGGERMANAGER_H
 
-#include <unordered_map>
 #include <boost/thread/mutex.hpp>
+#include <unordered_map>
+#include <vector>
 
 namespace SurgSim
 {
