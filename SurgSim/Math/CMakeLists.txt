@@ -45,6 +45,7 @@ set(SURGSIM_MATH_SOURCES
 	ParticlesShape.cpp
 	PlaneShape.cpp
 	SegmentMeshShape.cpp
+	SegmentMeshShapePlyReaderDelegate.cpp
 	Shape.cpp
 	SphereShape.cpp
 	SurfaceMeshShape.cpp
@@ -114,6 +115,7 @@ set(SURGSIM_MATH_HEADERS
 	Scalar-inl.h
 	SegmentMeshShape.h
 	SegmentMeshShape-inl.h
+	SegmentMeshShapePlyReaderDelegate.h
 	SegmentSegmentCcdContactCalculation-inl.h
 	Shape.h
 	Shapes.h
