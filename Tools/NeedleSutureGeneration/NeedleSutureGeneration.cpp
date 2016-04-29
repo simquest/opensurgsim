@@ -216,10 +216,10 @@ int main(int argc, char* argv[])
 									"program will use value(s) from command line if specified.")
 	("needleMassDensity", po::value<double>(), "Mass density for the needle (default 7500 Kg.m-3)")
 	("needlePoissonRatio", po::value<double>(), "Poisson ratio for the needle (default 0.305)")
-	("needleYoungModulus", po::value<double>(), "Young Modulus for the needle (default (180 GPa)")
+	("needleYoungModulus", po::value<double>(), "Young Modulus for the needle (default (1.8e11 Pa)")
 	("sutureMassDensity", po::value<double>(), "Mass density for the suture (default 900 Kg.m-3)")
 	("suturePoissonRatio", po::value<double>(), "Poisson ratio for the suture (default 0.45)")
-	("sutureYoungModulus", po::value<double>(), "Young Modulus for the suture (default 1.75 GPa)");
+	("sutureYoungModulus", po::value<double>(), "Young Modulus for the suture (default 1.75e9 Pa)");
 
 	po::variables_map variables;
 	try
@@ -256,19 +256,19 @@ int main(int argc, char* argv[])
 		boost::property_tree::ini_parser::read_ini(filePath.string(), parameters);
 		needleMassDensity  = parameters.get<double>("PhysicsProperty.needleMassDensity");
 		needlePoissonRatio = parameters.get<double>("PhysicsProperty.needlePoissonRatio");
-		needleYoungModulus = parameters.get<double>("PhysicsProperty.needleYoungModulus") * 1e9;
+		needleYoungModulus = parameters.get<double>("PhysicsProperty.needleYoungModulus");
 		sutureMassDensity  = parameters.get<double>("PhysicsProperty.sutureMassDensity");
 		suturePoissonRatio = parameters.get<double>("PhysicsProperty.suturePoissonRatio");
-		sutureYoungModulus = parameters.get<double>("PhysicsProperty.sutureYoungModulus") * 1e9;
+		sutureYoungModulus = parameters.get<double>("PhysicsProperty.sutureYoungModulus");
 	}
 
 	// Command line values for physics properties will take precedence if specified.
 	if (variables.count("needleMassDensity"))  needleMassDensity  = variables["needleMassDensity"].as<double>();
 	if (variables.count("needlePoissonRatio")) needlePoissonRatio = variables["needlePoissonRatio"].as<double>();
-	if (variables.count("needleYoungModulus")) needleYoungModulus = variables["needleYoungModulus"].as<double>() * 1e9;
+	if (variables.count("needleYoungModulus")) needleYoungModulus = variables["needleYoungModulus"].as<double>();
 	if (variables.count("sutureMassDensity"))  sutureMassDensity  = variables["sutureMassDensity"].as<double>();
 	if (variables.count("suturePoissonRatio")) suturePoissonRatio = variables["suturePoissonRatio"].as<double>();
-	if (variables.count("sutureYoungModulus")) sutureYoungModulus = variables["sutureYoungModulus"].as<double>() * 1e9;
+	if (variables.count("sutureYoungModulus")) sutureYoungModulus = variables["sutureYoungModulus"].as<double>();
 
 	auto needlePoints = generateNeedle(variables["needleSubdivisions"].as<int>(),
 									   variables["needleRadius"].as<double>(),
