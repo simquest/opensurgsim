@@ -164,7 +164,7 @@ void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::createDefaultEd
 
 
 template <class VertexData, class EdgeData>
-bool save(const std::string& fileName,
+bool SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName,
 		  bool asPhysics,
 		  double radius,
 		  double massDensity,
@@ -216,7 +216,7 @@ bool save(const std::string& fileName,
 		if (asPhysics)
 		{
 			out << radius << std::endl;
-			out << massDensity << " " poissonRatio << " " << youngsModulus << std::endl;
+			out << massDensity << " " << poissonRatio << " " << youngsModulus << std::endl;
 		}
 
 		if (out.bad())
