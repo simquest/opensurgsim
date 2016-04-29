@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <math.h>
+#include <cmath>
 
 #include "SurgSim/DataStructures/Image.h"
 #include "SurgSim/Graphics/PaintBehavior.h"
-
+#include "SurgSim/Math/Scalar.h"
 
 namespace SurgSim
 {
@@ -74,7 +74,7 @@ void PaintBehavior::setCoordinates(const std::vector<DataStructures::IndexedLoca
 		Math::Vector2d uv = vertex1.data.texture.getValue() * coordinate.coordinate[0] +
 							vertex2.data.texture.getValue() * coordinate.coordinate[1] +
 							vertex3.data.texture.getValue() * coordinate.coordinate[2];
-		m_paintCoordinates.push_back(uv);
+		m_coordinates.push_back(uv);
 	}
 }
 
@@ -113,20 +113,6 @@ bool PaintBehavior::doWakeUp()
 
 	m_texture->getSize(&m_width, &m_height);
 
-	for (size_t i = 0; i < m_width; i++)
-	{
-		for (size_t j = 0; j < m_height; j++)
-		{
-			auto data = m_texture->getOsgTexture2d()->getImage()->data();
-			auto ptr = data + (j * m_width + i) * 4;
-			*(ptr++) = 0;
-			*(ptr++) = 0;
-			*(ptr++) = 0;
-			*(ptr++) = 0;
-		}
-	}
-	m_texture->getOsgTexture2d()->dirtyTextureObject();
-
 	buildBrush(getRadius());
 
 	return true;
@@ -137,10 +123,10 @@ void PaintBehavior::update(double dt)
 	std::vector<Math::Vector2d> newCoordinates;
 	{
 		std::unique_lock<std::mutex> lock(m_mutex);
-		std::swap(newCoordinates, m_paintCoordinates);
+		std::swap(newCoordinates, m_coordinates);
 	}
 
-	for (Math::Vector2d uv : newCoordinates)
+	for (auto& uv : newCoordinates)
 	{
 		Math::Vector2d xy = toPixel(uv);
 
@@ -152,103 +138,89 @@ void PaintBehavior::update(double dt)
 
 void PaintBehavior::setRadius(double radius)
 {
-	if (radius > 0.0 && radius < 1.0)
-	{
 		m_radius = radius;
-	}
 }
 
-double PaintBehavior::getRadius() const {
+double PaintBehavior::getRadius() const
+{
 	return m_radius;
 }
 
-void PaintBehavior::buildBrush(double radius) {
-	m_brushWidth = static_cast<int>(ceil(2 * radius * m_width));
-	m_brushHeight = static_cast<int>(ceil(2 * radius * m_height));
+void PaintBehavior::buildBrush(double radius)
+{
+	int brushWidth = static_cast<int>(ceil(2 * radius * m_width));
+	int brushHeight = static_cast<int>(ceil(2 * radius * m_height));
 
-	int centerX = m_brushWidth / 2;
-	int centerY = m_brushHeight / 2;
+	int centerX = brushWidth / 2;
+	int centerY = brushHeight / 2;
 
 	m_brushOffsetX = -1 * centerX;
 	m_brushOffsetY = -1 * centerY;
 
-	m_brush.resize(m_brushWidth, m_brushHeight);
+	m_brush.resize(brushWidth, brushHeight);
 
-	for (int i = 0; i < m_brushWidth; i++)
+	for (int i = 0; i < m_brush.cols(); i++)
 	{
-		for (int j = 0; j < m_brushHeight; j++)
+		for (int j = 0; j < m_brush.rows(); j++)
 		{
 			double mag = ((i - centerX) * (i - centerX)) + ((j - centerY) * (j - centerY));
-			if (sqrt(mag) < m_brushWidth / 2.0)
+			if (sqrt(mag) < m_brush.cols() / 2.0)
 			{
-				m_brush(i * m_brushHeight + j) = 1.0;
+				m_brush(i, j) = 1.0;
 			}
 			else
 			{
-				m_brush(i * m_brushHeight + j) = 0.0;
+				m_brush(i, j) = 0.0;
 			}
 		}
 	}
 }
 
-void PaintBehavior::buildAntiAliasedBrush(double radius) {
+void PaintBehavior::buildAntiAliasedBrush(double radius)
+{
 	static const double sqrt2Half = 0.7071067811865475;
 	double dist;
-	m_brushWidth = static_cast<int>(ceil(2 * radius * m_width));
-	m_brushHeight = static_cast<int>(ceil(2 * radius * m_height));
+	int brushWidth = static_cast<int>(ceil(2 * radius * m_width));
+	int brushHeight = static_cast<int>(ceil(2 * radius * m_height));
 
-	int centerX = m_brushWidth / 2;
-	int centerY = m_brushHeight / 2;
+	int centerX = brushWidth / 2;
+	int centerY = brushHeight / 2;
 
 	m_brushOffsetX = -1 * centerX;
 	m_brushOffsetY = -1 * centerY;
 
-	m_brush.resize(m_brushWidth, m_brushHeight);
+	m_brush.resize(brushWidth, brushHeight);
 
-	for (int i = 0; i < m_brushWidth; i++)
+	for (int i = 0; i < m_brush.cols(); i++)
 	{
-		for (int j = 0; j < m_brushHeight; j++)
+		for (int j = 0; j < m_brush.rows(); j++)
 		{
 			double mag = (i - centerX) * (i - centerX) + (j - centerY) * (j - centerY);
-			dist = (m_brushWidth / 2) - sqrt(mag);
-			dist /= m_brushWidth / 2;
+			dist = (m_brush.cols() / 2) - sqrt(mag);
+			dist /= m_brush.cols() / 2;
 			if (dist > sqrt2Half)
 			{
-				m_brush(i * m_brushHeight + j) = 1.0;
+				m_brush(i, j) = 1.0;
 			}
 			else if (dist < 0.0)
 			{
-				m_brush(i * m_brushHeight + j) = 0.0;
+				m_brush(i, j) = 0.0;
 			}
 			else
 			{
-				m_brush(i * m_brushHeight + j) = sqrt(2) * dist;
+				m_brush(i, j) = sqrt(2) * dist;
 			}
 		}
 	}
 }
 
-Math::Vector2d PaintBehavior::toPixel(Math::Vector2d uv) {
+Math::Vector2d PaintBehavior::toPixel(Math::Vector2d uv)
+{
 	double s = uv[0];
 	double t = uv[1];
 
-	if (s > 1.0f)
-	{
-		s = 1.0f;
-	}
-	else if (s < 0.0f)
-	{
-		s = 0.0f;
-	}
-
-	if (t > 1.0f)
-	{
-		t = 1.0f;
-	}
-	else if (t < 0.0f)
-	{
-		t = 0.0f;
-	}
+	s = Math::clamp(s, 0.0, 1.0, 0.0);
+	t = Math::clamp(t, 0.0, 1.0, 0.0);
 
 	Math::Vector2d xy;
 	xy << round(s * m_width), round(t * m_height);
@@ -256,23 +228,24 @@ Math::Vector2d PaintBehavior::toPixel(Math::Vector2d uv) {
 	return xy;
 }
 
-void PaintBehavior::paint(Math::Vector2d coordinates) {
+void PaintBehavior::paint(Math::Vector2d coordinates)
+{
 	int numChannels = 4;
 
 	auto data = m_texture->getOsgTexture2d()->getImage()->data();
 
-	for (size_t x = 0; x < m_brushWidth; x++)
+	for (size_t x = 0; x < m_brush.cols(); x++)
 	{
-		for (size_t y = 0; y < m_brushHeight; y++)
+		for (size_t y = 0; y < m_brush.rows(); y++)
 		{
-			if (m_brush(x * m_brushHeight + y) > 0.0f)
+			if (m_brush(x, y) > 0.0f)
 			{
 				size_t i = static_cast<size_t>(coordinates[0] + m_brushOffsetX + x);
 				size_t j = static_cast<size_t>(coordinates[1] + m_brushOffsetY + y);
 				if (i >= 0 && i < m_width && j >= 0 && j < m_height)
 				{
 					Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (j * m_width + i) * numChannels);
-					pixel = (m_brush(x * m_brushHeight + y) * m_color * 255).template cast<unsigned char>();
+					pixel = (m_brush(x, y) * m_color * 255).template cast<unsigned char>();
 				}
 			}
 		}

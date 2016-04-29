@@ -19,9 +19,9 @@
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgLight.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgTexture2d.h"
 #include "SurgSim/Graphics/PaintBehavior.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
@@ -60,7 +60,7 @@ TEST_F(PaintBehaviorRenderTests, InitTest)
 	lightElement->setPose(makeRigidTranslation(Math::Vector3d(2.0, 2.0, 2.0)));
 	lightElement->addComponent(light);
 	scene->addSceneElement(lightElement);
-	
+
 	auto element = std::make_shared<Framework::BasicSceneElement>("Cube");
 	auto graphics = std::make_shared<Graphics::OsgMeshRepresentation>("Graphics");
 	graphics->loadMesh("Geometry/wound_deformable_with_texture.ply");
@@ -87,7 +87,7 @@ TEST_F(PaintBehaviorRenderTests, InitTest)
 	Blocks::enable2DTexture(material, "shadowMap", Graphics::SHADOW_TEXTURE_UNIT, "Textures/black.png");
 
 	graphics->setMaterial(material);
-	
+
 	element->addComponent(graphics);
 	element->addComponent(material);
 
