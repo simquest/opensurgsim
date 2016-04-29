@@ -26,8 +26,8 @@
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/OsgConversions.h"
-#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/CatmullRom.h"
+#include "SurgSim/Math/Geometry.h"
 
 namespace SurgSim
 {

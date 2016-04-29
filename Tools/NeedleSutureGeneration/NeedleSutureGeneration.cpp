@@ -13,21 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cmath>
+#include <fstream>
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <yaml-cpp/yaml.h>
-
 #include <string>
 #include <vector>
-#include <cmath>
-#include <fstream>
-#include "SurgSim/Math/Vector.h"
+#include <yaml-cpp/yaml.h>
+
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/CatmullRom.h"
+#include "SurgSim/Math/Vector.h"
 
 /// Function to generate points on a circle with radius 'radius'.
 /// \note The points always start from the origin and go on the circle to 'angle'.
