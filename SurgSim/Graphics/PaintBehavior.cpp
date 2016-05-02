@@ -16,6 +16,7 @@
 #include <cmath>
 
 #include "SurgSim/DataStructures/Image.h"
+#include "SurgSim/DataStructures/ImageMap.h"
 #include "SurgSim/Graphics/PaintBehavior.h"
 #include "SurgSim/Math/Scalar.h"
 
@@ -214,7 +215,7 @@ void PaintBehavior::buildAntiAliasedBrush(double radius)
 	}
 }
 
-Math::Vector2d PaintBehavior::toPixel(Math::Vector2d uv)
+Math::Vector2d PaintBehavior::toPixel(const Math::Vector2d& uv)
 {
 	double s = uv[0];
 	double t = uv[1];
@@ -228,11 +229,14 @@ Math::Vector2d PaintBehavior::toPixel(Math::Vector2d uv)
 	return xy;
 }
 
-void PaintBehavior::paint(Math::Vector2d coordinates)
+void PaintBehavior::paint(const Math::Vector2d& coordinates)
 {
 	int numChannels = 4;
 
-	auto data = m_texture->getOsgTexture2d()->getImage()->data();
+	auto image = DataStructures::ImageMap<unsigned char>(m_width,
+														 m_height,
+														 numChannels,
+														 m_texture->getOsgTexture2d()->getImage()->data());
 
 	for (size_t x = 0; x < m_brush.cols(); x++)
 	{
@@ -244,8 +248,7 @@ void PaintBehavior::paint(Math::Vector2d coordinates)
 				size_t j = static_cast<size_t>(coordinates[1] + m_brushOffsetY + y);
 				if (i >= 0 && i < m_width && j >= 0 && j < m_height)
 				{
-					Eigen::Map<Eigen::Matrix<unsigned char, 4, 1>> pixel(data + (j * m_width + i) * numChannels);
-					pixel = (m_brush(x, y) * m_color * 255).template cast<unsigned char>();
+					image(i, j) = (m_brush(x, y) * m_color * 255).template cast<unsigned char>();
 				}
 			}
 		}

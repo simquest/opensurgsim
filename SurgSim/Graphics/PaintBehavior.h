@@ -89,10 +89,10 @@ private:
 	void buildAntiAliasedBrush(double radius);
 
 	/// Convert texture uv coordinates to pixel coordinates
-	Math::Vector2d toPixel(Math::Vector2d uv);
+	Math::Vector2d toPixel(const Math::Vector2d& uv);
 
 	/// Apply paint brush to texture at specified texture coordinates
-	void paint(Math::Vector2d coordinates);
+	void paint(const Math::Vector2d& coordinates);
 
 	/// Graphics representation of the mesh to apply behavior to
 	std::shared_ptr<Graphics::OsgMeshRepresentation> m_representation;
