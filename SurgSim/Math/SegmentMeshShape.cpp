@@ -20,6 +20,7 @@
 #include "SurgSim/DataStructures/AabbTreeData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/SegmentMeshShapePlyReaderDelegate.h"
 
 
 namespace SurgSim
@@ -91,7 +92,24 @@ bool SegmentMeshShape::doUpdate()
 
 bool SegmentMeshShape::doLoad(const std::string& fileName)
 {
-	return DataStructures::SegmentMeshPlain::doLoad(fileName) && update();
+	DataStructures::PlyReader reader(fileName);
+	if (!reader.isValid())
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "'" << fileName << "' is an invalid .ply file.";
+		return false;
+	}
+
+	auto delegate = std::make_shared<SegmentMeshShapePlyReaderDelegate>(
+						std::dynamic_pointer_cast<SegmentMeshShape>(this->shared_from_this()));
+	if (!reader.parseWithDelegate(delegate))
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "The input file '" << fileName << "' does not have the property required by segment mesh.";
+		return false;
+	}
+
+	return true;
 }
 
 std::shared_ptr<const DataStructures::AabbTree> SegmentMeshShape::getAabbTree() const
@@ -128,6 +146,7 @@ void SegmentMeshShape::updateAabbTree()
 		}
 	}
 	m_aabbTree->set(std::move(items));
+	m_aabb = m_aabbTree->getAabb();
 }
 
 bool SegmentMeshShape::isTransformable() const

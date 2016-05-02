@@ -31,6 +31,8 @@ namespace SurgSim
 namespace Math
 {
 
+SURGSIM_STATIC_REGISTRATION(CompoundShape);
+
 class CompoundShape : public Shape
 {
 public:
@@ -39,6 +41,8 @@ public:
 
 	/// Destructor
 	~CompoundShape();
+
+	SURGSIM_CLASSNAME(SurgSim::Math::CompoundShape);
 
 	typedef std::pair<std::shared_ptr<Shape>, RigidTransform3d> SubShape;
 

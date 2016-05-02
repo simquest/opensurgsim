@@ -22,6 +22,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Math/CompoundShape.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Physics/Representation.h"
 
 
@@ -41,6 +42,8 @@ CompoundShapeToGraphics::CompoundShapeToGraphics(const std::string& name) : Fram
 	}
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CompoundShapeToGraphics, std::shared_ptr<Component>,
 									  Source, getSource, setSource);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CompoundShapeToGraphics, std::shared_ptr<SurgSim::Math::Shape>,
+									  Shape, getShape, setShape);
 }
 
 CompoundShapeToGraphics::~CompoundShapeToGraphics()
@@ -89,12 +92,14 @@ bool CompoundShapeToGraphics::doWakeUp()
 	return true;
 }
 
-void CompoundShapeToGraphics::setShape(const std::shared_ptr<Math::CompoundShape>& shape)
+void CompoundShapeToGraphics::setShape(const std::shared_ptr<Math::Shape>& shape)
 {
 	SURGSIM_ASSERT(m_source == nullptr) << "Can't assign the shape and the source at the same time.";
 	SURGSIM_ASSERT(shape != nullptr) << "Shape should not be nullptr.";
+	auto compoundShape = std::dynamic_pointer_cast<SurgSim::Math::CompoundShape>(shape);
+	SURGSIM_ASSERT(compoundShape != nullptr) << "'shape' is not a SurgSim::Math::CompoundShape.";
 
-	m_shape = shape;
+	m_shape = compoundShape;
 	m_source = nullptr;
 }
 

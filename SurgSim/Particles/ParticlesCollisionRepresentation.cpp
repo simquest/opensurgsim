@@ -40,12 +40,6 @@ ParticlesCollisionRepresentation::~ParticlesCollisionRepresentation()
 {
 }
 
-void ParticlesCollisionRepresentation::update(const double& dt)
-{
-	*m_shape = getParticleRepresentation()->getParticles().unsafeGet();
-	invalidatePosedShapeMotion();
-}
-
 bool ParticlesCollisionRepresentation::doInitialize()
 {
 	return true;
@@ -102,6 +96,12 @@ void ParticlesCollisionRepresentation::setParticleRadius(double radius)
 double ParticlesCollisionRepresentation::getParticleRadius() const
 {
 	return m_shape->getRadius();
+}
+
+void ParticlesCollisionRepresentation::updateShapeData()
+{
+	*m_shape = getParticleRepresentation()->getParticles().unsafeGet();
+	invalidatePosedShapeMotion();
 }
 
 };

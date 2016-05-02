@@ -68,6 +68,10 @@ public:
 	/// \return All the managers from the runtime
 	std::vector<std::weak_ptr<ComponentManager>> getManagers() const;
 
+	/// \return The first manager of type T that is found nullptr otherwise
+	template <class T>
+	std::shared_ptr<T> getManager() const;
+
 	/// \return The scene to be used for this runtime. Use this for any kind of scene manipulation.
 	std::shared_ptr<Scene> getScene();
 
@@ -211,6 +215,22 @@ private:
 
 	bool m_isStopped;
 };
+
+template <class T>
+std::shared_ptr<T>
+SurgSim::Framework::Runtime::getManager() const
+{
+	std::shared_ptr<T> result;
+	for (auto& manager : m_managers)
+	{
+		result = std::dynamic_pointer_cast<T>(manager);
+		if (result != nullptr)
+		{
+			return result;
+		}
+	}
+	return result;
+}
 
 /// Perform a YAML load operation
 /// \param fileName the filename of the scene to be loaded, needs to be found

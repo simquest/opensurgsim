@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Devices/Novint/NovintScaffold.h"
+#include "SurgSim/Math/MathConvert.h"
 
 using SurgSim::DataStructures::OptionalValue;
 
@@ -29,13 +30,21 @@ SURGSIM_REGISTER(SurgSim::Input::DeviceInterface, SurgSim::Devices::NovintDevice
 
 NovintDevice::NovintDevice(const std::string& uniqueName) :
 	Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
-	m_positionScale(1.0), m_orientationScale(1.0), m_7DofDevice(false)
+	m_positionScale(1.0), 
+	m_orientationScale(1.0), 
+	m_7DofDevice(false), 
+	m_maxForce(8.9), 
+	m_antigrav(Math::Vector3d::Zero())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, OptionalValue<std::string>, InitializationName,
 		getOptionalInitializationName, setOptionalInitializationName);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, OptionalValue<std::string>, SerialNumber,
 		getOptionalSerialNumber, setOptionalSerialNumber);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, bool, 7DofDevice, is7DofDevice, set7DofDevice);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, PositionScale, getPositionScale, setPositionScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, OrientationScale, getOrientationScale, setOrientationScale);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, MaxForce, getMaxForce, setMaxForce);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, Math::Vector3d, Antigrav, getAntigrav, setAntigrav);
 }
 
 NovintDevice::~NovintDevice()
@@ -149,6 +158,31 @@ void NovintDevice::set7DofDevice(bool val)
 bool NovintDevice::is7DofDevice() const
 {
 	return m_7DofDevice;
+}
+
+void NovintDevice::setMaxForce(double force)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Cannot setMaxForce after the device named " << getName() << " has been initialized.";
+	SURGSIM_ASSERT(force >= 0.0) << "Cannot set a negative maximum force magnitude on device named " << getName();
+	m_maxForce = force;
+}
+
+double NovintDevice::getMaxForce() const
+{
+	return m_maxForce;
+}
+
+void NovintDevice::setAntigrav(Math::Vector3d antigrav)
+{
+	SURGSIM_ASSERT(!isInitialized()) <<
+		"Cannot setAntigrav after the device named " << getName() << " has been initialized.";
+	m_antigrav = antigrav;
+}
+
+Math::Vector3d NovintDevice::getAntigrav() const
+{
+	return m_antigrav;
 }
 
 const OptionalValue<std::string>& NovintDevice::getOptionalInitializationName() const

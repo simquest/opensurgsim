@@ -24,7 +24,7 @@
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-6;
 };
 
 using SurgSim::Graphics::OsgVectorFieldRepresentation;
@@ -60,4 +60,20 @@ TEST(OsgVectorFieldRepresentationTests, PointSizeTest)
 		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
 	vectorFieldRepresentation->setPointSize(1.25);
 	EXPECT_NEAR(1.25, vectorFieldRepresentation->getPointSize(), epsilon);
+}
+
+TEST(OsgVectorFieldRepresentation, Properties)
+{
+	auto representation = std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
+	EXPECT_EQ("SurgSim::Graphics::OsgVectorFieldRepresentation", representation->getClassName());
+
+	EXPECT_NO_THROW(representation->setValue("Scale", 2.34));
+	EXPECT_NEAR(2.34, representation->getValue<double>("Scale"), epsilon);
+
+	EXPECT_NO_THROW(representation->setValue("LineWidth", 4.56));
+	EXPECT_NEAR(4.56, representation->getValue<double>("LineWidth"), epsilon);
+
+	EXPECT_NO_THROW(representation->setValue("PointSize", 7.89));
+	EXPECT_NEAR(7.89, representation->getValue<double>("PointSize"), epsilon);
+
 }

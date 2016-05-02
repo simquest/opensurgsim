@@ -80,22 +80,31 @@ void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::share
 
 std::shared_ptr<Math::Shape> Representation::getPosedShape()
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-	Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
-	Math::RigidTransform3d pose = getPose();
-	if (pose.isApprox(identity))
+	if (getShape()->isTransformable())
 	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-		m_posedShapeMotion.second = newPosedShape;
-	}
-	else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
-	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
-		m_posedShapeMotion.second = newPosedShape;
-	}
+		// HS-3-mar-2016 This is still being used by all representations it will be superceded by
+		// local update functionality after ryans merge request goes in
+		// #todo get rid of this in favor of transforming the mesh shape
+		boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
 
-	return m_posedShapeMotion.second.getShape();
+		Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
+		Math::RigidTransform3d pose = getPose();
+		if (pose.isApprox(identity))
+		{
+			Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
+			m_posedShapeMotion.second = newPosedShape;
+		}
+		else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
+		{
+			Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
+			m_posedShapeMotion.second = newPosedShape;
+		}
+		return m_posedShapeMotion.second.getShape();
+	}
+	else
+	{
+		return getShape();
+	}
 }
 
 void Representation::invalidatePosedShapeMotion()
@@ -126,6 +135,10 @@ bool Representation::collidedWith(const std::shared_ptr<Representation>& other)
 
 void Representation::update(const double& dt)
 {
+	// HS-2-Mar-2016
+	// #todo if we decide to keep this it should be used to make a threadsafe copy of the data and enable outside
+	// access to it, this can then be used by a behavior to access the correct shape
+	// currently this is unused
 }
 
 bool Representation::ignore(const std::string& fullName)
@@ -274,6 +287,21 @@ Math::Aabbd Representation::getBoundingBox() const
 {
 	SURGSIM_ASSERT(getShape() != nullptr);
 	return Math::transformAabb(getPose(), getShape()->getBoundingBox());
+}
+
+void Representation::updateDcdData()
+{
+
+}
+
+void Representation::updateCcdData()
+{
+
+}
+
+void Representation::updateShapeData()
+{
+	getPosedShape();
 }
 
 }; // namespace Collision

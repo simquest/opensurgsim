@@ -536,6 +536,14 @@ TEST_F(FemRepresentationTests, SerializationTest)
 	EXPECT_NO_THROW(fem->setValue("ComplianceWarping", false));
 	EXPECT_FALSE(fem->getComplianceWarping());
 	EXPECT_FALSE(fem->getValue<bool>("ComplianceWarping"));
+
+	EXPECT_NO_THROW(fem->setValue("RayleighDampingMass", 1.1));
+	EXPECT_NO_THROW(fem->getValue<double>("RayleighDampingMass"));
+	EXPECT_DOUBLE_EQ(1.1, fem->getValue<double>("RayleighDampingMass"));
+
+	EXPECT_NO_THROW(fem->setValue("RayleighDampingStiffness", 2.2));
+	EXPECT_NO_THROW(fem->getValue<double>("RayleighDampingStiffness"));
+	EXPECT_DOUBLE_EQ(2.2, fem->getValue<double>("RayleighDampingStiffness"));
 }
 
 TEST_F(FemRepresentationTests, SetInitialStateTest)
