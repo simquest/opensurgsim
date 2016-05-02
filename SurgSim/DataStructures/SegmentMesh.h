@@ -92,6 +92,13 @@ public:
 			  double poissonRatio = 0.45,
 			  double youngsModulus = 1.75e9);
 
+	using TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::addEdge;
+	using TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::doClearEdges;
+	using TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::getNumEdges;
+	using TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::getNumVertices;
+	using TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::getEdges;
+	using TriangleMesh<VertexData, EdgeData, SegmentEmptyData>::getVertices;
+
 	///@{
 	/// Functions that need to assert, because they deal with triangles.
 	size_t addTriangle(const TriangleType& triangle);
