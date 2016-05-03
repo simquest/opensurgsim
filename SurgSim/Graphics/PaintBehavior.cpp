@@ -238,14 +238,14 @@ void PaintBehavior::paint(const Math::Vector2d& coordinates)
 														 numChannels,
 														 m_texture->getOsgTexture2d()->getImage()->data());
 
-	for (size_t x = 0; x < m_brush.cols(); x++)
+	for (int x = 0; x < m_brush.cols(); x++)
 	{
-		for (size_t y = 0; y < m_brush.rows(); y++)
+		for (int y = 0; y < m_brush.rows(); y++)
 		{
 			if (m_brush(x, y) > 0.0f)
 			{
-				size_t i = static_cast<size_t>(coordinates[0] + m_brushOffsetX + x);
-				size_t j = static_cast<size_t>(coordinates[1] + m_brushOffsetY + y);
+				int i = static_cast<int>(coordinates[0] + m_brushOffsetX + x);
+				int j = static_cast<int>(coordinates[1] + m_brushOffsetY + y);
 				if (i >= 0 && i < m_width && j >= 0 && j < m_height)
 				{
 					image(i, j) = (m_brush(x, y) * m_color * 255).template cast<unsigned char>();
