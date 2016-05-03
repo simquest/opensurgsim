@@ -97,15 +97,21 @@ private:
 							 double epsilon,
 							 double contactTime);
 
+	/// Backs up all current contacts into oldContacts and then clears the ccdPairs
+	/// \param ccdPairs the list of current contact pairs
+	/// \param oldContacts the backup of the contacts
 	void backupContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 						std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+
+	/// Adds all of the backed up contacts back into the current contacts
+	/// \param ccdPairs the list of current contact pairs
+	/// \param oldContacts the backup of the contacts
 	void restoreContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 						 std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
-	void printContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs);
 
-	/// remove all the contacts from ccdPairs
-	/// \param ccdPairs list of pairs for removal
-	void clearContacts(std::vector<std::shared_ptr<Collision::CollisionPair>> ccdPairs);
+	/// Logs all of the contacts
+	/// \param ccdPairs the list of current contact pairs
+	void printContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs);
 
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };

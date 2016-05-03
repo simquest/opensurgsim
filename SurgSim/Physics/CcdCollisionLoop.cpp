@@ -88,6 +88,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 		{
 			break;
 		}
+		restoreContacts(ccdPairs, &oldContacts);
 
 		filterLaterContacts(ccdPairs, epsilon, localTimeOfImpact);
 		restoreContacts(ccdPairs, &oldContacts);
@@ -106,7 +107,6 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 										 timeOfImpact << ")" << std::endl;
 			break;
 		}
-
 	}
 
 	SURGSIM_LOG_IF(iterations == m_maxIterations, m_logger, WARNING) << "Maxed out iterations (" << m_maxIterations << ")";
