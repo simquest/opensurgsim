@@ -31,13 +31,13 @@ void extendControlPoints(const SurgSim::DataStructures::VerticesPlain& points,
 	result->clear();
 	result->reserve(points.getNumVertices() + 2);
 
-	// Interpolate the 1st point (ghost) as the symmetric of P1 from P0: P-1 = P0 + P1P0
+	// Interpolate the 1st point (ghost) as the symmetric of P1 from P0: P-1 = P0 - (P1 - P0)
 	result->push_back(2.0 * points.getVertexPosition(0) - points.getVertexPosition(1));
 	for (size_t i = 0; i < points.getNumVertices(); ++i)
 	{
 		result->push_back(points.getVertexPosition(i));
 	}
-	// Interpolate the last point (ghost) as the symmetric of Pn-1 from Pn: Pn+1 = Pn + Pn-1Pn
+	// Interpolate the last point (ghost) as the symmetric of Pn-1 from Pn: Pn+1 = Pn - (Pn-1 - Pn)
 	result->push_back(2.0 * points.getVertexPosition(points.getNumVertices() - 1) -
 							points.getVertexPosition(points.getNumVertices() - 2));
 }
