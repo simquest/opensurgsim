@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 #include <random>
+#include <boost/filesystem.hpp>
 
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
@@ -183,7 +184,7 @@ public:
 
 	void TearDown()
 	{
-
+		boost::filesystem::remove("export.ply");
 	}
 
 	/// Positions of test vertices
@@ -542,12 +543,62 @@ TEST_F(SegmentMeshTest, AssertingFunctions)
 	EXPECT_THROW(mesh.doClearTriangles(), SurgSim::Framework::AssertionFailure);
 }
 
+TEST_F(SegmentMeshTest, CreateDefaultedges)
+{
+	MockSegmentMesh mesh;
+	for (size_t i = 0; i < 10; ++i)
+	{
+		mesh.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0));
+	}
+
+	mesh.createDefaultEdges();
+	EXPECT_EQ(9, mesh.getNumEdges());
+	for (size_t i = 0; i < mesh.getNumEdges(); ++i)
+	{
+		EXPECT_EQ(i, mesh.getEdge(i).verticesId[0]);
+		EXPECT_EQ(i + 1, mesh.getEdge(i).verticesId[1]);
+	}
+}
+
 TEST_F(SegmentMeshTest, LoadMesh)
 {
 	auto mesh = std::make_shared<SegmentMeshPlain>();
 	SurgSim::Framework::ApplicationData data("config.txt");
 
 	mesh->load("SegmentMeshTest/segmentmesh.ply", data);
+
+	ASSERT_EQ(4u, mesh->getNumVertices());
+	ASSERT_EQ(3u, mesh->getNumEdges());
+
+	auto edge = mesh->getEdge(0);
+	ASSERT_EQ(0u, edge.verticesId[0]);
+	ASSERT_EQ(1u, edge.verticesId[1]);
+
+	edge = mesh->getEdge(1);
+	ASSERT_EQ(1u, edge.verticesId[0]);
+	ASSERT_EQ(2u, edge.verticesId[1]);
+
+	edge = mesh->getEdge(2);
+	ASSERT_EQ(2u, edge.verticesId[0]);
+	ASSERT_EQ(3u, edge.verticesId[1]);
+}
+
+
+
+TEST_F(SegmentMeshTest, WriteMesh)
+{
+	auto mesh = std::make_shared<SegmentMeshPlain>();
+	SurgSim::Framework::ApplicationData data("config.txt");
+
+	mesh->load("SegmentMeshTest/segmentmesh.ply", data);
+
+	EXPECT_NO_THROW(mesh->save("export.ply"));
+
+	std::vector<std::string> paths(1, ".");
+	SurgSim::Framework::ApplicationData localPath(paths);
+
+	auto loaded = std::make_shared<SegmentMeshPlain>();
+	EXPECT_NO_THROW(loaded->load("export.ply", localPath));
 
 	ASSERT_EQ(4u, mesh->getNumVertices());
 	ASSERT_EQ(3u, mesh->getNumEdges());

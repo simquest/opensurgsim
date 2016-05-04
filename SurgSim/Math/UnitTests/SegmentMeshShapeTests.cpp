@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Aabb.h"
 #include "SurgSim/Math/Geometry.h"
@@ -101,7 +102,7 @@ TEST_F(SegmentMeshShapeTest, TransformTest)
 
 	// Transform into a new mesh
 	auto newShape = std::dynamic_pointer_cast<SegmentMeshShape>(shape->getTransformed(
-		makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(0.0, 1.0, 0.0)), Vector3d(0.0, 10.0, 0.0))));
+						makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(0.0, 1.0, 0.0)), Vector3d(0.0, 10.0, 0.0))));
 
 	EXPECT_TRUE(Vector3d(-10.0, 0.0, 10.0).isApprox(newShape->getVertex(0).position));
 	EXPECT_TRUE(Vector3d(0.0, 10.0, 0.0).isApprox(newShape->getVertex(1).position));
@@ -115,4 +116,29 @@ TEST_F(SegmentMeshShapeTest, TransformTest)
 	EXPECT_TRUE(Vector3d(-10.0, 0.0, 10.0).isApprox(mesh->getVertex(0).position));
 	EXPECT_TRUE(Vector3d(0.0, 10.0, 0.0).isApprox(mesh->getVertex(1).position));
 	EXPECT_TRUE(Vector3d(10.0, 20.0, -10.0).isApprox(mesh->getVertex(2).position));
+}
+
+TEST_F(SegmentMeshShapeTest, LoadShape)
+{
+	auto mesh = std::make_shared<SegmentMeshShape>();
+	SurgSim::Framework::ApplicationData data("config.txt");
+
+	mesh->load("segmentmesh.ply", data);
+
+	ASSERT_EQ(4u, mesh->getNumVertices());
+	ASSERT_EQ(3u, mesh->getNumEdges());
+
+	auto edge = mesh->getEdge(0);
+	ASSERT_EQ(0u, edge.verticesId[0]);
+	ASSERT_EQ(1u, edge.verticesId[1]);
+
+	edge = mesh->getEdge(1);
+	ASSERT_EQ(1u, edge.verticesId[0]);
+	ASSERT_EQ(2u, edge.verticesId[1]);
+
+	edge = mesh->getEdge(2);
+	ASSERT_EQ(2u, edge.verticesId[0]);
+	ASSERT_EQ(3u, edge.verticesId[1]);
+
+	EXPECT_DOUBLE_EQ(1.234, mesh->getRadius());
 }

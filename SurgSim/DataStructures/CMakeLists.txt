@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,6 +54,10 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	Groups-inl.h
 	Image.h
 	Image-inl.h
+	ImageBase.h
+	ImageBase-inl.h
+	ImageMap.h
+	ImageMap-inl.h
 	IndexDirectory.h
 	IndexedLocalCoordinate.h
 	Location.h
