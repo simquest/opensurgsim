@@ -88,9 +88,8 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 		{
 			break;
 		}
-		restoreContacts(ccdPairs, &oldContacts);
-
 		filterLaterContacts(ccdPairs, epsilon, localTimeOfImpact);
+
 		restoreContacts(ccdPairs, &oldContacts);
 
 		ccdState = m_constraintGeneration->update(dt, ccdState);
