@@ -38,8 +38,8 @@ void extendControlPoints(const SurgSim::DataStructures::VerticesPlain& points,
 						 std::vector<SurgSim::Math::Vector3d>* result);
 
 /// Run Cardinal Splines interpolation on 'controlPoints'.
-/// See https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline 
-/// https://en.wikipedia.org/wiki/Cubic_Hermite_spline 
+/// See https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline
+/// https://en.wikipedia.org/wiki/Cubic_Hermite_spline
 /// https://people.cs.clemson.edu/~dhouse/courses/405/notes/splines.pdf
 /// https://www.cs.utexas.edu/~fussell/courses/cs384g/lectures/lecture16-Interpolating_curves.pdf for more details.
 /// \param subdivisions Number of interpolated points between each pair of control points.
