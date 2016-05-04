@@ -14,13 +14,13 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Math/CatmullRom.h"
+#include "SurgSim/Math/CardinalSplines.h"
 
 namespace SurgSim
 {
 namespace Math
 {
-namespace CatmullRom
+namespace CardinalSplines
 {
 
 void extendControlPoints(const SurgSim::DataStructures::VerticesPlain& points,
@@ -47,7 +47,7 @@ void interpolate(size_t subdivisions,
 				 std::vector<SurgSim::Math::Vector3d>* points,
 				 double tau)
 {
-	SURGSIM_ASSERT(controlPoints.size() >= 4) << "Cannot apply CatmullRom with less than 4 points";
+	SURGSIM_ASSERT(controlPoints.size() >= 4) << "Cannot apply Cardinal Splines interpolation with less than 4 points";
 	size_t numPoints = controlPoints.size();
 	double stepsize = 1.0 / static_cast<double>(subdivisions);
 	for (size_t pointIndex = 0; pointIndex < numPoints - 3; ++pointIndex)
@@ -84,6 +84,6 @@ void interpolate(size_t subdivisions,
 	}
 }
 
-}; // namespace CatmullRom
+}; // namespace CardinalSplines
 }; // namespace Math
 }; // namespace SurgSim

@@ -26,7 +26,7 @@
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Math/CatmullRom.h"
+#include "SurgSim/Math/CardinalSplines.h"
 #include "SurgSim/Math/Vector.h"
 
 /// Function to generate points on a circle with radius 'radius'.
@@ -94,7 +94,7 @@ std::vector<SurgSim::Math::Vector3d> generateSuture(size_t subdivisions, double 
 	}
 
 	std::vector<SurgSim::Math::Vector3d> result;
-	SurgSim::Math::CatmullRom::interpolate(subdivisions, controlPoints, &result);
+	SurgSim::Math::CardinalSplines::interpolate(subdivisions, controlPoints, &result);
 
 	return result;
 }

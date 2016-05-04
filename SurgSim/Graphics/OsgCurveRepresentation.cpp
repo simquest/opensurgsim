@@ -26,7 +26,7 @@
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Graphics/OsgConversions.h"
-#include "SurgSim/Math/CatmullRom.h"
+#include "SurgSim/Math/CardinalSplines.h"
 #include "SurgSim/Math/Geometry.h"
 
 namespace SurgSim
@@ -114,14 +114,14 @@ void OsgCurveRepresentation::updateGraphics(const DataStructures::VerticesPlain&
 {
 	const double stepsize = 1.0 / (m_subdivision + 1);
 
-	Math::CatmullRom::extendControlPoints(controlPoints, &m_controlPoints);
+	Math::CardinalSplines::extendControlPoints(controlPoints, &m_controlPoints);
 
 	size_t numPoints = static_cast<size_t>(static_cast<double>(m_controlPoints.size() - 3) / stepsize);
 
 	m_vertices.clear();
 	m_vertices.reserve(numPoints);
 
-	Math::CatmullRom::interpolate(getSubdivisions(), m_controlPoints, &m_vertices, getTension());
+	Math::CardinalSplines::interpolate(getSubdivisions(), m_controlPoints, &m_vertices, getTension());
 
 	size_t vertexCount = m_vertices.size();
 	if (m_vertexData->size() != vertexCount)
