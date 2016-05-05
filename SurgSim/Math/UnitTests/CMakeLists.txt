@@ -20,6 +20,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	AabbTests.cpp
+	CardinalSplinesTests.cpp
 	CompoundShapeTests.cpp
 	CubicSolverTests.cpp
 	GeometryTests.cpp
