@@ -63,8 +63,6 @@ public:
 	friend class CcdCollisionLoopTest_FilterContactsWithEpsilon_Test;
 	///@}
 
-	PhysicsManager* manager;
-
 private:
 	///@{
 	/// Computations
@@ -85,7 +83,7 @@ private:
 
 	/// Takes all the contacts from ccdPairs, finds the first contact wrt contact time
 	/// \param ccdPairs the list of pairs that should be checked for contacts
-	/// \param [out] currentTimeOfmpact the earliest contact time found in ccdPairs + epsilon
+	/// \param [out] currentTimeOfmpact the earliest contact time found in ccdPairs
 	/// \return true if there were any contacts found in ccdPairs
 	bool findEarliestContact(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 							 double* currentTimeOfImpact);
@@ -93,20 +91,21 @@ private:
 	/// Removes all contacts with contact time greater than the first contact time + epsilon
 	/// \param ccdPairs the list of pairs that should be checked for contacts
 	/// \param epsilon the epsilon to be added to the first contactTime for filtering
-	void filterLaterContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+	void filterLaterContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
 							 double epsilon,
 							 double contactTime);
 
 	/// Backs up all current contacts into oldContacts and then clears the ccdPairs
 	/// \param ccdPairs the list of current contact pairs
 	/// \param oldContacts the backup of the contacts
-	void backupContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+	void backupContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
 						std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
 
-	/// Adds all of the backed up contacts back into the current contacts
+	/// Adds all of the backed up contacts back into the current contacts. Contacts already in 'ccdPairs'
+	/// will be kept..
 	/// \param ccdPairs the list of current contact pairs
 	/// \param oldContacts the backup of the contacts
-	void restoreContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+	void restoreContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
 						 std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
 
 	/// Logs all of the contacts

@@ -176,17 +176,11 @@ public:
 	void setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping);
 
 	/// Set the time of impact
-	/// \param toi the time of impact for CCD
-	void setTimeOfImpact(double toi)
-	{
-		m_toi = toi;
-	}
+	/// \param timeOfImpact the time of impact for CCD
+	void setTimeOfImpact(double timeOfImpact);
 
 	/// \return the last time of impact when a CCD calculation ran
-	double getTimeOfImpact()
-	{
-		return m_toi;
-	}
+	double getTimeOfImpact();
 
 	/// \return whether to abort a grouped computation by the calling group
 	bool shouldAbortGroup() const;
@@ -251,7 +245,7 @@ private:
 	bool m_abortGroup;
 
 	/// last time of impact for a CCD calculation
-	double m_toi;
+	double m_timeOfImpact;
 };
 
 }; // Physics

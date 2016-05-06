@@ -36,8 +36,8 @@ public:
 	/// Destructor
 	~UpdateCcdData();
 
-	/// Change of behavior, the value transported is not the complete 'dt' but is is the percentage of the last interval
-	/// where the pervious impact was found, this is to trigger the correct interpolation of the state from the previous
+	/// Change of behavior, the value transported is not the complete 'interval' but is the percentage of the last interval
+	/// where the previous impact was found, this is to trigger the correct interpolation of the state from the previous
 	/// state to the interpolated state. This value is relative to the last interval to match the behavior of the
 	/// rest of the system
 	/// \param interval Parameter to be used to interpolate the previousPhysicsState

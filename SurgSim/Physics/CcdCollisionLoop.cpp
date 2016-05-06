@@ -88,21 +88,22 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 		{
 			break;
 		}
-		filterLaterContacts(ccdPairs, epsilon, localTimeOfImpact);
+		filterLaterContacts(&ccdPairs, epsilon, localTimeOfImpact);
 
-		restoreContacts(ccdPairs, &oldContacts);
+		restoreContacts(&ccdPairs, &oldContacts);
 
 		ccdState = m_constraintGeneration->update(dt, ccdState);
 		ccdState = m_buildMlcp->update(dt, ccdState);
 		ccdState = m_solveMlcp->update(dt, ccdState);
 		ccdState = m_pushResults->update(dt, ccdState);
 
-		backupContacts(ccdPairs, &oldContacts);
+		backupContacts(&ccdPairs, &oldContacts);
 
 		timeOfImpact += (1.0 - timeOfImpact) * localTimeOfImpact;
 		if (timeOfImpact > 1.0)
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Calculated toi is greater than the parametric upper bound of 1.0 (" <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Calculated time of impact is greater " <<
+										 "than the parametric upper bound of 1.0 (" <<
 										 timeOfImpact << ")" << std::endl;
 			break;
 		}
@@ -117,15 +118,16 @@ bool CcdCollisionLoop::findEarliestContact(
 	const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 	double* currentTimeOfImpact)
 {
-	SURGSIM_ASSERT(currentTimeOfImpact != nullptr);
+	SURGSIM_ASSERT(currentTimeOfImpact != nullptr) << "Please provide a valid currentTimeOfImpact variable";
 
 	double timeOfImpact = std::numeric_limits<double>::max();
 
 	// Find earliest time of impact
-	for (const auto& pair : ccdPairs)
+	for (auto& pair : ccdPairs)
 	{
 		std::for_each(pair->getContacts().begin(),
-					  pair->getContacts().end(), [&timeOfImpact](const std::shared_ptr<Collision::Contact>& contact)
+					  pair->getContacts().end(),
+					  [&timeOfImpact](const std::shared_ptr<Collision::Contact>& contact)
 		{
 			timeOfImpact = std::min<double>(timeOfImpact, contact->time);
 		});
@@ -143,11 +145,11 @@ bool CcdCollisionLoop::findEarliestContact(
 }
 
 void CcdCollisionLoop::filterLaterContacts(
-	const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+	std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
 	double epsilon,
 	double timeOfImpact)
 {
-	for (const auto& pair : ccdPairs)
+	for (auto& pair : (*ccdPairs))
 	{
 		pair->getContacts().remove_if([timeOfImpact, epsilon](const std::shared_ptr<Collision::Contact>& contact)
 		{
@@ -156,28 +158,30 @@ void CcdCollisionLoop::filterLaterContacts(
 	}
 }
 
-void CcdCollisionLoop::backupContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+void CcdCollisionLoop::backupContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
 									  std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts)
 {
-	for (auto& pair : ccdPairs)
+	SURGSIM_ASSERT(oldContacts != nullptr) << "Invalid container found.";
+	for (auto& pair : (*ccdPairs))
 	{
 		oldContacts->push_back(std::move(pair->getContacts()));
 		pair->getContacts().clear();
 	}
 }
 
-void CcdCollisionLoop::restoreContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+void CcdCollisionLoop::restoreContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
 									   std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts)
 {
+	SURGSIM_ASSERT(oldContacts != nullptr) << "Invalid container found.";
 	if (oldContacts->size() == 0)
 	{
 		return;
 	}
 
-	SURGSIM_ASSERT(oldContacts->size() == ccdPairs.size());
+	SURGSIM_ASSERT(oldContacts->size() == ccdPairs->size()) << "Contact size exception detected";
 	for (size_t i = 0; i < oldContacts->size(); ++i)
 	{
-		auto& newContacts = ccdPairs[i]->getContacts();
+		auto& newContacts = ccdPairs->at(i)->getContacts();
 		newContacts.splice(newContacts.end(), std::move(oldContacts->at(i)));
 	}
 	oldContacts->clear();
@@ -195,7 +199,8 @@ void CcdCollisionLoop::printContacts(const std::vector<std::shared_ptr<Collision
 			contactCount++;
 		}
 	}
-	SURGSIM_LOG_IF(contactCount != 0, m_logger, DEBUG) << "Number of Contacts: " << contactCount << std::endl << out.str();
+	SURGSIM_LOG_IF(contactCount != 0, m_logger, DEBUG) << "Number of Contacts: " <<
+			contactCount << std::endl << out.str();
 }
 }
 }
