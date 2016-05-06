@@ -30,6 +30,9 @@ PaintBehavior::PaintBehavior(const std::string& name) :
 	m_height(0),
 	m_radius(0)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, std::shared_ptr<Framework::Component>, Representation,
+									  getRepresentation, setRepresentation);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, Math::Vector4d, Color, getColor, setColor);
 }
 
 void PaintBehavior::setRepresentation(std::shared_ptr<Framework::Component> representation)
@@ -231,27 +234,23 @@ Math::Vector2d PaintBehavior::toPixel(const Math::Vector2d& uv)
 
 void PaintBehavior::paint(const Math::Vector2d& coordinates)
 {
-	int numChannels = 4;
+	size_t numChannels = 4;
 
 	auto image = DataStructures::ImageMap<unsigned char>(m_width,
 														 m_height,
 														 numChannels,
 														 m_texture->getOsgTexture2d()->getImage()->data());
 
-	for (int x = 0; x < m_brush.cols(); x++)
+	size_t i = static_cast<int>(std::max(0.0, coordinates[0] + m_brushOffsetX));
+	size_t j = static_cast<int>(std::max(0.0, coordinates[1] + m_brushOffsetY));
+	size_t p = std::min(m_width - i, static_cast<size_t>(m_brush.cols()));
+	size_t q = std::min(m_height - j, static_cast<size_t>(m_brush.rows()));
+	for (size_t channel = 0; channel < numChannels; channel++)
 	{
-		for (int y = 0; y < m_brush.rows(); y++)
-		{
-			if (m_brush(x, y) > 0.0f)
-			{
-				int i = static_cast<int>(coordinates[0] + m_brushOffsetX + x);
-				int j = static_cast<int>(coordinates[1] + m_brushOffsetY + y);
-				if (i >= 0 && i < m_width && j >= 0 && j < m_height)
-				{
-					image(i, j) = (m_brush(x, y) * m_color * 255).template cast<unsigned char>();
-				}
-			}
-		}
+		auto imageBlock = image.getChannel(channel).block(i, j, p, q);
+		auto brushBlock = m_brush.topLeftCorner(p, q);
+		imageBlock = (brushBlock.array() > 0).select((brushBlock * m_color(channel)*255).template cast<unsigned char>(),
+						imageBlock);
 	}
 }
 
