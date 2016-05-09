@@ -72,13 +72,16 @@ void PaintBehavior::setCoordinates(const std::vector<DataStructures::IndexedLoca
 	auto mesh = m_representation->getMesh();
 	for (auto coordinate : coordinates)
 	{
-		auto vertex1 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[0]);
-		auto vertex2 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[1]);
-		auto vertex3 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[2]);
-		Math::Vector2d uv = vertex1.data.texture.getValue() * coordinate.coordinate[0] +
-							vertex2.data.texture.getValue() * coordinate.coordinate[1] +
-							vertex3.data.texture.getValue() * coordinate.coordinate[2];
-		m_coordinates.push_back(uv);
+		if (coordinate.index < mesh->getNumVertices())
+		{
+			auto vertex1 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[0]);
+			auto vertex2 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[1]);
+			auto vertex3 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[2]);
+			Math::Vector2d uv = vertex1.data.texture.getValue() * coordinate.coordinate[0] +
+								vertex2.data.texture.getValue() * coordinate.coordinate[1] +
+								vertex3.data.texture.getValue() * coordinate.coordinate[2];
+			m_coordinates.push_back(uv);
+		}
 	}
 }
 
