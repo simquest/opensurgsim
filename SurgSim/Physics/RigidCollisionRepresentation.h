@@ -72,7 +72,7 @@ public:
 
 	void updateShapeData() override;
 	void updateDcdData() override;
-	void updateCcdData(double interval) override;
+	void updateCcdData(double timeOfImpact) override;
 
 private:
 	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;
