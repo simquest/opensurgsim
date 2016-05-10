@@ -225,8 +225,8 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentParallelCase(
 			*t = b;
 			return true;
 		}
-
-		return false;
+		*t = ((b - a) / 2.0);
+		return true;
 	}
 
 	// Geometry at time t=a
@@ -336,7 +336,8 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentCoplanarCase(
 			*t = b;
 			collisionFound = true;
 		}
-
+		*t = ((b - a) / 2.0);
+		collisionFound = true;
 		return collisionFound;
 	}
 	// Geometry at time t=a
@@ -448,7 +449,8 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentGeneralCase(
 			*t = b;
 			collisionFound = true;
 		}
-
+		*t = ((b - a) / 2.0);
+		collisionFound = true;
 		return collisionFound;
 	}
 

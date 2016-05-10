@@ -95,6 +95,7 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	const Math::SegmentMeshShape& segmentShape2 = segmentShape1AtTime1;
 	const Math::RigidTransform3d& segmentPose2 = segmentPose1AtTime1;
 
+	std::cout << "=======================================================================" << std::endl;
 	SURGSIM_ASSERT(segmentShape1.getNumEdges() == segmentShape2.getNumEdges()) <<
 			"Segment CCD self collision detects that " <<
 			"the segment at time t and time t + 1 have different numbers of edges.";
@@ -106,7 +107,19 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	std::set<std::pair<size_t, size_t>> segmentIds;
 	std::list<DataStructures::AabbTree::TreeNodePairType> intersectionList
 		= segmentShape1.getAabbTree()->spatialJoin(*segmentShape2.getAabbTree());
-	getUniqueCandidates(intersectionList, &segmentIds);
+	//getUniqueCandidates(intersectionList, &segmentIds);
+
+	for (int i = 0; i < segmentShape1.getNumEdges(); i++)
+	{
+		for (int j = 0; j < segmentShape1.getNumEdges(); j++)
+		{
+			if (abs(i - j) > 1)
+			{
+				segmentIds.emplace(i, j);
+			}
+		}
+	}
+
 
 	for (const auto& idPair : segmentIds)
 	{
@@ -175,7 +188,7 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 		Math::Vector3d segmentPContact;
 		Math::Vector3d segmentQContact;
 		if (detectCollision(pt0Positions, pt1Positions, qt0Positions, qt1Positions,
-							segmentRadius1, segmentRadius2, timePrecision,
+							segmentRadius1, segmentRadius2, timePrecision / 1000,
 							&r, &s, &t, &pToQDir, &segmentPContact, &segmentQContact))
 		{
 			// The segments collide within tolerance, but if the collision is really close to an endpoint
@@ -213,12 +226,14 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 				// m_distanceEpsilon/2. For accuracy, it is calculated from both starting points and then averaged.
 				double effectiveRadiusP = m_useSegmentThickness ? segmentRadius1 : m_distanceEpsilon / 2.0;
 				double effectiveRadiusQ = m_useSegmentThickness ? segmentRadius2 : m_distanceEpsilon / 2.0;
+				std::cout << "Normal:\t" << pToQDir.norm();
 				auto normal = pToQDir.normalized();
 				Math::Vector3d contactP = segmentPContact + (effectiveRadiusP * normal);
 				Math::Vector3d contactQ = segmentQContact - (effectiveRadiusQ * normal);
 				auto contactPoint = 0.5 * (contactP + contactQ);
 				auto depth = ((contactP - contactQ).dot(normal) > 0.0) ?
 							 (contactP - contactQ).norm() : -(contactP - contactQ).norm();
+				std::cout << "\tDepth:\t" << depth << std::endl;
 				contacts.emplace_back(std::make_shared<Contact>(
 										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, depth, t,
 										  contactPoint, -normal, penetrationPoints));
@@ -512,10 +527,11 @@ double SegmentSelfContact::maxTimePrecision(
 		std::sqrt(std::max(maxP1RelativeDisplacementNorm2, maxP2RelativeDisplacementNorm2));
 
 	// The time precision should be set low enough so that we don't miss any segment collision.
-	double timePrecision = effectiveThickness / maxRelativeDisplacement;
+	double timePrecision = effectiveThickness / (4 * maxRelativeDisplacement);
 
 	if (timePrecision < m_timeMinPrecisionEpsilon)
 	{
+		std::cout << "Moving too fast for sampling rate ... " << std::endl;
 		SURGSIM_LOG_ONCE(m_logger, WARNING) <<
 											"Minimum time precision(" << m_timeMinPrecisionEpsilon <<
 											") needs to be smaller(" << timePrecision <<

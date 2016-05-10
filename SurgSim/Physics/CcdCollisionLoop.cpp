@@ -74,6 +74,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	for (; iterations < m_maxIterations; ++iterations)
 	{
 		double epsilon = 1.0 / ((1 - timeOfImpact) * m_epsilonFactor);
+		//double epsilon = 1.0 / (m_epsilonFactor);
 
 		ccdState = m_updateCcdData->update(localTimeOfImpact, ccdState); // state interpolation is triggered in here
 		ccdState = m_ccdCollision->update(dt, ccdState);
@@ -88,6 +89,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 		{
 			break;
 		}
+		localTimeOfImpact += epsilon;
 		filterLaterContacts(ccdPairs, epsilon, localTimeOfImpact);
 
 		restoreContacts(ccdPairs, &oldContacts);
@@ -151,7 +153,7 @@ void CcdCollisionLoop::filterLaterContacts(
 	{
 		pair->getContacts().remove_if([timeOfImpact, epsilon](const std::shared_ptr<Collision::Contact>& contact)
 		{
-			return contact->time > timeOfImpact + epsilon;
+			return contact->time > timeOfImpact;
 		});
 	}
 }
