@@ -177,3 +177,9 @@ set(OPENSURGSIM_LIBRARIES ${SURGSIM_EXPORT_TARGETS} CACHE INTERNAL "OSS Exported
 
 # Copy OpenSurgSim Data folder containing common shaders and fonts to the Build folder
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+option(BUILD_TOOLS "Build Tool Utilities" OFF)
+
+if(BUILD_TOOLS)
+  add_subdirectory(Tools)
+endif(BUILD_TOOLS)

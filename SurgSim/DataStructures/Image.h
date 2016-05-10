@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,22 +16,21 @@
 #ifndef SURGSIM_DATASTRUCTURES_IMAGE_H
 #define SURGSIM_DATASTRUCTURES_IMAGE_H
 
-#include <array>
 #include <memory>
 
-#include <Eigen/Core>
+#include "SurgSim/DataStructures/ImageBase.h"
+
 
 namespace SurgSim
 {
-
 namespace DataStructures
 {
 
 /// A templated Image class
 ///
-/// \tparam T the data type stored in the Image
+/// \tparam T the data type of the image data
 template<class T>
-class Image
+class Image : public ImageBase<T>
 {
 public:
 	/// Default Constructor
@@ -80,79 +79,11 @@ public:
 	/// \return The Image that was assigned into
 	Image<T>& operator=(Image<T>&& other);
 
-	/// Get the Image width
-	/// \return the width
-	size_t getWidth() const;
+	T* const getData() override;
 
-	/// Get the Image height
-	/// \return the height
-	size_t getHeight() const;
-
-	/// Get the Image size
-	/// \return the image size as (width, height, channels)
-	std::array<size_t, 3> getSize() const;
-
-	/// Get the number of channels in this Image
-	/// \return the number of channels
-	size_t getNumChannels() const;
-
-	/// Get the pixel value at (x, y)
-	/// \param x The horizontal image position
-	/// \param y The vertical image position
-	/// \return mutable pixel value as Eigen::Map of size (channels x 1)
-	Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> operator()(size_t x, size_t y);
-
-	/// Get the pixel value at (x, y), constant version
-	/// \param x The horizontal position in the image
-	/// \param y The vertical position in the image
-	/// \return constant pixel value as Eigen::Map of size (channels x 1)
-	Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1>> operator()(size_t x, size_t y) const;
-
-	/// 2D Channel Type;
-	typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> ChannelType;
-
-	/// Get the 2D image channel data
-	/// \param index the channel number
-	/// \return mutable channel data as an Eigen::Map (can be used as an Eigen::Matrix)
-	Eigen::Map<ChannelType, Eigen::Unaligned, Eigen::Stride<-1, -1>> getChannel(size_t index);
-
-	/// Get the 2D image channel data, constant version
-	/// \param index the channel number
-	/// \return constant channel data as an Eigen::Map (can be used as an Eigen::Matrix)
-	Eigen::Map<const ChannelType, Eigen::Unaligned, Eigen::Stride<-1, -1>> getChannel(size_t index) const;
-
-	/// Set the image data in the channel
-	/// \param index the channel number
-	/// \param data the channel data as a compatible Eigen type
-	void setChannel(size_t index, const Eigen::Ref<const ChannelType>& data);
-
-	/// 1D Vector Type;
-	typedef Eigen::Matrix<T, Eigen::Dynamic, 1> VectorType;
-
-	/// Get the data as a 1D Vector
-	/// \return mutable 1D data as an Eigen::Map (can be used as an Eigen::Matrix)
-	Eigen::Map<VectorType, Eigen::Unaligned> getAsVector();
-
-	/// Get the data as a 1D Vector, constant version
-	/// \return constant 1D data as an Eigen::Map (can be used as an Eigen::Matrix)
-	Eigen::Map<const VectorType, Eigen::Unaligned> getAsVector() const;
-
-	/// Set the image data as a 1D Vector
-	/// \param data the data as a compatible Eigen vector type
-	void setAsVector(const Eigen::Ref<const VectorType>& data);
-
-	/// Get the pointer to the data
-	/// \return  the data
-	T* const getData();
-
-	/// Get the pointer to the data, constant version
-	/// \return  the data
-	const T* const getData() const;
+	const T* const getData() const override;
 
 private:
-	size_t m_width;
-	size_t m_height;
-	size_t m_channels;
 	std::unique_ptr<T[]> m_data;
 };
 

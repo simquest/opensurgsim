@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	Grid3DTests.cpp
 	GridTests.cpp
 	GroupsTests.cpp
+	ImageMapTest.cpp
 	ImageTest.cpp
 	IndexDirectoryTests.cpp
 	IndexedLocalCoordinateTest.cpp
