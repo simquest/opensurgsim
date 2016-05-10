@@ -30,7 +30,9 @@ namespace Blocks
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::VisualizeConstraintsBehavior,
 				 VisualizeConstraintsBehavior);
 
-VisualizeConstraintsBehavior::VisualizeConstraintsBehavior(const std::string& name) : Behavior(name)
+VisualizeConstraintsBehavior::VisualizeConstraintsBehavior(const std::string& name) :
+	Behavior(name),
+	m_logger(SurgSim::Framework::Logger::getLogger("Block/VisualizeConstraintsBehavior"))
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VisualizeConstraintsBehavior, FieldsType, VectorFields,
 									  getVectorFields, setVectorFields);
@@ -72,9 +74,8 @@ void VisualizeConstraintsBehavior::update(double dt)
 	Math::MlcpSolution::Vector& x = state.getMlcpSolution().x;
 	if (state.getMlcpProblem().getSize() != static_cast<size_t>(x.size()))
 	{
-		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger())
-				<< "mlcp solution size = " << x.size() << " while mlcp problem size = "
-				<< state.getMlcpProblem().getSize() << std::endl;
+		SURGSIM_LOG_WARNING(m_logger) << "mlcp solution size = " << x.size() << " while mlcp problem size = " <<
+									  state.getMlcpProblem().getSize() << std::endl;
 		return;
 	}
 
@@ -106,21 +107,21 @@ void VisualizeConstraintsBehavior::update(double dt)
 
 			switch ((*it)->getType())
 			{
-				case Math::MLCP_BILATERAL_3D_CONSTRAINT:
-					{
-						force = x.segment(mlcpConstraintIndex, 3);
-						color = Math::Vector4d(0.9, 0.9, 0.9, 1);
-					}
-					break;
-				case Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
-					{
-						const Math::Vector3d& forceNormal =
-							std::static_pointer_cast<ContactConstraintData>((*it)->getData())->getNormal();
-						double forceNormalIntensity = x[mlcpConstraintIndex];
-						force = forceNormal * forceNormalIntensity;
-						color = Math::Vector4d(0.9, 0.0, 0.0, 1);
-					}
-					break;
+				case SurgSim::Physics::FIXED_3DPOINT:
+				{
+					force = x.segment(mlcpConstraintIndex, 3);
+					color = SurgSim::Math::Vector4d(0.9, 0.9, 0.9, 1);
+				}
+				break;
+				case SurgSim::Physics::FRICTIONLESS_3DCONTACT:
+				{
+					const SurgSim::Math::Vector3d& forceNormal =
+						std::static_pointer_cast<ContactConstraintData>((*it)->getData())->getNormal();
+					double forceNormalIntensity = x[mlcpConstraintIndex];
+					force = forceNormal * forceNormalIntensity;
+					color = SurgSim::Math::Vector4d(0.9, 0.0, 0.0, 1);
+				}
+				break;
 				default:
 					break;
 			}

@@ -16,6 +16,7 @@
 #include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
 
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/SegmentMeshShape.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemLocalization.h"
@@ -29,7 +30,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemConstraintFrictionlessContact::FemConstraintFrictionlessContact()
+FemConstraintFrictionlessContact::FemConstraintFrictionlessContact(): m_mlcpNumericalPrecision(1.0e-04)
 {
 }
 
@@ -38,12 +39,12 @@ FemConstraintFrictionlessContact::~FemConstraintFrictionlessContact()
 }
 
 void FemConstraintFrictionlessContact::doBuild(double dt,
-											   const ConstraintData& data,
-											   const std::shared_ptr<Localization>& localization,
-											   MlcpPhysicsProblem* mlcp,
-											   size_t indexOfRepresentation,
-											   size_t indexOfConstraint,
-											   ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 	std::shared_ptr<FemRepresentation> fem
 		= std::static_pointer_cast<FemRepresentation>(localization->getRepresentation());
@@ -59,6 +60,21 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
 	Vector3d globalPosition = localization->calculatePosition();
+
+	{
+		auto rep = std::dynamic_pointer_cast<Collision::Representation>(fem->getCollisionRepresentation());
+		if (rep != nullptr)
+		{
+			auto segmentShape =
+				std::dynamic_pointer_cast<Math::SegmentMeshShape>(rep->getShape());
+			if (segmentShape != nullptr)
+			{
+
+				double radius = segmentShape->getRadius() + m_mlcpNumericalPrecision;
+				globalPosition -= n * (radius * scale);
+			}
+		}
+	}
 
 	// Update b with new violation
 	double violation = n.dot(globalPosition);
@@ -91,7 +107,7 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 	}
 
 	mlcp->updateConstraint(m_newH, fem->getComplianceMatrix() * m_newH.transpose(), indexOfRepresentation,
-		indexOfConstraint);
+						   indexOfConstraint);
 }
 
 SurgSim::Physics::ConstraintType FemConstraintFrictionlessContact::getConstraintType() const

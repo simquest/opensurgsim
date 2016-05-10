@@ -21,12 +21,31 @@
 namespace SurgSim
 {
 
+namespace Framework
+{
+class Logger;
+}
+
+namespace Collision
+{
+class CollisionPair;
+struct Contact;
+}
 namespace Physics
 {
 
-class CcdCollisionLoop : public ComputationGroup
+class CcdCollision;
+class UpdateCcdData;
+class ContactConstraintGeneration;
+class BuildMlcp;
+class SolveMlcp;
+class PushResults;
+class PhysicsManager;
+
+class CcdCollisionLoop : public Computation
 {
 public:
+
 	/// Constructor
 	explicit CcdCollisionLoop(bool copyState);
 
@@ -35,10 +54,65 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::CcdCollisionLoop);
 
-	bool endIteration() override;
+	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
+			const std::shared_ptr<PhysicsManagerState>& state) override;
+
+	///@{
+	/// Test access
+	friend class CcdCollisionLoopTest_FilterContacts_Test;
+	friend class CcdCollisionLoopTest_FilterContactsWithEpsilon_Test;
+	///@}
 
 private:
+	///@{
+	/// Computations
+	std::unique_ptr<CcdCollision> m_ccdCollision;
+	std::unique_ptr<UpdateCcdData> m_updateCcdData;
+	std::unique_ptr<ContactConstraintGeneration> m_constraintGeneration;
+	std::unique_ptr<BuildMlcp> m_buildMlcp;
+	std::unique_ptr<SolveMlcp> m_solveMlcp;
+	std::unique_ptr<PushResults> m_pushResults;
+	///@}
 
+	size_t m_maxIterations; ///< maximum number of iterations to run
+
+	/// epsilon as a fraction of dt, i.e. if this is 100, the epsilon will be dt/100
+	/// during the iteration epsilon will be scaled to remain dt/100 as it pertains to the ever shrinking interval
+	/// that is the iterations intervall
+	double m_epsilonFactor;
+
+	/// Takes all the contacts from ccdPairs, finds the first contact wrt contact time
+	/// \param ccdPairs the list of pairs that should be checked for contacts
+	/// \param [out] currentTimeOfmpact the earliest contact time found in ccdPairs
+	/// \return true if there were any contacts found in ccdPairs
+	bool findEarliestContact(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
+							 double* currentTimeOfImpact);
+
+	/// Removes all contacts with contact time greater than the first contact time + epsilon
+	/// \param ccdPairs the list of pairs that should be checked for contacts
+	/// \param epsilon the epsilon to be added to the first contactTime for filtering
+	void filterLaterContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
+							 double epsilon,
+							 double contactTime);
+
+	/// Backs up all current contacts into oldContacts and then clears the ccdPairs
+	/// \param ccdPairs the list of current contact pairs
+	/// \param oldContacts the backup of the contacts
+	void backupContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
+						std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+
+	/// Adds all of the backed up contacts back into the current contacts. Contacts already in 'ccdPairs'
+	/// will be kept..
+	/// \param ccdPairs the list of current contact pairs
+	/// \param oldContacts the backup of the contacts
+	void restoreContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
+						 std::vector<std::list<std::shared_ptr<Collision::Contact>>>* oldContacts);
+
+	/// Logs all of the contacts
+	/// \param ccdPairs the list of current contact pairs
+	void printContacts(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs);
+
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 }

@@ -20,6 +20,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
+	CcdCollisionLoopTest.cpp
 	ComputationGroupTest.cpp
 	ComputationTests.cpp
 	ConstraintComponentTests.cpp

@@ -61,13 +61,26 @@ public:
 
 	void resetState() override;
 
+	/// Initialize the state variables to initialState
+	/// \param initialState is the state to be set as the starting state
 	virtual void setInitialState(std::shared_ptr<SurgSim::Math::OdeState> initialState);
 
+	/// Return the current state of the deformable representation
+	/// \return the current state
 	virtual const std::shared_ptr<SurgSim::Math::OdeState> getCurrentState() const;
 
+	/// Return the previous state of the deformable representation
+	/// \return the previous state
 	virtual const std::shared_ptr<SurgSim::Math::OdeState> getPreviousState() const;
 
+	/// Return the final state of the deformable representation
+	/// \return the final state
 	virtual const std::shared_ptr<SurgSim::Math::OdeState> getFinalState() const;
+
+	/// Declare a new previous state by interpolating between the old previous
+	/// state and the current state using parametric time variable t
+	/// \param t parametric time at which to calculate the new state
+	virtual void interpolatePreviousState(double t);
 
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation
@@ -137,6 +150,8 @@ public:
 	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
 	void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
+
 
 protected:
 	bool doInitialize() override;

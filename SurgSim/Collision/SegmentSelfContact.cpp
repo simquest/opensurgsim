@@ -196,10 +196,10 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 				// Encode the segment specific intersection points for later recall. Here we encode each
 				// side of the contact point specific to each segment.
 				std::pair<Location, Location> penetrationPoints;
-				Math::Vector2d parametricCoordinateP(r, 1.0 - r);
+				Math::Vector2d parametricCoordinateP(1.0 - r, r);
 				penetrationPoints.first.elementMeshLocalCoordinate.setValue(
 					DataStructures::IndexedLocalCoordinate(id1, parametricCoordinateP));
-				Math::Vector2d parametricCoordinateQ(s, 1.0 - s);
+				Math::Vector2d parametricCoordinateQ(1.0 - s, s);
 				penetrationPoints.second.elementMeshLocalCoordinate.setValue(
 					DataStructures::IndexedLocalCoordinate(id2, parametricCoordinateQ));
 				penetrationPoints.first.rigidLocalPosition.setValue(
@@ -221,7 +221,7 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 							 (contactP - contactQ).norm() : -(contactP - contactQ).norm();
 				contacts.emplace_back(std::make_shared<Contact>(
 										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, depth, t,
-										  contactPoint, normal, penetrationPoints));
+										  contactPoint, -normal, penetrationPoints));
 			}
 		}
 		else
@@ -421,8 +421,8 @@ bool SegmentSelfContact::findSegSegContact(const Math::SegmentMeshShape& segment
 	{
 		auto existingSegId1 = contact->penetrationPoints.first.elementMeshLocalCoordinate.getValue().index;
 		auto existingSegId2 = contact->penetrationPoints.second.elementMeshLocalCoordinate.getValue().index;
-		auto existingS1 = contact->penetrationPoints.first.elementMeshLocalCoordinate.getValue().coordinate[0];
-		auto existingS2 = contact->penetrationPoints.second.elementMeshLocalCoordinate.getValue().coordinate[0];
+		auto existingS1 = contact->penetrationPoints.first.elementMeshLocalCoordinate.getValue().coordinate[1];
+		auto existingS2 = contact->penetrationPoints.second.elementMeshLocalCoordinate.getValue().coordinate[1];
 
 		// Check for same object type and same time. The test for same objectID was
 		// removed as it did not appear to be used (all find segment calls set that

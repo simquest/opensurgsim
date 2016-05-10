@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -148,6 +148,14 @@ public:
 	/// Check if this state is numerically valid
 	/// \return True if all positions and velocities are valid numerical values, False otherwise
 	virtual bool isValid() const;
+
+	/// Returns the linear interpolated ODE state between this and other at parameter t
+	/// \param other the end point for the linear interpolation
+	/// \param t the interpolation time
+	/// \return the interpolated state = this + (other - this) * t;
+	/// \note All dof are independently linearly interpolated (This will not work correctly
+	/// on rotation vectors where a slerp will be required.)
+	OdeState interpolate(const OdeState& other, double t) const;
 
 private:
 	/// Default public copy constructor and assignment operator are being used on purpose

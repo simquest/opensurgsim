@@ -175,6 +175,13 @@ public:
 	/// \param constraintsMapping The constraints mapping (mapping between the constraints and the mlcp)
 	void setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping);
 
+	/// Set the time of impact
+	/// \param timeOfImpact the time of impact for CCD
+	void setTimeOfImpact(double timeOfImpact);
+
+	/// \return the last time of impact when a CCD calculation ran
+	double getTimeOfImpact();
+
 	/// \return whether to abort a grouped computation by the calling group
 	bool shouldAbortGroup() const;
 
@@ -234,7 +241,11 @@ private:
 	/// Mlcp solution for this Physics Manager State
 	MlcpPhysicsSolution m_mlcpPhysicsSolution;
 
+	/// Flag for the abort group case
 	bool m_abortGroup;
+
+	/// last time of impact for a CCD calculation
+	double m_timeOfImpact;
 };
 
 }; // Physics

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -226,6 +226,17 @@ bool OdeState::isValid() const
 	/// Therefore, testing if a vector contains only finite numbers can be achieve easily by summing all the values
 	/// and testing if the result is a finite number or not.
 	return isValid(getPositions().sum()) && isValid(getVelocities().sum());
+}
+
+OdeState OdeState::interpolate(const OdeState& other, double t) const
+{
+	auto result = OdeState(*this);
+	if (t != 0)
+	{
+		result.m_v += (other.m_v - m_v) * t;
+		result.m_x += (other.m_x - m_x) * t;
+	}
+	return result;
 }
 
 }; // namespace Math

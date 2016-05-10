@@ -70,7 +70,7 @@ public:
 
 	void updateDcdData() override;
 
-	void updateCcdData() override;
+	void updateCcdData(double interval) override;
 
 	void updateShapeData() override;
 

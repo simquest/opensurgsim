@@ -53,6 +53,8 @@ class Computation;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
+/// The PhysicsManager pipeline can be configured, using the
+/// addComputation/setComputaton method.
 class PhysicsManager : public SurgSim::Framework::ComponentManager
 {
 public:
@@ -71,6 +73,16 @@ public:
 	/// \warning The state contains many pointers.  The objects pointed to are not thread-safe.
 	void getFinalState(SurgSim::Physics::PhysicsManagerState* s) const;
 
+	/// Add a computation to the list of computations to perform each update
+	/// \note The computations will be run in order they were added. This can't be done after initialization
+	/// \param computation The Computation to add.
+	void addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation);
+
+	/// Set a group of computations, the computations will be run in the order in the vector
+	/// \note this can't be done after initialization
+	/// \param computations The computations that you want to set on the physics manager
+	void setComputations(std::vector<std::shared_ptr<Physics::Computation>> computations);
+
 protected:
 	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
@@ -78,17 +90,13 @@ protected:
 
 	/// Initialize the Physics Manager
 	/// Derived class(es) should override this method to have a customized list of computations.
+	/// \note Current default is to only use DCD contacts
 	/// \sa SurgSim::Physics::Computation
 	bool doInitialize() override;
 
 	bool doStartUp() override;
 
 	bool doUpdate(double dt) override;
-
-	/// Add a computation to the list of computations to perform each update
-	/// \note The computations will be run in order they were added.
-	/// \param computation The Computation to add
-	void addComputation(std::shared_ptr<SurgSim::Physics::Computation> computation);
 
 	void doBeforeStop() override;
 
@@ -102,12 +110,19 @@ private:
 	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
 
 	/// A list of computations, to perform the physics update.
-	std::list<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;
+	std::vector<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;
 
 	/// A thread-safe copy of the last PhysicsManagerState in the previous update.
 	SurgSim::Framework::LockedContainer<SurgSim::Physics::PhysicsManagerState> m_finalState;
 };
 
+/// Creates default DCD pipeline, this currently does basic DCD without regard to CCD
+/// \param copyState if true the physics manager will maintain a copy of the Physics manager state for each computation
+std::vector<std::shared_ptr<Physics::Computation>> createDcdPipeline(bool copyState = false);
+
+/// Create default CCD pipeline, this currently does basic CCD without regard to DCD
+/// \param copyState if true the physics manager will maintain a copy of the Physics manager state for each computation
+std::vector<std::shared_ptr<Physics::Computation>> createCcdPipeline(bool copyState = false);
 }; // namespace Physics
 }; // namespace SurgSim
 

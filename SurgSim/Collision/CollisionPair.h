@@ -57,10 +57,10 @@ struct Contact
 	bool operator==(const Contact& contact) const
 	{
 		return type == contact.type &&
-			std::abs(time - contact.time) < 1e-8 &&
-			penetrationPoints.first.isApprox(contact.penetrationPoints.first) &&
-			penetrationPoints.second.isApprox(contact.penetrationPoints.second) &&
-			normal.isApprox(contact.normal);
+			   std::abs(time - contact.time) < 1e-8 &&
+			   penetrationPoints.first.isApprox(contact.penetrationPoints.first) &&
+			   penetrationPoints.second.isApprox(contact.penetrationPoints.second) &&
+			   normal.isApprox(contact.normal);
 	}
 	CollisionDetectionType type;						///< What collision algorithm class was used to get the contact
 	double depth;										///< What is the penetration depth for the representation
@@ -175,4 +175,16 @@ private:
 }; // namespace Collision
 }; // namespace SurgSim
 
+template <typename charT, typename traits>
+std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
+		const SurgSim::Collision::Contact& contact)
+{
+	out << "Normal: " << contact.normal.transpose() << std::endl;
+	out << "Depth: " << contact.depth << std::endl;
+	out << "Time: " << contact.time << std::endl;
+	out << "Penetration Point 1 :" << contact.penetrationPoints.first << std::endl;
+	out << "Penetration Point 2 :" << contact.penetrationPoints.second << std::endl;
+
+	return out;
+}
 #endif

@@ -28,6 +28,11 @@ namespace Physics
 class PhysicsManager;
 }
 
+namespace Framework
+{
+class Logger;
+}
+
 namespace Graphics
 {
 class VectorFieldRepresentation;
@@ -36,8 +41,6 @@ class VectorFieldRepresentation;
 namespace Blocks
 {
 SURGSIM_STATIC_REGISTRATION(VisualizeConstraintsBehavior);
-
-
 /// Behavior to visualize information about the constraints as they are in the physics manager
 /// this will show the constraint location and the force from the last iteration of the physics manager
 /// \note currently only two types of constraint are being visualized MLCP_BILATERAL_3D_CONSTRAINT and
@@ -82,6 +85,8 @@ private:
 			m_graphics;
 
 	boost::mutex m_graphicsMutex;
+
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 /// SceneElement that generates the VisualizeConstraintBehavior and the appropriate graphics Vectorfield

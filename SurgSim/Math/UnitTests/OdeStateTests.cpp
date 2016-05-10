@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ TEST(OdeStateTest, GetPositionsTest)
 	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
-	for(size_t i = 0; i < state1.getNumDof(); i++)
+	for (size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		state1.getPositions()[i] = static_cast<double>(i);
 		state2.getPositions()[i] = 0.0;
@@ -85,7 +85,7 @@ TEST(OdeStateTest, GetPositionsTest)
 
 	state1.reset();
 	// state1.m_x contains (0 0 0 0 0 0 0 0 0 0 0) & state2.m_x contains (0 1 2 3 4 5 6 7 8 9 10)
-	for(size_t i = 0; i < state1.getNumDof(); i++)
+	for (size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		EXPECT_EQ(0.0, state1.getPositions()[i]);
 		EXPECT_EQ(static_cast<double>(i), state2.getPositions()[i]);
@@ -101,7 +101,7 @@ TEST(OdeStateTest, GetVelocitiesTest)
 	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
-	for(size_t i = 0; i < state1.getNumDof(); i++)
+	for (size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		state1.getVelocities()[i] = static_cast<double>(i);
 		state2.getVelocities()[i] = 0.0;
@@ -114,7 +114,7 @@ TEST(OdeStateTest, GetVelocitiesTest)
 
 	state1.reset();
 	// state1.m_v contains (0 0 0 0 0 0 0 0 0 0 0) & state2.m_v contains (0 1 2 3 4 5 6 7 8 9 10)
-	for(size_t i = 0; i < state1.getNumDof(); i++)
+	for (size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		EXPECT_EQ(0.0, state1.getVelocities()[i]);
 		EXPECT_EQ(static_cast<double>(i), state2.getVelocities()[i]);
@@ -219,10 +219,10 @@ TEST(OdeStateTest, ResetTest)
 	OdeState state1, state2;
 	state1.setNumDof(3u, 3u);
 	state2.setNumDof(3u, 3u);
-	for(size_t i = 0; i < state1.getNumDof(); i++)
+	for (size_t i = 0; i < state1.getNumDof(); i++)
 	{
 		state1.getPositions()[i] = static_cast<double>(i);
-		state1.getVelocities()[i] = 2.0*static_cast<double>(i);
+		state1.getVelocities()[i] = 2.0 * static_cast<double>(i);
 	}
 	state1.addBoundaryCondition(0u, 0u);
 	state1.addBoundaryCondition(state1.getNumNodes() - 1u, 2u);
@@ -242,10 +242,10 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 {
 	OdeState state, stateAssigned;
 	state.setNumDof(3u, 3u);
-	for(size_t i = 0; i < state.getNumDof(); i++)
+	for (size_t i = 0; i < state.getNumDof(); i++)
 	{
 		state.getPositions()[i] = static_cast<double>(i);
-		state.getVelocities()[i] = 2.0*static_cast<double>(i);
+		state.getVelocities()[i] = 2.0 * static_cast<double>(i);
 	}
 	state.addBoundaryCondition(0u, 0u);
 	state.addBoundaryCondition(state.getNumNodes() - 1u, 2u);
@@ -260,12 +260,12 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 		ASSERT_EQ(9, stateCopied.getVelocities().size());
 		ASSERT_EQ(state.getVelocities().size(), stateCopied.getVelocities().size());
 
-		for(size_t i = 0; i < stateCopied.getNumDof(); i++)
+		for (size_t i = 0; i < stateCopied.getNumDof(); i++)
 		{
 			EXPECT_NEAR(state.getPositions()[i], stateCopied.getPositions()[i], epsilon);
 			EXPECT_NEAR(static_cast<double>(i), stateCopied.getPositions()[i], epsilon);
 			EXPECT_NEAR(state.getVelocities()[i], stateCopied.getVelocities()[i], epsilon);
-			EXPECT_NEAR(2.0*static_cast<double>(i), stateCopied.getVelocities()[i], epsilon);
+			EXPECT_NEAR(2.0 * static_cast<double>(i), stateCopied.getVelocities()[i], epsilon);
 		}
 
 		ASSERT_EQ(2u, stateCopied.getNumBoundaryConditions());
@@ -288,12 +288,12 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 		ASSERT_EQ(9, stateAssigned.getVelocities().size());
 		ASSERT_EQ(state.getVelocities().size(), stateAssigned.getVelocities().size());
 
-		for(size_t i = 0; i < stateAssigned.getNumDof(); i++)
+		for (size_t i = 0; i < stateAssigned.getNumDof(); i++)
 		{
 			EXPECT_NEAR(state.getPositions()[i], stateAssigned.getPositions()[i], epsilon);
 			EXPECT_NEAR(static_cast<double>(i), stateAssigned.getPositions()[i], epsilon);
 			EXPECT_NEAR(state.getVelocities()[i], stateAssigned.getVelocities()[i], epsilon);
-			EXPECT_NEAR(2.0*static_cast<double>(i), stateAssigned.getVelocities()[i], epsilon);
+			EXPECT_NEAR(2.0 * static_cast<double>(i), stateAssigned.getVelocities()[i], epsilon);
 		}
 
 		ASSERT_EQ(2u, stateAssigned.getNumBoundaryConditions());
@@ -411,4 +411,49 @@ TEST(OdeStateTest, IsValidTest)
 		SCOPED_TRACE("Test with valid numbers");
 		testOdeStateValidityWith(4.5e-34, true);
 	}
+}
+
+TEST(OdeStateTest, Interpolation)
+{
+	OdeState state1;
+	OdeState state2;
+	OdeState expected;
+	state1.setNumDof(3u, 3u);
+	state2.setNumDof(3u, 3u);
+	expected.setNumDof(3u, 3u);
+	double t = 0.25;
+	for (size_t i = 0; i < state1.getNumDof(); i++)
+	{
+		double num = static_cast<double>(i);
+		state1.getVelocities()[i] = 1.0;
+		state2.getVelocities()[i] = num;
+		expected.getVelocities()[i] = 1.0 + (num - 1.0) * t;
+		state1.getPositions()[i] = num * 2;
+		state2.getPositions()[i] = 0.0;
+		expected.getPositions()[i] = num * 2 + (0.0 - num * 2) * t;
+	}
+
+	auto result = state1.interpolate(state2, t);
+	ASSERT_TRUE(result.isValid());
+
+	for (size_t i = 0; i < expected.getNumDof(); i++)
+	{
+		EXPECT_NEAR(expected.getPositions()[i], result.getPositions()[i], epsilon);
+		EXPECT_NEAR(expected.getVelocities()[i], result.getVelocities()[i], epsilon);
+	}
+
+	result = state1.interpolate(state2, 0.0);
+	for (size_t i = 0; i < expected.getNumDof(); i++)
+	{
+		EXPECT_NEAR(state1.getPositions()[i], result.getPositions()[i], epsilon);
+		EXPECT_NEAR(state1.getVelocities()[i], result.getVelocities()[i], epsilon);
+	}
+
+	result = state1.interpolate(state2, 1.0);
+	for (size_t i = 0; i < expected.getNumDof(); i++)
+	{
+		EXPECT_NEAR(state2.getPositions()[i], result.getPositions()[i], epsilon);
+		EXPECT_NEAR(state2.getVelocities()[i], result.getVelocities()[i], epsilon);
+	}
+
 }

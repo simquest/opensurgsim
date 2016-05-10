@@ -294,7 +294,7 @@ void Representation::updateDcdData()
 
 }
 
-void Representation::updateCcdData()
+void Representation::updateCcdData(double timeOfImpact)
 {
 
 }

@@ -39,7 +39,7 @@ void extendControlPoints(const SurgSim::DataStructures::VerticesPlain& points,
 	}
 	// Interpolate the last point (ghost) as the symmetric of Pn-1 from Pn: Pn+1 = Pn - (Pn-1 - Pn)
 	result->push_back(2.0 * points.getVertexPosition(points.getNumVertices() - 1) -
-							points.getVertexPosition(points.getNumVertices() - 2));
+					  points.getVertexPosition(points.getNumVertices() - 2));
 }
 
 void interpolate(size_t subdivisions,
