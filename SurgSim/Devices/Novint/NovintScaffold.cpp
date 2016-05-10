@@ -703,7 +703,7 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 	}
 
 	// Get the additional 7DoF data if available.
-	if (info->isDevice7Dof && info->isOrientationHomed)
+	if (info->isDevice7Dof)
 	{
 		int gripStatus[2] = { 0, 0 };
 		// OSG2 grips report their "handedness" in the LSB of the second raw status byte
@@ -728,41 +728,44 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			info->eulerAngleOffsetPitch = 0.5;
 		}
 
-		// We compute the device orientation from the joint angles, for two reasons.  The first that it lets us
-		// compensate for recurrent bugs in the HDAL grip code.  The second is that we'll need the joint angles in
-		// order to correctly generate joint torques.
-		double angles[4];
-		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
-		fatalError = fatalError || isFatalError("hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
-
-		// The zero values are NOT the home orientation.
-		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
-		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
-		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
-		if (info->isDeviceRollAxisReversed)
+		if (info->isOrientationHomed)
 		{
-			info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
-			info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
+			// We compute the device orientation from the joint angles, for two reasons.  The first that it lets us
+			// compensate for recurrent bugs in the HDAL grip code.  The second is that we'll need the joint angles in
+			// order to correctly generate joint torques.
+			double angles[4];
+			hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
+			fatalError = fatalError || isFatalError("hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
+
+			// The zero values are NOT the home orientation.
+			info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
+			info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
+			info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+			if (info->isDeviceRollAxisReversed)
+			{
+				info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
+				info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
+			}
+
+			/* HW-Nov-12-2015
+			   Testing on Nov 10, 2015 shows that
+			   hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof);
+			   gives the correct reading for the 7th Dof value.
+			   However, it didn't give correct value in follow up tests.
+			   'angles[3]' has the value for the 7th Dof now (but it didn't on Nov 10's test).
+			   hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof); should be kept in mind.
+			   */
+			info->toolDof = angles[3]; // Get the reading for 7th Dof, the open/close angle of the tool.
+
+			// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
+			Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
+				Vector3d(Vector3d::UnitX()));
+			Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1] * info->orientationScale,
+				Vector3d(Vector3d::UnitY()));
+			Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
+				Vector3d(Vector3d::UnitZ()));
+			info->scaledPose.linear() = rotationY * rotationZ * rotationX;
 		}
-
-		/* HW-Nov-12-2015
-		   Testing on Nov 10, 2015 shows that 
-		   hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof);
-		   gives the correct reading for the 7th Dof value.
-		   However, it didn't give correct value in follow up tests.
-		   'angles[3]' has the value for the 7th Dof now (but it didn't on Nov 10's test).
-		   hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof); should be kept in mind.
-		*/
-		info->toolDof = angles[3]; // Get the reading for 7th Dof, the open/close angle of the tool.
-
-		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
-		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
-												 Vector3d(Vector3d::UnitX()));
-		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1] * info->orientationScale,
-												 Vector3d(Vector3d::UnitY()));
-		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
-												 Vector3d(Vector3d::UnitZ()));
-		info->scaledPose.linear() = rotationY * rotationZ * rotationX;
 	}
 
 	setInputData(info);
