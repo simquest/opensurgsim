@@ -27,7 +27,8 @@ namespace Physics
 {
 
 PhysicsManagerState::PhysicsManagerState() :
-	m_abortGroup(false)
+	m_abortGroup(false),
+	m_timeOfImpact(0)
 {
 
 }
@@ -224,6 +225,16 @@ const MlcpMapping<Constraint>& PhysicsManagerState::getConstraintsMapping() cons
 void PhysicsManagerState::setConstraintsMapping(const MlcpMapping<Constraint>& constraintsMapping)
 {
 	m_constraintsIndexMapping = constraintsMapping;
+}
+
+void PhysicsManagerState::setTimeOfImpact(double timeOfImpact)
+{
+	m_timeOfImpact = timeOfImpact;
+}
+
+double PhysicsManagerState::getTimeOfImpact()
+{
+	return m_timeOfImpact;
 }
 
 bool PhysicsManagerState::shouldAbortGroup() const

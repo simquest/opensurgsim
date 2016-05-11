@@ -45,7 +45,7 @@ TEST(CcdCollisionLoopTest, FilterContacts)
 						std::make_pair(location, location));
 	EXPECT_TRUE(computation->findEarliestContact(pairs, &toi));
 	EXPECT_DOUBLE_EQ(0.1, toi);
-	computation->filterLaterContacts(pairs, 0.0, toi);
+	computation->filterLaterContacts(&pairs, 0.0, toi);
 	EXPECT_EQ(1u, pair->getContacts().size());
 
 	pair->addCcdContact(0.0, 0.2, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
@@ -58,7 +58,7 @@ TEST(CcdCollisionLoopTest, FilterContacts)
 	toi = 0.0;
 	EXPECT_EQ(3u, pair->getContacts().size());
 	EXPECT_TRUE(computation->findEarliestContact(pairs, &toi));
-	computation->filterLaterContacts(pairs, 0.0, toi);
+	computation->filterLaterContacts(&pairs, 0.0, toi);
 	EXPECT_DOUBLE_EQ(0.1, toi);
 	EXPECT_EQ(1u, pair->getContacts().size());
 }
@@ -82,7 +82,7 @@ TEST(CcdCollisionLoopTest, FilterContactsWithEpsilon)
 	pair->addCcdContact(0.0, 0.3, Math::Vector3d::Zero(), Math::Vector3d::Zero(),
 						std::make_pair(location, location));
 	EXPECT_TRUE(computation->findEarliestContact(pairs, &toi));
-	computation->filterLaterContacts(pairs, 0.11, toi);
+	computation->filterLaterContacts(&pairs, 0.11, toi);
 	// toi should be 0.1 + 0.11 i.e. toi + epsilon
 	EXPECT_DOUBLE_EQ(0.1, toi);
 	EXPECT_EQ(2u, pair->getContacts().size());

@@ -151,7 +151,7 @@ void SegmentMesh<VertexData, EdgeData>::doClear()
 }
 
 template <class VertexData, class EdgeData>
-void SegmentMesh<VertexData, EdgeData>::createDefaultEdges()
+void SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>::createDefaultEdges()
 {
 	doClearEdges();
 	for (size_t i = 0; i < getNumVertices() - 1; ++i)
@@ -164,7 +164,12 @@ void SegmentMesh<VertexData, EdgeData>::createDefaultEdges()
 
 
 template <class VertexData, class EdgeData>
-void SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool addPhysics)
+bool SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName,
+		  bool asPhysics,
+		  double radius,
+		  double massDensity,
+		  double poissonRatio,
+		  double youngsModulus)
 {
 	std::fstream out(fileName, std::ios::out);
 
@@ -175,7 +180,7 @@ void SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool a
 		out << "comment Created by OpenSurgSim, www.opensurgsim.org" << std::endl;
 		out << "element vertex " << getNumVertices() << std::endl;
 		out << "property float x\nproperty float y\nproperty float z" << std::endl;
-		if (addPhysics)
+		if (asPhysics)
 		{
 			out << "element 1d_element " << getNumEdges() << std::endl;
 			out << "property list uint uint vertex_indices" << std::endl;
@@ -202,16 +207,16 @@ void SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool a
 
 		for (const auto& edge : getEdges())
 		{
-			if (addPhysics)
+			if (asPhysics)
 			{
 				out << "2 ";
 			}
 			out << edge.verticesId[0] << " " << edge.verticesId[1] << std::endl;
 		}
-		if (addPhysics)
+		if (asPhysics)
 		{
-			out << "0.001" << std::endl;
-			out << "900.0 0.45 1.75e9" << std::endl; // Prolene
+			out << radius << std::endl;
+			out << massDensity << " " << poissonRatio << " " << youngsModulus << std::endl;
 		}
 
 		if (out.bad())
@@ -226,7 +231,9 @@ void SegmentMesh<VertexData, EdgeData>::save(const std::string& fileName, bool a
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__
 				<< "Could not open " << fileName << " for writing.";
+		return false;
 	}
+	return true;
 }
 
 

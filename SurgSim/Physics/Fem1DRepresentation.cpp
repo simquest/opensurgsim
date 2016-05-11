@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -192,11 +192,9 @@ void Fem1DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 }
 
 
-std::shared_ptr<Localization> Fem1DRepresentation::createNodeLocalization(
-	const DataStructures::IndexedLocalCoordinate& location)
+std::shared_ptr<Localization> Fem1DRepresentation::createNodeLocalization(size_t nodeId)
 {
 	DataStructures::IndexedLocalCoordinate coordinate;
-	size_t nodeId = location.index;
 
 	SURGSIM_ASSERT(nodeId >= 0 && nodeId < getCurrentState()->getNumNodes()) << "Invalid node id";
 
@@ -232,20 +230,16 @@ std::shared_ptr<Localization> Fem1DRepresentation::createElementLocalization(
 
 std::shared_ptr<Localization> Fem1DRepresentation::createLocalization(const DataStructures::Location& location)
 {
-	if (location.nodeMeshLocalCoordinate.hasValue())
+	if (location.index.hasValue())
 	{
-		return createNodeLocalization(location.nodeMeshLocalCoordinate.getValue());
-	}
-	else if (location.triangleMeshLocalCoordinate.hasValue())
-	{
-		SURGSIM_FAILURE() << "Fem1DRepresentation supports only node and element-based location (not triangle-based)";
+		return createNodeLocalization(*location.index);
 	}
 	else if (location.elementMeshLocalCoordinate.hasValue())
 	{
-		return createElementLocalization(location.elementMeshLocalCoordinate.getValue());
+		return createElementLocalization(*location.elementMeshLocalCoordinate);
 	}
 
-	SURGSIM_FAILURE() << "Localization cannot be created without a mesh-based location (node, triangle or element).";
+	SURGSIM_FAILURE() << "Fem1DRepresentation supports only node and element-based location (not triangle-based)";
 
 	return nullptr;
 }

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -96,11 +96,10 @@ private:
 	std::unordered_map<size_t, size_t> createTriangleIdToElementIdMap(
 			std::shared_ptr<const SurgSim::Math::MeshShape> mesh);
 
-	/// Helper method: create a localization for a node-based IndexedLocalCoordinate
-	/// \param location The IndexedLocalCoordinate pointing to the node index
+	/// Helper method: create a localization for a node
+	/// \param nodeId The node index
 	/// \return Localization of the node for this representation
-	std::shared_ptr<Localization> createNodeLocalization(
-		const SurgSim::DataStructures::IndexedLocalCoordinate& location);
+	std::shared_ptr<Localization> createNodeLocalization(size_t nodeId);
 
 	/// Helper method: create a localization for an triangle-based IndexedLocalCoordinate
 	/// \param location The IndexedLocalCoordinate defining a point on the triangle mesh

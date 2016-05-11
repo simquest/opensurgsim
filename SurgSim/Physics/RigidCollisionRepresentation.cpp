@@ -100,7 +100,7 @@ void RigidCollisionRepresentation::updateDcdData()
 }
 
 
-void RigidCollisionRepresentation::updateCcdData(double time)
+void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 {
 	using Math::PosedShape;
 	using Math::PosedShapeMotion;
