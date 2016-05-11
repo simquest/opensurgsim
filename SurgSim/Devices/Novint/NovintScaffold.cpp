@@ -715,7 +715,8 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			return false;
 		}
 		info->eulerAngleOffsetRoll = 0.0;
-		if ((gripStatus[1] & 0x01) != 0)
+		bool leftHanded = (gripStatus[1] & 0x01) != 0;
+		if (leftHanded)
 		{
 			info->isDeviceRollAxisReversed = true;
 			info->eulerAngleOffsetYaw = 2.7;
