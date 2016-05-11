@@ -83,7 +83,7 @@ private:
 
 	/// Takes all the contacts from ccdPairs, finds the first contact wrt contact time
 	/// \param ccdPairs the list of pairs that should be checked for contacts
-	/// \param [out] currentTimeOfmpact the earliest contact time found in ccdPairs
+	/// \param [out] currentTimeOfImpact the earliest contact time found in ccdPairs
 	/// \return true if there were any contacts found in ccdPairs
 	bool findEarliestContact(const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 							 double* currentTimeOfImpact);
@@ -91,6 +91,7 @@ private:
 	/// Removes all contacts with contact time greater than the first contact time + epsilon
 	/// \param ccdPairs the list of pairs that should be checked for contacts
 	/// \param epsilon the epsilon to be added to the first contactTime for filtering
+	/// \param contactTime times outside of epsilon from contactTime will be reomved from consideration
 	void filterLaterContacts(std::vector<std::shared_ptr<Collision::CollisionPair>>* ccdPairs,
 							 double epsilon,
 							 double contactTime);
