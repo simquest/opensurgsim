@@ -34,8 +34,8 @@ namespace Physics
 
 CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
 	Computation(copyState),
-	m_updateCcdData(new UpdateCcdData(copyState)),
 	m_ccdCollision(new CcdCollision(copyState)),
+	m_updateCcdData(new UpdateCcdData(copyState)),
 	m_constraintGeneration(new ContactConstraintGeneration(copyState)),
 	m_buildMlcp(new BuildMlcp(copyState)),
 	m_solveMlcp(new SolveMlcp(copyState)),
