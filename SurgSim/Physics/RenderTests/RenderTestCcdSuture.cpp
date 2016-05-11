@@ -199,7 +199,7 @@ TEST_F(CcdSutureTest, SutureVsMeshedCylinder)
 {
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.1);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
-	double miliseconds = 100000.0;
+	double miliseconds = 25000.0;
 
 	physicsManager->setRate(4000.0);
 	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
@@ -226,7 +226,7 @@ TEST_F(CcdSutureTest, Fem1DHalfKnot)
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	double miliseconds = 100000.0;
+	double miliseconds = 10000.0;
 
 	runTest(cameraPosition, cameraLookAt, miliseconds);
 }
@@ -244,7 +244,7 @@ TEST_F(CcdSutureTest, Fem1DLoop)
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	double miliseconds = 100000.0;
+	double miliseconds = 5000.0;
 
 	runTest(cameraPosition, cameraLookAt, miliseconds);
 }
