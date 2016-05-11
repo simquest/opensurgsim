@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Datastructures/Location.h"
+#include "SurgSim/DataStructures/Location.h"
 
 namespace SurgSim
 {
