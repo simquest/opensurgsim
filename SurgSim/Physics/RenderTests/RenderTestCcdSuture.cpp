@@ -121,60 +121,41 @@ public:
 		SurgSim::Physics::RenderTests::SetUp();
 
 		SurgSim::Framework::Logger::getLoggerManager()->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
+		physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
 		physicsManager->setRate(150.0);
 	}
 };
 
 TEST_F(CcdSutureTest, SutureVsMeshedCylinder)
 {
-	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.1);
-	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
-	double miliseconds = 25000.0;
-
-	physicsManager->setRate(4000.0);
-	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
-
-	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
-
-	// Load the deformable suture
 	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
 	scene->addSceneElement(makeRigid("cylinder.ply"));
+	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
-	runTest(cameraPosition, cameraLookAt, miliseconds);
+	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.1);
+	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
+	double milliseconds = 5000.0;
+	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
 
 TEST_F(CcdSutureTest, Fem1DHalfKnot)
 {
-	SurgSim::Framework::Logger::getLogger("SegmentSelfContact")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 	scene->addSceneElement(makeSuture("half_knot.ply"));
-	physicsManager->setRate(4000.0);
-	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
-
-	SurgSim::Framework::Logger::getLogger("Collision/SegmentSelfContact")->setThreshold(
-		SurgSim::Framework::LOG_LEVEL_WARNING);
 	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
-	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
+	SurgSim::Math::Vector3d cameraPosition(1.0, 0.0, 1.0);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	double miliseconds = 10000.0;
-
-	runTest(cameraPosition, cameraLookAt, miliseconds);
+	double milliseconds = 5000.0;
+	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
 
 TEST_F(CcdSutureTest, Fem1DLoop)
 {
-	SurgSim::Framework::Logger::getLogger("SegmentSelfContact")->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 	scene->addSceneElement(makeSuture("loop.ply"));
-	physicsManager->setRate(1000.0);
-	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
-
-	SurgSim::Framework::Logger::getLogger("Collision/SegmentSelfContact")->setThreshold(
-		SurgSim::Framework::LOG_LEVEL_WARNING);
 	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	double miliseconds = 5000.0;
-
-	runTest(cameraPosition, cameraLookAt, miliseconds);
+	double milliseconds = 5000.0;
+	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
