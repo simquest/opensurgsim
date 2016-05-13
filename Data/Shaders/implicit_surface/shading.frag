@@ -87,8 +87,6 @@ void main(void)
 	vec3 lightDir = (mainCamera.viewMatrix * lightSource.position - eyeDir4).xyz;
     float lightDistance = length(lightDir);
 
-    float eyeDistance = length(eyeDir4.xyz);
-
     float attenuation = 1.0 / (lightSource.constantAttenuation + lightSource.linearAttenuation*lightDistance + lightSource.quadraticAttenuation*lightDistance*lightDistance);
 
 	vec3 normal = (texture2D(normalMap, texCoord0).xyz * 2.0) - 1.0;
@@ -99,7 +97,7 @@ void main(void)
 
     vec3 vAmbient = ambientColor.rgb * diffuseColor.rgb;
 
-	vec3 vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse * shadowAmount).rgb;
+	vec3 vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).rgb;
 	vec3 vertexSpecularColor = (attenuation * specularColor * lightSource.specular).rgb;
 
     float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
@@ -112,8 +110,8 @@ void main(void)
 	vec3 reflectDir = reflect(eyeDirNorm, normalDirNorm);
     vec3 vSpecular = vec3(textureCube(specularEnvMap, reflectDir)) * vertexSpecularColor;
 
-	color = mix(color, vSpecular + color, specularPercent) +
-				(specular * specularColor * lightSource.specular * attenuation * shadowAmount).rgb;
+	color = (mix(color, vSpecular + color, specularPercent) +
+				(specular * specularColor * lightSource.specular * attenuation).rgb) * shadowAmount;
 
     gl_FragColor.rgb = color;
     gl_FragColor.a = 1.0;
