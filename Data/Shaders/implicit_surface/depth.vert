@@ -47,5 +47,5 @@ void main(void)
 	eyeSpacePos = vec3(mainCamera.viewMatrix * modelMatrix * gl_Vertex);
 	float dist = length(eyeSpacePos);
 	gl_PointSize = sphereRadius * (sphereScale / dist);
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_Position = mainCamera.projectionMatrix * mainCamera.viewMatrix * modelMatrix * gl_Vertex;
 }
