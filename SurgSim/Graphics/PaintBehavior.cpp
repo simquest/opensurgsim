@@ -230,7 +230,7 @@ Math::Vector2d PaintBehavior::toPixel(const Math::Vector2d& uv)
 	t = Math::clamp(t, 0.0, 1.0, 0.0);
 
 	Math::Vector2d xy;
-	xy << static_cast<int>(s * m_width + 0.5), static_cast<int>(t * m_height + 0.5);
+	xy << floor(s * m_width + 0.5), floor(t * m_height + 0.5);
 
 	return xy;
 }
