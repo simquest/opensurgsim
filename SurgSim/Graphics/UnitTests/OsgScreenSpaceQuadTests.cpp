@@ -130,6 +130,14 @@ TEST(OsgScreenSpaceQuadRepresentationTests, SetLocation)
 
 }
 
+TEST(OsgScreenSpaceQuadRepresentationTests, SetTransparent)
+{
+	auto quad = std::make_shared<OsgScreenSpaceQuadRepresentation>("quad");
+	EXPECT_FALSE(quad->isTransparent());
+	quad->setTransparent(true);
+	EXPECT_TRUE(quad->isTransparent());
+}
+
 
 }  // namespace Graphics
 }  // namespace SurgSim

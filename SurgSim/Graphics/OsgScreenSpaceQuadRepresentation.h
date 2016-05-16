@@ -97,6 +97,14 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	bool setTexture(std::shared_ptr<OsgTextureRectangle> texture);
 
+	/// Sets whether or not the alpha component of the texture should be used for transparancy blending.
+	/// \param	value	true will render this last, allowing alpha-based blending to work.
+	void setTransparent(bool value);
+
+	/// Gets whether or not the alpha component of the texture should be used for transparancy blending.
+	/// \return true if this will render last, allowing alpha-based blending to work.
+	bool isTransparent();
+
 protected:
 	void doUpdate(double dt) override;
 
@@ -140,7 +148,6 @@ private:
 
 	/// Indicate which type of texture is currently being used
 	SurgSim::DataStructures::OptionalValue<int> m_texureType;
-
 };
 
 }; // Graphics
