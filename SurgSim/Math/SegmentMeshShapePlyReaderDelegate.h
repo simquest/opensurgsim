@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_SEGMENTMESHPLYREADERDELEGATE_H
-#define SURGSIM_DATASTRUCTURES_SEGMENTMESHPLYREADERDELEGATE_H
+#ifndef SURGSIM_MATH_SEGMENTMESHSHAPEPLYREADERDELEGATE_H
+#define SURGSIM_MATH_SEGMENTMESHSHAPEPLYREADERDELEGATE_H
 
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Math/SegmentMeshShape.h"
