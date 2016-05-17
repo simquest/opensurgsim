@@ -62,6 +62,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	PaintBehavior.cpp
 	PointCloudRepresentation.cpp
 	RenderPass.cpp
 	Representation.cpp
@@ -146,6 +147,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgVectorFieldRepresentation.h
 	OsgView.h
 	OsgViewElement.h
+	PaintBehavior.h
 	PlaneRepresentation.h
 	PointCloudRepresentation.h
 	Program.h
