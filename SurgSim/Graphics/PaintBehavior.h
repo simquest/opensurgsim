@@ -16,8 +16,6 @@
 #ifndef SURGSIM_GRAPHICS_PAINTBEHAVIOR_H
 #define SURGSIM_GRAPHICS_PAINTBEHAVIOR_H
 
-#include <mutex>
-
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -104,7 +102,7 @@ private:
 	Math::Vector4d m_color;
 
 	/// Collection of UV texture coordinates to paint to on next update
-	std::vector<Math::Vector2d> m_coordinates;
+	std::vector<DataStructures::IndexedLocalCoordinate> m_coordinates;
 
 	/// Width of assigned texture
 	int m_width;
@@ -120,7 +118,7 @@ private:
 
 	Math::Matrix m_brush;
 
-	std::mutex m_mutex;
+	boost::mutex m_mutex;
 };
 
 } // Graphics

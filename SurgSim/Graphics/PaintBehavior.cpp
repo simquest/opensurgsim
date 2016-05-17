@@ -68,21 +68,8 @@ Math::Vector4d PaintBehavior::getColor() const
 
 void PaintBehavior::setCoordinates(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinates)
 {
-	std::unique_lock<std::mutex> lock(m_mutex);
-	auto mesh = m_representation->getMesh();
-	for (auto coordinate : coordinates)
-	{
-		if (coordinate.index < mesh->getNumVertices())
-		{
-			auto vertex1 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[0]);
-			auto vertex2 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[1]);
-			auto vertex3 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[2]);
-			Math::Vector2d uv = vertex1.data.texture.getValue() * coordinate.coordinate[0] +
-								vertex2.data.texture.getValue() * coordinate.coordinate[1] +
-								vertex3.data.texture.getValue() * coordinate.coordinate[2];
-			m_coordinates.push_back(uv);
-		}
-	}
+	boost::unique_lock<boost::mutex> lock(m_mutex);
+	m_coordinates = coordinates;
 }
 
 bool PaintBehavior::doInitialize()
@@ -127,13 +114,27 @@ bool PaintBehavior::doWakeUp()
 
 void PaintBehavior::update(double dt)
 {
-	std::vector<Math::Vector2d> newCoordinates;
+	std::vector<Math::Vector2d> uvCoordinates;
+
 	{
-		std::unique_lock<std::mutex> lock(m_mutex);
-		std::swap(newCoordinates, m_coordinates);
+		boost::unique_lock<boost::mutex> lock(m_mutex);
+		auto mesh = m_representation->getMesh();
+		for (auto coordinate : m_coordinates)
+		{
+			if (coordinate.index < mesh->getNumVertices())
+			{
+				auto vertex1 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[0]);
+				auto vertex2 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[1]);
+				auto vertex3 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[2]);
+				Math::Vector2d uv = vertex1.data.texture.getValue() * coordinate.coordinate[0] +
+									vertex2.data.texture.getValue() * coordinate.coordinate[1] +
+									vertex3.data.texture.getValue() * coordinate.coordinate[2];
+				uvCoordinates.push_back(uv);
+			}
+		}
 	}
 
-	for (auto& uv : newCoordinates)
+	for (auto& uv : uvCoordinates)
 	{
 		Math::Vector2d xy = toPixel(uv);
 
@@ -239,19 +240,19 @@ void PaintBehavior::paint(const Math::Vector2d& coordinates)
 {
 	size_t numChannels = 4;
 
-	auto image = DataStructures::ImageMap<unsigned char>(m_width,
-														 m_height,
-														 numChannels,
-														 m_texture->getOsgTexture2d()->getImage()->data());
+	DataStructures::ImageMap<unsigned char> image(m_width,
+												  m_height,
+												  numChannels,
+												  m_texture->getOsgTexture2d()->getImage()->data());
 
-	size_t i = static_cast<int>(std::max(0.0, coordinates[0] + m_brushOffsetX));
-	size_t j = static_cast<int>(std::max(0.0, coordinates[1] + m_brushOffsetY));
-	size_t p = std::min(m_width - i, static_cast<size_t>(m_brush.cols()));
-	size_t q = std::min(m_height - j, static_cast<size_t>(m_brush.rows()));
+	size_t topLeftX = static_cast<size_t>(std::max(0.0, coordinates[0] + m_brushOffsetX));
+	size_t topLeftY = static_cast<size_t>(std::max(0.0, coordinates[1] + m_brushOffsetY));
+	size_t bottomRightX = std::min(m_width - topLeftX, static_cast<size_t>(m_brush.cols()));
+	size_t bottomRightY = std::min(m_height - topLeftY, static_cast<size_t>(m_brush.rows()));
 	for (size_t channel = 0; channel < numChannels; channel++)
 	{
-		auto imageBlock = image.getChannel(channel).block(i, j, p, q);
-		auto brushBlock = m_brush.topLeftCorner(p, q);
+		auto imageBlock = image.getChannel(channel).block(topLeftX, topLeftY, bottomRightX, bottomRightY);
+		auto brushBlock = m_brush.topLeftCorner(bottomRightX, bottomRightY);
 		imageBlock = (brushBlock.array() > 0).select((brushBlock * m_color(channel)*255).template cast<unsigned char>(),
 						imageBlock);
 	}
