@@ -153,7 +153,6 @@ void OsgRepresentation::setGenerateTangents(bool value)
 		m_tangentGenerator =
 			new TangentSpaceGenerator(DIFFUSE_TEXTURE_UNIT, TANGENT_VERTEX_ATTRIBUTE_ID, BITANGENT_VERTEX_ATTRIBUTE_ID);
 		m_tangentGenerator->setBasisOrthonormality(true);
-		updateTangents();
 	}
 	if (!value)
 	{

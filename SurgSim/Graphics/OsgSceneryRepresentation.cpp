@@ -82,5 +82,14 @@ osg::ref_ptr<osg::Node> OsgSceneryRepresentation::getModelNode() const
 	return m_osgNode;
 }
 
+void OsgSceneryRepresentation::setGenerateTangents(bool value)
+{
+	OsgRepresentation::setGenerateTangents(value);
+	if (m_osgNode.valid())
+	{
+		updateTangents();
+	}
+}
+
 };	// namespace Graphics
 };	// namespace SurgSim
