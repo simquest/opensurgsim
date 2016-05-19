@@ -56,6 +56,8 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 	}
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
+	const double depth = static_cast<const ContactConstraintData&>(data).getDistance();
+	const double timeOfImpact = static_cast<const ContactConstraintData&>(data).getContactTime();
 	const SurgSim::Math::Vector3d& n = static_cast<const ContactConstraintData&>(data).getNormal();
 	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
@@ -69,7 +71,6 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 				std::dynamic_pointer_cast<Math::SegmentMeshShape>(rep->getShape());
 			if (segmentShape != nullptr)
 			{
-
 				double radius = segmentShape->getRadius() + m_mlcpNumericalPrecision;
 				globalPosition -= n * (radius * scale);
 			}

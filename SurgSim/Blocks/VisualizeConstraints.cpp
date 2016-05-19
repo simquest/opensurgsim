@@ -119,8 +119,9 @@ void VisualizeConstraintsBehavior::update(double dt)
 						std::static_pointer_cast<ContactConstraintData>((*it)->getData())->getNormal();
 					double forceNormalIntensity = x[mlcpConstraintIndex];
 					force = forceNormal * forceNormalIntensity;
-					std::cout << "Force Normal: (" <<  forceNormal[0] << ", " << forceNormal[1] << ", " << forceNormal[2] <<
-							  ")\nForce Normal Intensity: " << forceNormalIntensity * 100000.0 << std::endl;
+//					std::cout << "Force Normal: (" <<  forceNormal[0] << ", " <<
+//							  forceNormal[1] << ", " << forceNormal[2] <<
+//							  ")\nForce Normal Intensity: " << forceNormalIntensity * 100000.0 << std::endl;
 					color = SurgSim::Math::Vector4d(0.9, 0.0, 0.0, 1);
 				}
 				break;

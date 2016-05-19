@@ -67,6 +67,13 @@ public:
 		return m_distance;
 	}
 
+	/// Gets the plane distance to the origin
+	/// \return The plane equation's distance to the origin
+	double getContactTime() const
+	{
+		return m_contact->time;
+	}
+
 	/// \return The contact that uses this constraint data.
 	std::shared_ptr<Collision::Contact> getContact()
 	{

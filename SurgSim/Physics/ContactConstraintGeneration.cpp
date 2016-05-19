@@ -44,8 +44,8 @@ ContactConstraintGeneration::~ContactConstraintGeneration()
 }
 
 std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
-		const double& dt,
-		const std::shared_ptr<PhysicsManagerState>& state)
+	const double& dt,
+	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	using SurgSim::DataStructures::Location;
 
@@ -71,8 +71,8 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 			if (foundFirst == collisionToPhysicsMap.end() || foundSecond == collisionToPhysicsMap.end())
 			{
 				SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
-					collisionRepresentations.first->getName() << " and/or " <<
-					collisionRepresentations.second->getName() << " does not have a physics representation";
+											collisionRepresentations.first->getName() << " and/or " <<
+											collisionRepresentations.second->getName() << " does not have a physics representation";
 				continue;
 			}
 			std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>> physicsRepresentations;
@@ -82,8 +82,8 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 			if (!(physicsRepresentations.first->isActive() && physicsRepresentations.second->isActive()))
 			{
 				SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
-					physicsRepresentations.first->getName() << " and/or " <<
-					physicsRepresentations.second->getName() << " is not an active physics representation";
+											physicsRepresentations.first->getName() << " and/or " <<
+											physicsRepresentations.second->getName() << " is not an active physics representation";
 				continue;
 			}
 
@@ -93,9 +93,9 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 				std::pair<std::shared_ptr<Location>, std::shared_ptr<Location>> locations;
 
 				locations.first = makeLocation(physicsRepresentations.first, collisionRepresentations.first,
-						contact->penetrationPoints.first);
+											   contact->penetrationPoints.first);
 				locations.second = makeLocation(physicsRepresentations.second, collisionRepresentations.second,
-						contact->penetrationPoints.second);
+												contact->penetrationPoints.second);
 
 				// HS-2013-jul-12 The type of constraint is fixed here right now, to get to a constraint
 				// that we can change we probably will need to predefine collision pairs and their appropriate
@@ -105,9 +105,9 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 				data->setContact(contact);
 
 				constraints.push_back(std::make_shared<Constraint>(
-					SurgSim::Physics::FRICTIONLESS_3DCONTACT, data,
-					physicsRepresentations.first, *locations.first,
-					physicsRepresentations.second, *locations.second));
+										  SurgSim::Physics::FRICTIONLESS_3DCONTACT, data,
+										  physicsRepresentations.first, *locations.first,
+										  physicsRepresentations.second, *locations.second));
 			}
 		}
 	}
@@ -130,9 +130,9 @@ std::shared_ptr<SurgSim::DataStructures::Location> ContactConstraintGeneration::
 		// Move the local position from the collision representation that created the location
 		// to local coordinates of the physics representation that is creating a localization
 		physicsLocation->rigidLocalPosition.setValue(
-				physicsRepresentation->getLocalPose().inverse() *
-				collisionRepresentation->getLocalPose() *
-				location.rigidLocalPosition.getValue());
+			physicsRepresentation->getLocalPose().inverse() *
+			collisionRepresentation->getLocalPose() *
+			location.rigidLocalPosition.getValue());
 	}
 	return physicsLocation;
 }

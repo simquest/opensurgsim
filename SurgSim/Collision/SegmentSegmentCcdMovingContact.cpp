@@ -120,7 +120,7 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentBaseCase(
 		// Either it collides at t=0 or we do a dichotomy to find intersection in [0..1]
 		if (m_staticTest.collideStaticSegmentSegment(pT0, qT0, thicknessP, thicknessQ, r, s))
 		{
-			t = 0;
+			*t = 0.0;
 			collisionFound = true;
 		}
 		else
@@ -160,7 +160,7 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentBaseCase(
 
 			if (m_staticTest.collideStaticSegmentSegment(pT0, qT0, thicknessP, thicknessQ, r, s))
 			{
-				t = 0;
+				*t = 0.0;
 				collisionFound = true;
 			}
 			else
@@ -222,10 +222,14 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentParallelCase(
 		// this collision, or something went wrong. Report false.
 		if (m_staticTest.collideStaticSegmentSegment(pb, qb, thicknessP, thicknessQ, r, s))
 		{
+			std::cout << ">>>>>>>>>>>>>>>>>>>>>>> Parallel >>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 			*t = b;
-			return true;
 		}
-		*t = ((b - a) / 2.0);
+		else
+		{
+			std::cout << "Parallel - Time recursion bottomed out at: " << *t << std::endl;
+			*t = ((b + a) / 2.0);
+		}
 		return true;
 	}
 
@@ -333,11 +337,16 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentCoplanarCase(
 		// and more likely the 2 segments are colliding at t=b
 		if (m_staticTest.collideStaticSegmentSegment(pTb, qTb, thickness_p, thickness_q, r, s))
 		{
+			std::cout << ">>>>>>>>>>>>>>>>>>>>>> Coplanar >>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 			*t = b;
 			collisionFound = true;
 		}
-		*t = ((b - a) / 2.0);
-		collisionFound = true;
+		else
+		{
+			std::cout << "Coplanar - Time recursion bottomed out at: " << *t << std::endl;
+			*t = ((b + a) / 2.0);
+			collisionFound = true;
+		}
 		return collisionFound;
 	}
 	// Geometry at time t=a
@@ -446,11 +455,17 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentGeneralCase(
 		if (m_staticTest.collideStaticSegmentSegment(pTb, qTb, state.thicknessP(),
 				state.thicknessQ(), r, s))
 		{
+			// std::cout << ">>>>>>>>>>>>>>>>>>>>> General >>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 			*t = b;
 			collisionFound = true;
 		}
-		*t = ((b - a) / 2.0);
-		collisionFound = true;
+		else
+		{
+			*t = b;
+			//std::cout << "General - Time recursion bottomed out at: " << ((b + a) / 2.0) << std::endl;
+			collisionFound = false;
+			return false;
+		}
 		return collisionFound;
 	}
 

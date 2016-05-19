@@ -70,6 +70,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	double localTimeOfImpact = 0.0;
 	std::vector<std::list<std::shared_ptr<Collision::Contact>>> oldContacts;
 
+	std::cout << "************************* Outer Loop *************************" << std::endl;
 	size_t iterations = 0;
 	for (; iterations < m_maxIterations; ++iterations)
 	{
