@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,28 +57,16 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgPointCloudRepresentation);
 
-	/// Gets the vertices.
-	/// \return	The vertices.
 	std::shared_ptr<PointCloud> getVertices() const override;
 
-	/// Sets point size.
-	/// \param	val	The value.
 	void setPointSize(double val) override;
 
-	/// Gets point size.
-	/// \return	The point size.
 	double getPointSize() const override;
 
-	/// Executes the update operation.
-	/// \param	dt	The dt.
 	void doUpdate(double dt) override;
 
-	/// Sets a color.
-	/// \param	color	The color.
 	void setColor(const SurgSim::Math::Vector4d& color) override;
 
-	/// Gets the color.
-	/// \return The current color.
 	SurgSim::Math::Vector4d getColor() const override;
 
 private:
