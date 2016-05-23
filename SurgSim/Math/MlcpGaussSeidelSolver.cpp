@@ -138,13 +138,26 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	SURGSIM_LOG_IF(*convergenceCriteria >= sqrt(m_epsilonConvergence), m_logger, WARNING) <<
 			"Convergence criteria (" << *convergenceCriteria << ") is greater than " << sqrt(m_epsilonConvergence) <<
 			" at end of " << *iteration << " Gauss Seidel iterations.";
+	if (*convergenceCriteria >= sqrt(m_epsilonConvergence))
+	{
+		SURGSIM_LOG_DEBUG(m_logger) <<
+									"Convergence criteria (" << *convergenceCriteria << ") is greater than " <<
+									sqrt(m_epsilonConvergence) << " at end of " << *iteration <<
+									" Gauss Seidel iterations.";
+	}
 
 	SURGSIM_LOG_IF(*convergenceCriteria > *initialConvergenceCriteria, m_logger, WARNING) <<
 			"Convergence criteria (" << *convergenceCriteria << ") is greater than before " << *iteration <<
 			" Gauss Seidel iterations (" << *initialConvergenceCriteria << ").";
+	if (*convergenceCriteria > *initialConvergenceCriteria)
+	{
+		SURGSIM_LOG_DEBUG(m_logger) << "Convergence criteria (" << *convergenceCriteria <<
+									") is greater than before " << *iteration <<
+									" Gauss Seidel iterations (" << *initialConvergenceCriteria << ").";
+	}
 
 	SURGSIM_LOG_IF(!(*validSignorini), m_logger, WARNING) <<
-		"Signorini not verified after " << *iteration << " Gauss Seidel iterations.";
+			"Signorini not verified after " << *iteration << " Gauss Seidel iterations.";
 
 	return (SurgSim::Math::isValid(*convergenceCriteria) && *convergenceCriteria <= m_epsilonConvergence);
 }
@@ -214,7 +227,8 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 
 			case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 			{
-				const double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
+				const double violation = b[currentAtomicIndex] +
+										 A.row(currentAtomicIndex) * initialGuessAndSolution - m_epsilonConvergence;
 				// Enforce orthogonality condition
 				if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
 					(initialGuessAndSolution[currentAtomicIndex] > m_epsilonConvergence &&
@@ -393,7 +407,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 				// Coupling part (fill up LHS and RHS)
 				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] =
 					b[matrixEntryForConstraintID] +
-					A.row(matrixEntryForConstraintID) * initialGuessAndSolution;
+					A.row(matrixEntryForConstraintID) * initialGuessAndSolution - m_epsilonConvergence;
 				m_lhsEnforcedLocalSystem.block(0, systemSizeWithoutConstraintID, systemSizeWithoutConstraintID, 1) =
 					A.block(0, matrixEntryForConstraintID, systemSizeWithoutConstraintID, 1);
 				m_lhsEnforcedLocalSystem.block(systemSizeWithoutConstraintID, 0, 1, systemSizeWithoutConstraintID) =

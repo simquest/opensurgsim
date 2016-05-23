@@ -95,7 +95,7 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	const Math::SegmentMeshShape& segmentShape2 = segmentShape1AtTime1;
 	const Math::RigidTransform3d& segmentPose2 = segmentPose1AtTime1;
 
-	std::cout << "============================ Inner Loop ================================" << std::endl;
+	SURGSIM_LOG_DEBUG(m_logger) << "============================ Inner Loop ================================";
 	SURGSIM_ASSERT(segmentShape1.getNumEdges() == segmentShape2.getNumEdges()) <<
 			"Segment CCD self collision detects that " <<
 			"the segment at time t and time t + 1 have different numbers of edges.";
@@ -105,18 +105,20 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	// Intersect the AABB trees of the Segment Mesh at time 0 and time 1 to get a list of
 	// potential intersecting segments.
 	std::set<std::pair<size_t, size_t>> segmentIds;
+
+	// TODO(wturner): We need to reinstitute the AABB tree to handle motion. When we do, the
+	// following codecan be reenabled and the brute force mmethod below removed:
+	//
+	// Beginning of AABB
 	//std::list<DataStructures::AabbTree::TreeNodePairType> intersectionList
 	//	= segmentShape1.getAabbTree()->spatialJoin(*segmentShape2.getAabbTree());
 	//getUniqueCandidates(intersectionList, &segmentIds);
-
+	// End of AABB.
 	for (int i = 0; i < segmentShape1.getNumEdges(); i++)
 	{
-		for (int j = 0; j < segmentShape1.getNumEdges(); j++)
+		for (int j = i + 1; j < segmentShape1.getNumEdges(); j++)
 		{
-			if (abs(i - j) > 1)
-			{
-				segmentIds.emplace(i, j);
-			}
+			segmentIds.emplace(i, j);
 		}
 	}
 
@@ -226,17 +228,16 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 				// m_distanceEpsilon/2. For accuracy, it is calculated from both starting points and then averaged.
 				double effectiveRadiusP = m_useSegmentThickness ? segmentRadius1 : m_distanceEpsilon / 2.0;
 				double effectiveRadiusQ = m_useSegmentThickness ? segmentRadius2 : m_distanceEpsilon / 2.0;
-				std::cout << "time:\t" << t;
-				std::cout << "\tid1:\t" << id1 << "\tid2:\t" << id2;
-				std::cout << "\tr:\t" << r << "\ts:\t" << s;
-				std::cout << "\tNormal:\t" << pToQDir.norm();
+
 				auto normal = pToQDir.normalized();
 				Math::Vector3d contactP = segmentPContact + (effectiveRadiusP * normal);
 				Math::Vector3d contactQ = segmentQContact - (effectiveRadiusQ * normal);
 				auto contactPoint = 0.5 * (contactP + contactQ);
 				auto depth = ((contactP - contactQ).dot(normal) > 0.0) ?
 							 (contactP - contactQ).norm() : -(contactP - contactQ).norm();
-				std::cout << "\tDepth:\t" << depth << std::endl;
+				SURGSIM_LOG_DEBUG(m_logger) << "time:\t" << t << "\tid1:\t" << id1 << "\tid2:\t" << id2 <<
+											"\tr:\t" << r << "\ts:\t" << s << "\tNormal:\t" <<
+											pToQDir.norm() << "\tDepth:\t" << depth;
 				contacts.emplace_back(std::make_shared<Contact>(
 										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, depth, t,
 										  contactPoint, -normal, penetrationPoints));
@@ -244,8 +245,8 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 		}
 		else
 		{
-			SURGSIM_LOG_DEBUG(m_logger) <<
-										"AABB tree detected false positive between segments " << id1 << " and " << id2;
+//			SURGSIM_LOG_DEBUG(m_logger) <<
+//										"AABB tree detected false positive between segments " << id1 << " and " << id2;
 		}
 	}
 	return contacts;
@@ -534,7 +535,6 @@ double SegmentSelfContact::maxTimePrecision(
 
 	if (timePrecision < m_timeMinPrecisionEpsilon)
 	{
-		std::cout << "Moving too fast for sampling rate ... " << std::endl;
 		SURGSIM_LOG_ONCE(m_logger, WARNING) <<
 											"Minimum time precision(" << m_timeMinPrecisionEpsilon <<
 											") needs to be smaller(" << timePrecision <<

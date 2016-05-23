@@ -70,7 +70,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	double localTimeOfImpact = 0.0;
 	std::vector<std::list<std::shared_ptr<Collision::Contact>>> oldContacts;
 
-	std::cout << "************************* Outer Loop *************************" << std::endl;
+	SURGSIM_LOG_DEBUG(m_logger) << "************************* Outer Loop *************************";
 	size_t iterations = 0;
 	for (; iterations < m_maxIterations; ++iterations)
 	{
@@ -109,9 +109,17 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 										 timeOfImpact << ")" << std::endl;
 			break;
 		}
+
+		// Lambda == 0 means we are no longer generating corrections. Exit the loop.
+		// We will take up the collision detection at the start of the next time step.
+		if (ccdState->getMlcpSolution().x.isZero())
+		{
+			break;
+		}
 	}
 
-	SURGSIM_LOG_IF(iterations == m_maxIterations, m_logger, WARNING) << "Maxed out iterations (" << m_maxIterations << ")";
+	SURGSIM_LOG_IF(iterations == m_maxIterations, m_logger, WARNING) <<
+			"Maxed out iterations (" << m_maxIterations << ")";
 
 	return ccdState;
 }
@@ -155,7 +163,7 @@ void CcdCollisionLoop::filterLaterContacts(
 	{
 		pair->getContacts().remove_if([timeOfImpact, epsilon](const std::shared_ptr<Collision::Contact>& contact)
 		{
-			return contact->time > timeOfImpact;
+			return contact->time > timeOfImpact + epsilon;
 		});
 	}
 }

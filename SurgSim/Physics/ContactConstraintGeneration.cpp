@@ -72,7 +72,8 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 			{
 				SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
 											collisionRepresentations.first->getName() << " and/or " <<
-											collisionRepresentations.second->getName() << " does not have a physics representation";
+											collisionRepresentations.second->getName() <<
+											" does not have a physics representation";
 				continue;
 			}
 			std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>> physicsRepresentations;
@@ -83,7 +84,8 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 			{
 				SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
 											physicsRepresentations.first->getName() << " and/or " <<
-											physicsRepresentations.second->getName() << " is not an active physics representation";
+											physicsRepresentations.second->getName() <<
+											" is not an active physics representation";
 				continue;
 			}
 
