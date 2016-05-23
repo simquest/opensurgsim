@@ -38,6 +38,7 @@ set(UNIT_TEST_SOURCES
 	OsgTextRepresentationRenderTests.cpp
 	OsgVectorFieldRepresentationRenderTests.cpp
 	OsgViewElementRenderTests.cpp
+	PaintBehaviorRenderTests.cpp
 	RenderTest.cpp
 )
 

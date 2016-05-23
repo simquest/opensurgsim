@@ -17,6 +17,8 @@
 ## Set build flags through CMake.
 ## Splitting this out removes excessive verbiage from CMakeLists.txt.
 
+cmake_policy(SET CMP0054 NEW)
+
 # If no build type is specified, default to "Release".
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	set(CMAKE_BUILD_TYPE "Release")

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,10 +47,12 @@ public:
 	virtual std::shared_ptr<PointCloud>	getVertices() const = 0;
 
 	/// Sets point size for the point elements.
+	/// The point size defines the the width and height of the drawn square, in window pixels.
 	/// \param	val	The value.
 	virtual void setPointSize(double val) = 0;
 
 	/// Gets point size.
+	/// The point size defines the the width and height of the drawn square, in window pixels.
 	/// \return	The point size.
 	virtual double getPointSize() const = 0;
 

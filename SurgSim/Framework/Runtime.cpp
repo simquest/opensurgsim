@@ -463,6 +463,12 @@ bool Runtime::tryConvertElements(const std::string& filename, const YAML::Node& 
 			SURGSIM_LOG_SEVERE(Logger::getLogger("Runtime"))
 					<< "File " << filename << " YAML conversion failed with exception: " + e.msg;
 		}
+		catch (SurgSim::Framework::AssertionFailure e)
+		{
+			SURGSIM_LOG_CRITICAL(Logger::getLogger("Runtime"))
+					<< "File " << filename << " conversion failed.";
+			throw e;
+		}
 	}
 	else
 	{

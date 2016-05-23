@@ -94,6 +94,9 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::st
 
 	removeGroupReference(Representation::DefaultGroupName);
 	addGroupReference(Representation::DefaultHudGroupName);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgScreenSpaceQuadRepresentation, bool, Transparent,
+		isTransparent, setTransparent);
 }
 
 OsgScreenSpaceQuadRepresentation::~OsgScreenSpaceQuadRepresentation()
@@ -200,6 +203,23 @@ void OsgScreenSpaceQuadRepresentation::getLocation(double* x, double* y)
 
 	*x = position.x();
 	*y = position.y();
+}
+
+void OsgScreenSpaceQuadRepresentation::setTransparent(bool value)
+{
+	if (value)
+	{
+		m_geode->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+	}
+	else
+	{
+		m_geode->getOrCreateStateSet()->setRenderingHint(osg::StateSet::DEFAULT_BIN);
+	}
+}
+
+bool OsgScreenSpaceQuadRepresentation::isTransparent()
+{
+	return osg::StateSet::TRANSPARENT_BIN == m_geode->getOrCreateStateSet()->getRenderingHint();
 }
 
 
