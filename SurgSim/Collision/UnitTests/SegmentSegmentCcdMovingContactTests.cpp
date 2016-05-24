@@ -228,11 +228,12 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSegmentSegmentCoplanarCase)
 		EXPECT_DOUBLE_EQ(0.0, s);
 
 		// Increase the interval and time precision so that no collision occurs
-		EXPECT_FALSE(movingTest.collideSegmentSegmentCoplanarCase(
-						 pEnd, pStart,
-						 qStart, qEnd,
-						 0.5 - .24, 0.5 + .25, .50,
-						 0.5, 0.25, &t, &r, &s, 0));
+		EXPECT_TRUE(movingTest.collideSegmentSegmentCoplanarCase(
+						pEnd, pStart,
+						qStart, qEnd,
+						0.5 - .24, 0.5 + .25, .50,
+						0.5, 0.25, &t, &r, &s, 0));
+		EXPECT_GE(1.0e-02, std::abs(0.5 - t));
 	}
 	{
 		// Test complete recursion
@@ -392,11 +393,12 @@ TEST(SegmentSegmentCcdMovingContactTests, TestSegmentSegmentParallelCase)
 		EXPECT_GE(1.0e-09, std::abs(5.0e-10 - r));
 		EXPECT_GE(1.0e-09, std::abs(1.0 - 5.0e-10 - s));
 
-		EXPECT_FALSE(movingTest.collideSegmentSegmentParallelCase(
-						 pStart, pEnd,
-						 qStart, qEnd,
-						 0.4 - 1.4e-07, 0.4 + 1.4e-07,
-						 0.5, 0.25, 3.0e-06, &t, &r, &s, 0));
+		EXPECT_TRUE(movingTest.collideSegmentSegmentParallelCase(
+						pStart, pEnd,
+						qStart, qEnd,
+						0.4 - 1.4e-07, 0.4 + 1.4e-07,
+						0.5, 0.25, 3.0e-06, &t, &r, &s, 0));
+		EXPECT_GE(5.0e-02, std::abs(0.425 - t));
 	}
 	{
 		// Test where collision occurs in one of the intervals

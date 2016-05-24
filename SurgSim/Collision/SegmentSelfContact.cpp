@@ -531,7 +531,7 @@ double SegmentSelfContact::maxTimePrecision(
 		std::sqrt(std::max(maxP1RelativeDisplacementNorm2, maxP2RelativeDisplacementNorm2));
 
 	// The time precision should be set low enough so that we don't miss any segment collision.
-	double timePrecision = effectiveThickness / (4 * maxRelativeDisplacement);
+	double timePrecision = effectiveThickness / maxRelativeDisplacement;
 
 	if (timePrecision < m_timeMinPrecisionEpsilon)
 	{

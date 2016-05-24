@@ -228,7 +228,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 			case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 			{
 				const double violation = b[currentAtomicIndex] +
-										 A.row(currentAtomicIndex) * initialGuessAndSolution - m_epsilonConvergence;
+										 A.row(currentAtomicIndex) * initialGuessAndSolution;
 				// Enforce orthogonality condition
 				if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
 					(initialGuessAndSolution[currentAtomicIndex] > m_epsilonConvergence &&
@@ -407,7 +407,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 				// Coupling part (fill up LHS and RHS)
 				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] =
 					b[matrixEntryForConstraintID] +
-					A.row(matrixEntryForConstraintID) * initialGuessAndSolution - m_epsilonConvergence;
+					A.row(matrixEntryForConstraintID) * initialGuessAndSolution;
 				m_lhsEnforcedLocalSystem.block(0, systemSizeWithoutConstraintID, systemSizeWithoutConstraintID, 1) =
 					A.block(0, matrixEntryForConstraintID, systemSizeWithoutConstraintID, 1);
 				m_lhsEnforcedLocalSystem.block(systemSizeWithoutConstraintID, 0, 1, systemSizeWithoutConstraintID) =

@@ -56,8 +56,6 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 	}
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
-	const double depth = static_cast<const ContactConstraintData&>(data).getDistance();
-	const double timeOfImpact = static_cast<const ContactConstraintData&>(data).getContactTime();
 	const SurgSim::Math::Vector3d& n = static_cast<const ContactConstraintData&>(data).getNormal();
 	const SurgSim::DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
@@ -79,7 +77,7 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 
 	// Update b with new violation
 	double violation = n.dot(globalPosition);
-	mlcp->b[indexOfConstraint] += violation * scale - radius;
+	mlcp->b[indexOfConstraint] += violation * scale - radius - m_mlcpNumericalPrecision;
 
 	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
 	m_newH.resize(fem->getNumDof());

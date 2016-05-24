@@ -43,6 +43,7 @@ namespace
 {
 const double epsilon = 1e-10;
 const double dt = 1e-3;
+const double mlcpPrecision = 1e-04;
 };
 
 static void addTetraheadron(Fem3DRepresentation* fem,
@@ -158,7 +159,7 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpTest)
 						  &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = Vector3d(0.30, -0.57,  0.40) - Vector3d::UnitY() * 9.81 * dt * dt;
-	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0] + mlcpPrecision, epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
 	SurgSim::Math::setSubVector(dt * m_n, 0, 3, &H);
@@ -199,7 +200,7 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpCoordinateTest)
 								  Vector3d(0.35,  0.52,  0.50) * barycentric[2] +
 								  Vector3d(1.14,  0.66,  0.71) * barycentric[3]) -
 								 Vector3d::UnitY() * 9.81 * dt * dt;
-	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0] + mlcpPrecision, epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
 	SurgSim::Math::setSubVector(0.25 * dt * m_n, 0, 3, &H);
@@ -287,7 +288,7 @@ TEST_F(Fem3DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 								  Vector3d(0.35,  0.52,  0.50) * barycentric[2] +
 								  Vector3d(1.14,  0.66,  0.71) * barycentric[3]) -
 								 Vector3d::UnitY() * 9.81 * dt * dt;
-	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint] + mlcpPrecision, epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
 	SurgSim::Math::setSubVector(0.25 * dt * m_n, 0, 3, &H);
