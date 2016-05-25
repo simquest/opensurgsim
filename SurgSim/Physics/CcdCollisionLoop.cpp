@@ -109,7 +109,8 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 		}
 	}
 
-	SURGSIM_LOG_IF(iterations == m_maxIterations, m_logger, WARNING) << "Maxed out iterations (" << m_maxIterations << ")";
+	SURGSIM_LOG_IF(iterations == m_maxIterations, m_logger, WARNING) <<
+			"Maxed out iterations (" << m_maxIterations << ")";
 
 	return ccdState;
 }
