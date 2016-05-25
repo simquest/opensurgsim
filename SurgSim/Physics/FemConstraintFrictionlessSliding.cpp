@@ -55,7 +55,6 @@ void FemConstraintFrictionlessSliding::doBuild(double dt,
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
 	const SlidingConstraintData& constraintData = static_cast<const SlidingConstraintData&>(data);
 	const auto normals = constraintData.getNormals();
-	const auto distances = constraintData.getDistances();
 
 	const DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
@@ -69,7 +68,7 @@ void FemConstraintFrictionlessSliding::doBuild(double dt,
 	for (size_t i = 0; i < 2; ++i)
 	{
 		// Update b with new violation
-		double violation = normals[i].dot(globalPosition) + distances[i];
+		double violation = normals[i].dot(globalPosition);
 		mlcp->b[indexOfConstraint + i] += violation * scale;
 
 		// Fill the new H.

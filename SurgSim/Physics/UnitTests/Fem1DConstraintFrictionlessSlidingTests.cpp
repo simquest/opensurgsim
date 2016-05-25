@@ -106,28 +106,6 @@ public:
 		m_constraintData.setSlidingDirection(m_localization->calculatePosition(0.0), m_slidingDirection);
 	}
 
-	Vector3d computeNewPosition(const IndexedLocalCoordinate& coord) const
-	{
-		// Solve the system M.a = f
-		// The gravity force should be M.g, but we actually use a mass per node diagonal matrix Md
-		// So the assumption that the violation should be oriented toward the gravity vector is false:
-		// Ma = f = Mg   => a = M^-1.f = M^-1.M.g = g
-		// Instead, we have
-		// Ma = f = Md.g => a = M^-1.f = M^-1.Md.g
-		SurgSim::Math::Vector a = m_fem->getM().toDense().inverse() * m_fem->getF();
-		SurgSim::Math::Vector v = m_fem->getInitialState()->getVelocities() + a * dt;
-		SurgSim::Math::Vector p = m_fem->getInitialState()->getPositions() + v * dt;
-		Vector3d newPosition = Vector3d::Zero();
-		const auto& nodeIds = m_fem->getFemElement(coord.index)->getNodeIds();
-
-		for (size_t node = 0; node < 2; node++)
-		{
-			newPosition += p.segment<3>(6 * nodeIds[node]) * coord.coordinate[node];
-		}
-
-		return newPosition;
-	}
-
 	std::shared_ptr<MockFem1DRepresentation> m_fem;
 	std::shared_ptr<Fem1DLocalization> m_localization;
 
@@ -166,11 +144,10 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[0]) + m_constraintData.getDistances()[0],
-		mlcpPhysicsProblem.b[0], epsilon);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[1]) + m_constraintData.getDistances()[1],
-		mlcpPhysicsProblem.b[1], epsilon);
+	auto pose = m_constraintData.getPose().inverse().rotation();
+	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));
+	EXPECT_TRUE((pose * m_constraintData.getNormals()[0]).isApprox(Vector3d(0.0, 1.0, 0.0)));
+	EXPECT_TRUE((pose * m_constraintData.getNormals()[1]).isApprox(Vector3d(0.0, 0.0, 1.0)));
 
 	Eigen::Matrix<double, 2, 30> H = Eigen::Matrix<double, 2, 30>::Zero();
 	H.block<1, 3>(0, 0) = (dt * m_constraintData.getNormals()[0]).eval();
@@ -205,11 +182,10 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpCoordinateTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[0]) + m_constraintData.getDistances()[0],
-		mlcpPhysicsProblem.b[0], epsilon);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[1]) + m_constraintData.getDistances()[1],
-		mlcpPhysicsProblem.b[1], epsilon);
+	auto pose = m_constraintData.getPose().inverse().rotation();
+	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));
+	EXPECT_TRUE((pose * m_constraintData.getNormals()[0]).isApprox(Vector3d(0.0, 1.0, 0.0)));
+	EXPECT_TRUE((pose * m_constraintData.getNormals()[1]).isApprox(Vector3d(0.0, 0.0, 1.0)));
 
 	Eigen::Matrix<double, 2, 30> H = Eigen::Matrix<double, 2, 30>::Zero();
 	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[0]).eval();
@@ -285,11 +261,10 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpIndiciesTest)
 		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint,
 		SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[0]) + m_constraintData.getDistances()[0],
-		mlcpPhysicsProblem.b[1], epsilon);
-	EXPECT_NEAR(newPosition.dot(m_constraintData.getNormals()[1]) + m_constraintData.getDistances()[1],
-		mlcpPhysicsProblem.b[2], epsilon);
+	auto pose = m_constraintData.getPose().inverse().rotation();
+	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));
+	EXPECT_TRUE((pose * m_constraintData.getNormals()[0]).isApprox(Vector3d(0.0, 1.0, 0.0)));
+	EXPECT_TRUE((pose * m_constraintData.getNormals()[1]).isApprox(Vector3d(0.0, 0.0, 1.0)));
 
 	Eigen::Matrix<double, 2, 30> H = Eigen::Matrix<double, 2, 30>::Zero();
 	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[0]).eval();
