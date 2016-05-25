@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/SlidingConstraintData.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
@@ -42,14 +43,9 @@ SlidingConstraintData::~SlidingConstraintData()
 void SlidingConstraintData::setSlidingDirection(const SurgSim::Math::Vector3d& point,
 												const SurgSim::Math::Vector3d& direction)
 {
-	Math::Vector3d normal, binormal, tangent;
-	normal = direction;
-	Math::buildOrthonormalBasis(&normal, &binormal, &tangent);
-
-	m_normals[0] = binormal;
-	m_distances[0] = -point.dot(binormal);
-	m_normals[1] = tangent;
-	m_distances[1] = -point.dot(tangent);
+	m_point = point;
+	m_slidingDirection = direction;
+	Math::buildOrthonormalBasis(&m_slidingDirection, &m_normals[0], &m_normals[1]);
 }
 
 const std::array<Math::Vector3d, 2>& SlidingConstraintData::getNormals() const
@@ -57,9 +53,11 @@ const std::array<Math::Vector3d, 2>& SlidingConstraintData::getNormals() const
 	return m_normals;
 }
 
-const std::array<double, 2>& SlidingConstraintData::getDistances() const
+const Math::RigidTransform3d SlidingConstraintData::getPose()
 {
-	return m_distances;
+	SurgSim::Math::Matrix33d rotation;
+	rotation << m_slidingDirection, m_normals[0], m_normals[1];
+	return SurgSim::Math::makeRigidTransform(rotation, m_point);
 }
 
 } // namespace Physics

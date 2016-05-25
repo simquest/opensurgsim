@@ -42,10 +42,12 @@ TEST(SlidingConstraintDataTests, TestSetGet)
 	slidingConstraintData.setSlidingDirection(point, direction);
 
 	const auto normals = slidingConstraintData.getNormals();
-	const auto distances = slidingConstraintData.getDistances();
 
-	EXPECT_NEAR(0.0, point.dot(normals[0]) + distances[0], epsilon);
-	EXPECT_NEAR(0.0, point.dot(normals[1]) + distances[1], epsilon);
+	EXPECT_TRUE(point.isApprox(slidingConstraintData.getPose().translation()));
+	auto pose = slidingConstraintData.getPose().inverse().rotation();
+	EXPECT_TRUE((pose * direction).isApprox(Vector3d(1.0, 0.0, 0.0)));
+	EXPECT_TRUE((pose * normals[0]).isApprox(Vector3d(0.0, 1.0, 0.0)));
+	EXPECT_TRUE((pose * normals[1]).isApprox(Vector3d(0.0, 0.0, 1.0)));
 
 	EXPECT_NEAR(0.0, direction.dot(normals[0]), epsilon);
 	EXPECT_NEAR(0.0, direction.dot(normals[1]), epsilon);
