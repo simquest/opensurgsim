@@ -195,7 +195,6 @@ void DeformableCollisionRepresentation::updateCcdData(double interval)
 		}
 	}
 
-	// physicsRepresentation->interpolatePreviousState(interval);
 	if (!updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get()))
 	{
 		setLocalActive(false);
