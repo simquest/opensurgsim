@@ -100,7 +100,6 @@ protected:
 
 	void doBeforeStop() override;
 
-private:
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
 	std::vector<std::shared_ptr<Collision::Representation>> m_collisionRepresentations;
