@@ -114,9 +114,9 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	//	= segmentShape1.getAabbTree()->spatialJoin(*segmentShape2.getAabbTree());
 	//getUniqueCandidates(intersectionList, &segmentIds);
 	// End of AABB.
-	for (int i = 0; i < segmentShape1.getNumEdges(); i++)
+	for (size_t i = 0; i < segmentShape1.getNumEdges(); i++)
 	{
-		for (int j = i + 1; j < segmentShape1.getNumEdges(); j++)
+		for (size_t j = i + 1; j < segmentShape1.getNumEdges(); j++)
 		{
 			segmentIds.emplace(i, j);
 		}
