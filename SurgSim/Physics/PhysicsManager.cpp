@@ -108,10 +108,8 @@ bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::C
 
 bool PhysicsManager::doUpdate(double dt)
 {
-	// Add all components that came in before the last update
-	processComponents();
-
 	processBehaviors(dt);
+	processComponents();
 
 	auto state = std::make_shared<PhysicsManagerState>();
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList(1, state);
