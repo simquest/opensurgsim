@@ -20,6 +20,7 @@
 #include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/SlidingConstraintData.h"
 
 namespace SurgSim
 {
@@ -108,20 +109,28 @@ void VisualizeConstraintsBehavior::update(double dt)
 			switch ((*it)->getType())
 			{
 				case SurgSim::Physics::FIXED_3DPOINT:
-				{
-					force = x.segment(mlcpConstraintIndex, 3);
-					color = SurgSim::Math::Vector4d(0.9, 0.9, 0.9, 1);
-				}
-				break;
+					{
+						force = x.segment(mlcpConstraintIndex, 3);
+						color = SurgSim::Math::Vector4d(0.9, 0.9, 0.9, 1);
+					}
+					break;
 				case SurgSim::Physics::FRICTIONLESS_3DCONTACT:
-				{
-					const SurgSim::Math::Vector3d& forceNormal =
-						std::static_pointer_cast<ContactConstraintData>((*it)->getData())->getNormal();
-					double forceNormalIntensity = x[mlcpConstraintIndex];
-					force = forceNormal * forceNormalIntensity;
-					color = SurgSim::Math::Vector4d(0.9, 0.0, 0.0, 1);
-				}
-				break;
+					{
+						const SurgSim::Math::Vector3d& forceNormal =
+							std::static_pointer_cast<ContactConstraintData>((*it)->getData())->getNormal();
+						double forceNormalIntensity = x[mlcpConstraintIndex];
+						force = forceNormal * forceNormalIntensity;
+						color = SurgSim::Math::Vector4d(0.9, 0.0, 0.0, 1);
+					}
+					break;
+				case SurgSim::Physics::FRICTIONLESS_SLIDING:
+					{
+						auto data = std::static_pointer_cast<SurgSim::Physics::SlidingConstraintData>((*it)->getData());
+						auto normals = data->getNormals();
+						force = normals[0].cross(normals[1]) * 0.1;
+						color = SurgSim::Math::Vector4d(0.0, 0.9, 0.0, 1);
+					}
+					break;
 				default:
 					break;
 			}
