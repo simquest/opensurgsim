@@ -65,7 +65,7 @@ TEST(SceneElementTest, UpdateFunctions)
 	EXPECT_TRUE(element.didFixedUpdate);
 }
 
-TEST(SceneElementTest, AddAndTestComponents)
+TEST(SceneElementTest, AddAndTestComponentsAssembly)
 {
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
@@ -75,7 +75,45 @@ TEST(SceneElementTest, AddAndTestComponents)
 
 	EXPECT_TRUE(element->addComponent(component));
 
-	// Scene and SceneElement in Component will not be set until initialization.
+	// SceneElement in Component should be set immediately
+	EXPECT_EQ(nullptr, component->getScene());
+	EXPECT_NE(nullptr, component->getSceneElement());
+
+	// Scene and SceneElement should be set after add
+	runtime->getScene()->addSceneElement(element);
+	EXPECT_EQ(element->getScene(), component->getScene());
+	EXPECT_EQ(element, component->getSceneElement());
+
+	// Verify the component made it to the manager
+	runtime->start(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	ASSERT_EQ(1, manager->getComponents().size());
+	EXPECT_EQ(component, manager->getComponents()[0]);
+	runtime->stop();
+}
+
+class ConstructorSceneElement : public MockSceneElement
+{
+public:
+	ConstructorSceneElement()
+	{
+		component = std::make_shared<MockComponent>("TestComponent");
+		addComponent(component);
+	}
+
+	std::shared_ptr<MockComponent> component;
+};
+
+TEST(SceneElementTest, AddAndTestComponentsConstructor)
+{
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
+	std::shared_ptr<ConstructorSceneElement> element = std::make_shared<ConstructorSceneElement>();
+	auto component = element->component;
+	runtime->addManager(manager);
+
+
+	// Scene and SceneElement in Component will not be set until initialization (add to scene).
 	EXPECT_EQ(nullptr, component->getScene());
 	EXPECT_EQ(nullptr, component->getSceneElement());
 
