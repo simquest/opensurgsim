@@ -154,12 +154,12 @@ double View::getEyeSeparation() const
 
 double View::getScreenWidth() const
 {
-	SURGSIM_ASSERT(!isAwake()) << "Can't change the view settings once the view has been woken up.";
 	return m_screenWidth;
 }
 
 void View::setScreenWidth(double val)
 {
+	SURGSIM_ASSERT(!isAwake()) << "Can't change the view settings once the view has been woken up.";
 	m_screenWidth = val;
 }
 
