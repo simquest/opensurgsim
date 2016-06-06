@@ -245,8 +245,8 @@ bool OsgView::doWakeUp()
 	if (isFullScreen())
 	{
 		m_view->setUpViewOnSingleScreen(getTargetScreen());
-		m_dimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
-		m_dimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
+		// m_dimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
+		// m_dimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
 		m_isWindowBorderEnabled = false;
 	}
 	else
