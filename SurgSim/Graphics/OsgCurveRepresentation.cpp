@@ -34,6 +34,7 @@ namespace SurgSim
 
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCurveRepresentation, OsgCurveRepresentation)
 
 OsgCurveRepresentation::OsgCurveRepresentation(const std::string& name) :
 	Representation(name),
