@@ -52,7 +52,7 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 
 		auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureWidth, textureHeight, 1.0, 0, true);
 		renderPass->setRenderTarget(renderTarget);
-		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 1);
+		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 		auto material = Graphics::buildMaterial("Shaders/gauss_blur_horizontal.vert", "Shaders/bilateral_blur.frag");
 		material->addUniform("sampler2D", "texture");
@@ -70,7 +70,7 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 		graphics->setGroupReference("ImplicitSurfaceHorizontalBlurPass");
 		renderPass->addComponent(graphics);
 
-		if(debug)
+		if (debug)
 		{
 			renderPass->showDepthTarget(0, 256, 256, 256);
 		}
@@ -85,7 +85,7 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 
 		auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureWidth, textureHeight, 1.0, 0, true);
 		renderPass->setRenderTarget(renderTarget);
-		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 2);
+		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 2);
 
 		auto material = Graphics::buildMaterial("Shaders/gauss_blur_vertical.vert", "Shaders/bilateral_blur.frag");
 		material->addUniform("sampler2D", "texture");
@@ -103,7 +103,7 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 		graphics->setGroupReference("ImplicitSurfaceVerticalBlurPass");
 		renderPass->addComponent(graphics);
 
-		if(debug)
+		if (debug)
 		{
 			renderPass->showDepthTarget(256, 256, 256, 256);
 		}
@@ -113,6 +113,7 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 
 	return previousCamera;
 }
+
 std::shared_ptr<Graphics::RenderPass> createDepthPass(
 		float sphereRadius,
 		float sphereScale,
@@ -125,7 +126,7 @@ std::shared_ptr<Graphics::RenderPass> createDepthPass(
 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureWidth, textureHeight, 1.0, 0, true);
 	renderPass->setRenderTarget(renderTarget);
-	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
+	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
 
 	auto material = Graphics::buildMaterial("Shaders/implicit_surface/depth.vert",
 											"Shaders/implicit_surface/depth.frag");
@@ -142,7 +143,7 @@ std::shared_ptr<Graphics::RenderPass> createDepthPass(
 	material->setValue("sphereScale", sphereScale);
 	renderPass->setMaterial(material);
 
-	if(debug)
+	if (debug)
 	{
 		renderPass->showDepthTarget(0, 0, 256, 256);
 	}
@@ -162,7 +163,7 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureWidth, textureHeight, 1.0, 1, false);
 	renderPass->setRenderTarget(renderTarget);
-	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 3);
+	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 3);
 
 	auto material = Graphics::buildMaterial("Shaders/implicit_surface/normal.vert",
 											"Shaders/implicit_surface/normal.frag");
@@ -182,7 +183,7 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 	graphics->setGroupReference("ImplicitSurfaceNormalPass");
 	renderPass->addComponent(graphics);
 
-	if(debug)
+	if (debug)
 	{
 		renderPass->showColorTarget(256, 0, 256, 256);
 	}
@@ -191,29 +192,30 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 }
 
 std::shared_ptr<Graphics::RenderPass> createShadingPass(
-	std::shared_ptr<Graphics::View> view,
-	std::shared_ptr<Graphics::Camera> camera,
-	std::shared_ptr<Graphics::Light> light,
-	std::shared_ptr<Graphics::Texture> depthMap,
-	std::shared_ptr<Graphics::Texture> normalMap,
-	const Math::Vector4f& diffuseColor,
-	const Math::Vector4f& specularColor,
-	const std::string diffuseEnvMap,
-	float diffusePct,
-	const std::string specularEnvMap,
-	float specularPct,
-	float shininess)
+		std::shared_ptr<Graphics::View> view,
+		std::shared_ptr<Graphics::Camera> camera,
+		std::shared_ptr<Graphics::Light> light,
+		std::shared_ptr<Graphics::Texture> depthMap,
+		std::shared_ptr<Graphics::Texture> normalMap,
+		const Math::Vector4f& diffuseColor,
+		const Math::Vector4f& specularColor,
+		const std::string diffuseEnvMap,
+		float diffusePct,
+		const std::string specularEnvMap,
+		float specularPct,
+		float shininess,
+		const std::string& renderGroup)
 {
 	std::array<int, 2> dimensions = view->getDimensions();
 
-	auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceShadingPass");
+	auto renderPass = std::make_shared<Graphics::RenderPass>(renderGroup);
 
 	auto renderCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(renderPass->getCamera());
 	renderCamera->setAmbientColor(camera->getAmbientColor());
 	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, dimensions[0], 0, dimensions[1]);
 	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
-	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 4);
+	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
 
 	auto material = Graphics::buildMaterial("Shaders/implicit_surface/shading.vert",
 											"Shaders/implicit_surface/shading.frag");
@@ -237,7 +239,7 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	{
 		// The Diffuse environment map
 		SURGSIM_ASSERT(Framework::Runtime::getApplicationData()->tryFindFile(diffuseEnvMap, &filename))
-				<< "Could not load diffuse environment map " << diffuseEnvMap;
+			<< "Could not load diffuse environment map " << diffuseEnvMap;
 		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "diffuseEnvMap");
@@ -249,7 +251,7 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	{
 		// The Specular environment map
 		SURGSIM_ASSERT(Framework::Runtime::getApplicationData()->tryFindFile(specularEnvMap, &filename))
-				<< "Could not load specular environment map " << specularEnvMap;
+			<< "Could not load specular environment map " << specularEnvMap;
 		auto texture = std::make_shared<SurgSim::Graphics::OsgTextureCubeMap>();
 		texture->loadImage(filename);
 		material->addUniform("samplerCube", "specularEnvMap");
@@ -263,26 +265,27 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Graphics");
 	graphics->setSize(dimensions[0], dimensions[1]);
 	graphics->setLocation(0, 0);
-	graphics->setGroupReference("ImplicitSurfaceShadingPass");
+	graphics->setGroupReference(renderGroup);
 	renderPass->addComponent(graphics);
 
 	return renderPass;
 }
 
 std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffect(
-			std::shared_ptr<Framework::Component> view,
-			std::shared_ptr<Framework::Component> light,
-			float sphereRadius,
-			float sphereScale,
-			float blurRadius,
-			const Math::Vector4f& diffuseColor,
-			const Math::Vector4f& specularColor,
-			const std::string diffuseEnvMap,
-			float diffusePct,
-			const std::string specularEnvMap,
-			float specularPct,
-			float shininess,
-			bool showDebug)
+		std::shared_ptr<Framework::Component> view,
+		std::shared_ptr<Framework::Component> light,
+		float sphereRadius,
+		float sphereScale,
+		float blurRadius,
+		const Math::Vector4f& diffuseColor,
+		const Math::Vector4f& specularColor,
+		const std::string diffuseEnvMap,
+		float diffusePct,
+		const std::string specularEnvMap,
+		float specularPct,
+		float shininess,
+		const std::string& renderGroup,
+		bool showDebug)
 {
 	SURGSIM_ASSERT(view != nullptr) << "View can't be nullptr.";
 	SURGSIM_ASSERT(light != nullptr) << "Light can't be nullptr.";
@@ -291,12 +294,16 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 																	 "SurgSim::Graphics::OsgCamera");
 	auto osgLight = Framework::checkAndConvert<Graphics::OsgLight>(light, "SurgSim::Graphics::OsgLight");
 
-	auto copier =  std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
+	auto copier = std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
 	copier->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_GRAPHICS);
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> result;
 
 	auto dimensions = graphicsView->getDimensions();
+//	if (graphicsView->getStereoMode() != Graphics::View::STEREO_MODE_NONE)
+//	{
+//		dimensions[0] /= 2;
+//	}
 
 	auto depthPass = createDepthPass(sphereRadius, sphereScale, dimensions[0], dimensions[1], showDebug);
 
@@ -306,10 +313,11 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 									   dimensions[0], dimensions[1], showDebug);
 
 	auto shadingPass = createShadingPass(graphicsView, osgCamera, osgLight,
-									blurPass->getRenderTarget()->getDepthTarget(),
-									normalPass->getRenderTarget()->getColorTarget(0),
-									diffuseColor, specularColor,
-									diffuseEnvMap, diffusePct, specularEnvMap, specularPct, shininess);
+										 blurPass->getRenderTarget()->getDepthTarget(),
+										 normalPass->getRenderTarget()->getColorTarget(0),
+										 diffuseColor, specularColor,
+										 diffuseEnvMap, diffusePct, specularEnvMap, specularPct, shininess,
+										 renderGroup);
 
 	depthPass->addComponent(copier);
 
