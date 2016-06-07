@@ -720,7 +720,7 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		{
 			info->isDeviceRollAxisReversed = true;
 			info->eulerAngleOffsetYaw = 2.7;
-			info->eulerAngleOffsetPitch = 0;
+			info->eulerAngleOffsetPitch = 1.2;
 		}
 		else
 		{
