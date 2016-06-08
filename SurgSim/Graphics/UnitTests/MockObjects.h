@@ -609,7 +609,7 @@ private:
 		return true;
 	}
 
-	void MockView::doSetTargetScreen(int val)
+	void doSetTargetScreen(int val)
 	{
 	}
 
