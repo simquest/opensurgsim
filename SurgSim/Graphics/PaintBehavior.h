@@ -45,13 +45,10 @@ public:
 	/// \return Shared pointer to a graphics representation
 	std::shared_ptr<Graphics::OsgMeshRepresentation> getRepresentation() const;
 
-	/// Sets the texture layer to paint onto
-	/// \param texture 2d texture from graphics representation
-	void setTexture(std::shared_ptr<Graphics::OsgTexture2d> texture);
-
-	/// Gets 2d texture that is being painted on
-	/// \return Shared pointer to 2d texture
-	std::shared_ptr<Graphics::OsgTexture2d> getTexture() const;
+	/// Sets the size of the texture layer to paint onto
+	/// \param width texture width
+	/// \param height texture height
+	void setTextureSize(int width, int height);
 
 	/// Sets color of the paint
 	/// \param color RGBA color in [0-1] range
