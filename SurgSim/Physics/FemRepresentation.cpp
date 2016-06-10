@@ -445,11 +445,22 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 	addRayleighDampingForce(&m_f, state, true, true);
 
 	// Add external generalized force, stiffness and damping
+	if (m_previousHasExternalGeneralizedForce != m_hasExternalGeneralizedForce)
+	{
+		setIsInitialComplianceMatrixComputed(false);
+	}
+
 	if (m_hasExternalGeneralizedForce)
 	{
 		m_f += m_externalGeneralizedForce;
 		m_K += m_externalGeneralizedStiffness;
 		m_D += m_externalGeneralizedDamping;
+
+		if (!m_previousExternalGeneralizedStiffness.isApprox(m_externalGeneralizedStiffness) ||
+			!m_previousExternalGeneralizedDamping.isApprox(m_externalGeneralizedDamping))
+		{
+			setIsInitialComplianceMatrixComputed(false);
+		}
 	}
 }
 

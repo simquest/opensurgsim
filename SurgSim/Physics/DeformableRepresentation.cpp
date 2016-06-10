@@ -102,6 +102,9 @@ void DeformableRepresentation::setInitialState(
 										  static_cast<SparseMatrix::Index>(getNumDof()));
 	m_externalGeneralizedDamping.resize(static_cast<SparseMatrix::Index>(getNumDof()),
 										static_cast<SparseMatrix::Index>(getNumDof()));
+	m_previousHasExternalGeneralizedForce = m_hasExternalGeneralizedForce;
+	m_previousExternalGeneralizedStiffness = m_externalGeneralizedStiffness;
+	m_previousExternalGeneralizedDamping = m_externalGeneralizedDamping;
 }
 
 const std::shared_ptr<SurgSim::Math::OdeState> DeformableRepresentation::getCurrentState() const
@@ -236,8 +239,11 @@ void DeformableRepresentation::afterUpdate(double dt)
 	*m_finalState = *m_currentState;
 
 	// Reset the external generalized force, stiffness and damping
+	m_previousHasExternalGeneralizedForce = m_hasExternalGeneralizedForce;
 	if (m_hasExternalGeneralizedForce)
 	{
+		std::swap(m_previousExternalGeneralizedStiffness, m_externalGeneralizedStiffness);
+		std::swap(m_previousExternalGeneralizedDamping, m_externalGeneralizedDamping);
 		m_externalGeneralizedForce.setZero();
 		m_externalGeneralizedStiffness.setZero();
 		m_externalGeneralizedDamping.setZero();
