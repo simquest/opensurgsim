@@ -39,6 +39,8 @@ namespace SurgSim
 namespace Graphics
 {
 
+SURGSIM_STATIC_REGISTRATION(OsgCurveRepresentation)
+
 /// Implements the CurveRepresentation for OpenSceneGraph, it uses Catmull Rom interpolation, to draw the line
 /// as a GL_LINESTRIP. use the material_curve.vert shader for rendering. This class will also deposit the information
 /// of the segment in the normal information for the vertex.
@@ -50,6 +52,8 @@ public:
 	explicit OsgCurveRepresentation(const std::string& name);
 
 	~OsgCurveRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgCurveRepresentation);
 
 	bool doInitialize() override;
 
