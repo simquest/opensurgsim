@@ -74,8 +74,8 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(
 				{
 					SURGSIM_ASSERT(name == sharedComponent->second->getName() &&
 								   className == sharedComponent->second->getClassName())
-							<< "The current node:\n" << node << "\nhas the same id as an instance "
-							<< "already registered, but the name and/or the className are different. This is "
+							<< "The current node:" << std::endl << node <<  std::endl << "has the same id as an "
+							<< "instance already registered, but the name and/or the className are different. This is "
 							<< "likely a problem with a manually assigned id." << std::endl
 							<< "The original component is a:" << std::endl
 							<< sharedComponent->second->getClassName() << std::endl
