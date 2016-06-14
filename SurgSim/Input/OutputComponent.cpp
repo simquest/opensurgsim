@@ -96,14 +96,17 @@ bool OutputComponent::isDeviceConnected()
 
 void OutputComponent::setData(const SurgSim::DataStructures::DataGroup& dataGroup)
 {
-	m_output->setData(dataGroup);
+	//  Should I dynamically cast here?  Then m_output could be an OutputProducerInterface and it all works well.
+	auto output = std::dynamic_pointer_cast<OutputProducer>(m_output);
+	if (output != nullptr)
+	{
+		output->setData(dataGroup);
+	}
 }
 
-DataStructures::DataGroup OutputComponent::getData() const
+bool OutputComponent::getData(DataStructures::DataGroup* data) const
 {
-	DataStructures::DataGroup data;
-	m_output->requestOutput("", &data);
-	return data;
+	return m_output->requestOutput("", data);
 }
 
 bool OutputComponent::doInitialize()

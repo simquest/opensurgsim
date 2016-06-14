@@ -32,7 +32,7 @@ class DataGroup;
 namespace Input
 {
 class DeviceInterface;
-class OutputProducer;
+class OutputProducerInterface;
 
 SURGSIM_STATIC_REGISTRATION(OutputComponent);
 
@@ -71,8 +71,10 @@ public:
 	/// \param dataGroup The data to output.
 	void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
 
-	/// \return The data which may be empty.
-	DataStructures::DataGroup getData() const;
+	/// Get the data from the OutputProducer.
+	/// \param data [out] The data, unchanged if the return value is false.
+	/// \return true if data was provided.
+	bool getData(DataStructures::DataGroup* data) const;
 
 	/// Overridden from Component, do nothing
 	virtual bool doInitialize();
@@ -84,13 +86,13 @@ public:
 	/// \return	The device name.
 	std::string getDeviceName() const;
 
-private:
+protected:
 	/// Name of the device to which this output component connects
 	std::string m_deviceName;
 	/// Indicates if this output component is connected to a device
 	bool m_deviceConnected;
 	/// Output producer which sends data to hardware device
-	std::shared_ptr<OutputProducer> m_output;
+	std::shared_ptr<OutputProducerInterface> m_output;
 };
 
 }; // namespace Input

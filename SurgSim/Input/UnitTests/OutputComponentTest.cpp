@@ -49,7 +49,9 @@ TEST(OutputComponentTest, Accessors)
 	dataGroup.booleans().set(name, true);
 	output.setData(dataGroup);
 	bool result = false;
-	ASSERT_TRUE(output.getData().booleans().get(name, &result));
+	SurgSim::DataStructures::DataGroup newData;
+	ASSERT_TRUE(output.getData(&newData));
+	ASSERT_TRUE(newData.booleans().get(name, &result));
 	EXPECT_TRUE(result);
 }
 
