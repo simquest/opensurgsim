@@ -75,7 +75,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	{
 		double epsilon = 1.0 / ((1 - timeOfImpact) * m_epsilonFactor);
 
-		ccdState = m_updateCcdData->update(localTimeOfImpact, ccdState); // state interpolation is triggered in here
+		ccdState = m_updateCcdData->update(localTimeOfImpact, ccdState);
 		ccdState = m_ccdCollision->update(dt, ccdState);
 
 		if (m_logger->getThreshold() <= SurgSim::Framework::LOG_LEVEL_DEBUG)
