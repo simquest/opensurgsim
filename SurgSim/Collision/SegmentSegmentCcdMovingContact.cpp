@@ -219,7 +219,8 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentParallelCase(
 		// We know that no collision happened at t=a, that is why we recursed to this level, but
 		// we believe that there is a collision in the interval. If our time precision is good enough,
 		// the segments should be colliding at t=b. Otherwise, we are either moving too fast to detect
-		// this collision, or something went wrong. Report false.
+		// this collision, or something went wrong. Report true and make a best guess at the middle of
+		// the current interval.
 		if (m_staticTest.collideStaticSegmentSegment(pb, qb, thicknessP, thicknessQ, r, s))
 		{
 			*t = b;
@@ -325,8 +326,6 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentCoplanarCase(
 
 	if (b - a < timePrecisionEpsilon)
 	{
-		bool collisionFound = false;
-
 		std::array<Math::Vector3d, 2> pTb = {p0Tb, p1Tb};
 		std::array<Math::Vector3d, 2> qTb = {q0Tb, q1Tb};
 
@@ -336,14 +335,12 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentCoplanarCase(
 		if (m_staticTest.collideStaticSegmentSegment(pTb, qTb, thickness_p, thickness_q, r, s))
 		{
 			*t = b;
-			collisionFound = true;
 		}
 		else
 		{
 			*t = ((b + a) / 2.0);
-			collisionFound = true;
 		}
-		return collisionFound;
+		return true;
 	}
 	// Geometry at time t=a
 	Math::Vector3d p0Ta = Math::interpolate(pT0[0], pT1[0], a); // p[0] interpolated at time a
@@ -445,22 +442,11 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentGeneralCase(
 
 		std::array<Math::Vector3d, 2> pTb = {state.motionP1().atTime(b), state.motionP2().atTime(b)};
 		std::array<Math::Vector3d, 2> qTb = {state.motionQ1().atTime(b), state.motionQ2().atTime(b)};
+		*t = b;
 
 		// The recursion has bottomed out, and we should have already detected if we are colliding at t=0.
 		// Make one final check at the other end of the interval and end the recursion.
-		if (m_staticTest.collideStaticSegmentSegment(pTb, qTb, state.thicknessP(),
-				state.thicknessQ(), r, s))
-		{
-			*t = b;
-			collisionFound = true;
-		}
-		else
-		{
-			*t = b;
-			collisionFound = false;
-			return false;
-		}
-		return collisionFound;
+		return m_staticTest.collideStaticSegmentSegment(pTb, qTb, state.thicknessP(), state.thicknessQ(), r, s);
 	}
 
 	// Otherwise, recursion has not yet bottomed out, go down one more level.

@@ -70,12 +70,10 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	double localTimeOfImpact = 0.0;
 	std::vector<std::list<std::shared_ptr<Collision::Contact>>> oldContacts;
 
-	SURGSIM_LOG_DEBUG(m_logger) << "************************* Outer Loop *************************";
 	size_t iterations = 0;
 	for (; iterations < m_maxIterations; ++iterations)
 	{
 		double epsilon = 1.0 / ((1 - timeOfImpact) * m_epsilonFactor);
-		//double epsilon = 1.0 / (m_epsilonFactor);
 
 		ccdState = m_updateCcdData->update(localTimeOfImpact, ccdState); // state interpolation is triggered in here
 		ccdState = m_ccdCollision->update(dt, ccdState);

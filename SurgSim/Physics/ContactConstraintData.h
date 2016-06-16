@@ -67,8 +67,8 @@ public:
 		return m_distance;
 	}
 
-	/// Gets the plane distance to the origin
-	/// \return The plane equation's distance to the origin
+	/// Gets the time of contact for the collision
+	/// \return The time of contact for the collision
 	double getContactTime() const
 	{
 		return m_contact->time;

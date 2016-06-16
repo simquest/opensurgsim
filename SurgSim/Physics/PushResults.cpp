@@ -24,12 +24,15 @@ namespace SurgSim
 namespace Physics
 {
 
-PushResults::PushResults(bool doCopyState) : Computation(doCopyState),
+PushResults::PushResults(bool doCopyState) :
+	Computation(doCopyState),
 	m_logger(SurgSim::Framework::Logger::getLogger("Physics/PushResults"))
-{}
+{
+}
 
 PushResults::~PushResults()
-{}
+{
+}
 
 std::shared_ptr<PhysicsManagerState>
 PushResults::doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)

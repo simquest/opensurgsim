@@ -95,7 +95,6 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	const Math::SegmentMeshShape& segmentShape2 = segmentShape1AtTime1;
 	const Math::RigidTransform3d& segmentPose2 = segmentPose1AtTime1;
 
-	SURGSIM_LOG_DEBUG(m_logger) << "============================ Inner Loop ================================";
 	SURGSIM_ASSERT(segmentShape1.getNumEdges() == segmentShape2.getNumEdges()) <<
 			"Segment CCD self collision detects that " <<
 			"the segment at time t and time t + 1 have different numbers of edges.";
@@ -107,7 +106,7 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	std::set<std::pair<size_t, size_t>> segmentIds;
 
 	// TODO(wturner): We need to reinstitute the AABB tree to handle motion. When we do, the
-	// following codecan be reenabled and the brute force mmethod below removed:
+	// following code can be re-enabled and the brute force method below removed:
 	//
 	// Beginning of AABB
 	//std::list<DataStructures::AabbTree::TreeNodePairType> intersectionList
@@ -235,8 +234,10 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 				auto contactPoint = 0.5 * (contactP + contactQ);
 				auto depth = ((contactP - contactQ).dot(normal) > 0.0) ?
 							 (contactP - contactQ).norm() : -(contactP - contactQ).norm();
-				SURGSIM_LOG_DEBUG(m_logger) << "time:\t" << t << "\tid1:\t" << id1 << "\tid2:\t" << id2 <<
-											"\tr:\t" << r << "\ts:\t" << s << "\tNormal:\t" <<
+				SURGSIM_LOG_DEBUG(m_logger) << "Contact detected: time:\t" << t << "\tsegment 1 id:\t"
+											<< id1 << "\tsegment 2 id:\t" << id2
+											<< "\tbarymetric coordinate r:\t" << r << "\tbarymetric coordinate s:\t"
+											<< s << "\tMagnitude:\t" <<
 											pToQDir.norm() << "\tDepth:\t" << depth;
 				contacts.emplace_back(std::make_shared<Contact>(
 										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, depth, t,
@@ -245,8 +246,8 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 		}
 		else
 		{
-//			SURGSIM_LOG_DEBUG(m_logger) <<
-//										"AABB tree detected false positive between segments " << id1 << " and " << id2;
+			SURGSIM_LOG_DEBUG(m_logger) << "AABB tree detected false positive between segments "
+										<< id1 << " and " << id2;
 		}
 	}
 	return contacts;
