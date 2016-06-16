@@ -566,7 +566,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 						  (A(currentAtomicIndex + 1, currentAtomicIndex + 1) +
 						   A(currentAtomicIndex + 2, currentAtomicIndex + 2));
 
-					const double maxFriction = frictionCoefs[constraint] * Fn;
+					const double maxFriction = frictionCoefs[currentAtomicIndex] * Fn;
 					if (Ft.norm() > maxFriction)
 					{
 						// Here, the Friction is too strong, we keep the direction, but modulate its length
@@ -627,7 +627,7 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 					Ft -= (b[currentAtomicIndex + 2] + A.row(currentAtomicIndex + 2) * (*initialGuessAndSolution)) /
 						  A(currentAtomicIndex + 2, currentAtomicIndex + 2);
 
-					const double maxFriction = frictionCoefs[constraint] * Fn.norm();
+					const double maxFriction = frictionCoefs[currentAtomicIndex] * Fn.norm();
 					const double ftNorm = fabs(Ft);
 					if (ftNorm > maxFriction)
 					{
