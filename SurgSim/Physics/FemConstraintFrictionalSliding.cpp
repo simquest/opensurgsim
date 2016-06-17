@@ -54,8 +54,11 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 	const size_t numDofPerNode = fem->getNumDofPerNode();
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
 	const SlidingConstraintData& constraintData = static_cast<const SlidingConstraintData&>(data);
-	const auto normals = constraintData.getNormals();
-	const auto tangent = constraintData.getTangent();
+
+	std::array<Math::Vector3d, 3> directions;
+	directions[0] = constraintData.getNormals()[0];
+	directions[1] = constraintData.getNormals()[1];
+	directions[2] = constraintData.getTangent();
 
 	const DataStructures::IndexedLocalCoordinate& coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
@@ -66,11 +69,10 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 	auto numNodes = fem->getFemElement(coord.index)->getNumNodes();
 	m_newH.reserve(numNodes * 3);
 
-	// Normal parts
-	for (size_t i = 0; i < 2; ++i)
+	for (size_t i = 0; i < 3; ++i)
 	{
 		// Update b with new violation
-		double violation = normals[i].dot(globalPosition);
+		double violation = directions[i].dot(globalPosition);
 		mlcp->b[indexOfConstraint + i] += violation * scale;
 
 		// Fill the new H.
@@ -78,33 +80,13 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 		for (size_t j = 0; j < numNodes; ++j)
 		{
 			auto nodeId = femElement->getNodeId(j);
-			m_newH.insert(numDofPerNode * nodeId + 0) = coord.coordinate[j] * normals[i][0] * scale * dt;
-			m_newH.insert(numDofPerNode * nodeId + 1) = coord.coordinate[j] * normals[i][1] * scale * dt;
-			m_newH.insert(numDofPerNode * nodeId + 2) = coord.coordinate[j] * normals[i][2] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeId + 0) = coord.coordinate[j] * directions[i][0] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeId + 1) = coord.coordinate[j] * directions[i][1] * scale * dt;
+			m_newH.insert(numDofPerNode * nodeId + 2) = coord.coordinate[j] * directions[i][2] * scale * dt;
 		}
 
 		mlcp->updateConstraint(m_newH, fem->getComplianceMatrix() * m_newH.transpose(), indexOfRepresentation,
 			indexOfConstraint + i);
-	}
-
-	// Tangential part
-	{
-		// Update b with new violation
-		double violation = tangent.dot(globalPosition);
-		mlcp->b[indexOfConstraint + 2] += violation * scale;
-
-		// Fill the new H.
-		m_newH.setZero();
-		for (size_t j = 0; j < numNodes; ++j)
-		{
-			auto nodeId = femElement->getNodeId(j);
-			m_newH.insert(numDofPerNode * nodeId + 0) = coord.coordinate[j] * tangent[0] * scale * dt;
-			m_newH.insert(numDofPerNode * nodeId + 1) = coord.coordinate[j] * tangent[1] * scale * dt;
-			m_newH.insert(numDofPerNode * nodeId + 2) = coord.coordinate[j] * tangent[2] * scale * dt;
-		}
-
-		mlcp->updateConstraint(m_newH, fem->getComplianceMatrix() * m_newH.transpose(), indexOfRepresentation,
-			indexOfConstraint + 2);
 	}
 
 	mlcp->mu[indexOfConstraint] = 0.5; // Friction coefficient for this frictional sliding constraint
