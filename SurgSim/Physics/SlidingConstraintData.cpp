@@ -26,6 +26,7 @@ SlidingConstraintData::SlidingConstraintData() :
 {
 	m_normals[0].setZero();
 	m_normals[1].setZero();
+	m_tangent.setZero();
 }
 
 SlidingConstraintData::SlidingConstraintData(const SurgSim::Math::Vector3d& point,
@@ -50,6 +51,8 @@ void SlidingConstraintData::setSlidingDirection(const SurgSim::Math::Vector3d& p
 	m_distances[0] = -point.dot(binormal);
 	m_normals[1] = tangent;
 	m_distances[1] = -point.dot(tangent);
+	m_tangent = normal;
+	m_distanceTangent = -point.dot(normal);
 }
 
 const std::array<Math::Vector3d, 2>& SlidingConstraintData::getNormals() const
@@ -57,9 +60,19 @@ const std::array<Math::Vector3d, 2>& SlidingConstraintData::getNormals() const
 	return m_normals;
 }
 
+const Math::Vector3d& SlidingConstraintData::getTangent() const
+{
+	return m_tangent;
+}
+
 const std::array<double, 2>& SlidingConstraintData::getDistances() const
 {
 	return m_distances;
+}
+
+const double SlidingConstraintData::getDistanceTangent() const
+{
+	return m_distanceTangent;
 }
 
 } // namespace Physics

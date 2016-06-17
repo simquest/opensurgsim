@@ -48,15 +48,23 @@ public:
 	/// \return The normals of the two planes.
 	const std::array<Math::Vector3d, 2>& getNormals() const;
 
+	/// \return The tangent (direction defined by the two planes).
+	const Math::Vector3d& getTangent() const;
+
 	/// \return The distance from origin of the two planes.
 	const std::array<double, 2>& getDistances() const;
+
+	/// \return The distance from origin of the planes direction (tangent).
+	const double getDistanceTangent() const;
 
 private:
 	/// The normals of the two planes.
 	std::array<Math::Vector3d, 2> m_normals;
+	Math::Vector3d m_tangent;
 
 	/// The distance from origin of the two planes.
 	std::array<double, 2> m_distances;
+	double m_distanceTangent;
 };
 
 } // namespace Physics
