@@ -55,8 +55,8 @@ TEST_F(BoolToScalarFilterTest, GeneralSetters)
 {
 	auto filter = std::make_shared<BoolToScalar>("Filter");
 
-	filter->setValue("Value", 0.5);
-	EXPECT_DOUBLE_EQ(0.5, filter->getValue<double>("Value"));
+	filter->setValue("Scalar", 0.5);
+	EXPECT_DOUBLE_EQ(0.5, filter->getValue<double>("Scalar"));
 
 	filter->setValue("Scale", 4.0);
 	EXPECT_DOUBLE_EQ(4.0, filter->getValue<double>("Scale"));
@@ -140,7 +140,7 @@ TEST_F(BoolToScalarFilterTest, UpdateTest)
 	defaultData.booleans().set(Names::BUTTON_1, true);
 	defaultData.booleans().set(Names::BUTTON_2, false);
 	// prevent accumulated error in the test
-	filter->setValue(0.5);
+	filter->setScalar(0.5);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(125));
 	filter->filterInput("device", defaultData, &resultData);
 	resultData.scalars().get(Names::TOOLDOF, &value);
@@ -194,7 +194,7 @@ TEST_F(BoolToScalarFilterTest, UnClampedTest)
 
 	// Switiching the buttons, running for .25 of a second so the value should go down by 0.25 * 10 (scale)
 	// but it's clamped to [0,]1
-	filter->setValue(0.5);
+	filter->setScalar(0.5);
 	defaultData.booleans().set(Names::BUTTON_1, true);
 	defaultData.booleans().set(Names::BUTTON_2, false);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
