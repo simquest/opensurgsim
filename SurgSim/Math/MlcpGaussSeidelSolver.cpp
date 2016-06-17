@@ -731,7 +731,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			{
 				Vector3d violation = b.segment<3>(currentAtomicIndex) +
 									 A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;
-				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " << 
+				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " <<
 										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" <<
 										   b.segment<3>(currentAtomicIndex).transpose() << ")" <<
