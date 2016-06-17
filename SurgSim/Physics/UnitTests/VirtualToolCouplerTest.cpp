@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		input = std::make_shared<InputComponent>("Input");
 		input->setDeviceName(inputDeviceName);
 		device = std::make_shared<IdentityPoseDevice>(inputDeviceName);
-		input->connectDevice(device);
+		device->addInputConsumer(input);
 
 		virtualToolCoupler = std::make_shared<MockVirtualToolCoupler>();
 		virtualToolCoupler->setInput(input);
@@ -242,7 +242,7 @@ TEST_F(VirtualToolCouplerTest, LinearDisplacementWithOffset)
 
 	auto device = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
 	auto inputComponent = std::make_shared<InputComponent>("InputComponent");
-	inputComponent->connectDevice(device);
+	device->addInputConsumer(inputComponent);
 	virtualToolCoupler->setInput(inputComponent);
 
 	RigidTransform3d inputOffset = makeRigidTranslation(Vector3d(0.1, 0.0, 0.0));

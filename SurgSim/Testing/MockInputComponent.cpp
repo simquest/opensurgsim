@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,8 +28,7 @@ MockInputComponent::MockInputComponent(const std::string& name) : SurgSim::Input
 
 void MockInputComponent::setData(const SurgSim::DataStructures::DataGroup& data)
 {
-	getConsumer()->handleInput("fake device", data);
-	m_deviceConnected = true;
+	handleInput("fake device", data);
 }
 
 }; // Testing
