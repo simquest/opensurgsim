@@ -37,7 +37,7 @@ BoolToScalar::BoolToScalar(const std::string& name) :
 	m_targetField(DataStructures::Names::TOOLDOF)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoolToScalar, double, Scale, getScale, setScale);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoolToScalar, double, Value, getValue, setValue);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoolToScalar, double, Scalar, getScalar, setScalar);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoolToScalar, bool, Clamping, isClamping, setClamping);
 
 	{
@@ -177,12 +177,12 @@ void BoolToScalar::setDecreaseField(const std::string& val)
 	m_decreaseField = val;
 }
 
-double BoolToScalar::getValue() const
+double BoolToScalar::getScalar() const
 {
 	return m_value;
 }
 
-void BoolToScalar::setValue(double val)
+void BoolToScalar::setScalar(double val)
 {
 	m_value = val;
 	if (m_isClamping)

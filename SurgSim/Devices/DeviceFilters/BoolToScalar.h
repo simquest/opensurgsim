@@ -37,10 +37,6 @@ SURGSIM_STATIC_REGISTRATION(BoolToScalar);
 class BoolToScalar : public DeviceFilter
 {
 public:
-
-	using DeviceFilter::setValue;
-	using DeviceFilter::getValue;
-
 	/// Constructor
 	BoolToScalar(const std::string& name);
 
@@ -91,10 +87,10 @@ public:
 
 	/// Set the value of the mapped field, can also be used to set a starting value for the field
 	/// \param val new Value to be used for the scalar field
-	void setValue(double val);
+	void setScalar(double val);
 
 	/// \return the actual value of the mapped field
-	double getValue() const;
+	double getScalar() const;
 
 	/// Set the name of the target field that carries the scalar value, will be created in the datagroup if it doesn't
 	/// exist
