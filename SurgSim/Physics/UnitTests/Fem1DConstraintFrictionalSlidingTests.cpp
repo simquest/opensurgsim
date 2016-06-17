@@ -144,11 +144,6 @@ TEST_F(Fem1DConstraintFrictionalSlidingTests, BuildMlcpTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	auto pose = m_constraintData.getPose().inverse().rotation();
-	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));
-	EXPECT_TRUE((pose * m_constraintData.getNormals()[0]).isApprox(Vector3d(0.0, 1.0, 0.0)));
-	EXPECT_TRUE((pose * m_constraintData.getNormals()[1]).isApprox(Vector3d(0.0, 0.0, 1.0)));
-
 	Eigen::Matrix<double, 3, 30> H = Eigen::Matrix<double, 3, 30>::Zero();
 	H.block<1, 3>(0, 0) = (dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 0) = (dt * m_constraintData.getNormals()[1]).eval();
@@ -184,11 +179,6 @@ TEST_F(Fem1DConstraintFrictionalSlidingTests, BuildMlcpCoordinateTest)
 
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
-
-	auto pose = m_constraintData.getPose().inverse().rotation();
-	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));
-	EXPECT_TRUE((pose * m_constraintData.getNormals()[0]).isApprox(Vector3d(0.0, 1.0, 0.0)));
-	EXPECT_TRUE((pose * m_constraintData.getNormals()[1]).isApprox(Vector3d(0.0, 0.0, 1.0)));
 
 	Eigen::Matrix<double, 3, 30> H = Eigen::Matrix<double, 3, 30>::Zero();
 	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[0]).eval();
@@ -267,11 +257,6 @@ TEST_F(Fem1DConstraintFrictionalSlidingTests, BuildMlcpIndiciesTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint,
 		SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
-
-	auto pose = m_constraintData.getPose().inverse().rotation();
-	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));
-	EXPECT_TRUE((pose * m_constraintData.getNormals()[0]).isApprox(Vector3d(0.0, 1.0, 0.0)));
-	EXPECT_TRUE((pose * m_constraintData.getNormals()[1]).isApprox(Vector3d(0.0, 0.0, 1.0)));
 
 	Eigen::Matrix<double, 3, 30> H = Eigen::Matrix<double, 3, 30>::Zero();
 	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[0]).eval();
