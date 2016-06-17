@@ -57,7 +57,7 @@ public:
 
 	/// Sets the output data.
 	/// \param dataGroup The data to output.
-	void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
+	virtual void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
 
 	/// \return The data which may be empty.
 	DataStructures::DataGroup getData();
