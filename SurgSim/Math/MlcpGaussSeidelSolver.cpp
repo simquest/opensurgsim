@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Math/MlcpConstraintTypeName.h"
 #include "SurgSim/Math/MlcpGaussSeidelSolver.h"
 
 #include <math.h>
@@ -668,7 +669,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			case MLCP_BILATERAL_1D_CONSTRAINT:
 			{
 				double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
-				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type BILATERAL_1D_CONSTRAINT" <<
+				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " <<
+										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" << b[currentAtomicIndex] <<
 										   ")" << std::endl <<
 										   "\t with final   violation b-Ax=(" << violation << ")" << std::endl <<
@@ -681,7 +683,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			{
 				Vector2d violation = b.segment<2>(currentAtomicIndex) +
 									 A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuessAndSolution;
-				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type BILATERAL_2D_CONSTRAINT" <<
+				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " <<
+										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" <<
 										   b.segment<2>(currentAtomicIndex).transpose() << ") " << std::endl <<
 										   "\t with final   violation b-Ax=(" << violation.transpose() << ")" <<
@@ -695,7 +698,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			{
 				Vector3d violation = b.segment<3>(currentAtomicIndex) +
 									 A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;
-				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type BILATERAL_3D_CONSTRAINT" <<
+				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " <<
+										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" <<
 										   b.segment<3>(currentAtomicIndex).transpose() << ")" << std::endl <<
 										   "\t with final   violation b-Ax=(" << violation.transpose() << ") " <<
@@ -708,8 +712,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 			{
 				double violation = b[currentAtomicIndex] + A.row(currentAtomicIndex) * initialGuessAndSolution;
-				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint <<
-										   "] of type UNILATERAL_FRICTIONLESS_CONSTRAINT" <<
+				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " <<
+										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" << b[currentAtomicIndex] <<
 										   ") " << std::endl <<
 										   "\t with final   violation b-Ax=(" << violation << ") ";
@@ -727,8 +731,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			{
 				Vector3d violation = b.segment<3>(currentAtomicIndex) +
 									 A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;
-				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint <<
-										   "] of type UNILATERAL_3D_FRICTIONAL_CONSTRAINT" <<
+				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " << 
+										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" <<
 										   b.segment<3>(currentAtomicIndex).transpose() << ")" <<
 										   std::endl << "\t with final   violation b-Ax=(" <<
@@ -748,8 +752,9 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			{
 				Vector2d violation = b.segment<2>(currentAtomicIndex) +
 									 A.block(currentAtomicIndex, 0, 2, problemSize) * initialGuessAndSolution;
-				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint <<
-										   "] of type UNILATERAL_3D_FRICTIONLESS_SUTURING" <<
+				getMlcpConstraintTypeName(constraintsType[constraint]);
+				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " <<
+										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" <<
 										   b.segment<2>(currentAtomicIndex).transpose() << ") " <<
 										   std::endl << "\t with final   violation b-Ax=(" <<
@@ -764,8 +769,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 			{
 				Vector3d violation = b.segment<3>(currentAtomicIndex) +
 									 A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;
-				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint <<
-										   "] of type UNILATERAL_3D_FRICTIONAL_SUTURING" <<
+				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " <<
+										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" <<
 										   b.segment<3>(currentAtomicIndex).transpose() << ") " <<
 										   std::endl << "\t with final   violation b-Ax=(" <<
