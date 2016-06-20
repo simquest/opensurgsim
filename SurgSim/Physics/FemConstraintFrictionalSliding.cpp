@@ -89,7 +89,7 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 			indexOfConstraint + i);
 	}
 
-	mlcp->mu[indexOfConstraint] = 0.5; // Friction coefficient for this frictional sliding constraint
+	mlcp->mu[indexOfConstraint] = constraintData.getFrictionCoefficient();
 }
 
 SurgSim::Physics::ConstraintType FemConstraintFrictionalSliding::getConstraintType() const
