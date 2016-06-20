@@ -45,6 +45,14 @@ public:
 	/// \param direction The sliding direction vector.
 	void setSlidingDirection(const SurgSim::Math::Vector3d& point, const SurgSim::Math::Vector3d& direction);
 
+	/// Set the friction coefficient for a frictional sliding constraint
+	/// \param mu The friction coefficient
+	void setFrictionCoefficient(double mu);
+
+	/// \return The friction coefficient (default is 0.5)
+	/// \note The friction coefficient is only used for frictional constraint, it is discarded othersise.
+	double getFrictionCoefficient() const;
+
 	/// \return The normals of the two planes.
 	const std::array<Math::Vector3d, 2>& getNormals() const;
 
@@ -61,7 +69,7 @@ private:
 	/// The normals of the two planes.
 	std::array<Math::Vector3d, 2> m_normals;
 
-	/// The tangent of the two planes
+	/// The tangent of the two planes.
 	Math::Vector3d m_tangent;
 
 	/// The distance from origin of the two planes.
@@ -69,6 +77,9 @@ private:
 
 	/// The distance from origin of the tangential plane.
 	double m_distanceTangent;
+
+	/// Friction coefficient for frictional constraint (unused for frictionless constraint).
+	double m_mu;
 };
 
 } // namespace Physics

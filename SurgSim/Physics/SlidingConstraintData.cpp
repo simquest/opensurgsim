@@ -22,7 +22,7 @@ namespace Physics
 {
 
 SlidingConstraintData::SlidingConstraintData() :
-	ConstraintData()
+	ConstraintData(), m_mu(0.5)
 {
 	m_normals[0].setZero();
 	m_normals[1].setZero();
@@ -31,7 +31,7 @@ SlidingConstraintData::SlidingConstraintData() :
 
 SlidingConstraintData::SlidingConstraintData(const SurgSim::Math::Vector3d& point,
 											 const SurgSim::Math::Vector3d& direction) :
-	ConstraintData()
+	ConstraintData(), m_mu(0.5)
 {
 	setSlidingDirection(point, direction);
 }
@@ -53,6 +53,16 @@ void SlidingConstraintData::setSlidingDirection(const SurgSim::Math::Vector3d& p
 	m_distances[1] = -point.dot(tangent);
 	m_tangent = normal;
 	m_distanceTangent = -point.dot(normal);
+}
+
+void SlidingConstraintData::setFrictionCoefficient(double mu)
+{
+	m_mu = mu;
+}
+
+double SlidingConstraintData::getFrictionCoefficient() const
+{
+	return m_mu;
 }
 
 const std::array<Math::Vector3d, 2>& SlidingConstraintData::getNormals() const
