@@ -98,13 +98,13 @@ TEST_F(BoolToScalarFilterTest, DataGroupHandling)
 		EXPECT_NO_THROW(filter->initializeInput("device", defaultData));
 	}
 	{
-		SCOPED_TRACE("Invalid IncreasField");
+		SCOPED_TRACE("Invalid IncreaseField");
 		auto filter = std::make_shared<BoolToScalar>("Filter");
 		filter->setIncreaseField("wrongIncrease");
 		EXPECT_ANY_THROW(filter->initializeInput("device", defaultData));
 	}
 	{
-		SCOPED_TRACE("Invalid IncreasField");
+		SCOPED_TRACE("Invalid DecreaseField");
 		auto filter = std::make_shared<BoolToScalar>("Filter");
 		filter->setDecreaseField("wrongDecrease");
 		EXPECT_ANY_THROW(filter->initializeInput("device", defaultData));
@@ -165,7 +165,7 @@ TEST_F(BoolToScalarFilterTest, ClampTest)
 	EXPECT_DOUBLE_EQ(1.0, value);
 
 	// Switiching the buttons, running for .25 of a second so the value should go down by 0.25 * 10 (scale)
-	// but it's clamped to [0,]1
+	// but it's clamped to [0,1]
 	defaultData.booleans().set(Names::BUTTON_1, true);
 	defaultData.booleans().set(Names::BUTTON_2, false);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
@@ -186,7 +186,7 @@ TEST_F(BoolToScalarFilterTest, UnClampedTest)
 	filter->initializeInput("device", defaultData);
 
 	// Running .25 of a second we expect the value to go up .. by 0.25 * 10 (scale)
-	// but it's not clampe
+	// but it's not clamped
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	filter->filterInput("device", defaultData, &resultData);
 	resultData.scalars().get(Names::TOOLDOF, &value);
