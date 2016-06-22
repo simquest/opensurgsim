@@ -65,6 +65,8 @@ void PaintBehavior::setCoordinates(const std::vector<DataStructures::IndexedLoca
 
 bool PaintBehavior::doInitialize()
 {
+	auto textureUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("paintMap");
+
 	m_texture = std::make_shared<OsgTexture2d>();
 	m_texture->setSize(m_width, m_height);
 	osg::Texture* osgTexture = m_texture->getOsgTexture();
@@ -84,13 +86,11 @@ bool PaintBehavior::doInitialize()
 	}
 
 	osg::ref_ptr<osg::Image> image = new osg::Image();
-	image->setImage(m_width, m_height, 1, GL_RGBA_INTEGER, GL_RGBA, GL_BYTE, data, osg::Image::NO_DELETE);
+	image->setImage(m_width, m_height, 1, GL_RGBA32F_ARB, GL_RGBA, GL_BYTE, data, osg::Image::NO_DELETE);
 
 	m_texture->getOsgTexture2d()->setImage(image);
-
-	m_representation->getMaterial()->addUniform("sampler2D", "paintMap");
-	m_representation->getMaterial()->setValue("paintMap", m_texture);
-
+	textureUniform->set(m_texture);
+	m_representation->getMaterial()->addUniform(textureUniform);
 	return true;
 }
 
