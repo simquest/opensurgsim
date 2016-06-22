@@ -70,13 +70,11 @@ bool PaintBehavior::doInitialize()
 	m_texture = std::make_shared<OsgTexture2d>();
 	m_texture->setSize(m_width, m_height);
 	osg::Texture* osgTexture = m_texture->getOsgTexture();
+	osgTexture->setDataVariance(osg::Object::DYNAMIC);
 	osgTexture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR);
 	osgTexture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR);
 	osgTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 	osgTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-	osgTexture->setInternalFormat(GL_RGBA32F_ARB);
-	osgTexture->setSourceFormat(GL_RGBA);
-	osgTexture->setSourceType(GL_BYTE);
 
 	int textureSize = m_width * m_height * 4;
 	auto data = new unsigned char[textureSize]();
@@ -86,7 +84,7 @@ bool PaintBehavior::doInitialize()
 	}
 
 	osg::ref_ptr<osg::Image> image = new osg::Image();
-	image->setImage(m_width, m_height, 1, GL_RGBA32F_ARB, GL_RGBA, GL_BYTE, data, osg::Image::NO_DELETE);
+	image->setImage(m_width, m_height, 1, GL_RGBA32F_ARB, GL_RGBA, GL_UNSIGNED_BYTE, data, osg::Image::NO_DELETE);
 
 	m_texture->getOsgTexture2d()->setImage(image);
 	textureUniform->set(m_texture);
