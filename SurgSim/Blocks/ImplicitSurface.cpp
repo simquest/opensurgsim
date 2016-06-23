@@ -297,9 +297,17 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 	std::vector<std::shared_ptr<Framework::SceneElement>> result;
 
 	auto dimensions = graphicsView->getDimensions();
-	if (graphicsView->getStereoMode() != Graphics::View::STEREO_MODE_NONE)
+
+	switch (graphicsView->getStereoMode())
 	{
-		dimensions[0] /= 2;
+		case  Graphics::View::STEREO_MODE_VERTICAL_SPLIT:
+			dimensions[0] /= 2;
+			break;
+		case Graphics::View::STEREO_MODE_HORIZONTAL_SPLIT:
+			dimensions[1] /= 2;
+			break;
+		default:
+			break;
 	}
 
 	auto depthPass = createDepthPass(sphereRadius, sphereScale, dimensions[0], dimensions[1], showDebug);
