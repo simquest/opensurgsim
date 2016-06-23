@@ -22,6 +22,7 @@ set(LIBS
 )
 
 set(DEVICE_FILTERS_SOURCES
+	BoolToScalar.cpp
 	DeviceFilter.cpp
 	FilteredDevice.cpp
 	ForceScale.cpp
@@ -31,6 +32,7 @@ set(DEVICE_FILTERS_SOURCES
 )
 
 set(DEVICE_FILTERS_HEADERS
+	BoolToScalar.h
 	DeviceFilter.h
 	FilteredDevice.h
 	ForceScale.h
