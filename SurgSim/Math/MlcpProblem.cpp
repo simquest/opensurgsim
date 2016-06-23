@@ -28,7 +28,7 @@ void MlcpProblem::setZero(size_t numDof, size_t numConstraintDof, size_t numCons
 {
 	A.setZero(numConstraintDof, numConstraintDof);
 	b.setZero(numConstraintDof);
-	mu.setZero(numConstraints);
+	mu.setZero(numConstraintDof);
 
 	constraintTypes.clear();
 }

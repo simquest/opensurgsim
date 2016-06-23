@@ -495,10 +495,10 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 				static_cast<int>(testData->problem.A.cols()), fileName.c_str());
 		return false;
 	}
-	if ((testData->problem.mu.rows() != numConstraints) || (testData->problem.mu.cols() != 1))
+	if ((testData->problem.mu.rows() != numAtomicConstraints) || (testData->problem.mu.cols() != 1))
 	{
 		fprintf(stderr, "Expected %dx%d vector mu, saw %dx%d\n  in file '%s'\n",
-				numConstraints, 1, static_cast<int>(testData->problem.mu.rows()),
+				numAtomicConstraints, 1, static_cast<int>(testData->problem.mu.rows()),
 				static_cast<int>(testData->problem.mu.cols()), fileName.c_str());
 		return false;
 	}
