@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,12 +46,8 @@ bool InputManager::doStartUp()
 
 bool InputManager::doUpdate(double dt)
 {
-	// Add all components that came in before the last update
-	processComponents();
-
-	// Process specific behaviors belongs to this manager
 	processBehaviors(dt);
-
+	processComponents();
 	return true;
 }
 

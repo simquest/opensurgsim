@@ -106,11 +106,20 @@ TEST(OsgViewElementRenderTest, FullScreenView)
 	scene->addSceneElement(viewElement);
 
 	auto osgView = std::static_pointer_cast<OsgView>(viewElement->getView());
+	std::array<int, 2> dimensions = { 0, 0 };
+	osgView->setDimensions(dimensions);
+	EXPECT_EQ(0, osgView->getDimensions()[0]);
+	EXPECT_EQ(0, osgView->getDimensions()[1]);
 	osgView->setFullScreen(true);
+	// The actual value depends on the system, it's hard to test for it here
+	EXPECT_NE(0, osgView->getDimensions()[0]);
+	EXPECT_NE(0, osgView->getDimensions()[1]);
+
 
 	runtime->start();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	runtime->stop();
+
 }
 
 TEST(OsgViewElementRenderTest, StereoView)

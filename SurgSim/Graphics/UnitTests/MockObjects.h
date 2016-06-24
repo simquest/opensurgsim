@@ -609,6 +609,10 @@ private:
 		return true;
 	}
 
+	void doSetTargetScreen(int val)
+	{
+	}
+
 	/// Position of the view on the screen (in pixels)
 	int m_x, m_y;
 	/// Dimensions of the view on the screen (in pixels)
@@ -625,6 +629,7 @@ private:
 	bool m_isInitialized;
 	/// Whether the view has been awoken
 	bool m_isAwoken;
+
 };
 
 /// Representation that does not subclass any graphics components

@@ -100,6 +100,8 @@ OsgView::OsgView(const std::string& name) : View(name),
 									  isKeyboardDeviceEnabled, enableKeyboardDevice);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgView, bool, MouseDeviceEnabled,
 									  isMouseDeviceEnabled, enableMouseDevice);
+
+	doSetTargetScreen(getTargetScreen());
 }
 
 OsgView::~OsgView()
@@ -134,7 +136,14 @@ void OsgView::setDimensions(const std::array<int, 2>& dimensions)
 
 std::array<int, 2> OsgView::getDimensions() const
 {
-	return m_dimensions;
+	if (isFullScreen())
+	{
+		return m_screenDimensions;
+	}
+	else
+	{
+		return m_dimensions;
+	}
 }
 
 void OsgView::setDimensionsDouble(const std::array<double, 2>& dimensions)
@@ -245,8 +254,6 @@ bool OsgView::doWakeUp()
 	if (isFullScreen())
 	{
 		m_view->setUpViewOnSingleScreen(getTargetScreen());
-		// m_dimensions[0] = m_view->getCamera()->getGraphicsContext()->getTraits()->width;
-		// m_dimensions[1] = m_view->getCamera()->getGraphicsContext()->getTraits()->height;
 		m_isWindowBorderEnabled = false;
 	}
 	else
@@ -335,6 +342,23 @@ void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 		state->setTextureAttributeAndModes(0, texture);
 		state->addUniform(new osg::Uniform("osg_TextTexture", static_cast<int>(0)));
 	}
+}
+
+void OsgView::doSetTargetScreen(int val)
+{
+	osg::GraphicsContext::WindowingSystemInterface* wsi =
+		osg::GraphicsContext::getWindowingSystemInterface();
+
+	if (!wsi)
+	{
+		SURGSIM_FAILURE() << "Error, no WindowSystemInterface  available, cannot create windows. ";
+	}
+
+	unsigned int width, height;
+	wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(getTargetScreen()), width, height);
+
+	m_screenDimensions[0] = static_cast<int>(width);
+	m_screenDimensions[1] = static_cast<int>(height);
 }
 
 void SurgSim::Graphics::OsgView::setOsgMapsUniforms(bool val)

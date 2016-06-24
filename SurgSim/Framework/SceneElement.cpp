@@ -69,6 +69,16 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 
 		if (result)
 		{
+			try
+			{
+				// This will except if called during constructor
+				// the this will be set in initialize()
+				component->setSceneElement(shared_from_this());
+			}
+			catch (std::exception)
+			{
+				// intentionally empty
+			}
 			m_components[component->getName()] = component;
 		}
 	}
@@ -142,7 +152,7 @@ bool SceneElement::initialize()
 	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
 	m_isInitialized = doInitialize();
 
-	// For completeness
+	// If it did not happen in addComponent do it here
 	m_pose->setSceneElement(getSharedPtr());
 
 	// Get my groups into the scenegroups and then copy from the scene

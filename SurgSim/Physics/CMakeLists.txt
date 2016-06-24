@@ -47,6 +47,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DPlyReaderDelegate.cpp
 	Fem3DRepresentation.cpp
 	FemConstraintFixedPoint.cpp
+	FemConstraintFrictionalSliding.cpp
 	FemConstraintFrictionlessContact.cpp
 	FemConstraintFrictionlessSliding.cpp
 	FemElement.cpp
@@ -128,6 +129,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
 	FemConstraintFixedPoint.h
+	FemConstraintFrictionalSliding.h
 	FemConstraintFrictionlessContact.h
 	FemConstraintFrictionlessSliding.h
 	FemElement.h

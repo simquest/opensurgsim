@@ -27,6 +27,7 @@
 #include <gtest/gtest.h>
 
 #include <random>
+#include "osg/GraphicsContext"
 
 namespace SurgSim
 {
@@ -86,6 +87,32 @@ TEST(OsgViewTests, PositionAndDimensionsTest)
 	EXPECT_FALSE(view->isWindowBorderEnabled());
 }
 
+TEST(OsgViewTests, FullScreenSize)
+{
+	std::shared_ptr<OsgView> osgView = std::make_shared<OsgView>("test name");
+	std::shared_ptr<View> view = osgView;
+
+	std::array<int, 2> dimensions = { 20, 30 };
+	view->setDimensions(dimensions);
+	EXPECT_EQ(dimensions, view->getDimensions());
+
+	view->setFullScreen(true);
+
+	osg::GraphicsContext::WindowingSystemInterface* wsi =
+		osg::GraphicsContext::getWindowingSystemInterface();
+
+	ASSERT_NE(nullptr, wsi);
+
+	unsigned int width, height;
+	wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(view->getTargetScreen()), width, height);
+
+	std::array<int, 2> screen = { static_cast<int>(width), static_cast<int>(height) };
+	EXPECT_EQ(screen, view->getDimensions());
+
+	view->setFullScreen(false);
+	EXPECT_EQ(dimensions, view->getDimensions());
+}
+
 TEST(OsgViewTests, CameraTest)
 {
 	std::shared_ptr<View> view = std::make_shared<OsgView>("test name");
@@ -143,9 +170,9 @@ void expectEqual(std::shared_ptr<OsgView> expected, std::shared_ptr<OsgView> act
 	EXPECT_EQ(boost::any_cast<bool>(expected->getValue("CameraManipulatorEnabled")),
 			  boost::any_cast<bool>(actual->getValue("CameraManipulatorEnabled")));
 	EXPECT_TRUE(boost::any_cast<Vector3d>(expected->getValue("CameraPosition")).isApprox(
-				boost::any_cast<Vector3d>(actual->getValue("CameraPosition"))));
+					boost::any_cast<Vector3d>(actual->getValue("CameraPosition"))));
 	EXPECT_TRUE(boost::any_cast<Vector3d>(expected->getValue("CameraLookAt")).isApprox(
-				boost::any_cast<Vector3d>(actual->getValue("CameraLookAt"))));
+					boost::any_cast<Vector3d>(actual->getValue("CameraLookAt"))));
 	EXPECT_EQ(boost::any_cast<bool>(expected->getValue("OsgMapUniforms")),
 			  boost::any_cast<bool>(actual->getValue("OsgMapUniforms")));
 	EXPECT_EQ(boost::any_cast<bool>(expected->getValue("KeyboardDeviceEnabled")),
@@ -168,7 +195,7 @@ TEST(OsgViewTests, Serialization)
 		/// Deserialize
 		std::shared_ptr<OsgView> newView;
 		EXPECT_NO_THROW(newView = std::dynamic_pointer_cast<OsgView>(
-			node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+									  node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 		EXPECT_NE(nullptr, newView);
 
 		// Verify
@@ -211,7 +238,7 @@ TEST(OsgViewTests, Serialization)
 		/// Deserialize
 		std::shared_ptr<OsgView> newView;
 		EXPECT_NO_THROW(newView = std::dynamic_pointer_cast<OsgView>(
-			node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+									  node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 		EXPECT_NE(nullptr, newView);
 
 		// Verify

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -95,6 +95,7 @@ protected:
 	/// Processes all the components that are scheduled for addition or removal, this needs to be called
 	/// inside the doUpdate() function.
 	void processComponents();
+
 	/// Processes behaviors
 	/// This needs to be called inside doUpdate() function in each 'sub' manager.
 	void processBehaviors(const double dt);

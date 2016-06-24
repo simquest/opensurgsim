@@ -34,6 +34,7 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
 	Fem1DConstraintFixedPointTests.cpp
+	Fem1DConstraintFrictionalSlidingTests.cpp
 	Fem1DConstraintFrictionlessContactTests.cpp
 	Fem1DConstraintFrictionlessSlidingTests.cpp
 	Fem1DElementBeamTests.cpp
@@ -42,6 +43,7 @@ set(UNIT_TEST_SOURCES
 	Fem1DPlyReaderDelegateTests.cpp
 	Fem1DRepresentationTests.cpp
 	Fem2DConstraintFixedPointTests.cpp
+	Fem2DConstraintFrictionalSlidingTests.cpp
 	Fem2DConstraintFrictionlessContactTests.cpp
 	Fem2DConstraintFrictionlessSlidingTests.cpp
 	Fem2DElementTriangleTests.cpp
@@ -50,6 +52,7 @@ set(UNIT_TEST_SOURCES
 	Fem2DPlyReaderDelegateTests.cpp
 	Fem2DRepresentationTests.cpp
 	Fem3DConstraintFixedPointTests.cpp
+	Fem3DConstraintFrictionalSlidingTests.cpp
 	Fem3DConstraintFrictionlessContactTests.cpp
 	Fem3DConstraintFrictionlessSlidingTests.cpp
 	Fem3DElementCorotationalTetrahedronTests.cpp

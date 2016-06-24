@@ -52,7 +52,7 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 
 		auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureWidth, textureHeight, 1.0, 0, true);
 		renderPass->setRenderTarget(renderTarget);
-		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 1);
+		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
 
 		auto material = Graphics::buildMaterial("Shaders/gauss_blur_horizontal.vert", "Shaders/bilateral_blur.frag");
 		material->addUniform("sampler2D", "texture");
@@ -85,7 +85,7 @@ std::shared_ptr<Graphics::Camera> createBlurPass(
 
 		auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureWidth, textureHeight, 1.0, 0, true);
 		renderPass->setRenderTarget(renderTarget);
-		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 2);
+		renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 2);
 
 		auto material = Graphics::buildMaterial("Shaders/gauss_blur_vertical.vert", "Shaders/bilateral_blur.frag");
 		material->addUniform("sampler2D", "texture");
@@ -125,7 +125,7 @@ std::shared_ptr<Graphics::RenderPass> createDepthPass(
 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureWidth, textureHeight, 1.0, 0, true);
 	renderPass->setRenderTarget(renderTarget);
-	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
+	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
 
 	auto material = Graphics::buildMaterial("Shaders/implicit_surface/depth.vert",
 											"Shaders/implicit_surface/depth.frag");
@@ -162,7 +162,7 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 
 	auto renderTarget = std::make_shared<Graphics::OsgRenderTarget2d>(textureWidth, textureHeight, 1.0, 1, false);
 	renderPass->setRenderTarget(renderTarget);
-	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 3);
+	renderPass->getCamera()->setRenderOrder(Graphics::Camera::RENDER_ORDER_PRE_RENDER, 3);
 
 	auto material = Graphics::buildMaterial("Shaders/implicit_surface/normal.vert",
 											"Shaders/implicit_surface/normal.frag");
@@ -213,7 +213,7 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	renderCamera->getOsgCamera()->setProjectionMatrixAsOrtho2D(0, dimensions[0], 0, dimensions[1]);
 	renderCamera->getOsgCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	renderCamera->getOsgCamera()->setClearMask(GL_NONE);
-	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 4);
+	renderCamera->setRenderOrder(Graphics::Camera::RENDER_ORDER_POST_RENDER, 0);
 
 	auto material = Graphics::buildMaterial("Shaders/implicit_surface/shading.vert",
 											"Shaders/implicit_surface/shading.frag");
@@ -297,6 +297,18 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 	std::vector<std::shared_ptr<Framework::SceneElement>> result;
 
 	auto dimensions = graphicsView->getDimensions();
+
+	switch (graphicsView->getStereoMode())
+	{
+		case  Graphics::View::STEREO_MODE_VERTICAL_SPLIT:
+			dimensions[0] /= 2;
+			break;
+		case Graphics::View::STEREO_MODE_HORIZONTAL_SPLIT:
+			dimensions[1] /= 2;
+			break;
+		default:
+			break;
+	}
 
 	auto depthPass = createDepthPass(sphereRadius, sphereScale, dimensions[0], dimensions[1], showDebug);
 
