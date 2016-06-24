@@ -162,6 +162,10 @@ protected:
 	/// Wake up the view
 	bool doWakeUp() override;
 
+	/// Determine Screen Size
+	void doSetTargetScreen(int val) override;
+
+
 	/// \return The DisplaySettings to be used in this view
 	virtual osg::ref_ptr<osg::DisplaySettings> createDisplaySettings() const;
 private:
@@ -174,6 +178,7 @@ private:
 	std::array<int, 2> m_position;
 	/// Dimensions of the view on the screen (in pixels)
 	std::array<int, 2> m_dimensions;
+	std::array<int, 2> m_screenDimensions;
 	/// Whether the view window has a border
 	bool m_isWindowBorderEnabled;
 

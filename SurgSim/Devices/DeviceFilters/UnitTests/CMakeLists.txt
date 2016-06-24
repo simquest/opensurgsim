@@ -18,6 +18,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	BoolToScalarTest.cpp
 	DeviceFilterTest.cpp
 	FilteredDeviceTest.cpp
 	ForceScaleTest.cpp

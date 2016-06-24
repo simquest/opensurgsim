@@ -23,15 +23,16 @@ namespace Physics
 {
 
 SlidingConstraintData::SlidingConstraintData() :
-	ConstraintData()
+	ConstraintData(), m_mu(0.5)
 {
 	m_normals[0].setZero();
 	m_normals[1].setZero();
+	m_tangent.setZero();
 }
 
 SlidingConstraintData::SlidingConstraintData(const SurgSim::Math::Vector3d& point,
 											 const SurgSim::Math::Vector3d& direction) :
-	ConstraintData()
+	ConstraintData(), m_mu(0.5)
 {
 	setSlidingDirection(point, direction);
 }
@@ -46,11 +47,19 @@ void SlidingConstraintData::setSlidingDirection(const SurgSim::Math::Vector3d& p
 	m_point = point;
 	m_slidingDirection = direction;
 	Math::buildOrthonormalBasis(&m_slidingDirection, &m_normals[0], &m_normals[1]);
+
+	m_tangent = direction;
+	m_distanceTangent = -point.dot(m_tangent);
 }
 
-const std::array<Math::Vector3d, 2>& SlidingConstraintData::getNormals() const
+void SlidingConstraintData::setFrictionCoefficient(double mu)
 {
-	return m_normals;
+	m_mu = mu;
+}
+
+double SlidingConstraintData::getFrictionCoefficient() const
+{
+	return m_mu;
 }
 
 const Math::RigidTransform3d SlidingConstraintData::getPose()
@@ -58,6 +67,21 @@ const Math::RigidTransform3d SlidingConstraintData::getPose()
 	SurgSim::Math::Matrix33d rotation;
 	rotation << m_slidingDirection, m_normals[0], m_normals[1];
 	return SurgSim::Math::makeRigidTransform(rotation, m_point);
+}
+
+const std::array<Math::Vector3d, 2>& SlidingConstraintData::getNormals() const
+{
+	return m_normals;
+}
+
+const Math::Vector3d& SlidingConstraintData::getTangent() const
+{
+	return m_tangent;
+}
+
+const double SlidingConstraintData::getDistanceTangent() const
+{
+	return m_distanceTangent;
 }
 
 } // namespace Physics

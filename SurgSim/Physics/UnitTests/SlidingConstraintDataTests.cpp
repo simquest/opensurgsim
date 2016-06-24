@@ -51,4 +51,15 @@ TEST(SlidingConstraintDataTests, TestSetGet)
 
 	EXPECT_NEAR(0.0, direction.dot(normals[0]), epsilon);
 	EXPECT_NEAR(0.0, direction.dot(normals[1]), epsilon);
+
+	const auto tangent = slidingConstraintData.getTangent();
+	const auto distanceTangent = slidingConstraintData.getDistanceTangent();
+
+	EXPECT_NEAR(0.0, point.dot(tangent) + distanceTangent, epsilon);
+	EXPECT_TRUE(direction.isApprox(tangent));
+
+	// Friction coefficient
+	EXPECT_DOUBLE_EQ(0.5, slidingConstraintData.getFrictionCoefficient());
+	EXPECT_NO_THROW(slidingConstraintData.setFrictionCoefficient(0.1));
+	EXPECT_DOUBLE_EQ(0.1, slidingConstraintData.getFrictionCoefficient());
 }

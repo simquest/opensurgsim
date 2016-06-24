@@ -191,6 +191,8 @@ private:
 
 	bool doInitialize() override;
 
+	virtual void doSetTargetScreen(int val) = 0;
+
 	/// Camera whose image will be shown in this view
 	std::shared_ptr<Camera> m_camera;
 
