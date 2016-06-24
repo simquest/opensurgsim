@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -183,14 +183,14 @@ bool Manager::doStartUp()
 
 bool Manager::doUpdate(double dt)
 {
+	processBehaviors(dt);
+
 	processComponents();
 
 	for (auto& view : m_views)
 	{
 		view->update(dt);
 	}
-
-	processBehaviors(dt);
 
 	for (auto& representation : m_representations)
 	{
