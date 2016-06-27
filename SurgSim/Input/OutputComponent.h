@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,26 +19,24 @@
 #include <string>
 #include <memory>
 
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+
 
 namespace SurgSim
 {
 
-namespace DataStructures
-{
-class DataGroup;
-}
-
 namespace Input
 {
 class DeviceInterface;
-class OutputProducer;
 
 SURGSIM_STATIC_REGISTRATION(OutputComponent);
 
 /// OutputComponents connect SceneElements to devices, facilitating data
 /// transfer from a SceneElement to a device.
-class OutputComponent : public SurgSim::Framework::Representation
+class OutputComponent : public SurgSim::Framework::Representation, public OutputProducerInterface
 {
 public:
 	/// Constructor
@@ -53,26 +51,16 @@ public:
 	/// param	deviceName	The name of the device that will receive the output data.
 	void setDeviceName(const std::string& deviceName);
 
-	/// Is a device connected
-	/// \return true if a device has been connected.
-	bool isDeviceConnected();
-
-	/// Connect to a device
-	/// This call will be made by the InputManager, and should generally not be called directly.
-	/// \param device The device to connect to.
-	void connectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
-
-	/// Disconnect from a device
-	/// This call will be made by the InputManager, and should generally not be called directly.
-	/// \param device The device to disconnect from.
-	void disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
+	/// Gets device name.
+	/// \return	The device name.
+	std::string getDeviceName() const;
 
 	/// Sets the output data.
 	/// \param dataGroup The data to output.
-	void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
+	virtual void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
 
 	/// \return The data which may be empty.
-	DataStructures::DataGroup getData() const;
+	DataStructures::DataGroup getData();
 
 	/// Overridden from Component, do nothing
 	virtual bool doInitialize();
@@ -80,17 +68,17 @@ public:
 	/// Overridden from Component, do nothing
 	virtual bool doWakeUp();
 
-	/// Gets device name.
-	/// \return	The device name.
-	std::string getDeviceName() const;
+	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
 private:
 	/// Name of the device to which this output component connects
 	std::string m_deviceName;
-	/// Indicates if this output component is connected to a device
-	bool m_deviceConnected;
-	/// Output producer which sends data to hardware device
-	std::shared_ptr<OutputProducer> m_output;
+
+	/// Thread safe container of most recent output data
+	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastOutput;
+
+	/// True if there is data available
+	bool m_haveData;
 };
 
 }; // namespace Input
