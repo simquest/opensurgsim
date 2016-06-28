@@ -438,8 +438,6 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentGeneralCase(
 	// Recursion bottoms out at time precision.
 	if (b - a < state.timePrecisionEpsilon())
 	{
-		bool collisionFound = false;
-
 		std::array<Math::Vector3d, 2> pTb = {state.motionP1().atTime(b), state.motionP2().atTime(b)};
 		std::array<Math::Vector3d, 2> qTb = {state.motionQ1().atTime(b), state.motionQ2().atTime(b)};
 		*t = b;
