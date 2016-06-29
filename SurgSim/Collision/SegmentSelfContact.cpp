@@ -264,8 +264,8 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 										<< id1 << " and " << id2;
 		}
 	}
-	SURGSIM_LOG_SEVERE(m_logger) << "Segment intersections detected: " << segmentIds.size() <<
-								 "\tActual intersections evaluated: " << evaluations;
+	SURGSIM_LOG_DEBUG(m_logger) << "Segment intersections detected: " << segmentIds.size() <<
+								"\tActual intersections evaluated: " << evaluations;
 	return contacts;
 }
 

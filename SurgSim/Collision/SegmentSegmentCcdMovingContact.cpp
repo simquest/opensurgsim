@@ -15,6 +15,7 @@
 
 #include "SurgSim/Collision/SegmentSegmentCcdMovingContact.h"
 
+#include <future>
 #include <vector>
 
 #include "SurgSim/Collision/SegmentSegmentCcdIntervalCheck.h"
@@ -438,8 +439,6 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentGeneralCase(
 	// Recursion bottoms out at time precision.
 	if (b - a < state.timePrecisionEpsilon())
 	{
-		bool collisionFound = false;
-
 		std::array<Math::Vector3d, 2> pTb = {state.motionP1().atTime(b), state.motionP2().atTime(b)};
 		std::array<Math::Vector3d, 2> qTb = {state.motionQ1().atTime(b), state.motionQ2().atTime(b)};
 		*t = b;
@@ -452,23 +451,40 @@ bool SegmentSegmentCcdMovingContact::collideSegmentSegmentGeneralCase(
 	// Otherwise, recursion has not yet bottomed out, go down one more level.
 	double midpoint = (a + b) * 0.5;
 
-	// Test 1st semi-interval [a, (a + b) / 2]
-	if (collideSegmentSegmentGeneralCase(
+	// Test semi-intervals [a, (a + b) / 2] and [(a + b) / 2, b]
+	double tLow = *t;
+	double tHigh = *t;
+	double rLow = *r;
+	double rHigh = *r;
+	double sLow = *s;
+	double sHigh = *s;
+
+	std::future<bool> fLow(std::async([&] {return this->collideSegmentSegmentGeneralCase(
 			state,
 			a, midpoint,
-			t, r, s,
-			depth + 1))
-	{
-		return true;
-	}
+			&tLow, &rLow, &sLow,
+			depth + 1);
+										  }));
 
-	// Test 2nd semi-interval [(a + b) / 2, b]
-	if (collideSegmentSegmentGeneralCase(
+	std::future<bool> fHigh(std::async([&] {return this->collideSegmentSegmentGeneralCase(
 			state,
 			midpoint, b,
-			t, r, s,
-			depth + 1))
+			&tHigh, &rHigh, &sHigh,
+			depth + 1);
+										   }));
+	if (fLow.get())
 	{
+		*t = tLow;
+		*r = rLow;
+		*s = sLow;
+		fHigh.get();
+		return true;
+	}
+	if (fHigh.get())
+	{
+		*t = tHigh;
+		*r = rHigh;
+		*s = sHigh;
 		return true;
 	}
 
