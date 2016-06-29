@@ -25,7 +25,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
-#include "SurgSim/Physics/Fem1DElementBeam.h"
+#include "SurgSim/Physics/Fem1DElementTimoshenkoBeam.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 using SurgSim::Blocks::TransferPhysicsToVerticesBehavior;
@@ -33,7 +33,7 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Graphics::OsgCurveRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Fem1DRepresentation;
-using SurgSim::Physics::Fem1DElementBeam;
+using SurgSim::Physics::Fem1DElementTimoshenkoBeam;
 
 namespace
 {
@@ -65,11 +65,11 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	for (size_t beamId = 0; beamId < numNodes - 1; beamId++)
 	{
 		std::array<size_t, 2> beamNodeIds = {{beamId, beamId + 1}};
-		std::shared_ptr<Fem1DElementBeam> beam = std::make_shared<Fem1DElementBeam>(beamNodeIds);
+		std::shared_ptr<Fem1DElementTimoshenkoBeam> beam = std::make_shared<Fem1DElementTimoshenkoBeam>(beamNodeIds);
 		beam->setRadius(0.10);
 		beam->setMassDensity(3000.0);
 		beam->setPoissonRatio(0.45);
-		beam->setYoungModulus(1e6);
+		beam->setYoungModulus(1e5);
 		physicsRepresentation->addFemElement(beam);
 	}
 }
@@ -87,8 +87,8 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFem1D(const std::string&
 	loadModelFem1D(physicsRepresentation, 10);
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
-	physicsRepresentation->setRayleighDampingMass(5e-2);
-	physicsRepresentation->setRayleighDampingStiffness(5e-3);
+	physicsRepresentation->setRayleighDampingMass(0.0);
+	physicsRepresentation->setRayleighDampingStiffness(0.0);
 
 	auto femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);

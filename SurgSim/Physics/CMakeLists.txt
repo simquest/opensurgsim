@@ -31,6 +31,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableRepresentation.cpp
 	Fem1D.cpp
 	Fem1DElementBeam.cpp
+	Fem1DElementTimoshenkoBeam.cpp
 	Fem1DLocalization.cpp
 	Fem1DPlyReaderDelegate.cpp
 	Fem1DRepresentation.cpp
@@ -112,6 +113,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem-inl.h
 	Fem1D.h
 	Fem1DElementBeam.h
+	Fem1DElementTimoshenkoBeam.h
 	Fem1DLocalization.h
 	Fem1DPlyReaderDelegate.h
 	Fem1DRepresentation.h
