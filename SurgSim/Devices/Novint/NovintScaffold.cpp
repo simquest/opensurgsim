@@ -726,7 +726,7 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		{
 			info->isDeviceRollAxisReversed = false;
 			info->eulerAngleOffsetYaw = 0.3;
-			info->eulerAngleOffsetPitch = 0.5;
+			info->eulerAngleOffsetPitch = 0.5 + M_PI_4;
 		}
 
 		if (info->isOrientationHomed)
