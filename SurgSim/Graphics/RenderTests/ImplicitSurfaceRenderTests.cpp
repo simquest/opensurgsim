@@ -20,6 +20,7 @@
 
 #include "SurgSim/Blocks/ImplicitSurface.h"
 #include "SurgSim/Blocks/PoseInterpolator.h"
+#include "SurgSim/Blocks/ShadowMapping.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Component.h"
@@ -65,6 +66,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	viewElement->getCamera()->setPerspectiveProjection(45, 1.7, 0.01, 10.0);
 	viewElement->getCamera()->setAmbientColor(Math::Vector4d(0.2, 0.2, 0.2, 1.0));
 
+
 	auto interpolator = std::make_shared<Blocks::PoseInterpolator>("Interpolator");
 	RigidTransform3d from = makeRigidTransform(
 								Vector3d(0.5, 0.0, -0.5),
@@ -89,18 +91,27 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
 	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
-	lightElement->setPose(makeRigidTranslation(Math::Vector3d(0.5, 0.5, 0.5)));
+	lightElement->setPose(makeRigidTransform(
+			Math::Vector3d(0.5, 0.5, 0.5),
+	Math::Vector3d(0.0 ,0.0, 0.0),
+	Math::Vector3d(0.0, 1.0, 0.0)));
 	lightElement->addComponent(light);
 	scene->addSceneElement(lightElement);
 
 	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
 	lightElement->addComponent(axes);
 
-	scene->addSceneElements(Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.01f, 800.0f, 4.0,
-												diffuseColor, specularColor,
-												"Textures/CubeMap_reflection_diffuse.png", 0.9,
-												"Textures/CubeMap_reflection_specular.png", 0.1,
-												100.0f, false));
+	std::array<double, 6> lightProjection = { -2.0, 2.0, -2.0, 2.0, -1.0, 2.0 };
+	scene->addSceneElements(Blocks::createShadowMapping(viewElement->getCamera(), light,
+														4096, 1024, lightProjection, 0.002, 0.75, true, 4.0, false));
+
+	scene->addSceneElements(Blocks::createImplicitSurfaceEffect(viewElement->getView(), light,
+																scene->getSceneElement(Blocks::GROUP_SHADOW_CASTER),
+																0.01f, 800.0f, 4.0,
+																diffuseColor, specularColor,
+																"Textures/CubeMap_reflection_diffuse.png", 0.9,
+																"Textures/CubeMap_reflection_specular.png", 0.1,
+																100.0f, false));
 
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
@@ -196,14 +207,23 @@ TEST_F(ImplicitSurfaceRenderTests, StereoFluid)
 	light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 
 	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
-	lightElement->setPose(makeRigidTranslation(Math::Vector3d(0.5, 0.5, 0.5)));
+	lightElement->setPose(makeRigidTransform(
+			Math::Vector3d(0.5, 0.5, 0.5),
+			Math::Vector3d(0.0 ,0.0, 0.0),
+			Math::Vector3d(0.0, 1.0, 0.0)));
 	lightElement->addComponent(light);
 	scene->addSceneElement(lightElement);
 
 	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
 	lightElement->addComponent(axes);
 
-	scene->addSceneElements(Blocks::createImplicitSurfaceEffect(viewElement->getView(), light, 0.1f, 200.0f, 4.0,
+	std::array<double, 6> lightProjection = { -2.0, 2.0, -2.0, 2.0, -1.0, 2.0 };
+	scene->addSceneElements(Blocks::createShadowMapping(viewElement->getCamera(), light,
+														4096, 1024, lightProjection, 0.002, 0.75, true, 4.0, false));
+
+	scene->addSceneElements(Blocks::createImplicitSurfaceEffect(viewElement->getView(), light,
+																scene->getSceneElement(Blocks::GROUP_SHADOW_CASTER),
+																0.01f, 800.0f, 4.0,
 																diffuseColor, specularColor,
 																"Textures/CubeMap_reflection_diffuse.png", 0.9,
 																"Textures/CubeMap_reflection_specular.png", 0.1,

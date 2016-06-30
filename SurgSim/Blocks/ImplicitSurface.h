@@ -17,6 +17,7 @@
 #define SURGSIM_BLOCKS_IMPLICITSURFACE_H
 
 #include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/Uniform.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -44,19 +45,20 @@ static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 /// \param shininess the shininess factor for the specular highlight
 /// \param showDebug whether to show debug information
 std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffect(
-			std::shared_ptr<Framework::Component> view,
-			std::shared_ptr<Framework::Component> light,
-			float sphereRadius,
-			float sphereScale,
-			float blurRadius,
-			const Math::Vector4f& diffuseColor,
-			const Math::Vector4f& specularColor,
-			const std::string diffuseEnvMap,
-			float diffusePct,
-			const std::string specularEnvMap,
-			float specularPct,
-			float shininess,
-			bool showDebug);
+		std::shared_ptr<Framework::Component> view,
+		std::shared_ptr<Framework::Component> light,
+		std::shared_ptr<Framework::SceneElement> lightMapPass,
+		float sphereRadius,
+		float sphereScale,
+		float blurRadius,
+		const Math::Vector4f& diffuseColor,
+		const Math::Vector4f& specularColor,
+		const std::string diffuseEnvMap,
+		float diffusePct,
+		const std::string specularEnvMap,
+		float specularPct,
+		float shininess,
+		bool showDebug);
 
 } // Blocks
 } // SurgSim
