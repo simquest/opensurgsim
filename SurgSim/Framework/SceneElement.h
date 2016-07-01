@@ -115,6 +115,8 @@ public:
 	/// \return all the groups of this scene element
 	std::vector<std::string> getGroups() const;
 
+	bool inGroup(const std::string& name);
+
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.
 	bool initialize();

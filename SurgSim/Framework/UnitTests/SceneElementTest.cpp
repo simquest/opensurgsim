@@ -283,39 +283,47 @@ TEST(SceneElementTest, DoubleInitTest)
 	ASSERT_ANY_THROW(element->initialize());
 }
 
+TEST(SceneElement, InGroup)
+{
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+
+	EXPECT_FALSE(element->inGroup("xxx"));
+	element->addToGroup("One");
+	EXPECT_TRUE(element->inGroup("One"));
+	EXPECT_FALSE(element->inGroup("xxx"));
+}
+
 TEST(SceneElementTest, NoSceneGroupsTest)
 {
-	using SurgSim::Testing::doesContain;
-
 	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
 	EXPECT_TRUE(element->getGroups().empty());
 
 	element->addToGroup("One");
-	EXPECT_TRUE(doesContain(element->getGroups(), "One"));
+	EXPECT_TRUE(element->inGroup("One"));
 
 	element->addToGroup("Two");
-	EXPECT_TRUE(doesContain(element->getGroups(), "Two"));
-	EXPECT_TRUE(doesContain(element->getGroups(), "One"));
+	EXPECT_TRUE(element->inGroup("One"));
+	EXPECT_TRUE(element->inGroup("Two"));
 
 	element->removeFromGroup("One");
-	EXPECT_TRUE(doesContain(element->getGroups(), "Two"));
-	EXPECT_FALSE(doesContain(element->getGroups(), "One"));
+	EXPECT_TRUE(element->inGroup("Two"));
+	EXPECT_FALSE(element->inGroup("One"));
 
 	std::vector<std::string> newGroups;
 	newGroups.push_back("Three");
 	newGroups.push_back("Four");
 
 	element->setGroups(newGroups);
-	EXPECT_FALSE(doesContain(element->getGroups(), "One"));
-	EXPECT_FALSE(doesContain(element->getGroups(), "Two"));
-	EXPECT_TRUE(doesContain(element->getGroups(), "Three"));
-	EXPECT_TRUE(doesContain(element->getGroups(), "Four"));
+	EXPECT_FALSE(element->inGroup("One"));
+	EXPECT_FALSE(element->inGroup("Two"));
+	EXPECT_TRUE(element->inGroup("Three"));
+	EXPECT_TRUE(element->inGroup("Four"));
 
 	std::vector<std::string> empty;
 	element->setGroups(empty);
-	EXPECT_FALSE(doesContain(element->getGroups(), "One"));
-	EXPECT_FALSE(doesContain(element->getGroups(), "Two"));
-	EXPECT_FALSE(doesContain(element->getGroups(), "Three"));
-	EXPECT_FALSE(doesContain(element->getGroups(), "Four"));
+	EXPECT_FALSE(element->inGroup("One"));
+	EXPECT_FALSE(element->inGroup("Two"));
+	EXPECT_FALSE(element->inGroup("Three"));
+	EXPECT_FALSE(element->inGroup("Four"));
 
 }
