@@ -63,6 +63,20 @@ void PaintBehavior::setCoordinates(const std::vector<DataStructures::IndexedLoca
 	m_coordinates = coordinates;
 }
 
+void PaintBehavior::setTextureSize(int width, int height)
+{
+	if (isInitialized())
+	{
+		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger()) << "You cannot set texture size of " << getName() <<
+								" after it has already been initialized.";
+	}
+	else
+	{
+		m_width = width;
+		m_height = height;
+	}
+}
+
 bool PaintBehavior::doInitialize()
 {
 	auto textureUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("paintMap");
@@ -265,13 +279,6 @@ void PaintBehavior::paint(const Math::Vector2d& coordinates)
 						imageBlock);
 	}
 }
-
-void PaintBehavior::setTextureSize(int width, int height)
-{
-	m_width = width;
-	m_height = height;
-}
-
 
 } // Graphics
 } // SurgSim
