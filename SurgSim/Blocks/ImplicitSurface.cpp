@@ -245,6 +245,8 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	material->setValue("specularColor", specularColor);
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", shininess);
+	material->addUniform("float", "intensity");
+	material->setValue("intensity", 0.75f);
 
 	std::string filename;
 	{

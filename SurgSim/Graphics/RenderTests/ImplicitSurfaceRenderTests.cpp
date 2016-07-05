@@ -63,7 +63,6 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	Math::Vector4f specularColor(0.8f, 0.8f, 0.8f, 1.0f);
 
 	std::array<int, 2> dimensions = {1280, 720};
-	viewElement->enableManipulator(true);
 	viewElement->getView()->setDimensions(dimensions);
 	viewElement->getCamera()->setPerspectiveProjection(45, 1.7, 0.01, 10.0);
 	viewElement->getCamera()->setAmbientColor(Math::Vector4d(0.2, 0.2, 0.2, 1.0));
@@ -84,7 +83,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	interpolator->setEndingPose(to);
 	interpolator->setPingPong(true);
 
-	//viewElement->setPose(from);
+	viewElement->setPose(from);
 	viewElement->addComponent(interpolator);
 
 	auto light = std::make_shared<Graphics::OsgLight>("Light");
@@ -138,6 +137,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	auto sphere = std::make_shared<Graphics::OsgSphereRepresentation>("Graphics");
 	sphere->setRadius(0.1);
 	sphere->addGroupReference(Blocks::GROUP_SHADOW_CASTER);
+	sphere->addGroupReference(Blocks::GROUP_SHADOW_RECEIVER);
 
 	material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
 	material->addUniform("vec4", "diffuseColor");
@@ -194,7 +194,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
 	runtime->stop();
 }
 
