@@ -33,6 +33,7 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgPlaneRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
@@ -62,6 +63,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	Math::Vector4f specularColor(0.8f, 0.8f, 0.8f, 1.0f);
 
 	std::array<int, 2> dimensions = {1280, 720};
+	viewElement->enableManipulator(true);
 	viewElement->getView()->setDimensions(dimensions);
 	viewElement->getCamera()->setPerspectiveProjection(45, 1.7, 0.01, 10.0);
 	viewElement->getCamera()->setAmbientColor(Math::Vector4d(0.2, 0.2, 0.2, 1.0));
@@ -82,7 +84,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	interpolator->setEndingPose(to);
 	interpolator->setPingPong(true);
 
-	viewElement->setPose(from);
+	//viewElement->setPose(from);
 	viewElement->addComponent(interpolator);
 
 	auto light = std::make_shared<Graphics::OsgLight>("Light");
@@ -92,7 +94,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
 	lightElement->setPose(makeRigidTransform(
-			Math::Vector3d(0.5, 0.5, 0.5),
+			Math::Vector3d(0.5, 0.1, -0.1),
 	Math::Vector3d(0.0 ,0.0, 0.0),
 	Math::Vector3d(0.0, 1.0, 0.0)));
 	lightElement->addComponent(light);
@@ -101,7 +103,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
 	lightElement->addComponent(axes);
 
-	std::array<double, 6> lightProjection = { -2.0, 2.0, -2.0, 2.0, -1.0, 2.0 };
+	std::array<double, 6> lightProjection = { -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 };
 	scene->addSceneElements(Blocks::createShadowMapping(viewElement->getCamera(), light,
 														4096, 1024, lightProjection, 0.002, 0.75, true, 4.0, false));
 
@@ -113,19 +115,31 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 																"Textures/CubeMap_reflection_specular.png", 0.1,
 																100.0f, false));
 
-	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
+	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
+	cube->addGroupReference(Blocks::GROUP_SHADOW_RECEIVER);
 
-	auto element = std::make_shared<Framework::BasicSceneElement>("box");
+	auto material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", Math::Vector4f(0.2, 0.2, 0.2, 1.0));
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 10.0f);
+	cube->setMaterial(material);
+
+	auto element = std::make_shared<Framework::BasicSceneElement>("Cube");
 	element->setPose(makeRigidTranslation(Math::Vector3d(0.0, 0.0, 0.25)));
 	element->addComponent(cube);
+	element->addComponent(material);
 
 	scene->addSceneElement(element);
 
 	auto sphere = std::make_shared<Graphics::OsgSphereRepresentation>("Graphics");
 	sphere->setRadius(0.1);
+	sphere->addGroupReference(Blocks::GROUP_SHADOW_CASTER);
 
-	auto material = Graphics::buildMaterial("Shaders/material.vert", "Shaders/material.frag");
+	material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
 	material->addUniform("vec4", "diffuseColor");
 	material->setValue("diffuseColor", diffuseColor);
 	material->addUniform("vec4", "specularColor");
@@ -135,8 +149,27 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	sphere->setMaterial(material);
 
 	element = std::make_shared<Framework::BasicSceneElement>("Sphere");
-	element->setPose(makeRigidTranslation(Math::Vector3d(0.25, 0.0, 0.0)));
+	element->setPose(makeRigidTranslation(Math::Vector3d(0.25, 0.0, 0.05)));
 	element->addComponent(sphere);
+	element->addComponent(material);
+
+	scene->addSceneElement(element);
+
+	auto plane = std::make_shared<Graphics::OsgPlaneRepresentation>("Graphics");
+	plane->addGroupReference(Blocks::GROUP_SHADOW_RECEIVER);
+
+	material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", Math::Vector4f(0.2, 0.2, 0.2, 1.0));
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 10.0f);
+	plane->setMaterial(material);
+
+	element = std::make_shared<Framework::BasicSceneElement>("Plane");
+	element->setPose(makeRigidTranslation(Math::Vector3d(0.0, -0.1, 0.0)));
+	element->addComponent(plane);
 	element->addComponent(material);
 
 	scene->addSceneElement(element);
@@ -161,7 +194,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(50000));
 	runtime->stop();
 }
 
