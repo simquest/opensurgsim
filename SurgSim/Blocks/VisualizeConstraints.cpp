@@ -20,6 +20,7 @@
 #include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
 #include "SurgSim/Physics/ContactConstraintData.h"
 #include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/SlidingConstraintData.h"
 
 namespace SurgSim
 {
@@ -120,8 +121,14 @@ void VisualizeConstraintsBehavior::update(double dt)
 					double forceNormalIntensity = x[mlcpConstraintIndex];
 					force = forceNormal * forceNormalIntensity;
 					color = SurgSim::Math::Vector4d(0.9, 0.0, 0.0, 1);
-					SURGSIM_LOG_DEBUG(m_logger) << "Force Normal: (" <<  forceNormal.transpose() << " Intensity: "
-												<< forceNormalIntensity;
+				}
+				break;
+				case SurgSim::Physics::FRICTIONLESS_SLIDING:
+				{
+					auto data = std::static_pointer_cast<SurgSim::Physics::SlidingConstraintData>((*it)->getData());
+					auto normals = data->getNormals();
+					force = normals[0].cross(normals[1]) * 0.1;
+					color = SurgSim::Math::Vector4d(0.0, 0.9, 0.0, 1);
 				}
 				break;
 				default:

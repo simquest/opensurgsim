@@ -183,6 +183,9 @@ protected:
 	SurgSim::Math::Vector m_externalGeneralizedForce;
 	SurgSim::Math::SparseMatrix m_externalGeneralizedStiffness;
 	SurgSim::Math::SparseMatrix m_externalGeneralizedDamping;
+	bool m_previousHasExternalGeneralizedForce;
+	SurgSim::Math::SparseMatrix m_previousExternalGeneralizedStiffness;
+	SurgSim::Math::SparseMatrix m_previousExternalGeneralizedDamping;
 	/// @}
 
 	/// Number of degrees of freedom per node (varies per deformable model)

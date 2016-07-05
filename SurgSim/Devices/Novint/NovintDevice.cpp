@@ -165,8 +165,8 @@ bool NovintDevice::is7DofDevice() const
 void NovintDevice::setMaxForce(double force)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
-									 "Cannot setMaxForce after the device named " << getName() <<
-									 " has been initialized.";
+									 "Cannot setMaxForce after the device named " <<
+									 getName() << " has been initialized.";
 	SURGSIM_ASSERT(force >= 0.0) << "Cannot set a negative maximum force magnitude on device named " << getName();
 	m_maxForce = force;
 }
@@ -179,8 +179,8 @@ double NovintDevice::getMaxForce() const
 void NovintDevice::setAntigrav(Math::Vector3d antigrav)
 {
 	SURGSIM_ASSERT(!isInitialized()) <<
-									 "Cannot setAntigrav after the device named " << getName() <<
-									 " has been initialized.";
+									 "Cannot setAntigrav after the device named " <<
+									 getName() << " has been initialized.";
 	m_antigrav = antigrav;
 }
 

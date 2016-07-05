@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,13 +51,6 @@ TEST(OutputComponentTest, Accessors)
 	bool result = false;
 	ASSERT_TRUE(output.getData().booleans().get(name, &result));
 	EXPECT_TRUE(result);
-}
-
-TEST(OutputComponentTest, NotConnected)
-{
-	OutputComponent output("Output");
-	output.setDeviceName("OutputDevice");
-	EXPECT_FALSE(output.isDeviceConnected());
 }
 
 TEST(OutputComponentTest, Serialization)

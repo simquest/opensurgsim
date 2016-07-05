@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,12 +46,8 @@ bool InputManager::doStartUp()
 
 bool InputManager::doUpdate(double dt)
 {
-	// Add all components that came in before the last update
-	processComponents();
-
-	// Process specific behaviors belongs to this manager
 	processBehaviors(dt);
-
+	processComponents();
 	return true;
 }
 
@@ -69,7 +65,6 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 	if (input != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		// Early exit
 		return addInputComponent(input);
 	}
 
@@ -77,7 +72,6 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 	if (output != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		// Early exit
 		return addOutputComponent(output);
 	}
 
@@ -88,19 +82,18 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 
 bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-
 	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_mutex);
 	if (tryRemoveComponent(component, &m_inputs))
 	{
 		auto input = std::static_pointer_cast<InputComponent>(component);
-		input->disconnectDevice(m_devices[input->getDeviceName()]);
+		m_devices[input->getDeviceName()]->removeInputConsumer(input);
 		result = true;
 	}
 	else if (tryRemoveComponent(component, &m_outputs))
 	{
 		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
-		m_devices[output->getDeviceName()]->setOutputProducer(nullptr);
+		m_devices[output->getDeviceName()]->removeOutputProducer(output);
 		result = true;
 	}
 	return result;
@@ -111,7 +104,7 @@ bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& inpu
 	bool result = false;
 	if (m_devices.find(input->getDeviceName()) != m_devices.end())
 	{
-		input->connectDevice(m_devices[input->getDeviceName()]);
+		m_devices[input->getDeviceName()]->addInputConsumer(input);
 		SURGSIM_LOG_INFO(m_logger)
 				<< "Added input component " << input->getFullName()
 				<< " connected to device " << input->getDeviceName();
@@ -133,7 +126,7 @@ bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& ou
 	{
 		if (!m_devices[output->getDeviceName()]->hasOutputProducer())
 		{
-			output->connectDevice(m_devices[output->getDeviceName()]);
+			m_devices[output->getDeviceName()]->setOutputProducer(output);
 			SURGSIM_LOG_INFO(m_logger)
 					<< "Added output component "
 					<< output->getFullName() << " connected to device " << output->getDeviceName();

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -163,7 +163,6 @@ TEST_F(InputManagerTest, InputfromDevice)
 
 	testDoAddComponent(listener1);
 
-	EXPECT_TRUE(listener1->isDeviceConnected());
 	EXPECT_NO_THROW(listener1->getData(&dataGroup));
 
 	testDevice1->pushInput("avalue");
