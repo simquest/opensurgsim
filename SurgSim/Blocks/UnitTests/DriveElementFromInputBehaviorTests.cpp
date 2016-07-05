@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ TEST(DriveElementFromInputBehaviorTest, Update)
 	auto device = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
 	auto inputComponent = std::make_shared<InputComponent>("InputComponent");
 
-	inputComponent->connectDevice(device);
+	device->addInputConsumer(inputComponent);
 	behavior->setSource(inputComponent);
 	element->addComponent(behavior);
 	element->addComponent(inputComponent);
