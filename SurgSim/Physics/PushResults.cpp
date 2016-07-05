@@ -24,14 +24,18 @@ namespace SurgSim
 namespace Physics
 {
 
-PushResults::PushResults(bool doCopyState) : Computation(doCopyState)
-{}
+PushResults::PushResults(bool doCopyState) :
+	Computation(doCopyState),
+	m_logger(SurgSim::Framework::Logger::getLogger("Physics/PushResults"))
+{
+}
 
 PushResults::~PushResults()
-{}
+{
+}
 
 std::shared_ptr<PhysicsManagerState>
-	PushResults::doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
+PushResults::doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 	// 1st step
@@ -46,6 +50,11 @@ std::shared_ptr<PhysicsManagerState>
 	SurgSim::Math::MlcpSolution::Vector& dofCorrection = result->getMlcpSolution().dofCorrection;
 	dofCorrection = CHt * lambda;
 
+	SURGSIM_LOG_DEBUG(m_logger) << "b:\t" << result->getMlcpProblem().b.transpose();
+	SURGSIM_LOG_DEBUG(m_logger) << "final:\t" <<
+								(result->getMlcpProblem().A * lambda + result->getMlcpProblem().b).transpose();
+	SURGSIM_LOG_DEBUG(m_logger) << "Lambda:\t" << lambda.transpose();
+
 	// 2nd step
 	// Push the dof displacement correction to all representation, using their assigned index
 	auto& representations = result->getActiveRepresentations();
@@ -55,7 +64,7 @@ std::shared_ptr<PhysicsManagerState>
 		{
 			ptrdiff_t index = result->getRepresentationsMapping().getValue(representation.get());
 			SURGSIM_ASSERT(index >= 0) << "Bad index found for representation " << representation->getName()
-				<< std::endl;
+									   << std::endl;
 			representation->applyCorrection(dt, dofCorrection.segment(index, representation->getNumDof()));
 		}
 	}

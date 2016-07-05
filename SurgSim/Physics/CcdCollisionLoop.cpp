@@ -75,7 +75,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	{
 		double epsilon = 1.0 / ((1 - timeOfImpact) * m_epsilonFactor);
 
-		ccdState = m_updateCcdData->update(localTimeOfImpact, ccdState); // state interpolation is triggered in here
+		ccdState = m_updateCcdData->update(localTimeOfImpact, ccdState);
 		ccdState = m_ccdCollision->update(dt, ccdState);
 
 		if (m_logger->getThreshold() <= SurgSim::Framework::LOG_LEVEL_DEBUG)
@@ -105,6 +105,13 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 			SURGSIM_LOG_SEVERE(m_logger) << "Calculated time of impact is greater " <<
 										 "than the parametric upper bound of 1.0 (" <<
 										 timeOfImpact << ")" << std::endl;
+			break;
+		}
+
+		// Lambda == 0 means we are no longer generating corrections. Exit the loop.
+		// We will take up the collision detection at the start of the next time step.
+		if (ccdState->getMlcpSolution().x.isZero())
+		{
 			break;
 		}
 	}

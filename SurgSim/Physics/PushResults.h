@@ -19,6 +19,11 @@
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Physics/Computation.h"
 
+namespace Framework
+{
+class Logger;
+}
+
 namespace SurgSim
 {
 namespace Physics
@@ -43,7 +48,9 @@ protected:
 
 	/// Override doUpdate from superclass
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
-		override;
+	override;
+
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 }; // namespace Physics

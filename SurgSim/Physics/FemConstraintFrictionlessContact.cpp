@@ -61,6 +61,7 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
 	Vector3d globalPosition = localization->calculatePosition();
 
+	double radius = 0.0;
 	{
 		auto rep = std::dynamic_pointer_cast<Collision::Representation>(fem->getCollisionRepresentation());
 		if (rep != nullptr)
@@ -69,16 +70,14 @@ void FemConstraintFrictionlessContact::doBuild(double dt,
 				std::dynamic_pointer_cast<Math::SegmentMeshShape>(rep->getShape());
 			if (segmentShape != nullptr)
 			{
-
-				double radius = segmentShape->getRadius() + m_mlcpNumericalPrecision;
-				globalPosition -= n * (radius * scale);
+				radius = segmentShape->getRadius();
 			}
 		}
 	}
 
 	// Update b with new violation
 	double violation = n.dot(globalPosition);
-	mlcp->b[indexOfConstraint] += violation * scale;
+	mlcp->b[indexOfConstraint] += violation * scale - radius - m_mlcpNumericalPrecision;
 
 	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
 	m_newH.resize(fem->getNumDof());
