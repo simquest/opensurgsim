@@ -18,6 +18,7 @@
 
 #include "SurgSim/Physics/ConstraintData.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
@@ -56,11 +57,11 @@ public:
 	/// \return The normals of the two planes.
 	const std::array<Math::Vector3d, 2>& getNormals() const;
 
+	/// /return The pose of constraint
+	const Math::RigidTransform3d getPose();
+
 	/// \return The tangent (direction defined by the two planes).
 	const Math::Vector3d& getTangent() const;
-
-	/// \return The distance from origin of the two planes.
-	const std::array<double, 2>& getDistances() const;
 
 	/// \return The distance from origin of the planes direction (tangent).
 	const double getDistanceTangent() const;
@@ -69,11 +70,14 @@ private:
 	/// The normals of the two planes.
 	std::array<Math::Vector3d, 2> m_normals;
 
+	/// The point of constraint.
+	Math::Vector3d m_point;
+
+	/// The sliding direction (intersection of the two planes).
+	Math::Vector3d m_slidingDirection;
+
 	/// The tangent of the two planes.
 	Math::Vector3d m_tangent;
-
-	/// The distance from origin of the two planes.
-	std::array<double, 2> m_distances;
 
 	/// The distance from origin of the tangential plane.
 	double m_distanceTangent;
