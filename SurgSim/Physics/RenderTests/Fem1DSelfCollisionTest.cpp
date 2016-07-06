@@ -90,6 +90,7 @@ TEST_F(Fem1DSelfCollisionTest, SimpleLoop)
 
 	scene->addSceneElement(makeSuture("loop.ply"));
 
+	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
 	physicsManager->setRate(1000.0);
 
 	SurgSim::Math::Vector3d cameraPosition(0.5, 0.0, 0.5);

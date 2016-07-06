@@ -68,7 +68,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& 
 	auto collision = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("Collision");
 	auto shape = std::make_shared<SurgSim::Math::SegmentMeshShape>();
 	shape->load(filename);
-	shape->setRadius(0.0001);
+	shape->setRadius(0.001);
 	collision->setShape(shape);
 	collision->setCollisionDetectionType(SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
 	collision->setSelfCollisionDetectionType(SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
@@ -119,6 +119,7 @@ public:
 	void SetUp() override
 	{
 		SurgSim::Physics::RenderTests::SetUp();
+		scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
 		SurgSim::Framework::Logger::getLoggerManager()->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
 		physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
@@ -130,10 +131,10 @@ TEST_F(CcdSutureTest, SutureVsMeshedCylinder)
 {
 	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
 	scene->addSceneElement(makeRigid("cylinder.ply"));
-	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.1);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
+	physicsManager->setRate(100.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
@@ -141,10 +142,10 @@ TEST_F(CcdSutureTest, SutureVsMeshedCylinder)
 TEST_F(CcdSutureTest, Fem1DHalfKnot)
 {
 	scene->addSceneElement(makeSuture("half_knot.ply"));
-	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
 	SurgSim::Math::Vector3d cameraPosition(1.0, 0.0, 1.0);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
+	physicsManager->setRate(150.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
@@ -152,10 +153,10 @@ TEST_F(CcdSutureTest, Fem1DHalfKnot)
 TEST_F(CcdSutureTest, Fem1DLoop)
 {
 	scene->addSceneElement(makeSuture("loop.ply"));
-	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
+	physicsManager->setRate(50.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
