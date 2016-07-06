@@ -17,6 +17,7 @@
 
 #include "SurgSim/DataStructures/Image.h"
 #include "SurgSim/DataStructures/ImageMap.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/PaintBehavior.h"
 #include "SurgSim/Math/Scalar.h"
 
@@ -46,16 +47,6 @@ std::shared_ptr<Graphics::OsgMeshRepresentation> PaintBehavior::getRepresentatio
 	return m_representation;
 }
 
-void PaintBehavior::setTexture(std::shared_ptr<Graphics::OsgTexture2d> texture)
-{
-	m_texture = texture;
-}
-
-std::shared_ptr<Graphics::OsgTexture2d> PaintBehavior::getTexture() const
-{
-	return m_texture;
-}
-
 void PaintBehavior::setColor(const Math::Vector4d& color)
 {
 	m_color = color;
@@ -72,8 +63,46 @@ void PaintBehavior::setCoordinates(const std::vector<DataStructures::IndexedLoca
 	m_coordinates = coordinates;
 }
 
+void PaintBehavior::setTextureSize(int width, int height)
+{
+	if (isInitialized())
+	{
+		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger()) << "You cannot set texture size of " << getName() <<
+								" after it has already been initialized.";
+	}
+	else
+	{
+		m_width = width;
+		m_height = height;
+	}
+}
+
 bool PaintBehavior::doInitialize()
 {
+	auto textureUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("paintMap");
+
+	m_texture = std::make_shared<OsgTexture2d>();
+	m_texture->setSize(m_width, m_height);
+	osg::Texture* osgTexture = m_texture->getOsgTexture();
+	osgTexture->setDataVariance(osg::Object::DYNAMIC);
+	osgTexture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR);
+	osgTexture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR);
+	osgTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+	osgTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+
+	int textureSize = m_width * m_height * 4;
+	auto data = new unsigned char[textureSize]();
+	for (int i = 0; i < textureSize; i++)
+	{
+		data[i] = 0;
+	}
+
+	osg::ref_ptr<osg::Image> image = new osg::Image();
+	image->setImage(m_width, m_height, 1, GL_RGBA32F_ARB, GL_RGBA, GL_UNSIGNED_BYTE, data, osg::Image::NO_DELETE);
+
+	m_texture->getOsgTexture2d()->setImage(image);
+	textureUniform->set(m_texture);
+	m_representation->getMaterial()->addUniform(textureUniform);
 	return true;
 }
 
@@ -100,13 +129,6 @@ bool PaintBehavior::doWakeUp()
 		return false;
 	}
 
-	m_texture->getOsgTexture2d()->setSourceFormat(GL_RGBA);
-	m_texture->getOsgTexture2d()->setSourceType(GL_BYTE);
-
-	m_texture->getOsgTexture2d()->dirtyTextureObject();
-
-	m_texture->getSize(&m_width, &m_height);
-
 	buildBrush(getRadius());
 
 	return true;
@@ -121,7 +143,7 @@ void PaintBehavior::update(double dt)
 		auto mesh = m_representation->getMesh();
 		for (auto coordinate : m_coordinates)
 		{
-			if (coordinate.index < mesh->getNumVertices())
+			if (coordinate.index < mesh->getNumTriangles())
 			{
 				auto vertex1 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[0]);
 				auto vertex2 = mesh->getVertex(mesh->getTriangle(coordinate.index).verticesId[1]);
