@@ -31,6 +31,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
 	ShadowMapping.cpp
+	SingleKeyBehavior.cpp
 	SphereElement.cpp
 	TransferParticlesToPointCloudBehavior.cpp
 	TransferPhysicsToGraphicsMeshBehavior.cpp
@@ -54,6 +55,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
 	ShadowMapping.h
+	SingleKeyBehavior.h
 	SphereElement.h
 	TransferParticlesToPointCloudBehavior.h
 	TransferPhysicsToGraphicsMeshBehavior.h
