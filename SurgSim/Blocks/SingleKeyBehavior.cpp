@@ -18,6 +18,7 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Input/InputComponent.h"
 
@@ -60,6 +61,13 @@ bool SingleKeyBehavior::doInitialize()
 
 bool SingleKeyBehavior::doWakeUp()
 {
+	SURGSIM_LOG_IF(m_inputComponent == nullptr,
+				   SurgSim::Framework::Logger::getDefaultLogger(),
+				   WARNING) << "Input component not present in " << getFullName();
+	SURGSIM_LOG_IF(m_actionKey != Devices::KeyCode::NONE,
+				   SurgSim::Framework::Logger::getDefaultLogger(),
+				   WARNING) << "No key set in " << getFullName();
+
 	return m_inputComponent != nullptr && m_actionKey != Devices::KeyCode::NONE;
 }
 

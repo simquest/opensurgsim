@@ -68,6 +68,7 @@ protected:
 
 	std::shared_ptr<Input::InputComponent> m_inputComponent;
 
+	/// Keep track if the key was pressed the last time around
 	bool m_keyPressedLastUpdate;
 
 	/// Registered key to trigger action
