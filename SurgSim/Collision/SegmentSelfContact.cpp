@@ -33,9 +33,9 @@ namespace Collision
 {
 
 SegmentSelfContact::SegmentSelfContact():
-	m_distanceEpsilon(1.0e-09),
+	m_distanceEpsilon(1.0e-04),
 	m_timeMinPrecisionEpsilon(1.0e-06),
-	m_timeMaxPrecisionEpsilon(1.0e-06),
+	m_timeMaxPrecisionEpsilon(1.0),
 	m_maxMovementThreshold(0.1),
 	m_useSegmentThickness(true),
 	m_logger(Framework::Logger::getLogger("Collision/SegmentSelfContact"))
@@ -104,10 +104,37 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	// Intersect the AABB trees of the Segment Mesh at time 0 and time 1 to get a list of
 	// potential intersecting segments.
 	std::set<std::pair<size_t, size_t>> segmentIds;
-	std::list<DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= segmentShape1.getAabbTree()->spatialJoin(*segmentShape2.getAabbTree());
+
+	// Use a local aabb tree for the movement volume to calculate the first set of possible intersections.
+	auto const& edges1 = segmentShape1.getEdges();
+	auto const& edges2 = segmentShape2.getEdges();
+	const Math::Vector3d halfExtent = Math::Vector3d(segmentShape1.getRadius(), segmentShape1.getRadius(),
+									  segmentShape1.getRadius());
+	std::list<DataStructures::AabbTreeData::Item> items;
+	for (size_t id = 0; id < edges1.size(); ++id)
+	{
+		if (edges1[id].isValid && edges2[id].isValid)
+		{
+			const auto& vertices1 = segmentShape1.getEdgePositions(id);
+			Math::Aabbd aabb((vertices1[0] - halfExtent).eval());
+			aabb.extend((vertices1[0] + halfExtent).eval());
+			aabb.extend((vertices1[1] - halfExtent).eval());
+			aabb.extend((vertices1[1] + halfExtent).eval());
+			const auto& vertices2 = segmentShape2.getEdgePositions(id);
+			aabb.extend((vertices2[0] - halfExtent).eval());
+			aabb.extend((vertices2[0] + halfExtent).eval());
+			aabb.extend((vertices2[1] - halfExtent).eval());
+			aabb.extend((vertices2[1] + halfExtent).eval());
+			items.emplace_back(aabb, id);
+		}
+	}
+	DataStructures::AabbTree tree;
+	tree.set(std::move(items));
+
+	std::list<DataStructures::AabbTree::TreeNodePairType> intersectionList = tree.spatialJoin(tree);
 	getUniqueCandidates(intersectionList, &segmentIds);
 
+	size_t evaluations = 0;
 	for (const auto& idPair : segmentIds)
 	{
 		size_t id1 = idPair.first;
@@ -127,6 +154,7 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 			continue;
 		}
 
+		evaluations++;
 		const auto& pt0Positions = segmentShape1.getEdgePositions(id1);
 		const auto& pt1Positions = segmentShape2.getEdgePositions(id1);
 		const auto& qt0Positions = segmentShape1.getEdgePositions(id2);
@@ -213,12 +241,18 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 				// m_distanceEpsilon/2. For accuracy, it is calculated from both starting points and then averaged.
 				double effectiveRadiusP = m_useSegmentThickness ? segmentRadius1 : m_distanceEpsilon / 2.0;
 				double effectiveRadiusQ = m_useSegmentThickness ? segmentRadius2 : m_distanceEpsilon / 2.0;
+
 				auto normal = pToQDir.normalized();
 				Math::Vector3d contactP = segmentPContact + (effectiveRadiusP * normal);
 				Math::Vector3d contactQ = segmentQContact - (effectiveRadiusQ * normal);
 				auto contactPoint = 0.5 * (contactP + contactQ);
 				auto depth = ((contactP - contactQ).dot(normal) > 0.0) ?
 							 (contactP - contactQ).norm() : -(contactP - contactQ).norm();
+				SURGSIM_LOG_DEBUG(m_logger) << "Contact detected: time:\t" << t << "\tsegment 1 id:\t"
+											<< id1 << "\tsegment 2 id:\t" << id2
+											<< "\tbarymetric coordinate r:\t" << r << "\tbarymetric coordinate s:\t"
+											<< s << "\tMagnitude:\t" <<
+											pToQDir.norm() << "\tDepth:\t" << depth;
 				contacts.emplace_back(std::make_shared<Contact>(
 										  CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, depth, t,
 										  contactPoint, -normal, penetrationPoints));
@@ -226,10 +260,12 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 		}
 		else
 		{
-			SURGSIM_LOG_DEBUG(m_logger) <<
-										"AABB tree detected false positive between segments " << id1 << " and " << id2;
+			SURGSIM_LOG_DEBUG(m_logger) << "AABB tree detected false positive between segments "
+										<< id1 << " and " << id2;
 		}
 	}
+	SURGSIM_LOG_DEBUG(m_logger) << "Segment intersections detected: " << segmentIds.size() <<
+								"\tActual intersections evaluated: " << evaluations;
 	return contacts;
 }
 
@@ -516,10 +552,10 @@ double SegmentSelfContact::maxTimePrecision(
 
 	if (timePrecision < m_timeMinPrecisionEpsilon)
 	{
-		SURGSIM_LOG_ONCE(m_logger, WARNING) <<
-											"Minimum time precision(" << m_timeMinPrecisionEpsilon <<
-											") needs to be smaller(" << timePrecision <<
-											") to guarantee no missed self - collisions!";
+		SURGSIM_LOG_WARNING(m_logger) <<
+									  "Minimum time precision(" << m_timeMinPrecisionEpsilon <<
+									  ") needs to be smaller(" << timePrecision <<
+									  ") to guarantee no missed self - collisions!";
 		timePrecision = m_timeMinPrecisionEpsilon;
 	}
 	timePrecision = std::min(timePrecision, m_timeMaxPrecisionEpsilon);

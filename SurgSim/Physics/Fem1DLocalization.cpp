@@ -51,7 +51,6 @@ bool Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool* hasReac
 	{
 		*hasReachedEnd = false;
 	}
-	bool moved = false;
 
 	auto femRepresentation = std::static_pointer_cast<FemRepresentation>(getRepresentation());
 	auto& currentState = femRepresentation->getCurrentState();
@@ -67,7 +66,8 @@ bool Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool* hasReac
 		auto femElement = femRepresentation->getFemElement(i);
 		const auto& nodeIds = femElement->getNodeIds();
 		std::array<Math::Vector3d, 2> nodePositions = {currentState->getPosition(nodeIds[0]),
-			currentState->getPosition(nodeIds[1])};
+													   currentState->getPosition(nodeIds[1])
+													  };
 
 		Math::distancePointSegment(point, nodePositions[0], nodePositions[1], &newPoint);
 		newDistance = (newPoint - point).norm();

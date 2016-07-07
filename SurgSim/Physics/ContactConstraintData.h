@@ -67,6 +67,13 @@ public:
 		return m_distance;
 	}
 
+	/// Gets the time of contact for the collision
+	/// \return The time of contact for the collision
+	double getContactTime() const
+	{
+		return m_contact->time;
+	}
+
 	/// \return The contact that uses this constraint data.
 	std::shared_ptr<Collision::Contact> getContact()
 	{

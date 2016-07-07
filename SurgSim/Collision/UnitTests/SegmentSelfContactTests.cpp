@@ -203,8 +203,8 @@ TEST_F(SegmentCcdSelfContactTests, Initialization)
 	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SEGMENTMESH, shapeTypes.second);
 
 	EXPECT_DOUBLE_EQ(1e-06, selfContact.getTimeMinPrecisionEpsilon());
-	EXPECT_DOUBLE_EQ(1e-06, selfContact.getTimeMaxPrecisionEpsilon());
-	EXPECT_DOUBLE_EQ(1e-09, selfContact.distanceEpsilon());
+	EXPECT_DOUBLE_EQ(1.0, selfContact.getTimeMaxPrecisionEpsilon());
+	EXPECT_DOUBLE_EQ(1e-04, selfContact.distanceEpsilon());
 
 	EXPECT_ANY_THROW(selfContact.setTimeMinPrecisionEpsilon(0.0));
 	EXPECT_ANY_THROW(selfContact.setTimeMinPrecisionEpsilon(-2.0e-06));
@@ -264,6 +264,9 @@ TEST_F(SegmentCcdSelfContactTests, IsSameSegContactPoint)
 {
 	std::shared_ptr<SegmentMeshShape> shape =
 		build(Vector3d(-10.0, -10.0, -10.0), Vector3d(10.0, 10.0, 10.0), 0.5, 10);
+	m_selfContact.setTimeMaxPrecisionEpsilon(1.0e-06);
+	m_selfContact.setTimeMinPrecisionEpsilon(1.0e-06);
+	m_selfContact.setDistanceEpsilon(1.0e-09);
 
 	// Different segments, no shared endpoints
 	EXPECT_FALSE(m_selfContact.isSameSegContactPoint(*shape, 1, 0.9, 7, 0.8));
@@ -478,6 +481,9 @@ TEST_F(SegmentCcdSelfContactTests, DetectCollision)
 		std::array<Math::Vector3d, 2> pt1Positions = shapeT1->getEdgePositions(0);
 		std::array<Math::Vector3d, 2> qt0Positions = shapeT0->getEdgePositions(9);
 		std::array<Math::Vector3d, 2> qt1Positions = shapeT1->getEdgePositions(9);
+		m_selfContact.setTimeMaxPrecisionEpsilon(1.0e-06);
+		m_selfContact.setTimeMinPrecisionEpsilon(1.0e-06);
+		m_selfContact.setDistanceEpsilon(1.0e-09);
 
 		EXPECT_TRUE(m_selfContact.detectCollision(pt0Positions, pt1Positions, qt0Positions, qt1Positions,
 					1.0e-04, 1.0e-04, 1.0e-09,

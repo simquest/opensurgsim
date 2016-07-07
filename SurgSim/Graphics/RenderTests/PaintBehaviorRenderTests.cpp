@@ -76,14 +76,8 @@ TEST_F(PaintBehaviorRenderTests, InitTest)
 	auto texture = std::make_shared<Graphics::OsgTexture2d>();
 	auto path = applicationData->findFile("Textures/wound_deformable.png");
 	texture->loadImage(path);
-	// Need to create RGBA Image object and set that as texture (or load empty texture)
 	material->addUniform("sampler2D", "diffuseMap");
 	material->setValue("diffuseMap", texture);
-	path = applicationData->findFile("Textures/paintMap.png");
-	texture = std::make_shared<Graphics::OsgTexture2d>();
-	texture->loadImage(path);
-	material->addUniform("sampler2D", "paintMap");
-	material->setValue("paintMap", texture);
 	Blocks::enable2DTexture(material, "shadowMap", Graphics::SHADOW_TEXTURE_UNIT, "Textures/black.png");
 
 	graphics->setMaterial(material);
@@ -93,7 +87,7 @@ TEST_F(PaintBehaviorRenderTests, InitTest)
 
 	auto paintBehavior = std::make_shared<Graphics::PaintBehavior>("Decals");
 	paintBehavior->setRepresentation(graphics);
-	paintBehavior->setTexture(texture);
+	paintBehavior->setTextureSize(2048, 2048);
 	paintBehavior->setRadius(0.05);
 	paintBehavior->setColor(Math::Vector4d(1.0, 0.0, 0.0, 0.75));
 

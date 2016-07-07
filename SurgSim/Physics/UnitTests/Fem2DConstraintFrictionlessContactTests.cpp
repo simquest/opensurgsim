@@ -44,6 +44,7 @@ namespace
 {
 const double epsilon = 1e-10;
 const double dt = 1e-3;
+const double mlcpPrecision = 1e-04;
 };
 
 static void addTriangle(Fem2DRepresentation* fem,
@@ -169,7 +170,7 @@ TEST_F(Fem2DConstraintFrictionlessContactTests, BuildMlcpTest)
 						  &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0] + mlcpPrecision, epsilon);
 
 	Eigen::Matrix<double, 1, 30> H = Eigen::Matrix<double, 1, 30>::Zero();
 	H.segment<3>(6 * 0) = dt * m_n;
@@ -205,7 +206,7 @@ TEST_F(Fem2DConstraintFrictionlessContactTests, BuildMlcpCoordinateTest)
 						  &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0] + mlcpPrecision, epsilon);
 
 	Eigen::Matrix<double, 1, 30> H = Eigen::Matrix<double, 1, 30>::Zero();
 	H.segment<3>(6 * 1) = 0.25 * dt * m_n;
@@ -288,7 +289,7 @@ TEST_F(Fem2DConstraintFrictionlessContactTests, BuildMlcpIndiciesTest)
 						  SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	const Vector3d newPosition = computeNewPosition(coord);
-	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
+	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint] + mlcpPrecision, epsilon);
 
 	Eigen::Matrix<double, 1, 30> H = Eigen::Matrix<double, 1, 30>::Zero();
 	H.segment<3>(6 * 1) = 0.25 * dt * m_n;
