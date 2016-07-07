@@ -50,6 +50,7 @@ set(UNIT_TEST_SOURCES
 	TriangleCapsuleContactCalculationTests.cpp
 	TriangleTriangleContactCalculationTests.cpp
 	TriangleTriangleIntersectionTests.cpp
+	TriangleTriangleSeparatingAxisContactCalculationTests.cpp
 	ValidTests.cpp
 )
 

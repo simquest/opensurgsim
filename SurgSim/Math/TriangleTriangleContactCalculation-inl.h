@@ -298,6 +298,202 @@ bool calculateContactTriangleTriangle(
 											penetrationPoint0, penetrationPoint1, contactNormal);
 }
 
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangleSeparatingAxis(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
+{
+	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+	using SurgSim::Math::Geometry::DistanceEpsilon;
+
+	if (t0n.isZero() || t1n.isZero())
+	{
+		// Degenerate triangle(s) passed to checkTriangleTriangleIntersection.
+		return false;
+	}
+
+	// Early Rejection test:
+	// If all the vertices of one triangle are on one side of the plane of the other triangle,
+	// there is no intersection.
+	Vector3 d[2] = {Vector3(t1n.dot(t0v0 - t1v0), t1n.dot(t0v1 - t1v0), t1n.dot(t0v2 - t1v0)),
+		Vector3(t0n.dot(t1v0 - t0v0), t0n.dot(t1v1 - t0v0), t0n.dot(t1v2 - t0v0))};
+
+	if ((d[0].array() < DistanceEpsilon).all() || (d[0].array() > -DistanceEpsilon).all() ||
+		(d[1].array() < DistanceEpsilon).all() || (d[1].array() > -DistanceEpsilon).all())
+	{
+		return false;
+	}
+
+	const Vector3 tv[2][3] = {{t0v0, t0v1, t0v2}, {t1v0, t1v1, t1v2}};
+
+	// Find the intersection between a triangle and the plane of the other triangle.
+	Vector3 sa[2][2];
+	for (int i = 0; i < 2; ++i)
+	{
+		int index = 0;
+
+		for (int j = 0; j < 3; ++j)
+		{
+			int k = (j + 1) % 3;
+
+			// Intersect the edge t0vi->t0vj with the plane of T1
+			if ((d[i][j] < 0.0 && d[i][k] >= 0.0) || (d[i][j] > 0.0 && d[i][k] <= 0.0))
+			{
+				// The edge intersects T1 plane.
+				auto ratio = std::abs(d[i][j]) / (std::abs(d[i][j]) + std::abs(d[i][k]));
+				sa[i][index++] = tv[i][j] + ratio * (tv[i][k] - tv[i][j]);
+			}
+		}
+
+		SURGSIM_ASSERT(index == 2)
+			<< "The intersection between the edges of triangle " << i << " and the plane of the other triangle"
+			<< " must result in two points exactly.";
+	}
+
+	// The separating axis.
+	const Vector3 D = t0n.cross(t1n).normalized();
+	Vector3 result;
+
+	SURGSIM_ASSERT(distancePointLine(sa[0][1], sa[0][0], (sa[0][0] + D).eval(), &result) < DistanceEpsilon &&
+		distancePointLine(sa[1][0], sa[0][0], (sa[0][0] + D).eval(), &result) < DistanceEpsilon &&
+		distancePointLine(sa[1][1], sa[0][0], (sa[0][0] + D).eval(), &result) < DistanceEpsilon)
+		<< "The intersection points on the triangles do not lie on the separating axis";
+
+	static const int DISTANCE = 0;
+	static const int TRIANGLE = 1;
+	static const int VERTEX = 2;
+
+	// Find the signed distance of the four points on D (from sa1[0])
+	std::vector<std::tuple<T, int, int>> intervals; // the pair contains the signed distance and the triangle id.
+	intervals.push_back(std::tuple<T, int, int>(0.0, 0, 0));
+	intervals.push_back(std::tuple<T, int, int>((sa[0][1] - sa[0][0]).dot(D), 0, 1));
+	intervals.push_back(std::tuple<T, int, int>((sa[1][0] - sa[0][0]).dot(D), 1, 0));
+	intervals.push_back(std::tuple<T, int, int>((sa[1][1] - sa[0][0]).dot(D), 1, 1));
+
+	// Sort the signed distance
+	std::sort(intervals.begin(), intervals.end(), [](const std::tuple<T, int, int>& i, std::tuple<T, int, int>& j)
+	{
+		return (std::get<DISTANCE>(i) < std::get<DISTANCE>(j));
+	});
+
+	// If the first two points belong to the same triangle, there is no intersection
+	if (std::get<TRIANGLE>(intervals[0]) == std::get<TRIANGLE>(intervals[1]))
+	{
+		return false;
+	}
+
+	// There is an intersection.
+	if (std::get<TRIANGLE>(intervals[1]) == std::get<TRIANGLE>(intervals[2]))
+	{
+		// Triangle intervals[1].second is within the Triangle intervals[0].second.
+		T depth1 = std::get<DISTANCE>(intervals[1]) - std::get<DISTANCE>(intervals[0]);
+		T depth2 = std::get<DISTANCE>(intervals[3]) - std::get<DISTANCE>(intervals[2]);
+
+		if (depth1 < depth2)
+		{
+			*penetrationDepth = std::get<DISTANCE>(intervals[2]) - std::get<DISTANCE>(intervals[0]);
+			if (*penetrationDepth < DistanceEpsilon)
+			{
+				return false;
+			}
+			if (std::get<TRIANGLE>(intervals[0]) == 0)
+			{
+				*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[0])][std::get<VERTEX>(intervals[0])];
+				*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[2])][std::get<VERTEX>(intervals[2])];
+			}
+			else
+			{
+				*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[2])][std::get<VERTEX>(intervals[2])];
+				*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[0])][std::get<VERTEX>(intervals[0])];
+			}
+		}
+		else
+		{
+			*penetrationDepth = std::get<DISTANCE>(intervals[3]) - std::get<DISTANCE>(intervals[1]);
+			if (*penetrationDepth < DistanceEpsilon)
+			{
+				return false;
+			}
+			if (std::get<TRIANGLE>(intervals[1]) == 0)
+			{
+				*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[1])][std::get<VERTEX>(intervals[1])];
+				*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[3])][std::get<VERTEX>(intervals[3])];
+			}
+			else
+			{
+				*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[3])][std::get<VERTEX>(intervals[3])];
+				*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[1])][std::get<VERTEX>(intervals[1])];
+			}
+		}
+	}
+	else
+	{
+		*penetrationDepth = std::get<DISTANCE>(intervals[2]) - std::get<DISTANCE>(intervals[1]);
+		if (*penetrationDepth < DistanceEpsilon)
+		{
+			return false;
+		}
+		if (std::get<TRIANGLE>(intervals[1]) == 0)
+		{
+			*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[1])][std::get<VERTEX>(intervals[1])];
+			*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[2])][std::get<VERTEX>(intervals[2])];
+		}
+		else
+		{
+			*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[2])][std::get<VERTEX>(intervals[2])];
+			*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[1])][std::get<VERTEX>(intervals[1])];
+		}
+	}
+
+	if ((*penetrationPoint0 - *penetrationPoint1).dot(D) > 0.0)
+	{
+		*contactNormal = -D;
+	}
+	else
+	{
+		*contactNormal = D;
+	}
+
+	return true;
+}
+
+
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangleSeparatingAxis(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> t0n = (t0v1 - t0v0).cross(t0v2 - t0v0);
+	Eigen::Matrix<T, 3, 1, MOpt> t1n = (t1v1 - t1v0).cross(t1v2 - t1v0);
+	if (t0n.isZero() || t1n.isZero())
+	{
+		// Degenerate triangle(s) passed to calculateContactTriangleTriangle
+		return false;
+	}
+	t0n.normalize();
+	t1n.normalize();
+	return calculateContactTriangleTriangleSeparatingAxis(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n,
+		penetrationDepth, penetrationPoint0, penetrationPoint1, contactNormal);
+}
+
 
 } // namespace Math
 
