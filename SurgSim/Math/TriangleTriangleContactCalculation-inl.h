@@ -315,12 +315,10 @@ bool calculateContactTriangleTriangleSeparatingAxis(
 {
 	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
 	using SurgSim::Math::Geometry::DistanceEpsilon;
+	using SurgSim::Math::Geometry::ScalarEpsilon;
 
-	if (t0n.isZero() || t1n.isZero())
-	{
-		// Degenerate triangle(s) passed to checkTriangleTriangleIntersection.
-		return false;
-	}
+	SURGSIM_ASSERT(std::abs(t0n.norm() - 1.0) < ScalarEpsilon && std::abs(t1n.norm() - 1.0) < ScalarEpsilon)
+		<< "The normals sent in are not normalized! t0n{" << t0n.transpose() << "}, t1n{" << t1n.transpose() << "}.";
 
 	// Early Rejection test:
 	// If all the vertices of one triangle are on one side of the plane of the other triangle,
