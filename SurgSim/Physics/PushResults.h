@@ -19,13 +19,13 @@
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Physics/Computation.h"
 
+namespace SurgSim
+{
 namespace Framework
 {
 class Logger;
 }
 
-namespace SurgSim
-{
 namespace Physics
 {
 
