@@ -115,6 +115,11 @@ public:
 	/// \return all the groups of this scene element
 	std::vector<std::string> getGroups() const;
 
+	/// Test whether this SceneElement is in a specific group
+	/// \param name group to test
+	/// \return true if the SceneElement is in group name
+	bool inGroup(const std::string& name);
+
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.
 	bool initialize();
