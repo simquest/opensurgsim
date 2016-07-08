@@ -325,7 +325,7 @@ bool calculateContactTriangleTriangleSeparatingAxis(
 	// Early Rejection test:
 	// If all the vertices of one triangle are on one side of the plane of the other triangle,
 	// there is no intersection.
-	Vector3 d[2] = {Vector3(t1n.dot(t0v0 - t1v0), t1n.dot(t0v1 - t1v0), t1n.dot(t0v2 - t1v0)),
+	std::array<Vector3, 2> d = {Vector3(t1n.dot(t0v0 - t1v0), t1n.dot(t0v1 - t1v0), t1n.dot(t0v2 - t1v0)),
 		Vector3(t0n.dot(t1v0 - t0v0), t0n.dot(t1v1 - t0v0), t0n.dot(t1v2 - t0v0))};
 
 	if ((d[0].array() < DistanceEpsilon).all() || (d[0].array() > -DistanceEpsilon).all() ||
@@ -334,10 +334,11 @@ bool calculateContactTriangleTriangleSeparatingAxis(
 		return false;
 	}
 
-	const Vector3 tv[2][3] = {{t0v0, t0v1, t0v2}, {t1v0, t1v1, t1v2}};
+	const std::array<std::array<Vector3, 3>, 2> tv = {{{t0v0, t0v1, t0v2}, {t1v0, t1v1, t1v2}}};
 
-	// Find the intersection between a triangle and the plane of the other triangle.
-	Vector3 sa[2][2];
+	// Find the intersection between a triangle and the plane of the other triangle. These intersections would
+	// lie on the separating axis (which is the cross product of the triangle normals).
+	std::array<std::array<Vector3, 2>, 2> tsa;
 	for (int i = 0; i < 2; ++i)
 	{
 		int index = 0;
@@ -346,12 +347,12 @@ bool calculateContactTriangleTriangleSeparatingAxis(
 		{
 			int k = (j + 1) % 3;
 
-			// Intersect the edge t0vi->t0vj with the plane of T1
+			// Intersect the edge tivj->tivk with the plane of t{(i+1)/2}
 			if ((d[i][j] < 0.0 && d[i][k] >= 0.0) || (d[i][j] > 0.0 && d[i][k] <= 0.0))
 			{
-				// The edge intersects T1 plane.
+				// The edge intersects the plane of t{(i+1)/2}.
 				auto ratio = std::abs(d[i][j]) / (std::abs(d[i][j]) + std::abs(d[i][k]));
-				sa[i][index++] = tv[i][j] + ratio * (tv[i][k] - tv[i][j]);
+				tsa[i][index++] = tv[i][j] + ratio * (tv[i][k] - tv[i][j]);
 			}
 		}
 
@@ -364,21 +365,22 @@ bool calculateContactTriangleTriangleSeparatingAxis(
 	const Vector3 D = t0n.cross(t1n).normalized();
 	Vector3 result;
 
-	SURGSIM_ASSERT(distancePointLine(sa[0][1], sa[0][0], (sa[0][0] + D).eval(), &result) < DistanceEpsilon &&
-		distancePointLine(sa[1][0], sa[0][0], (sa[0][0] + D).eval(), &result) < DistanceEpsilon &&
-		distancePointLine(sa[1][1], sa[0][0], (sa[0][0] + D).eval(), &result) < DistanceEpsilon)
+	SURGSIM_ASSERT(distancePointLine(tsa[0][1], tsa[0][0], (tsa[0][0] + D).eval(), &result) < DistanceEpsilon &&
+		distancePointLine(tsa[1][0], tsa[0][0], (tsa[0][0] + D).eval(), &result) < DistanceEpsilon &&
+		distancePointLine(tsa[1][1], tsa[0][0], (tsa[0][0] + D).eval(), &result) < DistanceEpsilon)
 		<< "The intersection points on the triangles do not lie on the separating axis";
 
 	static const int DISTANCE = 0;
 	static const int TRIANGLE = 1;
 	static const int VERTEX = 2;
 
-	// Find the signed distance of the four points on D (from sa1[0])
-	std::vector<std::tuple<T, int, int>> intervals; // the pair contains the signed distance and the triangle id.
-	intervals.push_back(std::tuple<T, int, int>(0.0, 0, 0));
-	intervals.push_back(std::tuple<T, int, int>((sa[0][1] - sa[0][0]).dot(D), 0, 1));
-	intervals.push_back(std::tuple<T, int, int>((sa[1][0] - sa[0][0]).dot(D), 1, 0));
-	intervals.push_back(std::tuple<T, int, int>((sa[1][1] - sa[0][0]).dot(D), 1, 1));
+	// Find the signed distance of the four points on D (from tsa[0][0])
+	// Store it in a tuple containing this signed distance, the corresponding triangle ID and vertex ID.
+	std::array<std::tuple<T, int, int>, 4> intervals =
+	{std::tuple<T, int, int>(0.0, 0, 0),
+	 std::tuple<T, int, int>((tsa[0][1] - tsa[0][0]).dot(D), 0, 1),
+	 std::tuple<T, int, int>((tsa[1][0] - tsa[0][0]).dot(D), 1, 0),
+	 std::tuple<T, int, int>((tsa[1][1] - tsa[0][0]).dot(D), 1, 1)};
 
 	// Sort the signed distance
 	std::sort(intervals.begin(), intervals.end(), [](const std::tuple<T, int, int>& i, std::tuple<T, int, int>& j)
@@ -386,73 +388,76 @@ bool calculateContactTriangleTriangleSeparatingAxis(
 		return (std::get<DISTANCE>(i) < std::get<DISTANCE>(j));
 	});
 
-	// If the first two points belong to the same triangle, there is no intersection
-	if (std::get<TRIANGLE>(intervals[0]) == std::get<TRIANGLE>(intervals[1]))
+	// The intersections of the triangles on the separating axis (P, Q, R, S) are now sorted according to their distance
+	// along the separating axis.
+	//
+	//   *--------*--------*--------*
+	//   P        Q        R        S
+
+	// If P and Q belong to the same triangle, there is no intersection between the triangles.
+	enum {P = 0, Q, R, S};
+	if (std::get<TRIANGLE>(intervals[P]) == std::get<TRIANGLE>(intervals[Q]))
 	{
 		return false;
 	}
 
-	// There is an intersection.
-	if (std::get<TRIANGLE>(intervals[1]) == std::get<TRIANGLE>(intervals[2]))
+	// At this point, there is some overlap of the triangles along the separating axis.
+	size_t indexLeft, indexRight;
+	if (std::get<TRIANGLE>(intervals[Q]) == std::get<TRIANGLE>(intervals[R]))
 	{
-		// Triangle intervals[1].second is within the Triangle intervals[0].second.
-		T depth1 = std::get<DISTANCE>(intervals[1]) - std::get<DISTANCE>(intervals[0]);
-		T depth2 = std::get<DISTANCE>(intervals[3]) - std::get<DISTANCE>(intervals[2]);
+		// Q and R belong to the same triangle: Depending on whether PQ or RS is shorter, either PS is moved to the
+		// right of QR or QR is moved to the right of PS.
+		//
+		//   *--------*--------*--------*
+		//   P        Q        R        S
+		//            *--------*
+		//                t1
+		//   *--------------------------*
+		//                t2
 
-		if (depth1 < depth2)
+		if ((std::get<DISTANCE>(intervals[Q]) - std::get<DISTANCE>(intervals[P])) <
+			(std::get<DISTANCE>(intervals[S]) - std::get<DISTANCE>(intervals[R])))
 		{
-			*penetrationDepth = std::get<DISTANCE>(intervals[2]) - std::get<DISTANCE>(intervals[0]);
-			if (*penetrationDepth < DistanceEpsilon)
-			{
-				return false;
-			}
-			if (std::get<TRIANGLE>(intervals[0]) == 0)
-			{
-				*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[0])][std::get<VERTEX>(intervals[0])];
-				*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[2])][std::get<VERTEX>(intervals[2])];
-			}
-			else
-			{
-				*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[2])][std::get<VERTEX>(intervals[2])];
-				*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[0])][std::get<VERTEX>(intervals[0])];
-			}
+			indexLeft = P;
+			indexRight = R;
 		}
 		else
 		{
-			*penetrationDepth = std::get<DISTANCE>(intervals[3]) - std::get<DISTANCE>(intervals[1]);
-			if (*penetrationDepth < DistanceEpsilon)
-			{
-				return false;
-			}
-			if (std::get<TRIANGLE>(intervals[1]) == 0)
-			{
-				*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[1])][std::get<VERTEX>(intervals[1])];
-				*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[3])][std::get<VERTEX>(intervals[3])];
-			}
-			else
-			{
-				*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[3])][std::get<VERTEX>(intervals[3])];
-				*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[1])][std::get<VERTEX>(intervals[1])];
-			}
+			indexLeft = Q;
+			indexRight = S;
 		}
 	}
 	else
 	{
-		*penetrationDepth = std::get<DISTANCE>(intervals[2]) - std::get<DISTANCE>(intervals[1]);
-		if (*penetrationDepth < DistanceEpsilon)
-		{
-			return false;
-		}
-		if (std::get<TRIANGLE>(intervals[1]) == 0)
-		{
-			*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[1])][std::get<VERTEX>(intervals[1])];
-			*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[2])][std::get<VERTEX>(intervals[2])];
-		}
-		else
-		{
-			*penetrationPoint0 = sa[std::get<TRIANGLE>(intervals[2])][std::get<VERTEX>(intervals[2])];
-			*penetrationPoint1 = sa[std::get<TRIANGLE>(intervals[1])][std::get<VERTEX>(intervals[1])];
-		}
+		// Q and R belong to different triangle: QS is moved to the right of PR.
+		//
+		//   *--------*--------*--------*
+		//   P        Q        R        S
+		//   *-----------------*
+		//           t1
+		//            *-----------------*
+		//                     t2
+
+		indexLeft = Q;
+		indexRight = R;
+	}
+
+	*penetrationDepth = std::get<DISTANCE>(intervals[indexRight]) - std::get<DISTANCE>(intervals[indexLeft]);
+	if (*penetrationDepth < DistanceEpsilon)
+	{
+		// Not enough overlap to be determined as an intersection.
+		return false;
+	}
+
+	if (std::get<TRIANGLE>(intervals[indexLeft]) == 0)
+	{
+		*penetrationPoint0 = tsa[0][std::get<VERTEX>(intervals[indexLeft])];
+		*penetrationPoint1 = tsa[1][std::get<VERTEX>(intervals[indexRight])];
+	}
+	else
+	{
+		*penetrationPoint0 = tsa[0][std::get<VERTEX>(intervals[indexRight])];
+		*penetrationPoint1 = tsa[1][std::get<VERTEX>(intervals[indexLeft])];
 	}
 
 	if ((*penetrationPoint0 - *penetrationPoint1).dot(D) > 0.0)
