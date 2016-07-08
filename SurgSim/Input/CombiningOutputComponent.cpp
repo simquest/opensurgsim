@@ -15,7 +15,7 @@
 
 #include "SurgSim/Input/CombiningOutputComponent.h"
 
-#include <set>
+#include <unordered_set>
 
 #include "SurgSim/Framework/FrameworkConvert.h"
 
@@ -114,7 +114,7 @@ std::vector<std::shared_ptr<SurgSim::Framework::Component>> CombiningOutputCompo
 
 void CombiningOutputComponent::setOutputs(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& outputs)
 {
-	std::set<std::shared_ptr<SurgSim::Input::OutputComponent>> uniqueOutputs;
+	std::unordered_set<std::shared_ptr<SurgSim::Input::OutputComponent>> uniqueOutputs;
 	m_outputs.clear();
 	for (const auto& component : outputs)
 	{

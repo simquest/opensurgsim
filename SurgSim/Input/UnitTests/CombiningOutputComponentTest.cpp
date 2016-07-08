@@ -20,6 +20,7 @@
 #include <boost/thread.hpp>
 #include <gtest/gtest.h>
 #include <memory>
+#include <set>
 #include <string>
 
 #include "SurgSim/DataStructures/DataGroup.h"
@@ -267,9 +268,16 @@ TEST(CombiningOutputComponentTest, Serialization)
 	}
 	ASSERT_NE(combiningOutputComponent, nullptr);
 
-	std::vector<std::shared_ptr<SurgSim::Framework::Component>> components;
-	components.insert(components.begin(), outputs.begin(), outputs.end());
-	ASSERT_EQ(combiningOutputComponent->getOutputs(), components);
+	std::set<std::shared_ptr<SurgSim::Framework::Component>> componentsFromElement;
+	componentsFromElement.insert(outputs.begin(), outputs.end());
+
+	std::set<std::shared_ptr<SurgSim::Framework::Component>> componentsFromCombiner;
+	auto actualOutputs = combiningOutputComponent->getOutputs();
+	componentsFromCombiner.insert(actualOutputs.begin(), actualOutputs.end());
+	ASSERT_EQ(componentsFromElement, componentsFromCombiner);
+	EXPECT_EQ("output1", actualOutputs[0]->getName());
+	EXPECT_EQ("output2", actualOutputs[1]->getName());
+	EXPECT_EQ("output3", actualOutputs[2]->getName());
 
 	auto mockDevice = std::make_shared<MockDevice>("device");
 	inputManager->addDevice(mockDevice);
