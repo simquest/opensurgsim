@@ -1,0 +1,25 @@
+- SurgSim::Framework::BasicSceneElement:
+    Name: element
+    Components:
+      - SurgSim::Input::CombiningOutputComponent:
+          Name: reducer
+          DeviceName: device
+          Outputs:
+            - SurgSim::Input::OutputComponent:
+                Name: output1
+                Id: output1
+            - SurgSim::Input::OutputComponent:
+                Name: output2
+                Id: output2
+            - SurgSim::Input::OutputComponent:
+                Name: output3
+                Id: output3
+      - SurgSim::Input::OutputComponent:
+          Name: output1
+          Id: output1
+      - SurgSim::Input::OutputComponent:
+          Name: output2
+          Id: output2
+      - SurgSim::Input::OutputComponent:
+          Name: output3
+          Id: output3
