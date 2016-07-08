@@ -93,7 +93,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
 	lightElement->setPose(makeRigidTransform(
-			Math::Vector3d(-0.3, 0.1, -0.5),
+			Math::Vector3d(-0.3 , 0.1, -0.5),
 	Math::Vector3d(0.0 ,0.0, 0.0),
 	Math::Vector3d(0.0, 1.0, 0.0)));
 	lightElement->addComponent(light);
@@ -241,7 +241,7 @@ TEST_F(ImplicitSurfaceRenderTests, StereoFluid)
 
 	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
 	lightElement->setPose(makeRigidTransform(
-			Math::Vector3d(0.5, 0.5, 0.5),
+			Math::Vector3d(-0.3 , 0.1, -0.5),
 			Math::Vector3d(0.0 ,0.0, 0.0),
 			Math::Vector3d(0.0, 1.0, 0.0)));
 	lightElement->addComponent(light);
@@ -250,31 +250,44 @@ TEST_F(ImplicitSurfaceRenderTests, StereoFluid)
 	auto axes = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
 	lightElement->addComponent(axes);
 
-	std::array<double, 6> lightProjection = { -2.0, 2.0, -2.0, 2.0, -1.0, 2.0 };
+	std::array<double, 6> lightProjection = { -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 };
 	scene->addSceneElements(Blocks::createShadowMapping(viewElement->getCamera(), light,
 														4096, 1024, lightProjection, 0.002, 0.75, true, 4.0, false));
 
 	scene->addSceneElements(Blocks::createImplicitSurfaceEffect(viewElement->getView(), light,
 																scene->getSceneElement(Blocks::GROUP_SHADOW_CASTER),
-																0.01f, 800.0f, 4.0,
+																0.02f, 800.0f, 4.0,
 																diffuseColor, specularColor,
 																"Textures/CubeMap_reflection_diffuse.png", 0.9,
 																"Textures/CubeMap_reflection_specular.png", 0.1,
 																100.0f, 0.0005f, 0.75f, false));
 
-	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
+	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
+	cube->addGroupReference(Blocks::GROUP_SHADOW_RECEIVER);
 
-	auto element = std::make_shared<Framework::BasicSceneElement>("box");
+	auto material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", Math::Vector4f(0.2, 0.2, 0.2, 1.0));
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 10.0f);
+	cube->setMaterial(material);
+
+	auto element = std::make_shared<Framework::BasicSceneElement>("Cube");
 	element->setPose(makeRigidTranslation(Math::Vector3d(0.0, 0.0, 0.25)));
 	element->addComponent(cube);
+	element->addComponent(material);
 
 	scene->addSceneElement(element);
 
 	auto sphere = std::make_shared<Graphics::OsgSphereRepresentation>("Graphics");
 	sphere->setRadius(0.1);
+	sphere->addGroupReference(Blocks::GROUP_SHADOW_CASTER);
+	sphere->addGroupReference(Blocks::GROUP_SHADOW_RECEIVER);
 
-	auto material = Graphics::buildMaterial("Shaders/material.vert", "Shaders/material.frag");
+	material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
 	material->addUniform("vec4", "diffuseColor");
 	material->setValue("diffuseColor", diffuseColor);
 	material->addUniform("vec4", "specularColor");
@@ -284,8 +297,27 @@ TEST_F(ImplicitSurfaceRenderTests, StereoFluid)
 	sphere->setMaterial(material);
 
 	element = std::make_shared<Framework::BasicSceneElement>("Sphere");
-	element->setPose(makeRigidTranslation(Math::Vector3d(0.25, 0.0, 0.0)));
+	element->setPose(makeRigidTranslation(Math::Vector3d(-0.25, 0.0, -0.25)));
 	element->addComponent(sphere);
+	element->addComponent(material);
+
+	scene->addSceneElement(element);
+
+	auto plane = std::make_shared<Graphics::OsgPlaneRepresentation>("Graphics");
+	plane->addGroupReference(Blocks::GROUP_SHADOW_RECEIVER);
+
+	material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
+	material->addUniform("vec4", "diffuseColor");
+	material->setValue("diffuseColor", Math::Vector4f(0.2, 0.2, 0.2, 1.0));
+	material->addUniform("vec4", "specularColor");
+	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("float", "shininess");
+	material->setValue("shininess", 10.0f);
+	plane->setMaterial(material);
+
+	element = std::make_shared<Framework::BasicSceneElement>("Plane");
+	element->setPose(makeRigidTranslation(Math::Vector3d(0.0, -0.1, 0.0)));
+	element->addComponent(plane);
 	element->addComponent(material);
 
 	scene->addSceneElement(element);
