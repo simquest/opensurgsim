@@ -58,6 +58,8 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 		const std::string specularEnvMap,
 		float specularPct,
 		float shininess,
+		float shadowBias,
+		float shadowIntensity,
 		bool showDebug);
 
 } // Blocks

@@ -93,7 +93,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	auto lightElement = std::make_shared<Framework::BasicSceneElement>("LightElement");
 	lightElement->setPose(makeRigidTransform(
-			Math::Vector3d(0.5, 0.1, -0.1),
+			Math::Vector3d(-0.3, 0.1, -0.5),
 	Math::Vector3d(0.0 ,0.0, 0.0),
 	Math::Vector3d(0.0, 1.0, 0.0)));
 	lightElement->addComponent(light);
@@ -112,7 +112,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 																diffuseColor, specularColor,
 																"Textures/CubeMap_reflection_diffuse.png", 0.9,
 																"Textures/CubeMap_reflection_specular.png", 0.1,
-																100.0f, false));
+																100.0f, 0.0005f, 0.75f, false));
 
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Graphics");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);
@@ -149,7 +149,7 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 	sphere->setMaterial(material);
 
 	element = std::make_shared<Framework::BasicSceneElement>("Sphere");
-	element->setPose(makeRigidTranslation(Math::Vector3d(0.25, 0.0, 0.05)));
+	element->setPose(makeRigidTranslation(Math::Vector3d(-0.25, 0.0, -0.25)));
 	element->addComponent(sphere);
 	element->addComponent(material);
 
@@ -260,7 +260,7 @@ TEST_F(ImplicitSurfaceRenderTests, StereoFluid)
 																diffuseColor, specularColor,
 																"Textures/CubeMap_reflection_diffuse.png", 0.9,
 																"Textures/CubeMap_reflection_specular.png", 0.1,
-																100.0f, false));
+																100.0f, 0.0005f, 0.75f, false));
 
 	auto cube = std::make_shared<Graphics::OsgBoxRepresentation>("Cube");
 	cube->setSizeXYZ(0.1, 0.1, 0.1);

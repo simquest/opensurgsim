@@ -193,7 +193,6 @@ std::shared_ptr<Graphics::RenderPass> createNormalPass(
 }
 
 std::shared_ptr<Graphics::RenderPass> createShadingPass(
-		std::shared_ptr<Framework::TransferPropertiesBehavior> copier,
 		std::shared_ptr<Graphics::View> view,
 		std::shared_ptr<Graphics::Camera> camera,
 		std::shared_ptr<Graphics::Light> light,
@@ -206,11 +205,16 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 		float diffusePct,
 		const std::string specularEnvMap,
 		float specularPct,
-		float shininess)
+		float shininess,
+		float shadowBias,
+		float shadowIntensity)
 {
 	std::array<int, 2> dimensions = view->getDimensions();
+	auto copier = std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
+	copier->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_GRAPHICS);
 
 	auto renderPass = std::make_shared<Graphics::RenderPass>("ImplicitSurfaceShadingPass");
+	renderPass->addComponent(copier);
 
 	auto renderCamera = std::dynamic_pointer_cast<Graphics::OsgCamera>(renderPass->getCamera());
 	renderCamera->setAmbientColor(camera->getAmbientColor());
@@ -245,8 +249,10 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	material->setValue("specularColor", specularColor);
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", shininess);
+	material->addUniform("float", "bias");
+	material->setValue("bias", shadowBias);
 	material->addUniform("float", "intensity");
-	material->setValue("intensity", 0.75f);
+	material->setValue("intensity", shadowIntensity);
 
 	std::string filename;
 	{
@@ -298,6 +304,8 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 		const std::string specularEnvMap,
 		float specularPct,
 		float shininess,
+		float shadowBias,
+		float shadowIntensity,
 		bool showDebug)
 {
 	SURGSIM_ASSERT(view != nullptr) << "View can't be nullptr.";
@@ -308,9 +316,6 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 	auto osgLight = Framework::checkAndConvert<Graphics::OsgLight>(light, "SurgSim::Graphics::OsgLight");
 
 	auto lightPass = std::dynamic_pointer_cast<Graphics::RenderPass>(lightMapPass);
-
-	auto copier = std::make_shared<Framework::TransferPropertiesBehavior>("Copier");
-	copier->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_GRAPHICS);
 
 	std::vector<std::shared_ptr<Framework::SceneElement>> result;
 
@@ -335,13 +340,13 @@ std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffec
 	auto normalPass = createNormalPass(osgCamera, blurPass->getRenderTarget()->getDepthTarget(),
 									   dimensions[0], dimensions[1], showDebug);
 
-	auto shadingPass = createShadingPass(copier, graphicsView, osgCamera, osgLight, lightPass,
+	auto shadingPass = createShadingPass(graphicsView, osgCamera, osgLight, lightPass,
 										 blurPass->getRenderTarget()->getDepthTarget(),
 										 normalPass->getRenderTarget()->getColorTarget(0),
 										 diffuseColor, specularColor,
-										 diffuseEnvMap, diffusePct, specularEnvMap, specularPct, shininess);
+										 diffuseEnvMap, diffusePct, specularEnvMap, specularPct, shininess,
+										 shadowBias, shadowIntensity);
 
-	depthPass->addComponent(copier);
 
 	result.push_back(depthPass);
 	result.push_back(normalPass);
