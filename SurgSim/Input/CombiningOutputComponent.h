@@ -54,8 +54,8 @@ public:
 	void setOutputs(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& outputs);
 
 	/// Set the function to do the combining.
-	/// \param combiner A function that receives all the OutputComponents and returns a DataGroup and a bool indicating
-	///		success.
+	/// The parameter is a function that receives all the OutputComponents and returns a DataGroup and a bool
+	/// indicating success.
 	void setCombiner(std::function<bool(const std::vector<std::weak_ptr<SurgSim::Input::OutputComponent>>&,
 		SurgSim::DataStructures::DataGroup*)> combiner);
 

@@ -257,7 +257,7 @@ TEST(CombiningOutputComponentTest, Serialization)
 	auto outputs = element->getComponents<SurgSim::Input::OutputComponent>();
 	ASSERT_EQ(outputs.size(), 4);
 	std::shared_ptr<SurgSim::Input::CombiningOutputComponent> combiningOutputComponent;
-	for (int i = 0; i < outputs.size(); ++i)
+	for (size_t i = 0; i < outputs.size(); ++i)
 	{
 		combiningOutputComponent = std::dynamic_pointer_cast<SurgSim::Input::CombiningOutputComponent>(outputs[i]);
 		if (combiningOutputComponent != nullptr)
