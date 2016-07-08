@@ -291,9 +291,9 @@ TEST(CombiningOutputComponentTest, Serialization)
 	data.vectors().set(SurgSim::DataStructures::Names::FORCE, initialForce);
 	data.booleans().set("extraData", true);
 
-	outputs[0]->setData(data);
+	std::static_pointer_cast<SurgSim::Input::OutputComponent>(actualOutputs[0])->setData(data);
 	data.booleans().set("extraData", false);
-	outputs[2]->setData(data);
+	std::static_pointer_cast<SurgSim::Input::OutputComponent>(actualOutputs[2])->setData(data);
 
 	runtime->start(true);
 	runtime->step();
