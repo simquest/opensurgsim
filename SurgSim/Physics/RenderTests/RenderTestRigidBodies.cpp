@@ -137,8 +137,6 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedPlaneSceneElement(c
 std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	const std::string& name, std::string plyFilename, double scale = 1.0)
 {
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-
 	auto mesh = std::make_shared<MeshShape>();
 	mesh->load(plyFilename);
 	for (auto& vertex : mesh->getVertices())
@@ -176,8 +174,6 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 std::shared_ptr<SurgSim::Framework::SceneElement> createFixedMeshSceneElement(
 	const std::string& name, std::string plyFilename, double scale = 1.0)
 {
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-
 	auto mesh = std::make_shared<MeshShape>();
 	mesh->load(plyFilename);
 	for (auto& vertex : mesh->getVertices())
