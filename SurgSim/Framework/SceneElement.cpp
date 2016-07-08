@@ -383,5 +383,11 @@ std::vector<std::string> SceneElement::getGroups() const
 	return m_groups->getGroups(std::const_pointer_cast<SceneElement>(shared_from_this()));
 }
 
+bool SceneElement::inGroup(const std::string& name)
+{
+	auto groups = getGroups();
+	return (std::find(groups.begin(), groups.end(), name) != groups.end());
+}
+
 }; // namespace Framework
 }; // namespace SurgSim
