@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Blocks/KeyBehavior.h"
 
 namespace SurgSim
 {
@@ -33,7 +33,7 @@ namespace Blocks
 
 /// Behavior to abstract the functionality of keyboard driven behaviors, can be programmed to react to a
 /// single keystroke
-class SingleKeyBehavior : public Framework::Behavior
+class SingleKeyBehavior : public KeyBehavior
 {
 public:
 	/// Constructor
@@ -42,17 +42,7 @@ public:
 	/// Destructor
 	~SingleKeyBehavior();
 
-	void update(double dt) override;
-	bool doInitialize() override;
 	bool doWakeUp() override;
-
-	/// Set the input component from which pressed key comes.
-	/// \param	inputComponent	The input component which contains the pressed key(s).
-	void setInputComponent(std::shared_ptr<Framework::Component> inputComponent);
-
-	/// Get the input component of this behavior, from which the pressed key comes.
-	/// \return The input component which sends key press to this behavior.
-	std::shared_ptr<Input::InputComponent> getInputComponent() const;
 
 	/// Sets the current key value used to trigger this behavior
 	/// \param val the key code to use to trigger this behavior
@@ -62,17 +52,20 @@ public:
 	int getKey() const;
 
 protected:
-	/// implement this to execute functionality on key stroke
-	/// \param actualKey the value of the key hit
-	virtual void onKey(int actualKey) = 0;
+	void setDescription(const std::string& description);
+
+	virtual void onKey() = 0;
+
+	void onKeyDown(int actualKey) override;
+
+	void onKeyUp(int actualKey) override;
 
 	std::shared_ptr<Input::InputComponent> m_inputComponent;
 
-	/// Keep track if the key was pressed the last time around
-	bool m_keyPressedLastUpdate;
-
 	/// Registered key to trigger action
 	int m_actionKey;
+
+	std::string m_description;
 };
 
 }; // namespace Blocks

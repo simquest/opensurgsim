@@ -70,6 +70,8 @@ static const char* const ANALOG_OUTPUT_PREFIX = "analogOutput";
 static const char* const PROJECTION_MATRIX = "projectionMatix";
 static const char* const LEFT_PROJECTION_MATRIX = "leftProjectionMatix";
 static const char* const RIGHT_PROJECTION_MATRIX = "rightProjectionMatix";
+
+static const char* const KEY = "key";
 };
 
 /// A templated dictionary in which data can be accessed by name or index, with immutable names & indices.

@@ -32,7 +32,7 @@ public:
 	}
 
 protected:
-	void onKey(int key) override
+	void onKey() override
 	{
 	}
 };
@@ -40,20 +40,9 @@ protected:
 TEST(SingleKeyBehaviorTest, Constructor)
 {
 	std::shared_ptr<SurgSim::Blocks::SingleKeyBehavior> singleKeyBehavior;
-	EXPECT_NO_THROW(singleKeyBehavior = std::make_shared<MockSingleKeyBehavior>("SingleKeyBehavior"));
+	ASSERT_NO_THROW(singleKeyBehavior = std::make_shared<MockSingleKeyBehavior>("SingleKeyBehavior"));
 	EXPECT_EQ(nullptr, singleKeyBehavior->getInputComponent());
 	EXPECT_EQ(SurgSim::Devices::KeyCode::NONE, singleKeyBehavior->getKey());
-}
-
-TEST(SingleKeyBehaviorTest, SetAndGetInputComponent)
-{
-	auto behavior = std::make_shared<MockSingleKeyBehavior>("MockSingleKeyBehavior");
-	auto input = std::make_shared<SurgSim::Input::InputComponent>("input");
-
-	EXPECT_NO_THROW(behavior->setInputComponent(input));
-	std::shared_ptr<SurgSim::Input::InputComponent> retrievedInputComponent;
-	EXPECT_NO_THROW(retrievedInputComponent = behavior->getInputComponent());
-	EXPECT_EQ(input, retrievedInputComponent);
 }
 
 TEST(SingleKeyBehaviorTest, SetAndGetKey)
@@ -109,7 +98,7 @@ TEST(SingleKeyBehaviorTest, AccessibleValues)
 
 	EXPECT_NO_THROW(retrievedKey = behavior->getValue<int>("ActionKey"));
 	EXPECT_NO_THROW(retrievedInputComponent =
-								behavior->getValue<std::shared_ptr<SurgSim::Input::InputComponent>>("InputComponent"));
+						behavior->getValue<std::shared_ptr<SurgSim::Input::InputComponent>>("InputComponent"));
 
 	EXPECT_EQ(key, retrievedKey);
 	EXPECT_EQ(input, retrievedInputComponent);

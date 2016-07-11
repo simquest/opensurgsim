@@ -28,13 +28,9 @@ namespace Blocks
 {
 
 SingleKeyBehavior::SingleKeyBehavior(const std::string& name) :
-	Framework::Behavior(name),
-	m_actionKey(SurgSim::Devices::KeyCode::NONE),
-	m_keyPressedLastUpdate(false)
-
+	KeyBehavior(name),
+	m_actionKey(SurgSim::Devices::KeyCode::NONE)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SingleKeyBehavior, std::shared_ptr<SurgSim::Framework::Component>,
-									  InputComponent, getInputComponent, setInputComponent);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SingleKeyBehavior, int, ActionKey, getKey, setKey);
 
 }
@@ -43,58 +39,49 @@ SingleKeyBehavior::~SingleKeyBehavior()
 {
 }
 
-void SingleKeyBehavior::setInputComponent(std::shared_ptr<SurgSim::Framework::Component> inputComponent)
-{
-	m_inputComponent = SurgSim::Framework::checkAndConvert<SurgSim::Input::InputComponent>(inputComponent,
-					   "SurgSim::Input::InputComponent");
-}
-
-std::shared_ptr<SurgSim::Input::InputComponent> SingleKeyBehavior::getInputComponent() const
-{
-	return m_inputComponent;
-}
-
-bool SingleKeyBehavior::doInitialize()
-{
-	return true;
-}
-
 bool SingleKeyBehavior::doWakeUp()
 {
-	SURGSIM_LOG_IF(m_inputComponent == nullptr,
-				   SurgSim::Framework::Logger::getDefaultLogger(),
-				   WARNING) << "Input component not present in " << getFullName();
 	SURGSIM_LOG_IF(m_actionKey != Devices::KeyCode::NONE,
 				   SurgSim::Framework::Logger::getDefaultLogger(),
 				   WARNING) << "No key set in " << getFullName();
 
-	return m_inputComponent != nullptr && m_actionKey != Devices::KeyCode::NONE;
+	return KeyBehavior::doWakeUp() && m_actionKey != Devices::KeyCode::NONE;
 }
 
-void SingleKeyBehavior::update(double dt)
-{
-	DataStructures::DataGroup dataGroup;
-	m_inputComponent->getData(&dataGroup);
-
-	int key;
-	if (dataGroup.integers().get("key", &key))
-	{
-		if (getKey() == key && !m_keyPressedLastUpdate)
-		{
-			onKey(key);
-		}
-		m_keyPressedLastUpdate = (Devices::KeyCode::NONE != key);
-	}
-}
 
 int SingleKeyBehavior::getKey() const
 {
 	return m_actionKey;
 }
 
+void SingleKeyBehavior::setDescription(const std::string& description)
+{
+	m_description = description;
+}
+
+void SingleKeyBehavior::onKeyDown(int actualKey)
+{
+	if (actualKey == m_actionKey)
+	{
+		onKey();
+	}
+}
+
+void SingleKeyBehavior::onKeyUp(int)
+{
+	return;
+}
+
 void SingleKeyBehavior::setKey(int val)
 {
+	KeyBehavior::unregisterKey(m_actionKey);
 	m_actionKey = val;
+	std::string description = m_description;
+	if (description == "")
+	{
+		description = getClassName();
+	}
+	KeyBehavior::registerKey(val, description);
 }
 
 }; // namespace Blocks
