@@ -129,7 +129,7 @@ bool PaintBehavior::doWakeUp()
 		return false;
 	}
 
-	buildBrush(getRadius());
+	buildAntiAliasedBrush(getRadius());
 
 	return true;
 }
