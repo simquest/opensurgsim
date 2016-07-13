@@ -47,6 +47,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DPlyReaderDelegate.cpp
 	Fem3DRepresentation.cpp
 	FemConstraintFixedPoint.cpp
+	FemConstraintFixedRotationVector.cpp
 	FemConstraintFrictionalSliding.cpp
 	FemConstraintFrictionlessContact.cpp
 	FemConstraintFrictionlessSliding.cpp
@@ -55,6 +56,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemPlyReaderDelegate.cpp
 	FemRepresentation.cpp
 	FixedConstraintFixedPoint.cpp
+	FixedConstraintFixedRotationVector.cpp
 	FixedConstraintFrictionlessContact.cpp
 	FixedRepresentation.cpp
 	FreeMotion.cpp
@@ -76,6 +78,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Representation.cpp
 	RigidCollisionRepresentation.cpp
 	RigidConstraintFixedPoint.cpp
+	RigidConstraintFixedRotationVector.cpp
 	RigidConstraintFrictionlessContact.cpp
 	RigidLocalization.cpp
 	RigidRepresentation.cpp
@@ -129,6 +132,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DPlyReaderDelegate.h
 	Fem3DRepresentation.h
 	FemConstraintFixedPoint.h
+	FemConstraintFixedRotationVector.h
 	FemConstraintFrictionalSliding.h
 	FemConstraintFrictionlessContact.h
 	FemConstraintFrictionlessSliding.h
@@ -139,6 +143,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemPlyReaderDelegate.h
 	FemRepresentation.h
 	FixedConstraintFixedPoint.h
+	FixedConstraintFixedRotationVector.h
 	FixedConstraintFrictionlessContact.h
 	FixedRepresentation.h
 	FreeMotion.h
@@ -163,12 +168,14 @@ set(SURGSIM_PHYSICS_HEADERS
 	Representation.h
 	RigidCollisionRepresentation.h
 	RigidConstraintFixedPoint.h
+	RigidConstraintFixedRotationVector.h
 	RigidConstraintFrictionlessContact.h
 	RigidLocalization.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
 	RigidState.h
+	RotationVectorConstraintData.h
 	SlidingConstraint.h
 	SlidingConstraintData.h
 	SolveMlcp.h
