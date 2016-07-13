@@ -66,6 +66,11 @@ public:
 	/// \return Radius in texture coordinate range [0-1]
 	double getRadius() const;
 
+	/// Sets whether to anti-alias the brush
+	/// \param antialias True enables AA, False disables
+	void setAntiAlias(bool antialias);
+	bool getAntiAlias() const;
+
 	/// Sets collection of local triangle coordinates to paint on during next update
 	/// \param coordinate Standard vector of IndexedLocalCoordinates
 	void setCoordinates(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinate);
@@ -97,6 +102,9 @@ private:
 
 	/// Color to use for decal painting
 	Math::Vector4d m_color;
+
+	/// Flag for antialiasing the brush
+	bool m_antialias;
 
 	/// Collection of UV texture coordinates to paint to on next update
 	std::vector<DataStructures::IndexedLocalCoordinate> m_coordinates;

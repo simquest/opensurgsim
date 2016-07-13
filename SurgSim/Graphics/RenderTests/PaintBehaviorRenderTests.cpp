@@ -90,6 +90,7 @@ TEST_F(PaintBehaviorRenderTests, InitTest)
 	paintBehavior->setTextureSize(2048, 2048);
 	paintBehavior->setRadius(0.05);
 	paintBehavior->setColor(Math::Vector4d(1.0, 0.0, 0.0, 0.75));
+	paintBehavior->setAntiAlias(true);
 
 	std::vector<DataStructures::IndexedLocalCoordinate> coords;
 	for (size_t i = 0; i < 10; i++)
