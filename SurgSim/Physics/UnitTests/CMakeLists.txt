@@ -90,6 +90,7 @@ set(UNIT_TEST_SOURCES
 	RigidLocalizationTest.cpp
 	RigidRepresentationTest.cpp
 	RigidStateTest.cpp
+	RotationVectorConstraintDataTests.cpp
 	SlidingConstraintDataTests.cpp
 	SolveMlcpTests.cpp
 	UpdateCollisionRepresentationsTest.cpp
