@@ -76,6 +76,11 @@ public:
 	/// i.e. rotVec(rigidR * rigidRAtGrasp^1 * beamRAtGrasp * beamR0^-1)
 	SurgSim::Math::Vector3d getCurrentRotationVector()
 	{
+		SURGSIM_ASSERT(nullptr != m_rigid) << "Did you call setRigidOrFixedRotation prior to using this class ?";
+		SURGSIM_ASSERT(nullptr != m_beams) << "Did you call setFem1DRotation prior to using this class ?";
+		SURGSIM_ASSERT(m_beams->getNumFemElements() > m_beamId) << "The beam id " << m_beamId
+			<< " does not exists, the fem1d has " << m_beams->getNumFemElements()  << " beams";
+
 		SurgSim::Math::Matrix33d rigidR = m_rigid->getCurrentState().getPose().linear();
 		if (!m_initialized)
 		{
