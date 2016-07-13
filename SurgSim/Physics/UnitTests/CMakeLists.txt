@@ -34,6 +34,7 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
 	Fem1DConstraintFixedPointTests.cpp
+	Fem1DConstraintFixedRotationVectorTests.cpp
 	Fem1DConstraintFrictionalSlidingTests.cpp
 	Fem1DConstraintFrictionlessContactTests.cpp
 	Fem1DConstraintFrictionlessSlidingTests.cpp
