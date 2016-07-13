@@ -22,16 +22,19 @@
 #include "SurgSim/Physics/Fem2DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemConstraintFixedPoint.h"
+#include "SurgSim/Physics/FemConstraintFixedRotationVector.h"
 #include "SurgSim/Physics/FemConstraintFrictionalSliding.h"
 #include "SurgSim/Physics/FemConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FemConstraintFrictionlessSliding.h"
 #include "SurgSim/Physics/FixedConstraintFixedPoint.h"
+#include "SurgSim/Physics/FixedConstraintFixedRotationVector.h"
 #include "SurgSim/Physics/FixedConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/MassSpringConstraintFixedPoint.h"
 #include "SurgSim/Physics/MassSpringConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/RigidConstraintFixedPoint.h"
+#include "SurgSim/Physics/RigidConstraintFixedRotationVector.h"
 #include "SurgSim/Physics/RigidConstraintFrictionlessContact.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 
@@ -62,6 +65,12 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 	addImplementation(typeid(Fem1DRepresentation), std::make_shared<FemConstraintFrictionalSliding>());
 	addImplementation(typeid(Fem2DRepresentation), std::make_shared<FemConstraintFrictionalSliding>());
 	addImplementation(typeid(Fem3DRepresentation), std::make_shared<FemConstraintFrictionalSliding>());
+
+	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFixedRotationVector>());
+	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFixedRotationVector>());
+	addImplementation(typeid(Fem1DRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
+	addImplementation(typeid(Fem2DRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
+	addImplementation(typeid(Fem3DRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
 
 	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
 	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
