@@ -135,6 +135,11 @@ void Fem1DElementBeam::initialize(const SurgSim::Math::OdeState& state)
 	computeStiffness(state);
 }
 
+SurgSim::Math::Matrix33d Fem1DElementBeam::getInitialRotation() const
+{
+	return m_R0.block<3, 3>(0, 0);
+}
+
 void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state)
 {
 	double& L = m_restLength;
