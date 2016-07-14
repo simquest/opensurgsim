@@ -549,6 +549,18 @@ bool VirtualToolCoupler::getCalculateInertialTorques() const
 	return m_calculateInertialTorques;
 }
 
+void VirtualToolCoupler::doRetire()
+{
+	m_outputData.resetAll();
+	Behavior::doRetire();
+}
+
+void VirtualToolCoupler::setLocalActive(bool val)
+{
+	m_outputData.resetAll();
+	Behavior::setLocalActive(val);
+}
+
 bool VirtualToolCoupler::isHapticOutputOnlyWhenColliding() const
 {
 	return m_hapticOutputOnlyWhenColliding;
