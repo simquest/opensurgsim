@@ -66,6 +66,7 @@ set(UNIT_TEST_SOURCES
 	FemLocalizationTest.cpp
 	FemRepresentationTests.cpp
 	FixedConstraintFixedPointTests.cpp
+	FixedConstraintFixedRotationVectorTests.cpp
 	FixedConstraintFrictionlessContactTests.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
@@ -87,6 +88,7 @@ set(UNIT_TEST_SOURCES
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp
 	RigidConstraintFixedPointTests.cpp
+	RigidConstraintFixedRotationVectorTests.cpp
 	RigidConstraintFrictionlessContactTests.cpp
 	RigidLocalizationTest.cpp
 	RigidRepresentationTest.cpp

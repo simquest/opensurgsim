@@ -114,33 +114,32 @@ TEST(Fem1DConstraintFixedRotationVectorTests, Constants)
 
 TEST(Fem1DConstraintFixedRotationVectorTests, BuildMlcpBasic)
 {
-	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem. It assumes
-	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
-	// necessary to supply a realistic C.  It only checks H and b.
 	FemConstraintFixedRotationVector constraint;
 
+	// Prepare the fem1d representation for this constraint type
 	auto fem1d = getFem1d("representation");
-	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("rigid");
-
 	auto localization = std::make_shared<Fem1DLocalization>(fem1d,
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(1.0, 0.0)));
 
-	Vector3d actual = Vector3d::Zero();
-	auto nodeIds = fem1d->getFemElement(2u)->getNodeIds();
-	Vector3d rotationVector0 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[0] + 3);
-	Vector3d rotationVector1 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[1] + 3);
-	actual = SurgSim::Math::interpolate(rotationVector0, rotationVector1, 0.0);
+	// Prepare the rigid representation for this constraint type
+	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("rigid");
 
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(24, 3, 1);
-
+	// Prepare the specific constraint data
 	RotationVectorRigidFem1DConstraintData emptyConstraint;
 	emptyConstraint.setFem1DRotation(fem1d, localization->getLocalPosition().index);
 	emptyConstraint.setRigidOrFixedRotation(rigid, rigid->getPose().linear());
+
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(24, 3, 1);
 
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
 	// Compare results
+	Vector3d actual = Vector3d::Zero();
+	auto nodeIds = fem1d->getFemElement(2u)->getNodeIds();
+	Vector3d rotationVector0 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[0] + 3);
+	Vector3d rotationVector1 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[1] + 3);
+	actual = SurgSim::Math::interpolate(rotationVector0, rotationVector1, 0.0);
 	Eigen::Matrix<double, 3, 1> violation = actual;
 	EXPECT_NEAR_EIGEN(violation, mlcpPhysicsProblem.b, epsilon);
 
@@ -154,34 +153,32 @@ TEST(Fem1DConstraintFixedRotationVectorTests, BuildMlcpBasic)
 
 TEST(Fem1DConstraintFixedRotationVectorTests, BuildMlcp)
 {
-	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
-	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
-	// necessary to supply a realistic C.  It only checks H and b.
 	FemConstraintFixedRotationVector constraint;
 
+	// Prepare the fem1d representation for this constraint type
 	auto fem1d = getFem1d("representation");
-	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("rigid");
-
-	// Setup parameters for FemConstraintFixedPoint::build
 	auto localization = std::make_shared<Fem1DLocalization>(fem1d,
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(0.3, 0.7)));
 
-	Vector3d actual = Vector3d::Zero();
-	auto nodeIds = fem1d->getFemElement(2u)->getNodeIds();
-	Vector3d rotationVector0 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[0] + 3);
-	Vector3d rotationVector1 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[1] + 3);
-	actual = SurgSim::Math::interpolate(rotationVector0, rotationVector1, 0.7);
+	// Prepare the rigid representation for this constraint type
+	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("rigid");
 
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(24, 3, 1);
-
+	// Prepare the specific constraint data
 	RotationVectorRigidFem1DConstraintData emptyConstraint;
 	emptyConstraint.setFem1DRotation(fem1d, localization->getLocalPosition().index);
 	emptyConstraint.setRigidOrFixedRotation(rigid, rigid->getPose().linear());
+
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(24, 3, 1);
 
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
 	// Compare results
+	Vector3d actual = Vector3d::Zero();
+	auto nodeIds = fem1d->getFemElement(2u)->getNodeIds();
+	Vector3d rotationVector0 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[0] + 3);
+	Vector3d rotationVector1 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[1] + 3);
+	actual = SurgSim::Math::interpolate(rotationVector0, rotationVector1, 0.7);
 	Eigen::Matrix<double, 3, 1> violation = actual;
 	EXPECT_NEAR_EIGEN(violation, mlcpPhysicsProblem.b, epsilon);
 
@@ -196,29 +193,22 @@ TEST(Fem1DConstraintFixedRotationVectorTests, BuildMlcp)
 
 TEST(Fem1DConstraintFixedRotationVectorTests, BuildMlcpTwoStep)
 {
-	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem. It assumes
-	// CHt and HCHt can be correctly built given H, so it does not necessarily construct the physical parameters
-	// necessary to supply a realistic C.  It only checks H and b.
 	FemConstraintFixedRotationVector constraint;
 
+	// Prepare the fem1d representation for this constraint type
 	auto fem1d = getFem1d("representation");
-	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("rigid");
-
-	// Setup parameters for FemConstraintFixedPoint::build
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(24, 3, 1);
-
 	auto localization = std::make_shared<Fem1DLocalization>(fem1d,
 		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(0.11, 0.89)));
 
-	Vector3d actual = Vector3d::Zero();
-	auto nodeIds = fem1d->getFemElement(2u)->getNodeIds();
-	Vector3d rotationVector0 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[0] + 3);
-	Vector3d rotationVector1 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[1] + 3);
-	actual = SurgSim::Math::interpolate(rotationVector0, rotationVector1, 0.89);
+	// Prepare the rigid representation for this constraint type
+	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("rigid");
 
+	// Prepare the specific constraint data
 	RotationVectorRigidFem1DConstraintData emptyConstraint;
 	emptyConstraint.setFem1DRotation(fem1d, localization->getLocalPosition().index);
 	emptyConstraint.setRigidOrFixedRotation(rigid, rigid->getPose().linear());
+
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(24, 3, 1);
 
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
@@ -236,6 +226,11 @@ TEST(Fem1DConstraintFixedRotationVectorTests, BuildMlcpTwoStep)
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_NEGATIVE_SIDE));
 
 	// Compare results
+	Vector3d actual = Vector3d::Zero();
+	auto nodeIds = fem1d->getFemElement(2u)->getNodeIds();
+	Vector3d rotationVector0 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[0] + 3);
+	Vector3d rotationVector1 = fem1d->getInitialState()->getPositions().segment<3>(6 * nodeIds[1] + 3);
+	actual = SurgSim::Math::interpolate(rotationVector0, rotationVector1, 0.89);
 	Eigen::Matrix<double, 3, 1> violation = actual - desired;
 	EXPECT_NEAR_EIGEN(violation, mlcpPhysicsProblem.b, epsilon);
 
