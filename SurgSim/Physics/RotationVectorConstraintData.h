@@ -44,7 +44,7 @@ class RotationVectorRigidFem1DConstraintData : public ConstraintData
 public:
 	/// Default constructor
 	RotationVectorRigidFem1DConstraintData() :
-		ConstraintData()
+		ConstraintData(), m_initialized(false)
 	{
 	}
 
