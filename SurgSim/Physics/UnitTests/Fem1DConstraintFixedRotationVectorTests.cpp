@@ -112,24 +112,6 @@ TEST(Fem1DConstraintFixedRotationVectorTests, Constants)
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 
-TEST(Fem1DConstraintFixedRotationVectorTests, TestConnectionWithFixedRepresentation)
-{
-	auto fem1d = getFem1d("representation");
-	auto fixed = std::make_shared<SurgSim::Physics::FixedRepresentation>("fixed");
-
-	auto localization = std::make_shared<Fem1DLocalization>(fem1d,
-		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(1.0, 0.0)));
-
-	RotationVectorRigidFem1DConstraintData emptyConstraint;
-	emptyConstraint.setFem1DRotation(fem1d, localization->getLocalPosition().index);
-	emptyConstraint.setRigidOrFixedRotation(rigid, rigid->getPose().linear());
-
-}
-
-TEST(Fem1DConstraintFixedRotationVectorTests, TestConnectionWithRigidRepresentation)
-{
-}
-
 TEST(Fem1DConstraintFixedRotationVectorTests, BuildMlcpBasic)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem. It assumes
