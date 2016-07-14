@@ -66,7 +66,7 @@ public:
 	/// Set the fem1d object part
 	/// \param beams The Fem1DRepresentation to be controlled by the rigid/fixed representation orientation
 	/// \param beamId The beam id that is going to be controlled by the rigid/fixed representation orientation
-	void setFem1DRotation(std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> beams, int beamId)
+	void setFem1DRotation(std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> beams, size_t beamId)
 	{
 		m_beams = beams;
 		m_beamId = beamId;
@@ -103,7 +103,7 @@ private:
 	/// Fem1D representation
 	std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> m_beams;
 	/// The beam in the fem1d representation that is constrained
-	int m_beamId;
+	size_t m_beamId;
 	/// The beam initial rotation and rotation at the time of the constraint creation
 	SurgSim::Math::Matrix33d m_beamR0, m_beamRAtGrasp;
 	/// Flag to keep track of the beam rotation information calculation
