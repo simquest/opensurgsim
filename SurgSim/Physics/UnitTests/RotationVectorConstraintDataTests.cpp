@@ -49,7 +49,8 @@ TEST (RotationVectorConstraintDataTests, TestSetGet)
 	auto elementData = std::make_shared<SurgSim::Physics::FemElementStructs::FemElement1DParameter>();
 	elementData->enableShear = false;
 	elementData->massDensity = 950;
-	elementData->nodeIds = { 0, 1 };
+	elementData->nodeIds.push_back(0);
+	elementData->nodeIds.push_back(1);
 	elementData->poissonRatio = 0.35;
 	elementData->radius = 0.01;
 	elementData->youngModulus = 1e6;
