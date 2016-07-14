@@ -54,26 +54,40 @@ public:
 	/// \return The input component which sends key press to this behavior.
 	std::shared_ptr<Input::InputComponent> getInputComponent() const;
 
+	/// Register the key, this let's the system keep track of keys used in the application
+	/// \param keycode the key that is being used
+	/// \param description description of functionality that the key triggers
+	/// \return true if the key is available, false if another key has already been register
 	static bool registerKey(int keycode, const std::string& description);
 
+	/// Remove a key from the registry
+	/// \param keycode the key to be removed
+	/// \return true if the key was actually removed
 	static bool unregisterKey(int keycode);
 
+	/// Write the keymap out to the logger
 	static void logMap();
 
 protected:
-	/// implement this to execute functionality on key stroke
-	/// \param actualKey the value of the key hit
-	virtual void onKeyDown(int actualKey) = 0;
+	/// Implement to execute functionality on key press
+	/// \param key the value of the key hit
+	virtual void onKeyDown(int key) = 0;
 
-	virtual void onKeyUp(int actualKey) = 0;
+	/// Implement to execute functionality on key release
+	/// \param key the value of the key hit
+	virtual void onKeyUp(int key) = 0;
 
+	/// Input component needs to provide key
 	std::shared_ptr<Input::InputComponent> m_inputComponent;
 
 	/// Keep track if the key was pressed the last time around
 	int m_lastKey;
 
-	static std::unordered_map<int, std::string> m_keyMap;
+	///@{
+	/// Handle the key map
 	static boost::mutex m_keyMapMutex;
+	static std::unordered_map<int, std::string> m_keyMap;
+	///@}
 };
 
 }; // namespace Blocks

@@ -95,7 +95,7 @@ TEST_F(KeyBehaviorTest, SimpleTrigger)
 	inputComponent->setData(data);
 	behavior->update(0.0);
 
-	// Shouldn't trigger another KeyUp ..
+	// Shouldn't trigger another KeyDown ..
 	data.integers().set(DataStructures::Names::KEY, Devices::KeyCode::KEY_A);
 	inputComponent->setData(data);
 	behavior->update(0.0);

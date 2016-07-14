@@ -41,7 +41,7 @@ SingleKeyBehavior::~SingleKeyBehavior()
 
 bool SingleKeyBehavior::doWakeUp()
 {
-	SURGSIM_LOG_IF(m_actionKey != Devices::KeyCode::NONE,
+	SURGSIM_LOG_IF(m_actionKey == Devices::KeyCode::NONE,
 				   SurgSim::Framework::Logger::getDefaultLogger(),
 				   WARNING) << "No key set in " << getFullName();
 
