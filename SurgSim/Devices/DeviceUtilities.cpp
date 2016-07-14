@@ -30,9 +30,9 @@ namespace
 const std::string NamePropertyName = "Name";
 
 /// Convert node to device
-/// \param fileName the original filename for error reporting
-/// \param node the node to be converted
-/// \return the device if it was created and initialized, otherwise nullptr
+/// \param possibleDevice The node to be converted
+/// \param fileName The original filename for error reporting
+/// \return The device if it was created and initialized, otherwise nullptr
 std::shared_ptr<DeviceInterface> tryConvertDevice(const YAML::Node& possibleDevice, const std::string& fileName)
 {
 	auto logger = SurgSim::Framework::Logger::getLogger("Devices");
