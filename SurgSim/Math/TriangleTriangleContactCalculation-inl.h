@@ -298,6 +298,206 @@ bool calculateContactTriangleTriangle(
 											penetrationPoint0, penetrationPoint1, contactNormal);
 }
 
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangleSeparatingAxis(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
+{
+	typedef Eigen::Matrix<T, 3, 1, MOpt> Vector3;
+	using SurgSim::Math::Geometry::DistanceEpsilon;
+	using SurgSim::Math::Geometry::ScalarEpsilon;
+
+	SURGSIM_ASSERT(std::abs(t0n.norm() - 1.0) < ScalarEpsilon && std::abs(t1n.norm() - 1.0) < ScalarEpsilon)
+		<< "The normals sent in are not normalized! t0n{" << t0n.transpose() << "}, t1n{" << t1n.transpose() << "}.";
+
+	// Early Rejection test:
+	// If all the vertices of one triangle are on one side of the plane of the other triangle,
+	// there is no intersection.
+	std::array<Vector3, 2> d = {Vector3(t1n.dot(t0v0 - t1v0), t1n.dot(t0v1 - t1v0), t1n.dot(t0v2 - t1v0)),
+		Vector3(t0n.dot(t1v0 - t0v0), t0n.dot(t1v1 - t0v0), t0n.dot(t1v2 - t0v0))};
+
+	if ((d[0].array() < DistanceEpsilon).all() || (d[0].array() > -DistanceEpsilon).all() ||
+		(d[1].array() < DistanceEpsilon).all() || (d[1].array() > -DistanceEpsilon).all())
+	{
+		return false;
+	}
+
+	const std::array<std::array<Vector3, 3>, 2> tv = {{{t0v0, t0v1, t0v2}, {t1v0, t1v1, t1v2}}};
+
+	// Find the intersection between a triangle and the plane of the other triangle. These intersections would
+	// lie on the separating axis (which is the cross product of the triangle normals).
+	// The name tsa is to indicate that this is storing the intersection of the Triangle with the Separating Axis.
+	std::array<std::array<Vector3, 2>, 2> tsa;
+	for (int i = 0; i < 2; ++i)
+	{
+		int index = 0;
+
+		for (int j = 0; j < 3; ++j)
+		{
+			int k = (j + 1) % 3;
+
+			// Intersect the edge tivj->tivk with the plane of t{(i+1)/2}
+			if ((d[i][j] < 0.0 && d[i][k] >= 0.0) || (d[i][j] > 0.0 && d[i][k] <= 0.0))
+			{
+				// The edge intersects the plane of t{(i+1)/2}.
+				auto ratio = std::abs(d[i][j]) / (std::abs(d[i][j]) + std::abs(d[i][k]));
+				tsa[i][index++] = tv[i][j] + ratio * (tv[i][k] - tv[i][j]);
+			}
+		}
+
+		SURGSIM_ASSERT(index == 2)
+			<< "The intersection between the edges of triangle " << i << " and the plane of the other triangle"
+			<< " must result in two points exactly.";
+	}
+
+	// The separating axis.
+	const Vector3 D = t0n.cross(t1n).normalized();
+	Vector3 result;
+
+	SURGSIM_ASSERT(distancePointLine(tsa[0][1], tsa[0][0], (tsa[0][0] + D).eval(), &result) < DistanceEpsilon &&
+		distancePointLine(tsa[1][0], tsa[0][0], (tsa[0][0] + D).eval(), &result) < DistanceEpsilon &&
+		distancePointLine(tsa[1][1], tsa[0][0], (tsa[0][0] + D).eval(), &result) < DistanceEpsilon)
+		<< "The intersection points on the triangles do not lie on the separating axis";
+
+	static const int DISTANCE = 0;
+	static const int TRIANGLE = 1;
+	static const int VERTEX = 2;
+
+	// Find the signed distance of the four points on D (from tsa[0][0])
+	// Store it in a tuple containing this signed distance, the corresponding triangle ID and vertex ID.
+	std::array<std::tuple<T, int, int>, 4> intervals =
+	{std::tuple<T, int, int>(0.0, 0, 0),
+	 std::tuple<T, int, int>((tsa[0][1] - tsa[0][0]).dot(D), 0, 1),
+	 std::tuple<T, int, int>((tsa[1][0] - tsa[0][0]).dot(D), 1, 0),
+	 std::tuple<T, int, int>((tsa[1][1] - tsa[0][0]).dot(D), 1, 1)};
+
+	// Sort the signed distance
+	std::sort(intervals.begin(), intervals.end(), [](const std::tuple<T, int, int>& i, std::tuple<T, int, int>& j)
+	{
+		return (std::get<DISTANCE>(i) < std::get<DISTANCE>(j));
+	});
+
+	// The intersections of the triangles on the separating axis (P, Q, R, S) are now sorted according to their distance
+	// along the separating axis.
+	//
+	//   *--------*--------*--------*
+	//   P        Q        R        S
+
+	// If P and Q belong to the same triangle, there is no intersection between the triangles.
+	enum {P = 0, Q, R, S};
+	if (std::get<TRIANGLE>(intervals[P]) == std::get<TRIANGLE>(intervals[Q]))
+	{
+		return false;
+	}
+
+	// At this point, there is some overlap of the triangles along the separating axis.
+	size_t indexLeft, indexRight;
+	if (std::get<TRIANGLE>(intervals[Q]) == std::get<TRIANGLE>(intervals[R]))
+	{
+		// Q and R belong to the same triangle: Depending on whether PQ or RS is shorter, either PS is moved to the
+		// right of QR or QR is moved to the right of PS.
+		//
+		//   *--------*--------*--------*
+		//   P        Q        R        S
+		//            *--------*
+		//                t1
+		//   *--------------------------*
+		//                t2
+
+		if ((std::get<DISTANCE>(intervals[Q]) - std::get<DISTANCE>(intervals[P])) <
+			(std::get<DISTANCE>(intervals[S]) - std::get<DISTANCE>(intervals[R])))
+		{
+			indexLeft = P;
+			indexRight = R;
+		}
+		else
+		{
+			indexLeft = Q;
+			indexRight = S;
+		}
+	}
+	else
+	{
+		// Q and R belong to different triangle: QS is moved to the right of PR.
+		//
+		//   *--------*--------*--------*
+		//   P        Q        R        S
+		//   *-----------------*
+		//           t1
+		//            *-----------------*
+		//                     t2
+
+		indexLeft = Q;
+		indexRight = R;
+	}
+
+	*penetrationDepth = std::get<DISTANCE>(intervals[indexRight]) - std::get<DISTANCE>(intervals[indexLeft]);
+	if (*penetrationDepth < DistanceEpsilon)
+	{
+		// Not enough overlap to be determined as an intersection.
+		return false;
+	}
+
+	if (std::get<TRIANGLE>(intervals[indexLeft]) == 0)
+	{
+		*penetrationPoint0 = tsa[0][std::get<VERTEX>(intervals[indexLeft])];
+		*penetrationPoint1 = tsa[1][std::get<VERTEX>(intervals[indexRight])];
+	}
+	else
+	{
+		*penetrationPoint0 = tsa[0][std::get<VERTEX>(intervals[indexRight])];
+		*penetrationPoint1 = tsa[1][std::get<VERTEX>(intervals[indexLeft])];
+	}
+
+	if ((*penetrationPoint0 - *penetrationPoint1).dot(D) > 0.0)
+	{
+		*contactNormal = -D;
+	}
+	else
+	{
+		*contactNormal = D;
+	}
+
+	return true;
+}
+
+
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangleSeparatingAxis(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> t0n = (t0v1 - t0v0).cross(t0v2 - t0v0);
+	Eigen::Matrix<T, 3, 1, MOpt> t1n = (t1v1 - t1v0).cross(t1v2 - t1v0);
+	if (t0n.isZero() || t1n.isZero())
+	{
+		// Degenerate triangle(s) passed to calculateContactTriangleTriangle
+		return false;
+	}
+	t0n.normalize();
+	t1n.normalize();
+	return calculateContactTriangleTriangleSeparatingAxis(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n,
+		penetrationDepth, penetrationPoint0, penetrationPoint1, contactNormal);
+}
+
 
 } // namespace Math
 

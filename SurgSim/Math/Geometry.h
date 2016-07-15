@@ -1710,6 +1710,64 @@ bool calculateContactTriangleTriangle(
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
 	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
 
+/// Calculate the contact between two triangles.
+/// Algorithm is implemented from http://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tritri.pdf
+///
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \param t0n Normal of the first triangle, should be normalized.
+/// \param t1n Normal of the second triangle, should be normalized.
+/// \param [out] penetrationDepth The depth of penetration.
+/// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
+/// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
+/// \param [out] contactNormal The contact normal that points from triangle1 to triangle0.
+/// \return True, if intersection is detected.
+/// \note The [out] params are not modified if there is no intersection.
+/// \note If penetrationPoint0 is moved by (contactNormal*penetrationDepth*0.5) and penetrationPoint1
+/// is moved by -(contactNormal*penetrationDepth*0.5), the triangles will no longer be intersecting.
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangleSeparatingAxis(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
+
+/// Calculate the contact between two triangles.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \param [out] penetrationDepth The depth of penetration.
+/// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
+/// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
+/// \param [out] contactNormal The contact normal that points from triangle1 to triangle0.
+/// \return True, if intersection is detected.
+/// \note The [out] params are not modified if there is no intersection.
+/// \note If penetrationPoint0 is moved by (contactNormal*penetrationDepth*0.5) and penetrationPoint1
+/// is moved by -(contactNormal*penetrationDepth*0.5), the triangles will no longer be intersecting.
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangleSeparatingAxis(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	T* penetrationDepth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* contactNormal);
+
 /// Calculate the contact between a capsule and a triangle.
 /// If the shapes intersect, the deepest penetration of the capsule along the triangle normal is calculated.
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
