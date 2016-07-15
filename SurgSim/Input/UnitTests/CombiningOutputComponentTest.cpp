@@ -39,7 +39,7 @@ namespace
 {
 const double ERROR_EPSILON = 1e-7;
 
-auto DO_NOTHING_FUNCTOR = [](const std::vector<std::weak_ptr<SurgSim::Input::OutputComponent>>&,
+auto DO_NOTHING_FUNCTOR = [](const std::vector<std::shared_ptr<SurgSim::Input::OutputComponent>>&,
 	SurgSim::DataStructures::DataGroup*) {return false; };
 
 /// Device that exposes pullOutput and getOutputData.
@@ -55,15 +55,9 @@ public:
 	{
 	}
 
-	bool doPullOutput()
-	{
-		return pullOutput();
-	}
+	using CommonDevice::pullOutput;
 
-	const SurgSim::DataStructures::DataGroup& doGetOutputData() const
-	{
-		return getOutputData();
-	}
+	using CommonDevice::getOutputData;
 
 	bool initialize() override
 	{
@@ -88,7 +82,7 @@ TEST(CombiningOutputComponentTest, NoOutputs)
 	auto combiningOutputComponent = std::make_shared<SurgSim::Input::CombiningOutputComponent>("combiner");
 	auto mockDevice = std::make_shared<MockDevice>("device");
 	mockDevice->setOutputProducer(combiningOutputComponent);
-	EXPECT_FALSE(mockDevice->doPullOutput());
+	EXPECT_FALSE(mockDevice->pullOutput());
 }
 
 TEST(CombiningOutputComponentTest, DuplicateOutputs)
@@ -125,7 +119,7 @@ TEST(CombiningOutputComponentTest, EmptyOutputs)
 	combiningOutputComponent->setOutputs(outputs);
 
 	ASSERT_EQ(outputs, combiningOutputComponent->getOutputs());
-	EXPECT_FALSE(mockDevice->doPullOutput());
+	EXPECT_FALSE(mockDevice->pullOutput());
 }
 
 TEST(CombiningOutputComponentTest, OneNonEmptyOutput)
@@ -150,16 +144,14 @@ TEST(CombiningOutputComponentTest, OneNonEmptyOutput)
 
 	output->setData(data);
 
-	ASSERT_TRUE(mockDevice->doPullOutput());
-	SurgSim::DataStructures::DataGroup actualData = mockDevice->doGetOutputData();
+	ASSERT_TRUE(mockDevice->pullOutput());
+	SurgSim::DataStructures::DataGroup actualData = mockDevice->getOutputData();
 	ASSERT_FALSE(actualData.isEmpty());
 
 	SurgSim::Math::Vector3d actualForce;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::FORCE, &actualForce));
 	EXPECT_TRUE(actualForce.isApprox(initialForce));
-	bool actualBoolean;
-	ASSERT_TRUE(actualData.booleans().get("extraData", &actualBoolean));
-	EXPECT_TRUE(actualBoolean);
+	EXPECT_FALSE(actualData.booleans().hasEntry("extraData"));
 
 	EXPECT_ANY_THROW(combiningOutputComponent->setData(data));
 }
@@ -182,17 +174,15 @@ TEST(CombiningOutputComponentTest, SetCombiner)
 
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector(SurgSim::DataStructures::Names::FORCE);
-	builder.addBoolean("extraData");
 
 	SurgSim::DataStructures::DataGroup data = builder.createData();
 	auto initialForce = SurgSim::Math::Vector3d(0.89, 0.0, -324.67);
 	data.vectors().set(SurgSim::DataStructures::Names::FORCE, initialForce);
-	data.booleans().set("extraData", true);
 
 	output1->setData(data);
 	output3->setData(data);
 
-	EXPECT_FALSE(mockDevice->doPullOutput());
+	EXPECT_FALSE(mockDevice->pullOutput());
 }
 
 
@@ -213,35 +203,30 @@ TEST(CombiningOutputComponentTest, MultipleOutputs)
 
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector(SurgSim::DataStructures::Names::FORCE);
-	builder.addBoolean("extraData");
 
 	SurgSim::DataStructures::DataGroup data = builder.createData();
 	auto initialForce = SurgSim::Math::Vector3d(0.89, 0.0, -324.67);
 	data.vectors().set(SurgSim::DataStructures::Names::FORCE, initialForce);
-	data.booleans().set("extraData", true);
 
 	output1->setData(data);
-	data.booleans().set("extraData", false);
 	output3->setData(data);
 
-	ASSERT_TRUE(mockDevice->doPullOutput());
-	SurgSim::DataStructures::DataGroup actualData = mockDevice->doGetOutputData();
+	ASSERT_TRUE(mockDevice->pullOutput());
+	SurgSim::DataStructures::DataGroup actualData = mockDevice->getOutputData();
 	ASSERT_FALSE(actualData.isEmpty());
 
 	SurgSim::Math::Vector3d actualForce;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::FORCE, &actualForce));
 	EXPECT_TRUE(actualForce.isApprox(2.0 * initialForce));
-	bool actualBoolean;
-	ASSERT_TRUE(actualData.booleans().get("extraData", &actualBoolean));
-	EXPECT_TRUE(actualBoolean);
 
 	// Check subsequent calls to pullOutput will correctly handle non-asserting DataGroup assignment.
-	EXPECT_NO_THROW(mockDevice->doPullOutput());
+	EXPECT_NO_THROW(mockDevice->pullOutput());
 
-	// Check first OutputComponent going away.  This should be false because the combiner cannot lock the first output.
+	// Check first OutputComponent going away.
 	outputs.clear();
 	output1.reset();
-	ASSERT_FALSE(mockDevice->doPullOutput());
+	EXPECT_TRUE(mockDevice->pullOutput());
+	EXPECT_EQ(2, combiningOutputComponent->getOutputs().size());
 }
 
 
@@ -284,15 +269,12 @@ TEST(CombiningOutputComponentTest, Serialization)
 	
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector(SurgSim::DataStructures::Names::FORCE);
-	builder.addBoolean("extraData");
 
 	SurgSim::DataStructures::DataGroup data = builder.createData();
 	auto initialForce = SurgSim::Math::Vector3d(0.89, 0.0, -324.67);
 	data.vectors().set(SurgSim::DataStructures::Names::FORCE, initialForce);
-	data.booleans().set("extraData", true);
 
 	std::static_pointer_cast<SurgSim::Input::OutputComponent>(actualOutputs[0])->setData(data);
-	data.booleans().set("extraData", false);
 	std::static_pointer_cast<SurgSim::Input::OutputComponent>(actualOutputs[2])->setData(data);
 
 	runtime->start(true);
@@ -300,15 +282,12 @@ TEST(CombiningOutputComponentTest, Serialization)
 	runtime->step();
 	runtime->step();
 
-	ASSERT_TRUE(mockDevice->doPullOutput());
-	SurgSim::DataStructures::DataGroup actualData = mockDevice->doGetOutputData();
+	ASSERT_TRUE(mockDevice->pullOutput());
+	SurgSim::DataStructures::DataGroup actualData = mockDevice->getOutputData();
 	ASSERT_FALSE(actualData.isEmpty());
 	SurgSim::Math::Vector3d actualForce;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::FORCE, &actualForce));
 	EXPECT_TRUE(actualForce.isApprox(2.0 * initialForce));
-	bool actualBoolean;
-	ASSERT_TRUE(actualData.booleans().get("extraData", &actualBoolean));
-	EXPECT_TRUE(actualBoolean);
 
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*combiningOutputComponent));

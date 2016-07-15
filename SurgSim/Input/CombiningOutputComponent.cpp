@@ -15,56 +15,54 @@
 
 #include "SurgSim/Input/CombiningOutputComponent.h"
 
+#include <boost/thread/locks.hpp>
 #include <unordered_set>
 
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 
 namespace
 {
 
-/// This functor copies the first datagroup, resetting any spring and damper Jacobians.
-/// Then for any additional datagroups it sums the force and torque.
+/// This functor accumulates the force and torque.  No other data is passed along.
 /// This can be used to combine the forces and torques from multiple OutputComponents (e.g., from multiple
 /// VirtualToolCouplers) to drive a single haptic device.
-auto DEFAULT_FUNCTOR = [](const std::vector<std::weak_ptr<SurgSim::Input::OutputComponent>>& outputs,
+auto DEFAULT_FUNCTOR = [](const std::vector<std::shared_ptr<SurgSim::Input::OutputComponent>>& outputs,
 	SurgSim::DataStructures::DataGroup *resultData)
 {
 	bool result = false;
-	bool firstOutput = true;
 	SurgSim::Math::Vector3d cumulativeForce = SurgSim::Math::Vector3d::Zero();
 	SurgSim::Math::Vector3d cumulativeTorque = SurgSim::Math::Vector3d::Zero();
-	for (const auto& weak : outputs)
+	for (const auto& output : outputs)
 	{
-		auto output = weak.lock();
 		if (output != nullptr)
 		{
 			auto data = output->getData();
 			if (!data.isEmpty())
 			{
-				if (firstOutput)
+				result = true;
+				SurgSim::Math::Vector3d force;
+				if (data.vectors().get(SurgSim::DataStructures::Names::FORCE, &force))
 				{
-					*resultData = data;
-					resultData->matrices().reset(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
-					resultData->matrices().reset(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
-					result = true;
+					cumulativeForce += force;
 				}
-				if (result)
+				SurgSim::Math::Vector3d torque;
+				if (data.vectors().get(SurgSim::DataStructures::Names::TORQUE, &torque))
 				{
-					SurgSim::Math::Vector3d force;
-					if (data.vectors().get(SurgSim::DataStructures::Names::FORCE, &force))
-					{
-						cumulativeForce += force;
-					}
-					SurgSim::Math::Vector3d torque;
-					if (data.vectors().get(SurgSim::DataStructures::Names::TORQUE, &torque))
-					{
-						cumulativeTorque += torque;
-					}
+					cumulativeTorque += torque;
 				}
 			}
 		}
-		firstOutput = false;
 	}
+
+	if (resultData->isEmpty())
+	{
+		SurgSim::DataStructures::DataGroupBuilder builder;
+		builder.addVector(SurgSim::DataStructures::Names::FORCE);
+		builder.addVector(SurgSim::DataStructures::Names::TORQUE);
+		*resultData = builder.createData();
+	}
+
 	if (result && resultData->vectors().hasEntry(SurgSim::DataStructures::Names::FORCE))
 	{
 		resultData->vectors().set(SurgSim::DataStructures::Names::FORCE, cumulativeForce);
@@ -107,7 +105,11 @@ std::vector<std::shared_ptr<SurgSim::Framework::Component>> CombiningOutputCompo
 	std::vector<std::shared_ptr<SurgSim::Framework::Component>> outputs;
 	for (const auto& output : m_outputs)
 	{
-		outputs.push_back(output.lock());
+		auto shared = output.lock();
+		if (shared != nullptr)
+		{
+			outputs.push_back(shared);
+		}
 	}
 	return outputs;
 }
@@ -127,9 +129,7 @@ void CombiningOutputComponent::setOutputs(const std::vector<std::shared_ptr<Surg
 	}
 }
 
-void CombiningOutputComponent::setCombiner(
-	std::function<bool(const std::vector<std::weak_ptr<SurgSim::Input::OutputComponent>>&,
-	SurgSim::DataStructures::DataGroup *result)> combiner)
+void CombiningOutputComponent::setCombiner(FunctorType combiner)
 {
 	m_combiner = combiner;
 }
@@ -137,7 +137,30 @@ void CombiningOutputComponent::setCombiner(
 bool CombiningOutputComponent::requestOutput(const std::string& device,
 		SurgSim::DataStructures::DataGroup* outputData)
 {
-	return m_combiner(m_outputs, outputData);
+	std::vector<std::shared_ptr<OutputComponent>> shareds;
+	{
+		boost::lock_guard<boost::mutex> lock(m_mutex);
+		std::vector<std::vector<std::weak_ptr<OutputComponent>>::const_iterator> stale;
+		for (auto weak = m_outputs.cbegin(); weak != m_outputs.cend(); ++weak)
+		{
+			auto shared = weak->lock();
+			if (shared == nullptr)
+			{
+				stale.push_back(weak);
+			}
+			else
+			{
+				shareds.push_back(shared);
+			}
+		}
+
+		std::reverse(stale.begin(), stale.end());
+		for (auto it : stale)
+		{
+			m_outputs.erase(it);
+		}
+	}
+	return m_combiner(shareds, outputData);
 }
 
 }; // namespace Input

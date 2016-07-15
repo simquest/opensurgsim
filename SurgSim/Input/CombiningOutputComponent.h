@@ -16,6 +16,7 @@
 #ifndef INPUT_COMBININGOUTPUTCOMPONENT_H
 #define INPUT_COMBININGOUTPUTCOMPONENT_H
 
+#include <boost/thread/mutex.hpp>
 #include <functional>
 #include <memory>
 #include <string>
@@ -33,9 +34,15 @@ SURGSIM_STATIC_REGISTRATION(CombiningOutputComponent);
 
 /// CombiningOutputComponents is-a OutputComponent that takes one or more OutputComponents and combines their
 /// datagroups into a single output datagroup.
+/// The combining functor can be set, with the default functor accumulating all vectors named "force", and all vectors
+/// named "torque".  The resulting DataGroup has only those two specific entries, and can be used to drive a haptic
+/// device from multiple OutputComponents.
 class CombiningOutputComponent : public SurgSim::Input::OutputComponent
 {
 public:
+	typedef std::function<bool(const std::vector<std::shared_ptr<SurgSim::Input::OutputComponent>>&,
+		SurgSim::DataStructures::DataGroup*)> FunctorType;
+
 	/// Constructor
 	/// \param name Name of this output component
 	explicit CombiningOutputComponent(const std::string& name);
@@ -56,8 +63,7 @@ public:
 	/// Set the function to do the combining.
 	/// The parameter is a function that receives all the OutputComponents and returns a DataGroup and a bool
 	/// indicating success.
-	void setCombiner(std::function<bool(const std::vector<std::weak_ptr<SurgSim::Input::OutputComponent>>&,
-		SurgSim::DataStructures::DataGroup*)> combiner);
+	void setCombiner(FunctorType combiner);
 
 	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
@@ -67,8 +73,10 @@ private:
 
 	/// The function that takes the OutputComponents and returns a DataGroup and a bool that specifies whether
 	/// it was successful.
-	std::function<bool(const std::vector<std::weak_ptr<SurgSim::Input::OutputComponent>>&,
-		SurgSim::DataStructures::DataGroup*)> m_combiner;
+	FunctorType m_combiner;
+
+	/// The mutex that protects the outputs.
+	boost::mutex m_mutex;
 };
 
 }; // namespace Input
