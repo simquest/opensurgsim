@@ -69,8 +69,6 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 	addImplementation(typeid(FixedRepresentation), std::make_shared<FixedConstraintFixedRotationVector>());
 	addImplementation(typeid(RigidRepresentation), std::make_shared<RigidConstraintFixedRotationVector>());
 	addImplementation(typeid(Fem1DRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
-	addImplementation(typeid(Fem2DRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
-	addImplementation(typeid(Fem3DRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
 
 	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
 	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());

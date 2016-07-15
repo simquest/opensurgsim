@@ -19,6 +19,7 @@
 
 #include "SurgSim/Physics/RotationVectorConstraintData.h"
 
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
@@ -30,22 +31,29 @@ using SurgSim::Physics::RotationVectorRigidFem1DConstraintData;
 
 TEST (RotationVectorConstraintDataTests, TestSetGet)
 {
-	RotationVectorRigidFem1DConstraintData rotationVectorConstraintData;
+	using SurgSim::Framework::AssertionFailure;
 
-	EXPECT_THROW(rotationVectorConstraintData.getCurrentRotationVector(),SurgSim::Framework::AssertionFailure);
+	RotationVectorRigidFem1DConstraintData rotationVectorConstraintData;
+	auto Id = SurgSim::Math::Matrix33d::Identity();
+
+	EXPECT_THROW(rotationVectorConstraintData.getCurrentRotationVector(), AssertionFailure);
 
 	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("rigid");
 	auto rigidRAtGrasp = rigid->getPose().linear();
+	EXPECT_THROW(rotationVectorConstraintData.setRigidOrFixedRotation(nullptr, Id), AssertionFailure);
 	rotationVectorConstraintData.setRigidOrFixedRotation(rigid, rigidRAtGrasp);
 
-	EXPECT_THROW(rotationVectorConstraintData.getCurrentRotationVector(), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(rotationVectorConstraintData.getCurrentRotationVector(), AssertionFailure);
 
+	EXPECT_THROW(rotationVectorConstraintData.setFem1DRotation(nullptr, 0), AssertionFailure);
 	auto fem1d = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("fem1d");
-	rotationVectorConstraintData.setFem1DRotation(fem1d, 0);
+	EXPECT_THROW(rotationVectorConstraintData.setFem1DRotation(fem1d, 0), AssertionFailure);
 
-	// Wrong beam id...no beam 0 exists yet
-	EXPECT_THROW(rotationVectorConstraintData.getCurrentRotationVector(), SurgSim::Framework::AssertionFailure);
-
+	auto initialState = std::make_shared<SurgSim::Math::OdeState>();
+	initialState->setNumDof(6, 2);
+	initialState->getPositions().setZero();
+	initialState->getPositions().segment<3>(6) = SurgSim::Math::Vector3d(1.0, 0.0, 0.0);
+	fem1d->setInitialState(initialState);
 	auto elementData = std::make_shared<SurgSim::Physics::FemElementStructs::FemElement1DParameter>();
 	elementData->enableShear = false;
 	elementData->massDensity = 950;
@@ -55,5 +63,8 @@ TEST (RotationVectorConstraintDataTests, TestSetGet)
 	elementData->radius = 0.01;
 	elementData->youngModulus = 1e6;
 	fem1d->addFemElement(std::make_shared<SurgSim::Physics::Fem1DElementBeam>(elementData));
+	fem1d->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+	EXPECT_NO_THROW(rotationVectorConstraintData.setFem1DRotation(fem1d, 0));
+
 	EXPECT_NO_THROW(rotationVectorConstraintData.getCurrentRotationVector());
 }
