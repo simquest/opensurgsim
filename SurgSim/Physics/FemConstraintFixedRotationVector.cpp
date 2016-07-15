@@ -46,6 +46,9 @@ void FemConstraintFixedRotationVector::doBuild(double dt,
 		= std::static_pointer_cast<FemRepresentation>(localization->getRepresentation());
 	const size_t numDofPerNode = fem->getNumDofPerNode();
 
+	SURGSIM_ASSERT(numDofPerNode >= 6) << "The rotation vector constraint needs rotational dof (6DOF/node minimum)"
+		<< " but " << fem->getFullName() << " only has " << numDofPerNode << " DOF";
+
 	if (!fem->isActive())
 	{
 		return;

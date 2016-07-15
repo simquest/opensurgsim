@@ -51,11 +51,8 @@ void RigidConstraintFixedRotationVector::doBuild(double dt,
 	}
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
-	const RotationVectorRigidFem1DConstraintData& constRotVecData =
-		static_cast<const RotationVectorRigidFem1DConstraintData&>(data);
-	RotationVectorRigidFem1DConstraintData& rotVecData =
-		const_cast<RotationVectorRigidFem1DConstraintData&>(constRotVecData);
-	SurgSim::Math::Vector3d rotationVector = rotVecData.getCurrentRotationVector();
+	const auto& constRotVecData = static_cast<const RotationVectorRigidFem1DConstraintData&>(data);
+	SurgSim::Math::Vector3d rotationVector = constRotVecData.getCurrentRotationVector();
 
 	// Fill up b with the constraint violation
 	mlcp->b.segment<3>(indexOfConstraint) += rotationVector * scale;

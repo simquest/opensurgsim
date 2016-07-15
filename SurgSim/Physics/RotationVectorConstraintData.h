@@ -32,19 +32,20 @@ namespace Physics
 /// Class for rotation vector constraint data between a rigid/fixed representation and Fem1d beam being controlled.
 ///
 /// It considers the Fem1D rotational dof (beamRotationVector) to be the only variable to account for.
-/// The equation to verify is rigidR * rigidRAtGrasp^-1 = beamR * beamRAtGrasp^-1
-/// where R denotes the current prefixed object 3x3 rotation matrix
-///       RAtGrasp is the 3x3 rotation matrix of the prefixed object at the time of the constraint creation
-/// and beamR is decomposed into the initial rotation beamR0 and the current rotation given by the rotational dof
-/// rigidR * rigidRAtGrasp^-1 = R(beamRotationVector) * beamR0 * beamRAtGrasp^-1
-/// rigidR * rigidRAtGrasp^1 * beamRAtGrasp * beamR0^-1 = R(beamRotationVector)
-/// rotVec(rigidR * rigidRAtGrasp^1 * beamRAtGrasp * beamR0^-1) = beamRotationVector
+/// The equation to verify is \f$ R_{rigid} * RAtGrasp_{rigid}^{-1} = R_{beam} * RAtGrasp_{beam}^{-1} \f$
+/// where \f$R\f$ denotes the current prefixed object 3x3 rotation matrix
+///       \f$RAtGrasp\f$ is the 3x3 rotation matrix of the prefixed object at the time of the constraint creation
+/// and \f$R_{beam}\f$ is decomposed into the initial rotation \f$R0_{beam}\f$ and the current rotation given by the
+/// rotational dof
+/// \f$R_{rigid} * RAtGrasp_{rigid}^{-1} = R(beamRotationVector) * R0_{beam} * RAtGrasp_{beam}^{-1}\f$
+/// \f$R_{rigid} * RAtGrasp_{rigid}^{-1} * RAtGrasp_{beam} * R0_{beam}^{-1} = R(beamRotationVector)\f$
+/// \f$rotationVector(R_{rigid} * RAtGrasp_{rigid}^{-1} * RAtGrasp_{beam} * R0_{beam}^{-1}) = beamRotationVector\f$
 class RotationVectorRigidFem1DConstraintData : public ConstraintData
 {
 public:
 	/// Default constructor
 	RotationVectorRigidFem1DConstraintData() :
-		ConstraintData(), m_initialized(false)
+		ConstraintData()
 	{
 	}
 
@@ -59,6 +60,8 @@ public:
 	void setRigidOrFixedRotation(std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> rigid,
 		const SurgSim::Math::Matrix33d& rigidRAtGrasp)
 	{
+		SURGSIM_ASSERT(nullptr != rigid) << "Need a valid rigid/fixed representation";
+
 		m_rigidRAtGrasp = rigidRAtGrasp;
 		m_rigid = rigid;
 	}
@@ -68,30 +71,35 @@ public:
 	/// \param beamId The beam id that is going to be controlled by the rigid/fixed representation orientation
 	void setFem1DRotation(std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> beams, size_t beamId)
 	{
+		SURGSIM_ASSERT(nullptr != beams) << "Need a valid fem1D representation";
+		SURGSIM_ASSERT(beams->getNumFemElements() > beamId) << "The beam id " << beamId
+			<< " does not exists, the fem1d has " << beams->getNumFemElements() << " beams";
+
+		auto beam = std::dynamic_pointer_cast<SurgSim::Physics::Fem1DElementBeam>(beams->getFemElement(beamId));
+
 		m_beams = beams;
-		m_beamId = beamId;
+
+		m_beamR0 = beam->getInitialRotation();
+
+		const auto& rotVecBeamNode0 = beams->getCurrentState()->getPositions().segment<3>(6 * beam->getNodeId(0) + 3);
+		SurgSim::Math::Matrix33d R = SurgSim::Math::Matrix33d::Identity();
+		if (!rotVecBeamNode0.isApprox(SurgSim::Math::Vector3d::Zero()))
+		{
+			R = SurgSim::Math::makeRotationMatrix(rotVecBeamNode0.norm(), rotVecBeamNode0.normalized());
+		}
+		m_beamRAtGrasp = R * m_beamR0;
 	}
 
 	/// \return The current rotation vector that should correspond to the beam rotation vector
-	/// i.e. rotVec(rigidR * rigidRAtGrasp^1 * beamRAtGrasp * beamR0^-1)
-	SurgSim::Math::Vector3d getCurrentRotationVector()
+	/// i.e. \f$ rotationVector(R_{rigid} * RAtGrasp_{rigid}^{-1} * RAtGrasp_{beam} * R0_{beam}^{-1}) \f$
+	SurgSim::Math::Vector3d getCurrentRotationVector() const
 	{
 		SURGSIM_ASSERT(nullptr != m_rigid) << "Did you call setRigidOrFixedRotation prior to using this class ?";
 		SURGSIM_ASSERT(nullptr != m_beams) << "Did you call setFem1DRotation prior to using this class ?";
-		SURGSIM_ASSERT(m_beams->getNumFemElements() > m_beamId) << "The beam id " << m_beamId
-			<< " does not exists, the fem1d has " << m_beams->getNumFemElements()  << " beams";
 
-		SurgSim::Math::Matrix33d rigidR = m_rigid->getCurrentState().getPose().linear();
-		if (!m_initialized)
-		{
-			auto beam = std::dynamic_pointer_cast<SurgSim::Physics::Fem1DElementBeam>(m_beams->getFemElement(m_beamId));
-			m_beamR0 = beam->getInitialRotation();
-			m_beamRAtGrasp = m_beamR0;
-			m_initialized = true;
-		}
-		SurgSim::Math::Matrix33d rotation = rigidR * m_rigidRAtGrasp.inverse() * m_beamRAtGrasp * m_beamR0.inverse();
-		Eigen::AngleAxisd aa(rotation);
-		return aa.angle() * aa.axis();
+		const auto& rigidR = m_rigid->getCurrentState().getPose().linear();
+		Eigen::AngleAxisd angleAxis(rigidR * m_rigidRAtGrasp.inverse() * m_beamRAtGrasp * m_beamR0.inverse());
+		return angleAxis.angle() * angleAxis.axis();
 	}
 
 private:
@@ -102,12 +110,8 @@ private:
 
 	/// Fem1D representation
 	std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> m_beams;
-	/// The beam in the fem1d representation that is constrained
-	size_t m_beamId;
 	/// The beam initial rotation and rotation at the time of the constraint creation
 	SurgSim::Math::Matrix33d m_beamR0, m_beamRAtGrasp;
-	/// Flag to keep track of the beam rotation information calculation
-	bool m_initialized;
 };
 
 };  // namespace Physics
