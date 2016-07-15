@@ -336,7 +336,7 @@ bool calculateContactTriangleTriangleSeparatingAxis(
 
 	// Find the intersection between a triangle and the plane of the other triangle. These intersections would
 	// lie on the separating axis (which is the cross product of the triangle normals).
-	// The name tsa id to indicate that this is storing the intersection of the Triangle with the Separating Axis.
+	// The name tsa is to indicate that this is storing the intersection of the Triangle with the Separating Axis.
 	std::array<std::array<Vector3, 2>, 2> tsa;
 	for (int i = 0; i < 2; ++i)
 	{
