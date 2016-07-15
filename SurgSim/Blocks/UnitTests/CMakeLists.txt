@@ -15,11 +15,13 @@
 
 include_directories (
 	${gtest_SOURCE_DIR}/include
+	${gmock_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
 	CompoundShapeToGraphicsTests.cpp
 	DriveElementFromInputBehaviorTests.cpp
+	KeyBehaviorTests.cpp
 	KeyboardCallbackBehaviorTests.cpp
 	KeyboardTogglesComponentBehaviorTests.cpp
 	MassSpring1DRepresentationTests.cpp

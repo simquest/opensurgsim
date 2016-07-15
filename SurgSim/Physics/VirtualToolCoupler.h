@@ -167,6 +167,10 @@ public:
 	/// \return true if inertia is being simulated.
 	bool getCalculateInertialTorques() const;
 
+	void doRetire() override;
+
+	void setLocalActive(bool val) override;
+
 protected:
 	bool doInitialize() override;
 	bool doWakeUp() override;
