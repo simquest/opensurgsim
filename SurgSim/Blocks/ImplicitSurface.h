@@ -33,6 +33,7 @@ static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 /// All of the elements added are \sa RenderPass elements
 /// \param view the view to pull screen space dimensions from
 /// \param light the scene light to be used to shade the surface
+/// \param lightMapPass scene element containing the render pass for shadow casters
 /// \param sphereRadius the radius in meters that each point sprite sphere should have
 /// \param sphereScale the scaling factor for the point sprite sphere based on distance from the camera
 /// \param blurRadius sampling radius for the blur pass
@@ -43,6 +44,10 @@ static const std::string GROUP_IMPLICIT_SURFACE = "ImplicitSurface";
 /// \param specularEnvMap the cube map to use for the specular environmental mapping
 /// \param specularPct the amount to blend the environment map with the rest of specular lighting
 /// \param shininess the shininess factor for the specular highlight
+/// \param shadowBias the bias to be used when determining something is in shadow or not, increasing this can help
+/// 	   remove sharp edges at glancing angles
+/// \param shadowIntensity the general intensity of the shadow, 1 means everything in shadow will be black, 0 means
+///        there won't be any shadows at all
 /// \param showDebug whether to show debug information
 std::vector<std::shared_ptr<Framework::SceneElement>> createImplicitSurfaceEffect(
 		std::shared_ptr<Framework::Component> view,
