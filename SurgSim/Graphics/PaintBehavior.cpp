@@ -25,6 +25,9 @@ namespace SurgSim
 {
 namespace Graphics
 {
+
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::PaintBehavior, PaintBehavior);
+
 PaintBehavior::PaintBehavior(const std::string& name) :
 	Framework::Behavior(name),
 	m_width(0),
@@ -35,6 +38,7 @@ PaintBehavior::PaintBehavior(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, std::shared_ptr<Framework::Component>, Representation,
 									  getRepresentation, setRepresentation);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, Math::Vector4d, Color, getColor, setColor);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, bool, AntiAlias, getAntiAlias, setAntiAlias);
 }
 
 void PaintBehavior::setRepresentation(std::shared_ptr<Framework::Component> representation)
@@ -62,7 +66,7 @@ void PaintBehavior::setAntiAlias(bool antialias)
 {
 	if (isInitialized())
 	{
-		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger()) << "You cannot set texture size of " << getName() <<
+		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger()) << "You cannot set anti-aliasing of " << getName() <<
 																   " after it has already been initialized.";
 	}
 	else
