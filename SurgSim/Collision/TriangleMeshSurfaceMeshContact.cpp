@@ -41,7 +41,7 @@ std::pair<int, int> TriangleMeshSurfaceMeshContact::getShapeTypes()
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_SURFACEMESH);
 }
 
-#ifdef SURGSIM_DEBUG_TRIANGLESURFACEONTACT
+#ifdef SURGSIM_DEBUG_TRIANGLESURFACECONTACT
 namespace
 {
 
@@ -134,7 +134,7 @@ namespace
 	}
 
 } // namespace
-#endif //SURGSIM_DEBUG_TRIANGLESURFACEONTACT
+#endif //SURGSIM_DEBUG_TRIANGLESURFACECONTACT
 
 std::list<std::shared_ptr<Contact>> TriangleMeshSurfaceMeshContact::calculateDcdContact(
 	const Math::MeshShape& meshA,
@@ -208,7 +208,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshSurfaceMeshContact::calculateDcd
 				// Check if the triangles intersect.
 				if (trianglesInContact)
 				{
-#ifdef SURGSIM_DEBUG_TRIANGLESURFACEONTACT
+#ifdef SURGSIM_DEBUG_TRIANGLESURFACECONTACT
 					assertIsCoplanar(verticesA[0], verticesA[1], verticesA[2], penetrationPointA);
 					assertIsCoplanar(verticesB[0], verticesB[1], verticesB[2], penetrationPointB);
 
