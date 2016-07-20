@@ -49,13 +49,6 @@ void OutputComponent::setData(const SurgSim::DataStructures::DataGroup& dataGrou
 	m_haveData = true;
 }
 
-DataStructures::DataGroup OutputComponent::getData()
-{
-	DataStructures::DataGroup data;
-	requestOutput("", &data);
-	return data;
-}
-
 bool OutputComponent::doInitialize()
 {
 	return true;

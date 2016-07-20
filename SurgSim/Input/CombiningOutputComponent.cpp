@@ -37,8 +37,8 @@ auto DEFAULT_FUNCTOR = [](const std::vector<std::shared_ptr<SurgSim::Input::Outp
 	{
 		if (output != nullptr)
 		{
-			auto data = output->getData();
-			if (!data.isEmpty())
+			SurgSim::DataStructures::DataGroup data;
+			if (output->requestOutput("", &data))
 			{
 				result = true;
 				SurgSim::Math::Vector3d force;
