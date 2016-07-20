@@ -22,7 +22,7 @@
 #version 120
 
 // These are 'free' uniforms to be set for this shader, they won't be provided by OSS
-uniform sampler2D shadowMap;
+uniform sampler2D lightMap;
 uniform sampler2D depthMap;
 uniform sampler2D normalMap;
 uniform samplerCube diffuseEnvMap;
@@ -32,6 +32,15 @@ uniform vec4 specularColor;
 uniform float diffusePercent = 0.9;
 uniform float specularPercent = 0.1;
 uniform float shininess;
+
+/// view matrix for the camera that rendered the original depth map (see shadow_map.frag)
+uniform mat4 lightViewMatrix;
+
+/// projection matrix for the camera that rendered the original depth map (see shadow_map.frag)
+uniform mat4 lightProjectionMatrix;
+
+uniform float bias = 0.0005;
+uniform float intensity = 0.75;
 
 // Main Camera Matrices
 struct MainCamera
@@ -64,7 +73,7 @@ varying vec4 clipCoord; ///< Projected and transformed vertex coordinates
 
 vec3 getEyeSpacePos(vec3 coord)
 {
-    vec3 homogenous = coord * 2.0 - 1.0;
+	vec3 homogenous = coord * 2.0 - 1.0;
 	vec4 clipSpacePos = vec4(homogenous, 1.0);
 	vec4 eyeSpacePos = mainCamera.inverseProjectionMatrix * clipSpacePos;
 	return eyeSpacePos.xyz/eyeSpacePos.w;
@@ -72,22 +81,24 @@ vec3 getEyeSpacePos(vec3 coord)
 
 void main(void)
 {
-    float maxDepth = 0.999999f;
-    float depth = texture2D(depthMap, texCoord0).x;
-    if (depth > maxDepth)
-    {
-        discard;
-    }
-
-	vec2 shadowCoord = clipCoord.xy / clipCoord.w * vec2(0.5) + vec2(0.5);
-    float shadowAmount = 1.0 - texture2D(shadowMap, shadowCoord).r;
+	float maxDepth = 0.999999f;
+	float depth = texture2D(depthMap, texCoord0).x;
+	if (depth > maxDepth)
+	{
+		discard;
+	}
 
 	vec4 eyeDir4 = vec4(getEyeSpacePos(vec3(texCoord0, depth)), 1.0);
 
-	vec3 lightDir = (mainCamera.viewMatrix * lightSource.position - eyeDir4).xyz;
-    float lightDistance = length(lightDir);
+	vec4 lightCoord = lightProjectionMatrix * lightViewMatrix * (mainCamera.inverseViewMatrix * eyeDir4);
+	vec3 lightCoord3 = (lightCoord.xyz / lightCoord.w) * vec3(0.5) + vec3(0.5);
+	float lightDepth = texture2D(lightMap, lightCoord3.xy).x;
+	float shadowAmount = 1.0 - (lightDepth + bias > lightCoord3.z || lightCoord3.z > 1.0 ? 0.0 : intensity);
 
-    float attenuation = 1.0 / (lightSource.constantAttenuation + lightSource.linearAttenuation*lightDistance + lightSource.quadraticAttenuation*lightDistance*lightDistance);
+	vec3 lightDir = (mainCamera.viewMatrix * lightSource.position - eyeDir4).xyz;
+	float lightDistance = length(lightDir);
+
+	float attenuation = 1.0 / (lightSource.constantAttenuation + lightSource.linearAttenuation*lightDistance + lightSource.quadraticAttenuation*lightDistance*lightDistance);
 
 	vec3 normal = (texture2D(normalMap, texCoord0).xyz * 2.0) - 1.0;
 
@@ -95,25 +106,25 @@ void main(void)
 	vec3 eyeDirNorm = normalize(eyeDir4.xyz);
 	vec3 normalDirNorm = normalize(normal);
 
-    vec3 vAmbient = ambientColor.rgb * diffuseColor.rgb;
+	vec3 vAmbient = ambientColor.rgb * diffuseColor.rgb;
 
 	vec3 vertexDiffuseColor = (attenuation * diffuseColor * lightSource.diffuse).rgb;
 	vec3 vertexSpecularColor = (attenuation * specularColor * lightSource.specular).rgb;
 
-    float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
-    vec3 vDiffuse = vec3(textureCube(diffuseEnvMap,  normalDirNorm)) * vertexDiffuseColor * diffuse;
+	float diffuse = max(dot(lightDirNorm, normalDirNorm), 0.0);
+	vec3 vDiffuse = vec3(textureCube(diffuseEnvMap,  normalDirNorm)) * vertexDiffuseColor * diffuse;
 
 	vec3 color = mix(vAmbient, vDiffuse, diffusePercent);
 
-    float temp = max(dot(reflect(lightDirNorm, normalDirNorm), eyeDirNorm), 0.0);
-    float specular = temp / (shininess - temp * shininess + temp);
+	float temp = max(dot(reflect(lightDirNorm, normalDirNorm), eyeDirNorm), 0.0);
+	float specular = temp / (shininess - temp * shininess + temp);
 	vec3 reflectDir = reflect(eyeDirNorm, normalDirNorm);
-    vec3 vSpecular = vec3(textureCube(specularEnvMap, reflectDir)) * vertexSpecularColor;
+	vec3 vSpecular = vec3(textureCube(specularEnvMap, reflectDir)) * vertexSpecularColor;
 
 	color = (mix(color, vSpecular + color, specularPercent) +
 				(specular * specularColor * lightSource.specular * attenuation).rgb) * shadowAmount;
 
-    gl_FragColor.rgb = color;
-    gl_FragColor.a = 1.0;
-    gl_FragDepth = depth;
+	gl_FragColor.rgb = color;
+	gl_FragColor.a = 1.0;
+	gl_FragDepth = depth;
 }

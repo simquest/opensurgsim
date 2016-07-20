@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	CombiningOutputComponentTest.cpp
 	CommonDeviceTests.cpp
 	InputComponentTest.cpp
 	InputManagerTest.cpp
@@ -37,3 +38,11 @@ set(LIBS
 surgsim_add_unit_tests(SurgSimInputTest)
 
 set_target_properties(SurgSimInputTest PROPERTIES FOLDER "Input")
+
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)

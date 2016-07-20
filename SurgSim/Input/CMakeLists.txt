@@ -15,6 +15,7 @@
 
 
 set(SURGSIM_INPUT_SOURCES
+	CombiningOutputComponent.cpp
 	CommonDevice.cpp
 	InputComponent.cpp
 	InputManager.cpp
@@ -22,6 +23,7 @@ set(SURGSIM_INPUT_SOURCES
 )
 
 set(SURGSIM_INPUT_HEADERS
+	CombiningOutputComponent.h
 	CommonDevice.h
 	DeviceInterface.h
 	InputComponent.h

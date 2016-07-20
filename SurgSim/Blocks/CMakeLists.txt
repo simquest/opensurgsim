@@ -23,6 +23,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	DriveElementFromInputBehavior.cpp
 	GraphicsUtilities.cpp
 	ImplicitSurface.cpp
+	KeyBehavior.cpp
 	KeyboardCallbackBehavior.cpp
 	KeyboardTogglesComponentBehavior.cpp
 	MassSpring1DRepresentation.cpp
@@ -47,6 +48,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	DriveElementFromInputBehavior.h
 	GraphicsUtilities.h
 	ImplicitSurface.h
+	KeyBehavior.h
 	KeyboardCallbackBehavior.h
 	KeyboardTogglesComponentBehavior.h
 	MassSpring1DRepresentation.h

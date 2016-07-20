@@ -124,7 +124,7 @@ bool doesIntersectTriangleTriangle(
 	}
 
 	// The separating axis.
-	Vector3 D = t0n.cross(t1n);
+	Vector3 D = t0n.cross(t1n).normalized();
 
 	// Projection of the triangle vertices on the separating axis.
 	Vector3 pv1(D.dot(t0v0), D.dot(t0v1), D.dot(t0v2));
