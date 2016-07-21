@@ -64,6 +64,7 @@ set(UNIT_TEST_SOURCES
 	OsgVectorFieldRepresentationTests.cpp
 	OsgViewElementTests.cpp
 	OsgViewTests.cpp
+	PaintBehaviorTests.cpp
 	RenderPassTests.cpp
 	ViewElementTests.cpp
 	ViewTests.cpp

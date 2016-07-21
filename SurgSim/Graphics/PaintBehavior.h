@@ -31,11 +31,15 @@ namespace SurgSim
 namespace Graphics
 {
 
+SURGSIM_STATIC_REGISTRATION(PaintBehavior);
+
 /// Behavior class to allow a specified scene element to receive painting effects
 class PaintBehavior : public Framework::Behavior
 {
 public:
 	explicit PaintBehavior(const std::string& name);
+
+	SURGSIM_CLASSNAME(SurgSim::Graphics::PaintBehavior);
 
 	/// Sets graphics representation being painted on
 	/// \param representation Graphics representation pointer
@@ -65,6 +69,14 @@ public:
 	/// Gets radius of paint splat
 	/// \return Radius in texture coordinate range [0-1]
 	double getRadius() const;
+
+	/// Sets whether to anti-alias the brush
+	/// \param antialias True enables AA, False disables
+	void setAntiAlias(bool antialias);
+
+	/// Gets status of antialiased brush
+	/// \return Boolean indicating if antialiasing is on
+	bool getAntiAlias() const;
 
 	/// Sets collection of local triangle coordinates to paint on during next update
 	/// \param coordinate Standard vector of IndexedLocalCoordinates
@@ -98,6 +110,12 @@ private:
 	/// Color to use for decal painting
 	Math::Vector4d m_color;
 
+	/// Radius of brush
+	double m_radius;
+
+	/// Flag for antialiasing the brush
+	bool m_antialias;
+
 	/// Collection of UV texture coordinates to paint to on next update
 	std::vector<DataStructures::IndexedLocalCoordinate> m_coordinates;
 
@@ -109,9 +127,6 @@ private:
 
 	int m_brushOffsetX;
 	int m_brushOffsetY;
-
-	/// Radius of brush
-	double m_radius;
 
 	Math::Matrix m_brush;
 
