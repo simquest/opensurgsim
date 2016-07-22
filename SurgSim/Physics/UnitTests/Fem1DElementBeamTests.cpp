@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	const Eigen::Matrix<double, 12, 12>& getInitialRotation() const
+	const Eigen::Matrix<double, 12, 12>& getInitialRotation12x12() const
 	{
 		return m_R0;
 	}
@@ -144,7 +144,7 @@ public:
 
 		m_restState.setNumDof(6, m_numberNodes);
 
-		m_orientation.coeffs().setRandom();
+		m_orientation.coeffs().setLinSpaced(2.0, 3.0);
 		m_orientation.normalize();
 
 		Vector3d firstExtremity(0.1, 1.2, 2.3);
@@ -428,7 +428,7 @@ public:
 
 		// Transform into correct coordinates and correct place in matrix
 		std::shared_ptr<MockFem1DElement> beam = getBeam();
-		const Eigen::Matrix<double, 12, 12>& r = beam->getInitialRotation();
+		const Eigen::Matrix<double, 12, 12>& r = beam->getInitialRotation12x12();
 
 		SurgSim::Math::addSubMatrix(r * in * r.transpose(), nodeIdsVectorForm, 6, &out);
 	}
@@ -537,19 +537,21 @@ TEST_F(Fem1DElementBeamTests, InitialRotationTest)
 	mask.block<3, 3>(3, 3).setZero();
 	mask.block<3, 3>(6, 6).setZero();
 	mask.block<3, 3>(9, 9).setZero();
-	EXPECT_TRUE(beam->getInitialRotation().cwiseProduct(mask).isZero());
+	EXPECT_TRUE(beam->getInitialRotation12x12().cwiseProduct(mask).isZero());
 
 	// Only the 1st direction of the frame can be compared as the 2 other ones are randomly
 	// chosen (can be any 2 vectors forming an Orthonormal frame)
 	Vector3d expected_i = m_orientation.matrix().col(0);
-	Vector3d i_0 = beam->getInitialRotation().block<3, 3>(0, 0).col(0);
-	Vector3d i_1 = beam->getInitialRotation().block<3, 3>(3, 3).col(0);
-	Vector3d i_2 = beam->getInitialRotation().block<3, 3>(6, 6).col(0);
-	Vector3d i_3 = beam->getInitialRotation().block<3, 3>(9, 9).col(0);
+	Vector3d i_0 = beam->getInitialRotation12x12().block<3, 3>(0, 0).col(0);
+	Vector3d i_1 = beam->getInitialRotation12x12().block<3, 3>(3, 3).col(0);
+	Vector3d i_2 = beam->getInitialRotation12x12().block<3, 3>(6, 6).col(0);
+	Vector3d i_3 = beam->getInitialRotation12x12().block<3, 3>(9, 9).col(0);
 	EXPECT_TRUE(i_0.isApprox(expected_i));
 	EXPECT_TRUE(i_1.isApprox(expected_i));
 	EXPECT_TRUE(i_2.isApprox(expected_i));
 	EXPECT_TRUE(i_3.isApprox(expected_i));
+
+	EXPECT_TRUE(beam->getInitialRotation().col(0).isApprox(expected_i));
 }
 
 TEST_F(Fem1DElementBeamTests, CoordinateTests)

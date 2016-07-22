@@ -34,6 +34,7 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationTest.cpp
 	EigenGtestAsserts.cpp
 	Fem1DConstraintFixedPointTests.cpp
+	Fem1DConstraintFixedRotationVectorTests.cpp
 	Fem1DConstraintFrictionalSlidingTests.cpp
 	Fem1DConstraintFrictionlessContactTests.cpp
 	Fem1DConstraintFrictionlessSlidingTests.cpp
@@ -65,6 +66,7 @@ set(UNIT_TEST_SOURCES
 	FemLocalizationTest.cpp
 	FemRepresentationTests.cpp
 	FixedConstraintFixedPointTests.cpp
+	FixedConstraintFixedRotationVectorTests.cpp
 	FixedConstraintFrictionlessContactTests.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
@@ -86,10 +88,12 @@ set(UNIT_TEST_SOURCES
 	RepresentationTest.cpp
 	RigidCollisionRepresentationTest.cpp
 	RigidConstraintFixedPointTests.cpp
+	RigidConstraintFixedRotationVectorTests.cpp
 	RigidConstraintFrictionlessContactTests.cpp
 	RigidLocalizationTest.cpp
 	RigidRepresentationTest.cpp
 	RigidStateTest.cpp
+	RotationVectorConstraintDataTests.cpp
 	SlidingConstraintDataTests.cpp
 	SolveMlcpTests.cpp
 	UpdateCollisionRepresentationsTest.cpp
