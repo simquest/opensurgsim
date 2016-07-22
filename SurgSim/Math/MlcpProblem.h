@@ -95,8 +95,7 @@ struct MlcpProblem
 	{
 		size_t numConstraintTypes = constraintTypes.size();
 		return ((b.rows() >= 0) && (b.cols() == 1) && (A.rows() == b.rows()) && (A.cols() == A.rows())
-				&& (numConstraintTypes <= static_cast<size_t>(b.rows())) && (mu.size() >= 0)
-				&& (static_cast<size_t>(mu.size()) == numConstraintTypes));
+				&& (numConstraintTypes <= static_cast<size_t>(b.rows())) && (mu.size() >= 0));
 	}
 
 	/// Resize an MlcpProblem and set to zero.

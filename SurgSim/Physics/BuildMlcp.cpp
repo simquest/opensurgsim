@@ -37,7 +37,7 @@ BuildMlcp::~BuildMlcp()
 {}
 
 std::shared_ptr<PhysicsManagerState>
-	BuildMlcp::doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
+BuildMlcp::doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
 {
 	// Copy state to new state
 	std::shared_ptr<PhysicsManagerState> result = state;
@@ -45,12 +45,10 @@ std::shared_ptr<PhysicsManagerState>
 	MlcpMapping<Constraint> constraintsMapping;
 
 	size_t numAtomicConstraint = 0;
-	size_t numConstraint = 0;
 	size_t numDof = 0;
 
-	// Calculate numAtomicConstraint and numConstraint
+	// Calculate numAtomicConstraint
 	auto const activeConstraints = result->getActiveConstraints();
-	numConstraint = activeConstraints.size();
 	for (auto it = activeConstraints.cbegin(); it != activeConstraints.cend(); it++)
 	{
 		constraintsMapping.setValue((*it).get(), static_cast<ptrdiff_t>(numAtomicConstraint));
@@ -72,7 +70,7 @@ std::shared_ptr<PhysicsManagerState>
 	result->getMlcpProblem().b.setZero(numAtomicConstraint);
 	result->getMlcpProblem().H.resize(numAtomicConstraint, numDof);
 	result->getMlcpProblem().CHt.setZero(numDof, numAtomicConstraint);
-	result->getMlcpProblem().mu.setZero(numConstraint);
+	result->getMlcpProblem().mu.setZero(numAtomicConstraint);
 	result->getMlcpProblem().constraintTypes.clear();
 
 	// Resize the Mlcp solution

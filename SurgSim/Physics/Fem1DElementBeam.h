@@ -83,6 +83,9 @@ public:
 			const SurgSim::Math::OdeState& state,
 			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
+	/// \return the initial beam rotation
+	SurgSim::Math::Matrix33d getInitialRotation() const;
+
 protected:
 	/// Initializes variables needed before Initialize() is called
 	void initializeMembers();

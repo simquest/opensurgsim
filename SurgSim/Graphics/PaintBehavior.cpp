@@ -25,15 +25,20 @@ namespace SurgSim
 {
 namespace Graphics
 {
+
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::PaintBehavior, PaintBehavior);
+
 PaintBehavior::PaintBehavior(const std::string& name) :
 	Framework::Behavior(name),
 	m_width(0),
 	m_height(0),
-	m_radius(0)
+	m_radius(0),
+	m_antialias(false)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, std::shared_ptr<Framework::Component>, Representation,
 									  getRepresentation, setRepresentation);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, Math::Vector4d, Color, getColor, setColor);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, bool, AntiAlias, getAntiAlias, setAntiAlias);
 }
 
 void PaintBehavior::setRepresentation(std::shared_ptr<Framework::Component> representation)
@@ -55,6 +60,24 @@ void PaintBehavior::setColor(const Math::Vector4d& color)
 Math::Vector4d PaintBehavior::getColor() const
 {
 	return m_color;
+}
+
+void PaintBehavior::setAntiAlias(bool antialias)
+{
+	if (isInitialized())
+	{
+		SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger()) << "You cannot set anti-aliasing of " << getName() <<
+																   " after it has already been initialized.";
+	}
+	else
+	{
+		m_antialias = antialias;
+	}
+}
+
+bool PaintBehavior::getAntiAlias() const
+{
+	return m_antialias;
 }
 
 void PaintBehavior::setCoordinates(const std::vector<DataStructures::IndexedLocalCoordinate>& coordinates)
@@ -129,7 +152,14 @@ bool PaintBehavior::doWakeUp()
 		return false;
 	}
 
-	buildBrush(getRadius());
+	if (m_antialias)
+	{
+		buildAntiAliasedBrush(getRadius());
+	}
+	else
+	{
+		buildBrush(getRadius());
+	}
 
 	return true;
 }
