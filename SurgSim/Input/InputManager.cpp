@@ -65,14 +65,24 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 	if (input != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		return addInputComponent(input);
+		if (addInputComponent(input))
+		{
+			return true;
+		}
+		tryRemoveComponent(component, &m_inputs);
+		return false;
 	}
 
 	auto output = tryAddComponent(component, &m_outputs);
 	if (output != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		return addOutputComponent(output);
+		if (addOutputComponent(output))
+		{
+			return true;
+		}
+		tryRemoveComponent(component, &m_outputs);
+		return false;
 	}
 
 	// If we got he the component was neither an Input nor and OutputComponent, no add was performed
@@ -87,13 +97,21 @@ bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Com
 	if (tryRemoveComponent(component, &m_inputs))
 	{
 		auto input = std::static_pointer_cast<InputComponent>(component);
-		m_devices[input->getDeviceName()]->removeInputConsumer(input);
+		auto deviceName = input->getDeviceName();
+		if (m_devices.count(deviceName) > 0)
+		{
+			m_devices[deviceName]->removeInputConsumer(input);
+		}
 		result = true;
 	}
 	else if (tryRemoveComponent(component, &m_outputs))
 	{
 		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
-		m_devices[output->getDeviceName()]->removeOutputProducer(output);
+		auto deviceName = output->getDeviceName();
+		if (m_devices.count(deviceName) > 0)
+		{
+			m_devices[deviceName]->removeOutputProducer(output);
+		}
 		result = true;
 	}
 	return result;
@@ -122,7 +140,13 @@ bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& inpu
 bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& output)
 {
 	bool result = false;
-	if (m_devices.find(output->getDeviceName()) != m_devices.end())
+	if (output->getDeviceName() == "")
+	{
+		SURGSIM_LOG_INFO(m_logger) << "Added output component " << output->getFullName()
+			<< " not connected to any device.";
+		result = true;
+	}
+	else if (m_devices.find(output->getDeviceName()) != m_devices.end())
 	{
 		if (!m_devices[output->getDeviceName()]->hasOutputProducer())
 		{
@@ -153,7 +177,11 @@ bool InputManager::addDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> de
 {
 	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_mutex);
-	if (m_devices.find(device->getName()) == m_devices.cend())
+	if (device->getName() == "")
+	{
+		SURGSIM_LOG_WARNING(m_logger) << "Cannot add a device that has an empty name.";
+	}
+	else if (m_devices.find(device->getName()) == m_devices.cend())
 	{
 		m_devices[device->getName()] = device;
 		SURGSIM_LOG_INFO(m_logger) << "Added device " << device->getName();

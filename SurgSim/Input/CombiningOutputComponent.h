@@ -57,7 +57,8 @@ public:
 	/// \return The OutputComponents that will be combined.
 	std::vector<std::shared_ptr<SurgSim::Framework::Component>> getOutputs() const;
 
-	/// \param outputs The OutputComponents that will be combined.
+	/// \param outputs The OutputComponents that will be combined.  They should have their device names set to the
+	///		empty string.
 	void setOutputs(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& outputs);
 
 	/// Set the function to do the combining.

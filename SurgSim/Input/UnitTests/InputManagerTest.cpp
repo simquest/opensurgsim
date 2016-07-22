@@ -114,9 +114,11 @@ TEST_F(InputManagerTest, DeviceAddRemove)
 
 	std::shared_ptr<DeviceInterface> testDevice3 = std::make_shared<TestDevice>("TestDevice3");
 	std::shared_ptr<DeviceInterface> testDevice4 = std::make_shared<TestDevice>("TestDevice4");
+	std::shared_ptr<DeviceInterface> testDevice5 = std::make_shared<TestDevice>("");
 
 	EXPECT_TRUE(inputManager->addDevice(testDevice3));
 	EXPECT_TRUE(inputManager->addDevice(testDevice4));
+	EXPECT_FALSE(inputManager->addDevice(testDevice5));
 	EXPECT_FALSE(inputManager->addDevice(testDevice3));
 	EXPECT_TRUE(inputManager->removeDevice(testDevice4));
 	EXPECT_FALSE(inputManager->removeDevice(testDevice4));
@@ -181,18 +183,24 @@ TEST_F(InputManagerTest, OutputAddRemove)
 	std::shared_ptr<OutputComponent> output1 = std::make_shared<OutputComponent>("Component1");
 	std::shared_ptr<OutputComponent> output2 = std::make_shared<OutputComponent>("Component2");
 	std::shared_ptr<OutputComponent> output3 = std::make_shared<OutputComponent>("Component3");
-	std::shared_ptr<OutputComponent> invalid = std::make_shared<OutputComponent>("Component4");
+	std::shared_ptr<OutputComponent> output4 = std::make_shared<OutputComponent>("Component4");
+	std::shared_ptr<OutputComponent> invalid = std::make_shared<OutputComponent>("Component5");
 	output1->setDeviceName("TestDevice1");
 	output2->setDeviceName("TestDevice1");
 	output3->setDeviceName("TestDevice2");
+	EXPECT_EQ("", output4->getDeviceName());
 	invalid->setDeviceName("InvalidDevice");
 	EXPECT_TRUE(testDoAddComponent(output1));
 	EXPECT_FALSE(testDoAddComponent(output2)); // same device already attached to an OutputComponent
 	EXPECT_FALSE(testDoAddComponent(output2));
 	EXPECT_TRUE(testDoAddComponent(output3));
+	EXPECT_TRUE(testDoAddComponent(output4));
 	EXPECT_FALSE(testDoAddComponent(invalid));
+
 	EXPECT_TRUE(testDoRemoveComponent(output1));
 	EXPECT_FALSE(testDoRemoveComponent(output1));
+	EXPECT_TRUE(testDoRemoveComponent(output4));
+	EXPECT_FALSE(testDoRemoveComponent(invalid));
 }
 
 TEST_F(InputManagerTest, OutputPush)
