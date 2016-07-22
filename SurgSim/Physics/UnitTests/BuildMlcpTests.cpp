@@ -243,7 +243,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 	EXPECT_EQ(3, mlcpProblem.CHt.cols());
 	EXPECT_EQ(3, mlcpProblem.H.rows());
 	EXPECT_EQ(6, mlcpProblem.H.cols());
-	EXPECT_EQ(1, mlcpProblem.mu.rows());
+	EXPECT_EQ(3, mlcpProblem.mu.rows());
 	EXPECT_EQ(1u, mlcpProblem.constraintTypes.size());
 	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, mlcpProblem.constraintTypes[0]);
 	EXPECT_TRUE(mlcpProblem.isConsistent());
