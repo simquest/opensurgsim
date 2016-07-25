@@ -42,6 +42,9 @@ TEST(OutputComponentTest, Accessors)
 	EXPECT_EQ("Output", output.getName());
 	EXPECT_EQ("OutputDevice", output.getDeviceName());
 
+	SurgSim::DataStructures::DataGroup actualData;
+	ASSERT_FALSE(output.requestOutput("", &actualData));
+
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	std::string name = "aBool";
 	builder.addBoolean(name);
@@ -49,7 +52,8 @@ TEST(OutputComponentTest, Accessors)
 	dataGroup.booleans().set(name, true);
 	output.setData(dataGroup);
 	bool result = false;
-	ASSERT_TRUE(output.getData().booleans().get(name, &result));
+	ASSERT_TRUE(output.requestOutput("", &actualData));
+	ASSERT_TRUE(actualData.booleans().get(name, &result));
 	EXPECT_TRUE(result);
 }
 
