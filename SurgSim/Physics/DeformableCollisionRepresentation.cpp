@@ -52,10 +52,11 @@ bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shap
 	bool result = false;
 	const size_t numNodes = odeState.getNumNodes();
 
-	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+		shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
 	{
 		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(shape);
-		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
+		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
 		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
 				"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
@@ -69,19 +70,6 @@ bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shap
 	{
 		auto meshShape = dynamic_cast<SurgSim::Math::SegmentMeshShape*>(shape);
 		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
-		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
-				"The number of nodes in the deformable does not match the number of vertices in the mesh.";
-
-		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
-		{
-			meshShape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
-		}
-		result = meshShape->update();
-	}
-	else if (shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
-	{
-		auto meshShape = dynamic_cast<SurgSim::Math::SurfaceMeshShape*>(shape);
-		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a surface mesh";
 		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
 				"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
