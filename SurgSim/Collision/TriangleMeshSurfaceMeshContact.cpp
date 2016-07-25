@@ -41,101 +41,6 @@ std::pair<int, int> TriangleMeshSurfaceMeshContact::getShapeTypes()
 	return std::pair<int, int>(SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_SURFACEMESH);
 }
 
-#ifdef SURGSIM_DEBUG_TRIANGLESURFACECONTACT
-namespace
-{
-
-	/// Asserts the points are coplanar, and prints debug output on the failing condition.
-	/// \param triangle0, triangle1, triangle2 the vertices of the triangle
-	/// \param point the point to compare against
-	/// \throws If the points are not coplanar
-	void assertIsCoplanar(const Vector3d& triangle0,
-		const Vector3d& triangle1,
-		const Vector3d& triangle2,
-		const Vector3d& point)
-	{
-		SURGSIM_ASSERT(SurgSim::Math::isCoplanar(triangle0, triangle1, triangle2, point))
-			<< "Coplanar assertion failed with: "
-			"t0 [" << triangle0.transpose() << "], "
-			"t1 [" << triangle1.transpose() << "], "
-			"t2 [" << triangle2.transpose() << "], "
-			"pt [" << point.transpose() << "]";
-	}
-
-	/// Asserts the point is inside the triangle, and prints debug output on the failing condition.
-	/// \param point the point to compare against
-	/// \param triangle0, triangle1, triangle2 the vertices of the triangle
-	/// \param normal the unit normal of the triangle
-	/// \throws If the point is not inside the triangle
-	void assertIsPointInsideTriangle(const Vector3d& point,
-		const Vector3d& triangle0,
-		const Vector3d& triangle1,
-		const Vector3d& triangle2,
-		const Vector3d& normal)
-	{
-		SURGSIM_ASSERT(SurgSim::Math::isPointInsideTriangle(point, triangle0, triangle1, triangle2, normal))
-			<< "Point inside triangle assertion failed with: "
-			"t0 [" << triangle0.transpose() << "], "
-			"t1 [" << triangle1.transpose() << "], "
-			"t2 [" << triangle2.transpose() << "], "
-			"n [" << normal.transpose() << "], "
-			"pt [" << point.transpose() << "]";
-	}
-
-	/// Asserts the provided normal and depth minimally resolve the interpenetration of the two triangles, and prints
-	/// debug output on the failing condition.
-	/// \param normal the unit normal in the direction to resolve the penetration
-	/// \param penetrationDepth the depth of penetration to check
-	/// \param triangleA0, triangleA1, triangleA2 the vertices of the first triangle
-	/// \param triangleB0, triangleB1, triangleB2 the vertices of the second triangle
-	/// \throws If the normal and depth do not minimally resolve the interpenetration of the two triangles
-	void assertIsCorrectNormalAndDepth(const Vector3d& normal,
-		double penetrationDepth,
-		const Vector3d& triangleA0,
-		const Vector3d& triangleA1,
-		const Vector3d& triangleA2,
-		const Vector3d& triangleB0,
-		const Vector3d& triangleB1,
-		const Vector3d& triangleB2)
-	{
-		Vector3d correction = normal * (penetrationDepth - SurgSim::Math::Geometry::DistanceEpsilon);
-
-		SURGSIM_ASSERT(SurgSim::Math::doesIntersectTriangleTriangle(
-			(Vector3d)(triangleA0 + correction),
-			(Vector3d)(triangleA1 + correction),
-			(Vector3d)(triangleA2 + correction),
-			triangleB0, triangleB1, triangleB2))
-			<< "Correct normal and depth assertion failed with: "
-			"n [" << normal.transpose() << "], "
-			"d [" << penetrationDepth << "], "
-			"a0 [" << triangleA0.transpose() << "], "
-			"a1 [" << triangleA1.transpose() << "], "
-			"a2 [" << triangleA2.transpose() << "], "
-			"b0 [" << triangleB0.transpose() << "], "
-			"b1 [" << triangleB1.transpose() << "], "
-			"b2 [" << triangleB2.transpose() << "]";
-
-		correction = normal * (penetrationDepth + 2.0 * SurgSim::Math::Geometry::DistanceEpsilon);
-
-		SURGSIM_ASSERT(!SurgSim::Math::doesIntersectTriangleTriangle(
-			(Vector3d)(triangleA0 + correction),
-			(Vector3d)(triangleA1 + correction),
-			(Vector3d)(triangleA2 + correction),
-			triangleB0, triangleB1, triangleB2))
-			<< "Correct normal and depth assertion failed with: "
-			"n [" << normal.transpose() << "], "
-			"d [" << penetrationDepth << "], "
-			"a0 [" << triangleA0.transpose() << "], "
-			"a1 [" << triangleA1.transpose() << "], "
-			"a2 [" << triangleA2.transpose() << "], "
-			"b0 [" << triangleB0.transpose() << "], "
-			"b1 [" << triangleB1.transpose() << "], "
-			"b2 [" << triangleB2.transpose() << "]";
-	}
-
-} // namespace
-#endif //SURGSIM_DEBUG_TRIANGLESURFACECONTACT
-
 std::list<std::shared_ptr<Contact>> TriangleMeshSurfaceMeshContact::calculateDcdContact(
 	const Math::MeshShape& meshA,
 	const Math::RigidTransform3d& meshAPose,
@@ -208,18 +113,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshSurfaceMeshContact::calculateDcd
 				// Check if the triangles intersect.
 				if (trianglesInContact)
 				{
-#ifdef SURGSIM_DEBUG_TRIANGLESURFACECONTACT
-					assertIsCoplanar(verticesA[0], verticesA[1], verticesA[2], penetrationPointA);
-					assertIsCoplanar(verticesB[0], verticesB[1], verticesB[2], penetrationPointB);
-
-					assertIsPointInsideTriangle(
-						penetrationPointA, verticesA[0], verticesA[1], verticesA[2], normalA);
-					assertIsPointInsideTriangle(penetrationPointB, verticesB[0], verticesB[1], verticesB[2], normalB);
-
-					assertIsCorrectNormalAndDepth(normal, depth, verticesA[0], verticesA[1], verticesA[2],
-						verticesB[0], verticesB[1], verticesB[2]);
-#endif
-
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
 					Vector3d barycentricCoordinate;
