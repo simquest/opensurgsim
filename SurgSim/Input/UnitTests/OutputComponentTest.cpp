@@ -42,6 +42,11 @@ TEST(OutputComponentTest, Accessors)
 	EXPECT_EQ("Output", output.getName());
 	EXPECT_EQ("OutputDevice", output.getDeviceName());
 
+	EXPECT_TRUE(output.getConnect());
+	output.setConnect(false);
+	EXPECT_FALSE(output.getConnect());
+	output.setConnect(true);
+
 	SurgSim::DataStructures::DataGroup actualData;
 	ASSERT_FALSE(output.requestOutput("", &actualData));
 

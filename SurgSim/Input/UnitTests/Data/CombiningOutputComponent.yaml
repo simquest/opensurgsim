@@ -17,9 +17,12 @@
       - SurgSim::Input::OutputComponent:
           Name: output1
           Id: output1
+          Connect: false
       - SurgSim::Input::OutputComponent:
           Name: output2
           Id: output2
+          Connect: false
       - SurgSim::Input::OutputComponent:
           Name: output3
           Id: output3
+          Connect: false

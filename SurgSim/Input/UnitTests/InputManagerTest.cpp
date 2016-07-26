@@ -188,7 +188,7 @@ TEST_F(InputManagerTest, OutputAddRemove)
 	output1->setDeviceName("TestDevice1");
 	output2->setDeviceName("TestDevice1");
 	output3->setDeviceName("TestDevice2");
-	EXPECT_EQ("", output4->getDeviceName());
+	output4->setConnect(false);
 	invalid->setDeviceName("InvalidDevice");
 	EXPECT_TRUE(testDoAddComponent(output1));
 	EXPECT_FALSE(testDoAddComponent(output2)); // same device already attached to an OutputComponent

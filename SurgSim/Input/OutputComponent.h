@@ -47,8 +47,16 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Input::OutputComponent);
 
-	/// Set name of the device of output component.  The default is an empty string, which will let this OutputComponent
-	///		be added to the InputManager without being connected to any device.
+	/// Set whether or not the InputManager should connect this Component to a device specified by name via
+	/// setDeviceName.  Defaults to connecting.
+	/// This should be set to false for OutputComponents that will be combined by a CombiningOutputComponent.
+	/// \param connect true if the OutputComponent should be connected to a device.
+	void setConnect(bool connect);
+
+	/// \return true if the OutputComponent should connect to a device.
+	bool getConnect() const;
+
+	/// Set name of the device of output component.
 	/// \param	deviceName	The name of the device that will receive the output data.
 	void setDeviceName(const std::string& deviceName);
 
@@ -77,6 +85,9 @@ private:
 
 	/// True if there is data available
 	bool m_haveData;
+
+	/// true if it should connect to a device.
+	bool m_connect;
 };
 
 }; // namespace Input

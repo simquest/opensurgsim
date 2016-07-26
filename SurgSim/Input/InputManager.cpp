@@ -140,35 +140,32 @@ bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& inpu
 bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& output)
 {
 	bool result = false;
-	if (output->getDeviceName() == "")
+	const auto outputName = output->getFullName();
+	if (output->getConnect())
 	{
-		SURGSIM_LOG_INFO(m_logger) << "Added output component " << output->getFullName()
-			<< " not connected to any device.";
-		result = true;
-	}
-	else if (m_devices.find(output->getDeviceName()) != m_devices.end())
-	{
-		if (!m_devices[output->getDeviceName()]->hasOutputProducer())
+		const auto deviceName = output->getDeviceName();
+		if (m_devices.find(deviceName) == m_devices.end())
 		{
-			m_devices[output->getDeviceName()]->setOutputProducer(output);
-			SURGSIM_LOG_INFO(m_logger)
-					<< "Added output component "
-					<< output->getFullName() << " connected to device " << output->getDeviceName();
-			result = true;
+			SURGSIM_LOG_CRITICAL(m_logger) << "Could not find Device with name " << deviceName
+				<< " when adding output component " << outputName;
+		}
+		else if (m_devices[deviceName]->hasOutputProducer())
+		{
+			SURGSIM_LOG_WARNING(m_logger) << "Trying to add OutputProducer " << outputName << " to device "
+				<< deviceName << ", but the device already has an OutputProducer assigned, this add will be ignored!";
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(m_logger)
-					<< "Trying to add OutputProducer " << output->getFullName() << " to device "
-					<< output->getDeviceName()
-					<< " but the device already has an OutputProducer assigned, this add will be ignored!";
+			m_devices[deviceName]->setOutputProducer(output);
+			SURGSIM_LOG_INFO(m_logger) << "Added output component " << outputName << " connected to device "
+				<< deviceName;
+			result = true;
 		}
 	}
 	else
 	{
-		SURGSIM_LOG_CRITICAL(m_logger)
-				<< "Could not find Device with name "
-				<< output->getDeviceName() << " when adding output component " << output->getFullName();
+		SURGSIM_LOG_INFO(m_logger) << "Added output component " << outputName << " not connected to any device.";
+		result = true;
 	}
 	return result;
 }
