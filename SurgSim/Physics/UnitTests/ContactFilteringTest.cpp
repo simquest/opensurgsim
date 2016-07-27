@@ -131,14 +131,11 @@ TEST_F(ContactFilteringTest, ProcessAllFilters)
 	filters.push_back(filter2);
 	state->setContactFilters(filters);
 
-
-	pairs.push_back(pairWithContacts);
-	pairs.push_back(pairWithContacts);
 	pairs.push_back(pairWithContacts);
 	state->setCollisionPairs(pairs);
 
-	EXPECT_CALL(*filter1, doFilterContacts(_, _)).Times(3);
-	EXPECT_CALL(*filter2, doFilterContacts(_, _)).Times(3);
+	EXPECT_CALL(*filter1, doFilterContacts(_, _)).Times(1);
+	EXPECT_CALL(*filter2, doFilterContacts(_, _)).Times(1);
 	contactFiltering->update(1.0, state);
 }
 
