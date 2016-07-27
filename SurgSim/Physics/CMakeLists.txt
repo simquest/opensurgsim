@@ -20,6 +20,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	CcdCollisionLoop.cpp
 	Computation.cpp
 	ComputationGroup.cpp
+	ContactFiltering.cpp
 	Constraint.cpp
 	ConstraintComponent.cpp
 	ConstraintData.cpp
@@ -101,6 +102,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	CcdCollisionLoop.h
 	Computation.h
 	ComputationGroup.h
+	ContactFiltering.h
 	Constraint.h
 	ConstraintComponent.h
 	ConstraintData.h
