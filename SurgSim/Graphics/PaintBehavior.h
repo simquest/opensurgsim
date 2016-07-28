@@ -110,6 +110,12 @@ private:
 	/// Color to use for decal painting
 	Math::Vector4d m_color;
 
+	/// Width of assigned texture
+	int m_width;
+
+	/// Height of assigned texture
+	int m_height;
+
 	/// Radius of brush
 	double m_radius;
 
@@ -118,12 +124,6 @@ private:
 
 	/// Collection of UV texture coordinates to paint to on next update
 	std::vector<DataStructures::IndexedLocalCoordinate> m_coordinates;
-
-	/// Width of assigned texture
-	int m_width;
-
-	/// Height of assigned texture
-	int m_height;
 
 	int m_brushOffsetX;
 	int m_brushOffsetY;
