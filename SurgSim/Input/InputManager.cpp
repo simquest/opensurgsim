@@ -120,18 +120,18 @@ bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Com
 bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& input)
 {
 	bool result = false;
-	if (m_devices.find(input->getDeviceName()) != m_devices.end())
+
+	DeviceInterface* device = nullptr;
+	if (tryFindDevice(input->getDeviceName(), &device))
 	{
-		m_devices[input->getDeviceName()]->addInputConsumer(input);
-		SURGSIM_LOG_INFO(m_logger)
-				<< "Added input component " << input->getFullName()
-				<< " connected to device " << input->getDeviceName();
+		device->addInputConsumer(input);
+		SURGSIM_LOG_INFO(m_logger) << "Added input component " << input->getFullName()
+			<< " connected to device " << input->getDeviceName();
 		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_CRITICAL(m_logger)
-				<< " Could not find Device named '"
+		SURGSIM_LOG_CRITICAL(m_logger) << " Could not find Device named '"
 				<< input->getDeviceName() << "' when adding input component named '" << input->getFullName() << "'.";
 	}
 	return result;
@@ -144,22 +144,27 @@ bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& ou
 	if (output->getConnect())
 	{
 		const auto deviceName = output->getDeviceName();
-		if (m_devices.find(deviceName) == m_devices.end())
+		DeviceInterface* device = nullptr;
+		if (tryFindDevice(deviceName, &device))
 		{
-			SURGSIM_LOG_CRITICAL(m_logger) << "Could not find Device with name " << deviceName
-				<< " when adding output component " << outputName;
-		}
-		else if (m_devices[deviceName]->hasOutputProducer())
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "Trying to add OutputProducer " << outputName << " to device "
-				<< deviceName << ", but the device already has an OutputProducer assigned, this add will be ignored!";
+			if (device->hasOutputProducer())
+			{
+				SURGSIM_LOG_WARNING(m_logger) << "Trying to add OutputProducer " << outputName
+					<< " to device " << deviceName
+					<< ", but the device already has an OutputProducer assigned, this add will be ignored!";
+			}
+			else
+			{
+				device->setOutputProducer(output);
+				SURGSIM_LOG_INFO(m_logger) << "Added output component " << outputName << " connected to device "
+					<< deviceName;
+				result = true;
+			}
 		}
 		else
 		{
-			m_devices[deviceName]->setOutputProducer(output);
-			SURGSIM_LOG_INFO(m_logger) << "Added output component " << outputName << " connected to device "
-				<< deviceName;
-			result = true;
+			SURGSIM_LOG_CRITICAL(m_logger) << "Could not find Device with name " << deviceName
+				<< " when adding output component " << outputName;
 		}
 	}
 	else
@@ -174,19 +179,22 @@ bool InputManager::addDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> de
 {
 	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_mutex);
-	if (device->getName() == "")
+
+	DeviceInterface* foundDevice = nullptr;
+	const auto& deviceName = device->getName();
+	if (deviceName == "")
 	{
 		SURGSIM_LOG_WARNING(m_logger) << "Cannot add a device that has an empty name.";
 	}
-	else if (m_devices.find(device->getName()) == m_devices.cend())
+	else if (tryFindDevice(deviceName, &foundDevice))
 	{
-		m_devices[device->getName()] = device;
-		SURGSIM_LOG_INFO(m_logger) << "Added device " << device->getName();
-		result = true;
+		SURGSIM_LOG_WARNING(m_logger) << "Device " << deviceName << " is already available in Input Manager";
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Device " << device->getName() << " is already available in Input Manager";
+		m_devices[deviceName] = device;
+		SURGSIM_LOG_INFO(m_logger) << "Added device " << deviceName;
+		result = true;
 	}
 	return result;
 }
@@ -212,6 +220,17 @@ bool InputManager::removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface>
 int InputManager::getType() const
 {
 	return SurgSim::Framework::MANAGER_TYPE_INPUT;
+}
+
+bool InputManager::tryFindDevice(const std::string& name, DeviceInterface** device)
+{
+	auto found = m_devices.find(name);
+	if (found != m_devices.end())
+	{
+		*device = found->second.get();
+		return true;
+	}
+	return false;
 }
 
 } // Input
