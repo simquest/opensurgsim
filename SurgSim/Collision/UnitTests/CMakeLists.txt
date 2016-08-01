@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	ContactCalculationTests.cpp
 	ContactCalculationTestsCommon.cpp
 	DefaultContactCalculationTests.cpp
+	ElementContactFilterTests.cpp
 	OctreeContactCalculationTests.cpp
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp

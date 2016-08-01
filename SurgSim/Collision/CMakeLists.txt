@@ -24,6 +24,7 @@ set(SURGSIM_COLLISION_SOURCES
 	ContactCalculation.cpp
 	ContactFilter.cpp
 	DefaultContactCalculation.cpp
+	ElementContactFilter.cpp
 	OctreeCapsuleContact.cpp
 	OctreeContact.cpp
 	OctreeDoubleSidedPlaneContact.cpp
@@ -56,6 +57,7 @@ set(SURGSIM_COLLISION_HEADERS
 	ContactCalculation.h
 	ContactFilter.h
 	DefaultContactCalculation.h
+	ElementContactFilter.h
 	OctreeCapsuleContact.h
 	OctreeContact.h
 	OctreeDoubleSidedPlaneContact.h

@@ -96,6 +96,24 @@ public:
 		}
 	}
 
+	const SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& get(Type meshType)
+	{
+		static SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> null;
+		switch (meshType)
+		{
+			case TRIANGLE:
+				return triangleMeshLocalCoordinate;
+				break;
+			case ELEMENT:
+				return elementMeshLocalCoordinate;
+				break;
+			default:
+				SURGSIM_FAILURE() << "Unknown location";
+				break;
+		}
+		return null;
+	}
+
 	bool isApprox(const Location& other, double precision = std::numeric_limits<double>::epsilon()) const
 	{
 		bool result = false;
