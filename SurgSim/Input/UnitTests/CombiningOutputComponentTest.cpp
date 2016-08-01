@@ -281,6 +281,8 @@ TEST(CombiningOutputComponentTest, Serialization)
 	runtime->step();
 	runtime->step();
 	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	runtime->stop();
 
 	ASSERT_TRUE(mockDevice->pullOutput());
 	SurgSim::DataStructures::DataGroup actualData = mockDevice->getOutputData();
