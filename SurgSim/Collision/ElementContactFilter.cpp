@@ -28,7 +28,8 @@ namespace Collision
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, ElementContactFilter, ElementContactFilter);
 
-ElementContactFilter::ElementContactFilter(const std::string& name) : ContactFilter(name)
+ElementContactFilter::ElementContactFilter(const std::string& name) : ContactFilter(name),
+	m_logger(SurgSim::Framework::Logger::getLogger("Collision/ElementContactFilter"))
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ElementContactFilter, std::shared_ptr<Framework::Component>, Representation,
 									  getRepresentation, setRepresentation);
@@ -46,9 +47,29 @@ bool ElementContactFilter::doInitialize()
 
 bool ElementContactFilter::doWakeUp()
 {
-	SURGSIM_LOG_IF(m_representation == nullptr, Framework::Logger::getDefaultLogger(), WARNING)
-			<< "No representation fol filtering on " << getFullName();
-	return m_representation != nullptr;
+	bool valid = false;
+	SURGSIM_LOG_IF(m_representation == nullptr, m_logger, WARNING)
+			<< "No representation for filtering on " << getFullName();
+	if (m_representation != nullptr)
+	{
+		auto type = m_representation->getShapeType();
+		if (type == SurgSim::Math::SHAPE_TYPE_MESH || type == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH ||
+			type == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
+		{
+			valid = true;
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(m_logger)
+					<< "ElementContactFilter " << getFullName()
+					<< "invalid mesh structure for collision shape, current shape is " << type << std::endl
+					<< "Should be one of " << SurgSim::Math::SHAPE_TYPE_MESH << ", "
+					<< SurgSim::Math::SHAPE_TYPE_SURFACEMESH << ", or "
+					<< SurgSim::Math::SHAPE_TYPE_SEGMENTMESH;
+		}
+	}
+
+	return valid;
 }
 
 void ElementContactFilter::setFilterElements(const std::vector<size_t>& indices)
@@ -83,6 +104,11 @@ std::shared_ptr<SurgSim::Collision::Representation> ElementContactFilter::getRep
 void ElementContactFilter::doFilterContacts(const std::shared_ptr<Physics::PhysicsManagerState>&,
 		const std::shared_ptr<CollisionPair>& pair)
 {
+	if (m_indices.empty())
+	{
+		return;
+	}
+
 	for (int i = 0; i < 2; ++i)
 	{
 		if (pairAt(pair->getRepresentations(), i).get() == getRepresentation().get())
@@ -112,6 +138,10 @@ void ElementContactFilter::excecuteFilter(
 	else if (shapeType == Math::SHAPE_TYPE_SEGMENTMESH)
 	{
 		locationType = DataStructures::Location::ELEMENT;
+	}
+	else
+	{
+		return;
 	}
 
 	pair->getContacts().erase(

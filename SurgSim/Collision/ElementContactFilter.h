@@ -70,6 +70,8 @@ protected:
 
 private:
 
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
 	/// Representation whose contacts need to be filtered
 	std::shared_ptr<Collision::Representation> m_representation;
 
