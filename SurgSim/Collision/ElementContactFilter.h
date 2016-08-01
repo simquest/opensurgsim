@@ -18,6 +18,7 @@
 
 #include "SurgSim/Collision/ContactFilter.h"
 #include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/Framework/LockedContainer.h"
 
 namespace SurgSim
 {
@@ -42,28 +43,50 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Collision::ElementContactFilter);
 
-	virtual bool doInitialize() override;
+	bool doInitialize() override;
 
-	virtual bool doWakeUp() override;
+	bool doWakeUp() override;
 
-	void addFilterElements(const std::shared_ptr<Collision::Representation>& rep, std::vector<size_t> indices);
+	void setFilterElements(const std::vector<size_t>& indices);
 
-	void setFilterElements(const std::shared_ptr<Collision::Representation>& rep, std::vector<size_t> indices);
+	std::vector<size_t> getFilterElements() const;
 
-	std::vector<size_t> getFilterElements(const std::shared_ptr<Collision::Representation>& rep) const;
+	void clearFilterElements();
 
-	void clearElements(const std::shared_ptr<Collision::Representation>& rep);
+	/// Sets the representation used for filtering
+	/// \param val the collision representation to be used for filtering
+	void setRepresentation(const std::shared_ptr<SurgSim::Framework::Component>& val);
+
+	/// \return the collision representation used for filtering
+	std::shared_ptr<SurgSim::Collision::Representation> getRepresentation() const;
 
 protected:
-	virtual void doFilterContacts(
+	void doFilterContacts(
 		const std::shared_ptr<Physics::PhysicsManagerState>& state,
 		const std::shared_ptr<CollisionPair>& pair) override;
 
+
+	void doUpdate(double dt) override;
+
 private:
 
-	std::unordered_map<Collision::Representation*, std::vector<size_t>> m_data;
+	/// Representation whose contacts need to be filtered
+	std::shared_ptr<Collision::Representation> m_representation;
 
-	void excecuteFilter(const std::shared_ptr<CollisionPair>& pair, size_t pairIndex, const std::vector<size_t>& filter);
+	/// Threadsafe container to update m_data
+	Framework::LockedContainer<std::vector<size_t>> m_writeBuffer;
+
+	/// Actual list of indices used for filtering
+	std::vector<size_t> m_indices;
+
+	/// Run the filter over the side of the collision pair indicated by pairIndex
+	/// \param pair the collision pair that is being filtered
+	/// \param pairIndex 0/1 representing first, and second values of the pair data structure
+	/// \param filter indices to filter
+	void excecuteFilter(
+		const std::shared_ptr<CollisionPair>& pair,
+		size_t pairIndex,
+		const std::vector<size_t>& filter);
 };
 
 template <class T>

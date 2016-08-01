@@ -17,6 +17,7 @@
 
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 namespace SurgSim
 {
@@ -29,6 +30,11 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, ElementContactFilter, ElementCon
 
 ElementContactFilter::ElementContactFilter(const std::string& name) : ContactFilter(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ElementContactFilter, std::shared_ptr<Framework::Component>, Representation,
+									  getRepresentation, setRepresentation);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ElementContactFilter, std::vector<size_t>, FilterElements,
+									  getFilterElements, setFilterElements);
 
 }
 
@@ -40,41 +46,38 @@ bool ElementContactFilter::doInitialize()
 
 bool ElementContactFilter::doWakeUp()
 {
-	return true;
+	SURGSIM_LOG_IF(m_representation == nullptr, Framework::Logger::getDefaultLogger(), WARNING)
+			<< "No representation fol filtering on " << getFullName();
+	return m_representation != nullptr;
 }
 
-void ElementContactFilter::addFilterElements(const std::shared_ptr<Collision::Representation>& rep,
-		std::vector<size_t> indices)
+void ElementContactFilter::setFilterElements(const std::vector<size_t>& indices)
+{
+	m_writeBuffer.set(indices);
+}
+
+std::vector<size_t> ElementContactFilter::getFilterElements() const
 {
 	std::vector<size_t> result;
-	std::sort(indices.begin(), indices.end());
-	std::set_union(indices.begin(), indices.end(), m_data[rep.get()].begin(), m_data[rep.get()].end(),
-				   std::back_inserter(result));
-
-	m_data[rep.get()] = result;
+	m_writeBuffer.get(&result);
+	return result;
 }
 
-void ElementContactFilter::setFilterElements(const std::shared_ptr<Collision::Representation>& rep,
-		std::vector<size_t> indices)
+void ElementContactFilter::clearFilterElements()
 {
-	m_data.emplace(rep.get(), std::move(indices));
+	m_writeBuffer.set(std::vector<size_t>());
 }
 
-std::vector<size_t> ElementContactFilter::getFilterElements(
-	const std::shared_ptr<Collision::Representation>& rep) const
+void ElementContactFilter::setRepresentation(const std::shared_ptr<SurgSim::Framework::Component>& val)
 {
-	auto found = m_data.find(rep.get());
-	if (found != m_data.end())
-	{
-		return found->second;
-	}
-
-	return std::vector<size_t>();
+	SURGSIM_ASSERT(!isAwake()) << "Can't set representation after waking up on " << getFullName();
+	m_representation = Framework::checkAndConvert<SurgSim::Collision::Representation>(
+						   val, "SurgSim::Collision::Representation");
 }
 
-void ElementContactFilter::clearElements(const std::shared_ptr<Collision::Representation>& rep)
+std::shared_ptr<SurgSim::Collision::Representation> ElementContactFilter::getRepresentation() const
 {
-	m_data[rep.get()].clear();
+	return m_representation;
 }
 
 void ElementContactFilter::doFilterContacts(const std::shared_ptr<Physics::PhysicsManagerState>&,
@@ -82,12 +85,16 @@ void ElementContactFilter::doFilterContacts(const std::shared_ptr<Physics::Physi
 {
 	for (int i = 0; i < 2; ++i)
 	{
-		auto found = m_data.find(pairAt(pair->getRepresentations(), i).get());
-		if (found != m_data.end() && !(*found).second.empty())
+		if (pairAt(pair->getRepresentations(), i).get() == getRepresentation().get())
 		{
-			excecuteFilter(pair, i, (*found).second);
+			excecuteFilter(pair, i, m_indices);
 		}
 	}
+}
+
+void ElementContactFilter::doUpdate(double dt)
+{
+	m_writeBuffer.tryGetChanged(&m_indices);
 }
 
 void ElementContactFilter::excecuteFilter(

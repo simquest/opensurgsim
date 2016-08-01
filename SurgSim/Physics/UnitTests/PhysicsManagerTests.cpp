@@ -54,6 +54,7 @@ public:
 	MockContactFilter(const std::string& name) : ContactFilter(name) {}
 	MOCK_METHOD0(doWakeUp, bool());
 	MOCK_METHOD0(doInitialize, bool());
+	MOCK_METHOD1(doUpdate, void(double));
 	MOCK_METHOD2(doFilterContacts, void(const std::shared_ptr<Physics::PhysicsManagerState>& state,
 										const std::shared_ptr<CollisionPair>& pairs));
 

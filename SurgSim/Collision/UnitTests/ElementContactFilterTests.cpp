@@ -92,7 +92,21 @@ public:
 
 TEST_F(ElementContactFilterTest, Accessors)
 {
-	std::vector<size_t> ignores(1, 1);
+	std::vector<size_t> expected(1, 10);
+
+	{
+		std::shared_ptr<Framework::Component> rep = std::make_shared<Physics::RigidCollisionRepresentation>("rep");
+		filter->setValue("Representation", rep);
+		auto result = filter->getValue <std::shared_ptr<Collision::Representation>>("Representation");
+		EXPECT_EQ(rep.get(), result.get());
+	}
+
+	{
+		EXPECT_NO_THROW(filter->setValue("FilterElements", expected));
+		auto result = filter->getValue<std::vector<size_t>>("FilterElements");
+		EXPECT_EQ(1u, result.size());
+		EXPECT_EQ(10u, result[0]);
+	}
 
 }
 
@@ -100,8 +114,9 @@ TEST_F(ElementContactFilterTest, Noop)
 {
 	EXPECT_NO_THROW(filter->filterContacts(state, pair));
 	std::vector<size_t> ignores(1, 1);
-
-	filter->setFilterElements(pair->getRepresentations().first, ignores);
+	filter->setRepresentation(pair->getRepresentations().first);
+	filter->setFilterElements(ignores);
+	filter->update(0.0);
 	EXPECT_NO_THROW(filter->filterContacts(state, pair));
 
 	pair->addContact(makeContact(0, 0, 0, 0));
@@ -114,7 +129,8 @@ TEST_F(ElementContactFilterTest, RemoveOnTriangleMesh)
 	std::vector<size_t> ignores;
 	ignores.push_back(0);
 	ignores.push_back(2);
-	filter->setFilterElements(pair->getRepresentations().first, ignores);
+	filter->setRepresentation(pair->getRepresentations().first);
+	filter->setFilterElements(ignores);
 
 	pair->addContact(makeContact(2, 10, 10, 10));
 	pair->addContact(makeContact(0, 10, 10, 10));
@@ -125,6 +141,9 @@ TEST_F(ElementContactFilterTest, RemoveOnTriangleMesh)
 
 	EXPECT_EQ(6u, pair->getContacts().size());
 	EXPECT_NO_THROW(filter->filterContacts(state, pair));
+	EXPECT_EQ(6u, pair->getContacts().size());
+	filter->update(0.0);
+	EXPECT_NO_THROW(filter->filterContacts(state, pair));
 	EXPECT_EQ(2u, pair->getContacts().size());
 }
 
@@ -133,7 +152,9 @@ TEST_F(ElementContactFilterTest, RemoveOnTriangleMeshSwapped)
 	std::vector<size_t> ignores;
 	ignores.push_back(0);
 	ignores.push_back(2);
-	filter->setFilterElements(pair->getRepresentations().first, ignores);
+	filter->setRepresentation(pair->getRepresentations().first);
+	filter->setFilterElements(ignores);
+	filter->update(0.0);
 
 	pair->swapRepresentations();
 
@@ -155,8 +176,9 @@ TEST_F(ElementContactFilterTest, RemoveOnSegmentMesh)
 	std::vector<size_t> ignores;
 	ignores.push_back(0);
 	ignores.push_back(2);
-	filter->setFilterElements(pair->getRepresentations().second, ignores);
-	auto type = pair->getRepresentations().second->getShapeType();
+	filter->setRepresentation(pair->getRepresentations().second);
+	filter->setFilterElements(ignores);
+	filter->update(0.0);
 
 	pair->addContact(makeContact(10, 10, 10, 0));
 	pair->addContact(makeContact(10, 10, 10, 1));
@@ -169,35 +191,6 @@ TEST_F(ElementContactFilterTest, RemoveOnSegmentMesh)
 	filter->filterContacts(state, pair);
 	EXPECT_EQ(2u, pair->getContacts().size());
 }
-
-TEST_F(ElementContactFilterTest, FilterOnBoth)
-{
-	{
-		std::vector<size_t> ignores;
-		ignores.push_back(0);
-		filter->setFilterElements(pair->getRepresentations().second, ignores);
-	}
-	{
-		std::vector<size_t> ignores;
-		ignores.push_back(100);
-		filter->setFilterElements(pair->getRepresentations().first, ignores);
-	}
-	auto type = pair->getRepresentations().second->getShapeType();
-
-	pair->addContact(makeContact(101, 10, 10, 2)); // Don't filter
-	pair->addContact(makeContact(100, 10, 10, 0)); // Filter due to both
-	pair->addContact(makeContact(100, 10, 10, 1)); // Filter due to index 100 on first shape
-	pair->addContact(makeContact(100, 10, 10, 2)); // Filter due to index 100 on first shape
-	pair->addContact(makeContact(100, 10, 10, 0)); // Filter due to both
-	pair->addContact(makeContact(101, 10, 10, 0)); // Filter due to index 0 on second shape
-	pair->addContact(makeContact(102, 10, 10, 3)); // Don't filter
-
-	EXPECT_EQ(7u, pair->getContacts().size());
-	filter->filterContacts(state, pair);
-	EXPECT_EQ(2u, pair->getContacts().size());
-}
-
-
 
 }
 }
