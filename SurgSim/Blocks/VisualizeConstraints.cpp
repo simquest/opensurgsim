@@ -114,6 +114,12 @@ void VisualizeConstraintsBehavior::update(double dt)
 					color = SurgSim::Math::Vector4d(0.9, 0.9, 0.9, 1);
 				}
 				break;
+				case SurgSim::Physics::FIXED_3DROTATION_VECTOR:
+				{
+					force = x.segment(mlcpConstraintIndex, 3);
+					color = SurgSim::Math::Vector4d(0.0, 0.0, 0.9, 1);
+				}
+				break;
 				case SurgSim::Physics::FRICTIONLESS_3DCONTACT:
 				{
 					const SurgSim::Math::Vector3d& forceNormal =
