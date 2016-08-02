@@ -130,7 +130,7 @@ void Constraint::build(double dt,
 		SurgSim::Math::Vector3d axis;
 		SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
 
-		mlcp->b.segment(indexOfConstraint, this->getNumDof()) = angle * axis;
+		mlcp->b.segment<3>(indexOfConstraint) = angle * axis;
 	}
 
 	mlcp->constraintTypes.push_back(
