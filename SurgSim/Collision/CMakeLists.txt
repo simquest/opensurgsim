@@ -21,8 +21,8 @@ set(SURGSIM_COLLISION_SOURCES
 	CapsuleSphereContact.cpp
 	CollisionPair.cpp
 	CompoundShapeContact.cpp
-	ContactFilter.cpp
 	ContactCalculation.cpp
+	ContactFilter.cpp
 	DefaultContactCalculation.cpp
 	OctreeCapsuleContact.cpp
 	OctreeContact.cpp

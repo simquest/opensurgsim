@@ -34,7 +34,7 @@ namespace Collision
 class CollisionPair;
 
 /// Base class to implement a contact filter, the job of this class is to be executed by the ContactFiltering stage
-/// in the PhysicsManager, in most cases there should be only one filter per scenario.
+/// in the PhysicsManager.
 /// Filters are being executed in parallel over all CollisionPair objects that have contacts, be careful with thread
 /// safety of the doFilterContacts function and all other writes to class members in your subclass
 class ContactFilter : public Framework::Component
