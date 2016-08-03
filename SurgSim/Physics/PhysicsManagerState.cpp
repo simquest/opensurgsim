@@ -159,6 +159,16 @@ const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& PhysicsMa
 	return m_collisionPairs;
 }
 
+void PhysicsManagerState::setContactFilters(const std::vector<std::shared_ptr<SurgSim::Collision::ContactFilter>>& val)
+{
+	m_contactFilters = val;
+}
+
+std::vector<std::shared_ptr<SurgSim::Collision::ContactFilter>> PhysicsManagerState::getContactFilters() const
+{
+	return m_contactFilters;
+}
+
 void PhysicsManagerState::setConstraintGroup(
 	ConstraintGroupType type,
 	const std::vector<std::shared_ptr<Constraint>>& constraints)

@@ -201,7 +201,7 @@ TEST_F(ContactConstraintGenerationTests, LocalPoses)
 	Vector3d localizationGlobalPosition = localization->calculatePosition();
 	Vector3d locationGlobalPosition = collision0->getPose() * location.rigidLocalPosition.getValue();
 	EXPECT_TRUE(localizationGlobalPosition.isApprox(locationGlobalPosition)) <<
-		"The contact location is not in the same position as the localization produced by constraint generation";
+			"The contact location is not in the same position as the localization produced by constraint generation";
 }
 
 
