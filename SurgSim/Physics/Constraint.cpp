@@ -82,59 +82,6 @@ void Constraint::build(double dt,
 	size_t indexOfConstraint)
 {
 	doBuild(dt, *m_data.get(), mlcp, indexOfRepresentation0, indexOfRepresentation1, indexOfConstraint);
-
-	m_implementations.first->build(
-		dt,
-		*m_data.get(),
-		m_localizations.first,
-		mlcp,
-		indexOfRepresentation0,
-		indexOfConstraint,
-		CONSTRAINT_POSITIVE_SIDE);
-
-	SurgSim::Math::Vector3d rotationVector1 = SurgSim::Math::Vector3d::Zero();
-	SurgSim::Math::Quaterniond q1 = SurgSim::Math::Quaterniond::Identity();
-	if (m_constraintType == FIXED_3DROTATION_VECTOR)
-	{
-		rotationVector1 = mlcp->b.segment<3>(indexOfConstraint);
-		if (rotationVector1.norm() > 1e-8)
-		{
-			q1 = SurgSim::Math::makeRotationQuaternion(rotationVector1.norm(), rotationVector1.normalized());
-		}
-	}
-
-	m_implementations.second->build(
-		dt,
-		*m_data.get(),
-		m_localizations.second,
-		mlcp,
-		indexOfRepresentation1,
-		indexOfConstraint,
-		CONSTRAINT_NEGATIVE_SIDE);
-
-	SurgSim::Math::Vector3d rotationVector2 = SurgSim::Math::Vector3d::Zero();
-	SurgSim::Math::Quaterniond q2 = SurgSim::Math::Quaterniond::Identity();
-	if (m_constraintType == FIXED_3DROTATION_VECTOR)
-	{
-		rotationVector2 = rotationVector1 - mlcp->b.segment<3>(indexOfConstraint);
-		if (rotationVector2.norm() > 1e-8)
-		{
-			q2 = SurgSim::Math::makeRotationQuaternion(rotationVector2.norm(), rotationVector2.normalized());
-		}
-	}
-
-	// Transform the data to have a rotation vector violation as a rotation vector
-	if (m_constraintType == FIXED_3DROTATION_VECTOR)
-	{
-		double angle;
-		SurgSim::Math::Vector3d axis;
-		SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
-
-		mlcp->b.segment<3>(indexOfConstraint) = angle * axis;
-	}
-
-	mlcp->constraintTypes.push_back(
-				(m_constraintType != INVALID_CONSTRAINT) ? m_mlcpMap[m_constraintType] : Math::MLCP_INVALID_CONSTRAINT);
 }
 
 bool Constraint::isActive()
@@ -155,6 +102,26 @@ void Constraint::doBuild(double dt,
 	size_t indexOfRepresentation1,
 	size_t indexOfConstraint)
 {
+	m_implementations.first->build(
+		dt,
+		*m_data.get(),
+		m_localizations.first,
+		mlcp,
+		indexOfRepresentation0,
+		indexOfConstraint,
+		CONSTRAINT_POSITIVE_SIDE);
+
+	m_implementations.second->build(
+		dt,
+		*m_data.get(),
+		m_localizations.second,
+		mlcp,
+		indexOfRepresentation1,
+		indexOfConstraint,
+		CONSTRAINT_NEGATIVE_SIDE);
+
+	mlcp->constraintTypes.push_back(
+		(m_constraintType != INVALID_CONSTRAINT) ? m_mlcpMap[m_constraintType] : Math::MLCP_INVALID_CONSTRAINT);
 }
 
 void Constraint::setInformation(ConstraintType constraintType,

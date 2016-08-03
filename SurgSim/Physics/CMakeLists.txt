@@ -84,6 +84,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
 	RigidState.cpp
+	RotationVectorConstraint.cpp
 	SlidingConstraint.cpp
 	SlidingConstraintData.cpp
 	SolveMlcp.cpp
@@ -175,6 +176,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
 	RigidState.h
+	RotationVectorConstraint.h
 	RotationVectorConstraintData.h
 	SlidingConstraint.h
 	SlidingConstraintData.h
