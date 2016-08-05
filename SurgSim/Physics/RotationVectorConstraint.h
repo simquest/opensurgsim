@@ -41,6 +41,11 @@ public:
 	virtual ~RotationVectorConstraint();
 
 protected:
+	/// \note The rotation vector violation being calculated based on a quaternion interpolation (slerp), and this
+	/// type of interpolation being highly non-linear, the classical way of using the implementation one after the
+	/// other one won't work.
+	/// Therefore, this method temporarily uses the vector mlcpPhysicsProblem->b to retrieve both representation's
+	/// rotation vectors, then calculate the proper slerp and set the violation back in mlcpPhysicsProblem->b
 	void doBuild(double dt,
 		const ConstraintData& data,
 		MlcpPhysicsProblem* mlcpPhysicsProblem,
