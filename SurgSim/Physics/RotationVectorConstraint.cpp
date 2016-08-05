@@ -55,6 +55,8 @@ void RotationVectorConstraint::doBuild(double dt,
 		indexOfConstraint,
 		CONSTRAINT_POSITIVE_SIDE);
 
+	// This uses the vector mlcp->b as a temporary vector to retrieve the 1st rotation vector
+	// mlcp->b = rotationVector1
 	SurgSim::Math::Vector3d rotationVector1 = mlcp->b.segment<3>(indexOfConstraint);
 	SurgSim::Math::Quaterniond q1 = SurgSim::Math::Quaterniond::Identity();
 	if (rotationVector1.norm() > 1e-8)
@@ -71,6 +73,8 @@ void RotationVectorConstraint::doBuild(double dt,
 		indexOfConstraint,
 		CONSTRAINT_NEGATIVE_SIDE);
 
+	// This uses the vector mlcp->b as a temporary vector to retrieve the 2nd rotation vector
+	// mlcp->b = rotationVector1 - rotationVector2
 	SurgSim::Math::Vector3d rotationVector2 = rotationVector1 - mlcp->b.segment<3>(indexOfConstraint);
 	SurgSim::Math::Quaterniond q2 = SurgSim::Math::Quaterniond::Identity();
 	if (rotationVector2.norm() > 1e-8)
@@ -82,6 +86,7 @@ void RotationVectorConstraint::doBuild(double dt,
 	double angle;
 	SurgSim::Math::Vector3d axis;
 	SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
+	// Set mlcp->b with the properly calculated rotation vector, using a quaternion interpolation.
 	mlcp->b.segment<3>(indexOfConstraint) = angle * axis;
 
 	mlcp->constraintTypes.push_back(
