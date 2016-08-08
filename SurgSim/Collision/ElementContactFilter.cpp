@@ -113,7 +113,7 @@ void ElementContactFilter::doFilterContacts(const std::shared_ptr<Physics::Physi
 	{
 		if (pairAt(pair->getRepresentations(), i).get() == getRepresentation().get())
 		{
-			excecuteFilter(pair, i, m_indices);
+			executeFilter(pair, i, m_indices);
 		}
 	}
 }
@@ -123,7 +123,7 @@ void ElementContactFilter::doUpdate(double dt)
 	m_writeBuffer.tryGetChanged(&m_indices);
 }
 
-void ElementContactFilter::excecuteFilter(
+void ElementContactFilter::executeFilter(
 	const std::shared_ptr<CollisionPair>& pair,
 	size_t pairIndex,
 	const std::vector<size_t>& filter)

@@ -36,6 +36,8 @@ struct Contact;
 
 SURGSIM_STATIC_REGISTRATION(ElementContactFilter);
 
+/// Given a DeformableCollisionRepresentation this filter can remove contacts on specific elements of that
+/// representation. The contacts will be flatly removed.
 class ElementContactFilter : public ContactFilter
 {
 public:
@@ -47,13 +49,17 @@ public:
 
 	bool doWakeUp() override;
 
+	/// Sets the indices of the elements that will have their contacts ignored
+	/// \param indices element indices to ignore
 	void setFilterElements(const std::vector<size_t>& indices);
 
+	/// \return the currently ignored indices
 	std::vector<size_t> getFilterElements() const;
 
+	/// Clear the indices to be ignored
 	void clearFilterElements();
 
-	/// Sets the representation used for filtering
+	/// Sets the representation used for filtering, can only be used before initialization
 	/// \param val the collision representation to be used for filtering
 	void setRepresentation(const std::shared_ptr<SurgSim::Framework::Component>& val);
 
@@ -85,12 +91,18 @@ private:
 	/// \param pair the collision pair that is being filtered
 	/// \param pairIndex 0/1 representing first, and second values of the pair data structure
 	/// \param filter indices to filter
-	void excecuteFilter(
+	void executeFilter(
 		const std::shared_ptr<CollisionPair>& pair,
 		size_t pairIndex,
 		const std::vector<size_t>& filter);
 };
 
+/// Get member of pair data via indexed access, the members of the pair have to have the same type
+/// const version
+/// \tparam T the member type
+/// \param p the pair
+/// \param i the index to access
+/// \return p.first if index == 0 and p.second if index == 1
 template <class T>
 const T& pairAt(const std::pair<T, T>& p, size_t i)
 {
@@ -98,6 +110,12 @@ const T& pairAt(const std::pair<T, T>& p, size_t i)
 	return (i == 0) ? p.first : p.second;
 };
 
+/// Get member of pair data via indexed access, the members of the pair have to have the same type
+/// non-const version
+/// \tparam T the member type
+/// \param p the pair
+/// \param i the index to access
+/// \return p.first if index == 0 and p.second if index == 1
 template <class T>
 T& pairAt(std::pair<T, T>& p, size_t i)
 {

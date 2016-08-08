@@ -96,6 +96,10 @@ public:
 		}
 	}
 
+	/// Gives access to the coordinates via enum rather than  '.' public member access, this can reduce complexity
+	/// in the calling code
+	/// \param meshType (TRIANGLE or ELEMENT)
+	/// \return the appropriate coordinate for the type of mesh
 	const SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& get(Type meshType)
 	{
 		static SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> null;
