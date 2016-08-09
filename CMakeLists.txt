@@ -126,7 +126,6 @@ if(BUILD_EXAMPLES)
 	add_subdirectory(Examples)
 endif()
 
-add_subdirectory(Modules)
 
 option(BUILD_DOCUMENTATION "Build the documentation using Doxygen." OFF)
 
@@ -180,6 +179,7 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 option(BUILD_TOOLS "Build Tool Utilities" OFF)
 
+add_subdirectory(Modules)
 if(BUILD_TOOLS)
   add_subdirectory(Tools)
 endif(BUILD_TOOLS)
