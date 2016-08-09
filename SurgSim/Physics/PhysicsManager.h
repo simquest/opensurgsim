@@ -34,6 +34,7 @@ namespace Collision
 {
 class CollisionPair;
 class Representation;
+class ContactFilter;
 }
 
 namespace Framework
@@ -104,9 +105,12 @@ protected:
 
 	std::vector<std::shared_ptr<Collision::Representation>> m_collisionRepresentations;
 
+	std::vector<std::shared_ptr<Collision::ContactFilter>> m_contactFilters;
+
 	std::vector<std::shared_ptr<Particles::Representation>> m_particleRepresentations;
 
 	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
+
 
 	/// A list of computations, to perform the physics update.
 	std::vector<std::shared_ptr<SurgSim::Physics::Computation>> m_computations;

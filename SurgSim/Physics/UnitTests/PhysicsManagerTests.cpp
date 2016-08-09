@@ -19,7 +19,8 @@
 /// add and removal of components, for this to work correctly PhysicsManagerTest is required
 /// to be in the SurgSim::Physics namespace.
 
-#include <gtest/gtest.h>
+
+#include <gmock/gmock.h>
 
 #include <string>
 #include <memory>
@@ -41,8 +42,24 @@ using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 
+
 namespace SurgSim
 {
+
+namespace Collision
+{
+class MockContactFilter : public Collision::ContactFilter
+{
+public:
+	MockContactFilter(const std::string& name) : ContactFilter(name) {}
+	MOCK_METHOD0(doWakeUp, bool());
+	MOCK_METHOD0(doInitialize, bool());
+	MOCK_METHOD2(doFilterContacts, void(const std::shared_ptr<Physics::PhysicsManagerState>& state,
+										const std::shared_ptr<CollisionPair>& pairs));
+
+};
+}
+
 namespace Physics
 {
 
@@ -106,6 +123,21 @@ TEST_F(PhysicsManagerTest, AddRemoveCollisionRepresentation)
 	EXPECT_TRUE(testDoRemoveComponent(representation1));
 	EXPECT_FALSE(testDoRemoveComponent(representation1));
 	EXPECT_TRUE(testDoRemoveComponent(representation2));
+}
+
+TEST_F(PhysicsManagerTest, AddRemoveContactFilter)
+{
+	auto filter1 = std::make_shared<Collision::MockContactFilter>("filter1");
+	auto filter2 = std::make_shared<Collision::MockContactFilter>("filter2");
+
+	EXPECT_TRUE(testDoAddComponent(filter1));
+	EXPECT_TRUE(testDoAddComponent(filter2));
+	EXPECT_FALSE(testDoAddComponent(filter1));
+
+	EXPECT_TRUE(testDoRemoveComponent(filter1));
+	EXPECT_FALSE(testDoRemoveComponent(filter1));
+	EXPECT_TRUE(testDoRemoveComponent(filter2));
+
 }
 
 TEST_F(PhysicsManagerTest, AddRemoveConstraintComponent)

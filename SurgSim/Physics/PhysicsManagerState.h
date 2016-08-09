@@ -21,6 +21,7 @@
 #include <unordered_map>
 
 #include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/ContactFilter.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Particles/Representation.h"
 #include "SurgSim/Physics/Constraint.h"
@@ -123,6 +124,14 @@ public:
 	/// \return	The collision pairs.
 	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& getCollisionPairs();
 
+	/// Set the list of contact filters
+	/// \param val the list of contact filters
+	void setContactFilters(const std::vector<std::shared_ptr<SurgSim::Collision::ContactFilter>>& val);
+
+	/// \return the list of contact filters
+	std::vector<std::shared_ptr<SurgSim::Collision::ContactFilter>> getContactFilters() const;
+
+
 	/// Sets the group of constraints to a given value, the grouping indicates what type of constraint we are dealing
 	/// with.
 	/// \param	type	   	The type of constraint grouping e.g. Contact Constraints.
@@ -188,6 +197,7 @@ public:
 	/// Set whether to abort the current grouped computation
 	/// \param val set to true to signal to an above computation to abort
 	void setAbortGroup(bool val);
+
 private:
 
 	///@{
@@ -200,16 +210,19 @@ private:
 	/// The list of active representations.
 	std::vector<std::shared_ptr<Representation>> m_activeRepresentations;
 
-	/// List of all the collision representations know to the state
+	/// List of all the collision representations known to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
 
-	/// List of all the active collision representations know to the state
+	/// List of all the active collision representations known to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_activeCollisionRepresentations;
 
-	/// List of all the particle representations know to the state
+	/// List of all the collision filters known to the state
+	std::vector <std::shared_ptr<Collision::ContactFilter>> m_contactFilters;
+
+	/// List of all the particle representations known to the state
 	std::vector<std::shared_ptr<SurgSim::Particles::Representation>> m_particleRepresentations;
 
-	/// List of all the active particle representations know to the state
+	/// List of all the active particle representations known to the state
 	std::vector<std::shared_ptr<SurgSim::Particles::Representation>> m_activeParticleRepresentations;
 
 	/// List of the constraint components

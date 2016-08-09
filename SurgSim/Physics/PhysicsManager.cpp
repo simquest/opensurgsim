@@ -21,6 +21,7 @@
 #include "SurgSim/Physics/CcdCollisionLoop.h"
 #include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
+#include "SurgSim/Physics/ContactFiltering.h"
 #include "SurgSim/Physics/DcdCollision.h"
 #include "SurgSim/Physics/FreeMotion.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
@@ -91,17 +92,19 @@ bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::
 {
 	std::shared_ptr<Representation> representation = tryAddComponent(component, &m_representations);
 	std::shared_ptr<Collision::Representation> collisionRep = tryAddComponent(component, &m_collisionRepresentations);
+	std::shared_ptr<Collision::ContactFilter> contactFilter = tryAddComponent(component, &m_contactFilters);
 	std::shared_ptr<Particles::Representation> particles = tryAddComponent(component, &m_particleRepresentations);
 	std::shared_ptr<ConstraintComponent> constraintComponent = tryAddComponent(component, &m_constraintComponents);
 
-	return representation != nullptr || collisionRep != nullptr || particles != nullptr ||
-		   constraintComponent != nullptr;
+	return  representation != nullptr || collisionRep != nullptr || contactFilter != nullptr ||
+			particles != nullptr || constraintComponent != nullptr;
 }
 
 bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryRemoveComponent(component, &m_representations) ||
 		   tryRemoveComponent(component, &m_collisionRepresentations) ||
+		   tryRemoveComponent(component, &m_contactFilters) ||
 		   tryRemoveComponent(component, &m_constraintComponents) ||
 		   tryRemoveComponent(component, &m_particleRepresentations);
 }
@@ -115,6 +118,7 @@ bool PhysicsManager::doUpdate(double dt)
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList(1, state);
 	state->setRepresentations(m_representations);
 	state->setCollisionRepresentations(m_collisionRepresentations);
+	state->setContactFilters(m_contactFilters);
 	state->setParticleRepresentations(m_particleRepresentations);
 	state->setConstraintComponents(m_constraintComponents);
 
@@ -177,6 +181,7 @@ std::vector<std::shared_ptr<Physics::Computation>> createDcdPipeline(bool copySt
 	result.push_back(std::make_shared<PrepareCollisionPairs>(copyState));
 	result.push_back(std::make_shared<UpdateDcdData>(copyState));
 	result.push_back(std::make_shared<DcdCollision>(copyState));
+	result.push_back(std::make_shared<ContactFiltering>(copyState));
 	result.push_back(std::make_shared<ContactConstraintGeneration>(copyState));
 	result.push_back(std::make_shared<BuildMlcp>(copyState));
 	result.push_back(std::make_shared<SolveMlcp>(copyState));
