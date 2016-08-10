@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/TriangleMeshTriangleMeshContact.h"
+#include "SurgSim/Collision/TriangleMeshSurfaceMeshContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
@@ -69,9 +69,9 @@ static const int cubeTrianglesCCW[12][3] =
 	{0, 4, 7}, {0, 7, 3}  // Left   (-1  0  0) [0473]
 };
 
-void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
+void doTriangleMeshSurfaceMeshTest(std::shared_ptr<MeshShape> meshA,
 									const RigidTransform3d& meshATransform,
-									std::shared_ptr<MeshShape> meshB,
+									std::shared_ptr<Math::SurfaceMeshShape> meshB,
 									const RigidTransform3d& meshBTransform,
 									const std::list<std::shared_ptr<Contact>> expectedContacts)
 {
@@ -86,20 +86,21 @@ void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 	meshBRep->setLocalPose(meshBTransform);
 
 	// Perform collision detection.
-	TriangleMeshTriangleMeshContact calcContact;
+	TriangleMeshSurfaceMeshContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
 	calcContact.calculateContact(pair);
 
 	contactsInfoEqualityTest(expectedContacts, pair->getContacts(), true);
 }
 
-TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
+TEST(TriangleMeshSurfaceMeshContactCalculationTests, NonintersectionTest)
 {
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRotationQuaternion;
 
 	// Create a Mesh Cube
-	std::shared_ptr<TriangleMeshPlain> mesh = std::make_shared<TriangleMeshPlain>();
+	std::shared_ptr<TriangleMeshPlain> meshA = std::make_shared<TriangleMeshPlain>();
+	std::shared_ptr<TriangleMeshPlain> meshB = std::make_shared<TriangleMeshPlain>();
 	for (int i = 0; i < cubeNumPoints; ++i)
 	{
 		Vector3d p;
@@ -107,7 +108,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		p[1] = cubePoints[i][1];
 		p[2] = cubePoints[i][2];
 		TriangleMeshPlain::VertexType v(p);
-		mesh->addVertex(v);
+		meshA->addVertex(v);
+		meshB->addVertex(v);
 	}
 	for (int i = 0; i < cubeNumEdges; ++i)
 	{
@@ -117,7 +119,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			edgePoints[j] = cubeEdges[i][j];
 		}
 		TriangleMeshPlain::EdgeType e(edgePoints);
-		mesh->addEdge(e);
+		meshA->addEdge(e);
+		meshB->addEdge(e);
 	}
 	for (int i = 0; i < cubeNumTriangles; ++i)
 	{
@@ -127,11 +130,15 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
 		}
 		TriangleMeshPlain::TriangleType t(trianglePoints);
-		mesh->addTriangle(t);
+		meshA->addTriangle(t);
+		if (i < cubeNumTriangles - 2)
+		{
+			meshB->addTriangle(t);
+		}
 	}
 
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshB = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA = std::make_shared<SurgSim::Math::MeshShape>(*meshA);
+	std::shared_ptr<Math::SurfaceMeshShape> cubeMeshB = std::make_shared<Math::SurfaceMeshShape>(*meshB);
 
 	SurgSim::Math::RigidTransform3d cubeMeshATransform;
 	SurgSim::Math::RigidTransform3d cubeMeshBTransform;
@@ -150,7 +157,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
+		doTriangleMeshSurfaceMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
@@ -162,7 +169,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
+		doTriangleMeshSurfaceMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
@@ -174,7 +181,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
+		doTriangleMeshSurfaceMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
@@ -186,7 +193,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
+		doTriangleMeshSurfaceMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
@@ -198,7 +205,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
+		doTriangleMeshSurfaceMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
@@ -210,7 +217,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
+		doTriangleMeshSurfaceMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 }
 
@@ -258,7 +265,7 @@ void addNewTriangle(std::shared_ptr<TriangleMeshPlain> mesh,
 }
 }
 
-TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
+TEST(TriangleMeshSurfaceMeshContactCalculationTests, IntersectionTest)
 {
 	using SurgSim::Math::MeshShape;
 	using SurgSim::Math::Vector3d;
@@ -269,7 +276,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			   SurgSim::Math::makeRotationQuaternion(0.3468, Vector3d(0.2577, 0.8245, 1.0532).normalized()),
 			   Vector3d(120.34, 567.23, -832.84));
 	{
-		// The second mesh.
+		// The first mesh.
 		auto intersectingTriangle = std::make_shared<TriangleMeshPlain>();
 		addNewTriangle(intersectingTriangle,
 					   Vector3d(0.0, 0.0, 0.0),
@@ -284,55 +291,50 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 
 		std::list<std::shared_ptr<Contact>> expectedContacts;
 		double expectedDepth;
-		double zOffset = 0.5 / numTriangles;
+		double zIncrement = 1.0 / (numTriangles + 1);
 		double zValue;
 		std::pair<Location, Location> expectedPenetrationPoints;
 		Vector3d expectedPoint0, expectedPoint1;
 		Vector3d expectedNormal, expectedContact(0, 0, 0);
-		for (int i = 0; i < numTriangles - 1; i++)
+		for (int i = 0; i < numTriangles; i++)
 		{
-			zValue = static_cast<double>(i) / numTriangles + zOffset;
+			zValue = static_cast<double>(i + 1) * zIncrement;
 			addNewTriangle(baseTriangles,
-						   Vector3d(0.5, 0.5, zValue),
-						   Vector3d(-0.5, 0.5, zValue),
-						   Vector3d(0.0, -0.5, zValue));
+						   Vector3d(50, 50, zValue),
+						   Vector3d(-50, 50, zValue),
+						   Vector3d(0, -50, zValue));
 			expectedDepth = zValue;
 			if (expectedDepth >= 0.5)
 			{
-				expectedDepth = 0.5;
-				expectedNormal = pose.linear() * Vector3d(0, 1, 0);
-				expectedPoint0 = Vector3d(0, -0.5, zValue);
+				expectedDepth = 1.0 - expectedDepth;
+				expectedNormal = pose.linear() * Vector3d(0, 0, -1);
+				expectedPoint0 = Vector3d(0, 0, 1.0);
 				expectedPoint1 = Vector3d(0, 0, zValue);
 			}
 			else
 			{
-				expectedNormal = pose.linear() * Vector3d(0, 0, -1);
-				expectedPoint0 = Vector3d(0, 0, zValue);
-				expectedPoint1 = Vector3d(0, 0, 0);
+				expectedNormal = pose.linear() * Vector3d(0, 0, 1);
+				expectedPoint0 = Vector3d(0, 0, 0.0);
+				expectedPoint1 = Vector3d(0, 0, zValue);
 			}
 			if (expectedDepth > 0.0)
 			{
 				expectedPenetrationPoints.first.rigidLocalPosition.setValue(expectedPoint0);
 				expectedPenetrationPoints.second.rigidLocalPosition.setValue(expectedPoint1);
 				SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
-				triangleLocalPosition.index = i;
-				expectedPenetrationPoints.first.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
 				triangleLocalPosition.index = 0;
+				expectedPenetrationPoints.first.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
+				triangleLocalPosition.index = i;
 				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
 				auto contact = std::make_shared<TriangleContact>(
 								   COLLISION_DETECTION_TYPE_DISCRETE, expectedDepth,
 								   1.0, expectedContact, expectedNormal, expectedPenetrationPoints);
-				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
-				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
-				for (size_t i = 0; i < 3; ++i)
-				{
-					contact->firstVertices[i] = contact->firstVertices[i];
-					contact->secondVertices[i] = contact->secondVertices[i];
-				}
+				contact->firstVertices = intersectingTriangle->getTrianglePositions(0);
+				contact->secondVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
 				expectedContacts.push_back(contact);
 			}
 		}
-		auto baseMesh = std::make_shared<MeshShape>(*baseTriangles);
+		auto baseMesh = std::make_shared<Math::SurfaceMeshShape>(*baseTriangles);
 
 		// Looking in -y, triangle A points in +y, +z is left, +x is down
 		//                     |-------| => k
@@ -369,126 +371,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 		//                 |--| => 2k
 		//
 
-		doTriangleMeshTriangleMeshTest(baseMesh, pose, triangleMesh,
-									   pose, expectedContacts);
-	}
-}
-
-TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTestAtIdenticalDepth)
-{
-	using SurgSim::Math::MeshShape;
-	using SurgSim::Math::Vector3d;
-	using SurgSim::Math::RigidTransform3d;
-
-	RigidTransform3d pose;
-	pose = SurgSim::Math::makeRigidTransform(
-			   SurgSim::Math::makeRotationQuaternion(0.4638, Vector3d(0.5727, 0.2485, 1.532).normalized()),
-			   Vector3d(210.34, 675.23, -283.84));
-	pose = SurgSim::Math::makeRigidTransform(
-			   SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.5727, 0.2485, 1.532).normalized()),
-			   Vector3d(0, 0, 0));
-
-	{
-		// The second mesh.
-		const double e = 8e-11;
-		auto intersectingTriangle = std::make_shared<TriangleMeshPlain>();
-		addNewTriangle(intersectingTriangle,
-					   Vector3d(e, 0.0, 0.0),
-					   Vector3d(-0.5, 0.0, 1.0),
-					   Vector3d(e, 0.0, 1.0));
-		auto triangleMesh = std::make_shared<MeshShape>(*intersectingTriangle);
-
-		// The first mesh.
-		auto baseTriangles = std::make_shared<TriangleMeshPlain>();
-
-		static const size_t numTriangles = 100;
-		SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition;
-
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		double expectedDepth;
-		double expectedTime;
-		double interval = 1.0 / static_cast<double>(numTriangles + 1);
-		double coordinate;
-		std::pair<Location, Location> expectedPenetrationPoints;
-		Vector3d expectedPoint0, expectedPoint1;
-		Vector3d expectedNormal, expectedContact(0, 0, 0);
-		for (size_t i = 0; i < numTriangles; i++)
-		{
-			coordinate = interval * static_cast<double>(i + 1);
-
-			addNewTriangle(baseTriangles,
-						   Vector3d(-e, -coordinate, coordinate),
-						   Vector3d(0.5, 1.0 - coordinate, coordinate),
-						   Vector3d(-e, 1.0 - coordinate, coordinate));
-			expectedDepth = coordinate;
-			expectedTime = 1.0;
-			{
-				expectedPenetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0, 0, coordinate));
-				expectedPenetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0, 0, 0));
-				triangleLocalPosition.index = i;
-				expectedPenetrationPoints.first.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
-				triangleLocalPosition.index = 0;
-				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
-				auto contact = std::make_shared<TriangleContact>(
-								   COLLISION_DETECTION_TYPE_DISCRETE,
-								   expectedDepth, expectedTime, expectedContact,
-								   pose.linear() * Vector3d(0, 0, -1),
-								   expectedPenetrationPoints);
-				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
-				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
-				for (size_t i = 0; i < 3; ++i)
-				{
-					contact->firstVertices[i] = contact->firstVertices[i];
-					contact->secondVertices[i] = contact->secondVertices[i];
-				}
-				expectedContacts.push_back(contact);
-			}
-			{
-				expectedPenetrationPoints.first.rigidLocalPosition.setValue(Vector3d(0, -coordinate, coordinate));
-				expectedPenetrationPoints.second.rigidLocalPosition.setValue(Vector3d(0, 0, coordinate));
-				triangleLocalPosition.index = i;
-				expectedPenetrationPoints.first.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
-				triangleLocalPosition.index = 0;
-				expectedPenetrationPoints.second.triangleMeshLocalCoordinate.setValue(triangleLocalPosition);
-				auto contact = std::make_shared<TriangleContact>(
-								   COLLISION_DETECTION_TYPE_DISCRETE,
-								   expectedDepth, expectedTime, expectedContact,
-								   pose.linear() * Vector3d(0, 1, 0),
-								   expectedPenetrationPoints);
-				contact->firstVertices = baseTriangles->getTrianglePositions(baseTriangles->getNumTriangles() - 1);
-				contact->secondVertices = intersectingTriangle->getTrianglePositions(0);
-				for (size_t i = 0; i < 3; ++i)
-				{
-					contact->firstVertices[i] = contact->firstVertices[i];
-					contact->secondVertices[i] = contact->secondVertices[i];
-				}
-				expectedContacts.push_back(contact);
-			}
-		}
-		auto baseMesh = std::make_shared<MeshShape>(*baseTriangles);
-
-		std::shared_ptr<ShapeCollisionRepresentation> meshARep =
-			std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 0");
-		meshARep->setShape(baseMesh);
-		meshARep->setLocalPose(pose);
-
-		std::shared_ptr<ShapeCollisionRepresentation> meshBRep =
-			std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 1");
-		meshBRep->setShape(triangleMesh);
-		meshBRep->setLocalPose(pose);
-
-		// Perform collision detection.
-		TriangleMeshTriangleMeshContact calcContact;
-		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
-		calcContact.calculateContact(pair);
-
-		auto& calculatedContacts = pair->getContacts();
-		EXPECT_EQ(numTriangles, calculatedContacts.size());
-
-		for (auto it = calculatedContacts.begin(); it != calculatedContacts.end(); ++it)
-		{
-			EXPECT_TRUE(isContactPresentInList(*it, expectedContacts, false));
-		}
+		doTriangleMeshSurfaceMeshTest(triangleMesh, pose, baseMesh, pose, expectedContacts);
 	}
 }
 

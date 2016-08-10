@@ -23,6 +23,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SegmentMeshShape.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/SurfaceMeshShape.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 
@@ -51,10 +52,11 @@ bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shap
 	bool result = false;
 	const size_t numNodes = odeState.getNumNodes();
 
-	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
+	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+		shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
 	{
 		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(shape);
-		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
+		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
 		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
 				"The number of nodes in the deformable does not match the number of vertices in the mesh.";
 
@@ -121,7 +123,8 @@ int DeformableCollisionRepresentation::getShapeType() const
 void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
 	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
-				   shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
+				   shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH ||
+				   shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
 			<< "Deformable collision shape has to be a mesh.  But what passed in is " << shape->getType();
 
 	m_shape = shape;
@@ -183,14 +186,16 @@ void DeformableCollisionRepresentation::updateCcdData(double interval)
 	if (m_previousShape == nullptr)
 	{
 		if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
-			m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
+			m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH ||
+			m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
 		{
 			m_previousShape = m_shape->getTransformed(Math::RigidTransform3d::Identity());
 		}
 		else
 		{
 			SURGSIM_FAILURE() << "Invalid type, should be MeshShape(" << SurgSim::Math::SHAPE_TYPE_MESH <<
-							  ") or SegmentMeshShape(" << SurgSim::Math::SHAPE_TYPE_SEGMENTMESH << "), but it is " <<
+							  ") or SegmentMeshShape(" << SurgSim::Math::SHAPE_TYPE_SEGMENTMESH <<
+							  ") or SurfaceMeshShape(" << SurgSim::Math::SHAPE_TYPE_SURFACEMESH <<"), but it is " <<
 							  m_shape->getType();
 		}
 	}

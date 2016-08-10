@@ -142,7 +142,7 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 
 bool SurfaceMeshShape::isValid() const
 {
-	return (m_thickness > 1e-5) && isValid();
+	return (m_thickness > 1e-5) && MeshShape::isValid();
 }
 
 }; // namespace Math
