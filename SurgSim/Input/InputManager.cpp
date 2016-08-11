@@ -65,24 +65,16 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 	if (input != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		if (addInputComponent(input))
-		{
-			return true;
-		}
-		tryRemoveComponent(component, &m_inputs);
-		return false;
+		addInputComponent(input);
+		return true;
 	}
 
 	auto output = tryAddComponent(component, &m_outputs);
 	if (output != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		if (addOutputComponent(output))
-		{
-			return true;
-		}
-		tryRemoveComponent(component, &m_outputs);
-		return false;
+		addOutputComponent(output);
+		return true;
 	}
 
 	// If we got he the component was neither an Input nor and OutputComponent, no add was performed
@@ -97,20 +89,20 @@ bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Com
 	if (tryRemoveComponent(component, &m_inputs))
 	{
 		auto input = std::static_pointer_cast<InputComponent>(component);
-		auto deviceName = input->getDeviceName();
-		if (m_devices.count(deviceName) > 0)
+		DeviceInterface* device = nullptr;
+		if (tryFindDevice(input->getDeviceName(), &device))
 		{
-			m_devices[deviceName]->removeInputConsumer(input);
+			device->removeInputConsumer(input);
 		}
 		result = true;
 	}
 	else if (tryRemoveComponent(component, &m_outputs))
 	{
 		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
-		auto deviceName = output->getDeviceName();
-		if (m_devices.count(deviceName) > 0)
+		DeviceInterface* device = nullptr;
+		if (tryFindDevice(output->getDeviceName(), &device))
 		{
-			m_devices[deviceName]->removeOutputProducer(output);
+			device->removeOutputProducer(output);
 		}
 		result = true;
 	}
@@ -120,7 +112,6 @@ bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Com
 bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& input)
 {
 	bool result = false;
-
 	DeviceInterface* device = nullptr;
 	if (tryFindDevice(input->getDeviceName(), &device))
 	{
@@ -141,36 +132,28 @@ bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& ou
 {
 	bool result = false;
 	const auto outputName = output->getFullName();
-	if (output->getConnect())
+	const auto deviceName = output->getDeviceName();
+	DeviceInterface* device = nullptr;
+	if (tryFindDevice(deviceName, &device))
 	{
-		const auto deviceName = output->getDeviceName();
-		DeviceInterface* device = nullptr;
-		if (tryFindDevice(deviceName, &device))
+		if (device->hasOutputProducer())
 		{
-			if (device->hasOutputProducer())
-			{
-				SURGSIM_LOG_WARNING(m_logger) << "Trying to add OutputProducer " << outputName
-					<< " to device " << deviceName
-					<< ", but the device already has an OutputProducer assigned, this add will be ignored!";
-			}
-			else
-			{
-				device->setOutputProducer(output);
-				SURGSIM_LOG_INFO(m_logger) << "Added output component " << outputName << " connected to device "
-					<< deviceName;
-				result = true;
-			}
+			SURGSIM_LOG_WARNING(m_logger) << "Trying to add OutputProducer " << outputName
+				<< " to device " << deviceName
+				<< ", but the device already has an OutputProducer assigned, this add will be ignored!";
 		}
 		else
 		{
-			SURGSIM_LOG_CRITICAL(m_logger) << "Could not find Device with name " << deviceName
-				<< " when adding output component " << outputName;
+			device->setOutputProducer(output);
+			SURGSIM_LOG_INFO(m_logger) << "Added output component " << outputName << " connected to device "
+				<< deviceName;
+			result = true;
 		}
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << "Added output component " << outputName << " not connected to any device.";
-		result = true;
+		SURGSIM_LOG_CRITICAL(m_logger) << "Could not find Device with name " << deviceName
+			<< " when adding output component " << outputName;
 	}
 	return result;
 }
@@ -179,7 +162,6 @@ bool InputManager::addDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> de
 {
 	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_mutex);
-
 	DeviceInterface* foundDevice = nullptr;
 	const auto& deviceName = device->getName();
 	if (deviceName == "")

@@ -141,7 +141,7 @@ TEST_F(InputManagerTest, InputAddRemove)
 	EXPECT_TRUE(testDoAddComponent(listener1));
 	EXPECT_TRUE(testDoAddComponent(listener2));
 	EXPECT_TRUE(testDoAddComponent(listener3));
-	EXPECT_FALSE(testDoAddComponent(notvalid));
+	EXPECT_TRUE(testDoAddComponent(notvalid)); // InputManager will add InputComponents that don't connect to a device.
 
 	// Excercise adds and removes
 
@@ -183,24 +183,20 @@ TEST_F(InputManagerTest, OutputAddRemove)
 	std::shared_ptr<OutputComponent> output1 = std::make_shared<OutputComponent>("Component1");
 	std::shared_ptr<OutputComponent> output2 = std::make_shared<OutputComponent>("Component2");
 	std::shared_ptr<OutputComponent> output3 = std::make_shared<OutputComponent>("Component3");
-	std::shared_ptr<OutputComponent> output4 = std::make_shared<OutputComponent>("Component4");
 	std::shared_ptr<OutputComponent> invalid = std::make_shared<OutputComponent>("Component5");
 	output1->setDeviceName("TestDevice1");
 	output2->setDeviceName("TestDevice1");
 	output3->setDeviceName("TestDevice2");
-	output4->setConnect(false);
 	invalid->setDeviceName("InvalidDevice");
 	EXPECT_TRUE(testDoAddComponent(output1));
-	EXPECT_FALSE(testDoAddComponent(output2)); // same device already attached to an OutputComponent
+	EXPECT_TRUE(testDoAddComponent(output2)); // InputManager will add even if same device already connected.
 	EXPECT_FALSE(testDoAddComponent(output2));
 	EXPECT_TRUE(testDoAddComponent(output3));
-	EXPECT_TRUE(testDoAddComponent(output4));
-	EXPECT_FALSE(testDoAddComponent(invalid));
+	EXPECT_TRUE(testDoAddComponent(invalid)); // InputManager will add even if does not connect to a device.
 
 	EXPECT_TRUE(testDoRemoveComponent(output1));
 	EXPECT_FALSE(testDoRemoveComponent(output1));
-	EXPECT_TRUE(testDoRemoveComponent(output4));
-	EXPECT_FALSE(testDoRemoveComponent(invalid));
+	EXPECT_TRUE(testDoRemoveComponent(invalid));
 }
 
 TEST_F(InputManagerTest, OutputPush)

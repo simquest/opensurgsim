@@ -29,41 +29,19 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::OutputComponent,
 OutputComponent::OutputComponent(const std::string& name) :
 	Representation(name),
 	m_deviceName(),
-	m_haveData(false),
-	m_connect(true)
+	m_haveData(false)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OutputComponent, std::string, DeviceName, getDeviceName, setDeviceName);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OutputComponent, bool, Connect, getConnect, setConnect);
 }
 
 OutputComponent::~OutputComponent()
 {
 }
 
-void OutputComponent::setConnect(bool connect)
-{
-	SURGSIM_ASSERT(!isInitialized()) << "Cannot call OutputComponent::setConnect after initialization of "
-		<< getFullName();
-	auto logger = SurgSim::Framework::Logger::getLogger("Input/OutputComponent");
-	SURGSIM_LOG_IF(!connect && m_deviceName != "", logger, WARNING) << "OutputComponent " << getFullName()
-		<< " has had setDeviceName called with name " << m_deviceName
-		<< ", and now setConnect(false) will prevent it from connecting with that device.";
-	m_connect = connect;
-}
-
-bool OutputComponent::getConnect() const
-{
-	return m_connect;
-}
-
 void OutputComponent::setDeviceName(const std::string& deviceName)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "Cannot call OutputComponent::setDeviceName after initialization of "
 		<< getFullName();
-	auto logger = SurgSim::Framework::Logger::getLogger("Input/OutputComponent");
-	SURGSIM_LOG_IF(!m_connect && deviceName != "", logger, WARNING) << "OutputComponent " << getFullName()
-		<< " will not be connected to any device due to a previous call to setConnect(false),"
-		<< " but setDeviceName is being called with name " << deviceName;
 	m_deviceName = deviceName;
 }
 
