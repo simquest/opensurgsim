@@ -51,7 +51,7 @@ namespace Collision
 class MockContactFilter : public Collision::ContactFilter
 {
 public:
-	MockContactFilter(const std::string& name) : ContactFilter(name) {}
+	explicit MockContactFilter(const std::string& name) : ContactFilter(name) {}
 	MOCK_METHOD0(doWakeUp, bool());
 	MOCK_METHOD0(doInitialize, bool());
 	MOCK_METHOD1(doUpdate, void(double));
