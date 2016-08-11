@@ -92,7 +92,6 @@ public:
 
 TEST_F(ElementContactFilterTest, Accessors)
 {
-	std::vector<size_t> expected(1, 10);
 
 	{
 		std::shared_ptr<Framework::Component> rep = std::make_shared<Physics::RigidCollisionRepresentation>("rep");
@@ -102,11 +101,78 @@ TEST_F(ElementContactFilterTest, Accessors)
 	}
 
 	{
-		EXPECT_NO_THROW(filter->setValue("FilterElements", expected));
-		auto result = filter->getValue<std::vector<size_t>>("FilterElements");
-		EXPECT_EQ(1u, result.size());
-		EXPECT_EQ(10u, result[0]);
+
+		typedef std::vector<std::pair<std::shared_ptr<SurgSim::Framework::Component>, std::vector<size_t>>>
+		FilterMapType;
+
+		FilterMapType empty;
+
+		EXPECT_NO_THROW(filter->setValue("FilterElements", empty));
+		filter->update(0.0);
+		auto result = filter->getValue<FilterMapType>("FilterElements");
+		EXPECT_EQ(0u, result.size());
+
+		FilterMapType filters;
+		filters.emplace_back(pair->getRepresentations().first, std::vector<size_t>(3, 1));
+		filters.emplace_back(pair->getRepresentations().second, std::vector<size_t>(5, 1));
+		filter->setValue("FilterElements", filters);
+		filter->update(0.0);
+		result = filter->getValue<FilterMapType>("FilterElements");
+
+		EXPECT_EQ(2u, result.size());
+		for (const auto& item : result)
+		{
+			if (item.first.get() == pair->getRepresentations().first.get())
+			{
+				EXPECT_EQ(3u, item.second.size());
+			}
+			else if (item.first.get() == pair->getRepresentations().second.get())
+			{
+				EXPECT_EQ(5u, item.second.size());
+			}
+			else
+			{
+				ADD_FAILURE() << "Found invalid representation in filters.";
+			}
+		}
 	}
+
+}
+
+TEST_F(ElementContactFilterTest, SetGetFilter)
+{
+	auto result = filter->getFilter(nullptr);
+
+	EXPECT_EQ(0u, result.size());
+
+	auto rep = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("representation");
+	rep->setShape(std::make_shared<SurgSim::Math::SegmentMeshShape>());
+
+	result = filter->getFilter(rep);
+	EXPECT_EQ(0u, result.size());
+
+	std::vector<size_t> ignores(2, 1);
+	filter->setFilter(rep, ignores);
+	filter->update(0.0);
+
+	result = filter->getFilter(rep);
+	EXPECT_EQ(2u, result.size());
+
+	std::vector<size_t> empty;
+	filter->setFilter(rep, empty);
+	filter->update(0.0);
+
+	result = filter->getFilter(rep);
+	EXPECT_EQ(0u, result.size());
+
+	filter->setFilter(pair->getRepresentations().second, ignores);
+	filter->update(0.0);
+
+	result = filter->getFilter(rep);
+	EXPECT_EQ(0u, result.size());
+
+	result = filter->getFilter(pair->getRepresentations().second);
+	EXPECT_EQ(2u, result.size());
 
 }
 
@@ -115,12 +181,39 @@ TEST_F(ElementContactFilterTest, Noop)
 	EXPECT_NO_THROW(filter->filterContacts(state, pair));
 	std::vector<size_t> ignores(1, 1);
 	filter->setRepresentation(pair->getRepresentations().first);
-	filter->setFilterElements(ignores);
+	filter->setFilter(pair->getRepresentations().second, ignores);
 	filter->update(0.0);
 	EXPECT_NO_THROW(filter->filterContacts(state, pair));
 
 	pair->addContact(makeContact(0, 0, 0, 0));
 	EXPECT_NO_THROW(filter->filterContacts(state, pair));
+}
+
+TEST_F(ElementContactFilterTest, OnlyRemoveMatches)
+{
+	auto rep3 = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("rep3");
+	rep3->setShape(std::make_shared<SurgSim::Math::SegmentMeshShape>());
+
+	std::vector<size_t> ignores;
+	ignores.push_back(0);
+	ignores.push_back(2);
+	filter->setRepresentation(pair->getRepresentations().first);
+	filter->setFilter(rep3, ignores);
+
+
+	pair->addContact(makeContact(2, 10, 10, 10));
+	pair->addContact(makeContact(0, 10, 10, 10));
+	pair->addContact(makeContact(1, 10, 10, 10));
+	pair->addContact(makeContact(1, 10, 10, 10));
+	pair->addContact(makeContact(2, 10, 10, 10));
+	pair->addContact(makeContact(2, 10, 10, 10));
+
+	EXPECT_EQ(6u, pair->getContacts().size());
+	EXPECT_NO_THROW(filter->filterContacts(state, pair));
+	EXPECT_EQ(6u, pair->getContacts().size());
+	filter->update(0.0);
+	EXPECT_NO_THROW(filter->filterContacts(state, pair));
+	EXPECT_EQ(6u, pair->getContacts().size());
 }
 
 TEST_F(ElementContactFilterTest, RemoveOnTriangleMesh)
@@ -130,7 +223,7 @@ TEST_F(ElementContactFilterTest, RemoveOnTriangleMesh)
 	ignores.push_back(0);
 	ignores.push_back(2);
 	filter->setRepresentation(pair->getRepresentations().first);
-	filter->setFilterElements(ignores);
+	filter->setFilter(pair->getRepresentations().second, ignores);
 
 	pair->addContact(makeContact(2, 10, 10, 10));
 	pair->addContact(makeContact(0, 10, 10, 10));
@@ -153,7 +246,7 @@ TEST_F(ElementContactFilterTest, RemoveOnTriangleMeshSwapped)
 	ignores.push_back(0);
 	ignores.push_back(2);
 	filter->setRepresentation(pair->getRepresentations().first);
-	filter->setFilterElements(ignores);
+	filter->setFilter(pair->getRepresentations().second, ignores);
 	filter->update(0.0);
 
 	pair->swapRepresentations();
@@ -177,7 +270,7 @@ TEST_F(ElementContactFilterTest, RemoveOnSegmentMesh)
 	ignores.push_back(0);
 	ignores.push_back(2);
 	filter->setRepresentation(pair->getRepresentations().second);
-	filter->setFilterElements(ignores);
+	filter->setFilter(pair->getRepresentations().first, ignores);
 	filter->update(0.0);
 
 	pair->addContact(makeContact(10, 10, 10, 0));

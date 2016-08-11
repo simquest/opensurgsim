@@ -34,9 +34,8 @@ ElementContactFilter::ElementContactFilter(const std::string& name) : ContactFil
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ElementContactFilter, std::shared_ptr<Framework::Component>, Representation,
 									  getRepresentation, setRepresentation);
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ElementContactFilter, std::vector<size_t>, FilterElements,
-									  getFilterElements, setFilterElements);
-
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ElementContactFilter, FilterMapType,
+									  FilterElements, getFilterElements, setFilterElements);
 }
 
 
@@ -72,21 +71,49 @@ bool ElementContactFilter::doWakeUp()
 	return valid;
 }
 
-void ElementContactFilter::setFilterElements(const std::vector<size_t>& indices)
+void ElementContactFilter::setFilter(const std::shared_ptr<Framework::Component>& other,
+									 const std::vector<size_t>& indices)
 {
-	m_writeBuffer.set(indices);
+	boost::lock_guard<boost::mutex> guard(m_writeMutex);
+	m_writeBuffer[other.get()] = indices;
 }
 
-std::vector<size_t> ElementContactFilter::getFilterElements() const
+const std::vector<size_t>& ElementContactFilter::getFilter(const std::shared_ptr<Framework::Component>& other) const
 {
-	std::vector<size_t> result;
-	m_writeBuffer.get(&result);
+	static const std::vector<size_t> empty;
+	auto it = m_filters.find(other.get());
+	if (it != m_filters.end())
+	{
+		return it->second;
+	}
+	return empty;
+}
+
+void ElementContactFilter::setFilterElements(const FilterMapType& filterElements)
+{
+	boost::lock_guard<boost::mutex> guard(m_writeMutex);
+	m_writeBuffer.clear();
+
+	for (const auto& item : filterElements)
+	{
+		auto converted = std::dynamic_pointer_cast<Collision::Representation>(item.first);
+		if (converted != nullptr)
+		{
+			m_writeBuffer[converted.get()] = item.second;
+		}
+	}
+}
+
+ElementContactFilter::FilterMapType ElementContactFilter::getFilterElements()
+{
+	FilterMapType result;
+	boost::lock_guard<boost::mutex> guard(m_writeMutex);
+	for (const auto& item : m_writeBuffer)
+	{
+		result.emplace_back(item.first->getSharedPtr(), item.second);
+	}
+
 	return result;
-}
-
-void ElementContactFilter::clearFilterElements()
-{
-	m_writeBuffer.set(std::vector<size_t>());
 }
 
 void ElementContactFilter::setRepresentation(const std::shared_ptr<SurgSim::Framework::Component>& val)
@@ -104,23 +131,24 @@ std::shared_ptr<SurgSim::Collision::Representation> ElementContactFilter::getRep
 void ElementContactFilter::doFilterContacts(const std::shared_ptr<Physics::PhysicsManagerState>&,
 		const std::shared_ptr<CollisionPair>& pair)
 {
-	if (m_indices.empty())
+	for (const auto& filter : m_filters)
 	{
-		return;
-	}
-
-	for (int i = 0; i < 2; ++i)
-	{
-		if (pairAt(pair->getRepresentations(), i).get() == getRepresentation().get())
+		for (size_t i = 0, j = 1; i < 2; ++i, --j)
 		{
-			executeFilter(pair, i, m_indices);
+			if (pairAt(pair->getRepresentations(), i).get() == getRepresentation().get() &&
+				pairAt(pair->getRepresentations(), j).get() == filter.first)
+			{
+				executeFilter(pair, i, filter.second);
+			}
 		}
 	}
+
 }
 
 void ElementContactFilter::doUpdate(double dt)
 {
-	m_writeBuffer.tryGetChanged(&m_indices);
+	boost::lock_guard<boost::mutex> guard(m_writeMutex);
+	m_filters = m_writeBuffer;
 }
 
 void ElementContactFilter::executeFilter(

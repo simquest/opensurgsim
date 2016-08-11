@@ -41,7 +41,7 @@ SURGSIM_STATIC_REGISTRATION(ElementContactFilter);
 class ElementContactFilter : public ContactFilter
 {
 public:
-	ElementContactFilter(const std::string& name);
+	explicit ElementContactFilter(const std::string& name);
 
 	SURGSIM_CLASSNAME(SurgSim::Collision::ElementContactFilter);
 
@@ -49,15 +49,16 @@ public:
 
 	bool doWakeUp() override;
 
-	/// Sets the indices of the elements that will have their contacts ignored
-	/// \param indices element indices to ignore
-	void setFilterElements(const std::vector<size_t>& indices);
+	/// Set the filter for one representation, this means any contects on the given indices for that representation
+	/// will be removed
+	/// \param other The other side of the collisionpair
+	/// \param indices The indices to filter from the list of contacts
+	void setFilter(const std::shared_ptr<Framework::Component>& other, const std::vector<size_t>& indices);
 
-	/// \return the currently ignored indices
-	std::vector<size_t> getFilterElements() const;
-
-	/// Clear the indices to be ignored
-	void clearFilterElements();
+	/// Query the filters for one specific representation
+	/// \param other the representation
+	/// \return the currently ignored indices for a specific element
+	const std::vector<size_t>& getFilter(const std::shared_ptr<Framework::Component>& other) const;
 
 	/// Sets the representation used for filtering, can only be used before initialization
 	/// \param val the collision representation to be used for filtering
@@ -67,6 +68,13 @@ public:
 	std::shared_ptr<SurgSim::Collision::Representation> getRepresentation() const;
 
 protected:
+
+	typedef std::vector<std::pair<std::shared_ptr<SurgSim::Framework::Component>, std::vector<size_t>>> FilterMapType;
+
+	void setFilterElements(const FilterMapType& filterElements);
+
+	FilterMapType getFilterElements();
+
 	void doFilterContacts(
 		const std::shared_ptr<Physics::PhysicsManagerState>& state,
 		const std::shared_ptr<CollisionPair>& pair) override;
@@ -81,11 +89,10 @@ private:
 	/// Representation whose contacts need to be filtered
 	std::shared_ptr<Collision::Representation> m_representation;
 
-	/// Threadsafe container to update m_data
-	Framework::LockedContainer<std::vector<size_t>> m_writeBuffer;
+	mutable boost::mutex m_writeMutex;
+	std::unordered_map<Framework::Component*, std::vector<size_t>> m_writeBuffer;
 
-	/// Actual list of indices used for filtering
-	std::vector<size_t> m_indices;
+	std::unordered_map<Framework::Component*, std::vector<size_t>> m_filters;
 
 	/// Run the filter over the side of the collision pair indicated by pairIndex
 	/// \param pair the collision pair that is being filtered
@@ -117,7 +124,7 @@ const T& pairAt(const std::pair<T, T>& p, size_t i)
 /// \param i the index to access
 /// \return p.first if index == 0 and p.second if index == 1
 template <class T>
-T& pairAt(std::pair<T, T>& p, size_t i)
+T& pairAt(std::pair<T, T>& p, size_t i) // NOLINT
 {
 	SURGSIM_ASSERT(i == 0 || i == 1) << "Index for pair must be 0 or 1.";
 	return (i == 0) ? p.first : p.second;
