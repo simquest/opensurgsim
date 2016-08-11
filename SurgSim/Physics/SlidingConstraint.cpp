@@ -70,6 +70,8 @@ void SlidingConstraint::doBuild(double dt,
 	{
 		setActive(false);
 	}
+
+	Constraint::doBuild(dt, data, mlcp, indexOfRepresentation0, indexOfRepresentation1, indexOfConstraint);
 }
 
 } // namespace Physics

@@ -82,27 +82,6 @@ void Constraint::build(double dt,
 	size_t indexOfConstraint)
 {
 	doBuild(dt, *m_data.get(), mlcp, indexOfRepresentation0, indexOfRepresentation1, indexOfConstraint);
-
-	m_implementations.first->build(
-		dt,
-		*m_data.get(),
-		m_localizations.first,
-		mlcp,
-		indexOfRepresentation0,
-		indexOfConstraint,
-		CONSTRAINT_POSITIVE_SIDE);
-
-	m_implementations.second->build(
-		dt,
-		*m_data.get(),
-		m_localizations.second,
-		mlcp,
-		indexOfRepresentation1,
-		indexOfConstraint,
-		CONSTRAINT_NEGATIVE_SIDE);
-
-	mlcp->constraintTypes.push_back(
-				(m_constraintType != INVALID_CONSTRAINT) ? m_mlcpMap[m_constraintType] : Math::MLCP_INVALID_CONSTRAINT);
 }
 
 bool Constraint::isActive()
@@ -123,6 +102,26 @@ void Constraint::doBuild(double dt,
 	size_t indexOfRepresentation1,
 	size_t indexOfConstraint)
 {
+	m_implementations.first->build(
+		dt,
+		*m_data.get(),
+		m_localizations.first,
+		mlcp,
+		indexOfRepresentation0,
+		indexOfConstraint,
+		CONSTRAINT_POSITIVE_SIDE);
+
+	m_implementations.second->build(
+		dt,
+		*m_data.get(),
+		m_localizations.second,
+		mlcp,
+		indexOfRepresentation1,
+		indexOfConstraint,
+		CONSTRAINT_NEGATIVE_SIDE);
+
+	mlcp->constraintTypes.push_back(
+		(m_constraintType != INVALID_CONSTRAINT) ? m_mlcpMap[m_constraintType] : Math::MLCP_INVALID_CONSTRAINT);
 }
 
 void Constraint::setInformation(ConstraintType constraintType,
