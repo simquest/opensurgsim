@@ -39,9 +39,10 @@ TEST(LocationTests, Constructor)
 	EXPECT_NO_THROW({Location location(index);});
 	EXPECT_NO_THROW({Location location(triangleMeshLocalCoordinate, SurgSim::DataStructures::Location::TRIANGLE);});
 	EXPECT_NO_THROW({Location location(elementMeshLocalCoordinate, SurgSim::DataStructures::Location::ELEMENT);});
-	EXPECT_THROW({Location location(elementMeshLocalCoordinate,\
-		static_cast<SurgSim::DataStructures::Location::Type>(SurgSim::DataStructures::Location::ELEMENT + 10));},\
-		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW({Location location(elementMeshLocalCoordinate, \
+									static_cast<SurgSim::DataStructures::Location::Type>(SurgSim::DataStructures::Location::ELEMENT + 10));
+				 }, \
+				 SurgSim::Framework::AssertionFailure);
 
 	{
 		SCOPED_TRACE("Using rigid local position");
@@ -118,7 +119,7 @@ TEST(LocationTests, Constructor)
 
 		EXPECT_EQ(triangleMeshLocalCoordinate.index, location.triangleMeshLocalCoordinate.getValue().index);
 		EXPECT_TRUE(location.triangleMeshLocalCoordinate.getValue().coordinate.isApprox(\
-			triangleMeshLocalCoordinate.coordinate));
+					triangleMeshLocalCoordinate.coordinate));
 
 		Location location1(location);
 		EXPECT_FALSE(location1.rigidLocalPosition.hasValue());
@@ -129,7 +130,7 @@ TEST(LocationTests, Constructor)
 
 		EXPECT_EQ(triangleMeshLocalCoordinate.index, location1.triangleMeshLocalCoordinate.getValue().index);
 		EXPECT_TRUE(location1.triangleMeshLocalCoordinate.getValue().coordinate.isApprox(\
-			triangleMeshLocalCoordinate.coordinate));
+					triangleMeshLocalCoordinate.coordinate));
 	}
 
 	{
@@ -143,7 +144,7 @@ TEST(LocationTests, Constructor)
 
 		EXPECT_EQ(elementMeshLocalCoordinate.index, location.elementMeshLocalCoordinate.getValue().index);
 		EXPECT_TRUE(location.elementMeshLocalCoordinate.getValue().coordinate.isApprox(\
-			elementMeshLocalCoordinate.coordinate));
+					elementMeshLocalCoordinate.coordinate));
 
 		Location location1(location);
 		EXPECT_FALSE(location1.rigidLocalPosition.hasValue());
@@ -154,7 +155,7 @@ TEST(LocationTests, Constructor)
 
 		EXPECT_EQ(elementMeshLocalCoordinate.index, location1.elementMeshLocalCoordinate.getValue().index);
 		EXPECT_TRUE(location1.elementMeshLocalCoordinate.getValue().coordinate.isApprox(\
-			elementMeshLocalCoordinate.coordinate));
+					elementMeshLocalCoordinate.coordinate));
 	}
 }
 
@@ -204,9 +205,12 @@ TEST(LocationTests, IsApprox)
 
 	{
 		SCOPED_TRACE("TriangleMesh location");
-		auto vector001 = Math::Vector(3); vector001 << 0, 0, 1;
-		auto vector100 = Math::Vector(3); vector100 << 1, 0, 0;
-		auto vector010 = Math::Vector(3); vector010 << 0, 1, 1;
+		auto vector001 = Math::Vector(3);
+		vector001 << 0, 0, 1;
+		auto vector100 = Math::Vector(3);
+		vector100 << 1, 0, 0;
+		auto vector010 = Math::Vector(3);
+		vector010 << 0, 1, 1;
 		IndexedLocalCoordinate triangleBarycentricCoord11(9, vector001);
 		IndexedLocalCoordinate triangleBarycentricCoord12(9, vector100);
 		IndexedLocalCoordinate triangleBarycentricCoord2(0, vector010);
@@ -221,8 +225,10 @@ TEST(LocationTests, IsApprox)
 
 	{
 		SCOPED_TRACE("Element location");
-		auto vector01 = Math::Vector(2); vector01 << 0, 1;
-		auto vector10 = Math::Vector(2); vector10 << 1, 0;
+		auto vector01 = Math::Vector(2);
+		vector01 << 0, 1;
+		auto vector10 = Math::Vector(2);
+		vector10 << 1, 0;
 		IndexedLocalCoordinate triangleBarycentricCoord11(9, vector01);
 		IndexedLocalCoordinate triangleBarycentricCoord12(9, vector10);
 		IndexedLocalCoordinate triangleBarycentricCoord2(0, vector10);
@@ -234,6 +240,25 @@ TEST(LocationTests, IsApprox)
 		EXPECT_FALSE(triangleMeshLocation11.isApprox(triangleMeshLocation12));
 		EXPECT_FALSE(triangleMeshLocation11.isApprox(triangleMeshLocation2));
 	}
+}
+
+TEST(LocationTests, get)
+{
+	Location loc1;
+
+	EXPECT_FALSE(loc1.get(Location::TRIANGLE).hasValue());
+	EXPECT_FALSE(loc1.get(Location::ELEMENT).hasValue());
+
+	loc1.triangleMeshLocalCoordinate = IndexedLocalCoordinate(0, Math::Vector3d::Zero());
+	EXPECT_TRUE(loc1.get(Location::TRIANGLE).hasValue());
+	EXPECT_FALSE(loc1.get(Location::ELEMENT).hasValue());
+
+	Location loc2;
+
+	loc2.elementMeshLocalCoordinate = IndexedLocalCoordinate(0, Math::Vector3d::Zero());
+	EXPECT_FALSE(loc2.get(Location::TRIANGLE).hasValue());
+	EXPECT_TRUE(loc2.get(Location::ELEMENT).hasValue());
+
 }
 
 }; // namespace DataStructures

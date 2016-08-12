@@ -96,6 +96,28 @@ public:
 		}
 	}
 
+	/// Gives access to the coordinates via enum rather than  '.' public member access, this can reduce complexity
+	/// in the calling code
+	/// \param meshType (TRIANGLE or ELEMENT)
+	/// \return the appropriate coordinate for the type of mesh
+	const SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& get(Type meshType)
+	{
+		static SurgSim::DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate> null;
+		switch (meshType)
+		{
+			case TRIANGLE:
+				return triangleMeshLocalCoordinate;
+				break;
+			case ELEMENT:
+				return elementMeshLocalCoordinate;
+				break;
+			default:
+				SURGSIM_FAILURE() << "Unknown location";
+				break;
+		}
+		return null;
+	}
+
 	bool isApprox(const Location& other, double precision = std::numeric_limits<double>::epsilon()) const
 	{
 		bool result = false;

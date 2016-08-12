@@ -32,5 +32,10 @@ void ContactFilter::filterContacts(const std::shared_ptr<Physics::PhysicsManager
 	doFilterContacts(state, pair);
 }
 
+void ContactFilter::update(double dt)
+{
+	doUpdate(dt);
+}
+
 }
 }

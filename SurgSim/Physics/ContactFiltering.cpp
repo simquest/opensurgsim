@@ -63,6 +63,11 @@ std::shared_ptr<PhysicsManagerState> ContactFiltering::doUpdate(
 		return result;
 	}
 
+	for (const auto& filter : filters)
+	{
+		filter->update(dt);
+	}
+
 	const auto& statePairs = state->getCollisionPairs();
 	std::vector <std::shared_ptr<Collision::CollisionPair>> pairs;
 	pairs.reserve(statePairs.size());

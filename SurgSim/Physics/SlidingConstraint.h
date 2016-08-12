@@ -30,6 +30,8 @@ namespace Physics
 /// The sliding direction vector (direction + origin) needs to be updated each physics time step. This is done by
 /// transforming the direction and origin into the local coordinates of the physics representations and recalculating
 /// them every time step.
+/// representation0 is the one that can 'slide' against Representation1, for example Representation0 could be a suture
+/// Representation1 tissue.
 class SlidingConstraint : public Constraint
 {
 public:
@@ -37,7 +39,8 @@ public:
 	/// is wrong with the constraint.
 	/// \param constraintType The constraint type.
 	/// \param data The data for this constraint.
-	/// \param representation0, representation1 Both representations in this constraint.
+	/// \param representation0 The moving representation e.g. suture.
+	/// \param representation1 The non-moving representation e.g. tissue.
 	/// \param location0, location1 Both locations of the representations involved in this constraint.
 	/// \param slidingDirection The direction of sliding.
 	SlidingConstraint(

@@ -17,7 +17,7 @@
 #define SURGSIM_COLLISION_CONTACTFILTER_H
 
 
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
 #include <string>
 
@@ -50,12 +50,19 @@ public:
 		const std::shared_ptr<Physics::PhysicsManagerState>& state,
 		const std::shared_ptr<CollisionPair>& pair);
 
+	/// Base function to update the internal data structures with regard to the filtering operation, this should only
+	/// be called once per iteration
+	/// \param dt the time passed since the last call to update
+	void update(double dt);
+
 protected:
 
 	/// Override this with the implementation of the filter, this has to be threadsafe, it will be called in parallel
 	/// with different collision pairs.
 	virtual void doFilterContacts(const std::shared_ptr<Physics::PhysicsManagerState>& state,
 								  const std::shared_ptr<CollisionPair>& pair) = 0;
+
+	virtual void doUpdate(double dt) = 0;
 
 };
 
