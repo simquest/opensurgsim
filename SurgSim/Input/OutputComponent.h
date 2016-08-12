@@ -48,7 +48,7 @@ public:
 	SURGSIM_CLASSNAME(SurgSim::Input::OutputComponent);
 
 	/// Set name of the device of output component.
-	/// param	deviceName	The name of the device that will receive the output data.
+	/// \param	deviceName	The name of the device that will receive the output data.
 	void setDeviceName(const std::string& deviceName);
 
 	/// Gets device name.

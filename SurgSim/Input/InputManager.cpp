@@ -65,14 +65,16 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 	if (input != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		return addInputComponent(input);
+		addInputComponent(input);
+		return true;
 	}
 
 	auto output = tryAddComponent(component, &m_outputs);
 	if (output != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		return addOutputComponent(output);
+		addOutputComponent(output);
+		return true;
 	}
 
 	// If we got he the component was neither an Input nor and OutputComponent, no add was performed
@@ -87,13 +89,21 @@ bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Com
 	if (tryRemoveComponent(component, &m_inputs))
 	{
 		auto input = std::static_pointer_cast<InputComponent>(component);
-		m_devices[input->getDeviceName()]->removeInputConsumer(input);
+		DeviceInterface* device = nullptr;
+		if (tryFindDevice(input->getDeviceName(), &device))
+		{
+			device->removeInputConsumer(input);
+		}
 		result = true;
 	}
 	else if (tryRemoveComponent(component, &m_outputs))
 	{
 		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
-		m_devices[output->getDeviceName()]->removeOutputProducer(output);
+		DeviceInterface* device = nullptr;
+		if (tryFindDevice(output->getDeviceName(), &device))
+		{
+			device->removeOutputProducer(output);
+		}
 		result = true;
 	}
 	return result;
@@ -102,18 +112,17 @@ bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Com
 bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& input)
 {
 	bool result = false;
-	if (m_devices.find(input->getDeviceName()) != m_devices.end())
+	DeviceInterface* device = nullptr;
+	if (tryFindDevice(input->getDeviceName(), &device))
 	{
-		m_devices[input->getDeviceName()]->addInputConsumer(input);
-		SURGSIM_LOG_INFO(m_logger)
-				<< "Added input component " << input->getFullName()
-				<< " connected to device " << input->getDeviceName();
+		device->addInputConsumer(input);
+		SURGSIM_LOG_INFO(m_logger) << "Added input component " << input->getFullName()
+			<< " connected to device " << input->getDeviceName();
 		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_CRITICAL(m_logger)
-				<< " Could not find Device named '"
+		SURGSIM_LOG_CRITICAL(m_logger) << " Could not find Device named '"
 				<< input->getDeviceName() << "' when adding input component named '" << input->getFullName() << "'.";
 	}
 	return result;
@@ -122,29 +131,29 @@ bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& inpu
 bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& output)
 {
 	bool result = false;
-	if (m_devices.find(output->getDeviceName()) != m_devices.end())
+	const auto outputName = output->getFullName();
+	const auto deviceName = output->getDeviceName();
+	DeviceInterface* device = nullptr;
+	if (tryFindDevice(deviceName, &device))
 	{
-		if (!m_devices[output->getDeviceName()]->hasOutputProducer())
+		if (device->hasOutputProducer())
 		{
-			m_devices[output->getDeviceName()]->setOutputProducer(output);
-			SURGSIM_LOG_INFO(m_logger)
-					<< "Added output component "
-					<< output->getFullName() << " connected to device " << output->getDeviceName();
-			result = true;
+			SURGSIM_LOG_WARNING(m_logger) << "Trying to add OutputProducer " << outputName
+				<< " to device " << deviceName
+				<< ", but the device already has an OutputProducer assigned, this add will be ignored!";
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(m_logger)
-					<< "Trying to add OutputProducer " << output->getFullName() << " to device "
-					<< output->getDeviceName()
-					<< " but the device already has an OutputProducer assigned, this add will be ignored!";
+			device->setOutputProducer(output);
+			SURGSIM_LOG_INFO(m_logger) << "Added output component " << outputName << " connected to device "
+				<< deviceName;
+			result = true;
 		}
 	}
 	else
 	{
-		SURGSIM_LOG_CRITICAL(m_logger)
-				<< "Could not find Device with name "
-				<< output->getDeviceName() << " when adding output component " << output->getFullName();
+		SURGSIM_LOG_CRITICAL(m_logger) << "Could not find Device with name " << deviceName
+			<< " when adding output component " << outputName;
 	}
 	return result;
 }
@@ -153,15 +162,21 @@ bool InputManager::addDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> de
 {
 	bool result = false;
 	boost::lock_guard<boost::mutex> lock(m_mutex);
-	if (m_devices.find(device->getName()) == m_devices.cend())
+	DeviceInterface* foundDevice = nullptr;
+	const auto& deviceName = device->getName();
+	if (deviceName == "")
 	{
-		m_devices[device->getName()] = device;
-		SURGSIM_LOG_INFO(m_logger) << "Added device " << device->getName();
-		result = true;
+		SURGSIM_LOG_WARNING(m_logger) << "Cannot add a device that has an empty name.";
+	}
+	else if (tryFindDevice(deviceName, &foundDevice))
+	{
+		SURGSIM_LOG_WARNING(m_logger) << "Device " << deviceName << " is already available in Input Manager";
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Device " << device->getName() << " is already available in Input Manager";
+		m_devices[deviceName] = device;
+		SURGSIM_LOG_INFO(m_logger) << "Added device " << deviceName;
+		result = true;
 	}
 	return result;
 }
@@ -187,6 +202,17 @@ bool InputManager::removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface>
 int InputManager::getType() const
 {
 	return SurgSim::Framework::MANAGER_TYPE_INPUT;
+}
+
+bool InputManager::tryFindDevice(const std::string& name, DeviceInterface** device)
+{
+	auto found = m_devices.find(name);
+	if (found != m_devices.end())
+	{
+		*device = found->second.get();
+		return true;
+	}
+	return false;
 }
 
 } // Input

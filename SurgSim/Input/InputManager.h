@@ -83,6 +83,12 @@ private:
 	/// Specific call for output components.
 	bool addOutputComponent(const std::shared_ptr<OutputComponent>& output);
 
+	/// Returns a device with the given name, if one is available.
+	/// \param name The name of the device.
+	/// \param device [out] The device.  Unchanged if the return value is false.
+	/// \return true if the device was found.
+	bool tryFindDevice(const std::string& name, DeviceInterface** device);
+
 	/// Collection of all input components.
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
 	/// Collection of all output components.

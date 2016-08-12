@@ -15,6 +15,7 @@
 
 #include "SurgSim/Input/OutputComponent.h"
 
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Input/DeviceInterface.h"
 
 
@@ -30,8 +31,7 @@ OutputComponent::OutputComponent(const std::string& name) :
 	m_deviceName(),
 	m_haveData(false)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OutputComponent, std::string, DeviceName,
-		getDeviceName, setDeviceName);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OutputComponent, std::string, DeviceName, getDeviceName, setDeviceName);
 }
 
 OutputComponent::~OutputComponent()
@@ -40,6 +40,8 @@ OutputComponent::~OutputComponent()
 
 void OutputComponent::setDeviceName(const std::string& deviceName)
 {
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot call OutputComponent::setDeviceName after initialization of "
+		<< getFullName();
 	m_deviceName = deviceName;
 }
 
