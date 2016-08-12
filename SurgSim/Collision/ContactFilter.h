@@ -17,7 +17,7 @@
 #define SURGSIM_COLLISION_CONTACTFILTER_H
 
 
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
 #include <string>
 

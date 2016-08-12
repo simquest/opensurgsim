@@ -40,14 +40,17 @@ namespace
 const double ERROR_EPSILON = 1e-7;
 
 auto DO_NOTHING_FUNCTOR = [](const std::vector<std::shared_ptr<SurgSim::Input::OutputComponent>>&,
-	SurgSim::DataStructures::DataGroup*) {return false; };
+							 SurgSim::DataStructures::DataGroup*)
+{
+	return false;
+};
 
 /// Device that exposes pullOutput and getOutputData.
 class MockDevice : public SurgSim::Input::CommonDevice
 {
 public:
 
-	MockDevice(const std::string& name) : SurgSim::Input::CommonDevice(name)
+	explicit MockDevice(const std::string& name) : SurgSim::Input::CommonDevice(name)
 	{
 	}
 
@@ -266,7 +269,7 @@ TEST(CombiningOutputComponentTest, Serialization)
 
 	auto mockDevice = std::make_shared<MockDevice>("device");
 	inputManager->addDevice(mockDevice);
-	
+
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector(SurgSim::DataStructures::Names::FORCE);
 
@@ -296,7 +299,7 @@ TEST(CombiningOutputComponentTest, Serialization)
 	EXPECT_TRUE(node.IsMap());
 	std::shared_ptr<SurgSim::Input::CombiningOutputComponent> newComponent;
 	EXPECT_NO_THROW(newComponent = std::dynamic_pointer_cast<SurgSim::Input::CombiningOutputComponent>(
-		node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+									   node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(newComponent, nullptr);
 	auto newOutputs = newComponent->getValue<std::vector<std::shared_ptr<SurgSim::Framework::Component>>>("Outputs");
 	for (auto newOutput : newOutputs)

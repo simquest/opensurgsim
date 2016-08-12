@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef INPUT_COMBININGOUTPUTCOMPONENT_H
-#define INPUT_COMBININGOUTPUTCOMPONENT_H
+#ifndef SURGSIM_INPUT_COMBININGOUTPUTCOMPONENT_H
+#define SURGSIM_INPUT_COMBININGOUTPUTCOMPONENT_H
 
 #include <boost/thread/mutex.hpp>
 #include <functional>
@@ -41,7 +41,7 @@ class CombiningOutputComponent : public SurgSim::Input::OutputComponent
 {
 public:
 	typedef std::function<bool(const std::vector<std::shared_ptr<SurgSim::Input::OutputComponent>>&,
-		SurgSim::DataStructures::DataGroup*)> FunctorType;
+							   SurgSim::DataStructures::DataGroup*)> FunctorType;
 
 	/// Constructor
 	/// \param name Name of this output component
