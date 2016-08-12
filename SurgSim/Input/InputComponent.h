@@ -16,8 +16,9 @@
 #ifndef SURGSIM_INPUT_INPUTCOMPONENT_H
 #define SURGSIM_INPUT_INPUTCOMPONENT_H
 
-#include <string>
+#include <atomic>
 #include <memory>
+#include <string>
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/LockedContainer.h"
@@ -73,6 +74,8 @@ private:
 
 	/// Thread safe container of most recent input data
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastInput;
+
+	std::atomic<bool> m_hasInput;
 };
 
 }; // namespace Input

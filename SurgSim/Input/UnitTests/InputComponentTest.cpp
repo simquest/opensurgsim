@@ -17,16 +17,18 @@
  * Tests for the InputComponent class.
  */
 
+#include <gtest/gtest.h>
 #include <memory>
 #include <string>
-#include <gtest/gtest.h>
-#include "SurgSim/Input/InputComponent.h"
-#include "SurgSim/DataStructures/DataGroup.h"
 #include "yaml-cpp/yaml.h"
+
+#include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/UnitTests/TestDevice.h"
 
 using SurgSim::Input::InputComponent;
-using SurgSim::DataStructures::DataGroup;
+
 
 TEST(InputComponentTest, CanConstruct)
 {
@@ -39,6 +41,19 @@ TEST(InputComponentTest, Accessors)
 	input.setDeviceName("InputDevice");
 	EXPECT_EQ("Input", input.getName());
 	EXPECT_EQ("InputDevice", input.getDeviceName());
+}
+
+TEST(InputComponentTest, GetData)
+{
+	auto input = std::make_shared<InputComponent>("Input");
+	SurgSim::DataStructures::DataGroup data;
+	ASSERT_NO_THROW(input->getData(&data)) << "Getting data from an unconnected InputComponent should not assert.";
+	EXPECT_TRUE(data.isEmpty()) << "The data from an unconnected InputComponent should be empty.";
+
+	TestDevice device("MyTestDevice");
+	device.addInputConsumer(input);
+	ASSERT_NO_THROW(input->getData(&data));
+	EXPECT_FALSE(data.isEmpty());
 }
 
 TEST(InputComponentTest, Serialization)
