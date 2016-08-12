@@ -201,6 +201,7 @@ void ContactCalculation::initializeTables()
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SpherePlaneContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshParticlesContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshPlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshSurfaceMeshContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshTriangleMeshContact>());
 
 	const std::array<int, Math::SHAPE_TYPE_COUNT> allshapes =

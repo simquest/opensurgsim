@@ -42,6 +42,15 @@ public:
 private:
 	size_t doGetNumDof() const override;
 
+	/// \note This is only setting the mlcp->b violation to the rigid representation current rotation vector.
+	/// It means that the rigid won't receive any forces back, it simply will control the other representation's
+	/// orientation in this constraint.
+	///
+	/// \note The rotation vector constraint violation being calculated based on a quaternion interpolation (slerp),
+	/// and this type of interpolation being highly non-linear, the classical way of using the implementation one after
+	/// the other one won't work.
+	/// Therefore, the RotationVectorConstraint will use the vector mlcp->b to retrieve both representation's
+	/// rotation vector, then calculate the proper slerp and set the violation back in mlcp->b
 	void doBuild(double dt,
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,

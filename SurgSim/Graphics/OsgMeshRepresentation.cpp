@@ -81,8 +81,9 @@ std::shared_ptr<Mesh> OsgMeshRepresentation::getMesh()
 
 void OsgMeshRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape> shape)
 {
-	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH)
-			<< "Shape for OsgMeshRepresentation needs to be a SurgSim::Math::MeshShape";
+	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+				   shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
+			<< "Shape for OsgMeshRepresentation needs to be a SurgSim::Math::MeshShape/SurgSim::Math::SurfaceMeshShape";
 	auto meshShape = std::static_pointer_cast<SurgSim::Math::MeshShape>(shape);
 	m_mesh = std::make_shared<Mesh>(*meshShape);
 }

@@ -43,6 +43,7 @@ using SurgSim::Math::BoxShape;
 using SurgSim::Math::MeshShape;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::SphereShape;
+using SurgSim::Math::SurfaceMeshShape;
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::RigidCollisionRepresentation;
@@ -171,10 +172,10 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createRigidMeshSceneElement(
 	return sceneElement;
 }
 
-std::shared_ptr<SurgSim::Framework::SceneElement> createFixedMeshSceneElement(
+std::shared_ptr<SurgSim::Framework::SceneElement> createFixedSurfaceMeshSceneElement(
 	const std::string& name, std::string plyFilename, double scale = 1.0)
 {
-	auto mesh = std::make_shared<MeshShape>();
+	auto mesh = std::make_shared<SurfaceMeshShape>();
 	mesh->load(plyFilename);
 	for (auto& vertex : mesh->getVertices())
 	{
@@ -486,7 +487,7 @@ TEST_F(RenderTests, VisualTestFallingRigidMeshesOnPlane)
 		// Floor on which the objects are falling
 		{
 			std::shared_ptr<SurgSim::Framework::SceneElement> planeMesh =
-				createFixedMeshSceneElement("floor", "Geometry/plane.ply", 0.25);
+				createFixedSurfaceMeshSceneElement("floor", "Geometry/plane.ply", 0.25);
 			scene->addSceneElement(planeMesh);
 			Eigen::AngleAxisd aa(xAngle[i], Vector3d(1.0, 0.0, 0.0));
 			planeMesh->setPose(

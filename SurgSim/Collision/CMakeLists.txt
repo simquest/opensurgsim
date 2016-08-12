@@ -42,6 +42,7 @@ set(SURGSIM_COLLISION_SOURCES
 	SphereSphereContact.cpp
 	TriangleMeshParticlesContact.cpp
 	TriangleMeshPlaneContact.cpp
+	TriangleMeshSurfaceMeshContact.cpp
 	TriangleMeshTriangleMeshContact.cpp
 )
 
@@ -76,6 +77,7 @@ set(SURGSIM_COLLISION_HEADERS
 	SphereSphereContact.h
 	TriangleMeshParticlesContact.h
 	TriangleMeshPlaneContact.h
+	TriangleMeshSurfaceMeshContact.h
 	TriangleMeshTriangleMeshContact.h
 )
 surgsim_create_library_header(Collision.h "${SURGSIM_COLLISION_HEADERS}")
