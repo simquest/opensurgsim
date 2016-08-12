@@ -25,7 +25,8 @@ namespace Input
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::InputComponent, InputComponent);
 
 InputComponent::InputComponent(const std::string& name) :
-	Representation(name)
+	Representation(name),
+	m_hasInput(false)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(InputComponent, std::string, DeviceName,
 		getDeviceName, setDeviceName);
@@ -47,7 +48,10 @@ std::string InputComponent::getDeviceName() const
 
 void InputComponent::getData(SurgSim::DataStructures::DataGroup* dataGroup)
 {
-	m_lastInput.get(dataGroup);
+	if (m_hasInput)
+	{
+		m_lastInput.get(dataGroup);
+	}
 }
 
 bool InputComponent::doInitialize()
@@ -63,11 +67,13 @@ bool InputComponent::doWakeUp()
 void InputComponent::initializeInput(const std::string& device,
 		const SurgSim::DataStructures::DataGroup& initialData)
 {
+	m_hasInput = true;
 	m_lastInput.set(initialData);
 }
 
 void InputComponent::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
+	m_hasInput = true;
 	m_lastInput.set(inputData);
 }
 
