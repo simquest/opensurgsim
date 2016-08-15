@@ -222,7 +222,7 @@ void OsgView::update(double dt)
 		else
 		{
 			SURGSIM_LOG_WARNING(Framework::Logger::getDefaultLogger()) << getFullName()
-				<< " is not in a SceneElement, unable to set the SceneElement pose with the camera manipulator.";
+					<< " is not in a SceneElement, unable to set the SceneElement pose with the camera manipulator.";
 		}
 	}
 }
@@ -344,7 +344,7 @@ void OsgView::fixupStatsHandler(osgViewer::StatsHandler* statsHandler)
 	}
 }
 
-void OsgView::doSetTargetScreen(int val)
+int OsgView::doSetTargetScreen(int val)
 {
 	osg::GraphicsContext::WindowingSystemInterface* wsi =
 		osg::GraphicsContext::getWindowingSystemInterface();
@@ -354,11 +354,26 @@ void OsgView::doSetTargetScreen(int val)
 		SURGSIM_FAILURE() << "Error, no WindowSystemInterface  available, cannot create windows. ";
 	}
 
+	int numScreens = wsi->getNumScreens();
+
+	if (val > numScreens)
+	{
+		val = numScreens - 1;
+	}
+
+	if (val < 0)
+	{
+		val = 0;
+	}
+
 	unsigned int width, height;
-	wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(getTargetScreen()), width, height);
+	wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(val), width, height);
 
 	m_screenDimensions[0] = static_cast<int>(width);
 	m_screenDimensions[1] = static_cast<int>(height);
+
+	return val;
+
 }
 
 void SurgSim::Graphics::OsgView::setOsgMapsUniforms(bool val)

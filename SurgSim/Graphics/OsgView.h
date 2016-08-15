@@ -163,7 +163,7 @@ protected:
 	bool doWakeUp() override;
 
 	/// Determine Screen Size
-	void doSetTargetScreen(int val) override;
+	int doSetTargetScreen(int val) override;
 
 
 	/// \return The DisplaySettings to be used in this view
