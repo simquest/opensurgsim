@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -321,7 +321,7 @@ std::shared_ptr<RenderTarget> OsgCamera::getRenderTarget() const
 }
 
 
-bool OsgCamera::setMaterial(std::shared_ptr<Material> material)
+bool OsgCamera::setMaterial(std::shared_ptr<SurgSim::Framework::Component> material)
 {
 	std::shared_ptr<OsgMaterial> osgMaterial = std::dynamic_pointer_cast<OsgMaterial>(material);
 	bool result = false;

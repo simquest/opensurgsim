@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -184,7 +184,7 @@ public:
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
-	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Framework::Component> material)
 	{
 		return false;
 	}
@@ -346,7 +346,7 @@ public:
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
-	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Framework::Component> material)
 	{
 		return false;
 	}
