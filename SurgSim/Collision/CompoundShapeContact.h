@@ -34,12 +34,15 @@ protected:
 	std::pair<int, int> getShapeTypes() override;
 
 	std::list<std::shared_ptr<Contact>> doCalculateDcdContact(
-		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
-		const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2) override;
+										 const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape1,
+										 const Math::PosedShape<std::shared_ptr<Math::Shape>>& posedShape2) override;
+
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> doCalculateCcdContact(
+				const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& shape1,
+				const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& shape2) override;
 
 	/// Local shape types for this instance, these can be set to match the expected shapes
 	std::pair<int, int> m_types;
-
 };
 
 }

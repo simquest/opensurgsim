@@ -17,17 +17,22 @@
 
 #include <memory>
 
+#include "SurgSim/Blocks/CompoundShapeToGraphics.h"
 #include "SurgSim/Blocks/TransferPhysicsToVerticesBehavior.h"
 #include "SurgSim/Blocks/VisualizeConstraints.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Graphics/OsgCurveRepresentation.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Math/CompoundShape.h"
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SegmentMeshShape.h"
 #include "SurgSim/Math/Vector.h"
@@ -111,6 +116,65 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeRigid(const std::string& f
 
 	return element;
 }
+
+std::shared_ptr<SurgSim::Framework::SceneElement> makeCompound()
+{
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Compound");
+	using SurgSim::Math::Vector3d;
+
+	auto physics = std::make_shared<SurgSim::Physics::RigidRepresentation>("Physics");
+	physics->setDensity(700.0); // Wood
+	physics->setLinearDamping(0.5);
+	physics->setIsGravityEnabled(false);
+
+	auto subShape = std::make_shared<SurgSim::Math::MeshShape>();
+	subShape->load("bar.ply");
+	auto shape = std::make_shared<SurgSim::Math::CompoundShape>();
+
+	physics->setShape(shape);
+	element->addComponent(physics);
+
+	auto transform = SurgSim::Math::makeRigidTransform(
+						 SurgSim::Math::makeRotationQuaternion(0.2, Vector3d(1.0, 0.0, 0.0)),
+						 Vector3d(0.0, 0.0, 0.0));
+	shape->addShape(subShape, transform);
+
+	auto copier = std::make_shared<SurgSim::Blocks::CompoundShapeToGraphics>("Copier");
+	copier->setSource(physics);
+	element->addComponent(copier);
+
+	auto graphics = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("LeftGraphics");
+	graphics->setLocalPose(transform);
+	graphics->loadModel("bar.ply");
+	element->addComponent(graphics);
+	copier->addTarget(graphics);
+
+
+	transform = SurgSim::Math::makeRigidTransform(
+					SurgSim::Math::makeRotationQuaternion(-0.2, Vector3d(1.0, 0.0, 0.0)),
+					Vector3d(0.0, 0.0, 0.0));
+	shape->addShape(subShape, transform);
+
+	graphics = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("RightGraphics");
+	graphics->setLocalPose(transform);
+	graphics->loadModel("bar.ply");
+	element->addComponent(graphics);
+	copier->addTarget(graphics);
+
+	auto rigidCollision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
+	physics->setCollisionRepresentation(rigidCollision);
+	rigidCollision->setCollisionDetectionType(SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
+
+	element->addComponent(rigidCollision);
+
+	transform = SurgSim::Math::makeRigidTransform(
+					SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(0.0, 1.0, 0.0)),
+					Vector3d(0.0, -0.2, 0.0));
+	element->setPose(transform);
+
+	return element;
+}
+
 }
 
 class CcdSutureTest : public SurgSim::Physics::RenderTests
@@ -160,3 +224,118 @@ TEST_F(CcdSutureTest, Fem1DLoop)
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
+
+TEST_F(CcdSutureTest, Fem1DBlock)
+{
+
+	std::shared_ptr<SurgSim::Framework::SceneElement> element =
+		std::make_shared<SurgSim::Framework::BasicSceneElement>("Axis");
+	element->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("Axis"));
+	scene->addSceneElement(element);
+
+	element = makeRigid("bar.ply");
+	auto transform = SurgSim::Math::makeRigidTransform(
+						 SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d(0.0, 1.0, 0.0)),
+						 SurgSim::Math::Vector3d(0.0, -0.2, 0.0));
+	element->setPose(transform);
+	scene->addSceneElement(element);
+	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
+
+	physicsManager->setRate(100.0);
+	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
+	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
+
+	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
+	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
+	double miliseconds = 5000.0;
+
+	runTest(cameraPosition, cameraLookAt, miliseconds);
+}
+
+
+TEST_F(CcdSutureTest, Fem1DCompound)
+{
+
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Axis");
+	element->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("Axis"));
+	scene->addSceneElement(element);
+
+	scene->addSceneElement(makeCompound());
+
+	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
+
+	physicsManager->setRate(100.0);
+	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
+	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
+
+	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
+	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
+	double miliseconds = 5000.0;
+
+	runTest(cameraPosition, cameraLookAt, miliseconds);
+}
+
+
+TEST_F(CcdSutureTest, Fem1DMovingCompound)
+{
+
+	using SurgSim::Math::Vector3d;
+	std::shared_ptr<SurgSim::Framework::SceneElement> element =
+		std::make_shared<SurgSim::Framework::BasicSceneElement>("Axis");
+	element->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("Axis"));
+	scene->addSceneElement(element);
+
+	element = makeCompound();
+
+	auto leftGraphics =
+		std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(element->getComponent("LeftGraphics"));
+	auto rightGraphics =
+		std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(element->getComponent("RightGraphics"));
+
+	auto physics = std::dynamic_pointer_cast<SurgSim::Physics::RigidRepresentation>(element->getComponent("Physics"));
+
+	ASSERT_NE(nullptr, leftGraphics);
+	ASSERT_NE(nullptr, rightGraphics);
+	ASSERT_NE(nullptr, physics);
+
+
+	auto shape = std::dynamic_pointer_cast<SurgSim::Math::CompoundShape>(physics->getShape());
+
+	scene->addSceneElement(element);
+
+	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
+
+	physicsManager->setRate(300.0);
+	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
+	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
+
+	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
+	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
+
+
+	runtime->start();
+	viewElement->enableManipulator(true);
+	viewElement->setManipulatorParameters(cameraPosition, cameraLookAt);
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+
+	for (double angle = 0.2, offset = -0.05; angle < 1.0; angle += 0.00125, offset += 0.0005)
+	{
+		auto transform = SurgSim::Math::makeRigidTransform(
+							 SurgSim::Math::makeRotationQuaternion(angle, Vector3d(1.0, 0.0, 0.0)),
+							 Vector3d(0.0, offset, 0.0));
+		shape->setPose(0, transform);
+		leftGraphics->setLocalPose(transform);
+
+		transform = SurgSim::Math::makeRigidTransform(
+						SurgSim::Math::makeRotationQuaternion(-angle, Vector3d(1.0, 0.0, 0.0)),
+						Vector3d(0.0, offset, 0.0));
+
+		shape->setPose(1, transform);
+		rightGraphics->setLocalPose(transform);
+		boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	}
+}
+
+
+
