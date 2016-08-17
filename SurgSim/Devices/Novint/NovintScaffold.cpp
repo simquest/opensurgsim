@@ -134,7 +134,9 @@ public:
 			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 				"No error during initializing device " <<
 				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
-				"', but an invalid handle returned. Is a Novint device plugged in?";
+				"', but an invalid handle returned. Is a Novint device plugged in? "
+				<< "Is there an hdal.ini file in the same folder as the devices.yaml? "
+				<< "Does that hdal.ini file have a section with the correct name/serial?";
 		}
 		else
 		{
@@ -611,10 +613,11 @@ std::shared_ptr<NovintScaffold::Handle>
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName <<
-				"', but that name does not map to a serial number.  Was the configuration file found?" <<
-				" Does it contain the text of a YAML node (for the map from name to serial number)?  Is '" <<
-				initializationName << "' a key in that map?";
+			SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName
+				<< "', but that name does not map to a serial number.  The configuration file (devices.yaml) was "
+				<< (m_state->nameToSerial.empty() ?
+				"not found, did not contain the text of a YAML node (the map from name to serial number), or the map was empty."
+				: "found, but the device name is not a key in the contained map from name to serial number.");
 		}
 	}
 	return handle;
@@ -1071,7 +1074,7 @@ std::map<std::string, std::string> NovintScaffold::getNameMap()
 	}
 	else
 	{
-		SURGSIM_LOG_DEBUG(m_state->logger) << "Failed to find devices.yaml, cannot map names to serial numbers.";
+		SURGSIM_LOG_INFO(m_state->logger) << "Failed to find devices.yaml, cannot map names to serial numbers.";
 	}
 	return map;
 }
