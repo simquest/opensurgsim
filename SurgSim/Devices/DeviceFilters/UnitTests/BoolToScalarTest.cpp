@@ -31,7 +31,10 @@ namespace SurgSim
 namespace Devices
 {
 
-using namespace DataStructures;
+using DataStructures::Names::BUTTON_0;
+using DataStructures::Names::BUTTON_1;
+using DataStructures::Names::BUTTON_2;
+using DataStructures::Names::TOOLDOF;
 
 class BoolToScalarFilterTest : public testing::Test
 {
@@ -40,9 +43,9 @@ public:
 	void SetUp()
 	{
 		// values for default buttons
-		builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);
-		builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_2);
-		builder.addScalar(SurgSim::DataStructures::Names::TOOLDOF);
+		builder.addBoolean(BUTTON_1);
+		builder.addBoolean(BUTTON_2);
+		builder.addScalar(TOOLDOF);
 
 		defaultData = builder.createData();
 	}
@@ -112,8 +115,8 @@ TEST_F(BoolToScalarFilterTest, DataGroupHandling)
 	{
 		SCOPED_TRACE("Append Target");
 		DataStructures::DataGroupBuilder builder;
-		builder.addBoolean(Names::BUTTON_1);
-		builder.addBoolean(Names::BUTTON_2);
+		builder.addBoolean(BUTTON_1);
+		builder.addBoolean(BUTTON_2);
 		auto data = builder.createData();
 		auto filter = std::make_shared<BoolToScalar>("Filter");
 		EXPECT_NO_THROW(filter->initializeInput("device", data));
@@ -125,25 +128,25 @@ TEST_F(BoolToScalarFilterTest, UpdateTest)
 	auto filter = std::make_shared<BoolToScalar>("Filter");
 	filter->setScale(2.0);
 	auto resultData = defaultData;
-	defaultData.booleans().set(Names::BUTTON_1, false);
-	defaultData.booleans().set(Names::BUTTON_2, true);
+	defaultData.booleans().set(BUTTON_1, false);
+	defaultData.booleans().set(BUTTON_2, true);
 	double value;
 	filter->initializeInput("device", defaultData);
 
 	// Running .25 of a second we expect the value to go up .. by 0.25 * 2 (scale)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	filter->filterInput("device", defaultData, &resultData);
-	resultData.scalars().get(Names::TOOLDOF, &value);
+	resultData.scalars().get(TOOLDOF, &value);
 	EXPECT_NEAR(0.5, value, 0.1);
 
 	// Switiching the buttons, running for .125 of a second so the value should go down by 0.125 * 2 (scale)
-	defaultData.booleans().set(Names::BUTTON_1, true);
-	defaultData.booleans().set(Names::BUTTON_2, false);
+	defaultData.booleans().set(BUTTON_1, true);
+	defaultData.booleans().set(BUTTON_2, false);
 	// prevent accumulated error in the test
 	filter->setScalar(0.5);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(125));
 	filter->filterInput("device", defaultData, &resultData);
-	resultData.scalars().get(Names::TOOLDOF, &value);
+	resultData.scalars().get(TOOLDOF, &value);
 	EXPECT_NEAR(0.25, value, 0.1);
 }
 
@@ -152,8 +155,8 @@ TEST_F(BoolToScalarFilterTest, ClampTest)
 	auto filter = std::make_shared<BoolToScalar>("Filter");
 	filter->setScale(10.0);
 	auto resultData = defaultData;
-	defaultData.booleans().set(Names::BUTTON_1, false);
-	defaultData.booleans().set(Names::BUTTON_2, true);
+	defaultData.booleans().set(BUTTON_1, false);
+	defaultData.booleans().set(BUTTON_2, true);
 	double value;
 	filter->initializeInput("device", defaultData);
 
@@ -161,16 +164,16 @@ TEST_F(BoolToScalarFilterTest, ClampTest)
 	// but it's clamped to [0,1]
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	filter->filterInput("device", defaultData, &resultData);
-	resultData.scalars().get(Names::TOOLDOF, &value);
+	resultData.scalars().get(TOOLDOF, &value);
 	EXPECT_DOUBLE_EQ(1.0, value);
 
 	// Switiching the buttons, running for .25 of a second so the value should go down by 0.25 * 10 (scale)
 	// but it's clamped to [0,1]
-	defaultData.booleans().set(Names::BUTTON_1, true);
-	defaultData.booleans().set(Names::BUTTON_2, false);
+	defaultData.booleans().set(BUTTON_1, true);
+	defaultData.booleans().set(BUTTON_2, false);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	filter->filterInput("device", defaultData, &resultData);
-	resultData.scalars().get(Names::TOOLDOF, &value);
+	resultData.scalars().get(TOOLDOF, &value);
 	EXPECT_DOUBLE_EQ(0.0, value);
 }
 
@@ -180,8 +183,8 @@ TEST_F(BoolToScalarFilterTest, UnClampedTest)
 	filter->setScale(10.0);
 	filter->setClamping(false);
 	auto resultData = defaultData;
-	defaultData.booleans().set(Names::BUTTON_1, false);
-	defaultData.booleans().set(Names::BUTTON_2, true);
+	defaultData.booleans().set(BUTTON_1, false);
+	defaultData.booleans().set(BUTTON_2, true);
 	double value;
 	filter->initializeInput("device", defaultData);
 
@@ -189,17 +192,17 @@ TEST_F(BoolToScalarFilterTest, UnClampedTest)
 	// but it's not clamped
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	filter->filterInput("device", defaultData, &resultData);
-	resultData.scalars().get(Names::TOOLDOF, &value);
+	resultData.scalars().get(TOOLDOF, &value);
 	EXPECT_TRUE(value > 2.0);
 
 	// Switiching the buttons, running for .25 of a second so the value should go down by 0.25 * 10 (scale)
 	// but it's clamped to [0,]1
 	filter->setScalar(0.5);
-	defaultData.booleans().set(Names::BUTTON_1, true);
-	defaultData.booleans().set(Names::BUTTON_2, false);
+	defaultData.booleans().set(BUTTON_1, true);
+	defaultData.booleans().set(BUTTON_2, false);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	filter->filterInput("device", defaultData, &resultData);
-	resultData.scalars().get(Names::TOOLDOF, &value);
+	resultData.scalars().get(TOOLDOF, &value);
 	EXPECT_TRUE(value < 0.0);
 }
 

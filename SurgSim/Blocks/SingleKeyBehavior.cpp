@@ -67,7 +67,7 @@ void SingleKeyBehavior::onKeyDown(int actualKey)
 	}
 }
 
-void SingleKeyBehavior::onKeyUp(int)
+void SingleKeyBehavior::onKeyUp(int val)
 {
 	return;
 }

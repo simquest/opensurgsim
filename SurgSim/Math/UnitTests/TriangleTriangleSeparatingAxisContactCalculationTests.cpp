@@ -46,11 +46,7 @@ protected:
 		MockTriangle t0 = std::get<1>(data);
 		MockTriangle t1 = std::get<2>(data);
 		bool contactExpected = std::get<3>(data);
-		bool checkForPenetrationPoints = std::get<4>(data);
-		Vector3d expectedT0Point = std::get<5>(data);
-		Vector3d expectedT1Point = std::get<6>(data);
 
-		double expectedPenetrationDepth = (expectedT1Point - expectedT0Point).norm();
 		double penetrationDepth;
 		Vector3d t0Point, t1Point, normal;
 		bool contactFound = false;

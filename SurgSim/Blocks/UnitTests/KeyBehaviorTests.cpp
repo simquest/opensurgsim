@@ -34,7 +34,7 @@ namespace Blocks
 class MockKeyBehavior : public KeyBehavior
 {
 public:
-	MockKeyBehavior(const std::string& name) : KeyBehavior(name) {}
+	explicit MockKeyBehavior(const std::string& name) : KeyBehavior(name) {}
 
 	MOCK_METHOD1(onKeyDown, void(int));
 	MOCK_METHOD1(onKeyUp, void(int));
