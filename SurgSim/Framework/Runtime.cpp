@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include <boost/thread/thread.hpp>
 #include <boost/thread/locks.hpp>
 
