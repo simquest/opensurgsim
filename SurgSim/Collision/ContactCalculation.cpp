@@ -104,6 +104,40 @@ std::list<std::shared_ptr<Contact>> ContactCalculation::calculateDcdContact(
 	return std::list<std::shared_ptr<Contact>>();
 }
 
+std::list<std::shared_ptr<SurgSim::Collision::Contact>> ContactCalculation::calculateCcdContact(
+			const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion1,
+			const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion2)
+{
+	auto types = getShapeTypes();
+	auto incoming = std::make_pair(posedShapeMotion1.first.getShape()->getType(),
+								   posedShapeMotion2.first.getShape()->getType());
+	if (incoming == types)
+	{
+		return doCalculateCcdContact(posedShapeMotion1, posedShapeMotion2);
+	}
+
+	if (incoming.first == types.second && incoming.second == types.first)
+	{
+		auto contacts = doCalculateCcdContact(posedShapeMotion2, posedShapeMotion1);
+		for (const auto& contact : contacts)
+		{
+			contact->normal = -contact->normal;
+			contact->force = -contact->force;
+			std::swap(contact->penetrationPoints.first, contact->penetrationPoints.second);
+		}
+		return contacts;
+	}
+
+	if (types.first != Math::SHAPE_TYPE_NONE && types.second != Math::SHAPE_TYPE_NONE)
+	{
+		SURGSIM_FAILURE() << "Incorrect shape type for this calculation expected "
+						  << types.first << ", " << types.second
+						  << " received " << incoming.first << ", " << incoming.second << ".";
+	}
+
+	return std::list<std::shared_ptr<Contact>>();
+}
+
 void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	std::pair<int, int> shapeTypes = getShapeTypes();
@@ -228,6 +262,9 @@ void ContactCalculation::initializeTables()
 
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentSelfContact>());
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentMeshTriangleMeshContact>());
+
+	ContactCalculation::privateCcdRegister(std::make_shared<Collision::CompoundShapeContact>(
+			std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_SEGMENTMESH)));
 }
 
 void ContactCalculation::privateDcdRegister(
