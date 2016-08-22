@@ -71,7 +71,18 @@ TEST(CardinalSplinesTests, interpolate)
 	EXPECT_ANY_THROW(SurgSim::Math::CardinalSplines::interpolate(1, controlPoints, &points, 0.5));
 
 	controlPoints.push_back(SurgSim::Math::Vector3d(0.3, 1.3, 2.3));
-	EXPECT_ANY_THROW(SurgSim::Math::CardinalSplines::interpolate(0, controlPoints, &points, 0.5));
+	EXPECT_NO_THROW(SurgSim::Math::CardinalSplines::interpolate(0, controlPoints, &points, 0.5));
+	EXPECT_EQ(4u, points.size());
+	auto control = controlPoints.begin();
+	for (auto point : points)
+	{
+		EXPECT_DOUBLE_EQ(point[0], (*control)[0]);
+		EXPECT_DOUBLE_EQ(point[1], (*control)[1]);
+		EXPECT_DOUBLE_EQ(point[2], (*control)[2]);
+		control++;
+	}
+	points.clear();
+
 	EXPECT_ANY_THROW(SurgSim::Math::CardinalSplines::interpolate(1, controlPoints, &points, -0.5));
 	EXPECT_ANY_THROW(SurgSim::Math::CardinalSplines::interpolate(1, controlPoints, &points, 1.5));
 	EXPECT_ANY_THROW(SurgSim::Math::CardinalSplines::interpolate(1, controlPoints, nullptr, 0.5));
