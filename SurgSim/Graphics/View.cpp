@@ -122,8 +122,7 @@ bool View::isFullScreen() const
 void View::setTargetScreen(int val)
 {
 	SURGSIM_ASSERT(!isAwake()) << "Can't change the view settings once the view has been woken up.";
-	m_targetScreen = val;
-	doSetTargetScreen(val);
+	m_targetScreen = doSetTargetScreen(val);
 }
 
 int View::getTargetScreen() const

@@ -609,8 +609,9 @@ private:
 		return true;
 	}
 
-	void doSetTargetScreen(int val)
+	int doSetTargetScreen(int val)
 	{
+		return 0;
 	}
 
 	/// Position of the view on the screen (in pixels)
