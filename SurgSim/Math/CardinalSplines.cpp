@@ -47,12 +47,23 @@ void interpolate(size_t subdivisions,
 				 std::vector<SurgSim::Math::Vector3d>* points,
 				 double tau)
 {
-	SURGSIM_ASSERT(subdivisions >= 1) << "'subdivision' must be at least 1.";
+	SURGSIM_ASSERT(subdivisions >= 0) << "'subdivision' must be at least 0.";
 	SURGSIM_ASSERT(controlPoints.size() >= 4) << "Cannot apply Cardinal Splines interpolation with less than 4 points";
 	SURGSIM_ASSERT(points != nullptr) << "'points' is nullptr";
 	SURGSIM_ASSERT(0 <= tau && tau <= 1) << "Tension parameter 'tau' must be in the range [0,1].";
 
 	size_t numPoints = controlPoints.size();
+
+	// Allow for no subdivisions for debug scenarios.
+	if (subdivisions == 0)
+	{
+		for (size_t pointIndex = 0; pointIndex < numPoints; ++pointIndex)
+		{
+			points->push_back(controlPoints[pointIndex]);
+		}
+		return;
+	}
+
 	double stepsize = 1.0 / static_cast<double>(subdivisions);
 	for (size_t pointIndex = 0; pointIndex < numPoints - 3; ++pointIndex)
 	{

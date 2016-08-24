@@ -361,16 +361,16 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 					"; segmentAlpha = " << segmentAlpha;
 			SURGSIM_ASSERT(triangleAlpha >= -epsilon && triangleBeta >= -epsilon &&
 						   triangleAlpha + triangleBeta <= (1.0 + epsilon + epsilon)) <<
-				"earliestTimeOfImpact = " << earliestTimeOfImpact <<
-				"; triangleAlpha = " << triangleAlpha <<
-				"; triangleBeta = " << triangleBeta <<
-				"; triangleAlpha + triangleBeta = " << triangleAlpha + triangleBeta;
+								   "earliestTimeOfImpact = " << earliestTimeOfImpact <<
+								   "; triangleAlpha = " << triangleAlpha <<
+								   "; triangleBeta = " << triangleBeta <<
+								   "; triangleAlpha + triangleBeta = " << triangleAlpha + triangleBeta;
 
 
 			Math::Vector3d T, Tn;
 			double penentrationDepthAtT1;
+			Math::Vector3d S = Math::interpolate(sv0.second, sv1.second, segmentAlpha);
 			{
-				Math::Vector3d S = Math::interpolate(sv0.second, sv1.second, segmentAlpha);
 				Math::Vector3d T0T1 = tv1.second - tv0.second;
 				Math::Vector3d T0T2 = tv2.second - tv0.second;
 				T = tv0.second + triangleAlpha * T0T1 + triangleBeta * T0T2;
@@ -382,6 +382,7 @@ std::list<std::shared_ptr<Contact>>SegmentMeshTriangleMeshContact::calculateCcdC
 			segmentBaryCoord << 1.0 - segmentAlpha, segmentAlpha;
 			DataStructures::IndexedLocalCoordinate localCoordinateSegment(edgeId, segmentBaryCoord);
 			DataStructures::Location locationSegment(localCoordinateSegment, Location::ELEMENT);
+			locationSegment.rigidLocalPosition = S;
 
 			Math::Vector triangleBaryCoord(3);
 			triangleBaryCoord << 1.0 - triangleAlpha - triangleBeta, triangleAlpha, triangleBeta;

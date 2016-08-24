@@ -93,4 +93,4 @@ protected:
 }; // namespace Blocks
 }; // namespace SurgSim
 
-#endif // SURGSIM_BLOCKS_SINGLEKEYBEHAVIOR_H
+#endif

@@ -38,7 +38,7 @@ class BoolToScalar : public DeviceFilter
 {
 public:
 	/// Constructor
-	BoolToScalar(const std::string& name);
+	explicit BoolToScalar(const std::string& name);
 
 	/// Destructor
 	~BoolToScalar();
@@ -122,4 +122,4 @@ private:
 }; // namespace Devices
 }; // namespace SurgSim
 
-#endif // SURGSIM_DEVICES_BOOLTOSCALARFILTER_H
+#endif

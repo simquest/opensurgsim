@@ -262,5 +262,13 @@ TEST(OsgViewTests, OnlyOneDevice)
 	EXPECT_ANY_THROW(view2->enableMouseDevice(true));
 }
 
+TEST(OsgViewTest, TargetScreenTest)
+{
+	std::shared_ptr<View> view = std::make_shared<OsgView>("view");
+
+	EXPECT_NO_THROW(view->setTargetScreen(100));
+	EXPECT_TRUE(view->getTargetScreen() != 100); // The actual number is dependent on the number of screens
+}
+
 }  // namespace Graphics
 }  // namespace SurgSim
