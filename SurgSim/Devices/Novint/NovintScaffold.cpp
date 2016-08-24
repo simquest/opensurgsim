@@ -131,12 +131,19 @@ public:
 		}
 		else if (!isValid())
 		{
-			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
-				"No error during initializing device " <<
-				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
-				"', but an invalid handle returned. Is a Novint device plugged in? "
-				<< "Is there an hdal.ini file in the same folder as the devices.yaml? "
-				<< "Does that hdal.ini file have a section with the correct name/serial?";
+			if (initBySerialNumber)
+			{
+				SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
+					"No error during initializing device with serial number: '" << info <<
+					"', but an invalid handle returned. Is that Novint device plugged in?";
+			}
+			else
+			{
+				SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
+					"No error during initializing device named: '" << info <<
+					"', but an invalid handle returned. Is that Novint device plugged in? " <<
+					"Did the HDAL find hdal.ini?  Is the initialization name in the hdal.ini?";
+			}
 		}
 		else
 		{
@@ -608,7 +615,8 @@ std::shared_ptr<NovintScaffold::Handle>
 			{
 				SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName <<
 					"', which should map to serial number " << serial <<
-					", but no device with that serial number is available.";
+					", but no device with that serial number is available. " <<
+					"Is it plugged in?  Is the correct hdal.ini found and does it have an entry for this name?";
 			}
 		}
 		else
