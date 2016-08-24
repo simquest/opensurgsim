@@ -708,6 +708,22 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 	// Get the additional 7DoF data if available.
 	if (info->isDevice7Dof)
 	{
+		if (info->isPositionHomed)
+		{
+			// The 7dofs should have +x towards the right Falcon (i.e., to the user's right),
+			//   +y up, and +z towards the user (i.e., right-hand frame based on x & y)
+			Matrix33d transform;
+			if (info->isDeviceRollAxisReversed)
+			{
+				transform = makeRotationMatrix(M_PI_2, Vector3d::UnitY().eval());
+			}
+			else
+			{
+				transform = makeRotationMatrix(-M_PI_2, Vector3d::UnitY().eval());
+			}
+			info->scaledPose.translation() = transform * info->scaledPose.translation();
+		}
+
 		int gripStatus[2] = { 0, 0 };
 		// OSG2 grips report their "handedness" in the LSB of the second raw status byte
 		// We re-check this state each update because sometimes the first few callbacks have incorrect states.
@@ -748,7 +764,6 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			if (info->isDeviceRollAxisReversed)
 			{
 				info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
-				info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
 			}
 
 			/* HW-Nov-12-2015
@@ -761,14 +776,16 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			   */
 			info->toolDof = angles[3]; // Get the reading for 7th Dof, the open/close angle of the tool.
 
-			// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
-			Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
+			// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles.
+			// The home position (identity orientation) is with the tool parallel to the ground with the handle pointed
+			// at the user (and some roll angle).
+			Matrix33d rotationX = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
 				Vector3d(Vector3d::UnitX()));
 			Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1] * info->orientationScale,
 				Vector3d(Vector3d::UnitY()));
-			Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
+			Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
 				Vector3d(Vector3d::UnitZ()));
-			info->scaledPose.linear() = rotationY * rotationZ * rotationX;
+			info->scaledPose.linear() = rotationY * rotationX * rotationZ;
 		}
 	}
 
@@ -830,7 +847,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		outputData.poses().get(DataStructures::Names::INPUT_POSE, &poseForNominal);
 
 		Vector3d rotationVector = Vector3d::Zero();
-		Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
+		Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);  //check if scaledPose is in the correct workspace, or is it INPUT_POSE?
 
 		Math::setSubVector(info->scaledPose.translation() - poseForNominal.translation(), 0, 3, &deltaPosition);
 		Math::setSubVector(rotationVector, 1, 3, &deltaPosition);
@@ -862,14 +879,21 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	// Calculate the torque command if applicable (and convert newton-meters to command counts).
 	if (info->isDevice7Dof)
 	{
-		Vector3d torque = Vector3d::Zero();
-		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
+		// Transform the forces from our device-space into the individual Falcon spaces
+		//   (+z out of Falcon front, +y up, +x to right of Falcon when looking at it from the front).
+		Matrix33d transform;
 		if (info->isDeviceRollAxisReversed)
 		{
-			torque[0] = -torque[0];
-			torque[2] = -torque[2];
+			transform = makeRotationMatrix(M_PI_2, Vector3d::UnitY().eval());
 		}
+		else
+		{
+			transform = makeRotationMatrix(-M_PI_2, Vector3d::UnitY().eval());
+		}
+		info->force = transform * info->force;
 
+		Vector3d torque = Vector3d::Zero();
+		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
 		if (havespringJacobian)
 		{
 			torque += springJacobian.block<3,6>(3, 0) * deltaPosition;
@@ -883,14 +907,14 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
 		// AXIS, not for each Cartesian axis. Which means we need to go back to calculations with joint angles.
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
-		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
+		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitX()));
 		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1], Vector3d(Vector3d::UnitY()));
-		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitZ()));
-		// NB: the order of rotations is (rotY * rotZ * rotX), not XYZ!
+		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitZ()));
+		// NB: the order of rotations is (rotY * rotX * rotZ), not XYZ!
 		// Construct the joint axes for the CURRENT pose of the device.
 		Vector3d jointAxisY = Vector3d::UnitY();
-		Vector3d jointAxisZ = rotationY * Vector3d::UnitZ();
-		Vector3d jointAxisX = rotationY * (rotationZ * Vector3d::UnitX());
+		Vector3d jointAxisX = rotationY * Vector3d::UnitX();
+		Vector3d jointAxisZ = rotationY * (rotationX * Vector3d::UnitZ());
 		// To convert from Cartesian space to motor-axis space, we assemble the axes into a basis matrix and invert it.
 		Matrix33d basisMatrix;
 		basisMatrix.col(0) = jointAxisX;
@@ -899,13 +923,13 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		double basisDeterminant = fabs(basisMatrix.determinant());
 
 		// Also construct a "fake" X axis orthogonal with the other two, to be used when the pose is degenerate.
-		// Note that the Y and Z axes are always perpendicular for the Falcon 7DoF, so the normalize() can't fail and
+		// Note that the Y and X axes are always perpendicular for the Falcon 7DoF, so the normalize() can't fail and
 		// is basically unnecessary, but...
-		Vector3d fakeAxisX  = jointAxisY.cross(jointAxisZ).normalized();
+		Vector3d fakeAxisZ  = jointAxisY.cross(jointAxisX).normalized();
 		Matrix33d fakeBasisMatrix;
-		fakeBasisMatrix.col(0) = fakeAxisX;
+		fakeBasisMatrix.col(0) = jointAxisX;
 		fakeBasisMatrix.col(1) = jointAxisY;
-		fakeBasisMatrix.col(2) = jointAxisZ;
+		fakeBasisMatrix.col(2) = fakeAxisZ;
 
 		const double mediumBasisDeterminantThreshold = 0.6;
 		const double smallBasisDeterminantThreshold = 0.4;
@@ -935,11 +959,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		else
 		{
 			// If the determinant is small, the matrix may not be invertible.
-			// The "fake" basis matrix replaces the X axis with a fake (so it's always invertible), but the output X
+			// The "fake" basis matrix replaces the Z axis with a fake (so it's always invertible), but the output Z
 			// torque is then meaningless.
 			decompositionMatrix = fakeBasisMatrix.inverse();
-			decompositionMatrix.row(0) = Vector3d::Zero();
-			// Moreover, near the degenerate position the X axis free-spins but is aligned with Y,
+			decompositionMatrix.row(2) = Vector3d::Zero();
+			// Moreover, near the degenerate position the Z axis free-spins but is aligned with Y,
 			// so we want to reduce Y torques as well.
 			//double ratio = (basisDeterminant / smallBasisDeterminantThreshold);
 			double ratio = 0;
@@ -961,7 +985,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		info->torque[0] = 0;  // Roll torque currently disabled because the roll sensor is too jittery.
 		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 									   axisTorqueMin, axisTorqueMax);
-		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
+		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.x() * axisTorqueVector.x(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[3] = 0;
 
