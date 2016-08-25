@@ -35,6 +35,7 @@ namespace Physics
 {
 
 class CcdCollision;
+class ContactFiltering;
 class UpdateCcdData;
 class ContactConstraintGeneration;
 class BuildMlcp;
@@ -68,6 +69,7 @@ private:
 	/// Computations
 	std::unique_ptr<CcdCollision> m_ccdCollision;
 	std::unique_ptr<UpdateCcdData> m_updateCcdData;
+	std::unique_ptr<ContactFiltering> m_contactFilter;
 	std::unique_ptr<ContactConstraintGeneration> m_constraintGeneration;
 	std::unique_ptr<BuildMlcp> m_buildMlcp;
 	std::unique_ptr<SolveMlcp> m_solveMlcp;
