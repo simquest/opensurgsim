@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,13 +51,12 @@ public:
 
 	/// Adds a uniform to this material.
 	/// \param	uniform	Uniform to add.
-	/// \return	True if uniform was added successfully, otherwise false.
-	virtual bool addUniform(std::shared_ptr<UniformBase> uniform) = 0;
+	virtual void addUniform(std::shared_ptr<UniformBase> uniform) = 0;
 
 	/// Adds a GLSL typed uniform to this material
 	/// \param type the type of the uniform
 	/// \param name the name that this uniform should have
-	virtual bool addUniform(const std::string& type, const std::string& name) = 0;
+	virtual void addUniform(const std::string& type, const std::string& name) = 0;
 
 	/// Removes a uniform from this material.
 	/// \param	uniform	Uniform to remove.

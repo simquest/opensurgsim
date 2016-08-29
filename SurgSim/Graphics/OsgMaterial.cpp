@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,10 @@
 
 #include "SurgSim/Graphics/OsgMaterial.h"
 
+#include <algorithm>
+#include <boost/any.hpp>
+#include <functional>
+
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
@@ -23,14 +27,9 @@
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgUniformFactory.h"
 
-#include <algorithm>
-#include <functional>
-
-#include <boost/any.hpp>
-
-
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgUniformBase;
+
 
 namespace SurgSim
 {
@@ -44,44 +43,42 @@ OsgMaterial::OsgMaterial(const std::string& name)  :
 
 }
 
-bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
+void OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 {
-	bool didSucceed = false;
-
 	std::shared_ptr<OsgUniformBase> osgUniform = std::dynamic_pointer_cast<OsgUniformBase>(uniform);
-	if (osgUniform != nullptr)
-	{
-		if (isInitialized())
-		{
-			osgUniform->addToStateSet(m_stateSet);
-		}
-		m_uniforms.push_back(osgUniform);
+	SURGSIM_ASSERT(osgUniform != nullptr) << "Uniform must be an OsgUniform";
 
-		// add a property to Material, that carries the uniform name and forwards to the value of the uniform
-		// This exposes the non-shared pointer to the uniform in the function table, the entry in the function
-		// table will be removed when the uniform is removed from the material. The material holds a shared
-		// pointer to the uniform, keeping the uniform alive during the lifetime of the material.
-		forwardProperty(osgUniform->getName(), *osgUniform.get(), "Value");
-		didSucceed = true;
+	if (isInitialized())
+	{
+		osgUniform->addToStateSet(m_stateSet);
 	}
-	return didSucceed;
+	m_uniforms.push_back(osgUniform);
+
+	// add a property to Material, that carries the uniform name and forwards to the value of the uniform
+	// This exposes the non-shared pointer to the uniform in the function table, the entry in the function
+	// table will be removed when the uniform is removed from the material. The material holds a shared
+	// pointer to the uniform, keeping the uniform alive during the lifetime of the material.
+	forwardProperty(osgUniform->getName(), *osgUniform.get(), "Value");
 }
 
-bool OsgMaterial::addUniform(const std::string& type, const std::string& name)
+void OsgMaterial::addUniform(const std::string& type, const std::string& name)
 {
 	static OsgUniformFactory factory;
 
-	bool result = false;
 	if (factory.isRegistered(type))
 	{
-		result = addUniform(factory.create(type, name));
+		addUniform(factory.create(type, name));
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-				<< "Type " << type << " not supported.";
+		SURGSIM_FAILURE() << "OsgUniform type " << type << " not supported.";
 	}
-	return result;
+}
+
+void OsgMaterial::addUniform(const std::string& type, const std::string& name, const boost::any& value)
+{
+	addUniform(type, name);
+	setValue(name, value);
 }
 
 bool OsgMaterial::removeUniform(std::shared_ptr<UniformBase> uniform)
@@ -223,19 +220,19 @@ std::shared_ptr<OsgMaterial> buildMaterial(const std::string& vertexShaderName, 
 
 	auto program = std::make_shared<OsgProgram>();
 	std::string fileName;
-	fileName = SurgSim::Framework::Runtime::getApplicationData()->findFile(vertexShaderName);
+	fileName = Framework::Runtime::getApplicationData()->findFile(vertexShaderName);
 	if (!program->loadVertexShader(fileName))
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
+		SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Graphics"))
 				<< "Shader " << vertexShaderName << ", could not "
 				<< ((fileName == "") ? "find shader file" : "compile " + fileName) << ".";
 		result = false;
 	}
 
-	fileName = SurgSim::Framework::Runtime::getApplicationData()->findFile(fragmentShaderName);
+	fileName = Framework::Runtime::getApplicationData()->findFile(fragmentShaderName);
 	if (!program->loadFragmentShader(fileName))
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
+		SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Graphics"))
 				<< "Shader " << fragmentShaderName << " , could not "
 				<< ((fileName == "") ? "find shader file" : "compile " + fileName) << ".";
 		result = false;
