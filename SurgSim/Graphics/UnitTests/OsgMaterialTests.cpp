@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 /// \file
 /// Tests for the OsgMaterial class.
 
+#include <boost/any.hpp>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgUniform.h"
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 using SurgSim::Math::Vector2f;
 
@@ -68,7 +70,6 @@ public:
 	MOCK_METHOD1(setGlobalScope, void(bool)); //NOLINT
 };
 
-
 TEST(OsgMaterialTests, InitTest)
 {
 	auto material = std::make_shared<OsgMaterial>("material");
@@ -79,11 +80,43 @@ TEST(OsgMaterialTests, InitTest)
 	EXPECT_NE(nullptr, material->getOsgStateSet());
 }
 
+TEST(OsgMaterialTests, AddUniformTest)
+{
+	auto material = std::make_shared<OsgMaterial>("material");
+	{
+		float value = 2.0;
+		ASSERT_NO_THROW(material->addUniform("float", "test_float_uniform", value));
+		EXPECT_EQ(value, material->getValue<float>("test_float_uniform"));
+	}
+	{
+		float value = 2.0;
+		EXPECT_THROW(material->addUniform("invalid", "test_float_uniform", value), Framework::AssertionFailure);
+	}
+	{
+		double value = 2.0;
+		EXPECT_THROW(material->addUniform("float", "test_float_uniform", value), boost::bad_any_cast);
+	}
+	{
+		Math::Vector4f vector(1.0, 2.0, 3.0, 4.0);
+		ASSERT_NO_THROW(material->addUniform("vec4", "test_vector_uniform", vector));
+		EXPECT_TRUE(vector.isApprox(material->getValue<Math::Vector4f>("test_vector_uniform")));
+	}
+	{
+		Math::Vector4f vector(1.0, 2.0, 3.0, 4.0);
+		EXPECT_THROW(material->addUniform("dvec4", "test_vector_uniform", vector), boost::bad_any_cast);
+	}
+	{
+		auto texture = std::make_shared<OsgTextureCubeMap>();
+		ASSERT_NO_THROW(material->addUniform("samplerCube", "test_texture_uniform", texture));
+		EXPECT_EQ(texture, material->getValue<std::shared_ptr<OsgTextureCubeMap>>("test_texture_uniform"));
+	}
+}
+
 TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 {
 	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>("material");
 	std::shared_ptr<Material> material = osgMaterial;
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	auto runtime = std::make_shared<Framework::Runtime>();
 	material->initialize(runtime);
 
 	EXPECT_EQ(0u, material->getNumUniforms());
@@ -96,7 +129,7 @@ TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 	const osg::StateSet::UniformList& uniforms = osgMaterial->getOsgStateSet()->getUniformList();
 
 	// Add a uniform to the material
-	EXPECT_TRUE(material->addUniform(uniform1));
+	EXPECT_NO_THROW(material->addUniform(uniform1));
 	EXPECT_EQ(1u, material->getNumUniforms());
 	EXPECT_EQ(uniform1, material->getUniform(0));
 
@@ -104,7 +137,7 @@ TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 	EXPECT_EQ(osgUniform1->getOsgUniform(), uniforms.at("float uniform").first);
 
 	/// Add another uniform to the material
-	EXPECT_TRUE(material->addUniform(uniform2));
+	EXPECT_NO_THROW(material->addUniform(uniform2));
 	EXPECT_EQ(2u, material->getNumUniforms());
 	EXPECT_EQ(uniform2, material->getUniform(1));
 
@@ -126,7 +159,7 @@ TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 
 	/// Try adding a non-OSG Uniform
 	std::shared_ptr<MockUniform> nonOsgUniform = std::make_shared<MockUniform>();
-	EXPECT_FALSE(material->addUniform(nonOsgUniform)) <<
+	EXPECT_THROW(material->addUniform(nonOsgUniform), Framework::AssertionFailure) <<
 			"Should not be able to add a uniform that is not a subclass of OsgUniformBase!";
 	EXPECT_EQ(1u, material->getNumUniforms());
 

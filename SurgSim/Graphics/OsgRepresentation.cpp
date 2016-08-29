@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 #include "SurgSim/Graphics/OsgRepresentation.h"
 
 #include <algorithm>
-
 #include <boost/thread/locks.hpp>
-
 #include <osg/Geode>
 #include <osg/Group>
 #include <osg/Switch>
@@ -30,6 +28,7 @@
 #include "SurgSim/Graphics/OsgRigidTransformConversions.h"
 #include "SurgSim/Graphics/OsgUnitBox.h"
 #include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgUniformFactory.h"
 #include "SurgSim/Graphics/TangentSpaceGenerator.h"
 
 namespace SurgSim
@@ -175,12 +174,27 @@ void OsgRepresentation::updateTangents()
 
 void OsgRepresentation::addUniform(std::shared_ptr<UniformBase> uniform)
 {
-	SURGSIM_ASSERT(uniform != nullptr);
 	auto osgUniform = std::dynamic_pointer_cast<OsgUniformBase>(uniform);
-	SURGSIM_ASSERT(osgUniform != nullptr);
-
+	SURGSIM_ASSERT(osgUniform != nullptr) << "Uniform must be an OsgUniform";
 	m_transform->getOrCreateStateSet()->addUniform(osgUniform->getOsgUniform());
 }
+
+void OsgRepresentation::addUniform(const std::string& type, const std::string& name, const boost::any& value)
+{
+	static OsgUniformFactory factory;
+
+	if (factory.isRegistered(type))
+	{
+		auto uniform = factory.create(type, name);
+		uniform->setValue("Value", value);
+		addUniform(uniform);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "OsgUniform type " << type << " not supported.";
+	}
+}
+
 
 }; // Graphics
 }; // SurgSim

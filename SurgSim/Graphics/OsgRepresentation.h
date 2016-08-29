@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -96,7 +96,15 @@ public:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	void update(double dt) override;
 
+	/// Adds a uniform to this representation.
+	/// \param uniform Uniform to add.
 	void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform);
+
+	/// Adds and a uniform to this representation and set its value
+	/// \param type the type of the uniform
+	/// \param name Name used in shader code to access this uniform
+	/// \param value The value for this uniform
+	void addUniform(const std::string& type, const std::string& name, const boost::any& value);
 
 protected:
 	virtual void doUpdate(double dt);

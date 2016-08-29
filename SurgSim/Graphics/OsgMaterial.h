@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 #ifndef SURGSIM_GRAPHICS_OSGMATERIAL_H
 #define SURGSIM_GRAPHICS_OSGMATERIAL_H
 
-#include "SurgSim/Graphics/Material.h"
-
+#include <boost/any.hpp>
 #include <osg/Material>
 #include <osg/StateSet>
-
 #include <set>
+
+#include "SurgSim/Graphics/Material.h"
+
 
 namespace SurgSim
 {
@@ -52,11 +53,16 @@ public:
 
 	/// Adds a uniform to this material
 	/// \param	uniform	Uniform to add
-	/// \return	True if uniform was added successfully, otherwise false
 	/// \note	OsgMaterial only accepts subclasses of OsgUniformBase
-	bool addUniform(std::shared_ptr<UniformBase> uniform) override;
+	void addUniform(std::shared_ptr<UniformBase> uniform) override;
 
-	bool addUniform(const std::string& type, const std::string& name) override;
+	void addUniform(const std::string& type, const std::string& name) override;
+
+	/// Adds and a uniform to this material and set its value
+	/// \param type the type of the uniform
+	/// \param name Name used in shader code to access this uniform
+	/// \param value The value for this uniform
+	void addUniform(const std::string& type, const std::string& name, const boost::any& value);
 
 	/// Removes a uniform from this material
 	/// \param	uniform	Uniform to remove

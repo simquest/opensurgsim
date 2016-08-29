@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,11 @@
 /// \file
 /// Tests for the OsgRepresentation class.
 
+#include <gtest/gtest.h>
+#include <osg/Geode>
+#include <osg/Geometry>
+#include <random>
+
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
@@ -26,17 +31,12 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
-#include <gtest/gtest.h>
-
-#include <random>
-#include <osg/Geode>
-#include <osg/Geometry>
-
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::makeRigidTransform;
+
 
 namespace SurgSim
 {
@@ -135,8 +135,7 @@ TEST(OsgRepresentationTests, PoseTest)
 	RigidTransform3d localPose;
 	{
 		SCOPED_TRACE("Set Local Pose");
-		localPose = SurgSim::Math::makeRigidTransform(
-						Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		localPose = Math::makeRigidTransform(Quaterniond(Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setLocalPose(localPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(localPose));
@@ -145,8 +144,7 @@ TEST(OsgRepresentationTests, PoseTest)
 	RigidTransform3d elementPose;
 	{
 		SCOPED_TRACE("Set Element Pose");
-		elementPose = SurgSim::Math::makeRigidTransform(
-						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		elementPose = Math::makeRigidTransform(Quaterniond(Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		element->setPose(elementPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(elementPose * localPose));
@@ -154,8 +152,7 @@ TEST(OsgRepresentationTests, PoseTest)
 
 	{
 		SCOPED_TRACE("Change Local Pose");
-		localPose = SurgSim::Math::makeRigidTransform(
-						Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		localPose = Math::makeRigidTransform(Quaterniond(Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setLocalPose(localPose);
 		EXPECT_TRUE(representation->getLocalPose().isApprox(localPose));
 		EXPECT_TRUE(representation->getPose().isApprox(elementPose * localPose));
@@ -191,6 +188,35 @@ TEST(OsgRepresentationTests, MaterialTest)
 		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 		EXPECT_NE(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
 				"State set should have been cleared!";
+	}
+}
+
+TEST(OsgRepresentationTests, AddUniformTest)
+{
+	std::shared_ptr<OsgRepresentation> representation = std::make_shared<MockOsgRepresentation>("test name");
+	{
+		float value = 2.0;
+		ASSERT_NO_THROW(representation->addUniform("float", "test_float_uniform", value));
+	}
+	{
+		float value = 2.0;
+		EXPECT_THROW(representation->addUniform("invalid", "test_float_uniform", value), Framework::AssertionFailure);
+	}
+	{
+		double value = 2.0;
+		EXPECT_THROW(representation->addUniform("float", "test_float_uniform", value), boost::bad_any_cast);
+	}
+	{
+		Math::Vector4f vector(1.0, 2.0, 3.0, 4.0);
+		ASSERT_NO_THROW(representation->addUniform("vec4", "test_vector_uniform", vector));
+	}
+	{
+		Math::Vector4f vector(1.0, 2.0, 3.0, 4.0);
+		EXPECT_THROW(representation->addUniform("dvec4", "test_vector_uniform", vector), boost::bad_any_cast);
+	}
+	{
+		auto texture = std::make_shared<OsgTextureCubeMap>();
+		ASSERT_NO_THROW(representation->addUniform("samplerCube", "test_texture_uniform", texture));
 	}
 }
 
