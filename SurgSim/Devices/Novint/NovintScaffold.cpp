@@ -746,14 +746,14 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		if (leftHanded)
 		{
 			info->isDeviceRollAxisReversed = true;
-			info->eulerAngleOffsetYaw = 2.7;
-			info->eulerAngleOffsetPitch = 0.8;
+			info->eulerAngleOffsetYaw = -0.5;
+			info->eulerAngleOffsetPitch = -0.9;
 		}
 		else
 		{
 			info->isDeviceRollAxisReversed = false;
 			info->eulerAngleOffsetYaw = 0.3;
-			info->eulerAngleOffsetPitch = 0.5;
+			info->eulerAngleOffsetPitch = -0.7;
 		}
 
 		if (info->isOrientationHomed)
@@ -768,10 +768,11 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			// The zero values are NOT the home orientation.
 			info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
 			info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
-			info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+			info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
 			if (info->isDeviceRollAxisReversed)
 			{
 				info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
+				info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
 			}
 
 			/* HW-Nov-12-2015
@@ -827,7 +828,7 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 	{
 		// Wait until the tool is pointed forwards (i.e. perpendicular to the Falcon centerline) before proclaiming the
 		// whole device homed.
-		Vector3d forwardDirection = Vector3d::UnitX();
+		Vector3d forwardDirection = Vector3d::UnitZ();
 		double forwardMetric = forwardDirection.dot(info->scaledPose.linear() * forwardDirection);
 
 		if (forwardMetric >= info->forwardPointingPoseThreshold)
@@ -892,11 +893,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		Matrix33d transform;
 		if (info->isDeviceRollAxisReversed)
 		{
-			transform = makeRotationMatrix(M_PI_2, Vector3d::UnitY().eval());
+			transform = makeRotationMatrix(-M_PI_2, Vector3d::UnitY().eval());
 		}
 		else
 		{
-			transform = makeRotationMatrix(-M_PI_2, Vector3d::UnitY().eval());
+			transform = makeRotationMatrix(M_PI_2, Vector3d::UnitY().eval());
 		}
 		info->force = transform * info->force;
 
@@ -911,6 +912,16 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		{
 			torque += damperJacobian.block<3,6>(3, 0) * deltaVelocity;
 		}
+
+		if (info->isDeviceRollAxisReversed)
+		{
+			transform = makeRotationMatrix(0.0, Vector3d::UnitY().eval());
+		}
+		else
+		{
+			transform = makeRotationMatrix(M_PI, Vector3d::UnitY().eval());
+		}
+		torque.head<3>() = transform * torque.head<3>();
 
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
 		// AXIS, not for each Cartesian axis. Which means we need to go back to calculations with joint angles.
