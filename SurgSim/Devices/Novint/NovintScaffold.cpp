@@ -876,13 +876,14 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		info->force += springJacobian.block<3,6>(0, 0) * deltaPosition;
 	}
 
+	/* Since the HDAL does not provide a velocity, NovintScaffold cannot use the damper Jacobian.
+	// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
 	// If the damperJacobian was provided, calculate a delta force based on the change in velocity.
 	Math::Vector6d deltaVelocity;
 	DataGroup::DynamicMatrixType damperJacobian;
 	bool havedamperJacobian = outputData.matrices().get(DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
 	if (havedamperJacobian)
 	{
-		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
 		Vector3d linearVelocity = Vector3d::Zero();
 		Vector3d angularVelocity = Vector3d::Zero();
 
@@ -896,6 +897,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 
 		info->force += damperJacobian.block<3,6>(0, 0) * deltaVelocity;
 	}
+	*/
 
 	// Calculate the torque command if applicable (and convert newton-meters to command counts).
 	if (info->isDevice7Dof)
@@ -921,10 +923,12 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 			torque += springJacobian.block<3,6>(3, 0) * deltaPosition;
 		}
 
-		if (havedamperJacobian)
-		{
-			torque += damperJacobian.block<3,6>(3, 0) * deltaVelocity;
-		}
+		// Since the HDAL does not provide a velocity, we cannot use the damper Jacobian.
+		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
+		//if (havedamperJacobian)
+		//{
+		//	torque += damperJacobian.block<3,6>(3, 0) * deltaVelocity;
+		//}
 
 		static const Matrix33d rightTorqueTransform = makeRotationMatrix(M_PI, Vector3d::UnitY().eval());
 		if (!info->isDeviceRollAxisReversed)
