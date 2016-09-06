@@ -356,7 +356,7 @@ int OsgView::doSetTargetScreen(int val)
 
 	int numScreens = wsi->getNumScreens();
 
-	if (val > numScreens)
+	if (val >= numScreens)
 	{
 		val = numScreens - 1;
 	}
