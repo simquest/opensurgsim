@@ -187,12 +187,13 @@ bool YAML::convert<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>
 	}
 	else if (node.IsMap())
 	{
-		YAML::Node temp;
-		temp.push_back(node);
 		rhs.push_back(node.as<std::shared_ptr<SurgSim::Framework::SceneElement>>());
 	}
 	else
 	{
+		SURGSIM_FAILURE()
+				<< "Trying to decode std::vector<std::shared_ptr<SceneElement>> but the received node is neither "
+				<< "a sequence nor a map";
 		return false;
 	}
 	return true;
