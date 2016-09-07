@@ -19,6 +19,9 @@
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -326,4 +329,52 @@ TEST(SceneElementTest, NoSceneGroupsTest)
 	EXPECT_FALSE(element->inGroup("Three"));
 	EXPECT_FALSE(element->inGroup("Four"));
 
+}
+
+TEST(SceneElementTest, Include)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	std::string file;
+
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("SceneElementTest/includer.yaml", &file));
+
+	YAML::Node node = YAML::LoadFile(file);
+	ASSERT_TRUE(node.IsSequence());
+
+	auto elements = node.as<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>();
+
+	EXPECT_EQ(4u, elements.size());
+}
+
+
+TEST(SceneElementTest, IncludeCircle)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	std::string file;
+
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("SceneElementTest/circle-1.yaml", &file));
+
+	YAML::Node node = YAML::LoadFile(file);
+	ASSERT_TRUE(node.IsSequence());
+
+	ASSERT_THROW(auto elements = node.as<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>(),
+				 SurgSim::Framework::AssertionFailure);
+}
+
+TEST(SceneElementTest, SingleAsArray)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	std::string file;
+
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("SceneElementTest/single.yaml", &file));
+
+	YAML::Node node = YAML::LoadFile(file);
+	ASSERT_FALSE(node.IsSequence());
+
+	auto elements = node.as<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>();
+
+	EXPECT_EQ(1u, elements.size());
 }

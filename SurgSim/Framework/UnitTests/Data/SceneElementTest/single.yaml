@@ -1,0 +1,6 @@
+SurgSim::Framework::BasicSceneElement:
+    Name: element2
+    IsActive: true
+    Components:
+      - MockComponent:
+          Name: clone
