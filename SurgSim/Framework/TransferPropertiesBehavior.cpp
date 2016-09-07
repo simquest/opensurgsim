@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ bool TransferPropertiesBehavior::doWakeUp()
 
 void TransferPropertiesBehavior::setTargetManagerType(int managerType)
 {
-	SURGSIM_ASSERT(managerType > 0 && managerType < MANAGER_TYPE_COUNT) << "Invalid manager type.";
+	SURGSIM_ASSERT(managerType >= 0 && managerType < MANAGER_TYPE_COUNT) << "Invalid manager type.";
 	SURGSIM_ASSERT(!isInitialized()) << "Cannot change the manager type after initialization.";
 	m_targetManager = managerType;
 }
