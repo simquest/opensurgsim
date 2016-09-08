@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 #ifndef SURGSIM_FRAMEWORK_LOGOUTPUT_H
 #define SURGSIM_FRAMEWORK_LOGOUTPUT_H
 
-#include <fstream>
 #include <boost/thread/mutex.hpp>
+#include <fstream>
 
 namespace SurgSim
 {
@@ -58,8 +58,6 @@ public:
 	/// \param filename The filename to be used for writing
 	explicit FileOutput(const std::string& filename);
 
-	virtual ~FileOutput();
-
 	/// \param message to be written out
 	/// \return true on success
 	bool writeMessage(const std::string& message) override;
@@ -80,7 +78,6 @@ public:
 	/// \param ostream stream to be used for writing
 	/// ostream parameter to be passed by non-const reference on purpose.
 	explicit StreamOutput(std::ostream& ostream); //NOLINT
-	virtual ~StreamOutput();
 
 	/// Writes a message to the stream.
 	/// \param	message	Message to be written to the stream
