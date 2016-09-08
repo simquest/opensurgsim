@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Framework/TransferPropertiesBehavior.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/TransferPropertiesBehavior.h"
 
+
+namespace {
 
 class A : public SurgSim::Framework::Accessible
 {
@@ -37,6 +39,8 @@ public:
 	void setB(int val) { b = val; }
 };
 
+};
+
 namespace SurgSim
 {
 namespace Framework
@@ -45,6 +49,26 @@ namespace Framework
 TEST(TransferPropertiesBehaviorTest, InitTest)
 {
 	ASSERT_NO_THROW({TransferPropertiesBehavior b("TestName");});
+}
+
+TEST(TransferPropertiesBehaviorTest, GetSetTargetManagerType)
+{
+	auto behavior = std::make_shared<TransferPropertiesBehavior>("test");
+	auto runtime = std::make_shared<Framework::Runtime>();
+
+	EXPECT_EQ(Framework::MANAGER_TYPE_BEHAVIOR, behavior->getTargetManagerType());
+
+	EXPECT_THROW(behavior->setTargetManagerType(-1), Framework::AssertionFailure);
+	EXPECT_THROW(behavior->setTargetManagerType(Framework::MANAGER_TYPE_COUNT), Framework::AssertionFailure);
+
+	EXPECT_NO_THROW(behavior->setTargetManagerType(Framework::MANAGER_TYPE_PHYSICS));
+	EXPECT_EQ(Framework::MANAGER_TYPE_PHYSICS, behavior->getTargetManagerType());
+
+	EXPECT_NO_THROW(behavior->setTargetManagerType(Framework::MANAGER_TYPE_BEHAVIOR));
+	EXPECT_EQ(Framework::MANAGER_TYPE_BEHAVIOR, behavior->getTargetManagerType());
+
+	behavior->initialize(runtime);
+	EXPECT_THROW(behavior->setTargetManagerType(Framework::MANAGER_TYPE_GRAPHICS), Framework::AssertionFailure);
 }
 
 TEST(TransferPropertiesBehaviorTest, ValidConnections)
