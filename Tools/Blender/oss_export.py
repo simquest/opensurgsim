@@ -1,20 +1,4 @@
-# ##### BEGIN GPL LICENSE BLOCK #####
-#
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-#
-# ##### END GPL LICENSE BLOCK #####
+# Copyright 2016 SimQuest Solutions
 
 bl_info = {
     "name": "OpenSurgSim FEM PLY format",
@@ -23,8 +7,6 @@ bl_info = {
     "description": "Export FEM PLY mesh data for use with OpenSurgSim",
     "support": 'COMMUNITY',
     "category": "Import-Export"}
-
-# Based on Stanford PLY exporter from Bruce Merry
 
 import os
 import bpy
@@ -41,61 +23,24 @@ from bpy_extras.io_utils import (ExportHelper,
 class ExportPLY(bpy.types.Operator, ExportHelper):
     """Export a single object as a PLY file for use as an FEM in OpenSurgSim"""
     bl_idname = "export_mesh.fem"
-    bl_label = "Export FEM for OSS"
+    bl_label = "Export FEM for OpenSurgSim"
 
     filename_ext = ".ply"
+
     filter_glob = StringProperty(default="*.ply", options={'HIDDEN'})
 
-    use_mesh_modifiers = BoolProperty(
-            name="Apply Modifiers",
-            description="Apply Modifiers to the exported mesh",
-            default=True,
+    use_graphics = BoolProperty(
+            name="Export Graphics",
+            description="Include data for graphics meshes",
+            default=False,
             )
-    use_normals = BoolProperty(
-            name="Normals",
-            description="Export Normals for smooth and "
-                        "hard shaded faces "
-                        "(hard shaded faces will be exported "
-                        "as individual faces)",
-            default=True,
-            )
-    use_uv_coords = BoolProperty(
-            name="UVs",
-            description="Export the active UV layer",
-            default=True,
-            )
-    use_colors = BoolProperty(
-            name="Vertex Colors",
-            description="Export the active vertex color layer",
-            default=True,
-            )
-
-    axis_forward = EnumProperty(
-            name="Forward",
-            items=(('X', "X Forward", ""),
-                   ('Y', "Y Forward", ""),
-                   ('Z', "Z Forward", ""),
-                   ('-X', "-X Forward", ""),
-                   ('-Y', "-Y Forward", ""),
-                   ('-Z', "-Z Forward", ""),
-                   ),
-            default='Y',
-            )
-    axis_up = EnumProperty(
-            name="Up",
-            items=(('X', "X Up", ""),
-                   ('Y', "Y Up", ""),
-                   ('Z', "Z Up", ""),
-                   ('-X', "-X Up", ""),
-                   ('-Y', "-Y Up", ""),
-                   ('-Z', "-Z Up", ""),
-                   ),
-            default='Z',
-            )
-    global_scale = FloatProperty(
-            name="Scale",
-            min=0.01, max=1000.0,
-            default=1.0,
+    fem_dimensions = EnumProperty(
+            name="FEM",
+            items=(('1', "FEM 1D", ""),
+                   ('2', "FEM 2D", ""),
+                   ('3', "FEM 3D", ""),
+                  ),
+            default='2',
             )
 
     @classmethod
@@ -103,18 +48,9 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
         return context.active_object != None
 
     def execute(self, context):
-        from mathutils import Matrix
-
-        keywords = self.as_keywords(ignore=("axis_forward",
-                                            "axis_up",
-                                            "global_scale",
-                                            "check_existing",
+        keywords = self.as_keywords(ignore=("check_existing",
                                             "filter_glob",
                                             ))
-        global_matrix = axis_conversion(to_forward=self.axis_forward,
-                                        to_up=self.axis_up,
-                                        ).to_4x4() * Matrix.Scale(self.global_scale, 4)
-        keywords["global_matrix"] = global_matrix
 
         filepath = self.filepath
         filepath = bpy.path.ensure_ext(filepath, self.filename_ext)
@@ -125,57 +61,38 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
         layout = self.layout
 
         row = layout.row()
-        row.prop(self, "use_mesh_modifiers")
-        row.prop(self, "use_normals")
-        row = layout.row()
-        row.prop(self, "use_uv_coords")
-        row.prop(self, "use_colors")
+        row.prop(self, "use_graphics")        
 
-        layout.prop(self, "axis_forward")
-        layout.prop(self, "axis_up")
-        layout.prop(self, "global_scale")
+        layout.prop(self, "fem_dimensions")
 
 
 def export_fem_save(operator,
          context,
+         fem_dimensions,
          filepath="",
-         use_mesh_modifiers=True,
-         use_normals=True,
-         use_uv_coords=True,
-         use_colors=True,
-         global_matrix=None
+         use_graphics=False,
          ):
 
     scene = context.scene
-    obj = context.active_object
-
-    if global_matrix is None:
-        from mathutils import Matrix
-        global_matrix = Matrix()
+    object = context.active_object
 
     if bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode='OBJECT')
 
-    if use_mesh_modifiers and obj.modifiers:
-        mesh = obj.to_mesh(scene, True, 'PREVIEW')
-    else:
-        mesh = obj.data.copy()
+    mesh = object.data.copy()
 
     if not mesh:
         raise Exception("Error, could not get mesh data from active object")
 
-    mesh.transform(global_matrix * obj.matrix_world)
-    if use_normals:
+    if use_graphics:
         mesh.calc_normals()
 
-    ret = save_mesh(filepath, mesh, obj.get('boundary_condition'),
-                    use_normals=use_normals,
-                    use_uv_coords=use_uv_coords,
-                    use_colors=use_colors,
+    ret = save_mesh(filepath, mesh, object.get('boundary_condition'),
+                    fem_dimensions,
+                    use_graphics=use_graphics,
                     )
 
-    if use_mesh_modifiers:
-        bpy.data.meshes.remove(mesh)
+    bpy.data.meshes.remove(mesh)
 
     return ret
 
@@ -183,107 +100,38 @@ def export_fem_save(operator,
 def save_mesh(filepath,
               mesh,
               boundary_condition,
-              use_normals=True,
-              use_uv_coords=True,
-              use_colors=True,
+              fem_dimensions,
+              use_graphics=False,
               ):
-
-    def rvec3d(v):
-        return round(v[0], 6), round(v[1], 6), round(v[2], 6)
-
-    def rvec2d(v):
-        return round(v[0], 6), round(v[1], 6)
 
     file = open(filepath, "w", encoding="utf8", newline="\n")
     fw = file.write
 
-    # Be sure tessface & co are available!
-    if not mesh.tessfaces and mesh.polygons:
-        mesh.calc_tessface()
+    has_uv = bool(mesh.uv_textures) and mesh.uv_textures.active
+    if has_uv and use_graphics:
+        uv_data = mesh.uv_textures.active
 
-    has_uv = bool(mesh.tessface_uv_textures)
-    has_vcol = bool(mesh.tessface_vertex_colors)
+    uvcoord = normal = None
 
-    if not has_uv:
-        use_uv_coords = False
-    if not has_vcol:
-        use_colors = False
+    verts = []
+    for i, face in enumerate(mesh.polygons):
 
-    if not use_uv_coords:
-        has_uv = False
-    if not use_colors:
-        has_vcol = False
-
-    if has_uv:
-        active_uv_layer = mesh.tessface_uv_textures.active
-        if not active_uv_layer:
-            use_uv_coords = False
-            has_uv = False
-        else:
-            active_uv_layer = active_uv_layer.data
-
-    if has_vcol:
-        active_col_layer = mesh.tessface_vertex_colors.active
-        if not active_col_layer:
-            use_colors = False
-            has_vcol = False
-        else:
-            active_col_layer = active_col_layer.data
-
-    # in case
-    color = uvcoord = uvcoord_key = normal = normal_key = None
-
-    mesh_verts = mesh.vertices  # save a lookup
-    ply_verts = []  # list of dictionaries
-    # vdict = {} # (index, normal, uv) -> new index
-    vdict = [{} for i in range(len(mesh_verts))]
-    ply_faces = [[] for f in range(len(mesh.tessfaces))]
-    vert_count = 0
-    for i, f in enumerate(mesh.tessfaces):
-
-        smooth = not use_normals or f.use_smooth
-        if not smooth:
-            normal = f.normal[:]
-            normal_key = rvec3d(normal)
+        if not face.use_smooth:
+            normal = face.normal[:]
 
         if has_uv:
-            uv = active_uv_layer[i]
-            uv = uv.uv1, uv.uv2, uv.uv3, uv.uv4
-        if has_vcol:
-            col = active_col_layer[i]
-            col = col.color1[:], col.color2[:], col.color3[:], col.color4[:]
+            uv = uv_data[i].uv1, uv_data[i].uv2, uv_data[i].uv3, uv_data[i].uv4
 
-        f_verts = f.vertices
+        for j, vert in enumerate(face.vertices):
+            v = mesh.vertices[vert]
 
-        pf = ply_faces[i]
-        for j, vidx in enumerate(f_verts):
-            v = mesh_verts[vidx]
-
-            if smooth:
+            if face.use_smooth:
                 normal = v.normal[:]
-                normal_key = rvec3d(normal)
 
             if has_uv:
                 uvcoord = uv[j][0], uv[j][1]
-                uvcoord_key = rvec2d(uvcoord)
 
-            if has_vcol:
-                color = col[j]
-                color = (int(color[0] * 255.0),
-                         int(color[1] * 255.0),
-                         int(color[2] * 255.0),
-                         )
-            key = normal_key, uvcoord_key, color
-
-            vdict_local = vdict[vidx]
-            pf_vidx = vdict_local.get(key)  # Will be None initially
-
-            if pf_vidx is None:  # same as vdict_local.has_key(key)
-                pf_vidx = vdict_local[key] = vert_count
-                ply_verts.append((vidx, normal, uvcoord, color))
-                vert_count += 1
-
-            pf.append(pf_vidx)
+            verts.append((vert, normal, uvcoord))
 
     fw("ply\n")
     fw("format ascii 1.0\n")
@@ -291,47 +139,72 @@ def save_mesh(filepath,
        "www.blender.org, source file: %r\n" %
        (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
 
-    fw("element vertex %d\n" % len(ply_verts))
+    if fem_dimensions != '1' and use_graphics:
+        fw("element vertex %d\n" % len(verts))
+    else:
+        fw("element vertex %d\n" % len(mesh.vertices))
 
     fw("property float x\n"
        "property float y\n"
        "property float z\n")
 
-    if use_normals:
+    if use_graphics:
         fw("property float nx\n"
            "property float ny\n"
            "property float nz\n")
-    if use_uv_coords:
         fw("property float s\n"
            "property float t\n")
-    if use_colors:
-        fw("property uchar red\n"
-           "property uchar green\n"
-           "property uchar blue\n")
 
-    fw("element face %d\n" % len(mesh.tessfaces))
-    fw("property list uchar uint vertex_indices\n")
+        if fem_dimensions != '1':
+            fw("element face %d\n" % len(mesh.polygons))
+            fw("property list uchar uint vertex_indices\n")
+        
+    if fem_dimensions == '1':
+        fw("element 1d_element %d\n" % (len(mesh.vertices)-1))
+        fw("property list uint uint vertex_indices\n")
+    elif fem_dimensions == '2':
+        fw("element 2d_element %d\n" % len(verts))
+        fw("property list uint uint vertex_indices\n")
+    elif fem_dimensions == '3':
+        fw("element 3d_element %d\n" % len(verts))
+        fw("property list uint uint vertex_indices\n")
 
     if boundary_condition is not None:
         fw("element boundary_condition %d\n" % len(boundary_condition))
         fw("property list uint uint vertex_index\n")
     fw("end_header\n")
 
-    for i, v in enumerate(ply_verts):
-        fw("%.6f %.6f %.6f" % mesh_verts[v[0]].co[:])  # co
-        if use_normals:
-            fw(" %.6f %.6f %.6f" % v[1])  # no
-        if use_uv_coords:
-            fw(" %.6f %.6f" % v[2])  # uv
-        if use_colors:
-            fw(" %u %u %u" % v[3])  # col
-        fw("\n")
+    if fem_dimensions != '1':
+        if use_graphics:
+            for vert in verts:
+                fw("%.6f %.6f %.6f" % mesh.vertices[vert[0]].co[:])  # co
+                fw(" %.6f %.6f %.6f" % vert[1])  # no
+                fw(" %.6f %.6f" % vert[2])  # uv
+                fw("\n")
 
-    for pf in ply_faces:
-        if len(pf) == 3:
-            fw("3 %d %d %d\n" % tuple(pf))
+            for face in mesh.polygons:
+                if len(face) == 3:
+                    fw("3 %d %d %d\n" % face.vertices[:])
+                else:
+                    fw("4 %d %d %d %d\n" % face.vertices[:])
         else:
-            fw("4 %d %d %d %d\n" % tuple(pf))
+            for vert in mesh.vertices:
+                fw("%.6f %.6f %.6f\n" % vert.co[:])  # co
+    else:
+        for vert in mesh.vertices:
+            fw("%.6f %.6f %.6f\n" % vert.co[:])  # co
+            
+    if fem_dimensions is '1':
+        for i in (len(mesh.vertices)-1):
+            fw("2 %d %d\n" % list(i, i+1))
+    elif fem_dimensions is '2':
+        for face in mesh.polygons:
+            if len(face) == 3:
+                fw("3 %d %d %d\n" % face.vertices[:])
+            else:
+                fw("3 %d %d %d\n" % face.vertices[:3])
+                fw("3 %d %d %d\n" % face.vertices[1:4])
+    # TODO: FEM 3D tets
 
     if boundary_condition is not None:
         for bc in boundary_condition:
