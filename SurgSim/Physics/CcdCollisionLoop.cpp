@@ -72,6 +72,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	double localTimeOfImpact = 0.0;
 	std::vector<std::list<std::shared_ptr<Collision::Contact>>> oldContacts;
 
+	bool executedOnce = false;
 	size_t iterations = 0;
 	for (; iterations < m_maxIterations; ++iterations)
 	{
@@ -99,6 +100,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 		ccdState = m_buildMlcp->update(dt, ccdState);
 		ccdState = m_solveMlcp->update(dt, ccdState);
 		ccdState = m_pushResults->update(dt, ccdState);
+		executedOnce = true;
 
 		backupContacts(&ccdPairs, &oldContacts);
 
@@ -123,6 +125,14 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 			"Maxed out iterations (" << m_maxIterations << ")";
 
 	restoreContacts(&ccdPairs, &oldContacts);
+	if (!executedOnce)
+	{
+		ccdState = m_constraintGeneration->update(dt, ccdState);
+		ccdState = m_buildMlcp->update(dt, ccdState);
+		ccdState = m_solveMlcp->update(dt, ccdState);
+		ccdState = m_pushResults->update(dt, ccdState);
+	}
+
 	return ccdState;
 }
 
