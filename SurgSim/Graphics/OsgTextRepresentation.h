@@ -124,6 +124,8 @@ private:
 
 	double m_characterSize; ///< the font height
 
+	int m_drawMode; ///< the text drawmode, wether to draw a background or not
+
 	boost::mutex m_parameterMutex; ///< protect changes of parameters
 	bool m_needUpdate;	///< indicate whether parameters need to be updated
 	int m_anchor;

@@ -50,6 +50,7 @@ OsgTextRepresentation::OsgTextRepresentation(const std::string& name) :
 {
 	m_textNode->setDataVariance(osg::Object::DYNAMIC);
 	m_textNode->setUseDisplayList(false);
+	m_drawMode = m_textNode->getDrawMode();
 	m_characterSize = m_textNode->getCharacterHeight();
 	m_geode->addDrawable(m_textNode);
 
@@ -116,6 +117,7 @@ void OsgTextRepresentation::doUpdate(double dt)
 			m_textNode->setText(m_text);
 			m_textNode->setCharacterSize(m_characterSize);
 			m_textNode->setMaximumWidth(m_optionalWidth.hasValue() ? m_optionalWidth.getValue() : 0.0);
+			m_textNode->setDrawMode(m_drawMode);
 			m_needUpdate = false;
 		}
 	}
@@ -188,13 +190,19 @@ SurgSim::DataStructures::OptionalValue<double> OsgTextRepresentation::getOptiona
 
 void OsgTextRepresentation::setDrawBackground(bool value)
 {
+
 	int drawMode = osgText::TextBase::TEXT;
 	if (value)
 	{
 		drawMode |= osgText::TextBase::FILLEDBOUNDINGBOX;
 	}
 
-	m_textNode->setDrawMode(drawMode);
+	boost::mutex::scoped_lock lock(m_parameterMutex);
+	if (drawMode != m_drawMode)
+	{
+		m_drawMode = drawMode;
+		m_needUpdate = true;
+	}
 }
 
 bool OsgTextRepresentation::isDrawingBackground() const

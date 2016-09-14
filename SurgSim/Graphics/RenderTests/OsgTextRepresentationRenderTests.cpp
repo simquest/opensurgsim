@@ -69,7 +69,7 @@ public:
 
 TEST_F(OsgTextRepresentationRenderTests, Operation)
 {
-	auto text =	std::make_shared<OsgTextRepresentation>("HUD");
+	auto text = std::make_shared<OsgTextRepresentation>("HUD");
 	text->setText("HelloWorld");
 	viewElement->addComponent(text);
 
@@ -90,6 +90,51 @@ TEST_F(OsgTextRepresentationRenderTests, Operation)
 	text->setDrawBackground(true);
 	text->setBackgroundColor(Math::Vector4d(0.3, 0.3, 0.3, 1.0));
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1500));
+}
+
+TEST_F(OsgTextRepresentationRenderTests, TwoText)
+{
+	double x = 50;
+	double y = 50;
+
+	{
+		auto text = std::make_shared<OsgTextRepresentation>("1");
+		text->setText("HelloWorld One");
+		text->setDrawBackground(true);
+		text->setBackgroundMargin(5.0);
+		text->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 0.0));
+		text->setBackgroundColor(SurgSim::Math::Vector4d(0.0, 1.0, 0.0, 1.0));
+		text->setLocation(x, y);
+		viewElement->addComponent(text);
+	}
+
+	{
+		auto text = std::make_shared<OsgTextRepresentation>("2");
+		text->setText("HelloWorld One");
+		text->setDrawBackground(true);
+		text->setBackgroundMargin(5.0);
+		text->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 1.0));
+		text->setBackgroundColor(SurgSim::Math::Vector4d(1.0, 0.0, 0.0, 1.0));
+		text->setLocation(x, y+50);
+		viewElement->addComponent(text);
+	}
+
+
+	{
+		auto text = std::make_shared<OsgTextRepresentation>("3");
+		text->setText("HelloWorld One");
+		text->setDrawBackground(true);
+		//text->setBackgroundMargin(5.0);
+		text->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 1.0));
+		text->setBackgroundColor(SurgSim::Math::Vector4d(0.0, 0.0, 1.0, 1.0));
+		text->setLocation(x, y+100);
+		viewElement->addComponent(text);
+	}
+
+	runtime->start();
+	EXPECT_TRUE(graphicsManager->isInitialized());
+	EXPECT_TRUE(viewElement->isInitialized());
+	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
 }
 
 TEST_F(OsgTextRepresentationRenderTests, WorldSpace)
