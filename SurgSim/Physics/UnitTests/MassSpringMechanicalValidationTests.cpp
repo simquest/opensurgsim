@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -204,7 +204,10 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 	double period = 1.0 / f;
 	// Let's look for a time step, factor of period, small enough for stability of Explicit Euler (~1Khz)
 	m_dt = period;
-	while(m_dt > 1e-3) m_dt *= 0.5;
+	while(m_dt > 1e-3)
+	{
+		m_dt *= 0.5;
+	}
 
 	// Simulate a single mass connected to a spring at the same time for comparison purpose
 	Vector3d x0 = SurgSim::Math::getSubVector(m.getInitialState()->getPositions(), 1, 3);

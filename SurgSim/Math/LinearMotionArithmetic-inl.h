@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -687,7 +687,7 @@ Polynomial <T, 3> analyticTripleProduct(const LinearMotionND<T, 3>& a, const Lin
 }
 
 template <typename T>
-static Interval<T> tripleProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
+Interval<T> tripleProduct(const LinearMotionND<T, 3>& a, const LinearMotionND<T, 3>& b,
 								 const LinearMotionND<T, 3>& c, const Interval<T>& range)
 {
 	return valuesOverInterval(analyticTripleProduct(a, b, c), range);

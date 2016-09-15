@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,10 @@ namespace Physics
 std::shared_ptr<MockFemElement> createFemElement(std::array<size_t, 2> nodes)
 {
 	auto element = std::make_shared<MockFemElement>();
-	for (const auto& node : nodes) element->addNode(node);
+	for (const auto& node : nodes)
+	{
+		element->addNode(node);
+	}
 	element->setMassDensity(1000.0);
 	element->setPoissonRatio(0.45);
 	element->setYoungModulus(1e6);
