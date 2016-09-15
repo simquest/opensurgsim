@@ -133,6 +133,30 @@ def save_mesh(filepath,
 
             verts.append((vert, normal, uvcoord))
 
+    elements = []
+    if fem_dimensions == '3':
+        indices = []
+        for face in mesh.polygons:
+            print(face.vertices[:])
+            new_vert = 0
+            for vert in face.vertices:
+                if vert not in indices:
+                    new_vert += 1
+
+            if new_vert > 0:
+                if len(indices) + new_vert <= 4:
+                    for vert in face.vertices:
+                        if vert not in indices:
+                            indices.append(vert)
+                else:
+                    elements.append(indices)
+                    indices = []
+                    for vert in face.vertices:
+                        indices.append(vert)
+
+        if len(indices) == 4:
+            elements.append(indices)
+
     fw("ply\n")
     fw("format ascii 1.0\n")
     fw("comment Created by Blender %s - "
@@ -144,30 +168,38 @@ def save_mesh(filepath,
     else:
         fw("element vertex %d\n" % len(mesh.vertices))
 
-    fw("property float x\n"
-       "property float y\n"
-       "property float z\n")
+    fw("property double x\n"
+       "property double y\n"
+       "property double z\n")
 
     if use_graphics:
-        fw("property float nx\n"
-           "property float ny\n"
-           "property float nz\n")
-        fw("property float s\n"
-           "property float t\n")
+        fw("property double nx\n"
+           "property double ny\n"
+           "property double nz\n")
+        if has_uv:
+            fw("property double s\n"
+               "property double t\n")
 
         if fem_dimensions != '1':
             fw("element face %d\n" % len(mesh.polygons))
-            fw("property list uchar uint vertex_indices\n")
+            fw("property list uint uint vertex_indices\n")
         
     if fem_dimensions == '1':
         fw("element 1d_element %d\n" % (len(mesh.vertices)-1))
         fw("property list uint uint vertex_indices\n")
     elif fem_dimensions == '2':
-        fw("element 2d_element %d\n" % len(verts))
+        fw("element 2d_element %d\n" % len(mesh.polygons))
         fw("property list uint uint vertex_indices\n")
     elif fem_dimensions == '3':
-        fw("element 3d_element %d\n" % len(verts))
+        fw("element 3d_element %d\n" % len(elements))
         fw("property list uint uint vertex_indices\n")
+
+    # TODO Implement physics material property in other addon
+    # if passed in variables are empty
+    fw("element material 1\n")
+    fw("property double mass_density\n")
+    fw("property double poisson_ratio\n")
+    fw("property double young_modulus\n")
 
     if boundary_condition is not None:
         fw("element boundary_condition %d\n" % len(boundary_condition))
@@ -179,11 +211,12 @@ def save_mesh(filepath,
             for vert in verts:
                 fw("%.6f %.6f %.6f" % mesh.vertices[vert[0]].co[:])  # co
                 fw(" %.6f %.6f %.6f" % vert[1])  # no
-                fw(" %.6f %.6f" % vert[2])  # uv
+                if has_uv:
+                    fw(" %.6f %.6f" % vert[2])  # uv
                 fw("\n")
 
             for face in mesh.polygons:
-                if len(face) == 3:
+                if len(face.vertices) == 3:
                     fw("3 %d %d %d\n" % face.vertices[:])
                 else:
                     fw("4 %d %d %d %d\n" % face.vertices[:])
@@ -199,12 +232,18 @@ def save_mesh(filepath,
             fw("2 %d %d\n" % list(i, i+1))
     elif fem_dimensions is '2':
         for face in mesh.polygons:
-            if len(face) == 3:
+            if len(face.vertices) == 3:
                 fw("3 %d %d %d\n" % face.vertices[:])
             else:
                 fw("3 %d %d %d\n" % face.vertices[:3])
                 fw("3 %d %d %d\n" % face.vertices[1:4])
-    # TODO: FEM 3D tets
+    elif fem_dimensions is '3':
+        for tet in elements:
+            fw("4 %s\n" % ' '.join(map(str, tet)))
+
+    # TODO Implement physics material property in other addon
+    # if passed in variables are empty
+    fw("900.0 0.45 1.75e9\n")
 
     if boundary_condition is not None:
         for bc in boundary_condition:
