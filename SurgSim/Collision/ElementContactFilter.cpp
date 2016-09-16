@@ -74,6 +74,8 @@ bool ElementContactFilter::doWakeUp()
 void ElementContactFilter::setFilter(const std::shared_ptr<Framework::Component>& other,
 									 const std::vector<size_t>& indices)
 {
+	SURGSIM_ASSERT(std::dynamic_pointer_cast<SurgSim::Collision::Representation>(other) != nullptr)
+			<< "Need a collision representation as a filter object.";
 	boost::lock_guard<boost::mutex> guard(m_writeMutex);
 	m_writeBuffer[other.get()] = indices;
 }
@@ -133,6 +135,11 @@ void ElementContactFilter::doFilterContacts(const std::shared_ptr<Physics::Physi
 {
 	for (const auto& filter : m_filters)
 	{
+		if (filter.second.empty())
+		{
+			continue;
+		}
+
 		for (size_t i = 0, j = 1; i < 2; ++i, --j)
 		{
 			if (pairAt(pair->getRepresentations(), i).get() == getRepresentation().get() &&
@@ -142,7 +149,6 @@ void ElementContactFilter::doFilterContacts(const std::shared_ptr<Physics::Physi
 			}
 		}
 	}
-
 }
 
 void ElementContactFilter::doUpdate(double dt)

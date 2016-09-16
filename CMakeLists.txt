@@ -99,7 +99,7 @@ endif()
 
 include_directories(${SURGSIM_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(SYSTEM
+include_directories(
 	${Boost_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}

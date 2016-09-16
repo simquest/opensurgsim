@@ -45,11 +45,11 @@ struct convert<std::shared_ptr<T>>
 {
 	static YAML::Node encode(
 		const typename std::enable_if <std::is_base_of <SurgSim::Framework::Component, T>::value,
-		std::shared_ptr<T> >::type  rhs);
+		std::shared_ptr<T>>::type  rhs);
 	static bool decode(
 		const Node& node,
 		typename std::enable_if <std::is_base_of<SurgSim::Framework::Component, T>::value,
-		std::shared_ptr<T> >::type& rhs); //NOLINT
+		std::shared_ptr<T>>::type& rhs); //NOLINT
 };
 
 
@@ -92,6 +92,16 @@ struct convert<std::shared_ptr<SurgSim::Framework::SceneElement>>
 };
 
 template<>
+struct convert <std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>
+{
+
+	static bool decode(const Node& node,
+					   std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>& rhs, //NOLINT
+					   std::vector<std::string>* stack = nullptr);
+};
+
+
+template<>
 struct convert<SurgSim::Framework::SceneElement>
 {
 	static Node encode(const SurgSim::Framework::SceneElement& rhs);
@@ -110,6 +120,7 @@ struct convert<std::shared_ptr<SurgSim::Framework::Asset>>
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Asset> rhs);
 	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Asset>& rhs); //NOLINT
 };
+
 
 };
 

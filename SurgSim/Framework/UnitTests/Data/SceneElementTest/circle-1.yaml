@@ -1,0 +1,9 @@
+- SurgSim::Framework::BasicSceneElement:
+    Name: element
+    IsActive: true
+    Components:
+      - MockComponent:
+          Name: clone
+- INCLUDE: SceneElementTest/circle-2.yaml
+
+

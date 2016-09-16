@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 #ifndef SURGSIM_FRAMEWORK_TRANSFERPROPERTIESBEHAVIOR_H
 #define SURGSIM_FRAMEWORK_TRANSFERPROPERTIESBEHAVIOR_H
 
+#include <boost/thread/mutex.hpp>
 #include <string>
 
-#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Behavior.h"
 
-#include <boost/thread/mutex.hpp>
 
 namespace SurgSim
 {
@@ -72,8 +72,8 @@ public:
 	/// \param managerType Type of manager for this behavior
 	void setTargetManagerType(int managerType);
 
-	/// Overridden from Behavior
-	/// \param dt The time step.
+	int getTargetManagerType() const override;
+
 	void update(double dt) override;
 
 private:
@@ -82,7 +82,6 @@ private:
 	/// Overridden from Behavior
 	bool doInitialize() override;
 	bool doWakeUp() override;
-	virtual int getTargetManagerType() const;
 	///@}
 
 	/// Local typedefs
@@ -96,6 +95,8 @@ private:
 
 	/// Queue for adding new connections
 	std::vector<Connection> m_incomingConnections;
+
+	/// The manager type that will handle this behavior
 	int m_targetManager;
 };
 
