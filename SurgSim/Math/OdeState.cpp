@@ -35,7 +35,7 @@ OdeState::~OdeState()
 bool OdeState::operator ==(const OdeState& state) const
 {
 	return m_x == state.m_x && m_v == state.m_v && m_boundaryConditionsPerDof == state.m_boundaryConditionsPerDof &&
-		m_nonDofBoundaryConditions == state.m_nonDofBoundaryConditions;
+		m_boundaryConditionsStaticDof == state.m_boundaryConditionsStaticDof;
 }
 
 bool OdeState::operator !=(const OdeState& state) const
@@ -49,7 +49,7 @@ void OdeState::reset()
 	m_v.setZero();
 	m_boundaryConditionsPerDof.setConstant(false);
 	m_boundaryConditionsAsDofIds.clear();
-	m_nonDofBoundaryConditions.clear();
+	m_boundaryConditionsStaticDof.clear();
 }
 
 void OdeState::setNumDof(size_t numDofPerNode, size_t numNodes)
