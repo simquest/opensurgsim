@@ -30,18 +30,18 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
     filter_glob = StringProperty(default="*.ply", options={'HIDDEN'})
 
     use_graphics = BoolProperty(
-            name="Export Graphics",
-            description="Include data for graphics meshes",
-            default=False,
-            )
+        name="Export Graphics",
+        description="Include data for graphics meshes",
+        default=False,
+    )
     fem_dimensions = EnumProperty(
-            name="FEM",
-            items=(('1', "FEM 1D", ""),
-                   ('2', "FEM 2D", ""),
-                   ('3', "FEM 3D", ""),
-                  ),
-            default='2',
-            )
+        name="FEM",
+        items=(('1', "FEM 1D", ""),
+               ('2', "FEM 2D", ""),
+               ('3', "FEM 3D", ""),
+               ),
+        default='2',
+    )
 
     @classmethod
     def poll(cls, context):
@@ -61,17 +61,17 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
         layout = self.layout
 
         row = layout.row()
-        row.prop(self, "use_graphics")        
+        row.prop(self, "use_graphics")
 
         layout.prop(self, "fem_dimensions")
 
 
 def export_fem_save(operator,
-         context,
-         fem_dimensions,
-         filepath="",
-         use_graphics=False,
-         ):
+                    context,
+                    fem_dimensions,
+                    filepath="",
+                    use_graphics=False,
+                    ):
 
     scene = context.scene
     object = context.active_object
@@ -114,24 +114,32 @@ def save_mesh(filepath,
     uvcoord = normal = None
 
     verts = []
-    for i, face in enumerate(mesh.polygons):
+    faces = []
+    vert_count = 0
+    if use_graphics and has_uv:
+        for i, polygon in enumerate(mesh.polygons):
 
-        if not face.use_smooth:
-            normal = face.normal[:]
-
-        if has_uv:
-            uv = uv_data[i].uv1, uv_data[i].uv2, uv_data[i].uv3, uv_data[i].uv4
-
-        for j, vert in enumerate(face.vertices):
-            v = mesh.vertices[vert]
-
-            if face.use_smooth:
-                normal = v.normal[:]
+            if not polygon.use_smooth:
+                normal = polygon.normal[:]
 
             if has_uv:
-                uvcoord = uv[j][0], uv[j][1]
+                uv = uv_data[i].uv1, uv_data[i].uv2, uv_data[i].uv3, uv_data[i].uv4
 
-            verts.append((vert, normal, uvcoord))
+            face = faces[i]
+            for j, vert in enumerate(polygon.vertices):
+                v = mesh.vertices[vert]
+
+                if polygon.use_smooth:
+                    normal = v.normal[:]
+
+                if has_uv:
+                    uvcoord = uv[j][0], uv[j][1]
+
+                verts.append((vert, normal, uvcoord))
+                face.append(vert_count);
+                vert_count += 1
+    else:
+        vert_count = len(mesh.vertices)
 
     elements = []
     if fem_dimensions == '3':
@@ -164,9 +172,7 @@ def save_mesh(filepath,
        (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
 
     if fem_dimensions != '1' and use_graphics:
-        fw("element vertex %d\n" % len(verts))
-    else:
-        fw("element vertex %d\n" % len(mesh.vertices))
+        fw("element vertex %d\n" % vert_count)
 
     fw("property double x\n"
        "property double y\n"
@@ -183,9 +189,9 @@ def save_mesh(filepath,
         if fem_dimensions != '1':
             fw("element face %d\n" % len(mesh.polygons))
             fw("property list uint uint vertex_indices\n")
-        
+
     if fem_dimensions == '1':
-        fw("element 1d_element %d\n" % (len(mesh.vertices)-1))
+        fw("element 1d_element %d\n" % vert_count-1)
         fw("property list uint uint vertex_indices\n")
     elif fem_dimensions == '2':
         fw("element 2d_element %d\n" % len(mesh.polygons))
@@ -208,25 +214,33 @@ def save_mesh(filepath,
 
     if fem_dimensions != '1':
         if use_graphics:
-            for vert in verts:
-                fw("%.6f %.6f %.6f" % mesh.vertices[vert[0]].co[:])  # co
-                fw(" %.6f %.6f %.6f" % vert[1])  # no
-                if has_uv:
-                    fw(" %.6f %.6f" % vert[2])  # uv
-                fw("\n")
-
-            for face in mesh.polygons:
-                if len(face.vertices) == 3:
-                    fw("3 %d %d %d\n" % face.vertices[:])
-                else:
-                    fw("4 %d %d %d %d\n" % face.vertices[:])
+            if has_uv:
+                for vert in verts:
+                    fw("%.6f %.6f %.6f" % mesh.vertices[vert[0]].co[:])  # co
+                    fw(" %.6f %.6f %.6f" % vert[1])  # no
+                    if has_uv:
+                        fw(" %.6f %.6f" % vert[2])  # uv
+                    fw("\n")
+                for face in faces:
+                    if len(face) == 3:
+                        fw("3 %d %d %d\n" % face[:])
+                    else:
+                        fw("4 %d %d %d %d\n" % face[:])
+            else:
+                for vert in mesh.vertices:
+                    fw("%.6f %.6f %.6f\n" % vert.co[:])  # co
+                for face in mesh.polygons:
+                    if len(face.vertices) == 3:
+                        fw("3 %d %d %d\n" % face.vertices[:])
+                    else:
+                        fw("4 %d %d %d %d\n" % face.vertices[:])
         else:
             for vert in mesh.vertices:
                 fw("%.6f %.6f %.6f\n" % vert.co[:])  # co
     else:
         for vert in mesh.vertices:
             fw("%.6f %.6f %.6f\n" % vert.co[:])  # co
-            
+
     if fem_dimensions is '1':
         for i in (len(mesh.vertices)-1):
             fw("2 %d %d\n" % list(i, i+1))
