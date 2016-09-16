@@ -34,7 +34,8 @@ OdeState::~OdeState()
 
 bool OdeState::operator ==(const OdeState& state) const
 {
-	return m_x == state.m_x && m_v == state.m_v && m_boundaryConditionsPerDof == state.m_boundaryConditionsPerDof;
+	return m_x == state.m_x && m_v == state.m_v && m_boundaryConditionsPerDof == state.m_boundaryConditionsPerDof &&
+		m_nonDofBoundaryConditions == state.m_nonDofBoundaryConditions;
 }
 
 bool OdeState::operator !=(const OdeState& state) const
@@ -48,6 +49,7 @@ void OdeState::reset()
 	m_v.setZero();
 	m_boundaryConditionsPerDof.setConstant(false);
 	m_boundaryConditionsAsDofIds.clear();
+	m_nonDofBoundaryConditions.clear();
 }
 
 void OdeState::setNumDof(size_t numDofPerNode, size_t numNodes)
@@ -159,11 +161,29 @@ Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 	SURGSIM_ASSERT(vector != nullptr && vector->size() >= 0 && static_cast<size_t>(vector->size()) == getNumDof())
 			<< "Invalid vector to apply boundary conditions on";
 
+	const size_t numDofPerNode = getNumDof() / getNumNodes();
+	const size_t N = numDofPerNode * (getNumNodes() - 2);
 	for (auto it = getBoundaryConditions().cbegin();
 		 it != getBoundaryConditions().cend();
 		 ++it)
 	{
-		(*vector)[*it] = 0.0;
+		//if (*it == N)
+		//{
+		//	(*vector)[*it] = -0.0001;
+		//	std::cout << "(*vector)["<<*it<<"] = -0.01;" << std::endl;
+		//}
+		//else if (*it == N + 1)
+		//{
+		//	(*vector)[*it] = -0.00001;
+		//}
+		//else if (*it == N + 2)
+		//{
+		//	(*vector)[*it] = -0.0000003;
+		//}
+		//else
+		{
+			(*vector)[*it] = 0.0;
+		}
 	}
 
 	return vector;
@@ -213,6 +233,35 @@ void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCom
 		Math::zeroColumn(static_cast<SparseMatrix::Index>((*it)), matrix);
 		(*matrix).coeffRef(static_cast<SparseMatrix::Index>(*it),
 						   static_cast<SparseMatrix::Index>(*it)) = complianceValue;
+	}
+}
+
+void OdeState::addBoundaryConditionStaticDof(size_t nodeId, double value)
+{
+	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
+		"Number of dof per node = 0. Make sure to call setNumDof() " <<
+		"prior to adding boundary conditions.";
+	SURGSIM_ASSERT(nodeId < m_numNodes) << "Invalid nodeId " << nodeId << " number of nodes is " << m_numNodes;
+
+	m_boundaryConditionsStaticDof.push_back(std::make_pair(nodeId, value));
+}
+
+size_t OdeState::getNumBoundaryConditionsStaticDof() const
+{
+	return m_boundaryConditionsStaticDof.size();
+}
+
+const std::vector<std::pair<size_t, double>>& OdeState::getBoundaryConditionsStaticDof() const
+{
+	return m_boundaryConditionsStaticDof;
+}
+
+void OdeState::setBoundaryConditionStaticDof(size_t nodeId, double value)
+{
+	auto bc = std::find_if(m_boundaryConditionsStaticDof.begin(), m_boundaryConditionsStaticDof.end(), [&nodeId](std::pair<size_t, double>& pair) { return pair.first == nodeId;  });
+	if (bc != m_boundaryConditionsStaticDof.end())
+	{
+		bc->second = value;
 	}
 }
 
