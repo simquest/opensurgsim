@@ -209,6 +209,24 @@ std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 	return result;
 }
 
+boost::any SceneElement::getValue(const std::string& component, const std::string& property) const
+{
+	auto found = m_components.find(component);
+	SURGSIM_ASSERT(found != m_components.end())
+		<< "Component named " << component << " not found in SceneElement named " << getName()
+		<< ". Cannot get " << property << " property.";
+	return found->second->getValue(property);
+}
+
+void SceneElement::setValue(const std::string& component, const std::string& property, const boost::any& value)
+{
+	auto found = m_components.find(component);
+	SURGSIM_ASSERT(found != m_components.end())
+		<< "Component named " << component << " not found in SceneElement named " << getName()
+		<< ". Cannot get " << property << " property.";
+	found->second->setValue(property, value);
+}
+
 void SceneElement::setScene(std::weak_ptr<Scene> scene)
 {
 	m_scene = scene;
