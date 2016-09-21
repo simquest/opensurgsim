@@ -81,31 +81,33 @@ bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	}
 
 
-	if (m_hasPerElementMaterial)
+	if (m_hasMaterial)
 	{
-		reader->requestScalarProperty(
-			getElementName(), "mass_density", PlyReader::TYPE_DOUBLE, offsetof(ElementData, massDensity));
-		reader->requestScalarProperty(
-			getElementName(), "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(ElementData, poissonRatio));
-		reader->requestScalarProperty(
-			getElementName(), "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(ElementData, youngModulus));
+		if (m_hasPerElementMaterial)
+		{
+			reader->requestScalarProperty(
+					getElementName(), "mass_density", PlyReader::TYPE_DOUBLE, offsetof(ElementData, massDensity));
+			reader->requestScalarProperty(
+					getElementName(), "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(ElementData, poissonRatio));
+			reader->requestScalarProperty(
+					getElementName(), "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(ElementData, youngModulus));
+		}
+		else
+		{
+			reader->requestElement(
+					"material",
+					std::bind(
+							&FemPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
+					nullptr,
+					std::bind(&FemPlyReaderDelegate::endMaterials, this, std::placeholders::_1));
+			reader->requestScalarProperty(
+					"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
+			reader->requestScalarProperty(
+					"material", "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, poissonRatio));
+			reader->requestScalarProperty(
+					"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
+		}
 	}
-	else
-	{
-		reader->requestElement(
-			"material",
-			std::bind(
-				&FemPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
-			nullptr,
-			std::bind(&FemPlyReaderDelegate::endMaterials, this, std::placeholders::_1));
-		reader->requestScalarProperty(
-			"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
-		reader->requestScalarProperty(
-			"material", "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, poissonRatio));
-		reader->requestScalarProperty(
-			"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
-	}
-
 
 	reader->setEndParseFileCallback(std::bind(&FemPlyReaderDelegate::endParseFile, this));
 
@@ -133,7 +135,7 @@ bool FemPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 
 	// Material: either have a default material for all elements
 	// or have per element material properties
-	bool hasMaterial = reader.hasProperty("material", "mass_density") &&
+	m_hasMaterial = reader.hasProperty("material", "mass_density") &&
 					   reader.hasProperty("material", "poisson_ratio") &&
 					   reader.hasProperty("material", "young_modulus");
 
@@ -141,9 +143,11 @@ bool FemPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 							  reader.hasProperty(getElementName(), "poisson_ratio") &&
 							  reader.hasProperty(getElementName(), "young_modulus");
 
+	m_hasMaterial = m_hasMaterial || m_hasPerElementMaterial;
+
 	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
 
-	return result && (hasMaterial || m_hasPerElementMaterial);
+	return result;
 }
 
 void* FemPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
