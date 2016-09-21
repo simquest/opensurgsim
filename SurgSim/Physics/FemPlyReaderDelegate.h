@@ -123,6 +123,7 @@ protected:
 		int64_t overrun; ///< Used to check for buffer overruns
 	} m_materialData;
 
+	bool m_hasMaterial;
 	bool m_hasPerElementMaterial;
 
 	/// Internal data to receive the fem element
