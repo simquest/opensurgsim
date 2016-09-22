@@ -42,7 +42,6 @@ set(OSS_GIT_REPOSITORY "git://git.assembla.com/OpenSurgSim.git")
 set(OSS_WITH_COVERAGE TRUE)
 set(OSS_COVERAGE_EXTRA_FLAGS "-g -fprofile-arcs -ftest-coverage")
 set(OSS_WITH_MEMCHECK TRUE)
-set(OSS_MEMORYCHECK_SUPPRESSIONS_FILE "${OSS_DASHBOARD_ROOT}/${OSS_SOURCE_NAME}/Tools/memcheck.supp")
 set(OSS_INITIAL_CACHE "")
 
 ##############################################################################
@@ -88,7 +87,7 @@ if(OSS_WITH_MEMCHECK)
 	find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind purify)
 
 	if(CTEST_MEMORYCHECK_COMMAND)
-		set(CTEST_MEMORYCHECK_SUPPRESSIONS_FILE "${OSS_MEMORYCHECK_SUPPRESSIONS_FILE}")
+		set(VALGRIND_COMMAND_OPTIONS "-q --tool=memcheck --leak-check=yes --num-callers=50")
 	endif()
 endif()
 
