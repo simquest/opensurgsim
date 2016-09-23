@@ -30,6 +30,7 @@ using SurgSim::Graphics::View;
 
 Manager::Manager() : ComponentManager("Graphics Manager")
 {
+	setRate(60.0);
 }
 
 Manager::~Manager()
