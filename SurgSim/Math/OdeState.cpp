@@ -167,23 +167,7 @@ Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 		 it != getBoundaryConditions().cend();
 		 ++it)
 	{
-		//if (*it == N)
-		//{
-		//	(*vector)[*it] = -0.0001;
-		//	std::cout << "(*vector)["<<*it<<"] = -0.01;" << std::endl;
-		//}
-		//else if (*it == N + 1)
-		//{
-		//	(*vector)[*it] = -0.00001;
-		//}
-		//else if (*it == N + 2)
-		//{
-		//	(*vector)[*it] = -0.0000003;
-		//}
-		//else
-		{
-			(*vector)[*it] = 0.0;
-		}
+		(*vector)[*it] = 0.0;
 	}
 
 	return vector;
