@@ -1,0 +1,6 @@
+[submodule "Modules/Vascular"]
+	path = Modules/Vascular
+	url = https://git.assembla.com/simquest.Vascular.git
+[submodule "Modules/SimQuest"]
+	path = Modules/SimQuest
+	url = https://git.assembla.com/simquest.modules.git
