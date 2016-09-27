@@ -69,7 +69,7 @@ void Fem1DPlyReaderDelegate::endParseFile()
 	{
 		element->radius = m_radius;
 		element->enableShear = m_enableShear;
-		if (!m_hasPerElementMaterial)
+		if (!m_hasPerElementMaterial && m_hasMaterial)
 		{
 			element->massDensity = m_materialData.massDensity;
 			element->poissonRatio = m_materialData.poissonRatio;
