@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
 
 #ifndef SURGSIM_FRAMEWORK_SCENEELEMENT_INL_H
 #define SURGSIM_FRAMEWORK_SCENEELEMENT_INL_H
+
+#include "SurgSim/Framework/Component.h"
+
 
 namespace SurgSim
 {
@@ -36,6 +39,28 @@ std::vector<std::shared_ptr<T>> SceneElement::getComponents() const
 		{
 			result.emplace_back(std::move(typedElement));
 		}
+	}
+	return result;
+}
+
+template <class T>
+T SceneElement::getValue(const std::string& component, const std::string& property) const
+{
+	auto found = m_components.find(component);
+	SURGSIM_ASSERT(found != m_components.end())
+		<< "Component named " << component << " not found in SceneElement named " << getName()
+		<< ". Cannot get " << property << " property.";
+	return found->second->getValue<T>(property);
+}
+
+template <class T>
+bool SceneElement::getValue(const std::string& component, const std::string& property, T* value) const
+{
+	bool result = false;
+	auto found = m_components.find(component);
+	if (found != m_components.end())
+	{
+		result = found->second->getValue(property, value);
 	}
 	return result;
 }

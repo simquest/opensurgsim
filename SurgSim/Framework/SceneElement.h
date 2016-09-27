@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
 #ifndef SURGSIM_FRAMEWORK_SCENEELEMENT_H
 #define SURGSIM_FRAMEWORK_SCENEELEMENT_H
 
-#include <string>
-#include <memory>
 #include <algorithm>
+#include <boost/any.hpp>
+#include <memory>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include "SurgSim/Math/RigidTransform.h"
+
 
 namespace YAML
 {
@@ -99,6 +101,39 @@ public:
 	/// \return The type T components
 	template <class T>
 	std::vector<std::shared_ptr<T>> getComponents() const;
+
+	/// Retrieves the property value from a component
+	/// \throws SurgSim::Framework::AssertionFailure If the conversion fails or the property cannot be found.
+	/// \tparam T The requested type for the property.
+	/// \param	component The name of the component.
+	/// \param	property The name of the property.
+	/// \return	The value of the property if found.
+	template <class T>
+	T getValue(const std::string& component, const std::string& property) const;
+
+	/// Retrieves the property value from a component
+	/// \throws SurgSim::Framework::AssertionFailure if the property cannot be found
+	/// \param	component The name of the component.
+	/// \param	property The name of the property.
+	/// \return	The value of the property if found.
+	boost::any getValue(const std::string& component, const std::string& property) const;
+
+	/// Retrieves the property value from a component, and convertis it to the
+	/// type of the output parameter. This does not throw.
+	/// \tparam T	the type of the property
+	/// \param	component The name of the component.
+	/// \param	property The name of the property.
+	/// \param [out]	value	If non-null, will receive the value of the given property.
+	/// \return	true if value != nullptr and the property is found.
+	template <class T>
+	bool getValue(const std::string& component, const std::string& property, T* value) const;
+
+	/// Sets the property value of a component
+	/// \throws SurgSim::Framework::AssertionFailure If the property cannot be found.
+	/// \param	component The name of the component.
+	/// \param	property The name of the property.
+	/// \param	value	The value that it should be set to.
+	void setValue(const std::string& component, const std::string& property, const boost::any& value);
 
 	/// Add this scene element to the given group
 	/// \param group name of the group

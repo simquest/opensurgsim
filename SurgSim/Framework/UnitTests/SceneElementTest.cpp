@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/any.hpp>
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -258,6 +259,37 @@ TEST(SceneElementTest, GetTypedComponentsTests)
 
 	element->removeComponent(component2);
 	EXPECT_EQ(0u, element->getComponents<MockComponent>().size());
+}
+
+TEST(SceneElementTest, GetSetValue)
+{
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+	std::shared_ptr<MockComponent> component(new MockComponent("Component"));
+	element->addComponent(component);
+
+	{
+		float value;
+		EXPECT_FALSE(element->getValue("Component", "MissingProperty", &value));
+		EXPECT_THROW(element->getValue("Component", "MissingProperty"), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(element->getValue<bool>("Component", "MissingProperty"), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(element->setValue("Component", "MissingProperty", value), SurgSim::Framework::AssertionFailure);
+	}
+	{
+		bool value = false;
+		component->succeedWithInit = true;
+		EXPECT_TRUE(element->getValue("Component", "SucceedWithInit", &value));
+		EXPECT_TRUE(value);
+		EXPECT_NO_THROW(element->getValue("Component", "SucceedWithInit"));
+		EXPECT_NO_THROW(element->getValue<bool>("Component", "SucceedWithInit"));
+		EXPECT_TRUE(boost::any_cast<bool>(element->getValue("Component", "SucceedWithInit")));
+		EXPECT_TRUE(element->getValue<bool>("Component", "SucceedWithInit"));
+	}
+	{
+		bool value = true;
+		component->succeedWithWakeUp = false;
+		EXPECT_NO_THROW(element->setValue("Component", "SucceedWithWakeUp", value));
+		EXPECT_TRUE(component->succeedWithWakeUp);
+	}
 }
 
 TEST(SceneElementTest, InitComponentTest)
