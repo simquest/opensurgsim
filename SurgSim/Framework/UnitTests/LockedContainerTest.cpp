@@ -578,11 +578,11 @@ void testReaderAndWriters(int numWriters)
 
 	LockedContainer<BigData> data;
 
-	std::vector<DataWriter*> writers(numWriters);
+	std::vector<std::unique_ptr<DataWriter>> writers(numWriters);
 	for (size_t i = 0;  i < writers.size();  ++i)
 	{
 		// The step has been chosen so two writers can't ever produce the same value
-		writers[i] = new DataWriter(data, static_cast<int>(i), numWriters, NUM_TOTAL_WRITES/numWriters);
+		writers[i] = std::unique_ptr<DataWriter>(new DataWriter(data, static_cast<int>(i), numWriters, NUM_TOTAL_WRITES/numWriters));
 	}
 	{
 		BigData value;
