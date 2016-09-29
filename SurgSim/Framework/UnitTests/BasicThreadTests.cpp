@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ TEST(BasicThreadTest, DestructStoppedThread)
 
 	m->stop();
 
-	EXPECT_NO_THROW(m.release());
+	EXPECT_NO_THROW(m.reset());
 }
 
 TEST(BasicThreadTest, SynchronousThread)
