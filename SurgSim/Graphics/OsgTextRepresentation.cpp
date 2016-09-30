@@ -20,7 +20,10 @@
 #include <osg/PositionAttitudeTransform>
 #include <osgText/Text>
 
-#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgFont.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
@@ -32,6 +35,28 @@
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
+
+
+namespace
+{
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> createDefaultMaterial()
+{
+	auto material = SurgSim::Graphics::buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
+	material->setName("unlittext");
+	std::string path;
+	SURGSIM_ASSERT(SurgSim::Framework::Runtime::getApplicationData()->tryFindFile("Textures/white.png", &path))
+			<< "Could not find default texture 'Textures/white.png'";
+	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
+	texture->loadImage(path);
+	auto textureUniform = std::make_shared
+						  <SurgSim::Graphics::OsgTextureUniform <SurgSim:: Graphics::OsgTexture2d>>("texture");
+
+	textureUniform->set(texture);
+	material->addUniform(textureUniform);
+	return material;
+}
+
+}
 
 namespace SurgSim
 {
@@ -64,9 +89,8 @@ OsgTextRepresentation::OsgTextRepresentation(const std::string& name) :
 	}
 	catch (std::exception e)
 	{
-		font = nullptr;
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
-				<< "Could not set default font Fonts/Vera.ttf";
+				<< "Could not set the font Fonts/Vera.ttf, the default will be used";
 	}
 
 	m_font = font;
@@ -127,19 +151,14 @@ void OsgTextRepresentation::doUpdate(double dt)
 
 bool OsgTextRepresentation::doInitialize()
 {
+
 	bool result = true;
 
 	// if the material was preassigned, don't create a default one
 	if (getMaterial() == nullptr)
 	{
-		result = false;
-		auto material = buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
-		if (material != nullptr)
-		{
-			m_textNode->getOrCreateStateSet()->addUniform(new osg::Uniform("texture", 0));
-			setMaterial(material);
-			result = true;
-		}
+		setMaterial(OsgTextRepresentation::getDefaultMaterial());
+		m_textNode->getOrCreateStateSet()->addUniform(new osg::Uniform("texture", 0));
 	}
 
 	return result;
@@ -184,6 +203,13 @@ void OsgTextRepresentation::setOptionalMaximumWidth(SurgSim::DataStructures::Opt
 SurgSim::DataStructures::OptionalValue<double> OsgTextRepresentation::getOptionalMaximumWidth()
 {
 	return m_optionalWidth;
+}
+
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> OsgTextRepresentation::getDefaultMaterial()
+{
+
+	static Framework::SharedInstance<OsgMaterial> shared(createDefaultMaterial);
+	return shared.get();
 }
 
 void OsgTextRepresentation::setDrawBackground(bool value)
