@@ -39,6 +39,12 @@ struct MlcpSolution
 
 	/// The number of iterations performed.
 	size_t numIterations;
+	/// The max iterations allowed for a solve.
+	size_t maxIterations;
+	/// The precision, aka epsilon convergence.
+	double epsilonConvergence;
+	/// The contact tolerance.
+	double contactTolerance;
 	/// True if the final value of the convergence criteria is valid.
 	bool validConvergence;
 	/// True if the final solution satisfies the Signorini conditions.
