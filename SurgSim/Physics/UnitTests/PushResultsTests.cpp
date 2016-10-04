@@ -161,6 +161,119 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 	EXPECT_NEAR(1.3 * 2.0 * dt, pose.translation()[2], epsilon);
 }
 
+
+TEST_F(PushResultsTests, DiscardBadResultsTest)
+{
+	// Prep the list of representations: use only 1 rigid representation + 1 fixed
+	m_usedRepresentations.push_back(m_allRepresentations[0]);
+	m_usedRepresentations.push_back(m_fixedWorldRepresentation);
+	// Set the representation list in the Physics Manager State
+	m_physicsManagerState->setRepresentations(m_usedRepresentations);
+	// The type of constraint.
+	auto constraintType = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
+
+	// Prep the list of constraints: use only 1 constraint
+	{
+		// Define the constraint specific data
+		std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
+		data->setPlaneEquation(SurgSim::Math::Vector3d(0.0, 1.0, 0.0), 0.0);
+
+		// Set up the constraint
+		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
+			data, m_usedRepresentations[0],
+			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+			m_fixedWorldRepresentation,
+			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
+
+		// Register the constraint in the list of used constraints for this test
+		m_usedConstraints.push_back(constraint);
+	}
+
+	// Set the constraint list in the Physics Manager State
+	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
+
+	// Update the Representations mapping.
+	updateRepresentationsMapping(m_physicsManagerState);
+
+	// Fill up the Mlcp problem and clear up the Mlcp solution
+	resetMlcpProblem(6, 1);
+	MlcpPhysicsProblem& mlcpProblem = m_physicsManagerState->getMlcpProblem();
+	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
+	double violation = 0.3;
+	{
+		mlcpProblem.CHt(0, 0) = 0.0;
+		mlcpProblem.CHt(1, 0) = 1.0;
+		mlcpProblem.CHt(2, 0) = 2.0;
+		mlcpProblem.CHt(3, 0) = 3.0;
+		mlcpProblem.CHt(4, 0) = 4.0;
+		mlcpProblem.CHt(5, 0) = 5.0;
+		mlcpProblem.A(0, 0) = 0.174;
+		mlcpSolution.x(0) = 1.3;
+		mlcpProblem.b(0) = violation - mlcpProblem.A(0, 0) * mlcpSolution.x(0);
+	}
+
+	ASSERT_FALSE(m_pushResultsComputation->isDiscardBadResults());
+	m_pushResultsComputation->setDiscardBadResults(true);
+	ASSERT_TRUE(m_pushResultsComputation->isDiscardBadResults());
+	{
+		double contactTolerance = violation / 100.0;
+		m_pushResultsComputation->setContactTolerance(contactTolerance);
+		ASSERT_NEAR(contactTolerance, m_pushResultsComputation->getContactTolerance(), epsilon);
+	}
+
+	ASSERT_NO_THROW(m_pushResultsComputation->update(dt, m_physicsManagerState));
+
+	// Test that the results were discarded because a violation is greater than the contact tolerance.
+	EXPECT_NEAR(0.0, mlcpSolution.dofCorrection(0), epsilon);
+	EXPECT_NEAR(0.0, mlcpSolution.dofCorrection(1), epsilon);
+	EXPECT_NEAR(0.0, mlcpSolution.dofCorrection(2), epsilon);
+	EXPECT_NEAR(0.0, mlcpSolution.dofCorrection(3), epsilon);
+	EXPECT_NEAR(0.0, mlcpSolution.dofCorrection(4), epsilon);
+	EXPECT_NEAR(0.0, mlcpSolution.dofCorrection(5), epsilon);
+
+	std::shared_ptr<RigidRepresentation> rigid;
+	rigid = std::static_pointer_cast<RigidRepresentation>(m_usedRepresentations[0]);
+	const SurgSim::Math::Vector3d& linVel = rigid->getCurrentState().getLinearVelocity();
+	const SurgSim::Math::Vector3d& angVel = rigid->getCurrentState().getAngularVelocity();
+	EXPECT_NEAR(0.0, linVel[0], epsilon);
+	EXPECT_NEAR(0.0, linVel[1], epsilon);
+	EXPECT_NEAR(0.0, linVel[2], epsilon);
+	EXPECT_NEAR(0.0, angVel[0], epsilon);
+	EXPECT_NEAR(0.0, angVel[1], epsilon);
+	EXPECT_NEAR(0.0, angVel[2], epsilon);
+
+	const SurgSim::Math::RigidTransform3d& pose = rigid->getCurrentState().getPose();
+	EXPECT_NEAR(0.0 * dt, pose.translation()[0], epsilon);
+	EXPECT_NEAR(0.0 * dt, pose.translation()[1], epsilon);
+	EXPECT_NEAR(0.0 * dt, pose.translation()[2], epsilon);
+
+	// Now a violation less than the contact tolerance.
+	m_pushResultsComputation->setContactTolerance(violation * 100.0);
+	ASSERT_NO_THROW(m_pushResultsComputation->update(dt, m_physicsManagerState));
+
+	// Test that the results were not discarded
+	EXPECT_EQ(1, mlcpSolution.x.rows());
+	EXPECT_NEAR(1.3, mlcpSolution.x(0), epsilon);
+	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+	EXPECT_NEAR(1.3 * 0.0, mlcpSolution.dofCorrection(0), epsilon);
+	EXPECT_NEAR(1.3 * 1.0, mlcpSolution.dofCorrection(1), epsilon);
+	EXPECT_NEAR(1.3 * 2.0, mlcpSolution.dofCorrection(2), epsilon);
+	EXPECT_NEAR(1.3 * 3.0, mlcpSolution.dofCorrection(3), epsilon);
+	EXPECT_NEAR(1.3 * 4.0, mlcpSolution.dofCorrection(4), epsilon);
+	EXPECT_NEAR(1.3 * 5.0, mlcpSolution.dofCorrection(5), epsilon);
+
+	EXPECT_NEAR(1.3 * 0.0, linVel[0], epsilon);
+	EXPECT_NEAR(1.3 * 1.0, linVel[1], epsilon);
+	EXPECT_NEAR(1.3 * 2.0, linVel[2], epsilon);
+	EXPECT_NEAR(1.3 * 3.0, angVel[0], epsilon);
+	EXPECT_NEAR(1.3 * 4.0, angVel[1], epsilon);
+	EXPECT_NEAR(1.3 * 5.0, angVel[2], epsilon);
+
+	EXPECT_NEAR(1.3 * 0.0 * dt, pose.translation()[0], epsilon);
+	EXPECT_NEAR(1.3 * 1.0 * dt, pose.translation()[1], epsilon);
+	EXPECT_NEAR(1.3 * 2.0 * dt, pose.translation()[2], epsilon);
+}
+
 TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 {
 	// Prep the list of representations: use only 1 rigid representation + 1 fixed
