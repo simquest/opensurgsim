@@ -147,5 +147,20 @@ TEST(Fem3DRepresentationReaderTests, PerElementMaterial)
 	}
 }
 
+TEST(Fem3DRepresentationReaderTests, NoMaterials)
+{
+	auto fem = std::make_shared<Fem3D>();
+	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
+
+	ASSERT_NO_THROW(fem->load("PlyReaderTests/Fem3DCubeNoMaterial.ply"));
+
+	for (auto element : fem->getElements())
+	{
+		EXPECT_DOUBLE_EQ(0.0, element->massDensity);
+		EXPECT_DOUBLE_EQ(0.0, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(0.0, element->youngModulus);
+	}
+}
+
 } // Physics
 } // SurgSim
