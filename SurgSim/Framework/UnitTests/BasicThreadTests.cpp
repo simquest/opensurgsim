@@ -61,6 +61,8 @@ TEST(BasicThreadTest, Stop)
 	EXPECT_TRUE(m.isRunning());
 	m.stop();
 
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
 	EXPECT_TRUE(m.didBeforeStop);
 	EXPECT_FALSE(m.isRunning());
 }
@@ -310,6 +312,7 @@ public:
 	void TearDown()
 	{
 		m->stop();
+		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	}
 
 	std::shared_ptr<MockThread> m;
