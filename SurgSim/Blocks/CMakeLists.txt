@@ -21,6 +21,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	CompoundShapeToGraphics.cpp
 	DebugDumpBehavior.cpp
 	DriveElementFromInputBehavior.cpp
+	EventManager.cpp
 	FunctionBehavior.cpp
 	GraphicsUtilities.cpp
 	ImplicitSurface.cpp
@@ -47,6 +48,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	CompoundShapeToGraphics.h
 	DebugDumpBehavior.h
 	DriveElementFromInputBehavior.h
+	EventManager.h
 	FunctionBehavior.h
 	GraphicsUtilities.h
 	ImplicitSurface.h
