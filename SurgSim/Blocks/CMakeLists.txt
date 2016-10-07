@@ -27,6 +27,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	KeyBehavior.cpp
 	KeyboardCallbackBehavior.cpp
 	KeyboardTogglesComponentBehavior.cpp
+	KnotIdentificationBehavior.cpp
 	MassSpring1DRepresentation.cpp
 	MassSpring2DRepresentation.cpp
 	MassSpring3DRepresentation.cpp
@@ -53,6 +54,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	KeyBehavior.h
 	KeyboardCallbackBehavior.h
 	KeyboardTogglesComponentBehavior.h
+	KnotIdentificationBehavior.h
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h

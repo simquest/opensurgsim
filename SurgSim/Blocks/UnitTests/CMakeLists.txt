@@ -25,6 +25,7 @@ set(UNIT_TEST_SOURCES
 	KeyBehaviorTests.cpp
 	KeyboardCallbackBehaviorTests.cpp
 	KeyboardTogglesComponentBehaviorTests.cpp
+	KnotIdentificationBehaviorTests.cpp
 	MassSpring1DRepresentationTests.cpp
 	MassSpring2DRepresentationTests.cpp
 	MassSpring3DRepresentationTests.cpp
