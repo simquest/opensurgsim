@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/Valid.h"
+#include "SurgSim/Physics/ConstraintType.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
 #include "SurgSim/Physics/MlcpPhysicsSolution.h"
 #include "SurgSim/Physics/PushResults.h"
@@ -41,35 +44,92 @@ PushResults::doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerStat
 	// 1st step
 	// Compute the global dof displacement correction from the constraints forces (result of the MLCP)
 	// correction = CHt . lambda
-	const Eigen::VectorXd& lambda = result->getMlcpSolution().x;
+	MlcpPhysicsSolution& solution = result->getMlcpSolution();
+	const Eigen::VectorXd& lambda = solution.x;
 	if (lambda.size() == 0)
 	{
 		return state;
 	}
-	const SurgSim::Math::MlcpProblem::Matrix& CHt = result->getMlcpProblem().CHt;
-	SurgSim::Math::MlcpSolution::Vector& dofCorrection = result->getMlcpSolution().dofCorrection;
-	dofCorrection = CHt * lambda;
-
-	SURGSIM_LOG_DEBUG(m_logger) << "b:\t" << result->getMlcpProblem().b.transpose();
-	SURGSIM_LOG_DEBUG(m_logger) << "final:\t" <<
-								(result->getMlcpProblem().A * lambda + result->getMlcpProblem().b).transpose();
-	SURGSIM_LOG_DEBUG(m_logger) << "Lambda:\t" << lambda.transpose();
 
 	// 2nd step
-	// Push the dof displacement correction to all representation, using their assigned index
-	auto& representations = result->getActiveRepresentations();
-	for (auto& representation : representations)
+	// Check for valid Signorini (e.g., good contact tolerances)
+	const auto& problem = result->getMlcpProblem();
+	bool validSignorini = true;
+
+	if (m_discardBadResults)
 	{
-		if (representation->isActive())
+		const SurgSim::Math::MlcpProblem::Matrix& A = problem.A;
+		const SurgSim::Math::MlcpProblem::Vector& b = problem.b;
+		auto& activeConstraints = result->getActiveConstraints();
+		auto& constraintsMapping = result->getConstraintsMapping();
+
+		for (const std::shared_ptr<SurgSim::Physics::Constraint>& constraint : activeConstraints)
 		{
-			ptrdiff_t index = result->getRepresentationsMapping().getValue(representation.get());
-			SURGSIM_ASSERT(index >= 0) << "Bad index found for representation " << representation->getName()
-									   << std::endl;
-			representation->applyCorrection(dt, dofCorrection.segment(index, representation->getNumDof()));
+			if (constraint->getType() == SurgSim::Physics::FRICTIONLESS_3DCONTACT ||
+				constraint->getType() == SurgSim::Physics::FRICTIONAL_3DCONTACT)
+			{
+				const auto index = constraintsMapping.getValue(constraint.get());
+				const double violation = b[index] + A.row(index) * lambda;
+				// Enforce orthogonality condition
+				if (!SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
+					(lambda[index] > solution.epsilonConvergence &&
+					violation > m_contactTolerance))
+				{
+					validSignorini = false;
+					SURGSIM_LOG_INFO(m_logger)
+						<< "Invalid contact violation, or violation magnitude greater than contact tolerance.";
+					break;
+				}
+			}
 		}
 	}
 
+	if (validSignorini)
+	{
+		// 3rd step
+		// Push the dof displacement correction to all representation, using their assigned index
+		// Compute the global dof displacement correction from the constraints forces (result of the MLCP)
+		const Math::MlcpProblem::Matrix& CHt = problem.CHt;
+		Math::MlcpSolution::Vector& dofCorrection = solution.dofCorrection;
+		dofCorrection = CHt * lambda;
+
+		SURGSIM_LOG_DEBUG(m_logger) << "b:\t" << problem.b.transpose();
+		SURGSIM_LOG_DEBUG(m_logger) << "final:\t" << (problem.A * lambda + problem.b).transpose();
+		SURGSIM_LOG_DEBUG(m_logger) << "Lambda:\t" << lambda.transpose();
+
+		auto& representations = result->getActiveRepresentations();
+		for (auto& representation : representations)
+		{
+			if (representation->isActive())
+			{
+				ptrdiff_t index = result->getRepresentationsMapping().getValue(representation.get());
+				SURGSIM_ASSERT(index >= 0) << "Bad index found for representation " << representation->getName()
+					<< std::endl;
+				representation->applyCorrection(dt, dofCorrection.segment(index, representation->getNumDof()));
+			}
+		}
+	}
 	return result;
+}
+
+void PushResults::setDiscardBadResults(bool discard)
+{
+	m_discardBadResults = discard;
+}
+
+bool PushResults::isDiscardBadResults() const
+{
+	return m_discardBadResults;
+}
+
+void PushResults::setContactTolerance(double tolerance)
+{
+	m_contactTolerance = tolerance;
+}
+
+double PushResults::getContactTolerance() const
+{
+	return m_contactTolerance;
 }
 
 }; // namespace Physics
