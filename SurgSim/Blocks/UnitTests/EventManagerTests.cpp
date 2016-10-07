@@ -103,7 +103,11 @@ TEST_F(EventManagerTest, EmptyMessage)
 
 TEST_F(EventManagerTest, SendMessage)
 {
-	EXPECT_CALL(*receiver1, onEventA(_)).Times(::testing::Exactly(1));
+	using ::testing::Field;
+	using ::testing::Eq;
+	EXPECT_CALL(*receiver1, onEventA(AllOf(Field(&EventManager::Event::sender, Eq("sender")),
+										   Field(&EventManager::Event::name, Eq("event"))))
+			   ).Times(::testing::Exactly(1));
 	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
 
 	EXPECT_ANY_THROW(eventManager->subscribe("event", receiver1, nullptr));
@@ -139,11 +143,11 @@ TEST_F(EventManagerTest, MultipleReceivers)
 	EXPECT_CALL(*receiver1, onEventA(_));
 	EXPECT_CALL(*receiver2, onEventB(_));
 
-	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	ASSERT_NO_THROW(eventManager->subscribe("event", receiver1, callback));
+	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
+	ASSERT_NO_THROW(eventManager->subscribe("event", receiver1, callback1));
 
-	callback = std::bind(&MockReceiver::onEventB, receiver2.get(), std::placeholders::_1);
-	ASSERT_NO_THROW(eventManager->subscribe("event", receiver2, callback));
+	auto callback2 = std::bind(&MockReceiver::onEventB, receiver2.get(), std::placeholders::_1);
+	ASSERT_NO_THROW(eventManager->subscribe("event", receiver2, callback2));
 
 	ASSERT_NO_THROW(eventManager->publish("sender", "event"));
 	ASSERT_NO_THROW(eventManager->update(0.0));
@@ -155,11 +159,11 @@ TEST_F(EventManagerTest, MultipleEvents)
 	EXPECT_CALL(*receiver2, onEventB(_));
 
 
-	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	ASSERT_NO_THROW(eventManager->subscribe("event1", receiver1, callback));
+	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
+	ASSERT_NO_THROW(eventManager->subscribe("event1", receiver1, callback1));
 
-	callback = std::bind(&MockReceiver::onEventB, receiver2.get(), std::placeholders::_1);
-	ASSERT_NO_THROW(eventManager->subscribe("event2", receiver2, callback));
+	auto callback2 = std::bind(&MockReceiver::onEventB, receiver2.get(), std::placeholders::_1);
+	ASSERT_NO_THROW(eventManager->subscribe("event2", receiver2, callback2));
 
 	ASSERT_NO_THROW(eventManager->publish("sender", "event1"));
 	ASSERT_NO_THROW(eventManager->publish("sender", "event2"));
@@ -170,11 +174,11 @@ TEST_F(EventManagerTest, Unsubscribe)
 {
 	EXPECT_CALL(*receiver1, onEventA(_));
 
-	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event1", receiver1, callback);
+	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
+	eventManager->subscribe("event1", receiver1, callback1);
 
-	callback = std::bind(&MockReceiver::onEventB, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event2", receiver1, callback);
+	auto callback2 = std::bind(&MockReceiver::onEventB, receiver1.get(), std::placeholders::_1);
+	eventManager->subscribe("event2", receiver1, callback2);
 
 	eventManager->publish("sender", "event1");
 	eventManager->update(0.0);
@@ -224,11 +228,11 @@ TEST_F(EventManagerTest, UnsubscribeFromAll)
 	EXPECT_CALL(*receiver1, onEventA(_)).Times(::testing::Exactly(0));
 	EXPECT_CALL(*receiver1, onEventB(_)).Times(::testing::Exactly(0));
 
-	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event1", receiver1, callback);
+	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
+	eventManager->subscribe("event1", receiver1, callback1);
 
-	callback = std::bind(&MockReceiver::onEventB, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event2", receiver1, callback);
+	auto callback2 = std::bind(&MockReceiver::onEventB, receiver1.get(), std::placeholders::_1);
+	eventManager->subscribe("event2", receiver1, callback2);
 
 	ASSERT_NO_THROW(eventManager->unsubscribe(receiver2));
 	ASSERT_NO_THROW(eventManager->unsubscribe(receiver1));
@@ -238,11 +242,24 @@ TEST_F(EventManagerTest, UnsubscribeFromAll)
 	eventManager->update(0.0);
 }
 
-// Test nullptr callback
+TEST_F(EventManagerTest, LifeTime)
+{
+	EXPECT_CALL(*receiver1, onEventA(_)).Times(::testing::Exactly(0));
+	std::weak_ptr<SurgSim::Framework::Component> weak(receiver1);
 
+	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
+	eventManager->subscribe("event1", receiver1, callback1);
 
+	sceneElement->removeComponent(receiver1);
+	receiver1 = nullptr;
 
+	// Verify that all the references are gone ...
+	ASSERT_TRUE(weak.expired());
 
+	eventManager->publish("sender", "event1");
+	eventManager->publish("sender", "event2");
+	ASSERT_NO_THROW(eventManager->update(0.0));
+}
 
 }
 }
