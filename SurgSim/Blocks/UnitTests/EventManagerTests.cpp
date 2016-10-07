@@ -18,9 +18,9 @@
 #include <gmock/gmock.h>
 
 #include "SurgSim/Blocks/EventManager.h"
-#include "../../Framework/Runtime.h"
-#include "../../Framework/Scene.h"
-#include "../../Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 
 using ::testing::_;
 
@@ -121,7 +121,6 @@ TEST_F(EventManagerTest, SendMessage)
 
 	// the queue should be empty, should not get another one
 	ASSERT_NO_THROW(eventManager->update(0.0));
-
 }
 
 TEST_F(EventManagerTest, DoubleAdd)
