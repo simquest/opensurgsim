@@ -89,7 +89,7 @@ public:
 	/// \return true if the decoding succeeded and the node was formatted correctly, false otherwise
 	bool decode(const YAML::Node& node);
 
-
+	/// \return the groups of the scene
 	SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>& getGroups();
 
 private:
