@@ -77,6 +77,11 @@ bool PoseInterpolator::doInitialize()
 	return true;
 }
 
+void PoseInterpolator::doRetire()
+{
+	m_target = nullptr;
+}
+
 bool PoseInterpolator::doWakeUp()
 {
 	bool result = false;
@@ -118,7 +123,7 @@ void PoseInterpolator::update(double dt)
 		}
 	}
 
-	m_target->setPose(Math::interpolate(m_startingPose, m_endingPose, m_currentTime/m_duration));
+	m_target->setPose(Math::interpolate(m_startingPose, m_endingPose, m_currentTime / m_duration));
 }
 
 void PoseInterpolator::setLoop(bool val)

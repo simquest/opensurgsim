@@ -115,6 +115,8 @@ private:
 	bool doWakeUp() override;
 
 	bool doInitialize() override;
+
+	void doRetire() override;
 };
 
 
