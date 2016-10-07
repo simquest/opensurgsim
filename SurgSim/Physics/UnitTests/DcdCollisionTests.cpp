@@ -103,18 +103,18 @@ TEST(DcdCollisionTest, Deactivate)
 	scene->addSceneElement(element);
 
 	runtime->start(true);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 	runtime->step();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	runtime->step();
 	EXPECT_TRUE(sphere1->collidedWith(sphere2));
 	EXPECT_TRUE(sphere2->collidedWith(sphere1));
 
 	sphere1->setLocalActive(false);
 	runtime->step();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	runtime->step();
 	EXPECT_FALSE(sphere1->collidedWith(sphere2));
 	EXPECT_FALSE(sphere2->collidedWith(sphere1));
 
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	runtime->stop();
 }
 

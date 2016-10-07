@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -197,28 +197,28 @@ TEST(SceneTest, SceneElementGroups)
 
 	element1->addToGroup("One");
 
-	auto groups = scene->getGroups();
+	auto& groups = scene->getGroups();
 
-	EXPECT_TRUE(groups->getGroups().empty());
+	EXPECT_TRUE(groups.getGroups().empty());
 
 	scene->addSceneElement(element1);
 
-	EXPECT_EQ(1L, groups->getGroups().size());
-	EXPECT_TRUE(doesContain(groups->getGroups(), "One"));
-	EXPECT_TRUE(doesContain(groups->getMembers("One"), element1));
+	EXPECT_EQ(1L, groups.getGroups().size());
+	EXPECT_TRUE(doesContain(groups.getGroups(), "One"));
+	EXPECT_TRUE(doesContain(groups.getMembers("One"), element1));
 
 	scene->addSceneElement(element2);
-	EXPECT_EQ(1L, groups->getGroups().size());
+	EXPECT_EQ(1L, groups.getGroups().size());
 
 	element2->addToGroup("Two");
-	EXPECT_EQ(2L, groups->getGroups().size());
-	EXPECT_TRUE(doesContain(groups->getGroups(), "Two"));
-	EXPECT_TRUE(doesContain(groups->getMembers("Two"), element2));
+	EXPECT_EQ(2L, groups.getGroups().size());
+	EXPECT_TRUE(doesContain(groups.getGroups(), "Two"));
+	EXPECT_TRUE(doesContain(groups.getMembers("Two"), element2));
 
 	element1->removeFromGroup("One");
-	EXPECT_EQ(1L, groups->getGroups().size());
-	EXPECT_TRUE(doesContain(groups->getGroups(), "Two"));
-	EXPECT_TRUE(doesContain(groups->getMembers("Two"), element2));
+	EXPECT_EQ(1L, groups.getGroups().size());
+	EXPECT_TRUE(doesContain(groups.getGroups(), "Two"));
+	EXPECT_TRUE(doesContain(groups.getMembers("Two"), element2));
 
 	element1->addToGroup("One");
 
@@ -228,7 +228,7 @@ TEST(SceneTest, SceneElementGroups)
 	groupNames.push_back("Four");
 
 	element1->setGroups(groupNames);
-	EXPECT_EQ(4L, groups->getGroups().size());
+	EXPECT_EQ(4L, groups.getGroups().size());
 
 }
 
