@@ -14,12 +14,100 @@
 #include "imgui.h"
 using namespace SurgSim;
 
+
+class ImGuiLogOutput : public Framework::LogOutput
+{
+
+public:
+	virtual bool writeMessage(const std::string& message) override
+	{
+		boost::lock_guard<boost::mutex> lock(m_bufferMutex);
+		m_messageBuffer.push_back(message);
+		if (m_messageBuffer.size() > 20)
+		{
+			m_messageBuffer.pop_front();
+		}
+		return true;
+	}
+
+	void draw()
+	{
+		boost::lock_guard<boost::mutex> lock(m_bufferMutex);
+		static bool open = true;
+		if (ImGui::Begin("Log", &open))
+		{
+			for (const auto& line : m_messageBuffer)
+			{
+				ImGui::Text(line.c_str());
+			}
+		}
+		ImGui::End();
+	}
+
+private:
+	std::list<std::string> m_messageBuffer;
+	boost::mutex m_bufferMutex;
+
+};
+
 struct Callback : public sf::GuiCallback
 {
+	Callback()
+	{
+		logger = std::make_shared<ImGuiLogOutput>();
+		Framework::Logger::getLoggerManager()->setDefaultOutput(logger);
+
+	}
+
 	void operator()()
 	{
-		ImGui::Text("This is a test");
+		bool open = true;
+		logger->draw();
+		auto elements = scene->getSceneElements();
+		for (const auto& element : elements)
+		{
+			if (ImGui::CollapsingHeader(element->getName().c_str()))
+			{
+				auto components = element->getComponents();
+				for (const auto& component : components)
+				{
+					ImGui::PushID(component->getFullName().c_str());
+					ImGui::Text(component->getName().c_str());
+					if (component->getName() == "Pose")
+					{
+						auto pose = component->getValue<SurgSim::Math::RigidTransform3d>("Pose");
+						component->setValue("Pose", InputRigidTransform(pose));
+					}
+					if (component->getClassName() == "SurgSim::Graphics::OsgAxesRepresentation")
+					{
+						auto val = component->getValue<double>("Size");
+						float floatVal = static_cast<float>(val);
+						if (ImGui::InputFloat("Size", &floatVal))
+						{
+							component->setValue("Size", static_cast<double>(floatVal));
+						}
+					}
+					ImGui::PopID();
+				}
+			}
+		}
+
 	}
+
+	Math::RigidTransform3d InputRigidTransform(const Math::RigidTransform3d& pose)
+	{
+		Math::RigidTransform3d result(pose);
+		auto translation = result.translation().cast<float>().eval();
+		ImGui::InputFloat("x", &translation[0]);
+		ImGui::InputFloat("y", &translation[1]);
+		ImGui::InputFloat("z", &translation[2]);
+		result.translation() = translation.cast<double>();
+		return result;
+	}
+
+
+	std::shared_ptr<Framework::Scene> scene;
+	std::shared_ptr<ImGuiLogOutput> logger;
 } callback;
 std::shared_ptr<Framework::Runtime> createRuntime(std::unordered_map<std::string, std::string> parameters =
 			std::unordered_map<std::string, std::string>())
@@ -60,6 +148,7 @@ std::shared_ptr<Framework::Runtime> createRuntime(std::unordered_map<std::string
 	auto axis = std::make_shared<Graphics::OsgAxesRepresentation>("Axes");
 	element->addComponent(axis);
 	scene->addSceneElement(element);
+	callback.scene = scene;
 
 	return runtime;
 }
