@@ -248,6 +248,11 @@ void OdeState::changeBoundaryConditionStaticDof(size_t nodeId, double value)
 	}
 }
 
+void OdeState::setBoundaryConditionsStaticDof(const std::vector<std::pair<size_t, double>>& staticDof)
+{
+	m_boundaryConditionsStaticDof = staticDof;
+}
+
 bool OdeState::isValid() const
 {
 	using SurgSim::Math::isValid;
