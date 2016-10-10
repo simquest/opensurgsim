@@ -158,6 +158,10 @@ public:
 	/// \return All boundary conditions for statically defined Dof as a vector of dof ids
 	const std::vector<std::pair<size_t, double>>& getBoundaryConditionsStaticDof() const;
 
+	/// Set all boundary conditions on static dofs
+	/// \param staticDof The vector of static dof that must be set
+	void setBoundaryConditionsStaticDof(const std::vector<std::pair<size_t, double>>& staticDof);
+
 	/// Set the value of an existing boundary condition on a static dof
 	/// \param nodeId The node for which the static dof must be set
 	/// \param value The value to set the static dof of the given node

@@ -256,6 +256,11 @@ const std::vector<std::pair<size_t, double>>& OdeState::getBoundaryConditionsSta
 	return m_boundaryConditionsStaticDof;
 }
 
+void OdeState::setBoundaryConditionsStaticDof(const std::vector<std::pair<size_t, double>>& staticDof)
+{
+	m_boundaryConditionsStaticDof = staticDof;
+}
+
 void OdeState::setBoundaryConditionStaticDof(size_t nodeId, double value)
 {
 	auto bc = std::find_if(m_boundaryConditionsStaticDof.begin(), m_boundaryConditionsStaticDof.end(), [&nodeId](std::pair<size_t, double>& pair) { return pair.first == nodeId;  });
