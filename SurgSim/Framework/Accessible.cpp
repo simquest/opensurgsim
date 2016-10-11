@@ -188,6 +188,19 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 	}
 }
 
+std::vector<std::string> Accessible::getProperties()
+{
+	std::vector<std::string> result;
+	for (const auto& functor : m_functors)
+	{
+		if (isReadable(functor.first) && isWriteable(functor.first))
+		{
+			result.push_back(functor.first);
+		}
+	}
+	return result;
+}
+
 void Accessible::forwardProperty(const std::string& name, const Accessible& target, const std::string& targetValueName)
 {
 	Functors functors;

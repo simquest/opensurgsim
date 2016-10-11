@@ -63,6 +63,7 @@ struct Callback : public sf::GuiCallback
 	{
 		bool open = true;
 		logger->draw();
+
 		auto elements = scene->getSceneElements();
 		for (const auto& element : elements)
 		{
@@ -72,21 +73,12 @@ struct Callback : public sf::GuiCallback
 				for (const auto& component : components)
 				{
 					ImGui::PushID(component->getFullName().c_str());
-					ImGui::Text(component->getName().c_str());
-					if (component->getName() == "Pose")
+					auto properties = component->getProperties();
+					for (const auto& prop : properties)
 					{
-						auto pose = component->getValue<SurgSim::Math::RigidTransform3d>("Pose");
-						component->setValue("Pose", InputRigidTransform(pose));
+						inputProperty(prop, component.get());
 					}
-					if (component->getClassName() == "SurgSim::Graphics::OsgAxesRepresentation")
-					{
-						auto val = component->getValue<double>("Size");
-						float floatVal = static_cast<float>(val);
-						if (ImGui::InputFloat("Size", &floatVal))
-						{
-							component->setValue("Size", static_cast<double>(floatVal));
-						}
-					}
+
 					ImGui::PopID();
 				}
 			}
@@ -94,15 +86,63 @@ struct Callback : public sf::GuiCallback
 
 	}
 
-	Math::RigidTransform3d InputRigidTransform(const Math::RigidTransform3d& pose)
+	bool inputProperty(const std::string& property, Framework::Component* component)
 	{
-		Math::RigidTransform3d result(pose);
-		auto translation = result.translation().cast<float>().eval();
-		ImGui::InputFloat("x", &translation[0]);
-		ImGui::InputFloat("y", &translation[1]);
-		ImGui::InputFloat("z", &translation[2]);
-		result.translation() = translation.cast<double>();
-		return result;
+		auto boostValue = component->getValue(property);
+		bool handled = false;
+		bool edited = false;
+		try
+		{
+			auto value = boost::any_cast<Math::RigidTransform3d>(boostValue);
+			edited = InputRigidTransform(property, &value);
+			if (edited)
+			{
+				component->setValue(property, value);
+			}
+			handled = true;
+		}
+		catch (std::exception e)
+		{
+
+		}
+		try
+		{
+			auto value = boost::any_cast<double>(boostValue);
+			auto floatValue = static_cast<float>(value);
+			edited = ImGui::InputFloat(property.c_str(), &floatValue);
+			if (edited)
+			{
+				component->setValue(property, static_cast<double>(floatValue));
+			}
+			handled = true;
+		}
+		catch (std::exception e)
+		{
+
+		}
+
+		if (!handled)
+		{
+			auto text = property + "!!!";
+			ImGui::Text(text.c_str());
+		}
+
+		return edited;
+	}
+
+	bool InputRigidTransform(const std::string title, Math::RigidTransform3d* pose)
+	{
+		ImGui::Text(title.c_str());
+		auto translation = pose->translation().cast<float>().eval();
+		bool changed;
+		changed = ImGui::InputFloat("x", &translation[0]);
+		changed = ImGui::InputFloat("y", &translation[1]) || changed;
+		changed = ImGui::InputFloat("z", &translation[2]) || changed;
+		if (changed == true)
+		{
+			pose->translation() = translation.cast<double>();
+		}
+		return changed;
 	}
 
 

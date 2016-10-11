@@ -152,6 +152,7 @@ public:
 	/// \param ignoredProperties Properties that will be ignored.
 	void decode(const YAML::Node& node, const std::vector<std::string>& ignoredProperties = std::vector<std::string>());
 
+	std::vector<std::string> getProperties();
 private:
 
 	/// @{
