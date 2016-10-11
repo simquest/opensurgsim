@@ -31,9 +31,9 @@ namespace Blocks
 namespace
 {
 
-class Contains
+struct Contains
 {
-public:
+
 	Contains(const std::shared_ptr<Framework::Component>& component) :
 		receiver(component)
 	{
@@ -43,23 +43,23 @@ public:
 	bool operator()(const std::pair<std::weak_ptr<Framework::Component>,
 					Blocks::EventManager::EventCallback>& r)
 	{
-		if (!r.first.expired())
-		{
-			auto candidate = r.first.lock();
-			return candidate.get() == receiver.get();
-		}
-		return false;
+
+		auto candidate = r.first.lock();
+		return candidate.get() == receiver.get();
 	}
 
-private:
 	const std::shared_ptr<Framework::Component>& receiver;
 };
 
-auto Expired = [](const std::pair<std::weak_ptr<Framework::Component>,
-				  Blocks::EventManager::EventCallback>& r)
+struct Expired
 {
-	return r.first.expired();
+	bool operator()(const std::pair<std::weak_ptr<Framework::Component>,
+					Blocks::EventManager::EventCallback>& r)
+	{
+		return r.first.expired();
+	}
 };
+
 }
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::EventManager, EventManager);
@@ -90,7 +90,7 @@ void EventManager::update(double dt)
 	}
 	{
 		boost::lock_guard<boost::mutex> lock(m_subscriberMutex);
-		m_broadcast.erase(std::remove_if(m_broadcast.begin(), m_broadcast.end(), Expired), m_broadcast.end());
+		m_broadcast.erase(std::remove_if(m_broadcast.begin(), m_broadcast.end(), Expired()), m_broadcast.end());
 		broadcast = m_broadcast;
 	}
 
@@ -100,7 +100,7 @@ void EventManager::update(double dt)
 		{
 			boost::lock_guard<boost::mutex> lock(m_subscriberMutex);
 			auto& temp = m_subscribers[event.name];
-			temp.erase(std::remove_if(temp.begin(), temp.end(), Expired), temp.end());
+			temp.erase(std::remove_if(temp.begin(), temp.end(), Expired()), temp.end());
 			subscribers = m_subscribers[event.name];
 		}
 
@@ -186,7 +186,8 @@ void EventManager::sendEvent(const Event& event, const std::vector<Subscriber>& 
 {
 	for (const auto& subscriber : subscribers)
 	{
-		if (!subscriber.first.expired())
+		auto shared = subscriber.first.lock();
+		if (shared != nullptr)
 		{
 			subscriber.second(event);
 		}
