@@ -48,18 +48,41 @@ namespace
 {
 std::shared_ptr<Graphics::OsgMaterial> createDefaultMaterial()
 {
+	auto logger = Framework::Logger::getLogger("Graphics/OsgTextRepresentation");
 	auto material = Graphics::buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
-	material->setName("unlittext");
-	std::string path;
-	SURGSIM_ASSERT(Framework::Runtime::getApplicationData()->tryFindFile("Textures/white.png", &path))
-			<< "Could not find default texture 'Textures/white.png'";
-	auto texture = std::make_shared<Graphics::OsgTexture2d>();
-	SURGSIM_ASSERT(texture->loadImage(path)) << "Loading failed for texture at " << path;
-	auto textureUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("texture");
+	if (material != nullptr)
+	{
+		material->setName("unlittext");
+		std::string path;
 
-	textureUniform->set(texture);
-	material->addUniform(textureUniform);
+		if (!Framework::Runtime::getApplicationData()->tryFindFile("Textures/white.png", &path))
+		{
+			SURGSIM_LOG_WARNING(logger) << "Could not find default texture for text background, text rectangles "
+										<< "might be compromised. (Textures/white.png)";
+			return material;
+		}
+
+		auto texture = std::make_shared<Graphics::OsgTexture2d>();
+		auto textureUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("texture");
+		if (!texture->loadImage(path))
+		{
+			SURGSIM_LOG_WARNING(logger) << "Could not load default texture for text background, text rectangles "
+										<< "might be compromised. (" << path << ")";
+			return material;
+		}
+
+		textureUniform->set(texture);
+		material->addUniform(textureUniform);
+	}
+	else
+	{
+		SURGSIM_LOG_ONCE(Framework::Logger::getDefaultLogger(), WARNING)
+				<< "Could not find default shaders for text. Text display will be compromised.";
+		material = std::make_shared<Graphics::OsgMaterial>("unlittext");
+	}
+
 	return material;
+
 }
 
 }
