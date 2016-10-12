@@ -37,19 +37,25 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
 
 
+
+
+namespace SurgSim
+{
+namespace Graphics
+{
+
 namespace
 {
-std::shared_ptr<SurgSim::Graphics::OsgMaterial> createDefaultMaterial()
+std::shared_ptr<Graphics::OsgMaterial> createDefaultMaterial()
 {
-	auto material = SurgSim::Graphics::buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
+	auto material = Graphics::buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
 	material->setName("unlittext");
 	std::string path;
-	SURGSIM_ASSERT(SurgSim::Framework::Runtime::getApplicationData()->tryFindFile("Textures/white.png", &path))
+	SURGSIM_ASSERT(Framework::Runtime::getApplicationData()->tryFindFile("Textures/white.png", &path))
 			<< "Could not find default texture 'Textures/white.png'";
-	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
-	texture->loadImage(path);
-	auto textureUniform = std::make_shared
-						  <SurgSim::Graphics::OsgTextureUniform <SurgSim:: Graphics::OsgTexture2d>>("texture");
+	auto texture = std::make_shared<Graphics::OsgTexture2d>();
+	SURGSIM_ASSERT(texture->loadImage(path)) << "Loading failed for texture at " << path;
+	auto textureUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("texture");
 
 	textureUniform->set(texture);
 	material->addUniform(textureUniform);
@@ -57,11 +63,6 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createDefaultMaterial()
 }
 
 }
-
-namespace SurgSim
-{
-namespace Graphics
-{
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgTextRepresentation, OsgTextRepresentation);
 
