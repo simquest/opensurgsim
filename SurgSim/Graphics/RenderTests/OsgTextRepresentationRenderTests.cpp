@@ -27,6 +27,8 @@
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Graphics/View.h"
 
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+
 #include <osg/Notify>
 
 namespace SurgSim
@@ -34,36 +36,9 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgTextRepresentationRenderTests : public ::testing::Test
+struct OsgTextRepresentationRenderTests : public SurgSim::Graphics::RenderTest
 {
-public:
 
-	void SetUp()
-	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-		graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-		runtime->addManager(graphicsManager);
-		runtime->addManager(std::make_shared<Framework::BehaviorManager>());
-
-		scene = runtime->getScene();
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		std::array<int, 2> position = {100, 100};
-		viewElement->getView()->setPosition(position);
-		viewElement->getView()->setWindowBorderEnabled(true);
-
-		scene->addSceneElement(viewElement);
-	}
-
-	void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<OsgManager> graphicsManager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
 };
 
 
