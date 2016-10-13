@@ -40,7 +40,7 @@ OpenSurgSim directory.
 2. Compiling on GNU/Linux
 =========================
 
-OpenSurgSim has been tested extensively on Debian Testing (Jessie). If you are
+OpenSurgSim has been tested extensively on Debian Unstable (Sid). If you are
 using another GNU/Linux distribution, please check your package management
 system for the dependencies (see Appendix). For Debian/Ubuntu based systems, the
 dependencies are easily installed through apt-get:
