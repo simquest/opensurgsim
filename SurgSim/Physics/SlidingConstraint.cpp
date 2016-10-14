@@ -43,7 +43,7 @@ SlidingConstraint::SlidingConstraint(ConstraintType constraintType,
 		"The data sent in for the sliding constraint is not of type SlidingConstraintData.";
 
 	Math::Vector3d directionEnd = m_localizations.second->calculatePosition() + slidingDirection;
-	m_directionEnd = m_localizations.second->getElementPose().inverse() * directionEnd;
+	m_directionEnd = m_localizations.second->getElementPose().inverse() * slidingDirection;
 }
 
 SlidingConstraint::~SlidingConstraint()
@@ -59,7 +59,8 @@ void SlidingConstraint::doBuild(double dt,
 {
 	// Update the SlidingConstraintData
 	Math::Vector3d pointOfConstraint = m_localizations.second->calculatePosition();
-	Math::Vector3d slidingDirection = m_localizations.second->getElementPose() * m_directionEnd - pointOfConstraint;
+	// Math::Vector3d slidingDirection = m_localizations.second->getElementPose() * m_directionEnd - pointOfConstraint;
+	Math::Vector3d slidingDirection = m_localizations.second->getElementPose() * m_directionEnd;
 	m_slidingConstraintData->setSlidingDirection(pointOfConstraint, slidingDirection);
 
 	// Update the representation0's localization (representation1's remains the same).
