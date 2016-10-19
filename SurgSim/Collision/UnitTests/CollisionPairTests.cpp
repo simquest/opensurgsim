@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,24 +15,23 @@
 
 
 #include <gtest/gtest.h>
-#include "SurgSim/Collision/UnitTests/RepresentationUtilities.h"
 
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/RigidTransform.h"
-
-#include "SurgSim/Physics/RigidState.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ContactCalculation.h"
 #include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/UnitTests/RepresentationUtilities.h"
 #include "SurgSim/DataStructures/BufferedValue.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/RigidState.h"
 
 using SurgSim::Collision::ContactMapType;
 using SurgSim::DataStructures::Location;
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -226,6 +225,9 @@ TEST(CollisionPairTests, addContactTest)
 					Vector3d(0.1, 0.2, 0.3)));
 	EXPECT_TRUE(rep1->collidedWith(rep0));
 	EXPECT_FALSE(rep0->collidedWith(other));
+
+	rep0->retire();
+	rep1->retire();
 }
 
 }; // namespace Collision

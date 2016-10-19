@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -624,7 +624,7 @@ std::shared_ptr<NovintScaffold::Handle>
 			SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName
 				<< "', but that name does not map to a serial number.  The configuration file (devices.yaml) was "
 				<< (m_state->nameToSerial.empty() ?
-				"not found, did not contain the text of a YAML node (the map from name to serial number), or the map was empty."
+				"not found, did not contain a YAML node (the map from name to serial number), or the map was empty."
 				: "found, but the device name is not a key in the contained map from name to serial number.");
 		}
 	}

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest LLC.
+// Copyright 2013-2016, SimQuest LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ namespace Framework
 
 Scene::Scene(std::weak_ptr<Runtime> runtime) :
 	m_runtime(runtime),
-	m_groups(new GroupsType()),
 	m_logger(Framework::Logger::getLogger("Framework/Scene"))
 {
 	SURGSIM_ASSERT(!m_runtime.expired()) << "Can't create scene with empty runtime.";
@@ -43,10 +42,7 @@ Scene::Scene(std::weak_ptr<Runtime> runtime) :
 
 Scene::~Scene()
 {
-	/// Clear out the groups references, this is needed because otherwise there will be circular references
-	/// between the SceneElements and themselves therefore preventing the release of the the sceneelement
-	/// instances, as it is shared with the sceneElements
-	m_groups->clear();
+
 }
 
 void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
@@ -63,6 +59,7 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 		{
 			boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
 			m_elements.push_back(element);
+			m_groups.add(element->getGroups(), element);
 		}
 		runtime->addSceneElement(element);
 	}
@@ -169,7 +166,7 @@ bool Scene::decode(const YAML::Node& node)
 	return result;
 }
 
-std::shared_ptr<Scene::GroupsType> Scene::getGroups()
+SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>& Scene::getGroups()
 {
 	return m_groups;
 }

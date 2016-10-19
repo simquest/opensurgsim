@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,12 +36,12 @@ using SurgSim::Collision::ContactMapType;
 using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::Location;
 using SurgSim::Framework::BasicSceneElement;
+using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
-using SurgSim::Math::makeRigidTransform;
 
 namespace
 {
@@ -197,6 +197,7 @@ TEST_F(RepresentationTest, AddContactsInParallelTest)
 		p.get();
 	});
 	ASSERT_EQ(numContacts, rep->getCollisions().unsafeGet()[rep].size());
+	rep->retire();
 }
 
 TEST_F(RepresentationTest, Ignoring)

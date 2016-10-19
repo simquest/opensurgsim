@@ -25,24 +25,22 @@ namespace DataStructures
 
 TEST(LocationTests, Constructor)
 {
-	SurgSim::Math::Vector3d rigidLocalPosition = SurgSim::Math::Vector3d::Ones();
-	SurgSim::DataStructures::OctreePath octreeNodePath;
+	Math::Vector3d rigidLocalPosition = Math::Vector3d::Ones();
+	OctreePath octreeNodePath;
 	octreeNodePath.push_back(1);
 	octreeNodePath.push_back(2);
 	octreeNodePath.push_back(3);
 	size_t index(3);
-	SurgSim::DataStructures::IndexedLocalCoordinate triangleMeshLocalCoordinate(1, SurgSim::Math::Vector2d(4.0, 5.0));
-	SurgSim::DataStructures::IndexedLocalCoordinate elementMeshLocalCoordinate(1, SurgSim::Math::Vector4d::Ones());
+	IndexedLocalCoordinate triangleMeshLocalCoordinate(1, Math::Vector2d(4.0, 5.0));
+	IndexedLocalCoordinate elementMeshLocalCoordinate(1, Math::Vector4d::Ones());
 
 	EXPECT_NO_THROW({Location location(rigidLocalPosition);});
 	EXPECT_NO_THROW({Location location(octreeNodePath);});
 	EXPECT_NO_THROW({Location location(index);});
-	EXPECT_NO_THROW({Location location(triangleMeshLocalCoordinate, SurgSim::DataStructures::Location::TRIANGLE);});
-	EXPECT_NO_THROW({Location location(elementMeshLocalCoordinate, SurgSim::DataStructures::Location::ELEMENT);});
+	EXPECT_NO_THROW({Location location(triangleMeshLocalCoordinate, Location::TRIANGLE);});
+	EXPECT_NO_THROW({Location location(elementMeshLocalCoordinate, Location::ELEMENT);});
 	EXPECT_THROW({Location location(elementMeshLocalCoordinate, \
-									static_cast<SurgSim::DataStructures::Location::Type>(SurgSim::DataStructures::Location::ELEMENT + 10));
-				 }, \
-				 SurgSim::Framework::AssertionFailure);
+		static_cast<Location::Type>(Location::ELEMENT + 10));}, Framework::AssertionFailure);
 
 	{
 		SCOPED_TRACE("Using rigid local position");
@@ -110,7 +108,7 @@ TEST(LocationTests, Constructor)
 
 	{
 		SCOPED_TRACE("Using triangle mesh local coordinate");
-		Location location(triangleMeshLocalCoordinate, SurgSim::DataStructures::Location::TRIANGLE);
+		Location location(triangleMeshLocalCoordinate, Location::TRIANGLE);
 		EXPECT_FALSE(location.rigidLocalPosition.hasValue());
 		EXPECT_FALSE(location.octreeNodePath.hasValue());
 		EXPECT_FALSE(location.index.hasValue());
@@ -135,7 +133,7 @@ TEST(LocationTests, Constructor)
 
 	{
 		SCOPED_TRACE("Using element mesh local coordinate");
-		Location location(elementMeshLocalCoordinate, SurgSim::DataStructures::Location::ELEMENT);
+		Location location(elementMeshLocalCoordinate, Location::ELEMENT);
 		EXPECT_FALSE(location.rigidLocalPosition.hasValue());
 		EXPECT_FALSE(location.octreeNodePath.hasValue());
 		EXPECT_FALSE(location.index.hasValue());
