@@ -68,6 +68,9 @@ bool doesIntersectSegmentSegment(const Eigen::Matrix<T, 2, 1, MOpt>& s1v0,
 {
 	using SurgSim::Math::Geometry::DistanceEpsilon;
 
+	SURGSIM_ASSERT(s != nullptr) << "Null pointers sent in s variable";
+	SURGSIM_ASSERT(t != nullptr) << "Null pointers sent in t variable";
+
 	auto u = (s1v1 - s1v0).eval();
 	auto v = (s2v1 - s2v0).eval();
 	double denom = u[0] * v[1] - u[1] * v[0];
@@ -77,8 +80,6 @@ bool doesIntersectSegmentSegment(const Eigen::Matrix<T, 2, 1, MOpt>& s1v0,
 	}
 
 	auto w = s1v0 - s2v0;
-	SURGSIM_ASSERT(s != nullptr && t != nullptr) << "Null pointers sent in for s and t variables";
-
 	*s = (v[0] * w[1] - v[1] * w[0]) / denom;
 	*t = (u[0] * w[1] - u[1] * w[0]) / denom;
 
