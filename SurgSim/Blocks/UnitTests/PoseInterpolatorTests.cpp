@@ -50,14 +50,23 @@ public:
 	{
 		runtime = std::make_shared<Framework::Runtime>("");
 		scene = runtime->getScene();
+		element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
+		representation = std::make_shared<SurgSim::Framework::Representation>("representation");
+		interpolator = std::make_shared<PoseInterpolator>("interpolator");
 	}
 
 	void TearDown()
 	{
+		representation->retire();
+		interpolator->retire();
 	}
 
 	std::shared_ptr<Framework::Runtime> runtime;
 	std::shared_ptr<Framework::Scene> scene;
+	std::shared_ptr<Framework::BasicSceneElement> element;
+	std::shared_ptr<Framework::Representation> representation;
+	std::shared_ptr<PoseInterpolator> interpolator;
+
 };
 
 TEST_F(PoseInterpolatorTests, InitTest)
@@ -67,9 +76,6 @@ TEST_F(PoseInterpolatorTests, InitTest)
 
 TEST_F(PoseInterpolatorTests, StartAndEndPose)
 {
-	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
-	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
-	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
 
 	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
@@ -94,10 +100,6 @@ TEST_F(PoseInterpolatorTests, StartAndEndPose)
 
 TEST_F(PoseInterpolatorTests, UseOptionalStartPose)
 {
-	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
-	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
-	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
-
 	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
 	interpolator->setTarget(element);
@@ -120,10 +122,6 @@ TEST_F(PoseInterpolatorTests, UseOptionalStartPose)
 
 TEST_F(PoseInterpolatorTests, UseLoop)
 {
-	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
-	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
-	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
-
 	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
 
@@ -158,10 +156,6 @@ TEST_F(PoseInterpolatorTests, UseLoop)
 
 TEST_F(PoseInterpolatorTests, UsePingPong)
 {
-	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("element");
-	auto representation = std::make_shared<SurgSim::Framework::Representation>("representation");
-	auto interpolator = std::make_shared<PoseInterpolator>("interpolator");
-
 	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
 

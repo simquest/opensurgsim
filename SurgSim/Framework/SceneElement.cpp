@@ -34,9 +34,7 @@ namespace Framework
 SceneElement::SceneElement(const std::string& name) :
 	m_name(name),
 	m_isInitialized(false),
-	m_isActive(true),
-	/// Local groups for serialization local handling
-	m_groups(new DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>())
+	m_isActive(true)
 {
 	m_pose = std::make_shared<PoseComponent>("Pose");
 	m_pose->setPose(Math::RigidTransform3d::Identity());
@@ -155,10 +153,6 @@ bool SceneElement::initialize()
 	// If it did not happen in addComponent do it here
 	m_pose->setSceneElement(getSharedPtr());
 
-	// Get my groups into the scenegroups and then copy from the scene
-	getScene()->getGroups()->add(*m_groups);
-	m_groups = getScene()->getGroups();
-
 	if (m_isInitialized)
 	{
 		// initialize all components
@@ -207,6 +201,24 @@ std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 		result[i] = componentIt->second;
 	}
 	return result;
+}
+
+boost::any SceneElement::getValue(const std::string& component, const std::string& property) const
+{
+	auto found = m_components.find(component);
+	SURGSIM_ASSERT(found != m_components.end())
+		<< "Component named " << component << " not found in SceneElement named " << getName()
+		<< ". Cannot get " << property << " property.";
+	return found->second->getValue(property);
+}
+
+void SceneElement::setValue(const std::string& component, const std::string& property, const boost::any& value)
+{
+	auto found = m_components.find(component);
+	SURGSIM_ASSERT(found != m_components.end())
+		<< "Component named " << component << " not found in SceneElement named " << getName()
+		<< ". Cannot get " << property << " property.";
+	found->second->setValue(property, value);
 }
 
 void SceneElement::setScene(std::weak_ptr<Scene> scene)
@@ -264,10 +276,9 @@ YAML::Node SceneElement::encode(bool standalone) const
 	data["IsActive"] = isActive();
 
 	// Only encode groups when they are there, also encode them using the flow style i.e. with []
-	auto groups = getGroups();
-	if (groups.size() > 0)
+	if (m_groups.size() > 0)
 	{
-		data["Groups"] = groups;
+		data["Groups"] = m_groups;
 		data["Groups"].SetStyle(YAML::EmitterStyle::Flow);
 	}
 
@@ -315,7 +326,8 @@ bool SceneElement::decode(const YAML::Node& node)
 
 		if (data["Groups"].IsDefined())
 		{
-			setGroups(data["Groups"].as<std::vector<std::string>>());
+
+			m_groups = data["Groups"].as<std::unordered_set<std::string>>();
 		}
 
 		if (data["Components"].IsSequence())
@@ -364,23 +376,37 @@ bool SceneElement::isActive() const
 
 void SceneElement::addToGroup(const std::string& group)
 {
-	m_groups->add(group, getSharedPtr());
+	m_groups.insert(group);
+	if (isInitialized())
+	{
+		getScene()->getGroups().add(group, getSharedPtr());
+	}
 }
 
 void SceneElement::removeFromGroup(const std::string& group)
 {
-	m_groups->remove(group, getSharedPtr());
+	m_groups.erase(group);
+	if (isInitialized())
+	{
+		getScene()->getGroups().remove(group, getSharedPtr());
+	}
 }
 
 void SceneElement::setGroups(const std::vector<std::string>& groups)
 {
-	m_groups->remove(getSharedPtr());
-	m_groups->add(groups, getSharedPtr());
+	if (isInitialized())
+	{
+		auto& groupings = getScene()->getGroups();
+		groupings.remove(getSharedPtr());
+		groupings.add(groups, getSharedPtr());
+	}
+	std::unordered_set<std::string> temp(groups.cbegin(), groups.cend());
+	std::swap(m_groups, temp);
 }
 
 std::vector<std::string> SceneElement::getGroups() const
 {
-	return m_groups->getGroups(std::const_pointer_cast<SceneElement>(shared_from_this()));
+	return std::vector<std::string>(m_groups.cbegin(), m_groups.cend());
 }
 
 bool SceneElement::inGroup(const std::string& name)

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -267,7 +267,25 @@ void PlyReader::parseFile()
 				ply_get_element(m_data->plyFile, readBuffer);
 				if (elementInfo.processElementCallback != nullptr)
 				{
-					elementInfo.processElementCallback(currentElementName);
+					try
+					{
+						elementInfo.processElementCallback(currentElementName);
+					}
+					catch (const std::exception&)
+					{
+						for (size_t i = 0; i<listOffsets.size(); ++i)
+						{
+							void** item = (void **)((char *)readBuffer + listOffsets[i]); // NOLINT
+							free(item[0]);
+						}
+						for (int i = 0; i < propertyCount; ++i)
+						{
+							free(properties[i]->name);
+							free(properties[i]);
+						}
+						free(properties);
+						throw;
+					}
 				}
 
 				// Free the lists that where allocated by plyreader

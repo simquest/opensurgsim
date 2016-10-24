@@ -34,22 +34,30 @@ SURGSIM_STATIC_REGISTRATION(NovintDevice);
 /// This should provide basic support for any device that can communicate using the Novint HDAL SDK toolkit, such as
 /// the off-the-shelf Novint Falcon haptic gaming controller.  Note that certain devices may require device-specific
 /// support in the code to enable particular hardware features.  In particular, the Novint Falcon with the Open Surgery
-/// Grip will not be able to produce torques unless it is accessed using the Novint7DofHapticDevice class.
+/// Grip will not be able to produce torques unless it is accessed using the NovintOsgDevice class.
 ///
 /// \par Application input provided by the device:
 ///   | type       | name                  |                                                      |
 ///   | ----       | ----                  | ---                                                  |
-///   | pose       | "pose"                | %Device pose (units are meters).                     |
+///   | pose       | "pose"                | %Device pose (units are meters)*.                    |
 ///   | scalar     | "toolDof"             | %7th Dof (e.g., handle open/close angle)             |
-///   | bool       | "button1"             | %State of the first device button if present.        |
-///   | bool       | "button2"             | %State of the second device button if present.       |
-///   | bool       | "button3"             | %State of the third device button if present.        |
-///   | bool       | "button4"             | %State of the third device button if present.        |
+///   | bool       | "button1"             | %State of the first device button if present.**      |
+///   | bool       | "button2"             | %State of the second device button if present.**     |
+///   | bool       | "button3"             | %State of the third device button if present.**      |
+///   | bool       | "button4"             | %State of the third device button if present.**      |
 ///   | bool       | "isHomed"             | %Device homing status.                               |
 ///   | bool       | "isPositionHomed"     | %Device homing status, position only.                |
 ///   | bool       | "isOrientationHomed"  | %Device homing status, orientation only.             |
-/// Note that \c button1 through \c 4 correspond to the buttons 0 through 3 provided by the
-/// HDAL SDK, but a custom Novint device might have fewer than 4 buttons.
+/// * The workspace of an off-the-shelf Novint Falcon is +z points out from the face of the Falcon, +y points up, and
+///     +x points to your right if you are looking at the face of the Falcon (a right-hand frame).  The workspace of
+///     both 7dof OSG Falcons in a pair is +x towards the right Falcon, +y up, and +z towards the user
+///     (a right-hand frame).  Thus, if the 7dof OSG Falcons are setup in a typical configuration such that the
+///     left Falcon is to the user's left and the right Falcon is to the user's right, then the workspace will be the
+///     same as an off-the-shelf Falcon placed directly facing the user.  The identity orientation for an OSG Falcon
+///     is with the handle of the tool parallel to the floor (pitch), and pointed towards the user (yaw)...therefore
+///     in the home pose, the "business end" of the tool points away from the user along the -z axis.
+/// **\c button1 through \c 4 correspond to the buttons 0 through 3 provided by the HDAL SDK, but a custom
+///     Novint device might have fewer than 4 buttons.
 ///
 /// \par Application output used by the device:
 ///   | type       | name                  |                                                      |

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -131,10 +131,19 @@ public:
 		}
 		else if (!isValid())
 		{
-			SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
-				"No error during initializing device " <<
-				(initBySerialNumber ? "with serial number: '" : "named: '") << info <<
-				"', but an invalid handle returned. Is a Novint device plugged in?";
+			if (initBySerialNumber)
+			{
+				SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
+					"No error during initializing device with serial number: '" << info <<
+					"', but an invalid handle returned. Is that Novint device plugged in?";
+			}
+			else
+			{
+				SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
+					"No error during initializing device named: '" << info <<
+					"', but an invalid handle returned. Is that Novint device plugged in? " <<
+					"Did the HDAL find hdal.ini?  Is the initialization name in the hdal.ini?";
+			}
 		}
 		else
 		{
@@ -418,7 +427,7 @@ NovintScaffold::NovintScaffold() : m_state(new StateData)
 	// Note: 1. If no device is initialized (i.e. hdlInitXXX returned an invalid handle),
 	//          don't call hdlStart() or it will crash.
 	//       2. In order to use Novint 7Dof device, device MUST BE initialized by name (NOT by serial number).
-	//          Novint 3Dof device could be used/initialzed either by name or serial number.
+	//          Novint 3Dof device could be used/initialized either by name or serial number.
 	//       3. If a Novint device is in 'cut-out' state (happened with E3 binary/serial number),
 	//          HDAL library will crash.
 
@@ -606,15 +615,17 @@ std::shared_ptr<NovintScaffold::Handle>
 			{
 				SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName <<
 					"', which should map to serial number " << serial <<
-					", but no device with that serial number is available.";
+					", but no device with that serial number is available. " <<
+					"Is it plugged in?  Is the correct hdal.ini found and does it have an entry for this name?";
 			}
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName <<
-				"', but that name does not map to a serial number.  Was the configuration file found?" <<
-				" Does it contain the text of a YAML node (for the map from name to serial number)?  Is '" <<
-				initializationName << "' a key in that map?";
+			SURGSIM_LOG_SEVERE(m_state->logger) << "Attempted to register a device named '" << initializationName
+				<< "', but that name does not map to a serial number.  The configuration file (devices.yaml) was "
+				<< (m_state->nameToSerial.empty() ?
+				"not found, did not contain a YAML node (the map from name to serial number), or the map was empty."
+				: "found, but the device name is not a key in the contained map from name to serial number.");
 		}
 	}
 	return handle;
@@ -705,6 +716,24 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 	// Get the additional 7DoF data if available.
 	if (info->isDevice7Dof)
 	{
+		if (info->isPositionHomed)
+		{
+			// The 7dofs should have +x towards the right Falcon (i.e., to the user's right),
+			//   +y up, and +z towards the user (i.e., right-hand frame based on x & y), so we transform from
+			//   the per-device HDAL workspace.
+			static const Matrix33d leftTranslationTransform = makeRotationMatrix(M_PI_2, Vector3d::UnitY().eval());
+			static const Matrix33d rightTranslationTransform = makeRotationMatrix(-M_PI_2, Vector3d::UnitY().eval());
+
+			if (info->isDeviceRollAxisReversed)
+			{
+				info->scaledPose.translation() = leftTranslationTransform * info->scaledPose.translation();
+			}
+			else
+			{
+				info->scaledPose.translation() = rightTranslationTransform * info->scaledPose.translation();
+			}
+		}
+
 		int gripStatus[2] = { 0, 0 };
 		// OSG2 grips report their "handedness" in the LSB of the second raw status byte
 		// We re-check this state each update because sometimes the first few callbacks have incorrect states.
@@ -719,14 +748,14 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 		if (leftHanded)
 		{
 			info->isDeviceRollAxisReversed = true;
-			info->eulerAngleOffsetYaw = 2.7;
-			info->eulerAngleOffsetPitch = 0;
+			info->eulerAngleOffsetYaw = -0.5;
+			info->eulerAngleOffsetPitch = -0.9;
 		}
 		else
 		{
 			info->isDeviceRollAxisReversed = false;
 			info->eulerAngleOffsetYaw = 0.3;
-			info->eulerAngleOffsetPitch = 0.5;
+			info->eulerAngleOffsetPitch = -0.7;
 		}
 
 		if (info->isOrientationHomed)
@@ -738,13 +767,18 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
 			fatalError = fatalError || isFatalError("hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
 
-			// The zero values are NOT the home orientation.
-			info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
-			info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
-			info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+			// The zero values are NOT the home orientation, and we are flipping some axes to map to our desired
+			// device workspace (from the underlying per-device HDAL workspace).
 			if (info->isDeviceRollAxisReversed)
 			{
 				info->jointAngles[0] = -angles[0] + info->eulerAngleOffsetRoll;
+				info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
+				info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+			}
+			else
+			{
+				info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
+				info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 				info->jointAngles[2] = -angles[2] + info->eulerAngleOffsetPitch;
 			}
 
@@ -758,14 +792,16 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			   */
 			info->toolDof = angles[3]; // Get the reading for 7th Dof, the open/close angle of the tool.
 
-			// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
-			Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
+			// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles.
+			// The home position (identity orientation) is with the tool parallel to the ground with the handle pointed
+			// at the user (and some roll angle).
+			Matrix33d rotationX = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
 				Vector3d(Vector3d::UnitX()));
 			Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1] * info->orientationScale,
 				Vector3d(Vector3d::UnitY()));
-			Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
+			Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
 				Vector3d(Vector3d::UnitZ()));
-			info->scaledPose.linear() = rotationY * rotationZ * rotationX;
+			info->scaledPose.linear() = rotationY * rotationX * rotationZ;
 		}
 	}
 
@@ -799,9 +835,12 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 	{
 		// Wait until the tool is pointed forwards (i.e. perpendicular to the Falcon centerline) before proclaiming the
 		// whole device homed.
-		Vector3d forwardDirection = Vector3d::UnitX();
+		static const Vector3d forwardDirection = Vector3d::UnitZ();
 		double forwardMetric = forwardDirection.dot(info->scaledPose.linear() * forwardDirection);
 
+		SURGSIM_LOG_DEBUG(m_state->logger) << "NovintDevice " << info->deviceObject->getName()
+			<< " is position- and orientation-homed, but needs to be near the home orientation. forwardMetric "
+			<< forwardMetric << " vs. threshold " << info->forwardPointingPoseThreshold;
 		if (forwardMetric >= info->forwardPointingPoseThreshold)
 		{
 			// It looks like everything is ready!
@@ -827,21 +866,24 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		outputData.poses().get(DataStructures::Names::INPUT_POSE, &poseForNominal);
 
 		Vector3d rotationVector = Vector3d::Zero();
-		Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
+		// Unfortunately, the current version of the OSG Falcon does not provide the roll angle via
+		// hdlGripGetAttributesd(HDL_GRIP_ANGLE, ...) so here we do not know the actual orientation of a 7Dof robot
+		// (and a 3Dof robot will not change orientation).
+		// Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
 
 		Math::setSubVector(info->scaledPose.translation() - poseForNominal.translation(), 0, 3, &deltaPosition);
 		Math::setSubVector(rotationVector, 1, 3, &deltaPosition);
-
 		info->force += springJacobian.block<3,6>(0, 0) * deltaPosition;
 	}
 
+	/* Since the HDAL does not provide a velocity, NovintScaffold cannot use the damper Jacobian.
+	// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
 	// If the damperJacobian was provided, calculate a delta force based on the change in velocity.
 	Math::Vector6d deltaVelocity;
 	DataGroup::DynamicMatrixType damperJacobian;
 	bool havedamperJacobian = outputData.matrices().get(DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
 	if (havedamperJacobian)
 	{
-		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
 		Vector3d linearVelocity = Vector3d::Zero();
 		Vector3d angularVelocity = Vector3d::Zero();
 
@@ -855,39 +897,56 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 
 		info->force += damperJacobian.block<3,6>(0, 0) * deltaVelocity;
 	}
+	*/
 
 	// Calculate the torque command if applicable (and convert newton-meters to command counts).
 	if (info->isDevice7Dof)
 	{
-		Vector3d torque = Vector3d::Zero();
-		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
+		// Transform the forces from our device-space into the individual Falcon spaces
+		//   (+z out of Falcon front, +y up, +x to right of Falcon when looking at it from the front).
+		static const Matrix33d leftForceTransform = makeRotationMatrix(-M_PI_2, Vector3d::UnitY().eval());
+		static const Matrix33d rightForceTransform = makeRotationMatrix(M_PI_2, Vector3d::UnitY().eval());
+
 		if (info->isDeviceRollAxisReversed)
 		{
-			torque[0] = -torque[0];
-			torque[2] = -torque[2];
+			info->force = leftForceTransform * info->force;
+		}
+		else
+		{
+			info->force = rightForceTransform * info->force;
 		}
 
+		Vector3d torque = Vector3d::Zero();
+		outputData.vectors().get(DataStructures::Names::TORQUE, &torque);
 		if (havespringJacobian)
 		{
 			torque += springJacobian.block<3,6>(3, 0) * deltaPosition;
 		}
 
-		if (havedamperJacobian)
+		// Since the HDAL does not provide a velocity, we cannot use the damper Jacobian.
+		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
+		//if (havedamperJacobian)
+		//{
+		//	torque += damperJacobian.block<3,6>(3, 0) * deltaVelocity;
+		//}
+
+		static const Matrix33d rightTorqueTransform = makeRotationMatrix(M_PI, Vector3d::UnitY().eval());
+		if (!info->isDeviceRollAxisReversed)
 		{
-			torque += damperJacobian.block<3,6>(3, 0) * deltaVelocity;
+			torque.head<3>() = rightTorqueTransform * torque.head<3>();
 		}
 
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
 		// AXIS, not for each Cartesian axis. Which means we need to go back to calculations with joint angles.
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
-		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
+		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitX()));
 		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1], Vector3d(Vector3d::UnitY()));
-		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitZ()));
-		// NB: the order of rotations is (rotY * rotZ * rotX), not XYZ!
+		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitZ()));
+		// NB: the order of rotations is (rotY * rotX * rotZ), not XYZ!
 		// Construct the joint axes for the CURRENT pose of the device.
 		Vector3d jointAxisY = Vector3d::UnitY();
-		Vector3d jointAxisZ = rotationY * Vector3d::UnitZ();
-		Vector3d jointAxisX = rotationY * (rotationZ * Vector3d::UnitX());
+		Vector3d jointAxisX = rotationY * Vector3d::UnitX();
+		Vector3d jointAxisZ = rotationY * (rotationX * Vector3d::UnitZ());
 		// To convert from Cartesian space to motor-axis space, we assemble the axes into a basis matrix and invert it.
 		Matrix33d basisMatrix;
 		basisMatrix.col(0) = jointAxisX;
@@ -896,13 +955,13 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		double basisDeterminant = fabs(basisMatrix.determinant());
 
 		// Also construct a "fake" X axis orthogonal with the other two, to be used when the pose is degenerate.
-		// Note that the Y and Z axes are always perpendicular for the Falcon 7DoF, so the normalize() can't fail and
+		// Note that the Y and X axes are always perpendicular for the Falcon 7DoF, so the normalize() can't fail and
 		// is basically unnecessary, but...
-		Vector3d fakeAxisX  = jointAxisY.cross(jointAxisZ).normalized();
+		Vector3d fakeAxisZ  = jointAxisY.cross(jointAxisX).normalized();
 		Matrix33d fakeBasisMatrix;
-		fakeBasisMatrix.col(0) = fakeAxisX;
+		fakeBasisMatrix.col(0) = jointAxisX;
 		fakeBasisMatrix.col(1) = jointAxisY;
-		fakeBasisMatrix.col(2) = jointAxisZ;
+		fakeBasisMatrix.col(2) = fakeAxisZ;
 
 		const double mediumBasisDeterminantThreshold = 0.6;
 		const double smallBasisDeterminantThreshold = 0.4;
@@ -932,11 +991,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		else
 		{
 			// If the determinant is small, the matrix may not be invertible.
-			// The "fake" basis matrix replaces the X axis with a fake (so it's always invertible), but the output X
+			// The "fake" basis matrix replaces the Z axis with a fake (so it's always invertible), but the output Z
 			// torque is then meaningless.
 			decompositionMatrix = fakeBasisMatrix.inverse();
-			decompositionMatrix.row(0) = Vector3d::Zero();
-			// Moreover, near the degenerate position the X axis free-spins but is aligned with Y,
+			decompositionMatrix.row(2) = Vector3d::Zero();
+			// Moreover, near the degenerate position the Z axis free-spins but is aligned with Y,
 			// so we want to reduce Y torques as well.
 			//double ratio = (basisDeterminant / smallBasisDeterminantThreshold);
 			double ratio = 0;
@@ -958,7 +1017,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		info->torque[0] = 0;  // Roll torque currently disabled because the roll sensor is too jittery.
 		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 									   axisTorqueMin, axisTorqueMax);
-		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
+		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.x() * axisTorqueVector.x(),
 									   axisTorqueMin, axisTorqueMax);
 		info->torque[3] = 0;
 
@@ -1071,7 +1130,7 @@ std::map<std::string, std::string> NovintScaffold::getNameMap()
 	}
 	else
 	{
-		SURGSIM_LOG_DEBUG(m_state->logger) << "Failed to find devices.yaml, cannot map names to serial numbers.";
+		SURGSIM_LOG_INFO(m_state->logger) << "Failed to find devices.yaml, cannot map names to serial numbers.";
 	}
 	return map;
 }

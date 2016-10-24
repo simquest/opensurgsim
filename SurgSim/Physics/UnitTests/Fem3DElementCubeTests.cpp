@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -574,7 +574,7 @@ TEST_F(Fem3DElementCubeTests, VolumeTest)
 
 		std::array<size_t, 8> nodeIds = {{0, 1, 3, 2, 4, 6, 7, 5}};
 		auto cube = getCubeElement(nodeIds);
-		ASSERT_THROW(cube->getVolume(m_restState), SurgSim::Framework::AssertionFailure);
+		ASSERT_THROW(cube->initialize(m_restState), SurgSim::Framework::AssertionFailure);
 	}
 
 	{
@@ -583,7 +583,7 @@ TEST_F(Fem3DElementCubeTests, VolumeTest)
 		// Copy the 1st 4 points over the 4 following points, so the cube degenerate to a square
 		m_restState.getPositions().segment<3 * 4>(12) = m_restState.getPositions().segment<3 * 4>(0);
 		auto cube = getCubeElement(m_nodeIds);
-		ASSERT_THROW(cube->getVolume(m_restState), SurgSim::Framework::AssertionFailure);
+		ASSERT_THROW(cube->initialize(m_restState), SurgSim::Framework::AssertionFailure);
 	}
 }
 

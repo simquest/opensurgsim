@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -450,7 +450,7 @@ inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepres
 {
 	using SurgSim::DataStructures::Location;
 
-	static auto type = (new MockConstraintImplementation())->getConstraintType();
+	static auto type = MockConstraintImplementation().getConstraintType();
 	if (firstRepresentation->getConstraintImplementation(type) == nullptr)
 	{
 		ConstraintImplementation::getFactory().addImplementation(typeid(MockRepresentation),
