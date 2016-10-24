@@ -56,7 +56,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KnotIdentificat
 				 KnotIdentificationBehavior);
 
 KnotIdentificationBehavior::KnotIdentificationBehavior(const std::string& name) :
-	Framework::Behavior(name), m_knotName("Calculating...")
+	Framework::Behavior(name), m_knotName("Calculating..."), m_lastReidmeister3iCount(0)
 {
 }
 
@@ -323,7 +323,7 @@ bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<int>* gaussCode
 		m_lastReidmeister3m = std::numeric_limits<size_t>::max();
 		m_lastReidmeister3n = std::numeric_limits<size_t>::max();
 	}
-	else// if (m_lastReidmeister3Code.size() == gaussCode->size())
+	else
 	{
 		*gaussCode = m_lastReidmeister3Code;
 		i = m_lastReidmeister3i;

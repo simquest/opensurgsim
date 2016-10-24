@@ -101,33 +101,33 @@ protected:
 		const std::vector<SurgSim::Math::Vector3d>& segments3d);
 
 	/// Perform Reidmeister moves.
-	/// \param [in,out] guassCode The gauss code of the knot projection diagram.
-	void performReidmeisterMoves(std::vector<int>* guassCode);
+	/// \param [in,out] gaussCode The gauss code of the knot projection diagram.
+	void performReidmeisterMoves(std::vector<int>* gaussCode);
 
 	/// Perform Reidmeister move 1.
-	/// \param [in,out] guassCode The gauss code of the knot projection diagram.
+	/// \param [in,out] gaussCode The gauss code of the knot projection diagram.
 	/// \param erased The crossings that were erased during this move
 	/// \return True, if a move was done.
-	bool tryReidmeisterMove1(std::vector<int>* guassCode, std::vector<int>* erased);
+	bool tryReidmeisterMove1(std::vector<int>* gaussCode, std::vector<int>* erased);
 
 	/// Perform Reidmeister move 2.
-	/// \param [in,out] guassCode The gauss code of the knot projection diagram.
+	/// \param [in,out] gaussCode The gauss code of the knot projection diagram.
 	/// \param erased The crossings that were erased during this move
 	/// \return True, if a move was done.
-	bool tryReidmeisterMove2(std::vector<int>* guassCode,
+	bool tryReidmeisterMove2(std::vector<int>* gaussCode,
 		std::vector<int>* erased);
 
 	/// Perform Reidmeister move 3.
-	/// \param [in,out] guassCode The gauss code of the knot projection diagram.
+	/// \param [in,out] gaussCode The gauss code of the knot projection diagram.
 	/// \return True, if a move was done.
-	bool tryReidmeisterMove3(std::vector<int>* guassCode);
+	bool tryReidmeisterMove3(std::vector<int>* gaussCode);
 
-	/// \param [in,out] guassCode The gauss code of the knot projection diagram.
+	/// \param [in,out] gaussCode The gauss code of the knot projection diagram.
 	/// \param erased The crossings that were erased.
-	void adjustGaussCodeForErasedCrossings(std::vector<int>* guassCode, std::vector<int>* erased);
+	void adjustGaussCodeForErasedCrossings(std::vector<int>* gaussCode, std::vector<int>* erased);
 
 	/// Identify the knot.
-	/// \param [in,out] guassCode The reduced gauss code of the knot projection diagram.
+	/// \param [in,out] gaussCode The reduced gauss code of the knot projection diagram.
 	/// \return True, if a knot was detected.
 	bool identifyKnot(const std::vector<int>& gaussCode);
 
