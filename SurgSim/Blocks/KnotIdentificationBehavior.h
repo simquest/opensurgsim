@@ -35,6 +35,7 @@ namespace SurgSim
 namespace Blocks
 {
 /// The KnotIdentificationBehavior detects and identifies a knot in a fem1d representation.
+/// https://en.wikipedia.org/wiki/Reidemeister_move explains the idea of Reidmeister moves.
 /// The document below gives an overview of the algorithm used to detect the knot.
 /// https://docs.google.com/document/d/1a8hCCvtFuOapYsj81enORBiN9pcoCS7HIDioquto6LA
 class KnotIdentificationBehavior : public SurgSim::Framework::Behavior
@@ -58,13 +59,23 @@ public:
 	bool doWakeUp() override;
 
 protected:
-	/// \param projection The projection matrix to be used.
-	/// \return The knot ID enum.
-	int detectAndIdentifyKnot(const SurgSim::Math::Matrix33d& projection);
+	/// struct to store a Crossing
+	struct Crossing
+	{
+		int id;
+		size_t segmentId;
+		double segmentLocation;
+		Crossing(int id, size_t segmentId, double segmentLocation)
+			: id(id), segmentId(segmentId), segmentLocation(segmentLocation) {}
+	};
 
 	/// \param projection The projection matrix to be used.
-	/// \param [out] guassCode The gauss code of the knot projection diagram.
-	void getGaussCode(const SurgSim::Math::Matrix33d& projection, std::vector<int>* guassCode);
+	/// \return True, if a knot was detected.
+	bool detectAndIdentifyKnot(const SurgSim::Math::Matrix33d& projection);
+
+	/// \param projection The projection matrix to be used.
+	/// \return The gauss code of the knot projection diagram.
+	std::vector<int> getGaussCode(const SurgSim::Math::Matrix33d& projection);
 
 	/// Build the node data needed to setup the knot identification.
 	/// \param projectionX The x-axis of the projection matrix.
@@ -72,19 +83,19 @@ protected:
 	/// \param nodes3d [out] The 3d positions of the nodes.
 	/// \param nodes2d [out] The 2d (projected) positions of the nodes.
 	/// \param segments3d [out] The 3d segments between the nodes.
-	void buildNodeData(Math::Vector3d projectionX, Math::Vector3d projectionY,
+	void buildNodeData(const Math::Vector3d& projectionX,
+		const Math::Vector3d& projectionY,
 		std::vector<SurgSim::Math::Vector3d>* nodes3d,
 		std::vector<SurgSim::Math::Vector2d>* nodes2d,
 		std::vector<SurgSim::Math::Vector3d>* segments3d);
 
 	/// Calculate the crossings from the node data.
 	/// \param projectionZ The z-axis of the projection matrix.
-	/// \param [in,out] crossings The crossings in the fem1d projection.
 	/// \param nodes3d The 3d positions of the nodes.
 	/// \param nodes2d The 2d (projected) positions of the nodes.
 	/// \param segments3d  The 3d segments between the nodes.
-	void calculateCrossings(Math::Vector3d projectionZ,
-		std::list<std::tuple<int, size_t, double>>* crossings,
+	/// \return The crossings in the fem1d projection.
+	std::list<Crossing> calculateCrossings(const Math::Vector3d& projectionZ,
 		const std::vector<SurgSim::Math::Vector3d>& nodes3d,
 		const std::vector<SurgSim::Math::Vector2d>& nodes2d,
 		const std::vector<SurgSim::Math::Vector3d>& segments3d);
@@ -117,8 +128,8 @@ protected:
 
 	/// Identify the knot.
 	/// \param [in,out] guassCode The reduced gauss code of the knot projection diagram.
-	/// \return The knot id enum.
-	int identifyKnot(const std::vector<int>& gaussCode);
+	/// \return True, if a knot was detected.
+	bool identifyKnot(const std::vector<int>& gaussCode);
 
 	/// The fem1d within which the knot is checked for.
 	std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> m_fem1d;
@@ -140,12 +151,12 @@ private:
 	/// \param code The Gauss Code of the knot diagram
 	/// \param i The current index in the code
 	/// \return The next index in the code (cycle if end of list is reached)
-	size_t next(const std::vector<int>& code, size_t i);
+	size_t nextIndex(const std::vector<int>& code, size_t i);
 
 	/// \param code The Gauss Code of the knot diagram
 	/// \param i The current index in the code
 	/// \return The previous index in the code (cycle to end if start of list is reached)
-	size_t prev(const std::vector<int>& code, size_t i);
+	size_t prevIndex(const std::vector<int>& code, size_t i);
 
 	/// \param code The Gauss Code of the knot diagram
 	/// \param i, j Indices of two entries in the code
@@ -184,7 +195,7 @@ private:
 
 	/// \param code The Gauss Code of the knot diagram
 	/// \param knot The knot code of a known knot, to which the firs parameter is compared to.
-	bool isSame(const std::vector<int>& code, const std::vector<int>& knot);
+	bool isSameCode(const std::vector<int>& code, const std::vector<int>& knot);
 };
 
 } // namespace Blocks
