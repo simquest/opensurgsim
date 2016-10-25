@@ -237,7 +237,7 @@ void KnotIdentificationBehavior::performReidmeisterMoves(std::vector<int>* gauss
 	}
 
 	// Setup some variables for Reidmeister Move 3.
-	m_lastReidmeister3Code.empty();
+	m_lastReidmeister3Code.clear();
 
 	// Perform Reidmeister moves.
 	std::vector<int> erased;
@@ -315,7 +315,7 @@ bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<int>* gaussCode
 	size_t l;
 	size_t m;
 	size_t n;
-	if (m_lastReidmeister3Code.size() > gaussCode->size() || m_lastReidmeister3Code.empty())
+	if (m_lastReidmeister3Code.empty() || m_lastReidmeister3Code.size() > gaussCode->size())
 	{
 		m_lastReidmeister3Code = *gaussCode;
 		m_lastReidmeister3i = std::numeric_limits<size_t>::max();

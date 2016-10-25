@@ -43,6 +43,11 @@ public:
 		return KnotIdentificationBehavior::tryReidmeisterMove2(gaussCode, erased);
 	}
 
+	void clearReidmeisterMove3()
+	{
+		m_lastReidmeister3Code.clear();
+	}
+
 	bool tryReidmeisterMove3(std::vector<int>* gaussCode)
 	{
 		return KnotIdentificationBehavior::tryReidmeisterMove3(gaussCode);
@@ -106,6 +111,11 @@ public:
 		bool actualReturn = mockKnotIdentificationBehavior3.tryReidmeisterMove3(&gaussCodeBefore);
 		EXPECT_EQ(expectedReturn, actualReturn);
 		EXPECT_TRUE(gaussCodeBefore == gaussCodeAfter);
+	}
+
+	void clearReidmeisterMove3()
+	{
+		mockKnotIdentificationBehavior3.clearReidmeisterMove3();
 	}
 
 	void testAdjustGaussCodeForErasedCrossings(std::vector<int> gaussCodeBefore, std::vector<int> gaussCodeAfter,
@@ -186,6 +196,7 @@ TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove3)
 	{
 		int input[] = {-1, -3, -2, 1, 2, 3};
 		int expected[] = {-1, -3, 3, -2, 1, 2};
+		clearReidmeisterMove3();
 		testReidmeisterMove3(MAKE_VEC(input), MAKE_VEC(expected), true);
 		int expected2[] = {2, -3, -2, 3, 1, -1};
 		testReidmeisterMove3(MAKE_VEC(expected), MAKE_VEC(expected2), true);
@@ -198,6 +209,7 @@ TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove3)
 	{
 		int input[] = {3, 1, -4, -2, -1, -5, 2, -3, 4, 5};
 		int expected[] = {3, 1, -4, -3, -2, -5, -1, 2, 4, 5};
+		clearReidmeisterMove3();
 		testReidmeisterMove3(MAKE_VEC(input), MAKE_VEC(expected), true);
 	}
 }
