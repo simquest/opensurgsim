@@ -340,7 +340,7 @@ bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<int>* gaussCode
 			n = (i == m_lastReidmeister3i) ? m_lastReidmeister3n : std::numeric_limits<size_t>::max();
 			if (hasCommonNeighbor(*gaussCode, k, l, &m, &n))
 			{
-				m_lastReidmeister3iCount = (i == m_lastReidmeister3i) ? ++m_lastReidmeister3iCount : 1;
+				m_lastReidmeister3iCount = (i == m_lastReidmeister3i) ? (m_lastReidmeister3iCount + 1) : 1;
 				m_lastReidmeister3i = i;
 				m_lastReidmeister3m = m;
 				m_lastReidmeister3n = n;
