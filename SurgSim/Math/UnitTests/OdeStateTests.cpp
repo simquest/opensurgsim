@@ -246,7 +246,7 @@ TEST(OdeStateTest, AddGetSetBoundaryConditionsStaticDofTest)
 	expected.push_back(std::make_pair(1u, 2.6)); // (node 1, value 2.6)
 	testBoundaryConditionsStaticDof(state, expected);
 
-	state.setBoundaryConditionStaticDof(0u, 5.4);
+	state.changeBoundaryConditionStaticDof(0u, 5.4);
 	expected.front().second = 5.4; // (node 0, value 5.4)
 	testBoundaryConditionsStaticDof(state, expected);
 

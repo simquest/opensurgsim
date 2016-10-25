@@ -161,8 +161,6 @@ Vector* OdeState::applyBoundaryConditionsToVector(Vector* vector) const
 	SURGSIM_ASSERT(vector != nullptr && vector->size() >= 0 && static_cast<size_t>(vector->size()) == getNumDof())
 			<< "Invalid vector to apply boundary conditions on";
 
-	const size_t numDofPerNode = getNumDof() / getNumNodes();
-	const size_t N = numDofPerNode * (getNumNodes() - 2);
 	for (auto it = getBoundaryConditions().cbegin();
 		 it != getBoundaryConditions().cend();
 		 ++it)
@@ -240,7 +238,7 @@ const std::vector<std::pair<size_t, double>>& OdeState::getBoundaryConditionsSta
 	return m_boundaryConditionsStaticDof;
 }
 
-void OdeState::setBoundaryConditionStaticDof(size_t nodeId, double value)
+void OdeState::changeBoundaryConditionStaticDof(size_t nodeId, double value)
 {
 	auto bc = std::find_if(m_boundaryConditionsStaticDof.begin(), m_boundaryConditionsStaticDof.end(),
 		[&nodeId](std::pair<size_t, double>& pair) { return pair.first == nodeId; });

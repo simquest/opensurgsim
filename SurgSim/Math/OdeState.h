@@ -162,7 +162,7 @@ public:
 	/// \param nodeId The node for which the static dof must be set
 	/// \param value The value to set the static dof of the given node
 	/// \note Does not do anything if the static dof boundary condition does not exists yet.
-	void setBoundaryConditionStaticDof(size_t nodeId, double value);
+	void changeBoundaryConditionStaticDof(size_t nodeId, double value);
 
 	/// Check if this state is numerically valid
 	/// \return True if all positions and velocities are valid numerical values, False otherwise
