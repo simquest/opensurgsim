@@ -32,6 +32,8 @@ namespace
 {
 // The list of knots that can be identified here.
 const int knot3[] = {1, -2, 3, -1, 2, -3};
+const int knot33_1[] = {1, -2, 3, -4, 5, -6, 4, -5, 6, -1, 2, -3};
+const int knot33_2[] = {1, -2, 3, 4, -5, 6, -4, 5, -6, -1, 2, -3};
 
 struct Knot
 {
@@ -42,9 +44,10 @@ struct Knot
 	{}
 };
 
-std::array<Knot, 2> knots = {
-	Knot("No Knot", std::vector<int>()),
-	Knot("Trefoil Knot", std::vector<int>(knot3, knot3 + sizeof(knot3) / sizeof(int)))
+std::array<Knot, 3> knots = {
+	Knot("Trefoil Knot", std::vector<int>(knot3, knot3 + sizeof(knot3) / sizeof(int))),
+	Knot("Granny Knot", std::vector<int>(knot33_1, knot33_1 + sizeof(knot33_1) / sizeof(int))),
+	Knot("Square Knot", std::vector<int>(knot33_2, knot33_2 + sizeof(knot33_2) / sizeof(int)))
 };
 }
 
