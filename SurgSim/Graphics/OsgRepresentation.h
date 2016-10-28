@@ -106,7 +106,11 @@ public:
 	/// \param value The value for this uniform
 	void addUniform(const std::string& type, const std::string& name, const boost::any& value);
 
+
+
 protected:
+	void doRetire() override;
+
 	virtual void doUpdate(double dt);
 
 	/// Set the visibility of this representation
