@@ -45,12 +45,12 @@ public:
 
 	void clearReidmeisterMove3()
 	{
-		m_lastReidmeister3Code.clear();
+		data.code.clear();
 	}
 
 	bool tryReidmeisterMove3(std::vector<int>* gaussCode)
 	{
-		return KnotIdentificationBehavior::tryReidmeisterMove3(gaussCode);
+		return KnotIdentificationBehavior::tryReidmeisterMove3(gaussCode, &data);
 	}
 
 	void adjustGaussCodeForErasedCrossings(std::vector<int>* gaussCode, std::vector<int>* erased)
@@ -63,6 +63,8 @@ public:
 		KnotIdentificationBehavior::identifyKnot(gaussCode);
 		return KnotIdentificationBehavior::getKnotName();
 	}
+
+	KnotIdentificationBehavior::ReidmeisterMove3Data data;
 };
 
 class KnotIdentificationBehaviorTest : public testing::Test
