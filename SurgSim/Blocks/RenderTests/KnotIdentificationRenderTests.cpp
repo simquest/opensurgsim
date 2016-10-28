@@ -164,7 +164,7 @@ public:
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
 	}
-	
+
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager;
 	std::shared_ptr<SurgSim::Physics::PhysicsManager> physicsManager;

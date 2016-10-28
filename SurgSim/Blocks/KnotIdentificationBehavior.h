@@ -68,10 +68,10 @@ protected:
 		Crossing(int id, size_t segmentId, double segmentLocation)
 			: id(id), segmentId(segmentId), segmentLocation(segmentLocation) {}
 	};
-	
+
 	/// List of known knot codes.
 	static std::map<std::string, std::vector<int>> m_knownLists;
-	
+
 	/// Function to add a known knot code to the list.
 	/// \param name The name of the knot
 	/// \param code The gauss code of the knot
@@ -162,8 +162,6 @@ protected:
 	/// The name of the knot that was detected.
 	std::string m_knotName;
 
-	
-
 private:
 	/// \param code The Gauss Code of the knot diagram
 	/// \param i The current index in the code
@@ -205,8 +203,8 @@ private:
 
 	/// \param code The Gauss Code of the knot diagram
 	/// \param i, j The two entries which are checked if they have a common cross as a neighbor
-	/// \param [in,out] k, l The out-params to store the common neighbor for i and j. The also bring in the
-	///					k, l from the last iteration for the same i, j. So, a different k, l is found (if it is possible)
+	/// \param [in,out] k, l The out-params to store the common neighbor for i and j. The also bring in the k, l
+	///					from the last iteration for the same i, j. So, a different k, l is found (if it is possible)
 	/// \return True, if a common neighbor was found
 	bool hasCommonNeighbor(const std::vector<int>& code, size_t i, size_t j, size_t* k, size_t* l);
 

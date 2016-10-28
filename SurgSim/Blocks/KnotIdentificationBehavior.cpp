@@ -427,7 +427,7 @@ bool KnotIdentificationBehavior::doesOverlap(const std::vector<int>& code, size_
 {
 	return isSameSign(code, i, j) && isSameSign(code, k, l) && !isSameSign(code, i, k) &&
 		   ((isSameCross(code, i, k) && isSameCross(code, j, l)) ||
-		    (isSameCross(code, i, l) && isSameCross(code, j, k)));
+			(isSameCross(code, i, l) && isSameCross(code, j, k)));
 }
 
 void KnotIdentificationBehavior::erase(std::vector<int>* code, size_t i, size_t j)
