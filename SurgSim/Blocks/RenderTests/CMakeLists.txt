@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,28 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
-	CompoundCollisionRenderTest.cpp
-	Fem3DMeshRenderTest.cpp
-	Fem3DvsTruthCubeRenderTest.cpp
-	RenderTest.cpp
-	RenderTestCcdSuture.cpp
-	RenderTestFem1D.cpp
-	RenderTestFem2D.cpp
-	RenderTestFem3D.cpp
-	RenderTestFem3DCorotational.cpp
-	RenderTestMassSprings.cpp
-	RenderTestRigidBodies.cpp
+	KnotIdentificationRenderTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
-	RenderTest.h
 )
 
 configure_file(
@@ -44,12 +31,10 @@ configure_file(
 
 set(LIBS
 	SurgSimBlocks
+	SurgSimFramework
 	SurgSimGraphics
-	SurgSimPhysics
 )
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+surgsim_add_unit_tests(SurgSimBlocksRenderTest)
 
-surgsim_add_unit_tests(SurgSimPhysicsRenderTest)
-
-set_target_properties(SurgSimPhysicsRenderTest PROPERTIES FOLDER "Physics")
+set_target_properties(SurgSimBlocksRenderTest PROPERTIES FOLDER "Blocks")

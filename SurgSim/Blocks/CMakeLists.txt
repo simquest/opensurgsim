@@ -92,5 +92,9 @@ if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 
+if(BUILD_RENDER_TESTING)
+	add_subdirectory(RenderTests)
+endif()
+
 # Put SurgSimBlocks into folder "Blocks"
 set_target_properties(SurgSimBlocks PROPERTIES FOLDER "Blocks")
