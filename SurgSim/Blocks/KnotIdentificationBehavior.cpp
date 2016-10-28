@@ -15,6 +15,7 @@
 
 #include "SurgSim/Blocks/KnotIdentificationBehavior.h"
 
+#include <boost/assign/list_of.hpp>
 #include <boost/math/special_functions/sign.hpp>
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
@@ -28,29 +29,6 @@
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector2d;
 
-namespace
-{
-// The list of knots that can be identified here.
-const int knot3[] = {1, -2, 3, -1, 2, -3};
-const int knot33_1[] = {1, -2, 3, -4, 5, -6, 4, -5, 6, -1, 2, -3};
-const int knot33_2[] = {1, -2, 3, 4, -5, 6, -4, 5, -6, -1, 2, -3};
-
-struct Knot
-{
-	std::string name;
-	std::vector<int> code;
-	Knot(const std::string& name, std::vector<int> code)
-		: name(name), code(code)
-	{}
-};
-
-std::array<Knot, 3> knots = {
-	Knot("Trefoil Knot", std::vector<int>(knot3, knot3 + sizeof(knot3) / sizeof(int))),
-	Knot("Granny Knot", std::vector<int>(knot33_1, knot33_1 + sizeof(knot33_1) / sizeof(int))),
-	Knot("Square Knot", std::vector<int>(knot33_2, knot33_2 + sizeof(knot33_2) / sizeof(int)))
-};
-}
-
 namespace SurgSim
 {
 namespace Blocks
@@ -58,15 +36,28 @@ namespace Blocks
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KnotIdentificationBehavior,
 				 KnotIdentificationBehavior);
 
+std::map<std::string, std::vector<int>> KnotIdentificationBehavior::m_knownLists;
+
 KnotIdentificationBehavior::KnotIdentificationBehavior(const std::string& name) :
-	Framework::Behavior(name), m_knotName("Calculating..."), m_lastReidmeister3iCount(0)
+	Framework::Behavior(name), m_knotName("Calculating...")
 {
+	using boost::assign::list_of;
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KnotIdentificationBehavior,
+		std::shared_ptr<SurgSim::Physics::Fem1DRepresentation>, Fem1d, getFem1d, setFem1d);
+
+	if (m_knownLists.empty())
+	{
+		addKnownKnotCode("Trefoil Knot", boost::assign::list_of(1)(-2)(3)(-1)(2)(-3));
+		addKnownKnotCode("Granny Knot", boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3));
+		addKnownKnotCode("Square Knot", boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3));
+	}
 }
 
 void KnotIdentificationBehavior::setFem1d(const std::shared_ptr<Framework::Component>& fem1d)
 {
 	m_fem1d = Framework::checkAndConvert<Physics::Fem1DRepresentation>(fem1d,
-		"Physics::Fem1DRepresentation");
+		"SurgSim::Physics::Fem1DRepresentation");
 }
 
 const std::shared_ptr<Physics::Fem1DRepresentation>& KnotIdentificationBehavior::getFem1d() const
@@ -120,6 +111,14 @@ bool KnotIdentificationBehavior::doInitialize()
 bool KnotIdentificationBehavior::doWakeUp()
 {
 	return true;
+}
+
+void KnotIdentificationBehavior::addKnownKnotCode(const std::string& name, const std::vector<int>& code)
+{
+	if (m_knownLists.find(name) == m_knownLists.end())
+	{
+		m_knownLists[name] = code;
+	}
 }
 
 bool KnotIdentificationBehavior::detectAndIdentifyKnot(
@@ -240,7 +239,7 @@ void KnotIdentificationBehavior::performReidmeisterMoves(std::vector<int>* gauss
 	}
 
 	// Setup some variables for Reidmeister Move 3.
-	m_lastReidmeister3Code.clear();
+	ReidmeisterMove3Data move3Data;
 
 	// Perform Reidmeister moves.
 	std::vector<int> erased;
@@ -250,7 +249,7 @@ void KnotIdentificationBehavior::performReidmeisterMoves(std::vector<int>* gauss
 		reidmeisterMovePerformed =
 			tryReidmeisterMove1(gaussCode, &erased) ||
 			tryReidmeisterMove2(gaussCode, &erased) ||
-			tryReidmeisterMove3(gaussCode);
+			tryReidmeisterMove3(gaussCode, &move3Data);
 	} while (reidmeisterMovePerformed && !gaussCode->empty());
 
 	adjustGaussCodeForErasedCrossings(gaussCode, &erased);
@@ -292,9 +291,11 @@ bool KnotIdentificationBehavior::tryReidmeisterMove2(std::vector<int>* gaussCode
 		if (isSameSign(*gaussCode, i, j))
 		{
 			k = nextIndex(*gaussCode, j);
-			while (k != i)
+			l = nextIndex(*gaussCode, k);
+			// If the gaussCode is correctly formed, then it has to have more than 2 crossings by the time this gets
+			// executed, so we don't need to check the case that k == i before l == i.
+			while (l != i)
 			{
-				l = nextIndex(*gaussCode, k);
 				if (doesOverlap(*gaussCode, i, j, k, l))
 				{
 					erased->push_back(std::abs((*gaussCode)[i]));
@@ -302,7 +303,8 @@ bool KnotIdentificationBehavior::tryReidmeisterMove2(std::vector<int>* gaussCode
 					erase(gaussCode, i, j, k, l);
 					return true;
 				}
-				k = nextIndex(*gaussCode, k);
+				k = l;
+				l = nextIndex(*gaussCode, k);
 			}
 		}
 		++i;
@@ -310,7 +312,7 @@ bool KnotIdentificationBehavior::tryReidmeisterMove2(std::vector<int>* gaussCode
 	return false;
 }
 
-bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<int>* gaussCode)
+bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<int>* gaussCode, ReidmeisterMove3Data* data)
 {
 	size_t i = 0;
 	size_t j;
@@ -318,35 +320,35 @@ bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<int>* gaussCode
 	size_t l;
 	size_t m;
 	size_t n;
-	if (m_lastReidmeister3Code.empty() || m_lastReidmeister3Code.size() > gaussCode->size())
+	if (data->code.empty() || data->code.size() > gaussCode->size())
 	{
-		m_lastReidmeister3Code = *gaussCode;
-		m_lastReidmeister3i = std::numeric_limits<size_t>::max();
-		m_lastReidmeister3iCount = 0;
-		m_lastReidmeister3m = std::numeric_limits<size_t>::max();
-		m_lastReidmeister3n = std::numeric_limits<size_t>::max();
+		data->code = *gaussCode;
+		data->i = std::numeric_limits<size_t>::max();
+		data->iCount = 0;
+		data->m = std::numeric_limits<size_t>::max();
+		data->n = std::numeric_limits<size_t>::max();
 	}
 	else
 	{
-		*gaussCode = m_lastReidmeister3Code;
-		i = m_lastReidmeister3i;
+		*gaussCode = data->code;
+		i = data->i;
 	}
 
 	while (i < gaussCode->size())
 	{
 		j = nextIndex(*gaussCode, i);
-		if (isSameSign(*gaussCode, i, j) && m_lastReidmeister3iCount < 2)
+		if (isSameSign(*gaussCode, i, j) && data->iCount < 2)
 		{
 			k = getComplementCross(*gaussCode, i);
 			l = getComplementCross(*gaussCode, j);
-			m = (i == m_lastReidmeister3i) ? m_lastReidmeister3m : std::numeric_limits<size_t>::max();
-			n = (i == m_lastReidmeister3i) ? m_lastReidmeister3n : std::numeric_limits<size_t>::max();
+			m = (i == data->i) ? data->m : std::numeric_limits<size_t>::max();
+			n = (i == data->i) ? data->n : std::numeric_limits<size_t>::max();
 			if (hasCommonNeighbor(*gaussCode, k, l, &m, &n))
 			{
-				m_lastReidmeister3iCount = (i == m_lastReidmeister3i) ? (m_lastReidmeister3iCount + 1) : 1;
-				m_lastReidmeister3i = i;
-				m_lastReidmeister3m = m;
-				m_lastReidmeister3n = n;
+				data->iCount = (i == data->i) ? (data->iCount + 1) : 1;
+				data->i = i;
+				data->m = m;
+				data->n = n;
 				std::swap(gaussCode->at(k), gaussCode->at(l));
 				std::swap(gaussCode->at(k), gaussCode->at(m));
 				std::swap(gaussCode->at(l), gaussCode->at(n));
@@ -387,11 +389,11 @@ bool KnotIdentificationBehavior::identifyKnot(const std::vector<int>& gaussCode)
 		return false;
 	}
 
-	for (const auto& knot : knots)
+	for (const auto& knot : m_knownLists)
 	{
-		if (isSameCode(gaussCode, knot.code))
+		if (isSameCode(gaussCode, knot.second))
 		{
-			m_knotName = knot.name;
+			m_knotName = knot.first;
 			return true;
 		}
 	}
@@ -430,17 +432,17 @@ bool KnotIdentificationBehavior::doesOverlap(const std::vector<int>& code, size_
 
 void KnotIdentificationBehavior::erase(std::vector<int>* code, size_t i, size_t j)
 {
-	code->at(i) = 0;
-	code->at(j) = 0;
+	(*code)[i] = 0;
+	(*code)[j] = 0;
 	code->erase(std::remove(code->begin(), code->end(), 0), code->end());
 }
 
 void KnotIdentificationBehavior::erase(std::vector<int>* code, size_t i, size_t j, size_t k, size_t l)
 {
-	code->at(i) = 0;
-	code->at(j) = 0;
-	code->at(k) = 0;
-	code->at(l) = 0;
+	(*code)[i] = 0;
+	(*code)[j] = 0;
+	(*code)[k] = 0;
+	(*code)[l] = 0;
 	code->erase(std::remove(code->begin(), code->end(), 0), code->end());
 }
 
@@ -508,7 +510,7 @@ bool KnotIdentificationBehavior::isSameCode(const std::vector<int>& code, const 
 
 	if (start == code.size())
 	{
-		return false;
+		return start == 0;
 	}
 
 	bool isSame = true;

@@ -68,6 +68,14 @@ protected:
 		Crossing(int id, size_t segmentId, double segmentLocation)
 			: id(id), segmentId(segmentId), segmentLocation(segmentLocation) {}
 	};
+	
+	/// List of known knot codes.
+	static std::map<std::string, std::vector<int>> m_knownLists;
+	
+	/// Function to add a known knot code to the list.
+	/// \param name The name of the knot
+	/// \param code The gauss code of the knot
+	static void addKnownKnotCode(const std::string& name, const std::vector<int>& code);
 
 	/// \param projection The projection matrix to be used.
 	/// \return True, if a knot was detected.
@@ -117,10 +125,24 @@ protected:
 	bool tryReidmeisterMove2(std::vector<int>* gaussCode,
 		std::vector<int>* erased);
 
+	/// struct with variables for tracking Reidmeister move 3.
+	struct ReidmeisterMove3Data
+	{
+		std::vector<int> code;
+		size_t i;
+		size_t iCount;
+		size_t m;
+		size_t n;
+		ReidmeisterMove3Data()
+			: i(std::numeric_limits<size_t>::max()), iCount(0),
+			  m(std::numeric_limits<size_t>::max()), n(std::numeric_limits<size_t>::max()) {}
+	};
+
 	/// Perform Reidmeister move 3.
 	/// \param [in,out] gaussCode The gauss code of the knot projection diagram.
+	/// \param data [in,out] The tracking data for this move.
 	/// \return True, if a move was done.
-	bool tryReidmeisterMove3(std::vector<int>* gaussCode);
+	bool tryReidmeisterMove3(std::vector<int>* gaussCode, ReidmeisterMove3Data* data);
 
 	/// \param [in,out] gaussCode The gauss code of the knot projection diagram.
 	/// \param erased The crossings that were erased.
@@ -140,12 +162,7 @@ protected:
 	/// The name of the knot that was detected.
 	std::string m_knotName;
 
-	/// Tracking variables for Reidmeister move 3.
-	std::vector<int> m_lastReidmeister3Code;
-	size_t m_lastReidmeister3i;
-	size_t m_lastReidmeister3iCount;
-	size_t m_lastReidmeister3m;
-	size_t m_lastReidmeister3n;
+	
 
 private:
 	/// \param code The Gauss Code of the knot diagram
