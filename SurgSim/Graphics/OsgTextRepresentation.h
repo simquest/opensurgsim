@@ -107,7 +107,10 @@ public:
 	void setBackgroundMargin(double margin) override;
 	double getBackgroundMargin() const override;
 
+	static std::shared_ptr<OsgMaterial> getDefaultMaterial();
+
 protected:
+
 	void doUpdate(double dt) override;
 	bool doInitialize() override;
 

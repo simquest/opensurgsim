@@ -34,7 +34,8 @@ OdeState::~OdeState()
 
 bool OdeState::operator ==(const OdeState& state) const
 {
-	return m_x == state.m_x && m_v == state.m_v && m_boundaryConditionsPerDof == state.m_boundaryConditionsPerDof;
+	return m_x == state.m_x && m_v == state.m_v && m_boundaryConditionsPerDof == state.m_boundaryConditionsPerDof &&
+		m_boundaryConditionsStaticDof == state.m_boundaryConditionsStaticDof;
 }
 
 bool OdeState::operator !=(const OdeState& state) const
@@ -48,6 +49,7 @@ void OdeState::reset()
 	m_v.setZero();
 	m_boundaryConditionsPerDof.setConstant(false);
 	m_boundaryConditionsAsDofIds.clear();
+	m_boundaryConditionsStaticDof.clear();
 }
 
 void OdeState::setNumDof(size_t numDofPerNode, size_t numNodes)
@@ -213,6 +215,36 @@ void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCom
 		Math::zeroColumn(static_cast<SparseMatrix::Index>((*it)), matrix);
 		(*matrix).coeffRef(static_cast<SparseMatrix::Index>(*it),
 						   static_cast<SparseMatrix::Index>(*it)) = complianceValue;
+	}
+}
+
+void OdeState::addBoundaryConditionStaticDof(size_t nodeId, double value)
+{
+	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
+		"Number of dof per node = 0. Make sure to call setNumDof() " <<
+		"prior to adding boundary conditions.";
+	SURGSIM_ASSERT(nodeId < m_numNodes) << "Invalid nodeId " << nodeId << " number of nodes is " << m_numNodes;
+
+	m_boundaryConditionsStaticDof.push_back(std::make_pair(nodeId, value));
+}
+
+size_t OdeState::getNumBoundaryConditionsStaticDof() const
+{
+	return m_boundaryConditionsStaticDof.size();
+}
+
+const std::vector<std::pair<size_t, double>>& OdeState::getBoundaryConditionsStaticDof() const
+{
+	return m_boundaryConditionsStaticDof;
+}
+
+void OdeState::changeBoundaryConditionStaticDof(size_t nodeId, double value)
+{
+	auto bc = std::find_if(m_boundaryConditionsStaticDof.begin(), m_boundaryConditionsStaticDof.end(),
+		[&nodeId](std::pair<size_t, double>& pair) { return pair.first == nodeId; });
+	if (bc != m_boundaryConditionsStaticDof.end())
+	{
+		bc->second = value;
 	}
 }
 

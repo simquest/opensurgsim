@@ -196,5 +196,11 @@ void OsgRepresentation::addUniform(const std::string& type, const std::string& n
 }
 
 
+void OsgRepresentation::doRetire()
+{
+	m_material = nullptr;
+	Graphics::Representation::doRetire();
+}
+
 }; // Graphics
 }; // SurgSim
