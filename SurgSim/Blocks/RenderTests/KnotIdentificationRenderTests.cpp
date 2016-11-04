@@ -46,11 +46,11 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& 
 	element->addComponent(physics);
 
 	// Graphics
-	auto gfx = std::make_shared<SurgSim::Graphics::OsgCurveRepresentation>("Graphics");
-	gfx->setColor(SurgSim::Math::Vector4d(0.0, 0.0, 1.0, 1.0));
-	gfx->setAntiAliasing(true);
-	gfx->setWidth(0.9);
-	element->addComponent(gfx);
+	auto graphics = std::make_shared<SurgSim::Graphics::OsgCurveRepresentation>("Graphics");
+	graphics->setColor(SurgSim::Math::Vector4d(0.0, 0.0, 1.0, 1.0));
+	graphics->setAntiAliasing(true);
+	graphics->setWidth(0.9);
+	element->addComponent(graphics);
 
 	auto collision = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("Collision");
 	auto shape = std::make_shared<SurgSim::Math::SegmentMeshShape>();
@@ -64,7 +64,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& 
 
 	auto copier = std::make_shared<SurgSim::Blocks::TransferPhysicsToVerticesBehavior>("Copier");
 	copier->setSource(physics);
-	copier->setTarget(gfx);
+	copier->setTarget(graphics);
 	element->addComponent(copier);
 
 	return element;

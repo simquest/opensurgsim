@@ -521,6 +521,24 @@ bool KnotIdentificationBehavior::isSameCode(const std::vector<int>& code, const 
 		j = nextIndex(knot, j);
 	}
 
+	if (!isSame)
+	{
+		// Check if (code * -1) is the same as knot.
+		start = 0;
+		while (start < code.size() && -code[0] != knot[start])
+		{
+			++start;
+		}
+
+		isSame = true;
+		j = start;
+		for (size_t i = 0; i < code.size() && isSame; ++i)
+		{
+			isSame = -code[i] == knot[j];
+			j = nextIndex(knot, j);
+		}
+	}
+
 	return isSame;
 }
 

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
+#include <boost/assign/list_of.hpp>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -21,13 +21,13 @@
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-
-#define MAKE_VEC(vec) std::vector<int>(vec, vec + sizeof(vec) / sizeof(int))
+#include "SurgSim/Physics/Fem1DRepresentation.h"
 
 namespace SurgSim
 {
 namespace Blocks
 {
+
 class MockKnotIdentificationBehavior : public KnotIdentificationBehavior
 {
 public:
@@ -41,11 +41,6 @@ public:
 	bool tryReidmeisterMove2(std::vector<int>* gaussCode, std::vector<int>* erased)
 	{
 		return KnotIdentificationBehavior::tryReidmeisterMove2(gaussCode, erased);
-	}
-
-	void clearReidmeisterMove3()
-	{
-		data.code.clear();
 	}
 
 	bool tryReidmeisterMove3(std::vector<int>* gaussCode)
@@ -70,7 +65,7 @@ public:
 class KnotIdentificationBehaviorTest : public testing::Test
 {
 public:
-	KnotIdentificationBehaviorTest() : testing::Test(), mockKnotIdentificationBehavior3("Test3")
+	KnotIdentificationBehaviorTest() : testing::Test(), mockKnotIdentificationBehavior("Test3")
 	{
 
 	}
@@ -88,10 +83,10 @@ public:
 		bool expectedReturn = gaussCodeBefore != gaussCodeAfter;
 		bool actualReturn = mockKnotIdentificationBehavior.tryReidmeisterMove1(&gaussCodeBefore, &erasedCalculated);
 		EXPECT_EQ(expectedReturn, actualReturn);
-		EXPECT_TRUE(gaussCodeBefore == gaussCodeAfter);
+		EXPECT_EQ(gaussCodeBefore, gaussCodeAfter);
 		std::sort(erased.begin(), erased.end(), std::greater<int>());
 		std::sort(erasedCalculated.begin(), erasedCalculated.end(), std::greater<int>());
-		EXPECT_TRUE(erased == erasedCalculated);
+		EXPECT_EQ(erased, erasedCalculated);
 	}
 
 	void testReidmeisterMove2(std::vector<int> gaussCodeBefore, std::vector<int> gaussCodeAfter,
@@ -102,22 +97,17 @@ public:
 		bool expectedReturn = gaussCodeBefore != gaussCodeAfter;
 		bool actualReturn = mockKnotIdentificationBehavior.tryReidmeisterMove2(&gaussCodeBefore, &erasedCalculated);
 		EXPECT_EQ(expectedReturn, actualReturn);
-		EXPECT_TRUE(gaussCodeBefore == gaussCodeAfter);
+		EXPECT_EQ(gaussCodeBefore, gaussCodeAfter);
 		std::sort(erased.begin(), erased.end(), std::greater<int>());
 		std::sort(erasedCalculated.begin(), erasedCalculated.end(), std::greater<int>());
-		EXPECT_TRUE(erased == erasedCalculated);
+		EXPECT_EQ(erased, erasedCalculated);
 	}
 
 	void testReidmeisterMove3(std::vector<int> gaussCodeBefore, std::vector<int> gaussCodeAfter, bool expectedReturn)
 	{
-		bool actualReturn = mockKnotIdentificationBehavior3.tryReidmeisterMove3(&gaussCodeBefore);
+		bool actualReturn = mockKnotIdentificationBehavior.tryReidmeisterMove3(&gaussCodeBefore);
 		EXPECT_EQ(expectedReturn, actualReturn);
-		EXPECT_TRUE(gaussCodeBefore == gaussCodeAfter);
-	}
-
-	void clearReidmeisterMove3()
-	{
-		mockKnotIdentificationBehavior3.clearReidmeisterMove3();
+		EXPECT_EQ(gaussCodeBefore, gaussCodeAfter);
 	}
 
 	void testAdjustGaussCodeForErasedCrossings(std::vector<int> gaussCodeBefore, std::vector<int> gaussCodeAfter,
@@ -125,134 +115,187 @@ public:
 	{
 		MockKnotIdentificationBehavior mockKnotIdentificationBehavior("Test AdjustGaussCodeForErasedCrossings");
 		mockKnotIdentificationBehavior.adjustGaussCodeForErasedCrossings(&gaussCodeBefore, &erased);
-		EXPECT_TRUE(gaussCodeBefore == gaussCodeAfter);
+		EXPECT_EQ(gaussCodeBefore, gaussCodeAfter);
 	}
 
 	void testIdentifyKnot(std::vector<int> gaussCode, std::string expected)
 	{
 		MockKnotIdentificationBehavior mockKnotIdentificationBehavior("Test IdentifyKnot");
 		auto actual = mockKnotIdentificationBehavior.identifyKnot(gaussCode);
-		EXPECT_TRUE(expected == actual);
+		EXPECT_EQ(expected, actual);
 	}
 
-	MockKnotIdentificationBehavior mockKnotIdentificationBehavior3;
+	MockKnotIdentificationBehavior mockKnotIdentificationBehavior;
 };
+
+TEST_F(KnotIdentificationBehaviorTest, Constructor)
+{
+	EXPECT_NO_THROW(KnotIdentificationBehavior knotId("KnotId"));
+	EXPECT_NO_THROW(new KnotIdentificationBehavior("KnotId"));
+	EXPECT_NO_THROW(std::make_shared<KnotIdentificationBehavior>("KnotId"));
+}
+
+TEST_F(KnotIdentificationBehaviorTest, GetSetFem1D)
+{
+	KnotIdentificationBehavior knotId("KnotId");
+	EXPECT_EQ(nullptr, knotId.getFem1d());
+	auto physics = std::make_shared<SurgSim::Physics::Representation>("Physics Representation");
+	EXPECT_THROW(knotId.setFem1d(physics), SurgSim::Framework::AssertionFailure);
+	auto fem1D = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Fem1D");
+	EXPECT_NO_THROW(knotId.setFem1d(fem1D));
+	EXPECT_EQ(fem1D->getName(), knotId.getFem1d()->getName());
+}
 
 TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove1)
 {
 	{
-		int input[] = {1, -2, 3, -1, 2, -3};
-		int expected[] = {1, -2, 3, -1, 2, -3};
-		testReidmeisterMove1(MAKE_VEC(input), MAKE_VEC(expected));
+		std::vector<int> input = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
+		std::vector<int> expected = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
+		testReidmeisterMove1(input, expected);
 	}
 	{
-		int input[] = {1, -2, 3, -3, -1, 2};
-		int expected[] = {1, -2, -1, 2};
-		int erased[] = {3};
-		testReidmeisterMove1(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(1)(-2)(3)(-3)(-1)(2);
+		std::vector<int> expected = boost::assign::list_of(1)(-2)(-1)(2);
+		std::vector<int> erased = boost::assign::list_of(3);
+		testReidmeisterMove1(input, expected, erased);
 	}
 	{
-		int input[] = {3, 1, -2, -1, 2, -3};
-		int expected[] = {1, -2, -1, 2};
-		int erased[] = {3};
-		testReidmeisterMove1(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3);
+		std::vector<int> expected = boost::assign::list_of(1)(-2)(-1)(2);
+		std::vector<int> erased = boost::assign::list_of(3);
+		testReidmeisterMove1(input, expected, erased);
 	}
 	{
-		int input[] = {3, 1, 4, -4, -2, 6, -6, -1, -5, 5, 2, -3};
-		int expected[] = {1, -2, -1, 2};
-		int erased[] = {3, 4, 5, 6};
-		testReidmeisterMove1(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(3)(1)(4)(-4)(-2)(6)(-6)(-1)(-5)(5)(2)(-3);
+		std::vector<int> expected = boost::assign::list_of(1)(-2)(-1)(2);
+		std::vector<int> erased = boost::assign::list_of(3)(4)(5)(6);
+		testReidmeisterMove1(input, expected, erased);
 	}
 	{
-		int input[] = {3, 1, 4, -4, -2, 6, 7, -6, -7, -1, -5, 5, 2, -3};
-		int expected[] = {1, -2, 6, 7, -6, -7, -1, 2};
-		int erased[] = {3, 4, 5};
-		testReidmeisterMove1(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(3)(1)(4)(-4)(-2)(6)(7)(-6)(-7)(-1)(-5)(5)(2)(-3);
+		std::vector<int> expected = boost::assign::list_of(1)(-2)(6)(7)(-6)(-7)(-1)(2);
+		std::vector<int> erased = boost::assign::list_of(3)(4)(5);
+		testReidmeisterMove1(input, expected, erased);
 	}
 }
 
 TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove2)
 {
 	{
-		int input[] = {3, 1, -2, -1, 2, -3, 4, 5, -4, -5};
-		int expected[] = {3, 1, -2, -1, 2, -3};
-		int erased[] = {4, 5};
-		testReidmeisterMove2(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3)(4)(5)(-4)(-5);
+		std::vector<int> expected = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3);
+		std::vector<int> erased = boost::assign::list_of(4)(5);
+		testReidmeisterMove2(input, expected, erased);
 	}
 	{
-		int input[] = {-5, 3, 1, -2, -1, 2, -3, 4, 5, -4};
-		int expected[] = {3, 1, -2, -1, 2, -3};
-		int erased[] = {4, 5};
-		testReidmeisterMove2(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(-5)(3)(1)(-2)(-1)(2)(-3)(4)(5)(-4);
+		std::vector<int> expected = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3);
+		std::vector<int> erased = boost::assign::list_of(4)(5);
+		testReidmeisterMove2(input, expected, erased);
 	}
 	{
-		int input[] = {3, 1, -2, 7, 6, -1, 2, -3, 4, 5, -7, -6, -4, -5};
-		int expected[] = {3, 1, -2, -1, 2, -3, 4, 5, -4, -5};
-		int erased[] = {6, 7};
-		testReidmeisterMove2(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(3)(1)(-2)(7)(6)(-1)(2)(-3)(4)(5)(-7)(-6)(-4)(-5);
+		std::vector<int> expected = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3)(4)(5)(-4)(-5);
+		std::vector<int> erased = boost::assign::list_of(6)(7);
+		testReidmeisterMove2(input, expected, erased);
 	}
 }
 
-TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove3)
+TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove3Test1)
 {
-	{
-		int input[] = {-1, -3, -2, 1, 2, 3};
-		int expected[] = {-1, -3, 3, -2, 1, 2};
-		clearReidmeisterMove3();
-		testReidmeisterMove3(MAKE_VEC(input), MAKE_VEC(expected), true);
-		int expected2[] = {2, -3, -2, 3, 1, -1};
-		testReidmeisterMove3(MAKE_VEC(expected), MAKE_VEC(expected2), true);
-		int expected3[] = {3, -1, -3, 1, 2, -2};
-		testReidmeisterMove3(MAKE_VEC(expected2), MAKE_VEC(expected3), true);
-		int expected4[] = {-2, -1, 1, -3, 2, 3};
-		testReidmeisterMove3(MAKE_VEC(expected3), MAKE_VEC(expected4), true);
-		testReidmeisterMove3(MAKE_VEC(expected4), MAKE_VEC(input), false);
-	}
-	{
-		int input[] = {3, 1, -4, -2, -1, -5, 2, -3, 4, 5};
-		int expected[] = {3, 1, -4, -3, -2, -5, -1, 2, 4, 5};
-		clearReidmeisterMove3();
-		testReidmeisterMove3(MAKE_VEC(input), MAKE_VEC(expected), true);
-	}
+	std::vector<int> input = boost::assign::list_of(-1)(-3)(-2)(1)(2)(3);
+	std::vector<int> expected = boost::assign::list_of(-1)(-3)(3)(-2)(1)(2);
+	testReidmeisterMove3(input, expected, true);
+	std::vector<int> expected2 = boost::assign::list_of(2)(-3)(-2)(3)(1)(-1);
+	testReidmeisterMove3(expected, expected2, true);
+	std::vector<int> expected3 = boost::assign::list_of(3)(-1)(-3)(1)(2)(-2);
+	testReidmeisterMove3(expected2, expected3, true);
+	std::vector<int> expected4 = boost::assign::list_of(-2)(-1)(1)(-3)(2)(3);
+	testReidmeisterMove3(expected3, expected4, true);
+	testReidmeisterMove3(expected4, input, false);
+}
+
+TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove3Test2)
+{
+	std::vector<int> input = boost::assign::list_of(3)(1)(-4)(-2)(-1)(-5)(2)(-3)(4)(5);
+	std::vector<int> expected = boost::assign::list_of(3)(1)(-4)(-3)(-2)(-5)(-1)(2)(4)(5);
+	testReidmeisterMove3(input, expected, true);
 }
 
 TEST_F(KnotIdentificationBehaviorTest, AdjustGaussCodeForErasedCrossings)
 {
 	{
-		int input[] = {3, -4, 5, -3, 4, -5};
-		int expected[] = {1, -2, 3, -1, 2, -3};
-		int erased[] = {1, 2};
-		testAdjustGaussCodeForErasedCrossings(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(3)(-4)(5)(-3)(4)(-5);
+		std::vector<int> expected = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
+		std::vector<int> erased = boost::assign::list_of(1)(2);
+		testAdjustGaussCodeForErasedCrossings(input, expected, erased);
 	}
 	{
-		int input[] = {1, -4, 5, -1, 4, -5};
-		int expected[] = {1, -2, 3, -1, 2, -3};
-		int erased[] = {2, 3};
-		testAdjustGaussCodeForErasedCrossings(MAKE_VEC(input), MAKE_VEC(expected), MAKE_VEC(erased));
+		std::vector<int> input = boost::assign::list_of(1)(-4)(5)(-1)(4)(-5);
+		std::vector<int> expected = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
+		std::vector<int> erased = boost::assign::list_of(2)(3);
+		testAdjustGaussCodeForErasedCrossings(input, expected, erased);
 	}
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnot)
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest1)
 {
-	{
-		testIdentifyKnot(std::vector<int>(), "No Knot");
-	}
-	{
-		int input[] = {1, -4, 5, -1, 4, -5};
-		testIdentifyKnot(MAKE_VEC(input), "Unknown Knot");
-	}
-	{
-		int input[] = {1, -2, 3, -1, 2, -3};
-		testIdentifyKnot(MAKE_VEC(input), "Trefoil Knot");
-	}
-	{
-		int input[] = {-1, 2, -3, 1, -2, 3};
-		testIdentifyKnot(MAKE_VEC(input), "Trefoil Knot");
-	}
-	{
-		int input[] = {-3, 1, -2, 3, -1, 2};
-		testIdentifyKnot(MAKE_VEC(input), "Trefoil Knot");
-	}
+	testIdentifyKnot(std::vector<int>(), "No Knot");
 }
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest2)
+{
+	std::vector<int> input = boost::assign::list_of(1)(-4)(5)(-1)(4)(-5);
+	testIdentifyKnot(input, "Unknown Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest3)
+{
+	std::vector<int> input = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
+	testIdentifyKnot(input, "Trefoil Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest4)
+{
+	std::vector<int> input = boost::assign::list_of(-1)(2)(-3)(1)(-2)(3);
+	testIdentifyKnot(input, "Trefoil Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest5)
+{
+	std::vector<int> input = boost::assign::list_of(-3)(1)(-2)(3)(-1)(2);
+	testIdentifyKnot(input, "Trefoil Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest6)
+{
+	std::vector<int> input = boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3);
+	testIdentifyKnot(input, "Granny Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest7)
+{
+	std::vector<int> input = boost::assign::list_of(-1)(2)(-3)(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6);
+	testIdentifyKnot(input, "Granny Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest8)
+{
+	std::vector<int> input = boost::assign::list_of(4)(-5)(6)(-1)(2)(-3)(1)(-2)(3)(-4)(5)(-6);
+	testIdentifyKnot(input, "Granny Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest9)
+{
+	std::vector<int> input = boost::assign::list_of(-1)(2)(-3)(4)(-5)(6)(-4)(5)(-6)(1)(-2)(3);
+	testIdentifyKnot(input, "Granny Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest10)
+{
+	std::vector<int> input = boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3);
+	testIdentifyKnot(input, "Square Knot");
+}
+
 }
 }
