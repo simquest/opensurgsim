@@ -90,6 +90,11 @@ public:
 		{
 			return false;
 		}
+		return true;
+	}
+
+	bool doWakeUp() override
+	{
 		m_text = std::make_shared<SurgSim::Graphics::OsgTextRepresentation>("KnotName");
 		m_text->setLocation(100.0, 100.0);
 		m_text->setText("Waiting...");
@@ -97,11 +102,6 @@ public:
 		m_text->setDrawBackground(true);
 		m_text->setBackgroundColor(SurgSim::Math::Vector4d(0.3, 0.3, 0.3, 1.0));
 		getSceneElement()->addComponent(m_text);
-		return true;
-	}
-
-	bool doWakeUp() override
-	{
 		return true;
 	}
 
