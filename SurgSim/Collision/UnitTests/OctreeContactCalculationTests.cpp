@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/OctreeCapsuleContact.h"
 #include "SurgSim/Collision/OctreeDoubleSidedPlaneContact.h"
 #include "SurgSim/Collision/OctreePlaneContact.h"
 #include "SurgSim/Collision/OctreeSphereContact.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -31,10 +31,10 @@
 #include "SurgSim/Math/Shapes.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::Location;
 using SurgSim::DataStructures::OctreeNode;
 using SurgSim::DataStructures::OctreePath;
-using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::Geometry::DistanceEpsilon;
@@ -450,6 +450,9 @@ TEST(OctreeContactCalculationTests, CheckNumberOfContacts)
 
 	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().size());
 	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().count(octreeRep));
+
+	octreeRep->retire();
+	shapeRep->retire();
 }
 
 }; // namespace Collision

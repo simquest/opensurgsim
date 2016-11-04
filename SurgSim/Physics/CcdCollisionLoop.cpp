@@ -18,6 +18,7 @@
 #include "SurgSim/Physics/CcdCollision.h"
 #include "SurgSim/Physics/CcdCollisionLoop.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
+#include "SurgSim/Physics/ContactFiltering.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/PushResults.h"
 #include "SurgSim/Physics/SolveMlcp.h"
@@ -36,6 +37,7 @@ CcdCollisionLoop::CcdCollisionLoop(bool copyState) :
 	Computation(copyState),
 	m_ccdCollision(new CcdCollision(copyState)),
 	m_updateCcdData(new UpdateCcdData(copyState)),
+	m_contactFilter(new ContactFiltering(copyState)),
 	m_constraintGeneration(new ContactConstraintGeneration(copyState)),
 	m_buildMlcp(new BuildMlcp(copyState)),
 	m_solveMlcp(new SolveMlcp(copyState)),
@@ -70,6 +72,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	double localTimeOfImpact = 0.0;
 	std::vector<std::list<std::shared_ptr<Collision::Contact>>> oldContacts;
 
+	bool executedOnce = false;
 	size_t iterations = 0;
 	for (; iterations < m_maxIterations; ++iterations)
 	{
@@ -77,6 +80,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 
 		ccdState = m_updateCcdData->update(localTimeOfImpact, ccdState);
 		ccdState = m_ccdCollision->update(dt, ccdState);
+		ccdState = m_contactFilter->update(dt, ccdState);
 
 		if (m_logger->getThreshold() <= SurgSim::Framework::LOG_LEVEL_DEBUG)
 		{
@@ -96,6 +100,7 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 		ccdState = m_buildMlcp->update(dt, ccdState);
 		ccdState = m_solveMlcp->update(dt, ccdState);
 		ccdState = m_pushResults->update(dt, ccdState);
+		executedOnce = true;
 
 		backupContacts(&ccdPairs, &oldContacts);
 
@@ -120,6 +125,14 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 			"Maxed out iterations (" << m_maxIterations << ")";
 
 	restoreContacts(&ccdPairs, &oldContacts);
+	if (!executedOnce)
+	{
+		ccdState = m_constraintGeneration->update(dt, ccdState);
+		ccdState = m_buildMlcp->update(dt, ccdState);
+		ccdState = m_solveMlcp->update(dt, ccdState);
+		ccdState = m_pushResults->update(dt, ccdState);
+	}
+
 	return ccdState;
 }
 

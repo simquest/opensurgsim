@@ -125,6 +125,8 @@ TEST_F(BoolToScalarFilterTest, DataGroupHandling)
 
 TEST_F(BoolToScalarFilterTest, UpdateTest)
 {
+	const double epsilon = 0.05;
+
 	auto filter = std::make_shared<BoolToScalar>("Filter");
 	filter->setScale(2.0);
 	auto resultData = defaultData;
@@ -133,13 +135,13 @@ TEST_F(BoolToScalarFilterTest, UpdateTest)
 	double value;
 	filter->initializeInput("device", defaultData);
 
-	// Running .25 of a second we expect the value to go up .. by 0.25 * 2 (scale)
+	// Running .25 of a second we expect the value to go up .. by at least 0.25 * 2 (scale)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	filter->filterInput("device", defaultData, &resultData);
 	resultData.scalars().get(TOOLDOF, &value);
-	EXPECT_NEAR(0.5, value, 0.1);
+	EXPECT_LT(0.5 - epsilon, value);
 
-	// Switiching the buttons, running for .125 of a second so the value should go down by 0.125 * 2 (scale)
+	// Switiching the buttons, running for .125 of a second so the value should go down by at least 0.125 * 2 (scale)
 	defaultData.booleans().set(BUTTON_1, true);
 	defaultData.booleans().set(BUTTON_2, false);
 	// prevent accumulated error in the test
@@ -147,7 +149,7 @@ TEST_F(BoolToScalarFilterTest, UpdateTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(125));
 	filter->filterInput("device", defaultData, &resultData);
 	resultData.scalars().get(TOOLDOF, &value);
-	EXPECT_NEAR(0.25, value, 0.1);
+	EXPECT_GT(0.25 + epsilon, value);
 }
 
 TEST_F(BoolToScalarFilterTest, ClampTest)

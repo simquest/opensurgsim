@@ -152,6 +152,18 @@ void testBoundaryConditions(const SurgSim::Math::OdeState& state, std::vector<si
 	EXPECT_TRUE(state.getPositions().isZero());
 	EXPECT_TRUE(state.getVelocities().isZero());
 }
+void testBoundaryConditionsStaticDof(const SurgSim::Math::OdeState& state,
+									 std::vector<std::pair<size_t, double>> expectedDofIds)
+{
+	EXPECT_EQ(6u, state.getNumDof());
+	EXPECT_EQ(expectedDofIds.size(), state.getNumBoundaryConditionsStaticDof());
+	ASSERT_EQ(expectedDofIds.size(), state.getBoundaryConditionsStaticDof().size());
+	for (size_t index = 0; index < expectedDofIds.size(); ++index)
+	{
+		EXPECT_EQ(expectedDofIds[index].first, state.getBoundaryConditionsStaticDof()[index].first);
+		EXPECT_EQ(expectedDofIds[index].second, state.getBoundaryConditionsStaticDof()[index].second);
+	}
+}
 }; // anonymous namespace
 
 TEST(OdeStateTest, AddGetIsBoundaryConditionsTest)
@@ -212,6 +224,34 @@ TEST(OdeStateTest, AddGetIsBoundaryConditionsTest)
 		expectedDofIdsBoundaryConditions.push_back((1u * 3u + 2u)); // (node 0, dof 2)
 		testBoundaryConditions(state, expectedDofIdsBoundaryConditions);
 	}
+}
+
+TEST(OdeStateTest, AddGetSetBoundaryConditionsStaticDofTest)
+{
+	OdeState state;
+	std::vector<std::pair<size_t, double>> expected;
+
+	// Assert trying to add a boundary condition before setting the number of node and dof per node
+	ASSERT_THROW(state.addBoundaryConditionStaticDof(0u, 0.1), SurgSim::Framework::AssertionFailure);
+
+	state.setNumDof(3u, 2u); // Number of dof per node is 3
+
+	SCOPED_TRACE("Testing addBoundaryConditionStaticDof(size_t nodeId, double value)");
+
+	state.addBoundaryConditionStaticDof(0u, 0.1);
+	expected.push_back(std::make_pair(0u, 0.1)); // (node 0, value 0.1)
+	testBoundaryConditionsStaticDof(state, expected);
+
+	state.addBoundaryConditionStaticDof(1u, 2.6);
+	expected.push_back(std::make_pair(1u, 2.6)); // (node 1, value 2.6)
+	testBoundaryConditionsStaticDof(state, expected);
+
+	state.changeBoundaryConditionStaticDof(0u, 5.4);
+	expected.front().second = 5.4; // (node 0, value 5.4)
+	testBoundaryConditionsStaticDof(state, expected);
+
+	// Assert on wrong nodeId
+	ASSERT_THROW(state.addBoundaryConditionStaticDof(3u, 0.0), SurgSim::Framework::AssertionFailure);
 }
 
 TEST(OdeStateTest, ResetTest)

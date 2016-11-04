@@ -13,12 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/any.hpp>
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/PoseComponent.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -257,6 +261,37 @@ TEST(SceneElementTest, GetTypedComponentsTests)
 	EXPECT_EQ(0u, element->getComponents<MockComponent>().size());
 }
 
+TEST(SceneElementTest, GetSetValue)
+{
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+	std::shared_ptr<MockComponent> component(new MockComponent("Component"));
+	element->addComponent(component);
+
+	{
+		float value;
+		EXPECT_FALSE(element->getValue("Component", "MissingProperty", &value));
+		EXPECT_THROW(element->getValue("Component", "MissingProperty"), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(element->getValue<bool>("Component", "MissingProperty"), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(element->setValue("Component", "MissingProperty", value), SurgSim::Framework::AssertionFailure);
+	}
+	{
+		bool value = false;
+		component->succeedWithInit = true;
+		EXPECT_TRUE(element->getValue("Component", "SucceedWithInit", &value));
+		EXPECT_TRUE(value);
+		EXPECT_NO_THROW(element->getValue("Component", "SucceedWithInit"));
+		EXPECT_NO_THROW(element->getValue<bool>("Component", "SucceedWithInit"));
+		EXPECT_TRUE(boost::any_cast<bool>(element->getValue("Component", "SucceedWithInit")));
+		EXPECT_TRUE(element->getValue<bool>("Component", "SucceedWithInit"));
+	}
+	{
+		bool value = true;
+		component->succeedWithWakeUp = false;
+		EXPECT_NO_THROW(element->setValue("Component", "SucceedWithWakeUp", value));
+		EXPECT_TRUE(component->succeedWithWakeUp);
+	}
+}
+
 TEST(SceneElementTest, InitComponentTest)
 {
 	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
@@ -326,4 +361,52 @@ TEST(SceneElementTest, NoSceneGroupsTest)
 	EXPECT_FALSE(element->inGroup("Three"));
 	EXPECT_FALSE(element->inGroup("Four"));
 
+}
+
+TEST(SceneElementTest, Include)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	std::string file;
+
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("SceneElementTest/includer.yaml", &file));
+
+	YAML::Node node = YAML::LoadFile(file);
+	ASSERT_TRUE(node.IsSequence());
+
+	auto elements = node.as<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>();
+
+	EXPECT_EQ(4u, elements.size());
+}
+
+
+TEST(SceneElementTest, IncludeCircle)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	std::string file;
+
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("SceneElementTest/circle-1.yaml", &file));
+
+	YAML::Node node = YAML::LoadFile(file);
+	ASSERT_TRUE(node.IsSequence());
+
+	ASSERT_THROW(auto elements = node.as<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>(),
+				 SurgSim::Framework::AssertionFailure);
+}
+
+TEST(SceneElementTest, SingleAsArray)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	std::string file;
+
+	ASSERT_TRUE(runtime->getApplicationData()->tryFindFile("SceneElementTest/single.yaml", &file));
+
+	YAML::Node node = YAML::LoadFile(file);
+	ASSERT_FALSE(node.IsSequence());
+
+	auto elements = node.as<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>();
+
+	EXPECT_EQ(1u, elements.size());
 }

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -216,9 +216,12 @@ osg::ref_ptr<osg::Shader> OsgProgram::getOrCreateOsgShader(int shaderType)
 
 std::shared_ptr<OsgProgram> loadProgram(const SurgSim::Framework::ApplicationData& data, const std::string& name)
 {
-	std::string vertexShaderName = name + ".vert";
-	std::string fragmentShaderName = name + ".frag";
+	return loadProgram(data, name + ".vert", name + ".frag");
+}
 
+std::shared_ptr<OsgProgram> loadProgram(const SurgSim::Framework::ApplicationData& data,
+		const std::string& vertexShaderName, const std::string& fragmentShaderName)
+{
 	std::string filename;
 
 	auto program(std::make_shared<SurgSim::Graphics::OsgProgram>());

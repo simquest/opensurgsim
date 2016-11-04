@@ -72,7 +72,7 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 		if (m_timeSinceLog > 5.0)
 		{
 			m_timeSinceLog = 0.0;
-			typedef std::pair<std::string, std::string> PairType;
+			typedef std::tuple<std::string, std::string, Collision::CollisionDetectionType> PairType;
 			std::vector<PairType> names;
 			for (const auto& pair : pairs)
 			{
@@ -80,21 +80,26 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 				std::string second = pair->getSecond()->getFullName();
 				if (first < second)
 				{
-					names.emplace_back(first, second);
+					names.emplace_back(first, second, pair->getType());
 				}
 				else
 				{
-					names.emplace_back(second, first);
+					names.emplace_back(second, first, pair->getType());
 				}
 			}
 			std::sort(names.begin(), names.end(), [](const PairType & i, const PairType & j)
 			{
-				return (i.first < j.first) || ((i.first == j.first) && (i.second < j.second));
+				return (std::get<0>(i) < std::get<0>(j)) ||
+					   ((std::get<0>(i) == std::get<0>(j)) && (std::get<1>(i) < std::get<1>(j)));
 			});
 			std::string message = "All collision pairs for testing:\n";
 			for (const auto& name : names)
 			{
-				message += "\t" + name.first + " : " + name.second + "\n";
+				message += "\t" + std::get<0>(name) + " : " + std::get<1>(name) +
+						   (
+							   (std::get<2>(name) == SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS) ?
+							   " CCD" : " DCD"
+						   ) + "\n";
 			}
 			SURGSIM_LOG_DEBUG(m_logger) << message;
 		}

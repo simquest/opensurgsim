@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,33 +13,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/program_options.hpp>
 #include <memory>
-
 #include <osg/Matrix>
 #include <osg/Camera>
 
-#include "SurgSim/Blocks/PoseInterpolator.h"
 #include "SurgSim/Blocks/DriveElementFromInputBehavior.h"
+#include "SurgSim/Blocks/GraphicsUtilities.h"
+#include "SurgSim/Blocks/PoseInterpolator.h"
+#include "SurgSim/Blocks/ShadowMapping.h"
+#include "SurgSim/Devices/Devices.h"
 #include "SurgSim/Framework/Framework.h"
 #include "SurgSim/Graphics/Graphics.h"
-#include "SurgSim/Math/Math.h"
-#include "SurgSim/Devices/Devices.h"
 #include "SurgSim/Input/Input.h"
-#include "SurgSim/Blocks/GraphicsUtilities.h"
-#include "SurgSim/Blocks/ShadowMapping.h"
+#include "SurgSim/Math/Math.h"
 
-#include <boost/program_options.hpp>
 
 using SurgSim::Framework::Logger;
 using SurgSim::Graphics::OsgTextureUniform;
 using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
 using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::Matrix44f;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
-using SurgSim::Math::Matrix44f;
 
 /// \file
 /// This example creates a simple graphics scene and use the RenderPass object to show
@@ -366,7 +365,6 @@ int main(int argc, char* argv[])
 	materials["default"] = materials["basic_lit"];
 
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgManager>();
-	graphics->setRate(60);
 	graphics->setMultiThreading(true);
 
 	auto input = std::make_shared<SurgSim::Input::InputManager>();

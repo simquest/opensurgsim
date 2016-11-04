@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	CompoundShapeToGraphics.cpp
 	DebugDumpBehavior.cpp
 	DriveElementFromInputBehavior.cpp
+	FunctionBehavior.cpp
 	GraphicsUtilities.cpp
 	ImplicitSurface.cpp
 	KeyBehavior.cpp
@@ -46,6 +47,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	CompoundShapeToGraphics.h
 	DebugDumpBehavior.h
 	DriveElementFromInputBehavior.h
+	FunctionBehavior.h
 	GraphicsUtilities.h
 	ImplicitSurface.h
 	KeyBehavior.h

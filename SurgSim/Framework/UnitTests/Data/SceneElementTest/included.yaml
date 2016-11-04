@@ -1,0 +1,13 @@
+- SurgSim::Framework::BasicSceneElement:
+    Name: element2
+    IsActive: true
+    Components:
+      - MockComponent:
+          Name: clone
+- SurgSim::Framework::BasicSceneElement:
+    Name: element3
+    IsActive: true
+    Components:
+      - MockComponent:
+          Name: clone
+

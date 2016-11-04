@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2015, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ project(OpenSurgSim)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(OPENSURGSIM_MAJOR_VERSION 0)
-set(OPENSURGSIM_MINOR_VERSION 6)
+set(OPENSURGSIM_MINOR_VERSION 7)
 set(OPENSURGSIM_PATCH_VERSION 0)
 set(OPENSURGSIM_VERSION
 	${OPENSURGSIM_MAJOR_VERSION}.${OPENSURGSIM_MINOR_VERSION}.${OPENSURGSIM_PATCH_VERSION})
@@ -99,7 +99,7 @@ endif()
 
 include_directories(${SURGSIM_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(SYSTEM
+include_directories(
 	${Boost_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}

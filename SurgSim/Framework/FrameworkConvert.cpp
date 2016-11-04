@@ -22,6 +22,9 @@
 
 #include <boost/uuid/uuid_io.hpp>
 
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ApplicationData.h"
+
 namespace
 {
 const std::string NamePropertyName = "Name";
@@ -142,6 +145,60 @@ bool convert<std::shared_ptr<SurgSim::Framework::SceneElement>>::decode(
 	}
 	return rhs->decode(node);
 }
+
+bool YAML::convert<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>::decode(
+	const Node& node,
+	std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>& rhs, // NOLINT
+	std::vector<std::string>* stack)
+{
+	std::unique_ptr<std::vector<std::string>> localStack;
+	if (node.IsSequence())
+	{
+		if (stack == nullptr)
+		{
+			localStack.reset(new std::vector<std::string>());
+			stack = localStack.get();
+		}
+		for (auto element = node.begin(); element != node.end(); ++element)
+		{
+			if (element->IsMap() && element->begin()->first.as<std::string>() == "INCLUDE")
+			{
+
+				auto file = element->begin()->second.as<std::string>();
+				auto data = SurgSim::Framework::Runtime::getApplicationData();
+				SURGSIM_ASSERT(data->tryFindFile(file, &file))
+						<< "Could not find include file " << file;
+
+				SURGSIM_ASSERT(std::find(stack->cbegin(), stack->cend(), file) == stack->cend())
+						<< "Found inclusion loop File: " << file << " included from " << stack->back()
+						<< " is already included.";
+
+				auto included = YAML::LoadFile(file);
+				stack->push_back(file);
+				YAML::convert<std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>>>::decode(
+					included, rhs, stack);
+				stack->pop_back();
+			}
+			else
+			{
+				rhs.push_back(element->as<std::shared_ptr<SurgSim::Framework::SceneElement>>());
+			}
+		}
+	}
+	else if (node.IsMap())
+	{
+		rhs.push_back(node.as<std::shared_ptr<SurgSim::Framework::SceneElement>>());
+	}
+	else
+	{
+		SURGSIM_FAILURE()
+				<< "Trying to decode std::vector<std::shared_ptr<SceneElement>> but the received node is neither "
+				<< "a sequence nor a map";
+		return false;
+	}
+	return true;
+}
+
 
 Node convert<SurgSim::Framework::SceneElement>::encode(
 	const SurgSim::Framework::SceneElement& rhs)

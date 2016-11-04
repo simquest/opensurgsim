@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2013-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ set(DEVICE_FILTERS_HEADERS
 )
 
 set(DEVICE_HEADERS ${DEVICE_HEADERS}
+	DeviceFilters/BoolToScalar.h #NOLINT
 	DeviceFilters/DeviceFilter.h #NOLINT
 	DeviceFilters/FilteredDevice.h #NOLINT
 	DeviceFilters/ForceScale.h #NOLINT
