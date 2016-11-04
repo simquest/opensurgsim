@@ -1,5 +1,7 @@
 OpenSurgSim Blender Add-ons
 
+Requires MeshPy python library to use the exporter
+
 To install into Blender:
 1) Open Blender
 2) Go to File > User Preferences (Ctrl Alt U)
@@ -14,7 +16,7 @@ Example for Linux and Blender 2.69:
 
 ```/home/$user/.blender/2.69/scripts/addons/OpenSurgSim```
 
-Example for Windows 7 and Blender 2.69:
+Example for Windows and Blender 2.69:
 
 ```C:\Users\%username%\AppData\Roaming\Blender Foundation\Blender\2.69\scripts\addons\OpenSurgSim```
 
