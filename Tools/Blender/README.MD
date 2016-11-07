@@ -2,7 +2,7 @@ OpenSurgSim Blender Add-ons
 
 Requires MeshPy python library to use the exporter
 
-To install into Blender:
+=== OpenSurgSim Blender Tool Installation ===
 1) Open Blender
 2) Go to File > User Preferences (Ctrl Alt U)
 3) Navigate to the 'Add-ons' tab
@@ -23,3 +23,16 @@ Example for Windows and Blender 2.69:
 You'll still need to activate the addon in Blender
 
 Note: In both scenarios you can find the addon in Blender by searching for 'OpenSurgSim'
+
+=== MeshPy Installation ===
+On Linux:
+1) Make sure pip is installed (usually installed with Python)
+2) Run `pip install meshpy`
+
+On Windows:
+Blender comes with its own python installation which gives you the option to install pip on there and install meshpy that way or the following way that worked for me:
+
+1) Download and install Python 3.5 for Windows and add it to the path
+2) Download the meshpy wheel for python 3.5 from http://www.lfd.uci.edu/~gohlke/pythonlibs/#meshpy (at the moment that is the unstable one labeled with cp3.5)
+3) Install MeshPy via pip with `pip install <filename>`
+4) Remove the python folder from your Blender installation so it falls back to using your installed Python and libraries
