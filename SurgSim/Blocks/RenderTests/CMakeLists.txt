@@ -35,6 +35,8 @@ set(LIBS
 	SurgSimGraphics
 )
 
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 surgsim_add_unit_tests(SurgSimBlocksRenderTest)
 
 set_target_properties(SurgSimBlocksRenderTest PROPERTIES FOLDER "Blocks")
