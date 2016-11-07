@@ -75,6 +75,23 @@ public:
 
 	}
 
+	std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> makeFem1D(const std::string& filename)
+	{
+		auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+		auto physics = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Physics");
+		physics->setFemElementType("SurgSim::Physics::Fem1DElementBeam");
+		physics->setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
+		physics->loadFem(filename);
+		physics->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT);
+		physics->setLinearSolver(SurgSim::Math::LINEARSOLVER_LU);
+		physics->setRayleighDampingMass(5.0);
+		physics->setRayleighDampingStiffness(0.001);
+		physics->setIsGravityEnabled(true);
+		physics->initialize(runtime);
+		return physics;
+	}
+	
+
 	void testReidmeisterMove1(std::vector<int> gaussCodeBefore, std::vector<int> gaussCodeAfter,
 							  std::vector<int> erased = std::vector<int>())
 	{
@@ -295,6 +312,33 @@ TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest10)
 {
 	std::vector<int> input = boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3);
 	testIdentifyKnot(input, "Square Knot");
+}
+
+TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoil)
+{
+	KnotIdentificationBehavior knotId("Knot ID");
+	knotId.setFem1d(makeFem1D("trefoil_knot.ply"));
+	knotId.doInitialize();
+	knotId.update(0.0);
+	EXPECT_EQ("Trefoil Knot", knotId.getKnotName());
+}
+
+TEST_F(KnotIdentificationBehaviorTest, Fem1DSquare)
+{
+	KnotIdentificationBehavior knotId("Knot ID");
+	knotId.setFem1d(makeFem1D("square_knot.ply"));
+	knotId.doInitialize();
+	knotId.update(0.0);
+	EXPECT_EQ("Square Knot", knotId.getKnotName());
+}
+
+TEST_F(KnotIdentificationBehaviorTest, Fem1DGranny)
+{
+	KnotIdentificationBehavior knotId("Knot ID");
+	knotId.setFem1d(makeFem1D("granny_knot.ply"));
+	knotId.doInitialize();
+	knotId.update(0.0);
+	EXPECT_EQ("Granny Knot", knotId.getKnotName());
 }
 
 }
