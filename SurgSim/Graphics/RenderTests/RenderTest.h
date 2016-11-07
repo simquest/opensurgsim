@@ -46,9 +46,9 @@ struct RenderTest : public ::testing::Test
 {
 public:
 
-	virtual void SetUp();
+	void SetUp() override;
 
-	virtual void TearDown();
+	void TearDown() override;
 
 	std::shared_ptr<ScreenSpaceQuadRepresentation> makeQuad(
 		const std::string& name,

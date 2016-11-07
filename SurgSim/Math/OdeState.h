@@ -145,6 +145,25 @@ public:
 	/// \note boundary conditions.
 	void applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCompliance = true) const;
 
+	/// Adds a boundary condition on the static dof of a given node (we consider here that each node has a single static dof)
+	/// \param nodeId The node on which the boundary condition needs to be set
+	/// \param value The boundary conidtion value that the static dof needs to be set on
+	/// \note for example, this is fixing the twist angle of a Kircchoff model using a quasi-static update of the material frame
+	/// \note i.e. the twist is not part of the dynamic DOF, but is still a static dof of the model.
+	void addBoundaryConditionStaticDof(size_t nodeId, double value);
+
+	/// \return The number of boundary conditions for statically defined Dof
+	size_t getNumBoundaryConditionsStaticDof() const;
+
+	/// \return All boundary conditions for statically defined Dof as a vector of dof ids
+	const std::vector<std::pair<size_t, double>>& getBoundaryConditionsStaticDof() const;
+
+	/// Set the value of an existing boundary condition on a static dof
+	/// \param nodeId The node for which the static dof must be set
+	/// \param value The value to set the static dof of the given node
+	/// \note Does not do anything if the static dof boundary condition does not exists yet.
+	void changeBoundaryConditionStaticDof(size_t nodeId, double value);
+
 	/// Check if this state is numerically valid
 	/// \return True if all positions and velocities are valid numerical values, False otherwise
 	virtual bool isValid() const;
@@ -174,6 +193,9 @@ private:
 
 	/// Boundary conditions stored per dof (True indicates a boundary condition, False does not)
 	Eigen::Matrix<bool, Eigen::Dynamic, 1> m_boundaryConditionsPerDof;
+
+	/// Boundary conditions of non dof stored as a list of pairs of <node id, value>
+	std::vector<std::pair<size_t, double>> m_boundaryConditionsStaticDof;
 };
 
 }; // namespace Math

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -95,8 +95,8 @@ void BasicThread::start(std::shared_ptr<Barrier> startupBarrier, bool isSynchron
 
 	// Start the thread with a reference to this
 	// prevents making a copy
-	m_thisThread = boost::thread(boost::ref(*this));
 	m_isRunning = true;
+	m_thisThread = boost::thread(boost::ref(*this));
 }
 
 boost::thread& BasicThread::getThread()

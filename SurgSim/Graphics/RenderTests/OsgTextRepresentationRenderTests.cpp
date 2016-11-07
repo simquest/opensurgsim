@@ -27,6 +27,8 @@
 #include "SurgSim/Graphics/OsgAxesRepresentation.h"
 #include "SurgSim/Graphics/View.h"
 
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+
 #include <osg/Notify>
 
 namespace SurgSim
@@ -34,36 +36,9 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgTextRepresentationRenderTests : public ::testing::Test
+struct OsgTextRepresentationRenderTests : public SurgSim::Graphics::RenderTest
 {
-public:
 
-	void SetUp()
-	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-		graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-		runtime->addManager(graphicsManager);
-		runtime->addManager(std::make_shared<Framework::BehaviorManager>());
-
-		scene = runtime->getScene();
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		std::array<int, 2> position = {100, 100};
-		viewElement->getView()->setPosition(position);
-		viewElement->getView()->setWindowBorderEnabled(true);
-
-		scene->addSceneElement(viewElement);
-	}
-
-	void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<OsgManager> graphicsManager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
 };
 
 
@@ -91,6 +66,36 @@ TEST_F(OsgTextRepresentationRenderTests, Operation)
 	text->setBackgroundColor(Math::Vector4d(0.3, 0.3, 0.3, 1.0));
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1500));
 }
+
+TEST_F(OsgTextRepresentationRenderTests, Background)
+{
+	{
+		auto text = std::make_shared<OsgTextRepresentation>("Text1");
+		text->setText("This is a sample text that should have a red box");
+		text->setDrawBackground(true);
+		viewElement->addComponent(text);
+		text->setBackgroundColor(SurgSim::Math::Vector4d(1.0, 0.0, 0.0, 1.0));
+		text->setColor(SurgSim::Math::Vector4d(1.0, 0.5, 0.5, 1.0));
+		//text->setLocation(0, 100);
+	}
+
+	{
+		auto text = std::make_shared<OsgTextRepresentation>("Text2");
+		text->setText("This is a sample text that should have a blue box");
+		text->setDrawBackground(true);
+		viewElement->addComponent(text);
+		text->setBackgroundColor(SurgSim::Math::Vector4d(0.0, 0.0, 1.0, 1.0));
+		text->setColor(SurgSim::Math::Vector4d(1.0, 0.5, 0.5, 1.0));
+		text->setLocation(100, 200);
+	}
+
+	runtime->start();
+	EXPECT_TRUE(graphicsManager->isInitialized());
+	EXPECT_TRUE(viewElement->isInitialized());
+	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
+
+}
+
 
 TEST_F(OsgTextRepresentationRenderTests, WorldSpace)
 {

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <osgDB/ReadFile>
 
 using SurgSim::Graphics::OsgTextureCubeMap;
+
 
 OsgTextureCubeMap::OsgTextureCubeMap() : OsgTexture(new osg::TextureCubeMap())
 {
@@ -137,10 +138,8 @@ osg::ref_ptr<osg::Image> OsgTextureCubeMap::copyImageBlock(
 	}
 
 	osg::ref_ptr<osg::Image> subImage = new osg::Image();
-
-	subImage->allocateImage(width, height, 1, source.getPixelFormat(), GL_UNSIGNED_BYTE, 1);
 	subImage->setImage(width, height, 1, source.getInternalTextureFormat(), source.getPixelFormat(),
-					   GL_UNSIGNED_BYTE, buffer, osg::Image::NO_DELETE, 1);
+					   GL_UNSIGNED_BYTE, buffer, osg::Image::USE_NEW_DELETE, 1);
 
 	return subImage;
 }

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -267,7 +267,7 @@ TEST(OsgViewTest, TargetScreenTest)
 	std::shared_ptr<View> view = std::make_shared<OsgView>("view");
 
 	EXPECT_NO_THROW(view->setTargetScreen(100));
-	EXPECT_TRUE(view->getTargetScreen() != 100); // The actual number is dependent on the number of screens
+	EXPECT_NE(100, view->getTargetScreen()); // The actual number is dependent on the number of screens
 }
 
 }  // namespace Graphics

@@ -80,17 +80,7 @@ bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 	}
 
-
-	if (m_hasPerElementMaterial)
-	{
-		reader->requestScalarProperty(
-			getElementName(), "mass_density", PlyReader::TYPE_DOUBLE, offsetof(ElementData, massDensity));
-		reader->requestScalarProperty(
-			getElementName(), "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(ElementData, poissonRatio));
-		reader->requestScalarProperty(
-			getElementName(), "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(ElementData, youngModulus));
-	}
-	else
+	if (m_hasMaterial)
 	{
 		reader->requestElement(
 			"material",
@@ -105,7 +95,15 @@ bool FemPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		reader->requestScalarProperty(
 			"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
 	}
-
+	else if (m_hasPerElementMaterial)
+	{
+		reader->requestScalarProperty(
+			getElementName(), "mass_density", PlyReader::TYPE_DOUBLE, offsetof(ElementData, massDensity));
+		reader->requestScalarProperty(
+			getElementName(), "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(ElementData, poissonRatio));
+		reader->requestScalarProperty(
+			getElementName(), "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(ElementData, youngModulus));
+	}
 
 	reader->setEndParseFileCallback(std::bind(&FemPlyReaderDelegate::endParseFile, this));
 
@@ -133,7 +131,7 @@ bool FemPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 
 	// Material: either have a default material for all elements
 	// or have per element material properties
-	bool hasMaterial = reader.hasProperty("material", "mass_density") &&
+	m_hasMaterial = reader.hasProperty("material", "mass_density") &&
 					   reader.hasProperty("material", "poisson_ratio") &&
 					   reader.hasProperty("material", "young_modulus");
 
@@ -143,7 +141,7 @@ bool FemPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 
 	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
 
-	return result && (hasMaterial || m_hasPerElementMaterial);
+	return result;
 }
 
 void* FemPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
