@@ -21,7 +21,6 @@ include_directories (
 set(UNIT_TEST_SOURCES
 	CompoundShapeToGraphicsTests.cpp
 	DriveElementFromInputBehaviorTests.cpp
-	EventManagerTests.cpp
 	FunctionBehaviorTests.cpp
 	KeyBehaviorTests.cpp
 	KeyboardCallbackBehaviorTests.cpp

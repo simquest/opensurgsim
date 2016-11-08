@@ -14,21 +14,21 @@
 // limitations under the License.
 
 
-#ifndef SURGSIM_BLOCKS_EVENTMANAGER_H
-#define SURGSIM_BLOCKS_EVENTMANAGER_H
+#ifndef SURGSIM_FRAMEWORK_MESSENGER_H
+#define SURGSIM_FRAMEWORK_MESSENGER_H
 
 
-#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Framework/Component.h"
 
+#include <boost/thread/mutex.hpp>
 
 namespace SurgSim
 {
-namespace Blocks
+namespace Framework
 {
-SURGSIM_STATIC_REGISTRATION(EventManager);
 
-/// EventManager adds somewhat asynchronous communication to OSS, components can add themselves as subscribers to
+/// Messenger implements asynchronous communication to OSS, components can add themselves as subscribers to
 /// this class when it is in the system, any component can publish events to the event manager. Events are named via
 /// free strings, to be notified the name that was used to subscribe has to match the name that was used to post
 /// the event.
@@ -37,39 +37,42 @@ SURGSIM_STATIC_REGISTRATION(EventManager);
 /// The event structure sent to the receiver contains the senders full name, the actual name of the event, the time
 /// that the event was received by the event manager (this based on a local clock inside the event manager) and
 /// some optional data. To decode the data the receiver has to know what type the original data was in.
-class EventManager : public SurgSim::Framework::Behavior
+class Messenger
 {
 public:
 
-	/// Datastructure to
+	/// Datastructure to contain basic event data
 	struct Event
 	{
-		Event(double time, const std::string& sender, const std::string& name, const boost::any& data) :
-			time(time), sender(sender), name(name), data(data) {}
+		Event(const std::string& name, const std::string& sender, double time, const boost::any& data) :
+			name(name), sender(sender), time(time), data(data) {}
 
 		Event() : time(0.0) {}
-
-		double time; /// Time the event is received
-		std::string sender; /// Name of the sender
 		std::string name; /// Name of the event
+		std::string sender; /// Name of the sender
+		double time; /// Time the event is received
 		boost::any data; /// Data
 	};
 
 	typedef std::function<void(const Event&)> EventCallback; /// To receive events this is the format of the callback
 
-	EventManager(const std::string& name);
+	Messenger();
 
-	SURGSIM_CLASSNAME(EventManager);
-
-	virtual void update(double dt) override;
-	virtual bool doInitialize() override;
-	virtual bool doWakeUp() override;
+	void update();
 
 	/// Put an event onto the queue to be sent to all subscribers
-	/// \param sender The name of the sender
 	/// \param event The name of the event
+	/// \param sender The name of the sender
 	/// \param data Optional data
-	void publish(const std::string& sender, const std::string& event, const boost::any& data = boost::any());
+	void publish(const std::string& event, const std::string& sender, const boost::any& data = boost::any());
+
+	/// Put an event onto the queue to be sent to all subscribers
+	/// \param event The name of the event
+	/// \param sender The Component doing the publishing
+	/// \param data Optional data
+	void publish(const std::string& event,
+				 const std::shared_ptr<Component>& sender,
+				 const boost::any& data = boost::any());
 
 	/// Subscribe to receiving events, when an event occurs that matches the `event` the callback function will be
 	/// called in the update loop of this class
@@ -101,7 +104,7 @@ private:
 	typedef std::pair<std::weak_ptr<SurgSim::Framework::Component>, EventCallback> Subscriber;
 
 	std::unordered_map<std::string, std::vector<Subscriber>> m_subscribers;
-	std::vector<Subscriber> m_broadcast;
+	std::vector<Subscriber> m_universalSubscribers;
 
 	boost::mutex m_subscriberMutex;
 	boost::mutex m_eventMutex;

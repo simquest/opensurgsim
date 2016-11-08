@@ -17,10 +17,14 @@
 #define SURGSIM_FRAMEWORK_RUNTIME_H
 
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+#include <atomic>
+
+#include "SurgSim/Framework/Messenger.h"
 
 
 namespace YAML
@@ -71,6 +75,9 @@ public:
 	/// \return The first manager of type T that is found nullptr otherwise
 	template <class T>
 	std::shared_ptr<T> getManager() const;
+
+	Messenger& getMessenger();
+
 
 	/// \return The scene to be used for this runtime. Use this for any kind of scene manipulation.
 	std::shared_ptr<Scene> getScene();
@@ -127,6 +134,8 @@ public:
 	/// Gets the thread pool for the runtime.
 	/// \return	The thread pool.
 	static std::shared_ptr<ThreadPool> getThreadPool();
+
+
 
 	/// Adds a component.
 	/// \param	component	The component.
@@ -203,14 +212,18 @@ private:
 	/// Gets a shared pointer to the runtime.
 	/// \return	The shared pointer.
 	std::shared_ptr<Runtime> getSharedPtr();
-	bool m_isRunning;
+	std::atomic<bool> m_isRunning;
 	std::vector<std::shared_ptr<ComponentManager>> m_managers;
 	std::shared_ptr<Scene> m_scene;
 	static std::shared_ptr<ApplicationData> m_applicationData;
 
+	Messenger m_messenger;
+	boost::thread m_messengerThread;
+
 	boost::mutex m_sceneHandling;
 
 	std::shared_ptr<Barrier> m_barrier;
+
 	bool m_isPaused;
 
 	bool m_isStopped;

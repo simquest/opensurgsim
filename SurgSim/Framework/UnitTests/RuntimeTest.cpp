@@ -338,3 +338,26 @@ TEST(RuntimeTest, TypedManagerAccess)
 	auto impossible = runtime->getManager<Runtime>();
 	EXPECT_EQ(nullptr, impossible);
 }
+
+TEST(RuntimeTest, Messaging)
+{
+	auto runtime = std::make_shared<Runtime>();
+
+	auto& messenger = runtime->getMessenger();
+
+	auto component = std::make_shared<MockComponent>("Component");
+
+	messenger.subscribe(component, std::bind(&MockComponent::eventCallback, component.get(), std::placeholders::_1));
+
+	runtime->start();
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+
+	messenger.publish("TestEvent", component);
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+
+	EXPECT_TRUE(component->didCallback);
+
+	runtime->stop();
+}

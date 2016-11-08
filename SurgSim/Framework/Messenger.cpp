@@ -14,18 +14,13 @@
 // limitations under the License.
 
 
-#include "SurgSim/Blocks/EventManager.h"
+#include "SurgSim/Framework/Messenger.h"
 
-#include "boost/thread/lock_guard.hpp"
-#include "boost/thread/mutex.hpp"
-
-#include <future>
-
-
+#include <boost/thread/lock_guard.hpp>
 
 namespace SurgSim
 {
-namespace Blocks
+namespace Framework
 {
 
 namespace
@@ -41,7 +36,7 @@ struct Contains
 	}
 
 	bool operator()(const std::pair<std::weak_ptr<Framework::Component>,
-					Blocks::EventManager::EventCallback>& r)
+					Framework::Messenger::EventCallback>& r)
 	{
 
 		auto candidate = r.first.lock();
@@ -54,7 +49,7 @@ struct Contains
 struct Expired
 {
 	bool operator()(const std::pair<std::weak_ptr<Framework::Component>,
-					Blocks::EventManager::EventCallback>& r)
+					Framework::Messenger::EventCallback>& r)
 	{
 		return r.first.expired();
 	}
@@ -62,24 +57,12 @@ struct Expired
 
 }
 
-SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::EventManager, EventManager);
-
-EventManager::EventManager(const std::string& name) : Behavior(name)
+Messenger::Messenger()
 {
 	m_timer.setMaxNumberOfFrames(1);
 }
 
-bool EventManager::doInitialize()
-{
-	return true;
-}
-
-bool EventManager::doWakeUp()
-{
-	return true;
-}
-
-void EventManager::update(double dt)
+void Messenger::update()
 {
 	std::vector<Subscriber> subscribers;
 	std::vector<Subscriber> broadcast;
@@ -90,11 +73,12 @@ void EventManager::update(double dt)
 	}
 	{
 		boost::lock_guard<boost::mutex> lock(m_subscriberMutex);
-		m_broadcast.erase(std::remove_if(m_broadcast.begin(), m_broadcast.end(), Expired()), m_broadcast.end());
-		broadcast = m_broadcast;
+		m_universalSubscribers.erase(std::remove_if(m_universalSubscribers.begin(), m_universalSubscribers.end(), Expired()),
+									 m_universalSubscribers.end());
+		broadcast = m_universalSubscribers;
 	}
 
-
+	// Should probably group events here
 	for (const auto& event : events)
 	{
 		{
@@ -109,14 +93,21 @@ void EventManager::update(double dt)
 	}
 }
 
-void EventManager::publish(const std::string& sender, const std::string& eventName, const boost::any& data)
+void Messenger::publish(const std::string& event, const std::string& sender, const boost::any& data)
 {
 	boost::lock_guard<boost::mutex> lock(m_eventMutex);
-	m_events.emplace_back(m_timer.getCumulativeTime(), sender, eventName, data);
+	m_events.emplace_back(event, sender, m_timer.getCumulativeTime(), data);
 }
 
-void EventManager::subscribe(const std::string& event, const std::shared_ptr<SurgSim::Framework::Component>& subscriber,
-							 const EventCallback& callback)
+void Messenger::publish(const std::string& event, const std::shared_ptr<Component>& sender, const boost::any& data)
+{
+	boost::lock_guard<boost::mutex> lock(m_eventMutex);
+	m_events.emplace_back(event, sender->getFullName(), m_timer.getCumulativeTime(), data);
+}
+
+
+void Messenger::subscribe(const std::string& event, const std::shared_ptr<SurgSim::Framework::Component>& subscriber,
+						  const EventCallback& callback)
 {
 	SURGSIM_ASSERT(subscriber != nullptr) << "Subscriber can't be nullptr.";
 	SURGSIM_ASSERT(callback != nullptr) << "Callback can't be nullptr.";
@@ -132,22 +123,22 @@ void EventManager::subscribe(const std::string& event, const std::shared_ptr<Sur
 
 }
 
-void EventManager::subscribe(const std::shared_ptr<SurgSim::Framework::Component>& subscriber,
-							 const EventCallback& callback)
+void Messenger::subscribe(const std::shared_ptr<SurgSim::Framework::Component>& subscriber,
+						  const EventCallback& callback)
 {
 	SURGSIM_ASSERT(subscriber != nullptr) << "Subscriber can't be nullptr.";
 	SURGSIM_ASSERT(callback != nullptr) << "Callback can't be nullptr.";
 
 	boost::lock_guard<boost::mutex> lock(m_subscriberMutex);
-	auto entry = std::find_if(m_broadcast.begin(), m_broadcast.end(), Contains(subscriber));
-	if (entry == m_broadcast.end())
+	auto entry = std::find_if(m_universalSubscribers.begin(), m_universalSubscribers.end(), Contains(subscriber));
+	if (entry == m_universalSubscribers.end())
 	{
-		m_broadcast.emplace_back(subscriber, callback);
+		m_universalSubscribers.emplace_back(subscriber, callback);
 	}
 }
 
-void EventManager::unsubscribe(const std::string& event,
-							   const std::shared_ptr<SurgSim::Framework::Component>& subscriber)
+void Messenger::unsubscribe(const std::string& event,
+							const std::shared_ptr<SurgSim::Framework::Component>& subscriber)
 {
 	SURGSIM_ASSERT(subscriber != nullptr) << "Subscriber can't be nullptr.";
 
@@ -163,14 +154,14 @@ void EventManager::unsubscribe(const std::string& event,
 	}
 }
 
-void EventManager::unsubscribe(const std::shared_ptr<SurgSim::Framework::Component>& subscriber)
+void Messenger::unsubscribe(const std::shared_ptr<SurgSim::Framework::Component>& subscriber)
 {
 	SURGSIM_ASSERT(subscriber != nullptr) << "Subscriber can't be nullptr.";
 
 	boost::lock_guard<boost::mutex> lock(m_subscriberMutex);
-	m_broadcast.erase(
-		std::remove_if(m_broadcast.begin(), m_broadcast.end(), Contains(subscriber)),
-		m_broadcast.end()
+	m_universalSubscribers.erase(
+		std::remove_if(m_universalSubscribers.begin(), m_universalSubscribers.end(), Contains(subscriber)),
+		m_universalSubscribers.end()
 	);
 
 	for (auto& entry : m_subscribers)
@@ -182,7 +173,7 @@ void EventManager::unsubscribe(const std::shared_ptr<SurgSim::Framework::Compone
 	}
 }
 
-void EventManager::sendEvent(const Event& event, const std::vector<Subscriber>& subscribers)
+void Messenger::sendEvent(const Event& event, const std::vector<Subscriber>& subscribers)
 {
 	for (const auto& subscriber : subscribers)
 	{

@@ -79,6 +79,11 @@ std::vector<std::weak_ptr<ComponentManager>> Runtime::getManagers() const
 }
 
 
+SurgSim::Framework::Messenger& Runtime::getMessenger()
+{
+	return m_messenger;
+}
+
 std::shared_ptr<Scene> Runtime::getScene()
 {
 	if (m_scene == nullptr)
@@ -161,6 +166,16 @@ bool Runtime::start(bool paused)
 	m_isRunning = true;
 	m_isPaused = paused;
 
+	// Start Messenger Thread
+	m_messengerThread = boost::thread([this]()
+	{
+		while (this->m_isRunning)
+		{
+			m_messenger.update();
+			boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+		}
+	});
+
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	m_barrier.reset(new Barrier(m_managers.size() + 1));
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
@@ -202,6 +217,7 @@ bool Runtime::stop()
 
 	m_isRunning = false;
 
+
 	// Suspend updates on all threads
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
@@ -209,8 +225,13 @@ bool Runtime::stop()
 		(*it)->setIdle(true);
 	}
 
+	// Wait for the messenger to run through and deliver the last pending messages
+	m_messengerThread.join();
+	m_messenger.update();
+
 	// Give all threads time to run through update
 	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+
 
 	// Now stop all threads
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)

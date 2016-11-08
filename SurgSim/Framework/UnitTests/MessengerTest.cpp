@@ -17,32 +17,34 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "SurgSim/Blocks/EventManager.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/Messenger.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/Behavior.h"
 
 using ::testing::_;
 
 namespace SurgSim
 {
-namespace Blocks
+namespace Framework
 {
 
 class MockReceiverInterface
 {
 public:
-	virtual void onEventA(const EventManager::Event& event) = 0;
-	virtual void onEventB(const EventManager::Event& event) = 0;
+	virtual void onEventA(const Messenger::Event& event) = 0;
+	virtual void onEventB(const Messenger::Event& event) = 0;
 };
+
 
 class MockReceiver : public SurgSim::Framework::Behavior, public MockReceiverInterface
 {
 public:
 	explicit MockReceiver(const std::string& name) : SurgSim::Framework::Behavior(name) {}
 
-	MOCK_METHOD1(onEventA, void(const EventManager::Event&));
-	MOCK_METHOD1(onEventB, void(const EventManager::Event&));
+	MOCK_METHOD1(onEventA, void(const Messenger::Event&));
+	MOCK_METHOD1(onEventB, void(const Messenger::Event&));
 
 
 	void update(double dt) override
@@ -63,7 +65,36 @@ public:
 
 };
 
-class EventManagerTest : public testing::Test
+class MockReceiver2 : public SurgSim::Framework::Behavior, public MockReceiverInterface
+{
+	void onEventA(const Messenger::Event& event)
+	{
+
+	}
+
+	void onEventB(const Messenger::Event& event)
+	{
+
+	}
+
+	void update(double dt) override
+	{
+	}
+
+
+	bool doInitialize() override
+	{
+		return true;
+	}
+
+
+	bool doWakeUp() override
+	{
+		return true;
+	}
+};
+
+class MessengerTest : public testing::Test
 {
 public:
 
@@ -72,8 +103,6 @@ public:
 		runtime = std::make_shared<Framework::Runtime>();
 		scene = runtime->getScene();
 		sceneElement = std::make_shared<Framework::BasicSceneElement>("control");
-		eventManager = std::make_shared<EventManager>("manager");
-		sceneElement->addComponent(eventManager);
 		sender = std::make_shared<MockReceiver>("sender");
 		sceneElement->addComponent(sender);
 		receiver1 = std::make_shared<MockReceiver>("receiver1");
@@ -81,173 +110,177 @@ public:
 		receiver2 = std::make_shared<MockReceiver>("receiver2");
 		sceneElement->addComponent(receiver2);
 		scene->addSceneElement(sceneElement);
-
 	}
 
 	std::shared_ptr<Framework::Runtime> runtime;
 	std::shared_ptr<Framework::Scene> scene;
 	std::shared_ptr<Framework::BasicSceneElement> sceneElement;
-	std::shared_ptr<EventManager> eventManager;
 	std::shared_ptr<MockReceiver> sender;
 	std::shared_ptr<MockReceiver> receiver1;
 	std::shared_ptr<MockReceiver> receiver2;
+
+	std::shared_ptr<MockReceiver2> receiver3;
+
+	Messenger messenger;
 };
 
-TEST_F(EventManagerTest, EmptyMessage)
+TEST_F(MessengerTest, EmptyMessage)
 {
-	ASSERT_NO_THROW(eventManager->publish("sender", "event"));
-	ASSERT_NO_THROW(eventManager->publish("sender", "event", 3));
+	ASSERT_NO_THROW(messenger.publish("event", "sender"));
+	ASSERT_NO_THROW(messenger.publish("event", "sender", 3));
 
-	ASSERT_NO_THROW(eventManager->update(0.0));
+	ASSERT_NO_THROW(messenger.update());
 }
 
-TEST_F(EventManagerTest, SendMessage)
+TEST_F(MessengerTest, SendMessage)
 {
 	using ::testing::Field;
 	using ::testing::Eq;
-	EXPECT_CALL(*receiver1, onEventA(AllOf(Field(&EventManager::Event::sender, Eq("sender")),
-										   Field(&EventManager::Event::name, Eq("event"))))
+
+	EXPECT_CALL(*receiver1, onEventA(AllOf(Field(&Messenger::Event::sender, Eq("sender")),
+										   Field(&Messenger::Event::name, Eq("event"))))
 			   ).Times(::testing::Exactly(1));
 	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
 
-	EXPECT_ANY_THROW(eventManager->subscribe("event", receiver1, nullptr));
-	EXPECT_ANY_THROW(eventManager->subscribe("event", nullptr, callback));
+	EXPECT_ANY_THROW(messenger.subscribe("event", receiver1, nullptr));
+	EXPECT_ANY_THROW(messenger.subscribe("event", nullptr, callback));
 
-	ASSERT_NO_THROW(eventManager->subscribe("event", receiver1, callback));
+	ASSERT_NO_THROW(messenger.subscribe("event", receiver1, callback));
 
 
-	ASSERT_NO_THROW(eventManager->publish("sender", "event"));
-	ASSERT_NO_THROW(eventManager->update(0.0));
+	ASSERT_NO_THROW(messenger.publish("event", "sender"));
+	ASSERT_NO_THROW(messenger.update());
 
 	// the queue should be empty, should not get another one
-	ASSERT_NO_THROW(eventManager->update(0.0));
+	ASSERT_NO_THROW(messenger.update());
 }
 
-TEST_F(EventManagerTest, DoubleAdd)
+
+TEST_F(MessengerTest, DoubleAdd)
 {
 	EXPECT_CALL(*receiver1, onEventA(_));
 
 	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
 
-	ASSERT_NO_THROW(eventManager->subscribe("event", receiver1, callback));
-	ASSERT_NO_THROW(eventManager->subscribe("event", receiver1, callback));
+	ASSERT_NO_THROW(messenger.subscribe("event", receiver1, callback));
+	ASSERT_NO_THROW(messenger.subscribe("event", receiver1, callback));
 
-	eventManager->publish("sender", "event");
-	eventManager->update(0.0);
+	messenger.publish("event", "sender");
+	messenger.update();
 }
 
 
-TEST_F(EventManagerTest, MultipleReceivers)
+TEST_F(MessengerTest, MultipleReceivers)
 {
 	EXPECT_CALL(*receiver1, onEventA(_));
 	EXPECT_CALL(*receiver2, onEventB(_));
 
 	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	ASSERT_NO_THROW(eventManager->subscribe("event", receiver1, callback1));
+	ASSERT_NO_THROW(messenger.subscribe("event", receiver1, callback1));
 
 	auto callback2 = std::bind(&MockReceiver::onEventB, receiver2.get(), std::placeholders::_1);
-	ASSERT_NO_THROW(eventManager->subscribe("event", receiver2, callback2));
+	ASSERT_NO_THROW(messenger.subscribe("event", receiver2, callback2));
 
-	ASSERT_NO_THROW(eventManager->publish("sender", "event"));
-	ASSERT_NO_THROW(eventManager->update(0.0));
+	ASSERT_NO_THROW(messenger.publish("event", "sender"));
+	ASSERT_NO_THROW(messenger.update());
 }
 
-TEST_F(EventManagerTest, MultipleEvents)
+TEST_F(MessengerTest, MultipleEvents)
 {
 	EXPECT_CALL(*receiver1, onEventA(_));
 	EXPECT_CALL(*receiver2, onEventB(_));
 
 
 	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	ASSERT_NO_THROW(eventManager->subscribe("event1", receiver1, callback1));
+	ASSERT_NO_THROW(messenger.subscribe("event1", receiver1, callback1));
 
 	auto callback2 = std::bind(&MockReceiver::onEventB, receiver2.get(), std::placeholders::_1);
-	ASSERT_NO_THROW(eventManager->subscribe("event2", receiver2, callback2));
+	ASSERT_NO_THROW(messenger.subscribe("event2", receiver2, callback2));
 
-	ASSERT_NO_THROW(eventManager->publish("sender", "event1"));
-	ASSERT_NO_THROW(eventManager->publish("sender", "event2"));
-	ASSERT_NO_THROW(eventManager->update(0.0));
+	ASSERT_NO_THROW(messenger.publish("event1", "sender"));
+	ASSERT_NO_THROW(messenger.publish("event2", "sender"));
+	ASSERT_NO_THROW(messenger.update());
 }
 
-TEST_F(EventManagerTest, Unsubscribe)
+TEST_F(MessengerTest, Unsubscribe)
 {
 	EXPECT_CALL(*receiver1, onEventA(_));
 
 	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event1", receiver1, callback1);
+	messenger.subscribe("event1", receiver1, callback1);
 
 	auto callback2 = std::bind(&MockReceiver::onEventB, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event2", receiver1, callback2);
+	messenger.subscribe("event2", receiver1, callback2);
 
-	eventManager->publish("sender", "event1");
-	eventManager->update(0.0);
+	messenger.publish("event1", "sender");
+	messenger.update();
 
 	// remove from non-existing event
-	ASSERT_NO_THROW(eventManager->unsubscribe("xxx", receiver2));
+	ASSERT_NO_THROW(messenger.unsubscribe("xxx", receiver2));
 
 	// remove non-existing receiver
-	ASSERT_NO_THROW(eventManager->unsubscribe("event1", receiver2));
+	ASSERT_NO_THROW(messenger.unsubscribe("event1", receiver2));
 
 	// actual removal
-	ASSERT_NO_THROW(eventManager->unsubscribe("event2", receiver1));
+	ASSERT_NO_THROW(messenger.unsubscribe("event2", receiver1));
 
 	// double remove, should have no effect
-	ASSERT_NO_THROW(eventManager->unsubscribe("event2", receiver1));
+	ASSERT_NO_THROW(messenger.unsubscribe("event2", receiver1));
 
 	// Now push a message and make sure we did not receive another one
-	eventManager->publish("sender", "event2");
-	eventManager->update(0.0);
+	messenger.publish("event2", "sender");
+	messenger.update();
 }
 
-TEST_F(EventManagerTest, Broadcast)
+TEST_F(MessengerTest, Broadcast)
 {
 	EXPECT_CALL(*receiver1, onEventA(_)).Times(::testing::Exactly(2));
 
 	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
 
-	EXPECT_ANY_THROW(eventManager->subscribe(receiver1, nullptr));
-	EXPECT_ANY_THROW(eventManager->subscribe(nullptr, callback));
+	EXPECT_ANY_THROW(messenger.subscribe(receiver1, nullptr));
+	EXPECT_ANY_THROW(messenger.subscribe(nullptr, callback));
 
-	ASSERT_NO_THROW(eventManager->subscribe(receiver1, callback));
+	ASSERT_NO_THROW(messenger.subscribe(receiver1, callback));
 
-	eventManager->publish("sender", "event1");
-	eventManager->publish("sender", "event2");
-	eventManager->update(0.0);
+	messenger.publish("event1", "sender");
+	messenger.publish("event2", "sender");
+	messenger.update();
 
-	ASSERT_NO_THROW(eventManager->unsubscribe(receiver1));
+	ASSERT_NO_THROW(messenger.unsubscribe(receiver1));
 
-	eventManager->publish("sender", "event1");
-	eventManager->publish("sender", "event2");
-	eventManager->update(0.0);
+	messenger.publish("event1", "sender");
+	messenger.publish("event2", "sender");
+	messenger.update();
 
 }
 
-TEST_F(EventManagerTest, UnsubscribeFromAll)
+TEST_F(MessengerTest, UnsubscribeFromAll)
 {
 	EXPECT_CALL(*receiver1, onEventA(_)).Times(::testing::Exactly(0));
 	EXPECT_CALL(*receiver1, onEventB(_)).Times(::testing::Exactly(0));
 
 	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event1", receiver1, callback1);
+	messenger.subscribe("event1", receiver1, callback1);
 
 	auto callback2 = std::bind(&MockReceiver::onEventB, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event2", receiver1, callback2);
+	messenger.subscribe("event2", receiver1, callback2);
 
-	ASSERT_NO_THROW(eventManager->unsubscribe(receiver2));
-	ASSERT_NO_THROW(eventManager->unsubscribe(receiver1));
+	ASSERT_NO_THROW(messenger.unsubscribe(receiver2));
+	ASSERT_NO_THROW(messenger.unsubscribe(receiver1));
 
-	eventManager->publish("sender", "event1");
-	eventManager->publish("sender", "event2");
-	eventManager->update(0.0);
+	messenger.publish("event1", "sender");
+	messenger.publish("event2", "sender");
+	messenger.update();
 }
 
-TEST_F(EventManagerTest, LifeTime)
+TEST_F(MessengerTest, LifeTime)
 {
 	EXPECT_CALL(*receiver1, onEventA(_)).Times(::testing::Exactly(0));
 	std::weak_ptr<SurgSim::Framework::Component> weak(receiver1);
 
 	auto callback1 = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
-	eventManager->subscribe("event1", receiver1, callback1);
+	messenger.subscribe("event1", receiver1, callback1);
 
 	sceneElement->removeComponent(receiver1);
 	receiver1 = nullptr;
@@ -255,10 +288,12 @@ TEST_F(EventManagerTest, LifeTime)
 	// Verify that all the references are gone ...
 	ASSERT_TRUE(weak.expired());
 
-	eventManager->publish("sender", "event1");
-	eventManager->publish("sender", "event2");
-	ASSERT_NO_THROW(eventManager->update(0.0));
+	messenger.publish("event1", "sender");
+	messenger.publish("event2", "sender");
+	ASSERT_NO_THROW(messenger.update());
 }
+
+
 
 }
 }
