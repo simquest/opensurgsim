@@ -42,6 +42,13 @@ public:
 										 const Math::MeshShape& mesh2,
 										 const Math::RigidTransform3d& mesh2Pose) const override;
 
+	/// \note this expects the posed version of the shape to be passed
+	std::list<std::shared_ptr<Contact>> calculateCcdContact(
+		const Math::MeshShape& shape1AtTime0, const Math::RigidTransform3d& pose1AtTime0,
+		const Math::MeshShape& shape1AtTime1, const Math::RigidTransform3d& pose1AtTime1,
+		const Math::MeshShape& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
+		const Math::MeshShape& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) const override;
+
 	std::pair<int, int> getShapeTypes() override;
 
 };

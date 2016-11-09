@@ -262,6 +262,7 @@ void ContactCalculation::initializeTables()
 
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentSelfContact>());
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentMeshTriangleMeshContact>());
+	ContactCalculation::privateCcdRegister(std::make_shared<Collision::TriangleMeshTriangleMeshContact>());
 
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::CompoundShapeContact>(
 			std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_SEGMENTMESH)));
