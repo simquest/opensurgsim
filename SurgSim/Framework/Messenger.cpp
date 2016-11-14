@@ -29,14 +29,13 @@ namespace
 struct Contains
 {
 
-	Contains(const std::shared_ptr<Framework::Component>& component) :
+	Contains(const std::shared_ptr<Component>& component) :
 		receiver(component)
 	{
 
 	}
 
-	bool operator()(const std::pair<std::weak_ptr<Framework::Component>,
-					Framework::Messenger::EventCallback>& r)
+	bool operator()(const std::pair<std::weak_ptr<Component>, Messenger::EventCallback>& r)
 	{
 
 		auto candidate = r.first.lock();
@@ -48,8 +47,7 @@ struct Contains
 
 struct Expired
 {
-	bool operator()(const std::pair<std::weak_ptr<Framework::Component>,
-					Framework::Messenger::EventCallback>& r)
+	bool operator()(const std::pair<std::weak_ptr<Component>, Messenger::EventCallback>& r)
 	{
 		return r.first.expired();
 	}
@@ -73,8 +71,8 @@ void Messenger::update()
 	}
 	{
 		boost::lock_guard<boost::mutex> lock(m_subscriberMutex);
-		m_universalSubscribers.erase(std::remove_if(m_universalSubscribers.begin(), m_universalSubscribers.end(), Expired()),
-									 m_universalSubscribers.end());
+		m_universalSubscribers.erase(std::remove_if(m_universalSubscribers.begin(), m_universalSubscribers.end(),
+									 Expired()), m_universalSubscribers.end());
 		broadcast = m_universalSubscribers;
 	}
 
@@ -101,10 +99,8 @@ void Messenger::publish(const std::string& event, const std::string& sender, con
 
 void Messenger::publish(const std::string& event, const std::shared_ptr<Component>& sender, const boost::any& data)
 {
-	boost::lock_guard<boost::mutex> lock(m_eventMutex);
-	m_events.emplace_back(event, sender->getFullName(), m_timer.getCumulativeTime(), data);
+	publish(event, sender->getFullName(), data);
 }
-
 
 void Messenger::subscribe(const std::string& event, const std::shared_ptr<SurgSim::Framework::Component>& subscriber,
 						  const EventCallback& callback)

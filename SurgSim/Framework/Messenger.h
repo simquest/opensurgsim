@@ -29,13 +29,13 @@ namespace Framework
 {
 
 /// Messenger implements asynchronous communication to OSS, components can add themselves as subscribers to
-/// this class when it is in the system, any component can publish events to the event manager. Events are named via
+/// this class when it is in the system, any component can publish events to the messenger. Events are named via
 /// free strings, to be notified the name that was used to subscribe has to match the name that was used to post
 /// the event.
-/// The publish function doesn't block it just stores the event in a local queue that will be worked off during this
-/// components update loop. That will cause a delay in the posting of the event.
+/// The publish function doesn't block it just stores the event in a local queue that will be worked off during when
+/// update is called by the thread. That will cause a delay in the posting of the event.
 /// The event structure sent to the receiver contains the senders full name, the actual name of the event, the time
-/// that the event was received by the event manager (this based on a local clock inside the event manager) and
+/// that the event was received by the messenger (this based on a local clock inside the messenger) and
 /// some optional data. To decode the data the receiver has to know what type the original data was in.
 class Messenger
 {
@@ -56,8 +56,10 @@ public:
 
 	typedef std::function<void(const Event&)> EventCallback; /// To receive events this is the format of the callback
 
+
 	Messenger();
 
+	/// Execute all the queued up callbacks
 	void update();
 
 	/// Put an event onto the queue to be sent to all subscribers
@@ -99,18 +101,28 @@ public:
 
 private:
 
+	/// Local timer for global wall-clock
 	SurgSim::Framework::Timer m_timer;
+
 
 	typedef std::pair<std::weak_ptr<SurgSim::Framework::Component>, EventCallback> Subscriber;
 
+	/// Subscribers to specific events
 	std::unordered_map<std::string, std::vector<Subscriber>> m_subscribers;
+
+	/// Subscribers to all events
 	std::vector<Subscriber> m_universalSubscribers;
 
+	/// Mutex for managing the subscribers
 	boost::mutex m_subscriberMutex;
-	boost::mutex m_eventMutex;
 
+	/// List of events that haven't been sent to subscribers
 	std::vector<Event> m_events;
 
+	/// Mutex to protect list of events
+	boost::mutex m_eventMutex;
+
+	/// Post an event to all its receivers
 	void sendEvent(const Event& event, const std::vector<Subscriber>& receivers);
 
 };
