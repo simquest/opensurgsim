@@ -257,14 +257,14 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			"triangleT0.valid = " << triangle1T0.isValid << "\ntriangleT1.valid = " << triangle1T1.isValid;
 
 		std::pair<Math::Vector3d, Math::Vector3d> t1v0 = std::make_pair(
-			shape2AtTime0.getVertexPosition(triangle1T0.verticesId[0]),
-			shape2AtTime1.getVertexPosition(triangle1T1.verticesId[0]));
+			shape1AtTime0.getVertexPosition(triangle1T0.verticesId[0]),
+			shape1AtTime1.getVertexPosition(triangle1T1.verticesId[0]));
 		std::pair<Math::Vector3d, Math::Vector3d> t1v1 = std::make_pair(
-			shape2AtTime0.getVertexPosition(triangle1T0.verticesId[1]),
-			shape2AtTime1.getVertexPosition(triangle1T1.verticesId[1]));
+			shape1AtTime0.getVertexPosition(triangle1T0.verticesId[1]),
+			shape1AtTime1.getVertexPosition(triangle1T1.verticesId[1]));
 		std::pair<Math::Vector3d, Math::Vector3d> t1v2 = std::make_pair(
-			shape2AtTime0.getVertexPosition(triangle1T0.verticesId[2]),
-			shape2AtTime1.getVertexPosition(triangle1T1.verticesId[2]));
+			shape1AtTime0.getVertexPosition(triangle1T0.verticesId[2]),
+			shape1AtTime1.getVertexPosition(triangle1T1.verticesId[2]));
 
 		Math::Aabbd triangle1Aabb;
 		triangle1Aabb.extend(t1v0.first);
@@ -274,10 +274,10 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 		triangle1Aabb.extend(t1v2.first);
 		triangle1Aabb.extend(t1v2.second);
 
-		for (size_t triangleId = 0; triangleId < shape2AtTime0.getNumTriangles(); triangleId++)
+		for (size_t triangle2Id = 0; triangle2Id < shape2AtTime0.getNumTriangles(); triangle2Id++)
 		{
-			auto triangle2T0 = shape2AtTime0.getTriangle(triangleId);
-			auto triangle2T1 = shape2AtTime1.getTriangle(triangleId);
+			auto triangle2T0 = shape2AtTime0.getTriangle(triangle2Id);
+			auto triangle2T1 = shape2AtTime1.getTriangle(triangle2Id);
 
 			SURGSIM_ASSERT(triangle2T0.verticesId == triangle2T1.verticesId) << "Triangles are different:\n" <<
 				"(" << triangle2T0.verticesId[0] << "," << triangle2T0.verticesId[1] << "," <<
@@ -613,7 +613,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			
 			Math::Vector triangle1BaryCoord(3);
 			triangle1BaryCoord << 1.0 - triangle1Alpha - triangle1Beta, triangle1Alpha, triangle1Beta;
-			DataStructures::IndexedLocalCoordinate localCoordinateTriangle1(triangleId, triangle1BaryCoord);
+			DataStructures::IndexedLocalCoordinate localCoordinateTriangle1(triangle1Id, triangle1BaryCoord);
 			// The location related to the TriangleMesh can carry a TRIANGLE information
 			// e.g. part of a Mass-Spring with deformable triangulation for collision
 			DataStructures::Location locationTriangle1(localCoordinateTriangle1, Location::TRIANGLE);
@@ -622,11 +622,11 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			locationTriangle1.elementMeshLocalCoordinate = locationTriangle1.triangleMeshLocalCoordinate;
 			// The location related to the TriangleMesh can carry a RIGID LOCAL POSITION information
 			// e.g. part of a rigid body
-			locationTriangle1.rigidLocalPosition = pose2AtTime1.inverse() * T1;
+			locationTriangle1.rigidLocalPosition = pose1AtTime1.inverse() * T1;
 
 			Math::Vector triangle2BaryCoord(3);
 			triangle2BaryCoord << 1.0 - triangle2Alpha - triangle2Beta, triangle2Alpha, triangle2Beta;
-			DataStructures::IndexedLocalCoordinate localCoordinateTriangle2(triangleId, triangle2BaryCoord);
+			DataStructures::IndexedLocalCoordinate localCoordinateTriangle2(triangle2Id, triangle2BaryCoord);
 			// The location related to the TriangleMesh can carry a TRIANGLE information
 			// e.g. part of a Mass-Spring with deformable triangulation for collision
 			DataStructures::Location locationTriangle2(localCoordinateTriangle2, Location::TRIANGLE);
