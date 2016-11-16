@@ -158,7 +158,7 @@ TEST_F(MessengerTest, SendMessage)
 
 TEST_F(MessengerTest, DoubleAdd)
 {
-	EXPECT_CALL(*receiver1, onEventA(_));
+	EXPECT_CALL(*receiver1, onEventA(_)).Times(::testing::Exactly(1));
 
 	auto callback = std::bind(&MockReceiver::onEventA, receiver1.get(), std::placeholders::_1);
 
