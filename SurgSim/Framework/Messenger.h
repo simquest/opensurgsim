@@ -104,7 +104,6 @@ private:
 	/// Local timer for global wall-clock
 	SurgSim::Framework::Timer m_timer;
 
-
 	typedef std::pair<std::weak_ptr<SurgSim::Framework::Component>, EventCallback> Subscriber;
 
 	/// Subscribers to specific events

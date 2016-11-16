@@ -94,7 +94,7 @@ void Messenger::update()
 void Messenger::publish(const std::string& event, const std::string& sender, const boost::any& data)
 {
 	boost::lock_guard<boost::mutex> lock(m_eventMutex);
-	m_events.emplace_back(event, sender, m_timer.getCumulativeTime(), data);
+	m_events.emplace_back(event, sender, m_timer.getCurrentTime(), data);
 }
 
 void Messenger::publish(const std::string& event, const std::shared_ptr<Component>& sender, const boost::any& data)
