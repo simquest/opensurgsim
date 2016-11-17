@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ TEST(RepresentationTest, AddParticle)
 	representation->initialize(runtime);
 
 	ASSERT_TRUE(representation->addParticle(Vector3d::Ones(), Vector3d::Constant(3.0), 10));
-	ASSERT_EQ(1, representation->getParticles().unsafeGet().getNumVertices());
+	ASSERT_EQ(1u, representation->getParticles().unsafeGet().getNumVertices());
 
 	auto& particle = representation->getParticles().unsafeGet().getVertices()[0];
 	EXPECT_TRUE(particle.position.isApprox(Vector3d::Ones()));
@@ -73,20 +73,20 @@ TEST(RepresentationTest, RemoveParticle)
 
 	ASSERT_TRUE(representation->addParticle(Vector3d::Ones(), Vector3d::Constant(3.0), 10));
 	ASSERT_TRUE(representation->addParticle(Vector3d(2.0, 3.0, 4.0), Vector3d::Zero(), 10));
-	ASSERT_EQ(2, representation->getParticles().unsafeGet().getNumVertices());
+	ASSERT_EQ(2u, representation->getParticles().unsafeGet().getNumVertices());
 	representation->update(1.0);
-	ASSERT_EQ(2, representation->getParticles().safeGet()->getNumVertices());
+	ASSERT_EQ(2u, representation->getParticles().safeGet()->getNumVertices());
 
 	representation->removeParticle(0);
 	representation->update(1.0);
 	auto& particleVertices = representation->getParticles().safeGet()->getVertices();
-	ASSERT_EQ(1, particleVertices.size());
+	ASSERT_EQ(1u, particleVertices.size());
 	EXPECT_TRUE(particleVertices[0].position.isApprox(Vector3d(2.0, 3.0, 4.0)));
 	EXPECT_TRUE(particleVertices[0].data.velocity.isApprox(Vector3d::Zero()));
 
 	representation->removeParticle(0);
 	representation->update(1.0);
-	ASSERT_EQ(0, representation->getParticles().safeGet()->getNumVertices());
+	ASSERT_EQ(0u, representation->getParticles().safeGet()->getNumVertices());
 }
 
 TEST(RepresentationTest, GetParticles)
@@ -98,7 +98,7 @@ TEST(RepresentationTest, GetParticles)
 	Vector3d expectedVelocity = Vector3d(-4.0, 5.0, -6.0);
 	double expectedLifetime = 12.34;
 	representation->addParticle(expectedPosition, expectedVelocity, expectedLifetime);
-	ASSERT_EQ(1, representation->getParticles().unsafeGet().getNumVertices());
+	ASSERT_EQ(1u, representation->getParticles().unsafeGet().getNumVertices());
 
 	auto& particles = representation->getParticles().unsafeGet().getVertices();
 	EXPECT_TRUE(expectedPosition.isApprox(particles[0].position));
@@ -124,23 +124,23 @@ TEST(RepresentationTest, Aging)
 	representation->addParticle(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), 1);
 	representation->addParticle(Vector3d(2.0, 2.0, 2.0), Vector3d(0.0, 0.0, 0.0), 2);
 	representation->addParticle(Vector3d(3.0, 3.0, 3.0), Vector3d(0.0, 0.0, 0.0), 3);
-	EXPECT_EQ(3, representation->getParticles().unsafeGet().getNumVertices());
+	EXPECT_EQ(3u, representation->getParticles().unsafeGet().getNumVertices());
 
 	representation->update(1.0);
-	EXPECT_EQ(2, representation->getParticles().unsafeGet().getNumVertices());
-	EXPECT_EQ(2, representation->getParticles().safeGet()->getNumVertices());
+	EXPECT_EQ(2u, representation->getParticles().unsafeGet().getNumVertices());
+	EXPECT_EQ(2u, representation->getParticles().safeGet()->getNumVertices());
 
 	representation->update(1.0);
-	EXPECT_EQ(1, representation->getParticles().unsafeGet().getNumVertices());
-	EXPECT_EQ(1, representation->getParticles().safeGet()->getNumVertices());
+	EXPECT_EQ(1u, representation->getParticles().unsafeGet().getNumVertices());
+	EXPECT_EQ(1u, representation->getParticles().safeGet()->getNumVertices());
 
 	representation->update(1.0);
-	EXPECT_EQ(0, representation->getParticles().unsafeGet().getNumVertices());
-	EXPECT_EQ(0, representation->getParticles().safeGet()->getNumVertices());
+	EXPECT_EQ(0u, representation->getParticles().unsafeGet().getNumVertices());
+	EXPECT_EQ(0u, representation->getParticles().safeGet()->getNumVertices());
 
 	representation->update(1.0);
-	EXPECT_EQ(0, representation->getParticles().unsafeGet().getNumVertices());
-	EXPECT_EQ(0, representation->getParticles().safeGet()->getNumVertices());
+	EXPECT_EQ(0u, representation->getParticles().unsafeGet().getNumVertices());
+	EXPECT_EQ(0u, representation->getParticles().safeGet()->getNumVertices());
 }
 
 }; // namespace Particles

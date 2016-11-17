@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -135,11 +135,11 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	setInitialState(m_localInitialState);
 	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(getNumDof()),
 							static_cast<SparseMatrix::Index>(getNumDof()));
-	EXPECT_EQ(getNumDof(), getExternalGeneralizedForce().size());
-	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().rows());
-	EXPECT_EQ(getNumDof(), getExternalGeneralizedStiffness().cols());
-	EXPECT_EQ(getNumDof(), getExternalGeneralizedDamping().rows());
-	EXPECT_EQ(getNumDof(), getExternalGeneralizedDamping().cols());
+	EXPECT_EQ(static_cast<Vector::Index>(getNumDof()), getExternalGeneralizedForce().size());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(getNumDof()), getExternalGeneralizedStiffness().rows());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(getNumDof()), getExternalGeneralizedStiffness().cols());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(getNumDof()), getExternalGeneralizedDamping().rows());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(getNumDof()), getExternalGeneralizedDamping().cols());
 	EXPECT_TRUE(getExternalGeneralizedForce().isZero());
 	EXPECT_TRUE(getExternalGeneralizedStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(getExternalGeneralizedDamping().isApprox(zeroMatrix));
@@ -185,7 +185,7 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_TRUE(*getFinalState()    == *m_localInitialState);
 
 	// Test getNumDofPerNode
-	EXPECT_EQ(3, getNumDofPerNode());
+	EXPECT_EQ(3u, getNumDofPerNode());
 
 	// Test getNumDof (needs to be tested after setInitialState has been called)
 	EXPECT_EQ(getNumDofPerNode() * numNodes, getNumDof());

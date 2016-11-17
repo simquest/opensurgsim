@@ -104,9 +104,9 @@ TEST(SceneTest, Removal)
 	scene->addSceneElement(std::make_shared<MockSceneElement>("element2"));
 	scene->addSceneElement(std::make_shared<MockSceneElement>("element3"));
 
-	EXPECT_EQ(3L, scene->getSceneElements().size());
+	EXPECT_EQ(3u, scene->getSceneElements().size());
 	EXPECT_NO_THROW(scene->removeSceneElement(scene->getSceneElement("element1")));
-	EXPECT_EQ(2L, scene->getSceneElements().size());
+	EXPECT_EQ(2u, scene->getSceneElements().size());
 }
 
 TEST(SceneTest, CheckForExpiredRuntime)
@@ -203,20 +203,20 @@ TEST(SceneTest, SceneElementGroups)
 
 	scene->addSceneElement(element1);
 
-	EXPECT_EQ(1L, groups.getGroups().size());
+	EXPECT_EQ(1u, groups.getGroups().size());
 	EXPECT_TRUE(doesContain(groups.getGroups(), "One"));
 	EXPECT_TRUE(doesContain(groups.getMembers("One"), element1));
 
 	scene->addSceneElement(element2);
-	EXPECT_EQ(1L, groups.getGroups().size());
+	EXPECT_EQ(1u, groups.getGroups().size());
 
 	element2->addToGroup("Two");
-	EXPECT_EQ(2L, groups.getGroups().size());
+	EXPECT_EQ(2u, groups.getGroups().size());
 	EXPECT_TRUE(doesContain(groups.getGroups(), "Two"));
 	EXPECT_TRUE(doesContain(groups.getMembers("Two"), element2));
 
 	element1->removeFromGroup("One");
-	EXPECT_EQ(1L, groups.getGroups().size());
+	EXPECT_EQ(1u, groups.getGroups().size());
 	EXPECT_TRUE(doesContain(groups.getGroups(), "Two"));
 	EXPECT_TRUE(doesContain(groups.getMembers("Two"), element2));
 
@@ -228,8 +228,7 @@ TEST(SceneTest, SceneElementGroups)
 	groupNames.push_back("Four");
 
 	element1->setGroups(groupNames);
-	EXPECT_EQ(4L, groups.getGroups().size());
-
+	EXPECT_EQ(4u, groups.getGroups().size());
 }
 
 }

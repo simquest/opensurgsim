@@ -1,4 +1,4 @@
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ TEST_F(BuildMlcpTests, NoRepresentationNoConstraintTest)
 	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
 
 	// Test that the Mlcp is as expected
-	EXPECT_EQ(0, mlcpProblem.getSize());
+	EXPECT_EQ(0u, mlcpProblem.getSize());
 	EXPECT_EQ(0, mlcpProblem.A.rows());
 	EXPECT_EQ(0, mlcpProblem.A.cols());
 	EXPECT_EQ(0, mlcpProblem.b.rows());
@@ -84,7 +84,7 @@ TEST_F(BuildMlcpTests, OneRepresentationNoConstraintTest)
 	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
 
 	// Test that the Mlcp is as expected
-	EXPECT_EQ(0, mlcpProblem.getSize());
+	EXPECT_EQ(0u, mlcpProblem.getSize());
 	EXPECT_EQ(0, mlcpProblem.A.rows());
 	EXPECT_EQ(0, mlcpProblem.A.cols());
 	EXPECT_EQ(0, mlcpProblem.b.rows());
@@ -116,7 +116,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsNoConstraintTest)
 	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
 
 	// Test that the Mlcp is as expected
-	EXPECT_EQ(0, mlcpProblem.getSize());
+	EXPECT_EQ(0u, mlcpProblem.getSize());
 	EXPECT_EQ(0, mlcpProblem.A.rows());
 	EXPECT_EQ(0, mlcpProblem.A.cols());
 	EXPECT_EQ(0, mlcpProblem.b.rows());
@@ -132,7 +132,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsNoConstraintTest)
 	EXPECT_EQ(12, mlcpSolution.dofCorrection.rows());
 
 	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
-	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+	EXPECT_EQ(static_cast<int>(m_allRepresentations[0]->getNumDof()),
 			  m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[1].get()));
 }
 
@@ -172,7 +172,7 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
 
 	// Test that the Mlcp is as expected
-	EXPECT_EQ(1, mlcpProblem.getSize());
+	EXPECT_EQ(1u, mlcpProblem.getSize());
 	EXPECT_EQ(1, mlcpProblem.A.rows());
 	EXPECT_EQ(1, mlcpProblem.A.cols());
 	EXPECT_EQ(1, mlcpProblem.b.rows());
@@ -189,7 +189,7 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
 
 	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
-	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+	EXPECT_EQ(static_cast<int>(m_allRepresentations[0]->getNumDof()),
 			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
 	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
 }
@@ -235,7 +235,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
 
 	// Test that the Mlcp is as expected
-	EXPECT_EQ(3, mlcpProblem.getSize());
+	EXPECT_EQ(3u, mlcpProblem.getSize());
 	EXPECT_EQ(3, mlcpProblem.A.rows());
 	EXPECT_EQ(3, mlcpProblem.A.cols());
 	EXPECT_EQ(3, mlcpProblem.b.rows());
@@ -252,7 +252,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
 
 	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
-	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+	EXPECT_EQ(static_cast<int>(m_allRepresentations[0]->getNumDof()),
 			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
 	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
 }
@@ -308,7 +308,7 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
 
 	// Test that the Mlcp is as expected
-	EXPECT_EQ(2, mlcpProblem.getSize());
+	EXPECT_EQ(2u, mlcpProblem.getSize());
 	EXPECT_EQ(2, mlcpProblem.A.rows());
 	EXPECT_EQ(2, mlcpProblem.A.cols());
 	EXPECT_EQ(2, mlcpProblem.b.rows());
@@ -326,10 +326,10 @@ TEST_F(BuildMlcpTests, OneRepresentationTwoConstraintsTest)
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
 
 	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
-	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+	EXPECT_EQ(static_cast<int>(m_allRepresentations[0]->getNumDof()),
 			  m_physicsManagerState->getRepresentationsMapping().getValue(m_fixedWorldRepresentation.get()));
 	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
-	EXPECT_EQ(m_usedConstraints[0]->getNumDof(),
+	EXPECT_EQ(static_cast<int>(m_usedConstraints[0]->getNumDof()),
 			  m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[1].get()));
 }
 
@@ -389,7 +389,7 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
 
 	// Test that the Mlcp is as expected
-	EXPECT_EQ(2, mlcpProblem.getSize());
+	EXPECT_EQ(2u, mlcpProblem.getSize());
 	EXPECT_EQ(2, mlcpProblem.A.rows());
 	EXPECT_EQ(2, mlcpProblem.A.cols());
 	EXPECT_EQ(2, mlcpProblem.b.rows());
@@ -412,10 +412,10 @@ TEST_F(BuildMlcpTests, TwoRepresentationsTwoConstraintsTest)
 	EXPECT_EQ(12, mlcpSolution.dofCorrection.rows());
 
 	EXPECT_EQ(0, m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[0].get()));
-	EXPECT_EQ(m_allRepresentations[0]->getNumDof(),
+	EXPECT_EQ(static_cast<int>(m_allRepresentations[0]->getNumDof()),
 			  m_physicsManagerState->getRepresentationsMapping().getValue(m_allRepresentations[1].get()));
 	EXPECT_EQ(0, m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[0].get()));
-	EXPECT_EQ(m_usedConstraints[0]->getNumDof(),
+	EXPECT_EQ(static_cast<int>(m_usedConstraints[0]->getNumDof()),
 			  m_physicsManagerState->getConstraintsMapping().getValue(m_usedConstraints[1].get()));
 }
 

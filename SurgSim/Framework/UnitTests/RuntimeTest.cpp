@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -255,7 +255,7 @@ TEST(RuntimeTest, LoadAndAddScene)
 	auto scene0 = runtime->getScene();
 
 	EXPECT_NE(nullptr, scene0);
-	EXPECT_EQ(2L, scene0->getSceneElements().size());
+	EXPECT_EQ(2u, scene0->getSceneElements().size());
 
 	EXPECT_NO_THROW(runtime->loadScene("SceneTestData/scene.yaml"));
 
@@ -271,7 +271,7 @@ TEST(RuntimeTest, LoadAndAddScene)
 	EXPECT_NE(nullptr, scene2);
 	EXPECT_EQ(scene1, scene2);
 
-	EXPECT_EQ(4L, scene2->getSceneElements().size());
+	EXPECT_EQ(4u, scene2->getSceneElements().size());
 }
 
 TEST(RuntimeTest, LoadAndDuplicate)
@@ -283,8 +283,8 @@ TEST(RuntimeTest, LoadAndDuplicate)
 	auto elements0 = runtime->duplicateSceneElements("SceneTestData/element.yaml");
 	auto elements1 = runtime->duplicateSceneElements("SceneTestData/element.yaml");
 
-	EXPECT_EQ(1L, elements0.size());
-	EXPECT_EQ(1L, elements1.size());
+	EXPECT_EQ(1u, elements0.size());
+	EXPECT_EQ(1u, elements1.size());
 
 	// Without the correct cloning, both of these elements would point to the same instance which would be bad
 
@@ -313,7 +313,7 @@ TEST(RuntimeTest, ManagerAccess)
 	auto runtime = std::make_shared<Runtime>();
 
 	auto managers = runtime->getManagers();
-	EXPECT_EQ(0L, managers.size());
+	EXPECT_EQ(0u, managers.size());
 
 	auto manager1 = std::make_shared<MockManager>();
 	auto manager2 = std::make_shared<MockManager>();
@@ -322,7 +322,7 @@ TEST(RuntimeTest, ManagerAccess)
 	runtime->addManager(manager2);
 
 	managers = runtime->getManagers();
-	EXPECT_EQ(2L, managers.size());
+	EXPECT_EQ(2u, managers.size());
 }
 
 TEST(RuntimeTest, TypedManagerAccess)

@@ -416,7 +416,7 @@ TYPED_TEST(AllVectorTests, YamlConvert)
 	ASSERT_NO_THROW(node = original);
 
 	EXPECT_TRUE(node.IsSequence());
-	EXPECT_EQ(original.size(), node.size());
+	EXPECT_EQ(original.size(), static_cast<typename Vector::Index>(node.size()));
 
 	ASSERT_NO_THROW({Vector expected = node.as<Vector>();});
 	EXPECT_TRUE(original.isApprox(node.as<Vector>()));

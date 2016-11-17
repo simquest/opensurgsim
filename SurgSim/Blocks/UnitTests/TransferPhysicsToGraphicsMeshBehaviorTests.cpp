@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -180,7 +180,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, MappingAccessors)
 	// SetValue with pair
 	ASSERT_NO_THROW(behavior->setValue("IndexMapMeshNames", names));
 	indices = behavior->getValue<std::vector<std::pair<size_t, size_t>>>("IndexMap");
-	EXPECT_EQ(4, indices.size());
+	EXPECT_EQ(4u, indices.size());
 
 	// SetValue with pair of meshes
 	std::shared_ptr<Framework::Asset> mesh1 = std::make_shared<DataStructures::TriangleMeshPlain>();
@@ -231,7 +231,7 @@ TEST(TransferPhysicsToGraphicsMeshBehaviorTests, Mapping)
 	{
 		++counts[pair.first];
 		// Nothing should refer to the first vertex
-		EXPECT_NE(0, pair.second);
+		EXPECT_NE(0u, pair.second);
 	}
 
 	EXPECT_EQ(0u, counts[0]);

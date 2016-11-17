@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ TYPED_TEST(AllRigidTransformTests, YamlConvert)
 	ASSERT_NO_THROW(node = transform);
 
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(2, node.size());
+	EXPECT_EQ(2u, node.size());
 
 	Transform expected;
 

@@ -79,7 +79,7 @@ TEST(FunctionBehaviorTest, Update)
 
 	behavior->update(1.0);
 	behavior->update(1.0);
-	EXPECT_EQ(2, numUpdates);
+	EXPECT_EQ(2u, numUpdates);
 }
 
 TEST(FunctionBehaviorTest, ExampleUsage)
