@@ -75,10 +75,10 @@ protected:
 private:
 	/// The contact tolerance.
 	/// \sa MlcpGaussSeidelSolver::m_contactTolerance
-	double m_contactTolerance = 1e300;
+	double m_contactTolerance;
 
 	/// If true, does not push MLCP results if any contact is outside of the tolerance.
-	bool m_discardBadResults = false;
+	bool m_discardBadResults;
 };
 
 }; // namespace Physics

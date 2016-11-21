@@ -29,7 +29,9 @@ namespace Physics
 
 PushResults::PushResults(bool doCopyState) :
 	Computation(doCopyState),
-	m_logger(SurgSim::Framework::Logger::getLogger("Physics/PushResults"))
+	m_logger(Framework::Logger::getLogger("Physics/PushResults")),
+	m_contactTolerance(std::numeric_limits<double>::max()),
+	m_discardBadResults(false)
 {
 }
 
