@@ -321,7 +321,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 				SURGSIM_LOG_WARNING(Framework::Logger::getLogger("TriangleMeshTriangleMeshContact")) <<
 					"The triangle mesh contains a degenerate triangle (null normal)";
 			}
-			
+
 			Math::Vector3d t2n = ((t2v1.first - t2v0.first).cross(t2v2.first - t2v0.first));
 			if (t2n.norm() < Math::Geometry::DistanceEpsilon)
 			{
@@ -331,7 +331,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 
 			t1n.normalize();
 			t2n.normalize();
-			
+
 			// Check collision at time t = 0
 			Math::Vector3d pt1;
 			Math::Vector3d pt2;
@@ -598,19 +598,19 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 
 			Math::Vector3d T1, T2, normal;
 			double penentrationDepthAtT1;
-			
+
 			Math::Vector3d t1T0T1 = t1v1.second - t1v0.second;
 			Math::Vector3d t1T0T2 = t1v2.second - t1v0.second;
-			T1 = t1v0.second + triangle2Alpha * t1T0T1 + triangle2Beta * t1T0T2;
-			
+			T1 = t1v0.second + triangle1Alpha * t1T0T1 + triangle1Beta * t1T0T2;
+
 			Math::Vector3d t2T0T1 = t2v1.second - t2v0.second;
 			Math::Vector3d t2T0T2 = t2v2.second - t2v0.second;
 			T2 = t2v0.second + triangle2Alpha * t2T0T1 + triangle2Beta * t2T0T2;
 
 			normal = (segmentSegmentCcdFound) ? (T1 - T2).normalized() :
 				((t1VertexThroughT2) ? t2T0T1.cross(t2T0T2).normalized() : -t1T0T1.cross(t1T0T2).normalized());
-			penentrationDepthAtT1 = (T2 - T1).dot(normal);
-			
+			penentrationDepthAtT1 = std::abs((T2 - T1).dot(normal));
+
 			Math::Vector triangle1BaryCoord(3);
 			triangle1BaryCoord << 1.0 - triangle1Alpha - triangle1Beta, triangle1Alpha, triangle1Beta;
 			DataStructures::IndexedLocalCoordinate localCoordinateTriangle1(triangle1Id, triangle1BaryCoord);
@@ -635,7 +635,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			locationTriangle2.elementMeshLocalCoordinate = locationTriangle2.triangleMeshLocalCoordinate;
 			// The location related to the TriangleMesh can carry a RIGID LOCAL POSITION information
 			// e.g. part of a rigid body
-			locationTriangle2.rigidLocalPosition = pose2AtTime1.inverse() * T1;
+			locationTriangle2.rigidLocalPosition = pose2AtTime1.inverse() * T2;
 
 			auto contact = std::make_shared<Contact>(
 				COLLISION_DETECTION_TYPE_CONTINUOUS,
