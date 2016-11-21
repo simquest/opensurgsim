@@ -210,6 +210,7 @@ TEST_F(PushResultsTests, DiscardBadResultsTest)
 		mlcpProblem.A(0, 0) = 0.174;
 		mlcpSolution.x(0) = 1.3;
 		mlcpProblem.b(0) = violation - mlcpProblem.A(0, 0) * mlcpSolution.x(0);
+		mlcpSolution.epsilonConvergence = 1e-4;
 	}
 
 	ASSERT_FALSE(m_pushResultsComputation->isDiscardBadResults());
