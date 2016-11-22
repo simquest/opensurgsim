@@ -1,6 +1,15 @@
 # Copyright 2016 SimQuest Solutions
 """Module to add FEM exporting to Blender"""
 
+from mathutils import Matrix
+import bpy
+import bmesh
+from bpy.props import (StringProperty,
+                       BoolProperty,
+                       EnumProperty,
+                      )
+from bpy_extras.io_utils import (ExportHelper)
+
 bl_info = {
     "name": "OpenSurgSim FEM PLY format",
     "author": "Ryan Kornheisl, Paul Novotny",
@@ -8,14 +17,6 @@ bl_info = {
     "description": "Export FEM PLY mesh data for use with OpenSurgSim",
     "support": 'COMMUNITY',
     "category": "Import-Export"}
-
-from mathutils import Matrix
-import bpy
-from bpy.props import (StringProperty,
-                       BoolProperty,
-                       EnumProperty,
-                      )
-from bpy_extras.io_utils import (ExportHelper)
 
 class ExportPLY(bpy.types.Operator, ExportHelper):
     """Export a single object as a PLY file for use as an FEM in OpenSurgSim"""
@@ -58,6 +59,7 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
 
     @classmethod
     def poll(cls, context):
+        """Check for active object"""
         return context.active_object is not None
 
     def execute(self, context):
@@ -93,6 +95,23 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
         row.prop(self, "meshpy")
 
 
+def check_for_holes(mesh):
+    """Checks for non-manifold elements (aka holes)
+
+       Return True if there are holes
+    """
+    if bpy.context.mode != 'EDIT_MESH':
+        bpy.ops.object.mode_set(mode='EDIT')
+
+    blender_mesh = bmesh.from_edit_mesh(mesh)
+    for elem in getattr(blender_mesh, 'edges'):
+        if not elem.is_manifold:
+            bpy.ops.object.mode_set(mode='OBJECT')
+            return True
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    return False
+
 def export_fem_save(operator,
                     context,
                     use_graphics,
@@ -105,6 +124,11 @@ def export_fem_save(operator,
                    ):
     """Preps a copy of the mesh for exporting"""
     blender_object = context.active_object
+
+    if fem_dimensions == '3':
+        if check_for_holes(blender_object.data):
+            operator.report({'ERROR'}, "You cannot export an FEM 3D from a mesh that is not closed")
+            return {'CANCELLED'}
 
     if bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -147,8 +171,9 @@ def save_mesh(filepath,
              ):
     """Write mesh data out to ply file
 
-       If graphics are checked to be exported, it will prep any UVs it can and prepare a full list of faces
-       FEM3D meshes have their mesh run through MeshPy which is a Python interface for TetGen
+       If graphics are checked to be exported, it will prep any UVs and normals it can and prepare
+       a full list of faces FEM3D meshes have their mesh run through MeshPy which is a Python
+       interface for TetGen
     """
 
     file = open(filepath, "w", encoding="utf8", newline="\n")
@@ -158,6 +183,7 @@ def save_mesh(filepath,
     faces = []
     elements = []
     uvcoords = {}
+    normals = {}
 
     has_uv = bool(mesh.uv_textures) and mesh.uv_textures.active
     if has_uv and use_graphics:
@@ -167,10 +193,12 @@ def save_mesh(filepath,
             uv = uv_data[i].uv1, uv_data[i].uv2, uv_data[i].uv3, uv_data[i].uv4
             for j, vert in enumerate(polygon.vertices):
                 uvcoord = uv[j][0], uv[j][1]
-
+                normal = mesh.vertices[vert].normal[:]
                 vertcoord = mesh.vertices[vert].co[:]
                 if vertcoord not in uvcoords:
                     uvcoords[vertcoord] = uvcoord
+                if vertcoord not in normals:
+                    normals[vertcoord] = normal
 
     if fem_dimensions == '3':
         from meshpy.tet import MeshInfo, build, Options
@@ -223,7 +251,7 @@ def save_mesh(filepath,
     fwrite("ply\n")
     fwrite("format ascii 1.0\n")
     fwrite("comment Created by OpenSurgSim FEM exporter for Blender\n")
-    fwrite("MeshPy options '%s'" % meshpy)
+    fwrite("MeshPy options '%s'\n" % meshpy)
 
     fwrite("element vertex %d\n" % len(verts))
     fwrite("property double x\n"
@@ -232,6 +260,10 @@ def save_mesh(filepath,
 
     if use_graphics:
         if fem_dimensions != '1':
+            if normals:
+                fwrite("property double nx\n"
+                       "property double ny\n"
+                       "property double nz\n")
             if has_uv:
                 fwrite("property double s\n"
                        "property double t\n")
@@ -262,6 +294,8 @@ def save_mesh(filepath,
         if use_graphics:
             for vert in verts:
                 fwrite("%.6f %.6f %.6f" % vert[:])
+                if vert in normals:
+                    fwrite(" %.6f %.6f %.6f" % normals[vert][:])
                 if has_uv and vert in uvcoords:
                     fwrite(" %.6f %.6f" % uvcoords[vert][:])
                 fwrite("\n")
