@@ -1,4 +1,5 @@
 # Copyright 2016 SimQuest Solutions
+"""Module to add FEM exporting to Blender"""
 
 bl_info = {
     "name": "OpenSurgSim FEM PLY format",
@@ -8,18 +9,13 @@ bl_info = {
     "support": 'COMMUNITY',
     "category": "Import-Export"}
 
-import os
 from mathutils import Matrix
 import bpy
-from bpy.props import (CollectionProperty,
-                       StringProperty,
+from bpy.props import (StringProperty,
                        BoolProperty,
                        EnumProperty,
-                       FloatProperty,
-                       )
-from bpy_extras.io_utils import (ExportHelper,
-                                 axis_conversion,
-                                 )
+                      )
+from bpy_extras.io_utils import (ExportHelper)
 
 class ExportPLY(bpy.types.Operator, ExportHelper):
     """Export a single object as a PLY file for use as an FEM in OpenSurgSim"""
@@ -32,26 +28,43 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
 
     use_graphics = BoolProperty(
         name="Export Graphics",
-        description="Include data for graphics meshes",
+        description="Include data for faces and uv coordinates",
         default=False,
     )
     fem_dimensions = EnumProperty(
-        name="FEM",
+        name="Dimension",
         items=(('1', "FEM 1D", ""),
                ('2', "FEM 2D", ""),
                ('3', "FEM 3D", ""),
-               ),
+              ),
         default='2',
+    )
+    mass_density = StringProperty(
+        name="Mass Density",
+        default="900.0"
+    )
+    poisson_ratio = StringProperty(
+        name="Poisson Ratio",
+        default="0.45"
+    )
+    young_modulus = StringProperty(
+        name="Young Modulus",
+        default="1.75e9"
+    )
+    meshpy = StringProperty(
+        name="MeshPy Options",
+        default="pq1.5a5MY"
     )
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None
+        return context.active_object is not None
 
     def execute(self, context):
+        """Execute save"""
         keywords = self.as_keywords(ignore=("check_existing",
                                             "filter_glob",
-                                            ))
+                                           ))
 
         filepath = self.filepath
         filepath = bpy.path.ensure_ext(filepath, self.filename_ext)
@@ -59,6 +72,7 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
         return export_fem_save(self, context, **keywords)
 
     def draw(self, context):
+        """Creates options UI in save dialog"""
         layout = self.layout
 
         row = layout.row()
@@ -66,58 +80,102 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
 
         layout.prop(self, "fem_dimensions")
 
+        row = layout.row()
+        row.prop(self, "mass_density")
+
+        row = layout.row()
+        row.prop(self, "poisson_ratio")
+
+        row = layout.row()
+        row.prop(self, "young_modulus")
+
+        row = layout.row()
+        row.prop(self, "meshpy")
+
 
 def export_fem_save(operator,
                     context,
+                    use_graphics,
                     fem_dimensions,
+                    mass_density,
+                    poisson_ratio,
+                    young_modulus,
+                    meshpy,
                     filepath="",
-                    use_graphics=False,
-                    ):
-
-    scene = context.scene
-    object = context.active_object
+                   ):
+    """Preps a copy of the mesh for exporting"""
+    blender_object = context.active_object
 
     if bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode='OBJECT')
 
-    mesh = object.data.copy()
+    mesh = blender_object.data.copy()
 
     if not mesh:
         raise Exception("Error, could not get mesh data from active object")
 
+    if fem_dimensions == '1':
+        use_graphics = False
+
     if use_graphics:
         mesh.calc_normals()
 
-    mesh.transform(Matrix() * object.matrix_world)
+    mesh.transform(Matrix() * blender_object.matrix_world)
 
-    ret = save_mesh(filepath, mesh, object.get('boundary_condition'),
+    ret = save_mesh(filepath, mesh, blender_object.get('boundary_condition'),
+                    use_graphics,
                     fem_dimensions,
-                    use_graphics=use_graphics,
-                    )
+                    mass_density,
+                    poisson_ratio,
+                    young_modulus,
+                    meshpy,
+                   )
 
     bpy.data.meshes.remove(mesh)
 
     return ret
 
-
 def save_mesh(filepath,
               mesh,
               boundary_condition,
+              use_graphics,
               fem_dimensions,
-              use_graphics=False,
-              ):
+              mass_density,
+              poisson_ratio,
+              young_modulus,
+              meshpy
+             ):
+    """Write mesh data out to ply file
+
+       If graphics are checked to be exported, it will prep any UVs it can and prepare a full list of faces
+       FEM3D meshes have their mesh run through MeshPy which is a Python interface for TetGen
+    """
 
     file = open(filepath, "w", encoding="utf8", newline="\n")
-    fw = file.write
+    fwrite = file.write
 
     verts = []
     faces = []
     elements = []
+    uvcoords = {}
+
+    has_uv = bool(mesh.uv_textures) and mesh.uv_textures.active
+    if has_uv and use_graphics:
+        mesh.calc_tessface()
+        uv_data = mesh.tessface_uv_textures.active.data
+        for i, polygon in enumerate(mesh.polygons):
+            uv = uv_data[i].uv1, uv_data[i].uv2, uv_data[i].uv3, uv_data[i].uv4
+            for j, vert in enumerate(polygon.vertices):
+                uvcoord = uv[j][0], uv[j][1]
+
+                vertcoord = mesh.vertices[vert].co[:]
+                if vertcoord not in uvcoords:
+                    uvcoords[vertcoord] = uvcoord
 
     if fem_dimensions == '3':
         from meshpy.tet import MeshInfo, build, Options
 
-        bpy.ops.object.mode_set(mode = 'OBJECT', toggle = False)
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
         bpy.context.scene.update()
 
         # get list of verts and faces direct from mesh
@@ -129,17 +187,17 @@ def save_mesh(filepath,
         for face in mesh.polygons:
             mesh_faces.append(face.vertices[:])
 
-        args = "pq1.5a5MY";
+        args = meshpy
         mesh_info = MeshInfo()
         mesh_info.set_points(mesh_verts)
         mesh_info.set_facets(mesh_faces)
         tets = build(mesh_info, Options(args),
-                     verbose = True,
-                     attributes = False,
-                     volume_constraints = False,
-                     max_volume = None,
-                     diagnose = False,
-                     insert_points = None)
+                     verbose=True,
+                     attributes=False,
+                     volume_constraints=False,
+                     max_volume=None,
+                     diagnose=False,
+                     insert_points=None)
 
         # Ply prep by creating updated vert list and face list using tets.points and tets.elements
         for point in tets.points:
@@ -162,66 +220,75 @@ def save_mesh(filepath,
                 faces.append((face.vertices[0], face.vertices[1], face.vertices[2]))
                 faces.append((face.vertices[0], face.vertices[2], face.vertices[3]))
 
-    fw("ply\n")
-    fw("format ascii 1.0\n")
-    fw("comment Created by Blender %s - "
-       "www.blender.org, source file: %r\n" %
-       (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
+    fwrite("ply\n")
+    fwrite("format ascii 1.0\n")
+    fwrite("comment Created by OpenSurgSim FEM exporter for Blender\n")
+    fwrite("MeshPy options '%s'" % meshpy)
 
-    fw("element vertex %d\n" % len(verts))
-    fw("property double x\n"
-       "property double y\n"
-       "property double z\n")
+    fwrite("element vertex %d\n" % len(verts))
+    fwrite("property double x\n"
+           "property double y\n"
+           "property double z\n")
 
     if use_graphics:
         if fem_dimensions != '1':
-            fw("element face %d\n" % len(faces))
-            fw("property list uint uint vertex_indices\n")
+            if has_uv:
+                fwrite("property double s\n"
+                       "property double t\n")
+            fwrite("element face %d\n" % len(faces))
+            fwrite("property list uint uint vertex_indices\n")
 
     if fem_dimensions == '1':
-        fw("element 1d_element %d\n" % vert_count-1)
-        fw("property list uint uint vertex_indices\n")
+        fwrite("element 1d_element %d\n" % len(mesh.vertices)-1)
+        fwrite("property list uint uint vertex_indices\n")
     elif fem_dimensions == '2':
-        fw("element 2d_element %d\n" % len(faces))
-        fw("property list uint uint vertex_indices\n")
+        fwrite("element 2d_element %d\n" % len(faces))
+        fwrite("property list uint uint vertex_indices\n")
     elif fem_dimensions == '3':
-        fw("element 3d_element %d\n" % len(elements))
-        fw("property list uint uint vertex_indices\n")
+        fwrite("element 3d_element %d\n" % len(elements))
+        fwrite("property list uint uint vertex_indices\n")
+
+    fwrite("element material 1\n")
+    fwrite("property double mass_density\n")
+    fwrite("property double poisson_ratio\n")
+    fwrite("property double young_modulus\n")
 
     if boundary_condition is not None:
-        fw("element boundary_condition %d\n" % len(boundary_condition))
-        fw("property uint vertex_index\n")
-    fw("end_header\n")
+        fwrite("element boundary_condition %d\n" % len(boundary_condition))
+        fwrite("property uint vertex_index\n")
+    fwrite("end_header\n")
 
     if fem_dimensions != '1':
         if use_graphics:
             for vert in verts:
-                fw("%.6f %.6f %.6f\n" % vert[:])
+                fwrite("%.6f %.6f %.6f" % vert[:])
+                if has_uv and vert in uvcoords:
+                    fwrite(" %.6f %.6f" % uvcoords[vert][:])
+                fwrite("\n")
             for face in faces:
-                if len(face) == 3:
-                    fw("3 %d %d %d\n" % face[:])
-                else:
-                    fw("4 %d %d %d %d\n" % face[:])
+                fwrite("3 %d %d %d\n" % face[:])
         else:
             for vert in verts:
-                fw("%.6f %.6f %.6f" % vert[:])
+                fwrite("%.6f %.6f %.6f\n" % vert[:])
     else:
         for vert in mesh.vertices:
-            fw("%.6f %.6f %.6f\n" % vert.co[:])
+            fwrite("%.6f %.6f %.6f\n" % vert.co[:])
 
     if fem_dimensions is '1':
-        for i in (len(mesh.vertices)-1):
-            fw("2 %d %d\n" % list(i, i+1))
+        for i in len(mesh.vertices)-1:
+            fwrite("2 %d %d\n" % list(i, i+1))
     elif fem_dimensions is '2':
         for face in faces:
-            fw("3 %d %d %d\n" % face[:])
+            fwrite("3 %d %d %d\n" % face[:])
     elif fem_dimensions is '3':
         for tet in elements:
-            fw("4 %d %d %d %d\n" % tet[:])
+            fwrite("4 %d %d %d %d\n" % tet[:])
+
+    fwrite("%s %s %s\n" % (mass_density, poisson_ratio, young_modulus))
 
     if boundary_condition is not None:
-        for bc in boundary_condition:
-            fw("%d\n" % bc)
+        for index in boundary_condition:
+            fwrite("%d\n" % index)
 
     file.close()
     print("writing %r done" % filepath)
@@ -230,16 +297,19 @@ def save_mesh(filepath,
 
 
 def menu_func_export(self, context):
+    """Adds menu item to Blender"""
     self.layout.operator(ExportPLY.bl_idname, text="OpenSurgSim FEM (.ply)")
 
 
 def register():
+    """Registers addon with Blender"""
     bpy.utils.register_module(__name__)
 
     bpy.types.INFO_MT_file_export.append(menu_func_export)
 
 
 def unregister():
+    """Unregisters addon with Blender"""
     bpy.utils.unregister_module(__name__)
 
     bpy.types.INFO_MT_file_export.remove(menu_func_export)
