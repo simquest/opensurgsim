@@ -28,8 +28,7 @@ namespace
 
 struct Contains
 {
-
-	Contains(const std::shared_ptr<Component>& component) :
+	explicit Contains(const std::shared_ptr<Component>& component) :
 		receiver(component)
 	{
 
