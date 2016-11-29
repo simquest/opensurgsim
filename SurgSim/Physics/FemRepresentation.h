@@ -103,7 +103,7 @@ public:
 	/// Determines whether the associated coordinate is valid
 	/// \param coordinate Coordinate to check
 	/// \return True if coordinate is valid
-	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const;
+	virtual bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)

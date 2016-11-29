@@ -77,6 +77,13 @@ double Timer::getCumulativeTime() const
 	return cumulativeTime.count();
 }
 
+double Timer::getCurrentTime()
+{
+	TimerTimePoint currentTime = now();
+	TimerDuration duration = currentTime - m_lastTime;
+	return duration.count();
+}
+
 double Timer::getAverageFramePeriod() const
 {
 	TimerDuration cumulativeTime;

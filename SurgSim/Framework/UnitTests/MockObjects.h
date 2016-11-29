@@ -147,11 +147,14 @@ public:
 	bool getSucceedWithWakeUp() const;
 	void setSucceedWithWakeUp(bool val);
 
+	void eventCallback(const SurgSim::Framework::Messenger::Event& event);
+
 	bool succeedWithInit;
 	bool succeedWithWakeUp;
 	bool didWakeUp;
 	bool didInit;
 	bool didRetire;
+	bool didCallback;
 };
 
 class MockBehavior : public SurgSim::Framework::Behavior
