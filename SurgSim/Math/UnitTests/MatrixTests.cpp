@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -454,7 +454,7 @@ TYPED_TEST(AllMatrixTests, YamlConvert)
 	ASSERT_NO_THROW(node = matrix);
 
 	EXPECT_TRUE(node.IsSequence());
-	EXPECT_EQ(matrix.rows(), node.size());
+	EXPECT_EQ(matrix.rows(), static_cast<typename Matrix::Index>(node.size()));
 
 	ASSERT_NO_THROW({Matrix expected = node.as<Matrix>();});
 	EXPECT_TRUE(matrix.isApprox(node.as<Matrix>()));

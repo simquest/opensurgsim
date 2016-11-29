@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2015, SimQuest Solutions Inc.
+// Copyright 2015-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ TEST(KeyboardCallbackBehavior, Serialization)
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<Component>::encode(*keyboardCallbackBehavior));
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(5, node[keyboardCallbackBehavior->getClassName()].size());
+	EXPECT_EQ(5u, node[keyboardCallbackBehavior->getClassName()].size());
 
 	std::shared_ptr<KeyboardCallbackBehavior> newKeyboardCallbackBehavior;
 	EXPECT_NO_THROW(newKeyboardCallbackBehavior = std::dynamic_pointer_cast<KeyboardCallbackBehavior>(

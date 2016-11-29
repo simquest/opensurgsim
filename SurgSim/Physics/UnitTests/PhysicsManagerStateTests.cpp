@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,10 +57,10 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	expectedRepresentations.push_back(rigid1);
 	physicsState->setRepresentations(expectedRepresentations);
 	actualRepresentations = physicsState->getRepresentations();
-	ASSERT_EQ(1, actualRepresentations.size());
+	ASSERT_EQ(1u, actualRepresentations.size());
 	EXPECT_EQ(rigid1, actualRepresentations.back());
 	actualCollisionsToPhysicsMap = physicsState->getCollisionToPhysicsMap();
-	EXPECT_EQ(0, actualCollisionsToPhysicsMap.size());
+	EXPECT_EQ(0u, actualCollisionsToPhysicsMap.size());
 
 	// Add a second representation.  This one has a collision representation.
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
@@ -69,12 +69,12 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	expectedRepresentations.push_back(rigid2);
 	physicsState->setRepresentations(expectedRepresentations);
 	actualRepresentations = physicsState->getRepresentations();
-	ASSERT_EQ(2, actualRepresentations.size());
+	ASSERT_EQ(2u, actualRepresentations.size());
 	EXPECT_EQ(rigid2, actualRepresentations.back());
 
 	// check the collisionsToPhysicsMap
 	actualCollisionsToPhysicsMap = physicsState->getCollisionToPhysicsMap();
-	ASSERT_EQ(1, actualCollisionsToPhysicsMap.size());
+	ASSERT_EQ(1u, actualCollisionsToPhysicsMap.size());
 	EXPECT_EQ(rigid2, actualCollisionsToPhysicsMap[collisionRepresentation]);
 }
 
@@ -90,7 +90,7 @@ TEST(PhysicsManagerStateTest, SetGetRepresentationsMapping)
 	physicsState->setRepresentationsMapping(expectedRepresentationsIndexMapping);
 	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
 	std::shared_ptr<Representation> rigid1AsRepresentation = rigid1;
-	EXPECT_EQ(13, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
+	EXPECT_EQ(13u, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
 
 	// Add a second representation.  This one has a collision representation.
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
@@ -100,7 +100,7 @@ TEST(PhysicsManagerStateTest, SetGetRepresentationsMapping)
 	physicsState->setRepresentationsMapping(expectedRepresentationsIndexMapping);
 	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
 	std::shared_ptr<Representation> rigid2AsRepresentation = rigid2;
-	EXPECT_EQ(17, actualRepresentationsIndexMapping.getValue(rigid2AsRepresentation.get()));
+	EXPECT_EQ(17u, actualRepresentationsIndexMapping.getValue(rigid2AsRepresentation.get()));
 }
 
 TEST(PhysicsManagerStateTest, SetGetActiveRepresentations)
@@ -116,7 +116,7 @@ TEST(PhysicsManagerStateTest, SetGetActiveRepresentations)
 
 	// Filter the active representations and test.
 	actualRepresentations = physicsState->getActiveRepresentations();
-	ASSERT_EQ(1, actualRepresentations.size());
+	ASSERT_EQ(1u, actualRepresentations.size());
 	EXPECT_EQ(rigid1, actualRepresentations.back());
 
 	// Add a second representation.  This one has a collision representation.
@@ -128,7 +128,7 @@ TEST(PhysicsManagerStateTest, SetGetActiveRepresentations)
 
 	// Filter the active representations and test.
 	actualRepresentations = physicsState->getActiveRepresentations();
-	ASSERT_EQ(2, actualRepresentations.size());
+	ASSERT_EQ(2u, actualRepresentations.size());
 	EXPECT_EQ(rigid2, actualRepresentations.back());
 }
 
@@ -145,7 +145,7 @@ TEST(PhysicsManagerStateTest, SetGetCollisionRepresentations)
 	expectedRepresentations.push_back(collision1);
 	physicsState->setCollisionRepresentations(expectedRepresentations);
 	actualRepresentations = physicsState->getCollisionRepresentations();
-	ASSERT_EQ(1, actualRepresentations.size());
+	ASSERT_EQ(1u, actualRepresentations.size());
 	EXPECT_EQ(collision1, actualRepresentations.back());
 
 	// Add a second collision representation.
@@ -154,7 +154,7 @@ TEST(PhysicsManagerStateTest, SetGetCollisionRepresentations)
 	expectedRepresentations.push_back(collision2);
 	physicsState->setCollisionRepresentations(expectedRepresentations);
 	actualRepresentations = physicsState->getCollisionRepresentations();
-	ASSERT_EQ(2, actualRepresentations.size());
+	ASSERT_EQ(2u, actualRepresentations.size());
 	EXPECT_EQ(collision2, actualRepresentations.back());
 }
 
@@ -171,7 +171,7 @@ TEST(PhysicsManagerStateTest, SetGetActiveCollisionRepresentations)
 	expectedRepresentations.push_back(collision1);
 	physicsState->setActiveCollisionRepresentations(expectedRepresentations);
 	actualRepresentations = physicsState->getActiveCollisionRepresentations();
-	ASSERT_EQ(1, actualRepresentations.size());
+	ASSERT_EQ(1u, actualRepresentations.size());
 	EXPECT_EQ(collision1, actualRepresentations.back());
 
 	// Add a second collision representation.
@@ -180,7 +180,7 @@ TEST(PhysicsManagerStateTest, SetGetActiveCollisionRepresentations)
 	expectedRepresentations.push_back(collision2);
 	physicsState->setActiveCollisionRepresentations(expectedRepresentations);
 	actualRepresentations = physicsState->getActiveCollisionRepresentations();
-	ASSERT_EQ(2, actualRepresentations.size());
+	ASSERT_EQ(2u, actualRepresentations.size());
 	EXPECT_EQ(collision2, actualRepresentations.back());
 }
 
@@ -195,7 +195,7 @@ TEST(PhysicsManagerStateTest, SetGetCollisionPairs)
 	expectedPairs.push_back(pair1);
 	physicsState->setCollisionPairs(expectedPairs);
 	actualPairs = physicsState->getCollisionPairs();
-	ASSERT_EQ(1, actualPairs.size());
+	ASSERT_EQ(1u, actualPairs.size());
 	EXPECT_EQ(pair1, actualPairs.back());
 
 	// Add a second collision representation.
@@ -203,7 +203,7 @@ TEST(PhysicsManagerStateTest, SetGetCollisionPairs)
 	expectedPairs.push_back(pair2);
 	physicsState->setCollisionPairs(expectedPairs);
 	actualPairs = physicsState->getCollisionPairs();
-	ASSERT_EQ(2, actualPairs.size());
+	ASSERT_EQ(2u, actualPairs.size());
 	EXPECT_EQ(pair2, actualPairs.back());
 }
 
@@ -232,7 +232,7 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	expectedConstraints.push_back(constraint1);
 	physicsState->setConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, expectedConstraints);
 	actualConstraints = physicsState->getConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT);
-	ASSERT_EQ(1, actualConstraints.size());
+	ASSERT_EQ(1u, actualConstraints.size());
 	EXPECT_EQ(constraint1, actualConstraints.back());
 
 	// Create a second constraint.
@@ -244,7 +244,7 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	expectedConstraints.push_back(constraint2);
 	physicsState->setConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT, expectedConstraints);
 	actualConstraints = physicsState->getConstraintGroup(SurgSim::Physics::CONSTRAINT_GROUP_TYPE_CONTACT);
-	ASSERT_EQ(2, actualConstraints.size());
+	ASSERT_EQ(2u, actualConstraints.size());
 	EXPECT_EQ(constraint2, actualConstraints.back());
 }
 
@@ -274,7 +274,7 @@ TEST(PhysicsManagerStateTest, SetGetConstraintsMapping)
 	physicsState->setConstraintsMapping(expectedConstraintsIndexMapping);
 	actualConstraintsIndexMapping = physicsState->getConstraintsMapping();
 	std::shared_ptr<Constraint> constraint1AsConstraint = constraint1;
-	ASSERT_EQ(5, actualConstraintsIndexMapping.getValue(constraint1AsConstraint.get()));
+	ASSERT_EQ(5u, actualConstraintsIndexMapping.getValue(constraint1AsConstraint.get()));
 }
 
 TEST(PhysicsManagerStateTest, SetGetActiveConstraints)
@@ -302,7 +302,7 @@ TEST(PhysicsManagerStateTest, SetGetActiveConstraints)
 	expectedConstraints.push_back(constraint1);
 	physicsState->setActiveConstraints(expectedConstraints);
 	actualConstraints = physicsState->getActiveConstraints();
-	ASSERT_EQ(1, actualConstraints.size());
+	ASSERT_EQ(1u, actualConstraints.size());
 	EXPECT_EQ(constraint1, actualConstraints.back());
 
 	// Create a second constraint.
@@ -314,7 +314,7 @@ TEST(PhysicsManagerStateTest, SetGetActiveConstraints)
 	expectedConstraints.push_back(constraint2);
 	physicsState->setActiveConstraints(expectedConstraints);
 	actualConstraints = physicsState->getActiveConstraints();
-	ASSERT_EQ(2, actualConstraints.size());
+	ASSERT_EQ(2u, actualConstraints.size());
 	EXPECT_EQ(constraint1, actualConstraints.front());
 	EXPECT_EQ(constraint2, actualConstraints.back());
 }

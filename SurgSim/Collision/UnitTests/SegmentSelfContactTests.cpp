@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -443,7 +443,7 @@ TEST_F(SegmentCcdSelfContactTests, GetUniqueCandidates)
 	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
 		= shapeT0->getAabbTree()->spatialJoin(*(shapeT1->getAabbTree()));
 	m_selfContact.getUniqueCandidates(intersectionList, &segmentIdList);
-	EXPECT_EQ(6, segmentIdList.size());
+	EXPECT_EQ(6u, segmentIdList.size());
 	EXPECT_TRUE(std::find(segmentIdList.begin(), segmentIdList.end(),
 						  std::pair<size_t, size_t>(0, 9)) != segmentIdList.end());
 	EXPECT_TRUE(std::find(segmentIdList.begin(), segmentIdList.end(),
@@ -569,7 +569,7 @@ TEST_F(SegmentCcdSelfContactTests, CalculateContact)
 								 *shapeT0, transformP,  // unused for self-collision
 								 *shapeT1, transformQ); // unused for self-collision
 
-		EXPECT_EQ(1, collisionList.size());
+		EXPECT_EQ(1u, collisionList.size());
 		std::shared_ptr<Collision::Contact> contacted = *(collisionList.begin());
 		EXPECT_EQ(CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS, contacted->type);
 		EXPECT_GT(2.0 * m_selfContact.getTimeMinPrecisionEpsilon(), std::abs(contacted->time - 0.4375));

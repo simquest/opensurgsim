@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2014, SimQuest Solutions Inc.
+# Copyright 2014-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 if(NOT GOOGLEMOCK_DIR)
 	find_path(GOOGLEMOCK_DIR
 		NAMES src/gmock.cc
-		PATHS "$ENV{GOOGLEMOCK_DIR}" "/usr/src/gmock/"
+		PATHS "$ENV{GOOGLEMOCK_DIR}" "/usr/src/googletest/googlemock" "/usr/src/gmock/"
 	)
 endif(NOT GOOGLEMOCK_DIR)
 

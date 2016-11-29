@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include "SurgSim/Framework/SamplingMetricBase.h"
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
 
+
 TEST(SamplingMetricBaseTest, SamplingMetricBaseInitTest)
 {
 	std::shared_ptr<MockSamplingMetric> mockMetric(std::make_shared<MockSamplingMetric>("Test Metric"));
@@ -27,11 +28,11 @@ TEST(SamplingMetricBaseTest, SamplingMetricBaseInitTest)
 
 	// Test initialization settings.
 	EXPECT_EQ("Test Metric", mockMetric->getName());
-	EXPECT_EQ(0, samples.size());
-	EXPECT_EQ(0.0, mockMetric->getElapsedTime());
+	EXPECT_EQ(0u, samples.size());
+	EXPECT_NEAR(0.0, mockMetric->getElapsedTime(), 1e-9);
 	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_BEHAVIOR, mockMetric->getTargetManagerType());
 	EXPECT_LT(0u, mockMetric->getMaxNumberOfMeasurements());
-	EXPECT_EQ(0, mockMetric->getCurrentNumberOfMeasurements());
+	EXPECT_EQ(0u, mockMetric->getCurrentNumberOfMeasurements());
 }
 
 TEST(SamplingMetricBaseTest, SetGetTests)
@@ -46,7 +47,7 @@ TEST(SamplingMetricBaseTest, SetGetTests)
 	mockMetric->setTargetManagerType(SurgSim::Framework::MANAGER_TYPE_PHYSICS);
 
 	EXPECT_EQ("Test2", mockMetric->getName());
-	EXPECT_EQ(5, mockMetric->getMaxNumberOfMeasurements());
+	EXPECT_EQ(5u, mockMetric->getMaxNumberOfMeasurements());
 	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_PHYSICS, mockMetric->getTargetManagerType());
 
 }
@@ -63,9 +64,9 @@ TEST(SamplingMetricBaseTest, AbleToPerformMeasurementsTests)
 	}
 	auto samples = mockMetric->getMeasurementValues();
 
-	EXPECT_EQ(5, mockMetric->getCurrentNumberOfMeasurements());
-	EXPECT_EQ(5, samples.size());
-	EXPECT_EQ(45.0, mockMetric->getElapsedTime());
+	EXPECT_EQ(5u, mockMetric->getCurrentNumberOfMeasurements());
+	EXPECT_EQ(5u, samples.size());
+	EXPECT_NEAR(45.0, mockMetric->getElapsedTime(), 1e-9);
 
 	// When we check the results, our deque holds 5 places. We skip the
 	// first 5 because they already rolled off the end. The metric value
@@ -78,8 +79,8 @@ TEST(SamplingMetricBaseTest, AbleToPerformMeasurementsTests)
 		 sampleIterator != samples.end();
 		 ++sampleIterator)
 	{
-		EXPECT_EQ(static_cast<double>(accumulator), sampleIterator->first);
-		EXPECT_EQ(static_cast<double>(counter + 2), sampleIterator->second);
+		EXPECT_NEAR(static_cast<double>(accumulator), sampleIterator->first, 1e-9);
+		EXPECT_NEAR(static_cast<double>(counter + 2), sampleIterator->second, 1e-9);
 		++counter;
 		accumulator += counter;
 	}
@@ -99,7 +100,7 @@ TEST(SamplingMetricBaseTest, UnableToPerformMeasurementsTests)
 	}
 	auto samples = mockMetric->getMeasurementValues();
 
-	EXPECT_EQ(0, mockMetric->getCurrentNumberOfMeasurements());
-	EXPECT_EQ(0, samples.size());
-	EXPECT_EQ(accumulatedTime, mockMetric->getElapsedTime());
+	EXPECT_EQ(0u, mockMetric->getCurrentNumberOfMeasurements());
+	EXPECT_EQ(0u, samples.size());
+	EXPECT_NEAR(accumulatedTime, mockMetric->getElapsedTime(), 1e-9);
 }
