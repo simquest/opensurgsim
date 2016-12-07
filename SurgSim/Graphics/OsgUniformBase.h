@@ -66,6 +66,9 @@ public:
 		return m_uniform;
 	}
 
+
+	virtual const std::string getGlslType() const = 0;
+
 protected:
 	/// Constructor
 	/// \param	name	Name used in shader code to access this uniform

@@ -139,6 +139,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUniformBase.h
 	OsgUniformFactory.h
 	OsgUniformTypes.h
+	OsgUniformGlslTypes.h
 	OsgUnitAxes.h
 	OsgUnitBox.h
 	OsgUnitCylinder.h

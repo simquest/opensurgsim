@@ -39,6 +39,12 @@ public:
 	{
 
 	}
+
+	virtual const std::string getGlslType() const override
+	{
+		return "";
+	}
+
 };
 
 TEST(OsgUniformBaseTests, InitTest)
