@@ -226,4 +226,17 @@ bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
 	return result;
 }
 
+template<class T>
+bool YAML::tryConvert(const boost::any& any, Node* node)
+{
+	if (typeid(T) == any.type())
+	{
+		*node = boost::any_cast<T>(any);
+		return true;
+	}
+	return false;
+}
+
+
+
 #endif // SURGSIM_MATH_MATHCONVERT_INL_H
