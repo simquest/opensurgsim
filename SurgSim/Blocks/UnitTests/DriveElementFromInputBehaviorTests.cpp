@@ -115,7 +115,7 @@ TEST(DriveElementFromInputBehaviorTest, Serialization)
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*behavior));
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(5, node[behavior->getClassName()].size());
+	EXPECT_EQ(5u, node[behavior->getClassName()].size());
 
 	std::shared_ptr<DriveElementFromInputBehavior> decodedBehavior;
 	EXPECT_NO_THROW(decodedBehavior = std::dynamic_pointer_cast<DriveElementFromInputBehavior>(

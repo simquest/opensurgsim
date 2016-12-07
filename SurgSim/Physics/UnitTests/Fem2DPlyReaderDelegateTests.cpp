@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2015, SimQuest Solutions Inc.
+// Copyright 2015-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,8 +56,8 @@ TEST(Fem2DRepresentationReaderTests, DelegateTest)
 	// Boundary conditions
 	ASSERT_EQ(2u, fem->getBoundaryConditions().size());
 
-	EXPECT_EQ(3, fem->getBoundaryCondition(0));
-	EXPECT_EQ(2, fem->getBoundaryCondition(1));
+	EXPECT_EQ(3u, fem->getBoundaryCondition(0));
+	EXPECT_EQ(2u, fem->getBoundaryCondition(1));
 
 	// Material
 	for (size_t i = 0; i < fem->getNumElements(); ++i)

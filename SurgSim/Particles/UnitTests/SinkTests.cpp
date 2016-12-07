@@ -126,7 +126,7 @@ TEST(SinkTest, Update)
 
 	particleSystem->addParticle(Math::Vector3d(0.0, 1.009, 0.0), Math::Vector3d::Zero(), 10);
 	runtime->getScene()->addSceneElement(element);
-	EXPECT_EQ(1, particleSystem->getParticles().safeGet()->getNumVertices());
+	EXPECT_EQ(1u, particleSystem->getParticles().safeGet()->getNumVertices());
 
 	runtime->start(true);
 	runtime->step();
@@ -134,7 +134,7 @@ TEST(SinkTest, Update)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 	runtime->stop();
 
-	EXPECT_EQ(0, particleSystem->getParticles().safeGet()->getNumVertices());
+	EXPECT_EQ(0u, particleSystem->getParticles().safeGet()->getNumVertices());
 }
 
 TEST(SinkTest, Serialization)

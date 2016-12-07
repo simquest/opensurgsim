@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ TEST(OsgMeshRepresentationTests, SerializationTest)
 
 	EXPECT_EQ("SurgSim::Graphics::OsgMeshRepresentation", newOsgMesh->getClassName());
 	EXPECT_EQ(filename, newOsgMesh->getMesh()->getFileName());
-	EXPECT_EQ(2u, newOsgMesh->getValue<int>("UpdateOptions"));
+	EXPECT_EQ(2, newOsgMesh->getValue<int>("UpdateOptions"));
 	EXPECT_TRUE(newOsgMesh->getValue<bool>("DrawAsWireFrame"));
 }
 

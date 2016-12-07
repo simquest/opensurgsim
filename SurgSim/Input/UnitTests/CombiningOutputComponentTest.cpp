@@ -105,7 +105,7 @@ TEST(CombiningOutputComponentTest, DuplicateOutputs)
 	combiningOutputComponent->setOutputs(outputs);
 
 	auto storedOutputs = combiningOutputComponent->getOutputs();
-	ASSERT_EQ(2, storedOutputs.size());
+	ASSERT_EQ(2u, storedOutputs.size());
 	EXPECT_EQ(output1, storedOutputs[0]);
 	EXPECT_EQ(output2, storedOutputs[1]);
 }
@@ -229,7 +229,7 @@ TEST(CombiningOutputComponentTest, MultipleOutputs)
 	outputs.clear();
 	output1.reset();
 	EXPECT_TRUE(mockDevice->pullOutput());
-	EXPECT_EQ(2, combiningOutputComponent->getOutputs().size());
+	EXPECT_EQ(2u, combiningOutputComponent->getOutputs().size());
 }
 
 
@@ -243,7 +243,7 @@ TEST(CombiningOutputComponentTest, Serialization)
 	auto element = runtime->getScene()->getSceneElement("element");
 	ASSERT_NE(element, nullptr);
 	auto outputs = element->getComponents<SurgSim::Input::OutputComponent>();
-	ASSERT_EQ(outputs.size(), 4);
+	ASSERT_EQ(4u, outputs.size());
 	std::shared_ptr<SurgSim::Input::CombiningOutputComponent> combiningOutputComponent;
 	for (size_t i = 0; i < outputs.size(); ++i)
 	{

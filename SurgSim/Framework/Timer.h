@@ -19,6 +19,7 @@
 #include <boost/chrono.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <deque>
+#include <atomic>
 
 namespace SurgSim
 {
@@ -50,6 +51,10 @@ public:
 	/// Return the sum of the durations over all the stored frames.
 	/// \return Sum of stored frame durations in seconds.
 	double getCumulativeTime() const;
+
+	/// Return the amount of time spent in the current frame
+	/// \return difference between time of last frame and now
+	double getCurrentTime();
 
 	/// Return the average duration across all stored frames.  Asserts if there are no frames.
 	/// \return Average period in seconds.
@@ -120,7 +125,7 @@ private:
 	mutable boost::shared_mutex m_sharedMutex;
 
 	/// Number of clock errors since last \c start.
-	size_t m_clockFails;
+	std::atomic<size_t> m_clockFails;
 };
 
 } // Framework
