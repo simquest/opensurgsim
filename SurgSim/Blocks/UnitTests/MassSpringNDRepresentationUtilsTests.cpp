@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
 		EXPECT_EQ(2u, linearSpring->getNumNodes());
 		EXPECT_EQ(3u, linearSpring->getNodeId(0));
 		EXPECT_EQ(7u, linearSpring->getNodeId(1));
-		EXPECT_EQ(2, linearSpring->getNodeIds().size());
+		EXPECT_EQ(2u, linearSpring->getNodeIds().size());
 		EXPECT_EQ(3u, linearSpring->getNodeIds()[0]);
 		EXPECT_EQ(7u, linearSpring->getNodeIds()[1]);
 	}
@@ -72,7 +72,7 @@ TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
 		EXPECT_EQ(2u, linearSpring->getNumNodes());
 		EXPECT_EQ(3u, linearSpring->getNodeId(0));
 		EXPECT_EQ(7u, linearSpring->getNodeId(1));
-		EXPECT_EQ(2, linearSpring->getNodeIds().size());
+		EXPECT_EQ(2u, linearSpring->getNodeIds().size());
 		EXPECT_EQ(3u, linearSpring->getNodeIds()[0]);
 		EXPECT_EQ(7u, linearSpring->getNodeIds()[1]);
 	}

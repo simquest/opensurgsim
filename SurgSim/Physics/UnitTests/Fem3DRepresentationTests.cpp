@@ -343,11 +343,11 @@ TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
 	EXPECT_NE(0, m_fem->getExternalGeneralizedStiffness().cols());
 	EXPECT_NE(0, m_fem->getExternalGeneralizedDamping().rows());
 	EXPECT_NE(0, m_fem->getExternalGeneralizedDamping().cols());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedForce().size());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedStiffness().cols());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedStiffness().rows());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedDamping().cols());
-	EXPECT_EQ(m_fem->getNumDof(), m_fem->getExternalGeneralizedDamping().rows());
+	EXPECT_EQ(static_cast<Math::Vector6d::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedForce().size());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedStiffness().cols());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedStiffness().rows());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedDamping().cols());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedDamping().rows());
 	EXPECT_TRUE(m_fem->getExternalGeneralizedForce().isZero());
 	EXPECT_TRUE(m_fem->getExternalGeneralizedStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(m_fem->getExternalGeneralizedDamping().isApprox(zeroMatrix));

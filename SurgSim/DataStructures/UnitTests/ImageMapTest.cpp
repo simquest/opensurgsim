@@ -81,9 +81,9 @@ TYPED_TEST(ImageMapTests, Accessors)
 
 	T array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 	ImageMap<T> image(3, 3, 1, array);
-	EXPECT_EQ(3, image.getWidth());
-	EXPECT_EQ(3, image.getHeight());
-	EXPECT_EQ(1, image.getNumChannels());
+	EXPECT_EQ(3u, image.getWidth());
+	EXPECT_EQ(3u, image.getHeight());
+	EXPECT_EQ(1u, image.getNumChannels());
 
 	std::array<size_t, 3> size = {3, 3, 1};
 	EXPECT_EQ(size, image.getSize());
@@ -105,9 +105,9 @@ TYPED_TEST(ImageMapTests, Move)
 		ImageMap<T> newImage = std::move(oldImage);
 
 		EXPECT_EQ(dataPtr, newImage.getData());
-		EXPECT_EQ(3, newImage.getWidth());
-		EXPECT_EQ(3, newImage.getHeight());
-		EXPECT_EQ(1, newImage.getNumChannels());
+		EXPECT_EQ(3u, newImage.getWidth());
+		EXPECT_EQ(3u, newImage.getHeight());
+		EXPECT_EQ(1u, newImage.getNumChannels());
 	}
 	{
 		T array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -116,9 +116,9 @@ TYPED_TEST(ImageMapTests, Move)
 		ImageMap<T> newImage(std::move(oldImage));
 
 		EXPECT_EQ(dataPtr, newImage.getData());
-		EXPECT_EQ(3, newImage.getWidth());
-		EXPECT_EQ(1, newImage.getHeight());
-		EXPECT_EQ(3, newImage.getNumChannels());
+		EXPECT_EQ(3u, newImage.getWidth());
+		EXPECT_EQ(1u, newImage.getHeight());
+		EXPECT_EQ(3u, newImage.getNumChannels());
 	}
 }
 

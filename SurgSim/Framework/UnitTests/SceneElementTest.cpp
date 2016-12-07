@@ -91,7 +91,7 @@ TEST(SceneElementTest, AddAndTestComponentsAssembly)
 	// Verify the component made it to the manager
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	ASSERT_EQ(1, manager->getComponents().size());
+	ASSERT_EQ(1u, manager->getComponents().size());
 	EXPECT_EQ(component, manager->getComponents()[0]);
 	runtime->stop();
 }
@@ -129,7 +129,7 @@ TEST(SceneElementTest, AddAndTestComponentsConstructor)
 	// Verify the component made it to the manager
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	ASSERT_EQ(1, manager->getComponents().size());
+	ASSERT_EQ(1u, manager->getComponents().size());
 	EXPECT_EQ(component, manager->getComponents()[0]);
 	runtime->stop();
 }
@@ -174,19 +174,19 @@ TEST(SceneElementTest, RemoveComponent)
 	runtime->getScene()->addSceneElement(element);
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(2, manager->getComponents().size());
+	EXPECT_EQ(2u, manager->getComponents().size());
 
 	EXPECT_TRUE(element->removeComponent("TestComponent2"));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent2"));
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(1, manager->getComponents().size());
+	EXPECT_EQ(1u, manager->getComponents().size());
 
 	EXPECT_TRUE(element->removeComponent(component1));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent1"));
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(0, manager->getComponents().size());
+	EXPECT_EQ(0u, manager->getComponents().size());
 
 	runtime->stop();
 }
@@ -207,12 +207,12 @@ TEST(SceneElementTest, RemoveComponents)
 	runtime->getScene()->addSceneElement(element);
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(2, manager->getComponents().size());
+	EXPECT_EQ(2u, manager->getComponents().size());
 
 	element->removeComponents();
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(0, manager->getComponents().size());
+	EXPECT_EQ(0u, manager->getComponents().size());
 
 	runtime->stop();
 }

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,10 +58,10 @@ TEST(GroupsTest, Clear)
 
 	groups.clear();
 
-	EXPECT_EQ(0L, groups.getGroups().size());
-	EXPECT_EQ(0L, groups.getGroups(element1).size());
-	EXPECT_EQ(0L, groups.getMembers("One").size());
-	EXPECT_EQ(0L, groups.getMembers("Two").size());
+	EXPECT_EQ(0u, groups.getGroups().size());
+	EXPECT_EQ(0u, groups.getGroups(element1).size());
+	EXPECT_EQ(0u, groups.getMembers("One").size());
+	EXPECT_EQ(0u, groups.getMembers("Two").size());
 }
 
 TEST(GroupsTests, AddElement)
@@ -73,29 +73,29 @@ TEST(GroupsTests, AddElement)
 
 	EXPECT_TRUE(groups.add("One", element1));
 
-	EXPECT_EQ(1L, groups.getGroups().size());
-	EXPECT_EQ(1L, groups.getGroups(element1).size());
-	EXPECT_EQ(1L, groups.getMembers("One").size());
+	EXPECT_EQ(1u, groups.getGroups().size());
+	EXPECT_EQ(1u, groups.getGroups(element1).size());
+	EXPECT_EQ(1u, groups.getMembers("One").size());
 
 	EXPECT_FALSE(groups.add("One", element1));
 
-	EXPECT_EQ(1L, groups.getGroups().size());
-	EXPECT_EQ(1L, groups.getGroups(element1).size());
-	EXPECT_EQ(1L, groups.getMembers("One").size());
+	EXPECT_EQ(1u, groups.getGroups().size());
+	EXPECT_EQ(1u, groups.getGroups(element1).size());
+	EXPECT_EQ(1u, groups.getMembers("One").size());
 
 	groups.add("Two", element1);
 
-	EXPECT_EQ(2L, groups.getGroups().size());
-	EXPECT_EQ(2L, groups.getGroups(element1).size());
-	EXPECT_EQ(1L, groups.getMembers("One").size());
+	EXPECT_EQ(2u, groups.getGroups().size());
+	EXPECT_EQ(2u, groups.getGroups(element1).size());
+	EXPECT_EQ(1u, groups.getMembers("One").size());
 
 	groups.add("Two", element2);
 
-	EXPECT_EQ(2L, groups.getGroups().size());
-	EXPECT_EQ(2L, groups.getGroups(element1).size());
-	EXPECT_EQ(1L, groups.getGroups(element2).size());
-	EXPECT_EQ(1L, groups.getMembers("One").size());
-	EXPECT_EQ(2L, groups.getMembers("Two").size());
+	EXPECT_EQ(2u, groups.getGroups().size());
+	EXPECT_EQ(2u, groups.getGroups(element1).size());
+	EXPECT_EQ(1u, groups.getGroups(element2).size());
+	EXPECT_EQ(1u, groups.getMembers("One").size());
+	EXPECT_EQ(2u, groups.getMembers("Two").size());
 
 
 	auto members = groups.getMembers("Two");
@@ -122,8 +122,8 @@ TEST(GroupsTests, MultiAddTest)
 	names.push_back("Two");
 
 	groups.add(names, element1);
-	EXPECT_EQ(2L, groups.getGroups().size());
-	EXPECT_EQ(2L, groups.getGroups(element1).size());
+	EXPECT_EQ(2u, groups.getGroups().size());
+	EXPECT_EQ(2u, groups.getGroups(element1).size());
 }
 
 TEST(GroupsTests, AddGroups)
@@ -141,17 +141,17 @@ TEST(GroupsTests, AddGroups)
 
 	EXPECT_FALSE(groups.add(groups));
 
-	EXPECT_EQ(2L, groups.getGroups().size());
-	EXPECT_EQ(2L, groups.getGroups(1).size());
+	EXPECT_EQ(2u, groups.getGroups().size());
+	EXPECT_EQ(2u, groups.getGroups(1).size());
 
 	EXPECT_TRUE(groups.add(sourceGroups));
 
-	EXPECT_EQ(3L, groups.getGroups().size());
-	EXPECT_EQ(3L, groups.getGroups(1).size());
-	EXPECT_EQ(1L, groups.getGroups(2).size());
-	EXPECT_EQ(2L, groups.getMembers("One").size());
-	EXPECT_EQ(1L, groups.getMembers("Two").size());
-	EXPECT_EQ(1L, groups.getMembers("Three").size());
+	EXPECT_EQ(3u, groups.getGroups().size());
+	EXPECT_EQ(3u, groups.getGroups(1).size());
+	EXPECT_EQ(1u, groups.getGroups(2).size());
+	EXPECT_EQ(2u, groups.getMembers("One").size());
+	EXPECT_EQ(1u, groups.getMembers("Two").size());
+	EXPECT_EQ(1u, groups.getMembers("Three").size());
 }
 
 TEST(GroupsTests, BracketOperator)
@@ -162,12 +162,12 @@ TEST(GroupsTests, BracketOperator)
 	auto element2 = std::make_shared<Framework::BasicSceneElement>("Two");
 
 
-	EXPECT_EQ(0L, groups["One"].size());
+	EXPECT_EQ(0u, groups["One"].size());
 
 	groups.add("One", element1);
 	groups.add("One", element2);
 
-	EXPECT_EQ(2L, groups["One"].size());
+	EXPECT_EQ(2u, groups["One"].size());
 }
 
 TEST(GroupsTests, ValidRemoves)
@@ -185,41 +185,41 @@ TEST(GroupsTests, ValidRemoves)
 	groups.add("Two", element2);
 
 	// Just check for the expected state ... (is tested above)
-	EXPECT_EQ(3L, groups.getGroups().size());
-	EXPECT_EQ(3L, groups.getGroups(element1).size());
-	EXPECT_EQ(2L, groups.getGroups(element2).size());
-	EXPECT_EQ(2L, groups.getMembers("One").size());
-	EXPECT_EQ(2L, groups.getMembers("Two").size());
-	EXPECT_EQ(1L, groups.getMembers("Three").size());
+	EXPECT_EQ(3u, groups.getGroups().size());
+	EXPECT_EQ(3u, groups.getGroups(element1).size());
+	EXPECT_EQ(2u, groups.getGroups(element2).size());
+	EXPECT_EQ(2u, groups.getMembers("One").size());
+	EXPECT_EQ(2u, groups.getMembers("Two").size());
+	EXPECT_EQ(1u, groups.getMembers("Three").size());
 
 	EXPECT_TRUE(groups.remove("Three", element1));
 
-	EXPECT_EQ(2L, groups.getGroups().size());
-	EXPECT_EQ(2L, groups.getGroups(element1).size());
-	EXPECT_EQ(2L, groups.getGroups(element2).size());
-	EXPECT_EQ(2L, groups.getMembers("One").size());
-	EXPECT_EQ(2L, groups.getMembers("Two").size());
-	EXPECT_EQ(0L, groups.getMembers("Three").size());
+	EXPECT_EQ(2u, groups.getGroups().size());
+	EXPECT_EQ(2u, groups.getGroups(element1).size());
+	EXPECT_EQ(2u, groups.getGroups(element2).size());
+	EXPECT_EQ(2u, groups.getMembers("One").size());
+	EXPECT_EQ(2u, groups.getMembers("Two").size());
+	EXPECT_EQ(0u, groups.getMembers("Three").size());
 
 	EXPECT_TRUE(groups.remove("One", element2));
 
-	EXPECT_EQ(2L, groups.getGroups().size());
-	EXPECT_EQ(2L, groups.getGroups(element1).size());
-	EXPECT_EQ(1L, groups.getGroups(element2).size());
-	EXPECT_EQ(1L, groups.getMembers("One").size());
-	EXPECT_EQ(2L, groups.getMembers("Two").size());
-	EXPECT_EQ(0L, groups.getMembers("Three").size());
+	EXPECT_EQ(2u, groups.getGroups().size());
+	EXPECT_EQ(2u, groups.getGroups(element1).size());
+	EXPECT_EQ(1u, groups.getGroups(element2).size());
+	EXPECT_EQ(1u, groups.getMembers("One").size());
+	EXPECT_EQ(2u, groups.getMembers("Two").size());
+	EXPECT_EQ(0u, groups.getMembers("Three").size());
 
 	groups.remove("One", element1);
 	groups.remove("Two", element1);
 	groups.remove("Two", element2);
 
-	EXPECT_EQ(0L, groups.getGroups().size());
-	EXPECT_EQ(0L, groups.getGroups(element1).size());
-	EXPECT_EQ(0L, groups.getGroups(element2).size());
-	EXPECT_EQ(0L, groups.getMembers("One").size());
-	EXPECT_EQ(0L, groups.getMembers("Two").size());
-	EXPECT_EQ(0L, groups.getMembers("Three").size());
+	EXPECT_EQ(0u, groups.getGroups().size());
+	EXPECT_EQ(0u, groups.getGroups(element1).size());
+	EXPECT_EQ(0u, groups.getGroups(element2).size());
+	EXPECT_EQ(0u, groups.getMembers("One").size());
+	EXPECT_EQ(0u, groups.getMembers("Two").size());
+	EXPECT_EQ(0u, groups.getMembers("Three").size());
 
 }
 
@@ -239,23 +239,23 @@ TEST(GroupsTests, InvalidRemoves)
 
 	// Remove non existing element from group should not do anything
 	EXPECT_FALSE(groups.remove("One", element3));
-	EXPECT_EQ(2L, groups.getMembers("One").size());
-	EXPECT_EQ(0L, groups.getGroups(element3).size());
+	EXPECT_EQ(2u, groups.getMembers("One").size());
+	EXPECT_EQ(0u, groups.getGroups(element3).size());
 
 	// Removing from a non existing group should not do anything
 	EXPECT_FALSE(groups.remove("None", element1));
-	EXPECT_EQ(3L, groups.getGroups().size());
-	EXPECT_EQ(3L, groups.getGroups(element1).size());
+	EXPECT_EQ(3u, groups.getGroups().size());
+	EXPECT_EQ(3u, groups.getGroups(element1).size());
 
 	// Removing a non exisiting member from a nonexisting group should not do anything
 	EXPECT_FALSE(groups.remove("None", element3));
-	EXPECT_EQ(3L, groups.getGroups().size());
-	EXPECT_EQ(0L, groups.getGroups(element3).size());
+	EXPECT_EQ(3u, groups.getGroups().size());
+	EXPECT_EQ(0u, groups.getGroups(element3).size());
 
 	// Removing a non exisitng member categorically should not do anything
 	EXPECT_FALSE(groups.remove(element3));
-	EXPECT_EQ(3L, groups.getGroups().size());
-	EXPECT_EQ(0L, groups.getGroups(element3).size());
+	EXPECT_EQ(3u, groups.getGroups().size());
+	EXPECT_EQ(0u, groups.getGroups(element3).size());
 }
 
 }

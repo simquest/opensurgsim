@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ TEST(KeyboardTogglesComponentBehavior, Serialization)
 	YAML::Node node;
 	EXPECT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*keyboardTogglesComponentBehavior));
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(5, node[keyboardTogglesComponentBehavior->getClassName()].size());
+	EXPECT_EQ(5u, node[keyboardTogglesComponentBehavior->getClassName()].size());
 
 	std::shared_ptr<KeyboardTogglesComponentBehavior> newKeyboardTogglesComponentBehavior;
 	EXPECT_NO_THROW(newKeyboardTogglesComponentBehavior = std::dynamic_pointer_cast<KeyboardTogglesComponentBehavior>(

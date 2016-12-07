@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ TEST_F(CompoundShapeDcdContactTest, SingleCube)
 
 	auto expected = calc1->calculateDcdContact(PosedShape(box, identity), PosedShape(sphere, transform));
 	auto result = calc2->calculateDcdContact(PosedShape(compoundShape, identity), PosedShape(sphere, transform));
-	ASSERT_EQ(1, expected.size());
+	ASSERT_EQ(1u, expected.size());
 
 	contactsInfoEqualityTest(expected, result);
 }
@@ -115,7 +115,7 @@ TEST_F(CompoundShapeDcdContactTest, MultipleShapes)
 			contact->penetrationPoints.first.rigidLocalPosition.getValue());
 	}
 	expected.splice(expected.end(), box2Expected);
-	ASSERT_EQ(12, expected.size());
+	ASSERT_EQ(12u, expected.size());
 
 	contactsInfoEqualityTest(expected, result);
 }

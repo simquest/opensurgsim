@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -300,11 +300,11 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 	EXPECT_NE(0, massSpring->getExternalForce().size());
 	EXPECT_NE(0, massSpring->getExternalStiffness().size());
 	EXPECT_NE(0, massSpring->getExternalDamping().size());
-	EXPECT_EQ(massSpring->getNumDof(), massSpring->getExternalForce().size());
-	EXPECT_EQ(massSpring->getNumDof(), massSpring->getExternalStiffness().cols());
-	EXPECT_EQ(massSpring->getNumDof(), massSpring->getExternalStiffness().rows());
-	EXPECT_EQ(massSpring->getNumDof(), massSpring->getExternalDamping().cols());
-	EXPECT_EQ(massSpring->getNumDof(), massSpring->getExternalDamping().rows());
+	EXPECT_EQ(static_cast<Vector::Index>(massSpring->getNumDof()), massSpring->getExternalForce().size());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().cols());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().rows());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().cols());
+	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().rows());
 	EXPECT_TRUE(massSpring->getExternalForce().isZero());
 	EXPECT_TRUE(massSpring->getExternalStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(massSpring->getExternalDamping().isApprox(zeroMatrix));

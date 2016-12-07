@@ -69,7 +69,7 @@ TEST(OsgCameraTests, InitTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()))) <<
 			"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
 
-	EXPECT_EQ(0, camera->getRenderGroups().size());
+	EXPECT_EQ(0u, camera->getRenderGroups().size());
 }
 
 TEST(OsgCameraTests, OsgNodesTest)
@@ -117,7 +117,7 @@ TEST(OsgCameraTests, GroupTest)
 	std::shared_ptr<Camera> camera = osgCamera;
 	camera->addRenderGroupReference("test group");
 
-	EXPECT_EQ(0, camera->getRenderGroups().size());
+	EXPECT_EQ(0u, camera->getRenderGroups().size());
 
 	/// Adding an OsgGroup should succeed
 	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>(camera->getRenderGroupReferences().front());
@@ -324,18 +324,18 @@ TEST(OsgCameraTests, MultipleRenderGroups)
 {
 	std::shared_ptr<OsgCamera> camera = std::make_shared<OsgCamera>("TestOsgCamera");
 
-	EXPECT_EQ(0, camera->getRenderGroupReferences().size());
+	EXPECT_EQ(0u, camera->getRenderGroupReferences().size());
 
 	camera->addRenderGroupReference("Group1");
 	camera->addRenderGroupReference("Group2");
-	EXPECT_EQ(2, camera->getRenderGroupReferences().size());
+	EXPECT_EQ(2u, camera->getRenderGroupReferences().size());
 
 	std::vector<std::string> references;
 	references.push_back("Group3");
 	references.push_back("Group4");
 	references.push_back("Group5");
 	camera->setRenderGroupReferences(references);
-	EXPECT_EQ(3, camera->getRenderGroupReferences().size());
+	EXPECT_EQ(3u, camera->getRenderGroupReferences().size());
 
 	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group3"));
 	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group4"));

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ TEST(ParticlesShapeTests, CopyConstruct)
 		otherVertices.addVertex(DataStructures::Vertex<DataStructures::EmptyData>(Vector3d::Constant(3.0)));
 
 		ParticlesShape particles(otherVertices);
-		EXPECT_EQ(1, particles.getNumVertices());
+		EXPECT_EQ(1u, particles.getNumVertices());
 		EXPECT_TRUE(particles.getVertex(0).position.isApprox(Vector3d::Constant(3.0)));
 	}
 	{
@@ -54,7 +54,7 @@ TEST(ParticlesShapeTests, CopyConstruct)
 		otherVertices.addVertex(DataStructures::Vertex<DataStructures::NormalData>(Vector3d::Constant(3.0)));
 
 		ParticlesShape particles(otherVertices);
-		EXPECT_EQ(1, particles.getNumVertices());
+		EXPECT_EQ(1u, particles.getNumVertices());
 		EXPECT_TRUE(particles.getVertex(0).position.isApprox(Vector3d::Constant(3.0)));
 	}
 }

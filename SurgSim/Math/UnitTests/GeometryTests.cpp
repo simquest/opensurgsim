@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1555,7 +1555,7 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		box.max() = VectorType(5.0 , 5.0, 5.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
-		EXPECT_EQ(0, intersections.size());
+		EXPECT_EQ(0u, intersections.size());
 	}
 
 	{
@@ -1566,7 +1566,7 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		box.max() = VectorType(1.0 , 1.0, 1.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
-		EXPECT_EQ(0, intersections.size());
+		EXPECT_EQ(0u, intersections.size());
 	}
 
 	{
@@ -1577,7 +1577,7 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		box.max() = VectorType(5.0 , 5.0, 5.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
-		EXPECT_EQ(0, intersections.size());
+		EXPECT_EQ(0u, intersections.size());
 	}
 
 	{
@@ -1588,7 +1588,7 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		box.max() = VectorType(5.0 , 5.0, 5.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
-		EXPECT_EQ(1, intersections.size());
+		EXPECT_EQ(1u, intersections.size());
 		EXPECT_TRUE(intersections[0].isApprox(VectorType(2.5, 2.5, 1.0)));
 	}
 
@@ -1600,7 +1600,7 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		box.max() = VectorType(5.0 , 5.0, 5.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
-		EXPECT_EQ(2, intersections.size());
+		EXPECT_EQ(2u, intersections.size());
 		EXPECT_TRUE(intersections[0].isApprox(box.min()) || intersections[0].isApprox(box.max()));
 		EXPECT_TRUE(intersections[1].isApprox(box.min()) || intersections[1].isApprox(box.max()));
 	}

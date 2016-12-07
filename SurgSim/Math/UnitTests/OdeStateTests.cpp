@@ -54,7 +54,7 @@ TEST(OdeStateTest, AllocateTest)
 	EXPECT_EQ(0u, state.getNumDof());
 	EXPECT_EQ(0u, state.getNumNodes());
 	EXPECT_EQ(0u, state.getNumBoundaryConditions());
-	EXPECT_EQ(0, state.getBoundaryConditions().size());
+	EXPECT_EQ(0u, state.getBoundaryConditions().size());
 	EXPECT_EQ(0, state.getPositions().size());
 	EXPECT_EQ(0, state.getVelocities().size());
 
@@ -63,8 +63,8 @@ TEST(OdeStateTest, AllocateTest)
 	EXPECT_EQ(3u, state.getNumNodes());
 	EXPECT_EQ(9, state.getPositions().size());
 	EXPECT_EQ(9, state.getVelocities().size());
-	EXPECT_EQ(0u , state.getNumBoundaryConditions());
-	EXPECT_EQ(0 , state.getBoundaryConditions().size());
+	EXPECT_EQ(0u, state.getNumBoundaryConditions());
+	EXPECT_EQ(0u, state.getBoundaryConditions().size());
 }
 
 TEST(OdeStateTest, GetPositionsTest)
@@ -275,7 +275,7 @@ TEST(OdeStateTest, ResetTest)
 	EXPECT_TRUE(state1.getPositions().isZero());
 	EXPECT_TRUE(state1.getVelocities().isZero());
 	EXPECT_EQ(0u, state1.getNumBoundaryConditions());
-	EXPECT_EQ(0, state1.getBoundaryConditions().size());
+	EXPECT_EQ(0u, state1.getBoundaryConditions().size());
 }
 
 TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
@@ -310,7 +310,7 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 
 		ASSERT_EQ(2u, stateCopied.getNumBoundaryConditions());
 		ASSERT_EQ(state.getNumBoundaryConditions(), stateCopied.getNumBoundaryConditions());
-		ASSERT_EQ(2, stateCopied.getBoundaryConditions().size());
+		ASSERT_EQ(2u, stateCopied.getBoundaryConditions().size());
 		ASSERT_EQ(state.getBoundaryConditions().size(), stateCopied.getBoundaryConditions().size());
 		ASSERT_EQ(0u, stateCopied.getBoundaryConditions()[0]);
 		ASSERT_EQ(state.getBoundaryConditions()[0], stateCopied.getBoundaryConditions()[0]);
@@ -338,7 +338,7 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 
 		ASSERT_EQ(2u, stateAssigned.getNumBoundaryConditions());
 		ASSERT_EQ(state.getNumBoundaryConditions(), stateAssigned.getNumBoundaryConditions());
-		ASSERT_EQ(2, stateAssigned.getBoundaryConditions().size());
+		ASSERT_EQ(2u, stateAssigned.getBoundaryConditions().size());
 		ASSERT_EQ(state.getBoundaryConditions().size(), stateAssigned.getBoundaryConditions().size());
 		ASSERT_EQ(0u, stateAssigned.getBoundaryConditions()[0]);
 		ASSERT_EQ(state.getBoundaryConditions()[0], stateAssigned.getBoundaryConditions()[0]);

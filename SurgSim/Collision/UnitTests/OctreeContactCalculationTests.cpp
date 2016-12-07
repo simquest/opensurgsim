@@ -172,7 +172,7 @@ TEST(OctreeContactCalculationTests, Capsule)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(0.0, 0.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -185,7 +185,7 @@ TEST(OctreeContactCalculationTests, Capsule)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(5.0, 3.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -250,7 +250,7 @@ TEST(OctreeContactCalculationTests, Plane)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(0.0, 0.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -322,7 +322,7 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(0.0, 0.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -379,7 +379,7 @@ TEST(OctreeContactCalculationTests, Sphere)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(0.0, 0.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -424,7 +424,7 @@ TEST(OctreeContactCalculationTests, Sphere)
 					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(8.0, 8.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 }
 
@@ -448,8 +448,8 @@ TEST(OctreeContactCalculationTests, CheckNumberOfContacts)
 	calculator.calculateContact(pair);
 	pair->updateRepresentations();
 
-	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().size());
-	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().count(octreeRep));
+	EXPECT_EQ(1u, shapeRep->getCollisions().unsafeGet().size());
+	EXPECT_EQ(1u, shapeRep->getCollisions().unsafeGet().count(octreeRep));
 
 	octreeRep->retire();
 	shapeRep->retire();

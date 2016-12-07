@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2015, SimQuest Solutions Inc.
+// Copyright 2015-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,14 +59,14 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	// Boundary conditions
 	ASSERT_EQ(8u, fem->getBoundaryConditions().size());
 
-	EXPECT_EQ(8, fem->getBoundaryCondition(0));
-	EXPECT_EQ(5, fem->getBoundaryCondition(1));
-	EXPECT_EQ(3, fem->getBoundaryCondition(2));
-	EXPECT_EQ(2, fem->getBoundaryCondition(3));
-	EXPECT_EQ(7, fem->getBoundaryCondition(4));
-	EXPECT_EQ(1, fem->getBoundaryCondition(5));
-	EXPECT_EQ(6, fem->getBoundaryCondition(6));
-	EXPECT_EQ(11, fem->getBoundaryCondition(7));
+	EXPECT_EQ(8u, fem->getBoundaryCondition(0));
+	EXPECT_EQ(5u, fem->getBoundaryCondition(1));
+	EXPECT_EQ(3u, fem->getBoundaryCondition(2));
+	EXPECT_EQ(2u, fem->getBoundaryCondition(3));
+	EXPECT_EQ(7u, fem->getBoundaryCondition(4));
+	EXPECT_EQ(1u, fem->getBoundaryCondition(5));
+	EXPECT_EQ(6u, fem->getBoundaryCondition(6));
+	EXPECT_EQ(11u, fem->getBoundaryCondition(7));
 
 	// Material
 	auto fem2 = fem->getElement(2);
@@ -106,8 +106,8 @@ TEST(Fem3DRepresentationReaderTests, CubeMeshDelegateTest)
 	// Boundary conditions
 	ASSERT_EQ(2u, fem->getBoundaryConditions().size());
 
-	EXPECT_EQ(9, fem->getBoundaryCondition(0));
-	EXPECT_EQ(5, fem->getBoundaryCondition(1));
+	EXPECT_EQ(9u, fem->getBoundaryCondition(0));
+	EXPECT_EQ(5u, fem->getBoundaryCondition(1));
 
 	// Material
 	auto fem2 = fem->getElement(2);
