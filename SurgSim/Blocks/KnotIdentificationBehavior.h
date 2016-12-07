@@ -58,6 +58,14 @@ public:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
+	/// Function to add a known knot code to the list.
+	/// \param name The name of the knot
+	/// \param code The gauss code of the knot
+	void addKnownKnotCode(const std::string& name, const std::vector<int>& code);
+
+	/// Function to clear the known knot code list.
+	void clearKnownKnotCodes();
+
 protected:
 	/// struct to store a Crossing
 	struct Crossing
@@ -70,12 +78,7 @@ protected:
 	};
 
 	/// List of known knot codes.
-	static std::map<std::string, std::vector<int>> m_knownLists;
-
-	/// Function to add a known knot code to the list.
-	/// \param name The name of the knot
-	/// \param code The gauss code of the knot
-	static void addKnownKnotCode(const std::string& name, const std::vector<int>& code);
+	std::map<std::string, std::vector<int>> m_knownLists;
 
 	/// \param projection The projection matrix to be used.
 	/// \return True, if a knot was detected.

@@ -175,7 +175,7 @@ public:
 
 TEST_F(KnotIdentificationRenderTests, TrefoilKnot)
 {
-	auto suture = makeSuture("trefoil_knot.ply");
+	auto suture = makeSuture("Geometry/trefoil_knot.ply");
 	auto knotId = std::make_shared<SurgSim::Blocks::KnotIdentificationBehavior>("KnotId");
 	knotId->setFem1d(suture->getComponent("Physics"));
 	suture->addComponent(knotId);
@@ -194,7 +194,7 @@ TEST_F(KnotIdentificationRenderTests, TrefoilKnot)
 
 TEST_F(KnotIdentificationRenderTests, SquareKnot)
 {
-	auto suture = makeSuture("square_knot.ply");
+	auto suture = makeSuture("Geometry/square_knot.ply");
 	auto knotId = std::make_shared<SurgSim::Blocks::KnotIdentificationBehavior>("KnotId");
 	knotId->setFem1d(suture->getComponent("Physics"));
 	suture->addComponent(knotId);
@@ -213,7 +213,7 @@ TEST_F(KnotIdentificationRenderTests, SquareKnot)
 
 TEST_F(KnotIdentificationRenderTests, GrannyKnot)
 {
-	auto suture = makeSuture("granny_knot.ply");
+	auto suture = makeSuture("Geometry/granny_knot.ply");
 	auto knotId = std::make_shared<SurgSim::Blocks::KnotIdentificationBehavior>("KnotId");
 	knotId->setFem1d(suture->getComponent("Physics"));
 	suture->addComponent(knotId);

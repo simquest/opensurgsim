@@ -216,7 +216,7 @@ TEST_F(CcdSutureTest, Fem1DHalfKnot)
 
 TEST_F(CcdSutureTest, Fem1DLoop)
 {
-	scene->addSceneElement(makeSuture("loop.ply"));
+	scene->addSceneElement(makeSuture("Geometry/loop.ply"));
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);

@@ -15,7 +15,6 @@
 
 #include <boost/assign/list_of.hpp>
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 #include "SurgSim/Blocks/KnotIdentificationBehavior.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -65,7 +64,7 @@ public:
 class KnotIdentificationBehaviorTest : public testing::Test
 {
 public:
-	KnotIdentificationBehaviorTest() : testing::Test(), mockKnotIdentificationBehavior("Test3")
+	KnotIdentificationBehaviorTest() : testing::Test(), mockReidmeisterMove3Behavior("Test3")
 	{
 
 	}
@@ -122,7 +121,7 @@ public:
 
 	void testReidmeisterMove3(std::vector<int> gaussCodeBefore, std::vector<int> gaussCodeAfter, bool expectedReturn)
 	{
-		bool actualReturn = mockKnotIdentificationBehavior.tryReidmeisterMove3(&gaussCodeBefore);
+		bool actualReturn = mockReidmeisterMove3Behavior.tryReidmeisterMove3(&gaussCodeBefore);
 		EXPECT_EQ(expectedReturn, actualReturn);
 		EXPECT_EQ(gaussCodeBefore, gaussCodeAfter);
 	}
@@ -140,9 +139,21 @@ public:
 		MockKnotIdentificationBehavior mockKnotIdentificationBehavior("Test IdentifyKnot");
 		auto actual = mockKnotIdentificationBehavior.identifyKnot(gaussCode);
 		EXPECT_EQ(expected, actual);
+		// Clear the list of known knot codes and identify again. If gaussCode is empty, it should say "No Knot",
+		// otherwise "Unknown Knot".
+		mockKnotIdentificationBehavior.clearKnownKnotCodes();
+		actual = mockKnotIdentificationBehavior.identifyKnot(gaussCode);
+		if (gaussCode.empty())
+		{
+			EXPECT_EQ("No Knot", actual);
+		}
+		else
+		{
+			EXPECT_EQ("Unknown Knot", actual);
+		}
 	}
 
-	MockKnotIdentificationBehavior mockKnotIdentificationBehavior;
+	MockKnotIdentificationBehavior mockReidmeisterMove3Behavior;
 };
 
 TEST_F(KnotIdentificationBehaviorTest, Constructor)
@@ -158,8 +169,10 @@ TEST_F(KnotIdentificationBehaviorTest, GetSetFem1D)
 	EXPECT_EQ(nullptr, knotId.getFem1d());
 	auto physics = std::make_shared<SurgSim::Physics::Representation>("Physics Representation");
 	EXPECT_THROW(knotId.setFem1d(physics), SurgSim::Framework::AssertionFailure);
+	EXPECT_FALSE(knotId.doWakeUp());
 	auto fem1D = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Fem1D");
 	EXPECT_NO_THROW(knotId.setFem1d(fem1D));
+	EXPECT_TRUE(knotId.doWakeUp());
 	EXPECT_EQ(fem1D->getName(), knotId.getFem1d()->getName());
 }
 
@@ -314,10 +327,19 @@ TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest10)
 	testIdentifyKnot(input, "Square Knot");
 }
 
+TEST_F(KnotIdentificationBehaviorTest, Fem1DNoKnot)
+{
+	KnotIdentificationBehavior knotId("Knot ID");
+	knotId.setFem1d(makeFem1D("Geometry/loop.ply"));
+	knotId.doInitialize();
+	knotId.update(0.0);
+	EXPECT_EQ("No Knot", knotId.getKnotName());
+}
+
 TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoil)
 {
 	KnotIdentificationBehavior knotId("Knot ID");
-	knotId.setFem1d(makeFem1D("trefoil_knot.ply"));
+	knotId.setFem1d(makeFem1D("Geometry/trefoil_knot.ply"));
 	knotId.doInitialize();
 	knotId.update(0.0);
 	EXPECT_EQ("Trefoil Knot", knotId.getKnotName());
@@ -326,7 +348,7 @@ TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoil)
 TEST_F(KnotIdentificationBehaviorTest, Fem1DSquare)
 {
 	KnotIdentificationBehavior knotId("Knot ID");
-	knotId.setFem1d(makeFem1D("square_knot.ply"));
+	knotId.setFem1d(makeFem1D("Geometry/square_knot.ply"));
 	knotId.doInitialize();
 	knotId.update(0.0);
 	EXPECT_EQ("Square Knot", knotId.getKnotName());
@@ -335,7 +357,7 @@ TEST_F(KnotIdentificationBehaviorTest, Fem1DSquare)
 TEST_F(KnotIdentificationBehaviorTest, Fem1DGranny)
 {
 	KnotIdentificationBehavior knotId("Knot ID");
-	knotId.setFem1d(makeFem1D("granny_knot.ply"));
+	knotId.setFem1d(makeFem1D("Geometry/granny_knot.ply"));
 	knotId.doInitialize();
 	knotId.update(0.0);
 	EXPECT_EQ("Granny Knot", knotId.getKnotName());

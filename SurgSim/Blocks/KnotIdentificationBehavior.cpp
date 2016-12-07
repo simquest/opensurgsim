@@ -17,6 +17,7 @@
 
 #include <boost/assign/list_of.hpp>
 #include <boost/math/special_functions/sign.hpp>
+
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgTextRepresentation.h"
@@ -36,8 +37,6 @@ namespace Blocks
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KnotIdentificationBehavior,
 				 KnotIdentificationBehavior);
 
-std::map<std::string, std::vector<int>> KnotIdentificationBehavior::m_knownLists;
-
 KnotIdentificationBehavior::KnotIdentificationBehavior(const std::string& name) :
 	Framework::Behavior(name), m_knotName("Calculating...")
 {
@@ -46,12 +45,9 @@ KnotIdentificationBehavior::KnotIdentificationBehavior(const std::string& name) 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KnotIdentificationBehavior,
 		std::shared_ptr<SurgSim::Physics::Fem1DRepresentation>, Fem1d, getFem1d, setFem1d);
 
-	if (m_knownLists.empty())
-	{
-		addKnownKnotCode("Trefoil Knot", boost::assign::list_of(1)(-2)(3)(-1)(2)(-3));
-		addKnownKnotCode("Granny Knot", boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3));
-		addKnownKnotCode("Square Knot", boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3));
-	}
+	addKnownKnotCode("Trefoil Knot", boost::assign::list_of(1)(-2)(3)(-1)(2)(-3));
+	addKnownKnotCode("Granny Knot", boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3));
+	addKnownKnotCode("Square Knot", boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3));
 }
 
 void KnotIdentificationBehavior::setFem1d(const std::shared_ptr<Framework::Component>& fem1d)
@@ -72,11 +68,6 @@ const std::string& KnotIdentificationBehavior::getKnotName()
 
 void KnotIdentificationBehavior::update(double dt)
 {
-	if (m_fem1d == nullptr)
-	{
-		return;
-	}
-
 	bool knotDetected = false;
 	auto projection = m_projections.begin();
 	do 
@@ -110,6 +101,12 @@ bool KnotIdentificationBehavior::doInitialize()
 
 bool KnotIdentificationBehavior::doWakeUp()
 {
+	if (m_fem1d == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << getClassName() << " named '" +
+			getName() + "' must have a Fem1D Representation to detect knots in it.";
+		return false;
+	}
 	return true;
 }
 
@@ -119,6 +116,11 @@ void KnotIdentificationBehavior::addKnownKnotCode(const std::string& name, const
 	{
 		m_knownLists[name] = code;
 	}
+}
+
+void KnotIdentificationBehavior::clearKnownKnotCodes()
+{
+	m_knownLists.clear();
 }
 
 bool KnotIdentificationBehavior::detectAndIdentifyKnot(
