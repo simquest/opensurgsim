@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Framework/Scene.h"
+
 
 #include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Framework/Log.h"
@@ -36,6 +38,8 @@ Representation::Representation(const std::string& name) :
 									  getDrawAsWireFrame, setDrawAsWireFrame);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, GenerateTangents,
 									  isGeneratingTangents, setGenerateTangents);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::string, MaterialReference,
+									  getMaterialReference, setMaterialReference);
 
 	addGroupReference(DefaultGroupName);
 }
@@ -87,6 +91,28 @@ void Representation::clearGroupReferences()
 	}
 }
 
+bool Representation::doWakeUp()
+{
+	if (getMaterial() == nullptr && !getMaterialReference().empty())
+	{
+		std::vector<std::string> names;
+		boost::split(names, getMaterialReference(), boost::is_any_of("/"));
+
+		auto material = getScene()->getComponent(names[0], names[1]);
+		if (material != nullptr)
+		{
+			setMaterial(material);
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Graphics/Representation"))
+					<< "Can't find material " << getMaterialReference() << " in Scene, rendering of " << getFullName()
+					<< " is going to be compromised.";
+		}
+	}
+	return true;
+}
+
 bool Representation::removeGroupReference(const std::string& name)
 {
 	bool result = false;
@@ -122,5 +148,16 @@ Representation::~Representation()
 
 }
 
+void Representation::setMaterialReference(const std::string& materialReference)
+{
+	m_materialReference = materialReference;
+}
+
+std::string Representation::getMaterialReference() const
+{
+	return m_materialReference;
+}
+
 }; // namespace Graphics
 }; // namespace SurgSim
+

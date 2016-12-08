@@ -59,6 +59,10 @@ public:
 	/// \return	Graphics material
 	virtual std::shared_ptr<Material> getMaterial() const = 0;
 
+	void setMaterialReference(const std::string& materialName);
+
+	std::string getMaterialReference() const;
+
 	/// Removes the material from the representation
 	virtual void clearMaterial() = 0;
 
@@ -121,6 +125,9 @@ private:
 	/// \param functionName the name of the calling function to be used in the error message
 	/// \return the value of isAwake()
 	bool checkAwake(const std::string& functionName);
+
+	/// Name for material lookup
+	std::string m_materialReference;
 };
 
 };  // namespace Graphics

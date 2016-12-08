@@ -373,6 +373,49 @@ TEST(OsgRepresentationTests, TangentGenerationTest)
 	scenery->getOsgNode()->accept(visitor);
 }
 
+TEST(OsgRepresentation, MaterialFromReference)
+{
+	auto runtime = std::make_shared<Framework::Runtime>();
+	auto manager = std::make_shared<OsgManager>();
+
+	runtime->addManager(manager);
+
+	auto scene = runtime->getScene();
+
+	auto element = std::make_shared<Framework::BasicSceneElement>("element");
+	auto material1  = std::make_shared<OsgMaterial>("material1");
+	element->addComponent(material1);
+	auto material2 = std::make_shared<OsgMaterial>("material2");
+	element->addComponent(material2);
+
+
+	auto rep1 = std::make_shared<MockOsgRepresentation>("representation1");
+	element->addComponent(rep1);
+	auto rep2 = std::make_shared<MockOsgRepresentation>("representation2");
+	element->addComponent(rep2);
+	auto rep3 = std::make_shared<MockOsgRepresentation>("representation3");
+	element->addComponent(rep3);
+	scene->addSceneElement(element);
+
+
+	rep1->setMaterial(material1);
+	rep2->setMaterialReference("element/material2");
+	rep3->setMaterial(material1);
+	rep3->setMaterialReference("element/material2");
+
+	runtime->start();
+
+	while (!rep1->isAwake() || !rep2->isAwake() || !rep3->isAwake())
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	}
+	EXPECT_EQ("element/material1", rep1->getMaterial()->getFullName());
+	EXPECT_EQ("element/material2", rep2->getMaterial()->getFullName());
+	EXPECT_EQ("element/material1", rep3->getMaterial()->getFullName());
+
+	runtime->stop();
+}
+
 
 }  // namespace Graphics
 }  // namespace SurgSim
