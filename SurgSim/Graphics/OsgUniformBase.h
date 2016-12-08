@@ -82,4 +82,16 @@ protected:
 
 };  // namespace SurgSim
 
+namespace YAML
+{
+template<>
+struct convert<std::shared_ptr<SurgSim::Graphics::OsgUniformBase>>
+{
+	static Node encode(const std::shared_ptr<SurgSim::Graphics::OsgUniformBase> rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::OsgUniformBase>& rhs); //NOLINT
+};
+
+};
+
+
 #endif  // SURGSIM_GRAPHICS_OSGUNIFORMBASE_H

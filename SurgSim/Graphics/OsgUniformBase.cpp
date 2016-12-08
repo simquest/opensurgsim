@@ -14,7 +14,9 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/OsgUniformBase.h"
+#include "SurgSim/Graphics/OsgUniformFactory.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/MathConvert.h"
 
 using SurgSim::Graphics::OsgUniformBase;
 
@@ -34,3 +36,36 @@ void OsgUniformBase::removeFromStateSet(osg::StateSet* stateSet)
 {
 	stateSet->removeUniform(m_uniform);
 }
+
+
+namespace YAML
+{
+
+Node convert<std::shared_ptr<SurgSim::Graphics::OsgUniformBase>>::encode(const
+		std::shared_ptr<SurgSim::Graphics::OsgUniformBase> rhs)
+{
+	YAML::Node node;
+	node.push_back(rhs->getGlslType());
+	node.push_back(rhs->getName());
+	node.push_back(rhs->getValue("Value"));
+
+	return node;
+}
+
+bool  convert<std::shared_ptr<SurgSim::Graphics::OsgUniformBase>>::decode(const Node& node,
+		std::shared_ptr<SurgSim::Graphics::OsgUniformBase>& rhs)
+{
+	static SurgSim::Graphics::OsgUniformFactory factory;
+	if (rhs == nullptr)
+	{
+		auto uniform = factory.create(node[0].as<std::string>(), node[1].as<std::string>());
+		rhs = std::dynamic_pointer_cast<SurgSim::Graphics::OsgUniformBase>(uniform);
+		SURGSIM_ASSERT(rhs != nullptr) << "Uniform conversion failed in deserialization for node " << node;
+		rhs->set(node[2]);
+	}
+	return true;
+}
+
+
+};
+
