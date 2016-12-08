@@ -109,33 +109,33 @@ inline const std::string getGlslType<SurgSim::Math::Vector4d>()
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix22f>()
 {
-	return "mat2x2";
+	return "mat2";
 }
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix33f>()
 {
-	return "mat3x3";
+	return "mat3";
 }
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix44f>()
 {
-	return "mat4x4";
+	return "mat4";
 }
 
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix22d>()
 {
-	return "dmat2x2";
+	return "dmat2";
 }
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix33d>()
 {
-	return "dmat3x3";
+	return "dmat3";
 }
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix44d>()
 {
-	return "dmat4x4";
+	return "dmat4";
 }
 
 /// \note This name depends on the fact of OSS using integer types for the texture types if we introduce
