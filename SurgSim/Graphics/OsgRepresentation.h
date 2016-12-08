@@ -96,17 +96,13 @@ public:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	void update(double dt) override;
 
-	/// Adds a uniform to this representation.
-	/// \param uniform Uniform to add.
-	void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform);
+	void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform) override;
 
-	/// Adds and a uniform to this representation and set its value
-	/// \param type the type of the uniform
-	/// \param name Name used in shader code to access this uniform
-	/// \param value The value for this uniform
-	void addUniform(const std::string& type, const std::string& name, const boost::any& value);
+	void addUniform(const std::string& type, const std::string& name, const boost::any& value) override;
 
+	void setUniforms(const std::vector<std::shared_ptr<Graphics::UniformBase>>& uniforms) override;
 
+	std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>> getUniforms() const override;
 
 protected:
 	void doRetire() override;
@@ -120,6 +116,13 @@ protected:
 	/// Causes the tangents to be recalculated if tangent generation is enabled
 	/// Subclasses should call this whenever the state changes in a way that need tangents to be recalculated
 	void updateTangents();
+
+	/// Typed setter for uniforms
+	/// \param uniforms to be set in the representation
+	void setOsgUniforms(const std::vector<std::shared_ptr<Graphics::OsgUniformBase>>& uniforms);
+
+	/// \return the typed list of uniforms used in this representation
+	std::vector<std::shared_ptr<Graphics::OsgUniformBase>> getOsgUniforms() const;
 
 	/// Switch used to toggle the visibility of the representation
 	osg::ref_ptr<osg::Switch> m_switch;
@@ -141,6 +144,7 @@ protected:
 
 	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_modelMatrixUniform;
 
+	std::vector<std::shared_ptr<OsgUniformBase>> m_uniforms;
 };
 
 }; // Graphics

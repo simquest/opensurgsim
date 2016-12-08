@@ -41,6 +41,11 @@ OsgRepresentation::OsgRepresentation(const std::string& name) :
 	m_drawAsWireFrame(false),
 	m_modelMatrixUniform(std::make_shared<OsgUniform<SurgSim::Math::Matrix44f>>("modelMatrix"))
 {
+	{
+		typedef std::vector<std::shared_ptr<Graphics::OsgUniformBase>> ParamType;
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgRepresentation, ParamType, Uniforms, getOsgUniforms, setOsgUniforms);
+	}
+
 	m_switch = new osg::Switch;
 	m_switch->setName(name + " Representation Switch");
 	m_modelMatrixUniform->addToStateSet(m_switch->getOrCreateStateSet());
@@ -172,11 +177,51 @@ void OsgRepresentation::updateTangents()
 	}
 }
 
+void OsgRepresentation::setUniforms(const std::vector<std::shared_ptr<Graphics::UniformBase>>& uniforms)
+{
+	SURGSIM_ASSERT(m_uniforms.empty()) << "Can't set the uniforms when there already are uniforms on the object.";
+	for (auto& uniform : m_uniforms)
+	{
+		addUniform(uniform);
+	}
+}
+
+void OsgRepresentation::setOsgUniforms(const std::vector<std::shared_ptr<Graphics::OsgUniformBase>>& uniforms)
+{
+	SURGSIM_ASSERT(m_uniforms.empty()) << "Can't set the uniforms when there already are uniforms on the object.";
+	for (auto& uniform : uniforms)
+	{
+		addUniform(uniform);
+	}
+}
+
+std::vector<std::shared_ptr<OsgUniformBase>> OsgRepresentation::getOsgUniforms() const
+{
+	return m_uniforms;
+}
+
+std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>> OsgRepresentation::getUniforms() const
+{
+	std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>> result;
+	result.reserve(m_uniforms.size());
+
+	std::copy(m_uniforms.begin(), m_uniforms.end(), std::back_inserter(result));
+	return result;
+}
+
 void OsgRepresentation::addUniform(std::shared_ptr<UniformBase> uniform)
 {
+	SURGSIM_ASSERT(uniform != nullptr) << "Can't add nullptr Uniform.";
+
 	auto osgUniform = std::dynamic_pointer_cast<OsgUniformBase>(uniform);
-	SURGSIM_ASSERT(osgUniform != nullptr) << "Uniform must be an OsgUniform";
+	SURGSIM_ASSERT(osgUniform != nullptr)  << "Added uniform is not an OsgUniform .";
+	SURGSIM_ASSERT(!isWriteable(osgUniform->getName()))
+			<< "Uniform or Property already exists on this object, can't add uniform.";
+
+	m_uniforms.push_back(osgUniform);
 	m_transform->getOrCreateStateSet()->addUniform(osgUniform->getOsgUniform());
+
+	forwardProperty(osgUniform->getName(), *osgUniform, "Value");
 }
 
 void OsgRepresentation::addUniform(const std::string& type, const std::string& name, const boost::any& value)

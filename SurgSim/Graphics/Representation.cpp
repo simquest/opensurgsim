@@ -20,6 +20,8 @@
 #include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Framework/Log.h"
 
+#include <boost/algorithm/string.hpp>
+
 using SurgSim::Graphics::Material;
 
 namespace SurgSim
@@ -93,10 +95,10 @@ void Representation::clearGroupReferences()
 
 bool Representation::doWakeUp()
 {
-	if (getMaterial() == nullptr && !getMaterialReference().empty())
+	if (getMaterial() == nullptr && !m_materialReference.empty())
 	{
 		std::vector<std::string> names;
-		boost::split(names, getMaterialReference(), boost::is_any_of("/"));
+		boost::split(names, m_materialReference, boost::is_any_of("/"));
 
 		auto material = getScene()->getComponent(names[0], names[1]);
 		if (material != nullptr)
@@ -106,7 +108,7 @@ bool Representation::doWakeUp()
 		else
 		{
 			SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Graphics/Representation"))
-					<< "Can't find material " << getMaterialReference() << " in Scene, rendering of " << getFullName()
+					<< "Can't find material " << m_materialReference << " in Scene, rendering of " << getFullName()
 					<< " is going to be compromised.";
 		}
 	}

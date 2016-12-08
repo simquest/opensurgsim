@@ -40,7 +40,7 @@ public:
 
 	}
 
-	virtual const std::string getGlslType() const override
+	const std::string getGlslType() const override
 	{
 		return "";
 	}

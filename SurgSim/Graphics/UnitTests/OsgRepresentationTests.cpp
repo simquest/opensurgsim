@@ -22,12 +22,17 @@
 #include <random>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -414,6 +419,27 @@ TEST(OsgRepresentation, MaterialFromReference)
 	EXPECT_EQ("element/material1", rep3->getMaterial()->getFullName());
 
 	runtime->stop();
+}
+
+TEST(OsgRepresentation, Serialization)
+{
+	// Using the scenery representation here, but only testing base class functionality
+	auto representation = std::make_shared<OsgBoxRepresentation>("representation1");
+
+	representation->addUniform("float", "floatValue", 2.0f);
+	representation->addUniform("double", "doubleValue", 2.0);
+	representation->addUniform("bool", "boolValue", false);
+	representation->addUniform("vec3", "vec3Value", Math::Vector3f(1.0, 2.0, 3.0));
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = *std::dynamic_pointer_cast<Framework::Component>(representation));
+	auto result = node.as<std::shared_ptr<Framework::Component>>();
+
+	EXPECT_EQ(2.0f, result->getValue<float>("floatValue"));
+	EXPECT_EQ(2.0, result->getValue<double>("doubleValue"));
+	EXPECT_EQ(false, result->getValue<bool>("boolValue"));
+	EXPECT_TRUE(Math::Vector3f(1.0, 2.0, 3.0).isApprox(result->getValue<Math::Vector3f>("vec3Value")));
+
 }
 
 

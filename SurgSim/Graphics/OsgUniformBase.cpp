@@ -45,6 +45,7 @@ Node convert<std::shared_ptr<SurgSim::Graphics::OsgUniformBase>>::encode(const
 		std::shared_ptr<SurgSim::Graphics::OsgUniformBase> rhs)
 {
 	YAML::Node node;
+	node.SetStyle(YAML::EmitterStyle::Flow);
 	node.push_back(rhs->getGlslType());
 	node.push_back(rhs->getName());
 	node.push_back(rhs->getValue("Value"));
@@ -53,7 +54,7 @@ Node convert<std::shared_ptr<SurgSim::Graphics::OsgUniformBase>>::encode(const
 }
 
 bool  convert<std::shared_ptr<SurgSim::Graphics::OsgUniformBase>>::decode(const Node& node,
-		std::shared_ptr<SurgSim::Graphics::OsgUniformBase>& rhs)
+		std::shared_ptr<SurgSim::Graphics::OsgUniformBase>& rhs) //NOLINT
 {
 	static SurgSim::Graphics::OsgUniformFactory factory;
 	if (rhs == nullptr)

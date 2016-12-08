@@ -30,6 +30,7 @@ namespace Graphics
 
 class Manager;
 class Material;
+class UniformBase;
 
 /// Base graphics representation class, which defines the interface that all graphics representations must implement.
 ///
@@ -116,6 +117,25 @@ public:
 
 	/// Clear all the Group references
 	void clearGroupReferences();
+
+	/// Adds a uniform to this representation.
+	/// \param uniform Uniform to add.
+	virtual void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform) = 0;
+
+	/// Adds and a uniform to this representation and set its value
+	/// \param type the type of the uniform
+	/// \param name Name used in shader code to access this uniform
+	/// \param value The value for this uniform
+	virtual void addUniform(const std::string& type, const std::string& name, const boost::any& value) = 0;
+
+	/// Sets a set of uniforms for this representation
+	/// \param uniforms the uniforms to be used in this representation
+	virtual void setUniforms(const std::vector<std::shared_ptr<Graphics::UniformBase>>& uniforms) = 0;
+
+	/// \return the uniforms used for this representation
+	virtual std::vector<std::shared_ptr<Graphics::UniformBase>> getUniforms() const = 0;
+
+	bool doWakeUp() override;
 
 private:
 	/// List of groups that this representation would like to be added
