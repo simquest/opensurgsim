@@ -96,13 +96,13 @@ public:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	void update(double dt) override;
 
-	void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform) override;
+	void addUniform(std::shared_ptr<UniformBase> uniform) override;
 
 	void addUniform(const std::string& type, const std::string& name, const boost::any& value) override;
 
-	void setUniforms(const std::vector<std::shared_ptr<Graphics::UniformBase>>& uniforms) override;
+	void setUniforms(const std::vector<std::shared_ptr<UniformBase>>& uniforms) override;
 
-	std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>> getUniforms() const override;
+	std::vector<std::shared_ptr<UniformBase>> getUniforms() const override;
 
 protected:
 	void doRetire() override;

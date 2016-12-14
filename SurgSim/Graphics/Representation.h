@@ -120,7 +120,7 @@ public:
 
 	/// Adds a uniform to this representation.
 	/// \param uniform Uniform to add.
-	virtual void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform) = 0;
+	virtual void addUniform(std::shared_ptr<UniformBase> uniform) = 0;
 
 	/// Adds and a uniform to this representation and set its value
 	/// \param type the type of the uniform
@@ -130,10 +130,10 @@ public:
 
 	/// Sets a set of uniforms for this representation
 	/// \param uniforms the uniforms to be used in this representation
-	virtual void setUniforms(const std::vector<std::shared_ptr<Graphics::UniformBase>>& uniforms) = 0;
+	virtual void setUniforms(const std::vector<std::shared_ptr<UniformBase>>& uniforms) = 0;
 
 	/// \return the uniforms used for this representation
-	virtual std::vector<std::shared_ptr<Graphics::UniformBase>> getUniforms() const = 0;
+	virtual std::vector<std::shared_ptr<UniformBase>> getUniforms() const = 0;
 
 	bool doWakeUp() override;
 

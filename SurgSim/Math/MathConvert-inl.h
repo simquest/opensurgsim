@@ -227,7 +227,7 @@ bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
 }
 
 template<class T>
-bool YAML::tryConvert(const boost::any& any, Node* node)
+bool YAML::tryConvert(const boost::any& any, YAML::Node* node)
 {
 	if (typeid(T) == any.type())
 	{
