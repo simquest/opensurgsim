@@ -229,6 +229,7 @@ void ContactCalculation::initializeTables()
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeDoubleSidedPlaneContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreePlaneContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeSphereContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::OctreeTriangleMeshContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SegmentMeshTriangleMeshContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SphereSphereContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SphereDoubleSidedPlaneContact>());

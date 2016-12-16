@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,6 +66,17 @@ void OctreeContact::calculateContactWithNode(
 		return;
 	}
 
+	auto nodeBoundingBox = Math::transformAabb(octreePose, node->getBoundingBox());
+	auto shapeBoundingBox = shape->getBoundingBox();
+	if (!shape->isTransformable())
+	{
+		shapeBoundingBox = Math::transformAabb(shapePose, shapeBoundingBox);
+	}
+	if (!shapeBoundingBox.isEmpty() && !Math::doAabbIntersect(nodeBoundingBox, shapeBoundingBox))
+	{
+		return;
+	}
+
 	Math::Vector3d nodeSize = node->getBoundingBox().sizes();
 	std::shared_ptr<Math::BoxShape> nodeShape;
 	if (m_shapes.count(nodeSize) > 0)
@@ -77,15 +88,15 @@ void OctreeContact::calculateContactWithNode(
 		nodeShape = std::make_shared<SurgSim::Math::BoxShape>(nodeSize.x(), nodeSize.y(), nodeSize.z());
 		m_shapes[nodeSize] = nodeShape;
 	}
+
 	Math::Vector3d nodeCenter = node->getBoundingBox().center();
 	Math::RigidTransform3d nodePose = octreePose;
 	nodePose.translation() += nodePose.linear() * nodeCenter;
 
-	auto contacts = boxContactCalculation(*nodeShape, nodePose, *shape, shapePose);
-
-	if (!contacts.empty())
+	if (node->hasChildren())
 	{
-		if (node->hasChildren())
+		if ((!shapeBoundingBox.isEmpty() && nodeBoundingBox.contains(shapeBoundingBox)) ||
+			 !boxContactCalculation(*nodeShape, nodePose, *shape, shapePose).empty())
 		{
 			for (size_t i = 0; i < node->getChildren().size(); i++)
 			{
@@ -94,19 +105,19 @@ void OctreeContact::calculateContactWithNode(
 				nodePath->pop_back();
 			}
 		}
-		else
+	}
+	else
+	{
+		auto contacts = boxContactCalculation(*nodeShape, nodePose, *shape, shapePose);
+		for (auto& contact : contacts)
 		{
-			Math::Vector3d contactPosition;
-			for (auto& contact : contacts)
-			{
-				contact->penetrationPoints.first.octreeNodePath.setValue(*nodePath);
+			contact->penetrationPoints.first.octreeNodePath.setValue(*nodePath);
 
-				contactPosition = contact->penetrationPoints.first.rigidLocalPosition.getValue();
-				contactPosition += nodeCenter;
-				contact->penetrationPoints.first.rigidLocalPosition.setValue(contactPosition);
-			}
-			result->splice(result->end(), contacts);
+			Math::Vector3d contactPosition = contact->penetrationPoints.first.rigidLocalPosition.getValue();
+			contactPosition += nodeCenter;
+			contact->penetrationPoints.first.rigidLocalPosition.setValue(contactPosition);
 		}
+		result->splice(result->end(), contacts);
 	}
 }
 
