@@ -136,6 +136,16 @@ std::shared_ptr<PhysicsManagerState> CcdCollisionLoop::doUpdate(const double& dt
 	return ccdState;
 }
 
+void CcdCollisionLoop::setSolveMlcp(std::unique_ptr<SolveMlcp> computation)
+{
+	m_solveMlcp = std::move(computation);
+}
+
+void CcdCollisionLoop::setPushResults(std::unique_ptr<PushResults> computation)
+{
+	m_pushResults = std::move(computation);
+}
+
 bool CcdCollisionLoop::findEarliestContact(
 	const std::vector<std::shared_ptr<Collision::CollisionPair>>& ccdPairs,
 	double* currentTimeOfImpact)
