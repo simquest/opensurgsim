@@ -233,28 +233,23 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 	const Math::MeshShape& shape2AtTime0, const Math::RigidTransform3d& pose2AtTime0,
 	const Math::MeshShape& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) const
 {
-	using Math::calculateCcdContactSegmentSegment;
-	using Math::calculateCcdContactPointTriangle;
+	using Math::Geometry::ScalarEpsilon;
 	double epsilon = Math::Geometry::DistanceEpsilon;
 
 	std::list<std::shared_ptr<Contact>> contacts;
 
-	SURGSIM_ASSERT(shape1AtTime0.getNumTriangles() > 0);
+	if (shape1AtTime0.getNumTriangles() == 0 || shape2AtTime0.getNumTriangles() == 0)
+	{
+		return contacts;
+	}
+
 	SURGSIM_ASSERT(shape1AtTime0.getNumTriangles() == shape1AtTime1.getNumTriangles());
-	SURGSIM_ASSERT(shape2AtTime0.getNumTriangles() > 0);
 	SURGSIM_ASSERT(shape2AtTime0.getNumTriangles() == shape2AtTime1.getNumTriangles());
 
 	for (size_t triangle1Id = 0; triangle1Id < shape1AtTime0.getNumTriangles(); triangle1Id++)
 	{
 		auto triangle1T0 = shape1AtTime0.getTriangle(triangle1Id);
 		auto triangle1T1 = shape1AtTime1.getTriangle(triangle1Id);
-
-		SURGSIM_ASSERT(triangle1T0.verticesId == triangle1T1.verticesId) << "Triangles are different:\n" <<
-			"(" << triangle1T0.verticesId[0] << "," << triangle1T0.verticesId[1] << "," <<
-			triangle1T0.verticesId[2] << ")\n" <<
-			"(" << triangle1T1.verticesId[0] << "," << triangle1T1.verticesId[1] << "," <<
-			triangle1T1.verticesId[2] << ")\n" <<
-			"triangleT0.valid = " << triangle1T0.isValid << "\ntriangleT1.valid = " << triangle1T1.isValid;
 
 		std::pair<Math::Vector3d, Math::Vector3d> t1v0 = std::make_pair(
 			shape1AtTime0.getVertexPosition(triangle1T0.verticesId[0]),
@@ -279,13 +274,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			auto triangle2T0 = shape2AtTime0.getTriangle(triangle2Id);
 			auto triangle2T1 = shape2AtTime1.getTriangle(triangle2Id);
 
-			SURGSIM_ASSERT(triangle2T0.verticesId == triangle2T1.verticesId) << "Triangles are different:\n" <<
-				"(" << triangle2T0.verticesId[0] << "," << triangle2T0.verticesId[1] << "," <<
-				triangle2T0.verticesId[2] << ")\n" <<
-				"(" << triangle2T1.verticesId[0] << "," << triangle2T1.verticesId[1] << "," <<
-				triangle2T1.verticesId[2] << ")\n" <<
-				"triangleT0.valid = " << triangle2T0.isValid << "\ntriangleT1.valid = " << triangle2T1.isValid;
-
 			std::pair<Math::Vector3d, Math::Vector3d> t2v0 = std::make_pair(
 				shape2AtTime0.getVertexPosition(triangle2T0.verticesId[0]),
 				shape2AtTime1.getVertexPosition(triangle2T1.verticesId[0]));
@@ -309,12 +297,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 				continue;
 			}
 
-			double earliestTimeOfImpact = std::numeric_limits<double>::max();
-			double triangle1Alpha = -1.0;  //!< Barycentric coordinates of P1 in triangle t1v0t1v1t1v2
-			double triangle1Beta = -1.0;  //!< P1 = t1v0 + triangle1Alpha.t1v0t1v1 + triangle1Beta.t1v0t1v2
-			double triangle2Alpha = -1.0;  //!< Barycentric coordinates of P2 in triangle t2v0t2v1t2v2
-			double triangle2Beta = -1.0;   //!< P2 = t2v0 + triangleAlpha.t2v0t2v1 + triangleBeta.t2v0t2v2
-
 			Math::Vector3d t1n = ((t1v1.first - t1v0.first).cross(t1v2.first - t1v0.first));
 			if (t1n.norm() < Math::Geometry::DistanceEpsilon)
 			{
@@ -335,321 +317,468 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			// Check collision at time t = 0
 			Math::Vector3d pt1;
 			Math::Vector3d pt2;
-			bool segmentSegmentCcdFound = false;
-			bool t1VertexThroughT2 = false;
+
+			std::shared_ptr<Contact> contact;
 
 			if (Math::distanceTriangleTriangle(
 				t1v0.first, t1v1.first, t1v2.first,
 				t2v0.first, t2v1.first, t2v2.first,
 				&pt1, &pt2) <= 0.0)
 			{
-				Math::Vector3d baryCoordTriangle1;
-				Math::Vector3d baryCoordTriangle2;
-				if (!Math::barycentricCoordinates(pt1, t1v0.first, t1v1.first, t1v2.first, &baryCoordTriangle1))
-				{
-					SURGSIM_LOG_WARNING(Framework::Logger::getLogger("TriangleMeshTriangleMeshContact")) <<
-						"[t=0] Could not deduce the barycentric coordinate of (" << pt1.transpose() <<
-						") in the triangle (" << t1v0.first.transpose() << ")  (" << t1v1.first.transpose() <<
-						") (" << t1v2.first.transpose() << ")";
-				}
-				if (!Math::barycentricCoordinates(pt2, t2v0.first, t2v1.first, t2v2.first, &baryCoordTriangle2))
-				{
-					SURGSIM_LOG_WARNING(Framework::Logger::getLogger("TriangleMeshTriangleMeshContact")) <<
-						"[t=0] Could not deduce the barycentric coordinate of (" << pt2.transpose() <<
-						") in the triangle (" << t2v0.first.transpose() << ")  (" << t2v1.first.transpose() <<
-						") (" << t2v2.first.transpose() << ")";
-				}
-				segmentSegmentCcdFound = false;
-				earliestTimeOfImpact = 0.0;
-				triangle1Alpha = baryCoordTriangle1[1];
-				triangle1Beta = baryCoordTriangle1[2];
-				triangle2Alpha = baryCoordTriangle2[1];
-				triangle2Beta = baryCoordTriangle2[2];
+				ccdContactDcdCase(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, t1n, t2n,
+					triangle1Id, triangle2Id, pose1AtTime1, pose2AtTime1, &contacts);
 			}
 			else
 			{
-				// No collision at time t = 0, let's look for collision in the interval ]0..1]
-
-				// Calculate Segment/Segment ccd
-				double timeOfImpact;
-				double t1Factor, t2Factor;
-				if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = t1Factor;
-						triangle1Beta = 0.0;
-						triangle2Alpha = t2Factor;
-						triangle2Beta = 0.0;
-					}
-				}
-
-				if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = t1Factor;
-						triangle1Beta = 0.0;
-						triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-						triangle2Beta = t2Factor;
-					}
-				}
-
-				if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v2, t2v0, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = t1Factor;
-						triangle1Beta = 0.0;
-						triangle2Alpha = 0.0; // P = P0 + P0P2.(1 - tFactor)
-						triangle2Beta = 1.0 - t2Factor;
-					}
-				}
-
-				if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-						triangle1Beta = t1Factor;
-						triangle2Alpha = t2Factor;
-						triangle2Beta = 0.0;
-					}
-				}
-
-				if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-						triangle1Beta = t1Factor;
-						triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-						triangle2Beta = t2Factor;
-					}
-				}
-
-				if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v2, t2v0, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-						triangle1Beta = t1Factor;
-						triangle2Alpha = 0.0; // P = P0 + P0P2.(1 - tFactor)
-						triangle2Beta = 1.0 - t2Factor;
-					}
-				}
-
-				if (calculateCcdContactSegmentSegment(t1v2, t1v0, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 0.0; // P = P0 + P0P2.(1 - tFactor)
-						triangle1Beta = 1.0 - t1Factor;
-						triangle2Alpha = t2Factor;
-						triangle2Beta = 0.0;
-					}
-				}
-
-				if (calculateCcdContactSegmentSegment(t1v2, t1v0, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 0.0; // P = P0 + P0P2.(1 - tFactor)
-						triangle1Beta = 1.0 - t1Factor;
-						triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-						triangle2Beta = t2Factor;
-					}
-				}
-
-				if (calculateCcdContactSegmentSegment(t1v2, t1v0, t2v2, t2v0, &timeOfImpact, &t1Factor, &t2Factor))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 0.0; // P = P0 + P0P2.(1 - tFactor)
-						triangle1Beta = 1.0 - t1Factor;
-						triangle2Alpha = 0.0; // P = P0 + P0P2.(1 - tFactor)
-						triangle2Beta = 1.0 - t2Factor;
-					}
-				}
-
-				// Calculate Point/Triangle ccd
-				double u, v;
-				if (calculateCcdContactPointTriangle(t1v0, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = false;
-						t1VertexThroughT2 = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 0.0;
-						triangle1Beta = 0.0;
-						triangle2Alpha = u;
-						triangle2Beta = v;
-					}
-				}
-
-				if (calculateCcdContactPointTriangle(t1v1, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = false;
-						t1VertexThroughT2 = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 1.0;
-						triangle1Beta = 0.0;
-						triangle2Alpha = u;
-						triangle2Beta = v;
-					}
-				}
-
-				if (calculateCcdContactPointTriangle(t1v2, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = false;
-						t1VertexThroughT2 = true;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = 0.0;
-						triangle1Beta = 1.0;
-						triangle2Alpha = u;
-						triangle2Beta = v;
-					}
-				}
-
-				if (calculateCcdContactPointTriangle(t2v0, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = false;
-						t1VertexThroughT2 = false;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = u;
-						triangle1Beta = v;
-						triangle2Alpha = 0.0;
-						triangle2Beta = 0.0;
-					}
-				}
-
-				if (calculateCcdContactPointTriangle(t2v1, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = false;
-						t1VertexThroughT2 = false;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = u;
-						triangle1Beta = v;
-						triangle2Alpha = 1.0;
-						triangle2Beta = 0.0;
-					}
-				}
-
-				if (calculateCcdContactPointTriangle(t2v2, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
-				{
-					if (timeOfImpact < earliestTimeOfImpact)
-					{
-						segmentSegmentCcdFound = false;
-						t1VertexThroughT2 = false;
-						earliestTimeOfImpact = timeOfImpact;
-						triangle1Alpha = u;
-						triangle1Beta = v;
-						triangle2Alpha = 0.0;
-						triangle2Beta = 1.0;
-					}
-				}
+				ccdContactCcdCase(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, t1n, t2n,
+					triangle1Id, triangle2Id, pose1AtTime1, pose2AtTime1, &contacts);
 			}
 
-			// False positive from the AABB, no collision found
-			if (earliestTimeOfImpact == std::numeric_limits<double>::max())
+			if (contact != nullptr)
 			{
-				continue;
+				contacts.emplace_back(std::move(contact));
 			}
-
-			SURGSIM_ASSERT(triangle1Alpha >= -epsilon && triangle1Beta >= -epsilon &&
-				triangle1Alpha + triangle1Beta <= (1.0 + epsilon + epsilon)) <<
-				"earliestTimeOfImpact = " << earliestTimeOfImpact <<
-				"; triangleAlpha = " << triangle1Alpha <<
-				"; triangleBeta = " << triangle1Beta <<
-				"; triangleAlpha + triangleBeta = " << triangle1Alpha + triangle1Beta;
-			SURGSIM_ASSERT(triangle2Alpha >= -epsilon && triangle2Beta >= -epsilon &&
-				triangle2Alpha + triangle2Beta <= (1.0 + epsilon + epsilon)) <<
-				"earliestTimeOfImpact = " << earliestTimeOfImpact <<
-				"; triangleAlpha = " << triangle2Alpha <<
-				"; triangleBeta = " << triangle2Beta <<
-				"; triangleAlpha + triangleBeta = " << triangle2Alpha + triangle2Beta;
-
-			Math::Vector3d T1, T2, normal;
-			double penentrationDepthAtT1;
-
-			Math::Vector3d t1T0T1 = t1v1.second - t1v0.second;
-			Math::Vector3d t1T0T2 = t1v2.second - t1v0.second;
-			T1 = t1v0.second + triangle1Alpha * t1T0T1 + triangle1Beta * t1T0T2;
-
-			Math::Vector3d t2T0T1 = t2v1.second - t2v0.second;
-			Math::Vector3d t2T0T2 = t2v2.second - t2v0.second;
-			T2 = t2v0.second + triangle2Alpha * t2T0T1 + triangle2Beta * t2T0T2;
-
-			normal = (segmentSegmentCcdFound) ? (T1 - T2).normalized() :
-				((t1VertexThroughT2) ? t2T0T1.cross(t2T0T2).normalized() : -t1T0T1.cross(t1T0T2).normalized());
-			penentrationDepthAtT1 = std::abs((T2 - T1).dot(normal));
-
-			Math::Vector triangle1BaryCoord(3);
-			triangle1BaryCoord << 1.0 - triangle1Alpha - triangle1Beta, triangle1Alpha, triangle1Beta;
-			DataStructures::IndexedLocalCoordinate localCoordinateTriangle1(triangle1Id, triangle1BaryCoord);
-			// The location related to the TriangleMesh can carry a TRIANGLE information
-			// e.g. part of a Mass-Spring with deformable triangulation for collision
-			DataStructures::Location locationTriangle1(localCoordinateTriangle1, Location::TRIANGLE);
-			// The location related to the TriangleMesh can carry an ELEMENT information
-			// e.g. part of an Fem2D for example
-			locationTriangle1.elementMeshLocalCoordinate = locationTriangle1.triangleMeshLocalCoordinate;
-			// The location related to the TriangleMesh can carry a RIGID LOCAL POSITION information
-			// e.g. part of a rigid body
-			locationTriangle1.rigidLocalPosition = pose1AtTime1.inverse() * T1;
-
-			Math::Vector triangle2BaryCoord(3);
-			triangle2BaryCoord << 1.0 - triangle2Alpha - triangle2Beta, triangle2Alpha, triangle2Beta;
-			DataStructures::IndexedLocalCoordinate localCoordinateTriangle2(triangle2Id, triangle2BaryCoord);
-			// The location related to the TriangleMesh can carry a TRIANGLE information
-			// e.g. part of a Mass-Spring with deformable triangulation for collision
-			DataStructures::Location locationTriangle2(localCoordinateTriangle2, Location::TRIANGLE);
-			// The location related to the TriangleMesh can carry an ELEMENT information
-			// e.g. part of an Fem2D for example
-			locationTriangle2.elementMeshLocalCoordinate = locationTriangle2.triangleMeshLocalCoordinate;
-			// The location related to the TriangleMesh can carry a RIGID LOCAL POSITION information
-			// e.g. part of a rigid body
-			locationTriangle2.rigidLocalPosition = pose2AtTime1.inverse() * T2;
-
-			auto contact = std::make_shared<Contact>(
-				COLLISION_DETECTION_TYPE_CONTINUOUS,
-				penentrationDepthAtT1,
-				earliestTimeOfImpact,
-				(T1 + T2) * 0.5,
-				normal,
-				std::make_pair(locationTriangle1, locationTriangle2));
-
-			contacts.push_back(std::move(contact));
 		}
 	}
 
 	return contacts;
+}
+
+void TriangleMeshTriangleMeshContact::ccdContactDcdCase(
+	const std::pair<Math::Vector3d, Math::Vector3d>& t1v0, const std::pair<Math::Vector3d, Math::Vector3d>& t1v1,
+	const std::pair<Math::Vector3d, Math::Vector3d>& t1v2, const std::pair<Math::Vector3d, Math::Vector3d>& t2v0,
+	const std::pair<Math::Vector3d, Math::Vector3d>& t2v1, const std::pair<Math::Vector3d, Math::Vector3d>& t2v2,
+	const Math::Vector3d& t1n, const Math::Vector3d& t2n, size_t triangle1Id, size_t triangle2Id,
+	const Math::RigidTransform3d& pose1AtTime1, const Math::RigidTransform3d& pose2AtTime1,
+	std::list<std::shared_ptr<Contact>>* contacts) const
+{
+	using Math::Geometry::ScalarEpsilon;
+
+	double depth;
+	Math::Vector3d pt1;
+	Math::Vector3d pt2;
+	Math::Vector3d normal;
+	Math::calculateContactTriangleTriangle(t1v0.first, t1v1.first, t1v2.first,
+		t2v0.first, t2v1.first, t2v2.first, t1n, t2n, &depth, &pt1, &pt2, &normal);
+
+	Math::Vector3d baryCoordTriangle1;
+	Math::Vector3d baryCoordTriangle2;
+	bool invalidCoordinates = false;
+	if (!Math::barycentricCoordinates(pt1, t1v0.first, t1v1.first, t1v2.first, t1n, &baryCoordTriangle1))
+	{
+		SURGSIM_LOG_WARNING(Framework::Logger::getLogger("TriangleMeshTriangleMeshContact")) <<
+			"[t=0] Could not deduce the barycentric coordinate of (" << pt1.transpose() <<
+			") in the triangle (" << t1v0.first.transpose() << ")  (" << t1v1.first.transpose() <<
+			") (" << t1v2.first.transpose() << ")";
+		invalidCoordinates = true;
+	}
+	if (!Math::barycentricCoordinates(pt2, t2v0.first, t2v1.first, t2v2.first, t2n, &baryCoordTriangle2))
+	{
+		SURGSIM_LOG_WARNING(Framework::Logger::getLogger("TriangleMeshTriangleMeshContact")) <<
+			"[t=0] Could not deduce the barycentric coordinate of (" << pt2.transpose() <<
+			") in the triangle (" << t2v0.first.transpose() << ")  (" << t2v1.first.transpose() <<
+			") (" << t2v2.first.transpose() << ")";
+		invalidCoordinates = true;
+	}
+
+	if (invalidCoordinates)
+	{
+		return;
+	}
+
+	Math::Vector3d t1contact = t1v0.second * baryCoordTriangle1[0] +
+		t1v1.second * baryCoordTriangle1[1] + t1v0.second * baryCoordTriangle1[2];
+
+	Math::Vector3d t2contact = t2v0.second * baryCoordTriangle2[0] +
+		t2v1.second * baryCoordTriangle2[1] + t2v0.second * baryCoordTriangle2[2];
+
+	DataStructures::IndexedLocalCoordinate localCoordinateTriangle1(triangle1Id, baryCoordTriangle1);
+	// The location related to the TriangleMesh can carry a TRIANGLE information
+	DataStructures::Location locationTriangle1(localCoordinateTriangle1, Location::TRIANGLE);
+	// The location related to the TriangleMesh can carry an ELEMENT information
+	locationTriangle1.elementMeshLocalCoordinate = locationTriangle1.triangleMeshLocalCoordinate;
+	// The location related to the TriangleMesh can carry a RIGID LOCAL POSITION information
+	locationTriangle1.rigidLocalPosition = pose1AtTime1.inverse() * t1contact;
+
+	DataStructures::IndexedLocalCoordinate localCoordinateTriangle2(triangle2Id, baryCoordTriangle2);
+	// The location related to the TriangleMesh can carry a TRIANGLE information
+	DataStructures::Location locationTriangle2(localCoordinateTriangle2, Location::TRIANGLE);
+	// The location related to the TriangleMesh can carry an ELEMENT information
+	locationTriangle2.elementMeshLocalCoordinate = locationTriangle2.triangleMeshLocalCoordinate;
+	// The location related to the TriangleMesh can carry a RIGID LOCAL POSITION information
+	locationTriangle2.rigidLocalPosition = pose2AtTime1.inverse() * t2contact;
+
+	if (std::abs(std::abs(normal.dot(t1n)) - 1.0) < ScalarEpsilon)
+	{
+		normal = -((t1v1.second - t1v0.second).cross(t1v2.second - t1v0.second)).normalized();
+	}
+	else
+	{
+		normal = ((t2v1.second - t2v0.second).cross(t2v2.second - t2v0.second)).normalized();
+	}
+
+	depth = (t1contact - t2contact).dot(normal);
+	contacts->emplace_back(std::make_shared<Contact>(
+		COLLISION_DETECTION_TYPE_CONTINUOUS,
+		depth,
+		0.0,
+		(t1contact + t2contact) * 0.5,
+		normal,
+		std::make_pair(locationTriangle1, locationTriangle2)));
+}
+
+void TriangleMeshTriangleMeshContact::ccdContactCcdCase(
+	const std::pair<Math::Vector3d, Math::Vector3d>& t1v0, const std::pair<Math::Vector3d, Math::Vector3d>& t1v1,
+	const std::pair<Math::Vector3d, Math::Vector3d>& t1v2, const std::pair<Math::Vector3d, Math::Vector3d>& t2v0,
+	const std::pair<Math::Vector3d, Math::Vector3d>& t2v1, const std::pair<Math::Vector3d, Math::Vector3d>& t2v2,
+	const Math::Vector3d& t1n, const Math::Vector3d& t2n, size_t triangle1Id, size_t triangle2Id,
+	const Math::RigidTransform3d& pose1AtTime1, const Math::RigidTransform3d& pose2AtTime1,
+	std::list<std::shared_ptr<Contact>>* contacts) const
+{
+	using Math::Geometry::ScalarEpsilon;
+	
+	// No collision at time t = 0, let's look for collision in the interval ]0..1]
+	double earliestTimeOfImpact = std::numeric_limits<double>::max();
+	double triangle1Alpha = -1.0;  //!< Barycentric coordinates of P1 in triangle t1v0t1v1t1v2
+	double triangle1Beta = -1.0;  //!< P1 = t1v0 + triangle1Alpha.t1v0t1v1 + triangle1Beta.t1v0t1v2
+	double triangle2Alpha = -1.0;  //!< Barycentric coordinates of P2 in triangle t2v0t2v1t2v2
+	double triangle2Beta = -1.0;   //!< P2 = t2v0 + triangleAlpha.t2v0t2v1 + triangleBeta.t2v0t2v2
+
+	bool segmentSegmentCcdFound = false;
+	bool t1VertexThroughT2 = false;
+
+	// Calculate Segment/Segment ccd
+	segmentSegmentCcdFound = ccdContactCcdCaseSegmentSegment(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2,
+		&earliestTimeOfImpact, &triangle1Alpha, &triangle1Beta, &triangle2Alpha, &triangle2Beta);
+
+	// Calculate Point/Triangle ccd
+	if (ccdContactCcdCasePointTriangle(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, &earliestTimeOfImpact,
+		&triangle1Alpha, &triangle1Beta, &triangle2Alpha, &triangle2Beta, &t1VertexThroughT2))
+	{
+		segmentSegmentCcdFound = false;
+	}
+
+	// False positive from the AABB, no collision found
+	if (earliestTimeOfImpact == std::numeric_limits<double>::max())
+	{
+		return;
+	}
+
+	Math::Vector3d t1contact, t2contact, normal;
+	double penetrationDepthAtT1;
+
+	Math::Vector3d t1v0v1 = t1v1.second - t1v0.second;
+	Math::Vector3d t1v0v2 = t1v2.second - t1v0.second;
+	t1contact = t1v0.second + triangle1Alpha * t1v0v1 + triangle1Beta * t1v0v2;
+
+	Math::Vector3d t2v0v1 = t2v1.second - t2v0.second;
+	Math::Vector3d t2v0v2 = t2v2.second - t2v0.second;
+	t2contact = t2v0.second + triangle2Alpha * t2v0v1 + triangle2Beta * t2v0v2;
+
+	if (segmentSegmentCcdFound)
+	{
+		Math::Vector3d t1v0v1T0 = t1v1.first - t1v0.first;
+		Math::Vector3d t1v0v2T0 = t1v2.first - t1v0.first;
+		Math::Vector3d t1contactT0 = t1v0.first + triangle1Alpha * t1v0v1T0 + triangle1Beta * t1v0v2T0;
+
+		Math::Vector3d t2v0v1T0 = t2v1.first - t2v0.first;
+		Math::Vector3d t2v0v2T0 = t2v2.first - t2v0.first;
+		Math::Vector3d t2contactT0 = t2v0.first + triangle2Alpha * t2v0v1T0 + triangle2Beta * t2v0v2T0;
+
+		auto dir1 = (t1contact - t1contactT0).normalized();
+		auto dir2 = (t2contact - t2contactT0).normalized();
+
+		if (std::abs(std::abs(dir1.dot(dir2)) - 1.0) < Math::Geometry::ScalarEpsilon)
+		{
+			normal = -dir1;
+		}
+		else
+		{
+			auto axis1 = (dir1 + dir2).normalized();
+			auto axis2 = axis1.cross(dir1);
+			normal = axis2.cross(axis1).normalized();
+		}
+
+		if (!Math::isValid(normal))
+		{
+			normal = (t1contact - t2contact).normalized();
+		}
+	}
+	else
+	{
+		if (t1VertexThroughT2)
+		{
+			normal = t2v0v1.cross(t2v0v2).normalized();
+		}
+		else
+		{
+			normal = -t1v0v1.cross(t1v0v2).normalized();
+		}
+	}
+	penetrationDepthAtT1 = (t2contact - t1contact).dot(normal);
+
+	Math::Vector triangle1BaryCoord(3);
+	triangle1BaryCoord << 1.0 - triangle1Alpha - triangle1Beta, triangle1Alpha, triangle1Beta;
+	DataStructures::IndexedLocalCoordinate localCoordinateTriangle1(triangle1Id, triangle1BaryCoord);
+	// The location related to the TriangleMesh can carry a TRIANGLE information
+	DataStructures::Location locationTriangle1(localCoordinateTriangle1, Location::TRIANGLE);
+	// The location related to the TriangleMesh can carry an ELEMENT information
+	locationTriangle1.elementMeshLocalCoordinate = locationTriangle1.triangleMeshLocalCoordinate;
+	// The location related to the TriangleMesh can carry a RIGID LOCAL POSITION information
+	locationTriangle1.rigidLocalPosition = pose1AtTime1.inverse() * t1contact;
+
+	Math::Vector triangle2BaryCoord(3);
+	triangle2BaryCoord << 1.0 - triangle2Alpha - triangle2Beta, triangle2Alpha, triangle2Beta;
+	DataStructures::IndexedLocalCoordinate localCoordinateTriangle2(triangle2Id, triangle2BaryCoord);
+	// The location related to the TriangleMesh can carry a TRIANGLE information
+	DataStructures::Location locationTriangle2(localCoordinateTriangle2, Location::TRIANGLE);
+	// The location related to the TriangleMesh can carry an ELEMENT information
+	locationTriangle2.elementMeshLocalCoordinate = locationTriangle2.triangleMeshLocalCoordinate;
+	// The location related to the TriangleMesh can carry a RIGID LOCAL POSITION information
+	locationTriangle2.rigidLocalPosition = pose2AtTime1.inverse() * t2contact;
+
+	contacts->emplace_back(std::make_shared<Contact>(
+		COLLISION_DETECTION_TYPE_CONTINUOUS,
+		penetrationDepthAtT1,
+		earliestTimeOfImpact,
+		(t1contact + t2contact) * 0.5,
+		normal,
+		std::make_pair(locationTriangle1, locationTriangle2)));
+}
+
+bool TriangleMeshTriangleMeshContact::ccdContactCcdCaseSegmentSegment(
+	const std::pair<Math::Vector3d, Math::Vector3d>& t1v0, const std::pair<Math::Vector3d, Math::Vector3d>& t1v1,
+	const std::pair<Math::Vector3d, Math::Vector3d>& t1v2, const std::pair<Math::Vector3d, Math::Vector3d>& t2v0,
+	const std::pair<Math::Vector3d, Math::Vector3d>& t2v1, const std::pair<Math::Vector3d, Math::Vector3d>& t2v2,
+	double* earliestTimeOfImpact, double* triangle1Alpha, double* triangle1Beta, double* triangle2Alpha,
+	double* triangle2Beta) const
+{
+	using Math::calculateCcdContactSegmentSegment;
+	
+	bool segmentSegmentCcdFound = false;
+	double timeOfImpact;
+	double t1Factor;
+	double t2Factor;
+
+	if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = t1Factor;
+			*triangle1Beta = 0.0;
+			*triangle2Alpha = t2Factor;
+			*triangle2Beta = 0.0;
+		}
+	}
+
+	if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = t1Factor;
+			*triangle1Beta = 0.0;
+			*triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+			*triangle2Beta = t2Factor;
+		}
+	}
+
+	if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v0, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = t1Factor;
+			*triangle1Beta = 0.0;
+			*triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+			*triangle2Beta = t2Factor;
+		}
+	}
+
+	if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+			*triangle1Beta = t1Factor;
+			*triangle2Alpha = t2Factor;
+			*triangle2Beta = 0.0;
+		}
+	}
+
+	if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+			*triangle1Beta = t1Factor;
+			*triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+			*triangle2Beta = t2Factor;
+		}
+	}
+
+	if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v0, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+			*triangle1Beta = t1Factor;
+			*triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+			*triangle2Beta = t2Factor;
+		}
+	}
+
+	if (calculateCcdContactSegmentSegment(t1v0, t1v2, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+			*triangle1Beta = t1Factor;
+			*triangle2Alpha = t2Factor;
+			*triangle2Beta = 0.0;
+		}
+	}
+
+	if (calculateCcdContactSegmentSegment(t1v0, t1v2, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+			*triangle1Beta = t1Factor;
+			*triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+			*triangle2Beta = t2Factor;
+		}
+	}
+
+	if (calculateCcdContactSegmentSegment(t1v0, t1v2, t2v0, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			segmentSegmentCcdFound = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+			*triangle1Beta = t1Factor;
+			*triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+			*triangle2Beta = t2Factor;
+		}
+	}
+
+	return segmentSegmentCcdFound;
+}
+
+bool TriangleMeshTriangleMeshContact::ccdContactCcdCasePointTriangle(
+	const std::pair<Math::Vector3d, Math::Vector3d>& t1v0, const std::pair<Math::Vector3d, Math::Vector3d>& t1v1,
+	const std::pair<Math::Vector3d, Math::Vector3d>& t1v2, const std::pair<Math::Vector3d, Math::Vector3d>& t2v0,
+	const std::pair<Math::Vector3d, Math::Vector3d>& t2v1, const std::pair<Math::Vector3d, Math::Vector3d>& t2v2,
+	double* earliestTimeOfImpact, double* triangle1Alpha, double* triangle1Beta, double* triangle2Alpha,
+	double* triangle2Beta, bool* t1VertexThroughT2) const
+{
+	using Math::calculateCcdContactPointTriangle;
+
+	bool pointTriangleCcdFound = false;
+	double timeOfImpact;
+	double u;
+	double v;
+
+	if (calculateCcdContactPointTriangle(t1v0, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			pointTriangleCcdFound = true;
+			*t1VertexThroughT2 = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 0.0;
+			*triangle1Beta = 0.0;
+			*triangle2Alpha = u;
+			*triangle2Beta = v;
+		}
+	}
+
+	if (calculateCcdContactPointTriangle(t1v1, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			pointTriangleCcdFound = true;
+			*t1VertexThroughT2 = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 1.0;
+			*triangle1Beta = 0.0;
+			*triangle2Alpha = u;
+			*triangle2Beta = v;
+		}
+	}
+
+	if (calculateCcdContactPointTriangle(t1v2, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			pointTriangleCcdFound = true;
+			*t1VertexThroughT2 = true;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = 0.0;
+			*triangle1Beta = 1.0;
+			*triangle2Alpha = u;
+			*triangle2Beta = v;
+		}
+	}
+
+	if (calculateCcdContactPointTriangle(t2v0, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			pointTriangleCcdFound = true;
+			*t1VertexThroughT2 = false;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = u;
+			*triangle1Beta = v;
+			*triangle2Alpha = 0.0;
+			*triangle2Beta = 0.0;
+		}
+	}
+
+	if (calculateCcdContactPointTriangle(t2v1, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			pointTriangleCcdFound = true;
+			*t1VertexThroughT2 = false;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = u;
+			*triangle1Beta = v;
+			*triangle2Alpha = 1.0;
+			*triangle2Beta = 0.0;
+		}
+	}
+
+	if (calculateCcdContactPointTriangle(t2v2, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
+	{
+		if (timeOfImpact < *earliestTimeOfImpact)
+		{
+			pointTriangleCcdFound = true;
+			*t1VertexThroughT2 = false;
+			*earliestTimeOfImpact = timeOfImpact;
+			*triangle1Alpha = u;
+			*triangle1Beta = v;
+			*triangle2Alpha = 0.0;
+			*triangle2Beta = 1.0;
+		}
+	}
+
+	return pointTriangleCcdFound;
 }
 
 }; // namespace Collision
