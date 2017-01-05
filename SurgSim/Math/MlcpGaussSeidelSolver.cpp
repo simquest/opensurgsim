@@ -95,6 +95,10 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	double* constraintConvergenceCriteria = solution->constraintConvergenceCriteria;
 	double* initialConstraintConvergenceCriteria = solution->initialConstraintConvergenceCriteria;
 
+	solution->maxIterations = m_maxIterations;
+	solution->epsilonConvergence = m_epsilonConvergence;
+	solution->contactTolerance = m_contactTolerance;
+
 	// Loop until it converges or maxIterations are reached
 	*iteration = 0;
 	*validSignorini = true;
