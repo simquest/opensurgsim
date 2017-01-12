@@ -18,6 +18,7 @@
 
 #include <string>
 #include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Asset.h"
 
 namespace SurgSim
 {
@@ -36,7 +37,7 @@ namespace Graphics
 /// Vertex and Fragment). Each shader itself is software that is executed on the GPU, shaders are usually introduced
 /// as source. The concept is similar to the use of program in
 /// OpenGL see https://www.opengl.org/sdk/docs/man4/html/glCreateProgram.xhtml
-class Program
+class Program : public Framework::Asset
 {
 public:
 

@@ -35,6 +35,8 @@ class ApplicationData;
 namespace Graphics
 {
 
+SURGSIM_STATIC_REGISTRATION(OsgProgram);
+
 /// OSG-based implementation of a graphics shader.
 ///
 /// Wraps an osg::Program which manages the geometry, vertex, and fragment shaders.
@@ -46,6 +48,8 @@ public:
 	/// Constructor
 	/// \post	No shader code is set, so the fixed-function pipeline is used.
 	OsgProgram();
+
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgProgram);
 
 	bool hasVertexShader() const override;
 
@@ -139,6 +143,10 @@ private:
 
 	/// Is the shader supposed to be used globally
 	bool m_globalScope;
+
+protected:
+
+	bool doLoad(const std::string& filePath) override;
 
 };
 

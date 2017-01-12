@@ -32,6 +32,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpring3DRepresentation.cpp
 	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
+	PostprocessingView.cpp
 	ShadowMapping.cpp
 	SingleKeyBehavior.cpp
 	SphereElement.cpp
@@ -58,6 +59,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpring3DRepresentation.h
 	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
+	PostprocessingView.cpp
 	ShadowMapping.h
 	SingleKeyBehavior.h
 	SphereElement.h
@@ -88,6 +90,10 @@ target_link_libraries(SurgSimBlocks ${LIBS}
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
+endif()
+
+if(BUILD_RENDER_TESTING)
+	add_subdirectory(RenderTests)
 endif()
 
 # Put SurgSimBlocks into folder "Blocks"

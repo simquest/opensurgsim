@@ -272,7 +272,7 @@ osg::ref_ptr<osgViewer::CompositeViewer> OsgManager::getOsgCompositeViewer() con
 
 void SurgSim::Graphics::OsgManager::dumpDebugInfo() const
 {
-	osgDB::writeNodeFile(*m_viewer->getView(0)->getCamera(), "viewer_zero_camera.osgt");
+	osgDB::writeNodeFile(*m_viewer->getView(0)->getCamera(), "viewer_zero_camera.osg");
 }
 
 }

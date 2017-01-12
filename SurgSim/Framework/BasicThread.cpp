@@ -55,10 +55,10 @@ BasicThread::~BasicThread() noexcept(false)  /// C++11 introduced noexcept
 	if (m_isRunning || m_thisThread.joinable())
 	{
 		SURGSIM_FAILURE() <<
-			"A BasicThread instance destructor was called while the thread was still running or " <<
-			"in the process of being stopped, this is currently not supported. If this was intentional " <<
-			"call stop() before destruction of the thread. If this is unintentional, make sure to prevent " <<
-			"the destructor from being called.";
+						  "A BasicThread instance destructor was called while the thread was still running or " <<
+						  "in the process of being stopped, this is currently not supported. If this was intentional " <<
+						  "call stop() before destruction of the thread. If this is unintentional, make sure to prevent " <<
+						  "the destructor from being called.";
 	}
 }
 
@@ -124,7 +124,7 @@ void BasicThread::operator()()
 	while (m_isRunning && !m_stopExecution)
 	{
 		start = Clock::now();
-		if (! m_isSynchronous)
+		if (!m_isSynchronous)
 		{
 			if (!m_isIdle)
 			{
@@ -170,10 +170,10 @@ void BasicThread::operator()()
 			if (totalFrameTime.count() > 5.0)
 			{
 				SURGSIM_LOG_INFO(m_logger) << std::setprecision(4)
-					<< "Rate: " << numUpdates / totalFrameTime.count() << "Hz / "
-					<<  1.0 / m_period.count() << "Hz, "
-					<< "Average doUpdate: " << (totalFrameTime.count() - totalSleepTime.count()) / numUpdates << "s, "
-					<< "Sleep: " << 100.0 * totalSleepTime.count() / totalFrameTime.count() << "%";
+										   << "Rate: " << numUpdates / totalFrameTime.count() << "Hz / "
+										   <<  1.0 / m_period.count() << "Hz, "
+										   << "Average doUpdate: " << (totalFrameTime.count() - totalSleepTime.count()) / numUpdates << "s, "
+										   << "Sleep: " << 100.0 * totalSleepTime.count() / totalFrameTime.count() << "%";
 				totalFrameTime = boost::chrono::duration<double>::zero();
 				totalSleepTime = boost::chrono::duration<double>::zero();
 				numUpdates = 0;

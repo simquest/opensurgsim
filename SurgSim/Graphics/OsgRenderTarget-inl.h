@@ -169,9 +169,12 @@ void OsgRenderTarget<T>::setupTexture(int type)
 		}
 		if (type >= TARGETTYPE_COLORBASE)
 		{
-			osgTexture->setInternalFormat(GL_RGBA32F_ARB);
+// 			osgTexture->setInternalFormat(GL_RGBA32F_ARB);
+// 			osgTexture->setSourceFormat(GL_RGBA);
+// 			osgTexture->setSourceType(GL_FLOAT);
+			osgTexture->setInternalFormat(GL_RGBA);
 			osgTexture->setSourceFormat(GL_RGBA);
-			osgTexture->setSourceType(GL_FLOAT);
+			osgTexture->setSourceType(GL_BYTE);
 		}
 	}
 }
