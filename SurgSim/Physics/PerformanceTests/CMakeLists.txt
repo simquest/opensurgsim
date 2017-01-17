@@ -32,6 +32,7 @@ set(UNIT_TEST_HEADERS
 set(LIBS
 	SurgSimInput
 	SurgSimPhysics
+	SurgSimParallel
 )
 
 # Configure the path for the data files

@@ -33,6 +33,8 @@
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
+#include "Modules/Parallel/OdeSolverEulerImplicitOpenCl.h"
+
 using SurgSim::Math::Matrix;
 using SurgSim::Math::OdeState;
 using SurgSim::Math::SparseMatrix;
@@ -361,6 +363,9 @@ bool DeformableRepresentation::doInitialize()
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4:
 			m_odeSolver = std::make_shared<SurgSim::Math::OdeSolverLinearRungeKutta4>(this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT_OPENCL:
+			m_odeSolver = std::make_shared<SurgSim::Parallel::OdeSolverEulerImplicitOpenCl>(this);
 			break;
 		default:
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())

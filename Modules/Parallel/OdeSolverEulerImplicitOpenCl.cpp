@@ -87,7 +87,8 @@ void OdeSolverEulerImplicitOpenCl::assembleLinearSystem(double dt, const Math::O
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix
 
-	// push SystemMatrix to openCl buffer ...
+	// For now keep this to keep the interface correct, getInverse() is called on the linear solver to grab
+	// the inverse of the system matrix when applying the compliance matrix
 	m_linearSolver->setMatrix(m_systemMatrix);
 
 
