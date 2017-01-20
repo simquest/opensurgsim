@@ -100,6 +100,10 @@ bool Representation::doWakeUp()
 		std::vector<std::string> names;
 		boost::split(names, m_materialReference, boost::is_any_of("/"));
 
+		SURGSIM_ASSERT(names.size() == 2)
+				<< "Material reference needs to have 2 parts <scenelement>/<component>, '" << m_materialReference
+				<< "' in " << getFullName() << " doesn't.";
+
 		auto material = getScene()->getComponent(names[0], names[1]);
 		if (material != nullptr)
 		{

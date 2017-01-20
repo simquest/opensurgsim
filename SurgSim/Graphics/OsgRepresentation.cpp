@@ -180,7 +180,7 @@ void OsgRepresentation::updateTangents()
 void OsgRepresentation::setUniforms(const std::vector<std::shared_ptr<Graphics::UniformBase>>& uniforms)
 {
 	SURGSIM_ASSERT(m_uniforms.empty()) << "Can't set the uniforms when there already are uniforms on the object.";
-	for (auto& uniform : m_uniforms)
+	for (auto& uniform : uniforms)
 	{
 		addUniform(uniform);
 	}
