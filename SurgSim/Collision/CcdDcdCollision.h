@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include "SurgSim/Collision/OctreeDoubleSidedPlaneContact.h"
 #include "SurgSim/Collision/OctreePlaneContact.h"
 #include "SurgSim/Collision/OctreeSphereContact.h"
+#include "SurgSim/Collision/OctreeTriangleMeshContact.h"
 #include "SurgSim/Collision/SegmentMeshTriangleMeshContact.h"
 #include "SurgSim/Collision/SegmentSelfContact.h"
 #include "SurgSim/Collision/SphereDoubleSidedPlaneContact.h"
