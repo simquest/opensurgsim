@@ -34,11 +34,34 @@ struct MlcpSolution
 {
 	typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
 
+	MlcpSolution() :
+		numIterations(0),
+		maxIterations(0),
+		epsilonConvergence(std::numeric_limits<double>::max()),
+		contactTolerance(std::numeric_limits<double>::max()),
+		validConvergence(false),
+		validSignorini(false),
+		convergenceCriteria(std::numeric_limits<double>::max()),
+		initialConvergenceCriteria(std::numeric_limits<double>::max())
+	{
+		for (size_t i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; ++i)
+		{
+			constraintConvergenceCriteria[i] = std::numeric_limits<double>::max();
+			initialConstraintConvergenceCriteria[i] = std::numeric_limits<double>::max();
+		}
+	}
+
 	/// Vector \f$x\f$ specifying a solution to the specified mixed LCP problem.
 	Vector x;
 
 	/// The number of iterations performed.
 	size_t numIterations;
+	/// The max iterations allowed for a solve.
+	size_t maxIterations;
+	/// The precision, aka epsilon convergence.
+	double epsilonConvergence;
+	/// The contact tolerance.
+	double contactTolerance;
 	/// True if the final value of the convergence criteria is valid.
 	bool validConvergence;
 	/// True if the final solution satisfies the Signorini conditions.
