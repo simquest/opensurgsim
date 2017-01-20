@@ -18,9 +18,13 @@
 
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/OdeState.h"
+#include "SurgSim/Framework/Timer.h"
+
+#include "Modules/Parallel/TimerGroup.h"
 
 namespace SurgSim
 {
+
 namespace Parallel
 {
 class OdeSolverEulerImplicitOpenCl : public Math::OdeSolver
@@ -43,13 +47,26 @@ public:
 	{
 
 	}
+
+	enum
+	{
+		SETUP_TIME,
+		COPY_TIME,
+		SOLVE_TIME,
+		RESULT_TIME,
+		CLEANUP_TIME
+	};
+
 protected:
 	virtual void assembleLinearSystem(double dt,
 									  const Math::OdeState& state,
 									  const Math::OdeState& newState,
 									  bool computeRHS = true) override;
 
+	Framework::TimerGroup m_timers;
+
 };
+
 
 
 }

@@ -22,13 +22,18 @@
 #include <viennacl/linalg/prod.hpp>
 #include <viennacl/linalg/cg.hpp>
 
+#include <boost/assign.hpp>
+
 namespace SurgSim
 {
 namespace Parallel
 {
 
 OdeSolverEulerImplicitOpenCl::OdeSolverEulerImplicitOpenCl(Math::OdeEquation* odeEquation)
-	: OdeSolver(odeEquation)
+	: OdeSolver(odeEquation),
+	  m_timers("OpenClOdeSolver",
+{"SETUP_TIME", "COPY_TIME", "SOLVE_TIME", "RESULT_TIME", "CLEANUP_TIME"
+})
 {
 
 }
@@ -36,28 +41,35 @@ OdeSolverEulerImplicitOpenCl::OdeSolverEulerImplicitOpenCl(Math::OdeEquation* od
 void OdeSolverEulerImplicitOpenCl::solve(double dt, const Math::OdeState& currentState, Math::OdeState* newState,
 		bool computeCompliance /*= true*/)
 {
-
+	m_timers[SETUP_TIME].beginFrame();
 	// Prepare the newState to be used in the loop, it starts as the current state.
 	*newState = currentState;
 
 	// Assemble the linear system systemMatrix*solution = rhs
 	assembleLinearSystem(dt, currentState, *newState);
+	m_timers[SETUP_TIME].endFrame();
 
-
+	m_timers[COPY_TIME].beginFrame();
 	viennacl::compressed_matrix<double> vcl_systemMatrix;
 	viennacl::vector<double> vcl_rhs(m_rhs.size());
 	viennacl::vector<double> vcl_solution(m_rhs.size());
 
 	viennacl::copy(m_systemMatrix, vcl_systemMatrix);
 	viennacl::copy(m_rhs, vcl_rhs);
+	m_timers[COPY_TIME].endFrame();
 
+	m_timers[SOLVE_TIME].beginFrame();
 	// Solve the linear system to find solution = deltaV
 	vcl_solution = viennacl::linalg::solve(vcl_systemMatrix, vcl_rhs, viennacl::linalg::cg_tag());
+	m_timers[SOLVE_TIME].endFrame();
 
+	m_timers[RESULT_TIME].beginFrame();
 	m_solution.resize(m_rhs.size());
 	viennacl::copy(vcl_solution, m_solution);
+	m_timers[RESULT_TIME].endFrame();
 
 	// Compute the new state using the Euler Implicit scheme:
+	m_timers[CLEANUP_TIME].beginFrame();
 	newState->getVelocities() += m_solution;
 	newState->getPositions() = currentState.getPositions() + dt * newState->getVelocities();
 
@@ -65,6 +77,16 @@ void OdeSolverEulerImplicitOpenCl::solve(double dt, const Math::OdeState& curren
 	if (computeCompliance)
 	{
 		computeComplianceMatrixFromSystemMatrix(currentState);
+	}
+	m_timers[CLEANUP_TIME].endFrame();
+
+	static size_t count = 0;
+	++count;
+	if (count == 10)
+	{
+		std::cout << m_timers;
+		m_timers.reset(100);
+		count = 0;
 	}
 }
 

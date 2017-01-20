@@ -116,6 +116,7 @@ set(LIBS
 	SurgSimMath
 	SurgSimParticles
 	SurgSimPhysics
+	SurgSimParallel
 	MlcpTestIO
 	IdentityPoseDevice
 )

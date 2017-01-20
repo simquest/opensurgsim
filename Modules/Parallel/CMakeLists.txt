@@ -15,10 +15,12 @@ include_directories(
 
 set(SURGSIMPARALLEL_SOURCES
 	OdeSolverEulerImplicitOpenCl.cpp
+	TimerGroup.cpp
 )
 
 set(SURGSIMPARALLEL_HEADERS
 	OdeSolverEulerImplicitOpenCl.h
+	TimerGroup.h
 )
 
 SET(LIBS
