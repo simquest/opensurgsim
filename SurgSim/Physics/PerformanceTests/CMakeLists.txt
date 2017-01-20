@@ -13,10 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(OpenCL REQUIRED)
+find_package(ViennaCL REQUIRED)
+
+add_definitions( -DVIENNACL_WITH_EIGEN )
+add_definitions( -DVIENNACL_WITH_OPENCL )
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${OPENTHREADS_INCLUDE_DIR}
+	${VIENNACL_INCLUDE_DIRS}
 )
 
 set(UNIT_TEST_SOURCES

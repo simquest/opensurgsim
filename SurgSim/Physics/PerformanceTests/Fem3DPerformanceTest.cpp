@@ -30,6 +30,7 @@
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/PerformanceTests/DivisibleCubeRepresentation.h"
 #include "SurgSim/Testing/MockPhysicsManager.h"
+#include "viennacl/backend/opencl.hpp"
 
 using SurgSim::Math::Vector3d;
 
@@ -38,7 +39,7 @@ namespace
 static const double dt = 0.001;
 static const double maxIterationConstant = 0.1;
 static const double tolerance = 1.0e-03;
-static const int frameCount = 10;
+static const int frameCount = 8000;
 
 static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::hash<int>> getIntegrationSchemeNames()
 {
@@ -90,6 +91,10 @@ class Fem3DPerformanceTestBase : public ::testing::Test
 public:
 	virtual void SetUp()
 	{
+		viennacl::ocl::set_context_platform_index(0, 1);
+		viennacl::ocl::set_context_device_type(0, viennacl::ocl::cpu_tag());
+
+
 		m_physicsManager = std::make_shared<SurgSim::Testing::MockPhysicsManager>();
 
 		m_physicsManager->doInitialize();
@@ -134,6 +139,7 @@ public:
 
 	void performTimingTest()
 	{
+		std::cout << "TEst Start\n";
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
 
@@ -208,7 +214,7 @@ TEST_P(IntegrationSchemeAndCountParamTest, CubeTest)
 	initializeRepresentation(fem);
 	performTimingTest();
 }
-
+/*
 INSTANTIATE_TEST_CASE_P(Fem3DPerformanceTest,
 						IntegrationSchemeParamTest,
 						::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
@@ -228,20 +234,32 @@ INSTANTIATE_TEST_CASE_P(Fem3DPerformanceTest,
 INSTANTIATE_TEST_CASE_P(
 	Fem3DPerformanceTest,
 	IntegrationSchemeAndCountParamTest,
-	::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
-					   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_STATIC,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
-					   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4,
-					   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT_OPENCL),
-					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU,
-							   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT),
-					   ::testing::Values(2, 3, 4, 5, 6, 7, 8)));
+	::testing::Combine(::testing::Values(
+						   //SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
+						   //SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT,
+						   //SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
+						   //SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
+						   //SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT,
+						   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT
+						   //SurgSim::Math::INTEGRATIONSCHEME_STATIC,
+						   //SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
+						   //SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
+						   //SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4,
+						   //SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT_OPENCL
+					   ),
+					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU
+							   //,SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT
+										),
+					   ::testing::Values(24)));
+					   */
+
+INSTANTIATE_TEST_CASE_P(
+	TimingTest,
+	IntegrationSchemeAndCountParamTest,
+	::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT),
+					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU),
+					   ::testing::Values(12)));
+
 
 } // namespace Physics
 } // namespace SurgSim
