@@ -222,6 +222,28 @@ public:
 		return false;
 	}
 
+	void addUniform(const std::string& type, const std::string& name, const boost::any& value)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void setUniforms(const std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>>& uniforms)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>> getUniforms() const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+
+
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -465,6 +487,27 @@ public:
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
+	void addUniform(const std::string& type, const std::string& name, const boost::any& value)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void setUniforms(const std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>>& uniforms)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>> getUniforms() const
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+
+	}
+
 private:
 	/// Number of times the camera has been updated
 	int m_numUpdates;
@@ -479,6 +522,7 @@ private:
 
 	/// Projection matrix of the camera
 	SurgSim::Math::Matrix44d m_projectionMatrix;
+
 };
 
 /// View class for testing

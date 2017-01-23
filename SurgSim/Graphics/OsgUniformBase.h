@@ -66,6 +66,9 @@ public:
 		return m_uniform;
 	}
 
+
+	virtual const std::string getGlslType() const = 0;
+
 protected:
 	/// Constructor
 	/// \param	name	Name used in shader code to access this uniform
@@ -78,5 +81,17 @@ protected:
 };  // namespace Graphics
 
 };  // namespace SurgSim
+
+namespace YAML
+{
+template<>
+struct convert<std::shared_ptr<SurgSim::Graphics::OsgUniformBase>>
+{
+	static Node encode(const std::shared_ptr<SurgSim::Graphics::OsgUniformBase> rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::OsgUniformBase>& rhs); //NOLINT
+};
+
+};
+
 
 #endif  // SURGSIM_GRAPHICS_OSGUNIFORMBASE_H
