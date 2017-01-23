@@ -20,6 +20,7 @@
 #include "SurgSim/Math/MathConvert.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgUniformTypes.h"
+#include "SurgSim/Graphics/OsgUniformGlslTypes.h"
 
 
 namespace SurgSim
@@ -67,6 +68,12 @@ template <class T>
 const T& OsgUniform<T>::get() const
 {
 	return m_value;
+}
+
+template <class T>
+const std::string OsgUniform<T>::getGlslType() const
+{
+	return SurgSim::Graphics::getGlslType<T>();
 }
 
 template <class T>
@@ -124,6 +131,15 @@ const std::vector<T>& OsgUniform<std::vector<T>>::get() const
 {
 	return m_value;
 }
+
+template <class T>
+const std::string OsgUniform<std::vector<T>>::getGlslType() const
+{
+	auto baseType = SurgSim::Graphics::getGlslType<T>();
+	return baseType + "[]";
+}
+
+
 
 };  // namespace Graphics
 
