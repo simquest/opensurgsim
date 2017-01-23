@@ -39,7 +39,7 @@ namespace
 static const double dt = 0.001;
 static const double maxIterationConstant = 0.1;
 static const double tolerance = 1.0e-03;
-static const int frameCount = 8000;
+static const int frameCount = 200;
 
 static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::hash<int>> getIntegrationSchemeNames()
 {
@@ -91,8 +91,8 @@ class Fem3DPerformanceTestBase : public ::testing::Test
 public:
 	virtual void SetUp()
 	{
-		viennacl::ocl::set_context_platform_index(0, 1);
-		viennacl::ocl::set_context_device_type(0, viennacl::ocl::cpu_tag());
+		viennacl::ocl::set_context_platform_index(0, 0);
+		viennacl::ocl::set_context_device_type(0, viennacl::ocl::gpu_tag());
 
 
 		m_physicsManager = std::make_shared<SurgSim::Testing::MockPhysicsManager>();
@@ -139,11 +139,12 @@ public:
 
 	void performTimingTest()
 	{
-		std::cout << "TEst Start\n";
+		std::cout << "Test Start\n";
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
 
 		SurgSim::Framework::Timer timer;
+		m_physicsManager->doUpdate(dt);
 		timer.setMaxNumberOfFrames(frameCount);
 		for (int i = 0; i < frameCount; i++)
 		{
@@ -230,7 +231,7 @@ INSTANTIATE_TEST_CASE_P(Fem3DPerformanceTest,
 								SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT_OPENCL),
 								::testing::Values(SurgSim::Math::LINEARSOLVER_LU,
 										SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT)));
-
+*/
 INSTANTIATE_TEST_CASE_P(
 	Fem3DPerformanceTest,
 	IntegrationSchemeAndCountParamTest,
@@ -247,18 +248,19 @@ INSTANTIATE_TEST_CASE_P(
 						   //SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4,
 						   //SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT_OPENCL
 					   ),
-					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU
-							   //,SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT
-										),
-					   ::testing::Values(24)));
-					   */
+					   ::testing::Values(//SurgSim::Math::LINEARSOLVER_LU,
+						   //SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT,
+						   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT_OPENCL
+					   ),
+					   ::testing::Values(8, 12, 14)));
+
 
 INSTANTIATE_TEST_CASE_P(
-	TimingTest,
+	SingleTest,
 	IntegrationSchemeAndCountParamTest,
 	::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT),
-					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU),
-					   ::testing::Values(12)));
+					   ::testing::Values(SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT_OPENCL),
+					   ::testing::Values(14)));
 
 
 } // namespace Physics

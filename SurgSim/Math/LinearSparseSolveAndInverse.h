@@ -42,13 +42,15 @@ enum LinearSolver
 {
 	LINEARSOLVER_LU = 0,
 	LINEARSOLVER_CONJUGATEGRADIENT,
+	LINEARSOLVER_CONJUGATEGRADIENT_OPENCL,
 	MAX_LINEARSOLVER
 };
 
 const std::unordered_map<LinearSolver, std::string, std::hash<int>> LinearSolverNames =
 			boost::assign::map_list_of
 			(LINEARSOLVER_LU, "LINEARSOLVER_LU")
-			(LINEARSOLVER_CONJUGATEGRADIENT, "LINEARSOLVER_CONJUGATEGRADIENT");
+			(LINEARSOLVER_CONJUGATEGRADIENT, "LINEARSOLVER_CONJUGATEGRADIENT")
+			(LINEARSOLVER_CONJUGATEGRADIENT_OPENCL, "LINEARSOLVER_CONJUGATEGRADIENT_OPENCL");
 
 /// LinearSparseSolveAndInverse aims at performing an efficient linear system resolution and
 /// calculating its inverse matrix at the same time.

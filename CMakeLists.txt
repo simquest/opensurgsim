@@ -78,7 +78,7 @@ else()
 endif()
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.54 COMPONENTS chrono date_time filesystem system thread REQUIRED)
+find_package(Boost 1.61 COMPONENTS chrono date_time filesystem system thread REQUIRED)
 mark_as_advanced(Boost_DIR)
 
 # Look for platform specific pthread.
@@ -97,6 +97,12 @@ else()
 	include(External_yamlcpp)
 endif()
 
+find_package(OpenCL REQUIRED)
+find_package(ViennaCL REQUIRED)
+
+add_definitions( -DVIENNACL_WITH_EIGEN )
+add_definitions( -DVIENNACL_WITH_OPENCL )
+
 include_directories(${SURGSIM_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(
@@ -104,6 +110,7 @@ include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${YAML_CPP_INCLUDE_DIR}
+	${VIENNACL_INCLUDE_DIRS}
 )
 
 include(CTest)

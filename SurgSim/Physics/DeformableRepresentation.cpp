@@ -34,6 +34,7 @@
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 
 #include "Modules/Parallel/OdeSolverEulerImplicitOpenCl.h"
+#include "Modules/Parallel/LinearSparseSolveAndInverseOpenCl.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::OdeState;
@@ -381,6 +382,9 @@ bool DeformableRepresentation::doInitialize()
 			break;
 		case SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT:
 			m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSparseSolveAndInverseCG>());
+			break;
+		case SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT_OPENCL:
+			m_odeSolver->setLinearSolver(std::make_shared<SurgSim::Math::LinearSparseSolveAndInverseOpenCLCG>());
 			break;
 		default:
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())

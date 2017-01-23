@@ -1,24 +1,16 @@
 # This file is a part of the SimQuest OpenSurgSim extension.
 # Copyright 2012-2016, SimQuest Solutions Inc.
 
-find_package(OpenCL REQUIRED)
-find_package(ViennaCL REQUIRED)
-find_package(Boost 1.61 COMPONENTS REQUIRED)
-
-add_definitions( -DVIENNACL_WITH_EIGEN )
-add_definitions( -DVIENNACL_WITH_OPENCL )
-
-
-include_directories(
-	${VIENNACL_INCLUDE_DIRS}
-)
-
 set(SURGSIMPARALLEL_SOURCES
+	LinearSparseSolveAndInverseOpenCl.cpp
+	OdeSolverEulerImplicitLinearOpenCl.cpp
 	OdeSolverEulerImplicitOpenCl.cpp
 	TimerGroup.cpp
 )
 
 set(SURGSIMPARALLEL_HEADERS
+	LinearSparseSolveAndInverseOpenCl.h
+	OdeSolverEulerImplicitLinearOpenCl.h
 	OdeSolverEulerImplicitOpenCl.h
 	TimerGroup.h
 )
