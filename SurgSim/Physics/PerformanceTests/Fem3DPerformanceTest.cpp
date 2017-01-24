@@ -30,7 +30,11 @@
 #include "SurgSim/Physics/Fem3DElementCube.h"
 #include "SurgSim/Physics/PerformanceTests/DivisibleCubeRepresentation.h"
 #include "SurgSim/Testing/MockPhysicsManager.h"
-#include "viennacl/backend/opencl.hpp"
+
+#include "viennacl/ocl/device.hpp"
+#include "viennacl/ocl/platform.hpp"
+#include "viennacl/ocl/backend.hpp"
+
 
 using SurgSim::Math::Vector3d;
 
@@ -79,6 +83,46 @@ static std::unordered_map<SurgSim::Math::IntegrationScheme, std::string, std::ha
 
 static std::unordered_map<SurgSim::Math::LinearSolver, std::string, std::hash<int>> LinearSolverNames
 		= getLinearSolverNames();
+
+static void initViennaCLContexts()
+{
+	// Picks the first device with the appropriate type to be used
+	// use viennacl::ocl::switch_context(0); for the CPU and
+	// viennacl::ocl::switch_context(1); for the GPU
+	static bool isInitialized = false;
+	if (isInitialized)
+	{
+		return;
+	}
+
+	int cpuContext = -1;
+	int gpuContext = -1;
+	size_t context = 0;
+	auto platforms = viennacl::ocl::get_platforms();
+	for (auto& platform : platforms)
+	{
+		for (auto& device : platform.devices())
+		{
+			if ((CL_DEVICE_TYPE_CPU & device.type()) != 0 && cpuContext < 0)
+			{
+				viennacl::ocl::setup_context(0, device);
+				std::cout << "Using CPU:  ----------------\n";
+				std::cout << device.info();
+				cpuContext = 0;
+			}
+
+			if ((CL_DEVICE_TYPE_GPU & device.type()) != 0 && gpuContext < 0)
+			{
+				viennacl::ocl::setup_context(1, device);
+				std::cout << "Using GPU:  ----------------\n";
+				std::cout << device.info();
+				gpuContext = 1;
+			}
+		}
+	}
+
+	isInitialized = true;
+}
 }
 
 namespace SurgSim
@@ -91,9 +135,8 @@ class Fem3DPerformanceTestBase : public ::testing::Test
 public:
 	virtual void SetUp()
 	{
-		viennacl::ocl::set_context_platform_index(0, 0);
-		viennacl::ocl::set_context_device_type(0, viennacl::ocl::gpu_tag());
-
+		initViennaCLContexts();
+		viennacl::ocl::switch_context(0);
 
 		m_physicsManager = std::make_shared<SurgSim::Testing::MockPhysicsManager>();
 
@@ -248,10 +291,10 @@ INSTANTIATE_TEST_CASE_P(
 						   //SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4,
 						   //SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT_OPENCL
 					   ),
-					   ::testing::Values(//SurgSim::Math::LINEARSOLVER_LU,
-						   //SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT,
-						   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT_OPENCL
-					   ),
+					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU,
+							   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT,
+							   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT_OPENCL
+										),
 					   ::testing::Values(8, 12, 14)));
 
 
