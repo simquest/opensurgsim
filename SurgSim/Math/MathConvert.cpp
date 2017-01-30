@@ -159,4 +159,40 @@ bool convert<SurgSim::Math::LinearSolver>::decode(
 	return result;
 }
 
+Node convert<boost::any>::encode(const boost::any rhs)
+{
+	Node result;
+	bool success = false;
+	try
+	{
+		// Rely on bool shortcut evaluation, the attempts will stop as soon as tryConvert returns true
+		success = tryConvert<float>(rhs, &result) ||
+				  tryConvert<double>(rhs, &result) ||
+				  tryConvert<int>(rhs, &result) ||
+				  tryConvert<size_t>(rhs, &result) ||
+				  tryConvert<unsigned int>(rhs, &result) ||
+				  tryConvert<bool>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector2f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector2d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector3f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector3d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector4f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector4d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix22f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix22d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix33f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix33d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix44f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix44d>(rhs, &result);
+
+	}
+	catch (std::exception e)
+	{
+		success = false;
+	}
+
+	SURGSIM_ASSERT(success) << "boost::any used with type that isn't known.";
+	return result;
+}
+
 }; // namespace YAML

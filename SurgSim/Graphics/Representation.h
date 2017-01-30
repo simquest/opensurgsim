@@ -30,6 +30,7 @@ namespace Graphics
 
 class Manager;
 class Material;
+class UniformBase;
 
 /// Base graphics representation class, which defines the interface that all graphics representations must implement.
 ///
@@ -58,6 +59,10 @@ public:
 	/// Gets the material that defines the visual appearance of the representation
 	/// \return	Graphics material
 	virtual std::shared_ptr<Material> getMaterial() const = 0;
+
+	void setMaterialReference(const std::string& materialName);
+
+	std::string getMaterialReference() const;
 
 	/// Removes the material from the representation
 	virtual void clearMaterial() = 0;
@@ -113,6 +118,25 @@ public:
 	/// Clear all the Group references
 	void clearGroupReferences();
 
+	/// Adds a uniform to this representation.
+	/// \param uniform Uniform to add.
+	virtual void addUniform(std::shared_ptr<UniformBase> uniform) = 0;
+
+	/// Adds and a uniform to this representation and set its value
+	/// \param type the type of the uniform
+	/// \param name Name used in shader code to access this uniform
+	/// \param value The value for this uniform
+	virtual void addUniform(const std::string& type, const std::string& name, const boost::any& value) = 0;
+
+	/// Sets a set of uniforms for this representation
+	/// \param uniforms the uniforms to be used in this representation
+	virtual void setUniforms(const std::vector<std::shared_ptr<UniformBase>>& uniforms) = 0;
+
+	/// \return the uniforms used for this representation
+	virtual std::vector<std::shared_ptr<UniformBase>> getUniforms() const = 0;
+
+	bool doWakeUp() override;
+
 private:
 	/// List of groups that this representation would like to be added
 	std::unordered_set<std::string> m_groups;
@@ -121,6 +145,9 @@ private:
 	/// \param functionName the name of the calling function to be used in the error message
 	/// \return the value of isAwake()
 	bool checkAwake(const std::string& functionName);
+
+	/// Name for material lookup
+	std::string m_materialReference;
 };
 
 };  // namespace Graphics

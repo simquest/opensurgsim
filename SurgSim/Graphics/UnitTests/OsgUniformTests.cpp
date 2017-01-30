@@ -92,6 +92,25 @@ Type testYamlSetter(const Type& value)
 	return osgUniform->get();
 }
 
+template <class Type>
+Type testEncodeDecode(const Type& value)
+{
+
+	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+	osgUniform->set(value);
+	std::shared_ptr<OsgUniformBase> base = osgUniform;
+
+	YAML::Node node;
+
+	node = base;
+
+	std::shared_ptr<OsgUniform<Type>> converted;
+
+	converted = std::dynamic_pointer_cast<OsgUniform<Type>>(node.as<std::shared_ptr<OsgUniformBase>>());
+
+	return converted->get();
+}
+
 /// Constructs an OsgUniform that stores a vector of values, sets it to the given vector values, and returns the result
 /// of Uniform::get() and the wrapped osg::Uniform::get().
 /// \tparam	Type	Uniform's value type
@@ -145,6 +164,10 @@ void testUniformFloat(FloatType min, FloatType max)
 	FloatType nodeValue = 0.0;
 	ASSERT_NO_THROW(nodeValue = testYamlSetter<FloatType>(value));
 	EXPECT_NEAR(value, nodeValue, Eigen::NumTraits<FloatType>::dummy_precision());
+
+	nodeValue = 0.0;
+	ASSERT_NO_THROW(nodeValue = testEncodeDecode<FloatType>(value));
+	EXPECT_NEAR(value, nodeValue, Eigen::NumTraits<FloatType>::dummy_precision());
 }
 
 /// Tests OsgUniform with a vector of random floating point type values.
@@ -193,9 +216,13 @@ void testUniformInt(IntType min, IntType max)
 	ASSERT_NO_THROW({accessibleValue = boost::any_cast<IntType>(accessibleResult.second);});
 	EXPECT_EQ(value, accessibleValue);
 
-	IntType nodeValue;
+	IntType nodeValue = 0;
 	EXPECT_NO_THROW(nodeValue = testYamlSetter<IntType>(value));
 	EXPECT_EQ(value, nodeValue);
+
+	nodeValue = 0;
+	ASSERT_NO_THROW(nodeValue = testEncodeDecode<IntType>(value));
+	EXPECT_NEAR(value, nodeValue, Eigen::NumTraits<IntType>::dummy_precision());
 }
 
 /// Tests OsgUniform with a vector of random integer type values.
@@ -243,9 +270,17 @@ void testUniformEigen()
 	accessibleValue = boost::any_cast<Type>(accessibleResult.second);
 	EXPECT_TRUE(value.isApprox(accessibleValue));
 
-	Type nodeValue;
-	EXPECT_NO_THROW(nodeValue = testYamlSetter<Type>(value));
-	EXPECT_TRUE(value.isApprox(nodeValue));
+	{
+		Type nodeValue;
+		EXPECT_NO_THROW(nodeValue = testYamlSetter<Type>(value));
+		EXPECT_TRUE(value.isApprox(nodeValue));
+	}
+
+	{
+		Type nodeValue;
+		ASSERT_NO_THROW(nodeValue = testEncodeDecode<Type>(value));
+		EXPECT_TRUE(value.isApprox(nodeValue));
+	}
 }
 
 /// Tests OsgUniform with a vector of random Eigen type values.
