@@ -387,10 +387,10 @@ void TriangleMeshTriangleMeshContact::ccdContactDcdCase(
 	}
 
 	Math::Vector3d t1contact = t1v0.second * baryCoordTriangle1[0] +
-		t1v1.second * baryCoordTriangle1[1] + t1v0.second * baryCoordTriangle1[2];
+		t1v1.second * baryCoordTriangle1[1] + t1v2.second * baryCoordTriangle1[2];
 
 	Math::Vector3d t2contact = t2v0.second * baryCoordTriangle2[0] +
-		t2v1.second * baryCoordTriangle2[1] + t2v0.second * baryCoordTriangle2[2];
+		t2v1.second * baryCoordTriangle2[1] + t2v2.second * baryCoordTriangle2[2];
 
 	DataStructures::IndexedLocalCoordinate localCoordinateTriangle1(triangle1Id, baryCoordTriangle1);
 	// The location related to the TriangleMesh can carry a TRIANGLE information
@@ -417,7 +417,7 @@ void TriangleMeshTriangleMeshContact::ccdContactDcdCase(
 		normal = ((t2v1.second - t2v0.second).cross(t2v2.second - t2v0.second)).normalized();
 	}
 
-	depth = (t1contact - t2contact).dot(normal);
+	depth = (t2contact - t1contact).dot(normal);
 	contacts->emplace_back(std::make_shared<Contact>(
 		COLLISION_DETECTION_TYPE_CONTINUOUS,
 		depth,
