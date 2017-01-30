@@ -318,8 +318,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			Math::Vector3d pt1;
 			Math::Vector3d pt2;
 
-			std::shared_ptr<Contact> contact;
-
 			if (Math::distanceTriangleTriangle(
 				t1v0.first, t1v1.first, t1v2.first,
 				t2v0.first, t2v1.first, t2v2.first,
@@ -332,11 +330,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			{
 				ccdContactCcdCase(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, t1n, t2n,
 					triangle1Id, triangle2Id, pose1AtTime1, pose2AtTime1, &contacts);
-			}
-
-			if (contact != nullptr)
-			{
-				contacts.emplace_back(std::move(contact));
 			}
 		}
 	}
@@ -436,7 +429,7 @@ void TriangleMeshTriangleMeshContact::ccdContactCcdCase(
 	std::list<std::shared_ptr<Contact>>* contacts) const
 {
 	using Math::Geometry::ScalarEpsilon;
-	
+
 	// No collision at time t = 0, let's look for collision in the interval ]0..1]
 	double earliestTimeOfImpact = std::numeric_limits<double>::max();
 	double triangle1Alpha = -1.0;  //!< Barycentric coordinates of P1 in triangle t1v0t1v1t1v2
@@ -488,7 +481,7 @@ void TriangleMeshTriangleMeshContact::ccdContactCcdCase(
 		auto dir1 = (t1contact - t1contactT0).normalized();
 		auto dir2 = (t2contact - t2contactT0).normalized();
 
-		if (std::abs(std::abs(dir1.dot(dir2)) - 1.0) < Math::Geometry::ScalarEpsilon)
+		if (std::abs(std::abs(dir1.dot(dir2)) - 1.0) < ScalarEpsilon)
 		{
 			normal = -dir1;
 		}
@@ -554,7 +547,7 @@ bool TriangleMeshTriangleMeshContact::ccdContactCcdCaseSegmentSegment(
 	double* triangle2Beta) const
 {
 	using Math::calculateCcdContactSegmentSegment;
-	
+
 	bool segmentSegmentCcdFound = false;
 	double timeOfImpact;
 	double t1Factor;
