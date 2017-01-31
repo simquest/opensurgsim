@@ -59,6 +59,8 @@ public:
 	/// \param	stateSet	OSG state set
 	virtual void removeFromStateSet(osg::StateSet* stateSet);
 
+	virtual const std::string getGlslType() const;
+
 private:
 	/// Texture
 	std::shared_ptr<T> m_texture;

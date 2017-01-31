@@ -20,6 +20,7 @@
 #include <Eigen/Geometry>
 
 #include <yaml-cpp/yaml.h>
+#include <boost/any.hpp>
 
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
@@ -100,6 +101,16 @@ struct convert<SurgSim::Math::LinearSolver>
 	static Node encode(const SurgSim::Math::LinearSolver& rhs);
 	static bool decode(const Node& node, SurgSim::Math::LinearSolver& rhs); //NOLINT
 };
+
+template<class T>
+bool tryConvert(const boost::any& any, YAML::Node* node);
+
+template <>
+struct convert<boost::any>
+{
+	static Node encode(const boost::any rhs);
+};
+
 
 };
 
