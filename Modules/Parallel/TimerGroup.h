@@ -52,6 +52,7 @@ public:
 
 	void reset(size_t frameCount);
 
+private:
 	std::string m_groupName;
 	std::vector<std::string> m_names;
 	std::vector<SurgSim::Framework::Timer> m_timers;

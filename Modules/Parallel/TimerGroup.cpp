@@ -78,7 +78,7 @@ std::ostream& operator<<(std::ostream& os, const SurgSim::Framework::TimerGroup&
 		os << std::fixed << std::setprecision(0)
 		   << timers.getName(i) << " \taverage duration " << 1e6 * period << " us (max "
 		   << 1e6 * timers[i].getMaxFramePeriod() << " us), "
-		   << 100.0 * period / totalTime << "% of timers.getGroupName. \n";
+		   << 100.0 * period / totalTime << "% of " << timers.getGroupName() << ". \n";
 	}
 	return os;
 }
