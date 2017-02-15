@@ -16,8 +16,10 @@
 #include "Modules/Parallel/LinearSparseSolveAndInverseOpenCl.h"
 
 #include <boost/compute/system.hpp>
-#include "viennacl/vector.hpp"
 #include "viennacl/linalg/cg.hpp"
+#include <viennacl/linalg/matrix_operations.hpp>
+#include "boost/thread/lock_guard.hpp"
+
 
 namespace SurgSim
 {
@@ -32,24 +34,28 @@ LinearSparseSolveAndInverseOpenCLCG::LinearSparseSolveAndInverseOpenCLCG()
 
 void LinearSparseSolveAndInverseOpenCLCG::setMatrix(const SparseMatrix& matrix)
 {
+	static boost::mutex m;
 	m_eigenMatrix = matrix;
-	viennacl::copy(matrix, m_vclMatrix);
+	m_inverse = m_eigenMatrix.inverse();
+
+	//boost::lock_guard<boost::mutex> guard(m);
+	viennacl::copy(m_inverse, m_vclMatrix);
 }
 
 Matrix LinearSparseSolveAndInverseOpenCLCG::solve(const Matrix& b) const
 {
-	// Try what happens when preallocating these
-	viennacl::vector<double> vcl_rhs(b.size());
-	viennacl::vector<double> vcl_solution(b.size());
+	// odd declaring these as class members causes the compilation to fail
+	viennacl::vector<double> vcl_rhs;
 
 	Vector v = static_cast<Vector>(b);
 
 	viennacl::copy(v, vcl_rhs);
+	//vcl_solution = viennacl::linalg::solve(m_vclMatrix, vcl_rhs, viennacl::linalg::cg_tag());
 
-	vcl_solution = viennacl::linalg::solve(m_vclMatrix, vcl_rhs, viennacl::linalg::cg_tag());
+	vcl_rhs = viennacl::linalg::prod(m_vclMatrix, vcl_rhs);
 
 	Vector result(b.size());
-	viennacl::copy(vcl_solution, result);
+	viennacl::copy(vcl_rhs, result);
 	return result;
 }
 

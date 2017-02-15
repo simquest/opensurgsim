@@ -19,6 +19,8 @@
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
 
 #include <viennacl/compressed_matrix.hpp>
+#include <viennacl/matrix.hpp>
+#include <viennacl/vector.hpp>
 
 
 namespace SurgSim
@@ -43,8 +45,10 @@ public:
 
 private:
 
-	viennacl::compressed_matrix<double> m_vclMatrix;
 	Matrix m_eigenMatrix;
+	Matrix m_inverse;
+	viennacl::matrix<double> m_vclMatrix;
+
 
 };
 }

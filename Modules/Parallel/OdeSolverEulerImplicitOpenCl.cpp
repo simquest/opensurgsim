@@ -82,7 +82,7 @@ void OdeSolverEulerImplicitOpenCl::solve(double dt, const Math::OdeState& curren
 
 	static size_t count = 0;
 	++count;
-	if (count == 10)
+	if (count == 100)
 	{
 		std::cout << m_timers;
 		m_timers.reset(100);
