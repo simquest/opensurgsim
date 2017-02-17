@@ -53,8 +53,9 @@ find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB o
 find_package(OpenThreads)
 find_package(OpenGL)
 if(WIN32)
-	find_package(Eigen3 3.2.3 REQUIRED)
+	find_package(Eigen3 3.3.2 REQUIRED)
 else(WIN32)
+	message("Check if we can update to 3.3.x ????? HS-2/15/2017")
 	find_package(Eigen3 3.2.1 REQUIRED)
 endif(WIN32)
 
@@ -78,7 +79,7 @@ else()
 endif()
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.54 COMPONENTS chrono date_time filesystem system thread REQUIRED)
+find_package(Boost 1.54 COMPONENTS chrono date_time filesystem system thread REQUIRED OPTIONAL_COMPONENTS  program_options)
 mark_as_advanced(Boost_DIR)
 
 # Look for platform specific pthread.
