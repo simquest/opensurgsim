@@ -14,9 +14,13 @@
 // limitations under the License.
 
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Framework/Scene.h"
+
 
 #include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Framework/Log.h"
+
+#include <boost/algorithm/string.hpp>
 
 using SurgSim::Graphics::Material;
 
@@ -36,6 +40,8 @@ Representation::Representation(const std::string& name) :
 									  getDrawAsWireFrame, setDrawAsWireFrame);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, GenerateTangents,
 									  isGeneratingTangents, setGenerateTangents);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::string, MaterialReference,
+									  getMaterialReference, setMaterialReference);
 
 	addGroupReference(DefaultGroupName);
 }
@@ -87,6 +93,32 @@ void Representation::clearGroupReferences()
 	}
 }
 
+bool Representation::doWakeUp()
+{
+	if (getMaterial() == nullptr && !m_materialReference.empty())
+	{
+		std::vector<std::string> names;
+		boost::split(names, m_materialReference, boost::is_any_of("/"));
+
+		SURGSIM_ASSERT(names.size() == 2)
+				<< "Material reference needs to have 2 parts <scenelement>/<component>, '" << m_materialReference
+				<< "' in " << getFullName() << " doesn't.";
+
+		auto material = getScene()->getComponent(names[0], names[1]);
+		if (material != nullptr)
+		{
+			setMaterial(material);
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Graphics/Representation"))
+					<< "Can't find material " << m_materialReference << " in Scene, rendering of " << getFullName()
+					<< " is going to be compromised.";
+		}
+	}
+	return true;
+}
+
 bool Representation::removeGroupReference(const std::string& name)
 {
 	bool result = false;
@@ -122,5 +154,16 @@ Representation::~Representation()
 
 }
 
+void Representation::setMaterialReference(const std::string& materialReference)
+{
+	m_materialReference = materialReference;
+}
+
+std::string Representation::getMaterialReference() const
+{
+	return m_materialReference;
+}
+
 }; // namespace Graphics
 }; // namespace SurgSim
+

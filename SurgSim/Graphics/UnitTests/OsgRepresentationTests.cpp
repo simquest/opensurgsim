@@ -22,12 +22,17 @@
 #include <random>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -371,6 +376,70 @@ TEST(OsgRepresentationTests, TangentGenerationTest)
 	CheckTangentsVisitor visitor;
 
 	scenery->getOsgNode()->accept(visitor);
+}
+
+TEST(OsgRepresentation, MaterialFromReference)
+{
+	auto runtime = std::make_shared<Framework::Runtime>();
+	auto manager = std::make_shared<OsgManager>();
+
+	runtime->addManager(manager);
+
+	auto scene = runtime->getScene();
+
+	auto element = std::make_shared<Framework::BasicSceneElement>("element");
+	auto material1  = std::make_shared<OsgMaterial>("material1");
+	element->addComponent(material1);
+	auto material2 = std::make_shared<OsgMaterial>("material2");
+	element->addComponent(material2);
+
+
+	auto rep1 = std::make_shared<MockOsgRepresentation>("representation1");
+	element->addComponent(rep1);
+	auto rep2 = std::make_shared<MockOsgRepresentation>("representation2");
+	element->addComponent(rep2);
+	auto rep3 = std::make_shared<MockOsgRepresentation>("representation3");
+	element->addComponent(rep3);
+	scene->addSceneElement(element);
+
+
+	rep1->setMaterial(material1);
+	rep2->setMaterialReference("element/material2");
+	rep3->setMaterial(material1);
+	rep3->setMaterialReference("element/material2");
+
+	runtime->start();
+
+	while (!rep1->isAwake() || !rep2->isAwake() || !rep3->isAwake())
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	}
+	EXPECT_EQ("element/material1", rep1->getMaterial()->getFullName());
+	EXPECT_EQ("element/material2", rep2->getMaterial()->getFullName());
+	EXPECT_EQ("element/material1", rep3->getMaterial()->getFullName());
+
+	runtime->stop();
+}
+
+TEST(OsgRepresentation, Serialization)
+{
+	// Using the scenery representation here, but only testing base class functionality
+	auto representation = std::make_shared<OsgBoxRepresentation>("representation1");
+
+	representation->addUniform("float", "floatValue", 2.0f);
+	representation->addUniform("double", "doubleValue", 2.0);
+	representation->addUniform("bool", "boolValue", false);
+	representation->addUniform("vec3", "vec3Value", Math::Vector3f(1.0, 2.0, 3.0));
+
+	YAML::Node node;
+	ASSERT_NO_THROW(node = *std::dynamic_pointer_cast<Framework::Component>(representation));
+	auto result = node.as<std::shared_ptr<Framework::Component>>();
+
+	EXPECT_EQ(2.0f, result->getValue<float>("floatValue"));
+	EXPECT_EQ(2.0, result->getValue<double>("doubleValue"));
+	EXPECT_EQ(false, result->getValue<bool>("boolValue"));
+	EXPECT_TRUE(Math::Vector3f(1.0, 2.0, 3.0).isApprox(result->getValue<Math::Vector3f>("vec3Value")));
+
 }
 
 
