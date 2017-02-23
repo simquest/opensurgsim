@@ -242,7 +242,7 @@ void FemRepresentation::update(double dt)
 		m_odeSolver->solve(dt, *m_currentState, m_newState.get(), false);
 
 		// Update the compliance matrix
-		updateComplianceMatrix(*m_newState);
+//		updateComplianceMatrix(*m_newState);
 	}
 	else
 	{
