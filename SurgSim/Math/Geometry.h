@@ -59,11 +59,16 @@ static const double ScalarEpsilon = 1e-10;
 }
 
 /// Calculate the intersection between the two 2D segments.
+/// \tparam T Floating point type of the calculation, can usually be inferred.
+/// \tparam MOpt Eigen Matrix options, can usually be inferred.
+/// \param s1v0, s1v1 First segment extremities
+/// \param s2v0, s2v1 Second segment extremities
+/// \param s, t [out] if intersection exists, contains distance on segment where intersection is
 template <class T, int MOpt> inline
-bool doesIntersectSegmentSegment(const Eigen::Matrix<T, 2, 1, MOpt>& s1v0,
+bool doesIntersectSegmentSegment(const Eigen::Matrix<T, 2, 1, MOpt>& s0v0,
+								 const Eigen::Matrix<T, 2, 1, MOpt>& s0v1,
+								 const Eigen::Matrix<T, 2, 1, MOpt>& s1v0,
 								 const Eigen::Matrix<T, 2, 1, MOpt>& s1v1,
-								 const Eigen::Matrix<T, 2, 1, MOpt>& s2v0,
-								 const Eigen::Matrix<T, 2, 1, MOpt>& s2v1,
 								 T* s, T* t)
 {
 	using SurgSim::Math::Geometry::DistanceEpsilon;
@@ -71,15 +76,15 @@ bool doesIntersectSegmentSegment(const Eigen::Matrix<T, 2, 1, MOpt>& s1v0,
 	SURGSIM_ASSERT(s != nullptr) << "Null pointers sent in s variable";
 	SURGSIM_ASSERT(t != nullptr) << "Null pointers sent in t variable";
 
-	auto u = (s1v1 - s1v0).eval();
-	auto v = (s2v1 - s2v0).eval();
+	auto u = (s0v1 - s0v0).eval();
+	auto v = (s1v1 - s1v0).eval();
 	double denom = u[0] * v[1] - u[1] * v[0];
 	if (std::abs(denom) <= DistanceEpsilon)
 	{
 		return false;
 	}
 
-	auto w = s1v0 - s2v0;
+	auto w = (s0v0 - s1v0).eval();
 	*s = (v[0] * w[1] - v[1] * w[0]) / denom;
 	*t = (u[0] * w[1] - u[1] * w[0]) / denom;
 
