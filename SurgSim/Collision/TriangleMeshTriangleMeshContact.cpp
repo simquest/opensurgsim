@@ -50,16 +50,16 @@ namespace
 /// \param point the point to compare against
 /// \throws If the points are not coplanar
 void assertIsCoplanar(const Vector3d& triangle0,
-					  const Vector3d& triangle1,
-					  const Vector3d& triangle2,
-					  const Vector3d& point)
+	const Vector3d& triangle1,
+	const Vector3d& triangle2,
+	const Vector3d& point)
 {
 	SURGSIM_ASSERT(SurgSim::Math::isCoplanar(triangle0, triangle1, triangle2, point))
-			<< "Coplanar assertion failed with: "
-			"t0 [" << triangle0.transpose() << "], "
-			"t1 [" << triangle1.transpose() << "], "
-			"t2 [" << triangle2.transpose() << "], "
-			"pt [" << point.transpose() << "]";
+		<< "Coplanar assertion failed with: "
+		"t0 [" << triangle0.transpose() << "], "
+		"t1 [" << triangle1.transpose() << "], "
+		"t2 [" << triangle2.transpose() << "], "
+		"pt [" << point.transpose() << "]";
 }
 
 /// Asserts the point is inside the triangle, and prints debug output on the failing condition.
@@ -68,18 +68,18 @@ void assertIsCoplanar(const Vector3d& triangle0,
 /// \param normal the unit normal of the triangle
 /// \throws If the point is not inside the triangle
 void assertIsPointInsideTriangle(const Vector3d& point,
-								 const Vector3d& triangle0,
-								 const Vector3d& triangle1,
-								 const Vector3d& triangle2,
-								 const Vector3d& normal)
+	const Vector3d& triangle0,
+	const Vector3d& triangle1,
+	const Vector3d& triangle2,
+	const Vector3d& normal)
 {
 	SURGSIM_ASSERT(SurgSim::Math::isPointInsideTriangle(point, triangle0, triangle1, triangle2, normal))
-			<< "Point inside triangle assertion failed with: "
-			"t0 [" << triangle0.transpose() << "], "
-			"t1 [" << triangle1.transpose() << "], "
-			"t2 [" << triangle2.transpose() << "], "
-			"n [" << normal.transpose() << "], "
-			"pt [" << point.transpose() << "]";
+		<< "Point inside triangle assertion failed with: "
+		"t0 [" << triangle0.transpose() << "], "
+		"t1 [" << triangle1.transpose() << "], "
+		"t2 [" << triangle2.transpose() << "], "
+		"n [" << normal.transpose() << "], "
+		"pt [" << point.transpose() << "]";
 }
 
 /// Asserts the provided normal and depth minimally resolve the interpenetration of the two triangles, and prints debug
@@ -90,57 +90,82 @@ void assertIsPointInsideTriangle(const Vector3d& point,
 /// \param triangleB0, triangleB1, triangleB2 the vertices of the second triangle
 /// \throws If the normal and depth do not minimally resolve the interpenetration of the two triangles
 void assertIsCorrectNormalAndDepth(const Vector3d& normal,
-								   double penetrationDepth,
-								   const Vector3d& triangleA0,
-								   const Vector3d& triangleA1,
-								   const Vector3d& triangleA2,
-								   const Vector3d& triangleB0,
-								   const Vector3d& triangleB1,
-								   const Vector3d& triangleB2)
+	double penetrationDepth,
+	const Vector3d& triangleA0,
+	const Vector3d& triangleA1,
+	const Vector3d& triangleA2,
+	const Vector3d& triangleB0,
+	const Vector3d& triangleB1,
+	const Vector3d& triangleB2)
 {
 	Vector3d correction = normal * (penetrationDepth - SurgSim::Math::Geometry::DistanceEpsilon);
 
 	SURGSIM_ASSERT(SurgSim::Math::doesIntersectTriangleTriangle(
-					   (Vector3d)(triangleA0 + correction),
-					   (Vector3d)(triangleA1 + correction),
-					   (Vector3d)(triangleA2 + correction),
-					   triangleB0, triangleB1, triangleB2))
-			<< "Correct normal and depth assertion failed with: "
-			"n [" << normal.transpose() << "], "
-			"d [" << penetrationDepth << "], "
-			"a0 [" << triangleA0.transpose() << "], "
-			"a1 [" << triangleA1.transpose() << "], "
-			"a2 [" << triangleA2.transpose() << "], "
-			"b0 [" << triangleB0.transpose() << "], "
-			"b1 [" << triangleB1.transpose() << "], "
-			"b2 [" << triangleB2.transpose() << "]";
+		(Vector3d)(triangleA0 + correction),
+		(Vector3d)(triangleA1 + correction),
+		(Vector3d)(triangleA2 + correction),
+		triangleB0, triangleB1, triangleB2))
+		<< "Correct normal and depth assertion failed with: "
+		"n [" << normal.transpose() << "], "
+		"d [" << penetrationDepth << "], "
+		"a0 [" << triangleA0.transpose() << "], "
+		"a1 [" << triangleA1.transpose() << "], "
+		"a2 [" << triangleA2.transpose() << "], "
+		"b0 [" << triangleB0.transpose() << "], "
+		"b1 [" << triangleB1.transpose() << "], "
+		"b2 [" << triangleB2.transpose() << "]";
 
 	correction = normal * (penetrationDepth + 2.0 * SurgSim::Math::Geometry::DistanceEpsilon);
 
 	SURGSIM_ASSERT(!SurgSim::Math::doesIntersectTriangleTriangle(
-					   (Vector3d)(triangleA0 + correction),
-					   (Vector3d)(triangleA1 + correction),
-					   (Vector3d)(triangleA2 + correction),
-					   triangleB0, triangleB1, triangleB2))
-			<< "Correct normal and depth assertion failed with: "
-			"n [" << normal.transpose() << "], "
-			"d [" << penetrationDepth << "], "
-			"a0 [" << triangleA0.transpose() << "], "
-			"a1 [" << triangleA1.transpose() << "], "
-			"a2 [" << triangleA2.transpose() << "], "
-			"b0 [" << triangleB0.transpose() << "], "
-			"b1 [" << triangleB1.transpose() << "], "
-			"b2 [" << triangleB2.transpose() << "]";
+		(Vector3d)(triangleA0 + correction),
+		(Vector3d)(triangleA1 + correction),
+		(Vector3d)(triangleA2 + correction),
+		triangleB0, triangleB1, triangleB2))
+		<< "Correct normal and depth assertion failed with: "
+		"n [" << normal.transpose() << "], "
+		"d [" << penetrationDepth << "], "
+		"a0 [" << triangleA0.transpose() << "], "
+		"a1 [" << triangleA1.transpose() << "], "
+		"a2 [" << triangleA2.transpose() << "], "
+		"b0 [" << triangleB0.transpose() << "], "
+		"b1 [" << triangleB1.transpose() << "], "
+		"b2 [" << triangleB2.transpose() << "]";
 }
 
 } // namespace
 #endif //SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
 
+namespace {
+struct IntersectionData {
+public:
+	IntersectionData() :
+		timeOfImpact(std::numeric_limits<double>::max()),
+		triangle1Alpha(0.0),
+		triangle2Alpha(0.0),
+		triangle2Beta(0.0),
+		triangle1Beta(0.0),
+		didOccur(false),
+		isSegment(false),
+		t1VertexThroughT2(false)
+	{}
+
+	double timeOfImpact;
+	double triangle1Alpha;
+	double triangle2Alpha;
+	double triangle1Beta;
+	double triangle2Beta;
+	bool didOccur;
+	bool isSegment;
+	bool t1VertexThroughT2;
+};
+}
+
 std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDcdContact(
-									 const Math::MeshShape& meshA,
-									 const Math::RigidTransform3d& meshAPose,
-									 const Math::MeshShape& meshB,
-									 const Math::RigidTransform3d& meshBPose) const
+	const Math::MeshShape& meshA,
+	const Math::RigidTransform3d& meshAPose,
+	const Math::MeshShape& meshB,
+	const Math::RigidTransform3d& meshBPose) const
 {
 
 	std::list<std::shared_ptr<Contact>> contacts;
@@ -185,10 +210,10 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 
 				// Check if the triangles intersect.
 				if (Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
-						verticesB[0], verticesB[1], verticesB[2],
-						normalA, normalB, &depth,
-						&penetrationPointA, &penetrationPointB,
-						&normal))
+					verticesB[0], verticesB[1], verticesB[2],
+					normalA, normalB, &depth,
+					&penetrationPointA, &penetrationPointB,
+					&normal))
 				{
 #ifdef SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
 					assertIsCoplanar(verticesA[0], verticesA[1], verticesA[2], penetrationPointA);
@@ -199,18 +224,18 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 					assertIsPointInsideTriangle(penetrationPointB, verticesB[0], verticesB[1], verticesB[2], normalB);
 
 					assertIsCorrectNormalAndDepth(normal, depth, verticesA[0], verticesA[1], verticesA[2],
-												  verticesB[0], verticesB[1], verticesB[2]);
+						verticesB[0], verticesB[1], verticesB[2]);
 #endif
 
 					// Create the contact.
 					std::pair<Location, Location> penetrationPoints;
 					Vector3d barycentricCoordinate;
 					Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
-												 normalA, &barycentricCoordinate);
+						normalA, &barycentricCoordinate);
 					penetrationPoints.first.triangleMeshLocalCoordinate.setValue(
 						DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
 					Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
-												 normalB, &barycentricCoordinate);
+						normalB, &barycentricCoordinate);
 					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
 						DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
 
@@ -218,8 +243,8 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 					penetrationPoints.second.rigidLocalPosition.setValue(meshBPose.inverse() * penetrationPointB);
 
 					contacts.emplace_back(std::make_shared<Contact>(
-											  COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth), 1.0,
-											  Vector3d::Zero(), normal, penetrationPoints));
+						COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth), 1.0,
+						Vector3d::Zero(), normal, penetrationPoints));
 				}
 			}
 		}
@@ -440,19 +465,20 @@ void TriangleMeshTriangleMeshContact::ccdContactCcdCase(
 	bool segmentSegmentCcdFound = false;
 	bool t1VertexThroughT2 = false;
 
+	bool tritriCcdFound = false;
+
 	// Calculate Segment/Segment ccd
 	segmentSegmentCcdFound = ccdContactCcdCaseSegmentSegment(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2,
 		&earliestTimeOfImpact, &triangle1Alpha, &triangle1Beta, &triangle2Alpha, &triangle2Beta);
 
 	// Calculate Point/Triangle ccd
-	if (ccdContactCcdCasePointTriangle(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, &earliestTimeOfImpact,
-		&triangle1Alpha, &triangle1Beta, &triangle2Alpha, &triangle2Beta, &t1VertexThroughT2))
-	{
-		segmentSegmentCcdFound = false;
-	}
+	tritriCcdFound = ccdContactCcdCasePointTriangle(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, &earliestTimeOfImpact,
+		&triangle1Alpha, &triangle1Beta, &triangle2Alpha, &triangle2Beta, &t1VertexThroughT2);
+
+	segmentSegmentCcdFound = segmentSegmentCcdFound && !tritriCcdFound;
 
 	// False positive from the AABB, no collision found
-	if (earliestTimeOfImpact == std::numeric_limits<double>::max())
+	if (!segmentSegmentCcdFound && !tritriCcdFound)
 	{
 		return;
 	}
@@ -553,125 +579,83 @@ bool TriangleMeshTriangleMeshContact::ccdContactCcdCaseSegmentSegment(
 	double t1Factor;
 	double t2Factor;
 
-	if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = t1Factor;
-			*triangle1Beta = 0.0;
-			*triangle2Alpha = t2Factor;
-			*triangle2Beta = 0.0;
-		}
-	}
+	std::array<IntersectionData, 9> d;
 
-	if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = t1Factor;
-			*triangle1Beta = 0.0;
-			*triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-			*triangle2Beta = t2Factor;
-		}
-	}
+	d[0].didOccur = calculateCcdContactSegmentSegment(t1v0, t1v1, t2v0, t2v1, &d[0].timeOfImpact, &t1Factor, &t2Factor);
+	d[0].isSegment = true;
+	d[0].triangle1Alpha = t1Factor;
+	d[0].triangle1Beta = 0.0;
+	d[0].triangle2Alpha = t2Factor;
+	d[0].triangle2Beta = 0.0;
 
-	if (calculateCcdContactSegmentSegment(t1v0, t1v1, t2v0, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = t1Factor;
-			*triangle1Beta = 0.0;
-			*triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
-			*triangle2Beta = t2Factor;
-		}
-	}
+	d[1].didOccur = calculateCcdContactSegmentSegment(t1v0, t1v1, t2v1, t2v2, &d[1].timeOfImpact, &t1Factor, &t2Factor);
+	d[1].isSegment = true;
+	d[1].triangle1Alpha = t1Factor;
+	d[1].triangle1Beta = 0.0;
+	d[1].triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+	d[1].triangle2Beta = t2Factor;
 
-	if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-			*triangle1Beta = t1Factor;
-			*triangle2Alpha = t2Factor;
-			*triangle2Beta = 0.0;
-		}
-	}
+	d[2].didOccur = calculateCcdContactSegmentSegment(t1v0, t1v1, t2v0, t2v2, &d[2].timeOfImpact, &t1Factor, &t2Factor);
+	d[2].isSegment = true;
+	d[2].triangle1Alpha = t1Factor;
+	d[2].triangle1Beta = 0.0;
+	d[2].triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+	d[2].triangle2Beta = t2Factor;
 
-	if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-			*triangle1Beta = t1Factor;
-			*triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-			*triangle2Beta = t2Factor;
-		}
-	}
+	d[3].didOccur = calculateCcdContactSegmentSegment(t1v1, t1v2, t2v0, t2v1, &d[3].timeOfImpact, &t1Factor, &t2Factor);
+	d[3].isSegment = true;
+	d[3].triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+	d[3].triangle1Beta = t1Factor;
+	d[3].triangle2Alpha = t2Factor;
+	d[3].triangle2Beta = 0.0;
 
-	if (calculateCcdContactSegmentSegment(t1v1, t1v2, t2v0, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-			*triangle1Beta = t1Factor;
-			*triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
-			*triangle2Beta = t2Factor;
-		}
-	}
+	d[4].didOccur = calculateCcdContactSegmentSegment(t1v1, t1v2, t2v1, t2v2, &d[4].timeOfImpact, &t1Factor, &t2Factor);
+	d[4].isSegment = true;
+	d[4].triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+	d[4].triangle1Beta = t1Factor;
+	d[4].triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+	d[4].triangle2Beta = t2Factor;
 
-	if (calculateCcdContactSegmentSegment(t1v0, t1v2, t2v0, t2v1, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
-			*triangle1Beta = t1Factor;
-			*triangle2Alpha = t2Factor;
-			*triangle2Beta = 0.0;
-		}
-	}
+	d[5].didOccur = calculateCcdContactSegmentSegment(t1v1, t1v2, t2v0, t2v2, &d[5].timeOfImpact, &t1Factor, &t2Factor);
+	d[5].isSegment = true;
+	d[5].triangle1Alpha = 1.0 - t1Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+	d[5].triangle1Beta = t1Factor;
+	d[5].triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+	d[5].triangle2Beta = t2Factor;
 
-	if (calculateCcdContactSegmentSegment(t1v0, t1v2, t2v1, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
-			*triangle1Beta = t1Factor;
-			*triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
-			*triangle2Beta = t2Factor;
-		}
-	}
+	d[6].didOccur = calculateCcdContactSegmentSegment(t1v0, t1v2, t2v0, t2v1, &d[6].timeOfImpact, &t1Factor, &t2Factor);
+	d[6].isSegment = true;
+	d[6].triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+	d[6].triangle1Beta = t1Factor;
+	d[6].triangle2Alpha = t2Factor;
+	d[6].triangle2Beta = 0.0;
 
-	if (calculateCcdContactSegmentSegment(t1v0, t1v2, t2v0, t2v2, &timeOfImpact, &t1Factor, &t2Factor))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			segmentSegmentCcdFound = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
-			*triangle1Beta = t1Factor;
-			*triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
-			*triangle2Beta = t2Factor;
-		}
-	}
+	d[7].didOccur = calculateCcdContactSegmentSegment(t1v0, t1v2, t2v1, t2v2, &d[7].timeOfImpact, &t1Factor, &t2Factor);
+	d[7].isSegment = true;
+	d[7].triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+	d[7].triangle1Beta = t1Factor;
+	d[7].triangle2Alpha = 1.0 - t2Factor; // P = P0 + P0P1.(1 - tFactor) + P0P2.tFactor
+	d[7].triangle2Beta = t2Factor;
 
-	return segmentSegmentCcdFound;
+	d[8].didOccur = calculateCcdContactSegmentSegment(t1v0, t1v2, t2v0, t2v2, &d[8].timeOfImpact, &t1Factor, &t2Factor);
+	d[8].isSegment = true;
+	d[8].triangle1Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+	d[8].triangle1Beta = t1Factor;
+	d[8].triangle2Alpha = 0.0; // P = P0 + P0P2.(tFactor)
+	d[8].triangle2Beta = t2Factor;
+
+	std::sort(d.begin(), d.end(), [](const IntersectionData& a, const IntersectionData& b) {
+		return a.timeOfImpact < b.timeOfImpact; });
+
+	*earliestTimeOfImpact = d[0].timeOfImpact;
+	*triangle1Alpha = d[0].triangle1Alpha;
+	*triangle2Alpha = d[0].triangle2Alpha;
+	*triangle1Beta = d[0].triangle1Beta;
+	*triangle2Beta = d[0].triangle2Beta;
+
+	return d[0].didOccur;
 }
+
 
 bool TriangleMeshTriangleMeshContact::ccdContactCcdCasePointTriangle(
 	const std::pair<Math::Vector3d, Math::Vector3d>& t1v0, const std::pair<Math::Vector3d, Math::Vector3d>& t1v1,
@@ -686,92 +670,67 @@ bool TriangleMeshTriangleMeshContact::ccdContactCcdCasePointTriangle(
 	double timeOfImpact;
 	double u;
 	double v;
+	std::array<IntersectionData, 6> d;
 
-	if (calculateCcdContactPointTriangle(t1v0, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
+	d[0].didOccur = calculateCcdContactPointTriangle(t1v0, t2v0, t2v1, t2v2, &d[0].timeOfImpact, &u, &v);
+	d[0].t1VertexThroughT2 = true;
+	d[0].triangle1Alpha = 0.0;
+	d[0].triangle1Beta = 0.0;
+	d[0].triangle2Alpha = u;
+	d[0].triangle2Beta = v;
+
+
+
+	d[1].didOccur = calculateCcdContactPointTriangle(t1v1, t2v0, t2v1, t2v2, &d[1].timeOfImpact, &u, &v);
+	d[1].t1VertexThroughT2 = true;
+	d[1].triangle1Alpha = 1.0;
+	d[1].triangle1Beta = 0.0;
+	d[1].triangle2Alpha = u;
+	d[1].triangle2Beta = v;
+
+
+	d[2].didOccur = calculateCcdContactPointTriangle(t1v2, t2v0, t2v1, t2v2, &d[2].timeOfImpact, &u, &v);
+	d[2].t1VertexThroughT2 = true;
+	d[2].triangle1Alpha = 0.0;
+	d[2].triangle1Beta = 1.0;
+	d[2].triangle2Alpha = u;
+	d[2].triangle2Beta = v;
+
+	d[3].didOccur = calculateCcdContactPointTriangle(t2v0, t1v0, t1v1, t1v2, &d[3].timeOfImpact, &u, &v);
+	d[3].t1VertexThroughT2 = false;
+	d[3].triangle1Alpha = u;
+	d[3].triangle1Beta = v;
+	d[3].triangle2Alpha = 0.0;
+	d[3].triangle2Beta = 0.0;
+
+	d[4].didOccur = calculateCcdContactPointTriangle(t2v1, t1v0, t1v1, t1v2, &d[4].timeOfImpact, &u, &v);
+	d[4].t1VertexThroughT2 = false;
+	d[4].triangle1Alpha = u;
+	d[4].triangle1Beta = v;
+	d[4].triangle2Alpha = 1.0;
+	d[4].triangle2Beta = 0.0;
+
+	d[5].didOccur = calculateCcdContactPointTriangle(t2v2, t1v0, t1v1, t1v2, &d[5].timeOfImpact, &u, &v);
+	d[5].t1VertexThroughT2 = false;
+	d[5].triangle1Alpha = u;
+	d[5].triangle1Beta = v;
+	d[5].triangle2Alpha = 0.0;
+	d[5].triangle2Beta = 1.0;
+
+	std::sort(d.begin(), d.end(), [](const IntersectionData& a, const IntersectionData& b) {
+		return a.timeOfImpact < b.timeOfImpact; });
+
+	if (d[0].didOccur)
 	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			pointTriangleCcdFound = true;
-			*t1VertexThroughT2 = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 0.0;
-			*triangle1Beta = 0.0;
-			*triangle2Alpha = u;
-			*triangle2Beta = v;
-		}
+		*earliestTimeOfImpact = d[0].timeOfImpact;
+		*triangle1Alpha = d[0].triangle1Alpha;
+		*triangle2Alpha = d[0].triangle2Alpha;
+		*triangle1Beta = d[0].triangle1Beta;
+		*triangle2Beta = d[0].triangle2Beta;
+		*t1VertexThroughT2 = d[0].t1VertexThroughT2;
 	}
 
-	if (calculateCcdContactPointTriangle(t1v1, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			pointTriangleCcdFound = true;
-			*t1VertexThroughT2 = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 1.0;
-			*triangle1Beta = 0.0;
-			*triangle2Alpha = u;
-			*triangle2Beta = v;
-		}
-	}
-
-	if (calculateCcdContactPointTriangle(t1v2, t2v0, t2v1, t2v2, &timeOfImpact, &u, &v))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			pointTriangleCcdFound = true;
-			*t1VertexThroughT2 = true;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = 0.0;
-			*triangle1Beta = 1.0;
-			*triangle2Alpha = u;
-			*triangle2Beta = v;
-		}
-	}
-
-	if (calculateCcdContactPointTriangle(t2v0, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			pointTriangleCcdFound = true;
-			*t1VertexThroughT2 = false;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = u;
-			*triangle1Beta = v;
-			*triangle2Alpha = 0.0;
-			*triangle2Beta = 0.0;
-		}
-	}
-
-	if (calculateCcdContactPointTriangle(t2v1, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			pointTriangleCcdFound = true;
-			*t1VertexThroughT2 = false;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = u;
-			*triangle1Beta = v;
-			*triangle2Alpha = 1.0;
-			*triangle2Beta = 0.0;
-		}
-	}
-
-	if (calculateCcdContactPointTriangle(t2v2, t1v0, t1v1, t1v2, &timeOfImpact, &u, &v))
-	{
-		if (timeOfImpact < *earliestTimeOfImpact)
-		{
-			pointTriangleCcdFound = true;
-			*t1VertexThroughT2 = false;
-			*earliestTimeOfImpact = timeOfImpact;
-			*triangle1Alpha = u;
-			*triangle1Beta = v;
-			*triangle2Alpha = 0.0;
-			*triangle2Beta = 1.0;
-		}
-	}
-
-	return pointTriangleCcdFound;
+	return d[0].didOccur;
 }
 
 }; // namespace Collision
