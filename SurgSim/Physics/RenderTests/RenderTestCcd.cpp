@@ -63,10 +63,10 @@ namespace
 void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentation,
 	std::shared_ptr<DeformableCollisionRepresentation> collisionRepresentation,
 	const SurgSim::Math::RigidTransform3d& pose,
-	bool setBoundraryConditions = true)
+	const bool setBoundaryConditions = true, const double youngModulus = 1e6)
 {
 	// Mechanical properties
-	const double youngModulus = 1e6;
+	//const double youngModulus = 1e6;
 	const double poissonRatio = 0.35;
 	const double massDensity = 5000.0;
 	// Geometrical properties
@@ -105,7 +105,7 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 			mesh->addVertex(meshVertex);
 		}
 	}
-	if (setBoundraryConditions)
+	if (setBoundaryConditions)
 	{
 		// We fix the nodes on the 1st and last cross-sections
 		const size_t section0 = 0;
@@ -172,14 +172,14 @@ void createFem2DCylinder(std::shared_ptr<Fem2DRepresentation> physicsRepresentat
 std::shared_ptr<SurgSim::Framework::SceneElement> loadFem2D(const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose,
 	SurgSim::Math::IntegrationScheme integrationScheme,
-	bool setBoundraryConditions = true)
+	bool setBoundaryConditions = true, double youngModulus = 1e6)
 {
 	std::shared_ptr<Fem2DRepresentation> physicsRepresentation
 		= std::make_shared<Fem2DRepresentation>("Physics Representation" + name);
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision " + name);
 	collisionRepresentation->setCollisionDetectionType(SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
 
-	createFem2DCylinder(physicsRepresentation, collisionRepresentation, pose, setBoundraryConditions);
+	createFem2DCylinder(physicsRepresentation, collisionRepresentation, pose, setBoundaryConditions, youngModulus);
 
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
@@ -277,9 +277,11 @@ public:
 	{
 		RenderTests::SetUp();
 
-		SurgSim::Framework::Logger::getLoggerManager()->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
+		SurgSim::Framework::Logger::getLoggerManager()->getLogger(physicsManager->getName())
+			->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
 		physicsManager->setRate(150.0);
 		physicsManager->setComputations(SurgSim::Physics::createCcdPipeline(false));
+
 	}
 };
 
@@ -320,7 +322,7 @@ TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshDeformableRigid)
 		makeRigidTranslation(Vector3d(0,0.1,0)),
 		SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT, false));
 
-	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 5000.0);
+	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 50000.0);
 }
 
 TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshDeformables)
@@ -337,9 +339,9 @@ TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshDeformables)
 	scene->addSceneElement(
 		loadFem2D("DeformableCylinder2",
 		makeRigidTransform(Vector3d(0, 0.1, 0), Vector3d(-1, 0.1, 0), Vector3d(0, 1.1, 0)),
-		SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT, false));
+		SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT, true, 1e5));
 
-	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 5000.0);
+	runTest(Vector3d(0.2, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 50000.0);
 }
 
 } // namespace Physics
