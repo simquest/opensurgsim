@@ -60,7 +60,7 @@ private:
 	/// \param pose1AtTime1 The pose of Shape 1 (first triangle's shape) at Time 1.
 	/// \param pose2AtTime1 The pose of Shape 2 (second triangle's shape) at Time 1.
 	/// \param [out] contacts The contacts generated (if any) will be added to this list.
-	void ccdContactDcdCase(
+	bool ccdContactDcdCase(
 		const std::pair<Math::Vector3d, Math::Vector3d>& t1v0, const std::pair<Math::Vector3d, Math::Vector3d>& t1v1,
 		const std::pair<Math::Vector3d, Math::Vector3d>& t1v2, const std::pair<Math::Vector3d, Math::Vector3d>& t2v0,
 		const std::pair<Math::Vector3d, Math::Vector3d>& t2v1, const std::pair<Math::Vector3d, Math::Vector3d>& t2v2,
