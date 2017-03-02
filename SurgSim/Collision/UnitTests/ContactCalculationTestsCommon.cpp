@@ -129,10 +129,10 @@ bool checkMeshLocalCoordinate(
 	else
 	{
 		return ::testing::AssertionFailure() << "Expected contact not found in calculated contacts list:\n" <<
-			   "Normal: " << expected->normal << "\n" <<
-			   "First objects' contact point: " << expected->penetrationPoints.first.rigidLocalPosition.getValue()
+			   "Normal: " << expected->normal.transpose() << "\n" <<
+			   "First objects' contact point: " << expected->penetrationPoints.first.rigidLocalPosition.getValue().transpose()
 			   << "\n" <<
-			   "Second objects' contact point: " << expected->penetrationPoints.second.rigidLocalPosition.getValue()
+			   "Second objects' contact point: " << expected->penetrationPoints.second.rigidLocalPosition.getValue().transpose()
 			   << "\n" <<
 			   "Depth of penetration: " << expected->depth << "\n";
 	}

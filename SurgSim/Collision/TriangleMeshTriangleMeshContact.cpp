@@ -259,7 +259,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 	const Math::MeshShape& shape2AtTime1, const Math::RigidTransform3d& pose2AtTime1) const
 {
 	using Math::Geometry::ScalarEpsilon;
-	double epsilon = Math::Geometry::DistanceEpsilon;
+	using Math::Geometry::DistanceEpsilon;
 
 	std::list<std::shared_ptr<Contact>> contacts;
 
@@ -343,15 +343,10 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			Math::Vector3d pt1;
 			Math::Vector3d pt2;
 
-			if (Math::distanceTriangleTriangle(
-				t1v0.first, t1v1.first, t1v2.first,
-				t2v0.first, t2v1.first, t2v2.first,
-				&pt1, &pt2) <= 0.0)
-			{
-				ccdContactDcdCase(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, t1n, t2n,
-					triangle1Id, triangle2Id, pose1AtTime1, pose2AtTime1, &contacts);
-			}
-			else
+			ccdContactDcdCase(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, t1n, t2n,
+				triangle1Id, triangle2Id, pose1AtTime1, pose2AtTime1, &contacts);
+
+			if (!contacts.empty())
 			{
 				ccdContactCcdCase(t1v0, t1v1, t1v2, t2v0, t2v1, t2v2, t1n, t2n,
 					triangle1Id, triangle2Id, pose1AtTime1, pose2AtTime1, &contacts);
@@ -376,8 +371,11 @@ void TriangleMeshTriangleMeshContact::ccdContactDcdCase(
 	Math::Vector3d pt1;
 	Math::Vector3d pt2;
 	Math::Vector3d normal;
-	Math::calculateContactTriangleTriangle(t1v0.first, t1v1.first, t1v2.first,
-		t2v0.first, t2v1.first, t2v2.first, t1n, t2n, &depth, &pt1, &pt2, &normal);
+	if (!Math::calculateContactTriangleTriangle(t1v0.first, t1v1.first, t1v2.first,
+		t2v0.first, t2v1.first, t2v2.first, t1n, t2n, &depth, &pt1, &pt2, &normal))
+	{
+		return;
+	}
 
 	Math::Vector3d baryCoordTriangle1;
 	Math::Vector3d baryCoordTriangle2;
