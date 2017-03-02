@@ -49,6 +49,12 @@ struct IndexedLocalCoordinate
 	/// \return True if the two IndexedLocalCoordinate are equal within precision, False otherwise
 	bool isApprox(const IndexedLocalCoordinate& other, double precision = std::numeric_limits<double>::epsilon())
 		const;
+
+	bool isValid()
+	{
+		return (std::abs(coordinate.sum() - 1.0) < 1e-10) && (-1e-10 <= coordinate.minCoeff() &&
+			coordinate.maxCoeff() <= 1.0 + 1e-10);
+	}
 };
 
 } // namespace DataStructures
