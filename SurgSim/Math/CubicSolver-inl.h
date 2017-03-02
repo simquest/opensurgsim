@@ -35,8 +35,8 @@ template <class T>
 int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 {
 	int numberOfRoots = 0;
-	boost::math::tools::eps_tolerance<T> tolerance(std::numeric_limits<T>::digits - 3);
-	const T epsilon = 4 * std::numeric_limits<T>::epsilon();
+	static const boost::math::tools::eps_tolerance<T> tolerance(std::numeric_limits<T>::digits - 3);
+	static const T epsilon = 4 * std::numeric_limits<T>::epsilon();
 
 	// Is degenerate?
 	if (isNearZero(p.getCoefficient(3), epsilon))
