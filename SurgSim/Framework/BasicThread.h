@@ -22,6 +22,9 @@
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 
+#include <chrono>
+#include <thread>
+
 #include "SurgSim/Framework/Barrier.h"
 #include "SurgSim/Framework/Timer.h"
 
@@ -102,7 +105,7 @@ public:
 	/// \param val	rate in hertz (updates per second) of the thread
 	void setRate(double val)
 	{
-		m_period = boost::chrono::duration<double>(1.0 / val);
+		m_period = std::chrono::duration<double>(1.0 / val);
 	}
 
 	/// Sets the thread to synchronized execution in concert with the startup
@@ -158,7 +161,7 @@ private:
 	std::string m_name;
 
 	boost::thread m_thisThread;
-	boost::chrono::duration<double> m_period;
+	std::chrono::duration<double> m_period;
 	std::shared_ptr<Barrier> m_startupBarrier;
 
 	// Protects the start and stop functions so on can only execute once the other is done

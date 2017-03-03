@@ -115,9 +115,9 @@ void BasicThread::operator()()
 
 
 	size_t numUpdates = 0;
-	boost::chrono::duration<double> totalFrameTime(0.0);
-	boost::chrono::duration<double> sleepTime(0.0);
-	boost::chrono::duration<double> totalSleepTime(0.0);
+	std::chrono::duration<double> totalFrameTime(0.0);
+	std::chrono::duration<double> sleepTime(0.0);
+	std::chrono::duration<double> totalSleepTime(0.0);
 	Clock::time_point start;
 
 	m_timer.start();
@@ -174,8 +174,8 @@ void BasicThread::operator()()
 					<<  1.0 / m_period.count() << "Hz, "
 					<< "Average doUpdate: " << (totalFrameTime.count() - totalSleepTime.count()) / numUpdates << "s, "
 					<< "Sleep: " << 100.0 * totalSleepTime.count() / totalFrameTime.count() << "%";
-				totalFrameTime = boost::chrono::duration<double>::zero();
-				totalSleepTime = boost::chrono::duration<double>::zero();
+				totalFrameTime = std::chrono::duration<double>::zero();
+				totalSleepTime = std::chrono::duration<double>::zero();
 				numUpdates = 0;
 			}
 		}
