@@ -246,10 +246,29 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 	SURGSIM_ASSERT(shape1AtTime0.getNumTriangles() == shape1AtTime1.getNumTriangles());
 	SURGSIM_ASSERT(shape2AtTime0.getNumTriangles() == shape2AtTime1.getNumTriangles());
 
+	const size_t shape2NumTriangles = shape2AtTime0.getNumTriangles();
+
+	std::vector<Math::Aabbd> shape2_aabbs(shape2NumTriangles);
+
+	for (size_t id = 0; id < shape2NumTriangles; id++)
+	{
+			auto& aabb = shape2_aabbs[id];
+			const auto& triangleT0 = shape2AtTime0.getTriangle(id);
+			aabb.extend(shape2AtTime0.getVertexPosition(triangleT0.verticesId[0]));
+			aabb.extend(shape2AtTime0.getVertexPosition(triangleT0.verticesId[1]));
+			aabb.extend(shape2AtTime0.getVertexPosition(triangleT0.verticesId[2]));
+
+			const auto& triangleT1 = shape2AtTime1.getTriangle(id);
+			aabb.extend(shape2AtTime0.getVertexPosition(triangleT1.verticesId[0]));
+			aabb.extend(shape2AtTime0.getVertexPosition(triangleT1.verticesId[1]));
+			aabb.extend(shape2AtTime0.getVertexPosition(triangleT1.verticesId[2]));
+	}
+
+
 	for (size_t triangle1Id = 0; triangle1Id < shape1AtTime0.getNumTriangles(); triangle1Id++)
 	{
-		auto triangle1T0 = shape1AtTime0.getTriangle(triangle1Id);
-		auto triangle1T1 = shape1AtTime1.getTriangle(triangle1Id);
+		const auto& triangle1T0 = shape1AtTime0.getTriangle(triangle1Id);
+		const auto& triangle1T1 = shape1AtTime1.getTriangle(triangle1Id);
 
 		std::pair<Math::Vector3d, Math::Vector3d> t1v0 = std::make_pair(
 			shape1AtTime0.getVertexPosition(triangle1T0.verticesId[0]),
@@ -284,13 +303,7 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 				shape2AtTime0.getVertexPosition(triangle2T0.verticesId[2]),
 				shape2AtTime1.getVertexPosition(triangle2T1.verticesId[2]));
 
-			Math::Aabbd triangle2Aabb;
-			triangle2Aabb.extend(t2v0.first);
-			triangle2Aabb.extend(t2v0.second);
-			triangle2Aabb.extend(t2v1.first);
-			triangle2Aabb.extend(t2v1.second);
-			triangle2Aabb.extend(t2v2.first);
-			triangle2Aabb.extend(t2v2.second);
+			const Math::Aabbd& triangle2Aabb = shape2_aabbs[triangle2Id];
 
 			if (!SurgSim::Math::doAabbIntersect(triangle1Aabb, triangle2Aabb))
 			{
