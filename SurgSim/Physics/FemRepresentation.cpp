@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <omp.h>
+
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
@@ -350,6 +352,14 @@ void FemRepresentation::computeM(const SurgSim::Math::OdeState& state)
 	{
 		(*femElement)->addMass(&m_M);
 	}
+
+	// Mass lumping
+	for (int i = 0; i < m_M.rows(); i++)
+	{
+		double mass = m_M.row(i).sum();
+		SurgSim::Math::zeroRow(i, &m_M);
+		m_M.coeffRef(i, i) = mass;
+	}
 }
 
 void FemRepresentation::computeD(const SurgSim::Math::OdeState& state)
@@ -408,6 +418,19 @@ void FemRepresentation::computeK(const SurgSim::Math::OdeState& state)
 	}
 }
 
+int fibo(int n)
+{
+	if (n <= 2) return n;
+	return fibo(n - 1) + fibo(n - 2);
+}
+
+double storage[10000];
+void f(int i)
+{
+	//storage[i] = fibo(i);
+	storage[i] = log(i) / exp(i) + sin(i / 100.0) - cos(i / 40.0) * i * i;
+}
+
 void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
@@ -423,10 +446,52 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 	Math::clearMatrix(&m_K);
 
 	// Add all the FemElement contribution to f, M, D, K
-	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
+	int numElements = static_cast<int>(m_femElements.size());
+	int i = 0;
+	double start = omp_get_wtime();
+	for (i = 0; i < numElements; i++)
 	{
-		(*femElement)->addFMDK(&m_f, &m_M, &m_D, &m_K);
+		m_femElements[i]->addFMDK(&m_f, &m_M, &m_D, &m_K);
 	}
+	double end = omp_get_wtime();
+	static int numIterations = 0;
+	static double cumulatedTimes = 0.0;
+	static double averageTime = 0.0;
+	cumulatedTimes += (end - start);
+	numIterations++;
+	averageTime = cumulatedTimes / static_cast<double>(numIterations);
+
+	Eigen::Matrix<double, Eigen::Dynamic, 1> fbackup = m_f;
+	SurgSim::Math::SparseMatrix Mbackup = m_M;
+	SurgSim::Math::SparseMatrix Dbackup = m_D;
+	SurgSim::Math::SparseMatrix Kbackup = m_K;
+
+	start = omp_get_wtime();
+	int numThreads;
+#pragma omp parallel for shared(numElements,numThreads) private(i)
+	for (i = 0; i < numElements; i++)
+	{
+		m_femElements[i]->addFMDK(&fbackup, &Mbackup, &Dbackup, &Kbackup);
+		numThreads = omp_get_num_threads(); // This needs to be registered in the parallel section, otherwise it returns 1
+	}
+	end = omp_get_wtime();
+
+	static int numIterationsWithOpenMP = 0;
+	static double cumulatedTimesWithOpenMP = 0.0;
+	static double averageTimeWithOpenMP = 0.0;
+	cumulatedTimesWithOpenMP += (end - start);
+	numIterationsWithOpenMP++;
+	averageTimeWithOpenMP = cumulatedTimesWithOpenMP / static_cast<double>(numIterationsWithOpenMP);
+	printf("Avg time computeFMDK with %d elements [with OpenMP(#procs %d; #threads %d) = %g; without OpenMP = %g; Speedup = %g]\n", numElements, omp_get_num_procs(), numThreads, averageTimeWithOpenMP, averageTime, averageTime / averageTimeWithOpenMP);
+
+	if ((m_f - fbackup).norm() > 1e-10)
+		printf(" [computeFMDK] > Errors between OpenMP results and non OpenMP f=%g\n", (m_f - fbackup).norm());
+	if ((m_M - Mbackup).norm() > 1e-10)
+		printf(" [computeFMDK] > Errors between OpenMP results and non OpenMP M=%g\n", (m_M - Mbackup).norm());
+	if ((m_D - Dbackup).norm() > 1e-10)
+		printf(" [computeFMDK] > Errors between OpenMP results and non OpenMP D=%g\n", (m_D - Dbackup).norm());
+	if ((m_K - Kbackup).norm() > 1e-10)
+		printf(" [computeFMDK] > Errors between OpenMP results and non OpenMP K=%g\n", (m_K - Kbackup).norm());
 
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
@@ -466,11 +531,62 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 
 void FemRepresentation::updateFMDK(const SurgSim::Math::OdeState& state, int options)
 {
+	std::vector<SurgSim::Math::Vector> fsBackup;
+	std::vector<SurgSim::Math::Matrix> MsBackup;
+	std::vector<SurgSim::Math::Matrix> DsBackup;
+	std::vector<SurgSim::Math::Matrix> KsBackup;
+
+	int i;
+	int numElements = static_cast<int>(m_femElements.size());
+	double start = omp_get_wtime();
 	// This function updates the matrices needed to calculate F, M, D, K for each element.
 	// Note that the relevant matrices are updated only for non-linear elements.
-	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
+	for (i = 0; i < numElements; i++)
 	{
-		(*femElement)->updateFMDK(state, options);
+		m_femElements[i]->updateFMDK(state, options);
+	}
+	double end = omp_get_wtime();
+
+	for (i = 0; i < numElements; i++)
+	{
+		fsBackup.push_back(m_femElements[i]->m_f);
+		MsBackup.push_back(m_femElements[i]->m_M);
+		DsBackup.push_back(m_femElements[i]->m_D);
+		KsBackup.push_back(m_femElements[i]->m_K);
+	}
+
+	static int numIterations = 0;
+	static double cumulatedTimes = 0.0;
+	static double averageTime = 0.0;
+	cumulatedTimes += (end - start);
+	numIterations++;
+	averageTime = cumulatedTimes / static_cast<double>(numIterations);
+
+
+
+	omp_set_num_threads(8);
+	start = omp_get_wtime();
+#pragma omp parallel for shared(numElements) private(i)
+	for (i = 0; i < numElements; i++)
+	{
+		m_femElements[i]->updateFMDK(state, options);
+	}
+	end = omp_get_wtime();
+
+	static int numIterationsWithOpenMP = 0;
+	static double cumulatedTimesWithOpenMP = 0.0;
+	static double averageTimeWithOpenMP = 0.0;
+	cumulatedTimesWithOpenMP += (end - start);
+	numIterationsWithOpenMP++;
+	averageTimeWithOpenMP = cumulatedTimesWithOpenMP / static_cast<double>(numIterationsWithOpenMP);
+	printf("Avg time updateFMDK with %d elements [with OpenMP = %g; without OpenMP = %g; Speedup = %g]\n", numElements, averageTimeWithOpenMP, averageTime, averageTime/ averageTimeWithOpenMP);
+
+	for (i = 0; i < numElements; i++)
+	{
+		if ((fsBackup[i] - m_femElements[i]->m_f).norm() > 1e-10) printf(" [updateFMDK] > FemElement[%d] f has an error of %g\n", i, (fsBackup[i] - m_femElements[i]->m_f).norm());
+		if ((MsBackup[i] - m_femElements[i]->m_M).norm() > 1e-10) printf(" [updateFMDK] > FemElement[%d] M has an error of %g\n", i, (MsBackup[i] - m_femElements[i]->m_M).norm());
+		if ((DsBackup[i] - m_femElements[i]->m_D).norm() > 1e-10) printf(" [updateFMDK] > FemElement[%d] D has an error of %g\n", i, (DsBackup[i] - m_femElements[i]->m_D).norm());
+		if ((KsBackup[i] - m_femElements[i]->m_K).norm() > 1e-10) printf(" [updateFMDK] > FemElement[%d] K has an error of %g\n", i, (KsBackup[i] - m_femElements[i]->m_K).norm());
 	}
 
 	OdeEquation::updateFMDK(state, options);
@@ -528,10 +644,37 @@ void FemRepresentation::addFemElementsForce(SurgSim::Math::Vector* force,
 											const SurgSim::Math::OdeState& state,
 											double scale)
 {
+	double start = omp_get_wtime();
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
 		(*femElement)->addForce(force, scale);
 	}
+	double end = omp_get_wtime();
+	static int numIterations = 0;
+	static double cumulatedTimes = 0.0;
+	static double averageTime = 0.0;
+	cumulatedTimes += (end - start);
+	numIterations++;
+	averageTime = cumulatedTimes / static_cast<double>(numIterations);
+
+	int numElements = static_cast<int>(m_femElements.size());
+	int i;
+
+	start = omp_get_wtime();
+#pragma omp parallel for shared(numElements) private(i)
+	for (i = 0; i < numElements; i++)
+	{
+		m_femElements[i]->addForce(force, scale);
+	}
+	end = omp_get_wtime();
+
+	static int numIterationsWithOpenMP = 0;
+	static double cumulatedTimesWithOpenMP = 0.0;
+	static double averageTimeWithOpenMP = 0.0;
+	cumulatedTimesWithOpenMP += (end - start);
+	numIterationsWithOpenMP++;
+	averageTimeWithOpenMP = cumulatedTimesWithOpenMP / static_cast<double>(numIterationsWithOpenMP);
+	printf("Avg time addFemElements with %d FemElements [with OpenMP = %10.7lf; without OpenMP = %10.7lf; Speedup = %10.7lf]\r", numElements, averageTimeWithOpenMP, averageTime, averageTime / averageTimeWithOpenMP);
 }
 
 void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,

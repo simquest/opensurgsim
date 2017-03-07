@@ -242,6 +242,7 @@ protected:
 	/// Poisson ratio (unitless)
 	double m_nu;
 
+public:
 	/// The force vector.
 	SurgSim::Math::Vector m_f;
 

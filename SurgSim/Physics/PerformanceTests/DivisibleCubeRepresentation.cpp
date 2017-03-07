@@ -17,6 +17,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
+#include "SurgSim/Physics/Fem3DElementCorotationalTetrahedron.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/PerformanceTests/DivisibleCubeRepresentation.h"
 
@@ -130,6 +131,7 @@ void DivisibleCubeRepresentation::addFemCubes(std::shared_ptr<SurgSim::Math::Ode
 		{
 			for (size_t k = 0; k < m_numNodesPerAxis - 1; k++)
 			{
+
 				std::array<size_t, 8> cubeNodeIds;
 				cubeNodeIds[0] = get1DIndexFrom3D(i  , j  , k);
 				cubeNodeIds[1] = get1DIndexFrom3D(i + 1, j  , k);
@@ -144,13 +146,34 @@ void DivisibleCubeRepresentation::addFemCubes(std::shared_ptr<SurgSim::Math::Ode
 											  cubeNodeIds[4], cubeNodeIds[5], cubeNodeIds[7], cubeNodeIds[6]
 											 };
 
-				// Add Fem3DElementCube for each cube
-				std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(cube);
-				femElement->setMassDensity(980.0);   // 0.98 g/cm^-3 (2-part silicone rubber a.k.a. RTV6166)
-				femElement->setPoissonRatio(0.499);  // From the paper (near 0.5)
-				femElement->setYoungModulus(15.3e3); // 15.3 kPa (From the paper)
-				femElement->initialize(*state);
-				addFemElement(femElement);
+				//// Add Fem3DElementCube for each cube
+				//std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(cube);
+				//femElement->setMassDensity(980.0);   // 0.98 g/cm^-3 (2-part silicone rubber a.k.a. RTV6166)
+				//femElement->setPoissonRatio(0.499);  // From the paper (near 0.5)
+				//femElement->setYoungModulus(15.3e3); // 15.3 kPa (From the paper)
+				//femElement->initialize(*state);
+				//addFemElement(femElement);
+
+				// Cube decomposition into 5 tetrahedrons
+				// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
+				std::array< std::array<size_t, 4>, 5> tetrahedrons = { {
+					{ { cubeNodeIds[4], cubeNodeIds[7], cubeNodeIds[1], cubeNodeIds[2] } }, // CCW (47)cross(41) . (42) > 0
+					{ { cubeNodeIds[4], cubeNodeIds[1], cubeNodeIds[7], cubeNodeIds[5] } }, // CCW (41)cross(47) . (45) > 0
+					{ { cubeNodeIds[4], cubeNodeIds[2], cubeNodeIds[1], cubeNodeIds[0] } }, // CCW (42)cross(41) . (40) > 0
+					{ { cubeNodeIds[4], cubeNodeIds[7], cubeNodeIds[2], cubeNodeIds[6] } }, // CCW (47)cross(42) . (46) > 0
+					{ { cubeNodeIds[1], cubeNodeIds[2], cubeNodeIds[7], cubeNodeIds[3] } }  // CCW (12)cross(17) . (13) > 0
+					}
+				};
+
+				for (int tetId = 0; tetId < 5; tetId++)
+				{
+					std::shared_ptr<Fem3DElementCorotationalTetrahedron> femElement = std::make_shared<Fem3DElementCorotationalTetrahedron>(tetrahedrons[tetId]);
+					femElement->setMassDensity(980.0);   // 0.98 g/cm^-3 (2-part silicone rubber a.k.a. RTV6166)
+					femElement->setPoissonRatio(0.499);  // From the paper (near 0.5)
+					femElement->setYoungModulus(15.3e3); // 15.3 kPa (From the paper)
+					femElement->initialize(*state);
+					addFemElement(femElement);
+				}
 			}
 		}
 	}

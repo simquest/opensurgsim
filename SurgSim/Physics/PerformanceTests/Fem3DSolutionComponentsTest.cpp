@@ -317,19 +317,21 @@ TEST_P(ComponentIntegrationSchemeAndCountParamTest, TimeInvertSystem)
 INSTANTIATE_TEST_CASE_P(
 	Fem3DSolutionComponentsTest,
 	ComponentIntegrationSchemeAndCountParamTest,
-	::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
-					   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_STATIC,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
-					   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4),
-					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU,
-							   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT),
-					   ::testing::Values(2, 3, 4, 5, 6, 7, 8)));
+	::testing::Combine(::testing::Values(
+//					   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
+//					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT,
+//					   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
+//					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
+					   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT),
+//					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
+//					   SurgSim::Math::INTEGRATIONSCHEME_STATIC,
+//					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
+//					   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4),
+//					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4),
+//					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU, SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT),
+					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU),
+//					   ::testing::Values(2, 3, 4, 5, 6, 7, 8)));
+					   ::testing::Values(4, 5, 6, 7, 8)));
 
 } // namespace Physics
 } // namespace SurgSim
