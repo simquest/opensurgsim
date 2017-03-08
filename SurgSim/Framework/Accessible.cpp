@@ -207,20 +207,20 @@ void Accessible::forwardProperty(const std::string& name, const Accessible& targ
 }
 
 template<>
-SurgSim::Math::Matrix44f convert(boost::any val)
+SurgSim::Math::UnalignedMatrix44f convert(boost::any val)
 {
 
-	SurgSim::Math::Matrix44f floatResult;
+	SurgSim::Math::UnalignedMatrix44f floatResult;
 	// Use try in case this conversion was created using a Matrix44f, in which case the any_cast will
 	// still fail and throw an exception
 	try
 	{
-		SurgSim::Math::Matrix44d result = boost::any_cast<SurgSim::Math::Matrix44d>(val);
+		SurgSim::Math::UnalignedMatrix44d result = boost::any_cast<SurgSim::Math::UnalignedMatrix44d>(val);
 		floatResult = result.cast<float>();
 	}
 	catch (boost::bad_any_cast&)
 	{
-		floatResult = boost::any_cast<SurgSim::Math::Matrix44f>(val);
+		floatResult = boost::any_cast<SurgSim::Math::UnalignedMatrix44f>(val);
 	}
 	return floatResult;
 }

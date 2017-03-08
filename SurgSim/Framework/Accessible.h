@@ -199,7 +199,7 @@ T convert(boost::any val);
 /// \param val The value to be converted, should be a Matrix44[df].
 /// \return A matrix val converted to Matrix44f.
 template <>
-SurgSim::Math::Matrix44f convert(boost::any val);
+SurgSim::Math::UnalignedMatrix44f convert(boost::any val);
 
 /// Specialization for convert<T>() to correctly cast const char* to std::string
 /// \param val The value to be converted, should be a const char*

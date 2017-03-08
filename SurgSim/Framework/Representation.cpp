@@ -28,8 +28,9 @@ namespace Framework
 Representation::Representation(const std::string& m_name) :
 	Component(m_name), m_localPose(Math::RigidTransform3d::Identity())
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, Math::RigidTransform3d, LocalPose, getLocalPose, setLocalPose);
-	SURGSIM_ADD_RO_PROPERTY(Representation, Math::RigidTransform3d, Pose, getPose);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, Math::UnalignedRigidTransform3d, LocalPose, getLocalPose,
+									  setLocalPose);
+	SURGSIM_ADD_RO_PROPERTY(Representation, Math::UnalignedRigidTransform3d, Pose, getUnalignedPose);
 }
 
 Representation::~Representation()
@@ -46,7 +47,7 @@ bool Representation::doWakeUp()
 	return true;
 }
 
-void Representation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
+void Representation::setLocalPose(const SurgSim::Math::UnalignedRigidTransform3d& pose)
 {
 	m_localPose = pose;
 }
@@ -56,7 +57,7 @@ SurgSim::Math::RigidTransform3d Representation::getPose() const
 	auto element = getSceneElement();
 	if (element != nullptr)
 	{
-		return element->getPose() * getLocalPose();
+		return Math::RigidTransform3d(element->getPose() * getLocalPose());
 	}
 	else
 	{
@@ -64,7 +65,12 @@ SurgSim::Math::RigidTransform3d Representation::getPose() const
 	}
 }
 
-SurgSim::Math::RigidTransform3d Representation::getLocalPose() const
+SurgSim::Math::UnalignedRigidTransform3d Representation::getUnalignedPose() const
+{
+	return getPose();
+}
+
+SurgSim::Math::UnalignedRigidTransform3d Representation::getLocalPose() const
 {
 	return m_localPose;
 }

@@ -453,7 +453,7 @@ TEST(ComponentTests, PoseComponentTest)
 
 	EXPECT_EQ("SurgSim::Framework::PoseComponent", component->getClassName());
 
-	SurgSim::Math::RigidTransform3d pose(SurgSim::Math::RigidTransform3d::Identity());
+	SurgSim::Math::UnalignedRigidTransform3d pose(SurgSim::Math::UnalignedRigidTransform3d::Identity());
 
 	component->setValue("Pose", pose);
 	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
@@ -462,7 +462,7 @@ TEST(ComponentTests, PoseComponentTest)
 					   node.as<std::shared_ptr<SurgSim::Framework::Component>>());
 
 	EXPECT_NE(nullptr, decoded);
-	EXPECT_TRUE(pose.isApprox(decoded->getValue<SurgSim::Math::RigidTransform3d>("Pose")));
+	EXPECT_TRUE(pose.isApprox(decoded->getValue<SurgSim::Math::UnalignedRigidTransform3d>("Pose")));
 }
 
 

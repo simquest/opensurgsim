@@ -46,7 +46,7 @@ public:
 
 	/// Get the pose of the PoseComponent
 	/// \return The pose in world coordinates
-	const SurgSim::Math::RigidTransform3d& getPose() const;
+	const SurgSim::Math::UnalignedRigidTransform3d& getPose() const;
 
 protected:
 	/// Get the PoseComponent for this component
@@ -65,7 +65,7 @@ private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
-	SurgSim::Math::RigidTransform3d m_pose;
+	SurgSim::Math::UnalignedRigidTransform3d m_pose;
 };
 
 }; // namespace Framework
