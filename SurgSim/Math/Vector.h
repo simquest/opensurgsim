@@ -43,10 +43,12 @@ typedef Eigen::Matrix<float,  3, 1>  Vector3f;
 /// A 4D vector of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  4, 1>  Vector4f;
+typedef Eigen::Matrix<float, 4, 1, Eigen::DontAlign>  UnalignedVector4f;
 
 /// A 6D vector of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  6, 1>  Vector6f;
+typedef Eigen::Matrix<float, 6, 1, Eigen::DontAlign>  UnalignedVector6f;
 
 /// A 2D vector of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
@@ -59,10 +61,12 @@ typedef Eigen::Matrix<double, 3, 1>  Vector3d;
 /// A 4D vector of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 4, 1>  Vector4d;
+typedef Eigen::Matrix<double, 4, 1, Eigen::DontAlign>  UnalignedVector4d;
 
 /// A 6D matrix of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 6, 1> Vector6d;
+typedef Eigen::Matrix<double, 6, 1, Eigen::DontAlign>  UnalignedVector6d;
 
 /// A dynamic size column vector
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;

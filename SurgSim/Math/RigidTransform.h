@@ -32,18 +32,22 @@ namespace Math
 /// A 2D rigid (isometric) transform, represented as floats.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<float,  2, Eigen::Isometry>  RigidTransform2f;
+typedef Eigen::Transform<float, 2, Eigen::Isometry, Eigen::DontAlign>  UnalignedRigidTransform2f;
 
 /// A 3D rigid (isometric) transform, represented as floats.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<float,  3, Eigen::Isometry>  RigidTransform3f;
+typedef Eigen::Transform<float, 3, Eigen::Isometry, Eigen::DontAlign>  UnalignedRigidTransform3f;
 
 /// A 2D rigid (isometric) transform, represented as doubles.
 /// This type (and any struct that contain it) can be safely allocated via new.
-typedef Eigen::Transform<double, 2, Eigen::Isometry>  RigidTransform2d;
+typedef Eigen::Transform<float,  2, Eigen::Isometry>  RigidTransform2d;
+typedef Eigen::Transform<float, 2, Eigen::Isometry, Eigen::DontAlign>  UnalignedRigidTransform2d;
 
 /// A 3D rigid (isometric) transform, represented as doubles.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<double, 3, Eigen::Isometry>  RigidTransform3d;
+typedef Eigen::Transform<double, 3, Eigen::Isometry, Eigen::DontAlign>  UnalignedRigidTransform3d;
 
 
 /// Create a rigid transform using the specified rotation matrix and translation.
@@ -106,8 +110,8 @@ inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(
 
 	typename Eigen::Transform<T, 3, Eigen::Isometry>::LinearMatrixType rotation;
 	rotation << side[0], actualUp[0], -forward[0],
-				side[1], actualUp[1], -forward[1],
-				side[2], actualUp[2], -forward[2];
+			 side[1], actualUp[1], -forward[1],
+			 side[2], actualUp[2], -forward[2];
 
 	rigid.linear() = rotation;
 	rigid.translation() = position;
