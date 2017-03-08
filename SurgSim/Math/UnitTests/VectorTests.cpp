@@ -136,8 +136,8 @@ typedef ::testing::Types<SurgSim::Math::Vector2d,
 		SurgSim::Math::Vector2f,
 		SurgSim::Math::Vector3d,
 		SurgSim::Math::Vector3f,
-		SurgSim::Math::Vector4d,
-		SurgSim::Math::Vector4f,
+		SurgSim::Math::UnalignedVector4d,
+		SurgSim::Math::UnalignedVector4f,
 		SurgSim::Math::Vector6d,
 		SurgSim::Math::Vector6f> UnalignedVectorVariants;
 TYPED_TEST_CASE(UnalignedVectorTests, UnalignedVectorVariants);
@@ -265,7 +265,7 @@ TYPED_TEST(UnalignedVectorTests, DefaultConstructorInitialization)
 	{
 		// Please don't write production (non-test) code that looks like this. =)
 		memset(&buffer, 0xF0, sizeof(buffer));
-		Vector* vector = new(&buffer) Vector;
+		Vector* vector = new (&buffer) Vector;
 		for (int i = 0;  i < SIZE; ++i)
 		{
 			EXPECT_NE(0.0f, (*vector)[i]) << i << " was NOT supposed to be zeroed.";

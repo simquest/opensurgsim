@@ -21,6 +21,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <Eigen/StdVector>
 
 #include "SurgSim/Math/Quaternion.h"
 
@@ -48,7 +49,6 @@ typedef Eigen::Transform<float, 2, Eigen::Isometry, Eigen::DontAlign>  Unaligned
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<double, 3, Eigen::Isometry>  RigidTransform3d;
 typedef Eigen::Transform<double, 3, Eigen::Isometry, Eigen::DontAlign>  UnalignedRigidTransform3d;
-
 
 /// Create a rigid transform using the specified rotation matrix and translation.
 /// \tparam M the type used to describe the rotation matrix.  Can usually be deduced.
@@ -165,5 +165,7 @@ inline Eigen::Transform<T, 3, Eigen::Isometry> interpolate(
 
 };  // namespace Math
 };  // namespace SurgSim
+
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::RigidTransform3d);
 
 #endif  // SURGSIM_MATH_RIGIDTRANSFORM_H

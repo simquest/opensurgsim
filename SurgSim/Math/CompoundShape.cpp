@@ -192,6 +192,7 @@ size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidT
 void CompoundShape::setShapes(const std::vector<SubShape>& shapes)
 {
 	WriteLock lock(m_mutex);
+	m_shapes.clear();
 	m_shapes = shapes;
 	invalidateData();
 }
@@ -216,7 +217,7 @@ RigidTransform3d CompoundShape::getPose(size_t index) const
 	return m_shapes[index].second;
 }
 
-void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
+void CompoundShape::setPoses(const std::vector<UnalignedRigidTransform3d>& poses)
 {
 	WriteLock lock(m_mutex);
 	SURGSIM_ASSERT(poses.size() == m_shapes.size()) << "New poses and number of shapes differ in size";

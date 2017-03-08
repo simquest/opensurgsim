@@ -44,7 +44,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Math::CompoundShape);
 
-	typedef std::pair<std::shared_ptr<Shape>, RigidTransform3d> SubShape;
+	typedef std::pair<std::shared_ptr<Shape>, UnalignedRigidTransform3d> SubShape;
 
 	/// Add a shape to this shape, you can optionally supply a pose for the added shape
 	/// \param shape to be added
@@ -71,7 +71,7 @@ public:
 	/// Sets the poses for all shapes
 	/// \param poses array of poses to be copied to each shape
 	/// \throws SurgSimm::AssertialFailure if the size of poses.size() != getNumShapes()
-	void setPoses(const std::vector<RigidTransform3d>& poses);
+	void setPoses(const std::vector<UnalignedRigidTransform3d>& poses);
 
 	/// Set the pose for the specified shape
 	/// \param index index of the target shape
