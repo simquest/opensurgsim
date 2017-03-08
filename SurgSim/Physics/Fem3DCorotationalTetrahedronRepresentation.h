@@ -1,8 +1,8 @@
 // This file is a part of the SimQuest OpenSurgSim extension.
 // Copyright 2012-2017, SimQuest Solutions Inc.
 
-#ifndef PHYSICS_TETRAHEDRALCOROTATIONALFEM3DREPRESENTATION_H
-#define PHYSICS_TETRAHEDRALCOROTATIONALFEM3DREPRESENTATION_H
+#ifndef PHYSICS_Fem3DCorotationalTetrahedronRepresentation_H
+#define PHYSICS_Fem3DCorotationalTetrahedronRepresentation_H
 
 #include <memory>
 #include <string>
@@ -12,12 +12,12 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 
-namespace SimQuest
+namespace SurgSim
 {
 
 	namespace Physics
 	{
-		SURGSIM_STATIC_REGISTRATION(TetrahedralCorotationalFem3DRepresentation);
+		SURGSIM_STATIC_REGISTRATION(Fem3DCorotationalTetrahedronRepresentation);
 
 		class FemPlyReaderDelegate;
 
@@ -25,17 +25,17 @@ namespace SimQuest
 		/// It derives from Fem1DRepresentation from which it uses most functionalities.
 		/// The only difference comes in the initialization and update to take a special care of
 		/// the rotational dof.
-		class TetrahedralCorotationalFem3DRepresentation : public SurgSim::Physics::Fem3DRepresentation
+		class Fem3DCorotationalTetrahedronRepresentation : public SurgSim::Physics::Fem3DRepresentation
 		{
 		public:
 			/// Constructor
-			/// \param name The name of the TetrahedralCorotationalFem3DRepresentation
-			explicit TetrahedralCorotationalFem3DRepresentation(const std::string& name);
+			/// \param name The name of the Fem3DCorotationalTetrahedronRepresentation
+			explicit Fem3DCorotationalTetrahedronRepresentation(const std::string& name);
 
 			/// Destructor
-			virtual ~TetrahedralCorotationalFem3DRepresentation();
+			virtual ~Fem3DCorotationalTetrahedronRepresentation();
 
-			SURGSIM_CLASSNAME(SimQuest::Physics::TetrahedralCorotationalFem3DRepresentation);
+			SURGSIM_CLASSNAME(SimQuest::Physics::Fem3DCorotationalTetrahedronRepresentation);
 
 			void setFemElementType(const std::string& type) override;
 
@@ -47,4 +47,4 @@ namespace SimQuest
 
 } // namespace SimQuest
 
-#endif // PHYSICS_TETRAHEDRALCOROTATIONALFEM3DREPRESENTATION_H
+#endif // PHYSICS_Fem3DCorotationalTetrahedronRepresentation_H

@@ -14,20 +14,19 @@
 #include "SurgSim/Physics/FemConstraintFrictionlessSliding.h"
 #include "SurgSim/Physics/Fem3DElementCorotationalTetrahedron.h"
 
-#include "SimQuest/Math/RotationVector.h"
-#include "SimQuest/Physics/TetrahedralCorotationalFem3DRepresentation.h"
+#include "SurgSim/Physics/Fem3DCorotationalTetrahedronRepresentation.h"
 
-namespace SimQuest
+namespace SurgSim
 {
 
 	namespace Physics
 	{
 
 		SURGSIM_REGISTER(SurgSim::Framework::Component,
-			SimQuest::Physics::TetrahedralCorotationalFem3DRepresentation,
-			TetrahedralCorotationalFem3DRepresentation);
+			SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation,
+			Fem3DCorotationalTetrahedronRepresentation);
 
-		TetrahedralCorotationalFem3DRepresentation::TetrahedralCorotationalFem3DRepresentation(const std::string& name)
+		Fem3DCorotationalTetrahedronRepresentation::Fem3DCorotationalTetrahedronRepresentation(const std::string& name)
 			: Fem3DRepresentation(name)
 		{
 			using SurgSim::Physics::ConstraintImplementation;
@@ -43,26 +42,26 @@ namespace SimQuest
 			setComplianceWarping(true);
 
 			// Register all the constraint for this representation in the ConstraintImplementation factory
-			// Because TetrahedralCorotationalFem3DRepresentation derives from Fem1DRepresentation, it can use the exact
+			// Because Fem3DCorotationalTetrahedronRepresentation derives from Fem3DRepresentation, it can use the exact
 			// same constraint implementation. The constraint expression is exactly the same and the compliance
 			// used will be the correct one.
 			ConstraintImplementation::getFactory().addImplementation(
-				typeid(TetrahedralCorotationalFem3DRepresentation), std::make_shared<FemConstraintFixedPoint>());
+				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFixedPoint>());
 			ConstraintImplementation::getFactory().addImplementation(
-				typeid(TetrahedralCorotationalFem3DRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
+				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
 			ConstraintImplementation::getFactory().addImplementation(
-				typeid(TetrahedralCorotationalFem3DRepresentation), std::make_shared<FemConstraintFrictionlessContact>());
+				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionlessContact>());
 			ConstraintImplementation::getFactory().addImplementation(
-				typeid(TetrahedralCorotationalFem3DRepresentation), std::make_shared<FemConstraintFrictionlessSliding>());
+				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionlessSliding>());
 			ConstraintImplementation::getFactory().addImplementation(
-				typeid(TetrahedralCorotationalFem3DRepresentation), std::make_shared<FemConstraintFrictionalSliding>());
+				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionalSliding>());
 		}
 
-		TetrahedralCorotationalFem3DRepresentation::~TetrahedralCorotationalFem3DRepresentation()
+		Fem3DCorotationalTetrahedronRepresentation::~Fem3DCorotationalTetrahedronRepresentation()
 		{
 		}
 
-		void TetrahedralCorotationalFem3DRepresentation::setFemElementType(const std::string& type)
+		void Fem3DCorotationalTetrahedronRepresentation::setFemElementType(const std::string& type)
 		{
 			SurgSim::Physics::Fem3DElementCorotationalTetrahedron tetCoro;
 			SURGSIM_ASSERT(type == tetCoro.getClassName()) <<
@@ -70,13 +69,9 @@ namespace SimQuest
 			Fem3DRepresentation::setFemElementType(type);
 		}
 
-		SurgSim::Math::Matrix TetrahedralCorotationalFem3DRepresentation::getNodeTransformation(
+		SurgSim::Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
 			const SurgSim::Math::OdeState& state, size_t nodeId)
 		{
-			return SurgSim::Math::Matrix33d::Identity();
-
-			using SimQuest::Math::rotationVectorToMatrix;
-
 			std::vector<SurgSim::Math::Matrix33d> elementRotations;
 			SurgSim::Math::Matrix33d R3x3;
 
@@ -85,7 +80,7 @@ namespace SimQuest
 				auto node = std::find(element->getNodeIds().begin(), element->getNodeIds().end(), nodeId);
 				if (node != element->getNodeIds().end())
 				{
-					elementRotations.push_back(std::static_pointer_cast<SurgSim::Physics::Fem3DElementCorotationalTetrahedron>(element)->m_R);
+					elementRotations.push_back(std::static_pointer_cast<SurgSim::Physics::Fem3DElementCorotationalTetrahedron>(element)->getRotationMatrix());
 				}
 			}
 
