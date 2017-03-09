@@ -116,11 +116,17 @@ protected:
 template <class T>
 struct PosedShape
 {
+
 	PosedShape()
 	{
 		pose = Math::RigidTransform3d::Identity();
 	}
-	PosedShape(const T& shapeInput, const Math::RigidTransform3d& poseInput) : shape(shapeInput), pose(poseInput) {}
+
+	PosedShape(const T& shapeInput, const Math::UnalignedRigidTransform3d& poseInput) :
+		shape(shapeInput),
+		pose(poseInput) {}
+
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
 	void invalidate()
 	{
@@ -130,14 +136,14 @@ struct PosedShape
 	{
 		return shape;
 	}
-	const Math::RigidTransform3d& getPose() const
+	const Math::UnalignedRigidTransform3d& getPose() const
 	{
 		return pose;
 	}
 
 protected:
 	T shape;
-	Math::RigidTransform3d pose;
+	Math::UnalignedRigidTransform3d pose;
 };
 
 /// PosedShapeMotion is embedding the motion of a PosedShape, providing a posed shape at 2 different instant.
