@@ -250,6 +250,19 @@ void OdeState::changeBoundaryConditionStaticDof(size_t nodeId, double value)
 
 void OdeState::setBoundaryConditionsStaticDof(const std::vector<std::pair<size_t, double>>& staticDof)
 {
+	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
+		"Number of dof per node = 0. Make sure to call setNumDof() " <<
+		"prior to setting boundary conditions.";
+
+	size_t i = 0;
+	for (auto staticDofOneByOne : staticDof)
+	{
+		SURGSIM_ASSERT(staticDofOneByOne.first < m_numNodes) <<
+			"Invalid boundary condition static dof #" << i << " with nodeId " << staticDofOneByOne.first <<
+			" when the number of nodes is " << m_numNodes;
+		i++;
+	}
+
 	m_boundaryConditionsStaticDof = staticDof;
 }
 
