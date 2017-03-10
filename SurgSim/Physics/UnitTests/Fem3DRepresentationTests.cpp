@@ -140,7 +140,7 @@ TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 		ASSERT_NO_THROW(ASSERT_TRUE(m_fem->initialize(runtime)));
 		EXPECT_EQ(3u, m_fem->getNumDofPerNode());
 		EXPECT_EQ(3u * 26u, m_fem->getNumDof());
-		EXPECT_EQ(24u, m_fem->getInitialState()->getNumBoundaryConditions());
+		EXPECT_EQ(12u, m_fem->getInitialState()->getNumBoundaryConditions());
 	}
 
 	{
@@ -418,17 +418,17 @@ TEST_F(Fem3DRepresentationTests, LoadMeshTest)
 	ASSERT_EQ(3u, fem->getNumDofPerNode());
 	ASSERT_EQ(3u * 26u, fem->getNumDof());
 
-	Vector3d vertex0(1.0, 1.0, -1.0);
-	Vector3d vertex25(-1.0, -1.0, 1.0);
+	Vector3d vertex0(-1.0, 0.0, 0.0);
+	Vector3d vertex25(1.0, 1.0, 1.0);
 
 	EXPECT_TRUE(vertex0.isApprox(fem->getInitialState()->getPosition(0)));
 	EXPECT_TRUE(vertex25.isApprox(fem->getInitialState()->getPosition(25)));
 
 	// Tetrahedrons
-	ASSERT_EQ(12u, fem->getNumFemElements());
+	ASSERT_EQ(44u, fem->getNumFemElements());
 
-	std::array<size_t, 4> tetrahedron0 = {0, 1, 2, 3};
-	std::array<size_t, 4> tetrahedron2 = {10, 25, 11, 9};
+	std::array<size_t, 4> tetrahedron0 = {16, 0, 7, 5};
+	std::array<size_t, 4> tetrahedron2 = {13, 14, 16, 2};
 
 	EXPECT_TRUE(std::equal(std::begin(tetrahedron0), std::end(tetrahedron0),
 						   std::begin(fem->getFemElement(0)->getNodeIds())));
@@ -436,29 +436,29 @@ TEST_F(Fem3DRepresentationTests, LoadMeshTest)
 						   std::begin(fem->getFemElement(11)->getNodeIds())));
 
 	// Boundary conditions
-	ASSERT_EQ(24u, fem->getInitialState()->getNumBoundaryConditions());
+	ASSERT_EQ(12u, fem->getInitialState()->getNumBoundaryConditions());
 
 	// Boundary condition 0 is on node 8
-	size_t boundaryNode0 = 8;
-	size_t boundaryNode7 = 11;
+	size_t boundaryNode0 = 19;
+	size_t boundaryNode7 = 25;
 
 	EXPECT_EQ(3 * boundaryNode0, fem->getInitialState()->getBoundaryConditions().at(0));
 	EXPECT_EQ(3 * boundaryNode0 + 1, fem->getInitialState()->getBoundaryConditions().at(1));
 	EXPECT_EQ(3 * boundaryNode0 + 2, fem->getInitialState()->getBoundaryConditions().at(2));
-	EXPECT_EQ(3 * boundaryNode7, fem->getInitialState()->getBoundaryConditions().at(21));
-	EXPECT_EQ(3 * boundaryNode7 + 1, fem->getInitialState()->getBoundaryConditions().at(22));
-	EXPECT_EQ(3 * boundaryNode7 + 2, fem->getInitialState()->getBoundaryConditions().at(23));
+	EXPECT_EQ(3 * boundaryNode7, fem->getInitialState()->getBoundaryConditions().at(9));
+	EXPECT_EQ(3 * boundaryNode7 + 1, fem->getInitialState()->getBoundaryConditions().at(10));
+	EXPECT_EQ(3 * boundaryNode7 + 2, fem->getInitialState()->getBoundaryConditions().at(11));
 
 	// Material
 	auto fem2 = fem->getFemElement(2);
-	EXPECT_DOUBLE_EQ(0.1432, fem2->getMassDensity());
-	EXPECT_DOUBLE_EQ(0.224, fem2->getPoissonRatio());
-	EXPECT_DOUBLE_EQ(0.472, fem2->getYoungModulus());
+	EXPECT_DOUBLE_EQ(900.0, fem2->getMassDensity());
+	EXPECT_DOUBLE_EQ(0.45, fem2->getPoissonRatio());
+	EXPECT_DOUBLE_EQ(1750000000, fem2->getYoungModulus());
 
 	auto fem8 = fem->getFemElement(8);
-	EXPECT_DOUBLE_EQ(0.1432, fem8->getMassDensity());
-	EXPECT_DOUBLE_EQ(0.224, fem8->getPoissonRatio());
-	EXPECT_DOUBLE_EQ(0.472, fem8->getYoungModulus());
+	EXPECT_DOUBLE_EQ(900.0, fem8->getMassDensity());
+	EXPECT_DOUBLE_EQ(0.45, fem8->getPoissonRatio());
+	EXPECT_DOUBLE_EQ(1750000000, fem8->getYoungModulus());
 }
 
 TEST_F(Fem3DRepresentationTests, SerializationTest)

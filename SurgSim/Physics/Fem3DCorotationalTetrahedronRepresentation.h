@@ -1,8 +1,8 @@
 // This file is a part of the SimQuest OpenSurgSim extension.
 // Copyright 2012-2017, SimQuest Solutions Inc.
 
-#ifndef PHYSICS_Fem3DCorotationalTetrahedronRepresentation_H
-#define PHYSICS_Fem3DCorotationalTetrahedronRepresentation_H
+#ifndef PHYSICS_FEM3DCOROTATIONALTETRAGEDRONREPRESENTATION_H
+#define PHYSICS_FEM3DCOROTATIONALTETRAGEDRONREPRESENTATION_H
 
 #include <memory>
 #include <string>
@@ -35,7 +35,7 @@ namespace SurgSim
 			/// Destructor
 			virtual ~Fem3DCorotationalTetrahedronRepresentation();
 
-			SURGSIM_CLASSNAME(SimQuest::Physics::Fem3DCorotationalTetrahedronRepresentation);
+			SURGSIM_CLASSNAME(SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation);
 
 			void setFemElementType(const std::string& type) override;
 
@@ -47,4 +47,4 @@ namespace SurgSim
 
 } // namespace SimQuest
 
-#endif // PHYSICS_Fem3DCorotationalTetrahedronRepresentation_H
+#endif // PHYSICS_FEM3DCOROTATIONALTETRAGEDRONREPRESENTATION_H
