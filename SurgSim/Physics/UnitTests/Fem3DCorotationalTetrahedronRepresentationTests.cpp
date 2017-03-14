@@ -94,7 +94,8 @@ protected:
 
 TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, ConstructorTest)
 {
-	ASSERT_NO_THROW(std::shared_ptr<Fem3DCorotationalTetrahedronRepresentation> fem = std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Fem3D"));
+	ASSERT_NO_THROW(std::shared_ptr<Fem3DCorotationalTetrahedronRepresentation> fem =
+							std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Fem3D"));
 }
 
 TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, GetNumDofPerNodeTest)
@@ -463,7 +464,7 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, LoadMeshTest)
 
 TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, SerializationTest)
 {
-	auto fem = std::make_shared<SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation>("Test-Fem3D");
+	auto fem = std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Test-Fem3D");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	const std::string filename = "PlyReaderTests/Tetrahedron.ply";
 	fem->loadFem(filename);
@@ -483,6 +484,21 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, SerializationTest)
 	EXPECT_EQ("SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation", newRepresentation->getClassName());
 	EXPECT_EQ(filename, newRepresentation->getFem()->getValue<std::string>("FileName"));
 }
+
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, FemElementTypeTest)
+{
+	auto fem = std::make_shared<SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation>("Test-Fem3D");
+	EXPECT_ANY_THROW(fem->setFemElementType("NotAnFem3D"));
+}
+
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
+{
+	auto fem = std::make_shared<SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation>("Test-Fem3D");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	const std::string filename = "PlyReaderTests/Tetrahedron.ply";
+	fem->loadFem(filename);
+}
+
 
 } // namespace Physics
 } // namespace SurgSim

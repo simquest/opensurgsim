@@ -1,7 +1,7 @@
 ply
 format ascii 1.0
 comment Created by OpenSurgSim FEM exporter for Blender
-MeshPy options 'pq1.5a5MY'
+comment MeshPy options 'pq1.5a5MY'
 element vertex 26
 property double x
 property double y

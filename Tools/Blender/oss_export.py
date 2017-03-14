@@ -251,7 +251,7 @@ def save_mesh(filepath,
     fwrite("ply\n")
     fwrite("format ascii 1.0\n")
     fwrite("comment Created by OpenSurgSim FEM exporter for Blender\n")
-    fwrite("MeshPy options '%s'\n" % meshpy)
+    fwrite("comment MeshPy options '%s'\n" % meshpy)
 
     fwrite("element vertex %d\n" % len(verts))
     fwrite("property double x\n"

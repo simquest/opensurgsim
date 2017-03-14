@@ -1,5 +1,17 @@
-// This file is a part of the SimQuest OpenSurgSim extension.
-// Copyright 2012-2017, SimQuest Solutions Inc.
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013-2017, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
@@ -19,90 +31,84 @@
 namespace SurgSim
 {
 
-	namespace Physics
+namespace Physics
+{
+
+SURGSIM_REGISTER(SurgSim::Framework::Component,
+				 SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation,
+				 Fem3DCorotationalTetrahedronRepresentation);
+
+Fem3DCorotationalTetrahedronRepresentation::Fem3DCorotationalTetrahedronRepresentation(const std::string& name)
+		: Fem3DRepresentation(name)
+{
+	using SurgSim::Physics::ConstraintImplementation;
+	using SurgSim::Physics::FemConstraintFixedPoint;
+	using SurgSim::Physics::FemConstraintFixedRotationVector;
+	using SurgSim::Physics::FemConstraintFrictionalSliding;
+	using SurgSim::Physics::FemConstraintFrictionlessContact;
+	using SurgSim::Physics::FemConstraintFrictionlessSliding;
+
+	Fem3DElementCorotationalTetrahedron tetCoro;
+	setFemElementType(tetCoro.getClassName());
+
+	setComplianceWarping(true);
+
+	// Register all the constraint for this representation in the ConstraintImplementation factory
+	// Because Fem3DCorotationalTetrahedronRepresentation derives from Fem3DRepresentation, it can use the exact
+	// same constraint implementation. The constraint expression is exactly the same and the compliance
+	// used will be the correct one.
+	ConstraintImplementation::getFactory().addImplementation(
+			typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFixedPoint>());
+	ConstraintImplementation::getFactory().addImplementation(
+			typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
+	ConstraintImplementation::getFactory().addImplementation(
+			typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionlessContact>());
+	ConstraintImplementation::getFactory().addImplementation(
+			typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionlessSliding>());
+	ConstraintImplementation::getFactory().addImplementation(
+			typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionalSliding>());
+}
+
+Fem3DCorotationalTetrahedronRepresentation::~Fem3DCorotationalTetrahedronRepresentation()
+{
+}
+
+void Fem3DCorotationalTetrahedronRepresentation::setFemElementType(const std::string& type)
+{
+	Fem3DElementCorotationalTetrahedron tetCoro;
+	SURGSIM_ASSERT(type == tetCoro.getClassName()) <<
+												   "Invalid FemElement type found '" << type
+												   << "', default and expected is '" << tetCoro.getClassName() << "'";
+	Fem3DRepresentation::setFemElementType(type);
+}
+
+Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
+		const Math::OdeState& state, size_t nodeId)
+{
+	std::vector<Math::Matrix33d> elementRotations;
+	Math::Matrix33d R3x3;
+
+	for (auto const& element : m_femElements)
 	{
-
-		SURGSIM_REGISTER(SurgSim::Framework::Component,
-			SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation,
-			Fem3DCorotationalTetrahedronRepresentation);
-
-		Fem3DCorotationalTetrahedronRepresentation::Fem3DCorotationalTetrahedronRepresentation(const std::string& name)
-			: Fem3DRepresentation(name)
+		auto node = std::find(element->getNodeIds().begin(), element->getNodeIds().end(), nodeId);
+		if (node != element->getNodeIds().end())
 		{
-			using SurgSim::Physics::ConstraintImplementation;
-			using SurgSim::Physics::FemConstraintFixedPoint;
-			using SurgSim::Physics::FemConstraintFixedRotationVector;
-			using SurgSim::Physics::FemConstraintFrictionalSliding;
-			using SurgSim::Physics::FemConstraintFrictionlessContact;
-			using SurgSim::Physics::FemConstraintFrictionlessSliding;
-
-			SurgSim::Physics::Fem3DElementCorotationalTetrahedron tetCoro;
-			setFemElementType(tetCoro.getClassName());
-
-			setComplianceWarping(true);
-
-			// Register all the constraint for this representation in the ConstraintImplementation factory
-			// Because Fem3DCorotationalTetrahedronRepresentation derives from Fem3DRepresentation, it can use the exact
-			// same constraint implementation. The constraint expression is exactly the same and the compliance
-			// used will be the correct one.
-			ConstraintImplementation::getFactory().addImplementation(
-				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFixedPoint>());
-			ConstraintImplementation::getFactory().addImplementation(
-				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFixedRotationVector>());
-			ConstraintImplementation::getFactory().addImplementation(
-				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionlessContact>());
-			ConstraintImplementation::getFactory().addImplementation(
-				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionlessSliding>());
-			ConstraintImplementation::getFactory().addImplementation(
-				typeid(Fem3DCorotationalTetrahedronRepresentation), std::make_shared<FemConstraintFrictionalSliding>());
+			elementRotations.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(element)->
+					getRotationMatrix());
 		}
+	}
 
-		Fem3DCorotationalTetrahedronRepresentation::~Fem3DCorotationalTetrahedronRepresentation()
-		{
-		}
+	SURGSIM_ASSERT(elementRotations.size() > 0) << "Node " << nodeId << " happens to not belong to any FemElements";
 
-		void Fem3DCorotationalTetrahedronRepresentation::setFemElementType(const std::string& type)
-		{
-			SurgSim::Physics::Fem3DElementCorotationalTetrahedron tetCoro;
-			SURGSIM_ASSERT(type == tetCoro.getClassName()) <<
-				"Invalid FemElement type found '" << type << "', default and expected is '" << tetCoro.getClassName() << "'";
-			Fem3DRepresentation::setFemElementType(type);
-		}
+	R3x3 = elementRotations[0];
+	for (size_t i = 1; i < elementRotations.size(); i++)
+	{
+		R3x3 = Eigen::Quaterniond(R3x3).slerp(0.5, Eigen::Quaterniond(elementRotations[i]));
+	}
 
-		SurgSim::Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
-			const SurgSim::Math::OdeState& state, size_t nodeId)
-		{
-			std::vector<SurgSim::Math::Matrix33d> elementRotations;
-			SurgSim::Math::Matrix33d R3x3;
+	return Math::Matrix(R3x3);
+}
 
-			for (auto const &element : m_femElements)
-			{
-				auto node = std::find(element->getNodeIds().begin(), element->getNodeIds().end(), nodeId);
-				if (node != element->getNodeIds().end())
-				{
-					elementRotations.push_back(std::static_pointer_cast<SurgSim::Physics::Fem3DElementCorotationalTetrahedron>(element)->getRotationMatrix());
-				}
-			}
-
-			if (elementRotations.size())
-			{
-				R3x3 = elementRotations[0];
-			}
-			else
-			{
-				R3x3 = elementRotations[0];
-				for (size_t i = 1; i < elementRotations.size(); i++)
-				{
-					R3x3 = Eigen::Quaterniond(R3x3).slerp(0.5, Eigen::Quaterniond(elementRotations[i]));
-				}
-			}
-
-			SurgSim::Math::Matrix rotation = SurgSim::Math::Matrix::Zero(getNumDofPerNode(), getNumDofPerNode());
-			rotation = R3x3;
-
-			return rotation;
-		}
-
-	} // namespace Physics
+} // namespace Physics
 
 } // namespace SimQuest
