@@ -1,0 +1,29 @@
+ply
+format ascii 1.0
+comment Created by OpenSurgSim FEM exporter for Blender
+comment MeshPy options 'pq1.5a5MY'
+element vertex 10
+property double x
+property double y
+property double z
+element 3d_element 3
+property list uint uint vertex_indices
+element material 1
+property double mass_density
+property double poisson_ratio
+property double young_modulus
+end_header
+0.000000 0.705558 3.121836
+0.866025 1.766992 2.061950
+-0.866025 1.766992 2.061950
+0.000000 -2.119981 1.711112
+0.000000 0.000000 1.000000
+0.866025 -1.057319 2.769767
+-0.866025 -1.057319 2.769767
+0.000000 1.000000 -1.000000
+0.866025 -0.500000 -1.000000
+-0.866025 -0.500000 -1.000000
+4 0 2 1 4
+4 6 5 3 4
+4 4 9 7 8
+900.0 0.45 1.75e9
