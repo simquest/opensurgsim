@@ -101,9 +101,10 @@ Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
 	SURGSIM_ASSERT(elementRotations.size() > 0) << "Node " << nodeId << " happens to not belong to any FemElements";
 
 	R3x3 = elementRotations[0];
-	for (size_t i = 1; i < elementRotations.size(); i++)
+	for (size_t i = 2; i <= elementRotations.size(); i++)
 	{
-		R3x3 = Eigen::Quaterniond(R3x3).slerp(0.5, Eigen::Quaterniond(elementRotations[i]));
+		double ai = 1.0/static_cast<double>(i);
+		R3x3 = Eigen::Quaterniond(R3x3).slerp(1.0 - ai, Eigen::Quaterniond(elementRotations[i - 1]));
 	}
 
 	return Math::Matrix(R3x3);

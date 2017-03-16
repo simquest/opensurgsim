@@ -64,7 +64,8 @@ public:
 	void addFemElement()
 	{
 		std::array<size_t, 4> elementNodeIds = {{0, 1, 2, 3}};
-		std::shared_ptr<Fem3DElementCorotationalTetrahedron> element = std::make_shared<Fem3DElementCorotationalTetrahedron>(elementNodeIds);
+		std::shared_ptr<Fem3DElementCorotationalTetrahedron> element =
+				std::make_shared<Fem3DElementCorotationalTetrahedron>(elementNodeIds);
 		element->setYoungModulus(1e9);
 		element->setPoissonRatio(0.45);
 		element->setMassDensity(1000.0);
@@ -489,14 +490,109 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, FemElementTypeTest)
 {
 	auto fem = std::make_shared<SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation>("Test-Fem3D");
 	EXPECT_ANY_THROW(fem->setFemElementType("NotAnFem3D"));
+	EXPECT_ANY_THROW(fem->setFemElementType("SurgSim::Physics::Fem3DElementTetrahedron"));
+	EXPECT_NO_THROW(fem->setFemElementType("SurgSim::Physics::Fem3DElementCorotationalTetrahedron"));
 }
 
 TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 {
-	auto fem = std::make_shared<SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation>("Test-Fem3D");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	const std::string filename = "PlyReaderTests/Tetrahedron.ply";
-	fem->loadFem(filename);
+
+	{
+		// Single tetrahedron
+		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("SingleTet");
+		const std::string filename = "singleTet.ply";
+		fem->loadFem(filename);
+
+		fem->initialize(runtime);
+		fem->wakeUp();
+
+		auto rotation = std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
+				getRotationMatrix();
+		for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+		{
+			auto transform = fem->getTransformation(i);
+			EXPECT_EQ(rotation, transform);
+		}
+	}
+
+	{
+		// Node shared with 2 tets
+		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("SharedNodeTet");
+		const std::string filename = "sharedTet.ply";
+		fem->loadFem(filename);
+
+		fem->initialize(runtime);
+		fem->wakeUp();
+
+		std::vector<Math::Matrix33d> rotationMatrix;
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
+				getRotationMatrix());
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(1))->
+				getRotationMatrix());
+
+		auto shared = Eigen::Quaterniond(rotationMatrix[0]).slerp(
+				0.5, Eigen::Quaterniond(rotationMatrix[1]));
+
+		for (size_t i = 0; i < fem->getNumFemElements(); i++)
+		{
+			for (size_t j = 0; j < fem->getCurrentState()->getNumNodes(); j++)
+			{
+				if (fem->getFemElement(i)->getNodeId(j))
+				{
+					auto transform = fem->getTransformation(j);
+					if (j == 4)
+					{
+						EXPECT_EQ(Math::Matrix33d(shared), transform);
+					}
+					else
+					{
+						EXPECT_EQ(rotationMatrix[i], transform);
+					}
+				}
+			}
+		}
+	}
+
+	{
+		// Node shared with 3 tets
+		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("TripleTet");
+		const std::string filename = "tripleTet.ply";
+		fem->loadFem(filename);
+
+		fem->initialize(runtime);
+		fem->wakeUp();
+
+		std::vector<Math::Matrix33d> rotationMatrix;
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
+				getRotationMatrix());
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(1))->
+				getRotationMatrix());
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(2))->
+				getRotationMatrix());
+
+		auto shared = Eigen::Quaterniond(rotationMatrix[0]).slerp(
+				0.5, Eigen::Quaterniond(rotationMatrix[1])).slerp(0.33, Eigen::Quaterniond(rotationMatrix[2]));
+
+		for (size_t i = 0; i < fem->getNumFemElements(); i++)
+		{
+			for (size_t j = 0; j < fem->getCurrentState()->getNumNodes(); j++)
+			{
+				if (fem->getFemElement(i)->getNodeId(j))
+				{
+					auto transform = fem->getTransformation(j);
+					if (j == 4)
+					{
+						EXPECT_EQ(Math::Matrix33d(shared), transform);
+					}
+					else
+					{
+						EXPECT_EQ(rotationMatrix[i], transform);
+					}
+				}
+			}
+		}
+	}
 }
 
 

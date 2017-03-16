@@ -288,9 +288,10 @@ void Fem3DElementCorotationalTetrahedron::computeRotationMassAndStiffness(const 
 	}
 }
 
-    const SurgSim::Math::Matrix33d& Fem3DElementCorotationalTetrahedron::getRotationMatrix() const {
-        return m_R;
-    }
+	const SurgSim::Math::Matrix33d& Fem3DElementCorotationalTetrahedron::getRotationMatrix() const
+	{
+		return m_R;
+	}
 
 }; // namespace Physics
 
