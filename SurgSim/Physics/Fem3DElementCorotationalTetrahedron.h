@@ -64,6 +64,7 @@ public:
 
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
+	/// Gets the current rotation of the element
 	const SurgSim::Math::Matrix33d& getRotationMatrix() const;
 
 protected:

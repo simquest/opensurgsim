@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file Fem3DCorotationalTetrahedronRepresentationTests.cpp
-/// This file tests the non-abstract functionalities of the Fem3DCorotationalTetrahedronRepresentation class
+/// This file tests the functionalities of the Fem3DCorotationalTetrahedronRepresentation class
 
 #include <gtest/gtest.h>
 
@@ -500,12 +500,27 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 
 	{
 		// Single tetrahedron
+        SCOPED_TRACE("A single tetrahedron");
 		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("SingleTet");
 		const std::string filename = "singleTet.ply";
 		fem->loadFem(filename);
 
 		fem->initialize(runtime);
 		fem->wakeUp();
+
+        {
+            SCOPED_TRACE("Prior to any update, the relative rotation is identity");
+            for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+            {
+                auto transform = fem->getTransformation(i);
+                EXPECT_TRUE(transform.isIdentity());
+            }
+        }
+
+        for (size_t i = 0; i < 50; i++)
+        {
+            fem->update(0.001);
+        }
 
 		auto rotation = std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
 				getRotationMatrix();
@@ -518,12 +533,27 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 
 	{
 		// Node shared with 2 tets
+        SCOPED_TRACE("Two tetrahedrons with a singe shared node");
 		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("SharedNodeTet");
 		const std::string filename = "sharedTet.ply";
 		fem->loadFem(filename);
 
 		fem->initialize(runtime);
 		fem->wakeUp();
+
+        {
+            SCOPED_TRACE("Prior to any update, the relative rotation is identity");
+            for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+            {
+                auto transform = fem->getTransformation(i);
+                EXPECT_TRUE(transform.isIdentity());
+            }
+        }
+
+        for (size_t i = 0; i < 50; i++)
+        {
+            fem->update(0.001);
+        }
 
 		std::vector<Math::Matrix33d> rotationMatrix;
 		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
@@ -536,19 +566,17 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 
 		for (size_t i = 0; i < fem->getNumFemElements(); i++)
 		{
-			for (size_t j = 0; j < fem->getCurrentState()->getNumNodes(); j++)
+			for (size_t j = 0; j < fem->getFemElement(i)->getNumNodes(); j++)
 			{
-				if (fem->getFemElement(i)->getNodeId(j))
+				auto transform = fem->getTransformation(fem->getFemElement(i)->getNodeId(j));
+
+				if (fem->getFemElement(i)->getNodeId(j) == 4)
 				{
-					auto transform = fem->getTransformation(j);
-					if (j == 4)
-					{
-						EXPECT_EQ(Math::Matrix33d(shared), transform);
-					}
-					else
-					{
-						EXPECT_EQ(rotationMatrix[i], transform);
-					}
+					EXPECT_EQ(Math::Matrix33d(shared), transform);
+				}
+				else
+				{
+					EXPECT_EQ(rotationMatrix[i], transform);
 				}
 			}
 		}
@@ -556,12 +584,27 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 
 	{
 		// Node shared with 3 tets
+        SCOPED_TRACE("Three tetrahedrons with single shared node");
 		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("TripleTet");
 		const std::string filename = "tripleTet.ply";
 		fem->loadFem(filename);
 
 		fem->initialize(runtime);
 		fem->wakeUp();
+
+        {
+            SCOPED_TRACE("Prior to any update, the relative rotation is identity");
+            for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+            {
+                auto transform = fem->getTransformation(i);
+                EXPECT_TRUE(transform.isIdentity());
+            }
+        }
+
+        for (size_t i = 0; i < 50; i++)
+        {
+            fem->update(0.001);
+        }
 
 		std::vector<Math::Matrix33d> rotationMatrix;
 		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
@@ -572,23 +615,22 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 				getRotationMatrix());
 
 		auto shared = Eigen::Quaterniond(rotationMatrix[0]).slerp(
-				0.5, Eigen::Quaterniond(rotationMatrix[1])).slerp(0.33, Eigen::Quaterniond(rotationMatrix[2]));
+                (1.0 / 2.0), Eigen::Quaterniond(rotationMatrix[1])).slerp(
+                (1.0 / 3.0), Eigen::Quaterniond(rotationMatrix[2]));
 
 		for (size_t i = 0; i < fem->getNumFemElements(); i++)
 		{
-			for (size_t j = 0; j < fem->getCurrentState()->getNumNodes(); j++)
+			for (size_t j = 0; j < fem->getFemElement(i)->getNumNodes(); j++)
 			{
-				if (fem->getFemElement(i)->getNodeId(j))
+				auto transform = fem->getTransformation(fem->getFemElement(i)->getNodeId(j));
+
+				if (fem->getFemElement(i)->getNodeId(j) == 4)
 				{
-					auto transform = fem->getTransformation(j);
-					if (j == 4)
-					{
-						EXPECT_EQ(Math::Matrix33d(shared), transform);
-					}
-					else
-					{
-						EXPECT_EQ(rotationMatrix[i], transform);
-					}
+					EXPECT_EQ(Math::Matrix33d(shared), transform);
+				}
+				else
+				{
+					EXPECT_EQ(rotationMatrix[i], transform);
 				}
 			}
 		}

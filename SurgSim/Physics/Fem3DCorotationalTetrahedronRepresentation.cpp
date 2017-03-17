@@ -103,7 +103,7 @@ Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
 	R3x3 = elementRotations[0];
 	for (size_t i = 2; i <= elementRotations.size(); i++)
 	{
-		double ai = 1.0/static_cast<double>(i);
+		double ai = 1.0 / static_cast<double>(i);
 		R3x3 = Eigen::Quaterniond(R3x3).slerp(1.0 - ai, Eigen::Quaterniond(elementRotations[i - 1]));
 	}
 
@@ -112,4 +112,4 @@ Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
 
 } // namespace Physics
 
-} // namespace SimQuest
+} // namespace SurgSim
