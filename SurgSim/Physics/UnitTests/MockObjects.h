@@ -30,6 +30,7 @@
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
+#include "SurgSim/Physics/Fem3DCorotationalTetrahedronRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
@@ -341,6 +342,15 @@ public:
 	explicit MockFem2DRepresentation(const std::string& name);
 
 	double getMassPerNode(size_t nodeId);
+};
+
+class MockFem3DCorotationalTetrahedronRepresentation
+		: public SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation
+{
+public:
+	explicit MockFem3DCorotationalTetrahedronRepresentation(const std::string& name);
+
+	SurgSim::Math::Matrix getTransformation(size_t nodeId);
 };
 
 class MockFixedConstraintFixedPoint : public ConstraintImplementation
