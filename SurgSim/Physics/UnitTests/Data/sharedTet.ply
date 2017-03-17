@@ -12,6 +12,8 @@ element material 1
 property double mass_density
 property double poisson_ratio
 property double young_modulus
+element boundary_conditions 1
+property uint vertex_index
 end_header
 0.000000 1.000000 3.000000
 -0.866025 -0.500000 3.000000
@@ -23,3 +25,4 @@ end_header
 4 4 1 2 0
 4 6 3 4 5
 900.0 0.45 1.75e9
+0
