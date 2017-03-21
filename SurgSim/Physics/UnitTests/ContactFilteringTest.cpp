@@ -75,7 +75,6 @@ struct ContactFilteringTest : public ::testing::Test
 		pairWithContacts->addContact(contact);
 		pairWithContacts->addContact(contact);
 		pairWithoutContacts = std::make_shared<Collision::CollisionPair>(collision0, collision0);
-
 	}
 
 	std::shared_ptr<PhysicsManagerState> state;
@@ -95,18 +94,22 @@ struct ContactFilteringTest : public ::testing::Test
 TEST_F(ContactFilteringTest, DontProcessWithoutPairs)
 {
 	EXPECT_CALL(*filter, doFilterContacts(_, _)).Times(0);
+	EXPECT_CALL(*filter, doUpdate(_)).Times(1);
 	contactFiltering->update(1.0, state);
 }
 
 
 TEST_F(ContactFilteringTest, ProcessAllPairsWithContacts)
 {
+	// HS-21-mar-2017 Seeing an intermittent error here don't know if this was caused by the AVX change
+	// #intermittentfailure
 	pairs.push_back(pairWithContacts);
 	pairs.push_back(pairWithContacts);
 	pairs.push_back(pairWithoutContacts);
 	state->setCollisionPairs(pairs);
 
 	EXPECT_CALL(*filter, doFilterContacts(_, _)).Times(2);
+	EXPECT_CALL(*filter, doUpdate(_)).Times(1);
 	contactFiltering->update(1.0, state);
 }
 
@@ -118,13 +121,14 @@ TEST_F(ContactFilteringTest, ModifyContacts)
 	state->setCollisionPairs(pairs);
 
 	EXPECT_CALL(*filter, doFilterContacts(_, _)).WillOnce(testing::Invoke(removeOne));
+	EXPECT_CALL(*filter, doUpdate(_)).Times(1);
 	contactFiltering->update(1.0, state);
 	EXPECT_EQ(1u, pairWithContacts->getContacts().size());
 }
 
 TEST_F(ContactFilteringTest, ProcessAllFilters)
 {
-	// Gmock is might not be threadsafe on windows, need separate instances
+	// Gmock might not be threadsafe on windows, need separate instances
 	std::vector<std::shared_ptr<Collision::ContactFilter>> filters;
 	auto filter1 = std::make_shared<MockContactFilter>("Filter1");
 	filters.push_back(filter1);
@@ -136,7 +140,9 @@ TEST_F(ContactFilteringTest, ProcessAllFilters)
 	state->setCollisionPairs(pairs);
 
 	EXPECT_CALL(*filter1, doFilterContacts(_, _)).Times(1);
+	EXPECT_CALL(*filter1, doUpdate(_)).Times(1);
 	EXPECT_CALL(*filter2, doFilterContacts(_, _)).Times(1);
+	EXPECT_CALL(*filter2, doUpdate(_)).Times(1);
 	contactFiltering->update(1.0, state);
 }
 

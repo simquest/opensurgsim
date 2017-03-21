@@ -30,7 +30,7 @@ using SurgSim::DataStructures::IndexedLocalCoordinate;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 namespace SurgSim
@@ -38,11 +38,11 @@ namespace SurgSim
 namespace Physics
 {
 
-void addTriangle(Fem2DRepresentation *fem, std::array<size_t, 3> nodes,
-	const SurgSim::Math::OdeState& state, double thickness = 0.01,
-	double massDensity = 1.0, double poissonRatio = 0.1, double youngModulus = 1.0)
+void addTriangle(Fem2DRepresentation* fem, std::array<size_t, 3> nodes,
+				 const SurgSim::Math::OdeState& state, double thickness = 0.01,
+				 double massDensity = 1.0, double poissonRatio = 0.1, double youngModulus = 1.0)
 {
-	auto element = std::make_shared<Fem2DElementTriangle>(nodes);
+	std::shared_ptr<Fem2DElementTriangle> element(new Fem2DElementTriangle(nodes));
 	element->setThickness(thickness);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
@@ -65,9 +65,9 @@ public:
 
 		auto& x = state->getPositions();
 		getSubVector(x, 0, 6).segment<3>(0) = Vector3d(-1.0, 0.0, 0.0);
-		getSubVector(x, 1, 6).segment<3>(0) = Vector3d( 0.0,-1.0, 0.0);
-		getSubVector(x, 2, 6).segment<3>(0) = Vector3d( 1.0, 0.0, 0.0);
-		getSubVector(x, 3, 6).segment<3>(0) = Vector3d( 0.0, 1.0, 0.0);
+		getSubVector(x, 1, 6).segment<3>(0) = Vector3d(0.0, -1.0, 0.0);
+		getSubVector(x, 2, 6).segment<3>(0) = Vector3d(1.0, 0.0, 0.0);
+		getSubVector(x, 3, 6).segment<3>(0) = Vector3d(0.0, 1.0, 0.0);
 
 		// Define Triangles
 		{
@@ -115,10 +115,10 @@ TEST_F(Fem2DLocalizationTest, ConstructorTest)
 	// either because the index is out of bound or because the coordinates are the wrong size (empty)
 	// This is tested by m_invalidIndexLocalPosition and m_invalidCoordinateLocalPosition
 	ASSERT_THROW(std::make_shared<Fem2DLocalization>(m_fem, m_invalidIndexLocalPosition),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 
 	ASSERT_THROW(std::make_shared<Fem2DLocalization>(m_fem, m_invalidCoordinateLocalPosition),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 
 	ASSERT_NO_THROW(std::make_shared<Fem2DLocalization>(m_fem, m_validLocalPosition););
 }

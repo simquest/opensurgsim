@@ -35,7 +35,7 @@ using SurgSim::Physics::MockMassSpring;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 class MassSpringMechanicalValidationTests : public ::testing::Test
@@ -83,8 +83,8 @@ public:
 		m_nodeBoundaryConditions.push_back(0);
 
 		MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
-			m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-			scheme);
+						 m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
+						 scheme);
 
 		m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
 		m.wakeUp();
@@ -94,13 +94,13 @@ public:
 		m.setIsGravityEnabled(false);
 
 		Vector3d initialDelta = m.getCurrentState()->getPosition(1) - m.getCurrentState()->getPosition(0);
-		double initialEk = 0.5 * (m_totalMass/2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
+		double initialEk = 0.5 * (m_totalMass / 2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
 		double initialEs = 0.5 * m_springStiffness * initialDelta.squaredNorm();
 		double initialEnergy = initialEk + initialEs;
 
 		// Simulate 2 seconds of virtual time
 		double time = 0.0;
-		while(time < 2.0)
+		while (time < 2.0)
 		{
 			m.beforeUpdate(m_dt);
 			m.update(m_dt);
@@ -110,10 +110,10 @@ public:
 			Vector3d currentDelta = m.getCurrentState()->getPosition(1) - m.getCurrentState()->getPosition(0);
 
 			// Calculate previous/current system energy (kinetic energy + spring energy)
-			double previousEk = 0.5 * (m_totalMass/2.0) * m.getPreviousState()->getVelocity(1).squaredNorm();
+			double previousEk = 0.5 * (m_totalMass / 2.0) * m.getPreviousState()->getVelocity(1).squaredNorm();
 			double previousEs = 0.5 * m_springStiffness * previousDelta.squaredNorm();
 			double previousEnergy = previousEk + previousEs;
-			double currentEk = 0.5 * (m_totalMass/2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
+			double currentEk = 0.5 * (m_totalMass / 2.0) * m.getCurrentState()->getVelocity(1).squaredNorm();
 			double currentEs = 0.5 * m_springStiffness * currentDelta.squaredNorm();
 			double currentEnergy = currentEk + currentEs;
 			if (expectedBehavior < 0)
@@ -150,15 +150,15 @@ protected:
 	double m_rayleighDampingMass, m_rayleighDampingStiffness;
 
 	/// IdentityPose and random pose
-	SurgSim::Math::RigidTransform3d m_poseIdentity, m_poseRandom;
+	SurgSim::Math::UnalignedRigidTransform3d m_poseIdentity, m_poseRandom;
 };
 
 TEST_F(MassSpringMechanicalValidationTests, NoGravityTest)
 {
 	// Note the use of identity pose to avoid small variation between the spring rest length and current length
 	MockMassSpring m("MassSpring", m_poseIdentity, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
-		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
+					 m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
+					 SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
 
 	m.setIsGravityEnabled(false);
 
@@ -188,8 +188,8 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 	// Only the Modified Euler Explicit integration conserves the energy exactly
 	// (explicit adds energy to the system, implicit removes energy to the system)
 	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
-		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED);
+					 m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
+					 SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED);
 
 	// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
 	std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
@@ -199,12 +199,15 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 	m.wakeUp();
 
 	// Frequency = 1/(2PI) sqrt(k / m)
-	double f = 1.0/(2.0 * M_PI) * sqrt(m_springStiffness / (m_totalMass/2.0));
+	double f = 1.0 / (2.0 * M_PI) * sqrt(m_springStiffness / (m_totalMass / 2.0));
 	// Period = 1/f
 	double period = 1.0 / f;
 	// Let's look for a time step, factor of period, small enough for stability of Explicit Euler (~1Khz)
 	m_dt = period;
-	while(m_dt > 1e-3) m_dt *= 0.5;
+	while (m_dt > 1e-3)
+	{
+		m_dt *= 0.5;
+	}
 
 	// Simulate a single mass connected to a spring at the same time for comparison purpose
 	Vector3d x0 = SurgSim::Math::getSubVector(m.getInitialState()->getPositions(), 1, 3);
@@ -213,7 +216,7 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 
 	double time = 0.0;
 	// Let's do all iterations (except the last 2) testing that the mass is NOT back yet to its original position
-	while(time < period - 2.0 * m_dt)
+	while (time < period - 2.0 * m_dt)
 	{
 		m.beforeUpdate(m_dt);
 		m.update(m_dt);
@@ -221,7 +224,7 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 
 		// Manually simulate a single mass connected to a spring
 		Vector3d anchor = SurgSim::Math::getSubVector(m.getInitialState()->getPositions(), 0, 3);
-		Vector3d f = (m_springStiffness * (anchor - x)) / (m_totalMass/2.0);
+		Vector3d f = (m_springStiffness * (anchor - x)) / (m_totalMass / 2.0);
 		v += f * m_dt;
 		x += v * m_dt;
 
@@ -242,7 +245,7 @@ TEST_F(MassSpringMechanicalValidationTests, OneSpringFrequencyTest)
 
 	// Let's do the last 2 iterations without testing as we are getting close enough to the solution
 	// that the test might become true before reaching the very last iteration
-	while(time < period)
+	while (time < period)
 	{
 		m.beforeUpdate(m_dt);
 		m.update(m_dt);
@@ -264,14 +267,14 @@ TEST_F(MassSpringMechanicalValidationTests, FallingTest)
 	m_nodeBoundaryConditions.clear();
 
 	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_nodeBoundaryConditions, m_totalMass,
-		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
+					 m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
+					 SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT);
 
 	m.initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	m.wakeUp();
 
 	// run few iterations of simulation...
-	for (int i = 0; i< 5; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		m.beforeUpdate(m_dt);
 		m.update(m_dt);
@@ -288,7 +291,7 @@ TEST_F(MassSpringMechanicalValidationTests, FallingTest)
 			EXPECT_GE(vi_dot_g, 0.0) << "v = " << vi.transpose() << " ; g = " << m.getGravityVector().transpose();
 			const Vector3d vi_cross_g = vi.cross(m.getGravityVector());
 			EXPECT_TRUE(vi_cross_g.isZero()) << "v = " << vi.transpose() << " ; g = " <<
-				m.getGravityVector().transpose() << " vi^g = " << vi_cross_g.transpose();
+											 m.getGravityVector().transpose() << " vi^g = " << vi_cross_g.transpose();
 		}
 	}
 }

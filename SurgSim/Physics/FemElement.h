@@ -48,6 +48,8 @@ public:
 	/// Constructor
 	FemElement();
 
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
 	/// Virtual destructor
 	virtual ~FemElement();
 
@@ -56,7 +58,7 @@ public:
 	virtual void initialize(const SurgSim::Math::OdeState& state);
 
 	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::shared_ptr<FemElementStructs::FemElementParameter>>
-		FactoryType;
+			FactoryType;
 
 	static FactoryType& getFactory();
 

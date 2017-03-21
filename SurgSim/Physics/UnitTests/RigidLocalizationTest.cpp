@@ -33,7 +33,7 @@ using SurgSim::Physics::RigidLocalization;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 class RigidLocalizationTest : public ::testing::Test
@@ -55,7 +55,8 @@ public:
 			q.normalize();
 			t.setRandom();
 			m_currentTransformation = SurgSim::Math::makeRigidTransform(q, t);
-		} while (m_initialTransformation.isApprox(m_currentTransformation));
+		}
+		while (m_initialTransformation.isApprox(m_currentTransformation));
 
 		m_identityTransformation.setIdentity();
 	}
@@ -65,18 +66,18 @@ public:
 	}
 
 	// Fixed representation initialization pose
-	SurgSim::Math::RigidTransform3d m_initialTransformation;
+	SurgSim::Math::UnalignedRigidTransform3d m_initialTransformation;
 
 	// Fixed representation current pose
-	SurgSim::Math::RigidTransform3d m_currentTransformation;
+	SurgSim::Math::UnalignedRigidTransform3d m_currentTransformation;
 
 	// Identity pose (no translation/rotation)
-	SurgSim::Math::RigidTransform3d m_identityTransformation;
+	SurgSim::Math::UnalignedRigidTransform3d m_identityTransformation;
 };
 
 TEST_F(RigidLocalizationTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {RigidLocalization rigidRepresentationLoc;});
+	ASSERT_NO_THROW({RigidLocalization rigidRepresentationLoc;});
 
 	ASSERT_NO_THROW(
 	{

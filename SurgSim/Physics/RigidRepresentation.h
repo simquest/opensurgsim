@@ -84,13 +84,13 @@ public:
 									 const SurgSim::Math::Matrix66d& D = SurgSim::Math::Matrix66d::Zero());
 
 	/// \return the current external generalized 6D force
-	SurgSim::DataStructures::BufferedValue<SurgSim::Math::Vector6d>& getExternalGeneralizedForce();
+	SurgSim::DataStructures::BufferedValue<SurgSim::Math::UnalignedVector6d>& getExternalGeneralizedForce();
 
 	/// \return the current external generalized stiffness 6x6 matrix
-	const SurgSim::Math::Matrix66d& getExternalGeneralizedStiffness() const;
+	const SurgSim::Math::UnalignedMatrix66d& getExternalGeneralizedStiffness() const;
 
 	/// \return the current external generalized damping 6x6 matrix
-	const SurgSim::Math::Matrix66d& getExternalGeneralizedDamping() const;
+	const SurgSim::Math::UnalignedMatrix66d& getExternalGeneralizedDamping() const;
 
 	void beforeUpdate(double dt) override;
 
@@ -102,13 +102,13 @@ public:
 
 	/// Retrieve the rigid body 6x6 compliance matrix
 	/// \return the 6x6 compliance matrix
-	const SurgSim::Math::Matrix66d& getComplianceMatrix() const;
+	const SurgSim::Math::UnalignedMatrix66d& getComplianceMatrix() const;
 
 protected:
 	/// Inertia matrices in global coordinates
-	SurgSim::Math::Matrix33d m_globalInertia;
+	SurgSim::Math::UnalignedMatrix33d m_globalInertia;
 	/// Inverse of inertia matrix in global coordinates
-	SurgSim::Math::Matrix33d m_invGlobalInertia;
+	SurgSim::Math::UnalignedMatrix33d m_invGlobalInertia;
 
 	/// Current force applied on the rigid representation (in N)
 	SurgSim::Math::Vector3d m_force;
@@ -116,14 +116,14 @@ protected:
 	SurgSim::Math::Vector3d m_torque;
 
 	/// Compliance matrix (size of the number of Dof = 6)
-	SurgSim::Math::Matrix66d m_C;
+	SurgSim::Math::UnalignedMatrix66d m_C;
 
 	/// External generalized force, stiffness and damping applied on the rigid representation
 	/// @{
 	bool m_hasExternalGeneralizedForce;
-	SurgSim::DataStructures::BufferedValue<SurgSim::Math::Vector6d> m_externalGeneralizedForce;
-	SurgSim::Math::Matrix66d m_externalGeneralizedStiffness;
-	SurgSim::Math::Matrix66d m_externalGeneralizedDamping;
+	SurgSim::DataStructures::BufferedValue<SurgSim::Math::UnalignedVector6d> m_externalGeneralizedForce;
+	SurgSim::Math::UnalignedMatrix66d m_externalGeneralizedStiffness;
+	SurgSim::Math::UnalignedMatrix66d m_externalGeneralizedDamping;
 	/// @}
 
 private:

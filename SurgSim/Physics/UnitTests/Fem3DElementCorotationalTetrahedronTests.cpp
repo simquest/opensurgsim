@@ -45,7 +45,7 @@ public:
 	{
 	}
 
-	const Eigen::Matrix<double, 12 , 1>& getInitialPosition() const
+	const Eigen::Matrix<double, 12, 1>& getInitialPosition() const
 	{
 		return m_x0;
 	}
@@ -111,8 +111,8 @@ public:
 	SurgSim::Math::OdeState m_restState, m_invalidState, m_state;
 	double m_rho, m_E, m_nu;
 
-	SurgSim::Math::Matrix33d m_rotation;
-	Eigen::Matrix<double, 12, 12> m_R12x12;
+	SurgSim::Math::UnalignedMatrix33d m_rotation;
+	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_R12x12;
 	Vector3d m_translation;
 
 	void SetUp() override
@@ -198,9 +198,11 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, ConstructorTest)
 	ASSERT_NO_THROW({MockFem3DElementCorotationalTet* tet = new MockFem3DElementCorotationalTet(m_nodeIds);
 					 delete tet;
 					});
-	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementCorotationalTet> tet =
-						 std::make_shared<MockFem3DElementCorotationalTet>(m_nodeIds);
-					});
+// 	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementCorotationalTet> tet =
+// 						 std::make_shared<MockFem3DElementCorotationalTet>(m_nodeIds);
+// 					});
+	ASSERT_NO_THROW(std::shared_ptr<MockFem3DElementCorotationalTet>
+					var(new MockFem3DElementCorotationalTet(m_nodeIds)););
 }
 
 TEST_F(Fem3DElementCorotationalTetrahedronTests, InitializeTest)
@@ -415,7 +417,7 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 
 	Eigen::Matrix<double, 12, 1> x;
 	SurgSim::Math::getSubVector(state.getPositions(), tet->getNodeIds(), 3, &x);
-	Eigen::Matrix<double, 12 , 1> f = - R12x12 * K0 * R12x12.transpose() * (x - (R12x12 * tet->getInitialPosition()));
+	Eigen::Matrix<double, 12, 1> f = - R12x12 * K0 * R12x12.transpose() * (x - (R12x12 * tet->getInitialPosition()));
 	SurgSim::Math::addSubVector(f, tet->getNodeIds(), 3, &expectedF);
 
 	Vector F = Vector::Zero(state.getNumDof());
@@ -558,7 +560,7 @@ void testAddForce(MockFem3DElementCorotationalTet* tet,
 
 	SurgSim::Math::Vector expectedF;
 	expectedF.setZero(statet.getNumDof());
-	Eigen::Matrix<double, 12 , 1> f = - R12x12 * K * R12x12.transpose() * (x - (R12x12 * x0));
+	Eigen::Matrix<double, 12, 1> f = - R12x12 * K * R12x12.transpose() * (x - (R12x12 * x0));
 	SurgSim::Math::addSubVector(f, tet->getNodeIds(), 3, &expectedF);
 
 	EXPECT_TRUE(tet->getRotation(statet).isApprox(R));
@@ -634,7 +636,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 	SurgSim::Math::OdeState state;
 	defineCurrentState(m_restState, &state, transformation, true);
 	tet.updateFMDK(state, OdeEquationUpdate::ODEEQUATIONUPDATE_M | OdeEquationUpdate::ODEEQUATIONUPDATE_D
-					  | OdeEquationUpdate::ODEEQUATIONUPDATE_K);
+				   | OdeEquationUpdate::ODEEQUATIONUPDATE_K);
 
 	SurgSim::Math::Matrix M = tet.getRotatedMassMatrix(state);
 	SurgSim::Math::Matrix K = tet.getRotatedStiffnessMatrix(state);

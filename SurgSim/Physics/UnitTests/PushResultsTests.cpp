@@ -100,10 +100,10 @@ TEST_F(PushResultsTests, OneRepresentationOneConstraintTest)
 
 		// Set up the constraint
 		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
-			data, m_usedRepresentations[0],
-			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
-			m_fixedWorldRepresentation,
-			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
+				data, m_usedRepresentations[0],
+				SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+				m_fixedWorldRepresentation,
+				SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
@@ -180,10 +180,10 @@ TEST_F(PushResultsTests, DiscardBadResultsTest)
 
 		// Set up the constraint
 		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
-			data, m_usedRepresentations[0],
-			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
-			m_fixedWorldRepresentation,
-			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
+				data, m_usedRepresentations[0],
+				SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+				m_fixedWorldRepresentation,
+				SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
@@ -243,7 +243,7 @@ TEST_F(PushResultsTests, DiscardBadResultsTest)
 	EXPECT_NEAR(0.0, angVel[1], epsilon);
 	EXPECT_NEAR(0.0, angVel[2], epsilon);
 
-	const SurgSim::Math::RigidTransform3d& pose = rigid->getCurrentState().getPose();
+	const SurgSim::Math::UnalignedRigidTransform3d& pose = rigid->getCurrentState().getPose();
 	EXPECT_NEAR(0.0 * dt, pose.translation()[0], epsilon);
 	EXPECT_NEAR(0.0 * dt, pose.translation()[1], epsilon);
 	EXPECT_NEAR(0.0 * dt, pose.translation()[2], epsilon);
@@ -293,10 +293,10 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 		// Set up the constraint
 		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
-			data, m_usedRepresentations[0],
-			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
-			m_fixedWorldRepresentation,
-			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
+				data, m_usedRepresentations[0],
+				SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()),
+				m_fixedWorldRepresentation,
+				SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Zero()));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
@@ -308,10 +308,10 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 		// Set up the constraint
 		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
-			data, m_usedRepresentations[0],
-			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Ones()),
-			m_fixedWorldRepresentation,
-			SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Ones()));
+				data, m_usedRepresentations[0],
+				SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Ones()),
+				m_fixedWorldRepresentation,
+				SurgSim::DataStructures::Location(SurgSim::Math::Vector3d::Ones()));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
@@ -335,7 +335,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 		}
 
 		mlcpSolution.x(0) = 1.3;
-		mlcpSolution.x(1) =-0.9;
+		mlcpSolution.x(1) = -0.9;
 	}
 
 	// Run the BuildMlcp computation...
@@ -343,7 +343,7 @@ TEST_F(PushResultsTests, OneRepresentationTwoConstraintsTest)
 
 	// Test that the Mlcp is as expected
 	EXPECT_EQ(2, mlcpSolution.x.rows());
-	EXPECT_NEAR( 1.3, mlcpSolution.x(0), epsilon);
+	EXPECT_NEAR(1.3, mlcpSolution.x(0), epsilon);
 	EXPECT_NEAR(-0.9, mlcpSolution.x(1), epsilon);
 	// dofCorrection = CHt .x = (0 1) . ( 1.3)
 	//                          (1 2)   (-0.9)
@@ -399,10 +399,10 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 		// Set up the constraint
 		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
-			data, m_usedRepresentations[0],
-			SurgSim::DataStructures::Location(pointOrigin),
-			m_usedRepresentations[1],
-			SurgSim::DataStructures::Location(pointOrigin));
+				data, m_usedRepresentations[0],
+				SurgSim::DataStructures::Location(pointOrigin),
+				m_usedRepresentations[1],
+				SurgSim::DataStructures::Location(pointOrigin));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
@@ -414,10 +414,10 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 		// Set up the constraint
 		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(constraintType,
-			data, m_usedRepresentations[0],
-			SurgSim::DataStructures::Location(pointOrigin),
-			m_usedRepresentations[1],
-			SurgSim::DataStructures::Location(pointOne));
+				data, m_usedRepresentations[0],
+				SurgSim::DataStructures::Location(pointOrigin),
+				m_usedRepresentations[1],
+				SurgSim::DataStructures::Location(pointOne));
 
 		// Register the constraint in the list of used constraints for this test
 		m_usedConstraints.push_back(constraint);
@@ -441,7 +441,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 		}
 
 		mlcpSolution.x(0) = 1.3;
-		mlcpSolution.x(1) =-0.9;
+		mlcpSolution.x(1) = -0.9;
 	}
 
 	// Run the BuildMlcp computation...
@@ -449,7 +449,7 @@ TEST_F(PushResultsTests, TwoRepresentationsTwoConstraintsTest)
 
 	// Test that the Mlcp is as expected
 	EXPECT_EQ(2, mlcpSolution.x.rows());
-	EXPECT_NEAR( 1.3, mlcpSolution.x(0), epsilon);
+	EXPECT_NEAR(1.3, mlcpSolution.x(0), epsilon);
 	EXPECT_NEAR(-0.9, mlcpSolution.x(1), epsilon);
 	// dofCorrection = CHt .x = ( 0  1) . ( 1.3)
 	//                          ( 1  2)   (-0.9)

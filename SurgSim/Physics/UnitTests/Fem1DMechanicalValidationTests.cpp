@@ -85,7 +85,7 @@ public:
 		{
 			nodeEnds[0] = nodeId;
 			nodeEnds[1] = nodeId + 1;
-			auto element = std::make_shared<Fem1DElementBeam>(nodeEnds);
+			std::shared_ptr<Fem1DElementBeam> element(new Fem1DElementBeam(nodeEnds));
 			element->setMassDensity(massDensity);
 			element->setYoungModulus(youngModulus);
 			element->setPoissonRatio(poissonRatio);
@@ -128,7 +128,7 @@ class Fem1DMechanicalValidationTests : public ::testing::Test
 {
 public:
 	std::shared_ptr<Fem1DRepresentation> m_fem;
-	SurgSim::Math::RigidTransform3d m_initialPose;
+	SurgSim::Math::UnalignedRigidTransform3d m_initialPose;
 	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
 
 	// Physical properties
@@ -197,7 +197,8 @@ protected:
 
 		// Create Fem1DElementBeam
 		std::array<size_t, 2> nodeIds = {0, 1};
-		auto element = std::make_shared<Fem1DElementBeam>(nodeIds);
+
+		std::shared_ptr<Fem1DElementBeam> element(new Fem1DElementBeam(nodeIds));
 		element->setMassDensity(m_rho);
 		element->setYoungModulus(m_E);
 		element->setPoissonRatio(m_nu);

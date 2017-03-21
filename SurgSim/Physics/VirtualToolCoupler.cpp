@@ -147,32 +147,33 @@ void VirtualToolCoupler::update(double dt)
 	if (m_linearVelocityIndex < 0)
 	{
 		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not " <<
-			"contain a linear velocity vector named " << DataStructures::Names::LINEAR_VELOCITY <<
-			", so it will be estimated.";
+											"contain a linear velocity vector named " << DataStructures::Names::LINEAR_VELOCITY <<
+											", so it will be estimated.";
 	}
 	inputData.vectors().cacheIndex(DataStructures::Names::ANGULAR_VELOCITY, &m_angularVelocityIndex);
 	if (m_angularVelocityIndex < 0)
 	{
 		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not " <<
-			"contain an angular velocity vector named " << DataStructures::Names::ANGULAR_VELOCITY <<
-			") so it will be estimated.";
+											"contain an angular velocity vector named " << DataStructures::Names::ANGULAR_VELOCITY <<
+											") so it will be estimated.";
 	}
 
 	RigidTransform3d inputPose;
+	RigidTransform3d previousInputPose(m_previousInputPose); // Use Aligned version
 	if (inputData.poses().get(m_poseIndex, &inputPose))
 	{
 		Vector3d inputLinearVelocity(Vector3d::Zero());
 		const bool gotInputLinearVelocity = inputData.vectors().get(m_linearVelocityIndex, &inputLinearVelocity);
 		if (!gotInputLinearVelocity)
 		{
-			inputLinearVelocity = (inputPose.translation() - m_previousInputPose.translation()) / dt;
+			inputLinearVelocity = (inputPose.translation() - previousInputPose.translation()) / dt;
 		}
 
 		Vector3d inputAngularVelocity(Vector3d::Zero());
 		const bool gotInputAngularVelocity = inputData.vectors().get(m_angularVelocityIndex, &inputAngularVelocity);
 		if (!gotInputAngularVelocity)
 		{
-			Math::computeRotationVector(inputPose, m_previousInputPose, &inputAngularVelocity);
+			Math::computeRotationVector(inputPose, previousInputPose, &inputAngularVelocity);
 			inputAngularVelocity /= dt;
 		}
 		m_previousInputPose = inputPose;
@@ -204,11 +205,11 @@ void VirtualToolCoupler::update(double dt)
 		const Matrix33d identity3x3 = Matrix33d::Identity();
 		const Matrix33d zero3x3 = Matrix33d::Zero();
 		Matrix66d generalizedStiffness;
-		generalizedStiffness << m_linearStiffness * identity3x3, zero3x3,
-								zero3x3                        , m_angularStiffness * identity3x3;
+		generalizedStiffness << m_linearStiffness* identity3x3, zero3x3,
+							 zero3x3, m_angularStiffness* identity3x3;
 		Matrix66d generalizedDamping;
-		generalizedDamping << m_linearDamping * identity3x3, zero3x3,
-							  zero3x3                      , m_angularDamping * identity3x3;
+		generalizedDamping << m_linearDamping* identity3x3, zero3x3,
+						   zero3x3, m_angularDamping* identity3x3;
 
 		if (m_calculateInertialTorques)
 		{
@@ -313,7 +314,7 @@ bool VirtualToolCoupler::doWakeUp()
 	if (m_input == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(m_logger) <<
-			"VirtualToolCoupler named " << getName() << " does not have an Input Component.";
+									 "VirtualToolCoupler named " << getName() << " does not have an Input Component.";
 		return false;
 	}
 	if (m_rigid == nullptr)
@@ -394,9 +395,9 @@ bool VirtualToolCoupler::doWakeUp()
 	}
 
 	SURGSIM_LOG_INFO(m_logger) <<
-		"VirtualToolCoupler named '" << getName() << "' has linear stiffness " << m_linearStiffness <<
-		", linear damping " << m_linearDamping << ", angular stiffness " << m_angularStiffness <<
-		", and angular damping " << m_angularDamping << ". Its Physics Representation has mass " << m_rigid->getMass();
+							   "VirtualToolCoupler named '" << getName() << "' has linear stiffness " << m_linearStiffness <<
+							   ", linear damping " << m_linearDamping << ", angular stiffness " << m_angularStiffness <<
+							   ", and angular damping " << m_angularDamping << ". Its Physics Representation has mass " << m_rigid->getMass();
 	return true;
 }
 

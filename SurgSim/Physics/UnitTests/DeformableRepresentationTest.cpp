@@ -85,8 +85,8 @@ protected:
 	std::shared_ptr<SurgSim::Math::OdeState> m_localInitialState;
 
 	// Identity and nonIdentity (but still valid) transforms
-	SurgSim::Math::RigidTransform3d m_identityTransform;
-	SurgSim::Math::RigidTransform3d m_nonIdentityTransform;
+	SurgSim::Math::UnalignedRigidTransform3d m_identityTransform;
+	SurgSim::Math::UnalignedRigidTransform3d m_nonIdentityTransform;
 
 	// Localization of node 0, to apply external force
 	std::shared_ptr<SurgSim::Physics::MockDeformableLocalization> m_localization0;
@@ -168,9 +168,9 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_NE(nullptr, getOdeSolver());
 	EXPECT_NE(nullptr, std::dynamic_pointer_cast<SurgSim::Math::OdeSolverEulerExplicit>(getOdeSolver()));
 	EXPECT_NE(nullptr,
-		std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(getOdeSolver()->getLinearSolver()));
+			  std::dynamic_pointer_cast<SurgSim::Math::LinearSparseSolveAndInverseCG>(getOdeSolver()->getLinearSolver()));
 	EXPECT_THROW(setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(setLinearSolver(SurgSim::Math::LINEARSOLVER_LU), SurgSim::Framework::AssertionFailure);
 
 	wakeUp();
@@ -447,7 +447,7 @@ TEST_F(DeformableRepresentationTest, DoInitializeTest)
 	{
 		Vector3d expectedPosition
 			= m_nonIdentityTransform
-			* Vector3d::LinSpaced(static_cast<double>(nodeId) * 3, (static_cast<double>(nodeId) + 1) * 3 - 1);
+			  * Vector3d::LinSpaced(static_cast<double>(nodeId) * 3, (static_cast<double>(nodeId) + 1) * 3 - 1);
 		Vector3d expectedVelocity = m_nonIdentityTransform.rotation() * Vector3d::Ones();
 		EXPECT_TRUE(getInitialState()->getPosition(nodeId).isApprox(expectedPosition));
 		EXPECT_TRUE(getInitialState()->getVelocity(nodeId).isApprox(expectedVelocity));

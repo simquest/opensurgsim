@@ -20,7 +20,6 @@
 #include <memory>
 #include <vector>
 
-#include "SurgSim/Blocks/SphereElement.h"
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -33,9 +32,10 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/PrepareCollisionPairs.h"
-
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 using SurgSim::Math::Vector3d;
-
 
 namespace SurgSim
 {
@@ -50,8 +50,8 @@ TEST(DcdCollisionTest, ConstructorTest)
 
 TEST(DcdCollisionTest, RigidRigidCollisionTest)
 {
-	auto sphere1 = std::make_shared<Blocks::SphereElement>("Sphere1");
-	auto sphere2 = std::make_shared<Blocks::SphereElement>("Sphere2");
+	auto sphere1 = std::make_shared<SphereCollisionElement>("Sphere1");
+	auto sphere2 = std::make_shared<SphereCollisionElement>("Sphere2");
 	sphere2->setPose(Math::makeRigidTransform(Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.5)));
 
 	auto runtime = std::make_shared<Framework::Runtime>();

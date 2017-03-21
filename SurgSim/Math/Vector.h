@@ -24,6 +24,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <Eigen/StdVector>
 
 #include "SurgSim/Framework/Assert.h"
 
@@ -232,7 +233,13 @@ Eigen::Matrix<T, 3, 1, VOpt> robustCrossProduct(const std::array<Eigen::Matrix<T
 	return pXq;
 }
 
+
 };  // namespace Math
 };  // namespace SurgSim
+
+
+// Only do the ones that are important (i.e. no float vectors for now)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Vector3d);
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Vector4d);
 
 #endif  // SURGSIM_MATH_VECTOR_H

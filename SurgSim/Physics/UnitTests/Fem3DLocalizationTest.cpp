@@ -32,7 +32,7 @@ using SurgSim::Math::getSubVector;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 namespace SurgSim
@@ -40,11 +40,11 @@ namespace SurgSim
 namespace Physics
 {
 
-void addTetraheadron(Fem3DRepresentation *fem, std::array<size_t, 4> nodes,
-	const SurgSim::Math::OdeState& state, double massDensity = 1.0,
-	double poissonRatio = 0.1, double youngModulus = 1.0)
+void addTetraheadron(Fem3DRepresentation* fem, std::array<size_t, 4> nodes,
+					 const SurgSim::Math::OdeState& state, double massDensity = 1.0,
+					 double poissonRatio = 0.1, double youngModulus = 1.0)
 {
-	auto element = std::make_shared<Fem3DElementTetrahedron>(nodes);
+	std::shared_ptr<Fem3DElementTetrahedron> element(new Fem3DElementTetrahedron(nodes));
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
@@ -64,12 +64,12 @@ public:
 		state->setNumDof(3, 6);
 
 		auto& x = state->getPositions();
-		getSubVector(x, 0, 3) = Vector3d( 0.0,  0.0,  0.0);
-		getSubVector(x, 1, 3) = Vector3d( 0.0,  1.0, -1.0);
+		getSubVector(x, 0, 3) = Vector3d(0.0,  0.0,  0.0);
+		getSubVector(x, 1, 3) = Vector3d(0.0,  1.0, -1.0);
 		getSubVector(x, 2, 3) = Vector3d(-1.0,  1.0,  0.0);
-		getSubVector(x, 3, 3) = Vector3d( 0.0,  1.0,  0.0);
-		getSubVector(x, 4, 3) = Vector3d( 1.0,  1.0,  0.0);
-		getSubVector(x, 5, 3) = Vector3d( 1.0,  0.0, -1.0);
+		getSubVector(x, 3, 3) = Vector3d(0.0,  1.0,  0.0);
+		getSubVector(x, 4, 3) = Vector3d(1.0,  1.0,  0.0);
+		getSubVector(x, 5, 3) = Vector3d(1.0,  0.0, -1.0);
 
 		// Define Tetrahedrons
 		{
@@ -96,19 +96,19 @@ public:
 		restState->setNumDof(3, 8);
 
 		auto& x0 = restState->getPositions();
-		getSubVector(x0, 0, 3) = Vector3d(-1.0,-1.0,-1.0);
-		getSubVector(x0, 1, 3) = Vector3d( 1.0,-1.0,-1.0);
-		getSubVector(x0, 2, 3) = Vector3d(-1.0, 1.0,-1.0);
-		getSubVector(x0, 3, 3) = Vector3d( 1.0, 1.0,-1.0);
-		getSubVector(x0, 4, 3) = Vector3d(-1.0,-1.0, 1.0);
-		getSubVector(x0, 5, 3) = Vector3d( 1.0,-1.0, 1.0);
+		getSubVector(x0, 0, 3) = Vector3d(-1.0, -1.0, -1.0);
+		getSubVector(x0, 1, 3) = Vector3d(1.0, -1.0, -1.0);
+		getSubVector(x0, 2, 3) = Vector3d(-1.0, 1.0, -1.0);
+		getSubVector(x0, 3, 3) = Vector3d(1.0, 1.0, -1.0);
+		getSubVector(x0, 4, 3) = Vector3d(-1.0, -1.0, 1.0);
+		getSubVector(x0, 5, 3) = Vector3d(1.0, -1.0, 1.0);
 		getSubVector(x0, 6, 3) = Vector3d(-1.0, 1.0, 1.0);
-		getSubVector(x0, 7, 3) = Vector3d( 1.0, 1.0, 1.0);
+		getSubVector(x0, 7, 3) = Vector3d(1.0, 1.0, 1.0);
 
 		// Define Cube
 		{
 			std::array<size_t, 8> node0 = {{0, 1, 3, 2, 4, 5, 7, 6}};
-			std::shared_ptr<Fem3DElementCube> femElement = std::make_shared<Fem3DElementCube>(node0);
+			std::shared_ptr<Fem3DElementCube> femElement(new Fem3DElementCube(node0));
 			femElement->setMassDensity(1.0);
 			femElement->setPoissonRatio(0.1);
 			femElement->setYoungModulus(1.0);
@@ -158,10 +158,10 @@ TEST_F(Fem3DLocalizationTest, ConstructorTest)
 	// or because the coordinates are the wrong size (empty or of size 2 do not correspond to any valid 3d FemElements)
 	// This is tested by m_invalidIndexLocalPosition and m_invalidCoordinateLocalPosition
 	ASSERT_THROW(std::make_shared<Fem3DLocalization>(m_fem, m_invalidIndexLocalPosition),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 
 	ASSERT_THROW(std::make_shared<Fem3DLocalization>(m_fem, m_invalidCoordinateLocalPosition),
-		SurgSim::Framework::AssertionFailure);
+				 SurgSim::Framework::AssertionFailure);
 
 	ASSERT_NO_THROW(std::make_shared<Fem3DLocalization>(m_fem, m_validLocalPosition););
 

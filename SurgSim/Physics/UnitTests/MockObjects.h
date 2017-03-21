@@ -17,16 +17,17 @@
 #define SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Framework/Macros.h"
+#include "SurgSim/Framework/ObjectFactory.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Computation.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ConstraintImplementation.h"
-#include "SurgSim/Physics/Computation.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
@@ -116,14 +117,14 @@ public:
 class MockDeformableLocalization : public SurgSim::Physics::Localization
 {
 public:
-	MockDeformableLocalization(){}
+	MockDeformableLocalization() {}
 
 	explicit MockDeformableLocalization(std::shared_ptr<Representation> representation) : Localization()
 	{
 		setRepresentation(representation);
 	}
 
-	virtual ~MockDeformableLocalization(){}
+	virtual ~MockDeformableLocalization() {}
 
 	void setLocalNode(size_t nodeID)
 	{
@@ -166,7 +167,7 @@ private:
 			std::static_pointer_cast<DeformableRepresentation>(getRepresentation());
 
 		SURGSIM_ASSERT(defRepresentation != nullptr) << "Deformable Representation is null, it was probably not" <<
-			" initialized";
+				" initialized";
 		SURGSIM_ASSERT((0.0 <= time) && (time <= 1.0)) << "Time must be between 0.0 and 1.0 inclusive";
 
 		const SurgSim::Math::Vector3d& currentVelocity = defRepresentation->getCurrentState()->getVelocity(m_nodeID);
@@ -493,6 +494,16 @@ protected:
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
 			const std::shared_ptr<PhysicsManagerState>& state) override;
 };
+
+class SphereCollisionElement : public SurgSim::Framework::SceneElement
+{
+public:
+	SphereCollisionElement(const std::string& name);
+
+	bool doInitialize();
+};
+
+
 
 }; // Physics
 }; // SurgSim

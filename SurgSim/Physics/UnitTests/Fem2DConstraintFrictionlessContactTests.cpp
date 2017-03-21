@@ -55,7 +55,7 @@ static void addTriangle(Fem2DRepresentation* fem,
 						double youngModulus = 1.0)
 {
 	std::array<size_t, 3> nodes = {node0, node1, node2};
-	auto element = std::make_shared<Fem2DElementTriangle>(nodes);
+	std::shared_ptr<Fem2DElementTriangle> element(new Fem2DElementTriangle(nodes));
 	element->setThickness(thickness);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);

@@ -30,7 +30,7 @@ using SurgSim::DataStructures::IndexedLocalCoordinate;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 namespace SurgSim
@@ -38,11 +38,11 @@ namespace SurgSim
 namespace Physics
 {
 
-void addBeam(Fem1DRepresentation *fem, std::array<size_t, 2> nodes,
-	const SurgSim::Math::OdeState& state, double radius = 0.01,
-	double massDensity = 1.0, double poissonRatio = 0.1, double youngModulus = 1.0)
+void addBeam(Fem1DRepresentation* fem, std::array<size_t, 2> nodes,
+			 const SurgSim::Math::OdeState& state, double radius = 0.01,
+			 double massDensity = 1.0, double poissonRatio = 0.1, double youngModulus = 1.0)
 {
-	auto element = std::make_shared<Fem1DElementBeam>(nodes);
+	std::shared_ptr<Fem1DElementBeam> element(new Fem1DElementBeam(nodes));
 	element->setRadius(radius);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
@@ -64,8 +64,8 @@ public:
 		state->setNumDof(6, 3);
 
 		auto& x = state->getPositions();
-		getSubVector(x, 0, 6).segment<3>(0) = Vector3d( 0.0,  0.0,  0.0);
-		getSubVector(x, 1, 6).segment<3>(0) = Vector3d( 0.0,  1.0, -1.0);
+		getSubVector(x, 0, 6).segment<3>(0) = Vector3d(0.0,  0.0,  0.0);
+		getSubVector(x, 1, 6).segment<3>(0) = Vector3d(0.0,  1.0, -1.0);
 		getSubVector(x, 2, 6).segment<3>(0) = Vector3d(-1.0,  1.0,  0.0);
 
 		// Define Beams

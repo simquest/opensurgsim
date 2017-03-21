@@ -438,7 +438,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
-		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2.2e-7); // Epsilon set by trial and error
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2.5e-7); // Epsilon set by trial and error
 		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
 	}
 
@@ -476,7 +476,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
-		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2.5e-7); // Epsilon set by trial and error
 		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
 	}
 }

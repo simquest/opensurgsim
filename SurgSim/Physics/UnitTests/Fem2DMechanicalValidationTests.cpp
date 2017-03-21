@@ -108,11 +108,11 @@ public:
 
 	void addTriangle(const std::array<size_t, 3>& t, double youngModulus, double poissonRatio, double thickness)
 	{
-		std::shared_ptr<Fem2DElementTriangle> triangle = std::make_shared<Fem2DElementTriangle>(t);
+		std::shared_ptr<Fem2DElementTriangle> triangle(new Fem2DElementTriangle(t));
 		triangle->setYoungModulus(youngModulus);
 		triangle->setPoissonRatio(poissonRatio);
 		triangle->setMassDensity(1.0);  // In static mode, the mass density is not used, but it needs to be non null to
-										// pass the initialize validation
+		// pass the initialize validation
 		triangle->setThickness(thickness);
 		m_fem->addFemElement(triangle);
 	}
@@ -201,14 +201,14 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest1)
 	std::vector<Vector3d> nodes;
 	nodes.push_back(Vector3d(-L / 2.0, - h / 2.0, 0.0));
 	nodes.push_back(Vector3d(-L / 4.0, - h / 2.0, 0.0));
-	nodes.push_back(Vector3d(     0.0, - h / 2.0, 0.0));
-	nodes.push_back(Vector3d( L / 4.0, - h / 2.0, 0.0));
-	nodes.push_back(Vector3d( L / 2.0, - h / 2.0, 0.0));
+	nodes.push_back(Vector3d(0.0, - h / 2.0, 0.0));
+	nodes.push_back(Vector3d(L / 4.0, - h / 2.0, 0.0));
+	nodes.push_back(Vector3d(L / 2.0, - h / 2.0, 0.0));
 	nodes.push_back(Vector3d(-L / 2.0,   h / 2.0, 0.0));
 	nodes.push_back(Vector3d(-L / 4.0,   h / 2.0, 0.0));
-	nodes.push_back(Vector3d(     0.0,   h / 2.0, 0.0));
-	nodes.push_back(Vector3d( L / 4.0,   h / 2.0, 0.0));
-	nodes.push_back(Vector3d( L / 2.0,   h / 2.0, 0.0));
+	nodes.push_back(Vector3d(0.0,   h / 2.0, 0.0));
+	nodes.push_back(Vector3d(L / 4.0,   h / 2.0, 0.0));
+	nodes.push_back(Vector3d(L / 2.0,   h / 2.0, 0.0));
 
 	std::vector<size_t> fixedNodes;
 	fixedNodes.push_back(0);
@@ -218,10 +218,12 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest1)
 
 	const int numTriangles = 8;
 	const std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds =
-	{{
-		{{0, 6, 5}}, {{0, 1, 6}}, {{1, 7, 6}}, {{1, 2, 7}},
-		{{2, 8, 7}}, {{2, 3, 8}}, {{3, 9, 8}}, {{3, 4, 9}}
-	}};
+	{
+		{
+			{{0, 6, 5}}, {{0, 1, 6}}, {{1, 7, 6}}, {{1, 2, 7}},
+			{{2, 8, 7}}, {{2, 3, 8}}, {{3, 9, 8}}, {{3, 4, 9}}
+		}
+	};
 
 	for (size_t triangleId = 0; triangleId < numTriangles; triangleId++)
 	{
@@ -234,9 +236,9 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest1)
 	solve();
 
 	EXPECT_NEAR(-0.014159 * inchToMeter, getUx(9), epsilonCantilever1);
-	EXPECT_NEAR( 0.090347 * inchToMeter, getUy(9), epsilonCantilever1);
+	EXPECT_NEAR(0.090347 * inchToMeter, getUy(9), epsilonCantilever1);
 	EXPECT_NEAR(-0.010825 * inchToMeter, getUx(7), epsilonCantilever1);
-	EXPECT_NEAR( 0.030403 * inchToMeter, getUy(7), epsilonCantilever1);
+	EXPECT_NEAR(0.030403 * inchToMeter, getUy(7), epsilonCantilever1);
 }
 
 TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
@@ -250,14 +252,14 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 	std::vector<Vector3d> nodes;
 	nodes.push_back(Vector3d(-L / 2.0, - h / 2.0, 0.0)); // 0
 	nodes.push_back(Vector3d(-L / 4.0, - h / 2.0, 0.0)); // 1
-	nodes.push_back(Vector3d(     0.0, - h / 2.0, 0.0)); // 2
-	nodes.push_back(Vector3d( L / 4.0, - h / 2.0, 0.0)); // 3
-	nodes.push_back(Vector3d( L / 2.0, - h / 2.0, 0.0)); // 4
+	nodes.push_back(Vector3d(0.0, - h / 2.0, 0.0));      // 2
+	nodes.push_back(Vector3d(L / 4.0, - h / 2.0, 0.0));  // 3
+	nodes.push_back(Vector3d(L / 2.0, - h / 2.0, 0.0));  // 4
 	nodes.push_back(Vector3d(-L / 2.0,   h / 2.0, 0.0)); // 5
 	nodes.push_back(Vector3d(-L / 4.0,   h / 2.0, 0.0)); // 6
-	nodes.push_back(Vector3d(     0.0,   h / 2.0, 0.0)); // 7
-	nodes.push_back(Vector3d( L / 4.0,   h / 2.0, 0.0)); // 8
-	nodes.push_back(Vector3d( L / 2.0,   h / 2.0, 0.0)); // 9
+	nodes.push_back(Vector3d(0.0,   h / 2.0, 0.0));      // 7
+	nodes.push_back(Vector3d(L / 4.0,   h / 2.0, 0.0));  // 8
+	nodes.push_back(Vector3d(L / 2.0,   h / 2.0, 0.0));  // 9
 
 	// Subdivision
 	nodes.push_back((nodes[0] + nodes[1]) * 0.5); // 10
@@ -287,32 +289,34 @@ TEST_F(Fem2DMechanicalValidationTests, MembraneCantileverTest2)
 
 	const int numTriangles = 32;
 	const std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds =
-	{{
-		{{0, 10, 12}}, {{10, 11, 12}}, {{12, 11, 13}}, {{12, 13, 5}},
-		{{10, 1, 11}}, {{1, 14, 11}}, {{11, 14, 6}}, {{11, 6, 13}},
-		{{1, 15, 14}}, {{15, 16, 14}}, {{14, 16, 17}}, {{14, 17, 6}},
-		{{15, 2, 16}}, {{2, 18, 16}}, {{16, 18, 7}}, {{16, 7, 17}},
-		{{2, 19, 18}}, {{19, 20, 18}}, {{18, 20, 21}}, {{18, 21, 7}},
-		{{19, 3, 20}}, {{3, 22, 20}}, {{20, 22, 8}}, {{20, 8, 21}},
-		{{3, 23, 22}}, {{23, 24, 22}}, {{22, 24, 25}}, {{22, 25, 8}},
-		{{23, 4, 24}}, {{4, 26, 24}}, {{24, 26, 9}}, {{24, 9, 25}}
-	}};
+	{
+		{
+			{{0, 10, 12}}, {{10, 11, 12}}, {{12, 11, 13}}, {{12, 13, 5}},
+			{{10, 1, 11}}, {{1, 14, 11}}, {{11, 14, 6}}, {{11, 6, 13}},
+			{{1, 15, 14}}, {{15, 16, 14}}, {{14, 16, 17}}, {{14, 17, 6}},
+			{{15, 2, 16}}, {{2, 18, 16}}, {{16, 18, 7}}, {{16, 7, 17}},
+			{{2, 19, 18}}, {{19, 20, 18}}, {{18, 20, 21}}, {{18, 21, 7}},
+			{{19, 3, 20}}, {{3, 22, 20}}, {{20, 22, 8}}, {{20, 8, 21}},
+			{{3, 23, 22}}, {{23, 24, 22}}, {{22, 24, 25}}, {{22, 25, 8}},
+			{{23, 4, 24}}, {{4, 26, 24}}, {{24, 26, 9}}, {{24, 9, 25}}
+		}
+	};
 
 	for (size_t triangleId = 0; triangleId < numTriangles; triangleId++)
 	{
 		addTriangle(trianglesNodeIds[triangleId], youngModulus, poissonRatio, thickness);
 	}
 
-	addPunctualLoad( 4, Vector3d(0,  6.67 * kipToNewton, 0));
-	addPunctualLoad( 9, Vector3d(0,  6.67 * kipToNewton, 0));
+	addPunctualLoad(4, Vector3d(0,  6.67 * kipToNewton, 0));
+	addPunctualLoad(9, Vector3d(0,  6.67 * kipToNewton, 0));
 	addPunctualLoad(26, Vector3d(0, 26.67 * kipToNewton, 0));
 
 	solve();
 
 	EXPECT_NEAR(-0.034271 * inchToMeter, getUx(9), epsilonCantilever2);
-	EXPECT_NEAR( 0.194456 * inchToMeter, getUy(9), epsilonCantilever2);
+	EXPECT_NEAR(0.194456 * inchToMeter, getUy(9), epsilonCantilever2);
 	EXPECT_NEAR(-0.025605 * inchToMeter, getUx(7), epsilonCantilever2);
-	EXPECT_NEAR( 0.062971 * inchToMeter, getUy(7), epsilonCantilever2);
+	EXPECT_NEAR(0.062971 * inchToMeter, getUy(7), epsilonCantilever2);
 }
 
 /// Generic algorithm to define the triangles in between 2 arrays of consecutive node indices:
@@ -344,7 +348,7 @@ void defineTriangleStrips(size_t beginIndex1, size_t beginIndex2, size_t number,
 /// \param [in,out] nodes The list of nodes in which the new nodes will be added
 /// \note The spacing between 2 consecutive nodes is constant equal to (L / 2.0 - radius) / 5.0
 void membranePlateWithSemiCircularHoleAddNodesForAngle(double angle, size_t numNodes, double L, double radius,
-													   std::vector<Vector3d>* nodes)
+		std::vector<Vector3d>* nodes)
 {
 	for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
 	{
@@ -507,16 +511,16 @@ TEST_F(Fem2DMechanicalValidationTests, MembranePlateWithSemiCircularHoleTest)
 		addTriangle(trianglesNodeIds[triangleId], youngModulus, poissonRatio, thickness);
 	}
 
-	addPunctualLoad( 5, Vector3d(0, -1.0 * kipToNewton, 0));
+	addPunctualLoad(5, Vector3d(0, -1.0 * kipToNewton, 0));
 	addPunctualLoad(11, Vector3d(0, -1.0 * kipToNewton, 0));
 	addPunctualLoad(18, Vector3d(0, -1.0 * kipToNewton, 0));
 	addPunctualLoad(25, Vector3d(0, -1.0 * kipToNewton, 0));
 
 	solve();
 
-	EXPECT_NEAR( 0.001545 * inchToMeter, getUx(0), epsilonPlateWithSemiCirculatHole);
+	EXPECT_NEAR(0.001545 * inchToMeter, getUx(0), epsilonPlateWithSemiCirculatHole);
 	EXPECT_NEAR(-0.003132 * inchToMeter, getUy(0), epsilonPlateWithSemiCirculatHole);
-	EXPECT_NEAR( 0.004213 * inchToMeter, getUx(5), epsilonPlateWithSemiCirculatHole);
+	EXPECT_NEAR(0.004213 * inchToMeter, getUx(5), epsilonPlateWithSemiCirculatHole);
 	EXPECT_NEAR(-0.003355 * inchToMeter, getUy(5), epsilonPlateWithSemiCirculatHole);
 }
 
@@ -556,9 +560,9 @@ TEST_F(Fem2DMechanicalValidationTests, PlateBendingSquarePlateMeshPatternATest)
 	const int numTriangles = 128;
 	std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(size_t Y = 0; Y < 8; Y++)
+	for (size_t Y = 0; Y < 8; Y++)
 	{
-		for(size_t X = 0; X < 8; X++)
+		for (size_t X = 0; X < 8; X++)
 		{
 			std::array<size_t, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + (X + 1)}};
 			trianglesNodeIds[triangleId++] = triangle1;
@@ -615,9 +619,9 @@ TEST_F(Fem2DMechanicalValidationTests, PlateBendingSquarePlateMeshPatternBTest)
 	const int numTriangles = 128;
 	std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(size_t Y = 0; Y < 8; Y++)
+	for (size_t Y = 0; Y < 8; Y++)
 	{
-		for(size_t X = 0; X < 8; X++)
+		for (size_t X = 0; X < 8; X++)
 		{
 			std::array<size_t, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle1;
@@ -665,9 +669,9 @@ TEST_F(Fem2DMechanicalValidationTests, CantileverPlateTest)
 	const int numTriangles = 128;
 	std::array<std::array<size_t, 3>, numTriangles> trianglesNodeIds;
 	size_t triangleId = 0;
-	for(size_t Y = 0; Y < 8; Y++)
+	for (size_t Y = 0; Y < 8; Y++)
 	{
-		for(size_t X = 0; X < 8; X++)
+		for (size_t X = 0; X < 8; X++)
 		{
 			std::array<size_t, 3> triangle1 = {{Y * 9 + X, Y * 9 + (X + 1), (Y + 1) * 9 + X}};
 			trianglesNodeIds[triangleId++] = triangle1;

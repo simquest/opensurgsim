@@ -49,9 +49,9 @@ class ConstraintTests : public ::testing::Test
 {
 protected:
 	/// Fixed plane pose
-	SurgSim::Math::RigidTransform3d m_poseFixed;
+	SurgSim::Math::UnalignedRigidTransform3d m_poseFixed;
 	/// Rigid sphere pose
-	SurgSim::Math::RigidTransform3d m_poseRigid;
+	SurgSim::Math::UnalignedRigidTransform3d m_poseRigid;
 	/// Contact normal direction
 	Vector3d m_n;
 	/// Distance to origin of the contact plane equation
@@ -221,8 +221,8 @@ TEST_F(ConstraintTests, SetActive)
 	m_n[1] = -1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
 	m_constraint = std::make_shared<Constraint>(type, m_constraintData,
-		m_fixed, m_locFixedPlane,
-		m_rigid, m_locRigidSphere);
+				   m_fixed, m_locFixedPlane,
+				   m_rigid, m_locRigidSphere);
 
 	EXPECT_TRUE(m_constraint->isActive());
 	m_constraint->setActive(false);
@@ -235,7 +235,7 @@ TEST_F(ConstraintTests, SetActive)
 // Constraint: (Sphere - Plane).n >= 0 with n=(0 1 0) The normal should be the contact normal on the 2nd object
 TEST_F(ConstraintTests, TestBuildMlcpSpherePlane)
 {
-	auto type =SurgSim::Physics::FRICTIONLESS_3DCONTACT;
+	auto type = SurgSim::Physics::FRICTIONLESS_3DCONTACT;
 	auto mlcptype = SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
 	m_n.setZero();
 	m_n[1] = 1.0;
@@ -271,9 +271,9 @@ TEST_F(ConstraintTests, TestBuildMlcpSpherePlane)
 	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
 
 	SurgSim::Math::Matrix H = m_mlcpPhysicsProblem.H;
-	EXPECT_NEAR(sign * m_dt * m_n[0] , H(0, 0), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[1] , H(0, 1), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[2] , H(0, 2), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[0], H(0, 0), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[1], H(0, 1), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[2], H(0, 2), epsilon);
 	EXPECT_NEAR(sign * m_dt * n_GP[0], H(0, 3), epsilon);
 	EXPECT_NEAR(sign * m_dt * n_GP[1], H(0, 4), epsilon);
 	EXPECT_NEAR(sign * m_dt * n_GP[2], H(0, 5), epsilon);
@@ -325,9 +325,9 @@ TEST_F(ConstraintTests, TestBuildMlcpPlaneSphere)
 	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
 
 	SurgSim::Math::Matrix h = m_mlcpPhysicsProblem.H;
-	EXPECT_NEAR(sign * m_dt * m_n[0] , h(0, 0), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[1] , h(0, 1), epsilon);
-	EXPECT_NEAR(sign * m_dt * m_n[2] , h(0, 2), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[0], h(0, 0), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[1], h(0, 1), epsilon);
+	EXPECT_NEAR(sign * m_dt * m_n[2], h(0, 2), epsilon);
 	EXPECT_NEAR(sign * m_dt * n_GP[0], h(0, 3), epsilon);
 	EXPECT_NEAR(sign * m_dt * n_GP[1], h(0, 4), epsilon);
 	EXPECT_NEAR(sign * m_dt * n_GP[2], h(0, 5), epsilon);

@@ -55,8 +55,7 @@ RigidRepresentation::~RigidRepresentation()
 }
 
 void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::Math::Vector6d& generalizedForce,
-		const SurgSim::Math::Matrix66d& K,
-		const SurgSim::Math::Matrix66d& D)
+		const SurgSim::Math::Matrix66d& K, const SurgSim::Math::Matrix66d& D)
 {
 	m_externalGeneralizedForce.unsafeGet() += generalizedForce;
 	m_externalGeneralizedStiffness += K;
@@ -112,15 +111,15 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 	Matrix33d dRdAxisZ;
 	Matrix33d dRdAngle =
 		-sinAngle * Matrix33d::Identity() + cosAngle * skewAxis + sinAngle * axis * axis.transpose();
-	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos * axis[1], oneMinusCos * axis[2],
-			 oneMinusCos * axis[1], 0.0, -sinAngle,
-			 oneMinusCos * axis[2], sinAngle, 0.0;
-	dRdAxisY << 0.0, oneMinusCos * axis[0], sinAngle,
-			 oneMinusCos * axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos * axis[2],
-			 -sinAngle, oneMinusCos * axis[2], 0.0;
-	dRdAxisZ << 0.0, -sinAngle, oneMinusCos * axis[0],
-			 sinAngle, 0.0, oneMinusCos * axis[1],
-			 oneMinusCos * axis[0], oneMinusCos * axis[1], oneMinusCos * 2.0 * axis[2];
+	dRdAxisX << oneMinusCos * 2.0 * axis[0], oneMinusCos* axis[1], oneMinusCos* axis[2],
+			 oneMinusCos* axis[1], 0.0, -sinAngle,
+			 oneMinusCos* axis[2], sinAngle, 0.0;
+	dRdAxisY << 0.0, oneMinusCos* axis[0], sinAngle,
+			 oneMinusCos* axis[0], oneMinusCos * 2.0 * axis[1], oneMinusCos* axis[2],
+			 -sinAngle, oneMinusCos* axis[2], 0.0;
+	dRdAxisZ << 0.0, -sinAngle, oneMinusCos* axis[0],
+			 sinAngle, 0.0, oneMinusCos* axis[1],
+			 oneMinusCos* axis[0], oneMinusCos* axis[1], oneMinusCos * 2.0 * axis[2];
 	Vector3d dAngledRotationVector, dAxisXdRotationVector, dAxisYdRotationVector, dAxisZdRotationVector;
 	if (std::abs(rotationVectorNorm) > rotationVectorEpsilon)
 	{
@@ -177,18 +176,18 @@ void RigidRepresentation::addExternalGeneralizedForce(const SurgSim::DataStructu
 	m_hasExternalGeneralizedForce = true;
 }
 
-SurgSim::DataStructures::BufferedValue<SurgSim::Math::Vector6d>&
+SurgSim::DataStructures::BufferedValue<SurgSim::Math::UnalignedVector6d>&
 RigidRepresentation::getExternalGeneralizedForce()
 {
 	return m_externalGeneralizedForce;
 }
 
-const SurgSim::Math::Matrix66d& RigidRepresentation::getExternalGeneralizedStiffness() const
+const SurgSim::Math::UnalignedMatrix66d& RigidRepresentation::getExternalGeneralizedStiffness() const
 {
 	return m_externalGeneralizedStiffness;
 }
 
-const SurgSim::Math::Matrix66d& RigidRepresentation::getExternalGeneralizedDamping() const
+const SurgSim::Math::UnalignedMatrix66d& RigidRepresentation::getExternalGeneralizedDamping() const
 {
 	return m_externalGeneralizedDamping;
 }
@@ -400,8 +399,7 @@ void RigidRepresentation::applyCorrection(double dt,
 	computeComplianceMatrix(dt);
 }
 
-const Eigen::Matrix <double, 6, 6, Eigen::RowMajor>&
-SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
+const SurgSim::Math::UnalignedMatrix66d& SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 {
 	return m_C;
 }

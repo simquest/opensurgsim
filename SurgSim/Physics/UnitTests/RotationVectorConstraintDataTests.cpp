@@ -29,7 +29,7 @@ using SurgSim::Physics::Fem1DRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RotationVectorRigidFem1DConstraintData;
 
-TEST (RotationVectorConstraintDataTests, TestSetGet)
+TEST(RotationVectorConstraintDataTests, TestSetGet)
 {
 	using SurgSim::Framework::AssertionFailure;
 
@@ -62,7 +62,8 @@ TEST (RotationVectorConstraintDataTests, TestSetGet)
 	elementData->poissonRatio = 0.35;
 	elementData->radius = 0.01;
 	elementData->youngModulus = 1e6;
-	fem1d->addFemElement(std::make_shared<SurgSim::Physics::Fem1DElementBeam>(elementData));
+	std::shared_ptr<SurgSim::Physics::Fem1DElementBeam> element(new SurgSim::Physics::Fem1DElementBeam(elementData));
+	fem1d->addFemElement(element);
 	fem1d->initialize(std::make_shared<SurgSim::Framework::Runtime>());
 	EXPECT_NO_THROW(rotationVectorConstraintData.setFem1DRotation(fem1d, 0));
 
