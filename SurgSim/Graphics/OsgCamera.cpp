@@ -149,9 +149,9 @@ OsgCamera::OsgCamera(const std::string& name) :
 	OsgRepresentation(name),
 	Camera(name),
 	m_camera(new osg::Camera()),
-	m_viewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("viewMatrix")),
-	m_inverseViewMatrixUniform(std::make_shared<OsgUniform<Matrix44f>>("inverseViewMatrix")),
-	m_ambientColorUniform(std::make_shared<OsgUniform<Vector4f>>("ambientColor")),
+	m_viewMatrixUniform(new OsgUniform<Matrix44f>("viewMatrix")),
+	m_inverseViewMatrixUniform(new OsgUniform<Matrix44f>("inverseViewMatrix")),
+	m_ambientColorUniform(new OsgUniform<Vector4f>("ambientColor")),
 	m_isMainCamera(false)
 {
 	m_switch->removeChildren(0, m_switch->getNumChildren());
@@ -202,7 +202,7 @@ bool OsgCamera::setRenderGroups(const std::vector<std::shared_ptr<Group>>& group
 		std::vector<std::string> groupReferences = Camera::getRenderGroupReferences();
 		SURGSIM_ASSERT(std::find(groupReferences.begin(), groupReferences.end(),
 								 group->getName()) != groupReferences.end())
-			<< "Trying to set the wrong group in the camera with group name <" << group->getName() << ">.";
+				<< "Trying to set the wrong group in the camera with group name <" << group->getName() << ">.";
 
 		std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 		if (osgGroup)
@@ -243,7 +243,7 @@ void OsgCamera::setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
 	m_camera->setProjectionMatrix(toOsg(matrix));
 }
 
-const SurgSim::Math::Matrix44d& OsgCamera::getProjectionMatrix() const
+const SurgSim::Math::UnalignedMatrix44d& OsgCamera::getProjectionMatrix() const
 {
 	return m_projectionMatrix;
 }
@@ -388,7 +388,7 @@ void OsgCamera::setViewportSize(std::array<double, 2> dimensions)
 	{
 		double aspectRatioChange = (dimensions[0] / viewPort->width()) / (dimensions[1] / viewPort->height());
 		m_camera->setViewport(viewPort->x(), viewPort->y(), dimensions[0], dimensions[1]);
-		m_camera->getProjectionMatrix() *= osg::Matrix::scale(1.0 / aspectRatioChange, aspectRatioChange,1.0);
+		m_camera->getProjectionMatrix() *= osg::Matrix::scale(1.0 / aspectRatioChange, aspectRatioChange, 1.0);
 		m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 	}
 	else
@@ -496,13 +496,13 @@ SurgSim::Math::Matrix44d OsgCamera::getInverseViewMatrix() const
 	return getPose().matrix();
 }
 
-void OsgCamera::setAmbientColor(const SurgSim::Math::Vector4d& color)
+void OsgCamera::setAmbientColor(const SurgSim::Math::UnalignedVector4d& color)
 {
 	m_ambientColor = color;
 	m_ambientColorUniform->set(color.cast<float>());
 }
 
-SurgSim::Math::Vector4d OsgCamera::getAmbientColor()
+SurgSim::Math::UnalignedVector4d OsgCamera::getAmbientColor()
 {
 	return m_ambientColor;
 }

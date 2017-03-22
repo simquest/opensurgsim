@@ -26,20 +26,20 @@ namespace Graphics
 Camera::Camera(const std::string& name) : Representation(name)
 {
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::Matrix44d, ProjectionMatrix,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44d, ProjectionMatrix,
 									  getProjectionMatrix, setProjectionMatrix);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, std::vector<std::string>, RenderGroupReferences,
 									  getRenderGroupReferences, setRenderGroupReferences);
 	SURGSIM_ADD_SETTER(Camera, std::string, RenderGroupReference, setRenderGroupReference);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::Vector4d, AmbientColor,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, SurgSim::Math::UnalignedVector4d, AmbientColor,
 									  getAmbientColor, setAmbientColor);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, bool, MainCamera, isMainCamera, setMainCamera);
 
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44d, ViewMatrix, getViewMatrix);
-	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatViewMatrix, getViewMatrix);
-	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatProjectionMatrix, getProjectionMatrix);
-	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatInverseViewMatrix, getInverseViewMatrix);
-	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, FloatInverseProjectionMatrix, getInverseProjectionMatrix);
+	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44f, FloatViewMatrix, getViewMatrix);
+	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44f, FloatProjectionMatrix, getProjectionMatrix);
+	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44f, FloatInverseViewMatrix, getInverseViewMatrix);
+	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44f, FloatInverseProjectionMatrix, getInverseProjectionMatrix);
 
 	{
 		typedef std::array<double, 2> ParamType;

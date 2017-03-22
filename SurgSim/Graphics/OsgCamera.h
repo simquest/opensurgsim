@@ -75,7 +75,7 @@ public:
 
 	void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) override;
 
-	const SurgSim::Math::Matrix44d& getProjectionMatrix() const override;
+	const SurgSim::Math::UnalignedMatrix44d& getProjectionMatrix() const override;
 
 	SurgSim::Math::Matrix44d getInverseProjectionMatrix() const override;
 
@@ -99,9 +99,9 @@ public:
 
 	void setRenderOrder(RenderOrder order, int value) override;
 
-	void setAmbientColor(const SurgSim::Math::Vector4d& color) override;
+	void setAmbientColor(const SurgSim::Math::UnalignedVector4d& color) override;
 
-	SurgSim::Math::Vector4d getAmbientColor() override;
+	SurgSim::Math::UnalignedVector4d getAmbientColor() override;
 
 	void setGenerateTangents(bool value) override;
 
@@ -130,7 +130,7 @@ private:
 	osg::ref_ptr<osg::Camera> m_camera;
 
 	/// Projection matrix of the camera
-	SurgSim::Math::Matrix44d m_projectionMatrix;
+	SurgSim::Math::UnalignedMatrix44d m_projectionMatrix;
 
 	std::unordered_map<int, std::shared_ptr<Texture>> m_textureMap;
 	std::shared_ptr<RenderTarget> m_renderTarget;
@@ -153,7 +153,7 @@ private:
 	std::shared_ptr<OsgUniform<SurgSim::Math::Vector4f>> m_ambientColorUniform;
 
 	/// Value for ambient color
-	SurgSim::Math::Vector4d m_ambientColor;
+	SurgSim::Math::UnalignedVector4d m_ambientColor;
 
 	bool m_isMainCamera;
 };

@@ -49,15 +49,17 @@ struct SurgSim::Graphics::BoneData
 	osg::ref_ptr<osgAnimation::Bone> osgBone;
 	osg::ref_ptr<osgAnimation::StackedQuaternionElement> osgRotation;
 	osg::ref_ptr<osgAnimation::StackedTranslateElement> osgTranslation;
-	SurgSim::Math::RigidTransform3d neutralPose;
-	SurgSim::Math::RigidTransform3d pose;
+	SurgSim::Math::UnalignedRigidTransform3d neutralPose;
+	SurgSim::Math::UnalignedRigidTransform3d pose;
+
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
 	BoneData() :
 		osgBone(nullptr),
 		osgRotation(nullptr),
 		osgTranslation(nullptr),
-		neutralPose(SurgSim::Math::RigidTransform3d::Identity()),
-		pose(SurgSim::Math::RigidTransform3d::Identity())
+		neutralPose(SurgSim::Math::UnalignedRigidTransform3d::Identity()),
+		pose(SurgSim::Math::UnalignedRigidTransform3d::Identity())
 	{
 	}
 };
@@ -302,7 +304,7 @@ SurgSim::Math::RigidTransform3d OsgSkeletonRepresentation::getNeutralBonePose(co
 	return std::move(pose);
 }
 
-void OsgSkeletonRepresentation::setNeutralBonePoses(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poses)
+void OsgSkeletonRepresentation::setNeutralBonePoses(const std::map<std::string, SurgSim::Math::UnalignedRigidTransform3d>& poses)
 {
 	for (auto& pose : poses)
 	{
@@ -310,16 +312,16 @@ void OsgSkeletonRepresentation::setNeutralBonePoses(const std::map<std::string, 
 	}
 }
 
-std::map<std::string, SurgSim::Math::RigidTransform3d> OsgSkeletonRepresentation::getNeutralBonePoses() const
+std::map<std::string, SurgSim::Math::UnalignedRigidTransform3d> OsgSkeletonRepresentation::getNeutralBonePoses() const 
 {
-	std::map<std::string, SurgSim::Math::RigidTransform3d> neutralBonePoses;
+	std::map<std::string, SurgSim::Math::UnalignedRigidTransform3d> neutralBonePoses;
 	boost::shared_lock<boost::shared_mutex> lock(m_mutex);
 
 	for (auto& bone : *m_bones)
 	{
 		neutralBonePoses[bone.first] = bone.second.neutralPose;
 	}
-	return std::move(neutralBonePoses);
+	return neutralBonePoses;
 }
 
 void OsgSkeletonRepresentation::doUpdate(double dt)

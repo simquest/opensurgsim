@@ -190,7 +190,7 @@ bool OsgCurveRepresentation::isAntiAliasing() const
 	return m_geometry->getOrCreateStateSet()->getMode(GL_BLEND) == osg::StateAttribute::ON;
 }
 
-void OsgCurveRepresentation::setColor(const SurgSim::Math::Vector4d& color)
+void OsgCurveRepresentation::setColor(const SurgSim::Math::UnalignedVector4d& color)
 {
 	osg::Vec4Array* colors = dynamic_cast<osg::Vec4Array*>(m_geometry->getColorArray());
 	if (colors == nullptr)
@@ -203,7 +203,7 @@ void OsgCurveRepresentation::setColor(const SurgSim::Math::Vector4d& color)
 	m_color = color;
 }
 
-Math::Vector4d OsgCurveRepresentation::getColor() const
+SurgSim::Math::UnalignedVector4d OsgCurveRepresentation::getColor() const
 {
 	return m_color;
 }

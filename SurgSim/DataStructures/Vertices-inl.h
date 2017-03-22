@@ -114,13 +114,13 @@ typename Vertices<VertexData>::VertexType& Vertices<VertexData>::getVertex(size_
 }
 
 template <class VertexData>
-const std::vector<typename Vertices<VertexData>::VertexType>& Vertices<VertexData>::getVertices() const
+const typename Vertices<VertexData>::VerticesType& Vertices<VertexData>::getVertices() const
 {
 	return m_vertices;
 }
 
 template <class VertexData>
-std::vector<typename Vertices<VertexData>::VertexType>& Vertices<VertexData>::getVertices()
+typename Vertices<VertexData>::VerticesType& Vertices<VertexData>::getVertices()
 {
 	return m_vertices;
 }

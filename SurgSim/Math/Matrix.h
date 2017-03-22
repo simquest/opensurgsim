@@ -24,6 +24,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/LU> 		// needed for determinant() and inverse()
+#include <Eigen/StdVector>
 
 namespace SurgSim
 {
@@ -246,5 +247,11 @@ void zeroColumn(size_t column, Eigen::DenseBase<Derived>* matrix)
 
 };  // namespace Math
 };  // namespace SurgSim
+
+	// Only do the ones that are important (i.e. no float vectors for now)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Matrix44d);
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Matrix44f);
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Matrix22d);
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Matrix22f);
 
 #endif  // SURGSIM_MATH_MATRIX_H

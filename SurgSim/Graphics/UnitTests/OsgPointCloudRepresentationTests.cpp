@@ -27,6 +27,7 @@ using SurgSim::Graphics::PointCloudRepresentation;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
+using SurgSim::Math::UnalignedVector4d;
 
 namespace
 {
@@ -92,7 +93,7 @@ TEST(OsgPointCloudRepresentationTests, SerializationTest)
 	auto pointCloud = std::make_shared<OsgPointCloudRepresentation>("TestPointCloud");
 
 	double pointSize = 1.234;
-	Vector4d color = Vector4d(1.0, 2.0, 3.0, 4.0);
+	UnalignedVector4d color = UnalignedVector4d(1.0, 2.0, 3.0, 4.0);
 
 	pointCloud->setValue("PointSize", pointSize);
 	pointCloud->setValue("Color", color);
@@ -110,7 +111,7 @@ TEST(OsgPointCloudRepresentationTests, SerializationTest)
 
 	EXPECT_EQ("SurgSim::Graphics::OsgPointCloudRepresentation", newOsgPointCloud->getClassName());
 	EXPECT_NEAR(pointSize, newOsgPointCloud->getValue<double>("PointSize"), epsilon);
-	EXPECT_TRUE(color.isApprox(newOsgPointCloud->getValue<Vector4d>("Color")));
+	EXPECT_TRUE(color.isApprox(newOsgPointCloud->getValue<UnalignedVector4d>("Color")));
 }
 
 }; // namespace Graphics

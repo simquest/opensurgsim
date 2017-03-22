@@ -28,7 +28,7 @@ CurveRepresentation::CurveRepresentation(const std::string& name) : Representati
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, size_t, Subdivisions, getSubdivisions, setSubdivisions);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, double, Tension, getTension, setTension);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, Math::Vector4d, Color, getColor, setColor);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, Math::UnalignedVector4d, Color, getColor, setColor);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, double, Width, getWidth, setWidth);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(CurveRepresentation, bool, AntiAliasing, isAntiAliasing, setAntiAliasing);
 

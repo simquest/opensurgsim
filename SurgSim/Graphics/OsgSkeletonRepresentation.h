@@ -78,9 +78,9 @@ public:
 	SurgSim::Math::RigidTransform3d getNeutralBonePose(const std::string& name) const override;
 
 protected:
-	void setNeutralBonePoses(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poses) override;
+	void setNeutralBonePoses(const std::map<std::string, SurgSim::Math::UnalignedRigidTransform3d>& poses) override;
 
-	std::map<std::string, SurgSim::Math::RigidTransform3d> getNeutralBonePoses() const override;
+	std::map<std::string, SurgSim::Math::UnalignedRigidTransform3d> getNeutralBonePoses() const override;
 
 	void doUpdate(double dt) override;
 

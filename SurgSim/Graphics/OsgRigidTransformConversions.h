@@ -51,6 +51,13 @@ inline std::pair<osg::Quat, osg::Vec3d> toOsg(const SurgSim::Math::RigidTransfor
 	return std::make_pair(toOsg(normalizedQuaternion), toOsg(SurgSim::Math::Vector3d(transform.translation())));
 }
 
+/// Convert 3D rigid body (isometric) transform, represented as doubles, to OSG
+inline std::pair<osg::Quat, osg::Vec3d> toOsg(const SurgSim::Math::UnalignedRigidTransform3d& transform)
+{
+	SurgSim::Math::Quaterniond normalizedQuaternion = SurgSim::Math::Quaterniond(transform.linear()).normalized();
+	return std::make_pair(toOsg(normalizedQuaternion), toOsg(SurgSim::Math::Vector3d(transform.translation())));
+}
+
 /// Convert from OSG to 3D rigid body (isometric) transform, represented as floats
 inline SurgSim::Math::RigidTransform3f fromOsg(const osg::Quat& rotation, const osg::Vec3f& translation)
 {

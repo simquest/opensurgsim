@@ -69,9 +69,9 @@ public:
 
 	double getTension() const override;
 
-	void setColor(const SurgSim::Math::Vector4d& color) override;
+	void setColor(const SurgSim::Math::UnalignedVector4d& color) override;
 
-	Math::Vector4d getColor() const override;
+	Math::UnalignedVector4d getColor() const override;
 
 	void setWidth(double width) override;
 
@@ -97,7 +97,7 @@ private:
 
 	/// @{
 	/// Members for the CurveRepresentation properties
-	Math::Vector4d m_color;
+	Math::UnalignedVector4d m_color;
 	size_t m_subdivision;
 	double m_tension;
 	double m_width;

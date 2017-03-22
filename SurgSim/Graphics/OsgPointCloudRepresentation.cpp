@@ -130,7 +130,7 @@ double OsgPointCloudRepresentation::getPointSize() const
 	return static_cast<double>(m_point->getSize());
 }
 
-void OsgPointCloudRepresentation::setColor(const SurgSim::Math::Vector4d& color)
+void OsgPointCloudRepresentation::setColor(const SurgSim::Math::UnalignedVector4d& color)
 {
 	// Set the color of the particles to one single color by default
 	osg::Vec4Array* colors = dynamic_cast<osg::Vec4Array*>(m_geometry->getColorArray());
@@ -144,7 +144,7 @@ void OsgPointCloudRepresentation::setColor(const SurgSim::Math::Vector4d& color)
 	m_color = color;
 }
 
-SurgSim::Math::Vector4d OsgPointCloudRepresentation::getColor() const
+SurgSim::Math::UnalignedVector4d OsgPointCloudRepresentation::getColor() const
 {
 	return m_color;
 }

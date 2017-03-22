@@ -71,7 +71,7 @@ public:
 	void updateVectorField(const VectorField& vectorfield) override;
 
 private:
-	void privateUpdate(const std::vector<DataStructures::Vertex<VectorFieldData>>& vertices);
+	void privateUpdate(const VectorField::VerticesType& vertices);
 
 	/// Vector Field holds a list of vertices/points (X,Y,Z) in 3D space
 	/// Each point is associated with a vector and an optional color

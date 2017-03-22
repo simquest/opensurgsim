@@ -93,7 +93,7 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 	}
 }
 
-void OsgVectorFieldRepresentation::privateUpdate(const std::vector<DataStructures::Vertex<VectorFieldData>>& vertices)
+void OsgVectorFieldRepresentation::privateUpdate(const VectorField::VerticesType& vertices)
 {
 	size_t count = vertices.size();
 

@@ -60,9 +60,9 @@ TEST(OsgCurveRepresentationTests, SetterGettersProperties)
 	EXPECT_EQ(subdivisions, curve->getValue<size_t>("Subdivisions"));
 	EXPECT_EQ(subdivisions, curve->getSubdivisions());
 
-	Math::Vector4d color(4.0, 3.0, 2.0, 1.0);
+	Math::UnalignedVector4d color(4.0, 3.0, 2.0, 1.0);
 	curve->setValue("Color", color);
-	EXPECT_TRUE(color.isApprox(curve->getValue<Math::Vector4d>("Color")));
+	EXPECT_TRUE(color.isApprox(curve->getValue<Math::UnalignedVector4d>("Color")));
 	EXPECT_TRUE(color.isApprox(curve->getColor()));
 }
 

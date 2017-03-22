@@ -25,6 +25,8 @@
 
 #include <random>
 
+#include <boost/align/aligned_allocator.hpp>
+
 using SurgSim::Math::Vector2f;
 using SurgSim::Math::Vector3f;
 using SurgSim::Math::Vector4f;
@@ -56,8 +58,8 @@ namespace Graphics
 template <class Type, class OsgType>
 std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 {
-	std::shared_ptr<OsgUniform<Type>> osgUniform =
-									   std::make_shared<OsgUniform<Type>>("test name");
+	
+	std::shared_ptr<OsgUniform<Type>> osgUniform(new OsgUniform<Type>("test name"));
 	std::shared_ptr<OsgUniformBase> osgUniformBase = osgUniform;
 	std::shared_ptr<Uniform<Type>> uniform = osgUniform;
 	std::shared_ptr<UniformBase> uniformBase = osgUniform;
@@ -76,7 +78,7 @@ std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 template <class Type>
 std::pair<Type, boost::any> testAccessible(const Type& value)
 {
-	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+	std::shared_ptr<OsgUniform<Type>> osgUniform(new OsgUniform<Type>("test name"));
 
 	osgUniform->setValue("Value", value);
 
@@ -87,7 +89,7 @@ template <class Type>
 Type testYamlSetter(const Type& value)
 {
 	YAML::Node node = YAML::convert<Type>::encode(value);
-	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+	std::shared_ptr<OsgUniform<Type>> osgUniform(new OsgUniform<Type>("test name"));
 	osgUniform->set(node);
 	return osgUniform->get();
 }
@@ -95,8 +97,7 @@ Type testYamlSetter(const Type& value)
 template <class Type>
 Type testEncodeDecode(const Type& value)
 {
-
-	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+	std::shared_ptr<OsgUniform<Type>> osgUniform(new OsgUniform<Type>("test name"));
 	osgUniform->set(value);
 	std::shared_ptr<OsgUniformBase> base = osgUniform;
 

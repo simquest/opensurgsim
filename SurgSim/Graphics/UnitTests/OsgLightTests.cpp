@@ -178,8 +178,8 @@ TEST_F(OsgLightTests, Serialization)
 		"SurgSim::Graphics::OsgLight",
 		"light"));
 
-	SurgSim::Math::Vector4d diffuse(0.1, 0.2, 0.3, 0.4);
-	SurgSim::Math::Vector4d specular(0.4, 0.3, 0.2, 0.1);
+	SurgSim::Math::UnalignedVector4d diffuse(0.1, 0.2, 0.3, 0.4);
+	SurgSim::Math::UnalignedVector4d specular(0.4, 0.3, 0.2, 0.1);
 	double constant = 0.1;
 	double linear = 0.2;
 	double quadratic = 0.3;
@@ -198,8 +198,8 @@ TEST_F(OsgLightTests, Serialization)
 					node.as<std::shared_ptr<OsgLight>>());
 
 	EXPECT_NE(nullptr, decode);
-	EXPECT_TRUE(diffuse.isApprox(decode->getValue<SurgSim::Math::Vector4d>("DiffuseColor")));
-	EXPECT_TRUE(specular.isApprox(decode->getValue<SurgSim::Math::Vector4d>("SpecularColor")));
+	EXPECT_TRUE(diffuse.isApprox(decode->getValue<SurgSim::Math::UnalignedVector4d>("DiffuseColor")));
+	EXPECT_TRUE(specular.isApprox(decode->getValue<SurgSim::Math::UnalignedVector4d>("SpecularColor")));
 	EXPECT_NEAR(constant, decode->getValue<double>("ConstantAttenuation"), 1e-9);
 	EXPECT_NEAR(linear, decode->getValue<double>("LinearAttenuation"), 1e-9);
 	EXPECT_NEAR(quadratic, decode->getValue<double>("QuadraticAttenuation"), 1e-9);
