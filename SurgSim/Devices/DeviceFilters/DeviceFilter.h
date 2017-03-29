@@ -42,6 +42,8 @@ public:
 	/// \param name	Name of this device filter.
 	explicit DeviceFilter(const std::string& name);
 
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
 	SURGSIM_CLASSNAME(SurgSim::Devices::DeviceFilter);
 
 	bool initialize() override;
