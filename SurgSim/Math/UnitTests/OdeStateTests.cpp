@@ -231,27 +231,57 @@ TEST(OdeStateTest, AddGetSetBoundaryConditionsStaticDofTest)
 	OdeState state;
 	std::vector<std::pair<size_t, double>> expected;
 
-	// Assert trying to add a boundary condition before setting the number of node and dof per node
-	ASSERT_THROW(state.addBoundaryConditionStaticDof(0u, 0.1), SurgSim::Framework::AssertionFailure);
+	{
+		SCOPED_TRACE("Testing OdeState::setNumDof hasn't been called prior to adding a boundary condition");
+
+		// Assert trying to add/set boundary condition before setting the number of node and dof per node
+		ASSERT_THROW(state.addBoundaryConditionStaticDof(0u, 0.1), SurgSim::Framework::AssertionFailure);
+		ASSERT_THROW(state.setBoundaryConditionsStaticDof(expected), SurgSim::Framework::AssertionFailure);
+	}
 
 	state.setNumDof(3u, 2u); // Number of dof per node is 3
 
-	SCOPED_TRACE("Testing addBoundaryConditionStaticDof(size_t nodeId, double value)");
+	{
+		SCOPED_TRACE("Testing addBoundaryConditionStaticDof(size_t nodeId, double value)");
 
-	state.addBoundaryConditionStaticDof(0u, 0.1);
-	expected.push_back(std::make_pair(0u, 0.1)); // (node 0, value 0.1)
-	testBoundaryConditionsStaticDof(state, expected);
+		state.addBoundaryConditionStaticDof(0u, 0.1);
+		expected.push_back(std::make_pair(0u, 0.1)); // (node 0, value 0.1)
+		testBoundaryConditionsStaticDof(state, expected);
 
-	state.addBoundaryConditionStaticDof(1u, 2.6);
-	expected.push_back(std::make_pair(1u, 2.6)); // (node 1, value 2.6)
-	testBoundaryConditionsStaticDof(state, expected);
+		state.addBoundaryConditionStaticDof(1u, 2.6);
+		expected.push_back(std::make_pair(1u, 2.6)); // (node 1, value 2.6)
+		testBoundaryConditionsStaticDof(state, expected);
+	}
 
-	state.changeBoundaryConditionStaticDof(0u, 5.4);
-	expected.front().second = 5.4; // (node 0, value 5.4)
-	testBoundaryConditionsStaticDof(state, expected);
+	{
+		SCOPED_TRACE("Testing addBoundaryConditionStaticDof(size_t nodeId, double value)");
 
-	// Assert on wrong nodeId
-	ASSERT_THROW(state.addBoundaryConditionStaticDof(3u, 0.0), SurgSim::Framework::AssertionFailure);
+		state.changeBoundaryConditionStaticDof(0u, 5.4);
+		expected.front().second = 5.4; // (node 0, value 5.4)
+		testBoundaryConditionsStaticDof(state, expected);
+	}
+
+	{
+		SCOPED_TRACE("Testing addBoundaryConditionStaticDof(size_t nodeId, double value) with invalid nodeId");
+
+		// Assert on wrong nodeId
+		ASSERT_THROW(state.addBoundaryConditionStaticDof(3u, 0.0), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("Testing setBoundaryConditionsStaticDof(vector<pair<size_t, double>>)");
+
+		expected.push_back(std::make_pair(1u, 1.4)); // (node 1, value 1.4)
+		expected.push_back(std::make_pair(0u, 0.9)); // (node 0, value 0.9)
+		state.setBoundaryConditionsStaticDof(expected);
+		testBoundaryConditionsStaticDof(state, expected);
+	}
+
+	{
+		SCOPED_TRACE("Testing setBoundaryConditionsStaticDof(vector<pair<size_t, double>>) with an invalid nodeId");
+		expected.push_back(std::make_pair(3u, 0.0)); // (node 3, value 0.0)
+		ASSERT_THROW(state.setBoundaryConditionsStaticDof(expected), SurgSim::Framework::AssertionFailure);
+	}
 }
 
 TEST(OdeStateTest, ResetTest)

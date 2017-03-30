@@ -13,23 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Fem3DRepresentationTests.cpp
-/// This file tests the non-abstract functionalities of the base class fem3DRepresentation
+/// \file Fem3DCorotationalTetrahedronRepresentationTests.cpp
+/// This file tests the functionalities of the Fem3DCorotationalTetrahedronRepresentation class
 
 #include <gtest/gtest.h>
 
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/ApplicationData.h"
-#include "SurgSim/Framework/Runtime.h" ///< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Framework/Runtime.h" ///< Used to initialize the Component Fem3DCorotationalTetrahedronRepresentation
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
-#include "SurgSim/Physics/Fem3DElementTetrahedron.h"
+#include "SurgSim/Physics/Fem3DElementCorotationalTetrahedron.h"
 #include "SurgSim/Physics/Fem3DLocalization.h"
-#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/Fem3DCorotationalTetrahedronRepresentation.h"
 #include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
@@ -38,7 +38,7 @@ namespace SurgSim
 namespace Physics
 {
 
-class Fem3DRepresentationTests : public ::testing::Test
+class Fem3DCorotationalTetrahedronRepresentationTests : public ::testing::Test
 {
 public:
 	void SetUp() override
@@ -48,7 +48,7 @@ public:
 
 	void createFem()
 	{
-		m_fem = std::make_shared<Fem3DRepresentation>("Fem3d");
+		m_fem = std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Fem3d");
 
 		m_initialState = std::make_shared<SurgSim::Math::OdeState>();
 		m_initialState->setNumDof(m_fem->getNumDofPerNode(), m_numNodes);
@@ -64,7 +64,8 @@ public:
 	void addFemElement()
 	{
 		std::array<size_t, 4> elementNodeIds = {{0, 1, 2, 3}};
-		std::shared_ptr<Fem3DElementTetrahedron> element(new Fem3DElementTetrahedron(elementNodeIds));
+		std::shared_ptr<Fem3DElementCorotationalTetrahedron> element =
+				std::make_shared<Fem3DElementCorotationalTetrahedron>(elementNodeIds);
 		element->setYoungModulus(1e9);
 		element->setPoissonRatio(0.45);
 		element->setMassDensity(1000.0);
@@ -85,25 +86,26 @@ public:
 
 protected:
 	size_t m_numNodes;
-	std::shared_ptr<Fem3DRepresentation> m_fem;
+	std::shared_ptr<Fem3DCorotationalTetrahedronRepresentation> m_fem;
 	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
-	SurgSim::Math::UnalignedRigidTransform3d m_initialPose;
+	SurgSim::Math::RigidTransform3d m_initialPose;
 	std::shared_ptr<Fem3DLocalization> m_localization;
 	std::shared_ptr<MockLocalization> m_wrongLocalizationType;
 };
 
-TEST_F(Fem3DRepresentationTests, ConstructorTest)
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, ConstructorTest)
 {
-	ASSERT_NO_THROW(std::shared_ptr<Fem3DRepresentation> fem = std::make_shared<Fem3DRepresentation>("Fem3D"));
+	ASSERT_NO_THROW(std::shared_ptr<Fem3DCorotationalTetrahedronRepresentation> fem =
+							std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Fem3D"));
 }
 
-TEST_F(Fem3DRepresentationTests, GetNumDofPerNodeTest)
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, GetNumDofPerNodeTest)
 {
 	createFem();
 	EXPECT_EQ(3u, m_fem->getNumDofPerNode());
 }
 
-TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, TransformInitialStateTest)
 {
 	using SurgSim::Math::Vector;
 
@@ -129,7 +131,7 @@ TEST_F(Fem3DRepresentationTests, TransformInitialStateTest)
 	EXPECT_TRUE(m_fem->getInitialState()->getVelocities().isApprox(expectedV));
 }
 
-TEST_F(Fem3DRepresentationTests, DoInitializeTest)
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, DoInitializeTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	{
@@ -169,7 +171,7 @@ TEST_F(Fem3DRepresentationTests, DoInitializeTest)
 	}
 }
 
-TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, CreateLocalizationTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	ASSERT_NO_THROW(createFem());
@@ -217,10 +219,10 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		{
 			SurgSim::DataStructures::IndexedLocalCoordinate triangleLocalPosition(triangleId, *barycentricCoordinate);
 			SurgSim::DataStructures::Location location(triangleLocalPosition,
-					SurgSim::DataStructures::Location::TRIANGLE);
+				SurgSim::DataStructures::Location::TRIANGLE);
 			std::shared_ptr<SurgSim::Physics::Fem3DLocalization> localization;
 			EXPECT_NO_THROW(localization =
-								std::dynamic_pointer_cast<SurgSim::Physics::Fem3DLocalization>(m_fem->createLocalization(location)););
+				std::dynamic_pointer_cast<SurgSim::Physics::Fem3DLocalization>(m_fem->createLocalization(location)););
 			EXPECT_TRUE(localization != nullptr);
 			EXPECT_TRUE(localization->getRepresentation() == m_fem);
 
@@ -250,8 +252,8 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		SurgSim::DataStructures::Location location(0);
 		std::shared_ptr<SurgSim::Physics::Fem3DLocalization> localization;
 		EXPECT_NO_THROW(localization =
-							std::dynamic_pointer_cast<SurgSim::Physics::Fem3DLocalization>(
-								m_fem->createLocalization(location)););
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DLocalization>(
+			m_fem->createLocalization(location)););
 		EXPECT_TRUE(localization != nullptr);
 		EXPECT_TRUE(localization->getRepresentation() == m_fem);
 
@@ -306,7 +308,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
 		std::shared_ptr<SurgSim::Physics::Fem3DLocalization> localization;
 		EXPECT_NO_THROW(localization =
-							std::dynamic_pointer_cast<SurgSim::Physics::Fem3DLocalization>(m_fem->createLocalization(location)));
+			std::dynamic_pointer_cast<SurgSim::Physics::Fem3DLocalization>(m_fem->createLocalization(location)));
 		EXPECT_TRUE(localization != nullptr);
 		EXPECT_TRUE(localization->getRepresentation() == m_fem);
 
@@ -321,7 +323,7 @@ TEST_F(Fem3DRepresentationTests, CreateLocalizationTest)
 	}
 }
 
-TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, ExternalForceAPITest)
 {
 	createFem();
 
@@ -406,9 +408,9 @@ TEST_F(Fem3DRepresentationTests, ExternalForceAPITest)
 	EXPECT_TRUE(m_fem->getExternalGeneralizedDamping().isApprox(2.0 * D));
 }
 
-TEST_F(Fem3DRepresentationTests, LoadMeshTest)
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, LoadMeshTest)
 {
-	auto fem = std::make_shared<Fem3DRepresentation>("Representation");
+	auto fem = std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Representation");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
 	fem->loadFem("PlyReaderTests/Tetrahedron.ply");
@@ -461,28 +463,210 @@ TEST_F(Fem3DRepresentationTests, LoadMeshTest)
 	EXPECT_DOUBLE_EQ(1750000000, fem8->getYoungModulus());
 }
 
-TEST_F(Fem3DRepresentationTests, SerializationTest)
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, SerializationTest)
 {
-	auto fem3DRepresentation = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("Test-Fem3D");
+	auto fem = std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Test-Fem3D");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	const std::string filename = "PlyReaderTests/Fem3DCube.ply";
-	fem3DRepresentation->loadFem(filename);
+	const std::string filename = "PlyReaderTests/Tetrahedron.ply";
+	fem->loadFem(filename);
 	auto collisionRepresentation = std::make_shared<DeformableCollisionRepresentation>("Collision");
-	fem3DRepresentation->setCollisionRepresentation(collisionRepresentation);
+	fem->setCollisionRepresentation(collisionRepresentation);
 
 	YAML::Node node;
-	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*fem3DRepresentation));
+	ASSERT_NO_THROW(node = YAML::convert<SurgSim::Framework::Component>::encode(*fem));
 	EXPECT_TRUE(node.IsMap());
 	EXPECT_EQ(1u, node.size());
 
-	std::shared_ptr<Fem3DRepresentation> newRepresentation;
-	ASSERT_NO_THROW(newRepresentation = std::dynamic_pointer_cast<Fem3DRepresentation>(
+	std::shared_ptr<Fem3DCorotationalTetrahedronRepresentation> newRepresentation;
+	ASSERT_NO_THROW(newRepresentation = std::dynamic_pointer_cast<Fem3DCorotationalTetrahedronRepresentation>(
 											node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	ASSERT_NE(nullptr, newRepresentation);
 
-	EXPECT_EQ("SurgSim::Physics::Fem3DRepresentation", newRepresentation->getClassName());
+	EXPECT_EQ("SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation", newRepresentation->getClassName());
 	EXPECT_EQ(filename, newRepresentation->getFem()->getValue<std::string>("FileName"));
 }
+
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, FemElementTypeTest)
+{
+	auto fem = std::make_shared<SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation>("Test-Fem3D");
+	EXPECT_ANY_THROW(fem->setFemElementType("NotAnFem3D"));
+	EXPECT_ANY_THROW(fem->setFemElementType("SurgSim::Physics::Fem3DElementTetrahedron"));
+	EXPECT_NO_THROW(fem->setFemElementType("SurgSim::Physics::Fem3DElementCorotationalTetrahedron"));
+}
+
+TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	// Single tetrahedron
+	{
+		SCOPED_TRACE("A single tetrahedron");
+
+		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("SingleTet");
+		const std::string filename = "singleTet.ply";
+		fem->loadFem(filename);
+
+		fem->initialize(runtime);
+		fem->wakeUp();
+
+		{
+			SCOPED_TRACE("Prior to any update, the relative rotation should be identity");
+			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+			{
+				auto transform = fem->getTransformation(i);
+				EXPECT_TRUE(transform.isIdentity());
+			}
+		}
+
+		for (size_t i = 0; i < 50; i++)
+		{
+			fem->update(0.001);
+		}
+
+		{
+			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+			{
+				auto transform = fem->getTransformation(i);
+				EXPECT_FALSE(transform.isIdentity());
+			}
+		}
+
+		auto rotation = std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
+				getRotationMatrix();
+		for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+		{
+			auto transform = fem->getTransformation(i);
+			EXPECT_TRUE(transform.isApprox(rotation));
+		}
+	}
+
+	// Node shared with 2 tets
+	{
+		SCOPED_TRACE("Two tetrahedrons with a singe shared node");
+
+		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("SharedNodeTet");
+		const std::string filename = "sharedTet.ply";
+		fem->loadFem(filename);
+
+		fem->initialize(runtime);
+		fem->wakeUp();
+
+		{
+			SCOPED_TRACE("Prior to any update, the relative rotation should be identity");
+			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+			{
+				auto transform = fem->getTransformation(i);
+				EXPECT_TRUE(transform.isIdentity());
+			}
+		}
+
+		for (size_t i = 0; i < 50; i++)
+		{
+			fem->update(0.001);
+		}
+
+		{
+			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+			{
+				auto transform = fem->getTransformation(i);
+				EXPECT_FALSE(transform.isIdentity());
+			}
+		}
+
+		std::vector<Math::Matrix33d> rotationMatrix;
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
+				getRotationMatrix());
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(1))->
+				getRotationMatrix());
+
+		auto shared = Eigen::Quaterniond(rotationMatrix[0]).slerp(
+				0.5, Eigen::Quaterniond(rotationMatrix[1]));
+
+		for (size_t i = 0; i < fem->getNumFemElements(); i++)
+		{
+			for (size_t j = 0; j < fem->getFemElement(i)->getNumNodes(); j++)
+			{
+				auto transform = fem->getTransformation(fem->getFemElement(i)->getNodeId(j));
+
+				if (fem->getFemElement(i)->getNodeId(j) == 4)
+				{
+					EXPECT_TRUE(transform.isApprox(Math::Matrix33d(shared)));
+				}
+				else
+				{
+					EXPECT_TRUE(transform.isApprox(rotationMatrix[i]));
+				}
+			}
+		}
+	}
+
+	// Node shared with 3 tets
+	{
+		SCOPED_TRACE("Three tetrahedrons with single shared node");
+
+		auto fem = std::make_shared<SurgSim::Physics::MockFem3DCorotationalTetrahedronRepresentation>("TripleTet");
+		const std::string filename = "tripleTet.ply";
+		fem->loadFem(filename);
+
+		fem->initialize(runtime);
+		fem->wakeUp();
+
+		{
+			SCOPED_TRACE("Prior to any update, the relative rotation should be identity");
+			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+			{
+				auto transform = fem->getTransformation(i);
+				EXPECT_TRUE(transform.isIdentity());
+			}
+		}
+
+		for (size_t i = 0; i < 50; i++)
+		{
+			fem->update(0.001);
+		}
+
+		{
+			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
+			{
+				auto transform = fem->getTransformation(i);
+				EXPECT_FALSE(transform.isIdentity());
+			}
+		}
+
+		std::vector<Math::Matrix33d> rotationMatrix;
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(0))->
+				getRotationMatrix());
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(1))->
+				getRotationMatrix());
+		rotationMatrix.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(fem->getFemElement(2))->
+				getRotationMatrix());
+
+		auto shared = Eigen::Quaterniond(rotationMatrix[0]).slerp(
+			1.0 - (1.0 / 2.0), Eigen::Quaterniond(rotationMatrix[1])).slerp(
+			1.0 - (1.0 / 3.0), Eigen::Quaterniond(rotationMatrix[2]));
+
+		for (size_t i = 0; i < fem->getNumFemElements(); i++)
+		{
+			for (size_t j = 0; j < fem->getFemElement(i)->getNumNodes(); j++)
+			{
+				auto transform = fem->getTransformation(fem->getFemElement(i)->getNodeId(j));
+
+				if (fem->getFemElement(i)->getNodeId(j) == 4)
+				{
+					EXPECT_TRUE(transform.isApprox(Math::Matrix33d(shared)));
+				}
+				else
+				{
+					EXPECT_TRUE(transform.isApprox(rotationMatrix[i]));
+				}
+			}
+		}
+	}
+}
+
 
 } // namespace Physics
 } // namespace SurgSim
