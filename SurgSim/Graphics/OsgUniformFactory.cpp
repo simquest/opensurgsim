@@ -53,7 +53,7 @@ OsgUniformFactory::OsgUniformFactory()
 	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("mat2x2");
 	registerClass<OsgUniform<SurgSim::Math::Matrix33f>>("mat3");
 	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("mat3x3");
-	registerClass<OsgUniform<SurgSim::Math::Matrix44f>>("mat4");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedMatrix44f>>("mat4");
 	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("mat4x4");
 
 	registerClass<OsgUniform<SurgSim::Math::Matrix22d>>("dmat2");

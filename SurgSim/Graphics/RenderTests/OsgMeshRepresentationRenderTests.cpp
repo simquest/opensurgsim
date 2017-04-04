@@ -120,7 +120,7 @@ TEST_F(OsgMeshRepresentationRenderTests, BasicCubeTest)
 		std::pair<double, double> scale;
 	};
 
-	std::vector<InterpolationData> interpolators;
+	std::vector<InterpolationData, Eigen::aligned_allocator<InterpolationData>> interpolators;
 	InterpolationData interpolator;
 
 	interpolator.transform.first =

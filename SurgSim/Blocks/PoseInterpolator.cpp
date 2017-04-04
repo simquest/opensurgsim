@@ -19,7 +19,7 @@
 
 #include <memory>
 
-using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::UnalignedRigidTransform3d;
 namespace SurgSim
 {
 namespace Blocks
@@ -27,8 +27,8 @@ namespace Blocks
 
 PoseInterpolator::PoseInterpolator(const std::string& name) :
 	Behavior(name),
-	m_startingPose(RigidTransform3d::Identity()),
-	m_endingPose(RigidTransform3d::Identity()),
+	m_startingPose(UnalignedRigidTransform3d::Identity()),
+	m_endingPose(UnalignedRigidTransform3d::Identity()),
 	m_duration(1.0),
 	m_currentTime(0.0)
 {

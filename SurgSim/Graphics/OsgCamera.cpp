@@ -232,7 +232,7 @@ void OsgCamera::setLocalActive(bool val)
 	m_switch->setChildValue(m_camera, isActive());
 }
 
-SurgSim::Math::Matrix44d OsgCamera::getViewMatrix() const
+SurgSim::Math::UnalignedMatrix44d OsgCamera::getViewMatrix() const
 {
 	return getPose().matrix().inverse();
 }

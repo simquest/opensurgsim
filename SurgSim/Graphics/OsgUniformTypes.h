@@ -123,6 +123,12 @@ inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Matrix44f>()
 	return osg::Uniform::FLOAT_MAT4;
 }
 
+template<>
+inline osg::Uniform::Type getOsgUniformType <SurgSim::Math::UnalignedMatrix44f>()
+{
+	return osg::Uniform::FLOAT_MAT4;
+}
+
 template <>
 inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Matrix22d>()
 {

@@ -89,13 +89,13 @@ public:
 private:
 
 	/// Optional value to take the from rigid transform
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::RigidTransform3d> m_optionalStartPose;
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::UnalignedRigidTransform3d> m_optionalStartPose;
 
 	/// Target of the interpolation
-	SurgSim::Math::RigidTransform3d m_startingPose;
+	SurgSim::Math::UnalignedRigidTransform3d m_startingPose;
 
 	/// Start of the interpolation
-	SurgSim::Math::RigidTransform3d m_endingPose;
+	SurgSim::Math::UnalignedRigidTransform3d m_endingPose;
 
 	/// Target for the interpolated RigidTransform
 	std::shared_ptr<SurgSim::Framework::SceneElement> m_target;

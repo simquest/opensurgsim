@@ -104,7 +104,7 @@ public:
 
 	/// Gets the view matrix of the camera
 	/// \return	View matrix
-	virtual SurgSim::Math::Matrix44d getViewMatrix() const = 0;
+	virtual SurgSim::Math::UnalignedMatrix44d getViewMatrix() const = 0;
 
 	/// Gets the inverse view matrix of the camera
 	/// \return	Inverse view matrix

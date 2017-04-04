@@ -35,7 +35,7 @@ Camera::Camera(const std::string& name) : Representation(name)
 									  getAmbientColor, setAmbientColor);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Camera, bool, MainCamera, isMainCamera, setMainCamera);
 
-	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44d, ViewMatrix, getViewMatrix);
+	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44d, ViewMatrix, getViewMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44f, FloatViewMatrix, getViewMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44f, FloatProjectionMatrix, getProjectionMatrix);
 	SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::UnalignedMatrix44f, FloatInverseViewMatrix, getInverseViewMatrix);

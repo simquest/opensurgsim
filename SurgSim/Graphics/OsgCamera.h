@@ -69,7 +69,7 @@ public:
 
 	void setLocalActive(bool val) override;
 
-	virtual SurgSim::Math::Matrix44d getViewMatrix() const;
+	virtual SurgSim::Math::UnalignedMatrix44d getViewMatrix() const;
 
 	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const;
 
