@@ -325,14 +325,14 @@ public:
 
 	/// Sets the view matrix of the camera
 	/// \param	matrix	View matrix
-	virtual void setViewMatrix(const SurgSim::Math::Matrix44d& matrix)
+	virtual void setViewMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix)
 	{
 		m_viewMatrix = matrix;
 	}
 
 	/// Gets the view matrix of the camera
 	/// \return	View matrix
-	virtual SurgSim::Math::Matrix44d getViewMatrix() const
+	virtual SurgSim::Math::UnalignedMatrix44d getViewMatrix() const
 	{
 		return m_viewMatrix;
 	}
