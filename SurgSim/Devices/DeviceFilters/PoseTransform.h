@@ -69,13 +69,13 @@ public:
 	void setTranslationScale(double translationScale);
 
 	/// \return The current transform.
-	const Math::RigidTransform3d& getTransform() const;
+	const Math::UnalignedRigidTransform3d& getTransform() const;
 
 	/// Set the constant transform.  The transform is pre-applied to the input pose.
 	/// \param transform The transform, which must be invertible.
 	/// \warning This setter is thread-safe, but after calling this function the output filter will use the new
 	///		transform even if the following output data is based off input data that used the old transform.
-	void setTransform(const Math::RigidTransform3d& transform);
+	void setTransform(const Math::UnalignedRigidTransform3d& transform);
 
 private:
 	void filterInput(const std::string& device, const DataStructures::DataGroup& dataToFilter,
@@ -88,10 +88,10 @@ private:
 	boost::mutex m_mutex;
 
 	/// The constant pre-transform.
-	Math::RigidTransform3d m_transform;
+	Math::UnalignedRigidTransform3d m_transform;
 
 	/// The inverse of the pre-transform.
-	Math::RigidTransform3d m_transformInverse;
+	Math::UnalignedRigidTransform3d m_transformInverse;
 
 	/// The scaling factor applied to each direction of the translation.
 	double m_translationScale;

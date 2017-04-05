@@ -144,13 +144,13 @@ private:
 	void detachCurrentRenderTarget();
 
 	/// Uniform to carry the view matrix
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_viewMatrixUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::UnalignedMatrix44f>> m_viewMatrixUniform;
 
 	/// Uniform to carry the inverse view matrix
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseViewMatrixUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::UnalignedMatrix44f>> m_inverseViewMatrixUniform;
 
 	/// Uniform to carry the ambient color
-	std::shared_ptr<OsgUniform<SurgSim::Math::Vector4f>> m_ambientColorUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::UnalignedVector4f>> m_ambientColorUniform;
 
 	/// Value for ambient color
 	SurgSim::Math::UnalignedVector4d m_ambientColor;
