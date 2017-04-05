@@ -54,10 +54,10 @@ Emitter::Emitter(const std::string& name) :
 									 Target, getTarget, setTarget);
 	typedef std::pair<Vector3d, Vector3d> VelocityRangeType;
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Emitter, VelocityRangeType, VelocityRange, getVelocityRange, setVelocityRange);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Emitter, SurgSim::Math::RigidTransform3d, LocalPose, getLocalPose,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Emitter, SurgSim::Math::UnalignedRigidTransform3d, LocalPose, getLocalPose,
 									  setLocalPose);
 
-	SURGSIM_ADD_RO_PROPERTY(Emitter, SurgSim::Math::RigidTransform3d, Pose, getPose);
+	SURGSIM_ADD_RO_PROPERTY(Emitter, SurgSim::Math::UnalignedRigidTransform3d, Pose, getUnalignedPose);
 
 	std::random_device device;
 	m_generator.seed(device());
@@ -86,6 +86,11 @@ bool Emitter::doWakeUp()
 		return false;
 	}
 	return true;
+}
+
+SurgSim::Math::UnalignedRigidTransform3d Emitter::getUnalignedPose() const
+{
+	return getPose();
 }
 
 void Emitter::update(double dt)
@@ -191,7 +196,7 @@ const std::pair<SurgSim::Math::Vector3d, SurgSim::Math::Vector3d>& Emitter::getV
 	return m_velocityRange;
 }
 
-void Emitter::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
+void Emitter::setLocalPose(const SurgSim::Math::UnalignedRigidTransform3d& pose)
 {
 	m_localPose = pose;
 }
@@ -208,7 +213,7 @@ SurgSim::Math::RigidTransform3d Emitter::getPose() const
 	}
 }
 
-SurgSim::Math::RigidTransform3d Emitter::getLocalPose() const
+SurgSim::Math::UnalignedRigidTransform3d Emitter::getLocalPose() const
 {
 	return m_localPose;
 }

@@ -125,11 +125,11 @@ public:
 
 	/// Set the pose of the Emitter with respect to the Scene Element
 	/// \param pose The pose to set the Emitter to
-	virtual void setLocalPose(const SurgSim::Math::RigidTransform3d& pose);
+	virtual void setLocalPose(const SurgSim::Math::UnalignedRigidTransform3d& pose);
 
 	/// Get the pose of the Emitter with respect to the Scene Element
 	/// \return The pose of this Emitter
-	virtual SurgSim::Math::RigidTransform3d getLocalPose() const;
+	virtual SurgSim::Math::UnalignedRigidTransform3d getLocalPose() const;
 
 	/// Get the pose of the Emitter in world coordinates
 	/// \return The pose of this Emitter
@@ -138,6 +138,10 @@ public:
 private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
+
+	// Cast Pose to unaligned for boost::any transport 
+	SurgSim::Math::UnalignedRigidTransform3d getUnalignedPose() const;
+
 
 	/// PointGenerator for generating random points within or on the emitter shape.
 	RandomPointGenerator m_pointGenerator;
@@ -170,7 +174,7 @@ private:
 	std::shared_ptr<SurgSim::Particles::Representation> m_target;
 
 	/// Local Pose of the Representation with respect to the SceneElement
-	SurgSim::Math::RigidTransform3d m_localPose;
+	SurgSim::Math::UnalignedRigidTransform3d m_localPose;
 
 	/// Logger used by the Emitter
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
