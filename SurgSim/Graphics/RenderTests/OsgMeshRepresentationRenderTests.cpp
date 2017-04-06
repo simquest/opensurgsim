@@ -245,23 +245,9 @@ TEST_F(OsgMeshRepresentationRenderTests, ShaderTest)
 	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/ds_mapping_material");
 	ASSERT_TRUE(program != nullptr);
 	material->setProgram(program);
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
-		material->addUniform(uniform);
-		material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.8, 1.0));
-	}
-
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("specularColor");
-		material->addUniform(uniform);
-		material->setValue("specularColor", SurgSim::Math::Vector4f(0.01, 0.01, 0.01, 1.0));
-	}
-
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<float>>("shininess");
-		material->addUniform(uniform);
-		material->setValue("shininess", 32.0f);
-	}
+	material->addUniform("vec4", "diffuseColor", SurgSim::Math::UnalignedVector4f(0.8, 0.8, 0.8, 1.0));
+	material->addUniform("vec4", "specularColor", SurgSim::Math::UnalignedVector4f(0.01, 0.01, 0.01, 1.0));
+	material->addUniform("float", "shininess", 32.0f);
 
 	{
 		auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();

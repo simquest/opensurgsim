@@ -90,10 +90,10 @@ public:
 
 	/// Set the color for the text.
 	/// \param color the color to be used.
-	virtual void setColor(SurgSim::Math::Vector4d color) = 0;
+	virtual void setColor(SurgSim::Math::UnalignedVector4d color) = 0;
 
 	/// \return the current text color
-	virtual SurgSim::Math::Vector4d getColor() const = 0;
+	virtual SurgSim::Math::UnalignedVector4d getColor() const = 0;
 
 	/// If set to true all the coordinate values are in screen-space coordinates (i.e. pixels), world spaces otherwise
 	/// \note ScreeenSpace is default, when using world coordinates the font size has to be adjusted to an appropriately
@@ -113,10 +113,10 @@ public:
 
 	/// Set the color of the background (if drawn)
 	/// \param color The color to use.
-	virtual void setBackgroundColor(Math::Vector4d color) = 0;
+	virtual void setBackgroundColor(Math::UnalignedVector4d color) = 0;
 
 	/// \return the color that the background uses
-	virtual Math::Vector4d getBackgroundColor() = 0;
+	virtual Math::UnalignedVector4d getBackgroundColor() = 0;
 
 	/// Set the margin between background and text
 	/// \note If world coordinates is being used, this is also world coordinates and should be appropriately small,

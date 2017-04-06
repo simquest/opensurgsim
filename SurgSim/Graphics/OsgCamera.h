@@ -71,13 +71,13 @@ public:
 
 	virtual SurgSim::Math::UnalignedMatrix44d getViewMatrix() const;
 
-	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const;
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseViewMatrix() const;
 
-	void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) override;
+	void setProjectionMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix) override;
 
 	const SurgSim::Math::UnalignedMatrix44d& getProjectionMatrix() const override;
 
-	SurgSim::Math::Matrix44d getInverseProjectionMatrix() const override;
+	SurgSim::Math::UnalignedMatrix44d getInverseProjectionMatrix() const override;
 
 	void update(double dt) override;
 

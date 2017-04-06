@@ -244,9 +244,9 @@ std::shared_ptr<Graphics::RenderPass> createShadingPass(
 	material->addUniform("vec3", "light");
 	material->setValue("light", light->getPose().translation().cast<float>().eval());
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", diffuseColor);
+	material->setValue("diffuseColor", SurgSim::Math::UnalignedVector4f(diffuseColor));
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", specularColor);
+	material->setValue("specularColor", SurgSim::Math::UnalignedVector4f(specularColor));
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", shininess);
 	material->addUniform("float", "bias");

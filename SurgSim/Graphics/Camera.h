@@ -108,11 +108,11 @@ public:
 
 	/// Gets the inverse view matrix of the camera
 	/// \return	Inverse view matrix
-	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const = 0;
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseViewMatrix() const = 0;
 
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix
-	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) = 0;
+	virtual void setProjectionMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix) = 0;
 
 	/// Sets the viewport size for this camera
 	/// \param x,y location of the viewport in screen space
@@ -151,7 +151,7 @@ public:
 
 	/// Gets the inverse projection matrix of the camera
 	/// \return	Inverse Projection matrix
-	virtual SurgSim::Math::Matrix44d getInverseProjectionMatrix() const = 0;
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseProjectionMatrix() const = 0;
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
 	/// \param	renderTarget	The render target.

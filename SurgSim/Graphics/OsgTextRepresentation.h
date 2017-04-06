@@ -80,8 +80,8 @@ public:
 	void setFont(std::shared_ptr<SurgSim::Framework::Asset> font) override;
 	std::shared_ptr<Font> getFont() const override;
 
-	void setColor(SurgSim::Math::Vector4d color) override;
-	SurgSim::Math::Vector4d getColor() const override;
+	void setColor(SurgSim::Math::UnalignedVector4d color) override;
+	SurgSim::Math::UnalignedVector4d getColor() const override;
 
 	void setFontSize(double size) override;
 	double getFontSize() const override;
@@ -101,8 +101,8 @@ public:
 	void setDrawBackground(bool value) override;
 	bool isDrawingBackground() const override;
 
-	void setBackgroundColor(Math::Vector4d color) override;
-	Math::Vector4d getBackgroundColor() override;
+	void setBackgroundColor(Math::UnalignedVector4d color) override;
+	Math::UnalignedVector4d getBackgroundColor() override;
 
 	void setBackgroundMargin(double margin) override;
 	double getBackgroundMargin() const override;

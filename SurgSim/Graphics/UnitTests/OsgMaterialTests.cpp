@@ -97,9 +97,9 @@ TEST(OsgMaterialTests, AddUniformTest)
 		EXPECT_THROW(material->addUniform("float", "test_float_uniform", value), boost::bad_any_cast);
 	}
 	{
-		Math::Vector4f vector(1.0, 2.0, 3.0, 4.0);
+		Math::UnalignedVector4f vector(1.0, 2.0, 3.0, 4.0);
 		ASSERT_NO_THROW(material->addUniform("vec4", "test_vector_uniform", vector));
-		EXPECT_TRUE(vector.isApprox(material->getValue<Math::Vector4f>("test_vector_uniform")));
+		EXPECT_TRUE(vector.isApprox(material->getValue<Math::UnalignedVector4f>("test_vector_uniform")));
 	}
 	{
 		Math::Vector4f vector(1.0, 2.0, 3.0, 4.0);

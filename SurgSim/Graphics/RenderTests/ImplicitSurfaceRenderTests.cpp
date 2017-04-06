@@ -59,8 +59,8 @@ class ImplicitSurfaceRenderTests : public RenderTest
 
 TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 {
-	Math::Vector4f diffuseColor(0.83f, 0.0f, 0.0f, 1.0f);
-	Math::Vector4f specularColor(0.8f, 0.8f, 0.8f, 1.0f);
+	Math::UnalignedVector4f diffuseColor(0.83f, 0.0f, 0.0f, 1.0f);
+	Math::UnalignedVector4f specularColor(0.8f, 0.8f, 0.8f, 1.0f);
 
 	std::array<int, 2> dimensions = {1280, 720};
 	viewElement->getView()->setDimensions(dimensions);
@@ -120,9 +120,9 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	auto material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(0.2, 0.2, 0.2, 1.0));
+	material->setValue("diffuseColor", Math::UnalignedVector4f(0.2, 0.2, 0.2, 1.0));
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->setValue("specularColor", Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 	cube->setMaterial(material);
@@ -160,9 +160,9 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 	material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(0.2, 0.2, 0.2, 1.0));
+	material->setValue("diffuseColor", Math::UnalignedVector4f(0.2, 0.2, 0.2, 1.0));
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->setValue("specularColor", Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 	plane->setMaterial(material);
@@ -200,8 +200,8 @@ TEST_F(ImplicitSurfaceRenderTests, PointSpriteFluid)
 
 TEST_F(ImplicitSurfaceRenderTests, StereoFluid)
 {
-	Math::Vector4f diffuseColor(0.83f, 0.0f, 0.0f, 1.0f);
-	Math::Vector4f specularColor(0.8f, 0.8f, 0.8f, 1.0f);
+	Math::UnalignedVector4f diffuseColor(0.83f, 0.0f, 0.0f, 1.0f);
+	Math::UnalignedVector4f specularColor(0.8f, 0.8f, 0.8f, 1.0f);
 
 	std::array<int, 2> dimensions = {1280, 720};
 	viewElement->getView()->setDimensions(dimensions);
@@ -268,9 +268,9 @@ TEST_F(ImplicitSurfaceRenderTests, StereoFluid)
 
 	auto material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(0.2, 0.2, 0.2, 1.0));
+	material->setValue("diffuseColor", Math::UnalignedVector4f(0.2, 0.2, 0.2, 1.0));
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->setValue("specularColor", Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 	cube->setMaterial(material);
@@ -308,9 +308,9 @@ TEST_F(ImplicitSurfaceRenderTests, StereoFluid)
 
 	material = Graphics::buildMaterial("Shaders/s_mapping_material.vert", "Shaders/s_mapping_material.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(0.2, 0.2, 0.2, 1.0));
+	material->setValue("diffuseColor", Math::UnalignedVector4f(0.2, 0.2, 0.2, 1.0));
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->setValue("specularColor", Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 	plane->setMaterial(material);

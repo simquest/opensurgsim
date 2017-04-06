@@ -21,6 +21,7 @@
 #include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
+#include "../OsgVectorConversions.h"
 
 using SurgSim::Graphics::fromOsg;
 using SurgSim::Graphics::toOsg;
@@ -32,14 +33,14 @@ using SurgSim::Math::Vector4d;
 
 TEST(OsgQuaternionConversionsTests, QuaternionfTest)
 {
-	Quaternionf quaternion = Quaternionf(Vector4f::Random());
+	Quaternionf quaternion(2.5f,3.4f,4.3f,1.2f);
 	osg::Quat osgQuaternion = toOsg(quaternion);
 	EXPECT_TRUE(quaternion.isApprox(fromOsg<float>(osgQuaternion)));
 }
 
 TEST(OsgQuaternionConversionsTests, QuaterniondTest)
 {
-	Quaterniond quaternion = Quaterniond(Vector4d::Random());
+	Quaterniond quaternion(2.5, 3.4, 4.3, 1.2);
 	osg::Quat osgQuaternion = toOsg(quaternion);
 	EXPECT_TRUE(quaternion.isApprox(fromOsg<double>(osgQuaternion)));
 }

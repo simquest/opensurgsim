@@ -67,9 +67,9 @@ TEST_F(PaintBehaviorRenderTests, PaintTest)
 
 	auto material = Graphics::buildMaterial("Shaders/ds_mapping_material.vert", "Shaders/ds_mapping_multitexture.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->setValue("diffuseColor", Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->setValue("specularColor", Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 
@@ -133,9 +133,9 @@ TEST_F(PaintBehaviorRenderTests, AntiAliasTest)
 
 	auto material = Graphics::buildMaterial("Shaders/ds_mapping_material.vert", "Shaders/ds_mapping_multitexture.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->setValue("diffuseColor", Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Math::Vector4f(1.0, 1.0, 1.0, 1.0));
+	material->setValue("specularColor", Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 10.0f);
 

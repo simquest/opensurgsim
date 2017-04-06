@@ -239,7 +239,7 @@ SurgSim::Math::UnalignedMatrix44d OsgCamera::getViewMatrix() const
 	return getPose().matrix().inverse();
 }
 
-void OsgCamera::setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
+void OsgCamera::setProjectionMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix)
 {
 	m_projectionMatrix = matrix;
 	m_camera->setProjectionMatrix(toOsg(matrix));
@@ -250,7 +250,7 @@ const SurgSim::Math::UnalignedMatrix44d& OsgCamera::getProjectionMatrix() const
 	return m_projectionMatrix;
 }
 
-SurgSim::Math::Matrix44d OsgCamera::getInverseProjectionMatrix() const
+SurgSim::Math::UnalignedMatrix44d OsgCamera::getInverseProjectionMatrix() const 
 {
 	return m_projectionMatrix.inverse();
 }
@@ -493,7 +493,7 @@ osg::ref_ptr<osg::Node> OsgCamera::getOsgNode() const
 	return m_switch;
 }
 
-SurgSim::Math::Matrix44d OsgCamera::getInverseViewMatrix() const
+SurgSim::Math::UnalignedMatrix44d OsgCamera::getInverseViewMatrix() const
 {
 	return getPose().matrix();
 }

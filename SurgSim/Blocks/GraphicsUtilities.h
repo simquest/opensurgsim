@@ -61,8 +61,8 @@ void enable2DTexture(std::shared_ptr<SurgSim::Graphics::OsgMaterial> material,
 /// \param shininess Phong shininess exponent
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createPlainMaterial(
 	const std::string& name,
-	SurgSim::Math::Vector4f diffuseColor,
-	SurgSim::Math::Vector4f specularColor,
+	SurgSim::Math::UnalignedVector4f diffuseColor,
+	SurgSim::Math::UnalignedVector4f specularColor,
 	float shininess);
 
 /// Create a basic textured material
@@ -74,8 +74,8 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createPlainMaterial(
 ///        pass an empty string here, it has to occupy the correct texture unit though.
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
 	const std::string& name,
-	SurgSim::Math::Vector4f diffuseColor,
-	SurgSim::Math::Vector4f specularColor,
+	SurgSim::Math::UnalignedVector4f diffuseColor,
+	SurgSim::Math::UnalignedVector4f specularColor,
 	float shininess,
 	const std::string& diffuseMap = "");
 
@@ -90,8 +90,8 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createTexturedMaterial(
 ///        it has to occupy the correct texture unit as defined by \sa NORMAL_TEXTURE_UNIT.
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> createNormalMappedMaterial(
 	const std::string& name,
-	SurgSim::Math::Vector4f diffuseColor,
-	SurgSim::Math::Vector4f specularColor,
+	SurgSim::Math::UnalignedVector4f diffuseColor,
+	SurgSim::Math::UnalignedVector4f specularColor,
 	float shininess,
 	const std::string& diffuseMap = "",
 	const std::string& normalMap = "");
