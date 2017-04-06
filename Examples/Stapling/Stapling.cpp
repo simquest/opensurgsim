@@ -54,6 +54,8 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 using SurgSim::Math::Vector4f;
+using SurgSim::Math::UnalignedVector4d;
+using SurgSim::Math::UnalignedVector4f;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::InputComponent;
 using SurgSim::Input::InputManager;
@@ -279,8 +281,8 @@ std::shared_ptr<OsgViewElement> createViewElement()
 	result->enableKeyboardDevice(true);
 
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-	light->setDiffuseColor(Vector4d(1.0, 1.0, 1.0, 1.0));
-	light->setSpecularColor(Vector4d(1.0, 1.0, 1.0, 1.0));
+	light->setDiffuseColor(UnalignedVector4d(1.0, 1.0, 1.0, 1.0));
+	light->setSpecularColor(UnalignedVector4d(1.0, 1.0, 1.0, 1.0));
 	result->addComponent(light);
 
 	result->getCamera()->setAmbientColor(Vector4d(0.2, 0.2, 0.2, 1.0));
@@ -298,23 +300,9 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> createShinyMaterial(
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>("shiny");
 	material->setProgram(program);
 
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("diffuseColor");
-		material->addUniform(uniform);
-		material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
-	}
-
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<Vector4f>>("specularColor");
-		material->addUniform(uniform);
-		material->setValue("specularColor", SurgSim::Math::Vector4f(0.01, 0.01, 0.01, 1.0));
-	}
-
-	{
-		auto uniform = std::make_shared<SurgSim::Graphics::OsgUniform<float>>("shininess");
-		material->addUniform(uniform);
-		material->setValue("shininess", 32.0f);
-	}
+	material->addUniform("vec4", "diffuseColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("vec4", "specularColor", SurgSim::Math::UnalignedVector4f(0.01, 0.01, 0.01, 1.0));
+	material->addUniform("float", "shininess", 32.0f);
 
 	std::string blackTexture;
 	SURGSIM_ASSERT(data.tryFindFile("Textures/black.png", &blackTexture));

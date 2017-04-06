@@ -71,13 +71,13 @@ public:
 
 	virtual SurgSim::Math::UnalignedMatrix44d getViewMatrix() const;
 
-	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const;
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseViewMatrix() const;
 
-	void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) override;
+	void setProjectionMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix) override;
 
 	const SurgSim::Math::UnalignedMatrix44d& getProjectionMatrix() const override;
 
-	SurgSim::Math::Matrix44d getInverseProjectionMatrix() const override;
+	SurgSim::Math::UnalignedMatrix44d getInverseProjectionMatrix() const override;
 
 	void update(double dt) override;
 
@@ -144,13 +144,13 @@ private:
 	void detachCurrentRenderTarget();
 
 	/// Uniform to carry the view matrix
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_viewMatrixUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::UnalignedMatrix44f>> m_viewMatrixUniform;
 
 	/// Uniform to carry the inverse view matrix
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_inverseViewMatrixUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::UnalignedMatrix44f>> m_inverseViewMatrixUniform;
 
 	/// Uniform to carry the ambient color
-	std::shared_ptr<OsgUniform<SurgSim::Math::Vector4f>> m_ambientColorUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::UnalignedVector4f>> m_ambientColorUniform;
 
 	/// Value for ambient color
 	SurgSim::Math::UnalignedVector4d m_ambientColor;

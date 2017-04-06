@@ -142,7 +142,7 @@ protected:
 	/// Indicates if the representation is rendered as a wireframe.
 	bool m_drawAsWireFrame;
 
-	std::shared_ptr<OsgUniform<SurgSim::Math::Matrix44f>> m_modelMatrixUniform;
+	std::shared_ptr<OsgUniform<SurgSim::Math::UnalignedMatrix44f>> m_modelMatrixUniform;
 
 	std::vector<std::shared_ptr<OsgUniformBase>> m_uniforms;
 };

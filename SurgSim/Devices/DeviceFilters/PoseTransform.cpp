@@ -22,6 +22,7 @@
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::UnalignedRigidTransform3d;
 using SurgSim::Math::Vector3d;
 
 namespace SurgSim
@@ -39,7 +40,7 @@ PoseTransform::PoseTransform(const std::string& name) :
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseTransform, double, TranslationScale,
 		getTranslationScale, setTranslationScale);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseTransform, RigidTransform3d, Transform, getTransform, setTransform);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseTransform, UnalignedRigidTransform3d, Transform, getTransform, setTransform);
 }
 
 void PoseTransform::filterInput(const std::string& device, const DataGroup& dataToFilter, DataGroup* result)
@@ -180,12 +181,12 @@ void PoseTransform::setTranslationScale(double translationScale)
 	m_translationScale = translationScale;
 }
 
-const RigidTransform3d& PoseTransform::getTransform() const
+const SurgSim::Math::UnalignedRigidTransform3d& PoseTransform::getTransform() const
 {
 	return m_transform;
 }
 
-void PoseTransform::setTransform(const RigidTransform3d& transform)
+void PoseTransform::setTransform(const UnalignedRigidTransform3d& transform)
 {
 	boost::lock_guard<boost::mutex> lock(m_mutex);
 	m_transform = transform;

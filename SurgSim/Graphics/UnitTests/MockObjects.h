@@ -339,7 +339,7 @@ public:
 
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix
-	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
+	virtual void setProjectionMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix)
 	{
 		m_projectionMatrix = matrix;
 	}
@@ -351,7 +351,7 @@ public:
 		return m_projectionMatrix;
 	}
 
-	virtual SurgSim::Math::Matrix44d getInverseProjectionMatrix() const
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseProjectionMatrix() const
 	{
 		return m_projectionMatrix.inverse();
 	}
@@ -427,7 +427,7 @@ public:
 		return false;
 	}
 
-	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseViewMatrix() const
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}

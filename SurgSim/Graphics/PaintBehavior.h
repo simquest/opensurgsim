@@ -56,11 +56,11 @@ public:
 
 	/// Sets color of the paint
 	/// \param color RGBA color in [0-1] range
-	void setColor(const Math::Vector4d& color);
+	void setColor(const Math::UnalignedVector4d& color);
 
 	/// Gets color of the paint
 	/// \return Vector4d representation of RGBA color in [0-1] range
-	Math::Vector4d getColor() const;
+	Math::UnalignedVector4d getColor() const;
 
 	/// Sets radius of paint splat
 	/// \param  radius Radius in texture coordinate range [0-1]
@@ -108,7 +108,7 @@ private:
 	std::shared_ptr<Graphics::OsgTexture2d> m_texture;
 
 	/// Color to use for decal painting
-	Math::Vector4d m_color;
+	Math::UnalignedVector4d m_color;
 
 	/// Width of assigned texture
 	int m_width;

@@ -92,17 +92,32 @@ inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Vector4f>()
 }
 
 template <>
+inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::UnalignedVector4f>()
+{
+	return osg::Uniform::FLOAT_VEC4;
+}
+
+
+template <>
 inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Vector2d>()
 {
 	return osg::Uniform::DOUBLE_VEC2;
 }
+
 template <>
 inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Vector3d>()
 {
 	return osg::Uniform::DOUBLE_VEC3;
 }
+
 template <>
 inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Vector4d>()
+{
+	return osg::Uniform::DOUBLE_VEC4;
+}
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::UnalignedVector4d>()
 {
 	return osg::Uniform::DOUBLE_VEC4;
 }
@@ -112,6 +127,13 @@ inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Matrix22f>()
 {
 	return osg::Uniform::FLOAT_MAT2;
 }
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::UnalignedMatrix22f>()
+{
+	return osg::Uniform::FLOAT_MAT2;
+}
+
 template <>
 inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Matrix33f>()
 {
@@ -134,13 +156,28 @@ inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Matrix22d>()
 {
 	return osg::Uniform::DOUBLE_MAT2;
 }
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::UnalignedMatrix22d>()
+{
+	return osg::Uniform::DOUBLE_MAT2;
+}
+
+
 template <>
 inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Matrix33d>()
 {
 	return osg::Uniform::DOUBLE_MAT3;
 }
+
 template <>
 inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Matrix44d>()
+{
+	return osg::Uniform::DOUBLE_MAT4;
+}
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::UnalignedMatrix44d>()
 {
 	return osg::Uniform::DOUBLE_MAT4;
 }

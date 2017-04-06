@@ -252,12 +252,12 @@ bool OsgTextRepresentation::isDrawingBackground() const
 	return (m_textNode->getDrawMode() & osgText::TextBase::FILLEDBOUNDINGBOX) != 0;
 }
 
-void OsgTextRepresentation::setBackgroundColor(Math::Vector4d color)
+void OsgTextRepresentation::setBackgroundColor(Math::UnalignedVector4d color)
 {
 	m_textNode->setBoundingBoxColor(toOsg(color));
 }
 
-Math::Vector4d OsgTextRepresentation::getBackgroundColor()
+SurgSim::Math::UnalignedVector4d OsgTextRepresentation::getBackgroundColor()
 {
 	Math::Vector4d result = fromOsg(m_textNode->getBoundingBoxColor()).cast<double>();
 	return result;
@@ -329,12 +329,12 @@ double OsgTextRepresentation::getFontSize() const
 	return m_characterSize;
 }
 
-void OsgTextRepresentation::setColor(SurgSim::Math::Vector4d color)
+void OsgTextRepresentation::setColor(SurgSim::Math::UnalignedVector4d color)
 {
 	m_textNode->setColor(toOsg(color));
 }
 
-SurgSim::Math::Vector4d  OsgTextRepresentation::getColor() const
+SurgSim::Math::UnalignedVector4d OsgTextRepresentation::getColor() const
 {
 	SurgSim::Math::Vector4d result = fromOsg(m_textNode->getColor()).cast<double>();
 	return result;

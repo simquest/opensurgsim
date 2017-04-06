@@ -30,8 +30,10 @@
 
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Matrix44f;
+using SurgSim::Math::UnalignedMatrix44f;
 using SurgSim::Math::Vector4d;
 using SurgSim::Math::Vector4f;
+using SurgSim::Math::UnalignedVector4f;
 
 namespace
 {
@@ -149,9 +151,9 @@ OsgCamera::OsgCamera(const std::string& name) :
 	OsgRepresentation(name),
 	Camera(name),
 	m_camera(new osg::Camera()),
-	m_viewMatrixUniform(new OsgUniform<Matrix44f>("viewMatrix")),
-	m_inverseViewMatrixUniform(new OsgUniform<Matrix44f>("inverseViewMatrix")),
-	m_ambientColorUniform(new OsgUniform<Vector4f>("ambientColor")),
+	m_viewMatrixUniform(new OsgUniform<UnalignedMatrix44f>("viewMatrix")),
+	m_inverseViewMatrixUniform(new OsgUniform<UnalignedMatrix44f>("inverseViewMatrix")),
+	m_ambientColorUniform(new OsgUniform<UnalignedVector4f>("ambientColor")),
 	m_isMainCamera(false)
 {
 	m_switch->removeChildren(0, m_switch->getNumChildren());
@@ -237,7 +239,7 @@ SurgSim::Math::UnalignedMatrix44d OsgCamera::getViewMatrix() const
 	return getPose().matrix().inverse();
 }
 
-void OsgCamera::setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
+void OsgCamera::setProjectionMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix)
 {
 	m_projectionMatrix = matrix;
 	m_camera->setProjectionMatrix(toOsg(matrix));
@@ -248,7 +250,7 @@ const SurgSim::Math::UnalignedMatrix44d& OsgCamera::getProjectionMatrix() const
 	return m_projectionMatrix;
 }
 
-SurgSim::Math::Matrix44d OsgCamera::getInverseProjectionMatrix() const
+SurgSim::Math::UnalignedMatrix44d OsgCamera::getInverseProjectionMatrix() const 
 {
 	return m_projectionMatrix.inverse();
 }
@@ -491,7 +493,7 @@ osg::ref_ptr<osg::Node> OsgCamera::getOsgNode() const
 	return m_switch;
 }
 
-SurgSim::Math::Matrix44d OsgCamera::getInverseViewMatrix() const
+SurgSim::Math::UnalignedMatrix44d OsgCamera::getInverseViewMatrix() const
 {
 	return getPose().matrix();
 }
@@ -499,7 +501,7 @@ SurgSim::Math::Matrix44d OsgCamera::getInverseViewMatrix() const
 void OsgCamera::setAmbientColor(const SurgSim::Math::UnalignedVector4d& color)
 {
 	m_ambientColor = color;
-	m_ambientColorUniform->set(color.cast<float>());
+	//m_ambientColorUniform->set(m_ambientColor);
 }
 
 SurgSim::Math::UnalignedVector4d OsgCamera::getAmbientColor()

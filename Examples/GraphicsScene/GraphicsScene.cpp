@@ -151,33 +151,22 @@ void configureShinyMaterial()
 	// This will change the shared material
 	auto material = materials["shiny"];
 
-	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
-
-	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", SurgSim::Math::Vector4f(0.9, 0.9, 0.1, 1.0));
-
-	material->addUniform("float", "shininess");
-	material->setValue("shininess", 32.0f);
+	material->addUniform("vec4", "diffuseColor", SurgSim::Math::UnalignedVector4f(0.8, 0.8, 0.1, 1.0));
+	material->addUniform("vec4", "specularColor", SurgSim::Math::UnalignedVector4f(0.9, 0.9, 0.1, 1.0));
+	material->addUniform("float", "shininess", 32.0f);
 }
 
 void configureTexturedMaterial(const std::string& filename)
 {
 	auto material = materials["texturedShadowed"];
-	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
-
-	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
-
-	material->addUniform("float", "shininess");
-	material->setValue("shininess", 32.0f);
+	material->addUniform("vec4", "diffuseColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("vec4", "specularColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("float", "shininess", 32.0f);
 
 	auto texture = std::make_shared<SurgSim::Graphics::OsgTexture2d>();
 	texture->loadImage(filename);
 
-	material->addUniform("sampler2D", "diffuseMap");
-	material->setValue("diffuseMap", texture);
+	material->addUniform("sampler2D", "diffuseMap", texture);
 }
 
 /// A simple box as a scenelement
