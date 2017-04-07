@@ -64,8 +64,8 @@ public:
 	void addFemElement()
 	{
 		std::array<size_t, 4> elementNodeIds = {{0, 1, 2, 3}};
-		std::shared_ptr<Fem3DElementCorotationalTetrahedron> element =
-				std::make_shared<Fem3DElementCorotationalTetrahedron>(elementNodeIds);
+		std::shared_ptr<Fem3DElementCorotationalTetrahedron> 
+			element(new Fem3DElementCorotationalTetrahedron(elementNodeIds));
 		element->setYoungModulus(1e9);
 		element->setPoissonRatio(0.45);
 		element->setMassDensity(1000.0);

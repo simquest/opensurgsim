@@ -149,7 +149,8 @@ struct ReplayPoseScaffold::DeviceData
 	double m_timestamp;
 
 	/// Series of poses through time loaded from the input file
-	std::vector<std::pair<double, Math::RigidTransform3d>> m_motion;
+	typedef std::pair<double, Math::RigidTransform3d> MotionData;
+	std::vector<MotionData, Eigen::aligned_allocator<MotionData>> m_motion;
 
 	/// Index of the latest pose used
 	size_t m_index;
