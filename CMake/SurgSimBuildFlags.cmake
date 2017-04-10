@@ -34,7 +34,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOSS_DEBUG")
 
 option(SURGSIM_WARNINGS_AS_ERRORS "Treat warnings as errors in the compilation process" OFF)
 
-option(SURGSIM_USE_AVX "Utilise AVX extensions, this will be passed onto eigen" OFF)
+option(SURGSIM_USE_AVX "Utilise AVX extensions, this will be passed onto eigen" ON)
 
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
