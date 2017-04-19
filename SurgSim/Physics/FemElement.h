@@ -200,7 +200,7 @@ public:
 	/// \param initialize Optional parameter, default true. If true, the matrix form is assumed to be undefined and is
 	/// initialized when necessary. If false, the matrix form is assumed to be previously defined.
 	template <typename DerivedSub, typename T, int Opt, typename Index>
-	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
+	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t>& blockIds,
 							  size_t blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
 							  bool initialize = true) const;
 
