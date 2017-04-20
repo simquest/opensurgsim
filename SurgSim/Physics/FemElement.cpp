@@ -37,9 +37,9 @@ void FemElement::initialize(const SurgSim::Math::OdeState& state)
 	SURGSIM_ASSERT(m_rho != 0.0) << "Mass density is not set. Did you call setMassDensity() ?";
 	SURGSIM_ASSERT(m_nu != 0.0) << "Poisson ratio is not set. Did you call setPoissonRatio() ?";
 	SURGSIM_ASSERT(m_E != 0.0) << "Young modulus is not set. Did you call setYoungModulus() ?";
-	SURGSIM_ASSERT(m_rho > 0.0) << "Mass density ("<<m_rho<<") is invalid, it should be positive";
-	SURGSIM_ASSERT(m_nu > 0.0 && m_nu < 0.5) << "Poisson ratio ("<<m_nu<<") is invalid, it should be within [0 0.5)";
-	SURGSIM_ASSERT(m_E > 0.0) << "Young modulus ("<<m_E<<") is invalid, it should be positive";
+	SURGSIM_ASSERT(m_rho > 0.0) << "Mass density (" << m_rho << ") is invalid, it should be positive";
+	SURGSIM_ASSERT(m_nu > 0.0 && m_nu < 0.5) << "Poisson ratio (" << m_nu << ") is invalid, it should be within [0 0.5)";
+	SURGSIM_ASSERT(m_E > 0.0) << "Young modulus (" << m_E << ") is invalid, it should be positive";
 }
 
 FemElement::FactoryType& FemElement::getFactory()
@@ -143,7 +143,8 @@ void FemElement::addFMDK(SurgSim::Math::Vector* F,
 }
 
 void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const SurgSim::Math::Vector& x,
-						   SurgSim::Math::Vector* F) const
+						   SurgSim::Math::Vector* F,
+						   SurgSim::Math::Vector* extractedX, SurgSim::Math::Vector* accumulator) const
 {
 	using Math::addSubVector;
 	using Math::getSubVector;
@@ -154,32 +155,35 @@ void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const Su
 	}
 
 	size_t size = getNumNodes() * getNumDofPerNode();
-	Math::Vector extractedX(size);
-	getSubVector(x, m_nodeIds, getNumDofPerNode(), &extractedX);
+
+	// For safety, this is a small op if current size equals size
+	accumulator->resize(size);
+	extractedX->resize(size);
+
+	getSubVector(x, m_nodeIds, getNumDofPerNode(), extractedX);
 
 	// Accumulate the mass/damping/stiffness contribution
-	Math::Vector extractedResult;
-	extractedResult.setZero(size);
+	accumulator->setZero();
 
 	// Adds the mass contribution
 	if (alphaM != 0.0)
 	{
-		extractedResult += alphaM * (m_M * extractedX);
+		(*accumulator).noalias() = alphaM * (m_M * (*extractedX));
 	}
 
 	// Adds the damping contribution
 	if (m_useDamping && alphaD != 0.0)
 	{
-		extractedResult += alphaD * (m_D * extractedX);
+		(*accumulator).noalias() += alphaD * (m_D * (*extractedX));
 	}
 
 	// Adds the stiffness contribution
 	if (alphaK != 0.0)
 	{
-		extractedResult += alphaK * (m_K * extractedX);
+		(*accumulator).noalias() += alphaK * (m_K * (*extractedX));
 	}
 
-	addSubVector(extractedResult, m_nodeIds, m_numDofPerNode, F);
+	addSubVector(*accumulator, m_nodeIds, m_numDofPerNode, F);
 }
 
 bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const

@@ -56,7 +56,7 @@ public:
 	virtual void initialize(const SurgSim::Math::OdeState& state);
 
 	typedef SurgSim::Framework::ObjectFactory1<FemElement, std::shared_ptr<FemElementStructs::FemElementParameter>>
-		FactoryType;
+			FactoryType;
 
 	static FactoryType& getFactory();
 
@@ -164,7 +164,8 @@ public:
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	virtual void addMatVec(double alphaM, double alphaD, double alphaK,
-						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) const;
+						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F,
+						   SurgSim::Math::Vector* extractedX, SurgSim::Math::Vector* acumulator) const;
 
 	/// Determines whether a given natural coordinate is valid
 	/// \param naturalCoordinate Coordinate to check
