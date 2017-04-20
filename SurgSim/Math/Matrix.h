@@ -168,7 +168,7 @@ void addSubMatrix(const SubMatrix& subMatrix, size_t blockIdRow, size_t blockIdC
 /// \param blockSize The blocks size
 /// \param[out] matrix The matrix to add the sub-matrix blocks into
 template <class Matrix, class SubMatrix>
-void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t> blockIds, size_t blockSize, Matrix* matrix)
+void addSubMatrix(const SubMatrix& subMatrix, const std::vector<size_t>& blockIds, size_t blockSize, Matrix* matrix)
 {
 	const size_t numBlocks = blockIds.size();
 

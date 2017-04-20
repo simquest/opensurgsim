@@ -88,7 +88,7 @@ void addSubVector(const SubVector& subVector, size_t blockId, size_t blockSize, 
 /// \param blockSize The block size
 /// \param[out] vector The vector to add the sub-vector blocks into
 template <class Vector, class SubVector>
-void addSubVector(const SubVector& subVector, const std::vector<size_t> blockIds, size_t blockSize, Vector* vector)
+void addSubVector(const SubVector& subVector, const std::vector<size_t>& blockIds, size_t blockSize, Vector* vector)
 {
 	const size_t numBlocks = blockIds.size();
 
@@ -136,7 +136,7 @@ Eigen::VectorBlock<Vector> getSubVector(Vector& vector, size_t blockId, size_t b
 /// \param blockSize The block size
 /// \param[out] subVector The sub-vector to store the requested blocks (blockIds) from vector into
 template <class Vector, class SubVector>
-void getSubVector(const Vector& vector, const std::vector<size_t> blockIds, size_t blockSize, SubVector* subVector)
+void getSubVector(const Vector& vector, const std::vector<size_t>& blockIds, size_t blockSize, SubVector* subVector)
 {
 	const size_t numBlocks = blockIds.size();
 
