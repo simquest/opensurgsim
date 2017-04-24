@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2017, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -300,7 +300,7 @@ Matrix66d computeExtraStiffness(const Vector6d& inputForce, const Vector3d& anch
 		dofX[column] -= 2.0 * epsilon;
 		Vector6d fXMinus2H = computeExtraTorque(inputForce, anchorLocalPoint, dofX, dofVelocity);
 
-		K.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
+		K.col(column) = -(-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
 	}
 
 	return K;
@@ -330,7 +330,7 @@ Matrix66d computeExtraDamping(const Vector6d& inputForce, const Vector3d& anchor
 		dofV[column] -= 2.0 * epsilon;
 		Vector6d fXMinus2H = computeExtraTorque(inputForce, anchorLocalPoint, dofPosition, dofV);
 
-		D.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
+		D.col(column) = -(-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
 	}
 
 	return D;
@@ -438,7 +438,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
-		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2.2e-7); // Epsilon set by trial and error
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2.5e-7); // Epsilon set by trial and error
 		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
 	}
 
@@ -476,7 +476,7 @@ TEST_F(RigidRepresentationTest, AddExternalGeneralizedForceExtraTermsTest)
 		D = rigidBody->getExternalGeneralizedDamping();
 
 		EXPECT_LE((F - Fnumeric).cwiseAbs().maxCoeff(), 2e-7);
-		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2e-7);
+		EXPECT_LE((K - Knumeric).cwiseAbs().maxCoeff(), 2.5e-7); // Epsilon set by trial and error
 		EXPECT_LE((D - Dnumeric).cwiseAbs().maxCoeff(), 2e-7);
 	}
 }
@@ -561,7 +561,7 @@ Matrix66d computeSpringStiffness(double linearStiffness, double linearDamping,
 												targetAngularVelocity, dofX, dofVelocity,
 												doComputeExtraTorque, localApplicationPoint);
 
-		K.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
+		K.col(column) = -(-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
 	}
 
 	return K;
@@ -607,7 +607,7 @@ Matrix66d computeSpringDamping(double linearStiffness, double linearDamping,
 												targetAngularVelocity, dofPosition, dofV,
 												doComputeExtraTorque, localApplicationPoint);
 
-		D.col(column) = - (-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
+		D.col(column) = -(-fXPlus2H + 8.0 * fXPlusH - 8.0 * fXMinusH + fXMinus2H) / (12.0 * epsilon);
 	}
 
 	return D;
@@ -878,9 +878,9 @@ void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
 
 TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 {
-	Quaterniond q  = Quaterniond::Identity();
+	Quaterniond q = Quaterniond::Identity();
 	Vector3d vZero = Vector3d::Zero();
-	Vector3d vMax  = Vector3d::Constant(std::numeric_limits<double>::max());
+	Vector3d vMax = Vector3d::Constant(std::numeric_limits<double>::max());
 
 	// Test linear failure (with Signaling Nan)
 	{
@@ -1083,7 +1083,7 @@ TEST_F(RigidRepresentationTest, SerializationTest)
 			node = YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(rigidRepresentation));
 
 		std::shared_ptr<RigidRepresentation> newRepresentation;
-		EXPECT_NO_THROW(newRepresentation =	std::dynamic_pointer_cast<RigidRepresentation>
+		EXPECT_NO_THROW(newRepresentation = std::dynamic_pointer_cast<RigidRepresentation>
 											(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 	}
 
