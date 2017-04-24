@@ -46,8 +46,8 @@ selected, go to the Object tab in the Properties Panel and look under the Custom
 
 ### MeshPy Installation ###
 On Linux:
-1. Make sure pip is installed (usually installed with Python.
-2. Run `pip install meshpy`
+1. Make sure pip is installed (at this point Blender uses Python3 so you'll need the appropriate pip for that version)
+2. Run `pip install meshpy` (or on some systems: `pip3 install meshpy`)
 
 On Windows:
 Blender comes with its own python installation which gives you the option to install pip on there and install meshpy 
