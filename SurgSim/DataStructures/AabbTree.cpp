@@ -47,14 +47,14 @@ void AabbTree::add(const SurgSim::Math::Aabbd& aabb, size_t objectId)
 	m_typedRoot->addData(aabb, objectId, m_maxObjectsPerNode);
 }
 
-void AabbTree::set(const std::list<AabbTreeData::Item>& items)
+void AabbTree::set(const AabbTreeData::ItemList& items)
 {
 	m_typedRoot = std::make_shared<AabbTreeNode>();
 	setRoot(m_typedRoot);
 	m_typedRoot->setData(items, m_maxObjectsPerNode);
 }
 
-void AabbTree::set(std::list<AabbTreeData::Item>&& items)
+void AabbTree::set(AabbTreeData::ItemList&& items)
 {
 	m_typedRoot = std::make_shared<AabbTreeNode>();
 	setRoot(m_typedRoot);

@@ -230,7 +230,7 @@ void MeshShape::updateAabbTree()
 {
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 
-	std::list<DataStructures::AabbTreeData::Item> items;
+	SurgSim::DataStructures::AabbTreeData::ItemList items;
 
 	auto const& triangles = getTriangles();
 

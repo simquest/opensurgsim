@@ -67,7 +67,7 @@ public:
 	/// \param maxNodeData number of maximum items of data in this node, if more, the node will split,
 	///					   if 0 the node will not be split until it is no longer possible, the structure will
 	///                    approach a binary tree.
-	void setData(const std::list<AabbTreeData::Item>& items, size_t maxNodeData = 0);
+	void setData(const AabbTreeData::ItemList& items, size_t maxNodeData = 0);
 
 	/// Set the data on this node, rvalue reference version,
 	/// the node needs to be empty and not have any children for this to work.
@@ -76,7 +76,7 @@ public:
 	/// \param maxNodeData number of maximum items of data in this node, if more, the node will split,
 	///					   if 0 the node will not be split until it is no longer possible, the structure will
 	///                    approach a binary tree.
-	void setData(std::list<AabbTreeData::Item>&& items, size_t maxNodeData);
+	void setData(AabbTreeData::ItemList&& items, size_t maxNodeData);
 
 	/// Fetch a list of items that have AABBs intersecting with the given AABB.
 	/// \param aabb The bounding box for the query.

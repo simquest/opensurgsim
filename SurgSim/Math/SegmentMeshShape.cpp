@@ -129,7 +129,7 @@ void SegmentMeshShape::updateAabbTree()
 {
 	m_aabbTree = std::make_shared<DataStructures::AabbTree>();
 
-	std::list<DataStructures::AabbTreeData::Item> items;
+	SurgSim::DataStructures::AabbTreeData::ItemList items;
 
 	auto const& edges = getEdges();
 
