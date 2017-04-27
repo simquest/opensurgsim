@@ -17,6 +17,7 @@
 #define SURGSIM_DATASTRUCTURES_AABBTREE_H
 
 #include <list>
+#include <vector>
 
 #include "SurgSim/DataStructures/Tree.h"
 #include "SurgSim/DataStructures/AabbTreeData.h"
@@ -82,6 +83,10 @@ public:
 	void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
 					 std::shared_ptr<AabbTreeNode> rhsParent,
 					 std::list<TreeNodePairType>* result) const;
+
+	void updateBounds(const std::vector<Math::Aabbd>& bounds);
+
+	void updateNodeBounds(const std::vector<Math::Aabbd>& bounds, SurgSim::DataStructures::AabbTreeNode* node);
 
 private:
 

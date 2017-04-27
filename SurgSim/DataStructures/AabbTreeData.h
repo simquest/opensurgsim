@@ -86,9 +86,15 @@ public:
 	/// \param [out] result list to be used for intersecting items
 	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result) const;
 
-private:
+	ItemList& getData()
+	{
+		return m_data;
+	}
+
 	/// Recalculate the aabb of this class, in case items where updated
 	void recalculateAabb();
+
+private:
 
 	bool isEqual(const TreeData* data) const override;
 

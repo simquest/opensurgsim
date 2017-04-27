@@ -126,6 +126,41 @@ void AabbTree::spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
 	}
 }
 
+void AabbTree::updateBounds(const std::vector<Math::Aabbd>& bounds)
+{
+	updateNodeBounds(bounds, static_cast<SurgSim::DataStructures::AabbTreeNode*>(getRoot().get()));
+}
+
+void AabbTree::updateNodeBounds(const std::vector<Math::Aabbd>& bounds,
+								SurgSim::DataStructures::AabbTreeNode* node)
+{
+
+	const size_t numChildren = node->getNumChildren();
+	if (numChildren > 0)
+	{
+		SurgSim::Math::Aabbd aabb;
+		aabb.setEmpty();
+
+		for (int i = 0; i < numChildren; ++i)
+		{
+			SurgSim::DataStructures::AabbTreeNode* child =
+				static_cast<SurgSim::DataStructures::AabbTreeNode*>(node->getChild(i).get());
+			updateNodeBounds(bounds, static_cast<SurgSim::DataStructures::AabbTreeNode*>(child));
+			aabb.extend(child->getAabb());
+		}
+		node->setAabb(aabb);
+	}
+	else
+	{
+		auto data = static_cast<SurgSim::DataStructures::AabbTreeData*>(node->getData().get());
+		for (auto& item : data->getData())
+		{
+			item.first = bounds[item.second];
+		}
+		data->recalculateAabb();
+	}
+}
+
 }
 }
 

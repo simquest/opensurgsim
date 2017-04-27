@@ -108,6 +108,12 @@ const SurgSim::Math::Aabbd& AabbTreeNode::getAabb() const
 	}
 }
 
+void AabbTreeNode::setAabb(const SurgSim::Math::Aabbd& aabb)
+{
+	SURGSIM_ASSERT(getNumChildren() != 0);
+	m_aabb = aabb;
+}
+
 void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t maxNodeData)
 {
 

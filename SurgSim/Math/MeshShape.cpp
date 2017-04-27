@@ -17,6 +17,8 @@
 
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeData.h"
+#include "SurgSim/DataStructures/AabbTreeNode.h"
+#include "SurgSim/DataStructures/TreeNode.h"
 #include "SurgSim/Framework/Assert.h"
 
 using SurgSim::DataStructures::EmptyData;
@@ -245,6 +247,21 @@ void MeshShape::updateAabbTree()
 	m_aabbTree->set(std::move(items));
 
 	m_aabb = m_aabbTree->getAabb();
+}
+
+void MeshShape::actuallyUpdateAabbTree()
+{
+	m_aabbCache.resize(getTriangles().size());
+	size_t i = 0;
+	for (const auto& triangle : getTriangles())
+	{
+		m_aabbCache[i++] = SurgSim::Math::makeAabb(
+							   getVertexPosition(triangle.verticesId[0]),
+							   getVertexPosition(triangle.verticesId[1]),
+							   getVertexPosition(triangle.verticesId[2]));
+	}
+
+	m_aabbTree->updateBounds(m_aabbCache);
 }
 
 bool MeshShape::isTransformable() const
