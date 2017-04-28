@@ -71,10 +71,10 @@ bool MeshShape::calculateNormals()
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Math/MeshShape")) <<
 					"MeshShape::calculateNormals unable to calculate normals. For example, for triangle #" << i <<
-					" with vertices:" << std::endl << "1: " << vertex0.transpose() << std::endl <<
-					"2: " << vertex1.transpose() << std::endl << "3: " << vertex2.transpose();
+					" with vertices:" << std::endl << "1: " << vertex0.transpose() << " [" << getTriangle(i).verticesId[0] << "]" << std::endl <<
+					"2: " << vertex1.transpose() << " [" << getTriangle(i).verticesId[1] << "]" << std::endl << "3: " << vertex2.transpose() << " [" << getTriangle(i).verticesId[2] << "]";
 			result = false;
-			break;
+			continue;
 		}
 		normal.normalize();
 		getTriangle(i).data.normal = normal;
@@ -217,7 +217,10 @@ std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose) c
 {
 	auto transformed = std::make_shared<MeshShape>(*this);
 	transformed->transform(pose);
-	transformed->update();
+	if (!transformed->update())
+	{
+		return nullptr;
+	}
 	return transformed;
 }
 

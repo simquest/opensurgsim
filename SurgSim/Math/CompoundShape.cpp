@@ -270,6 +270,10 @@ std::shared_ptr<Shape> CompoundShape::getTransformed(const RigidTransform3d& pos
 		{
 			newShape = shape.first;
 		}
+		if (newShape == nullptr)
+		{
+			return nullptr;
+		}
 		transformed->addShape(newShape, newPose);
 	}
 	return transformed;

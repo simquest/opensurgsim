@@ -89,7 +89,11 @@ SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 void RigidCollisionRepresentation::updateShapeData()
 {
 	// All we want to do is to transform the shape into the current pose
-	getPosedShape();
+	if (getPosedShape() == nullptr)
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Physics/RigidCollisionRepresentation")) <<
+			"Could not update pose of " << getFullName();
+	}
 }
 
 
