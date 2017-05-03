@@ -57,7 +57,7 @@ int RigidCollisionRepresentation::getShapeType() const
 	return getShape()->getType();
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> RigidCollisionRepresentation::getShape() const
 {
 	if (m_shape != nullptr)
 	{
@@ -88,8 +88,23 @@ SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 
 void RigidCollisionRepresentation::updateShapeData()
 {
-	// All we want to do is to transform the shape into the current pose
-	getPosedShape();
+	auto verticesShape = std::dynamic_pointer_cast<Math::VerticesShape>(m_shape);
+	if (verticesShape != nullptr)
+	{
+		Math::RigidTransform3d currentPose;
+		auto physicsRepresentation = m_physicsRepresentation.lock();
+		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+				"PhysicsRepresentation went out of scope for Collision Representation " << getFullName();
+		const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
+		Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+		currentPose = physicsCurrentPose * transform;
+
+		verticesShape->setPose(currentPose);
+
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape(verticesShape, currentPose);
+		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape, posedShape);
+		setPosedShapeMotion(posedShapeMotion);
+	}
 }
 
 

@@ -54,7 +54,7 @@ public:
 
 	/// Get the shape
 	/// \return The actual shape used for collision.
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	std::shared_ptr<Math::Shape> getShape() const override;
 
 	/// Set the shape
 	/// The default is to use the shape of the Rigid Representation, this

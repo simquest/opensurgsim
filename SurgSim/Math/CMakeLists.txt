@@ -50,6 +50,7 @@ set(SURGSIM_MATH_SOURCES
 	Shape.cpp
 	SphereShape.cpp
 	SurfaceMeshShape.cpp
+	VerticesShape.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
@@ -131,6 +132,7 @@ set(SURGSIM_MATH_HEADERS
 	Valid.h
 	Valid-inl.h
 	Vector.h
+	VerticesShape.h
 )
 surgsim_create_library_header(Math.h "${SURGSIM_MATH_HEADERS}")
 

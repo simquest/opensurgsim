@@ -24,6 +24,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/VerticesShape.h"
 
 namespace SurgSim
 {
@@ -51,7 +52,7 @@ SURGSIM_STATIC_REGISTRATION(MeshShape);
 /// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
 ///
 /// \sa SurfaceMeshShape
-class MeshShape : public Shape, public SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData,
+class MeshShape : public VerticesShape, public SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData,
 	SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::NormalData>
 {
 public:
@@ -93,7 +94,7 @@ public:
 
 	bool isValid() const override;
 
-	bool isTransformable() const override;
+	void setPose(const RigidTransform3d& pose) override;
 
 protected:
 	bool doUpdate() override;

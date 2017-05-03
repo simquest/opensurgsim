@@ -48,6 +48,7 @@ MeshShape::MeshShape(const MeshShape& other) :
 	m_volume(other.getVolume()),
 	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
+	setInitialVertices(other.getInitialVertices());
 	updateAabbTree();
 }
 
@@ -247,11 +248,20 @@ void MeshShape::updateAabbTree()
 	m_aabb = m_aabbTree->getAabb();
 }
 
-bool MeshShape::isTransformable() const
+void MeshShape::setPose(const RigidTransform3d& pose)
 {
-	return true;
+	auto& vertices = getVertices();
+	const size_t numVertices = vertices.size();
+	const auto& initialVertices = m_initialVertices.getVertices();
+	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+		"MeshShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
+		" vertices, vs initially " << initialVertices.size() << " vertices.";
+	for (size_t i = 0; i < numVertices; ++i)
+	{
+		vertices[i].position = pose * initialVertices[i].position;
+	}
+	calculateNormals();
 }
-
 
 }; // namespace Math
 }; // namespace SurgSim

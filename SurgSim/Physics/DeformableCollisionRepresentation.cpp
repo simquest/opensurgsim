@@ -130,7 +130,7 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 	m_shape = shape;
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> DeformableCollisionRepresentation::getShape() const
 {
 	return m_shape;
 }

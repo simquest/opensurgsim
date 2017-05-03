@@ -143,3 +143,43 @@ TEST_F(SegmentMeshShapeTest, LoadShape)
 
 	EXPECT_DOUBLE_EQ(1.234, mesh->getRadius());
 }
+
+TEST_F(SegmentMeshShapeTest, GetPose)
+{
+	auto segmentMeshPlain = std::make_shared<SurgSim::DataStructures::SegmentMeshPlain>();
+	const int numPoints = 10;
+	for (int i = 0; i < numPoints; i++)
+	{
+		segmentMeshPlain->addVertex(SurgSim::DataStructures::SegmentMeshPlain::VertexType(Vector3d::Random()));
+	}
+	auto segmentMeshShape = std::make_shared<SegmentMeshShape>(*segmentMeshPlain);
+
+	const auto& initial = segmentMeshShape->getInitialVertices();
+	for (size_t i = 0; i < segmentMeshShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(segmentMeshShape->getVertex(i).position.isApprox(initial.getVertex(i).position));
+	}
+
+	const auto pose = SurgSim::Math::makeRigidTransform(
+		SurgSim::Math::makeRotationQuaternion(0.1, Vector3d(0.1, 0.2, -0.1)),
+		Vector3d(3.0, 4.0, -5.0));
+	segmentMeshShape->setPose(pose);
+	for (size_t i = 0; i < segmentMeshShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(segmentMeshShape->getVertex(i).position.isApprox(pose * initial.getVertex(i).position));
+	}
+
+	segmentMeshShape->setPose(SurgSim::Math::RigidTransform3d::Identity());
+	for (size_t i = 0; i < segmentMeshShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(segmentMeshShape->getVertex(i).position.isApprox(initial.getVertex(i).position));
+	}
+
+	segmentMeshShape->setPose(pose);
+	segmentMeshShape->setInitialVertices(*segmentMeshShape);
+	const auto& newInitial = segmentMeshShape->getInitialVertices();
+	for (size_t i = 0; i < segmentMeshShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(segmentMeshShape->getVertex(i).position.isApprox(newInitial.getVertex(i).position));
+	}
+}

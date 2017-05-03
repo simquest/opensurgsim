@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/VerticesShape.h"
 
 namespace SurgSim
 {
@@ -33,7 +34,7 @@ SURGSIM_STATIC_REGISTRATION(SegmentMeshShape);
 /// But, unlike MeshShape, the mesh does not have any triangle topology. It only consists of edges.
 ///
 /// \sa MeshShape
-class SegmentMeshShape : public Shape, public DataStructures::SegmentMeshPlain
+class SegmentMeshShape : public VerticesShape, public DataStructures::SegmentMeshPlain
 {
 public:
 	/// Constructor
@@ -68,9 +69,9 @@ public:
 	/// \return The object's associated AabbTree
 	std::shared_ptr<const DataStructures::AabbTree> getAabbTree() const;
 
-	bool isTransformable() const override;
-
 	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const override;
+
+	void setPose(const RigidTransform3d& pose) override;
 
 protected:
 	bool doUpdate() override;

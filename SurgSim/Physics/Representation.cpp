@@ -32,11 +32,11 @@ namespace Physics
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
 	m_collisionRepresentation(nullptr),
+	m_logger(Framework::Logger::getLogger("Physics/Representation")),
 	m_gravity(0.0, -9.81, 0.0),
 	m_numDof(0),
 	m_isGravityEnabled(true),
-	m_isDrivingSceneElementPose(true),
-	m_logger(SurgSim::Framework::Logger::getLogger("Physics/Representation"))
+	m_isDrivingSceneElementPose(true)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, size_t, NumDof, getNumDof, setNumDof);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, IsGravityEnabled, isGravityEnabled, setIsGravityEnabled);
