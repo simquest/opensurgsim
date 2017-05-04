@@ -67,7 +67,7 @@ static const int cubeNumEdges = 12;
 static const int cubeEdges[12][2] =
 {
 	{0, 1}, {3, 2}, {4, 5}, {7, 6}, // +X
-	{0, 3}, {1, 2}, {4, 7}, {5 , 6}, // +Y
+	{0, 3}, {1, 2}, {4, 7}, {5, 6},  // +Y
 	{0, 4}, {1, 5}, {2, 6}, {3, 7}  // +Z
 };
 
@@ -217,7 +217,7 @@ TEST_F(MeshShapeTest, GetPose)
 	}
 
 	const auto pose = makeRigidTransform(makeRotationQuaternion(0.1, Vector3d(0.1, 0.2, -0.1)),
-		Vector3d(3.0, 4.0, -5.0));
+										 Vector3d(3.0, 4.0, -5.0));
 	meshShape->setPose(pose);
 	for (size_t i = 0; i < meshShape->getNumVertices(); ++i)
 	{
@@ -459,7 +459,7 @@ TEST_F(MeshShapeTest, DoLoadTest)
 	}
 
 	{
-		SCOPED_TRACE("Load of non existant file should throw");
+		SCOPED_TRACE("Load of non existing file should throw");
 		auto fileName = std::string("Nonexistent file");
 		auto meshShape = std::make_shared<MeshShape>();
 		EXPECT_THROW(meshShape->load("Nonexistent file"), SurgSim::Framework::AssertionFailure);

@@ -96,22 +96,30 @@ void RigidCollisionRepresentation::updateShapeData()
 		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
 				"PhysicsRepresentation went out of scope for Collision Representation " << getFullName();
 		const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
-		Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
-		currentPose = physicsCurrentPose * transform;
+		currentPose = physicsCurrentPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
 
 		verticesShape->setPose(currentPose);
 
 		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape(verticesShape, currentPose);
 		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape, posedShape);
 		setPosedShapeMotion(posedShapeMotion);
+		m_aabb = m_shape->getBoundingBox();
+	}
+	else if (m_shape != nullptr)
+	{
+		m_aabb = SurgSim::Math::transformAabb(getPose(), m_shape->getBoundingBox());
 	}
 }
 
 
 void RigidCollisionRepresentation::updateDcdData()
 {
-	// HS-2-Mar-2016
-	// #todo need to trigger the aabb tree build/update here
+
+	auto vertices = dynamic_cast<SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData>*>(m_shape.get());
+	if (vertices != nullptr)
+	{
+		vertices->update();
+	}
 }
 
 
@@ -155,6 +163,11 @@ void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 
 }
 
+
+SurgSim::Math::Aabbd RigidCollisionRepresentation::getBoundingBox() const
+{
+	return m_aabb;
+}
 
 }; // namespace Collision
 }; // namespace SurgSim

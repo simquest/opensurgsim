@@ -197,7 +197,7 @@ public:
 	bool isAllowing(const std::shared_ptr<Representation>& representation) const;
 
 	/// \return the Bounding box for this object
-	Math::Aabbd getBoundingBox() const;
+	virtual Math::Aabbd getBoundingBox() const;
 
 protected:
 	/// Invalidate the cached posed shape motion
