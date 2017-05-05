@@ -207,5 +207,43 @@ TEST_F(RigidCollisionRepresentationTest, GetPosedShape)
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 }
 
+
+TEST_F(RigidCollisionRepresentationTest, MeshPoseTest)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	const std::string fileName = "Geometry/staple_collision.ply";
+	auto mesh = std::make_shared<SurgSim::DataStructures::TriangleMeshPlain>();
+	EXPECT_NO_THROW(mesh->load(fileName));
+
+	auto originalMesh = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
+	auto expectedMesh = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
+
+	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("Collision");
+	auto physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
+
+	physicsRepresentation->setDensity(8050); // Stainless steel (in Kg.m-3)
+	physicsRepresentation->setShape(originalMesh);
+	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
+	collisionRepresentation->setShape(physicsRepresentation->getShape());
+	collisionRepresentation->update(dt);
+
+	auto actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape());
+	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
+	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
+
+	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(Vector3d(4.3, 2.1, 6.5),
+		Vector3d(-1.5, 7.5, -2.5),
+		Vector3d(8.7, -4.7, -3.1));
+	collisionRepresentation->setLocalPose(transform);
+	collisionRepresentation->update(dt);
+
+	actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape());
+	expectedMesh->transform(transform);
+	expectedMesh->update();
+	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
+	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
+}
+
 } // namespace Physics
 } // namespace SurgSim

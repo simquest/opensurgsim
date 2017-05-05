@@ -48,6 +48,7 @@ MeshShape::MeshShape(const MeshShape& other) :
 	m_volume(other.getVolume()),
 	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
+	setInitialVertices(other.getInitialVertices());
 	updateAabbTree();
 }
 
@@ -216,7 +217,7 @@ void MeshShape::computeVolumeIntegrals()
 std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose) const
 {
 	auto transformed = std::make_shared<MeshShape>(*this);
-	transformed->transform(pose);
+	transformed->setPose(pose);
 	transformed->update();
 	return transformed;
 }
@@ -244,14 +245,29 @@ void MeshShape::updateAabbTree()
 	}
 	m_aabbTree->set(std::move(items));
 
-	m_aabb = m_aabbTree->getAabb();
 }
 
-bool MeshShape::isTransformable() const
+void MeshShape::setPose(const RigidTransform3d& pose)
 {
-	return true;
-}
+	auto& vertices = getVertices();
+	const size_t numVertices = vertices.size();
+	const auto& initialVertices = m_initialVertices.getVertices();
+	m_aabb.setEmpty();
 
+	if (initialVertices.size() == 0)
+	{
+		setInitialVertices(*this);
+	}
+
+	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+			"MeshShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
+			" vertices, vs initially " << initialVertices.size() << " vertices.";
+	for (size_t i = 0; i < numVertices; ++i)
+	{
+		vertices[i].position = pose * initialVertices[i].position;
+		m_aabb.extend(vertices[i].position);
+	}
+}
 
 }; // namespace Math
 }; // namespace SurgSim

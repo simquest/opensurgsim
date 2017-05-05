@@ -145,6 +145,9 @@ protected:
 	/// \param pose New pose for the SceneElement
 	void driveSceneElementPose(const SurgSim::Math::RigidTransform3d& pose);
 
+	/// Logger for this class.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
 private:
 	/// NO copy constructor
 	Representation(const Representation&);
@@ -163,9 +166,6 @@ private:
 
 	/// Is this representation driving the sceneElement pose
 	bool m_isDrivingSceneElementPose;
-
-	/// Logger for this class.
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 };  // namespace Physics

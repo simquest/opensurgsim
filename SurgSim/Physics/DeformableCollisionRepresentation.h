@@ -57,7 +57,7 @@ public:
 	/// \param shape The shape to be used.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	std::shared_ptr<Math::Shape> getShape() const override;
 
 	/// Sets the deformable to which this collision representation is connected
 	/// \param representation The deformable that will be used to update the contained mesh

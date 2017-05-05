@@ -66,7 +66,7 @@ int ParticlesCollisionRepresentation::getShapeType() const
 	return m_shape->getType();
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> ParticlesCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> ParticlesCollisionRepresentation::getShape() const
 {
 	return m_shape;
 }

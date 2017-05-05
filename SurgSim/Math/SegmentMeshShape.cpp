@@ -39,6 +39,7 @@ SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
 	DataStructures::SegmentMeshPlain(other)
 {
 	setRadius(other.m_radius);
+	setInitialVertices(other.getInitialVertices());
 	updateAabbTree();
 }
 
@@ -149,9 +150,18 @@ void SegmentMeshShape::updateAabbTree()
 	m_aabb = m_aabbTree->getAabb();
 }
 
-bool SegmentMeshShape::isTransformable() const
+void SegmentMeshShape::setPose(const RigidTransform3d& pose)
 {
-	return true;
+	auto& vertices = getVertices();
+	const size_t numVertices = vertices.size();
+	const auto& initialVertices = m_initialVertices.getVertices();
+	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+		"SegmentMeshShape cannot update vertices' positions because of mismatched size: currently " <<
+		numVertices << " vertices, vs initially " << initialVertices.size() << " vertices.";
+	for (size_t i = 0; i < numVertices; ++i)
+	{
+		vertices[i].position = pose * initialVertices[i].position;
+	}
 }
 
 }; // namespace Math

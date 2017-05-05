@@ -49,38 +49,17 @@ namespace
 {
 bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shape* shape)
 {
-	bool result = false;
+	auto vertices = dynamic_cast<SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData>*>(shape);
+	SURGSIM_ASSERT(vertices != nullptr) << "The Shape is not a Vertices.";
 	const size_t numNodes = odeState.getNumNodes();
+	SURGSIM_ASSERT(vertices->getNumVertices() == numNodes) <<
+			"The number of nodes in the deformable does not match the number of vertices in the shape.";
 
-	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
-		shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
+	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 	{
-		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(shape);
-		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
-		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
-				"The number of nodes in the deformable does not match the number of vertices in the mesh.";
-
-		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
-		{
-			meshShape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
-		}
-		result = meshShape->update();
+		vertices->setVertexPosition(nodeId, odeState.getPosition(nodeId));
 	}
-	else if (shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
-	{
-		auto meshShape = dynamic_cast<SurgSim::Math::SegmentMeshShape*>(shape);
-		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
-		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
-				"The number of nodes in the deformable does not match the number of vertices in the mesh.";
-
-		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
-		{
-			meshShape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
-		}
-		result = meshShape->update();
-	}
-
-	return result;
+	return vertices->update();
 }
 }
 
@@ -130,7 +109,7 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 	m_shape = shape;
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> DeformableCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> DeformableCollisionRepresentation::getShape() const
 {
 	return m_shape;
 }
@@ -172,8 +151,9 @@ void DeformableCollisionRepresentation::updateShapeData()
 
 void DeformableCollisionRepresentation::updateDcdData()
 {
-	// HS-2-Mar-2016
-	// #todo should only have to build the AABB tree here
+	auto vertices = dynamic_cast<SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData>*>(m_shape.get());
+	SURGSIM_ASSERT(vertices != nullptr) << "The Shape is not a Vertices.";
+	vertices->update(); // Update normals, update AABBTree
 }
 
 void DeformableCollisionRepresentation::updateCcdData(double interval)
@@ -195,7 +175,7 @@ void DeformableCollisionRepresentation::updateCcdData(double interval)
 		{
 			SURGSIM_FAILURE() << "Invalid type, should be MeshShape(" << SurgSim::Math::SHAPE_TYPE_MESH <<
 							  ") or SegmentMeshShape(" << SurgSim::Math::SHAPE_TYPE_SEGMENTMESH <<
-							  ") or SurfaceMeshShape(" << SurgSim::Math::SHAPE_TYPE_SURFACEMESH <<"), but it is " <<
+							  ") or SurfaceMeshShape(" << SurgSim::Math::SHAPE_TYPE_SURFACEMESH << "), but it is " <<
 							  m_shape->getType();
 		}
 	}

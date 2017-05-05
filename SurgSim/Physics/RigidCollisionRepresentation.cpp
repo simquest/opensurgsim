@@ -57,7 +57,7 @@ int RigidCollisionRepresentation::getShapeType() const
 	return getShape()->getType();
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> RigidCollisionRepresentation::getShape() const
 {
 	if (m_shape != nullptr)
 	{
@@ -88,15 +88,38 @@ SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 
 void RigidCollisionRepresentation::updateShapeData()
 {
-	// All we want to do is to transform the shape into the current pose
-	getPosedShape();
+	auto verticesShape = std::dynamic_pointer_cast<Math::VerticesShape>(m_shape);
+	if (verticesShape != nullptr)
+	{
+		Math::RigidTransform3d currentPose;
+		auto physicsRepresentation = m_physicsRepresentation.lock();
+		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+				"PhysicsRepresentation went out of scope for Collision Representation " << getFullName();
+		const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
+		currentPose = physicsCurrentPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+
+		verticesShape->setPose(currentPose);
+
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape(verticesShape, currentPose);
+		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape, posedShape);
+		setPosedShapeMotion(posedShapeMotion);
+		m_aabb = m_shape->getBoundingBox();
+	}
+	else if (m_shape != nullptr)
+	{
+		m_aabb = SurgSim::Math::transformAabb(getPose(), m_shape->getBoundingBox());
+	}
 }
 
 
 void RigidCollisionRepresentation::updateDcdData()
 {
-	// HS-2-Mar-2016
-	// #todo need to trigger the aabb tree build/update here
+
+	auto vertices = dynamic_cast<SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData>*>(m_shape.get());
+	if (vertices != nullptr)
+	{
+		vertices->update();
+	}
 }
 
 
@@ -140,6 +163,11 @@ void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 
 }
 
+
+SurgSim::Math::Aabbd RigidCollisionRepresentation::getBoundingBox() const
+{
+	return m_aabb;
+}
 
 }; // namespace Collision
 }; // namespace SurgSim

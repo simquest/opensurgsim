@@ -29,6 +29,7 @@ MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMesh<V, E, T>& other
 {
 	SURGSIM_ASSERT(other.isValid()) << "Invalid mesh";
 
+	setInitialVertices(other);
 	updateAabbTree();
 	computeVolumeIntegrals();
 	calculateNormals();
