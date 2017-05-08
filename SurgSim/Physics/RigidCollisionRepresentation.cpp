@@ -31,7 +31,9 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollision
 				 RigidCollisionRepresentation);
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
-	Representation(name)
+	Representation(name),
+	m_oldVolume(-1.0),
+	m_aabbThreshold(0.1)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
 									  Shape, getShape, setShape);
@@ -114,12 +116,39 @@ void RigidCollisionRepresentation::updateShapeData()
 
 void RigidCollisionRepresentation::updateDcdData()
 {
-
-	auto vertices = dynamic_cast<SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData>*>(m_shape.get());
-	if (vertices != nullptr)
+	static size_t updateCount = 0;
+	static size_t rebuiltCount = 0;
+	static int count = 0;
+	if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+		m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
 	{
-		vertices->update();
+		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(m_shape.get());
+		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
+
+		std::cout << meshShape->getBoundingBox() << "\n";
+
+		//if (std::abs(m_oldVolume - meshShape->getBoundingBox().volume()) > m_aabbThreshold)
+		if (true)
+		{
+			meshShape->update();
+			m_oldVolume = meshShape->getBoundingBox().volume();
+			rebuiltCount += 1.0;
+		}
+		else
+		{
+			meshShape->actuallyUpdateAabbTree();
+			meshShape->calculateNormals();
+			updateCount += 1.0;
+		}
 	}
+
+	count++;
+	if (count > 1000)
+	{
+		std::cout << "Ratio :" << updateCount << ":" << rebuiltCount << "\n";
+		count = 0;
+	}
+
 }
 
 

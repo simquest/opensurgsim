@@ -108,6 +108,12 @@ const SurgSim::Math::Aabbd& AabbTreeNode::getAabb() const
 	}
 }
 
+void AabbTreeNode::setAabb(const SurgSim::Math::Aabbd& aabb)
+{
+	SURGSIM_ASSERT(getNumChildren() != 0);
+	m_aabb = aabb;
+}
+
 void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t maxNodeData)
 {
 
@@ -134,7 +140,7 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 	}
 }
 
-void AabbTreeNode::setData(const std::list<AabbTreeData::Item>& items, size_t maxNodeData)
+void AabbTreeNode::setData(const AabbTreeData::ItemList& items, size_t maxNodeData)
 {
 	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
 	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
@@ -144,7 +150,7 @@ void AabbTreeNode::setData(const std::list<AabbTreeData::Item>& items, size_t ma
 	splitNode(maxNodeData);
 }
 
-void AabbTreeNode::setData(std::list<AabbTreeData::Item>&& items, size_t maxNodeData)
+void AabbTreeNode::setData(AabbTreeData::ItemList&& items, size_t maxNodeData)
 {
 	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
 	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";

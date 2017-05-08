@@ -78,11 +78,17 @@ private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
+	bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shape* shape);
+
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::Shape> m_shape, m_previousShape;
 
 	/// Reference to the deformable driving changes to this mesh
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentation> m_deformable;
+	
+	double m_oldVolume;
+	
+	double m_aabbThreshold;
 };
 
 } // namespace Physics

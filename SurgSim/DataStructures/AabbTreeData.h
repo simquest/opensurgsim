@@ -36,6 +36,7 @@ class AabbTreeData : public TreeData
 public:
 
 	typedef std::pair<SurgSim::Math::Aabbd, size_t> Item;
+	typedef std::list<Item> ItemList;
 
 	/// Constructor
 	AabbTreeData();
@@ -44,10 +45,10 @@ public:
 	AabbTreeData(const AabbTreeData& data);
 
 	/// Constructor with list of items
-	explicit AabbTreeData(const std::list<Item>& data);
+	explicit AabbTreeData(const ItemList& data);
 
 	/// Constructor with moveable list of items
-	explicit AabbTreeData(std::list<Item>&& data);
+	explicit AabbTreeData(ItemList&& data);
 
 	/// Destructor
 	~AabbTreeData();
@@ -85,17 +86,24 @@ public:
 	/// \param [out] result list to be used for intersecting items
 	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result) const;
 
-private:
+	ItemList& getData()
+	{
+		return m_data;
+	}
+
 	/// Recalculate the aabb of this class, in case items where updated
 	void recalculateAabb();
 
+private:
+
 	bool isEqual(const TreeData* data) const override;
 
-	/// AABB containg all items
+	/// AABB containing all items
 	SurgSim::Math::Aabbd m_aabb;
 
 	/// The items that were added to this list
-	std::list<Item> m_data;
+
+	ItemList m_data;
 };
 
 }

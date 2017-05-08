@@ -85,7 +85,7 @@ bool ParticlesShape::doUpdate()
 	const double numParticles = static_cast<double>(getVertices().size());
 	const Vector3d radius = Vector3d::Constant(m_radius);
 
-	std::list<DataStructures::AabbTreeData::Item> items;
+	SurgSim::DataStructures::AabbTreeData::ItemList items;
 	Vector3d totalPosition = Vector3d::Zero();
 	Matrix33d totalDisplacementSkewSquared = Matrix33d::Zero();
 	size_t id = 0;

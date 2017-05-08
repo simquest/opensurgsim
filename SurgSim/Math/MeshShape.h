@@ -31,6 +31,7 @@ namespace SurgSim
 namespace DataStructures
 {
 class AabbTree;
+class AabbTreeNode;
 }
 
 namespace Math
@@ -96,15 +97,18 @@ public:
 
 	void setPose(const RigidTransform3d& pose) override;
 
-protected:
-	bool doUpdate() override;
-
-	bool doLoad(const std::string& fileName) override;
+	void actuallyUpdateAabbTree();
 
 	/// Calculate normals for all triangles.
 	/// \note Normals will be normalized.
 	/// \return true on success, or false if any triangle has an indeterminate normal.
 	bool calculateNormals();
+
+
+protected:
+	bool doUpdate() override;
+
+	bool doLoad(const std::string& fileName) override;
 
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	void updateAabbTree();
@@ -125,6 +129,7 @@ protected:
 private:
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
+	std::vector<SurgSim::Math::Aabbd> m_aabbCache;
 };
 
 }; // Math
