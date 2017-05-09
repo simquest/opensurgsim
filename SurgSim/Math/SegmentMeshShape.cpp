@@ -32,7 +32,7 @@ SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::SegmentMeshShape, SegmentM
 SegmentMeshShape::SegmentMeshShape()
 {
 	setRadius(0.001);
-	updateAabbTree();
+	buildAabbTree();
 }
 
 SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
@@ -40,7 +40,7 @@ SegmentMeshShape::SegmentMeshShape(const SegmentMeshShape& other) :
 {
 	setRadius(other.m_radius);
 	setInitialVertices(other.getInitialVertices());
-	updateAabbTree();
+	buildAabbTree();
 }
 
 int SegmentMeshShape::getType() const
@@ -87,7 +87,7 @@ double SegmentMeshShape::getRadius() const
 
 bool SegmentMeshShape::doUpdate()
 {
-	updateAabbTree();
+	buildAabbTree();
 	return true;
 }
 
@@ -126,7 +126,7 @@ std::shared_ptr<Shape> SegmentMeshShape::getTransformed(const RigidTransform3d& 
 	return transformed;
 }
 
-void SegmentMeshShape::updateAabbTree()
+void SegmentMeshShape::buildAabbTree()
 {
 	m_aabbTree = std::make_shared<DataStructures::AabbTree>();
 
@@ -150,14 +150,35 @@ void SegmentMeshShape::updateAabbTree()
 	m_aabb = m_aabbTree->getAabb();
 }
 
+void SegmentMeshShape::updateAabbTree()
+{
+	auto const& edges = getEdges();
+	m_aabbCache.resize(edges.size());
+
+	for (size_t id = 0; id < edges.size(); ++id)
+	{
+		if (edges[id].isValid)
+		{
+			const auto& vertices = getEdgePositions(id);
+			Aabbd aabb((vertices[0] - m_segmentEndBoundingBoxHalfExtent).eval());
+			aabb.extend((vertices[0] + m_segmentEndBoundingBoxHalfExtent).eval());
+			aabb.extend((vertices[1] - m_segmentEndBoundingBoxHalfExtent).eval());
+			aabb.extend((vertices[1] + m_segmentEndBoundingBoxHalfExtent).eval());
+			m_aabbCache[id] = aabb;
+		}
+	}
+	m_aabbTree->updateBounds(m_aabbCache);
+	m_aabb = m_aabbTree->getAabb();
+}
+
 void SegmentMeshShape::setPose(const RigidTransform3d& pose)
 {
 	auto& vertices = getVertices();
 	const size_t numVertices = vertices.size();
 	const auto& initialVertices = m_initialVertices.getVertices();
 	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
-		"SegmentMeshShape cannot update vertices' positions because of mismatched size: currently " <<
-		numVertices << " vertices, vs initially " << initialVertices.size() << " vertices.";
+			"SegmentMeshShape cannot update vertices' positions because of mismatched size: currently " <<
+			numVertices << " vertices, vs initially " << initialVertices.size() << " vertices.";
 	for (size_t i = 0; i < numVertices; ++i)
 	{
 		vertices[i].position = pose * initialVertices[i].position;

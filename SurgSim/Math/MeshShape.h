@@ -97,7 +97,12 @@ public:
 
 	void setPose(const RigidTransform3d& pose) override;
 
-	void actuallyUpdateAabbTree();
+	/// Build the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void buildAabbTree();
+
+	/// Update the AabbTree, this will only update the bounding boxes for the triangles, without rebalancing the tree
+	/// do this for smaller changes as it is much faster than building the tree
+	void updateAabbTree();
 
 	/// Calculate normals for all triangles.
 	/// \note Normals will be normalized.
@@ -109,9 +114,6 @@ protected:
 	bool doUpdate() override;
 
 	bool doLoad(const std::string& fileName) override;
-
-	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
 
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.

@@ -29,7 +29,7 @@ SegmentMeshShape::SegmentMeshShape(
 {
 	setInitialVertices(mesh);
 	setRadius(radius);
-	updateAabbTree();
+	buildAabbTree();
 }
 
 }; // namespace Math

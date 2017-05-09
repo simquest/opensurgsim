@@ -97,7 +97,7 @@ Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim,
 		Eigen::AlignedBox<Scalar, Dim>::BottomLeftCeil, Eigen::AlignedBox<Scalar, Dim>::BottomRightCeil,
 		Eigen::AlignedBox<Scalar, Dim>::TopLeftCeil, Eigen::AlignedBox<Scalar, Dim>::TopRightCeil,
 	};
-	if (aabb.isEmpty())
+	if (aabb.isEmpty() || transform.isApprox(Eigen::Transform<Scalar, Dim, Eigen::Isometry>::Identity()))
 	{
 		return aabb;
 	}
