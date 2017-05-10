@@ -640,12 +640,14 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 	SurgSim::Math::Matrix K = tet.getRotatedStiffnessMatrix(state);
 
 	SurgSim::Math::Vector ones = SurgSim::Math::Vector::Ones(state.getNumDof());
+	SurgSim::Math::Vector extractedX;
+	SurgSim::Math::Vector accumulator;
 
 	{
 		SCOPED_TRACE("Mass only");
 
 		SurgSim::Math::Vector result = SurgSim::Math::Vector::Zero(state.getNumDof());
-		tet.addMatVec(1.4, 0.0, 0.0, ones, &result);
+		tet.addMatVec(1.4, 0.0, 0.0, ones, &result, &extractedX, &accumulator);
 
 		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = 1.4 * M * SurgSim::Math::Vector::Ones(12);
@@ -658,7 +660,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 		SCOPED_TRACE("Damping only");
 
 		SurgSim::Math::Vector result = SurgSim::Math::Vector::Zero(state.getNumDof());
-		tet.addMatVec(0.0, 1.5, 0.0, ones, &result);
+		tet.addMatVec(0.0, 1.5, 0.0, ones, &result, &extractedX, &accumulator);
 
 		EXPECT_TRUE(result.isZero());
 	}
@@ -667,7 +669,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 		SCOPED_TRACE("Stiffness only");
 
 		SurgSim::Math::Vector result = SurgSim::Math::Vector::Zero(state.getNumDof());
-		tet.addMatVec(0.0, 0.0, 1.6, ones, &result);
+		tet.addMatVec(0.0, 0.0, 1.6, ones, &result, &extractedX, &accumulator);
 
 		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = 1.6 * K * SurgSim::Math::Vector::Ones(12);
@@ -680,7 +682,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 		SCOPED_TRACE("Mass/Damping/Stiffness");
 
 		SurgSim::Math::Vector result = SurgSim::Math::Vector::Zero(state.getNumDof());
-		tet.addMatVec(1.4, 1.5, 1.6, ones, &result);
+		tet.addMatVec(1.4, 1.5, 1.6, ones, &result, &extractedX, &accumulator);
 
 		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = (1.4 * M + 1.6 * K) * SurgSim::Math::Vector::Ones(12);
