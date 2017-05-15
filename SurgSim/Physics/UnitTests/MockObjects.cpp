@@ -448,6 +448,7 @@ const std::vector<double>& MockFemRepresentation::getMassPerNode() const
 
 void MockFemRepresentation::clearFMDK()
 {
+	m_initState = 0;
 	m_f.setZero();
 	SurgSim::Math::clearMatrix(&m_M);
 	SurgSim::Math::clearMatrix(&m_D);
