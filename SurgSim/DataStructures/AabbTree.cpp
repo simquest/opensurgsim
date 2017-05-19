@@ -158,6 +158,7 @@ void AabbTree::updateNodeBounds(const std::vector<Math::Aabbd>& bounds,
 			item.first = bounds[item.second];
 		}
 		data->recalculateAabb();
+		node->setAabb(data->getAabb());
 	}
 
 
