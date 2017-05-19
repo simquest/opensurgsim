@@ -57,7 +57,7 @@ public:
 	/// Add an item to the data
 	/// \param aabb the AABB of the item
 	/// \param id an object identifier assigned by the user of this class
-	void add(const SurgSim::Math::Aabbd aabb, size_t id);
+	void add(const SurgSim::Math::Aabbd& aabb, size_t id);
 
 	/// \return the combined AABB of all the contained items
 	const SurgSim::Math::Aabbd& getAabb() const;
