@@ -71,7 +71,7 @@ bool AabbTreeData::isEqual(const TreeData* data) const
 	return result;
 }
 
-void AabbTreeData::add(const SurgSim::Math::Aabbd aabb, size_t id)
+void AabbTreeData::add(const SurgSim::Math::Aabbd& aabb, size_t id)
 {
 	m_aabb.extend(aabb);
 	m_data.emplace_back(aabb, id);

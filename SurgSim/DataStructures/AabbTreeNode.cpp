@@ -81,36 +81,33 @@ void AabbTreeNode::splitNode(size_t maxNodeData)
 		size_t leftCount = leftData->getSize();
 		size_t rightCount = rightData->getSize();
 
+		leftChild->m_aabb = leftData->getAabb();
 		leftChild->setData(std::move(leftData));
 		if (maxNodeData > 0 && leftCount > maxNodeData)
 		{
 			leftChild->splitNode(maxNodeData);
 		}
 
+		rightChild->m_aabb = rightData->getAabb();
 		rightChild->setData(std::move(rightData));
 		if (maxNodeData > 0 && rightCount > maxNodeData)
 		{
 			rightChild->splitNode(maxNodeData);
 		}
 	}
+	else
+	{
+		m_aabb = leftData->getAabb();
+	}
 }
 
 const SurgSim::Math::Aabbd& AabbTreeNode::getAabb() const
 {
-	auto data = std::static_pointer_cast<AabbTreeData>(getData());
-	if (data == nullptr)
-	{
-		return m_aabb;
-	}
-	else
-	{
-		return data->getAabb();
-	}
+	return m_aabb;
 }
 
 void AabbTreeNode::setAabb(const SurgSim::Math::Aabbd& aabb)
 {
-	SURGSIM_ASSERT(getNumChildren() != 0);
 	m_aabb = aabb;
 }
 
@@ -133,6 +130,7 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 			setData(data);
 		}
 		data->add(aabb, id);
+		m_aabb = data->getAabb();
 		if (maxNodeData > 0 && data->getSize() > maxNodeData)
 		{
 			splitNode();
