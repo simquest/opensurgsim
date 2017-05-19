@@ -81,6 +81,8 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		virtualToolCoupler = std::make_shared<MockVirtualToolCoupler>();
 		virtualToolCoupler->setInput(input);
 		virtualToolCoupler->setRepresentation(rigidBody);
+		virtualToolCoupler->setInitializeRigidWithInputPose(false); // Override the new default behavior to keep
+		// the tests correct.
 	}
 
 	virtual void TearDown()
@@ -347,6 +349,41 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 
 	angleAxis = Eigen::AngleAxisd(state.getPose().linear());
 	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
+}
+
+
+TEST_F(VirtualToolCouplerTest, NoDisplacementWhenInitializingWithInputPose)
+{
+	const double mass = rigidBody->getMass();
+	virtualToolCoupler->overrideAngularDamping(mass * 1.0);
+	virtualToolCoupler->overrideAngularStiffness(mass * 200);
+	virtualToolCoupler->overrideLinearDamping(mass * 50);
+	virtualToolCoupler->overrideLinearStiffness(mass * 200);
+	virtualToolCoupler->setInitializeRigidWithInputPose(true);
+
+	RigidTransform3d initialPose = RigidTransform3d::Identity();
+	initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
+	initialPose.linear() = Matrix33d(Eigen::AngleAxisd(M_PI / 4.0, Vector3d::UnitY()));
+
+	input->setLocalPose(initialPose);
+	// rigidBody->setLocalPose(initialPose);
+	rigidBody->setIsGravityEnabled(false);
+
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	virtualToolCoupler->initialize(runtime);
+	rigidBody->initialize(runtime);
+	virtualToolCoupler->wakeUp();
+	rigidBody->wakeUp();
+
+	EXPECT_TRUE(rigidBody->isActive());
+	runSystem(1);
+	EXPECT_TRUE(rigidBody->isActive());
+
+	EXPECT_TRUE(rigidBody->getCurrentState().getLinearVelocity().isZero(epsilon));
+	EXPECT_TRUE(rigidBody->getCurrentState().getAngularVelocity().isZero(epsilon));
+	RigidState state = rigidBody->getCurrentState();
+	EXPECT_TRUE(state.getPose().translation().isApprox(initialPose.translation()));
+	EXPECT_TRUE(state.getPose().linear().isApprox(initialPose.linear()));
 }
 
 TEST_F(VirtualToolCouplerTest, WithGravity)
@@ -643,6 +680,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	virtualToolCoupler->setCalculateInertialTorques(true);
 
 	virtualToolCoupler->setHapticOutputOnlyWhenColliding(true);
+	virtualToolCoupler->setInitializeRigidWithInputPose(false);
 
 	// Encode
 	YAML::Node node;
@@ -664,6 +702,7 @@ TEST_F(VirtualToolCouplerTest, Serialization)
 	EXPECT_TRUE(vec.isApprox(newVirtualToolCoupler->getAttachmentPoint()));
 	EXPECT_TRUE(newVirtualToolCoupler->getCalculateInertialTorques());
 	EXPECT_TRUE(virtualToolCoupler->isHapticOutputOnlyWhenColliding());
+	EXPECT_FALSE(virtualToolCoupler->isInitializingRigidWithInputPose());
 
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getInput());
 	EXPECT_NE(nullptr, newVirtualToolCoupler->getRepresentation());
