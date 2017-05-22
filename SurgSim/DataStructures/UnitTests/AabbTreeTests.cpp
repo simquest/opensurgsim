@@ -234,7 +234,7 @@ public:
 };
 
 template <typename PairTypeLhs, typename PairTypeRhs>
-static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const std::list<PairTypeLhs>& list,
+static typename std::vector<PairTypeLhs>::const_iterator getEquivalentPair(const std::vector<PairTypeLhs>& list,
 		const PairTypeRhs& item)
 {
 	return std::find_if(list.cbegin(), list.cend(),
@@ -279,7 +279,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	std::static_pointer_cast<SurgSim::DataStructures::AabbTreeNode>(aabbB->getRoot())->accept(&leavesVisitorB);
 	auto& leavesB = leavesVisitorB.leaves;
 
-	std::list<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
+	std::vector<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
 			expectedIntersection;
 	for (auto leafA = leavesA.begin(); leafA != leavesA.end(); ++leafA)
 	{
@@ -318,7 +318,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 			SurgSim::Math::makeAabb(Vector3d(-0.1, 0.3, 5.3), Vector3d(5.4, -5.8, 1.1), Vector3d(0, 0.5, 11)), 4543);
 
 		expectedIntersection.emplace_back(newNode.get(), expectedIntersection.front().second);
-		actualIntersection.emplace_back(newNode, actualIntersection.back().first);
+		actualIntersection.emplace_back(newNode.get(), actualIntersection.back().first);
 
 		ASSERT_GT(expectedIntersection.size(), 0u);
 		ASSERT_EQ(expectedIntersection.size(), actualIntersection.size());

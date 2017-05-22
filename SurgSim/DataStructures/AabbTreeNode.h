@@ -83,7 +83,7 @@ public:
 	/// Fetch a list of items that have AABBs intersecting with the given AABB.
 	/// \param aabb The bounding box for the query.
 	/// \param [out] result location to receive the results of the call.
-	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result);
+	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::vector<size_t>* result);
 
 protected:
 
