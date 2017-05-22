@@ -163,9 +163,9 @@ bool AabbTreeNode::doAccept(TreeVisitor* visitor)
 	return visitor->handle(this);
 }
 
-void AabbTreeNode::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result)
+void AabbTreeNode::getIntersections(const SurgSim::Math::Aabbd& aabb, std::vector<size_t>* result)
 {
-	auto data = std::static_pointer_cast<AabbTreeData>(getData());
+	auto data = static_cast<AabbTreeData*>(getData().get());
 	SURGSIM_ASSERT(data != nullptr) << "AabbTreeNode data is nullptr.";
 	data->getIntersections(aabb, result);
 }

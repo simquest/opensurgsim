@@ -131,7 +131,7 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	DataStructures::AabbTree tree;
 	tree.set(std::move(items));
 
-	std::list<DataStructures::AabbTree::TreeNodePairType> intersectionList = tree.spatialJoin(tree);
+	auto intersectionList = tree.spatialJoin(tree);
 	getUniqueCandidates(intersectionList, &segmentIds);
 
 	size_t evaluations = 0;
@@ -362,15 +362,19 @@ bool SegmentSelfContact::detectCollision(
 }
 
 void SegmentSelfContact::getUniqueCandidates(
-	const std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
+	const std::vector<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
 	std::set<std::pair<size_t, size_t>>* segmentIds) const
 {
+	std::vector<size_t> localIdListA;
+	std::vector<size_t> localIdListB;
+
 	for (const auto& intersection : intersectionList)
 	{
-		std::shared_ptr<DataStructures::AabbTreeNode> nodeA = intersection.first;
-		std::shared_ptr<DataStructures::AabbTreeNode> nodeB = intersection.second;
-		std::list<size_t> localIdListA;
-		std::list<size_t> localIdListB;
+		DataStructures::AabbTreeNode* nodeA = intersection.first;
+		DataStructures::AabbTreeNode* nodeB = intersection.second;
+		
+		localIdListA.clear();
+		localIdListB.clear();
 
 		nodeA->getIntersections(nodeB->getAabb(), &localIdListA);
 		nodeB->getIntersections(nodeA->getAabb(), &localIdListB);

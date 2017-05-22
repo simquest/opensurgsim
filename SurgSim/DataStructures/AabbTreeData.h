@@ -22,6 +22,7 @@
 
 #include <utility>
 #include <list>
+#include <vector>
 #include <memory>
 
 namespace SurgSim
@@ -84,7 +85,7 @@ public:
 	/// to the list given as a parameter
 	/// \param aabb the bounding box being queried
 	/// \param [out] result list to be used for intersecting items
-	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result) const;
+	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::vector<size_t>* result) const;
 
 	ItemList& getData()
 	{

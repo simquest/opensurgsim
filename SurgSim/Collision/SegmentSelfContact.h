@@ -114,7 +114,7 @@ protected:
 	/// \param intersectionList list of potentially intersecting AABB node.
 	/// \param segmentIds [out] paired unique matches
 	void getUniqueCandidates(
-		const std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
+		const std::vector<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
 		std::set<std::pair<size_t, size_t>>* segmentIds) const;
 
 	/// From the initial AABB tree collisions, there are some very simple filtering operations that we can

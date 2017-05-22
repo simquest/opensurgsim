@@ -130,11 +130,11 @@ void AabbTreeData::recalculateAabb()
 	});
 }
 
-void AabbTreeData::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result) const
+void AabbTreeData::getIntersections(const SurgSim::Math::Aabbd& aabb, std::vector<size_t>* result) const
 {
 	std::for_each(m_data.begin(), m_data.end(), [&](const Item & item)
 	{
-		if (SurgSim::Math::doAabbIntersect(item.first, aabb))
+		if (aabb.intersects(item.first))
 		{
 			result->push_back(item.second);
 		}
