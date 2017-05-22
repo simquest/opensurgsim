@@ -919,30 +919,33 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix));
 
+	SurgSim::Math::Vector extractedX;
+	SurgSim::Math::Vector accumulator;
+
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
-	cube->addMatVec(1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(1.0, 0.0, 0.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	cube->addMatVec(0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(0.0, 1.0, 0.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedDampingMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	cube->addMatVec(0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(0.0, 0.0, 1.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	cube->addMatVec(1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(1.0, 2.0, 3.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		double expectedCoef = 1.0 * m_expectedMassMatrix.row(rowId).sum() +

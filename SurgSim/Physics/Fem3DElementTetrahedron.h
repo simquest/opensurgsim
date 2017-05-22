@@ -105,20 +105,9 @@ protected:
 	void computeMass(const SurgSim::Math::OdeState& state,
 					 SurgSim::Math::Matrix* m);
 
-	/// Shape functions: Tetrahedron rest volume
-	double m_restVolume;
-	/// Shape functions coefficients Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
-	std::array<double, 4> m_ai, m_bi, m_ci, m_di;
-
 	/// The tetrahedon rest state
 	Eigen::Matrix<double, 12, 1> m_x0;
 
-	/// Elasticity material matrix (contains the elastic properties of the material)
-	Eigen::Matrix<double, 6, 6> m_Em;
-	/// Strain matrix
-	Eigen::Matrix<double, 6, 12> m_strain;
-	/// Stress matrix
-	Eigen::Matrix<double, 6, 12> m_stress;
 };
 
 } // namespace Physics
