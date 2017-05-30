@@ -4,7 +4,7 @@
 
 LabJack Corporation produces measurement and automation devices (e.g., DAQs).  Currently OpenSurgSim supports only some devices (dependent on operating system, see below), and only some functionality on any device.
 
-Supported functionality: digital input, digital output, and timers (e.g., PWM, frequency output, and quadrature input).
+Supported functionality: digital input, digital output, analog input, analog output, and timers (e.g., PWM, frequency output, and quadrature input).
 
 Supported models:
 - Linux (and Mac OS X): The LabJack U3 and U6 (including Pro version) are supported with limited functionality.
