@@ -325,7 +325,8 @@ SurgSim::Math::Vector Fem1DElementBeam::computeCartesianCoordinate(
 
 	for (int i = 0; i < 2; i++)
 	{
-		cartesianCoordinate += naturalCoordinate(i) * getSubVector(positions, m_nodeIds[i], getNumDofPerNode()).segment<3>(0);
+		cartesianCoordinate +=
+			naturalCoordinate(i) * getSubVector(positions, m_nodeIds[i], getNumDofPerNode()).segment<3>(0);
 	}
 
 	return cartesianCoordinate;

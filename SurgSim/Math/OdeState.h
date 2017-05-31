@@ -145,10 +145,12 @@ public:
 	/// \note boundary conditions.
 	void applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCompliance = true) const;
 
-	/// Adds a boundary condition on the static dof of a given node (we consider here that each node has a single static dof)
+	/// Adds a boundary condition on the static dof of a given node
+	/// (we consider here that each node has a single static dof)
 	/// \param nodeId The node on which the boundary condition needs to be set
 	/// \param value The boundary conidtion value that the static dof needs to be set on
-	/// \note for example, this is fixing the twist angle of a Kircchoff model using a quasi-static update of the material frame
+	/// \note for example, this is fixing the twist angle of a Kircchoff model using a quasi-static update of 
+	/// the material frame
 	/// \note i.e. the twist is not part of the dynamic DOF, but is still a static dof of the model.
 	void addBoundaryConditionStaticDof(size_t nodeId, double value);
 

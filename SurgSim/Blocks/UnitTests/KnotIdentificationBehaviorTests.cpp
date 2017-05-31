@@ -89,7 +89,7 @@ public:
 		physics->initialize(runtime);
 		return physics;
 	}
-	
+
 
 	void testReidmeisterMove1(std::vector<int> gaussCodeBefore, std::vector<int> gaussCodeAfter,
 							  std::vector<int> erased = std::vector<int>())

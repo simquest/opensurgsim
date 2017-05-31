@@ -70,7 +70,7 @@ void KnotIdentificationBehavior::update(double dt)
 {
 	bool knotDetected = false;
 	auto projection = m_projections.begin();
-	do 
+	do
 	{
 		knotDetected = detectAndIdentifyKnot(*projection);
 		++projection;
@@ -183,7 +183,7 @@ void KnotIdentificationBehavior::buildNodeData(
 	Vector3d node3d;
 	Vector2d node2d;
 	for (size_t i = 0; i < m_fem1d->getNumFemElements(); ++i)
-	{	
+	{
 		if (i == 0)
 		{
 			node3d = finalState->getPosition(m_fem1d->getFemElement(i)->getNodeIds()[0]);

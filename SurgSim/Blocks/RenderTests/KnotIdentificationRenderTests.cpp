@@ -73,7 +73,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& 
 class KnotNameTextBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	KnotNameTextBehavior(const std::string& name)
+	explicit KnotNameTextBehavior(const std::string& name)
 		: SurgSim::Framework::Behavior(name)
 	{
 
