@@ -167,6 +167,16 @@ public:
 	/// \return true if inertia is being simulated.
 	bool getCalculateInertialTorques() const;
 
+	/// Set whether the pose of the attached rigid is initialized with the first input pose received by the VTC
+	/// this will 'teleport' the rigid into the first pose of the vtc. When this is not set, the rigid would be
+	/// pulled to this pose, potentially pulling the rigid through other objects. Default true
+	/// \param val true to enable the initialization of the rigid
+	void setInitializeRigidWithInputPose(bool val);
+
+	/// Get whether the pose of the attached rigid is initialized with the first input pose received by the VTC
+	/// \return true if the rigid will be initialized in the first frame
+	bool isInitializingRigidWithInputPose() const;
+
 	void doRetire() override;
 
 	void setLocalActive(bool val) override;
@@ -175,6 +185,7 @@ protected:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 	int getTargetManagerType() const override;
+	void setInitialInputPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// \return The DataGroup to be sent to the device via the OutputComponent.
 	virtual DataStructures::DataGroup buildOutputData();
@@ -274,6 +285,9 @@ private:
 	/// Whether or not the calculated torques will simulate inertia.  This setting only has an effect if the device
 	/// input point is not the mass center.
 	bool m_calculateInertialTorques;
+
+	/// Whether or not the rigid should assume the input pose in the first frame (default true)
+	bool m_initializeRigidWithInputPose;
 
 	/// The logger.
 	std::shared_ptr<Framework::Logger> m_logger;
