@@ -492,6 +492,16 @@ double MockFem2DRepresentation::getMassPerNode(size_t nodeId)
 	return m_massPerNode[nodeId];
 }
 
+MockFem3DCorotationalTetrahedronRepresentation::MockFem3DCorotationalTetrahedronRepresentation(const std::string& name)
+		: SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation(name)
+{
+}
+
+SurgSim::Math::Matrix MockFem3DCorotationalTetrahedronRepresentation::getTransformation(size_t nodeId)
+{
+	return getNodeTransformation(*getCurrentState(), nodeId);
+}
+
 MockFixedConstraintFixedPoint::MockFixedConstraintFixedPoint() : ConstraintImplementation()
 {
 }

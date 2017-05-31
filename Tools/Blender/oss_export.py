@@ -235,7 +235,7 @@ def save_mesh(filepath,
             elements.append((tet[0], tet[1], tet[2], tet[3]))
 
         for face in tets.faces:
-            faces.append((face[0], face[1], face[2]))
+            faces.append((face[2], face[1], face[0]))
 
     else:
         for vert in mesh.vertices:
@@ -251,7 +251,7 @@ def save_mesh(filepath,
     fwrite("ply\n")
     fwrite("format ascii 1.0\n")
     fwrite("comment Created by OpenSurgSim FEM exporter for Blender\n")
-    fwrite("MeshPy options '%s'\n" % meshpy)
+    fwrite("comment MeshPy options '%s'\n" % meshpy)
 
     fwrite("element vertex %d\n" % len(verts))
     fwrite("property double x\n"
