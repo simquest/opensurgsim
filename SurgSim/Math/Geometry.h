@@ -61,8 +61,8 @@ static const double ScalarEpsilon = 1e-10;
 /// Calculate the intersection between the two 2D segments.
 /// \tparam T Floating point type of the calculation, can usually be inferred.
 /// \tparam MOpt Eigen Matrix options, can usually be inferred.
-/// \param s1v0, s1v1 First segment extremities
-/// \param s2v0, s2v1 Second segment extremities
+/// \param s0v0, s0v1 First segment extremities
+/// \param s1v0, s1v1 Second segment extremities
 /// \param s, t [out] if intersection exists, contains distance on segment where intersection is
 template <class T, int MOpt> inline
 bool doesIntersectSegmentSegment(const Eigen::Matrix<T, 2, 1, MOpt>& s0v0,
@@ -78,8 +78,8 @@ bool doesIntersectSegmentSegment(const Eigen::Matrix<T, 2, 1, MOpt>& s0v0,
 
 	auto u = (s0v1 - s0v0).eval();
 	auto v = (s1v1 - s1v0).eval();
-	double denom = u[0] * v[1] - u[1] * v[0];
-	if (std::abs(denom) <= DistanceEpsilon)
+	T denom = u[0] * v[1] - u[1] * v[0];
+	if (std::abs(denom) <= static_cast<T>(DistanceEpsilon))
 	{
 		return false;
 	}

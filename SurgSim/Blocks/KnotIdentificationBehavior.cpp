@@ -38,7 +38,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Blocks::KnotIdentificat
 				 KnotIdentificationBehavior);
 
 KnotIdentificationBehavior::KnotIdentificationBehavior(const std::string& name) :
-	Framework::Behavior(name), m_knotName("Calculating...")
+	Framework::Behavior(name), m_knotName("Undetermined")
 {
 	using boost::assign::list_of;
 
@@ -88,6 +88,7 @@ bool KnotIdentificationBehavior::doInitialize()
 	Math::Matrix33d projection;
 	m_projections.push_back(Math::Matrix33d::Identity() * 100.0);
 	{
+		// #note JL (31-5-2017) This projection does not give a Identity matrix? Or X and Z are switched? 
 		projection = makeRigidTransform(Vector3d(0,0,0), Vector3d(0,0,1), Vector3d(0,1,0)).linear();
 		m_projections.push_back(projection * 100.0);
 	}
