@@ -336,7 +336,7 @@ void FemRepresentation::updateComplianceMatrix(const SurgSim::Math::OdeState& st
 	}
 
 	// Then, transform the initial compliance matrix to get the current compliance warping matrix
-	m_complianceWarpingMatrix = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
+	m_complianceWarpingMatrix.noalias() = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
 								m_complianceWarpingTransformation.transpose();
 }
 

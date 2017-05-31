@@ -76,6 +76,7 @@ public:
 protected:
 	/// A copy of the system matrix for use when an inverse is necessary.
 	SparseMatrix m_matrix;
+
 };
 
 /// Derivation for sparse LU solver
@@ -84,10 +85,13 @@ class LinearSparseSolveAndInverseLU : public LinearSparseSolveAndInverse
 public:
 	void setMatrix(const SparseMatrix& matrix) override;
 
+	Matrix getInverse() const override;
+
 	Matrix solve(const Matrix& b) const override;
 
 private:
 	Eigen::SparseLU<SparseMatrix> m_solver;
+	Matrix m_identity;
 };
 
 /// Derivation for sparse CG solver

@@ -25,7 +25,7 @@ namespace Physics
 {
 
 FemElement::FemElement() : m_numDofPerNode(0), m_rho(0.0), m_E(0.0), m_nu(0.0),
-	m_useDamping(false), m_initializedFMDK(false)
+	m_useDamping(false)
 {}
 
 FemElement::~FemElement()
@@ -202,9 +202,8 @@ void FemElement::updateFMDK(const Math::OdeState& state, int options)
 
 void FemElement::initializeFMDK()
 {
-	if (!m_initializedFMDK)
+	if (!m_f.size() != 0)
 	{
-		m_initializedFMDK = true;
 		doInitializeFMDK();
 	}
 }
