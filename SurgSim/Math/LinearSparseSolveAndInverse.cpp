@@ -31,9 +31,22 @@ Matrix LinearSparseSolveAndInverse::getInverse() const
 void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 {
 	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
-	m_solver.compute(matrix);
+	auto m = matrix.pruned();
+	m_solver.compute(m);
 	SURGSIM_ASSERT(m_solver.info() == Eigen::Success) << m_solver.lastErrorMessage();
-	m_matrix = matrix;
+	//m_matrix = m;
+
+	if (m_identity.cols() != matrix.cols() || m_identity.rows() != matrix.rows())
+	{
+		m_identity.resize(matrix.cols(), matrix.rows());
+		m_identity.setIdentity();
+	}
+}
+
+Matrix LinearSparseSolveAndInverseLU::getInverse() const
+{
+	// HS-5/24/2017 m_identity is Dense, if it sparse there is a reallocation when we return a dense matrix here
+	return m_solver.solve(m_identity);
 }
 
 Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const

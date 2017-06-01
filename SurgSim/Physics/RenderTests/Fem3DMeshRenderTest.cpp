@@ -168,7 +168,7 @@ TEST_F(RenderTests, Fem3dMeshCollision)
 										 "Geometry/wound_deformable.ply",
 										 SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT));
 
-	runTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 5000.0);
+	runFixedFrameTest(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero(), 500);
 }
 
 } // namespace Physics

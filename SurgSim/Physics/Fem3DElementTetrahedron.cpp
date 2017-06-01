@@ -84,7 +84,8 @@ void Fem3DElementTetrahedron::doUpdateFMDK(const Math::OdeState& state, int opti
 		// K.U = Fext
 		// K.(x - x0) = Fext
 		// 0 = Fext + Fint     with Fint = -K.(x - x0)
-		getSubVector(state.getPositions(), m_nodeIds, 3, &x);
+		// Tetrahedron::getSubVector(state.getPositions(), m_nodeIds, 3, &x);
+		Tetrahedron::getSubVector(state.getPositions(), m_nodeIds, &x);
 		m_f.noalias() = -m_K * (x - m_x0);
 	}
 }

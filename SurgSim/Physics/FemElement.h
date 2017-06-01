@@ -234,17 +234,11 @@ protected:
 	/// Node ids connected by this element
 	std::vector<size_t> m_nodeIds;
 
-	/// Mass density (in Kg.m-3)
-	double m_rho;
-
-	/// Young modulus (in N.m-2)
-	double m_E;
-
-	/// Poisson ratio (unitless)
-	double m_nu;
-
 	/// The force vector.
 	SurgSim::Math::Vector m_f;
+
+	/// The stiffness matrix.
+	SurgSim::Math::Matrix m_K;
 
 	/// The mass matrix.
 	SurgSim::Math::Matrix m_M;
@@ -255,12 +249,15 @@ protected:
 	/// Flag to specify of the damping is used.
 	bool m_useDamping;
 
-	/// The stiffness matrix.
-	SurgSim::Math::Matrix m_K;
+	/// Mass density (in Kg.m-3)
+	double m_rho;
 
-private:
-	/// Flag to check in the f, M, D, K variables have been initialized.
-	bool m_initializedFMDK;
+	/// Young modulus (in N.m-2)
+	double m_E;
+
+	/// Poisson ratio (unitless)
+	double m_nu;
+
 };
 
 } // namespace Physics

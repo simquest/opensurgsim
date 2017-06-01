@@ -60,7 +60,7 @@ template <class Scalar, int Dim>
 bool doAabbIntersect(const Eigen::AlignedBox<Scalar, Dim>& a,
 					 const Eigen::AlignedBox<Scalar, Dim>& b)
 {
-	return !a.intersection(b).isEmpty();
+	return a.intersects(b);
 }
 
 /// Convenience function for creating a bounding box from three vertices (e.g. the vertices of a triangle)
