@@ -259,9 +259,9 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateCc
 			aabb.extend(shape2AtTime0.getVertexPosition(triangleT0.verticesId[2]));
 
 			const auto& triangleT1 = shape2AtTime1.getTriangle(id);
-			aabb.extend(shape2AtTime0.getVertexPosition(triangleT1.verticesId[0]));
-			aabb.extend(shape2AtTime0.getVertexPosition(triangleT1.verticesId[1]));
-			aabb.extend(shape2AtTime0.getVertexPosition(triangleT1.verticesId[2]));
+			aabb.extend(shape2AtTime1.getVertexPosition(triangleT1.verticesId[0]));
+			aabb.extend(shape2AtTime1.getVertexPosition(triangleT1.verticesId[1]));
+			aabb.extend(shape2AtTime1.getVertexPosition(triangleT1.verticesId[2]));
 	}
 
 
