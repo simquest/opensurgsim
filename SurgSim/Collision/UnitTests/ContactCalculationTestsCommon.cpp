@@ -146,6 +146,30 @@ void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expecte
 
 	EXPECT_EQ(expectedContacts.size(), calculatedContacts.size());
 
+	if (Framework::Logger::getDefaultLogger()->getThreshold() <= Framework::LOG_LEVEL_DEBUG)
+	{
+		std::stringstream calculatedText;
+		std::stringstream expectedText;
+		size_t numCalculated = 0;
+		size_t numExpected = 0;
+
+		for (const auto& contact : calculatedContacts)
+		{
+			calculatedText << *contact;
+			++numCalculated;
+		}
+
+		for (const auto& contact : expectedContacts)
+		{
+			expectedText << *contact;
+			++numExpected;
+		}
+
+		SURGSIM_LOG_DEBUG(Framework::Logger::getDefaultLogger()) << "Checking contacts." << std::endl <<
+			"Number of Calculated contacts: " << numCalculated << std::endl << calculatedText.str() << std::endl <<
+			"Number of Expected contacts: " << numExpected << std::endl << expectedText.str() << std::endl;
+	}
+
 	for (auto it = expectedContacts.begin(); it != expectedContacts.end(); ++it)
 	{
 		EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts, expectedHasTriangleContactObject));
