@@ -121,6 +121,14 @@ public:
 	/// \return True if compliance warping is used, False otherwise
 	bool getComplianceWarping() const;
 
+	/// Enable mass lumping for the mass matrix, currently we use the row sum i.e. 
+	/// \f$M_{ii}^{(lumped)} = \sum_{j} M_{ji}\f$
+	/// \param useMassLumping whether to enable or disable lumped masses
+	void setMassLumping(bool useMassLumping);
+
+	/// \return True if lumped masses are enabled
+	bool getMassLumping() const;
+
 	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param b The input matrix b
@@ -213,6 +221,8 @@ private:
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
+
+	bool m_useMassLumping;
 
 	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
 

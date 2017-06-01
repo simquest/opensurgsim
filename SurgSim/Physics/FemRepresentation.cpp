@@ -38,6 +38,7 @@ namespace Physics
 
 FemRepresentation::FemRepresentation(const std::string& name) :
 	DeformableRepresentation(name),
+	m_useMassLumping(false),
 	m_useComplianceWarping(false),
 	m_isInitialComplianceMatrixComputed(false)
 {
@@ -47,6 +48,9 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, ComplianceWarping,
 									  getComplianceWarping, setComplianceWarping);
 
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, MassLumping,
+									  getMassLumping, setMassLumping);
+
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, FemElementType,
 									  getFemElementType, setFemElementType);
 
@@ -55,7 +59,9 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, double, RayleighDampingStiffness,
 									  getRayleighDampingStiffness, setRayleighDampingStiffness);
+
 }
+
 
 FemRepresentation::~FemRepresentation()
 {
@@ -277,6 +283,15 @@ bool FemRepresentation::getComplianceWarping() const
 	return m_useComplianceWarping;
 }
 
+void FemRepresentation::setMassLumping(bool useMassLumping) {
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change mass lumping after initialization.";
+	m_useMassLumping = useMassLumping;
+}
+
+bool FemRepresentation::getMassLumping() const {
+	return m_useMassLumping;
+}
+
 Math::Matrix FemRepresentation::applyCompliance(const Math::OdeState& state, const Math::Matrix& b)
 {
 	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
@@ -331,7 +346,7 @@ void FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	m_f.setZero(state.getNumDof());
 
 	addGravityForce(&m_f, state);
-	addRayleighDampingForce(&m_f, state);
+	addRayleighDampingForce(&m_f, state, hasK(), hasF());
 	addFemElementsForce(&m_f, state);
 
 	// Add external generalized force
@@ -428,6 +443,17 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 		(*femElement)->addFMDK(&m_f, &m_M, &m_D, &m_K);
 	}
 
+	if (m_useMassLumping == true)
+	{
+		for (auto i = 0; i < m_M.rows(); i++)
+		{
+			double sum = m_M.row(i).sum();
+			Math::zeroRow(i, &m_M);
+			m_M.coeffRef(i, i) = sum;
+		}
+		m_M.makeCompressed();
+	}
+
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
 	{
@@ -442,7 +468,9 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 	addGravityForce(&m_f, state);
 
 	// Add the Rayleigh damping force to m_f
-	addRayleighDampingForce(&m_f, state, true, true);
+	// The mass matrix should exist, the stiffness matrix might not
+	// #todo HS we should let the OdeEquation tell us wether the stiffness matrix is calculated
+	addRayleighDampingForce(&m_f, state, false, true);
 
 	// Add external generalized force, stiffness and damping
 	if (m_previousHasExternalGeneralizedForce != m_hasExternalGeneralizedForce)
@@ -504,8 +532,14 @@ void FemRepresentation::addRayleighDampingForce(
 		// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
 		if (useGlobalMassMatrix)
 		{
-			Math::Vector tempForce = (scale * rayleighMass) * (m_M * v);
-			*force -= tempForce;
+			if (m_useMassLumping)
+			{
+				force->noalias() -= (scale * rayleighMass) * (m_M.diagonal().cwiseProduct(v));
+			}
+			else
+			{
+				force->noalias() -= (scale * rayleighMass) * (m_M * v);
+			}
 		}
 		else
 		{
@@ -526,8 +560,7 @@ void FemRepresentation::addRayleighDampingForce(
 	{
 		if (useGlobalStiffnessMatrix)
 		{
-			Math::Vector tempForce = scale * rayleighStiffness * (m_K * v);
-			*force -= tempForce;
+			force->noalias() -= scale * rayleighStiffness * (m_K * v);
 		}
 		else
 		{
