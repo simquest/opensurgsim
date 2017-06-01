@@ -110,7 +110,7 @@ std::list<std::shared_ptr<Contact>> SegmentSelfContact::calculateCcdContact(
 	auto const& edges2 = segmentShape2.getEdges();
 	const Math::Vector3d halfExtent = Math::Vector3d(segmentShape1.getRadius(), segmentShape1.getRadius(),
 									  segmentShape1.getRadius());
-	std::list<DataStructures::AabbTreeData::Item> items;
+	SurgSim::DataStructures::AabbTreeData::ItemList items;
 	for (size_t id = 0; id < edges1.size(); ++id)
 	{
 		if (edges1[id].isValid && edges2[id].isValid)

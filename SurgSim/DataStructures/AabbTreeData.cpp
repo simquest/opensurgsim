@@ -28,12 +28,12 @@ AabbTreeData::AabbTreeData()
 
 }
 
-AabbTreeData::AabbTreeData(const std::list<Item>& data) : m_data(data)
+AabbTreeData::AabbTreeData(const ItemList& data) : m_data(data)
 {
 	recalculateAabb();
 }
 
-AabbTreeData::AabbTreeData(std::list<Item>&& data) : m_data(std::move(data))
+AabbTreeData::AabbTreeData(ItemList&& data) : m_data(std::move(data))
 {
 	recalculateAabb();
 }

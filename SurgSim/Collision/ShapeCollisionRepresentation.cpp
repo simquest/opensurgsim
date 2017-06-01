@@ -57,7 +57,7 @@ void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math:
 	update(0.0);
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> ShapeCollisionRepresentation::getShape() const
 {
 	return m_shape;
 }

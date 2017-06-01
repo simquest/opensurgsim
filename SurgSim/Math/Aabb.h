@@ -97,20 +97,32 @@ Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim,
 		Eigen::AlignedBox<Scalar, Dim>::BottomLeftCeil, Eigen::AlignedBox<Scalar, Dim>::BottomRightCeil,
 		Eigen::AlignedBox<Scalar, Dim>::TopLeftCeil, Eigen::AlignedBox<Scalar, Dim>::TopRightCeil,
 	};
-	if (aabb.isEmpty())
+	if (aabb.isEmpty() || transform.isApprox(Eigen::Transform<Scalar, Dim, Eigen::Isometry>::Identity()))
 	{
 		return aabb;
 	}
 
 	Eigen::AlignedBox<Scalar, Dim> result;
 	std::for_each(corners.cbegin(), corners.cend(),
-			[&result, &aabb, &transform](typename Eigen::AlignedBox<Scalar, Dim>::CornerType c)
-			{
-				result.extend(transform * aabb.corner(c));
-			});
+				  [&result, &aabb, &transform](typename Eigen::AlignedBox<Scalar, Dim>::CornerType c)
+	{
+		result.extend(transform * aabb.corner(c));
+	});
 	return result;
 }
 }
 
+}
+
+
+namespace Eigen
+{
+
+template<class T, int Dim>
+::std::ostream& operator<<(::std::ostream& os, const Eigen::AlignedBox<T, Dim>& box)
+{
+	os << "[" << box.min().transpose() << ", " << box.max().transpose() << "]";
+	return os;
+}
 }
 #endif

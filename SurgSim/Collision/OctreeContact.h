@@ -29,7 +29,6 @@ namespace Collision
 {
 
 class CollisionPair;
-class ShapeCollisionRepresentation;
 
 /// Abstract base class to calculate intersections between an Octree and other shapes
 ///

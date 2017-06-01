@@ -21,6 +21,7 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/VerticesShape.h"
 
 namespace SurgSim
 {
@@ -33,7 +34,7 @@ SURGSIM_STATIC_REGISTRATION(SegmentMeshShape);
 /// But, unlike MeshShape, the mesh does not have any triangle topology. It only consists of edges.
 ///
 /// \sa MeshShape
-class SegmentMeshShape : public Shape, public DataStructures::SegmentMeshPlain
+class SegmentMeshShape : public VerticesShape, public DataStructures::SegmentMeshPlain
 {
 public:
 	/// Constructor
@@ -68,16 +69,21 @@ public:
 	/// \return The object's associated AabbTree
 	std::shared_ptr<const DataStructures::AabbTree> getAabbTree() const;
 
-	bool isTransformable() const override;
-
 	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const override;
+
+	void setPose(const RigidTransform3d& pose) override;
+
+	/// Build the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void buildAabbTree();
+
+	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void updateAabbTree();
 
 protected:
 	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;
 
-	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
+
 
 private:
 	/// Segment radius
@@ -85,6 +91,7 @@ private:
 
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<DataStructures::AabbTree> m_aabbTree;
+	std::vector<SurgSim::Math::Aabbd> m_aabbCache;
 
 	/// Half extent of the AABB of the sphere at one of the segment end.
 	Vector3d m_segmentEndBoundingBoxHalfExtent;

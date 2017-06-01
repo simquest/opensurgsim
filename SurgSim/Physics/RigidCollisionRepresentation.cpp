@@ -31,7 +31,9 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollision
 				 RigidCollisionRepresentation);
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
-	Representation(name)
+	Representation(name),
+	m_oldVolume(0.0),
+	m_aabbThreshold(0.01)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
 									  Shape, getShape, setShape);
@@ -57,7 +59,7 @@ int RigidCollisionRepresentation::getShapeType() const
 	return getShape()->getType();
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> RigidCollisionRepresentation::getShape() const
 {
 	if (m_shape != nullptr)
 	{
@@ -88,15 +90,49 @@ SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 
 void RigidCollisionRepresentation::updateShapeData()
 {
-	// All we want to do is to transform the shape into the current pose
-	getPosedShape();
+	auto verticesShape = std::dynamic_pointer_cast<Math::VerticesShape>(getShape());
+	if (verticesShape != nullptr)
+	{
+		Math::RigidTransform3d currentPose;
+		auto physicsRepresentation = m_physicsRepresentation.lock();
+		SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
+				"PhysicsRepresentation went out of scope for Collision Representation " << getFullName();
+		const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
+		currentPose = physicsCurrentPose * physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+
+		verticesShape->setPose(currentPose);
+
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape(verticesShape, currentPose);
+		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShape, posedShape);
+		setPosedShapeMotion(posedShapeMotion);
+		m_aabb = verticesShape->getBoundingBox();
+	}
+	else if (getShape() != nullptr)
+	{
+		m_aabb = SurgSim::Math::transformAabb(getPose(), getShape()->getBoundingBox());
+	}
 }
 
 
 void RigidCollisionRepresentation::updateDcdData()
 {
-	// HS-2-Mar-2016
-	// #todo need to trigger the aabb tree build/update here
+
+	if (getShape()->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+		getShape()->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
+	{
+		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(getShape().get());
+		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
+		if (std::abs(m_oldVolume - meshShape->getBoundingBox().volume()) > m_oldVolume * m_aabbThreshold)
+		{
+			meshShape->update();
+			m_oldVolume = meshShape->getBoundingBox().volume();
+		}
+		else
+		{
+			meshShape->updateAabbTree();
+			meshShape->calculateNormals();
+		}
+	}
 }
 
 
@@ -140,6 +176,11 @@ void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 
 }
 
+
+SurgSim::Math::Aabbd RigidCollisionRepresentation::getBoundingBox() const
+{
+	return m_aabb;
+}
 
 }; // namespace Collision
 }; // namespace SurgSim

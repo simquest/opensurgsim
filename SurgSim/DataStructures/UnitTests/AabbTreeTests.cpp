@@ -63,6 +63,39 @@ TEST(AabbTreeTests, AddTest)
 	EXPECT_EQ(2u, tree->getRoot()->getNumChildren());
 }
 
+TEST(AabbTreeTests, UpdateTest)
+{
+	auto tree = std::make_shared<AabbTree>(3);
+
+	Aabbd bigBox;
+	for (int i = 0; i <= 6; ++i)
+	{
+		Aabbd aabb(Vector3d(static_cast<double>(i) - 0.01, -0.01, -0.01),
+				   Vector3d(static_cast<double>(i) + 0.01, 0.01, 0.01));
+		bigBox.extend(aabb);
+		tree->add(aabb, i);
+	}
+
+	EXPECT_TRUE(bigBox.isApprox(tree->getAabb())) << bigBox << ", " << tree->getAabb();
+
+	std::vector<Aabbd> newBoxes;
+
+	bigBox.setEmpty();
+	for (int i = 0; i <= 6; ++i)
+	{
+		Aabbd aabb(Vector3d(static_cast<double>(i) - 0.01, -0.02, -0.02),
+				   Vector3d(static_cast<double>(i) + 0.01, 0.02, 0.02));
+		bigBox.extend(aabb);
+		newBoxes.push_back(aabb);
+	}
+
+	tree->updateBounds(newBoxes);
+
+	EXPECT_TRUE(bigBox.isApprox(tree->getAabb())) << bigBox << ", " << tree->getAabb();
+
+}
+
+
 TEST(AabbTreeTests, BuildTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
