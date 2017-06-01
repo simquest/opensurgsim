@@ -548,6 +548,144 @@ TEST(TriangleMeshTriangleMeshCcdContactCalculationTests, IntersectionTest)
 			}
 		}
 	}
+
+	{
+		SCOPED_TRACE("Edge of triangle into edge of prism, opposite motions");
+		globalTransform = makeRigidTransform(makeRotationQuaternion(16.04, Vector3d(0.2, 7.4, 5.6).normalized()),
+			Vector3d(39.4, 7.6, 34.5));
+		for (int i = 0; i < 3; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				// collision between prism segment 01 at midpoint, and triangle segment 02 at midpoint.
+				// prism moves -x
+				// triangle moves +x
+				// expect normal to be +x (opposite of prism motion)
+				shapeATransform1 = globalTransform * makeRigidTranslation(Vector3d(0.5, 0.0, 0.0));
+				shapeATransform2 = globalTransform;
+				shapeBTransform1 = globalTransform * makeRigidTranslation(Vector3d(-0.75, 0.5, 0.25));
+				shapeBTransform2 = globalTransform * makeRigidTranslation(Vector3d(-0.25 + epsilonTrans, 0.5, 0.25));
+
+				auto shapeA1 = createPrismShape(shapeATransform1, i);
+				auto shapeA2 = createPrismShape(shapeATransform2, i);
+				auto shapeB1 = createTriangleShape(shapeBTransform1, j);
+				auto shapeB2 = createTriangleShape(shapeBTransform2, j);
+
+				std::list<std::shared_ptr<Contact>> contacts;
+				contacts.push_back(createTriangleContact(
+					shapeA1, shapeA2, 0,
+					globalTransform * Vector3d(0.5, 0.5, 0.5),
+					globalTransform * Vector3d(0.0, 0.5, 0.5),
+					shapeB1, shapeB2, 0,
+					globalTransform * Vector3d(-0.5, 0.5, 0.5),
+					globalTransform * Vector3d(0.001, 0.5, 0.5),
+					globalTransform.linear() * Vector3d(1.0, 0.0, 0.0)));
+				contacts.push_back(createTriangleContact(
+					shapeA1, shapeA2, 5,
+					globalTransform * Vector3d(0.5, 0.5, 0.5),
+					globalTransform * Vector3d(0.0, 0.5, 0.5),
+					shapeB1, shapeB2, 0,
+					globalTransform * Vector3d(-0.5, 0.5, 0.5),
+					globalTransform * Vector3d(0.001, 0.5, 0.5),
+					globalTransform.linear() * Vector3d(1.0, 0.0, 0.0)));
+
+				doTriangleMeshTriangleMeshTest(shapeA1, shapeA2, shapeB1, shapeB2, contacts);
+			}
+		}
+	}
+
+	{
+		SCOPED_TRACE("Edge of triangle into edge of prism, parallel motions");
+		globalTransform = makeRigidTransform(makeRotationQuaternion(0.34, Vector3d(9.1, 7.4, 5.6).normalized()),
+			Vector3d(39.4, 7.6, 3.5));
+		for (int i = 0; i < 3; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				// collision between prism segment 01 at midpoint, and triangle segment 02 at midpoint.
+				// prism moves -x
+				// triangle moves -x
+				// expect normal to be +x (opposite of prism motion)
+				shapeATransform1 = globalTransform * makeRigidTranslation(Vector3d(0.5, 0.0, 0.0));
+				shapeATransform2 = globalTransform;
+				shapeBTransform1 = globalTransform * makeRigidTranslation(Vector3d(0.0, 0.5, 0.25));
+				shapeBTransform2 = globalTransform * makeRigidTranslation(Vector3d(-0.25 + epsilonTrans, 0.5, 0.25));
+
+				auto shapeA1 = createPrismShape(shapeATransform1, i);
+				auto shapeA2 = createPrismShape(shapeATransform2, i);
+				auto shapeB1 = createTriangleShape(shapeBTransform1, j);
+				auto shapeB2 = createTriangleShape(shapeBTransform2, j);
+
+				std::list<std::shared_ptr<Contact>> contacts;
+				contacts.push_back(createTriangleContact(
+					shapeA1, shapeA2, 0,
+					globalTransform * Vector3d(0.5, 0.5, 0.5),
+					globalTransform * Vector3d(0.0, 0.5, 0.5),
+					shapeB1, shapeB2, 0,
+					globalTransform * Vector3d(0.25, 0.5, 0.5),
+					globalTransform * Vector3d(0.001, 0.5, 0.5),
+					globalTransform.linear() * Vector3d(1.0, 0.0, 0.0)));
+				contacts.push_back(createTriangleContact(
+					shapeA1, shapeA2, 5,
+					globalTransform * Vector3d(0.5, 0.5, 0.5),
+					globalTransform * Vector3d(0.0, 0.5, 0.5),
+					shapeB1, shapeB2, 0,
+					globalTransform * Vector3d(0.25, 0.5, 0.5),
+					globalTransform * Vector3d(0.001, 0.5, 0.5),
+					globalTransform.linear() * Vector3d(1.0, 0.0, 0.0)));
+
+				doTriangleMeshTriangleMeshTest(shapeA1, shapeA2, shapeB1, shapeB2, contacts);
+			}
+		}
+	}
+
+	{
+		SCOPED_TRACE("Edge of triangle into edge of prism, orthogonal motions");
+		globalTransform = makeRigidTransform(makeRotationQuaternion(0.81, Vector3d(0.2, 7.4, 0.6).normalized()),
+			Vector3d(392.4, 7.6, 34.5));
+		for (int i = 0; i < 3; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				// collision between prism segment 01 at midpoint, and triangle segment 02 at midpoint.
+				// prism moves +y
+				// triangle moves +x
+				// expect normal to be +x-y: slow the prism and push it in the direction of triangle motion,
+				//   while the triangle will be adjusted in the -x+y direction so it slows and is pushed in the
+				//   direction of the prism's motion.
+				shapeATransform1 = globalTransform * makeRigidTranslation(Vector3d(0.0, -1.0, 0.0));
+				shapeATransform2 = globalTransform;
+				shapeBTransform1 = globalTransform * makeRigidTranslation(Vector3d(-0.75, 0.5, 0.25));
+				shapeBTransform2 = globalTransform * makeRigidTranslation(Vector3d(-0.25 + epsilonTrans, 0.5, 0.25));
+
+				auto shapeA1 = createPrismShape(shapeATransform1, i);
+				auto shapeA2 = createPrismShape(shapeATransform2, i);
+				auto shapeB1 = createTriangleShape(shapeBTransform1, j);
+				auto shapeB2 = createTriangleShape(shapeBTransform2, j);
+
+				std::list<std::shared_ptr<Contact>> contacts;
+				const double prismTravelPostContact = 0.001996007984031999;
+				contacts.push_back(createTriangleContact(
+					shapeA1, shapeA2, 0,
+					globalTransform * Vector3d(0.0, -0.5 + prismTravelPostContact, 0.5),
+					globalTransform * Vector3d(0.0, 0.5 + prismTravelPostContact, 0.5),
+					shapeB1, shapeB2, 0,
+					globalTransform * Vector3d(-0.5, 0.5, 0.5),
+					globalTransform * Vector3d(0.001, 0.5, 0.5),
+					globalTransform.linear() * Vector3d(1.0, -1.0, 0.0).normalized()));
+				contacts.push_back(createTriangleContact(
+					shapeA1, shapeA2, 5,
+					globalTransform * Vector3d(0.0, -0.5 + prismTravelPostContact, 0.5),
+					globalTransform * Vector3d(0.0, 0.5 + prismTravelPostContact, 0.5),
+					shapeB1, shapeB2, 0,
+					globalTransform * Vector3d(-0.5, 0.5, 0.5),
+					globalTransform * Vector3d(0.001, 0.5, 0.5),
+					globalTransform.linear() * Vector3d(1.0, -1.0, 0.0).normalized()));
+
+				doTriangleMeshTriangleMeshTest(shapeA1, shapeA2, shapeB1, shapeB2, contacts);
+			}
+		}
+	}
 }
 
 } // namespace Collision

@@ -502,7 +502,7 @@ void TriangleMeshTriangleMeshContact::ccdContactCcdCase(
 		{
 			auto axis1 = (dir1 + dir2).normalized();
 			auto axis2 = axis1.cross(dir1);
-			normal = axis2.cross(axis1).normalized();
+			normal = axis1.cross(axis2).normalized();
 		}
 
 		if (!Math::isValid(normal))
