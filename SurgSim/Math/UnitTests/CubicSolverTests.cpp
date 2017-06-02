@@ -126,19 +126,6 @@ TEST(CubicSolverTests, DerivativeNegativeDeterminantCases)
 		double eval = p.evaluate(roots[0]);
 		EXPECT_TRUE(isNearZero(eval)) << "P(" << roots[0] << ") = " << eval;
 	}
-
-	{
-		// From a real use case of segment-segment continuous collision detection.
-		// Fails if epsilon is too small in the call to PolynomialRoots<T, 2> quadraticRoots(quadratic, epsilon);
-		SCOPED_TRACE("P(x) = -2.0e-9 x^2 - 0.250x + 0.249 = 0 => P'(x) = -4.0e-9x - 0.250 => discriminant = -5e-10");
-		// Roots at -1.25e8 and 0.996
-		CubicPolynomial p(0.249, -0.250, -2.0e-9, 0.0);
-		EXPECT_NO_THROW(numberOfRoots = findRootsInRange01(p, &roots));
-		EXPECT_EQ(1, numberOfRoots);
-		EXPECT_TRUE(roots[0] >= 0.0 && roots[0] <= 1.0);
-		double eval = p.evaluate(roots[0]);
-		EXPECT_TRUE(isNearZero(eval)) << "P(" << roots[0] << ") = " << eval;
-	}
 };
 
 TEST(CubicSolverTests, DerivativePositiveDeterminantCases)

@@ -36,12 +36,13 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 {
 	int numberOfRoots = 0;
 	static const boost::math::tools::eps_tolerance<T> tolerance(std::numeric_limits<T>::digits - 3);
+	static const T epsilon = 4 * std::numeric_limits<T>::epsilon();
 
 	// Is degenerate?
-	if (isNearZero(p.getCoefficient(3)))
+	if (isNearZero(p.getCoefficient(3), epsilon))
 	{
 		Polynomial<T, 2> quadratic(p.getCoefficient(0), p.getCoefficient(1), p.getCoefficient(2));
-		PolynomialRoots<T, 2> quadraticRoots(quadratic);
+		PolynomialRoots<T, 2> quadraticRoots(quadratic, std::numeric_limits<T>::epsilon());
 
 		for (int i = 0; i < quadraticRoots.getNumRoots(); ++i)
 		{
@@ -54,19 +55,19 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 		return numberOfRoots;
 	}
 
-	PolynomialRoots<T, 2> stationaryPoints(p.derivative());
+	PolynomialRoots<T, 2> stationaryPoints(p.derivative(), std::numeric_limits<T>::epsilon());
 	if (stationaryPoints.getNumRoots() < 2 ||
 		!Interval<T>(0, 1).overlapsWith(Interval<T>(stationaryPoints[0], stationaryPoints[1])))
 	{
 		T p0 = p.getCoefficient(0); // p.evaluate(static_cast<T>(0));
-		if (isNearZero(p0))
+		if (isNearZero(p0, epsilon))
 		{
 			(*roots)[0] = 0.0;
 			return 1;
 		}
 
 		T p1 = p.evaluate(static_cast<T>(1));
-		if (isNearZero(p1))
+		if (isNearZero(p1, epsilon))
 		{
 			(*roots)[0] = static_cast<T>(1);
 			return 1;
@@ -102,14 +103,14 @@ int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 		{
 			// On each interval, only 1 root can be found
 			T pMin = p.evaluate(interval.getMin());
-			if (isNearZero(pMin))
+			if (isNearZero(pMin, epsilon))
 			{
 				(*roots)[numberOfRoots++] = interval.getMin();
 			}
 			else
 			{
 				T pMax = p.evaluate(interval.getMax());
-				if (isNearZero(pMax))
+				if (isNearZero(pMax, epsilon))
 				{
 					(*roots)[numberOfRoots++] = interval.getMax();
 				}

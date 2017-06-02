@@ -276,6 +276,8 @@ public:
 	void SetUp() override
 	{
 		RenderTests::SetUp();
+
+		SurgSim::Framework::Logger::getLoggerManager()->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
 		physicsManager->setRate(300.0);
 		physicsManager->setComputations(SurgSim::Physics::createCcdPipeline(false));
 	}
@@ -285,6 +287,8 @@ TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshDeformableRigid)
 {
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRigidTranslation;
+
+	physicsManager->setRate(300.0);
 
 	scene->addSceneElement(
 		loadMesh("RigidMesh",
@@ -316,12 +320,14 @@ TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshDeformableRigid)
 		makeRigidTranslation(Vector3d(0,0.1,0)),
 		SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT, false));
 
-	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 5000.0);
+	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 50000.0);
 }
 
 TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshDeformables)
 {
 	using SurgSim::Math::makeRigidTransform;
+
+	physicsManager->setRate(300.0);
 
 	scene->addSceneElement(
 		loadFem2D("DeformableCylinder1",
@@ -333,7 +339,7 @@ TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshDeformables)
 		makeRigidTransform(Vector3d(0, 0.1, 0), Vector3d(-1, 0.1, 0), Vector3d(0, 1.1, 0)),
 		SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT, true, 8e4));
 
-	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 10000.0);
+	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 50000.0);
 }
 
 } // namespace Physics
