@@ -87,7 +87,7 @@ public:
 	/// Constructor
 	/// \param p the degree 1 polynomial for which the roots are to be calculated
 	/// \param epsilon tolerance parameter for determining the number of valid, unique roots
-	explicit PolynomialRoots(const Polynomial<T, 1>& p, const T& epsilon = 1.0e-09);
+	explicit PolynomialRoots(const Polynomial<T, 1>& p, const T& epsilon = 1.0e-15);
 };
 
 /// PolynomialRoots<T, 2> specializes the PolynomialRoots class for degree 2 (quadratic polynomials)
@@ -99,7 +99,7 @@ public:
 	/// Constructor
 	/// \param p the degree 2 polynomial for which the roots are to be calculated
 	/// \param epsilon tolerance parameter for determining the number of valid, unique roots
-	explicit PolynomialRoots(const Polynomial<T, 2>& p, const T& epsilon = 1.0e-09);
+	explicit PolynomialRoots(const Polynomial<T, 2>& p, const T& epsilon = 1.0e-15);
 };
 
 /// Specialized solve routine for linear polynomials (2 coefficients)

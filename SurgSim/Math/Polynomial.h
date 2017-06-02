@@ -25,7 +25,7 @@ namespace Math
 
 namespace
 {
-double polynomial_epsilon = 1.0e-09;
+double polynomial_epsilon = 1.0e-15;
 }
 
 /// Define an utility function for comparing individual coefficients to 0.

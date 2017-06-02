@@ -1845,11 +1845,11 @@ int timesOfCoplanarityInRange01(
 {
 	/// Let's define the following:
 	/// A(t) = A0 + t * VA with VA = A1 - A0
-	/// Similarily for B(t), C(t) and D(t)
+	/// Similarly for B(t), C(t), and D(t)
 	/// Therefore we have AB(t) = B(t) - A(t) = B(0) + t * VB - A(0) - t * VA
 	///                         = AB(0) + t * [VB - VA] = AB(0) + t * VAB
 	///
-	/// The 4 points ABCD are coplanar are time t if they verify:
+	/// The 4 points ABCD are coplanar at time t if they satisfy:
 	/// [AB(t).cross(CD(t))].AC(t) = 0
 	/// We develop this equation to clearly formulate the resulting cubic equation:
 	///
