@@ -161,6 +161,8 @@ public:
 	/// \param alphaK The scaling factor for the stiffness contribution
 	/// \param x A complete system vector to be used as the vector in the matrix-vector multiplication
 	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
+	/// \param [out] extractedX, acumulator temporary memory for the function operation, this is an optimization
+	/// as addMatVec will get repeatedly called during one physics frame, preallocating these vectors helps
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
 	virtual void addMatVec(double alphaM, double alphaD, double alphaK,
