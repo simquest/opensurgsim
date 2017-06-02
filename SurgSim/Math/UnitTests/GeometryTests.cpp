@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2016, SimQuest Solutions Inc.
+// Copyright 2013-2017, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -425,7 +425,7 @@ TEST_F(GeometryTest, DistanceLineLine)
 	EXPECT_NEAR(2.0, distance, epsilon);
 
 	// Not quite parallel, trying to get below epsilon
-	parallel = Segment(plainSegment.a + plainNormal * 2 , plainSegment.b + plainNormal * 2 - plainNormal * 1.0e-10);
+	parallel = Segment(plainSegment.a + plainNormal * 2, plainSegment.b + plainNormal * 2 - plainNormal * 1.0e-10);
 	distance = distanceLineLine(plainSegment.a, plainSegment.b, parallel.a, parallel.b, &p0, &p1);
 	EXPECT_NEAR(2.0, distance, epsilon);
 
@@ -792,14 +792,14 @@ TEST_F(GeometryTest, DistancePointTriangle)
 
 	// Edge v0v2
 	distance = distancePointTriangle(inputPoint,
-									 (tri.v2 - tri.v0v2 * epsilon * 0.01).eval(), tri.v1 , tri.v2,
+									 (tri.v2 - tri.v0v2 * epsilon * 0.01).eval(), tri.v1, tri.v2,
 									 &result);
 	expectedDistance = distancePointSegment(inputPoint, tri.v1, tri.v2, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint, result));
 
 	// Edge v1v2
-	distance = distancePointTriangle(inputPoint, tri.v0, tri.v1 , tri.v1, &result);
+	distance = distancePointTriangle(inputPoint, tri.v0, tri.v1, tri.v1, &result);
 	expectedDistance = distancePointSegment(inputPoint, tri.v1, tri.v0, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint, result));
@@ -1214,7 +1214,7 @@ TEST_F(GeometryTest, TrianglePlaneTest)
 
 	{
 		SCOPED_TRACE("Coplanar Case");
-		MockTriangle target(triangle.v0 , triangle.v1 , triangle.v2);
+		MockTriangle target(triangle.v0, triangle.v1, triangle.v2);
 		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, pointOnPlane, pointOnPlane, 0));
 	}
 
@@ -1354,6 +1354,13 @@ void checkSegTriDistance(const SegTriDistanceData& data)
 	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
 
+	// Check call without n;
+	distance = distanceSegmentTriangle(segment.a, segment.b, tri.v0, tri.v1, tri.v2,
+									   &segmentPoint, &trianglePoint);
+	EXPECT_NEAR(expectedDistance, distance, epsilon);
+	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
+	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
+
 
 	// Repeat above with segment reversed
 	distance = distanceSegmentTriangle(segment.b, segment.a, tri.v0, tri.v1, tri.v2, tri.n,
@@ -1361,6 +1368,7 @@ void checkSegTriDistance(const SegTriDistanceData& data)
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
+
 }
 TEST_F(GeometryTest, SegmentTriangleDistance)
 {
@@ -1430,7 +1438,7 @@ TEST_F(GeometryTest, SegmentTriangleDistance)
 		intersection = tri.v0 + tri.v0v2 * 0.4;
 		Segment seg(intersection, intersection + tri.n * 2);
 		segment = Segment(seg.a + seg.ab * 0.01, seg.b + seg.ab * 0.01);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a , intersection));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection));
 	}
 	{
 		SCOPED_TRACE("segment endpoint is close to edge v1v2");
@@ -1548,7 +1556,7 @@ TEST_F(GeometryTest, distanceTriangleTriangle)
 	{
 		SCOPED_TRACE("vertex t1v0 close to the inside of triangle t0");
 		VectorType intersection = t0.pointInTriangle(0.2, 0.2);
-		t1 = MockTriangle(intersection + t0.n , t0.v1 + t0.n * 2, t0.v2 + t0.n * 2);
+		t1 = MockTriangle(intersection + t0.n, t0.v1 + t0.n * 2, t0.v2 + t0.n * 2);
 		checkTriTriDistance(TriTriDistanceData(t1, t0, t1.v0, intersection));
 	}
 	{
@@ -1582,8 +1590,8 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		SCOPED_TRACE("No intersection, zero length segment");
 		VectorType point1(0.0, 0.0, 0.0);
 		VectorType point2(0.0, 0.0, 0.0);
-		box.min() = VectorType(1.0 , 1.0, 1.0);
-		box.max() = VectorType(5.0 , 5.0, 5.0);
+		box.min() = VectorType(1.0, 1.0, 1.0);
+		box.max() = VectorType(5.0, 5.0, 5.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
 		EXPECT_EQ(0u, intersections.size());
@@ -1593,8 +1601,8 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		SCOPED_TRACE("No intersection, zero size box");
 		VectorType point1(0.0, 0.0, 0.0);
 		VectorType point2(0.0, 5.0, 0.0);
-		box.min() = VectorType(1.0 , 1.0, 1.0);
-		box.max() = VectorType(1.0 , 1.0, 1.0);
+		box.min() = VectorType(1.0, 1.0, 1.0);
+		box.max() = VectorType(1.0, 1.0, 1.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
 		EXPECT_EQ(0u, intersections.size());
@@ -1604,8 +1612,8 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		SCOPED_TRACE("No Intersection, parallel and beyond corners");
 		VectorType point1(-0.0, 0.0, -0.0);
 		VectorType point2(0.0, 5.0, -0.0);
-		box.min() = VectorType(1.0 , 1.0, 1.0);
-		box.max() = VectorType(5.0 , 5.0, 5.0);
+		box.min() = VectorType(1.0, 1.0, 1.0);
+		box.max() = VectorType(5.0, 5.0, 5.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
 		EXPECT_EQ(0u, intersections.size());
@@ -1615,8 +1623,8 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		SCOPED_TRACE("Entering box, but not leaving");
 		VectorType point1(2.0, 2.0, 0.0);
 		VectorType point2(3.0, 3.0, 2.0);
-		box.min() = VectorType(1.0 , 1.0, 1.0);
-		box.max() = VectorType(5.0 , 5.0, 5.0);
+		box.min() = VectorType(1.0, 1.0, 1.0);
+		box.max() = VectorType(5.0, 5.0, 5.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
 		EXPECT_EQ(1u, intersections.size());
@@ -1627,8 +1635,8 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 		SCOPED_TRACE("Entering and exiting box, through box corners");
 		VectorType point1(0.0, 0.0, 0.0);
 		VectorType point2(6.0, 6.0, 6.0);
-		box.min() = VectorType(1.0 , 1.0, 1.0);
-		box.max() = VectorType(5.0 , 5.0, 5.0);
+		box.min() = VectorType(1.0, 1.0, 1.0);
+		box.max() = VectorType(5.0, 5.0, 5.0);
 		std::vector<VectorType> intersections;
 		intersectionsSegmentBox(point1, point2, box, &intersections);
 		EXPECT_EQ(2u, intersections.size());
@@ -1645,7 +1653,7 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 		VectorType bottom(-5.0, 5.0, 0.0);
 		VectorType top(5.0, 5.0, 0.0);
 		double radius = 1.0;
-		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		BoxType box(VectorType(-1.0, -1.0, -1.0), VectorType(1.0, 1.0, 1.0));
 		EXPECT_FALSE(doesIntersectBoxCapsule(bottom, top, radius, box));
 	}
 	{
@@ -1653,7 +1661,7 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 		VectorType bottom(-5.0, -5.0, -5.0);
 		VectorType top(5.0, 5.0, 5.0);
 		double radius = 10.0;
-		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		BoxType box(VectorType(-1.0, -1.0, -1.0), VectorType(1.0, 1.0, 1.0));
 		EXPECT_TRUE(doesIntersectBoxCapsule(bottom, top, radius, box));
 	}
 	{
@@ -1661,7 +1669,7 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 		VectorType bottom(-5.0, -5.0, -5.0);
 		VectorType top(5.0, 5.0, 5.0);
 		double radius = 1.0;
-		BoxType box(VectorType(1.0 , 1.0, -1.0), VectorType(2.0 , 2.0, -2.0));
+		BoxType box(VectorType(1.0, 1.0, -1.0), VectorType(2.0, 2.0, -2.0));
 		EXPECT_FALSE(doesIntersectBoxCapsule(bottom, top, radius, box));
 	}
 	{
@@ -1669,7 +1677,7 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 		VectorType bottom(-5.0, -5.0, -5.0);
 		VectorType top(5.0, 5.0, 5.0);
 		double radius = 1.0;
-		BoxType box(VectorType(0.0 , 0.0, 0.0), VectorType(1.0 , 1.0, 1.0));
+		BoxType box(VectorType(0.0, 0.0, 0.0), VectorType(1.0, 1.0, 1.0));
 		EXPECT_TRUE(doesIntersectBoxCapsule(bottom, top, radius, box));
 	}
 	{
@@ -1677,7 +1685,7 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 		VectorType bottom(2.0, -2.0, 2.0);
 		VectorType top(2.0, 2.0, 2.0);
 		double radius = sqrt(2.0) - 1.0;
-		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		BoxType box(VectorType(-1.0, -1.0, -1.0), VectorType(1.0, 1.0, 1.0));
 		EXPECT_FALSE(doesIntersectBoxCapsule(bottom, top, radius, box));
 	}
 	{
@@ -1685,7 +1693,7 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 		VectorType bottom(2.0, -2.0, 2.0);
 		VectorType top(2.0, 2.0, 2.0);
 		double radius = sqrt(2.0) + 0.1;
-		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		BoxType box(VectorType(-1.0, -1.0, -1.0), VectorType(1.0, 1.0, 1.0));
 		EXPECT_TRUE(doesIntersectBoxCapsule(bottom, top, radius, box));
 	}
 	{
@@ -1693,7 +1701,7 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 		VectorType bottom(2.0, 3.0, 1.0);
 		VectorType top(2.0, 1.0, 3.0);
 		double radius = sqrt(3.0) - 0.1;
-		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		BoxType box(VectorType(-1.0, -1.0, -1.0), VectorType(1.0, 1.0, 1.0));
 		EXPECT_FALSE(doesIntersectBoxCapsule(bottom, top, radius, box));
 	}
 	{
@@ -1701,7 +1709,7 @@ TEST_F(GeometryTest, DoesIntersectBoxCapsule)
 		VectorType bottom(2.0, 3.0, 1.0);
 		VectorType top(2.0, 1.0, 3.0);
 		double radius = sqrt(3.0) + 0.1;
-		BoxType box(VectorType(-1.0 , -1.0, -1.0), VectorType(1.0 , 1.0, 1.0));
+		BoxType box(VectorType(-1.0, -1.0, -1.0), VectorType(1.0, 1.0, 1.0));
 		EXPECT_TRUE(doesIntersectBoxCapsule(bottom, top, radius, box));
 	}
 }

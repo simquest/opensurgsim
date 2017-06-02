@@ -149,8 +149,8 @@ public:
 	/// (we consider here that each node has a single static dof)
 	/// \param nodeId The node on which the boundary condition needs to be set
 	/// \param value The boundary conidtion value that the static dof needs to be set on
-	/// \note for example, this is fixing the twist angle of a Kircchoff model using a quasi-static update of 
-	/// the material frame
+	/// \note For example, this is fixing the twist angle of a Kircchoff model using a quasi-static
+	/// update of the material frame.
 	/// \note i.e. the twist is not part of the dynamic DOF, but is still a static dof of the model.
 	void addBoundaryConditionStaticDof(size_t nodeId, double value);
 
@@ -159,6 +159,12 @@ public:
 
 	/// \return All boundary conditions for statically defined Dof as a vector of dof ids
 	const std::vector<std::pair<size_t, double>>& getBoundaryConditionsStaticDof() const;
+
+	/// Set all boundary conditions on static dofs
+	/// \param staticDof The vector of static dof that must be set
+	/// \exception SurgSim::Framework::AssertionFailure if a an item in staticDof does not have
+	/// a valid nodeId (entry.first)
+	void setBoundaryConditionsStaticDof(const std::vector<std::pair<size_t, double>>& staticDof);
 
 	/// Set the value of an existing boundary condition on a static dof
 	/// \param nodeId The node for which the static dof must be set

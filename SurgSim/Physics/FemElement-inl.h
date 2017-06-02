@@ -28,7 +28,7 @@ namespace Physics
 {
 
 template <typename DerivedSub, typename T, int Opt, typename Index>
-void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t> blockIds,
+void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t>& blockIds,
 									  size_t blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
 									  bool initialize) const
 {

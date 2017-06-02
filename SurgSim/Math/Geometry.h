@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2017, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1299,32 +1299,6 @@ bool doesIntersectPlanePlane(
 	return true;
 }
 
-
-/// Calculate the distance of a line segment to a triangle.
-/// Note that this version will calculate the normal of the triangle,
-/// if the normal is known use the other version of this function.
-/// \tparam T		Accuracy of the calculation, can usually be inferred.
-/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
-/// \param sv0,sv1	Extremities of the line segment.
-/// \param tv0, tv1, tv2 Triangle points.
-/// \param [out] segmentPoint Closest point on the segment.
-/// \param [out] trianglePoint Closest point on the triangle.
-/// \return the the distance between the two closest points, i.e. (trianglePoint - segmentPoint).norm().
-template <class T, int MOpt> inline
-T distanceSegmentTriangle(
-	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-	Eigen::Matrix<T, 3, 1, MOpt>* segmentPoint,
-	Eigen::Matrix<T, 3, 1, MOpt>* trianglePoint)
-{
-	Eigen::Matrix<T, 3, 1, MOpt> n = (tv1 - tv0).cross(tv2 - tv1);
-	n.normalize();
-	return distanceSegmentTriangle(sv0, sv1, tv0, tv1, tv2, n, segmentPoint, trianglePoint);
-}
-
 /// Calculate the distance of a line segment to a triangle.
 /// \pre n needs to be normalized.
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
@@ -1442,6 +1416,31 @@ T distanceSegmentTriangle(
 
 }
 
+
+/// Calculate the distance of a line segment to a triangle.
+/// Note that this version will calculate the normal of the triangle,
+/// if the normal is known use the other version of this function.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param sv0,sv1	Extremities of the line segment.
+/// \param tv0, tv1, tv2 Triangle points.
+/// \param [out] segmentPoint Closest point on the segment.
+/// \param [out] trianglePoint Closest point on the triangle.
+/// \return the the distance between the two closest points, i.e. (trianglePoint - segmentPoint).norm().
+template <class T, int MOpt> inline
+T distanceSegmentTriangle(
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	Eigen::Matrix<T, 3, 1, MOpt>* segmentPoint,
+	Eigen::Matrix<T, 3, 1, MOpt>* trianglePoint)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> n = (tv1 - tv0).cross(tv2 - tv1);
+	n.normalize();
+	return distanceSegmentTriangle(sv0, sv1, tv0, tv1, tv2, n, segmentPoint, trianglePoint);
+}
 
 /// Calculate the distance between two triangles
 /// \tparam T		Accuracy of the calculation, can usually be inferred.

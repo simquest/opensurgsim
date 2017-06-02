@@ -1399,10 +1399,13 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	EXPECT_TRUE(dampingMatrix.isApprox(zeroMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffnessMatrix));
 
+	SurgSim::Math::Vector extractedX;
+	SurgSim::Math::Vector accumulator;
+
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
 	ones.setOnes();
-	tri->addMatVec(1.0, 0.0, 0.0, ones, &forceVector);
+	tri->addMatVec(1.0, 0.0, 0.0, ones, &forceVector, &extractedX, &accumulator);
 	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Mass component only");
@@ -1410,7 +1413,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	tri->addMatVec(0.0, 1.0, 0.0, ones, &forceVector);
+	tri->addMatVec(0.0, 1.0, 0.0, ones, &forceVector, &extractedX, &accumulator);
 	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Damping component only");
@@ -1418,7 +1421,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	tri->addMatVec(0.0, 0.0, 1.0, ones, &forceVector);
+	tri->addMatVec(0.0, 0.0, 1.0, ones, &forceVector, &extractedX, &accumulator);
 	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Stiffness component only");
@@ -1426,7 +1429,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	tri->addMatVec(1.0, 2.0, 3.0, ones, &forceVector);
+	tri->addMatVec(1.0, 2.0, 3.0, ones, &forceVector, &extractedX, &accumulator);
 	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with mix Mass/Damping/Stiffness components");
