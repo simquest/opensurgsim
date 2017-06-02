@@ -491,23 +491,26 @@ void TriangleMeshTriangleMeshContact::ccdContactCcdCase(
 		Math::Vector3d t2v0v2T0 = t2v2.first - t2v0.first;
 		Math::Vector3d t2contactT0 = t2v0.first + triangle2Alpha * t2v0v1T0 + triangle2Beta * t2v0v2T0;
 
-		auto dir1 = (t1contact - t1contactT0).normalized();
-		auto dir2 = (t2contact - t2contactT0).normalized();
-
-		if (std::abs(std::abs(dir1.dot(dir2)) - 1.0) < ScalarEpsilon)
+		Math::Vector3d dir1 = t1contact - t1contactT0;
+		Math::Vector3d dir2 = t2contact - t2contactT0;
+		if (dir1.isZero() || dir2.isZero())
 		{
-			normal = -dir1;
+			normal = (dir2 - dir1).normalized();
 		}
 		else
 		{
-			auto axis1 = (dir1 + dir2).normalized();
-			auto axis2 = axis1.cross(dir1);
-			normal = axis1.cross(axis2).normalized();
-		}
-
-		if (!Math::isValid(normal))
-		{
-			normal = (t1contact - t2contact).normalized();
+			dir1.normalize();
+			dir2.normalize();
+			if (std::abs(std::abs(dir1.dot(dir2)) - 1.0) < ScalarEpsilon)
+			{
+				normal = -dir1;
+			}
+			else
+			{
+				auto axis1 = (dir1 + dir2).normalized();
+				auto axis2 = axis1.cross(dir1);
+				normal = axis1.cross(axis2).normalized();
+			}
 		}
 	}
 	else
