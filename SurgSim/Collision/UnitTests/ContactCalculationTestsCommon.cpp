@@ -128,13 +128,16 @@ bool checkMeshLocalCoordinate(
 	}
 	else
 	{
-		return ::testing::AssertionFailure() << "Expected contact not found in calculated contacts list:\n" <<
-			   "Normal: " << expected->normal << "\n" <<
-			   "First objects' contact point: " << expected->penetrationPoints.first.rigidLocalPosition.getValue()
-			   << "\n" <<
-			   "Second objects' contact point: " << expected->penetrationPoints.second.rigidLocalPosition.getValue()
-			   << "\n" <<
-			   "Depth of penetration: " << expected->depth << "\n";
+		std::stringstream calculatedText;
+		size_t numCalculated = 0;
+		for (const auto& contact : contactsList)
+		{
+			calculatedText << "Calculated Contact " << numCalculated << ":" << std::endl << *contact << std::endl;
+			++numCalculated;
+		}
+		return ::testing::AssertionFailure() << "Expected contact not found in calculated contacts list:\nExpected:\n"
+			<< *expected << "\nNumber of Calculated contacts: " << numCalculated << std::endl << calculatedText.str()
+			<< std::endl;
 	}
 }
 
@@ -143,9 +146,7 @@ void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expecte
 							  bool expectedHasTriangleContactObject)
 {
 	SCOPED_TRACE("Comparing the contact info.");
-
 	EXPECT_EQ(expectedContacts.size(), calculatedContacts.size());
-
 	for (auto it = expectedContacts.begin(); it != expectedContacts.end(); ++it)
 	{
 		EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts, expectedHasTriangleContactObject));
