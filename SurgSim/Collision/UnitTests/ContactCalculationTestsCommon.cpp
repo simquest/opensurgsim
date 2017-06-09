@@ -128,13 +128,16 @@ bool checkMeshLocalCoordinate(
 	}
 	else
 	{
-		return ::testing::AssertionFailure() << "Expected contact not found in calculated contacts list:\n" <<
-			   "Normal: " << expected->normal.transpose() << "\n" <<
-			   "First objects' contact point: " << expected->penetrationPoints.first.rigidLocalPosition.getValue().transpose()
-			   << "\n" <<
-			   "Second objects' contact point: " << expected->penetrationPoints.second.rigidLocalPosition.getValue().transpose()
-			   << "\n" <<
-			   "Depth of penetration: " << expected->depth << "\n";
+		std::stringstream calculatedText;
+		size_t numCalculated = 0;
+		for (const auto& contact : contactsList)
+		{
+			calculatedText << "Calculated Contact " << numCalculated << ":" << std::endl << *contact << std::endl;
+			++numCalculated;
+		}
+		return ::testing::AssertionFailure() << "Expected contact not found in calculated contacts list:\nExpected:\n"
+			<< *expected << "\nNumber of Calculated contacts: " << numCalculated << std::endl << calculatedText.str()
+			<< std::endl;
 	}
 }
 
@@ -143,33 +146,7 @@ void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expecte
 							  bool expectedHasTriangleContactObject)
 {
 	SCOPED_TRACE("Comparing the contact info.");
-
 	EXPECT_EQ(expectedContacts.size(), calculatedContacts.size());
-
-	if (Framework::Logger::getDefaultLogger()->getThreshold() <= Framework::LOG_LEVEL_DEBUG)
-	{
-		std::stringstream calculatedText;
-		std::stringstream expectedText;
-		size_t numCalculated = 0;
-		size_t numExpected = 0;
-
-		for (const auto& contact : calculatedContacts)
-		{
-			calculatedText << *contact;
-			++numCalculated;
-		}
-
-		for (const auto& contact : expectedContacts)
-		{
-			expectedText << *contact;
-			++numExpected;
-		}
-
-		SURGSIM_LOG_DEBUG(Framework::Logger::getDefaultLogger()) << "Checking contacts." << std::endl <<
-			"Number of Calculated contacts: " << numCalculated << std::endl << calculatedText.str() << std::endl <<
-			"Number of Expected contacts: " << numExpected << std::endl << expectedText.str() << std::endl;
-	}
-
 	for (auto it = expectedContacts.begin(); it != expectedContacts.end(); ++it)
 	{
 		EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts, expectedHasTriangleContactObject));
