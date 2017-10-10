@@ -54,6 +54,11 @@ enum OdeEquationUpdate
 class OdeEquation
 {
 public:
+
+	OdeEquation() : m_initState(0) 
+	{
+
+	}
 	/// Virtual destructor
 	virtual ~OdeEquation() {}
 
@@ -86,6 +91,14 @@ public:
 	/// \return The matrix \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
 	const SparseMatrix& getK() const;
 
+	bool hasF()const;
+
+	bool hasM()const;
+
+	bool hasK()const;
+
+	bool hasD()const;
+
 protected:
 	/// Evaluation of the RHS function \f$f(x, v)\f$ for a given state
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the function \f$f(x,v)\f$ with
@@ -113,6 +126,8 @@ protected:
 	/// The initial state (which defines the ODE initial conditions \f$(x0, v0)\f$)
 	/// \note MUST be set by the derived classes
 	std::shared_ptr<OdeState> m_initialState;
+
+	unsigned int m_initState;
 
 	/// The vector containing \f$f(x, v)\f$
 	Vector m_f;

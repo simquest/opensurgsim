@@ -448,6 +448,7 @@ const std::vector<double>& MockFemRepresentation::getMassPerNode() const
 
 void MockFemRepresentation::clearFMDK()
 {
+	m_initState = 0;
 	m_f.setZero();
 	SurgSim::Math::clearMatrix(&m_M);
 	SurgSim::Math::clearMatrix(&m_D);
@@ -667,7 +668,7 @@ int MockCollisionRepresentation::getShapeType() const
 	return -1;
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> MockCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> MockCollisionRepresentation::getShape() const
 {
 	return nullptr;
 }

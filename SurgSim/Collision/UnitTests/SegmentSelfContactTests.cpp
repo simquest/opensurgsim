@@ -83,7 +83,7 @@ public:
 	}
 
 	void getUniqueCandidates(
-		const std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
+		const std::vector<SurgSim::DataStructures::AabbTree::TreeNodePairType>& intersectionList,
 		std::set<std::pair<size_t, size_t>>* segmentIdList) const
 	{
 		SegmentSelfContact::getUniqueCandidates(intersectionList, segmentIdList);
@@ -440,7 +440,7 @@ TEST_F(SegmentCcdSelfContactTests, GetUniqueCandidates)
 		buildLoop(-1.0e-03, 1.0e-04);
 
 	std::set<std::pair<size_t, size_t>> segmentIdList;
-	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
+	std::vector<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
 		= shapeT0->getAabbTree()->spatialJoin(*(shapeT1->getAabbTree()));
 	m_selfContact.getUniqueCandidates(intersectionList, &segmentIdList);
 	EXPECT_EQ(6u, segmentIdList.size());

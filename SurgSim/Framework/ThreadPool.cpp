@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/ThreadPool.h"
 
+#include "windows.h"
 
 namespace SurgSim
 {
@@ -25,7 +26,7 @@ ThreadPool::ThreadPool(size_t numThreads) :
 	m_destructing(false)
 {
 	// Main loop for each worker thread.
-	auto threadLoop = [this] ()
+	auto threadLoop = [this]()
 	{
 		while (true)
 		{
@@ -47,7 +48,12 @@ ThreadPool::ThreadPool(size_t numThreads) :
 
 	for (size_t i = 0; i < numThreads; i++)
 	{
-		m_threads.emplace_back(threadLoop);
+		boost::thread thread(threadLoop);
+		//auto handle = thread.native_handle();
+
+		//DWORD_PTR mask = 1ULL << ((i % 4) * 2);
+		//SetThreadAffinityMask(handle, mask);
+		m_threads.push_back(std::move(thread));
 	}
 }
 

@@ -12,27 +12,34 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-#ifndef SURGSIM_MATH_SEGMENTMESHSHAPE_INL_H
-#define SURGSIM_MATH_SEGMENTMESHSHAPE_INL_H
+#include "SurgSim/Math/VerticesShape.h"
 
 namespace SurgSim
 {
 namespace Math
 {
 
-template <class VertexData, class EdgeData>
-SegmentMeshShape::SegmentMeshShape(
-	const SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
-	double radius) : SurgSim::DataStructures::SegmentMeshPlain(mesh)
+bool VerticesShape::isTransformable() const
 {
-	setInitialVertices(mesh);
-	setRadius(radius);
-	buildAabbTree();
+	return true;
 }
+
+void VerticesShape::setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices)
+{
+	m_initialVertices = vertices;
+}
+
+void VerticesShape::setInitialVertices(DataStructures::Vertices<DataStructures::EmptyData>&& vertices)
+{
+	m_initialVertices = std::move(vertices);
+}
+
+const DataStructures::Vertices<DataStructures::EmptyData>& VerticesShape::getInitialVertices() const
+{
+	return m_initialVertices;
+}
+
 
 }; // namespace Math
 }; // namespace SurgSim
-
-#endif // SURGSIM_MATH_SEGMENTMESHSHAPE_INL_H

@@ -41,6 +41,8 @@ ParticlesShape::ParticlesShape(const ParticlesShape& other) :
 	m_volume(other.getVolume()),
 	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
+	setInitialVertices(other.getInitialVertices());
 }
 
 int ParticlesShape::getType() const
@@ -83,7 +85,7 @@ bool ParticlesShape::doUpdate()
 	const double numParticles = static_cast<double>(getVertices().size());
 	const Vector3d radius = Vector3d::Constant(m_radius);
 
-	std::list<DataStructures::AabbTreeData::Item> items;
+	SurgSim::DataStructures::AabbTreeData::ItemList items;
 	Vector3d totalPosition = Vector3d::Zero();
 	Matrix33d totalDisplacementSkewSquared = Matrix33d::Zero();
 	size_t id = 0;
@@ -128,11 +130,6 @@ const std::shared_ptr<const SurgSim::DataStructures::AabbTree> ParticlesShape::g
 	return m_aabbTree;
 }
 
-bool ParticlesShape::isTransformable() const
-{
-	return true;
-}
-
 const Math::Aabbd& ParticlesShape::getBoundingBox() const
 {
 	if (m_aabbTree != nullptr)
@@ -142,6 +139,20 @@ const Math::Aabbd& ParticlesShape::getBoundingBox() const
 	else
 	{
 		return m_aabb;
+	}
+}
+
+void ParticlesShape::setPose(const RigidTransform3d& pose)
+{
+	auto& vertices = getVertices();
+	const size_t numVertices = vertices.size();
+	const auto& initialVertices = m_initialVertices.getVertices();
+	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+		"ParticlesShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
+		" vertices, vs initially " << initialVertices.size() << " vertices.";
+	for (size_t i = 0; i < numVertices; ++i)
+	{
+		vertices[i].position = pose * initialVertices[i].position;
 	}
 }
 

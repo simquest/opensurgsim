@@ -185,7 +185,9 @@ public:
 		SurgSim::Physics::RenderTests::SetUp();
 		scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
-		SurgSim::Framework::Logger::getLoggerManager()->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
+		//SurgSim::Framework::Logger::getLoggerManager()->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
+		SurgSim::Framework::Logger::getLogger("Physics/PrepareCollisionPairs")->setThreshold(
+			SurgSim::Framework::LOG_LEVEL_DEBUG);
 		physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
 		physicsManager->setRate(150.0);
 	}

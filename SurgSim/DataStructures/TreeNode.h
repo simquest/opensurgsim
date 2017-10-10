@@ -47,7 +47,7 @@ public:
 	void setData(std::shared_ptr<TreeData> data);
 
 	/// \return The data of this node.
-	std::shared_ptr<TreeData> getData() const;
+	const std::shared_ptr<TreeData>& getData() const;
 
 	/// \return The number of children of this node.
 	size_t getNumChildren() const;
@@ -55,7 +55,7 @@ public:
 	/// Returns the specified child of this node.
 	/// \param index	Index of the child
 	/// \return Child at the specified index
-	std::shared_ptr<TreeNode> getChild(size_t index) const;
+	std::shared_ptr<TreeNode>& getChild(size_t index);
 
 	/// Public entry point for visitor, currently this performs pre-order traversal of the tree
 	/// \param visitor The visitor that wants to traverse the tree

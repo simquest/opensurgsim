@@ -24,12 +24,14 @@
 #include "SurgSim/Framework/ObjectFactory.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/VerticesShape.h"
 
 namespace SurgSim
 {
 namespace DataStructures
 {
 class AabbTree;
+class AabbTreeNode;
 }
 
 namespace Math
@@ -51,7 +53,7 @@ SURGSIM_STATIC_REGISTRATION(MeshShape);
 /// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
 ///
 /// \sa SurfaceMeshShape
-class MeshShape : public Shape, public SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData,
+class MeshShape : public VerticesShape, public SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData,
 	SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::NormalData>
 {
 public:
@@ -93,20 +95,25 @@ public:
 
 	bool isValid() const override;
 
-	bool isTransformable() const override;
+	void setPose(const RigidTransform3d& pose) override;
 
-protected:
-	bool doUpdate() override;
+	/// Build the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void buildAabbTree();
 
-	bool doLoad(const std::string& fileName) override;
+	/// Update the AabbTree, this will only update the bounding boxes for the triangles, without rebalancing the tree
+	/// do this for smaller changes as it is much faster than building the tree
+	void updateAabbTree();
 
 	/// Calculate normals for all triangles.
 	/// \note Normals will be normalized.
 	/// \return true on success, or false if any triangle has an indeterminate normal.
 	bool calculateNormals();
 
-	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
+
+protected:
+	bool doUpdate() override;
+
+	bool doLoad(const std::string& fileName) override;
 
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
@@ -124,6 +131,7 @@ protected:
 private:
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<SurgSim::DataStructures::AabbTree> m_aabbTree;
+	std::vector<SurgSim::Math::Aabbd> m_aabbCache;
 };
 
 }; // Math

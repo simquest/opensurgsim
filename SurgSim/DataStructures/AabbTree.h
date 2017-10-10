@@ -17,6 +17,7 @@
 #define SURGSIM_DATASTRUCTURES_AABBTREE_H
 
 #include <list>
+#include <vector>
 
 #include "SurgSim/DataStructures/Tree.h"
 #include "SurgSim/DataStructures/AabbTreeData.h"
@@ -58,30 +59,33 @@ public:
 
 	/// Create the tree from a list of tree items, all the tree information will be deleted
 	/// \param items list of items to insert into the tree
-	void set(const std::list<AabbTreeData::Item>& items);
+	void set(const AabbTreeData::ItemList& items);
 
 	/// Create the tree from a list of tree items, all the tree information will be deleted
 	/// \param items rvalue reference to list of items to insert into the tree
-	void set(std::list<AabbTreeData::Item>&& items);
+	void set(AabbTreeData::ItemList&& items);
 
 	/// \return the AABB for the tree
 	const SurgSim::Math::Aabbd& getAabb() const;
 
 	/// Type indicating a relationship between two AabbTreeNodes
-	typedef std::pair<std::shared_ptr<AabbTreeNode>, std::shared_ptr<AabbTreeNode>> TreeNodePairType;
+	typedef std::pair<AabbTreeNode*, AabbTreeNode*> TreeNodePairType;
 
 	/// Query to find all pairs of intersecting nodes between two aabb r-trees.
 	/// \param otherTree The other tree to compare against
 	/// \return The list of all pairs of intersecting nodes
-	std::list<TreeNodePairType> spatialJoin(const AabbTree& otherTree) const;
+	std::vector<TreeNodePairType> spatialJoin(const AabbTree& otherTree) const;
 
 	/// Query to find all pairs of intersecting nodes between two aabb r-trees.
 	/// \param lhsParent root node of the first tree
 	/// \param rhsParent root node of the second tree
 	/// \param result the list of all pairs of intersecting nodes
-	void spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
-					 std::shared_ptr<AabbTreeNode> rhsParent,
-					 std::list<TreeNodePairType>* result) const;
+	void AabbTree::spatialJoin(AabbTreeNode* lhsParent, AabbTreeNode* rhsParent, std::vector<TreeNodePairType>* result) const;
+
+
+	void updateBounds(const std::vector<Math::Aabbd>& bounds);
+
+	void updateNodeBounds(const std::vector<Math::Aabbd>& bounds, SurgSim::DataStructures::AabbTreeNode* node);
 
 private:
 
