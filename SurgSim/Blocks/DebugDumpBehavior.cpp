@@ -15,6 +15,7 @@
 
 #include "SurgSim/Blocks/DebugDumpBehavior.h"
 
+#include <iostream>
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
