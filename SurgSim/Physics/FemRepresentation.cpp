@@ -38,7 +38,7 @@ namespace Physics
 
 FemRepresentation::FemRepresentation(const std::string& name) :
 	DeformableRepresentation(name),
-	m_useMassLumping(true),
+	m_useMassLumping(false),
 	m_useComplianceWarping(false),
 	m_isInitialComplianceMatrixComputed(false)
 {
