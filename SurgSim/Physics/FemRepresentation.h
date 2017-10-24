@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_FEMREPRESENTATION_H
 #define SURGSIM_PHYSICS_FEMREPRESENTATION_H
 
+#include <future>
 #include <memory>
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
@@ -232,6 +233,14 @@ private:
 
 	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
 	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;
+
+	///@{
+	/// For the asynchronous compliance matrix multiplication.
+	SurgSim::Math::Matrix m_complianceWarpingMatrixForCalculation;
+	Eigen::SparseMatrix<double> m_complianceWarpingTransformationForCalculation;
+	std::future<void> m_task;
+	bool m_hasRunTaskOnce;
+	///@}
 };
 
 } // namespace Physics

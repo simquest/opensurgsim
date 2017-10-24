@@ -19,6 +19,7 @@
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
@@ -40,7 +41,8 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 	DeformableRepresentation(name),
 	m_useMassLumping(false),
 	m_useComplianceWarping(false),
-	m_isInitialComplianceMatrixComputed(false)
+	m_isInitialComplianceMatrixComputed(false),
+	m_hasRunTaskOnce(false)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
@@ -335,9 +337,26 @@ void FemRepresentation::updateComplianceMatrix(const SurgSim::Math::OdeState& st
 						nodeId, &m_complianceWarpingTransformation, false);
 	}
 
-	// Then, transform the initial compliance matrix to get the current compliance warping matrix
-	m_complianceWarpingMatrix.noalias() = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
-								m_complianceWarpingTransformation.transpose();
+	if (!m_hasRunTaskOnce)
+	{
+		m_complianceWarpingTransformationForCalculation = m_complianceWarpingTransformation;
+		m_task = Framework::Runtime::getThreadPool()->enqueue<void>([&]()
+		{
+			m_complianceWarpingMatrixForCalculation.noalias() = m_complianceWarpingTransformationForCalculation *
+				m_odeSolver->getComplianceMatrix() * m_complianceWarpingTransformationForCalculation.transpose();
+		});
+		m_hasRunTaskOnce = true;
+	}
+	
+	m_task.get();
+	m_complianceWarpingMatrix = m_complianceWarpingMatrixForCalculation;
+	m_complianceWarpingTransformationForCalculation = m_complianceWarpingTransformation;
+	m_task = Framework::Runtime::getThreadPool()->enqueue<void>([&]()
+	{
+		// Then, transform the initial compliance matrix to get the current compliance warping matrix
+		m_complianceWarpingMatrixForCalculation.noalias() = m_complianceWarpingTransformationForCalculation *
+			m_odeSolver->getComplianceMatrix() * m_complianceWarpingTransformationForCalculation.transpose();
+	});
 }
 
 void FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
