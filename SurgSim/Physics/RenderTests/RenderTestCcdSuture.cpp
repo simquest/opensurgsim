@@ -230,7 +230,6 @@ TEST_F(CcdSutureTest, SutureVsMeshedCylinder)
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.1);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
-	physicsManager->setRate(100.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
@@ -253,7 +252,6 @@ TEST_F(CcdSutureTest, Fem1DHalfKnot)
 
 	SurgSim::Math::Vector3d cameraPosition(1.0, 0.0, 1.0);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	physicsManager->setRate(150.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
@@ -264,7 +262,6 @@ TEST_F(CcdSutureTest, Fem1DLoop)
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	physicsManager->setRate(50.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
@@ -285,7 +282,6 @@ TEST_F(CcdSutureTest, Fem1DBlock)
 	scene->addSceneElement(element);
 	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
 
-	physicsManager->setRate(100.0);
 	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
 	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
@@ -308,7 +304,6 @@ TEST_F(CcdSutureTest, Fem1DCompound)
 
 	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
 
-	physicsManager->setRate(100.0);
 	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
 	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 

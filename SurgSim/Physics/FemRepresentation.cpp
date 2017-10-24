@@ -19,6 +19,7 @@
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
@@ -40,6 +41,7 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 	DeformableRepresentation(name),
 	m_useMassLumping(false),
 	m_useComplianceWarping(false),
+	m_isComplianceWarpingSynchronous(true),
 	m_isInitialComplianceMatrixComputed(false)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
@@ -246,6 +248,23 @@ void FemRepresentation::update(double dt)
 		{
 			m_odeSolver->computeMatrices(dt, *m_initialState, true);
 			setIsInitialComplianceMatrixComputed(true);
+
+			if (!m_isComplianceWarpingSynchronous)
+			{
+				auto calculation = [&]()
+				{
+					return (m_complianceWarpingTransformationForCalculation *
+						m_odeSolver->getComplianceMatrix() *
+						m_complianceWarpingTransformationForCalculation.transpose()).eval();
+				};
+
+				// Then, transform the initial compliance matrix to get the current compliance warping matrix
+				m_complianceWarpingMatrix.noalias() = m_complianceWarpingTransformation *
+					m_odeSolver->getComplianceMatrix() * m_complianceWarpingTransformation.transpose();
+
+				m_complianceWarpingTransformationForCalculation = m_complianceWarpingTransformation;
+				m_task = Framework::Runtime::getThreadPool()->enqueue<Math::Matrix>(calculation);
+			}
 		}
 		m_odeSolver->solve(dt, *m_currentState, m_newState.get(), false);
 
@@ -284,6 +303,18 @@ bool FemRepresentation::getComplianceWarping() const
 {
 	return m_useComplianceWarping;
 }
+
+void FemRepresentation::setComplianceWarpingSynchronous(bool complianceWarpingSynchronous)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Compliance warping cannot be modified once the component is initialized";
+	m_isComplianceWarpingSynchronous = complianceWarpingSynchronous;
+}
+
+bool FemRepresentation::isComplianceWarpingSynchronous() const
+{
+	return m_isComplianceWarpingSynchronous;
+}
+
 
 void FemRepresentation::setMassLumping(bool useMassLumping) {
 	SURGSIM_ASSERT(!isInitialized()) << "Can't change mass lumping after initialization.";
@@ -335,9 +366,27 @@ void FemRepresentation::updateComplianceMatrix(const SurgSim::Math::OdeState& st
 			&m_complianceWarpingTransformation);
 	}
 
-	// Then, transform the initial compliance matrix to get the current compliance warping matrix
-	m_complianceWarpingMatrix.noalias() = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
-								m_complianceWarpingTransformation.transpose();
+	if (m_isComplianceWarpingSynchronous)
+	{
+		m_complianceWarpingMatrix.noalias() = m_complianceWarpingTransformation *
+			m_odeSolver->getComplianceMatrix() * m_complianceWarpingTransformation.transpose();
+	}
+	else
+	{
+		auto calculation = [&]()
+		{
+			return (m_complianceWarpingTransformationForCalculation *
+				m_odeSolver->getComplianceMatrix() *
+				m_complianceWarpingTransformationForCalculation.transpose()).eval();
+		};
+
+		if (m_task.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+		{
+			m_complianceWarpingMatrix = m_task.get();
+			m_complianceWarpingTransformationForCalculation = m_complianceWarpingTransformation;
+			m_task = Framework::Runtime::getThreadPool()->enqueue<Math::Matrix>(calculation);
+		}
+	}
 }
 
 void FemRepresentation::computeF(const SurgSim::Math::OdeState& state)

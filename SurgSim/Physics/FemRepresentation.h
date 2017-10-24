@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_FEMREPRESENTATION_H
 #define SURGSIM_PHYSICS_FEMREPRESENTATION_H
 
+#include <future>
 #include <memory>
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
@@ -121,6 +122,18 @@ public:
 	/// \return True if compliance warping is used, False otherwise
 	bool getComplianceWarping() const;
 
+	/// If using compliance warping, set the calculation to synchronous or asynchronous. Defaults to synchronous.
+	/// Synchronous calculation is slower, but after free motion the compliance matrix will be up-to-date,
+	/// which means the MLCP will be as accurate as possible. Asynchronous calculation is faster, but the compliance
+	/// matrix will be stale by at least one update.
+	/// \param complianceWarpingSynchronous True for synchronous computation of the compliance warping matrix.
+	/// \exception SurgSim::Framework::AssertionFailure If the call is done after initialization.
+	void setComplianceWarpingSynchronous(bool complianceWarpingSynchronous);
+
+	/// Get whether or not any compliance warping will be done synchronously. Default is synchronous.
+	/// \return True if compliance warping is calculated synchronously.
+	bool isComplianceWarpingSynchronous() const;
+
 	/// Enable mass lumping for the mass matrix, currently we use the row sum i.e. 
 	/// \f$M_{ii}^{(lumped)} = \sum_{j} M_{ji}\f$
 	/// \param useMassLumping whether to enable or disable lumped masses
@@ -211,6 +224,24 @@ protected:
 	/// This ensures that when using a mesh Asset, a single FemElement type is used. Therefore we do
 	/// not need to define this type in the ply file, but rather is part of the Representation properties (YAML).
 	std::string m_femElementType;
+	
+	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
+
+	/// Is the compliance warping computation be synchronous (slower but up-to-date results)?
+	bool m_isComplianceWarpingSynchronous;
+
+	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
+
+	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
+
+	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
+	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;
+
+	///@{
+	/// For the asynchronous compliance matrix multiplication.
+	Eigen::SparseMatrix<double> m_complianceWarpingTransformationForCalculation;
+	std::future<SurgSim::Math::Matrix> m_task;
+	///@}
 
 private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
@@ -223,15 +254,6 @@ private:
 	} m_rayleighDamping;
 
 	bool m_useMassLumping;
-
-	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
-
-	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
-
-	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
-
-	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
-	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;
 };
 
 } // namespace Physics
