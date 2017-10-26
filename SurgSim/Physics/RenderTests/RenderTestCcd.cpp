@@ -400,7 +400,7 @@ TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshRigids)
 {
 	scene->addSceneElement(makeRigid("flatCylinder.ply"));
 	scene->addSceneElement(makeFixed("flatCylinder.ply"));
-	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 5000.0);
+	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 7000.0);
 }
 
 } // namespace Physics
