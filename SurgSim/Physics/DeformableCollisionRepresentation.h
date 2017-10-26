@@ -85,6 +85,7 @@ private:
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentation> m_deformable;
 
 	double m_oldVolume;
+	double m_previousOldVolume;
 	double m_aabbThreshold;
 };
 

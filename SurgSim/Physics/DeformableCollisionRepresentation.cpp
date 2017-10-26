@@ -37,6 +37,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::DeformableColl
 DeformableCollisionRepresentation::DeformableCollisionRepresentation(const std::string& name) :
 	SurgSim::Collision::Representation(name),
 	m_oldVolume(0.0),
+	m_previousOldVolume(0.0),
 	m_aabbThreshold(0.1)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DeformableCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
@@ -49,20 +50,63 @@ DeformableCollisionRepresentation::~DeformableCollisionRepresentation()
 
 namespace
 {
-bool updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shape* shape)
+
+/// Call update on the shape if the AABB tree has changed significantly, otherwise just update the AABB tree.
+/// \param odeState The state.
+/// \param [in,out] shape The shape to update.
+/// \param [in,out] oldVolume The previous volume of the AABB tree.
+/// \param threshold The aabb volume threshold that triggers a tree rebuild.
+void updateShapeFromOdeState(const Math::OdeState& odeState, SurgSim::Math::Shape* shape,
+	double* oldVolume, double threshold)
 {
-	auto vertices = dynamic_cast<SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData>*>(shape);
-	SURGSIM_ASSERT(vertices != nullptr) << "The Shape is not a Vertices.";
-	const size_t numNodes = odeState.getNumNodes();
-	SURGSIM_ASSERT(vertices->getNumVertices() == numNodes) <<
+	if (shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
+		shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
+	{
+		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(shape);
+		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
+		const size_t numNodes = odeState.getNumNodes();
+		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
 			"The number of nodes in the deformable does not match the number of vertices in the shape.";
 
-	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
-	{
-		vertices->setVertexPosition(nodeId, odeState.getPosition(nodeId));
-	}
+		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+		{
+			meshShape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
+		}
 
-	return true;
+		if (std::abs(*oldVolume - meshShape->getBoundingBox().volume()) >(*oldVolume) * threshold)
+		{
+			meshShape->update();
+			*oldVolume = meshShape->getBoundingBox().volume();
+		}
+		else
+		{
+			meshShape->updateAabbTree();
+			meshShape->calculateNormals();
+		}
+	}
+	else if (shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
+	{
+		auto meshShape = dynamic_cast<SurgSim::Math::SegmentMeshShape*>(shape);
+		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type SegmentMeshShape but the dynamic cast failed.";
+		const size_t numNodes = odeState.getNumNodes();
+		SURGSIM_ASSERT(meshShape->getNumVertices() == numNodes) <<
+			"The number of nodes in the deformable does not match the number of vertices in the shape.";
+
+		for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
+		{
+			meshShape->setVertexPosition(nodeId, odeState.getPosition(nodeId));
+		}
+
+		if (std::abs(*oldVolume - meshShape->getBoundingBox().volume()) > (*oldVolume) * threshold)
+		{
+			meshShape->update();
+			*oldVolume = meshShape->getBoundingBox().volume();
+		}
+		else
+		{
+			meshShape->updateAabbTree();
+		}
+	}
 }
 }
 
@@ -142,49 +186,20 @@ void DeformableCollisionRepresentation::updateShapeData()
 			"Failed to update. The DeformableCollisionRepresentation either was not attached to a "
 			"Physics::Representation or the Physics::Representation has expired.";
 
-	// Write current shape
-	if (!updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get()))
+	updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get(),
+		&m_oldVolume, m_aabbThreshold);
+
+	if (m_previousShape != nullptr)
 	{
-		setLocalActive(false);
-		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
+		updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get(),
+			&m_previousOldVolume, m_aabbThreshold);
 	}
-	
 }
 
 
 void DeformableCollisionRepresentation::updateDcdData()
 {
-	if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
-		m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
-	{
-		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(m_shape.get());
-		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
-		if (std::abs(m_oldVolume - meshShape->getBoundingBox().volume()) > m_oldVolume * m_aabbThreshold)
-		{
-			meshShape->update();
-			m_oldVolume = meshShape->getBoundingBox().volume();
-		}
-		else
-		{
-			meshShape->updateAabbTree();
-			meshShape->calculateNormals();
-		}
-	}
-	else if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH)
-	{
-		auto meshShape = dynamic_cast<SurgSim::Math::SegmentMeshShape*>(m_shape.get());
-		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is of type mesh but is not a mesh";
-		if (std::abs(m_oldVolume - meshShape->getBoundingBox().volume()) > m_oldVolume * m_aabbThreshold)
-		{
-			meshShape->update();
-			m_oldVolume = meshShape->getBoundingBox().volume();
-		}
-		else
-		{
-			meshShape->updateAabbTree();
-		}
-	}
+	// Already updated in updateShapeData, above.
 }
 
 void DeformableCollisionRepresentation::updateCcdData(double interval)
@@ -211,21 +226,13 @@ void DeformableCollisionRepresentation::updateCcdData(double interval)
 		}
 	}
 
-	if (!updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get()))
-	{
-		setLocalActive(false);
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
-	}
+	// We should only need to update the previous state's shape & AABB once per CCD loop, right?
+	// And we already did so in updateShapeData, above.
+	//updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get(),
+	//	&m_previousOldVolume, m_aabbThreshold);
 
-
-	// Write current shape
-	if (!updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get()))
-	{
-		setLocalActive(false);
-		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Collision/DeformableCollisionRepresentation")) <<
-				"CollisionRepresentation '" << getFullName() << "' went inactive because its shape failed to update.";
-	}
+	updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get(),
+		&m_oldVolume, m_aabbThreshold);
 
 	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_previousShape, Math::RigidTransform3d::Identity());
 	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeSecond(m_shape, Math::RigidTransform3d::Identity());
