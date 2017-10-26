@@ -73,7 +73,7 @@ public:
 
 	/// Set the type of collision detection to use between this representation and other representations
 	/// \param type The collision detection type
-	void setCollisionDetectionType(CollisionDetectionType type);
+	virtual void setCollisionDetectionType(CollisionDetectionType type);
 
 	/// Get the type of collision detection used between this representation and other representations
 	/// \return The collision detection type
@@ -81,7 +81,7 @@ public:
 
 	/// Set the type of collision detection to use between this representation and itself
 	/// \param type The collision detection type
-	void setSelfCollisionDetectionType(CollisionDetectionType type);
+	virtual void setSelfCollisionDetectionType(CollisionDetectionType type);
 
 	/// Get the type of collision detection used between this representation and itself
 	/// \return The collision detection type

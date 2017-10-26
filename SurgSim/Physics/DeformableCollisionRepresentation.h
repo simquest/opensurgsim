@@ -66,6 +66,10 @@ public:
 	/// \return The deformable that is used to update the contained mesh
 	const std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getDeformableRepresentation() const;
 
+	virtual void setCollisionDetectionType(Collision::CollisionDetectionType type) override;
+
+	virtual void setSelfCollisionDetectionType(Collision::CollisionDetectionType type) override;
+
 	int getShapeType() const override;
 
 	void updateDcdData() override;
@@ -74,12 +78,18 @@ public:
 
 	void updateShapeData() override;
 
+	Math::Aabbd getBoundingBox() const override;
+
 private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::Shape> m_shape, m_previousShape;
+
+	/// Stores the bounding box for the shape.  If this collision rep uses CCD, the bounding box encompasses both
+	/// the previous state and the current state.
+	Math::Aabbd m_aabb;
 
 	/// Reference to the deformable driving changes to this mesh
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentation> m_deformable;
