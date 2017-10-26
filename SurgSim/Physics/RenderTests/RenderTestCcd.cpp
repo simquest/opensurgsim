@@ -263,6 +263,66 @@ std::shared_ptr<SurgSim::Framework::SceneElement> loadMesh(
 	return sceneElement;
 }
 
+
+std::shared_ptr<SurgSim::Framework::SceneElement> makeRigid(const std::string& filename)
+{
+	SurgSim::Math::RigidTransform3d pose =
+		SurgSim::Math::makeRigidTransform(Vector3d(0, 10.0, 0), Vector3d::UnitX().eval(), Vector3d::UnitY().eval());
+
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("RigidMesh");
+	element->setPose(pose);
+	auto shape = std::make_shared<SurgSim::Math::MeshShape>();
+	shape->load(filename);
+
+	auto rigid = std::make_shared<SurgSim::Physics::RigidRepresentation>("Physics");
+	// http://www.engineeringtoolbox.com/wood-density-d_40.html
+	rigid->setDensity(5800.0); // Cedar of Lebanon wood density 5800.0 Kg/m-3
+	rigid->setShape(shape);
+	element->addComponent(rigid);
+
+	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
+	collision->setCollisionDetectionType(SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
+	rigid->setCollisionRepresentation(collision);
+	collision->setShape(shape);
+	element->addComponent(collision);
+
+	auto osgRepresentation = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Graphics");
+	osgRepresentation->setShape(shape);
+	element->addComponent(osgRepresentation);
+
+	return element;
+}
+
+std::shared_ptr<SurgSim::Framework::SceneElement> makeFixed(const std::string& filename)
+{
+	SurgSim::Math::RigidTransform3d pose = 
+		SurgSim::Math::makeRigidTransform(Vector3d::Zero().eval(), Vector3d::UnitY().eval(), Vector3d::UnitZ().eval());
+
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("FixedMesh");
+	element->setPose(pose);
+	auto shape = std::make_shared<SurgSim::Math::MeshShape>();
+	shape->load(filename);
+
+	auto rigid = std::make_shared<SurgSim::Physics::FixedRepresentation>("Physics");
+	rigid->setIsGravityEnabled(false);
+	// http://www.engineeringtoolbox.com/wood-density-d_40.html
+	rigid->setDensity(100.0 * 5800.0); // Cedar of Lebanon wood density 5800.0 Kg/m-3
+	rigid->setShape(shape);
+	element->addComponent(rigid);
+
+	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
+	collision->setCollisionDetectionType(SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
+	rigid->setCollisionRepresentation(collision);
+	collision->setShape(shape);
+	element->addComponent(collision);
+
+	auto osgRepresentation = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Graphics");
+	osgRepresentation->setShape(shape);
+	element->addComponent(osgRepresentation);
+
+	return element;
+}
+
 } // anonymous namespace
 
 namespace SurgSim
@@ -333,6 +393,13 @@ TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshDeformables)
 		makeRigidTransform(Vector3d(0, 0.1, 0), Vector3d(-1, 0.1, 0), Vector3d(0, 1.1, 0)),
 		SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT, true, 8e4));
 
+	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 5000.0);
+}
+
+TEST_F(CcdRenderTest, CcdTriangleMeshTriangleMeshRigids)
+{
+	scene->addSceneElement(makeRigid("flatCylinder.ply"));
+	scene->addSceneElement(makeFixed("flatCylinder.ply"));
 	runTest(Vector3d(0.0, 0.2, 1.0), Vector3d(0.0, 0.0, 0.0), 5000.0);
 }
 
