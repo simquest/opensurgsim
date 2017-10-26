@@ -140,6 +140,44 @@ bool DeformableCollisionRepresentation::doWakeUp()
 	return true;
 }
 
+void DeformableCollisionRepresentation::setCollisionDetectionType(Collision::CollisionDetectionType type)
+{
+	Collision::Representation::setCollisionDetectionType(type);
+
+	if ((m_shape != nullptr) &&
+		((getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS) ||
+		(getSelfCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)))
+	{
+		if (m_previousShape == nullptr)
+		{
+			m_previousShape = m_shape->getTransformed(Math::RigidTransform3d::Identity());
+		}
+	}
+	else
+	{
+		m_previousShape.reset();
+	}
+}
+
+void DeformableCollisionRepresentation::setSelfCollisionDetectionType(Collision::CollisionDetectionType type)
+{
+	Collision::Representation::setSelfCollisionDetectionType(type);
+
+	if ((m_shape != nullptr) &&
+		((getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS) ||
+		(getSelfCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS)))
+	{
+		if (m_previousShape == nullptr)
+		{
+			m_previousShape = m_shape->getTransformed(Math::RigidTransform3d::Identity());
+		}
+	}
+	else
+	{
+		m_previousShape.reset();
+	}
+}
+
 int DeformableCollisionRepresentation::getShapeType() const
 {
 	SURGSIM_ASSERT(nullptr != m_shape) << "No mesh/shape assigned to DeformableCollisionRepresentation " << getName();
@@ -150,10 +188,22 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 {
 	SURGSIM_ASSERT(shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
 				   shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH ||
-				   shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
-			<< "Deformable collision shape has to be a mesh.  But what passed in is " << shape->getType();
+				   shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH) <<
+		"Deformable collision shape has to be a MeshShape(" << SurgSim::Math::SHAPE_TYPE_MESH <<
+		") or SegmentMeshShape(" << SurgSim::Math::SHAPE_TYPE_SEGMENTMESH <<
+		") or SurfaceMeshShape(" << SurgSim::Math::SHAPE_TYPE_SURFACEMESH << "), but it is " << m_shape->getType();
 
 	m_shape = shape;
+
+	if ((getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS) ||
+		(getSelfCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS))
+	{
+		m_previousShape = m_shape->getTransformed(Math::RigidTransform3d::Identity());
+	}
+	else
+	{
+		m_previousShape.reset();
+	}
 }
 
 std::shared_ptr<Math::Shape> DeformableCollisionRepresentation::getShape() const
@@ -188,11 +238,13 @@ void DeformableCollisionRepresentation::updateShapeData()
 
 	updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get(),
 		&m_oldVolume, m_aabbThreshold);
+	m_aabb = m_shape->getBoundingBox();
 
 	if (m_previousShape != nullptr)
 	{
 		updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get(),
 			&m_previousOldVolume, m_aabbThreshold);
+		m_aabb.extend(m_previousShape->getBoundingBox());
 	}
 }
 
@@ -209,23 +261,6 @@ void DeformableCollisionRepresentation::updateCcdData(double interval)
 			"Failed to update. The DeformableCollisionRepresentation either was not attached to a "
 			"Physics::Representation or the Physics::Representation has expired.";
 
-	if (m_previousShape == nullptr)
-	{
-		if (m_shape->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
-			m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SEGMENTMESH ||
-			m_shape->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
-		{
-			m_previousShape = m_shape->getTransformed(Math::RigidTransform3d::Identity());
-		}
-		else
-		{
-			SURGSIM_FAILURE() << "Invalid type, should be MeshShape(" << SurgSim::Math::SHAPE_TYPE_MESH <<
-							  ") or SegmentMeshShape(" << SurgSim::Math::SHAPE_TYPE_SEGMENTMESH <<
-							  ") or SurfaceMeshShape(" << SurgSim::Math::SHAPE_TYPE_SURFACEMESH << "), but it is " <<
-							  m_shape->getType();
-		}
-	}
-
 	// We should only need to update the previous state's shape & AABB once per CCD loop, right?
 	// And we already did so in updateShapeData, above.
 	//updateShapeFromOdeState(*physicsRepresentation->getPreviousState().get(), m_previousShape.get(),
@@ -233,6 +268,7 @@ void DeformableCollisionRepresentation::updateCcdData(double interval)
 
 	updateShapeFromOdeState(*physicsRepresentation->getCurrentState().get(), m_shape.get(),
 		&m_oldVolume, m_aabbThreshold);
+	m_aabb.extend(m_shape->getBoundingBox());
 
 	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_previousShape, Math::RigidTransform3d::Identity());
 	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeSecond(m_shape, Math::RigidTransform3d::Identity());
@@ -242,6 +278,11 @@ void DeformableCollisionRepresentation::updateCcdData(double interval)
 	// HS-2-Mar-2016
 	// #todo Add AABB tree for the posedShapeMotion (i.e. that is the tree where each bounding box consists of the
 	// corresponding elements from posedShape1 and posedShape2
+}
+
+SurgSim::Math::Aabbd DeformableCollisionRepresentation::getBoundingBox() const
+{
+	return m_aabb;
 }
 
 } // namespace Physics
