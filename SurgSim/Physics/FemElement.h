@@ -195,16 +195,16 @@ public:
 	/// support Eigen expression. If it is a Sparse storage type the alignment must be the same
 	/// as the SparseMatrix: Opt.
 	/// Note that no assertion or verification is done on this type.
-	/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+	/// \tparam T, Opt, StorageIndex Types and option defining the output matrix type SparseMatrix<T, Opt, StorageIndex>
 	/// \param subMatrix The sub-matrix (containing all the squared-blocks)
 	/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
 	/// \param blockSize The blocks size
 	/// \param[out] matrix The matrix to add the sub-matrix blocks into
 	/// \param initialize Optional parameter, default true. If true, the matrix form is assumed to be undefined and is
 	/// initialized when necessary. If false, the matrix form is assumed to be previously defined.
-	template <typename DerivedSub, typename T, int Opt, typename Index>
-	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t>& blockIds,
-							  size_t blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
+	template <typename DerivedSub, typename T, int Opt, typename StorageIndex>
+	void assembleMatrixBlocks(const Eigen::Ref<const DerivedSub>& subMatrix, const std::vector<size_t>& blockIds,
+							  size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix,
 							  bool initialize = true) const;
 
 	/// Update the FemElement based on the given state.

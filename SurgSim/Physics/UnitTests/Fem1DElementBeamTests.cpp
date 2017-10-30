@@ -159,18 +159,21 @@ public:
 		forceVector = Vector::Zero(6 * m_numberNodes);
 		Fem1DElementBeam beam(m_nodeIds);
 		massMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
-		beam.assembleMatrixBlocks(SurgSim::Math::Matrix::Zero(12, 12),
-								  nodeIdsVectorForm, 6, &massMatrix, true);
+		beam.assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+			SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+			(SurgSim::Math::Matrix::Zero(12, 12), nodeIdsVectorForm, 6, &massMatrix, true);
 		massMatrix.makeCompressed();
 
 		dampingMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
-		beam.assembleMatrixBlocks(SurgSim::Math::Matrix::Zero(12, 12),
-								  nodeIdsVectorForm, 6, &dampingMatrix, true);
+		beam.assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+			SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+			(SurgSim::Math::Matrix::Zero(12, 12), nodeIdsVectorForm, 6, &dampingMatrix, true);
 		dampingMatrix.makeCompressed();
 
 		stiffnessMatrix.resize(6 * m_numberNodes, 6 * m_numberNodes);
-		beam.assembleMatrixBlocks(SurgSim::Math::Matrix::Zero(12, 12),
-								  nodeIdsVectorForm, 6, &stiffnessMatrix, true);
+		beam.assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+			SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+			(SurgSim::Math::Matrix::Zero(12, 12), nodeIdsVectorForm, 6, &stiffnessMatrix, true);
 		stiffnessMatrix.makeCompressed();
 	}
 

@@ -355,8 +355,9 @@ void testAddStiffness(MockFem3DElementCorotationalTet* tet,
 	K.setZero();
 	Matrix zeroMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
 									 tet->getNumDofPerNode() * tet->getNumNodes());
-	tet->assembleMatrixBlocks(zeroMatrix, tet->getNodeIds(),
-							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &K, true);
+	tet->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+		(zeroMatrix, tet->getNodeIds(), tet->getNumDofPerNode(), &K, true);
 	K.makeCompressed();
 	tet->addStiffness(&K, scale);
 
@@ -385,8 +386,9 @@ void testAddMass(MockFem3DElementCorotationalTet* tet,
 	M.setZero();
 	Matrix zeroMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
 									 tet->getNumDofPerNode() * tet->getNumNodes());
-	tet->assembleMatrixBlocks(zeroMatrix, tet->getNodeIds(),
-							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &M, true);
+	tet->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+		(zeroMatrix, tet->getNodeIds(), tet->getNumDofPerNode(), &M, true);
 	M.makeCompressed();
 	tet->addMass(&M, scale);
 
@@ -430,16 +432,19 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 	Matrix zeroElementMatrix = Matrix::Zero(tet->getNumDofPerNode() * tet->getNumNodes(),
 											tet->getNumDofPerNode() * tet->getNumNodes());
 	M.setZero();
-	tet->assembleMatrixBlocks(zeroElementMatrix, tet->getNodeIds(),
-							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &M, true);
+	tet->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+		(zeroElementMatrix, tet->getNodeIds(), tet->getNumDofPerNode(), &M, true);
 	M.makeCompressed();
 	D.setZero();
-	tet->assembleMatrixBlocks(zeroElementMatrix, tet->getNodeIds(),
-							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &D, true);
+	tet->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+		(zeroElementMatrix, tet->getNodeIds(), tet->getNumDofPerNode(), &D, true);
 	D.makeCompressed();
 	K.setZero();
-	tet->assembleMatrixBlocks(zeroElementMatrix, tet->getNodeIds(),
-							  static_cast<SparseMatrix::Index>(tet->getNumDofPerNode()), &K, true);
+	tet->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+		(zeroElementMatrix, tet->getNodeIds(), tet->getNumDofPerNode(), &K, true);
 	K.makeCompressed();
 	zeroMatrix.setZero();
 

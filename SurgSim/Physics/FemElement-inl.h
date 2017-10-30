@@ -27,12 +27,12 @@ namespace SurgSim
 namespace Physics
 {
 
-template <typename DerivedSub, typename T, int Opt, typename Index>
-void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t>& blockIds,
-									  size_t blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
-									  bool initialize) const
+template <typename DerivedSub, typename T, int Opt, typename StorageIndex>
+void FemElement::assembleMatrixBlocks(const Eigen::Ref<const DerivedSub>& subMatrix, const std::vector<size_t>& blockIds,
+	size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix, bool initialize) const
 {
 	using SurgSim::Math::addSubMatrix;
+	using Eigen::Index;
 
 	const Index numBlocks = static_cast<Index>(blockIds.size());
 	for (Index block0 = 0; block0 < numBlocks; block0++)

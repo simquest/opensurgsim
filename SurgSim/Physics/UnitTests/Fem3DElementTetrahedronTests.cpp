@@ -496,16 +496,19 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 	Matrix zeroMatrix = Matrix::Zero(tet.getNumDofPerNode() * tet.getNumNodes(),
 									 tet.getNumDofPerNode() * tet.getNumNodes());
 	massMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &massMatrix, true);
+	tet.assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+		(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &massMatrix, true);
 	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &dampingMatrix, true);
+	tet.assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+		(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &dampingMatrix, true);
 	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &stiffnessMatrix, true);
+	tet.assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
+		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
+		(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &stiffnessMatrix, true);
 	stiffnessMatrix.makeCompressed();
 
 	// Make sure that the 2 ways of computing the expected stiffness matrix gives the same result
