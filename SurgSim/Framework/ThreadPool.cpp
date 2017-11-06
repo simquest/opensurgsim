@@ -15,7 +15,7 @@
 
 #include "SurgSim/Framework/ThreadPool.h"
 
-#include "windows.h"
+//#include "windows.h"
 
 namespace SurgSim
 {

@@ -82,7 +82,8 @@ std::vector<AabbTree::TreeNodePairType> AabbTree::spatialJoin(const AabbTree& ot
 	return result;
 }
 
-void AabbTree::spatialJoin(AabbTreeNode* lhsParent, AabbTreeNode* rhsParent, std::vector<TreeNodePairType>* result) const
+void AabbTree::spatialJoin(AabbTreeNode* lhsParent, AabbTreeNode* rhsParent,
+	std::vector<TreeNodePairType>* result) const
 {
 	if (!SurgSim::Math::doAabbIntersect(lhsParent->getAabb(), rhsParent->getAabb()))
 	{

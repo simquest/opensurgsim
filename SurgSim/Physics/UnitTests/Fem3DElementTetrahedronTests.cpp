@@ -84,7 +84,7 @@ public:
 		initialize(state);
 		computeShapeFunctions(state, &m_restvolume, &m_ai, &m_bi, &m_ci, &m_di);
 	}
-	
+
 private:
 	double m_restvolume;
 	std::array<double, 4> m_ai;

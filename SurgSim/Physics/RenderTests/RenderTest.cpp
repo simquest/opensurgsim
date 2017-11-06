@@ -63,8 +63,8 @@ void RenderTests::runTest(const SurgSim::Math::Vector3d& cameraPosition, const S
 	boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
 }
 
-void RenderTests::runFixedFrameTest(const SurgSim::Math::Vector3d& cameraPosition, const SurgSim::Math::Vector3d& cameraLookAt,
-						  size_t frameCount)
+void RenderTests::runFixedFrameTest(const SurgSim::Math::Vector3d& cameraPosition,
+	const SurgSim::Math::Vector3d& cameraLookAt, size_t frameCount)
 {
 	using SurgSim::Graphics::OsgAxesRepresentation;
 

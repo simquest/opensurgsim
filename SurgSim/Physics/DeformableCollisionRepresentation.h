@@ -66,9 +66,9 @@ public:
 	/// \return The deformable that is used to update the contained mesh
 	const std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getDeformableRepresentation() const;
 
-	virtual void setCollisionDetectionType(Collision::CollisionDetectionType type) override;
+	void setCollisionDetectionType(Collision::CollisionDetectionType type) override;
 
-	virtual void setSelfCollisionDetectionType(Collision::CollisionDetectionType type) override;
+	void setSelfCollisionDetectionType(Collision::CollisionDetectionType type) override;
 
 	int getShapeType() const override;
 

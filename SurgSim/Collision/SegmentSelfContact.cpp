@@ -372,7 +372,7 @@ void SegmentSelfContact::getUniqueCandidates(
 	{
 		DataStructures::AabbTreeNode* nodeA = intersection.first;
 		DataStructures::AabbTreeNode* nodeB = intersection.second;
-		
+
 		localIdListA.clear();
 		localIdListB.clear();
 

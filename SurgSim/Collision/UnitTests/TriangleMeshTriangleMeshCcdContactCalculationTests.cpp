@@ -172,7 +172,7 @@ std::shared_ptr<Math::MeshShape> createTriangleShape(const Math::RigidTransform3
 class MockCollisionRepresentation : public ShapeCollisionRepresentation
 {
 public:
-	MockCollisionRepresentation(const std::string& name)
+	explicit MockCollisionRepresentation(const std::string& name)
 		: ShapeCollisionRepresentation(name) {}
 
 	void setPosedShapeMotionPublic(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape)

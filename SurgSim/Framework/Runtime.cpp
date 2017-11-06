@@ -349,8 +349,8 @@ std::shared_ptr<const ApplicationData> Runtime::getApplicationData()
 std::shared_ptr<ThreadPool> Runtime::getThreadPool()
 {
 #ifdef THREADPOOL_SIZE
-	static auto threadPool = std::make_shared<ThreadPool>((int(THREADPOOL_SIZE) > 0) ? int(THREADPOOL_SIZE) :
-		static_cast<int>(std::ceil(boost::thread::hardware_concurrency() * 0.5)));
+	static auto threadPool = std::make_shared<ThreadPool>((static_cast<int>(THREADPOOL_SIZE) > 0) ?
+		static_cast<int>(THREADPOOL_SIZE) : static_cast<int>(std::ceil(boost::thread::hardware_concurrency() * 0.5)));
 #else
 	static auto threadPool =
 		std::make_shared<ThreadPool>(static_cast<int>(std::ceil(boost::thread::hardware_concurrency() * 0.5)));

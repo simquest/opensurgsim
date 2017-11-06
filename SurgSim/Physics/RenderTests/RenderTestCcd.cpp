@@ -295,7 +295,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeRigid(const std::string& f
 
 std::shared_ptr<SurgSim::Framework::SceneElement> makeFixed(const std::string& filename)
 {
-	SurgSim::Math::RigidTransform3d pose = 
+	SurgSim::Math::RigidTransform3d pose =
 		SurgSim::Math::makeRigidTransform(Vector3d::Zero().eval(), Vector3d::UnitY().eval(), Vector3d::UnitZ().eval());
 
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("FixedMesh");

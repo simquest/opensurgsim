@@ -219,7 +219,7 @@ void Fem1DElementBeam::computeStiffness(const SurgSim::Math::OdeState& state)
 
 	// General expression for shear modulus in terms of Young's modulus and Poisson's ratio
 	const double g = m_E / (2.0 * (1.0 + m_nu));
-	
+
 	/// The shear area in the y and z directions (=0 => no shear) http://en.wikipedia.org/wiki/Timoshenko_beam_theory
 	double asy = 0.0;
 	double asz = 0.0;
@@ -327,7 +327,8 @@ SurgSim::Math::Vector Fem1DElementBeam::computeCartesianCoordinate(
 
 	for (int i = 0; i < 2; i++)
 	{
-		cartesianCoordinate += naturalCoordinate(i) * getSubVector(positions, m_nodeIds[i], getNumDofPerNode()).segment<3>(0);
+		cartesianCoordinate += naturalCoordinate(i) *
+			getSubVector(positions, m_nodeIds[i], getNumDofPerNode()).segment<3>(0);
 	}
 
 	return cartesianCoordinate;

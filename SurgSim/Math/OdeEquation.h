@@ -55,7 +55,7 @@ class OdeEquation
 {
 public:
 
-	OdeEquation() : m_initState(0) 
+	OdeEquation() : m_initState(0)
 	{
 
 	}

@@ -524,7 +524,7 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 		}
 
 		{
-			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			SCOPED_TRACE("After updates, relative rotation should not be identity (gravity and boundary conditions)");
 			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
 			{
 				auto transform = fem->getTransformation(i);
@@ -567,7 +567,7 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 		}
 
 		{
-			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			SCOPED_TRACE("After updates, relative rotation should not be identity (gravity and boundary conditions)");
 			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
 			{
 				auto transform = fem->getTransformation(i);
@@ -628,7 +628,7 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 		}
 
 		{
-			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			SCOPED_TRACE("After updates, relative rotation should not be identity (gravity and boundary conditions)");
 			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
 			{
 				auto transform = fem->getTransformation(i);

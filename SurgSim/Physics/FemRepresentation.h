@@ -134,7 +134,7 @@ public:
 	/// \return True if compliance warping is calculated synchronously.
 	bool isComplianceWarpingSynchronous() const;
 
-	/// Enable mass lumping for the mass matrix, currently we use the row sum i.e. 
+	/// Enable mass lumping for the mass matrix, currently we use the row sum i.e.
 	/// \f$M_{ii}^{(lumped)} = \sum_{j} M_{ji}\f$
 	/// \param useMassLumping whether to enable or disable lumped masses
 	void setMassLumping(bool useMassLumping);
@@ -224,7 +224,7 @@ protected:
 	/// This ensures that when using a mesh Asset, a single FemElement type is used. Therefore we do
 	/// not need to define this type in the ply file, but rather is part of the Representation properties (YAML).
 	std::string m_femElementType;
-	
+
 	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
 
 	/// Is the compliance warping computation be synchronous (slower but up-to-date results)?
