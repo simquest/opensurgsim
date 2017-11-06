@@ -105,8 +105,8 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 
 	fem->setInitialState(initialState);
 
-	Math::SparseMatrix zeroMat(static_cast<SparseMatrix::Index>(fem->getNumDof()),
-							   static_cast<SparseMatrix::Index>(fem->getNumDof()));
+	Math::SparseMatrix zeroMat(static_cast<Eigen::Index>(fem->getNumDof()),
+							   static_cast<Eigen::Index>(fem->getNumDof()));
 	zeroMat.setZero();
 
 	// Vector initialized (properly sized and zeroed)
@@ -115,11 +115,11 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	EXPECT_NE(0, fem->getExternalGeneralizedStiffness().cols());
 	EXPECT_NE(0, fem->getExternalGeneralizedDamping().rows());
 	EXPECT_NE(0, fem->getExternalGeneralizedDamping().cols());
-	EXPECT_EQ(static_cast<Math::Vector6d::Index>(fem->getNumDof()), fem->getExternalGeneralizedForce().size());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(fem->getNumDof()), fem->getExternalGeneralizedStiffness().cols());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(fem->getNumDof()), fem->getExternalGeneralizedStiffness().rows());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(fem->getNumDof()), fem->getExternalGeneralizedDamping().cols());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(fem->getNumDof()), fem->getExternalGeneralizedDamping().rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(fem->getNumDof()), fem->getExternalGeneralizedForce().size());
+	EXPECT_EQ(static_cast<Eigen::Index>(fem->getNumDof()), fem->getExternalGeneralizedStiffness().cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(fem->getNumDof()), fem->getExternalGeneralizedStiffness().rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(fem->getNumDof()), fem->getExternalGeneralizedDamping().cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(fem->getNumDof()), fem->getExternalGeneralizedDamping().rows());
 	EXPECT_TRUE(fem->getExternalGeneralizedForce().isZero());
 	EXPECT_TRUE(fem->getExternalGeneralizedStiffness().isApprox(zeroMat));
 	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isApprox(zeroMat));
@@ -146,15 +146,13 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	Matrix Dlocal = Klocal + Matrix::Identity(fem->getNumDofPerNode(), fem->getNumDofPerNode());
 	Vector F = Vector::Zero(fem->getNumDof());
 	F.segment(0, fem->getNumDofPerNode()) = Flocal;
-	SparseMatrix K(static_cast<SparseMatrix::Index>(fem->getNumDof()),
-				   static_cast<SparseMatrix::Index>(fem->getNumDof()));
+	SparseMatrix K(static_cast<Eigen::Index>(fem->getNumDof()), static_cast<Eigen::Index>(fem->getNumDof()));
 	K.setZero();
-	Math::addSubMatrix(Klocal, 0, 0, &K, true);
+	Math::addSubMatrix(Klocal, 0, 0, &K);
 	K.makeCompressed();
-	SparseMatrix D(static_cast<SparseMatrix::Index>(fem->getNumDof()),
-				   static_cast<SparseMatrix::Index>(fem->getNumDof()));
+	SparseMatrix D(static_cast<Eigen::Index>(fem->getNumDof()), static_cast<Eigen::Index>(fem->getNumDof()));
 	D.setZero();
-	Math::addSubMatrix(Dlocal, 0, 0, &D, true);
+	Math::addSubMatrix(Dlocal, 0, 0, &D);
 	D.makeCompressed();
 
 	// Test invalid localization nullptr
@@ -180,8 +178,8 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 				 SurgSim::Framework::AssertionFailure);
 
 	// Test valid call to addExternalGeneralizedForce
-	Math::SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(fem->getNumDof()),
-								  static_cast<SparseMatrix::Index>(fem->getNumDof()));
+	Math::SparseMatrix zeroMatrix(static_cast<Eigen::Index>(fem->getNumDof()),
+		static_cast<Eigen::Index>(fem->getNumDof()));
 	zeroMatrix.setZero();
 	fem->addExternalGeneralizedForce(localization, Flocal, Klocal, Dlocal);
 	EXPECT_FALSE(fem->getExternalGeneralizedForce().isZero());

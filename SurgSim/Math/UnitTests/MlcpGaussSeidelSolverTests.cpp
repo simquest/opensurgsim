@@ -68,8 +68,8 @@ static void solveAndCompareResult(const std::string& fileName,
 	// XXX set ratio to 1
 	mlcpSolver.solve(data->problem, &solution);
 
-	ASSERT_EQ(static_cast<SurgSim::Math::Vector::Index>(size), solution.x.rows());
-	ASSERT_EQ(static_cast<Eigen::VectorXd::Index>(size), data->expectedLambda.rows());
+	ASSERT_EQ(static_cast<Eigen::Index>(size), solution.x.rows());
+	ASSERT_EQ(static_cast<Eigen::Index>(size), data->expectedLambda.rows());
 	if (size > 0)
 	{
 		ASSERT_TRUE(isValid(solution.x)) << solution.x;

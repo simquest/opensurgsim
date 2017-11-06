@@ -102,27 +102,29 @@ bool FemRepresentation::doInitialize()
 	}
 
 	// Compute the entries of m_massPerNode from the FemElements mass information
-	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)
+	for (auto element = std::cbegin(m_femElements); element != std::cend(m_femElements); ++element)
 	{
 		double mass = (*element)->getMass(*m_initialState);
-		for (auto nodeId = std::begin((*element)->getNodeIds()); nodeId != std::end((*element)->getNodeIds()); nodeId++)
+		for (auto nodeId = std::cbegin((*element)->getNodeIds()); nodeId != std::cend((*element)->getNodeIds());
+			++nodeId)
 		{
 			m_massPerNode[*nodeId] += mass / (*element)->getNumNodes();
 		}
 	}
 
-	typedef SparseMatrix::Index Index;
+	using Eigen::Index;
 
 	// Precompute the sparsity pattern for the global arrays.
 	m_M.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
 	m_D.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
 	m_K.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
-	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
+	for (auto femElement = std::cbegin(m_femElements); femElement != std::cend(m_femElements); ++femElement)
 	{
 		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode() * (*femElement)->getNumNodes(),
 												getNumDofPerNode() * (*femElement)->getNumNodes());
-		(*femElement)->assembleMatrixBlocks<Math::Matrix, Math::SparseMatrix::Scalar, Math::SparseMatrix::Options,
-			Math::SparseMatrix::StorageIndex>(block, (*femElement)->getNodeIds(), getNumDofPerNode(), &m_M, true);
+		(*femElement)->assembleMatrixBlocksWithInitialize<Math::Matrix, Math::SparseMatrix::Scalar,
+			Math::SparseMatrix::Options, Math::SparseMatrix::StorageIndex>
+			(block, (*femElement)->getNodeIds(), getNumDofPerNode(), &m_M);
 	}
 	m_M.makeCompressed();
 	m_D = m_K = m_M;
@@ -326,13 +328,11 @@ SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Ma
 
 void FemRepresentation::updateComplianceMatrix(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::assignSubMatrix;
-
 	// Update the compliance warping transformation using all the nodes' transformation
 	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
 	{
-		assignSubMatrix(getNodeTransformation(state, nodeId), nodeId,
-						nodeId, &m_complianceWarpingTransformation, false);
+		Math::assignSubMatrixNoInitialize(getNodeTransformation(state, nodeId), nodeId, nodeId,
+			&m_complianceWarpingTransformation);
 	}
 
 	// Then, transform the initial compliance matrix to get the current compliance warping matrix

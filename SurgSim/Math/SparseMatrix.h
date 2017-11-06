@@ -286,53 +286,68 @@ void blockOperation(const Eigen::Ref<const Matrix>& subMatrix, Eigen::Index rowS
 	}
 }
 
-/// Helper method to add a sub-matrix into a matrix, for the sake of clarity
+/// Add a dense sub-matrix into a matrix that may need the memory locations to be initialized.
 /// \tparam Opt, StorageIndex Type parameters defining the output matrix type SparseMatrix<double, Opt, StorageIndex>
 /// \param subMatrix The sub-matrix
 /// \param blockIdRow, blockIdCol The block indices in matrix
 /// \param[in,out] matrix The matrix to add the sub-matrix into
-/// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
-/// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
 /// \note This is a specialization of addSubMatrix for sparse matrices.
+/// \sa addSubMatrixNoInitialize
 template <int Opt, typename StorageIndex>
-void addSubMatrix(const Eigen::Ref<const Matrix>& subMatrix, Eigen::Index blockIdRow, Eigen::Index blockIdCol,
-				  Eigen::SparseMatrix<double, Opt, StorageIndex>* matrix, bool initialize = true)
+void addSubMatrix(const Eigen::Ref<const Matrix>& subMatrix, Eigen::Index blockIdRow,
+	Eigen::Index blockIdCol, Eigen::SparseMatrix<double, Opt, StorageIndex>* matrix)
 {
-	if (initialize)
-	{
-		blockOperation(subMatrix, subMatrix.rows() * blockIdRow, subMatrix.cols() * blockIdCol, matrix,
-			&Operation<Matrix, Eigen::SparseMatrix<double, Opt, StorageIndex>>::add);
-	}
-	else
-	{
-		blockWithSearch(subMatrix, subMatrix.rows() * blockIdRow, subMatrix.cols() * blockIdCol,
-			subMatrix.rows(), subMatrix.cols(), matrix,
-			&Operation<Matrix, Eigen::SparseMatrix<double, Opt, StorageIndex>>::add);
-	}
+	blockOperation(subMatrix, subMatrix.rows() * blockIdRow, subMatrix.cols() * blockIdCol, matrix,
+		&Operation<Matrix, Eigen::SparseMatrix<double, Opt, StorageIndex>>::add);
 }
 
-/// Helper method to assign a sub-matrix into a matrix, for the sake of clarity
+/// Add a dense sub-matrix into a sparse matrix that does not need the memory locations to be initialized.
+/// \tparam Opt, StorageIndex Type parameters defining the output matrix type SparseMatrix<double, Opt, StorageIndex>
+/// \param subMatrix The sub-matrix
+/// \param blockIdRow, blockIdCol The block indices in matrix
+/// \param[in,out] matrix The matrix to add the sub-matrix into
+/// \note This is a specialization of addSubMatrix for sparse matrices.
+/// \sa addSubMatrix
+template <int Opt, typename StorageIndex>
+void addSubMatrixNoInitialize(const Eigen::Ref<const Matrix>& subMatrix, Eigen::Index blockIdRow,
+	Eigen::Index blockIdCol, Eigen::SparseMatrix<double, Opt, StorageIndex>* matrix)
+{
+	blockWithSearch(subMatrix, subMatrix.rows() * blockIdRow, subMatrix.cols() * blockIdCol,
+		subMatrix.rows(), subMatrix.cols(), matrix,
+		&Operation<Matrix, Eigen::SparseMatrix<double, Opt, StorageIndex>>::add);
+}
+
+/// Assign a dense sub-matrix into a matrix that may need the memory locations to be initialized.
 /// \tparam Opt, StorageIndex Type parameters defining the output matrix type SparseMatrix<double, Opt, Index>
 /// \param subMatrix The sub-matrix
 /// \param blockIdRow, blockIdCol The block indices in matrix
 /// \param[in,out] matrix The matrix to assign the sub-matrix into
 /// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
 /// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
+/// \sa assignSubMatrixNoInitialize
 template <int Opt, typename StorageIndex>
 void assignSubMatrix(const Eigen::Ref<const Matrix>& subMatrix, Eigen::Index blockIdRow, Eigen::Index blockIdCol,
-					 Eigen::SparseMatrix<double, Opt, StorageIndex>* matrix, bool initialize = true)
+					 Eigen::SparseMatrix<double, Opt, StorageIndex>* matrix)
 {
-	if (initialize)
-	{
-		blockOperation(subMatrix, subMatrix.rows() * blockIdRow, subMatrix.cols() * blockIdCol, matrix,
-			&Operation<Matrix, Eigen::SparseMatrix<double, Opt, StorageIndex>>::assign);
-	}
-	else
-	{
-		blockWithSearch(subMatrix, subMatrix.rows() * blockIdRow, subMatrix.cols() * blockIdCol,
-			subMatrix.rows(), subMatrix.cols(), matrix,
-			&Operation<Matrix, Eigen::SparseMatrix<double, Opt, StorageIndex>>::assign);
-	}
+	blockOperation(subMatrix, subMatrix.rows() * blockIdRow, subMatrix.cols() * blockIdCol, matrix,
+		&Operation<Matrix, Eigen::SparseMatrix<double, Opt, StorageIndex>>::assign);
+}
+
+/// Assign a dense sub-matrix into a sparse matrix that does not need the memory locations to be initialized.
+/// \tparam Opt, StorageIndex Type parameters defining the output matrix type SparseMatrix<double, Opt, Index>
+/// \param subMatrix The sub-matrix
+/// \param blockIdRow, blockIdCol The block indices in matrix
+/// \param[in,out] matrix The matrix to assign the sub-matrix into
+/// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
+/// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
+/// \sa assignSubMatrix
+template <int Opt, typename StorageIndex>
+void assignSubMatrixNoInitialize(const Eigen::Ref<const Matrix>& subMatrix,
+	Eigen::Index blockIdRow, Eigen::Index blockIdCol, Eigen::SparseMatrix<double, Opt, StorageIndex>* matrix)
+{
+	blockWithSearch(subMatrix, subMatrix.rows() * blockIdRow, subMatrix.cols() * blockIdCol,
+		subMatrix.rows(), subMatrix.cols(), matrix,
+		&Operation<Matrix, Eigen::SparseMatrix<double, Opt, StorageIndex>>::assign);
 }
 
 /// Helper method to zero a row of a matrix specialized for Sparse Matrices

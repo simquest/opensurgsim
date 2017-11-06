@@ -294,17 +294,17 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 	massSpring->addSpring(std::make_shared<SurgSim::Physics::LinearSpring>(0, 1));
 
 	// Vector initialized (properly sized and zeroed)
-	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(massSpring->getNumDof()),
-							static_cast<SparseMatrix::Index>(massSpring->getNumDof()));
+	SparseMatrix zeroMatrix(static_cast<Eigen::Index>(massSpring->getNumDof()),
+							static_cast<Eigen::Index>(massSpring->getNumDof()));
 	zeroMatrix.setZero();
 	EXPECT_NE(0, massSpring->getExternalForce().size());
 	EXPECT_NE(0, massSpring->getExternalStiffness().size());
 	EXPECT_NE(0, massSpring->getExternalDamping().size());
-	EXPECT_EQ(static_cast<Vector::Index>(massSpring->getNumDof()), massSpring->getExternalForce().size());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().cols());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().rows());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().cols());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalForce().size());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().rows());
 	EXPECT_TRUE(massSpring->getExternalForce().isZero());
 	EXPECT_TRUE(massSpring->getExternalStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(massSpring->getExternalDamping().isApprox(zeroMatrix));

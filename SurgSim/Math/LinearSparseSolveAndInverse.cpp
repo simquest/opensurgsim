@@ -64,12 +64,12 @@ double LinearSparseSolveAndInverseCG::getTolerance()
 	return m_solver.tolerance();
 }
 
-void LinearSparseSolveAndInverseCG::setMaxIterations(SparseMatrix::Index iterations)
+void LinearSparseSolveAndInverseCG::setMaxIterations(Eigen::Index iterations)
 {
 	m_solver.setMaxIterations(iterations);
 }
 
-SparseMatrix::Index LinearSparseSolveAndInverseCG::getMaxIterations()
+Eigen::Index LinearSparseSolveAndInverseCG::getMaxIterations()
 {
 	return m_solver.maxIterations();
 }

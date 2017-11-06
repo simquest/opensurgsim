@@ -1333,7 +1333,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	std::shared_ptr<MockFem2DElement> tri = getElement();
 
-	const SparseMatrix::Index numDof = 6 * static_cast<SparseMatrix::Index>(m_restState.getNumNodes());
+	const Eigen::Index numDof = 6 * static_cast<Eigen::Index>(m_restState.getNumNodes());
 	Vector forceVector(numDof);
 	Vector ones(numDof);
 	SparseMatrix massMatrix(numDof, numDof);
@@ -1412,7 +1412,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	forceVector.setZero();
 	ones.setOnes();
 	tri->addMatVec(1.0, 0.0, 0.0, ones, &forceVector, &extractedX, &accumulator);
-	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
+	for (Eigen::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Mass component only");
 		EXPECT_NEAR(expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
@@ -1420,7 +1420,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
 	tri->addMatVec(0.0, 1.0, 0.0, ones, &forceVector, &extractedX, &accumulator);
-	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
+	for (Eigen::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Damping component only");
 		EXPECT_NEAR(0.0, forceVector[rowId], epsilon);
@@ -1428,7 +1428,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
 	tri->addMatVec(0.0, 0.0, 1.0, ones, &forceVector, &extractedX, &accumulator);
-	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
+	for (Eigen::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with Stiffness component only");
 		EXPECT_NEAR(expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
@@ -1436,7 +1436,7 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
 	tri->addMatVec(1.0, 2.0, 3.0, ones, &forceVector, &extractedX, &accumulator);
-	for (SparseMatrix::Index rowId = 0; rowId < numDof; rowId++)
+	for (Eigen::Index rowId = 0; rowId < numDof; rowId++)
 	{
 		SCOPED_TRACE("Test addMatVec API with mix Mass/Damping/Stiffness components");
 		double expectedCoef = 1.0 * expectedMassMatrix.row(rowId).sum() +

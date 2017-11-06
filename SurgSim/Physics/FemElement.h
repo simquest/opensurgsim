@@ -113,7 +113,8 @@ public:
 	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addForce(SurgSim::Math::Vector* F, double scale = 1.0) const;
+	virtual void addForce(SurgSim::Math::Vector* F, double scale) const;
+	virtual void addForce(SurgSim::Math::Vector* F) const;
 
 	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
 	/// \param[in,out] M The complete system mass matrix to add the element mass-matrix into
@@ -121,7 +122,8 @@ public:
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(SurgSim::Math::SparseMatrix* M, double scale = 1.0) const;
+	virtual void addMass(SurgSim::Math::SparseMatrix* M, double scale) const;
+	virtual void addMass(SurgSim::Math::SparseMatrix* M) const;
 
 	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
 	/// to a complete system damping matrix D (assembly)
@@ -130,7 +132,8 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addDamping(SurgSim::Math::SparseMatrix* D, double scale = 1.0) const;
+	virtual void addDamping(SurgSim::Math::SparseMatrix* D, double scale) const;
+	virtual void addDamping(SurgSim::Math::SparseMatrix* D) const;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
 	/// to a complete system stiffness matrix K (assembly)
@@ -139,7 +142,8 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(SurgSim::Math::SparseMatrix* K, double scale = 1.0) const;
+	virtual void addStiffness(SurgSim::Math::SparseMatrix* K, double scale) const;
+	virtual void addStiffness(SurgSim::Math::SparseMatrix* K) const;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
 	/// into a complete system data structure F, M, D, K (assembly)
@@ -205,7 +209,13 @@ public:
 	template <typename DerivedSub, typename T, int Opt, typename StorageIndex>
 	void assembleMatrixBlocks(const Eigen::Ref<const DerivedSub>& subMatrix, const std::vector<size_t>& blockIds,
 							  size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix,
-							  bool initialize = true) const;
+							  bool initialize) const;
+	template <typename DerivedSub, typename T, int Opt, typename StorageIndex>
+	void assembleMatrixBlocksWithInitialize(const Eigen::Ref<const DerivedSub>& subMatrix,
+		const std::vector<size_t>& blockIds, size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix) const;
+	template <typename DerivedSub, typename T, int Opt, typename StorageIndex>
+	void assembleMatrixBlocksWithoutInitialize(const Eigen::Ref<const DerivedSub>& subMatrix,
+		const std::vector<size_t>& blockIds, size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix) const;
 
 	/// Update the FemElement based on the given state.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with

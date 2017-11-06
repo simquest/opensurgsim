@@ -30,14 +30,12 @@ namespace
 void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform, SurgSim::Math::Vector* x,
 							   bool rotationOnly = false)
 {
-	typedef SurgSim::Math::Vector::Index IndexType;
-
-	IndexType numNodes = x->size() / 6;
+	Eigen::Index numNodes = x->size() / 6;
 
 	SURGSIM_ASSERT(numNodes * 6 == x->size())
 			<< "Unexpected number of dof in a Fem2D state vector (not a multiple of 6)";
 
-	for (IndexType nodeId = 0; nodeId < numNodes; nodeId++)
+	for (Eigen::Index nodeId = 0; nodeId < numNodes; nodeId++)
 	{
 		// Only the translational dof are transformed, rotational dof remains unchanged
 		SurgSim::Math::Vector3d xi = x->segment<3>(6 * nodeId);
@@ -133,7 +131,7 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	using SurgSim::Math::SparseMatrix;
 
 	const size_t dofPerNode = getNumDofPerNode();
-	const Math::Matrix::Index expectedSize = static_cast<const Math::Matrix::Index>(dofPerNode);
+	const Eigen::Index expectedSize = static_cast<const Eigen::Index>(dofPerNode);
 
 	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
 	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
@@ -170,17 +168,13 @@ void Fem2DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 			{
 				if (K.size() != 0)
 				{
-					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K,
-									   static_cast<SparseMatrix::Index>(nodeId1),
-									   static_cast<SparseMatrix::Index>(nodeId2),
-									   &m_externalGeneralizedStiffness, true);
+					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K, nodeId1, nodeId2,
+						&m_externalGeneralizedStiffness);
 				}
 				if (D.size() != 0)
 				{
-					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D,
-									   static_cast<SparseMatrix::Index>(nodeId1),
-									   static_cast<SparseMatrix::Index>(nodeId2),
-									   &m_externalGeneralizedDamping, true);
+					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D, nodeId1, nodeId2,
+						&m_externalGeneralizedDamping);
 				}
 				index2++;
 			}
