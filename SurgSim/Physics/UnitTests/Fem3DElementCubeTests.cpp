@@ -878,17 +878,17 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	massMatrix.setZero();
 	cube->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
 		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
-		(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &massMatrix, true);
+		(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &massMatrix);
 	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
 	cube->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
 		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
-		(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &dampingMatrix, true);
+		(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &dampingMatrix);
 	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
 	cube->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
 		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
-		(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &stiffnessMatrix, true);
+		(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &stiffnessMatrix);
 	stiffnessMatrix.makeCompressed();
 
 	// Update the internal f, M, D, K variables.

@@ -28,21 +28,7 @@ namespace Physics
 {
 
 template <typename DerivedSub, typename T, int Opt, typename StorageIndex>
-void FemElement::assembleMatrixBlocks(const Eigen::Ref<const DerivedSub>& subMatrix, const std::vector<size_t>& blockIds,
-	size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix, bool initialize) const
-{
-	if (initialize)
-	{
-		assembleMatrixBlocksWithInitialize(subMatrix, blockIds, blockSize, matrix);
-	}
-	else
-	{
-		assembleMatrixBlocksWithoutInitialize(subMatrix, blockIds, blockSize, matrix);
-	}
-}
-
-template <typename DerivedSub, typename T, int Opt, typename StorageIndex>
-void FemElement::assembleMatrixBlocksWithInitialize(const Eigen::Ref<const DerivedSub>& subMatrix,
+void FemElement::assembleMatrixBlocks(const Eigen::Ref<const DerivedSub>& subMatrix,
 	const std::vector<size_t>& blockIds, size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix) const
 {
 	using SurgSim::Math::addSubMatrix;
@@ -62,7 +48,7 @@ void FemElement::assembleMatrixBlocksWithInitialize(const Eigen::Ref<const Deriv
 }
 
 template <typename DerivedSub, typename T, int Opt, typename StorageIndex>
-void FemElement::assembleMatrixBlocksWithoutInitialize(const Eigen::Ref<const DerivedSub>& subMatrix,
+void FemElement::assembleMatrixBlocksNoInitialize(const Eigen::Ref<const DerivedSub>& subMatrix,
 	const std::vector<size_t>& blockIds, size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix) const
 {
 	using SurgSim::Math::addSubMatrixNoInitialize;
