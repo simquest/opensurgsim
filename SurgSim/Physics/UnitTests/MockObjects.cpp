@@ -459,7 +459,8 @@ bool MockFemRepresentation::hasSetInitialStateBeenCalled()
 }
 
 SurgSim::Math::Matrix
-MockFemRepresentationValidComplianceWarping::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
+MockFemRepresentationValidComplianceWarping::getNodeTransformation(const SurgSim::Math::OdeState& state,
+	size_t nodeId) const
 {
 	return SurgSim::Math::Matrix::Identity(getNumDofPerNode(), getNumDofPerNode());
 }

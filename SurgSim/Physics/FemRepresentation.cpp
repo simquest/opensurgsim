@@ -349,7 +349,8 @@ const SurgSim::Math::Matrix& FemRepresentation::getComplianceMatrix() const
 	return m_odeSolver->getComplianceMatrix();
 }
 
-SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
+SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Math::OdeState& state,
+	size_t nodeId) const
 {
 	SURGSIM_FAILURE() << "Any representation using compliance warping should override this method to provide the " <<
 					  "proper nodes transformation";
@@ -357,14 +358,15 @@ SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Ma
 	return SurgSim::Math::Matrix();
 }
 
+void FemRepresentation::calculateComplianceWarpingTransformation(const SurgSim::Math::OdeState& state)
+{
+	SURGSIM_FAILURE() << "Any representation using compliance warping should override this method to calculate and " <<
+		"store the proper compliance warping transformation";
+}
+
 void FemRepresentation::updateComplianceMatrix(const SurgSim::Math::OdeState& state)
 {
-	// Update the compliance warping transformation using all the nodes' transformation
-	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
-	{
-		Math::assignSubMatrixNoInitialize(getNodeTransformation(state, nodeId), nodeId, nodeId,
-			&m_complianceWarpingTransformation);
-	}
+	calculateComplianceWarpingTransformation(state);
 
 	if (m_isComplianceWarpingSynchronous)
 	{

@@ -323,7 +323,7 @@ public:
 	{}
 
 protected:
-	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) override;
+	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) const override;
 };
 
 class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation

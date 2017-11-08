@@ -193,7 +193,11 @@ protected:
 	/// \param state The state to extract the node transformation from
 	/// \param nodeId The node to update the rotation for
 	/// \return The node transformation. i.e. a numDofPerNode x numDofPerNode matrix
-	virtual SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId);
+	virtual SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) const;
+
+	/// Calculates and stores the compliance warping transformation matrix.
+	/// \param state The state to extract the node transformation from
+	virtual void calculateComplianceWarpingTransformation(const SurgSim::Math::OdeState& state);
 
 	/// Gets the flag keeping track of the initial compliance matrix calculation (compliance warping case)
 	/// \return True if the initial compliance matrix has been computed, False otherwise
