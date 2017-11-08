@@ -320,18 +320,9 @@ SurgSim::Math::Vector Fem1DElementBeam::computeCartesianCoordinate(
 		const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 2.";
-
-	Vector3d cartesianCoordinate(0.0, 0.0, 0.0);
-
 	const Vector& positions = state.getPositions();
-
-	for (int i = 0; i < 2; i++)
-	{
-		cartesianCoordinate += naturalCoordinate(i) *
-			getSubVector(positions, m_nodeIds[i], getNumDofPerNode()).segment<3>(0);
-	}
-
-	return cartesianCoordinate;
+	return naturalCoordinate(0) * getSubVector(positions, m_nodeIds[0], getNumDofPerNode()).segment<3>(0) +
+		naturalCoordinate(1) * getSubVector(positions, m_nodeIds[1], getNumDofPerNode()).segment<3>(0);
 }
 
 void Fem1DElementBeam::doUpdateFMDK(const Math::OdeState& state, int options)
@@ -344,7 +335,7 @@ void Fem1DElementBeam::doUpdateFMDK(const Math::OdeState& state, int options)
 		// K.(x - x0) = F_ext
 		// 0 = F_ext + F_int, with F_int = -K.(x - x0)
 		getSubVector(state.getPositions(), m_nodeIds, 6, &x);
-		m_f = -m_K * (x - m_x0);
+		m_f.noalias() = -m_K * (x - m_x0);
 	}
 }
 

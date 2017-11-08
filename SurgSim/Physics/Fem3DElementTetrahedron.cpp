@@ -365,17 +365,11 @@ SurgSim::Math::Vector Fem3DElementTetrahedron::computeCartesianCoordinate(
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
 			<< "naturalCoordinate must be normalized and length 4.";
-
 	const Vector& x = state.getPositions();
-	Vector3d p0 = getSubVector(x, m_nodeIds[0], 3);
-	Vector3d p1 = getSubVector(x, m_nodeIds[1], 3);
-	Vector3d p2 = getSubVector(x, m_nodeIds[2], 3);
-	Vector3d p3 = getSubVector(x, m_nodeIds[3], 3);
-
-	return naturalCoordinate(0) * p0
-		   + naturalCoordinate(1) * p1
-		   + naturalCoordinate(2) * p2
-		   + naturalCoordinate(3) * p3;
+	return naturalCoordinate(0) * getSubVector(x, m_nodeIds[0], 3)
+		   + naturalCoordinate(1) * getSubVector(x, m_nodeIds[1], 3)
+		   + naturalCoordinate(2) * getSubVector(x, m_nodeIds[2], 3)
+		   + naturalCoordinate(3) * getSubVector(x, m_nodeIds[3], 3);
 }
 
 SurgSim::Math::Vector Fem3DElementTetrahedron::computeNaturalCoordinate(

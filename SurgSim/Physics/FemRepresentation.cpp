@@ -517,9 +517,8 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 	addGravityForce(&m_f, state);
 
 	// Add the Rayleigh damping force to m_f
-	// The mass matrix should exist, the stiffness matrix might not
-	// #todo HS we should let the OdeEquation tell us wether the stiffness matrix is calculated
-	addRayleighDampingForce(&m_f, state, false, true);
+	// The mass matrix should exist, the stiffness matrix was set above in the addFMDK loop over the FemElements.
+	addRayleighDampingForce(&m_f, state, hasK(), true);
 
 	// Add external generalized force, stiffness and damping
 	if (m_previousHasExternalGeneralizedForce != m_hasExternalGeneralizedForce)
@@ -613,12 +612,11 @@ void FemRepresentation::addRayleighDampingForce(
 		}
 		else
 		{
-
 			size_t size = m_femElements[0]->getNumNodes() * m_femElements[0]->getNumDofPerNode();
 			accumulator.resize(size);
 			extractedX.resize(size);
 			// Otherwise, we loop through each fem element to compute its contribution
-			for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
+			for (auto femElement = std::cbegin(m_femElements); femElement != std::cend(m_femElements); ++femElement)
 			{
 				(*femElement)->addMatVec(0.0, 0.0, - scale * rayleighStiffness, v, force, &extractedX, &accumulator);
 			}
