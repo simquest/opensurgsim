@@ -121,22 +121,19 @@ void FemElement::addForce(SurgSim::Math::Vector* F) const
 
 void FemElement::addMass(SurgSim::Math::SparseMatrix* M, double scale) const
 {
-	assembleMatrixBlocksNoInitialize<Math::Matrix, Math::SparseMatrix::Scalar, Math::SparseMatrix::Options,
-		Math::SparseMatrix::StorageIndex>(m_M * scale, m_nodeIds, m_numDofPerNode, M);
+	assembleMatrixBlocksNoInitialize(m_M * scale, m_nodeIds, m_numDofPerNode, M);
 }
 
 void FemElement::addMass(SurgSim::Math::SparseMatrix* M) const
 {
-	assembleMatrixBlocksNoInitialize<Math::Matrix, Math::SparseMatrix::Scalar, Math::SparseMatrix::Options,
-		Math::SparseMatrix::StorageIndex>(m_M, m_nodeIds, m_numDofPerNode, M);
+	assembleMatrixBlocksNoInitialize(m_M, m_nodeIds, m_numDofPerNode, M);
 }
 
 void FemElement::addDamping(SurgSim::Math::SparseMatrix* D, double scale) const
 {
 	if (m_useDamping)
 	{
-		assembleMatrixBlocksNoInitialize<Math::Matrix, Math::SparseMatrix::Scalar, Math::SparseMatrix::Options,
-			Math::SparseMatrix::StorageIndex>(m_D * scale, m_nodeIds, m_numDofPerNode, D);
+		assembleMatrixBlocksNoInitialize(m_D * scale, m_nodeIds, m_numDofPerNode, D);
 	}
 }
 
@@ -144,21 +141,18 @@ void FemElement::addDamping(SurgSim::Math::SparseMatrix* D) const
 {
 	if (m_useDamping)
 	{
-		assembleMatrixBlocksNoInitialize<Math::Matrix, Math::SparseMatrix::Scalar, Math::SparseMatrix::Options,
-			Math::SparseMatrix::StorageIndex>(m_D, m_nodeIds, m_numDofPerNode, D);
+		assembleMatrixBlocksNoInitialize(m_D, m_nodeIds, m_numDofPerNode, D);
 	}
 }
 
 void FemElement::addStiffness(SurgSim::Math::SparseMatrix* K, double scale) const
 {
-	assembleMatrixBlocksNoInitialize<Math::Matrix, Math::SparseMatrix::Scalar, Math::SparseMatrix::Options,
-		Math::SparseMatrix::StorageIndex>(m_K * scale, m_nodeIds, m_numDofPerNode, K);
+	assembleMatrixBlocksNoInitialize(m_K * scale, m_nodeIds, m_numDofPerNode, K);
 }
 
 void FemElement::addStiffness(SurgSim::Math::SparseMatrix* K) const
 {
-	assembleMatrixBlocksNoInitialize<Math::Matrix, Math::SparseMatrix::Scalar, Math::SparseMatrix::Options,
-		Math::SparseMatrix::StorageIndex>(m_K, m_nodeIds, m_numDofPerNode, K);
+	assembleMatrixBlocksNoInitialize(m_K, m_nodeIds, m_numDofPerNode, K);
 }
 
 void FemElement::addFMDK(SurgSim::Math::Vector* F,

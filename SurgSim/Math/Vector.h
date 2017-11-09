@@ -75,28 +75,26 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
 /// \param blockSize The block size
 /// \param[out] vector The vector to add the sub-vector into
 template <class Vector, class SubVector>
-void addSubVector(const SubVector& subVector, size_t blockId, size_t blockSize, Vector* vector)
+void addSubVector(const SubVector& subVector, Eigen::Index blockId, Eigen::Index blockSize, Vector* vector)
 {
 	vector->segment(blockSize * blockId, blockSize) += subVector;
 }
 
 /// Helper method to add a sub-vector per block into a vector, for the sake of clarity
-/// \tparam Vector The vector type
-/// \tparam SubVector The sub-vector type
+/// \tparam VectorType The vector type
 /// \param subVector The sub-vector (containing all the blocks)
 /// \param blockIds Vector of block indices (for accessing vector) corresponding to the blocks in sub-vector
 /// \param blockSize The block size
 /// \param[out] vector The vector to add the sub-vector blocks into
-template <class Vector, class SubVector>
-void addSubVector(const SubVector& subVector, const std::vector<size_t>& blockIds, size_t blockSize, Vector* vector)
+template <class VectorType>
+void addSubVector(const Eigen::Ref<const Vector>& subVector,
+	const std::vector<size_t>& blockIds, Eigen::Index blockSize, VectorType* vector)
 {
-	const size_t numBlocks = blockIds.size();
-
-	for (size_t block = 0; block < numBlocks; block++)
+	const Eigen::Index numBlocks = static_cast<Eigen::Index>(blockIds.size());
+	for (Eigen::Index block = 0; block < numBlocks; ++block)
 	{
-		size_t blockId = blockIds[block];
-
-		vector->segment(blockSize * blockId, blockSize) += subVector.segment(blockSize * block, blockSize);
+		vector->segment(blockSize * static_cast<Eigen::Index>(blockIds[block]), blockSize) +=
+			subVector.segment(blockSize * block, blockSize);
 	}
 }
 
@@ -108,7 +106,7 @@ void addSubVector(const SubVector& subVector, const std::vector<size_t>& blockId
 /// \param blockSize The size of the sub-vector
 /// \param[out] vector The vector to set the sub-vector into
 template <class Vector, class SubVector>
-void setSubVector(const SubVector& subVector, size_t blockId, size_t blockSize, Vector* vector)
+void setSubVector(const SubVector& subVector, Eigen::Index blockId, Eigen::Index blockSize, Vector* vector)
 {
 	vector->segment(blockSize * blockId, blockSize) = subVector;
 }
@@ -123,7 +121,7 @@ void setSubVector(const SubVector& subVector, size_t blockId, size_t blockSize, 
 /// \note Eigen has a specific type for VectorBlock that we want to return with read/write access
 /// \note therefore the Vector from which the VectorBlock is built from must not be const
 template <class Vector>
-Eigen::VectorBlock<Vector> getSubVector(Vector& vector, size_t blockId, size_t blockSize) // NOLINT
+Eigen::VectorBlock<Vector> getSubVector(Vector& vector, Eigen::Index blockId, Eigen::Index blockSize) // NOLINT
 {
 	return vector.segment(blockSize * blockId, blockSize);
 }
@@ -136,15 +134,14 @@ Eigen::VectorBlock<Vector> getSubVector(Vector& vector, size_t blockId, size_t b
 /// \param blockSize The block size
 /// \param[out] subVector The sub-vector to store the requested blocks (blockIds) from vector into
 template <class Vector, class SubVector>
-void getSubVector(const Vector& vector, const std::vector<size_t>& blockIds, size_t blockSize, SubVector* subVector)
+void getSubVector(const Vector& vector, const std::vector<size_t>& blockIds, Eigen::Index blockSize,
+	SubVector* subVector)
 {
-	const size_t numBlocks = blockIds.size();
-
-	for (size_t block = 0; block < numBlocks; block++)
+	const Eigen::Index numBlocks = static_cast<Eigen::Index>(blockIds.size());
+	for (Eigen::Index block = 0; block < numBlocks; ++block)
 	{
-		size_t blockId = blockIds[block];
-
-		subVector->segment(blockSize * block, blockSize) = vector.segment(blockSize * blockId, blockSize);
+		subVector->segment(blockSize * block, blockSize) =
+			vector.segment(blockSize * static_cast<Eigen::Index>(blockIds[block]), blockSize);
 	}
 }
 

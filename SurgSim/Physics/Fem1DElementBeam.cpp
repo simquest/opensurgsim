@@ -19,7 +19,6 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 
-using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::setSubMatrix;

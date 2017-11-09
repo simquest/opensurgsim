@@ -19,7 +19,6 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DElementCube.h"
 
-using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;

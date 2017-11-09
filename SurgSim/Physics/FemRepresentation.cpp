@@ -124,9 +124,7 @@ bool FemRepresentation::doInitialize()
 	{
 		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode() * (*femElement)->getNumNodes(),
 												getNumDofPerNode() * (*femElement)->getNumNodes());
-		(*femElement)->assembleMatrixBlocks<Math::Matrix, Math::SparseMatrix::Scalar,
-			Math::SparseMatrix::Options, Math::SparseMatrix::StorageIndex>
-			(block, (*femElement)->getNodeIds(), getNumDofPerNode(), &m_M);
+		(*femElement)->assembleMatrixBlocks(block, (*femElement)->getNodeIds(), getNumDofPerNode(), &m_M);
 	}
 	m_M.makeCompressed();
 	m_D = m_K = m_M;

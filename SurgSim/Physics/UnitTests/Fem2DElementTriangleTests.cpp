@@ -1360,19 +1360,13 @@ TEST_F(Fem2DElementTriangleTests, ForceAndMatricesAPITest)
 
 	forceVector.setZero();
 	massMatrix.setZero();
-	tri->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
-		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
-		(zeros18x18, tri->getNodeIds(), 6, &massMatrix);
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &massMatrix);
 	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
-	tri->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
-		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
-		(zeros18x18, tri->getNodeIds(), 6, &dampingMatrix);
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &dampingMatrix);
 	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
-	tri->assembleMatrixBlocks<SurgSim::Math::Matrix, SurgSim::Math::SparseMatrix::Scalar,
-		SurgSim::Math::SparseMatrix::Options, SurgSim::Math::SparseMatrix::StorageIndex>
-		(zeros18x18, tri->getNodeIds(), 6, &stiffnessMatrix);
+	tri->assembleMatrixBlocks(zeros18x18, tri->getNodeIds(), 6, &stiffnessMatrix);
 	stiffnessMatrix.makeCompressed();
 	zeroMatrix.setZero();
 

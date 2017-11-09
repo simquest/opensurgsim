@@ -21,7 +21,6 @@
 
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::getSubMatrix;
-using SurgSim::Math::addSubVector;
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;

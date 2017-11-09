@@ -21,7 +21,6 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 
-using SurgSim::Math::addSubVector;
 using SurgSim::Math::gaussQuadrature2DTriangle3Points;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::getSubVector;

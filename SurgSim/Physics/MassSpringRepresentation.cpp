@@ -294,8 +294,6 @@ void MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 
 void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::addSubVector;
-
 	// Make sure the force vector has been properly allocated and zeroed out
 	m_f.setZero(state.getNumDof());
 
