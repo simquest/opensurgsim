@@ -142,10 +142,6 @@ public:
 	/// \return True if lumped masses are enabled
 	bool getMassLumping() const;
 
-	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
-	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
-	/// \param b The input matrix b
-	/// \return Returns the matrix \f$C.b\f$
 	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
 	const SurgSim::Math::Matrix& getComplianceMatrix() const override;

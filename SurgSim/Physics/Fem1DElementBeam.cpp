@@ -153,9 +153,9 @@ void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state)
 	m_MLocal(2, 2)   =  13.0 / 35.0 + 6.0 * Iy / (5.0 * AL2);
 	m_MLocal(2, 4)   = -11.0 * L / 210.0 - Iy / (10.0 * AL);
 	m_MLocal(3, 3)   =  m_J / (3.0 * m_A);
-	m_MLocal(4, 2)   = -11.0 * L / 210.0 - Iy / (10.0 * AL);
+	m_MLocal(4, 2) = m_MLocal(2, 4); // symmetric
 	m_MLocal(4, 4)   =  L2 / 105.0 + 2.0 * Iy / (15.0 * m_A);
-	m_MLocal(5, 1)   =  11.0 * L / 210.0 + Iz / (10.0 * AL);
+	m_MLocal(5, 1) = m_MLocal(1, 5); // symmetric
 	m_MLocal(5, 5)   =  L2 / 105.0 + 2.0 * Iz / (15.0 * m_A);
 
 	// Mass matrix for node1 / node1
@@ -165,9 +165,9 @@ void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state)
 	m_MLocal(8, 8)   =  13.0 / 35.0 + 6.0 * Iy / (5.0 * AL2);
 	m_MLocal(8, 10)  =  11.0 * L / 210.0 + Iy / (10.0 * AL);
 	m_MLocal(9, 9)   =  m_J / (3.0 * m_A);
-	m_MLocal(10, 8)  =  11.0 * L / 210.0 + Iy / (10.0 * AL);
+	m_MLocal(10, 8) = m_MLocal(8, 10); // symmetric
 	m_MLocal(10, 10) =  L2 / 105.0 + 2.0 * Iy / (15.0 * m_A);
-	m_MLocal(11, 7)  = -11.0 * L / 210.0 - Iz / (10.0 * AL);
+	m_MLocal(11, 7) = m_MLocal(7, 11); // symmetric
 	m_MLocal(11, 11) =  L2 / 105.0 + 2.0 * Iz / (15.0 * m_A);
 
 	// Mass matrix for node1 / node0
@@ -183,16 +183,16 @@ void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state)
 	m_MLocal(11, 5)  = -L2 / 140.0 - Iz / (30.0 * m_A);
 
 	// Mass matrix for node0 / node1
-	m_MLocal(0, 6)   =  1.0 / 6.0;
-	m_MLocal(1, 7)   =  9.0 / 70.0 - 6.0 * Iz / (5.0 * AL2);
-	m_MLocal(1, 11)  = -13.0 * L / 420.0 + Iz / (10.0 * AL);
-	m_MLocal(2, 8)   =  9.0 / 70.0 - 6.0 * Iy / (5.0 * AL2);
-	m_MLocal(2, 10)  =  13.0 * L / 420.0 - Iy / (10.0 * AL);
-	m_MLocal(3, 9)   =  m_J / (6.0 * m_A);
-	m_MLocal(4, 8)   = -13.0 * L / 420.0 + Iy / (10.0 * AL);
-	m_MLocal(4, 10)  = -L2 / 140.0 - Iy / (30.0 * m_A);
-	m_MLocal(5, 7)   =  13.0 * L / 420.0 - Iz / (10.0 * AL);
-	m_MLocal(5, 11)  = -L2 / 140.0 - Iz / (30.0 * m_A);
+	m_MLocal(0, 6) = m_MLocal(6, 0); // symmetric
+	m_MLocal(1, 7) = m_MLocal(7, 1); // symmetric
+	m_MLocal(1, 11) = m_MLocal(11, 1); // symmetric
+	m_MLocal(2, 8) = m_MLocal(8, 2); // symmetric
+	m_MLocal(2, 10) = m_MLocal(10, 2); // symmetric
+	m_MLocal(3, 9) = m_MLocal(9, 3); // symmetric
+	m_MLocal(4, 8) = m_MLocal(8, 4); // symmetric
+	m_MLocal(4, 10) = m_MLocal(10, 4); // symmetric
+	m_MLocal(5, 7) = m_MLocal(7, 5); // symmetric
+	m_MLocal(5, 11) = m_MLocal(11, 5); // symmetric
 
 	m_MLocal *= m;
 
@@ -203,7 +203,7 @@ void Fem1DElementBeam::computeMass(const SurgSim::Math::OdeState& state)
 	setSubMatrix(m_R0, 1, 1, 3, 3, &r0);
 	setSubMatrix(m_R0, 2, 2, 3, 3, &r0);
 	setSubMatrix(m_R0, 3, 3, 3, 3, &r0);
-	m_M = r0 * m_MLocal * r0.transpose();
+	m_M = r0 * m_MLocal.selfadjointView<Eigen::Upper>() * r0.transpose();
 }
 
 void Fem1DElementBeam::computeStiffness(const SurgSim::Math::OdeState& state)
