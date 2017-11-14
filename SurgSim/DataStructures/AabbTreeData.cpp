@@ -123,7 +123,7 @@ std::shared_ptr<AabbTreeData> AabbTreeData::takeLargerElements()
 
 void AabbTreeData::recalculateAabb()
 {
-	m_aabb.setNull();
+	m_aabb.setEmpty();
 	std::for_each(m_data.begin(), m_data.end(), [&](const Item & item)
 	{
 		m_aabb.extend(item.first);

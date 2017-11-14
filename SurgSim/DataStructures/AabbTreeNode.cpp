@@ -113,7 +113,6 @@ void AabbTreeNode::setAabb(const SurgSim::Math::Aabbd& aabb)
 
 void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t maxNodeData)
 {
-
 	if (getNumChildren() > 0)
 	{
 		size_t childIndex = (aabb.center()(m_axis) < m_aabb.center()(m_axis)) ? 0 : 1;

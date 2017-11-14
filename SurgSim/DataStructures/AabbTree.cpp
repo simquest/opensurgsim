@@ -133,17 +133,16 @@ void AabbTree::updateBounds(const std::vector<Math::Aabbd>& bounds)
 void AabbTree::updateNodeBounds(const std::vector<Math::Aabbd>& bounds,
 								SurgSim::DataStructures::AabbTreeNode* node)
 {
-
 	const size_t numChildren = node->getNumChildren();
 	if (numChildren > 0)
 	{
-		SurgSim::Math::Aabbd aabb;
-		aabb.setEmpty();
+		auto* child = static_cast<SurgSim::DataStructures::AabbTreeNode*>(node->getChild(0).get());
+		updateNodeBounds(bounds, child);
+		auto aabb = child->getAabb();
 
-		for (int i = 0; i < numChildren; ++i)
+		for (size_t i = 1; i < numChildren; ++i)
 		{
-			SurgSim::DataStructures::AabbTreeNode* child =
-				static_cast<SurgSim::DataStructures::AabbTreeNode*>(node->getChild(i).get());
+			auto* child = static_cast<SurgSim::DataStructures::AabbTreeNode*>(node->getChild(i).get());
 			updateNodeBounds(bounds, child);
 			aabb.extend(child->getAabb());
 		}
@@ -159,8 +158,6 @@ void AabbTree::updateNodeBounds(const std::vector<Math::Aabbd>& bounds,
 		data->recalculateAabb();
 		node->setAabb(data->getAabb());
 	}
-
-
 }
 
 }
