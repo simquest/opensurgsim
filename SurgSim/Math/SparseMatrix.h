@@ -322,8 +322,6 @@ void addSubMatrixNoInitialize(const Eigen::Ref<const Matrix>& subMatrix, Eigen::
 /// \param subMatrix The sub-matrix
 /// \param blockIdRow, blockIdCol The block indices in matrix
 /// \param[in,out] matrix The matrix to assign the sub-matrix into
-/// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
-/// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
 /// \sa assignSubMatrixNoInitialize
 template <int Opt, typename StorageIndex>
 void assignSubMatrix(const Eigen::Ref<const Matrix>& subMatrix, Eigen::Index blockIdRow, Eigen::Index blockIdCol,
@@ -338,8 +336,6 @@ void assignSubMatrix(const Eigen::Ref<const Matrix>& subMatrix, Eigen::Index blo
 /// \param subMatrix The sub-matrix
 /// \param blockIdRow, blockIdCol The block indices in matrix
 /// \param[in,out] matrix The matrix to assign the sub-matrix into
-/// \param initialize Option parameter, default=true. If true, the matrix form is assumed to be undefined
-/// and is initialized when necessary. If false, the matrix form is assumed to be previously defined.
 /// \sa assignSubMatrix
 template <int Opt, typename StorageIndex>
 void assignSubMatrixNoInitialize(const Eigen::Ref<const Matrix>& subMatrix,
