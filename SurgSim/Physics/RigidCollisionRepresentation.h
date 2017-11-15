@@ -82,6 +82,9 @@ private:
 	Math::Aabbd m_aabb;
 	double m_oldVolume;
 	double m_aabbThreshold;
+	Math::RigidTransform3d m_previousDcdPose;
+	Math::RigidTransform3d m_previousCcdPreviousPose;
+	Math::RigidTransform3d m_previousCcdCurrentPose;
 };
 
 }; // namespace Collision

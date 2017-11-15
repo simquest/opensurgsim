@@ -35,6 +35,12 @@ RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& na
 	m_oldVolume(0.0),
 	m_aabbThreshold(0.01)
 {
+	m_previousDcdPose.translation() = Math::Vector3d(std::numeric_limits<double>::max(),
+		std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+	m_previousCcdPreviousPose.translation() = Math::Vector3d(std::numeric_limits<double>::max(),
+		std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+	m_previousCcdCurrentPose.translation() = Math::Vector3d(std::numeric_limits<double>::max(),
+		std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
 									  Shape, getShape, setShape);
 }
@@ -131,15 +137,20 @@ void RigidCollisionRepresentation::updateDcdData()
 	{
 		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(getShape().get());
 		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
-		if (std::abs(m_oldVolume - meshShape->getBoundingBox().volume()) > m_oldVolume * m_aabbThreshold)
+		auto pose = getPose();
+		if (!pose.isApprox(m_previousDcdPose))
 		{
-			meshShape->update();
-			m_oldVolume = meshShape->getBoundingBox().volume();
-		}
-		else
-		{
-			meshShape->updateAabbTree();
-			meshShape->calculateNormals();
+			m_previousDcdPose = pose;
+			if (std::abs(m_oldVolume - meshShape->getBoundingBox().volume()) > m_oldVolume * m_aabbThreshold)
+			{
+				meshShape->update();
+				m_oldVolume = meshShape->getBoundingBox().volume();
+			}
+			else
+			{
+				meshShape->updateAabbTree();
+				meshShape->calculateNormals();
+			}
 		}
 	}
 }
@@ -163,27 +174,32 @@ void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 	previousPose = physicsPreviousPose * transform;
 	currentPose = physicsCurrentPose * transform;
 
-	std::shared_ptr<Shape> previousShape = getShape();
-	std::shared_ptr<Shape> currentShape = getShape();
-	if (currentShape->isTransformable())
+	if (!previousPose.isApprox(m_previousCcdPreviousPose) || !currentPose.isApprox(m_previousCcdCurrentPose))
 	{
-		previousShape = currentShape->getTransformed(previousPose);
-		currentShape = currentShape->getTransformed(currentPose);
-		m_aabb.extend(currentShape->getBoundingBox());
-	}
-	else
-	{
-		m_aabb.extend(Math::transformAabb(getPose(), currentShape->getBoundingBox()));
-	}
+		m_previousCcdPreviousPose = previousPose;
+		m_previousCcdCurrentPose = currentPose;
+		std::shared_ptr<Shape> previousShape = getShape();
+		std::shared_ptr<Shape> currentShape = getShape();
+		if (currentShape->isTransformable())
+		{
+			previousShape = currentShape->getTransformed(previousPose);
+			currentShape = currentShape->getTransformed(currentPose);
+			m_aabb.extend(currentShape->getBoundingBox());
+		}
+		else
+		{
+			m_aabb.extend(Math::transformAabb(getPose(), currentShape->getBoundingBox()));
+		}
 
-	PosedShape<std::shared_ptr<Shape>> posedShape1(previousShape, previousPose);
-	PosedShape<std::shared_ptr<Shape>> posedShape2(currentShape, currentPose);
-	PosedShapeMotion<std::shared_ptr<Shape>> posedShapeMotion(posedShape1, posedShape2);
-	setPosedShapeMotion(posedShapeMotion);
+		PosedShape<std::shared_ptr<Shape>> posedShape1(previousShape, previousPose);
+		PosedShape<std::shared_ptr<Shape>> posedShape2(currentShape, currentPose);
+		PosedShapeMotion<std::shared_ptr<Shape>> posedShapeMotion(posedShape1, posedShape2);
+		setPosedShapeMotion(posedShapeMotion);
 
-	// HS-2-Mar-2016
-	// #todo Add AABB tree for the posedShapeMotion (i.e. that is the tree where each bounding box consists of the
-	// corresponding elements from posedShape1 and posedShape2
+		// HS-2-Mar-2016
+		// #todo Add AABB tree for the posedShapeMotion (i.e. that is the tree where each bounding box consists of the
+		// corresponding elements from posedShape1 and posedShape2
+	}
 }
 
 
