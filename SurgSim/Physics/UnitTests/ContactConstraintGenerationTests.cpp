@@ -21,6 +21,7 @@
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -63,6 +64,12 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 
 		state = std::make_shared<PhysicsManagerState>();
 		state->setRepresentations(representations);
+
+		auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+		ASSERT_TRUE(collision0->initialize(runtime));
+		ASSERT_TRUE(collision0->wakeUp());
+		ASSERT_TRUE(collision1->initialize(runtime));
+		ASSERT_TRUE(collision1->wakeUp());
 
 		collision0->update(0.0);
 		collision1->update(0.0);

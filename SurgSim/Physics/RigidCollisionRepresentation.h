@@ -44,6 +44,9 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidCollisionRepresentation);
 
+	bool doInitialize() override;
+	bool doWakeUp() override;
+
 	/// Get the pose of the representation
 	/// \return The pose of this representation
 	SurgSim::Math::RigidTransform3d getPose() const override;
@@ -60,6 +63,7 @@ public:
 	/// The default is to use the shape of the Rigid Representation, this
 	/// will override that shape.
 	/// \param shape The actual shape used for collision, if nullptr the Rigid Representation shape will be used.
+	/// \warning If the shape is a VerticesShape, it may be altered so provide a deep copy if necessary.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
 	/// Set rigid representation
