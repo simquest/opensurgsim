@@ -83,7 +83,6 @@ void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::share
 
 std::shared_ptr<Math::Shape> Representation::getPosedShape()
 {
-/*
 	if (getShape()->isTransformable())
 	{
 		// HS-3-mar-2016 This is still being used by all representations it will be superceded by
@@ -102,47 +101,6 @@ std::shared_ptr<Math::Shape> Representation::getPosedShape()
 		{
 			Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
 			m_posedShapeMotion.second = newPosedShape;
-		}
-		return m_posedShapeMotion.second.getShape();
-	}
-	else
-	{
-		return getShape();
-	}
-	*/
-	if (getShape()->isTransformable())
-	{
-		// HS-3-mar-2016 This is still being used by all representations it will be superceded by
-		// local update functionality after ryans merge request goes in
-		// #todo get rid of this in favor of transforming the mesh shape
-		const Math::RigidTransform3d pose = getPose();
-		boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-		auto meshShape = std::dynamic_pointer_cast<Math::MeshShape>(getShape());
-		if (meshShape != nullptr)
-		{
-			std::cout << "getPosedShape using MeshShape::setPose for " + getFullName() << std::endl;
-
-			meshShape->setPose(pose);  //this section doesn't work for some reason.
-			meshShape->update(); // After we call setPose, how much of the mesh do we expect to be updated?  Just the vertices? triangle normals too?  volume integrals?
-			m_posedShapeMotion.second =
-				Math::PosedShape<std::shared_ptr<Math::Shape>>(meshShape, pose);
-		}
-		else
-		{
-			static const Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
-			if (pose.isApprox(identity))
-			{
-				Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-				m_posedShapeMotion.second = newPosedShape;
-			}
-			else if (m_posedShapeMotion.second.getShape() == nullptr ||
-				!pose.isApprox(m_posedShapeMotion.second.getPose()))
-			{
-				std::cout << "getPosedShape for " + getFullName() << std::endl;
-				m_posedShapeMotion.second =
-					Math::PosedShape<std::shared_ptr<Math::Shape>>(getShape()->getTransformed(pose), pose);
-			}
 		}
 		return m_posedShapeMotion.second.getShape();
 	}
