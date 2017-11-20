@@ -109,6 +109,8 @@ public:
 	/// \return true on success, or false if any triangle has an indeterminate normal.
 	bool calculateNormals();
 
+	void updateShape() override;
+	void updateShapePartial() override;
 
 protected:
 	bool doUpdate() override;

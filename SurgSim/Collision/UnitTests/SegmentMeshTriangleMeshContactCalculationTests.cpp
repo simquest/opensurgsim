@@ -177,11 +177,15 @@ protected:
 				std::make_shared<ShapeCollisionRepresentation>("Collision Mesh - Segment");
 			segmentMeshRep->setShape(segmentMeshShape);
 			segmentMeshRep->setLocalPose(transform.first * segmentMeshShapeTransform);
+			segmentMeshRep->updateShapeData();
+			segmentMeshRep->updateDcdData();
 
 			std::shared_ptr<ShapeCollisionRepresentation> triangleMeshRep =
 				std::make_shared<ShapeCollisionRepresentation>("Collision Mesh - Triangle");
 			triangleMeshRep->setShape(meshShape);
 			triangleMeshRep->setLocalPose(transform.first * meshShapeTransform);
+			triangleMeshRep->updateShapeData();
+			triangleMeshRep->updateDcdData();
 
 			// Perform collision detection.
 			SegmentMeshTriangleMeshContact calcContact;

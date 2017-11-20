@@ -79,6 +79,9 @@ public:
 	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
 	void updateAabbTree();
 
+	void updateShape() override;
+	void updateShapePartial() override;
+
 protected:
 	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;

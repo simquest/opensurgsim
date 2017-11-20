@@ -67,6 +67,10 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 
 FemRepresentation::~FemRepresentation()
 {
+	//if (m_task.valid())
+	//{
+	//	m_task.get();
+	//}
 }
 
 void FemRepresentation::setFemElementType(const std::string& type)

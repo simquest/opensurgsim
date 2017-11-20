@@ -52,7 +52,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::DeformableCollisionRepresentation);
 
-	/// Set the shape for this collision representation, has to be a SurgSim::Math::MeshShape.
+	/// Set the shape for this collision representation, has to be a Mesh, SegmentMesh, or SurfaceMesh.
 	/// The vertices in the mesh need to be the same number as the vertices in the deformable representation.
 	/// \param shape The shape to be used.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);

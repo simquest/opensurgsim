@@ -85,6 +85,16 @@ double SegmentMeshShape::getRadius() const
 	return m_radius;
 }
 
+void SegmentMeshShape::updateShape()
+{
+	doUpdate();
+}
+
+void SegmentMeshShape::updateShapePartial()
+{
+	updateAabbTree();
+}
+
 bool SegmentMeshShape::doUpdate()
 {
 	buildAabbTree();

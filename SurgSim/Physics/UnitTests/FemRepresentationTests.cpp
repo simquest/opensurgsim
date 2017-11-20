@@ -482,7 +482,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
-		// update() will call updateNodesRotations() which will raise an exception in this case.
+		// update() will call calculateComplianceWarpingTransformation() which will raise an exception in this case.
 		// This method has not been overridden.
 		EXPECT_THROW(fem->update(1e-3), SurgSim::Framework::AssertionFailure);
 	}
@@ -517,7 +517,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
-		// update() will call updateNodesRotations() which will not raise an exception in this case.
+		// update() will call calculateComplianceWarpingTransformation() which will not raise an exception in this case.
 		// This method has been overridden.
 		EXPECT_NO_THROW(fem->update(1e-3));
 

@@ -43,7 +43,7 @@ class FemPlyReaderDelegate;
 /// \note  "Efficient Contact Modeling using Compliance Warping", G Saupin, C Duriez, S Cotin, L Grisoni;
 /// Computer %Graphics International (CGI), Istanbul, Turkey, june 2008.
 /// \note  To use compliance warping, it needs to be turned on by calling setComplianceWarping(true) and the method
-/// updateNodesRotations() needs to be overloaded properly.
+/// calculateComplianceWarpingTransformation() needs to be overloaded properly.
 class FemRepresentation : public DeformableRepresentation
 {
 public:

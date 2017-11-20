@@ -85,6 +85,17 @@ bool MeshShape::calculateNormals()
 	return result;
 }
 
+void MeshShape::updateShape()
+{
+	doUpdate();
+}
+
+void MeshShape::updateShapePartial()
+{
+	updateAabbTree();
+	calculateNormals();
+}
+
 bool MeshShape::doUpdate()
 {
 	buildAabbTree();
@@ -167,7 +178,7 @@ void MeshShape::computeVolumeIntegrals()
 		const Vector3d& v2 = getVertexPosition(triangle.verticesId[2]);
 
 		// get edges and cross product of edges
-		Vector3d normal = (v1 - v0).cross(v2 - v0);
+		Vector3d scaledNormal = (v1 - v0).cross(v2 - v0);
 
 		// compute integral terms
 		double f1x, f1y, f1z, f2x, f2y, f2z, f3x, f3y, f3z;
@@ -177,16 +188,16 @@ void MeshShape::computeVolumeIntegrals()
 		computeIntegralTerms(v0.z(), v1.z(), v2.z(), &f1z, &f2z, &f3z, &g0z, &g1z, &g2z);
 
 		// update integrals
-		integral[0] += normal[0] * f1x;
-		integral[1] += normal[0] * f2x;
-		integral[2] += normal[1] * f2y;
-		integral[3] += normal[2] * f2z;
-		integral[4] += normal[0] * f3x;
-		integral[5] += normal[1] * f3y;
-		integral[6] += normal[2] * f3z;
-		integral[7] += normal[0] * (v0.y() * g0x + v1.y() * g1x + v2.y() * g2x);
-		integral[8] += normal[1] * (v0.z() * g0y + v1.z() * g1y + v2.z() * g2y);
-		integral[9] += normal[2] * (v0.x() * g0z + v1.x() * g1z + v2.x() * g2z);
+		integral[0] += scaledNormal[0] * f1x;
+		integral[1] += scaledNormal[0] * f2x;
+		integral[2] += scaledNormal[1] * f2y;
+		integral[3] += scaledNormal[2] * f2z;
+		integral[4] += scaledNormal[0] * f3x;
+		integral[5] += scaledNormal[1] * f3y;
+		integral[6] += scaledNormal[2] * f3z;
+		integral[7] += scaledNormal[0] * (v0.y() * g0x + v1.y() * g1x + v2.y() * g2x);
+		integral[8] += scaledNormal[1] * (v0.z() * g0y + v1.z() * g1y + v2.z() * g2y);
+		integral[9] += scaledNormal[2] * (v0.x() * g0z + v1.x() * g1z + v2.x() * g2z);
 	}
 	integral = integral.cwiseProduct(multiplier);
 

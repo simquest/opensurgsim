@@ -92,8 +92,8 @@ public:
 	virtual std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
 
 	/// Get the shape, posed
-	/// \return The shape transformed by the pose of this representation
-	virtual std::shared_ptr<SurgSim::Math::Shape> getPosedShape();
+	/// \return The shape transformed by the pose of this representation, and the pose.
+	virtual const Math::PosedShape<std::shared_ptr<Math::Shape>>& getPosedShape();
 
 	/// \return the posed shape motion
 	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& getPosedShapeMotion() const;
@@ -217,6 +217,14 @@ protected:
 	void setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape);
 
 	std::shared_ptr<Framework::Logger> m_logger;
+
+	///@{
+	/// Used to optimize aabb tree updates.
+	double m_oldVolume;
+	double m_aabbThreshold;
+	Math::RigidTransform3d m_previousDcdPose;
+	Math::RigidTransform3d m_previousCcdCurrentPose;
+	///@}
 
 private:
 	/// The type of collision detection
