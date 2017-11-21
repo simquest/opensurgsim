@@ -15,6 +15,7 @@
 
 #include "SurgSim/Math/CompoundShape.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/MeshShape.h"
 
 namespace SurgSim
 {
@@ -24,7 +25,7 @@ namespace Math
 
 SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::CompoundShape, CompoundShape);
 
-CompoundShape::CompoundShape()
+CompoundShape::CompoundShape() : m_lastSetPose(RigidTransform3d::Identity())
 {
 	{
 		typedef std::vector<SubShape> PropertyType;
@@ -184,7 +185,8 @@ void CompoundShape::invalidateData()
 size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose)
 {
 	WriteLock lock(m_mutex);
-	m_shapes.emplace_back(shape, pose);
+	m_shapes.emplace_back(shape, m_lastSetPose * pose);
+	m_localPoses.push_back(pose);
 	invalidateData();
 	return m_shapes.size() - 1;
 }
@@ -193,6 +195,12 @@ void CompoundShape::setShapes(const std::vector<SubShape>& shapes)
 {
 	WriteLock lock(m_mutex);
 	m_shapes = shapes;
+	m_localPoses.clear();
+	for (auto& shape : m_shapes)
+	{
+		m_localPoses.push_back(shape.second);
+	}
+	m_lastSetPose = RigidTransform3d::Identity();
 	invalidateData();
 }
 
@@ -223,7 +231,8 @@ void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
 	size_t i = 0;
 	for (auto& shape : m_shapes)
 	{
-		shape.second = poses[i++];
+		m_localPoses[i] = poses[i];
+		shape.second = m_lastSetPose * poses[i++];
 	}
 	invalidateData();
 }
@@ -233,7 +242,8 @@ void CompoundShape::setPose(size_t index, const RigidTransform3d& pose)
 {
 	WriteLock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
-	m_shapes[index].second = pose;
+	m_shapes[index].second = m_lastSetPose * pose;
+	m_localPoses[index] = pose;
 	invalidateData();
 }
 
@@ -261,7 +271,7 @@ std::shared_ptr<Shape> CompoundShape::getTransformed(const RigidTransform3d& pos
 	for (const auto& shape : m_shapes)
 	{
 		std::shared_ptr<Shape> newShape;
-		RigidTransform3d newPose = pose * shape.second;
+		RigidTransform3d newPose = pose * shape.second; // not sure what to do here...if we call setPose and then getTransformed
 		if (shape.first->isTransformable())
 		{
 			newShape = shape.first->getTransformed(newPose);
@@ -273,6 +283,30 @@ std::shared_ptr<Shape> CompoundShape::getTransformed(const RigidTransform3d& pos
 		transformed->addShape(newShape, newPose);
 	}
 	return transformed;
+}
+
+void CompoundShape::setPose(const RigidTransform3d& pose)
+{   /// this should be just like getTransformed, except instead of using shape.second we should use m_localPoses
+	/// look up what the code path used to be before I changed RigidCollisionRep.
+	WriteLock(m_mutex);
+	size_t index = 0;
+	for (auto& shape : m_shapes)
+	{
+		const auto& localPose = m_localPoses[index++];
+		const auto newPose = pose * localPose;
+		if (shape.first->isTransformable())
+		{
+			shape.first->setPose(newPose);
+			auto mesh = std::dynamic_pointer_cast<Math::MeshShape>(shape.first);
+			if (mesh != nullptr)
+			{
+				mesh->update();  // shouldn't be necessary, right?
+			}
+		}
+		shape.second = newPose;
+	}
+	m_lastSetPose = pose;
+	invalidateData();
 }
 
 }

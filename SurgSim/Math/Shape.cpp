@@ -43,6 +43,11 @@ std::shared_ptr<Shape> Shape::getTransformed(const RigidTransform3d& pose) const
 	return nullptr;
 }
 
+void Shape::setPose(const RigidTransform3d& pose)
+{
+	SURGSIM_FAILURE() << "setPose not implemented for " << getClassName();
+}
+
 std::string Shape::getClassName() const
 {
 	SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<

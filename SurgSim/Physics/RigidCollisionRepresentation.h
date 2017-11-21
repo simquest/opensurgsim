@@ -47,8 +47,6 @@ public:
 	bool doInitialize() override;
 	bool doWakeUp() override;
 
-	/// Get the pose of the representation
-	/// \return The pose of this representation
 	SurgSim::Math::RigidTransform3d getPose() const override;
 
 	/// Get the shape type id

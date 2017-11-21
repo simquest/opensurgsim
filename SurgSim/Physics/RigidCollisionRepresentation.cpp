@@ -23,8 +23,6 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 
-#include <iostream>
-
 namespace SurgSim
 {
 namespace Physics
@@ -82,14 +80,7 @@ bool RigidCollisionRepresentation::doWakeUp()
 		}
 		else
 		{
-			if (shape->isTransformable())
-			{
-				m_shape = shape->getTransformed(physicsRepresentation->getCurrentState().getPose());
-			}
-			else
-			{
-				m_shape = shape;
-			}
+			setShape(shape);
 		}
 	}
 	return result;
@@ -122,6 +113,15 @@ void RigidCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::Shape
 	SURGSIM_ASSERT(shape != nullptr) <<
 		"Cannot set nullptr Shape on Rigid Collision Representation " << getFullName();
 	m_shape = shape;
+	auto firstShape = shape;
+	if (shape->isTransformable())
+	{
+		firstShape = shape->getTransformed(Math::RigidTransform3d::Identity());
+	}
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(firstShape, Math::RigidTransform3d::Identity());
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeSecond(m_shape, Math::RigidTransform3d::Identity());
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeSecond);
+	setPosedShapeMotion(posedShapeMotion);
 }
 
 SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
@@ -135,27 +135,28 @@ SurgSim::Math::RigidTransform3d RigidCollisionRepresentation::getPose() const
 
 void RigidCollisionRepresentation::updateShapeData()
 {
-	auto verticesShape = std::dynamic_pointer_cast<Math::VerticesShape>(getShape());
 	auto physicsRepresentation = m_physicsRepresentation.lock();
 	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
 		"PhysicsRepresentation went out of scope for Collision Representation " << getFullName();
-	if (verticesShape != nullptr)
+	if (m_shape->isTransformable())
 	{
 		const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
 		const Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
 		Math::RigidTransform3d currentPose = physicsCurrentPose * transform;
-		verticesShape->setPose(currentPose);
-		m_aabb = verticesShape->getBoundingBox();
+		
+		m_shape->setPose(currentPose);
+		m_aabb = m_shape->getBoundingBox();
 
+		// TODO(ryanbeasley):  This probably won't handle CompoundShapes correctly if the subshapes' poses change.
 		if ((getCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS) ||
 			(getSelfCollisionDetectionType() == Collision::COLLISION_DETECTION_TYPE_CONTINUOUS))
 		{
 			const Math::RigidTransform3d& physicsPreviousPose = physicsRepresentation->getPreviousState().getPose();
 			const Math::RigidTransform3d previousPose = physicsPreviousPose * transform;
-			m_aabb.extend(Math::transformAabb(previousPose, verticesShape->getBoundingBox()));
+			m_aabb.extend(Math::transformAabb(previousPose, m_shape->getBoundingBox()));
 		}
 	}
-	else if (getShape() != nullptr)
+	else
 	{
 		m_aabb = Math::transformAabb(getPose(), getShape()->getBoundingBox());
 
@@ -171,6 +172,7 @@ void RigidCollisionRepresentation::updateShapeData()
 
 void RigidCollisionRepresentation::updateDcdData()
 {
+	// this should become ifTransformable and setpose?
 	if (getShape()->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
 		getShape()->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
 	{
@@ -197,7 +199,6 @@ void RigidCollisionRepresentation::updateDcdData()
 
 void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 {
-	std::cout << "In updateCcdData for " << getFullName() << std::endl;
 	using Math::PosedShape;
 	using Math::PosedShapeMotion;
 	using Math::Shape;
@@ -214,28 +215,32 @@ void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 	previousPose = physicsPreviousPose * transform;
 	currentPose = physicsCurrentPose * transform;
 
+	// TODO(ryanbeasley):  This probably won't handle CompoundShapes correctly if the subshapes' poses change,
+	// because the previous shape is a deep copy and is thus not changing its poses similarly.
 	if (!previousPose.isApprox(m_previousCcdPreviousPose) || !currentPose.isApprox(m_previousCcdCurrentPose))
 	{
 		m_previousCcdPreviousPose = previousPose;
 		m_previousCcdCurrentPose = currentPose;
-		std::shared_ptr<Shape> previousShape = getShape();
-		std::shared_ptr<Shape> currentShape = getShape();
+		auto posedShapeMotion = getPosedShapeMotion();
+		auto previousShape = posedShapeMotion.first.getShape();
+		auto currentShape = posedShapeMotion.second.getShape();
 		if (currentShape->isTransformable())
 		{
-			previousShape = currentShape->getTransformed(previousPose);  // is this really what we want to do?  This makes copies right?
-			// Also, do we even do this update on all rigid collision reps?  Or do we miss some?
-			currentShape = currentShape->getTransformed(currentPose);
+			previousShape->setPose(previousPose);
+			currentShape->setPose(currentPose);
+			m_aabb = previousShape->getBoundingBox();
 			m_aabb.extend(currentShape->getBoundingBox());
 		}
 		else
 		{
-			m_aabb.extend(Math::transformAabb(getPose(), currentShape->getBoundingBox()));
+			m_aabb = Math::transformAabb(previousPose, currentShape->getBoundingBox());
+			m_aabb.extend(Math::transformAabb(currentPose, currentShape->getBoundingBox()));
 		}
 
 		PosedShape<std::shared_ptr<Shape>> posedShape1(previousShape, previousPose);
 		PosedShape<std::shared_ptr<Shape>> posedShape2(currentShape, currentPose);
-		PosedShapeMotion<std::shared_ptr<Shape>> posedShapeMotion(posedShape1, posedShape2);
-		setPosedShapeMotion(posedShapeMotion);
+		PosedShapeMotion<std::shared_ptr<Shape>> newPosedShapeMotion(posedShape1, posedShape2);
+		setPosedShapeMotion(newPosedShapeMotion);
 
 		// HS-2-Mar-2016
 		// #todo Add AABB tree for the posedShapeMotion (i.e. that is the tree where each bounding box consists of the

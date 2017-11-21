@@ -20,8 +20,6 @@
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
 
-#include <iostream>
-
 
 namespace SurgSim
 {
@@ -83,31 +81,7 @@ void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::share
 
 std::shared_ptr<Math::Shape> Representation::getPosedShape()
 {
-	if (getShape()->isTransformable())
-	{
-		// HS-3-mar-2016 This is still being used by all representations it will be superceded by
-		// local update functionality after ryans merge request goes in
-		// #todo get rid of this in favor of transforming the mesh shape
-		boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-		Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
-		Math::RigidTransform3d pose = getPose();
-		if (pose.isApprox(identity))
-		{
-			Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-			m_posedShapeMotion.second = newPosedShape;
-		}
-		else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
-		{
-			Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
-			m_posedShapeMotion.second = newPosedShape;
-		}
-		return m_posedShapeMotion.second.getShape();
-	}
-	else
-	{
-		return getShape();
-	}
+	return m_posedShapeMotion.second.getShape();
 }
 
 void Representation::invalidatePosedShapeMotion()
@@ -304,8 +278,6 @@ void Representation::updateCcdData(double timeOfImpact)
 
 void Representation::updateShapeData()
 {
-	std::cout << "In CollisionRep::updateShapeData() for " << getFullName() << std::endl;
-	getPosedShape();
 }
 
 }; // namespace Collision

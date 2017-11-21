@@ -204,6 +204,11 @@ void DeformableCollisionRepresentation::setShape(std::shared_ptr<SurgSim::Math::
 	{
 		m_previousShape.reset();
 	}
+
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_previousShape, Math::RigidTransform3d::Identity());
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeSecond(m_shape, Math::RigidTransform3d::Identity());
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeSecond);
+	setPosedShapeMotion(posedShapeMotion);
 }
 
 std::shared_ptr<Math::Shape> DeformableCollisionRepresentation::getShape() const

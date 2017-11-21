@@ -98,6 +98,10 @@ public:
 	/// \return the posed shape
 	virtual std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const;
 
+	/// Set the pose on a transformable shape.
+	/// \param pose The pose to transform the shape by.
+	virtual void setPose(const RigidTransform3d& pose);
+
 	/// Get class name
 	virtual std::string getClassName() const;
 
