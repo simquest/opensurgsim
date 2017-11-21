@@ -79,9 +79,9 @@ void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::share
 	m_posedShapeMotion = posedShapeMotion;
 }
 
-std::shared_ptr<Math::Shape> Representation::getPosedShape()
+const Math::PosedShape<std::shared_ptr<Math::Shape>>& Representation::getPosedShape()
 {
-	return m_posedShapeMotion.second.getShape();
+	return m_posedShapeMotion.second;
 }
 
 void Representation::invalidatePosedShapeMotion()

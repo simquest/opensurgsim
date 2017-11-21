@@ -138,12 +138,16 @@ void RigidCollisionRepresentation::updateShapeData()
 	auto physicsRepresentation = m_physicsRepresentation.lock();
 	SURGSIM_ASSERT(physicsRepresentation != nullptr) <<
 		"PhysicsRepresentation went out of scope for Collision Representation " << getFullName();
+
+	auto posedShapeMotion = getPosedShapeMotion();
+	const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
+	const Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+	Math::RigidTransform3d currentPose = physicsCurrentPose * transform;
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(m_shape, currentPose);
+	setPosedShapeMotion(Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>(posedShapeMotion.first, posedShape2));
+
 	if (m_shape->isTransformable())
 	{
-		const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
-		const Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
-		Math::RigidTransform3d currentPose = physicsCurrentPose * transform;
-		
 		m_shape->setPose(currentPose);
 		m_aabb = m_shape->getBoundingBox();
 
