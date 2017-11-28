@@ -47,6 +47,13 @@ int ShapeCollisionRepresentation::getShapeType() const
 void ShapeCollisionRepresentation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	Representation::setLocalPose(pose);
+	if (m_shape->isTransformable())
+	{
+		m_shape->setPose(getPose());
+	}
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_shape, getPose());
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeFirst);
+	setPosedShapeMotion(posedShapeMotion);
 	update(0.0);
 }
 
@@ -54,6 +61,13 @@ void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math:
 {
 	SURGSIM_ASSERT(nullptr != shape) << "Can not set a empty shape.";
 	m_shape = shape;
+	if (m_shape->isTransformable())
+	{
+		m_shape->setPose(getPose());
+	}
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_shape, getPose());
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeFirst);
+	setPosedShapeMotion(posedShapeMotion);
 	update(0.0);
 }
 

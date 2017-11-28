@@ -262,8 +262,14 @@ void Representation::doRetire()
 
 Math::Aabbd Representation::getBoundingBox() const
 {
-	SURGSIM_ASSERT(getShape() != nullptr);
-	return Math::transformAabb(getPose(), getShape()->getBoundingBox());
+	const auto shape = getShape();
+	SURGSIM_ASSERT(shape != nullptr) << getFullName() << " does not have a shape! Cannot get bounding box.";
+	auto aabb = shape->getBoundingBox();
+	if (!shape->isTransformable())
+	{
+		aabb = Math::transformAabb(getPose(), aabb);
+	}
+	return aabb;
 }
 
 void Representation::updateDcdData()
@@ -278,6 +284,20 @@ void Representation::updateCcdData(double timeOfImpact)
 
 void Representation::updateShapeData()
 {
+	auto posedShapeMotion = getPosedShapeMotion();
+	const Math::RigidTransform3d& pose = getPose();
+
+	if (!pose.isApprox(posedShapeMotion.second.getPose()))
+	{
+		auto shape = getShape();
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(shape, pose);
+		setPosedShapeMotion(Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>(posedShapeMotion.first, posedShape2));
+
+		if (shape->isTransformable())
+		{
+			shape->setPose(pose);
+		}
+	}
 }
 
 }; // namespace Collision

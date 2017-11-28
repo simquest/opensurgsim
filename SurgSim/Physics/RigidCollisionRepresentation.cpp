@@ -215,7 +215,7 @@ void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 	const Math::RigidTransform3d& physicsCurrentPose = physicsRepresentation->getCurrentState().getPose();
 	const Math::RigidTransform3d& physicsPreviousPose = physicsRepresentation->getPreviousState().getPose();
 
-	Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
+	const Math::RigidTransform3d transform = physicsRepresentation->getLocalPose().inverse() * getLocalPose();
 	previousPose = physicsPreviousPose * transform;
 	currentPose = physicsCurrentPose * transform;
 

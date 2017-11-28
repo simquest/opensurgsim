@@ -183,7 +183,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeCompound()
 	transform = SurgSim::Math::makeRigidTransform(
 					SurgSim::Math::makeRotationQuaternion(-0.2, Vector3d(1.0, 0.0, 0.0)),
 					Vector3d(0.0, 0.0, 0.0));
-	shape->addShape(subShape, transform);
+	shape->addShape(subShape->getTransformed(SurgSim::Math::RigidTransform3d::Identity()), transform);  //should the identity be transform here???? .Fem1D*Compound
 
 	graphics = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("RightGraphics");
 	graphics->setLocalPose(transform);

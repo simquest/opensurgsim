@@ -80,6 +80,7 @@ std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
 		std::make_shared<ShapeCollisionRepresentation>("Shape");
 	shapeRep->setShape(shape);
 	shapeRep->setLocalPose(makeRigidTransform(shapeQuat, shapeTrans));
+	shapeRep->updateShapeData();
 
 	// Perform collision detection.
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(octreeRep, shapeRep);
