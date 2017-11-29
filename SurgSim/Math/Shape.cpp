@@ -61,5 +61,13 @@ const Math::Aabbd& Shape::getBoundingBox() const
 	return m_aabb;
 }
 
+void Shape::updateShape()
+{
+}
+
+void Shape::updateShapePartial()
+{
+}
+
 } // namespace Math
 } // namespace SurgSim

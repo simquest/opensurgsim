@@ -73,7 +73,6 @@ public:
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> getRigidRepresentation();
 
 	void updateShapeData() override;
-	void updateDcdData() override;
 	void updateCcdData(double timeOfImpact) override;
 
 	Math::Aabbd getBoundingBox() const override;
@@ -82,11 +81,7 @@ private:
 	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 	Math::Aabbd m_aabb;
-	double m_oldVolume;
-	double m_aabbThreshold;
-	Math::RigidTransform3d m_previousDcdPose;
 	Math::RigidTransform3d m_previousCcdPreviousPose;
-	Math::RigidTransform3d m_previousCcdCurrentPose;
 };
 
 }; // namespace Collision

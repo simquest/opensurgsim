@@ -218,6 +218,14 @@ protected:
 
 	std::shared_ptr<Framework::Logger> m_logger;
 
+	///@{
+	/// Used to optimize aabb tree updates.
+	double m_oldVolume;
+	double m_aabbThreshold;
+	Math::RigidTransform3d m_previousDcdPose;
+	Math::RigidTransform3d m_previousCcdCurrentPose;
+	///@}
+
 private:
 	/// The type of collision detection
 	CollisionDetectionType m_collisionDetectionType;

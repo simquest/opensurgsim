@@ -85,11 +85,26 @@ bool MeshShape::calculateNormals()
 	return result;
 }
 
+void MeshShape::updateShape()
+{
+	doUpdate();
+}
+
+void MeshShape::updateShapePartial()
+{
+	updateAabbTree();
+	calculateNormals();
+}
+
 bool MeshShape::doUpdate()
 {
 	buildAabbTree();
-	computeVolumeIntegrals();
-	return calculateNormals();
+	bool result = calculateNormals();
+	if (result)
+	{
+		computeVolumeIntegrals();
+	}
+	return result;
 }
 
 bool MeshShape::doLoad(const std::string& fileName)
@@ -167,7 +182,7 @@ void MeshShape::computeVolumeIntegrals()
 		const Vector3d& v2 = getVertexPosition(triangle.verticesId[2]);
 
 		// get edges and cross product of edges
-		Vector3d normal = (v1 - v0).cross(v2 - v0);
+		const Vector3d& normal = triangle.data.normal;
 
 		// compute integral terms
 		double f1x, f1y, f1z, f2x, f2y, f2z, f3x, f3y, f3z;

@@ -297,16 +297,29 @@ void CompoundShape::setPose(const RigidTransform3d& pose)
 		if (shape.first->isTransformable())
 		{
 			shape.first->setPose(newPose);
-			auto mesh = std::dynamic_pointer_cast<Math::MeshShape>(shape.first);
-			if (mesh != nullptr)
-			{
-				mesh->update();  // shouldn't be necessary, right?
-			}
 		}
 		shape.second = newPose;
 	}
 	m_lastSetPose = pose;
 	invalidateData();
+}
+
+void CompoundShape::updateShape()
+{
+	WriteLock(m_mutex);
+	for (auto& shape : m_shapes)
+	{
+		shape.first->updateShape();
+	}
+}
+
+void CompoundShape::updateShapePartial()
+{
+	WriteLock(m_mutex);
+	for (auto& shape : m_shapes)
+	{
+		shape.first->updateShapePartial();
+	}
 }
 
 }

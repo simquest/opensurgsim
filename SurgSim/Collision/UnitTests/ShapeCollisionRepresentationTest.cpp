@@ -51,7 +51,7 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setShape(originalMesh);
 	collisionRepresentation->setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
-	collisionRepresentation->update(dt);
+	collisionRepresentation->updateShapeData();
 
 	EXPECT_EQ(collisionRepresentation->getShapeType(), originalMesh->getType());
 
@@ -63,7 +63,8 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5),
 			Vector3d(8.7, -4.7, -3.1));
 	collisionRepresentation->setLocalPose(transform);
-	collisionRepresentation->update(dt);
+	collisionRepresentation->updateShapeData();
+	collisionRepresentation->updateDcdData();
 
 	actualMesh =
 		std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape().getShape());

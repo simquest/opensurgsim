@@ -17,7 +17,6 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
-#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/Representation.h"
 
 
@@ -29,9 +28,15 @@ namespace Collision
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
 	m_logger(Framework::Logger::getLogger("Collision/Representation")),
+	m_oldVolume(0.0),
+	m_aabbThreshold(0.01),
+	m_previousDcdPose(Math::RigidTransform3d::Identity()),
 	m_collisionDetectionType(COLLISION_DETECTION_TYPE_DISCRETE),
 	m_selfCollisionDetectionType(COLLISION_DETECTION_TYPE_NONE)
 {
+	m_previousDcdPose.translation() = Math::Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
+	m_previousCcdCurrentPose.translation() = Math::Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
+
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Ignore, getIgnoring, setIgnoring);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Allow, getAllowing, setAllowing);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, CollisionDetectionType, CollisionDetectionType,
@@ -274,7 +279,24 @@ Math::Aabbd Representation::getBoundingBox() const
 
 void Representation::updateDcdData()
 {
-
+	auto shape = getShape();
+	if (shape->isTransformable())
+	{
+		auto pose = getPose();
+		if (!pose.isApprox(m_previousDcdPose))
+		{
+			m_previousDcdPose = pose;
+			if (std::abs(m_oldVolume - shape->getBoundingBox().volume()) > m_oldVolume * m_aabbThreshold)
+			{
+				shape->updateShape();
+				m_oldVolume = shape->getBoundingBox().volume();
+			}
+			else
+			{
+				shape->updateShapePartial();
+			}
+		}
+	}
 }
 
 void Representation::updateCcdData(double timeOfImpact)

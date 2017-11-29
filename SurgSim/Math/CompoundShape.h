@@ -103,6 +103,8 @@ public:
 	bool isTransformable() const override;
 	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const override;
 	void setPose(const RigidTransform3d& pose) override;
+	void updateShape() override;
+	void updateShapePartial() override;
 
 private:
 

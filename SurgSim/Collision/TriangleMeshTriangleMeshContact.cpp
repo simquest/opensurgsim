@@ -154,12 +154,9 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 	std::vector<size_t> triangleListA;
 	std::vector<size_t> triangleListB;
 
-	std::cout << "In TriMeshTriMeshContact" << std::endl;
-
 	size_t myInt = 0;
 	for (auto intersection = intersectionList.begin(); intersection != intersectionList.end(); ++intersection)
 	{
-		std::cout << "intersection " << myInt++ << std::endl;
 		DataStructures::AabbTreeNode* nodeA = intersection->first;
 		DataStructures::AabbTreeNode* nodeB = intersection->second;
 
@@ -171,7 +168,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 
 		for (auto i = triangleListA.begin(); i != triangleListA.end(); ++i)
 		{
-			std::cout << "new triangleA" << std::endl << std::endl;
 			const Vector3d& normalA = meshA.getNormal(*i);
 			if (normalA.isZero())
 			{
@@ -191,8 +187,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 				auto verticesB = meshB.getTrianglePositions(*j);
 
 				// Check if the triangles intersect.
-				std::cout << "verticesA:\n" << verticesA[0].transpose() << "\n" << verticesA[1].transpose() << "\n" << verticesA[2].transpose() << "\n"
-					<< "verticesB:\n" << verticesB[0].transpose() << "\n" << verticesB[1].transpose() << "\n" << verticesB[2].transpose() << std::endl << std::endl;
 				if (Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
 						verticesB[0], verticesB[1], verticesB[2],
 						normalA, normalB, &depth,

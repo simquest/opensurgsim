@@ -80,6 +80,16 @@ void ParticlesShape::setRadius(double radius)
 	m_radius = radius;
 }
 
+void ParticlesShape::updateShape()
+{
+	doUpdate();
+}
+
+void ParticlesShape::updateShapePartial()
+{
+	doUpdate();
+}
+
 bool ParticlesShape::doUpdate()
 {
 	const double numParticles = static_cast<double>(getVertices().size());
@@ -147,12 +157,21 @@ void ParticlesShape::setPose(const RigidTransform3d& pose)
 	auto& vertices = getVertices();
 	const size_t numVertices = vertices.size();
 	const auto& initialVertices = m_initialVertices.getVertices();
+	m_aabb.setEmpty();
+
+	if (initialVertices.size() == 0)
+	{
+		setInitialVertices(*this);
+	}
+
 	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
 		"ParticlesShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
 		" vertices, vs initially " << initialVertices.size() << " vertices.";
+	const Vector3d radius = Vector3d::Constant(m_radius);
 	for (size_t i = 0; i < numVertices; ++i)
 	{
 		vertices[i].position = pose * initialVertices[i].position;
+		m_aabb.extend(SurgSim::Math::Aabbd(vertices[i].position - radius, vertices[i].position + radius));
 	}
 }
 

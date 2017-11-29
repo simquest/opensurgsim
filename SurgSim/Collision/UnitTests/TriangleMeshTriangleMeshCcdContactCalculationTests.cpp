@@ -195,17 +195,17 @@ void doTriangleMeshTriangleMeshTest(const std::shared_ptr<Math::MeshShape>& shap
 		PosedShape<std::shared_ptr<Shape>>(std::static_pointer_cast<Shape>(shapeA1), RigidTransform3d::Identity()),
 		PosedShape<std::shared_ptr<Shape>>(std::static_pointer_cast<Shape>(shapeA2), RigidTransform3d::Identity()));
 	auto meshARep = std::make_shared<MockCollisionRepresentation>("Collision Mesh 0");
-	meshARep->setPosedShapeMotionPublic(posedShapeAMotion);
 	meshARep->setShape(shapeA1);
 	meshARep->setCollisionDetectionType(COLLISION_DETECTION_TYPE_CONTINUOUS);
+	meshARep->setPosedShapeMotionPublic(posedShapeAMotion);
 
 	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeBMotion(
 		PosedShape<std::shared_ptr<Shape>>(std::static_pointer_cast<Shape>(shapeB1), RigidTransform3d::Identity()),
 		PosedShape<std::shared_ptr<Shape>>(std::static_pointer_cast<Shape>(shapeB2), RigidTransform3d::Identity()));
 	auto meshBRep = std::make_shared<MockCollisionRepresentation>("Collision Mesh 1");
-	meshBRep->setPosedShapeMotionPublic(posedShapeBMotion);
 	meshBRep->setShape(shapeB1);
 	meshBRep->setCollisionDetectionType(COLLISION_DETECTION_TYPE_CONTINUOUS);
+	meshBRep->setPosedShapeMotionPublic(posedShapeBMotion);
 
 	// Perform collision detection.
 	TriangleMeshTriangleMeshContact calcContact;

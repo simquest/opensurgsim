@@ -47,14 +47,16 @@ int ShapeCollisionRepresentation::getShapeType() const
 void ShapeCollisionRepresentation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	Representation::setLocalPose(pose);
-	if (m_shape->isTransformable())
+	if (m_shape != nullptr)
 	{
-		m_shape->setPose(getPose());
+		if (m_shape->isTransformable())
+		{
+			m_shape->setPose(getPose());
+		}
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_shape, getPose());
+		Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeFirst);
+		setPosedShapeMotion(posedShapeMotion);
 	}
-	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_shape, getPose());
-	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeFirst);
-	setPosedShapeMotion(posedShapeMotion);
-	update(0.0);
 }
 
 void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape)
@@ -68,7 +70,6 @@ void ShapeCollisionRepresentation::setShape(const std::shared_ptr<SurgSim::Math:
 	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_shape, getPose());
 	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeFirst);
 	setPosedShapeMotion(posedShapeMotion);
-	update(0.0);
 }
 
 std::shared_ptr<Math::Shape> ShapeCollisionRepresentation::getShape() const
@@ -85,6 +86,28 @@ bool ShapeCollisionRepresentation::doInitialize()
 	}
 
 	return true;
+}
+
+void ShapeCollisionRepresentation::updateCcdData(double timeOfImpact)
+{
+	using Math::PosedShape;
+	using Math::PosedShapeMotion;
+	using Math::Shape;
+
+	Math::RigidTransform3d pose = getPose();
+	if (!pose.isApprox(m_previousCcdCurrentPose))
+	{
+		m_previousCcdCurrentPose = pose;
+		if (m_shape->isTransformable())
+		{
+			m_shape->setPose(pose);
+			m_shape->updateShape();
+		}
+
+		PosedShape<std::shared_ptr<Shape>> posedShape1(m_shape, pose);
+		PosedShapeMotion<std::shared_ptr<Shape>> newPosedShapeMotion(posedShape1, posedShape1);
+		setPosedShapeMotion(newPosedShapeMotion);
+	}
 }
 
 }; // namespace Collision

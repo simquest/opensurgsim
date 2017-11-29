@@ -102,6 +102,13 @@ public:
 	/// \param pose The pose to transform the shape by.
 	virtual void setPose(const RigidTransform3d& pose);
 
+	/// Update the internals of a transformable shape.
+	virtual void updateShape();
+
+	/// Update some of the internals of a transformable shape.
+	/// Only called if the AABB has not changed much.
+	virtual void updateShapePartial();
+
 	/// Get class name
 	virtual std::string getClassName() const;
 

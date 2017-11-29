@@ -19,7 +19,6 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/MathConvert.h"
-#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Physics/RigidRepresentationBase.h"
 
@@ -31,16 +30,9 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::RigidCollision
 				 RigidCollisionRepresentation);
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
-	Representation(name),
-	m_oldVolume(0.0),
-	m_aabbThreshold(0.01)
+	Representation(name)
 {
-	m_previousDcdPose.translation() = Math::Vector3d(std::numeric_limits<double>::max(),
-		std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
-	m_previousCcdPreviousPose.translation() = Math::Vector3d(std::numeric_limits<double>::max(),
-		std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
-	m_previousCcdCurrentPose.translation() = Math::Vector3d(std::numeric_limits<double>::max(),
-		std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+	m_previousCcdPreviousPose.translation() = Math::Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidCollisionRepresentation, std::shared_ptr<SurgSim::Math::Shape>,
 									  Shape, getShape, setShape);
 }
@@ -174,33 +166,6 @@ void RigidCollisionRepresentation::updateShapeData()
 }
 
 
-void RigidCollisionRepresentation::updateDcdData()
-{
-	// this should become ifTransformable and setpose?
-	if (getShape()->getType() == SurgSim::Math::SHAPE_TYPE_MESH ||
-		getShape()->getType() == SurgSim::Math::SHAPE_TYPE_SURFACEMESH)
-	{
-		auto meshShape = dynamic_cast<SurgSim::Math::MeshShape*>(getShape().get());
-		SURGSIM_ASSERT(meshShape != nullptr) << "The shape is neither a mesh nor a surface mesh";
-		auto pose = getPose();
-		if (!pose.isApprox(m_previousDcdPose))
-		{
-			m_previousDcdPose = pose;
-			if (std::abs(m_oldVolume - meshShape->getBoundingBox().volume()) > m_oldVolume * m_aabbThreshold)
-			{
-				meshShape->update();
-				m_oldVolume = meshShape->getBoundingBox().volume();
-			}
-			else
-			{
-				meshShape->updateAabbTree();
-				meshShape->calculateNormals();
-			}
-		}
-	}
-}
-
-
 void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 {
 	using Math::PosedShape;
@@ -223,20 +188,34 @@ void RigidCollisionRepresentation::updateCcdData(double timeOfImpact)
 	// because the previous shape is a deep copy and is thus not changing its poses similarly.
 	if (!previousPose.isApprox(m_previousCcdPreviousPose) || !currentPose.isApprox(m_previousCcdCurrentPose))
 	{
-		m_previousCcdPreviousPose = previousPose;
-		m_previousCcdCurrentPose = currentPose;
 		auto posedShapeMotion = getPosedShapeMotion();
 		auto previousShape = posedShapeMotion.first.getShape();
 		auto currentShape = posedShapeMotion.second.getShape();
+
 		if (currentShape->isTransformable())
 		{
-			previousShape->setPose(previousPose);
-			currentShape->setPose(currentPose);
+			if (!previousPose.isApprox(m_previousCcdPreviousPose))
+			{
+				m_previousCcdPreviousPose = previousPose;
+				previousShape->setPose(previousPose);
+				previousShape->updateShape();
+			}
+
+			if (!currentPose.isApprox(m_previousCcdCurrentPose))
+			{
+				m_previousCcdCurrentPose = currentPose;
+				currentShape->setPose(currentPose);
+				//TODO(ryanbeasley): the currentShape may have been updated in updateDcdData, so this may be skippable.
+				currentShape->updateShape();
+			}
+
 			m_aabb = previousShape->getBoundingBox();
 			m_aabb.extend(currentShape->getBoundingBox());
 		}
 		else
 		{
+			m_previousCcdPreviousPose = previousPose;
+			m_previousCcdCurrentPose = currentPose;
 			m_aabb = Math::transformAabb(previousPose, currentShape->getBoundingBox());
 			m_aabb.extend(Math::transformAabb(currentPose, currentShape->getBoundingBox()));
 		}
