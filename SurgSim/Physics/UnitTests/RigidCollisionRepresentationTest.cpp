@@ -211,8 +211,8 @@ TEST_F(RigidCollisionRepresentationTest, GetPosedShape)
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 	ASSERT_TRUE(collisionRepresentation->initialize(runtime));
 	ASSERT_TRUE(collisionRepresentation->wakeUp());
-
-	collisionRepresentation->update(dt);
+	collisionRepresentation->updateShapeData();
+	collisionRepresentation->updateDcdData();
 
 	auto actualMesh =
 		std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape().getShape());
@@ -223,7 +223,8 @@ TEST_F(RigidCollisionRepresentationTest, GetPosedShape)
 								 Vector3d(-1.5, 7.5, -2.5),
 								 Vector3d(8.7, -4.7, -3.1));
 	collisionRepresentation->setLocalPose(transform);
-	collisionRepresentation->update(dt);
+	collisionRepresentation->updateShapeData();
+	collisionRepresentation->updateDcdData();
 
 	actualMesh =
 		std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape().getShape());
@@ -254,8 +255,8 @@ TEST_F(RigidCollisionRepresentationTest, MeshPoseTest)
 	collisionRepresentation->setShape(physicsRepresentation->getShape());
 	ASSERT_TRUE(collisionRepresentation->initialize(runtime));
 	ASSERT_TRUE(collisionRepresentation->wakeUp());
-
-	collisionRepresentation->update(dt);
+	collisionRepresentation->updateShapeData();
+	collisionRepresentation->updateDcdData();
 
 	auto actualMesh =
 		std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape().getShape());
@@ -266,7 +267,8 @@ TEST_F(RigidCollisionRepresentationTest, MeshPoseTest)
 		Vector3d(-1.5, 7.5, -2.5),
 		Vector3d(8.7, -4.7, -3.1));
 	collisionRepresentation->setLocalPose(transform);
-	collisionRepresentation->update(dt);
+	collisionRepresentation->updateShapeData();
+	collisionRepresentation->updateDcdData();
 
 	actualMesh =
 		std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape().getShape());

@@ -458,11 +458,10 @@ bool MockFemRepresentation::hasSetInitialStateBeenCalled()
 	return m_setInitialStateCalled;
 }
 
-SurgSim::Math::Matrix
-MockFemRepresentationValidComplianceWarping::getNodeTransformation(const SurgSim::Math::OdeState& state,
-	size_t nodeId) const
+void MockFemRepresentationValidComplianceWarping::calculateComplianceWarpingTransformation(
+	const SurgSim::Math::OdeState& state)
 {
-	return SurgSim::Math::Matrix::Identity(getNumDofPerNode(), getNumDofPerNode());
+	m_complianceWarpingTransformation.setIdentity();
 }
 
 MockFem1DRepresentation::MockFem1DRepresentation(const std::string& name) : SurgSim::Physics::Fem1DRepresentation(name)

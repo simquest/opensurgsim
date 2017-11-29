@@ -140,7 +140,7 @@ void RigidCollisionRepresentation::updateShapeData()
 
 	if (m_shape->isTransformable())
 	{
-		m_shape->setPose(currentPose);
+		m_shape->setPose(currentPose); // we only need to call this if the pose changes...
 		m_aabb = m_shape->getBoundingBox();
 
 		// TODO(ryanbeasley):  This probably won't handle CompoundShapes correctly if the subshapes' poses change.
