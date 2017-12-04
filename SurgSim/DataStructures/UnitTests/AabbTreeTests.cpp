@@ -29,6 +29,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Testing/MathUtilities.h"
 
+#include "SurgSim/DataStructures/AabbTree2.h"
+
 using SurgSim::Math::Aabbd;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -113,6 +115,45 @@ TEST(AabbTreeTests, BuildTest)
 					   mesh->getVertex(triangle.verticesId[2]).position));
 		tree->add(std::move(aabb), i);
 	}
+}
+
+TEST(AabbTreeTests, BatchBuildTestAabbTree2)
+{
+
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	auto tree = std::make_shared<SurgSim::Experimental::AabbTree>();
+
+	auto mesh = std::make_shared<TriangleMeshPlain>();
+	mesh->load("Geometry/arm_collision.ply");
+
+	std::vector<Math::Aabbd> aabbs;
+	std::vector<size_t> indices;
+	aabbs.reserve(mesh->getNumTriangles());
+	indices.reserve(mesh->getNumTriangles());
+	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
+	{
+		auto triangle = mesh->getTriangle(i);
+		Aabbd aabb(SurgSim::Math::makeAabb(
+			mesh->getVertex(triangle.verticesId[0]).position,
+			mesh->getVertex(triangle.verticesId[1]).position,
+			mesh->getVertex(triangle.verticesId[2]).position));
+		aabbs.emplace_back(std::move(aabb));
+		indices.push_back(i);
+	}
+	tree->build(aabbs, &indices);
+
+	std::vector<Aabbd> bounds;
+	bounds.reserve(mesh->getNumTriangles());
+	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
+	{
+		auto triangle = mesh->getTriangle(i);
+		Aabbd aabb(SurgSim::Math::makeAabb(
+			mesh->getVertex(triangle.verticesId[0]).position,
+			mesh->getVertex(triangle.verticesId[1]).position,
+			mesh->getVertex(triangle.verticesId[2]).position));
+		bounds.push_back(std::move(aabb));
+	}
+	tree->update(bounds);
 }
 
 TEST(AabbTreeTests, BatchBuildTest)

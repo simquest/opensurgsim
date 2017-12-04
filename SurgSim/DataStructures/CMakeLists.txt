@@ -16,6 +16,7 @@
 
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	AabbTree.cpp
+	AabbTree2.cpp
 	AabbTreeData.cpp
 	AabbTreeIntersectionVisitor.cpp
 	AabbTreeNode.cpp
@@ -37,6 +38,7 @@ set(SURGSIM_DATA_STRUCTURES_SOURCES
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
 	AabbTree.h
+	AabbTree2.h
 	AabbTreeData.h
 	AabbTreeIntersectionVisitor.h
 	AabbTreeNode.h
