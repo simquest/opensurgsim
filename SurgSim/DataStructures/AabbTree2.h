@@ -47,6 +47,8 @@ public:
 
 	void spatialJoin(const AabbTree & other, std::vector<std::pair<size_t, size_t>>* triangles);
 
+	void recursiveSpatialJoin(const AabbTree & other, std::vector<std::pair<size_t, size_t>>* triangles, size_t myNode, size_t otherNode);
+
 private:
 	std::vector<AabbTreeNode> m_nodes;
 	

@@ -1,8 +1,11 @@
 #include "AabbTree2.h"
 
+#include <stack>
+
 namespace SurgSim {
 	namespace Experimental {
-		
+		std::vector<std::pair<size_t, size_t>> stack;
+
 		void AabbTree::build(std::vector<Math::Aabbd>& aabbs, std::vector<size_t>* indices)
 		{
 			m_nodes.reserve(indices->size() * 2);
@@ -12,8 +15,8 @@ namespace SurgSim {
 
 		void AabbTree::spatialJoin(const AabbTree & other, std::vector<std::pair<size_t, size_t>>* triangles)
 		{
-			std::vector<std::pair<size_t, size_t>> stack;
-			stack.emplace_back(0, 0);
+			stack.clear();
+			stack.push_back(std::make_pair(0, 0));
 
 			while (!stack.empty())
 			{
@@ -52,6 +55,39 @@ namespace SurgSim {
 			}
 		}
 
+		void AabbTree::recursiveSpatialJoin(const AabbTree & other, std::vector<std::pair<size_t, size_t>>* triangles,
+			size_t myIndex, size_t otherIndex)
+		{
+				if (m_nodes[myIndex].aabb.intersects(other.m_nodes[otherIndex].aabb))
+				{
+					unsigned char value = (isLeaf(m_nodes[myIndex])) ? 1 : 0;
+					value |= (isLeaf(m_nodes[otherIndex])) ? 2 : 0;
+
+					switch (value)
+					{
+					case 0:
+						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].left, other.m_nodes[otherIndex].left);
+						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].left, other.m_nodes[otherIndex].right);
+						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].right, other.m_nodes[otherIndex].left);
+						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].right, other.m_nodes[otherIndex].right);
+						break;
+					case 1:
+						recursiveSpatialJoin(other, triangles, myIndex, other.m_nodes[otherIndex].left);
+						recursiveSpatialJoin(other, triangles, myIndex, other.m_nodes[otherIndex].right);
+						break;
+					case 2:
+						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].left, otherIndex);
+						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].right, otherIndex);
+						break;
+					case 3:
+						triangles->emplace_back(myIndex, otherIndex);
+						break;
+					default:
+						break;
+					}
+				}
+		}
+
 		size_t AabbTree::build(
 			std::vector<Math::Aabbd>& aabb,
 			std::vector<size_t>* indices,
@@ -78,12 +114,6 @@ namespace SurgSim {
 				}
 				default:
 				{
-					Math::Vector3d min(std::numeric_limits<double>::max(),
-						std::numeric_limits<double>::max(),
-						std::numeric_limits<double>::max());
-					Math::Vector3d max(std::numeric_limits<double>::min(),
-						std::numeric_limits<double>::min(), 
-						std::numeric_limits<double>::min());
 
 					Math::Aabbd extent;
 					for (auto item = start; item < end; ++item)
