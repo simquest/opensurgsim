@@ -171,7 +171,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeCompound()
 
 	auto copier = std::make_shared<SurgSim::Blocks::CompoundShapeToGraphics>("Copier");
 	copier->setSource(physics);
-	element->addComponent(copier);
+	//element->addComponent(copier);
 
 	auto graphics = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("LeftGraphics");
 	graphics->setLocalPose(transform);
