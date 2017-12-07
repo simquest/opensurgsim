@@ -242,8 +242,8 @@ void CompoundShape::setPose(size_t index, const RigidTransform3d& pose)
 {
 	WriteLock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
-	m_shapes[index].second = m_lastSetPose * pose;
 	m_localPoses[index] = pose;
+	m_shapes[index].second = m_lastSetPose * pose;
 	invalidateData();
 }
 
@@ -286,8 +286,7 @@ std::shared_ptr<Shape> CompoundShape::getTransformed(const RigidTransform3d& pos
 }
 
 void CompoundShape::setPose(const RigidTransform3d& pose)
-{   /// this should be just like getTransformed, except instead of using shape.second we should use m_localPoses
-	/// look up what the code path used to be before I changed RigidCollisionRep.
+{
 	WriteLock(m_mutex);
 	size_t index = 0;
 	for (auto& shape : m_shapes)
@@ -297,8 +296,12 @@ void CompoundShape::setPose(const RigidTransform3d& pose)
 		if (shape.first->isTransformable())
 		{
 			shape.first->setPose(newPose);
+			shape.second = localPose;
 		}
-		shape.second = newPose;
+		else
+		{
+			shape.second = newPose;
+		}
 	}
 	m_lastSetPose = pose;
 	invalidateData();
