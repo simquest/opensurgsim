@@ -113,8 +113,8 @@ private:
 	void invalidateData();
 
 	std::vector<SubShape> m_shapes;
-	std::vector<RigidTransform3d> m_localPoses;
-	RigidTransform3d m_lastSetPose;
+	std::vector<UnalignedRigidTransform3d> m_localPoses;
+	UnalignedRigidTransform3d m_lastSetPose;
 
 	typedef boost::shared_lock<boost::shared_mutex> ReadLock;
 	typedef boost::unique_lock<boost::shared_mutex> WriteLock;

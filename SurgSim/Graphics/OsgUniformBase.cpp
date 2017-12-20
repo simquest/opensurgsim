@@ -18,6 +18,8 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/MathConvert.h"
 
+#include <iostream>
+
 using SurgSim::Graphics::OsgUniformBase;
 
 OsgUniformBase::OsgUniformBase(const std::string& name) : UniformBase(),
