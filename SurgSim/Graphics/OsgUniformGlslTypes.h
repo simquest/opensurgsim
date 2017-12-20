@@ -84,8 +84,15 @@ inline const std::string getGlslType<SurgSim::Math::Vector3f>()
 {
 	return "vec3";
 }
+
 template <>
 inline const std::string getGlslType<SurgSim::Math::Vector4f>()
+{
+	return "vec4";
+}
+
+template <>
+inline const std::string getGlslType<SurgSim::Math::UnalignedVector4f>()
 {
 	return "vec4";
 }
@@ -100,6 +107,7 @@ inline const std::string getGlslType<SurgSim::Math::Vector3d>()
 {
 	return "dvec3";
 }
+
 template <>
 inline const std::string getGlslType<SurgSim::Math::Vector4d>()
 {
@@ -107,15 +115,31 @@ inline const std::string getGlslType<SurgSim::Math::Vector4d>()
 }
 
 template <>
+inline const std::string getGlslType<SurgSim::Math::UnalignedVector4d>()
+{
+	return "dvec4";
+}
+
+
+template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix22f>()
 {
 	return "mat2";
 }
+
+template <>
+inline const std::string getGlslType<SurgSim::Math::UnalignedMatrix22f>()
+{
+	return "mat2";
+}
+
+
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix33f>()
 {
 	return "mat3";
 }
+
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix44f>()
 {
@@ -123,20 +147,43 @@ inline const std::string getGlslType<SurgSim::Math::Matrix44f>()
 }
 
 template <>
+inline const std::string getGlslType<SurgSim::Math::UnalignedMatrix44f>()
+{
+	return "mat4";
+}
+
+
+template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix22d>()
 {
 	return "dmat2";
 }
+
+template <>
+inline const std::string getGlslType<SurgSim::Math::UnalignedMatrix22d>()
+{
+	return "dmat2";
+}
+
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix33d>()
 {
 	return "dmat3";
 }
+
 template <>
 inline const std::string getGlslType<SurgSim::Math::Matrix44d>()
 {
 	return "dmat4";
 }
+
+template <>
+inline const std::string getGlslType<SurgSim::Math::UnalignedMatrix44d>()
+{
+	return "dmat4";
+}
+
+
 
 /// \note This name depends on the fact of OSS using integer types for the texture types if we introduce
 /// a different type as the data type for the texture, the name has to be changed accordingly

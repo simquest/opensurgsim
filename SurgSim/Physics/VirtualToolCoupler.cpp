@@ -163,20 +163,21 @@ void VirtualToolCoupler::update(double dt)
 	}
 
 	RigidTransform3d inputPose;
+	RigidTransform3d previousInputPose(m_previousInputPose); // Use Aligned version
 	if (inputData.poses().get(m_poseIndex, &inputPose))
 	{
 		Vector3d inputLinearVelocity(Vector3d::Zero());
 		const bool gotInputLinearVelocity = inputData.vectors().get(m_linearVelocityIndex, &inputLinearVelocity);
 		if (!gotInputLinearVelocity)
 		{
-			inputLinearVelocity = (inputPose.translation() - m_previousInputPose.translation()) / dt;
+			inputLinearVelocity = (inputPose.translation() - previousInputPose.translation()) / dt;
 		}
 
 		Vector3d inputAngularVelocity(Vector3d::Zero());
 		const bool gotInputAngularVelocity = inputData.vectors().get(m_angularVelocityIndex, &inputAngularVelocity);
 		if (!gotInputAngularVelocity)
 		{
-			Math::computeRotationVector(inputPose, m_previousInputPose, &inputAngularVelocity);
+			Math::computeRotationVector(inputPose, previousInputPose, &inputAngularVelocity);
 			inputAngularVelocity /= dt;
 		}
 		m_previousInputPose = inputPose;

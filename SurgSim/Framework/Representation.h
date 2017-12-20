@@ -41,19 +41,21 @@ public:
 
 	/// Set the pose of the representation with respect to the Scene Element
 	/// \param pose The pose to set the representation to
-	virtual void setLocalPose(const SurgSim::Math::RigidTransform3d& pose);
+	virtual void setLocalPose(const SurgSim::Math::UnalignedRigidTransform3d& pose);
 
 	/// Get the pose of the representation with respect to the Scene Element
 	/// \return The pose of this representation
-	virtual SurgSim::Math::RigidTransform3d getLocalPose() const;
+	virtual SurgSim::Math::UnalignedRigidTransform3d getLocalPose() const;
 
 	/// Get the pose of the representation in world coordinates
 	/// \return The pose of this representation
 	virtual SurgSim::Math::RigidTransform3d getPose() const;
 
 private:
+	SurgSim::Math::UnalignedRigidTransform3d getUnalignedPose() const;
+
 	/// Local Pose of the Representation with respect to the SceneElement
-	SurgSim::Math::RigidTransform3d m_localPose;
+	SurgSim::Math::UnalignedRigidTransform3d m_localPose;
 
 	bool doInitialize() override;
 	bool doWakeUp() override;

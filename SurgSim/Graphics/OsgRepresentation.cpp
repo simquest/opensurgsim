@@ -39,7 +39,7 @@ namespace Graphics
 OsgRepresentation::OsgRepresentation(const std::string& name) :
 	Representation(name),
 	m_drawAsWireFrame(false),
-	m_modelMatrixUniform(std::make_shared<OsgUniform<SurgSim::Math::Matrix44f>>("modelMatrix"))
+	m_modelMatrixUniform(new OsgUniform<SurgSim::Math::UnalignedMatrix44f>("modelMatrix"))
 {
 	{
 		typedef std::vector<std::shared_ptr<Graphics::OsgUniformBase>> ParamType;

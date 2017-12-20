@@ -235,11 +235,11 @@ TEST(OsgCameraTests, Serialization)
 	std::shared_ptr<OsgCamera> camera = std::make_shared<OsgCamera>("TestOsgCamera");
 
 	// Set values.
-	SurgSim::Math::Matrix44d projection = SurgSim::Math::Matrix44d::Random();
+	SurgSim::Math::UnalignedMatrix44d projection = SurgSim::Math::Matrix44d::Random();
 	std::array<double, 2> viewport = { 1024, 768};
 	camera->setValue("ProjectionMatrix", projection);
 	camera->setValue("ViewportSize", viewport);
-	camera->setValue("AmbientColor", SurgSim::Math::Vector4d(0.1, 0.2, 0.3, 0.4));
+	camera->setValue("AmbientColor", SurgSim::Math::UnalignedVector4d(0.1, 0.2, 0.3, 0.4));
 	camera->setViewport(10, 20, 30, 50);
 
 	// Serialize.
@@ -252,15 +252,15 @@ TEST(OsgCameraTests, Serialization)
 	EXPECT_NE(nullptr, newCamera);
 
 	// Verify.
-	EXPECT_TRUE(boost::any_cast<SurgSim::Math::Matrix44d>(camera->getValue("ProjectionMatrix")).isApprox(
-					boost::any_cast<SurgSim::Math::Matrix44d>(newCamera->getValue("ProjectionMatrix"))));
+	EXPECT_TRUE(boost::any_cast<SurgSim::Math::UnalignedMatrix44d>(camera->getValue("ProjectionMatrix")).isApprox(
+					boost::any_cast<SurgSim::Math::UnalignedMatrix44d>(newCamera->getValue("ProjectionMatrix"))));
 
 	typedef std::array<double, 2> ParamType;
 	EXPECT_TRUE(boost::any_cast<ParamType>(camera->getValue("ViewportSize")) ==
 				boost::any_cast<ParamType>(newCamera->getValue("ViewportSize")));
 
-	EXPECT_TRUE(boost::any_cast<SurgSim::Math::Vector4d>(camera->getValue("AmbientColor")).isApprox(
-					boost::any_cast<SurgSim::Math::Vector4d>(newCamera->getValue("AmbientColor"))));
+	EXPECT_TRUE(boost::any_cast<SurgSim::Math::UnalignedVector4d>(camera->getValue("AmbientColor")).isApprox(
+					boost::any_cast<SurgSim::Math::UnalignedVector4d>(newCamera->getValue("AmbientColor"))));
 }
 
 TEST(OsgCameraTests, SetProjection)

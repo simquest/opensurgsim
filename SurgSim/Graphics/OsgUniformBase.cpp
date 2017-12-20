@@ -59,6 +59,7 @@ bool  convert<std::shared_ptr<SurgSim::Graphics::OsgUniformBase>>::decode(const 
 	static SurgSim::Graphics::OsgUniformFactory factory;
 	if (rhs == nullptr)
 	{
+		std::cout << node;
 		auto uniform = factory.create(node[0].as<std::string>(), node[1].as<std::string>());
 		rhs = std::dynamic_pointer_cast<SurgSim::Graphics::OsgUniformBase>(uniform);
 		SURGSIM_ASSERT(rhs != nullptr) << "Uniform conversion failed in deserialization for node " << node;

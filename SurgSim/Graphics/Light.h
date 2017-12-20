@@ -52,9 +52,9 @@ public:
 	/// Constructor
 	explicit Light(const std::string& name) : Representation(name)
 	{
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, SurgSim::Math::Vector4d, DiffuseColor,
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, SurgSim::Math::UnalignedVector4d, DiffuseColor,
 											getDiffuseColor, setDiffuseColor);
-		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, SurgSim::Math::Vector4d, SpecularColor,
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, SurgSim::Math::UnalignedVector4d, SpecularColor,
 											getSpecularColor, setSpecularColor);
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(Light, double, ConstantAttenuation,
 											getConstantAttenuation, setConstantAttenuation);
@@ -81,19 +81,19 @@ public:
 
 	/// Sets diffuse color of this light.
 	/// \param	color	The color.
-	virtual void setDiffuseColor(const SurgSim::Math::Vector4d& color) = 0;
+	virtual void setDiffuseColor(const SurgSim::Math::UnalignedVector4d& color) = 0;
 
 	/// Gets diffuse color.
 	/// \return	The diffuse color.
-	virtual SurgSim::Math::Vector4d getDiffuseColor() = 0;
+	virtual SurgSim::Math::UnalignedVector4d getDiffuseColor() = 0;
 
 	/// Sets specular color of this light.
 	/// \param	color	The color.
-	virtual void setSpecularColor(const SurgSim::Math::Vector4d& color) = 0;
+	virtual void setSpecularColor(const SurgSim::Math::UnalignedVector4d& color) = 0;
 
 	/// Gets specular color.
 	/// \return	The specular color.
-	virtual SurgSim::Math::Vector4d getSpecularColor() = 0;
+	virtual SurgSim::Math::UnalignedVector4d getSpecularColor() = 0;
 
 	/// Sets constant attenuation.
 	/// \param	val	The value.

@@ -42,26 +42,26 @@ OsgUniformFactory::OsgUniformFactory()
 	// Vector Types
 	registerClass<OsgUniform<SurgSim::Math::Vector2f>>("vec2");
 	registerClass<OsgUniform<SurgSim::Math::Vector3f>>("vec3");
-	registerClass<OsgUniform<SurgSim::Math::Vector4f>>("vec4");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedVector4f>>("vec4");
 
 	registerClass<OsgUniform<SurgSim::Math::Vector2d>>("dvec2");
 	registerClass<OsgUniform<SurgSim::Math::Vector3d>>("dvec3");
-	registerClass<OsgUniform<SurgSim::Math::Vector4d>>("dvec4");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedVector4d>>("dvec4");
 
 	// Matrix Types
-	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("mat2");
-	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("mat2x2");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedMatrix22f>>("mat2");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedMatrix22f>>("mat2x2");
 	registerClass<OsgUniform<SurgSim::Math::Matrix33f>>("mat3");
-	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("mat3x3");
-	registerClass<OsgUniform<SurgSim::Math::Matrix44f>>("mat4");
-	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("mat4x4");
+	registerClass<OsgUniform<SurgSim::Math::Matrix33f>>("mat3x3");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedMatrix44f>>("mat4");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedMatrix44f>>("mat4x4");
 
-	registerClass<OsgUniform<SurgSim::Math::Matrix22d>>("dmat2");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedMatrix22d>>("dmat2");
 	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("dmat2x2");
 	registerClass<OsgUniform<SurgSim::Math::Matrix33d>>("dmat3");
-	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("dmat3x3");
-	registerClass<OsgUniform<SurgSim::Math::Matrix44d>>("dmat4");
-	registerClass<OsgUniform<SurgSim::Math::Matrix22f>>("dmat4x4");
+	registerClass<OsgUniform<SurgSim::Math::Matrix33d>>("dmat3x3");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedMatrix44d>>("dmat4");
+	registerClass<OsgUniform<SurgSim::Math::UnalignedMatrix44d>>("dmat4x4");
 
 	// Sampler Types
 	registerClass<OsgTextureUniform<OsgTexture1d>>("sampler1D");

@@ -29,6 +29,7 @@
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Quaterniond;
+using SurgSim::Math::UnalignedQuaterniond;
 using SurgSim::Math::SparseMatrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
@@ -121,7 +122,7 @@ public:
 	double m_expectedVolume;
 	double m_rho, m_E, m_nu, m_L;
 	double m_radius;
-	Quaterniond m_orientation;
+	UnalignedQuaterniond m_orientation;
 	Vector forceVector;
 	SparseMatrix massMatrix;
 	SparseMatrix dampingMatrix;
@@ -439,7 +440,7 @@ public:
 
 	std::shared_ptr<MockFem1DElement> getBeam()
 	{
-		auto beam = std::make_shared<MockFem1DElement>(m_nodeIds);
+		std::shared_ptr<MockFem1DElement> beam(new MockFem1DElement(m_nodeIds));
 		beam->setRadius(m_radius);
 		beam->setMassDensity(m_rho);
 		beam->setPoissonRatio(m_nu);

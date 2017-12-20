@@ -275,7 +275,7 @@ private:
 	bool m_drawAsWireFrame;
 
 	/// Rigid transform describing pose of the representation
-	SurgSim::Math::RigidTransform3d m_transform;
+	SurgSim::Math::UnalignedRigidTransform3d m_transform;
 };
 
 /// Camera class for testing
@@ -325,33 +325,33 @@ public:
 
 	/// Sets the view matrix of the camera
 	/// \param	matrix	View matrix
-	virtual void setViewMatrix(const SurgSim::Math::Matrix44d& matrix)
+	virtual void setViewMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix)
 	{
 		m_viewMatrix = matrix;
 	}
 
 	/// Gets the view matrix of the camera
 	/// \return	View matrix
-	virtual SurgSim::Math::Matrix44d getViewMatrix() const
+	virtual SurgSim::Math::UnalignedMatrix44d getViewMatrix() const
 	{
 		return m_viewMatrix;
 	}
 
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix
-	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
+	virtual void setProjectionMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix)
 	{
 		m_projectionMatrix = matrix;
 	}
 
 	/// Gets the projection matrix of the camera
 	/// \return	Projection matrix
-	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const
+	virtual const SurgSim::Math::UnalignedMatrix44d& getProjectionMatrix() const
 	{
 		return m_projectionMatrix;
 	}
 
-	virtual SurgSim::Math::Matrix44d getInverseProjectionMatrix() const
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseProjectionMatrix() const
 	{
 		return m_projectionMatrix.inverse();
 	}
@@ -427,17 +427,17 @@ public:
 		return false;
 	}
 
-	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseViewMatrix() const
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	void setAmbientColor(const SurgSim::Math::Vector4d& color)
+	void setAmbientColor(const SurgSim::Math::UnalignedVector4d& color)
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	SurgSim::Math::Vector4d getAmbientColor()
+	SurgSim::Math::UnalignedVector4d getAmbientColor()
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
@@ -515,13 +515,13 @@ private:
 	double m_sumDt;
 
 	/// Rigid transform describing pose of the camera
-	SurgSim::Math::RigidTransform3d m_pose;
+	SurgSim::Math::UnalignedRigidTransform3d m_pose;
 
 	/// View matrix of the camera
-	SurgSim::Math::Matrix44d m_viewMatrix;
+	SurgSim::Math::UnalignedMatrix44d m_viewMatrix;
 
 	/// Projection matrix of the camera
-	SurgSim::Math::Matrix44d m_projectionMatrix;
+	SurgSim::Math::UnalignedMatrix44d m_projectionMatrix;
 
 };
 

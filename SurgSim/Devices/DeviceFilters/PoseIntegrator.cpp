@@ -71,7 +71,7 @@ void PoseIntegrator::initializeInput(const std::string& device, const DataStruct
 		m_copier->copy(inputData, &getInputData());
 	}
 
-	PoseType pose;
+	Math::RigidTransform3d pose;
 	if (inputData.poses().get(DataStructures::Names::POSE, &pose))
 	{
 		m_poseResult = pose;
@@ -89,7 +89,7 @@ void PoseIntegrator::handleInput(const std::string& device, const DataStructures
 		m_copier->copy(inputData, &getInputData());
 	}
 
-	PoseType pose;
+	Math::RigidTransform3d pose;
 	if (inputData.poses().get(DataStructures::Names::POSE, &pose))
 	{
 		m_timer.markFrame();

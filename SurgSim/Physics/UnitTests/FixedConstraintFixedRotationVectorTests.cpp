@@ -67,7 +67,7 @@ TEST(FixedConstraintFixedRotationVectorTests, BuildMlcp)
 	initialState->getPositions().segment<3>(6) = SurgSim::Math::Vector3d(1.0, 0.0, 0.0);
 	fem1d->setInitialState(initialState);
 	std::array<size_t, 2> nodeIds = { {0, 1} };
-	auto beam = std::make_shared<Fem1DElementBeam>(nodeIds);
+	std::shared_ptr<Fem1DElementBeam> beam(new Fem1DElementBeam(nodeIds));
 	beam->setMassDensity(900);
 	beam->setPoissonRatio(0.4);
 	beam->setRadius(0.1);
@@ -92,7 +92,7 @@ TEST(FixedConstraintFixedRotationVectorTests, BuildMlcp)
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(0, 3, 1);
 
 	ASSERT_NO_THROW(constraint.build(
-		dt, constraintData, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
+						dt, constraintData, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
 	// Compare results
 	Eigen::AngleAxisd aa(objectPose.linear());

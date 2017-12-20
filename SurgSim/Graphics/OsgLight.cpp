@@ -133,7 +133,7 @@ std::shared_ptr<SurgSim::Graphics::Group> OsgLight::getGroup()
 	return m_group;
 }
 
-void OsgLight::setDiffuseColor(const SurgSim::Math::Vector4d& color)
+void OsgLight::setDiffuseColor(const SurgSim::Math::UnalignedVector4d& color)
 {
 	m_diffuseColor = color;
 	SurgSim::Math::Vector4f floatColor = color.cast<float>();
@@ -142,12 +142,12 @@ void OsgLight::setDiffuseColor(const SurgSim::Math::Vector4d& color)
 	m_light->setDiffuse(osgVec);
 }
 
-SurgSim::Math::Vector4d OsgLight::getDiffuseColor()
+SurgSim::Math::UnalignedVector4d OsgLight::getDiffuseColor()
 {
 	return m_diffuseColor;
 }
 
-void OsgLight::setSpecularColor(const SurgSim::Math::Vector4d& color)
+void OsgLight::setSpecularColor(const SurgSim::Math::UnalignedVector4d& color)
 {
 	m_specularColor = color;
 	SurgSim::Math::Vector4f floatColor = color.cast<float>();
@@ -156,7 +156,7 @@ void OsgLight::setSpecularColor(const SurgSim::Math::Vector4d& color)
 	m_light->setSpecular(osgVec);
 }
 
-SurgSim::Math::Vector4d OsgLight::getSpecularColor()
+SurgSim::Math::UnalignedVector4d OsgLight::getSpecularColor()
 {
 	return m_specularColor;
 }

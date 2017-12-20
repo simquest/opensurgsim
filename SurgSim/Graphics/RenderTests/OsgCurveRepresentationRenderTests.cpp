@@ -40,6 +40,7 @@
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 using SurgSim::Math::Vector4f;
+using SurgSim::Math::UnalignedVector4f;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
@@ -91,10 +92,10 @@ TEST_F(OsgCurveRepresentationRenderTests, DynamicRotate)
 
 	auto material = buildMaterial("Shaders/material_curve.vert", "Shaders/material.frag");
 	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", Vector4f(0.2, 0.2, 0.9, 1.0));
+	material->setValue("diffuseColor", UnalignedVector4f(0.2, 0.2, 0.9, 1.0));
 
 	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", Vector4f(0.4, 0.4, 0.4, 1.0));
+	material->setValue("specularColor", UnalignedVector4f(0.4, 0.4, 0.4, 1.0));
 
 	material->addUniform("float", "shininess");
 	material->setValue("shininess", 64.0f);

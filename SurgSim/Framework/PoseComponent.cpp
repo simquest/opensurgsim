@@ -25,7 +25,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Framework::PoseComponen
 
 PoseComponent::PoseComponent(const std::string& name) : Component(name)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseComponent, SurgSim::Math::RigidTransform3d, Pose, getPose, setPose);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PoseComponent, SurgSim::Math::UnalignedRigidTransform3d, Pose, getPose, setPose);
 }
 
 void PoseComponent::setPose(const SurgSim::Math::RigidTransform3d& pose)
@@ -33,7 +33,7 @@ void PoseComponent::setPose(const SurgSim::Math::RigidTransform3d& pose)
 	m_pose = pose;
 }
 
-const SurgSim::Math::RigidTransform3d& PoseComponent::getPose() const
+const SurgSim::Math::UnalignedRigidTransform3d& PoseComponent::getPose() const
 {
 	return m_pose;
 }

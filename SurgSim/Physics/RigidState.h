@@ -74,19 +74,19 @@ public:
 
 	/// Set the linear velocity
 	/// \param v The linear velocity
-	void setLinearVelocity(const SurgSim::Math::Vector3d &v);
+	void setLinearVelocity(const SurgSim::Math::Vector3d& v);
 
 	/// Set the angular velocity
 	/// \param w The angular velocity
-	void setAngularVelocity(const SurgSim::Math::Vector3d &w);
+	void setAngularVelocity(const SurgSim::Math::Vector3d& w);
 
 	/// Set the rigid representation pose
 	/// \param pose The pose to set the rigid representation to
-	void setPose(const SurgSim::Math::RigidTransform3d& pose);
+	void setPose(const SurgSim::Math::UnalignedRigidTransform3d& pose);
 
 	/// Get the rigid representation pose
 	/// \return A constant reference to the pose (read only)
-	const SurgSim::Math::RigidTransform3d& getPose() const;
+	const SurgSim::Math::UnalignedRigidTransform3d& getPose() const;
 
 private:
 	/// Register accessors of serializable properties
@@ -99,7 +99,7 @@ private:
 	SurgSim::Math::Vector3d m_w;
 
 	/// Rigid representation pose (translation + rotation)
-	SurgSim::Math::RigidTransform3d m_pose;
+	SurgSim::Math::UnalignedRigidTransform3d m_pose;
 };
 
 }; // Physics

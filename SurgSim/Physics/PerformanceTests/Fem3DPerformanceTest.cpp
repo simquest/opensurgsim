@@ -136,6 +136,8 @@ public:
 		SurgSim::Framework::Timer totalTime;
 		totalTime.beginFrame();
 
+		// One update to prime linear solvers
+		m_physicsManager->doUpdate(dt);
 		SurgSim::Framework::Timer timer;
 		timer.setMaxNumberOfFrames(frameCount);
 		for (int i = 0; i < frameCount; i++)
@@ -215,30 +217,35 @@ INSTANTIATE_TEST_CASE_P(Fem3DPerformanceTest,
 								SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
 								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
 								SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT,
-								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
-								SurgSim::Math::INTEGRATIONSCHEME_STATIC,
-								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
-								SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
-								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4),
+								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT
+// 								SurgSim::Math::INTEGRATIONSCHEME_STATIC,
+// 								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
+// 								SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
+// 								SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4
+															),
 								::testing::Values(SurgSim::Math::LINEARSOLVER_LU,
-										SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT)));
+										SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT
+												 )));
 
 INSTANTIATE_TEST_CASE_P(
 	Fem3DPerformanceTest,
 	IntegrationSchemeAndCountParamTest,
-	::testing::Combine(::testing::Values(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
-					   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT,
-					   SurgSim::Math::INTEGRATIONSCHEME_STATIC,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
-					   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
-					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4),
-					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU,
-							   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT),
-					   ::testing::Values(2, 3, 4, 5, 6, 7, 8)));
+	::testing::Combine(::testing::Values(
+						   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT,
+						   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT,
+						   SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT_MODIFIED,
+						   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_EXPLICIT_MODIFIED,
+						   SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT,
+						   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_EULER_IMPLICIT
+// 					   SurgSim::Math::INTEGRATIONSCHEME_STATIC,
+// 					   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_STATIC,
+// 					   SurgSim::Math::INTEGRATIONSCHEME_RUNGE_KUTTA_4,
+// 				   SurgSim::Math::INTEGRATIONSCHEME_LINEAR_RUNGE_KUTTA_4
+					   ),
+					   ::testing::Values(SurgSim::Math::LINEARSOLVER_LU
+//							   SurgSim::Math::LINEARSOLVER_CONJUGATEGRADIENT
+										),
+					   ::testing::Values(2, 4, 8, 10)));
 
 } // namespace Physics
 } // namespace SurgSim

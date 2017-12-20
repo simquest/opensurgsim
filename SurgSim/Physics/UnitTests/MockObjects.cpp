@@ -13,9 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/UnitTests/MockObjects.h"
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Physics/FemPlyReaderDelegate.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
 {
@@ -409,7 +411,7 @@ void MockFemRepresentation::setInitialState(std::shared_ptr<SurgSim::Math::OdeSt
 	m_setInitialStateCalled = true;
 }
 
-void MockFemRepresentation::loadFem(const std::string &filename)
+void MockFemRepresentation::loadFem(const std::string& filename)
 {
 }
 
@@ -516,12 +518,12 @@ size_t MockFixedConstraintFixedPoint::doGetNumDof() const
 }
 
 void MockFixedConstraintFixedPoint::doBuild(double dt,
-											 const ConstraintData& data,
-											 const std::shared_ptr<Localization>& localization,
-											 MlcpPhysicsProblem* mlcp,
-											 size_t indexOfRepresentation,
-											 size_t indexOfConstraint,
-											 ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 }
 
@@ -544,12 +546,12 @@ size_t MockRigidConstraintFixedPoint::doGetNumDof() const
 }
 
 void MockRigidConstraintFixedPoint::doBuild(double dt,
-											 const ConstraintData& data,
-											 const std::shared_ptr<Localization>& localization,
-											 MlcpPhysicsProblem* mlcp,
-											 size_t indexOfRepresentation,
-											 size_t indexOfConstraint,
-											 ConstraintSideSign sign)
+		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
+		MlcpPhysicsProblem* mlcp,
+		size_t indexOfRepresentation,
+		size_t indexOfConstraint,
+		ConstraintSideSign sign)
 {
 }
 
@@ -687,5 +689,29 @@ std::shared_ptr<PhysicsManagerState> MockComputation::doUpdate(const double& dt,
 {
 	return state;
 }
+
+SphereCollisionElement::SphereCollisionElement(const std::string& name) : SceneElement(name)
+{
+
+}
+
+bool SphereCollisionElement::doInitialize()
+{
+	auto physics = std::make_shared<SurgSim::Physics::RigidRepresentation>("Physics");
+
+	physics->setDensity(700.0); // Wood
+	physics->setLinearDamping(0.1);
+
+	auto shape = std::make_shared<SurgSim::Math::SphereShape>(0.1); // 1cm Sphere
+	physics->setShape(shape);
+	addComponent(physics);
+
+	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
+	physics->setCollisionRepresentation(collision);
+	addComponent(collision);
+
+	return true;
+}
+
 }; // Physics
 }; // SurgSim

@@ -104,15 +104,15 @@ public:
 
 	/// Gets the view matrix of the camera
 	/// \return	View matrix
-	virtual SurgSim::Math::Matrix44d getViewMatrix() const = 0;
+	virtual SurgSim::Math::UnalignedMatrix44d getViewMatrix() const = 0;
 
 	/// Gets the inverse view matrix of the camera
 	/// \return	Inverse view matrix
-	virtual SurgSim::Math::Matrix44d getInverseViewMatrix() const = 0;
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseViewMatrix() const = 0;
 
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix
-	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) = 0;
+	virtual void setProjectionMatrix(const SurgSim::Math::UnalignedMatrix44d& matrix) = 0;
 
 	/// Sets the viewport size for this camera
 	/// \param x,y location of the viewport in screen space
@@ -147,11 +147,11 @@ public:
 
 	/// Gets the projection matrix of the camera
 	/// \return	Projection matrix
-	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
+	virtual const SurgSim::Math::UnalignedMatrix44d& getProjectionMatrix() const = 0;
 
 	/// Gets the inverse projection matrix of the camera
 	/// \return	Inverse Projection matrix
-	virtual SurgSim::Math::Matrix44d getInverseProjectionMatrix() const = 0;
+	virtual SurgSim::Math::UnalignedMatrix44d getInverseProjectionMatrix() const = 0;
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
 	/// \param	renderTarget	The render target.
@@ -173,10 +173,10 @@ public:
 
 	/// Sets a value for the ambient lighting term, this can add light to the scene when there is no lighting
 	/// \param color value for the light that should get added to the scene
-	virtual void setAmbientColor(const SurgSim::Math::Vector4d& color) = 0;
+	virtual void setAmbientColor(const SurgSim::Math::UnalignedVector4d& color) = 0;
 
 	/// \return the ambient light that gets added to the scene
-	virtual SurgSim::Math::Vector4d getAmbientColor() = 0;
+	virtual SurgSim::Math::UnalignedVector4d getAmbientColor() = 0;
 
 	/// Marks the camera as a main view camera, this means that view dependent passes should follow this camera with
 	/// their appropriate calculations, for this purpose when isMainCamera() is true, the camera provides a uniform

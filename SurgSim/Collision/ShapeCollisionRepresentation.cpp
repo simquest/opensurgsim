@@ -44,7 +44,7 @@ int ShapeCollisionRepresentation::getShapeType() const
 }
 
 
-void ShapeCollisionRepresentation::setLocalPose(const SurgSim::Math::RigidTransform3d& pose)
+void ShapeCollisionRepresentation::setLocalPose(const SurgSim::Math::UnalignedRigidTransform3d& pose)
 {
 	Representation::setLocalPose(pose);
 	if (m_shape != nullptr)
@@ -82,7 +82,7 @@ bool ShapeCollisionRepresentation::doInitialize()
 	if (nullptr != m_shape)
 	{
 		SURGSIM_ASSERT(m_shape->isValid()) <<
-			"An invalid MeshShape is used in this ShapeCollisionRepresentation.";
+										   "An invalid MeshShape is used in this ShapeCollisionRepresentation.";
 	}
 
 	return true;

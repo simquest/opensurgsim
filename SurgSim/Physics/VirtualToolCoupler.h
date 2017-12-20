@@ -296,7 +296,7 @@ private:
 	bool m_hapticOutputOnlyWhenColliding;
 
 	/// The previous input pose.
-	Math::RigidTransform3d m_previousInputPose;
+	Math::UnalignedRigidTransform3d m_previousInputPose;
 
 	///@{
 	/// Cached DataGroup indices.

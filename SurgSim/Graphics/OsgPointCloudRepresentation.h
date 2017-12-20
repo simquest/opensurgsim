@@ -65,9 +65,9 @@ public:
 
 	void doUpdate(double dt) override;
 
-	void setColor(const SurgSim::Math::Vector4d& color) override;
+	void setColor(const SurgSim::Math::UnalignedVector4d& color) override;
 
-	SurgSim::Math::Vector4d getColor() const override;
+	SurgSim::Math::UnalignedVector4d getColor() const override;
 
 private:
 
@@ -87,7 +87,7 @@ private:
 	osg::ref_ptr<osg::Point> m_point;
 
 	/// Color backing variable
-	SurgSim::Math::Vector4d m_color;
+	SurgSim::Math::UnalignedVector4d m_color;
 
 	/// Update the geometry
 	/// \param vertices new vertices

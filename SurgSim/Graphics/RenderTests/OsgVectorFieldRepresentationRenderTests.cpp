@@ -34,6 +34,8 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Testing::interpolate;
 
+typedef std::vector<SurgSim::Graphics::VectorFieldData, Eigen::aligned_allocator<SurgSim::Graphics::VectorFieldData>> VectorFieldDataVector;
+
 struct OsgVectorFieldRepresentationRenderTests : public SurgSim::Graphics::RenderTest
 {
 protected:
@@ -99,10 +101,10 @@ protected:
 		return colors;
 	}
 
-	std::vector<SurgSim::Graphics::VectorFieldData> makeVectors(const std::vector<Vector3d>& points,
+	VectorFieldDataVector makeVectors(const std::vector<Vector3d>& points,
 			const std::vector<Vector4d>& colors)
 	{
-		std::vector<SurgSim::Graphics::VectorFieldData> vecs(8);
+		VectorFieldDataVector vecs(8);
 		for (auto i = 0; i < 8; ++i)
 		{
 			vecs[i].direction = points[i];
@@ -113,7 +115,7 @@ protected:
 
 	std::shared_ptr<VectorFieldRepresentation>
 	makeVectorFieldRepresentation(const std::vector<Vector3d>& points,
-								  const std::vector<SurgSim::Graphics::VectorFieldData>& vectors)
+								  const VectorFieldDataVector& vectors)
 	{
 		auto representation = std::make_shared<OsgVectorFieldRepresentation>("Vector Field Representation");
 		auto vertices =  representation->getVectorField();

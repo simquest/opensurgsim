@@ -34,6 +34,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOSS_DEBUG")
 
 option(SURGSIM_WARNINGS_AS_ERRORS "Treat warnings as errors in the compilation process" OFF)
 
+option(SURGSIM_USE_AVX "Utilise AVX extensions, this will be passed onto eigen" ON)
+
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
 	# default G++ compilation flags
@@ -56,6 +58,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 			message(WARNING "G++ is missing C++0x/C++11 support; trying anyway.")
 		endif(HAVE_FLAG_STD_GNUXX0X)
 	endif(HAVE_FLAG_STD_GNUXX11)
+	
+	if (SURGSIM_USE_AVX)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx")
+	endif()
 
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
@@ -106,6 +112,10 @@ if(MSVC)
 	if(BUILD_SHARED_LIBS)
 		message(FATAL_ERROR "Please turn off BUILD_SHARED_LIBS. Shared libraries on Windows is currently unsupported.")
 	endif()
+	
+	if (SURGSIM_USE_AVX)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX")
+	endif()
 endif(MSVC)
 
 # Settings for LLVM Clang.
@@ -128,15 +138,22 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	add_definitions( -D_POSIX_C_SOURCE=200809L )  # request POSIX APIs
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
+
 set(DEFAULT_EIGEN_ALIGNMENT OFF)
 # Enable alignement on 64bit systems by default
-if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
+if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8" OR SURGSIM_USE_AVX)
 	set(DEFAULT_EIGEN_ALIGNMENT ON)
 endif()
 
 option(EIGEN_ALIGNMENT "Enable alignment in Eigen" ${DEFAULT_EIGEN_ALIGNMENT})
+
 mark_as_advanced(EIGEN_ALIGNMENT)
 
 if(NOT EIGEN_ALIGNMENT)
 	add_definitions( -DEIGEN_DONT_ALIGN )
+endif()
+
+option(EIGEN_DEBUG "Enable debug assertions in Eigen" ON)
+if(NOT EIGEN_DEBUG)
+	add_definitions( -DEIGEN_NO_DEBUG)
 endif()

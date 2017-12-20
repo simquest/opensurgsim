@@ -125,10 +125,10 @@ TEST(Fem2DRepresentationTests, ExternalForceAPITest)
 	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isApprox(zeroMat));
 
 	std::array<size_t, 3> element1NodeIds = {{0, 1, 2}};
-	auto element1 = std::make_shared<Fem2DElementTriangle>(element1NodeIds);
+	std::shared_ptr<Fem2DElementTriangle> element1(new Fem2DElementTriangle(element1NodeIds));
 	fem->addFemElement(element1);
 	std::array<size_t, 3> element2NodeIds = {{1, 2, 3}};
-	auto element2 = std::make_shared<Fem2DElementTriangle>(element2NodeIds);
+	std::shared_ptr<Fem2DElementTriangle> element2(new Fem2DElementTriangle(element2NodeIds));
 	fem->addFemElement(element2);
 
 	SurgSim::DataStructures::IndexedLocalCoordinate femRepCoordinate;
@@ -276,7 +276,7 @@ TEST(Fem2DRepresentationTests, CreateLocalizationTest)
 		SurgSim::DataStructures::Location location(0);
 		std::shared_ptr<SurgSim::Physics::Fem2DLocalization> localization;
 		EXPECT_NO_THROW(localization =
-			std::dynamic_pointer_cast<SurgSim::Physics::Fem2DLocalization>(fem->createLocalization(location)););
+							std::dynamic_pointer_cast<SurgSim::Physics::Fem2DLocalization>(fem->createLocalization(location)););
 		EXPECT_TRUE(localization != nullptr);
 		EXPECT_TRUE(localization->getRepresentation() == fem);
 
@@ -343,8 +343,8 @@ TEST(Fem2DRepresentationTests, CreateLocalizationTest)
 			SurgSim::DataStructures::Location location(coord, locationType);
 			std::shared_ptr<SurgSim::Physics::Fem2DLocalization> localization;
 			EXPECT_NO_THROW(localization =
-				std::dynamic_pointer_cast<SurgSim::Physics::Fem2DLocalization>(
-				fem->createLocalization(location)));
+								std::dynamic_pointer_cast<SurgSim::Physics::Fem2DLocalization>(
+									fem->createLocalization(location)));
 			EXPECT_TRUE(localization != nullptr);
 			EXPECT_TRUE(localization->getRepresentation() == fem);
 

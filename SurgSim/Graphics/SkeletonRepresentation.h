@@ -56,7 +56,7 @@ public:
 
 		setSetter("ModelFileName", setter);
 
-		typedef std::map<std::string, SurgSim::Math::RigidTransform3d> PoseMap;
+		typedef std::map<std::string, SurgSim::Math::UnalignedRigidTransform3d> PoseMap;
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SkeletonRepresentation, PoseMap,
 			NeutralPoses, getNeutralBonePoses, setNeutralBonePoses);
 	}
@@ -96,11 +96,11 @@ public:
 protected:
 	/// Set neutral poses for a set of bones.
 	/// \param poses A map of bone names and neutral poses
-	virtual void setNeutralBonePoses(const std::map<std::string, SurgSim::Math::RigidTransform3d>& poses) = 0;
+	virtual void setNeutralBonePoses(const std::map<std::string, SurgSim::Math::UnalignedRigidTransform3d>& poses) = 0;
 
 	/// Get all the neutral poses
 	/// \return A map of bone names and neutral poses
-	virtual std::map<std::string, SurgSim::Math::RigidTransform3d> getNeutralBonePoses() const = 0;
+	virtual std::map<std::string, SurgSim::Math::UnalignedRigidTransform3d> getNeutralBonePoses() const = 0;
 };
 
 };  // namespace Graphics

@@ -24,6 +24,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/LU> 		// needed for determinant() and inverse()
+#include <Eigen/StdVector>
 
 namespace SurgSim
 {
@@ -33,30 +34,37 @@ namespace Math
 /// A 2x2 matrix of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  2, 2, Eigen::RowMajor>  Matrix22f;
+typedef Eigen::Matrix < float, 2, 2, Eigen::RowMajor | Eigen::DontAlign >  UnalignedMatrix22f;
 
 /// A 3x3 matrix of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  3, 3, Eigen::RowMajor>  Matrix33f;
+typedef Eigen::Matrix < float, 3, 3, Eigen::RowMajor | Eigen::DontAlign >  UnalignedMatrix33f;
 
 /// A 4x4 matrix of floats.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  4, 4, Eigen::RowMajor>  Matrix44f;
+typedef Eigen::Matrix < float, 4, 4, Eigen::RowMajor | Eigen::DontAlign >  UnalignedMatrix44f;
 
 /// A 2x2 matrix of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 2, 2, Eigen::RowMajor>  Matrix22d;
+typedef Eigen::Matrix < double, 2, 2, Eigen::RowMajor | Eigen::DontAlign >  UnalignedMatrix22d;
 
 /// A 3x3 matrix of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 3, 3, Eigen::RowMajor>  Matrix33d;
+typedef Eigen::Matrix < double, 3, 3, Eigen::RowMajor | Eigen::DontAlign >  UnalignedMatrix33d;
 
 /// A 4x4 matrix of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 4, 4, Eigen::RowMajor>  Matrix44d;
+typedef Eigen::Matrix < double, 4, 4, Eigen::RowMajor | Eigen::DontAlign >  UnalignedMatrix44d;
 
 /// A 6x6 matrix of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 6, 6, Eigen::RowMajor> Matrix66d;
+typedef Eigen::Matrix < double, 6, 6, Eigen::RowMajor | Eigen::DontAlign >  UnalignedMatrix66d;
 
 /// A dynamic size diagonal matrix
 typedef Eigen::DiagonalMatrix<double, Eigen::Dynamic> DiagonalMatrix;
@@ -239,5 +247,11 @@ void zeroColumn(size_t column, Eigen::DenseBase<Derived>* matrix)
 
 };  // namespace Math
 };  // namespace SurgSim
+
+	// Only do the ones that are important (i.e. no float vectors for now)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Matrix44d);
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Matrix44f);
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Matrix22d);
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(SurgSim::Math::Matrix22f);
 
 #endif  // SURGSIM_MATH_MATRIX_H

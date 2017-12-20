@@ -44,7 +44,7 @@ void RigidState::addSerializableProperty()
 									  getLinearVelocity, setLinearVelocity);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidState, SurgSim::Math::Vector3d, AngularVelocity,
 									  getAngularVelocity, setAngularVelocity);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidState, SurgSim::Math::RigidTransform3d, Pose,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(RigidState, SurgSim::Math::UnalignedRigidTransform3d, Pose,
 									  getPose, setPose);
 }
 
@@ -90,22 +90,22 @@ const SurgSim::Math::Vector3d& RigidState::getAngularVelocity() const
 	return m_w;
 }
 
-void RigidState::setLinearVelocity(const SurgSim::Math::Vector3d &v)
+void RigidState::setLinearVelocity(const SurgSim::Math::Vector3d& v)
 {
 	m_v = v;
 }
 
-void RigidState::setAngularVelocity(const SurgSim::Math::Vector3d &w)
+void RigidState::setAngularVelocity(const SurgSim::Math::Vector3d& w)
 {
 	m_w = w;
 }
 
-void RigidState::setPose(const SurgSim::Math::RigidTransform3d& pose)
+void RigidState::setPose(const SurgSim::Math::UnalignedRigidTransform3d& pose)
 {
 	m_pose = pose;
 }
 
-const SurgSim::Math::RigidTransform3d& RigidState::getPose() const
+const SurgSim::Math::UnalignedRigidTransform3d& RigidState::getPose() const
 {
 	return m_pose;
 }

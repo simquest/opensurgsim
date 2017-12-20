@@ -47,13 +47,15 @@ namespace Physics
 {
 
 static std::shared_ptr<Fem1DElementBeam> getBeam(size_t node0, size_t node1,
-												 double radius,
-												 double massDensity,
-												 double poissonRatio,
-												 double youngModulus)
+		double radius,
+		double massDensity,
+		double poissonRatio,
+		double youngModulus)
 {
 	std::array<size_t, 2> nodeIds = {node0, node1};
-	auto element = std::make_shared<Fem1DElementBeam>(nodeIds);
+
+	// Use new to get aligned element
+	std::shared_ptr<Fem1DElementBeam> element(new Fem1DElementBeam(nodeIds));
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
@@ -61,11 +63,11 @@ static std::shared_ptr<Fem1DElementBeam> getBeam(size_t node0, size_t node1,
 	return element;
 }
 
-static std::shared_ptr<Fem1DRepresentation> getFem1d(const std::string &name,
-													 double radius = 0.01,
-													 double massDensity = 1.0,
-													 double poissonRatio = 0.1,
-													 double youngModulus = 1.0)
+static std::shared_ptr<Fem1DRepresentation> getFem1d(const std::string& name,
+		double radius = 0.01,
+		double massDensity = 1.0,
+		double poissonRatio = 0.1,
+		double youngModulus = 1.0)
 {
 	auto fem = std::make_shared<Fem1DRepresentation>(name);
 	auto state = std::make_shared<SurgSim::Math::OdeState>();
@@ -121,7 +123,7 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcpBasic)
 
 	// Setup parameters for FemConstraintFixedPoint::build
 	auto localization = std::make_shared<Fem1DLocalization>(getFem1d("representation"),
-		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(1.0, 0.0)));
+						SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(1.0, 0.0)));
 
 	actual = localization->calculatePosition();
 
@@ -130,7 +132,7 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcpBasic)
 	ConstraintData emptyConstraint;
 
 	ASSERT_NO_THROW(constraint.build(
-		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
+						dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
 	// Compare results
 	Eigen::Matrix<double, 3, 1> violation = actual;
@@ -155,7 +157,7 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcp)
 
 	// Setup parameters for FemConstraintFixedPoint::build
 	auto localization = std::make_shared<Fem1DLocalization>(getFem1d("representation"),
-		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(0.3, 0.7)));
+						SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(0.3, 0.7)));
 
 	actual = localization->calculatePosition();
 
@@ -164,7 +166,7 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcp)
 	ConstraintData emptyConstraint;
 
 	ASSERT_NO_THROW(constraint.build(
-		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
+						dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
 	// Compare results
 	Eigen::Matrix<double, 3, 1> violation = actual;
@@ -195,16 +197,16 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcpTwoStep)
 	ConstraintData emptyConstraint;
 
 	auto localization = std::make_shared<Fem1DLocalization>(getFem1d("representation"),
-		SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(0.11, 0.89)));
+						SurgSim::DataStructures::IndexedLocalCoordinate(2u, Vector2d(0.11, 0.89)));
 	actual = localization->calculatePosition();
 	ASSERT_NO_THROW(constraint.build(
-		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
+						dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
 	localization->setLocalPosition(
 		SurgSim::DataStructures::IndexedLocalCoordinate(1u, Vector2d(0.32, 0.68)));
 	desired = localization->calculatePosition();
 	ASSERT_NO_THROW(constraint.build(
-		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_NEGATIVE_SIDE));
+						dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_NEGATIVE_SIDE));
 
 	// Compare results
 	Eigen::Matrix<double, 3, 1> violation = actual - desired;
@@ -212,8 +214,8 @@ TEST(Fem1DConstraintFixedPointTests, BuildMlcpTwoStep)
 
 	Eigen::Matrix<double, 3, 24> H = Eigen::Matrix<double, 3, 24>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
-	SurgSim::Math::addSubMatrix( 0.11 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 2 (beam 2, nodeId 0)
-	SurgSim::Math::addSubMatrix( 0.89 * dt * identity, 0, 6, 3, 3, &H); // This weight is on node 3 (beam 2, nodeId 1)
+	SurgSim::Math::addSubMatrix(0.11 * dt * identity, 0, 4, 3, 3, &H);  // This weight is on node 2 (beam 2, nodeId 0)
+	SurgSim::Math::addSubMatrix(0.89 * dt * identity, 0, 6, 3, 3, &H);  // This weight is on node 3 (beam 2, nodeId 1)
 	SurgSim::Math::addSubMatrix(-0.32 * dt * identity, 0, 2, 3, 3, &H); // This weight is on node 1 (beam 1, nodeId 0)
 	SurgSim::Math::addSubMatrix(-0.68 * dt * identity, 0, 4, 3, 3, &H); // This weight is on node 2 (beam 1, nodeId 0)
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);

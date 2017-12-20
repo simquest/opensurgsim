@@ -148,11 +148,12 @@ TEST(Fem1DRepresentationTests, ExternalForceAPITest)
 	EXPECT_TRUE(fem->getExternalGeneralizedDamping().isApprox(zeroMat));
 
 	std::array<size_t, 2> element1NodeIds = {{0, 1}};
-	auto element1 = std::make_shared<Fem1DElementBeam>(element1NodeIds);
+	std::shared_ptr<Fem1DElementBeam> element1(new Fem1DElementBeam(element1NodeIds));
 	fem->addFemElement(element1);
 	std::array<size_t, 2> element2NodeIds = {{1, 2}};
-	auto element2 = std::make_shared<Fem1DElementBeam>(element2NodeIds);
+	std::shared_ptr<Fem1DElementBeam> element2(new Fem1DElementBeam(element2NodeIds));
 	fem->addFemElement(element2);
+
 
 	SurgSim::DataStructures::IndexedLocalCoordinate femRepCoordinate;
 	femRepCoordinate.index = 0;
@@ -291,8 +292,8 @@ TEST(Fem1DRepresentationTests, CreateLocalizationTest)
 		SurgSim::DataStructures::Location location(1000);
 		std::shared_ptr<SurgSim::Physics::Fem1DLocalization> localization;
 		EXPECT_THROW(localization =
-			std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(
-			fem->createLocalization(location)), SurgSim::Framework::AssertionFailure);
+						 std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(
+							 fem->createLocalization(location)), SurgSim::Framework::AssertionFailure);
 	}
 
 	// Localization on a valid node
@@ -302,7 +303,7 @@ TEST(Fem1DRepresentationTests, CreateLocalizationTest)
 		SurgSim::DataStructures::Location location(0);
 		std::shared_ptr<SurgSim::Physics::Fem1DLocalization> localization;
 		EXPECT_NO_THROW(localization =
-			std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(fem->createLocalization(location)););
+							std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(fem->createLocalization(location)););
 		EXPECT_TRUE(localization != nullptr);
 		EXPECT_TRUE(localization->getRepresentation() == fem);
 
@@ -370,7 +371,7 @@ TEST(Fem1DRepresentationTests, CreateLocalizationTest)
 		SurgSim::DataStructures::Location location(coord, SurgSim::DataStructures::Location::ELEMENT);
 		std::shared_ptr<SurgSim::Physics::Fem1DLocalization> localization;
 		EXPECT_NO_THROW(localization =
-			std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(fem->createLocalization(location)));
+							std::dynamic_pointer_cast<SurgSim::Physics::Fem1DLocalization>(fem->createLocalization(location)));
 		EXPECT_TRUE(localization != nullptr);
 		EXPECT_TRUE(localization->getRepresentation() == fem);
 

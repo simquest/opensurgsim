@@ -260,7 +260,7 @@ TEST(EmitterTest, Serialization)
 	std::shared_ptr<Shape> expectedShape = std::make_shared<SurgSim::Math::SphereShape>(0.1);
 	std::shared_ptr<Component> expectedTarget = std::make_shared<MockParticleSystem>("ParticleSystem");
 	const std::pair<Vector3d, Vector3d> expectedVelocityRange(Vector3d::Ones(), Vector3d::Constant(2.0));
-	Math::RigidTransform3d expectedPose = makeRigidTransform(Eigen::AngleAxisd(0.25 * M_PI, Vector3d::UnitX()).matrix(),
+	Math::UnalignedRigidTransform3d expectedPose = makeRigidTransform(Eigen::AngleAxisd(0.25 * M_PI, Vector3d::UnitX()).matrix(),
 			Vector3d(1.0, 2.0, 3.0));
 
 	EXPECT_NO_THROW(emitter->setValue("LifetimeRange", expectedLifetimeRange));
@@ -289,7 +289,7 @@ TEST(EmitterTest, Serialization)
 	auto velocityRange = decodedEmitter->getValue<std::pair<Vector3d, Vector3d>>("VelocityRange");
 	EXPECT_TRUE(expectedVelocityRange.first.isApprox(velocityRange.first));
 	EXPECT_TRUE(expectedVelocityRange.second.isApprox(velocityRange.second));
-	EXPECT_TRUE(expectedPose.isApprox(decodedEmitter->getValue<Math::RigidTransform3d>("LocalPose")));
+	EXPECT_TRUE(expectedPose.isApprox(decodedEmitter->getValue<Math::UnalignedRigidTransform3d>("LocalPose")));
 }
 
 }; // namespace Particles

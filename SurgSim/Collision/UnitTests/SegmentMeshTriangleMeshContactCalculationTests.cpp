@@ -37,12 +37,12 @@ class SegmentMeshTriangleMeshContactCalculationTests : public ::testing::Test
 {
 protected:
 	RigidTransform3d buildRigidTransform(double angle, double axisX, double axisY, double axisZ,
-		double translationX, double translationY, double translationZ)
+										 double translationX, double translationY, double translationZ)
 	{
 		using SurgSim::Math::makeRigidTransform;
 		using SurgSim::Math::makeRotationQuaternion;
 		return makeRigidTransform(makeRotationQuaternion(angle, Vector3d(axisX, axisY, axisZ).normalized()),
-			Vector3d(translationX, translationY, translationZ));
+								  Vector3d(translationX, translationY, translationZ));
 	}
 
 	void SetUp() override
@@ -51,15 +51,15 @@ protected:
 		m_segmentRadius = 0.1;
 
 		m_transforms.push_back(std::pair<RigidTransform3d, std::string>(
-			RigidTransform3d::Identity(), "Identity"));
+								   RigidTransform3d::Identity(), "Identity"));
 		m_transforms.push_back(std::pair<RigidTransform3d, std::string>(
-			buildRigidTransform(1.234, 17.04, 2.047, 3.052, 23.34, 42.45, 83.68), "Transform 1"));
+								   buildRigidTransform(1.234, 17.04, 2.047, 3.052, 23.34, 42.45, 83.68), "Transform 1"));
 		m_transforms.push_back(std::pair<RigidTransform3d, std::string>(
-			buildRigidTransform(-5.34, 41.03, -2.52, -3.84, -3.45, 66.47, 29.34), "Transform 2"));
+								   buildRigidTransform(-5.34, 41.03, -2.52, -3.84, -3.45, 66.47, 29.34), "Transform 2"));
 		m_transforms.push_back(std::pair<RigidTransform3d, std::string>(
-			buildRigidTransform(0.246, -9.42, -4.86, 2.469, 37.68, -34.6, -17.1), "Transform 3"));
+								   buildRigidTransform(0.246, -9.42, -4.86, 2.469, 37.68, -34.6, -17.1), "Transform 3"));
 		m_transforms.push_back(std::pair<RigidTransform3d, std::string>(
-			buildRigidTransform(-0.85, 3.344, 8.329, -97.4, 9.465, 0.275, -95.9), "Transform 4"));
+								   buildRigidTransform(-0.85, 3.344, 8.329, -97.4, 9.465, 0.275, -95.9), "Transform 4"));
 	}
 
 	/// \return The SegmentMeshShape with a line mesh.
@@ -166,8 +166,8 @@ protected:
 	}
 
 	void testSegmentMeshTriangleMeshDCD(std::string scenario, std::shared_ptr<SegmentMeshShape> segmentMeshShape,
-		RigidTransform3d segmentMeshShapeTransform, std::shared_ptr<MeshShape> meshShape,
-		RigidTransform3d meshShapeTransform, size_t expectedNumContacts = 0)
+										RigidTransform3d segmentMeshShapeTransform, std::shared_ptr<MeshShape> meshShape,
+										RigidTransform3d meshShapeTransform, size_t expectedNumContacts = 0)
 	{
 		for (const auto& transform : m_transforms)
 		{
@@ -202,7 +202,7 @@ protected:
 			{
 				// Find correction that need to be applied to remove all intersections.
 				Vector3d correction = Vector3d::Zero();
-				for (auto &contact : contacts)
+				for (auto& contact : contacts)
 				{
 					Vector3d intersection = contact->normal * contact->depth;
 					// Project intersection on correction and subtract that component from intersection.
@@ -239,7 +239,9 @@ protected:
 
 private:
 	// List of random transformations and a string to identify it.
-	std::vector<std::pair<RigidTransform3d, std::string>> m_transforms;
+	typedef std::pair<RigidTransform3d, std::string> TransformData;
+
+	std::vector<TransformData, Eigen::aligned_allocator<TransformData>> m_transforms;
 };
 
 
@@ -263,8 +265,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			makeRigidTranslation(Vector3d(0.0, m_cubeSize + m_segmentRadius + epsilonTrans, 0.0));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -272,8 +274,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			makeRigidTranslation(Vector3d(0.0, -m_cubeSize - m_segmentRadius - epsilonTrans, 0.0));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -281,8 +283,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			makeRigidTranslation(Vector3d(-m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans, 0.0, 0.0));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -290,8 +292,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			makeRigidTranslation(Vector3d(m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans, 0.0, 0.0));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -299,8 +301,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			makeRigidTranslation(Vector3d(0.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -308,8 +310,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			makeRigidTranslation(Vector3d(0.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	// Rotation about X
@@ -319,8 +321,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, offset + m_segmentRadius + epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about x-axis) segment mesh above box)",
-			createSegmentMeshShape(), segmentMeshShapeTransform,
-			createCubeMeshShape(), meshShapeTransform);
+									   createSegmentMeshShape(), segmentMeshShapeTransform,
+									   createCubeMeshShape(), meshShapeTransform);
 	}
 
 	{
@@ -329,8 +331,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, -offset - m_segmentRadius - epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about x-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -338,8 +340,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about x-axis) segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -347,28 +349,28 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about x-axis) segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
 		double offset = (1.0 + std::sin(M_PI_4)) * m_cubeSize * 0.5;
 		segmentMeshShapeTransform =
-			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0,0.0, 0.0, offset + m_segmentRadius + epsilonTrans);
+			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, 0.0, offset + m_segmentRadius + epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about x-axis) segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
 		double offset = (1.0 + std::sin(M_PI_4)) * m_cubeSize * 0.5;
 		segmentMeshShapeTransform =
-			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0,0.0, 0.0, -offset - m_segmentRadius - epsilonTrans);
+			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, 0.0, -offset - m_segmentRadius - epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about x-axis) segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	// Rotation about Y
@@ -377,8 +379,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, 0.0, m_cubeSize + m_segmentRadius + epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about y-axis) segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -386,8 +388,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, 0.0, -m_cubeSize - m_segmentRadius - epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about y-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -395,8 +397,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about y-axis) segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -404,8 +406,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about y-axis) segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -413,8 +415,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, 0.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about y-axis) segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -422,8 +424,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, 0.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about y-axis) segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	// Rotation about Z
@@ -433,8 +435,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, offset + m_segmentRadius + epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about z-axis) segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -443,8 +445,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, -offset - m_segmentRadius - epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about z-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -453,8 +455,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, offset + m_segmentRadius + epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about z-axis) segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -463,8 +465,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, -offset - m_segmentRadius - epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about z-axis) segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -472,8 +474,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about z-axis) segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 
 	{
@@ -481,8 +483,8 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("No intersection (rotated (about z-axis) segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform);
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform);
 	}
 }
 
@@ -506,9 +508,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			makeRigidTranslation(Vector3d(0.0, m_cubeSize + m_segmentRadius + epsilonTrans, 0.0));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			2); // bottom segment intersects top two triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   2); // bottom segment intersects top two triangles
 	}
 
 	{
@@ -516,9 +518,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			makeRigidTranslation(Vector3d(0.0, -m_cubeSize - m_segmentRadius - epsilonTrans, 0.0));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			2); // top segment intersects bottom two triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   2); // top segment intersects bottom two triangles
 	}
 
 	{
@@ -526,9 +528,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			makeRigidTranslation(Vector3d(-m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans, 0.0, 0.0));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			6); // both segments intersect left two, one top and one bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   6); // both segments intersect left two, one top and one bottom triangles
 	}
 
 	{
@@ -536,9 +538,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			makeRigidTranslation(Vector3d(m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans, 0.0, 0.0));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			6); // both segments intersect right two, one top and one bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   6); // both segments intersect right two, one top and one bottom triangles
 	}
 
 	{
@@ -546,9 +548,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			makeRigidTranslation(Vector3d(0.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			6); // both segments intersect farthest two, one top and one bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   6); // both segments intersect farthest two, one top and one bottom triangles
 	}
 
 	{
@@ -556,9 +558,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			makeRigidTranslation(Vector3d(0.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			6); // both segments intersect nearest two, one top and one bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   6); // both segments intersect nearest two, one top and one bottom triangles
 	}
 
 	// Rotation about X
@@ -568,9 +570,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, offset + m_segmentRadius + epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about x-axis) segment mesh above box)",
-			createSegmentMeshShape(), segmentMeshShapeTransform,
-			createCubeMeshShape(), meshShapeTransform,
-			1); // bottom segment intersect one top triangle
+									   createSegmentMeshShape(), segmentMeshShapeTransform,
+									   createCubeMeshShape(), meshShapeTransform,
+									   1); // bottom segment intersect one top triangle
 	}
 
 	{
@@ -579,9 +581,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, -offset - m_segmentRadius - epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about x-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersect one bottom triangle
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersect one bottom triangle
 	}
 
 	{
@@ -589,9 +591,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about x-axis) segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			4); // both segments intersect two right side triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   4); // both segments intersect two right side triangles
 	}
 
 	{
@@ -599,31 +601,31 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about x-axis) segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			4); // both segments intersect two left side triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   4); // both segments intersect two left side triangles
 	}
 
 	{
 		double offset = (1.0 + std::sin(M_PI_4)) * m_cubeSize * 0.5;
 		segmentMeshShapeTransform =
-			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0,0.0, 0.0, offset + m_segmentRadius + epsilonTrans);
+			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, 0.0, offset + m_segmentRadius + epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about x-axis) segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersects one of the nearer triangle
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersects one of the nearer triangle
 	}
 
 	{
 		double offset = (1.0 + std::sin(M_PI_4)) * m_cubeSize * 0.5;
 		segmentMeshShapeTransform =
-			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0,0.0, 0.0, -offset - m_segmentRadius - epsilonTrans);
+			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, 0.0, -offset - m_segmentRadius - epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about x-axis) segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1);  // bottom segment intersects one of the farther triangle
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1);  // bottom segment intersects one of the farther triangle
 	}
 
 	// Rotation about Y
@@ -632,9 +634,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, 0.0, m_cubeSize + m_segmentRadius + epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about y-axis) segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			2); // bottom segment intersects top two triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   2); // bottom segment intersects top two triangles
 	}
 
 	{
@@ -642,9 +644,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, 0.0, -m_cubeSize - m_segmentRadius - epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about y-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			2); // top segment intersects bottom two triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   2); // top segment intersects bottom two triangles
 	}
 
 	{
@@ -652,9 +654,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about y-axis) segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			6); // both segments intersect left two, one top and one bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   6); // both segments intersect left two, one top and one bottom triangles
 	}
 
 	{
@@ -662,9 +664,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about y-axis) segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			6); // both segments intersect right two, one top and one bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   6); // both segments intersect right two, one top and one bottom triangles
 	}
 
 	{
@@ -672,9 +674,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, 0.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about y-axis) segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			6); // both segments intersect nearest two, one top and one bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   6); // both segments intersect nearest two, one top and one bottom triangles
 	}
 
 	{
@@ -682,9 +684,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, 0.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about y-axis) segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			6); // both segments intersect farthest two, one top and one bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   6); // both segments intersect farthest two, one top and one bottom triangles
 	}
 
 	// Rotation about Z
@@ -694,9 +696,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, offset + m_segmentRadius + epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about z-axis) segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // bottom segment intersect one of the top triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // bottom segment intersect one of the top triangles
 	}
 
 	{
@@ -705,9 +707,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, -offset - m_segmentRadius - epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about z-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersects one of the bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersects one of the bottom triangles
 	}
 
 	{
@@ -716,9 +718,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, offset + m_segmentRadius + epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about z-axis) segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // bottom segment intersects one of the right side triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // bottom segment intersects one of the right side triangles
 	}
 
 	{
@@ -727,9 +729,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, -offset - m_segmentRadius - epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about z-axis) segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersects one of the left side triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersects one of the left side triangles
 	}
 
 	{
@@ -737,9 +739,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, 0.0, m_cubeSize * 0.5 + m_segmentRadius + epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about z-axis) segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			4); // both segments intersect the two nearest triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   4); // both segments intersect the two nearest triangles
 	}
 
 	{
@@ -747,9 +749,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionTest)
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, 0.0, -m_cubeSize * 0.5 - m_segmentRadius - epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection (rotated (about z-axis) segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			4); // both segments intersect the two farthest triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   4); // both segments intersect the two farthest triangles
 	}
 }
 
@@ -774,9 +776,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			makeRigidTranslation(Vector3d(offset, m_cubeSize + epsilonTrans, -offset));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // bottom segment intersects one of the top two triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // bottom segment intersects one of the top two triangles
 	}
 
 	{
@@ -785,9 +787,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			makeRigidTranslation(Vector3d(offset, -m_cubeSize - epsilonTrans, -offset));
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersects one of the bottom two triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersects one of the bottom two triangles
 	}
 
 	// Rotation about X
@@ -797,9 +799,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, offset + epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about x-axis) segment mesh above box)",
-			createSegmentMeshShape(), segmentMeshShapeTransform,
-			createCubeMeshShape(), meshShapeTransform,
-			1); // bottom segment intersects one of the top triangles
+									   createSegmentMeshShape(), segmentMeshShapeTransform,
+									   createCubeMeshShape(), meshShapeTransform,
+									   1); // bottom segment intersects one of the top triangles
 	}
 
 	{
@@ -808,31 +810,31 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, -offset - epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about x-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersect one bottom triangle
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersect one bottom triangle
 	}
 
 	{
 		double offset = (1.0 + std::sin(M_PI_4)) * m_cubeSize * 0.5;
 		segmentMeshShapeTransform =
-			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0,0.0, 0.0, offset + epsilonTrans);
+			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, 0.0, offset + epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about x-axis) segment mesh in front of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersects one of the nearer triangle
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersects one of the nearer triangle
 	}
 
 	{
 		double offset = (1.0 + std::sin(M_PI_4)) * m_cubeSize * 0.5;
 		segmentMeshShapeTransform =
-			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0,0.0, 0.0, -offset - epsilonTrans);
+			buildRigidTransform(M_PI_4, 1.0, 0.0, 0.0, 0.0, 0.0, -offset - epsilonTrans);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about x-axis) segment mesh behind box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1);  // bottom segment intersects one of the farther triangle
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1);  // bottom segment intersects one of the farther triangle
 	}
 
 	// Rotation about Y
@@ -842,9 +844,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, offset, m_cubeSize + epsilonTrans, -offset);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about y-axis) segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // bottom segment intersects one of the top two triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // bottom segment intersects one of the top two triangles
 	}
 
 	{
@@ -853,9 +855,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			buildRigidTransform(M_PI_4, 0.0, 1.0, 0.0, offset, -m_cubeSize - epsilonTrans, -offset);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about y-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersects one of the bottom two triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersects one of the bottom two triangles
 	}
 
 	// Rotation about Z
@@ -865,9 +867,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, offset + epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about z-axis) segment mesh above box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // bottom segment intersect one of the top triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // bottom segment intersect one of the top triangles
 	}
 
 	{
@@ -876,9 +878,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, 0.0, -offset - epsilonTrans, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about z-axis) segment mesh below box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersects one of the bottom triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersects one of the bottom triangles
 	}
 
 	{
@@ -887,9 +889,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, offset + epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about z-axis) segment mesh right of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // bottom segment intersects one of the right side triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // bottom segment intersects one of the right side triangles
 	}
 
 	{
@@ -898,9 +900,9 @@ TEST_F(SegmentMeshTriangleMeshContactCalculationTests, IntersectionWithSegmentAx
 			buildRigidTransform(M_PI_4, 0.0, 0.0, 1.0, -offset - epsilonTrans, 0.0, 0.0);
 		meshShapeTransform.setIdentity();
 		testSegmentMeshTriangleMeshDCD("Intersection with axis (rotated (about z-axis) segment mesh left of box)",
-			segmentMeshShape, segmentMeshShapeTransform,
-			meshShape, meshShapeTransform,
-			1); // top segment intersects one of the left side triangles
+									   segmentMeshShape, segmentMeshShapeTransform,
+									   meshShape, meshShapeTransform,
+									   1); // top segment intersects one of the left side triangles
 	}
 }
 

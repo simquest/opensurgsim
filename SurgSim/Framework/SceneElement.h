@@ -161,7 +161,7 @@ public:
 
 	/// Get the pose of this SceneElement
 	/// \return the pose
-	const SurgSim::Math::RigidTransform3d& getPose() const;
+	const SurgSim::Math::UnalignedRigidTransform3d& getPose() const;
 
 	/// Get the PoseComponent that controls the pose all Representations
 	/// in this SceneElement

@@ -64,8 +64,8 @@ public:
 	void addFemElement()
 	{
 		std::array<size_t, 4> elementNodeIds = {{0, 1, 2, 3}};
-		std::shared_ptr<Fem3DElementCorotationalTetrahedron> element =
-				std::make_shared<Fem3DElementCorotationalTetrahedron>(elementNodeIds);
+		std::shared_ptr<Fem3DElementCorotationalTetrahedron> 
+			element(new Fem3DElementCorotationalTetrahedron(elementNodeIds));
 		element->setYoungModulus(1e9);
 		element->setPoissonRatio(0.45);
 		element->setMassDensity(1000.0);
@@ -88,15 +88,14 @@ protected:
 	size_t m_numNodes;
 	std::shared_ptr<Fem3DCorotationalTetrahedronRepresentation> m_fem;
 	std::shared_ptr<SurgSim::Math::OdeState> m_initialState;
-	SurgSim::Math::RigidTransform3d m_initialPose;
+	SurgSim::Math::UnalignedRigidTransform3d m_initialPose;
 	std::shared_ptr<Fem3DLocalization> m_localization;
 	std::shared_ptr<MockLocalization> m_wrongLocalizationType;
 };
 
 TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, ConstructorTest)
 {
-	ASSERT_NO_THROW(std::shared_ptr<Fem3DCorotationalTetrahedronRepresentation> fem =
-							std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Fem3D"));
+	ASSERT_NO_THROW(auto fem = std::make_shared<Fem3DCorotationalTetrahedronRepresentation>("Fem3D"));
 }
 
 TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, GetNumDofPerNodeTest)

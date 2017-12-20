@@ -54,10 +54,10 @@ public:
 
 	/// Sets the color for the curve
 	/// \param color the new color to be used
-	virtual void setColor(const SurgSim::Math::Vector4d& color)  = 0;
+	virtual void setColor(const SurgSim::Math::UnalignedVector4d& color) = 0;
 
 	/// \return the current color for this curve
-	virtual Math::Vector4d getColor() const = 0;
+	virtual Math::UnalignedVector4d getColor() const = 0;
 
 	/// Sets the line width to be used for drawing this curve
 	/// \param width the new width to be used

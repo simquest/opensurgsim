@@ -82,16 +82,14 @@ public:
 	std::array<size_t, 8> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
-	Eigen::Matrix<double, 24, 1> m_expectedX0;
+	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> m_expectedX0;
 	double m_rho, m_E, m_nu;
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix, m_expectedStiffnessMatrix;
 	SurgSim::Math::Vector m_vectorOnes;
 
 	std::shared_ptr<MockFem3DElementCube> getCubeElement(const std::array<size_t, 8>& nodeIds)
 	{
-		std::shared_ptr<MockFem3DElementCube> element;
-
-		element = std::make_shared<MockFem3DElementCube>(nodeIds);
+		std::shared_ptr<MockFem3DElementCube> element(new MockFem3DElementCube(nodeIds));
 		element->setYoungModulus(m_E);
 		element->setPoissonRatio(m_nu);
 		element->setMassDensity(m_rho);
@@ -368,7 +366,7 @@ public:
 			K.triangularView<Eigen::StrictlyLower>().setZero();
 			K += K.triangularView<Eigen::StrictlyUpper>().adjoint();
 		}
-		addSubMatrix(K, nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix);
+		addSubMatrix(K, nodeIdsVectorForm, 3, &m_expectedStiffnessMatrix);
 	}
 
 	void computeExpectedMassMatrix(std::vector<size_t> nodeIdsVectorForm)
@@ -419,7 +417,7 @@ public:
 		}
 
 		M *= m_rho;
-		addSubMatrix(M, nodeIdsVectorForm, 3 , &m_expectedMassMatrix);
+		addSubMatrix(M, nodeIdsVectorForm, 3, &m_expectedMassMatrix);
 	}
 
 	void SetUp() override
@@ -521,9 +519,10 @@ TEST_F(Fem3DElementCubeTests, ConstructorTest)
 {
 	ASSERT_NO_THROW({MockFem3DElementCube cube(m_nodeIds);});
 	ASSERT_NO_THROW({MockFem3DElementCube* cube = new MockFem3DElementCube(m_nodeIds); delete cube;});
-	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementCube> cube =
-						 std::make_shared<MockFem3DElementCube>(m_nodeIds);
-					});
+// 	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementCube> cube =
+// 						 std::make_shared<MockFem3DElementCube>(m_nodeIds);
+// 					});
+	ASSERT_NO_THROW(std::shared_ptr<MockFem3DElementCube> cube(new MockFem3DElementCube(m_nodeIds)););
 }
 
 TEST_F(Fem3DElementCubeTests, InitializeTest)

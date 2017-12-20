@@ -51,6 +51,8 @@ public:
 	/// Destructor
 	virtual ~Component();
 
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
 	/// Gets component name.
 	/// \return	Name of this component.
 	std::string getName() const;

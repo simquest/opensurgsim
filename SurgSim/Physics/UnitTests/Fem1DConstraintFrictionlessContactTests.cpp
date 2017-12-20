@@ -56,7 +56,7 @@ static void addBeam(Fem1DRepresentation* fem,
 					double youngModulus = 1.0)
 {
 	std::array<size_t, 2> nodes = {node0, node1};
-	auto element = std::make_shared<Fem1DElementBeam>(nodes);
+	std::shared_ptr<Fem1DElementBeam> element(new Fem1DElementBeam(nodes));
 	element->setRadius(radius);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);

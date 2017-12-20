@@ -33,7 +33,10 @@ class Uniform : public virtual UniformBase
 {
 public:
 
-	Uniform() {
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
+	Uniform()
+	{
 		SURGSIM_ADD_RW_PROPERTY(Uniform, T, Value, get, set);
 	}
 

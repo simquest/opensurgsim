@@ -74,7 +74,7 @@ else()
 endif()
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.54 COMPONENTS chrono date_time filesystem system thread REQUIRED)
+find_package(Boost 1.54 COMPONENTS chrono date_time filesystem system thread REQUIRED OPTIONAL_COMPONENTS  program_options)
 mark_as_advanced(Boost_DIR)
 
 # Enable OpenMP

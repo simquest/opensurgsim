@@ -25,6 +25,7 @@
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
+using SurgSim::Math::UnalignedVector4d;
 
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -54,16 +55,18 @@ public:
 TEST_F(MeshTests, MakeMeshTestWorking)
 {
 	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-	ASSERT_NO_THROW({
-		mesh->initialize(cubeVertices, cubeColors, cubeTextures, cubeTriangles);}
+	ASSERT_NO_THROW(
+	{
+		mesh->initialize(cubeVertices, cubeColors, cubeTextures, cubeTriangles);
+	}
 	);
 
 	EXPECT_TRUE(mesh->isValid());
 
 	EXPECT_EQ(cubeVertices.size(), mesh->getNumVertices());
-	EXPECT_EQ(cubeTriangles.size()/3, mesh->getNumTriangles());
+	EXPECT_EQ(cubeTriangles.size() / 3, mesh->getNumTriangles());
 
-	for (size_t i=0; i< cubeVertices.size(); ++i)
+	for (size_t i = 0; i < cubeVertices.size(); ++i)
 	{
 		EXPECT_TRUE(cubeColors[i] == mesh->getVertex(i).data.color.getValue());
 		EXPECT_TRUE(cubeTextures[i] == mesh->getVertex(i).data.texture.getValue());
@@ -75,28 +78,34 @@ TEST_F(MeshTests, MakeMeshColors)
 	std::vector<Vector4d> emptyCubeColors;
 	std::vector<Vector4d> tooFewCubeColors;
 	std::vector<Vector4d> tooManyCubeColors(cubeColors);
-	tooFewCubeColors.push_back(Vector4d(0.0,0.0,0.0,0.0));
-	tooManyCubeColors.push_back(Vector4d(0.0,0.0,0.0,0.0));
+	tooFewCubeColors.push_back(Vector4d(0.0, 0.0, 0.0, 0.0));
+	tooManyCubeColors.push_back(Vector4d(0.0, 0.0, 0.0, 0.0));
 
 	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-	ASSERT_NO_THROW({
-		mesh->initialize(cubeVertices, emptyCubeColors, cubeTextures, cubeTriangles);}
+	ASSERT_NO_THROW(
+	{
+		mesh->initialize(cubeVertices, emptyCubeColors, cubeTextures, cubeTriangles);
+	}
 	);
 
-	for (size_t i=0; i< cubeVertices.size(); ++i)
+	for (size_t i = 0; i < cubeVertices.size(); ++i)
 	{
 		EXPECT_FALSE(mesh->getVertex(i).data.color.hasValue());
 	}
 
 
 	mesh = std::make_shared<Mesh>();
-	ASSERT_ANY_THROW({
-		mesh->initialize(cubeVertices, tooFewCubeColors, cubeTextures, cubeTriangles);}
+	ASSERT_ANY_THROW(
+	{
+		mesh->initialize(cubeVertices, tooFewCubeColors, cubeTextures, cubeTriangles);
+	}
 	);
 
 	mesh = std::make_shared<Mesh>();
-	ASSERT_NO_THROW({
-		mesh->initialize(cubeVertices, tooManyCubeColors, cubeTextures, cubeTriangles);}
+	ASSERT_NO_THROW(
+	{
+		mesh->initialize(cubeVertices, tooManyCubeColors, cubeTextures, cubeTriangles);
+	}
 	);
 
 }
@@ -106,27 +115,33 @@ TEST_F(MeshTests, MakeMeshTextures)
 	std::vector<Vector2d> emptyCubeTextures;
 	std::vector<Vector2d> tooFewCubeTextures;
 	std::vector<Vector2d> tooManyCubeTextures(cubeTextures);
-	tooFewCubeTextures.push_back(Vector2d(0.0,0.0));
-	tooManyCubeTextures.push_back(Vector2d(0.0,0.0));
+	tooFewCubeTextures.push_back(Vector2d(0.0, 0.0));
+	tooManyCubeTextures.push_back(Vector2d(0.0, 0.0));
 
 	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-	ASSERT_NO_THROW({
-		mesh->initialize(cubeVertices, cubeColors, emptyCubeTextures, cubeTriangles);}
+	ASSERT_NO_THROW(
+	{
+		mesh->initialize(cubeVertices, cubeColors, emptyCubeTextures, cubeTriangles);
+	}
 	);
 
-	for (size_t i=0; i< cubeVertices.size(); ++i)
+	for (size_t i = 0; i < cubeVertices.size(); ++i)
 	{
 		EXPECT_FALSE(mesh->getVertex(i).data.texture.hasValue());
 	}
 
 	mesh = std::make_shared<Mesh>();
-	ASSERT_ANY_THROW({
-		mesh->initialize(cubeVertices, cubeColors, tooFewCubeTextures, cubeTriangles);}
+	ASSERT_ANY_THROW(
+	{
+		mesh->initialize(cubeVertices, cubeColors, tooFewCubeTextures, cubeTriangles);
+	}
 	);
 
 	mesh = std::make_shared<Mesh>();
-	ASSERT_NO_THROW({
-		mesh->initialize(cubeVertices, cubeColors, tooManyCubeTextures, cubeTriangles);}
+	ASSERT_NO_THROW(
+	{
+		mesh->initialize(cubeVertices, cubeColors, tooManyCubeTextures, cubeTriangles);
+	}
 	);
 
 }

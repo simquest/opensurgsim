@@ -45,8 +45,8 @@ public:
 	std::shared_ptr<Shape> shape1;
 	std::shared_ptr<Shape> shape2;
 
-	RigidTransform3d transform1;
-	RigidTransform3d transform2;
+	UnalignedRigidTransform3d transform1;
+	UnalignedRigidTransform3d transform2;
 };
 
 TEST_F(CompoundShapeTest, SimpleShapes)
@@ -82,7 +82,7 @@ TEST_F(CompoundShapeTest, Transforms)
 
 	compoundShape->setPose(1, transform1);
 
-	std::vector<RigidTransform3d> poses;
+	std::vector<UnalignedRigidTransform3d> poses;
 
 	EXPECT_ANY_THROW(compoundShape->setPoses(poses));
 	poses.push_back(transform1);

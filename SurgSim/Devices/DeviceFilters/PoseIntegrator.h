@@ -45,7 +45,7 @@ class PoseIntegrator : public DeviceFilter
 {
 public:
 	/// The type used for poses.
-	typedef Math::RigidTransform3d PoseType;
+	typedef Math::UnalignedRigidTransform3d PoseType;
 
 	/// Constructor.
 	/// \param name	Name of this device filter.

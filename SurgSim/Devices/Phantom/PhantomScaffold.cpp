@@ -256,6 +256,8 @@ struct PhantomScaffold::DeviceData
 	{
 	}
 
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
 	/// The OpenHaptics device name.
 	const std::string initializationName;
 	/// The corresponding device object.

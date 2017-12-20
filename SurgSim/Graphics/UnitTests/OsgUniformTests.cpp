@@ -25,18 +25,26 @@
 
 #include <random>
 
+#include <boost/align/aligned_allocator.hpp>
+
 using SurgSim::Math::Vector2f;
 using SurgSim::Math::Vector3f;
 using SurgSim::Math::Vector4f;
+using SurgSim::Math::UnalignedVector4f;
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
+using SurgSim::Math::UnalignedVector4d;
 using SurgSim::Math::Matrix22f;
+using SurgSim::Math::UnalignedMatrix22f;
 using SurgSim::Math::Matrix33f;
 using SurgSim::Math::Matrix44f;
+using SurgSim::Math::UnalignedMatrix44f; 
 using SurgSim::Math::Matrix22d;
+using SurgSim::Math::UnalignedMatrix22d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Matrix44d;
+using SurgSim::Math::UnalignedMatrix44d;
 
 namespace
 {
@@ -56,8 +64,8 @@ namespace Graphics
 template <class Type, class OsgType>
 std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 {
-	std::shared_ptr<OsgUniform<Type>> osgUniform =
-									   std::make_shared<OsgUniform<Type>>("test name");
+	
+	std::shared_ptr<OsgUniform<Type>> osgUniform(new OsgUniform<Type>("test name"));
 	std::shared_ptr<OsgUniformBase> osgUniformBase = osgUniform;
 	std::shared_ptr<Uniform<Type>> uniform = osgUniform;
 	std::shared_ptr<UniformBase> uniformBase = osgUniform;
@@ -76,7 +84,7 @@ std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 template <class Type>
 std::pair<Type, boost::any> testAccessible(const Type& value)
 {
-	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+	std::shared_ptr<OsgUniform<Type>> osgUniform(new OsgUniform<Type>("test name"));
 
 	osgUniform->setValue("Value", value);
 
@@ -87,7 +95,7 @@ template <class Type>
 Type testYamlSetter(const Type& value)
 {
 	YAML::Node node = YAML::convert<Type>::encode(value);
-	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+	std::shared_ptr<OsgUniform<Type>> osgUniform(new OsgUniform<Type>("test name"));
 	osgUniform->set(node);
 	return osgUniform->get();
 }
@@ -95,8 +103,7 @@ Type testYamlSetter(const Type& value)
 template <class Type>
 Type testEncodeDecode(const Type& value)
 {
-
-	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+	std::shared_ptr<OsgUniform<Type>> osgUniform(new OsgUniform<Type>("test name"));
 	osgUniform->set(value);
 	std::shared_ptr<OsgUniformBase> base = osgUniform;
 
@@ -352,7 +359,7 @@ TEST(OsgUniformTests, Vector3fTest)
 }
 TEST(OsgUniformTests, Vector4fTest)
 {
-	testUniformEigen<Vector4f, osg::Vec4f>();
+	testUniformEigen<UnalignedVector4f, osg::Vec4f>();
 }
 
 TEST(OsgUniformTests, Vector2dTest)
@@ -365,12 +372,12 @@ TEST(OsgUniformTests, Vector3dTest)
 }
 TEST(OsgUniformTests, Vector4dTest)
 {
-	testUniformEigen<Vector4d, osg::Vec4d>();
+	testUniformEigen<UnalignedVector4d, osg::Vec4d>();
 }
 
 TEST(OsgUniformTests, Matrix22fTest)
 {
-	testUniformEigen<Matrix22f, osg::Matrix2>();
+	testUniformEigen<UnalignedMatrix22f, osg::Matrix2>();
 }
 TEST(OsgUniformTests, Matrix33fTest)
 {
@@ -378,12 +385,12 @@ TEST(OsgUniformTests, Matrix33fTest)
 }
 TEST(OsgUniformTests, Matrix44fTest)
 {
-	testUniformEigen<Matrix44f, osg::Matrixf>();
+	testUniformEigen<UnalignedMatrix44f, osg::Matrixf>();
 }
 
 TEST(OsgUniformTests, Matrix22dTest)
 {
-	testUniformEigen<Matrix22d, osg::Matrix2d>();
+	testUniformEigen<UnalignedMatrix22d, osg::Matrix2d>();
 }
 TEST(OsgUniformTests, Matrix33dTest)
 {
@@ -391,7 +398,7 @@ TEST(OsgUniformTests, Matrix33dTest)
 }
 TEST(OsgUniformTests, Matrix44dTest)
 {
-	testUniformEigen<Matrix44d, osg::Matrixd>();
+	testUniformEigen<UnalignedMatrix44d, osg::Matrixd>();
 }
 
 TEST(OsgUniformTests, FloatElementsTest)

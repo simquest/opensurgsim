@@ -48,7 +48,7 @@ public:
 
 	int getShapeType() const override;
 
-	void setLocalPose(const SurgSim::Math::RigidTransform3d& pose) override;
+	void setLocalPose(const SurgSim::Math::UnalignedRigidTransform3d& pose) override;
 
 	// Set the shape to be used in this representation
 	// \param shape Shape to be used in this representation.

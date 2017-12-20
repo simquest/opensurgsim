@@ -32,18 +32,18 @@ struct RigidStateTest : public ::testing::Test
 		translation = SurgSim::Math::Vector3d(5.2, -6.13, 4.12356);
 		pose = SurgSim::Math::makeRigidTransform(quaterniond, translation);
 		linearVelocity = SurgSim::Math::Vector3d(2, -3.1, -2.75);
-		angularVelocity = SurgSim::Math::Vector3d (5, -10, 21.5);
+		angularVelocity = SurgSim::Math::Vector3d(5, -10, 21.5);
 		id4x4 = SurgSim::Math::RigidTransform3d::Identity();
 	}
 
-	SurgSim::Math::Quaterniond quaterniond;
+	SurgSim::Math::UnalignedQuaterniond quaterniond;
 	SurgSim::Math::Vector3d translation;
-	SurgSim::Math::RigidTransform3d pose;
+	SurgSim::Math::UnalignedRigidTransform3d pose;
 
 	SurgSim::Math::Vector3d linearVelocity;
 	SurgSim::Math::Vector3d angularVelocity;
 
-	SurgSim::Math::RigidTransform3d id4x4;
+	SurgSim::Math::UnalignedRigidTransform3d id4x4;
 };
 
 TEST_F(RigidStateTest, ConstructorTest)
@@ -126,9 +126,9 @@ TEST_F(RigidStateTest, SerializationTest)
 	SurgSim::Physics::RigidState newRigidRepresentationState;
 	ASSERT_NO_THROW(newRigidRepresentationState = node.as<SurgSim::Physics::RigidState>());
 
-	EXPECT_TRUE(pose.isApprox(newRigidRepresentationState.getValue<SurgSim::Math::RigidTransform3d>("Pose")));
+	EXPECT_TRUE(pose.isApprox(newRigidRepresentationState.getValue<SurgSim::Math::UnalignedRigidTransform3d>("Pose")));
 	EXPECT_TRUE(linearVelocity.isApprox(
-		newRigidRepresentationState.getValue<SurgSim::Math::Vector3d>("LinearVelocity")));
+					newRigidRepresentationState.getValue<SurgSim::Math::Vector3d>("LinearVelocity")));
 	EXPECT_TRUE(angularVelocity.isApprox(
-		newRigidRepresentationState.getValue<SurgSim::Math::Vector3d>("AngularVelocity")));
+					newRigidRepresentationState.getValue<SurgSim::Math::Vector3d>("AngularVelocity")));
 }

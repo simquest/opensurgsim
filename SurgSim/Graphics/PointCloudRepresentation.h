@@ -58,11 +58,11 @@ public:
 
 	/// Sets a color for all of the points together.
 	/// \param	color	The color.
-	virtual void setColor(const SurgSim::Math::Vector4d& color) = 0;
+	virtual void setColor(const SurgSim::Math::UnalignedVector4d& color) = 0;
 
 	/// Gets the color.
 	/// \return The current color.
-	virtual SurgSim::Math::Vector4d getColor() const = 0;
+	virtual SurgSim::Math::UnalignedVector4d getColor() const = 0;
 
 	void updateVertices(const DataStructures::VerticesPlain& vertices);
 

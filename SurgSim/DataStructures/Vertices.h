@@ -53,6 +53,8 @@ class Vertices
 public:
 	/// Vertex type for convenience
 	typedef Vertex<VertexData> VertexType;
+	typedef std::vector<VertexType, Eigen::aligned_allocator<VertexType>> VerticesType;
+
 
 	/// Constructor
 	Vertices();
@@ -100,10 +102,10 @@ public:
 	VertexType& getVertex(size_t id);
 
 	/// Returns a vector containing the position of each vertex.
-	const std::vector<VertexType>& getVertices() const;
+	const VerticesType& getVertices() const;
 
 	/// Returns a vector containing the position of each vertex (non const version).
-	std::vector<VertexType>& getVertices();
+	VerticesType& getVertices();
 
 	/// Sets the position of a vertex.
 	/// \param	id	Unique ID of the vertex
@@ -155,7 +157,7 @@ private:
 	virtual bool doUpdate();
 
 	/// Vertices
-	std::vector<VertexType> m_vertices;
+	VerticesType m_vertices;
 };
 
 typedef Vertices<EmptyData> VerticesPlain;

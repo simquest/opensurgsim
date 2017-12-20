@@ -94,6 +94,15 @@ inline osg::Vec4f toOsg(const SurgSim::Math::Vector4f& vector)
 	Eigen::Map<SurgSim::Math::Vector4f>(osgVector.ptr()) = vector;
 	return osgVector;
 }
+
+/// Convert 4D vector of floats to OSG
+inline osg::Vec4f toOsg(const SurgSim::Math::UnalignedVector4f& vector)
+{
+	osg::Vec4f osgVector;
+	Eigen::Map<SurgSim::Math::Vector4f>(osgVector.ptr()) = vector;
+	return osgVector;
+}
+
 /// Convert from OSG to 4D vector of floats
 inline SurgSim::Math::Vector4f fromOsg(const osg::Vec4f& vector)
 {
@@ -107,6 +116,15 @@ inline osg::Vec4d toOsg(const SurgSim::Math::Vector4d& vector)
 	Eigen::Map<SurgSim::Math::Vector4d>(osgVector.ptr()) = vector;
 	return osgVector;
 }
+
+/// Convert 4D vector of doubles to OSG
+inline osg::Vec4d toOsg(const SurgSim::Math::UnalignedVector4d& vector)
+{
+	osg::Vec4d osgVector;
+	Eigen::Map<SurgSim::Math::UnalignedVector4d>(osgVector.ptr()) = vector;
+	return osgVector;
+}
+
 /// Convert from OSG to 4D vector of doubles
 inline SurgSim::Math::Vector4d fromOsg(const osg::Vec4d& vector)
 {

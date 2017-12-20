@@ -38,7 +38,7 @@ TextRepresentation::TextRepresentation(const std::string name) : Representation(
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TextRepresentation, SurgSim::DataStructures::OptionalValue<double>,
 									  MaximumWidth, getOptionalMaximumWidth, setOptionalMaximumWidth);
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, SurgSim::Math::Vector4d,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, SurgSim::Math::UnalignedVector4d,
 									  Color, getColor, setColor);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, bool, UseScreenSpace,
@@ -47,7 +47,7 @@ TextRepresentation::TextRepresentation(const std::string name) : Representation(
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, bool, DrawBackground,
 									  isDrawingBackground, setDrawBackground);
 
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, Math::Vector4d, BackgroundColor,
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, Math::UnalignedVector4d, BackgroundColor,
 									  getBackgroundColor, setBackgroundColor);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Graphics::TextRepresentation, double, BackgroundMargin,

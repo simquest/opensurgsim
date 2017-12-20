@@ -176,14 +176,14 @@ Node convert<boost::any>::encode(const boost::any rhs)
 				  tryConvert<SurgSim::Math::Vector2d>(rhs, &result) ||
 				  tryConvert<SurgSim::Math::Vector3f>(rhs, &result) ||
 				  tryConvert<SurgSim::Math::Vector3d>(rhs, &result) ||
-				  tryConvert<SurgSim::Math::Vector4f>(rhs, &result) ||
-				  tryConvert<SurgSim::Math::Vector4d>(rhs, &result) ||
-				  tryConvert<SurgSim::Math::Matrix22f>(rhs, &result) ||
-				  tryConvert<SurgSim::Math::Matrix22d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::UnalignedVector4f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::UnalignedVector4d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::UnalignedMatrix22f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::UnalignedMatrix22d>(rhs, &result) ||
 				  tryConvert<SurgSim::Math::Matrix33f>(rhs, &result) ||
 				  tryConvert<SurgSim::Math::Matrix33d>(rhs, &result) ||
-				  tryConvert<SurgSim::Math::Matrix44f>(rhs, &result) ||
-				  tryConvert<SurgSim::Math::Matrix44d>(rhs, &result);
+				  tryConvert<SurgSim::Math::UnalignedMatrix44f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::UnalignedMatrix44d>(rhs, &result);
 
 	}
 	catch (std::exception e)

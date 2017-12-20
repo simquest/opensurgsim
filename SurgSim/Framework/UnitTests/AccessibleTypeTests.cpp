@@ -57,7 +57,7 @@ typedef ::testing::Types<SurgSim::Math::Vector2d,
 		SurgSim::Math::Vector2f,
 		SurgSim::Math::Vector3d,
 		SurgSim::Math::Vector3f,
-		SurgSim::Math::Vector4d,
+		SurgSim::Math::UnalignedVector4d,
 		SurgSim::Math::Vector4f> VectorTypes;
 
 TYPED_TEST_CASE(VectorTest, VectorTypes);
@@ -78,7 +78,8 @@ class RigidTransformTest : public BaseTest<typename T::Scalar>
 public:
 	typedef T RigidTransform;
 };
-typedef ::testing::Types <SurgSim::Math::RigidTransform3f, SurgSim::Math::RigidTransform3d> RigidTransformTypes;
+typedef ::testing::Types <SurgSim::Math::UnalignedRigidTransform3f, SurgSim::Math::UnalignedRigidTransform3d>
+RigidTransformTypes;
 
 TYPED_TEST_CASE(RigidTransformTest, RigidTransformTypes);
 

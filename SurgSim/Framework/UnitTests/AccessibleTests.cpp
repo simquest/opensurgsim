@@ -351,29 +351,29 @@ TEST(AccessibleTests, VirtualFunctionTest)
 TEST(AccessibleTest, ConvertDoubleToFloat)
 {
 	// Values don't matter only care for them to be filled
-	SurgSim::Math::Matrix44d sourceDouble;
+	SurgSim::Math::UnalignedMatrix44d sourceDouble;
 	sourceDouble <<
 				 1.0 / 2.0, 1.0 / 3.0, 1.0 / 4.0, 1.0 / 5.0,
 					 1.0 / 6.0, 1.0 / 7.0, 1.0 / 8.0, 1.0 / 9.0,
 					 1.0 / 10.0, 1.0 / 11.0, 1.0 / 12.0, 1.0 / 13.0,
 					 1.0 / 14.0, 1.0 / 15.0, 1.0 / 16.0, 1.0 / 17.0;
 
-	SurgSim::Math::Matrix44f sourceFloat;
+	SurgSim::Math::UnalignedMatrix44f sourceFloat;
 	sourceFloat <<
 				1.0f / 2.0f, 1.0f / 3.0f, 1.0f / 4.0f, 1.0f / 5.0f,
 					 1.0f / 6.0f, 1.0f / 7.0f, 1.0f / 8.0f, 1.0f / 9.0f,
 					 1.0f / 10.0f, 1.0f / 11.0f, 1.0f / 12.0f, 1.0f / 13.0f,
 					 1.0f / 14.0f, 1.0f / 15.0f, 1.0f / 16.0f, 1.0f / 17.0f;
 
-	SurgSim::Math::Matrix44f target;
+	SurgSim::Math::UnalignedMatrix44f target;
 
-	ASSERT_NO_THROW({convert<SurgSim::Math::Matrix44f>(sourceDouble);});
-	target = convert<SurgSim::Math::Matrix44f>(sourceDouble);
-	SurgSim::Math::Matrix44f doubleToFloat = sourceDouble.cast<float>();
+	ASSERT_NO_THROW({convert<SurgSim::Math::UnalignedMatrix44f>(sourceDouble);});
+	target = convert<SurgSim::Math::UnalignedMatrix44f>(sourceDouble);
+	SurgSim::Math::UnalignedMatrix44f doubleToFloat = sourceDouble.cast<float>();
 	EXPECT_TRUE(target.isApprox(doubleToFloat));
 
-	ASSERT_NO_THROW({convert<SurgSim::Math::Matrix44f>(sourceFloat);});
-	target = convert<SurgSim::Math::Matrix44f>(sourceFloat);
+	ASSERT_NO_THROW({convert<SurgSim::Math::UnalignedMatrix44f>(sourceFloat);});
+	target = convert<SurgSim::Math::UnalignedMatrix44f>(sourceFloat);
 	EXPECT_TRUE(target.isApprox(sourceFloat));
 }
 

@@ -35,7 +35,7 @@ namespace Math
 class LinearSolveAndInverse
 {
 public:
-	virtual ~LinearSolveAndInverse(){}
+	virtual ~LinearSolveAndInverse() {}
 
 	/// Set the linear solver matrix
 	/// \param matrix the new matrix to solve/inverse for
@@ -127,7 +127,7 @@ private:
 
 	///@{
 	/// Intermediate block matrices, helpful to construct the inverse matrix
-	std::vector<Block> m_Di, m_Ei, m_Bi_AiDiminus1_inv;
+	std::vector<Block, Eigen::aligned_allocator<Block>> m_Di, m_Ei, m_Bi_AiDiminus1_inv;
 	///@}
 };
 

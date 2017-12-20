@@ -37,7 +37,7 @@ PaintBehavior::PaintBehavior(const std::string& name) :
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, std::shared_ptr<Framework::Component>, Representation,
 									  getRepresentation, setRepresentation);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, Math::Vector4d, Color, getColor, setColor);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, Math::UnalignedVector4d, Color, getColor, setColor);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, bool, AntiAlias, getAntiAlias, setAntiAlias);
 }
 
@@ -52,12 +52,12 @@ std::shared_ptr<Graphics::OsgMeshRepresentation> PaintBehavior::getRepresentatio
 	return m_representation;
 }
 
-void PaintBehavior::setColor(const Math::Vector4d& color)
+void PaintBehavior::setColor(const Math::UnalignedVector4d& color)
 {
 	m_color = color;
 }
 
-Math::Vector4d PaintBehavior::getColor() const
+SurgSim::Math::UnalignedVector4d PaintBehavior::getColor() const
 {
 	return m_color;
 }

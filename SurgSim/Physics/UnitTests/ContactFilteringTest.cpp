@@ -75,7 +75,6 @@ struct ContactFilteringTest : public ::testing::Test
 		pairWithContacts->addContact(contact);
 		pairWithContacts->addContact(contact);
 		pairWithoutContacts = std::make_shared<Collision::CollisionPair>(collision0, collision0);
-
 	}
 
 	std::shared_ptr<PhysicsManagerState> state;
@@ -102,6 +101,8 @@ TEST_F(ContactFilteringTest, DontProcessWithoutPairs)
 
 TEST_F(ContactFilteringTest, ProcessAllPairsWithContacts)
 {
+	// HS-21-mar-2017 Seeing an intermittent error here don't know if this was caused by the AVX change
+	// #intermittentfailure
 	pairs.push_back(pairWithContacts);
 	pairs.push_back(pairWithContacts);
 	pairs.push_back(pairWithoutContacts);
@@ -127,7 +128,7 @@ TEST_F(ContactFilteringTest, ModifyContacts)
 
 TEST_F(ContactFilteringTest, ProcessAllFilters)
 {
-	// Gmock is might not be threadsafe on windows, need separate instances
+	// Gmock might not be threadsafe on windows, need separate instances
 	std::vector<std::shared_ptr<Collision::ContactFilter>> filters;
 	auto filter1 = std::make_shared<MockContactFilter>("Filter1");
 	filters.push_back(filter1);

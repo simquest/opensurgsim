@@ -182,7 +182,7 @@ void SceneElement::setPose(const SurgSim::Math::RigidTransform3d& pose)
 	m_pose->setPose(pose);
 }
 
-const SurgSim::Math::RigidTransform3d& SceneElement::getPose() const
+const SurgSim::Math::UnalignedRigidTransform3d& SceneElement::getPose() const
 {
 	return m_pose->getPose();
 }
@@ -207,8 +207,8 @@ boost::any SceneElement::getValue(const std::string& component, const std::strin
 {
 	auto found = m_components.find(component);
 	SURGSIM_ASSERT(found != m_components.end())
-		<< "Component named " << component << " not found in SceneElement named " << getName()
-		<< ". Cannot get " << property << " property.";
+			<< "Component named " << component << " not found in SceneElement named " << getName()
+			<< ". Cannot get " << property << " property.";
 	return found->second->getValue(property);
 }
 
@@ -216,8 +216,8 @@ void SceneElement::setValue(const std::string& component, const std::string& pro
 {
 	auto found = m_components.find(component);
 	SURGSIM_ASSERT(found != m_components.end())
-		<< "Component named " << component << " not found in SceneElement named " << getName()
-		<< ". Cannot get " << property << " property.";
+			<< "Component named " << component << " not found in SceneElement named " << getName()
+			<< ". Cannot get " << property << " property.";
 	found->second->setValue(property, value);
 }
 

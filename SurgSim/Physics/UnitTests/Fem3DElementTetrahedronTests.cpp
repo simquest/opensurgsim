@@ -100,7 +100,7 @@ public:
 	std::array<size_t, 4> m_nodeIds;
 	SurgSim::Math::OdeState m_restState;
 	double m_expectedVolume;
-	Eigen::Matrix<double, 12, 1> m_expectedX0;
+	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_expectedX0;
 	double m_rho, m_E, m_nu;
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix;
 	SurgSim::Math::Matrix m_expectedStiffnessMatrix, m_expectedStiffnessMatrix2;
@@ -154,7 +154,7 @@ public:
 			M.block(9, 0, 3, 3).diagonal().setConstant(1.0);
 		}
 		M *= m_rho * m_expectedVolume / 20.0;
-		addSubMatrix(M, m_nodeIdsVectorForm, 3 , &m_expectedMassMatrix);
+		addSubMatrix(M, m_nodeIdsVectorForm, 3, &m_expectedMassMatrix);
 
 		Eigen::Matrix<double, 12, 12> K = Eigen::Matrix<double, 12, 12>::Zero();
 		{
@@ -194,7 +194,7 @@ public:
 
 			K = m_expectedVolume * B.transpose() * E * B;
 		}
-		addSubMatrix(K, m_nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix);
+		addSubMatrix(K, m_nodeIdsVectorForm, 3, &m_expectedStiffnessMatrix);
 
 		// Expecte stiffness matrix given for our case in:
 		// http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf
@@ -244,7 +244,7 @@ public:
 
 		K *= E;
 
-		addSubMatrix(K, m_nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix2);
+		addSubMatrix(K, m_nodeIdsVectorForm, 3, &m_expectedStiffnessMatrix2);
 	}
 };
 
@@ -255,9 +255,10 @@ TEST_F(Fem3DElementTetrahedronTests, ConstructorTest)
 {
 	ASSERT_NO_THROW({MockFem3DElementTet tet(m_nodeIds);});
 	ASSERT_NO_THROW({MockFem3DElementTet* tet = new MockFem3DElementTet(m_nodeIds); delete tet;});
-	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementTet> tet =
-						 std::make_shared<MockFem3DElementTet>(m_nodeIds);
-					});
+// 	ASSERT_NO_THROW({std::shared_ptr<MockFem3DElementTet> tet =
+// 						 std::make_shared<MockFem3DElementTet>(m_nodeIds);
+//					});
+	ASSERT_NO_THROW(std::shared_ptr<MockFem3DElementTet> var(new MockFem3DElementTet(m_nodeIds)););
 }
 
 TEST_F(Fem3DElementTetrahedronTests, NodeIdsTest)

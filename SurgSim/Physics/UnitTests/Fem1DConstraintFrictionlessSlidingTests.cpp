@@ -43,8 +43,8 @@ using SurgSim::Math::Vector2d;
 
 namespace
 {
-	const double epsilon = 1e-10;
-	const double dt = 1e-3;
+const double epsilon = 1e-10;
+const double dt = 1e-3;
 };
 
 static void addBeam(Fem1DRepresentation* fem,
@@ -55,7 +55,7 @@ static void addBeam(Fem1DRepresentation* fem,
 					double youngModulus = 1.0)
 {
 	std::array<size_t, 2> nodes = {node0, node1};
-	auto element = std::make_shared<Fem1DElementBeam>(nodes);
+	std::shared_ptr<Fem1DElementBeam> element(new Fem1DElementBeam(nodes));
 	element->setRadius(radius);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
@@ -142,7 +142,7 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpTest)
 	setSlidingConstraintAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
-		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+						  &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	auto pose = m_constraintData.getPose().inverse().rotation();
 	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));
@@ -180,7 +180,7 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpCoordinateTest)
 	setSlidingConstraintAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
-		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+						  &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	auto pose = m_constraintData.getPose().inverse().rotation();
 	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));
@@ -233,11 +233,11 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpIndiciesTest)
 
 	Eigen::Matrix<double, 5, 5> localC;
 	localC <<
-		-0.2294,  0.5160,  0.2520,  0.5941, -0.4854,
-		0.1233, -0.4433,  0.3679,  0.9307,  0.2600,
-		0.1988,  0.6637, -0.7591,  0.1475,  0.8517,
-		-0.5495, -0.4305,  0.3162, -0.7862,  0.7627,
-		-0.5754,  0.4108,  0.8445, -0.5565,  0.7150;
+		   -0.2294,  0.5160,  0.2520,  0.5941, -0.4854,
+		   0.1233, -0.4433,  0.3679,  0.9307,  0.2600,
+		   0.1988,  0.6637, -0.7591,  0.1475,  0.8517,
+		   -0.5495, -0.4305,  0.3162, -0.7862,  0.7627,
+		   -0.5754,  0.4108,  0.8445, -0.5565,  0.7150;
 	localC = localC * localC.transpose(); // force to be symmetric
 
 	Eigen::Matrix<double, 5, 1> localCHt = localC * localH.transpose();
@@ -258,8 +258,8 @@ TEST_F(Fem1DConstraintFrictionlessSlidingTests, BuildMlcpIndiciesTest)
 	setSlidingConstraintAt(coord);
 
 	implementation->build(dt, m_constraintData, m_localization,
-		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint,
-		SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+						  &mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint,
+						  SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	auto pose = m_constraintData.getPose().inverse().rotation();
 	EXPECT_TRUE((pose * m_slidingDirection).isApprox(Vector3d(1.0, 0.0, 0.0)));

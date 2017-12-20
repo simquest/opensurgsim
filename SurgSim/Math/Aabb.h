@@ -86,8 +86,8 @@ Eigen::AlignedBox<Scalar, Dim> makeAabb(
 /// \param transform The Rigidtransform to use
 /// \param aabb the aabb to transform
 /// \return the transformed aabb
-template <class Scalar, int Dim>
-Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim, Eigen::Isometry>& transform,
+template <class Scalar, int Dim, int MOpt>
+Eigen::AlignedBox<Scalar, Dim> transformAabb(const Eigen::Transform<Scalar, Dim, Eigen::Isometry, MOpt>& transform,
 		const Eigen::AlignedBox<Scalar, Dim>& aabb)
 {
 	static std::array<typename Eigen::AlignedBox<Scalar, Dim>::CornerType, 8> corners =

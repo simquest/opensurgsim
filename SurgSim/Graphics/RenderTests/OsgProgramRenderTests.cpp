@@ -85,15 +85,9 @@ std::shared_ptr<Material> createShinyMaterial(const SurgSim::Framework::Applicat
 	auto program = SurgSim::Graphics::loadProgram(data, "Shaders/material");
 	material->setProgram(program);
 
-	std::shared_ptr<SurgSim::Graphics::UniformBase>
-	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
-	material->addUniform(uniform);
-
-	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
-	material->addUniform(uniform);
-
-	uniform = std::make_shared<OsgUniform<float>>("shininess");
-	material->addUniform(uniform);
+	material->addUniform("vec4", "diffuseColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("vec4", "specularColor", SurgSim::Math::UnalignedVector4f(0.01, 0.01, 0.01, 1.0));
+	material->addUniform("float", "shininess", 32.0f);
 
 	return material;
 }
@@ -143,8 +137,8 @@ struct OsgProgramRenderTests : public RenderTest
 		// Light
 		auto sceneElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("Light");
 		auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Light");
-		light->setDiffuseColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
-		light->setSpecularColor(SurgSim::Math::Vector4d(0.8, 0.8, 0.8, 1.0));
+		light->setDiffuseColor(SurgSim::Math::UnalignedVector4d(0.8, 0.8, 0.8, 1.0));
+		light->setSpecularColor(SurgSim::Math::UnalignedVector4d(0.8, 0.8, 0.8, 1.0));
 		light->setLightGroupReference(SurgSim::Graphics::Representation::DefaultGroupName);
 		sceneElement->addComponent(light);
 		sceneElement->addComponent(std::make_shared<SurgSim::Graphics::OsgAxesRepresentation>("axes"));
@@ -152,7 +146,7 @@ struct OsgProgramRenderTests : public RenderTest
 		scene->addSceneElement(sceneElement);
 
 		// Camera
-		viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.1, 0.1, 0.1, 1.0));
+		viewElement->getCamera()->setAmbientColor(SurgSim::Math::UnalignedVector4d(0.1, 0.1, 0.1, 1.0));
 		viewElement->setPose(
 			makeRigidTransform(Vector3d(0.0, 0.0, -2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0)));
 		viewElement->enableManipulator(true);
@@ -199,8 +193,8 @@ TEST_F(OsgProgramRenderTests, Shiny)
 	sphereRepresentation->setRadius(0.25);
 
 	auto material = createShinyMaterial(*runtime->getApplicationData());
-	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
-	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 0.4, 1.0));
+	material->setValue("diffuseColor", SurgSim::Math::UnalignedVector4f(0.8, 0.8, 0.1, 1.0));
+	material->setValue("specularColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 0.4, 1.0));
 	material->setValue("shininess", 64.0f);
 	sphereRepresentation->setMaterial(material);
 	sceneElement->addComponent(material);
@@ -223,19 +217,9 @@ TEST_F(OsgProgramRenderTests, TexturedShiny)
 	ASSERT_TRUE(program != nullptr);
 	material->setProgram(program);
 
-	std::shared_ptr<SurgSim::Graphics::UniformBase>
-	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("diffuseColor");
-	material->addUniform(uniform);
-
-	uniform = std::make_shared<OsgUniform<SurgSim::Math::Vector4f>>("specularColor");
-	material->addUniform(uniform);
-
-	uniform = std::make_shared<OsgUniform<float>>("shininess");
-	material->addUniform(uniform);
-
-	material->setValue("diffuseColor", SurgSim::Math::Vector4f(0.8, 0.8, 0.1, 1.0));
-	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 0.4, 1.0));
-	material->setValue("shininess", 1.0f);
+	material->addUniform("vec4", "diffuseColor", SurgSim::Math::UnalignedVector4f(0.8, 0.8, 0.1, 1.0));
+	material->addUniform("vec4", "specularColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 0.4, 1.0));
+	material->addUniform("float", "shininess", 1.0f);
 
 	// Provide a texture for the diffuse color
 	std::string filename;
@@ -287,17 +271,10 @@ TEST_F(OsgProgramRenderTests, Metal)
 	ASSERT_TRUE(program != nullptr);
 	material->setProgram(program);
 
-	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
-
-	material->addUniform("float", "shininess");
-	material->setValue("shininess", 1024.0f);
-
-	material->addUniform("float", "specularPercent");
-	material->setValue("specularPercent", 1.0f);
-
-	material->addUniform("float", "diffusePercent");
-	material->setValue("diffusePercent", 0.0f);
+	material->addUniform("vec4", "specularColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("float", "shininess", 1024.0f);
+	material->addUniform("float", "specularPercent", 1.0f);
+	material->addUniform("float", "diffusePercent", 0.0f);
 
 	std::string filename;
 	// Provide a fake shadow map, it's all black so no shadow contribution
@@ -360,15 +337,9 @@ TEST_F(OsgProgramRenderTests, NormalMap)
 	auto program = SurgSim::Graphics::loadProgram(*runtime->getApplicationData(), "Shaders/dns_mapping_material");
 	ASSERT_TRUE(program != nullptr);
 	material->setProgram(program);
-
-	material->addUniform("vec4", "specularColor");
-	material->setValue("specularColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
-
-	material->addUniform("vec4", "diffuseColor");
-	material->setValue("diffuseColor", SurgSim::Math::Vector4f(1.0, 1.0, 1.0, 1.0));
-
-	material->addUniform("float", "shininess");
-	material->setValue("shininess", 1.0f);
+	material->addUniform("vec4", "specularColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("vec4", "diffuseColor", SurgSim::Math::UnalignedVector4f(1.0, 1.0, 1.0, 1.0));
+	material->addUniform("float", "shininess", 1.0f);
 
 	std::string filename;
 
@@ -408,10 +379,8 @@ TEST_F(OsgProgramRenderTests, BlurShader)
 	// Material
 	auto material = Graphics::buildMaterial("Shaders/gauss_blur_horizontal.vert",
 											"Shaders/gauss_blur.frag");
-	material->addUniform("float", "width");
-	material->setValue("width", 1024.0f);
-	material->addUniform("float", "blurRadius");
-	material->setValue("blurRadius", 16.0f);
+	material->addUniform("float", "width", 1024.0f);
+	material->addUniform("float", "blurRadius", 16.0f);
 	material->getProgram()->setGlobalScope(true);
 
 	auto graphics = std::make_shared<Graphics::OsgScreenSpaceQuadRepresentation>("Quad");

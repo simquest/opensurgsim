@@ -33,6 +33,7 @@ using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::UnalignedRigidTransform3d;
 using SurgSim::Math::SphereShape;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::FixedRepresentation;
@@ -80,13 +81,13 @@ public:
 	std::shared_ptr<BasicSceneElement> m_element;
 
 	// Fixed representation initialization pose
-	RigidTransform3d m_initialTransformation;
+	UnalignedRigidTransform3d m_initialTransformation;
 
 	// Fixed representation current pose
-	RigidTransform3d m_currentTransformation;
+	UnalignedRigidTransform3d m_currentTransformation;
 
 	// Identity pose (no translation/rotation)
-	RigidTransform3d m_identityTransformation;
+	UnalignedRigidTransform3d m_identityTransformation;
 
 };
 
@@ -200,7 +201,7 @@ TEST_F(FixedRepresentationTest, SerializationTest)
 
 		std::shared_ptr<FixedRepresentation> newRepresentation;
 		EXPECT_NO_THROW(newRepresentation =
-			std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
+							std::dynamic_pointer_cast<FixedRepresentation>(node.as<std::shared_ptr<SurgSim::Framework::Component>>()));
 		EXPECT_NE(nullptr, newRepresentation);
 	}
 

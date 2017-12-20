@@ -72,13 +72,13 @@ public:
 
 	std::shared_ptr<SurgSim::Graphics::Group> getGroup() override;
 
-	void setDiffuseColor(const SurgSim::Math::Vector4d& color) override;
+	void setDiffuseColor(const SurgSim::Math::UnalignedVector4d& color) override;
 
-	SurgSim::Math::Vector4d getDiffuseColor() override;
+	SurgSim::Math::UnalignedVector4d getDiffuseColor() override;
 
-	void setSpecularColor(const SurgSim::Math::Vector4d& color) override;
+	void setSpecularColor(const SurgSim::Math::UnalignedVector4d& color) override;
 
-	SurgSim::Math::Vector4d getSpecularColor() override;
+	SurgSim::Math::UnalignedVector4d getSpecularColor() override;
 
 	void setConstantAttenuation(double val) override;
 
@@ -119,8 +119,8 @@ private:
 	/// Map for managing all uniforms that this object owns
 	std::unordered_map<int, osg::ref_ptr<osg::Uniform>> m_uniforms;
 
-	SurgSim::Math::Vector4d m_diffuseColor;		///< The actual diffuse color that was set
-	SurgSim::Math::Vector4d m_specularColor;	///< The actual specular color that was set
+	SurgSim::Math::UnalignedVector4d m_diffuseColor;		///< The actual diffuse color that was set
+	SurgSim::Math::UnalignedVector4d m_specularColor;	///< The actual specular color that was set
 
 	double m_constantAttenuation;				///< The actual constant attenuation value that was set
 	double m_linearAttenuation;					///< The actual linear attenuation value that was set
