@@ -289,10 +289,55 @@ static typename std::vector<PairTypeLhs>::const_iterator getEquivalentPair(const
 					   );
 }
 
+
+std::vector<std::pair<size_t, size_t>> getPairWiseIntersections(
+	const std::shared_ptr<SurgSim::Math::MeshShape>& meshA,
+	const std::shared_ptr<SurgSim::Math::MeshShape>& meshB)
+{
+	std::vector<std::pair<size_t, size_t>> intersections;
+	std::vector<Math::Aabbd> leftAabb;
+	std::vector<Math::Aabbd> rightAabb;
+
+	for (size_t i = 0; i < meshA->getNumTriangles(); ++i)
+	{
+		auto& triangle = meshA->getTriangle(i);
+		Aabbd aabb(SurgSim::Math::makeAabb(
+			meshA->getVertex(triangle.verticesId[0]).position,
+			meshA->getVertex(triangle.verticesId[1]).position,
+			meshA->getVertex(triangle.verticesId[2]).position));
+		leftAabb.push_back(aabb);
+	}
+
+	for (size_t i = 0; i < meshB->getNumTriangles(); ++i)
+	{
+		auto& triangle = meshB->getTriangle(i);
+		Aabbd aabb(SurgSim::Math::makeAabb(
+			meshB->getVertex(triangle.verticesId[0]).position,
+			meshB->getVertex(triangle.verticesId[1]).position,
+			meshB->getVertex(triangle.verticesId[2]).position));
+		rightAabb.push_back(aabb);
+	}
+
+	for (size_t i = 0; i < leftAabb.size(); ++i)
+	{
+		for (size_t j = 0; j < rightAabb.size(); ++j)
+		{
+			if (leftAabb[i].intersects(rightAabb[j]))
+			{
+				intersections.emplace_back(i, j);
+			}
+		}
+	}
+
+	std::sort(std::begin(intersections), std::end(intersections));
+	return intersections;
+}
+
 TEST(AabbTreeTests, SpatialJoinTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	const std::string fileName = "Geometry/staple_collision.ply";
+	//const std::string fileName = "Geometry/staple_collision.ply";
+	const std::string fileName = "Geometry/arm_collision.ply";
 
 	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
 	ASSERT_NO_THROW(meshA->load(fileName));
@@ -300,7 +345,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
 	ASSERT_NO_THROW(meshB->load(fileName));
 
-	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.005, 0.0, 0.0));
+	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.05, 0.05, 0.0));
 	meshB->transform(rhsPose);
 
 	// update the AABB trees
@@ -321,7 +366,10 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	auto& leavesB = leavesVisitorB.leaves;
 
 	std::vector<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
-			expectedIntersection;
+		expectedIntersection;
+
+	std::vector<std::pair<size_t, size_t>> triIntersections;
+
 	for (auto leafA = leavesA.begin(); leafA != leavesA.end(); ++leafA)
 	{
 		for (auto leafB = leavesB.begin(); leafB != leavesB.end(); ++leafB)
@@ -329,9 +377,26 @@ TEST(AabbTreeTests, SpatialJoinTest)
 			if (SurgSim::Math::doAabbIntersect((*leafA)->getAabb(), (*leafB)->getAabb()))
 			{
 				expectedIntersection.emplace_back(*leafA, *leafB);
+
+				auto& leftData = (static_cast<AabbTreeData*>((*leafA)->getData().get())->getData());
+				auto& rightData = (static_cast<AabbTreeData*>((*leafB)->getData().get())->getData());
+
+				for (auto& leftTri : leftData)
+				{
+					for (auto& rightTri : rightData)
+					{
+						if (leftTri.first.intersects(rightTri.first))
+						{
+							triIntersections.emplace_back(leftTri.second, rightTri.second);
+						}
+					}
+				}
 			}
 		}
 	}
+
+	std::sort(std::begin(triIntersections), std::end(triIntersections));
+	ASSERT_EQ(triIntersections, getPairWiseIntersections(meshA, meshB));
 
 	{
 		SCOPED_TRACE("Equivalent sets");
@@ -367,6 +432,126 @@ TEST(AabbTreeTests, SpatialJoinTest)
 		EXPECT_TRUE(getEquivalentPair(expectedIntersection, actualIntersection.back()) == expectedIntersection.cend());
 		EXPECT_TRUE(getEquivalentPair(actualIntersection, expectedIntersection.back()) == actualIntersection.cend());
 	}
+}
+
+static void fillTree(std::shared_ptr<SurgSim::Experimental::AabbTree> tree,
+	std::shared_ptr<SurgSim::Math::MeshShape> mesh)
+{
+
+	std::vector<Aabbd> aabbs;
+	std::vector<size_t> indices;
+	aabbs.reserve(mesh->getNumTriangles());
+	indices.reserve(mesh->getNumTriangles());
+
+	for (size_t i = 0; i < mesh->getNumTriangles(); ++i)
+	{
+		auto triangle = mesh->getTriangle(i);
+		Aabbd aabb(SurgSim::Math::makeAabb(
+			mesh->getVertex(triangle.verticesId[0]).position,
+			mesh->getVertex(triangle.verticesId[1]).position,
+			mesh->getVertex(triangle.verticesId[2]).position));
+		aabbs.emplace_back(std::move(aabb));
+		indices.push_back(i);
+	}
+	tree->build(aabbs, &indices);
+	//tree->update(aabbs);
+}
+
+TEST(AabbTree2Tests, NodeTest)
+{
+	using SurgSim::Math::Vector3d;
+	Vector3d a(-1, 1, 1);
+	Vector3d b(0, 0.5, 0.5);
+	Vector3d c(1, 0, 0);
+
+	std::vector<size_t> indices{ 0, 1 };
+	std::vector<Aabbd> aabbs;
+
+	aabbs.push_back(Aabbd().extend(a).extend(b));
+	aabbs.push_back(Aabbd().extend(b).extend(c));
+
+	Experimental::AabbTree tree;
+	tree.build(aabbs, &indices);
+
+}
+
+TEST(AabbTree2Tests, Consistency)
+{
+
+	auto tree = std::make_shared<SurgSim::Experimental::AabbTree>();
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	const std::string fileName = "Geometry/arm_collision.ply";
+
+	auto mesh = std::make_shared<SurgSim::Math::MeshShape>();
+	ASSERT_NO_THROW(mesh->load(fileName));
+
+	fillTree(tree, mesh);
+
+	auto data = tree->getTreeData();
+
+	std::vector<size_t> children;
+	size_t index = 0;
+	for (auto& node : data)
+	{
+		if (node.left != -1)
+		{
+			EXPECT_TRUE(index < node.left && index < node.right) << index;
+			children.push_back(node.left);
+			children.push_back(node.right);
+
+			Aabbd parent(node.aabb);
+			Aabbd left(data[node.left].aabb);
+			Aabbd right(data[node.right].aabb);
+			Aabbd combined(left);
+			combined.extend(right);
+			EXPECT_TRUE(node.aabb.isApprox(combined)) << index;
+		}
+		++index;
+	}
+
+	std::sort(std::begin(children), std::end(children));
+
+	for (int i = 0; i < children.size() - 1; ++i)
+	{
+		EXPECT_TRUE(children[i + 1] - children[i] == 1);
+	}
+}
+
+TEST(AabbTree2Tests, SpatialJoinTestAabbTree2)
+{
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	//const std::string fileName = "Geometry/staple_collision.ply";
+	const std::string fileName = "Geometry/arm_collision.ply";
+
+	auto meshA = std::make_shared<SurgSim::Math::MeshShape>();
+	ASSERT_NO_THROW(meshA->load(fileName));
+
+	auto meshB = std::make_shared<SurgSim::Math::MeshShape>();
+	ASSERT_NO_THROW(meshB->load(fileName));
+
+	RigidTransform3d rhsPose = SurgSim::Math::makeRigidTranslation(Vector3d(0.05, 0.05, 0.0));
+	meshB->transform(rhsPose);
+
+	// update the AABB trees
+	meshA->update();
+	meshB->update();
+
+	std::vector<std::pair<size_t, size_t>> intersections;
+
+	auto treeA = std::make_shared<SurgSim::Experimental::AabbTree>();
+	fillTree(treeA, meshA);
+
+	auto treeB = std::make_shared<SurgSim::Experimental::AabbTree>();
+	fillTree(treeB, meshB);
+
+	treeA->recursiveSpatialJoin(*treeB, &intersections, 0, 0);
+	//treeA->spatialJoin(*treeB, &intersections);
+	std::sort(std::begin(intersections), std::end(intersections));
+
+	auto result = getPairWiseIntersections(meshA, meshB);
+
+	EXPECT_EQ(result, intersections);
+
 }
 
 } // namespace DataStructure

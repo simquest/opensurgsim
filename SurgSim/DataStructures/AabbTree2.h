@@ -23,20 +23,28 @@ namespace SurgSim {
 namespace Experimental {
 
 struct AabbTreeNode {
-	size_t parent;
-	size_t left;
+	Math::Aabbd aabb;
 	union {
 		size_t right;
 		size_t triangle;
 	};
-	Math::Aabbd aabb;
+	size_t left;
+	size_t parent;
 };
 
 class AabbTree {
 public:
+	std::vector<AabbTreeNode> m_nodes;
+
+	std::vector<std::pair<size_t, size_t>> stack;
+
 	typedef std::vector<size_t>::iterator iterator_t;
 
+	void build(std::vector<std::pair<Math::Aabbd, size_t>>& data);
+
 	void build(std::vector<Math::Aabbd>& aabbs, std::vector<size_t>* indices);
+
+	const std::vector<AabbTreeNode>& getTreeData();
 
 	void update(std::vector<Math::Aabbd>& aabbs);
 
@@ -47,12 +55,14 @@ public:
 
 	void spatialJoin(const AabbTree & other, std::vector<std::pair<size_t, size_t>>* triangles);
 
-	void recursiveSpatialJoin(const AabbTree & other, std::vector<std::pair<size_t, size_t>>* triangles, size_t myNode, size_t otherNode);
+	void recursiveSpatialJoin(const AabbTree & other, size_t myNode, size_t otherNode, std::vector<std::pair<size_t, size_t>>* triangles);
+
+	void recursiveSpatialJoin2(const AabbTree & other, size_t myIndex, size_t otherIndex, std::vector<std::pair<size_t, size_t>>* triangles);
 
 private:
-	std::vector<AabbTreeNode> m_nodes;
 	
 	size_t build(std::vector<Math::Aabbd>& aabb, std::vector<size_t>* indices, size_t parent, iterator_t start, iterator_t end);
+
 
 };
 

@@ -4,15 +4,20 @@
 
 namespace SurgSim {
 	namespace Experimental {
-		std::vector<std::pair<size_t, size_t>> stack;
 
 		void AabbTree::build(std::vector<Math::Aabbd>& aabbs, std::vector<size_t>* indices)
 		{
 			m_nodes.reserve(indices->size() * 2);
 			m_nodes.clear();
-			build(aabbs, indices, 0, std::begin(*indices), std::end(*indices));
+			build(aabbs, indices, -1, std::begin(*indices), std::end(*indices));
 		}
 
+		const std::vector<AabbTreeNode>&  AabbTree::getTreeData()
+		{
+			return m_nodes;
+		}
+
+		
 		void AabbTree::spatialJoin(const AabbTree & other, std::vector<std::pair<size_t, size_t>>* triangles)
 		{
 			stack.clear();
@@ -27,7 +32,7 @@ namespace SurgSim {
 				if (m_nodes[myIndex].aabb.intersects(other.m_nodes[otherIndex].aabb))
 				{
 					unsigned char value = (isLeaf(m_nodes[myIndex])) ? 1 : 0;
-					value |= (isLeaf(m_nodes[otherIndex])) ? 2 : 0;
+					value |= (isLeaf(other.m_nodes[otherIndex])) ? 2 : 0;
 					
 					switch (value) 
 					{
@@ -46,46 +51,80 @@ namespace SurgSim {
 							stack.emplace_back(m_nodes[myIndex].right, otherIndex);
 							break;
 						case 3:
-							triangles->emplace_back(myIndex, otherIndex);
+							triangles->emplace_back(m_nodes[myIndex].right, other.m_nodes[otherIndex].right);
 							break;
 						default:
-							break;
+							SURGSIM_FAILURE() << "Should be unreachable";
 					}
 				}
 			}
 		}
-
-		void AabbTree::recursiveSpatialJoin(const AabbTree & other, std::vector<std::pair<size_t, size_t>>* triangles,
-			size_t myIndex, size_t otherIndex)
+		
+		void AabbTree::recursiveSpatialJoin(const AabbTree & other, size_t myIndex, size_t otherIndex, std::vector<std::pair<size_t, size_t>>* triangles)
 		{
 				if (m_nodes[myIndex].aabb.intersects(other.m_nodes[otherIndex].aabb))
 				{
-					unsigned char value = (isLeaf(m_nodes[myIndex])) ? 1 : 0;
-					value |= (isLeaf(m_nodes[otherIndex])) ? 2 : 0;
+					unsigned char value = (m_nodes[myIndex].left == -1) ? 1 : 0;
+					value |= (other.m_nodes[otherIndex].left == -1) ? 2 : 0;
 
 					switch (value)
 					{
+					case 3:
+						triangles->emplace_back(m_nodes[myIndex].right, other.m_nodes[otherIndex].right);
+						break;
 					case 0:
-						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].left, other.m_nodes[otherIndex].left);
-						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].left, other.m_nodes[otherIndex].right);
-						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].right, other.m_nodes[otherIndex].left);
-						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].right, other.m_nodes[otherIndex].right);
+						recursiveSpatialJoin(other, m_nodes[myIndex].left, other.m_nodes[otherIndex].left, triangles);
+						recursiveSpatialJoin(other, m_nodes[myIndex].right, other.m_nodes[otherIndex].left, triangles);
+						recursiveSpatialJoin(other, m_nodes[myIndex].left, other.m_nodes[otherIndex].right, triangles);
+						recursiveSpatialJoin(other, m_nodes[myIndex].right, other.m_nodes[otherIndex].right, triangles);
 						break;
 					case 1:
-						recursiveSpatialJoin(other, triangles, myIndex, other.m_nodes[otherIndex].left);
-						recursiveSpatialJoin(other, triangles, myIndex, other.m_nodes[otherIndex].right);
+						recursiveSpatialJoin(other, myIndex, other.m_nodes[otherIndex].left, triangles);
+						recursiveSpatialJoin(other, myIndex, other.m_nodes[otherIndex].right, triangles);
 						break;
 					case 2:
-						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].left, otherIndex);
-						recursiveSpatialJoin(other, triangles, m_nodes[myIndex].right, otherIndex);
-						break;
-					case 3:
-						triangles->emplace_back(myIndex, otherIndex);
+						recursiveSpatialJoin(other, m_nodes[myIndex].left, otherIndex, triangles);
+						recursiveSpatialJoin(other, m_nodes[myIndex].right, otherIndex, triangles);
 						break;
 					default:
 						break;
 					}
 				}
+		}
+
+		void AabbTree::recursiveSpatialJoin2(const AabbTree & other, size_t myIndex, size_t otherIndex, std::vector<std::pair<size_t, size_t>>* triangles)
+		{
+			const auto& myNode = m_nodes[myIndex];
+			const auto& otherNode = other.m_nodes[otherIndex];
+			if (myNode.aabb.intersects(otherNode.aabb))
+			{
+				//unsigned char value = (isLeaf(myNode)) ? 1 : 0;
+				//value |= (isLeaf(otherNode)) ? 2 : 0;
+				unsigned char value = (m_nodes[myIndex].left == -1) ? 1 : 0;
+				value |= (other.m_nodes[otherIndex].left == -1) ? 2 : 0;
+
+				if (value == 3)
+				{
+					triangles->emplace_back(m_nodes[myIndex].right, other.m_nodes[otherIndex].right);
+				}
+				else if (value == 1)
+				{
+					recursiveSpatialJoin2(other, myIndex, otherNode.left, triangles);
+					recursiveSpatialJoin2(other, myIndex, otherNode.right, triangles);
+				}
+				else if (value == 2)
+				{
+					recursiveSpatialJoin2(other, myNode.left, otherIndex, triangles);
+					recursiveSpatialJoin2(other, myNode.right, otherIndex, triangles);
+				}
+				else
+				{
+					recursiveSpatialJoin2(other, myNode.left, otherNode.left, triangles);
+					recursiveSpatialJoin2(other, myNode.right, otherNode.left, triangles);
+					recursiveSpatialJoin2(other, myNode.left, otherNode.right, triangles);
+					recursiveSpatialJoin2(other, myNode.right, otherNode.right, triangles);
+				}
+			}
 		}
 
 		size_t AabbTree::build(
@@ -140,6 +179,7 @@ namespace SurgSim {
 					{
 						midpoint = start + (end - start) / 2;
 					}
+					midpoint = start + (end - start) / 2;
 
 					auto current = m_nodes.size() - 1;
 					
@@ -147,7 +187,7 @@ namespace SurgSim {
 					size_t right = build(aabb, indices, current, midpoint, end);
 					m_nodes[current].left = left;
 					m_nodes[current].right = right;
-					m_nodes[current].aabb = m_nodes[left].aabb.extend(m_nodes[right].aabb);
+					m_nodes[current].aabb = Math::Aabbd(m_nodes[left].aabb).extend(m_nodes[right].aabb);
 					return current;
 				}
 			}
@@ -165,10 +205,13 @@ namespace SurgSim {
 					}
 					else
 					{
-						node.aabb = m_nodes[node.left].aabb.extend(m_nodes[node.right].aabb);
+						node.aabb.setEmpty();
+						node.aabb.extend(m_nodes[node.left].aabb).extend(m_nodes[node.right].aabb);
 					}
 			});
+			
 		}
 
 	}
+
 }
