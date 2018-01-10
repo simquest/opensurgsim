@@ -202,7 +202,7 @@ void MockSpring::addNode(size_t nodeId)
 
 void MockSpring::addForce(const OdeState& state, Vector* F, double scale)
 {
-	SurgSim::Math::addSubVector(scale * m_F, m_nodeIds, 3, F);
+	SurgSim::Math::addSubVector<Vector, Vector>(scale * m_F, m_nodeIds, 3, F);
 }
 
 void MockSpring::addDamping(const OdeState& state, SparseMatrix* D, double scale)
@@ -256,7 +256,7 @@ void MockSpring::addMatVec(const OdeState& state, double alphaD, double alphaK, 
 	Vector xLocal(3 * m_nodeIds.size()), fLocal;
 	SurgSim::Math::getSubVector(x, m_nodeIds, 3, &xLocal);
 	fLocal = (alphaD * m_D + alphaK * m_K) * xLocal;
-	SurgSim::Math::addSubVector(fLocal, m_nodeIds, 3, F);
+	SurgSim::Math::addSubVector<Vector, Vector>(fLocal, m_nodeIds, 3, F);
 }
 
 MockMassSpring::MockMassSpring(const std::string& name,

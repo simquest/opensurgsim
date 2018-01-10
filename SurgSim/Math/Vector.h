@@ -86,9 +86,9 @@ void addSubVector(const SubVector& subVector, Eigen::Index blockId, Eigen::Index
 /// \param blockIds Vector of block indices (for accessing vector) corresponding to the blocks in sub-vector
 /// \param blockSize The block size
 /// \param[out] vector The vector to add the sub-vector blocks into
-template <class VectorType>
-void addSubVector(const Eigen::Ref<const Vector>& subVector,
-	const std::vector<size_t>& blockIds, Eigen::Index blockSize, VectorType* vector)
+template <class Vector, class SubVector>
+void addSubVector(const Eigen::Ref<const SubVector>& subVector,
+	const std::vector<size_t>& blockIds, Eigen::Index blockSize, Vector* vector)
 {
 	const Eigen::Index numBlocks = static_cast<Eigen::Index>(blockIds.size());
 	for (Eigen::Index block = 0; block < numBlocks; ++block)

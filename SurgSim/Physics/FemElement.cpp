@@ -111,12 +111,12 @@ double FemElement::getMass(const SurgSim::Math::OdeState& state) const
 
 void FemElement::addForce(SurgSim::Math::Vector* F, double scale) const
 {
-	Math::addSubVector(m_f * scale, m_nodeIds, m_numDofPerNode, F);
+	Math::addSubVector<Math::Vector, Math::Vector>(m_f * scale, m_nodeIds, m_numDofPerNode, F);
 }
 
 void FemElement::addForce(SurgSim::Math::Vector* F) const
 {
-	Math::addSubVector(m_f, m_nodeIds, m_numDofPerNode, F);
+	Math::addSubVector<Math::Vector, Math::Vector>(m_f, m_nodeIds, m_numDofPerNode, F);
 }
 
 void FemElement::addMass(SurgSim::Math::SparseMatrix* M, double scale) const
@@ -207,7 +207,7 @@ void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const Su
 		(*accumulator).noalias() += alphaK * (m_K * (*extractedX));
 	}
 
-	addSubVector(*accumulator, m_nodeIds, m_numDofPerNode, F);
+	addSubVector<Math::Vector, Math::Vector>(*accumulator, m_nodeIds, m_numDofPerNode, F);
 }
 
 bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const

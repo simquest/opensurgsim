@@ -411,8 +411,8 @@ void testAddFMDK(MockFem3DElementCorotationalTet* tet,
 
 	Eigen::Matrix<double, 12, 1> x;
 	SurgSim::Math::getSubVector(state.getPositions(), tet->getNodeIds(), 3, &x);
-	Eigen::Matrix<double, 12 , 1> f = - R12x12 * K0 * R12x12.transpose() * (x - (R12x12 * tet->getInitialPosition()));
-	SurgSim::Math::addSubVector(f, tet->getNodeIds(), 3, &expectedF);
+	Eigen::Matrix<double, 12, 1> f = - R12x12 * K0 * R12x12.transpose() * (x - (R12x12 * tet->getInitialPosition()));
+	SurgSim::Math::addSubVector<Vector, Eigen::Matrix<double, 12, 1>>(f, tet->getNodeIds(), 3, &expectedF);
 
 	Vector F = Vector::Zero(state.getNumDof());
 	SparseMatrix M(static_cast<Eigen::Index>(state.getNumDof()), static_cast<Eigen::Index>(state.getNumDof()));
@@ -548,8 +548,8 @@ void testAddForce(MockFem3DElementCorotationalTet* tet,
 
 	SurgSim::Math::Vector expectedF;
 	expectedF.setZero(statet.getNumDof());
-	Eigen::Matrix<double, 12 , 1> f = - R12x12 * K * R12x12.transpose() * (x - (R12x12 * x0));
-	SurgSim::Math::addSubVector(f, tet->getNodeIds(), 3, &expectedF);
+	Eigen::Matrix<double, 12, 1> f = - R12x12 * K * R12x12.transpose() * (x - (R12x12 * x0));
+	SurgSim::Math::addSubVector<Vector, Eigen::Matrix<double, 12, 1>>(f, tet->getNodeIds(), 3, &expectedF);
 
 	EXPECT_TRUE(tet->getRotation(statet).isApprox(R));
 	EXPECT_TRUE(tet->getNonRotatedStiffnessMatrix().isApprox(K));
@@ -641,7 +641,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 
 		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = 1.4 * M * SurgSim::Math::Vector::Ones(12);
-		SurgSim::Math::addSubVector(f, m_nodeIdsAsVector, 3, &expectedResult);
+		SurgSim::Math::addSubVector<Vector, Eigen::Matrix<double, 12, 1>>(f, m_nodeIdsAsVector, 3, &expectedResult);
 
 		EXPECT_TRUE(result.isApprox(expectedResult));
 	}
@@ -663,7 +663,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 
 		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = 1.6 * K * SurgSim::Math::Vector::Ones(12);
-		SurgSim::Math::addSubVector(f, m_nodeIdsAsVector, 3, &expectedResult);
+		SurgSim::Math::addSubVector<Vector, Eigen::Matrix<double, 12, 1>>(f, m_nodeIdsAsVector, 3, &expectedResult);
 
 		EXPECT_TRUE(result.isApprox(expectedResult));
 	}
@@ -676,7 +676,7 @@ TEST_F(Fem3DElementCorotationalTetrahedronTests, AddMatVecTest)
 
 		SurgSim::Math::Vector expectedResult = SurgSim::Math::Vector::Zero(state.getNumDof());
 		Eigen::Matrix<double, 12, 1> f = (1.4 * M + 1.6 * K) * SurgSim::Math::Vector::Ones(12);
-		SurgSim::Math::addSubVector(f, m_nodeIdsAsVector, 3, &expectedResult);
+		SurgSim::Math::addSubVector<Vector, Eigen::Matrix<double, 12, 1>>(f, m_nodeIdsAsVector, 3, &expectedResult);
 
 		EXPECT_TRUE(result.isApprox(expectedResult, epsilonAddMatVec));
 	}
