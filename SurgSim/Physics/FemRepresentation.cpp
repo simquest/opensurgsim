@@ -253,11 +253,12 @@ void FemRepresentation::update(double dt)
 
 			if (!m_isComplianceWarpingSynchronous)
 			{
-				auto calculation = [&]()
+				auto shared = std::dynamic_pointer_cast<FemRepresentation>(getSharedPtr());
+				auto calculation = [shared]()
 				{
-					return (m_complianceWarpingTransformationForCalculation *
-						m_odeSolver->getComplianceMatrix() *
-						m_complianceWarpingTransformationForCalculation.transpose()).eval();
+					return (shared->m_complianceWarpingTransformationForCalculation *
+						shared->m_odeSolver->getComplianceMatrix() *
+						shared->m_complianceWarpingTransformationForCalculation.transpose()).eval();
 				};
 
 				// Then, transform the initial compliance matrix to get the current compliance warping matrix
@@ -377,11 +378,12 @@ void FemRepresentation::updateComplianceMatrix(const SurgSim::Math::OdeState& st
 	}
 	else
 	{
-		auto calculation = [&]()
+		auto shared = std::dynamic_pointer_cast<FemRepresentation>(getSharedPtr());
+		auto calculation = [shared]()
 		{
-			return (m_complianceWarpingTransformationForCalculation *
-				m_odeSolver->getComplianceMatrix() *
-				m_complianceWarpingTransformationForCalculation.transpose()).eval();
+			return (shared->m_complianceWarpingTransformationForCalculation *
+				shared->m_odeSolver->getComplianceMatrix() *
+				shared->m_complianceWarpingTransformationForCalculation.transpose()).eval();
 		};
 
 		if (m_task.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
