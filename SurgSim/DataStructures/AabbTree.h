@@ -80,7 +80,7 @@ public:
 	/// \param lhsParent root node of the first tree
 	/// \param rhsParent root node of the second tree
 	/// \param result the list of all pairs of intersecting nodes
-	void AabbTree::spatialJoin(AabbTreeNode* lhsParent, AabbTreeNode* rhsParent,
+	void spatialJoin(AabbTreeNode* lhsParent, AabbTreeNode* rhsParent,
 		std::vector<TreeNodePairType>* result) const;
 
 	void updateBounds(const std::vector<Math::Aabbd>& bounds);

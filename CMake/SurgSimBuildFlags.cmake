@@ -43,19 +43,19 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 	endif()
 
-	# Enable support for C++0x/C++11 for G++ if available
+	# Enable support for C++0x/C++14 for G++ if available
 	include(CheckCXXCompilerFlag)
-	check_cxx_compiler_flag(-std=gnu++11 HAVE_FLAG_STD_GNUXX11)
-	if(HAVE_FLAG_STD_GNUXX11)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-	else(HAVE_FLAG_STD_GNUXX11)
-		check_cxx_compiler_flag(-std=gnu++0x HAVE_FLAG_STD_GNUXX0X)
+	check_cxx_compiler_flag(--std=gnu++14 HAVE_FLAG_STD_GNUXX14)
+	if(HAVE_FLAG_STD_GNUXX14)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=gnu++14")
+	else(HAVE_FLAG_STD_GNUXX14)
+		check_cxx_compiler_flag(--std=gnu++0x HAVE_FLAG_STD_GNUXX0X)
 		if(HAVE_FLAG_STD_GNUXX0X)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=gnu++0x")
 		else(HAVE_FLAG_STD_GNUXX0X)
-			message(WARNING "G++ is missing C++0x/C++11 support; trying anyway.")
+			message(WARNING "G++ is missing C++0x/C++14 support; trying anyway.")
 		endif(HAVE_FLAG_STD_GNUXX0X)
-	endif(HAVE_FLAG_STD_GNUXX11)
+	endif(HAVE_FLAG_STD_GNUXX14)
 
 endif(CMAKE_COMPILER_IS_GNUCXX)
 

@@ -52,7 +52,7 @@ include(SurgSimUtilities)
 find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
 find_package(OpenThreads)
 find_package(OpenGL)
-find_package(Eigen3 3.3.2 REQUIRED)
+find_package(Eigen3 3.2 REQUIRED)
 
 if(WIN32)
 	set(GLUT_ROOT_PATH "$ENV{GLUT_ROOT_PATH}")
