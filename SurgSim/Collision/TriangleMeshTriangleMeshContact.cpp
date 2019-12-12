@@ -145,20 +145,23 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 
 	std::list<std::shared_ptr<Contact>> contacts;
 
-	std::list<SurgSim::DataStructures::AabbTree::TreeNodePairType> intersectionList
-		= meshA.getAabbTree()->spatialJoin(*(meshB.getAabbTree()));
+	auto intersectionList = meshA.getAabbTree()->spatialJoin(*(meshB.getAabbTree()));
 
 	double depth = 0.0;
 	Vector3d normal;
 	Vector3d penetrationPointA, penetrationPointB;
 
+	std::vector<size_t> triangleListA;
+	std::vector<size_t> triangleListB;
+
+	size_t myInt = 0;
 	for (auto intersection = intersectionList.begin(); intersection != intersectionList.end(); ++intersection)
 	{
-		std::shared_ptr<SurgSim::DataStructures::AabbTreeNode> nodeA = intersection->first;
-		std::shared_ptr<SurgSim::DataStructures::AabbTreeNode> nodeB = intersection->second;
+		DataStructures::AabbTreeNode* nodeA = intersection->first;
+		DataStructures::AabbTreeNode* nodeB = intersection->second;
 
-		std::list<size_t> triangleListA;
-		std::list<size_t> triangleListB;
+		triangleListA.clear();
+		triangleListB.clear();
 
 		nodeA->getIntersections(nodeB->getAabb(), &triangleListA);
 		nodeB->getIntersections(nodeA->getAabb(), &triangleListB);

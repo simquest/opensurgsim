@@ -35,7 +35,7 @@ const std::string valueName = "Value";
 
 template <class T>
 YAML::Node YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::encode(
-			const SurgSim::DataStructures::OptionalValue<T>& rhs)
+            const SurgSim::DataStructures::OptionalValue<T>& rhs)
 {
 	Node node;
 	node[SurgSim::DataStructures::Convert::hasValueName] = rhs.hasValue();
@@ -52,7 +52,7 @@ YAML::Node YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::encode(
 
 template <class T>
 bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
-			const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs) //NOLINT
+            const Node& node, SurgSim::DataStructures::OptionalValue<T>& rhs) //NOLINT
 {
 	bool result = true;
 	if (node.IsMap())
@@ -86,43 +86,6 @@ bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 			result = false;
 			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
 			SURGSIM_LOG(logger, WARNING) << "Bad conversion";
-		}
-	}
-	return result;
-}
-
-template <class T, size_t N>
-YAML::Node YAML::convert<std::array<T, N>>::encode(const std::array<T, N>& rhs)
-{
-	Node node(NodeType::Sequence);
-	for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
-	{
-		node.push_back(*it);
-	}
-	return node;
-}
-
-template <class T, size_t N>
-bool YAML::convert<std::array<T, N>>::decode(const Node& node, std::array<T, N>& rhs) //NOLINT
-{
-	if (!node.IsSequence() || node.size() != N)
-	{
-		return false;
-	}
-
-	bool result = true;
-	auto rhsit = rhs.begin();
-	for (YAML::const_iterator it = node.begin(); it != node.end(); ++it, ++rhsit)
-	{
-		try
-		{
-			(*rhsit) = it->as<T>();
-		}
-		catch (YAML::RepresentationException)
-		{
-			result = false;
-			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
-			SURGSIM_LOG(logger, WARNING) << __FUNCTION__ << ": Bad conversion";
 		}
 	}
 	return result;

@@ -50,7 +50,9 @@ public:
 	void setFemElementType(const std::string& type) override;
 
 protected:
-	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) override;
+	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) const override;
+
+	void calculateComplianceWarpingTransformation(const SurgSim::Math::OdeState& state) override;
 };
 
 } // namespace Physics

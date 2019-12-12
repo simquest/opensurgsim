@@ -98,10 +98,10 @@ void DeformableRepresentation::setInitialState(
 
 	m_hasExternalGeneralizedForce = false;
 	m_externalGeneralizedForce.setZero(getNumDof());
-	m_externalGeneralizedStiffness.resize(static_cast<SparseMatrix::Index>(getNumDof()),
-										  static_cast<SparseMatrix::Index>(getNumDof()));
-	m_externalGeneralizedDamping.resize(static_cast<SparseMatrix::Index>(getNumDof()),
-										static_cast<SparseMatrix::Index>(getNumDof()));
+	m_externalGeneralizedStiffness.resize(static_cast<Eigen::Index>(getNumDof()),
+										  static_cast<Eigen::Index>(getNumDof()));
+	m_externalGeneralizedDamping.resize(static_cast<Eigen::Index>(getNumDof()),
+										static_cast<Eigen::Index>(getNumDof()));
 	m_previousHasExternalGeneralizedForce = m_hasExternalGeneralizedForce;
 	m_previousExternalGeneralizedStiffness = m_externalGeneralizedStiffness;
 	m_previousExternalGeneralizedDamping = m_externalGeneralizedDamping;

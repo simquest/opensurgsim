@@ -414,7 +414,7 @@ template <typename T>
 static void compareMatrices(const T& a, const T& b)
 {
 	typedef T Matrix;
-	typedef typename Matrix::Index Index;
+	using Eigen::Index;
 
 	EXPECT_EQ(a.rows(), b.rows());
 	EXPECT_EQ(a.cols(), b.cols());

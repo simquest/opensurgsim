@@ -139,12 +139,12 @@ TEST_F(DeformableCollisionRepresentationTest, UpdateAndInitializationTest)
 	EXPECT_NO_THROW(m_deformableCollisionRepresentation->updateShapeData());
 	EXPECT_TRUE(m_deformableCollisionRepresentation->isActive());
 
-	// The MeshShape fails to update due to the normal calculation, making the collision rep inactive
+	// The MeshShape updates ok
 	auto state = fem3DRepresentation->getCurrentState();
 	state->getPositions().setConstant(0.0);
 	fem3DRepresentation->setInitialState(state);
 	EXPECT_NO_THROW(m_deformableCollisionRepresentation->updateShapeData());
-	EXPECT_FALSE(m_deformableCollisionRepresentation->isActive());
+	EXPECT_TRUE(m_deformableCollisionRepresentation->isActive());
 }
 
 } // namespace Physics

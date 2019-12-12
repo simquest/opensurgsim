@@ -93,7 +93,7 @@ std::list<std::shared_ptr<Contact>> BoxCapsuleContact::calculateDcdContact(
 			if (box.contains(segmentPoint))
 			{
 				// The capsule's segment passes through the box.
-				Vector3d::Index closestFace;
+				Eigen::Index closestFace;
 				(boxRadii - segmentPoint.cwiseAbs()).minCoeff(&closestFace);
 				normal.setZero();
 				normal[closestFace] = -segmentPoint[closestFace];
@@ -151,7 +151,7 @@ std::list<std::shared_ptr<Contact>> BoxCapsuleContact::calculateDcdContact(
 			if (capsuleTop.isZero(DistanceEpsilon) && capsuleBottom.isZero(DistanceEpsilon))
 			{
 				// The capsule's segment has no length and is located at the box center.
-				Vector3d::Index closestFace;
+				Eigen::Index closestFace;
 				boxRadii.minCoeff(&closestFace);
 				normal.setZero();
 				normal[closestFace] = -boxRadii[closestFace];

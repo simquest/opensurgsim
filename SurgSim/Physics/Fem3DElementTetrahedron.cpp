@@ -21,7 +21,6 @@
 
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::getSubMatrix;
-using SurgSim::Math::addSubVector;
 
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
@@ -84,7 +83,8 @@ void Fem3DElementTetrahedron::doUpdateFMDK(const Math::OdeState& state, int opti
 		// K.U = Fext
 		// K.(x - x0) = Fext
 		// 0 = Fext + Fint     with Fint = -K.(x - x0)
-		getSubVector(state.getPositions(), m_nodeIds, 3, &x);
+		// Tetrahedron::getSubVector(state.getPositions(), m_nodeIds, 3, &x);
+		Tetrahedron::getSubVector(state.getPositions(), m_nodeIds, &x);
 		m_f.noalias() = -m_K * (x - m_x0);
 	}
 }
@@ -364,17 +364,11 @@ SurgSim::Math::Vector Fem3DElementTetrahedron::computeCartesianCoordinate(
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
 			<< "naturalCoordinate must be normalized and length 4.";
-
 	const Vector& x = state.getPositions();
-	Vector3d p0 = getSubVector(x, m_nodeIds[0], 3);
-	Vector3d p1 = getSubVector(x, m_nodeIds[1], 3);
-	Vector3d p2 = getSubVector(x, m_nodeIds[2], 3);
-	Vector3d p3 = getSubVector(x, m_nodeIds[3], 3);
-
-	return naturalCoordinate(0) * p0
-		   + naturalCoordinate(1) * p1
-		   + naturalCoordinate(2) * p2
-		   + naturalCoordinate(3) * p3;
+	return naturalCoordinate(0) * getSubVector(x, m_nodeIds[0], 3)
+		   + naturalCoordinate(1) * getSubVector(x, m_nodeIds[1], 3)
+		   + naturalCoordinate(2) * getSubVector(x, m_nodeIds[2], 3)
+		   + naturalCoordinate(3) * getSubVector(x, m_nodeIds[3], 3);
 }
 
 SurgSim::Math::Vector Fem3DElementTetrahedron::computeNaturalCoordinate(

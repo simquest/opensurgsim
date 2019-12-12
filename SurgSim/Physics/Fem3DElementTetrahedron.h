@@ -110,6 +110,18 @@ protected:
 
 };
 
+namespace Tetrahedron {
+	template <class Vector, class SubVector>
+	void getSubVector(const Vector& vector, const std::vector<size_t>& blockIds, SubVector* subVector)
+	{
+		static const int blockSize = 3;
+		subVector->segment(blockSize * 0, blockSize) = vector.segment(blockSize * blockIds[0], blockSize);
+		subVector->segment(blockSize * 1, blockSize) = vector.segment(blockSize * blockIds[1], blockSize);
+		subVector->segment(blockSize * 2, blockSize) = vector.segment(blockSize * blockIds[2], blockSize);
+		subVector->segment(blockSize * 3, blockSize) = vector.segment(blockSize * blockIds[3], blockSize);
+	}
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include(ProcessorCount)
+ProcessorCount(N)
+set(SURGSIM_THREADPOOL_SIZE "${N}" CACHE STRING "The number of threads in a ThreadPool. Defaults to number of logical cores, but may be faster if set to the number of physical cores.")
 
 set(SURGSIM_FRAMEWORK_SOURCES
 	Accessible.cpp
@@ -95,6 +98,8 @@ surgsim_add_library(
 	"${SURGSIM_FRAMEWORK_SOURCES}"
 	"${SURGSIM_FRAMEWORK_HEADERS}"
 )
+
+target_compile_definitions(SurgSimFramework PRIVATE THREADPOOL_SIZE=${SURGSIM_THREADPOOL_SIZE})
 
 SET(LIBS
 	${Boost_LIBRARIES}

@@ -135,7 +135,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMeshObject(
 	transform = SurgSim::Math::makeRigidTransform(
 					SurgSim::Math::makeRotationQuaternion(-0.2, Vector3d(1.0, 0.0, 0.0)),
 					Vector3d(0.0, 0.0, 0.0));
-	shape->addShape(subShape, transform);
+	shape->addShape(subShape->getTransformed(SurgSim::Math::RigidTransform3d::Identity()), transform);
 
 	graphics = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("RightGraphics");
 	graphics->setLocalPose(transform);
@@ -146,8 +146,6 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMeshObject(
 	{
 		*rightGraphicsOut = graphics;
 	}
-
-
 
 	auto rigidCollision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
 	physics->setCollisionRepresentation(rigidCollision);
@@ -231,6 +229,67 @@ std::vector <std::shared_ptr<SurgSim::Framework::SceneElement>> makeScenery()
 	return result;
 }
 
+class RotateSubshapeBehavior : public SurgSim::Framework::Behavior
+{
+public:
+	explicit RotateSubshapeBehavior(const std::string& name = "RotateSubshapeBehavior") :
+		m_angle(0.2), m_velocity(0.05), SurgSim::Framework::Behavior(name)
+	{
+	}
+	
+	~RotateSubshapeBehavior()
+	{
+	}
+
+	void setShape(std::shared_ptr<SurgSim::Math::CompoundShape> shape)
+	{
+		m_shape = shape;
+	}
+
+	void setGraphics(std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> leftGraphics,
+		std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> rightGraphics)
+	{
+		m_leftGraphics = leftGraphics;
+		m_rightGraphics = rightGraphics;
+	}
+
+	void update(double dt) override
+	{
+		//std::cout << "Starting to update poses" << std::endl;
+		m_angle += m_velocity * dt;
+		auto transform = SurgSim::Math::makeRigidTransform(
+			SurgSim::Math::makeRotationQuaternion(m_angle, Vector3d(1.0, 0.0, 0.0)),
+			Vector3d(0.0, 0.0, 0.0));
+		m_shape->setPose(0, transform);
+		m_leftGraphics->setLocalPose(transform);
+
+		transform = SurgSim::Math::makeRigidTransform(
+			SurgSim::Math::makeRotationQuaternion(-m_angle, Vector3d(1.0, 0.0, 0.0)),
+			Vector3d(0.0, 0.0, 0.0));
+
+		m_shape->setPose(1, transform);
+		m_rightGraphics->setLocalPose(transform);
+		//std::cout << "Done updating poses" << std::endl;
+	}
+
+protected:
+	bool doInitialize() override
+	{
+		return true;
+	}
+	bool doWakeUp() override
+	{
+		return true;
+	}
+
+private:
+	double m_angle;
+	double m_velocity;
+	std::shared_ptr<SurgSim::Math::CompoundShape> m_shape;
+	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> m_leftGraphics;
+	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> m_rightGraphics;
+};
+
 }
 
 namespace SurgSim
@@ -241,34 +300,48 @@ namespace Physics
 
 TEST_F(RenderTests, CompoundCollisionShapePlane)
 {
-	scene->addSceneElement(createSphereObject());
-	scene->addSceneElement(makeScenery()[0]);
+	auto sphereObject = createSphereObject();
+	scene->addSceneElement(sphereObject);
+	sphereObject->getComponent("Collision")->wakeUp();
+	auto scenery = makeScenery()[0];
+	scene->addSceneElement(scenery);
+	scenery->getComponent("Collision")->wakeUp();
 
 	runTest(Vector3d(0.8, 0.8, 0.8), Vector3d(0.0, 0.0, 0.0), 5000);
-
 }
 
 TEST_F(RenderTests, CompoundCollisionShapeSphere)
 {
-	scene->addSceneElement(createSphereObject());
-	scene->addSceneElement(makeScenery()[1]);
-
-	runTest(Vector3d(0.8, 0.8, 0.8), Vector3d(0.0, 0.0, 0.0), 5000);
-
-}
-
-TEST_F(RenderTests, CompoundCollsionMeshPlane)
-{
-	scene->addSceneElement(createMeshObject());
-	scene->addSceneElement(makeScenery()[0]);
+	auto sphereObject = createSphereObject();
+	scene->addSceneElement(sphereObject);
+	sphereObject->getComponent("Collision")->wakeUp();
+	auto scenery = makeScenery()[1];
+	scene->addSceneElement(scenery);
+	scenery->getComponent("Collision")->wakeUp();
 
 	runTest(Vector3d(0.8, 0.8, 0.8), Vector3d(0.0, 0.0, 0.0), 5000);
 }
 
-TEST_F(RenderTests, CompoundCollsionMeshBox)
+TEST_F(RenderTests, CompoundCollisionMeshPlane)
 {
-	scene->addSceneElement(createMeshObject());
-	scene->addSceneElement(makeScenery()[2]);
+	auto meshObject = createMeshObject();
+	scene->addSceneElement(meshObject);
+	meshObject->getComponent("Collision")->wakeUp();
+	auto scenery = makeScenery()[0];
+	scene->addSceneElement(scenery);
+	scenery->getComponent("Collision")->wakeUp();
+
+	runTest(Vector3d(0.8, 0.8, 0.8), Vector3d(0.0, 0.0, 0.0), 5000);
+}
+
+TEST_F(RenderTests, CompoundCollisionMeshBox)
+{
+	auto meshObject = createMeshObject();
+	scene->addSceneElement(meshObject);
+	meshObject->getComponent("Collision")->wakeUp();
+	auto scenery = makeScenery()[2];
+	scene->addSceneElement(scenery);
+	scenery->getComponent("Collision")->wakeUp();
 
 	runTest(Vector3d(0.8, 0.8, 0.8), Vector3d(0.0, 0.0, 0.0), 5000);
 }
@@ -286,31 +359,25 @@ TEST_F(RenderTests, CompoundCollisionMoving)
 						 Vector3d(0.0, 0.5, 0.0));
 	element->setPose(transform);
 	scene->addSceneElement(element);
-	scene->addSceneElement(makeScenery()[2]);
+	element->getComponent("Collision")->wakeUp();
+
+	auto scenery = makeScenery()[0];
+	scene->addSceneElement(scenery);
+	scenery->getComponent("Collision")->wakeUp();
 
 	viewElement->enableManipulator(true);
 	viewElement->setManipulatorParameters(Vector3d(0.8, 0.8, 0.8), Vector3d(0.0, 0.0, 0.0));
 
 	runtime->start();
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
-
-	for (double angle = 0.2; angle < 0.4; angle += 0.0025)
-	{
-		transform = SurgSim::Math::makeRigidTransform(
-						SurgSim::Math::makeRotationQuaternion(angle, Vector3d(1.0, 0.0, 0.0)),
-						Vector3d(0.0, 0.0, 0.0));
-		shape->setPose(0, transform);
-		leftGraphics->setLocalPose(transform);
-
-		transform = SurgSim::Math::makeRigidTransform(
-						SurgSim::Math::makeRotationQuaternion(-angle, Vector3d(1.0, 0.0, 0.0)),
-						Vector3d(0.0, 0.0, 0.0));
-
-		shape->setPose(1, transform);
-		rightGraphics->setLocalPose(transform);
-		boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
+	auto behavior = std::make_shared<RotateSubshapeBehavior>();
+	behavior->setShape(shape);
+	behavior->setGraphics(leftGraphics, rightGraphics);
+	auto behaviorElement = std::make_shared<SurgSim::Framework::BasicSceneElement>("BehaviorElement");
+	behaviorElement->addComponent(behavior);
+	scene->addSceneElement(behaviorElement);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
 }
 
 }

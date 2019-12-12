@@ -42,6 +42,11 @@ public:
 	virtual void runTest(const SurgSim::Math::Vector3d& cameraPosition,
 		const SurgSim::Math::Vector3d& cameraLookAt, double miliseconds);
 
+
+	void RenderTests::runFixedFrameTest(const SurgSim::Math::Vector3d& cameraPosition,
+										const SurgSim::Math::Vector3d& cameraLookAt,
+										size_t frameCount);
+
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager;
 	std::shared_ptr<SurgSim::Physics::PhysicsManager> physicsManager;

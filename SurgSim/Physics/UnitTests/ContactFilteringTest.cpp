@@ -95,6 +95,7 @@ struct ContactFilteringTest : public ::testing::Test
 TEST_F(ContactFilteringTest, DontProcessWithoutPairs)
 {
 	EXPECT_CALL(*filter, doFilterContacts(_, _)).Times(0);
+	EXPECT_CALL(*filter, doUpdate(_));
 	contactFiltering->update(1.0, state);
 }
 
@@ -107,6 +108,7 @@ TEST_F(ContactFilteringTest, ProcessAllPairsWithContacts)
 	state->setCollisionPairs(pairs);
 
 	EXPECT_CALL(*filter, doFilterContacts(_, _)).Times(2);
+	EXPECT_CALL(*filter, doUpdate(_));
 	contactFiltering->update(1.0, state);
 }
 
@@ -118,6 +120,7 @@ TEST_F(ContactFilteringTest, ModifyContacts)
 	state->setCollisionPairs(pairs);
 
 	EXPECT_CALL(*filter, doFilterContacts(_, _)).WillOnce(testing::Invoke(removeOne));
+	EXPECT_CALL(*filter, doUpdate(_));
 	contactFiltering->update(1.0, state);
 	EXPECT_EQ(1u, pairWithContacts->getContacts().size());
 }
@@ -137,6 +140,8 @@ TEST_F(ContactFilteringTest, ProcessAllFilters)
 
 	EXPECT_CALL(*filter1, doFilterContacts(_, _)).Times(1);
 	EXPECT_CALL(*filter2, doFilterContacts(_, _)).Times(1);
+	EXPECT_CALL(*filter1, doUpdate(_));
+	EXPECT_CALL(*filter2, doUpdate(_));
 	contactFiltering->update(1.0, state);
 }
 

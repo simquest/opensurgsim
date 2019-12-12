@@ -81,36 +81,38 @@ void AabbTreeNode::splitNode(size_t maxNodeData)
 		size_t leftCount = leftData->getSize();
 		size_t rightCount = rightData->getSize();
 
+		leftChild->m_aabb = leftData->getAabb();
 		leftChild->setData(std::move(leftData));
 		if (maxNodeData > 0 && leftCount > maxNodeData)
 		{
 			leftChild->splitNode(maxNodeData);
 		}
 
+		rightChild->m_aabb = rightData->getAabb();
 		rightChild->setData(std::move(rightData));
 		if (maxNodeData > 0 && rightCount > maxNodeData)
 		{
 			rightChild->splitNode(maxNodeData);
 		}
 	}
+	else
+	{
+		m_aabb = leftData->getAabb();
+	}
 }
 
 const SurgSim::Math::Aabbd& AabbTreeNode::getAabb() const
 {
-	auto data = std::static_pointer_cast<AabbTreeData>(getData());
-	if (data == nullptr)
-	{
-		return m_aabb;
-	}
-	else
-	{
-		return data->getAabb();
-	}
+	return m_aabb;
+}
+
+void AabbTreeNode::setAabb(const SurgSim::Math::Aabbd& aabb)
+{
+	m_aabb = aabb;
 }
 
 void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t maxNodeData)
 {
-
 	if (getNumChildren() > 0)
 	{
 		size_t childIndex = (aabb.center()(m_axis) < m_aabb.center()(m_axis)) ? 0 : 1;
@@ -127,6 +129,7 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 			setData(data);
 		}
 		data->add(aabb, id);
+		m_aabb = data->getAabb();
 		if (maxNodeData > 0 && data->getSize() > maxNodeData)
 		{
 			splitNode();
@@ -134,7 +137,7 @@ void AabbTreeNode::addData(const SurgSim::Math::Aabbd& aabb, size_t id, size_t m
 	}
 }
 
-void AabbTreeNode::setData(const std::list<AabbTreeData::Item>& items, size_t maxNodeData)
+void AabbTreeNode::setData(const AabbTreeData::ItemList& items, size_t maxNodeData)
 {
 	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
 	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
@@ -144,7 +147,7 @@ void AabbTreeNode::setData(const std::list<AabbTreeData::Item>& items, size_t ma
 	splitNode(maxNodeData);
 }
 
-void AabbTreeNode::setData(std::list<AabbTreeData::Item>&& items, size_t maxNodeData)
+void AabbTreeNode::setData(AabbTreeData::ItemList&& items, size_t maxNodeData)
 {
 	SURGSIM_ASSERT(getNumChildren() == 0) << "Can't call setData on a node that already has nodes";
 	SURGSIM_ASSERT(getData() == nullptr) << "Can't call setData on a node that already has data.";
@@ -159,9 +162,9 @@ bool AabbTreeNode::doAccept(TreeVisitor* visitor)
 	return visitor->handle(this);
 }
 
-void AabbTreeNode::getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result)
+void AabbTreeNode::getIntersections(const SurgSim::Math::Aabbd& aabb, std::vector<size_t>* result)
 {
-	auto data = std::static_pointer_cast<AabbTreeData>(getData());
+	auto data = static_cast<AabbTreeData*>(getData().get());
 	SURGSIM_ASSERT(data != nullptr) << "AabbTreeNode data is nullptr.";
 	data->getIntersections(aabb, result);
 }

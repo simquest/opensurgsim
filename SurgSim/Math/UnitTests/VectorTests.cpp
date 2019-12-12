@@ -1232,7 +1232,7 @@ TYPED_TEST(AllDynamicVectorTests, addSubVectorBlocks)
 	nodeIds.push_back(3);
 	nodeIds.push_back(5);
 
-	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3, 15), nodeIds, 3, &v););
+	ASSERT_NO_THROW((SurgSim::Math::addSubVector<Vector, Vector>(v2.segment(3, 15), nodeIds, 3, &v)););
 	EXPECT_TRUE(v2.isApprox(v2Init));
 	EXPECT_FALSE(v.isApprox(vInit));
 	for (int dofId = 0; dofId < 3; dofId++)

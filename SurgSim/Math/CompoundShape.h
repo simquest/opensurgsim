@@ -101,8 +101,10 @@ public:
 	const Math::Aabbd& getBoundingBox() const override;
 
 	bool isTransformable() const override;
-
 	std::shared_ptr<Shape> getTransformed(const RigidTransform3d& pose) const override;
+	void setPose(const RigidTransform3d& pose) override;
+	void updateShape() override;
+	void updateShapePartial() override;
 
 private:
 
@@ -111,6 +113,8 @@ private:
 	void invalidateData();
 
 	std::vector<SubShape> m_shapes;
+	std::vector<RigidTransform3d> m_localPoses;
+	RigidTransform3d m_lastSetPose;
 
 	typedef boost::shared_lock<boost::shared_mutex> ReadLock;
 	typedef boost::unique_lock<boost::shared_mutex> WriteLock;

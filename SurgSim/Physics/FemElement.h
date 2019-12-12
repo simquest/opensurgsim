@@ -113,7 +113,8 @@ public:
 	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addForce(SurgSim::Math::Vector* F, double scale = 1.0) const;
+	virtual void addForce(SurgSim::Math::Vector* F, double scale) const;
+	virtual void addForce(SurgSim::Math::Vector* F) const;
 
 	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
 	/// \param[in,out] M The complete system mass matrix to add the element mass-matrix into
@@ -121,7 +122,8 @@ public:
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(SurgSim::Math::SparseMatrix* M, double scale = 1.0) const;
+	virtual void addMass(SurgSim::Math::SparseMatrix* M, double scale) const;
+	virtual void addMass(SurgSim::Math::SparseMatrix* M) const;
 
 	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
 	/// to a complete system damping matrix D (assembly)
@@ -130,7 +132,8 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addDamping(SurgSim::Math::SparseMatrix* D, double scale = 1.0) const;
+	virtual void addDamping(SurgSim::Math::SparseMatrix* D, double scale) const;
+	virtual void addDamping(SurgSim::Math::SparseMatrix* D) const;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
 	/// to a complete system stiffness matrix K (assembly)
@@ -139,7 +142,8 @@ public:
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(SurgSim::Math::SparseMatrix* K, double scale = 1.0) const;
+	virtual void addStiffness(SurgSim::Math::SparseMatrix* K, double scale) const;
+	virtual void addStiffness(SurgSim::Math::SparseMatrix* K) const;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
 	/// into a complete system data structure F, M, D, K (assembly)
@@ -190,22 +194,25 @@ public:
 		const SurgSim::Math::OdeState& state,
 		const SurgSim::Math::Vector& cartesianCoordinate) const = 0;
 
-	/// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
-	/// \tparam DerivedSub The type of the 'subMatrix' (can usually be inferred). Can be any type, but does not
-	/// support Eigen expression. If it is a Sparse storage type the alignment must be the same
-	/// as the SparseMatrix: Opt.
-	/// Note that no assertion or verification is done on this type.
-	/// \tparam T, Opt, Index Types and option defining the output matrix type SparseMatrix<T, Opt, Index>
+	/// Add a sub-matrix made of squared-blocks into a matrix that could be un-initialized.
+	/// \tparam T, Opt, StorageIndex Types and option defining the output matrix type SparseMatrix<T, Opt, StorageIndex>
 	/// \param subMatrix The sub-matrix (containing all the squared-blocks)
 	/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
 	/// \param blockSize The blocks size
 	/// \param[out] matrix The matrix to add the sub-matrix blocks into
-	/// \param initialize Optional parameter, default true. If true, the matrix form is assumed to be undefined and is
-	/// initialized when necessary. If false, the matrix form is assumed to be previously defined.
-	template <typename DerivedSub, typename T, int Opt, typename Index>
-	void assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t>& blockIds,
-							  size_t blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
-							  bool initialize = true) const;
+	template <typename T, int Opt, typename StorageIndex>
+	void assembleMatrixBlocks(const Eigen::Ref<const Math::Matrix>& subMatrix,
+		const std::vector<size_t>& blockIds, size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix) const;
+
+	/// Add a sub-matrix made of squared-blocks into a matrix that is already initialized.
+	/// \tparam T, Opt, StorageIndex Types and option defining the output matrix type SparseMatrix<T, Opt, StorageIndex>
+	/// \param subMatrix The sub-matrix (containing all the squared-blocks)
+	/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
+	/// \param blockSize The blocks size
+	/// \param[out] matrix The matrix to add the sub-matrix blocks into
+	template <typename T, int Opt, typename StorageIndex>
+	void assembleMatrixBlocksNoInitialize(const Eigen::Ref<const Math::Matrix>& subMatrix,
+		const std::vector<size_t>& blockIds, size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix) const;
 
 	/// Update the FemElement based on the given state.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
@@ -236,17 +243,11 @@ protected:
 	/// Node ids connected by this element
 	std::vector<size_t> m_nodeIds;
 
-	/// Mass density (in Kg.m-3)
-	double m_rho;
-
-	/// Young modulus (in N.m-2)
-	double m_E;
-
-	/// Poisson ratio (unitless)
-	double m_nu;
-
 	/// The force vector.
 	SurgSim::Math::Vector m_f;
+
+	/// The stiffness matrix.
+	SurgSim::Math::Matrix m_K;
 
 	/// The mass matrix.
 	SurgSim::Math::Matrix m_M;
@@ -257,12 +258,15 @@ protected:
 	/// Flag to specify of the damping is used.
 	bool m_useDamping;
 
-	/// The stiffness matrix.
-	SurgSim::Math::Matrix m_K;
+	/// Mass density (in Kg.m-3)
+	double m_rho;
 
-private:
-	/// Flag to check in the f, M, D, K variables have been initialized.
-	bool m_initializedFMDK;
+	/// Young modulus (in N.m-2)
+	double m_E;
+
+	/// Poisson ratio (unitless)
+	double m_nu;
+
 };
 
 } // namespace Physics

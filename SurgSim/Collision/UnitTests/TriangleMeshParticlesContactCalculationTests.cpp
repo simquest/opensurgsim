@@ -45,9 +45,13 @@ void doCollisionTest(std::shared_ptr<ParticlesShape> particles, std::shared_ptr<
 	auto meshRep = std::make_shared<ShapeCollisionRepresentation>("Mesh");
 	meshRep->setShape(mesh);
 	meshRep->setLocalPose(meshPose);
+	meshRep->updateShapeData();
+	meshRep->updateDcdData();
 
 	auto particlesRep = std::make_shared<ShapeCollisionRepresentation>("Particles");
 	particlesRep->setShape(particles);
+	particlesRep->updateShapeData();
+	particlesRep->updateDcdData();
 
 	TriangleMeshParticlesContact calcContact;
 	auto pair = std::make_shared<CollisionPair>(meshRep, particlesRep);
@@ -61,7 +65,7 @@ void doCollisionTest(std::shared_ptr<ParticlesShape> particles, std::shared_ptr<
 		ASSERT_GT(particles->getVertices().size(), particleIndex);
 		contactingParticles.insert(particleIndex);
 
-		Vector3d particlesToMesh = meshPose * mesh->getCenter() - particles->getVertex(particleIndex).position;
+		Vector3d particlesToMesh = mesh->getCenter() - particles->getVertex(particleIndex).position;
 		if (!particlesToMesh.isZero())
 		{
 			// Check that each normal is pointing into the mesh
