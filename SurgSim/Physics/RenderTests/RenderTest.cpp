@@ -60,7 +60,7 @@ void RenderTests::runTest(const SurgSim::Math::Vector3d& cameraPosition, const S
 	/// Run the thread
 	runtime->start();
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(static_cast<int>(miliseconds)));
 }
 
 void RenderTests::runFixedFrameTest(const SurgSim::Math::Vector3d& cameraPosition,
