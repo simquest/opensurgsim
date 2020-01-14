@@ -118,11 +118,6 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -stdlib=libc++")
 endif()
 
-# Windows-specific settings
-if(WIN32)
-	add_definitions( -D_WIN32_WINNT=0x0501 )  # request compatibility with WinXP
-endif(WIN32)
-
 # Linux-specific settings
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	add_definitions( -D_POSIX_C_SOURCE=200809L )  # request POSIX APIs
