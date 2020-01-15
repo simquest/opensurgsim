@@ -51,6 +51,8 @@ include(ConfigureDependency)
 ### Find required libraries
 
 cmake_policy(SET CMP0074 NEW)
+cmake_policy(SET CMP0048 NEW)
+
 find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
 find_package(OpenThreads)
 find_package(OpenGL)
