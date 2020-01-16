@@ -45,7 +45,9 @@ BasicThread::BasicThread(const std::string& name) :
 	m_timer.setMaxNumberOfFrames(1000000);
 }
 
-#ifdef _MSC_VER
+// As per https://docs.microsoft.com/en-us/cpp/cpp/exception-specifications-throw-cpp?view=vs-2019
+// noexcept(false) has implementation from Visual Studio 2017 15.5
+#if defined(_MSC_VER) && _MSC_VER < 1912
 BasicThread::~BasicThread() throw(...) // Visual Studio does not support noexcept. The throw(...) is optional.
 #else
 BasicThread::~BasicThread() noexcept(false)  /// C++11 introduced noexcept

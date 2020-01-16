@@ -15,14 +15,9 @@
 
 
 cmake_minimum_required(VERSION 2.8.11)
-project(OpenSurgSim)
+cmake_policy(SET CMP0048 NEW)
+project(OpenSurgSim VERSION 0.7.0)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-set(OPENSURGSIM_MAJOR_VERSION 0)
-set(OPENSURGSIM_MINOR_VERSION 7)
-set(OPENSURGSIM_PATCH_VERSION 0)
-set(OPENSURGSIM_VERSION
-	${OPENSURGSIM_MAJOR_VERSION}.${OPENSURGSIM_MINOR_VERSION}.${OPENSURGSIM_PATCH_VERSION})
 
 # Install Directories
 set(INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
@@ -45,9 +40,13 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${SURGSIM_THIRD_PARTY_DIR})
 include(ExternalProject)
 include(SurgSimBuildFlags)
 include(SurgSimUtilities)
+include(ConfigureDependency)
 
 
 ### Find required libraries
+
+cmake_policy(SET CMP0074 NEW)
+cmake_policy(SET CMP0048 NEW)
 
 find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
 find_package(OpenThreads)
@@ -77,6 +76,8 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.7 COMPONENTS chrono date_time filesystem system thread REQUIRED)
 mark_as_advanced(Boost_DIR)
 
+
+
 # Enable OpenMP
 #find_package(OpenMP)
 #if (OPENMP_FOUND)
@@ -92,13 +93,13 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
-find_package(yaml-cpp 0.6.2 QUIET)
-if(yaml-cpp_FOUND)
-	message(STATUS "Found yaml-cpp")
-else()
-	message(STATUS "Yaml-cpp was not found. It will be downloaded and built during the build.")
-	include(External_yamlcpp)
-endif()
+
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "")
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "")
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "")
+configure_dependency(yaml-cpp)
+set(YAML_CPP_LIBRARIES yaml-cpp)
+
 
 include_directories(${SURGSIM_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -106,7 +107,6 @@ include_directories(
 	${Boost_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
-	${YAML_CPP_INCLUDE_DIR}
 )
 
 include(CTest)
@@ -116,9 +116,9 @@ option(BUILD_RENDER_TESTING "Build the render testing tree." OFF)
 option(BUILD_PERFORMANCE_TESTING "Build the performance testing tree." OFF)
 
 if(BUILD_TESTING)
-	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
-	find_package(GoogleMock)
-	add_subdirectory(${GOOGLEMOCK_DIR} GoogleMock)
+	set(gtest_force_shared_crt ON CACHE BOOL "")
+	set(INSTALL_GTEST OFF CACHE BOOL "")
+	configure_dependency(googletest)
 endif()
 
 add_subdirectory(SurgSim)
