@@ -49,10 +49,13 @@ class BasicThread
 {
 public:
 	explicit BasicThread(const std::string& name = "Unknown Thread");
-#ifdef _MSC_VER
-	virtual ~BasicThread() throw(...);  // Visual Studio does not support noexcept. The throw(...) is optional.
+
+	// As per https://docs.microsoft.com/en-us/cpp/cpp/exception-specifications-throw-cpp?view=vs-2019
+	// noexcept(false) has implementation from Visual Studio 2017 15.5
+#if defined(_MSC_VER) && _MSC_VER < 1912
+	virtual ~BasicThread() throw(...);  
 #else
-	virtual ~BasicThread() noexcept(false);  /// C++11 introduced noexcept
+	virtual ~BasicThread() noexcept(false);
 #endif
 
 	/// Live cycle functions, public implementation.
