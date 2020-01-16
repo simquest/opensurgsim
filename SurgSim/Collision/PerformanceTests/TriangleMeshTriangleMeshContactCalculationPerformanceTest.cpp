@@ -60,7 +60,11 @@ TEST(TriangleMeshTriangleMeshContactCalculationPerformanceTests, IntersectionTes
 			Math::makeRigidTransform(Math::makeRotationQuaternion(2.0 * M_PI * i / loops, Vector3d::UnitX().eval()),
 			Vector3d(i, -1.5 * i, 0.0));
 		meshARep->setLocalPose(pose);
+		meshARep->updateShapeData();
+		meshARep->updateDcdData();
 		meshBRep->setLocalPose(pose);
+		meshBRep->updateShapeData();
+		meshBRep->updateDcdData();
 		timer.beginFrame();
 		calcContact.calculateContact(pair);
 		timer.endFrame();
