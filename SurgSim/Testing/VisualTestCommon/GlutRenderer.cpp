@@ -151,7 +151,7 @@ void GlutImage::draw()
 		float maxPixel = imageData.getAsVector().maxCoeff();
 		if (maxPixel > 1.0)
 		{
-		   float scaleFactor = 1.0 / maxPixel;
+		   float scaleFactor = 1.0f / maxPixel;
 		   glPixelTransferf(GL_RED_SCALE, scaleFactor);
 		   glPixelTransferf(GL_BLUE_SCALE, scaleFactor);
 		   glPixelTransferf(GL_GREEN_SCALE, scaleFactor);
@@ -182,16 +182,15 @@ void GlutImage::draw()
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(1, 1);
-	glVertex2f(m_bounds.min()(0), m_bounds.min()(1));
+	glVertex2f(float(m_bounds.min()(0)), float(m_bounds.min()(1)));
 
 	glTexCoord2f(0, 1);
-	glVertex2f(m_bounds.max()(0), m_bounds.min()(1));
+	glVertex2f(float(m_bounds.max()(0)), float(m_bounds.min()(1)));
 
 	glTexCoord2f(0, 0);
-	glVertex2f(m_bounds.max()(0), m_bounds.max()(1));
+	glVertex2f(float(m_bounds.max()(0)), float(m_bounds.max()(1)));
 
 	glTexCoord2f(1, 0);
-	glVertex2f(m_bounds.min()(0), m_bounds.max()(1));
 
 	glEnd();
 
