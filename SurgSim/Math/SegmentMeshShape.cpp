@@ -120,7 +120,7 @@ bool SegmentMeshShape::doLoad(const std::string& fileName)
 		return false;
 	}
 
-	return true;
+	return update();
 }
 
 std::shared_ptr<const DataStructures::AabbTree> SegmentMeshShape::getAabbTree() const
@@ -186,12 +186,20 @@ void SegmentMeshShape::setPose(const RigidTransform3d& pose)
 	auto& vertices = getVertices();
 	const size_t numVertices = vertices.size();
 	const auto& initialVertices = m_initialVertices.getVertices();
+	m_aabb.setEmpty();
+
+	if (initialVertices.size() == 0)
+	{
+		setInitialVertices(*this);
+	}
+
 	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
 			"SegmentMeshShape cannot update vertices' positions because of mismatched size: currently " <<
 			numVertices << " vertices, vs initially " << initialVertices.size() << " vertices.";
 	for (size_t i = 0; i < numVertices; ++i)
 	{
 		vertices[i].position = pose * initialVertices[i].position;
+		m_aabb.extend(vertices[i].position);
 	}
 }
 

@@ -142,6 +142,11 @@ TEST_F(SegmentMeshShapeTest, LoadShape)
 	ASSERT_EQ(3u, edge.verticesId[1]);
 
 	EXPECT_DOUBLE_EQ(1.234, mesh->getRadius());
+
+	const auto pose = SurgSim::Math::makeRigidTransform(
+		SurgSim::Math::makeRotationQuaternion(0.1, Vector3d(0.1, 0.2, -0.1)),
+		Vector3d(3.0, 4.0, -5.0));
+	mesh->setPose(pose);
 }
 
 TEST_F(SegmentMeshShapeTest, GetPose)
