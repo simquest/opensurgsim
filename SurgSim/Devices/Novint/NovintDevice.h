@@ -147,6 +147,34 @@ public:
 	/// \return The constant force that gets added to all forces sent to the hardware (in Newtons).
 	Math::Vector3d getAntigrav() const;
 
+	/// \return The constant offset for yaw in radians.
+	double getYawOffset() const;
+
+	/// Set constant offset for yaw.
+	/// \param yawOffset The yaw offset in radians.
+	void setYawOffset(double yawOffset);
+
+	/// \return The constant offset for pitch in radians.
+	double getPitchOffset() const;
+
+	/// Set constant offset for pitch.
+	/// \param pitchOffset The pitch offset in radians.
+	void setPitchOffset(double pitchOffset);
+
+	/// \return The constant offset for roll in radians.
+	double getRollOffset() const;
+
+	/// Set constant offset for roll.
+	/// \param rollOffset The roll offset in radians.
+	void setRollOffset(double rollOffset);
+
+	/// \return The constant offset for the tool DOF (e.g., grasp) in radians.
+	double getToolDofOffset() const;
+
+	/// Set constant offset for tool DOF.
+	/// \param toolDofOffset The toolDof offset in radians.
+	void setToolDofOffset(double toolDofOffset);
+
 protected:
 	/// True if the device is 7Dof, false if the device is 3Dof.
 	bool m_7DofDevice;
@@ -156,6 +184,14 @@ protected:
 
 	/// The anti-gravity force in Newtons.
 	Math::Vector3d m_antigrav;
+
+	///@{
+	/// For 7Dof device, the euler angle offsets that should be added to the angles provided by the hardware.
+	double m_yawOffset;
+	double m_pitchOffset;
+	double m_rollOffset;
+	double m_toolDofOffset;
+	///@}
 
 private:
 	friend class NovintScaffold;

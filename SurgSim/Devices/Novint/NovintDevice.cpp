@@ -34,7 +34,11 @@ NovintDevice::NovintDevice(const std::string& uniqueName) :
 	m_orientationScale(1.0),
 	m_7DofDevice(false),
 	m_maxForce(8.9),
-	m_antigrav(Math::Vector3d::Zero())
+	m_antigrav(Math::Vector3d::Zero()),
+	m_yawOffset(0.0),
+	m_pitchOffset(0.0),
+	m_rollOffset(0.0),
+	m_toolDofOffset(0.0)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, OptionalValue<std::string>, InitializationName,
 									  getOptionalInitializationName, setOptionalInitializationName);
@@ -45,6 +49,10 @@ NovintDevice::NovintDevice(const std::string& uniqueName) :
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, OrientationScale, getOrientationScale, setOrientationScale);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, MaxForce, getMaxForce, setMaxForce);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, Math::Vector3d, Antigrav, getAntigrav, setAntigrav);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, YawOffset, getYawOffset, setYawOffset);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, PitchOffset, getPitchOffset, setPitchOffset);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, RollOffset, getRollOffset, setRollOffset);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(NovintDevice, double, ToolDofOffset, getToolDofOffset, setToolDofOffset);
 }
 
 NovintDevice::~NovintDevice()
@@ -207,6 +215,46 @@ const OptionalValue<std::string>& NovintDevice::getOptionalSerialNumber() const
 void NovintDevice::setOptionalSerialNumber(const OptionalValue<std::string>& serial)
 {
 	m_serialNumber = serial;
+}
+
+double NovintDevice::getYawOffset() const
+{
+	return m_yawOffset;
+}
+
+void NovintDevice::setYawOffset(double yawOffset)
+{
+	m_yawOffset = yawOffset;
+}
+
+double NovintDevice::getPitchOffset() const
+{
+	return m_pitchOffset;
+}
+
+void NovintDevice::setPitchOffset(double pitchOffset)
+{
+	m_pitchOffset = pitchOffset;
+}
+
+double NovintDevice::getRollOffset() const
+{
+	return m_rollOffset;
+}
+
+void NovintDevice::setRollOffset(double rollOffset)
+{
+	m_rollOffset = rollOffset;
+}
+
+double NovintDevice::getToolDofOffset() const
+{
+	return m_toolDofOffset;
+}
+
+void NovintDevice::setToolDofOffset(double toolDofOffset)
+{
+	m_toolDofOffset = toolDofOffset;
 }
 
 };  // namespace Devices
