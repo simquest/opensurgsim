@@ -185,7 +185,7 @@ void CompoundShape::invalidateData()
 size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose)
 {
 	WriteLock lock(m_mutex);
-	m_localPoses.push_back(pose);
+	m_relativePoses.push_back(pose);
 
 	const auto newPose = m_lastSetPose * pose;
 	if (shape->isTransformable())
@@ -206,10 +206,10 @@ void CompoundShape::setShapes(const std::vector<SubShape>& shapes)
 {
 	WriteLock lock(m_mutex);
 	m_shapes = shapes;
-	m_localPoses.clear();
+	m_relativePoses.clear();
 	for (auto& shape : m_shapes)
 	{
-		m_localPoses.push_back(shape.second);
+		m_relativePoses.push_back(shape.second);
 		const auto newPose = m_lastSetPose * shape.second;
 		if (shape.first->isTransformable())
 		{
@@ -243,7 +243,20 @@ RigidTransform3d CompoundShape::getPose(size_t index) const
 	return m_shapes[index].second;
 }
 
-void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
+RigidTransform3d CompoundShape::getRelativePose(size_t index) const
+{
+	ReadLock lock(m_mutex);
+	SURGSIM_ASSERT(index < m_relativePoses.size()) << "Shape index out of range.";
+	return m_relativePoses[index];
+}
+
+const std::vector<RigidTransform3d>& CompoundShape::getRelativePoses() const
+{
+	ReadLock lock(m_mutex);
+	return m_relativePoses;
+}
+
+void CompoundShape::setRelativePoses(const std::vector<RigidTransform3d>& poses)
 {
 	WriteLock lock(m_mutex);
 	SURGSIM_ASSERT(poses.size() == m_shapes.size()) << "New poses and number of shapes differ in size";
@@ -260,18 +273,18 @@ void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
 		{
 			shape.second = newPose;
 		}
-		m_localPoses[i] = poses[i];
+		m_relativePoses[i] = poses[i];
 		++i;
 	}
 	invalidateData();
 }
 
 
-void CompoundShape::setPose(size_t index, const RigidTransform3d& pose)
+void CompoundShape::setRelativePose(size_t index, const RigidTransform3d& pose)
 {
 	WriteLock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
-	m_localPoses[index] = pose;
+	m_relativePoses[index] = pose;
 	auto& shape = m_shapes[index];
 	const auto newPose = m_lastSetPose * pose;
 	if (shape.first->isTransformable())
@@ -332,12 +345,12 @@ void CompoundShape::setPose(const RigidTransform3d& pose)
 	size_t index = 0;
 	for (auto& shape : m_shapes)
 	{
-		const auto& localPose = m_localPoses[index++];
-		const auto newPose = pose * localPose;
+		const auto& relativePose = m_relativePoses[index++];
+		const auto newPose = pose * relativePose;
 		if (shape.first->isTransformable())
 		{
 			shape.first->setPose(newPose);
-			shape.second = localPose;
+			shape.second = relativePose;
 		}
 		else
 		{

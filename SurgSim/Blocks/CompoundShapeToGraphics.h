@@ -21,6 +21,7 @@
 #include <string>
 
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
@@ -83,7 +84,8 @@ public:
 	/// \throws SurgSim::AssertionFailure if one of the components is not a graphics representation
 	void setTargets(const std::vector<std::shared_ptr<Framework::Component>> components);
 
-	/// Adds a single target to the list of targets, the target needs to be a graphics representation
+	/// Adds a single target to the list of targets, the target needs to be a graphics representation.
+	/// The graphics rep's local pose at the time of this call will be saved and used as a relative offset.
 	/// \param component Graphics Representation to be added at the end of the list
 	/// \throws SurgSim::AssertionFailure if the component is not a graphics representation
 	void addTarget(const std::shared_ptr<Framework::Component>& component);
@@ -105,8 +107,8 @@ private:
 	/// Source representation if known
 	std::shared_ptr<Framework::Component> m_source;
 
-	/// List of graphics targets for updating
-	std::vector<std::shared_ptr<Graphics::Representation>> m_representations;
+	/// List of graphics targets for updating, and their relative poses to this CompoundShape.
+	std::vector<std::pair<std::shared_ptr<Graphics::Representation>, Math::RigidTransform3d>> m_representations;
 };
 
 }

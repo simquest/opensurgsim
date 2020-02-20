@@ -59,7 +59,7 @@ void CompoundShapeToGraphics::update(double dt)
 
 	for (const auto& representation : m_representations)
 	{
-		representation->setLocalPose(m_shape->getPose(i++));
+		representation.first->setLocalPose(m_shape->getRelativePose(i++) * representation.second);
 
 	}
 }
@@ -127,13 +127,14 @@ void CompoundShapeToGraphics::addTarget(const std::shared_ptr<Framework::Compone
 					"SurgSim::Graphics::Representation");
 	SURGSIM_ASSERT(graphics != nullptr)
 			<< "Component " << component->getFullName() << " not a graphics representation, could not add.";
-	m_representations.push_back(std::move(graphics));
+	m_representations.emplace_back(std::move(graphics), graphics->getLocalPose());
 }
 
 std::vector<std::shared_ptr<Framework::Component>> CompoundShapeToGraphics::getTargets() const
 {
 	std::vector<std::shared_ptr<Framework::Component>> result;
-	std::copy(m_representations.cbegin(), m_representations.cend(), std::back_inserter(result));
+	std::transform(m_representations.cbegin(), m_representations.cend(), std::back_inserter(result),
+		[](const std::pair<std::shared_ptr<Graphics::Representation>, Math::RigidTransform3d>& p) {return p.first; });
 	return result;
 }
 
