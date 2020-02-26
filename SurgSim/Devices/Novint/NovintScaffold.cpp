@@ -746,15 +746,8 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			// HDL reported an error.  An error message was already logged.
 			return false;
 		}
-		bool leftHanded = (gripStatus[1] & 0x01) != 0;
-		if (leftHanded)
-		{
-			info->isDeviceRollAxisReversed = true;
-		}
-		else
-		{
-			info->isDeviceRollAxisReversed = false;
-		}
+
+		info->isDeviceRollAxisReversed = (gripStatus[1] & 0x01) != 0; // LeftHanded Device 
 
 		if (info->isOrientationHomed)
 		{
