@@ -262,6 +262,8 @@ void ContactCalculation::initializeTables()
 
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::CompoundShapeContact>(
 			std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_SEGMENTMESH)));
+	ContactCalculation::privateCcdRegister(std::make_shared<Collision::CompoundShapeContact>(
+		std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_MESH)));
 }
 
 void ContactCalculation::privateDcdRegister(
