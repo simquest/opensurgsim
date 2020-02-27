@@ -46,9 +46,9 @@ public:
 
 	typedef std::pair<std::shared_ptr<Shape>, RigidTransform3d> SubShape;
 
-	/// Add a shape to this shape, you can optionally supply a relative pose for the added shape w.r.t. this CompoundShape.
+	/// Add a shape to this shape, you can optionally supply a local pose for the added shape w.r.t. this CompoundShape.
 	/// \param shape to be added
-	/// \param pose The relative pose for the newly added shape
+	/// \param pose The local pose for the newly added shape
 	/// \return the index of the newly added shape
 	size_t addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose = RigidTransform3d::Identity());
 
@@ -65,28 +65,27 @@ public:
 	const std::shared_ptr<Shape>& getShape(size_t index) const;
 
 	/// \return The compound pose of a specific shape
-	///   i.e., the local pose of this CompoundShape times the relative pose of the subshape.
+	///   i.e., the local pose of this CompoundShape times the local pose of the subshape in the CompoundShape.
+	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
+	RigidTransform3d getCompoundPose(size_t index) const;
+
+	/// \return The local pose of a specific shape with respect to this CompoundShape.
 	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
 	RigidTransform3d getPose(size_t index) const;
 
-	/// \return The relative pose of a specific shape with respect to this CompoundShape.
-	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
-	RigidTransform3d getRelativePose(size_t index) const;
+	/// \return The local poses of the subshapes with respect to this CompoundShape.
+	const std::vector<RigidTransform3d>& getPoses() const;
 
-	/// \return The relative poses of the subshapes with respect to this CompoundShape.
-	const std::vector<RigidTransform3d>& getRelativePoses() const;
-
-
-	/// Sets the relative poses for all subshapes with respect to this CompoundShape.
+	/// Sets the local poses for all subshapes with respect to this CompoundShape.
 	/// \param poses array of poses to be copied to each shape
 	/// \throws SurgSimm::AssertialFailure if the size of poses.size() != getNumShapes()
-	void setRelativePoses(const std::vector<RigidTransform3d>& poses);
+	void setPoses(const std::vector<RigidTransform3d>& poses);
 
-	/// Set the relative pose for the specified shape with respect to this CompoundShape.
+	/// Set the local pose for the specified shape with respect to this CompoundShape.
 	/// \param index index of the target shape
 	/// \param pose new pose for the indicated shape
 	/// \throws SurgSim::AssertionFailure if the index exceeds the current number of shapes
-	void setRelativePose(size_t index, const RigidTransform3d& pose);
+	void setPose(size_t index, const RigidTransform3d& pose);
 
 	/// \return the number of shapes in this shape
 	size_t getNumShapes() const;
@@ -122,7 +121,8 @@ private:
 	void invalidateData();
 
 	std::vector<SubShape> m_shapes;
-	std::vector<RigidTransform3d> m_relativePoses;
+	/// The local poses of the subshapes with respect to this CompoundShape.
+	std::vector<RigidTransform3d> m_poses;
 	RigidTransform3d m_lastSetPose;
 
 	typedef boost::shared_lock<boost::shared_mutex> ReadLock;

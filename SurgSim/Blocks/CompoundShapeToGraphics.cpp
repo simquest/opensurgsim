@@ -59,8 +59,7 @@ void CompoundShapeToGraphics::update(double dt)
 
 	for (const auto& representation : m_representations)
 	{
-		representation.first->setLocalPose(m_shape->getRelativePose(i++) * representation.second);
-
+		representation.first->setLocalPose(m_shape->getPose(i++) * representation.second);
 	}
 }
 

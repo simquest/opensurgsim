@@ -185,7 +185,7 @@ void CompoundShape::invalidateData()
 size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose)
 {
 	WriteLock lock(m_mutex);
-	m_relativePoses.push_back(pose);
+	m_poses.push_back(pose);
 
 	const auto newPose = m_lastSetPose * pose;
 	if (shape->isTransformable())
@@ -206,10 +206,10 @@ void CompoundShape::setShapes(const std::vector<SubShape>& shapes)
 {
 	WriteLock lock(m_mutex);
 	m_shapes = shapes;
-	m_relativePoses.clear();
+	m_poses.clear();
 	for (auto& shape : m_shapes)
 	{
-		m_relativePoses.push_back(shape.second);
+		m_poses.push_back(shape.second);
 		const auto newPose = m_lastSetPose * shape.second;
 		if (shape.first->isTransformable())
 		{
@@ -236,27 +236,27 @@ const std::shared_ptr<Shape>& CompoundShape::getShape(size_t index) const
 	return m_shapes[index].first;
 }
 
-RigidTransform3d CompoundShape::getPose(size_t index) const
+RigidTransform3d CompoundShape::getCompoundPose(size_t index) const
 {
 	ReadLock lock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
 	return m_shapes[index].second;
 }
 
-RigidTransform3d CompoundShape::getRelativePose(size_t index) const
+RigidTransform3d CompoundShape::getPose(size_t index) const
 {
 	ReadLock lock(m_mutex);
-	SURGSIM_ASSERT(index < m_relativePoses.size()) << "Shape index out of range.";
-	return m_relativePoses[index];
+	SURGSIM_ASSERT(index < m_poses.size()) << "Shape index out of range.";
+	return m_poses[index];
 }
 
-const std::vector<RigidTransform3d>& CompoundShape::getRelativePoses() const
+const std::vector<RigidTransform3d>& CompoundShape::getPoses() const
 {
 	ReadLock lock(m_mutex);
-	return m_relativePoses;
+	return m_poses;
 }
 
-void CompoundShape::setRelativePoses(const std::vector<RigidTransform3d>& poses)
+void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
 {
 	WriteLock lock(m_mutex);
 	SURGSIM_ASSERT(poses.size() == m_shapes.size()) << "New poses and number of shapes differ in size";
@@ -273,18 +273,18 @@ void CompoundShape::setRelativePoses(const std::vector<RigidTransform3d>& poses)
 		{
 			shape.second = newPose;
 		}
-		m_relativePoses[i] = poses[i];
+		m_poses[i] = poses[i];
 		++i;
 	}
 	invalidateData();
 }
 
 
-void CompoundShape::setRelativePose(size_t index, const RigidTransform3d& pose)
+void CompoundShape::setPose(size_t index, const RigidTransform3d& pose)
 {
 	WriteLock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
-	m_relativePoses[index] = pose;
+	m_poses[index] = pose;
 	auto& shape = m_shapes[index];
 	const auto newPose = m_lastSetPose * pose;
 	if (shape.first->isTransformable())
@@ -345,7 +345,7 @@ void CompoundShape::setPose(const RigidTransform3d& pose)
 	size_t index = 0;
 	for (auto& shape : m_shapes)
 	{
-		const auto& relativePose = m_relativePoses[index++];
+		const auto& relativePose = m_poses[index++];
 		const auto newPose = pose * relativePose;
 		if (shape.first->isTransformable())
 		{
