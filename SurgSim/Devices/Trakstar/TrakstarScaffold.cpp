@@ -91,7 +91,7 @@ struct TrakstarScaffold::StateData
 {
 public:
 	/// Initialize the state.
-	StateData() : hasFailed(false)
+	StateData()
 	{
 	}
 	
@@ -109,9 +109,6 @@ public:
 	DataStructures::OptionalValue<double> updateRate;
 	/// The latest data records for all sensors.
 	RECORD_TYPE records[MAX_NUMBER_SENSORS];
-
-	/// true if the SDK has returned an error.
-	bool hasFailed;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -171,72 +168,59 @@ bool TrakstarScaffold::registerDevice(TrakstarDevice* device)
 	const unsigned short id = device->getSensorId();
 	SURGSIM_LOG_DEBUG(m_logger) <<
 		"Attempting to register TrakStar device, " << name << ", with sensorId, " << device->getSensorId() << ".";
-
-	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	
 	bool returnVal = true;
-	if (m_state->hasFailed)
+	std::unique_ptr<DeviceData> info(new DeviceData(device, id));
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+
+	// Make sure the object is unique.
+	auto sameObject = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	SURGSIM_ASSERT(sameObject == m_state->registeredDevices.end()) << "Trakstar: Tried to register a device" <<
+		" which is already registered!";
+
+	// Make sure the name is unique.
+	auto sameName = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
+		[&name](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == name; });
+	SURGSIM_ASSERT(sameName == m_state->registeredDevices.end()) << "Trakstar: Tried to register a device" <<
+		" when the same name, " << name << ", is already present!";
+
+	// Make sure the sensor ID is unique.
+	auto sameId = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
+		[&id](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getSensorId() == id; });
+	SURGSIM_ASSERT(sameId == m_state->registeredDevices.end()) << "Trakstar: Tried to register a device" <<
+		" when the same sensorId, " << id << ", is already present!";
+
+	if (!isInitialized())
 	{
-		returnVal = false;
-		SURGSIM_LOG_DEBUG(m_logger) <<
-			"Cannot register a new TrakstarDevice because the SDK has previously returned an error.";
-	}
-
-	if (returnVal)
-	{
-		// Make sure the object is unique.
-		auto sameObject = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-		SURGSIM_ASSERT(sameObject == m_state->registeredDevices.end()) << "Trakstar: Tried to register a device" <<
-			" which is already registered!";
-
-		// Make sure the name is unique.
-		auto sameName = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
-			[&name](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == name; });
-		SURGSIM_ASSERT(sameName == m_state->registeredDevices.end()) << "Trakstar: Tried to register a device" <<
-			" when the same name, " << name << ", is already present!";
-
-		// Make sure the sensor ID is unique.
-		auto sameId = std::find_if(m_state->registeredDevices.cbegin(), m_state->registeredDevices.cend(),
-			[&id](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getSensorId() == id; });
-		SURGSIM_ASSERT(sameId == m_state->registeredDevices.end()) << "Trakstar: Tried to register a device" <<
-			" when the same sensorId, " << id << ", is already present!";
-
-		if (!isInitialized())
+		m_barrier.reset(new Framework::Barrier(2));
+		this->start(m_barrier, true);
+		m_barrier->wait(true);
+		SURGSIM_LOG_INFO(m_logger) << "thread initialized.";
+		if (isInitialized())
 		{
-			m_barrier.reset(new Framework::Barrier(2));
-			this->start(m_barrier, true);
-			m_barrier->wait(true);
-			SURGSIM_LOG_INFO(m_logger) << "thread initialized.";
-			// If the thread is not at the barrier when setSynchronous is called, it may hang.
+			// If the thread is not at the barrier when setSynchronous is called, waiting may hang.
 			boost::this_thread::sleep(boost::posix_time::milliseconds(200));
 			this->setSynchronous(false);
-			if (isInitialized())
-			{
-				m_barrier->wait(true);
-				SURGSIM_LOG_INFO(m_logger) << "thread doStartup() succeeded";
-			}
+			m_barrier->wait(true);
+			SURGSIM_LOG_INFO(m_logger) << "thread doStartup() succeeded";
 		}
+	}
 
-		std::unique_ptr<DeviceData> info(new DeviceData(device, id));
-		if (isSuccess(GetSensorConfiguration(id, &info->sensorConfiguration)))
-		{
-			if (info->sensorConfiguration.attached)
-			{
-				m_state->registeredDevices.emplace_back(std::move(info));
-			}
-			else
-			{
-				SURGSIM_LOG_SEVERE(m_logger) <<
-					"sensorId " << id << " is not attached. Cannot use for device '" << name << "'.";
-				returnVal = false;
-			}
-		}
-		else
+	if (isSuccess(GetSensorConfiguration(id, &info->sensorConfiguration)))
+	{
+		if (!info->sensorConfiguration.attached)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) <<
-				"Failed to get sensor configuration for device '" << name << "' with sensorId, " << id << ".";
+				"sensorId " << id << " is not attached. Cannot use for device '" << name << "'.";
 			returnVal = false;
 		}
+	}
+	else
+	{
+		SURGSIM_LOG_SEVERE(m_logger) <<
+			"Failed to get sensor configuration for device '" << name << "' with sensorId, " << id << ".";
+		returnVal = false;
 	}
 
 	if (returnVal)
@@ -259,7 +243,6 @@ bool TrakstarScaffold::registerDevice(TrakstarDevice* device)
 				{
 					SURGSIM_LOG_SEVERE(m_logger) << "Failed to set SDK measurement rate.";
 					returnVal = false;
-					m_state->hasFailed = true;
 				}
 			}
 		}
@@ -267,6 +250,7 @@ bool TrakstarScaffold::registerDevice(TrakstarDevice* device)
 
 	if (returnVal)
 	{
+		m_state->registeredDevices.emplace_back(std::move(info));
 		SURGSIM_LOG_INFO(m_logger) << "Device " << name << " initialized.";
 	}
 	else
@@ -332,8 +316,15 @@ bool TrakstarScaffold::doInitialize()
 				break;
 			}
 		}
-		SURGSIM_LOG_IF(!hasFoundTransmitter, m_logger, SEVERE) <<
-			"None of the " << m_state->system.numberTransmitters << " transmitter ports have an attached transmitter.";
+		if (hasFoundTransmitter)
+		{
+			SURGSIM_LOG_DEBUG(m_logger) << "Found an attached transmitter.";
+		}
+		else
+		{
+			SURGSIM_LOG_SEVERE(m_logger) << "None of the " << m_state->system.numberTransmitters <<
+				" transmitter ports have an attached transmitter.";
+		}
 	}
 
 	for (int i = 0; i < m_state->system.numberSensors; i++)
