@@ -50,20 +50,20 @@ TEST(TrakstarDeviceTest, GettersAndSetters)
 	ASSERT_TRUE(nullptr != device) << "Device creation failed.";
 
 	EXPECT_NO_THROW(device->setSensorId((unsigned short)(0)));
-	EXPECT_NO_THROW(device->setMeasurementRate(100.0));
-	SurgSim::DataStructures::OptionalValue<double> optionalMeasurementRate;
-	optionalMeasurementRate.setValue(100.0);
-	EXPECT_NO_THROW(device->setOptionalMeasurementRate(optionalMeasurementRate));
+	EXPECT_NO_THROW(device->setUpdateRate(100.0));
+	SurgSim::DataStructures::OptionalValue<double> optionalUpdateRate;
+	optionalUpdateRate.setValue(100.0);
+	EXPECT_NO_THROW(device->setOptionalUpdateRate(optionalUpdateRate));
 	EXPECT_EQ("Trakstar", device->getName());
 
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Trakstar device plugged in?";
 
 	EXPECT_EQ("Trakstar", device->getName());
-	EXPECT_EQ(optionalMeasurementRate, device->getOptionalMeasurementRate());
+	EXPECT_EQ(optionalUpdateRate, device->getOptionalUpdateRate());
 	ASSERT_ANY_THROW(device->setSensorId((unsigned short)(0))) << "setSensorId should throw after initialization.";
-	ASSERT_ANY_THROW(device->setMeasurementRate(80.0)) << "setMeasurementRate should throw after initialization.";
-	ASSERT_ANY_THROW(device->setOptionalMeasurementRate(optionalMeasurementRate)) <<
-		"setOptionalMeasurementRate should throw after initialization.";
+	ASSERT_ANY_THROW(device->setUpdateRate(80.0)) << "setUpdateRate should throw after initialization.";
+	ASSERT_ANY_THROW(device->setOptionalUpdateRate(optionalUpdateRate)) <<
+		"setOptionalUpdateRate should throw after initialization.";
 }
 
 TEST(TrakstarDeviceTest, CreateDevicesWithSameName)
@@ -92,19 +92,19 @@ TEST(TrakstarDeviceTest, CreateDevicesWithSameId)
 	ASSERT_ANY_THROW(device2->initialize()) << "Initialization succeeded despite duplicate ID.";
 }
 
-TEST(TrakstarDeviceTest, CreateDevicesWithDifferentMeasurementRates)
+TEST(TrakstarDeviceTest, CreateDevicesWithDifferentUpdateRates)
 {
 	std::shared_ptr<TrakstarDevice> device1 = std::make_shared<TrakstarDevice>("Trakstar");
 	ASSERT_TRUE(nullptr != device1) << "Device creation failed.";
 	device1->setSensorId((unsigned short)(0));
-	device1->setMeasurementRate(100.0);
+	device1->setUpdateRate(100.0);
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Trakstar device plugged in?";
 
 	std::shared_ptr<TrakstarDevice> device2 = std::make_shared<TrakstarDevice>("Trakstar2");
 	ASSERT_TRUE(nullptr != device2) << "Device creation failed.";
 	device2->setSensorId((unsigned short)(1));
-	device2->setMeasurementRate(90.0);
-	ASSERT_ANY_THROW(device2->initialize()) << "Initialization succeeded despite different measurement rate.";
+	device2->setUpdateRate(90.0);
+	ASSERT_ANY_THROW(device2->initialize()) << "Initialization succeeded despite different update rates.";
 }
 
 TEST(TrakstarDeviceTest, InputConsumer)
@@ -129,4 +129,5 @@ TEST(TrakstarDeviceTest, InputConsumer)
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 360);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().isValid());
+	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().isValid());
 }

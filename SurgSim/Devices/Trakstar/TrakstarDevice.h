@@ -65,19 +65,19 @@ public:
 	/// \param id The sensor ID.
 	void setSensorId(unsigned short id);
 
-	/// \return The optional measurement rate.
-	DataStructures::OptionalValue<double> getOptionalMeasurementRate() const;
+	/// \return The optional update rate.
+	DataStructures::OptionalValue<double> getOptionalUpdateRate() const;
 
-	/// Set the optional measurement rate. Cannot be called after initialization.
-	/// \param rate The optional measurement rate.
-	void setOptionalMeasurementRate(DataStructures::OptionalValue<double> rate);
+	/// Set the optional update rate. Cannot be called after initialization.
+	/// \param rate The optional update rate.
+	void setOptionalUpdateRate(DataStructures::OptionalValue<double> rate);
 
-	/// Set the measurement rate.
+	/// Set the update rate.
 	/// This call sets the update rate for the shared scaffold, so devices cannot set it to different values.
-	/// The default update rate is 240Hz.
+	/// The default (factory-set) update rate is 240Hz, but that can be changed 
 	/// Cannot be called after initialization.
-	/// \param rate The measurement rate in Hz, must be >=60Hz and <=765Hz.
-	void setMeasurementRate(double rate);
+	/// \param rate The update rate in Hz, must be >=60Hz and <=765Hz.
+	void setUpdateRate(double rate);
 
 private:
 	friend class TrakstarScaffold;
@@ -90,8 +90,8 @@ private:
 	/// The sensor ID.
 	unsigned short m_sensorId;
 
-	/// The measurement rate requested for this sensor.
-	DataStructures::OptionalValue<double> m_measurementRate;
+	/// The update rate requested for this sensor.
+	DataStructures::OptionalValue<double> m_updateRate;
 };
 
 };  // namespace Devices

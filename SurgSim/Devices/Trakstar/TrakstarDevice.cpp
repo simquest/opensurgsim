@@ -31,8 +31,8 @@ TrakstarDevice::TrakstarDevice(const std::string& uniqueName) :
 	m_sensorId(0)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TrakstarDevice, unsigned short, SensorID, getSensorId, setSensorId);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TrakstarDevice, SurgSim::DataStructures::OptionalValue<double>, MeasurementRate,
-		getOptionalMeasurementRate, setOptionalMeasurementRate);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(TrakstarDevice, SurgSim::DataStructures::OptionalValue<double>, UpdateRate,
+		getOptionalUpdateRate, setOptionalUpdateRate);
 }
 
 TrakstarDevice::~TrakstarDevice()
@@ -83,49 +83,49 @@ void TrakstarDevice::setSensorId(unsigned short id)
 	m_sensorId = id;
 }
 
-DataStructures::OptionalValue<double> TrakstarDevice::getOptionalMeasurementRate() const
+DataStructures::OptionalValue<double> TrakstarDevice::getOptionalUpdateRate() const
 {
-	return m_measurementRate;
+	return m_updateRate;
 }
 
-void TrakstarDevice::setOptionalMeasurementRate(DataStructures::OptionalValue<double> rate)
+void TrakstarDevice::setOptionalUpdateRate(DataStructures::OptionalValue<double> rate)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Cannot set TrakstarDevice measurement rate after initialization!";
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot set TrakstarDevice update rate after initialization!";
 	if (rate.hasValue())
 	{
 		auto val = rate.getValue();
 		if (val > 765.0)
 		{
 			SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Devices/Trakstar")) <<
-				"Attempting to set TrakstarDevice measurement rate to " << val << ". The maximum rate is 765 Hz.";
+				"Attempting to set TrakstarDevice update rate to " << val << ". The maximum rate is 765 Hz.";
 			rate.setValue(765.0);
 		}
 		if (val < 60)
 		{
 			SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Devices/Trakstar")) <<
-				"Attempting to set TrakstarDevice measurement rate to " << val << ". The minimum rate is 60 Hz.";
+				"Attempting to set TrakstarDevice update rate to " << val << ". The minimum rate is 60 Hz.";
 			rate.setValue(60.0);
 		}
 	}
-	m_measurementRate = rate;
+	m_updateRate = rate;
 }
 
-void TrakstarDevice::setMeasurementRate(double rate)
+void TrakstarDevice::setUpdateRate(double rate)
 {
-	SURGSIM_ASSERT(!isInitialized()) << "Cannot set TrakstarDevice measurement rate after initialization!";
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot set TrakstarDevice update rate after initialization!";
 	if (rate > 765.0)
 	{
 		SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Devices/Trakstar")) <<
-			"Attempting to set TrakstarDevice measurement rate to " << rate << ". The maximum rate is 765 Hz.";
+			"Attempting to set TrakstarDevice update rate to " << rate << ". The maximum rate is 765 Hz.";
 		rate = 765.0;
 	}
 	if (rate < 60.0)
 	{
 		SURGSIM_LOG_WARNING(Framework::Logger::getLogger("Devices/Trakstar")) <<
-			"Attempting to set TrakstarDevice measurement rate to " << rate << ". The minimum rate is 60 Hz.";
+			"Attempting to set TrakstarDevice update rate to " << rate << ". The minimum rate is 60 Hz.";
 		rate = 60.0;
 	}
-	m_measurementRate.setValue(rate);
+	m_updateRate.setValue(rate);
 }
 
 };  // namespace Devices

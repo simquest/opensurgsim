@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2020, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 #include "SurgSim/Devices/Trakstar/TrakstarScaffold.h"
 
 #include <algorithm>
-#include <list>
 #include <memory>
 
 #include <boost/thread/locks.hpp>
@@ -36,7 +35,6 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::DataGroupBuilder;
-using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -85,9 +83,8 @@ struct TrakstarScaffold::DeviceData
 	SENSOR_CONFIGURATION sensorConfiguration;
 
 private:
-	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
-	DeviceData(const DeviceData&) /*= delete*/;
-	DeviceData& operator=(const DeviceData&) /*= delete*/;
+	DeviceData(const DeviceData&) = delete;
+	DeviceData& operator=(const DeviceData&) = delete;
 };
 
 struct TrakstarScaffold::StateData
@@ -98,18 +95,18 @@ public:
 	{
 	}
 	
-	/// The list of known devices.
-	std::list<std::unique_ptr<TrakstarScaffold::DeviceData>> registeredDevices;
+	/// The known devices.
+	std::vector<std::unique_ptr<TrakstarScaffold::DeviceData>> registeredDevices;
 
-	/// The mutex that protects the list of known devices.
+	/// The mutex that protects the collection of known devices.
 	boost::mutex mutex;
 
 	/// The trakSTAR system configuration.
 	SYSTEM_CONFIGURATION system;
 	/// The transmitter configuration.
 	TRANSMITTER_CONFIGURATION transmitter;
-	/// The measurement rate requested for the system.
-	DataStructures::OptionalValue<double> measurementRate;
+	/// The update rate requested for the system.
+	DataStructures::OptionalValue<double> updateRate;
 	/// The latest data records for all sensors.
 	RECORD_TYPE records[MAX_NUMBER_SENSORS];
 
@@ -133,6 +130,11 @@ TrakstarScaffold::TrakstarScaffold() :
 
 TrakstarScaffold::~TrakstarScaffold()
 {
+	if (isRunning())
+	{
+		stop();
+	}
+
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -141,11 +143,6 @@ TrakstarScaffold::~TrakstarScaffold()
 			SURGSIM_LOG_SEVERE(m_logger) << "Trakstar: Destroying scaffold while devices are active!?!";
 			m_state->registeredDevices.clear();
 		}
-	} // Need to end the lock before calling stop, in case doUpdate is waiting for the lock.
-
-	if (isRunning())
-	{
-		stop();
 	}
 
 	if (isInitialized())
@@ -244,23 +241,23 @@ bool TrakstarScaffold::registerDevice(TrakstarDevice* device)
 
 	if (returnVal)
 	{
-		auto sensorRate = device->getOptionalMeasurementRate();
-		if (m_state->measurementRate.hasValue())
+		auto sensorRate = device->getOptionalUpdateRate();
+		if (m_state->updateRate.hasValue())
 		{
-			SURGSIM_ASSERT(!sensorRate.hasValue() || (sensorRate.getValue() == m_state->measurementRate.getValue())) <<
-				"Two TrakstarDevices attempted to set different measurement rates.";
+			SURGSIM_ASSERT(!sensorRate.hasValue() || (sensorRate.getValue() == m_state->updateRate.getValue())) <<
+				"Two TrakstarDevices attempted to set different update rates.";
 		}
 		else
 		{
 			if (sensorRate.hasValue())
 			{
 				double rate = sensorRate.getValue();
-				m_state->measurementRate.setValue(rate);
+				m_state->updateRate.setValue(rate);
 				setRate(rate);
-				double sdkRate = rate / 3.0; // See GetSynchronousRecord() (aka STREAM mode) and ReportRate.
-				if (!isSuccess(SetSystemParameter(MEASUREMENT_RATE, &sdkRate, sizeof(sdkRate))))
+				double measurementRate = rate / 3.0; // See GetSynchronousRecord() (aka STREAM mode) and ReportRate.
+				if (!isSuccess(SetSystemParameter(MEASUREMENT_RATE, &measurementRate, sizeof(measurementRate))))
 				{
-					SURGSIM_LOG_SEVERE(m_logger) << "Failed to set measurement rate.";
+					SURGSIM_LOG_SEVERE(m_logger) << "Failed to set SDK measurement rate.";
 					returnVal = false;
 					m_state->hasFailed = true;
 				}
@@ -359,20 +356,20 @@ bool TrakstarScaffold::doUpdate(double dt)
 	int lengthOfRecordData = (int)(m_state->system.numberSensors * sizeof(m_state->records[0]));
 	if (isSuccess(GetSynchronousRecord(-1, &m_state->records[0], lengthOfRecordData)))
 	{
-		for (auto& it = m_state->registeredDevices.begin(); it != m_state->registeredDevices.end(); ++it)
+		for (auto& device : m_state->registeredDevices)
 		{
-			updateDevice((*it).get());
+			updateDevice(device.get());
 		}
 	}
 	else
 	{
-		for (auto& it = m_state->registeredDevices.begin(); it != m_state->registeredDevices.end(); ++it)
+		for (auto& device : m_state->registeredDevices)
 		{
-			DataStructures::DataGroup& inputData = (*it)->deviceObject->getInputData();
+			DataStructures::DataGroup& inputData = device->deviceObject->getInputData();
 			inputData.poses().reset(DataStructures::Names::POSE);
 			inputData.scalars().reset("time");
 			inputData.scalars().reset("quality");
-			(*it)->deviceObject->pushInput();
+			device->deviceObject->pushInput();
 		}
 	}
 	return true;
