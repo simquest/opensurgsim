@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -191,6 +192,10 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedMeshSceneElement(
 	auto collisionRepresentation = std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
+	auto visualizeContactsBehavior = std::make_shared<SurgSim::Blocks::VisualizeContactsBehavior>("Contacts");
+	visualizeContactsBehavior->setSource(collisionRepresentation);
+	visualizeContactsBehavior->setVectorFieldScale(1000);
+
 	// Graphic representation of the physics model
 	auto osgRepresentation = std::make_shared<OsgMeshRepresentation>("OsgRepresentation");
 	osgRepresentation->setShape(mesh);
@@ -200,6 +205,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedMeshSceneElement(
 	sceneElement->addComponent(osgRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(physicsRepresentation);
+	sceneElement->addComponent(visualizeContactsBehavior);
 
 	return sceneElement;
 }
@@ -225,6 +231,10 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedSurfaceMeshSceneEle
 		std::make_shared<RigidCollisionRepresentation>("Collision");
 	physicsRepresentation->setCollisionRepresentation(collisionRepresentation);
 
+	auto visualizeContactsBehavior = std::make_shared<SurgSim::Blocks::VisualizeContactsBehavior>("Contacts");
+	visualizeContactsBehavior->setSource(collisionRepresentation);
+	visualizeContactsBehavior->setVectorFieldScale(10);
+
 	// Graphic representation of the physics model
 	std::shared_ptr<OsgMeshRepresentation> osgRepresentation =
 		std::make_shared<OsgMeshRepresentation>("OsgRepresentation");
@@ -235,6 +245,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createFixedSurfaceMeshSceneEle
 	sceneElement->addComponent(osgRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
 	sceneElement->addComponent(physicsRepresentation);
+	sceneElement->addComponent(visualizeContactsBehavior);
 
 	return sceneElement;
 }
@@ -553,8 +564,10 @@ TEST_F(RenderTests, VisualTestFallingSphereOnMesh)
 			std::shared_ptr<SurgSim::Framework::SceneElement> sphereShape =
 				createRigidSphereSceneElement(ss.str(), radius);
 			scene->addSceneElement(sphereShape);
-			sphereShape->setPose(
-				makeRigidTranslation(Vector3d(xAxis[i], (2.0 * radius + distanceBetweenSphere) * sphere, 0.0)));
+			auto translation = Vector3d(xAxis[i] + 0.01*(fmod(sphere, 3) - 1),
+				(2.0 * radius + distanceBetweenSphere) * sphere,
+				0.01 * (floor(sphere / 3.0) - 0.1));
+			sphereShape->setPose(makeRigidTranslation(translation));
 		}
 
 		// Floor on which the objects are falling

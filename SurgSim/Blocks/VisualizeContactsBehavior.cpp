@@ -102,8 +102,8 @@ void VisualizeContactsBehavior::update(double dt)
 			{
 				VectorFieldData vectorData1;
 				VectorFieldData vectorData2;
-				vectorData1.direction = -(*iter)->normal * (*iter)->depth;
-				vectorData2.direction = (*iter)->normal * (*iter)->depth;
+				vectorData2.direction = inverseElementPose.linear() * (*iter)->normal * (*iter)->depth;
+				vectorData1.direction = -vectorData2.direction;
 
 				Vertex<VectorFieldData> vertex1 = Vertex<VectorFieldData>(
 						(*iter)->penetrationPoints.first.rigidLocalPosition.getValue(), vectorData1);
@@ -112,6 +112,8 @@ void VisualizeContactsBehavior::update(double dt)
 
 				vertex1.position = inverseElementPose * representationPoseFirst * vertex1.position;
 				vertex2.position = inverseElementPose * representationPoseSecond * vertex2.position;
+				vertex1.data.color = Math::Vector4d(1.0, 0.0, 0.0, 1.0);
+				vertex2.data.color = Math::Vector4d(0.0, 0.0, 1.0, 1.0);
 				vectorField->addVertex(vertex1);
 				vectorField->addVertex(vertex2);
 			}
