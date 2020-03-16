@@ -142,7 +142,7 @@ public:
 				SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 					"No error during initializing device named: '" << info <<
 					"', but an invalid handle returned. Is that Novint device plugged in? " <<
-					"Did the HDAL find hdal.ini?  Is the initialization name in the hdal.ini?";
+					"Did the HDAL find hdal.ini?  Is the initialization name a header in the hdal.ini?";
 			}
 		}
 		else
@@ -1047,6 +1047,7 @@ bool NovintScaffold::createAllHandles()
 	{
 		std::string deviceName = item.first;
 		std::transform(deviceName.begin(), deviceName.end(), deviceName.begin(), tolower);
+		SURGSIM_LOG_INFO(m_state->logger) << "Creating handle for device name: " << deviceName;
 		if (deviceName == "default")
 		{
 			SURGSIM_LOG_INFO(m_state->logger) << "'" << item.first <<
@@ -1120,6 +1121,7 @@ std::map<std::string, std::string> NovintScaffold::getNameMap()
 		SURGSIM_LOG_DEBUG(m_state->logger) << "Found devices.yaml at '" << filePath << "'.";
 		YAML::Node node = YAML::LoadFile(filePath);
 		map = node["Novint"].as<std::map<std::string, std::string>>();
+		SURGSIM_LOG_INFO(m_state->logger) << "Devices.yaml file contained the name map:\n" << node["Novint"];
 	}
 	else
 	{
