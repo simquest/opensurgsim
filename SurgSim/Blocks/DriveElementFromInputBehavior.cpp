@@ -68,7 +68,7 @@ void DriveElementFromInputBehavior::update(double dt)
 	RigidTransform3d pose;
 	if (dataGroup.poses().get(m_poseName, &pose))
 	{
-		getPoseComponent()->setPose(m_source->getLocalPose() * pose);
+		getPoseComponent()->setPose(m_source->getToDeviceTransform() * pose * m_source->getToElementTransform());
 	}
 }
 

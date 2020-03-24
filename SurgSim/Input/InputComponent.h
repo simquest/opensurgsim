@@ -68,12 +68,21 @@ public:
 
 	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
+	SurgSim::Math::RigidTransform3d getToDeviceTransform() const;
+	void setToDeviceTransform(const SurgSim::Math::RigidTransform3d& val);
+
+	
+	SurgSim::Math::RigidTransform3d getToElementTransform() const;
+	void setToElementTransform(const SurgSim::Math::RigidTransform3d& val);
+
 private:
 	/// Name of the device to which this input component connects
 	std::string m_deviceName;
 
 	/// Thread safe container of most recent input data
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastInput;
+
+	SurgSim::Math::RigidTransform3d m_toElementTransform;
 
 	std::atomic<bool> m_hasInput;
 };

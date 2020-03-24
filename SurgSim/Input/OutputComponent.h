@@ -67,6 +67,12 @@ public:
 
 	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
+	SurgSim::Math::RigidTransform3d getToDeviceTransform() const;
+	void setToDeviceTransform(const SurgSim::Math::RigidTransform3d& val);
+
+	SurgSim::Math::RigidTransform3d getToElementTransform() const;
+	void setToElementTransform(const SurgSim::Math::RigidTransform3d& val);
+
 private:
 	/// Name of the device to which this output component connects
 	std::string m_deviceName;
@@ -76,6 +82,8 @@ private:
 
 	/// True if there is data available
 	bool m_haveData;
+
+	SurgSim::Math::RigidTransform3d m_toElementTransform;
 };
 
 }; // namespace Input
