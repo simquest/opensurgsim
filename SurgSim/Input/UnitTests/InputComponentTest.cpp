@@ -41,6 +41,9 @@ TEST(InputComponentTest, Accessors)
 	input.setDeviceName("InputDevice");
 	EXPECT_EQ("Input", input.getName());
 	EXPECT_EQ("InputDevice", input.getDeviceName());
+
+	EXPECT_TRUE(input.getToDeviceTransform().isApprox(SurgSim::Math::RigidTransform3d::Identity()));
+	EXPECT_TRUE(input.getToElementTransform().isApprox(SurgSim::Math::RigidTransform3d::Identity()));
 }
 
 TEST(InputComponentTest, GetData)
