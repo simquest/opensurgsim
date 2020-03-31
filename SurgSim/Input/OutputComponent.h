@@ -36,6 +36,8 @@ SURGSIM_STATIC_REGISTRATION(OutputComponent);
 
 /// OutputComponents connect SceneElements to devices, facilitating data
 /// transfer from a SceneElement to a device.
+/// The actual SceneElement pose is expected to be calculated like this
+/// ToDeviceTransform * pose * ToElementTransform
 class OutputComponent : public SurgSim::Framework::Representation, public OutputProducerInterface
 {
 public:
@@ -67,10 +69,18 @@ public:
 
 	bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
+	/// \return the offset of the device pose to the scene 
 	SurgSim::Math::RigidTransform3d getToDeviceTransform() const;
+
+	/// Sets the offset of the device pose to the scene
+	/// \param val the actual offset
 	void setToDeviceTransform(const SurgSim::Math::RigidTransform3d& val);
 
+	/// \return the offset of the device to the element origin
 	SurgSim::Math::RigidTransform3d getToElementTransform() const;
+
+	/// Sets the offset of the device to the element origin
+	/// \param val the actual offset
 	void setToElementTransform(const SurgSim::Math::RigidTransform3d& val);
 
 private:
