@@ -52,6 +52,7 @@ SURGSIM_STATIC_REGISTRATION(MultiAxisDevice);
 ///   | type       | name              |                                                                           |
 ///   | ----       | ----              | ---                                                                       |
 ///   | bool       | "led1"            | If the device has at least one LED light, controls the first one.         |
+///   | pose       | "pose"            | This resets the builtin integrator to the give pose                       | 
 ///
 /// \sa RawMultiAxisDevice
 class MultiAxisDevice : public FilteredDevice
