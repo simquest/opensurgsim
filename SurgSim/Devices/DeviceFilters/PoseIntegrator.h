@@ -21,7 +21,6 @@
 
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Devices/DeviceFilters/DeviceFilter.h"
-#include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/RigidTransform.h"
 
