@@ -243,7 +243,7 @@ struct AnalogInputSettings
 ///   | type   | name                        |                                                                 |
 ///   | ----   | ----                        | ---                                                             |
 ///   | scalar | "analogInput0"              | %Analog input with AIN0 as the positive channel                 |
-///   | scalar | "analogInput"               | %Analog input with AIN1 as the positive channel                 |
+///   | scalar | "analogInput1"              | %Analog input with AIN1 as the positive channel                 |
 ///   | ...    |  ...                        | ...                                                             |
 ///   | scalar | "analogInput16"             | %Analog input with AIN16 as the positive channel                |
 ///   | boolean| "digitalInput0"             | %Digital input, line #0, true for high input, false for low     |
