@@ -176,7 +176,7 @@ std::shared_ptr<Component> Component::getSharedPtr()
 	}
 	catch (const std::exception&)
 	{
-		SURGSIM_FAILURE() << "Component was not created as a shared_ptr.";
+		SURGSIM_FAILURE() << "Component '" << getFullName() << "' not created as a shared_ptr.";
 	}
 	return result;
 }
