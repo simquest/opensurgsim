@@ -100,6 +100,13 @@ TEST(DriveElementFromInputBehaviorTest, Update)
 	inputComponent->setLocalPose(inputOffset);
 	behavior->update(0.1);
 	EXPECT_TRUE(element->getPose().isApprox(inputOffset));
+
+	RigidTransform3d toElementOffset = makeRigidTranslation(Vector3d(30.0, 20.0, 10.0));
+	inputComponent->setToElementTransform(toElementOffset);
+	behavior->update(0.1);
+	
+	// Note data from input is Identity ... 
+	EXPECT_TRUE(element->getPose().isApprox(inputOffset * toElementOffset));
 }
 
 TEST(DriveElementFromInputBehaviorTest, Serialization)
