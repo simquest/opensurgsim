@@ -38,6 +38,8 @@ SURGSIM_STATIC_REGISTRATION(TrakstarDevice);
 ///   | scalar     | "time"            | %The time returned with the record.    |
 ///   | scalar     | "quality"         | %The record's quality measure.         |
 ///
+/// The standard directions for the front hemisphere are: +x out of the transmitter face, +z out of the transmitter
+/// bottom, and +y to the left if you are looking at the face of the transmitter.
 /// \par Application output used by the device: none.
 ///
 /// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
