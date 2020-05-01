@@ -76,13 +76,13 @@ private:
 	bool finalizeSdk();
 
 	/// Registers the specified device object.
-	/// If successful, the device object will become connected to an unused controller.
+	/// If successful, the device object will become connected to an unused sensor.
 	///
 	/// \param device The device object to be used, which should have a unique name.
 	/// \return True if the initialization succeeds, false if it fails.
 	bool registerDevice(TrakstarDevice* device);
 	/// Unregisters the specified device object.
-	/// The corresponding controller will become unused, and can be re-registered later.
+	/// The corresponding sensor will become unused, and can be re-registered later.
 	///
 	/// \param device The device object.
 	/// \return true on success, false on failure.
