@@ -372,17 +372,12 @@ void TrakstarScaffold::updateDevice(TrakstarScaffold::DeviceData* info)
 	SURGSIM_LOG_IF(status != 0, m_logger, WARNING) << "Sensor status: " << status;
 
 	const auto& record = m_state->records[info->sensorID];
-	Matrix33d rotation;
-	rotation << record.s[0][0], record.s[0][1], record.s[0][2],
-		record.s[1][0], record.s[1][1], record.s[1][2],
-		record.s[2][0], record.s[2][1], record.s[2][2];
-
-	// Convert millimeter to meter
-	Vector3d position(record.x / 1000.0, record.y / 1000.0, record.z / 1000.0);
-
 	RigidTransform3d pose;
-	pose.linear() = rotation;
-	pose.translation() = position;
+	pose.linear() << record.s[0][0], record.s[1][0], record.s[2][0],
+		record.s[0][1], record.s[1][1], record.s[2][1],
+		record.s[0][2], record.s[1][2], record.s[2][2];
+	// Convert millimeter to meter
+	pose.translation() = Vector3d(record.x / 1000.0, record.y / 1000.0, record.z / 1000.0);
 
 	DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 	inputData.poses().set(DataStructures::Names::POSE, pose);
