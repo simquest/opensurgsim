@@ -36,7 +36,8 @@ BasicThread::BasicThread(const std::string& name) :
 	m_isInitialized(false),
 	m_isRunning(false),
 	m_stopExecution(false),
-	m_isSynchronous(false)
+	m_isSynchronous(false),
+	m_ignoreExceptions(false)
 {
 	// The maximum number of frames in the timer is set to 1,000,000
 	// + If the timer is reset every second, that is enough frame to measure real rates up to 1MHz
@@ -108,83 +109,90 @@ boost::thread& BasicThread::getThread()
 
 void BasicThread::operator()()
 {
-	bool success = executeInitialization();
-	if (! success)
-	{
-		m_isRunning = false;
-		return;
+	try {
+		bool success = executeInitialization();
+		if (! success)
+		{
+			m_isRunning = false;
+			return;
+		}
+
+
+		size_t numUpdates = 0;
+		boost::chrono::duration<double> totalFrameTime(0.0);
+		boost::chrono::duration<double> sleepTime(0.0);
+		boost::chrono::duration<double> totalSleepTime(0.0);
+		Clock::time_point start;
+
+		m_timer.start();
+		while (m_isRunning && !m_stopExecution)
+		{
+			start = Clock::now();
+			if (! m_isSynchronous)
+			{
+				if (!m_isIdle)
+				{
+					m_timer.beginFrame();
+					m_isRunning = doUpdate(m_period.count());
+					m_timer.endFrame();
+				}
+
+				// Check for frameTime being > desired update period report error, adjust ...
+				sleepTime = m_period - (Clock::now() - start);
+				if (sleepTime.count() > 0.0)
+				{
+					totalSleepTime += sleepTime;
+					SurgSim::Framework::sleep_until(start + m_period);
+				}
+			}
+			else
+			{
+				// HS-2014-feb-21 This is not thread safe, if setSynchronous(false) is called while the thread is in the
+				// _not_ in the wait state, the thread will exit without having issued a wait, this will cause the
+				// all the threads that are waiting to indefinitely wait as there is one less thread on the barrier
+				// #threadsafety
+				bool success = waitForBarrier(true);
+				totalSleepTime += Clock::now() - start;
+
+				if (success && !m_isIdle)
+				{
+					m_timer.beginFrame();
+					m_isRunning = doUpdate(m_period.count());
+					m_timer.endFrame();
+				}
+				if (! success || !m_isRunning)
+				{
+					m_isRunning = false;
+					m_isSynchronous = false;
+				}
+			}
+			totalFrameTime += Clock::now() - start;
+			numUpdates++;
+
+			if (m_logger->getThreshold() <= SURGSIM_LOG_LEVEL(INFO))
+			{
+				if (totalFrameTime.count() > 5.0)
+				{
+					SURGSIM_LOG_INFO(m_logger) << std::setprecision(4)
+						<< "Rate: " << numUpdates / totalFrameTime.count() << "Hz / "
+						<<  1.0 / m_period.count() << "Hz, "
+						<< "Average doUpdate: " << (totalFrameTime.count() - totalSleepTime.count()) / numUpdates << "s, "
+						<< "Sleep: " << 100.0 * totalSleepTime.count() / totalFrameTime.count() << "%";
+					totalFrameTime = boost::chrono::duration<double>::zero();
+					totalSleepTime = boost::chrono::duration<double>::zero();
+					numUpdates = 0;
+				}
+			}
+		}
+
+		doBeforeStop();
 	}
-
-
-	size_t numUpdates = 0;
-	boost::chrono::duration<double> totalFrameTime(0.0);
-	boost::chrono::duration<double> sleepTime(0.0);
-	boost::chrono::duration<double> totalSleepTime(0.0);
-	Clock::time_point start;
-
-	m_timer.start();
-	while (m_isRunning && !m_stopExecution)
+	catch (std::exception e)
 	{
-		start = Clock::now();
-		if (! m_isSynchronous)
-		{
-			if (!m_isIdle)
-			{
-				m_timer.beginFrame();
-				m_isRunning = doUpdate(m_period.count());
-				m_timer.endFrame();
-			}
-
-			// Check for frameTime being > desired update period report error, adjust ...
-			sleepTime = m_period - (Clock::now() - start);
-			if (sleepTime.count() > 0.0)
-			{
-				totalSleepTime += sleepTime;
-				SurgSim::Framework::sleep_until(start + m_period);
-			}
-		}
-		else
-		{
-			// HS-2014-feb-21 This is not thread safe, if setSynchronous(false) is called while the thread is in the
-			// _not_ in the wait state, the thread will exit without having issued a wait, this will cause the
-			// all the threads that are waiting to indefinitely wait as there is one less thread on the barrier
-			// #threadsafety
-			bool success = waitForBarrier(true);
-			totalSleepTime += Clock::now() - start;
-
-			if (success && !m_isIdle)
-			{
-				m_timer.beginFrame();
-				m_isRunning = doUpdate(m_period.count());
-				m_timer.endFrame();
-			}
-			if (! success || !m_isRunning)
-			{
-				m_isRunning = false;
-				m_isSynchronous = false;
-			}
-		}
-		totalFrameTime += Clock::now() - start;
-		numUpdates++;
-
-		if (m_logger->getThreshold() <= SURGSIM_LOG_LEVEL(INFO))
-		{
-			if (totalFrameTime.count() > 5.0)
-			{
-				SURGSIM_LOG_INFO(m_logger) << std::setprecision(4)
-					<< "Rate: " << numUpdates / totalFrameTime.count() << "Hz / "
-					<<  1.0 / m_period.count() << "Hz, "
-					<< "Average doUpdate: " << (totalFrameTime.count() - totalSleepTime.count()) / numUpdates << "s, "
-					<< "Sleep: " << 100.0 * totalSleepTime.count() / totalFrameTime.count() << "%";
-				totalFrameTime = boost::chrono::duration<double>::zero();
-				totalSleepTime = boost::chrono::duration<double>::zero();
-				numUpdates = 0;
-			}
-		}
+		doBeforeStop();
+		if (!m_ignoreExceptions) throw(e);
+		SURGSIM_LOG_SEVERE(m_logger) << "Exception in " << getName() << "\nMessage: " << e.what();
 	}
-
-	doBeforeStop();
-
 	m_isRunning = false;
 	m_stopExecution = false;
 }
@@ -230,7 +238,6 @@ std::string BasicThread::getName() const
 bool BasicThread::executeInitialization()
 {
 	bool success = true;
-
 	success = initialize();
 	SURGSIM_ASSERT(success) << "Initialization has failed for thread " << getName();
 	SURGSIM_LOG_INFO(m_logger) << "Initialization has succeeded for thread";
@@ -291,6 +298,16 @@ size_t BasicThread::getUpdateCount() const
 void BasicThread::resetCpuTimeAndUpdateCount()
 {
 	m_timer.start();
+}
+
+bool BasicThread::ignoresExceptions() const
+{
+	return m_ignoreExceptions;
+}
+
+void BasicThread::setIgnoreExceptions(bool val)
+{
+	m_ignoreExceptions = val;
 }
 
 bool BasicThread::doUpdate(double dt)
