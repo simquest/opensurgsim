@@ -30,6 +30,7 @@ set(OPTIONAL_DEVICES
 	Phantom
 	Sixense
 	TrackIR
+	Trakstar
 )
 
 set(DEVICE_LIBRARIES "SurgSimDeviceFilters;IdentityPoseDevice;KeyboardDevice;MouseDevice;ReplayPoseDevice;")
