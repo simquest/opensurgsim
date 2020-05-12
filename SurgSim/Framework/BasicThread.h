@@ -134,6 +134,8 @@ public:
 	/// Reset the cpu time and the update count to 0
 	void resetCpuTimeAndUpdateCount();
 
+	bool ignoresExceptions() const;
+	void setIgnoreExceptions(bool val);
 protected:
 
 	/// Timer to measure the actual time taken to doUpdate
@@ -172,6 +174,7 @@ private:
 	bool m_isRunning;
 	bool m_stopExecution;
 	bool m_isSynchronous;
+	bool m_ignoreExceptions;
 
 	virtual bool doInitialize() = 0;
 	virtual bool doStartUp() = 0;
