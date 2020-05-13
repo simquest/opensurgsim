@@ -15,8 +15,43 @@
 
 #include "SurgSim/Devices/LabJack/LabJackDevice.h"
 
+#include <yaml-cpp/yaml.h>
+
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
 #include "SurgSim/Devices/LabJack/LabJackScaffold.h"
 #include "SurgSim/Framework/Log.h"
+
+namespace YAML
+{
+template <>
+struct convert<SurgSim::Devices::LabJack::AnalogInputSettings>
+{
+	static Node encode(const SurgSim::Devices::LabJack::AnalogInputSettings& rhs)
+	{
+		Node node;
+		node.SetStyle(EmitterStyle::Flow);
+		node["Range"] = rhs.range;
+		node["NegativeChannel"] = convert<SurgSim::DataStructures::OptionalValue<int>>::encode(rhs.negativeChannel);
+		return node;
+	}
+
+	static bool decode(const Node& node, SurgSim::Devices::LabJack::AnalogInputSettings& rhs)
+	{
+		if (node.IsMap())
+		{
+			if (node["Range"].IsDefined())
+			{
+				rhs.range = node["Range"].as<SurgSim::Devices::LabJack::Range>();
+			}
+			if (node["NegativeChannel"].IsDefined())
+			{
+				rhs.negativeChannel = node["NegativeChannel"].as<SurgSim::DataStructures::OptionalValue<int>>();
+			}
+		}
+		return true;
+	}
+};
+};
 
 namespace SurgSim
 {
@@ -38,6 +73,8 @@ LabJackDevice::LabJackDevice(const std::string& uniqueName) :
 	m_analogInputResolution(0),
 	m_analogInputSettling(0)
 {
+	using analogInputsType = std::unordered_map<int, LabJack::AnalogInputSettings>;
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(LabJackDevice, analogInputsType, AnalogInputs, getAnalogInputs, setAnalogInputs);
 }
 
 LabJackDevice::~LabJackDevice()

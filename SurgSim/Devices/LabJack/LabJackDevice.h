@@ -194,21 +194,9 @@ struct TimerSettings
 	SurgSim::DataStructures::OptionalValue<int> initialValue;
 };
 
-/// The analog input ranges.  Equivalent to gain.  Ignored for Linux scaffold, which auto-ranges.
-enum Range
-{
-	RANGE_20 = 1, // -20V to +20V, LJ_rgBIP20V
-	RANGE_10 = 2, // -10V to +10V, LJ_rgBIP10V
-	RANGE_5 = 3, // -5V to +5V, LJ_rgBIP5V
-	RANGE_4 = 4, // -4V to +4V, LJ_rgBIP4V
-	RANGE_2_POINT_5 = 5, // -2.5V to +2.5V, LJ_rgBIP2P5V
-	RANGE_2 = 6, // -2V to +2V, LJ_rgBIP2V
-	RANGE_1_POINT_25 = 7, // -1.25V to +1.25V, LJ_rgBIP1P25V
-	RANGE_1 = 8, // -1V to +1V, LJ_rgBIP1V
-	RANGE_0_POINT_625 = 9, // -0.625V to +0.625V, LJ_rgBIPP625V
-	RANGE_0_POINT_1 = 10, // -0.1V to +0.1V, LJ_rgBIPP1V
-	RANGE_0_POINT_01 = 11 // -0.01V to +0.01V, LJ_rgBIPP01V
-};
+/// The analog input ranges.  Equivalent to gain.  Ignored for Linux scaffold, which auto-ranges. The name is the
+/// maximum absolute voltage allowed, e.g., RANGE_2_POINT_5 can handle from -2.5v to +2.5v.
+enum Range : SURGSIM_ENUM_TYPE;
 
 /// A struct holding the data to be associated with the positive channel for an analog input.
 struct AnalogInputSettings
@@ -532,5 +520,7 @@ private:
 
 };  // namespace Devices
 };  // namespace SurgSim
+
+SURGSIM_SERIALIZABLE_ENUM(SurgSim::Devices::LabJack::Range, (RANGE_NONE)(RANGE_20)(RANGE_10)(RANGE_5)(RANGE_4)(RANGE_2_POINT_5)(RANGE_2)(RANGE_1_POINT_25)(RANGE_1)(RANGE_0_POINT_625)(RANGE_0_POINT_1)(RANGE_0_POINT_01));
 
 #endif  // SURGSIM_DEVICES_LABJACK_LABJACKDEVICE_H
