@@ -37,6 +37,7 @@ struct convert<SurgSim::Devices::LabJack::AnalogInputSettings>
 
 	static bool decode(const Node& node, SurgSim::Devices::LabJack::AnalogInputSettings& rhs)
 	{
+		bool result = false;
 		if (node.IsMap())
 		{
 			if (node["Range"].IsDefined())
@@ -47,8 +48,9 @@ struct convert<SurgSim::Devices::LabJack::AnalogInputSettings>
 			{
 				rhs.negativeChannel = node["NegativeChannel"].as<SurgSim::DataStructures::OptionalValue<int>>();
 			}
+			result = true;
 		}
-		return true;
+		return result;
 	}
 };
 };
