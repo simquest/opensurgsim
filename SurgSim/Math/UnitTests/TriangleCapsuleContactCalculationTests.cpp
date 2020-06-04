@@ -484,8 +484,9 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase36)
 	auto penetration = Geometry::DistanceEpsilon * 0.5;
 	testTriangleCapsuleContactCalculation(
 		"Failing test 5 (Angled capsule axis penetrating triangle, less than DistanceEpsilon on positive side)",
-		Vector3d(0.0, 0.0, penetration), Vector3d(0.01, 0.01, -1.0), true, true, Vector3d::Zero(),
-		Vector3d(0, 0, -0.5 - penetration));
+		Vector3d(0.0, 0.0, penetration), Vector3d(0.01, 0.01, -1.0), true, true,
+		Vector3d(0.01, 0.01, 0.0),
+		Vector3d(0.01, 0.01, -1.5));
 }
 }
 }
