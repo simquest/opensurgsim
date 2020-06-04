@@ -482,11 +482,13 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase35)
 TEST_F(TriangleCapsuleContactCalculationTest, TestCase36)
 {
 	auto penetration = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(0.0, 0.0, penetration);
+	auto cv1 = Vector3d(0.01, 0.01, -1.0);
+	Vector3d trianglePoint = { cv1.x(), cv1.y(), 0.0 };
+	Vector3d segmentPoint = { cv1.x(), cv1.y(), cv1.z() - 0.5 };
 	testTriangleCapsuleContactCalculation(
 		"Failing test 5 (Angled capsule axis penetrating triangle, less than DistanceEpsilon on positive side)",
-		Vector3d(0.0, 0.0, penetration), Vector3d(0.01, 0.01, -1.0), true, true,
-		Vector3d(0.01, 0.01, 0.0),
-		Vector3d(0.01, 0.01, -1.5));
+		cv0, cv1, true, true, trianglePoint, segmentPoint);
 }
 }
 }

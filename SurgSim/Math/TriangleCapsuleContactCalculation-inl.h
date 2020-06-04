@@ -203,6 +203,7 @@ private:
 					&m_penetrationPointCapsule, &m_penetrationPointCapsuleAxis);
 			}
 			m_penetrationDepth = (m_tv0 - m_penetrationPointCapsule).dot(m_tn);
+			m_penetrationPointTriangle = m_penetrationPointCapsule + m_tn * m_penetrationDepth;
 			return true;
 		}
 
@@ -455,30 +456,19 @@ private:
 			dStart = segmentStart->dot(planeN[i]) + planeD[i];
 			dEnd = segmentEnd->dot(planeN[i]) + planeD[i];
 
-			if (dStart < -m_epsilon && dEnd > m_epsilon)
+			if (dStart < 0.0 && dEnd > 0.0)
 			{
 				ratio = std::abs(dStart) / (std::abs(dStart) + dEnd);
 				*segmentEnd = *segmentStart + (*segmentEnd - *segmentStart) * ratio;
 				j = i;
 			}
-			else if (dStart > m_epsilon && dEnd < -m_epsilon)
+			else if (dStart > 0.0 && dEnd < 0.0)
 			{
 				ratio = dStart / (dStart + std::abs(dEnd));
 				*segmentStart = *segmentStart + (*segmentEnd - *segmentStart) * ratio;
 				j = i;
 			}
-			else if (dStart < m_epsilon && dEnd > m_epsilon)
-			{
-				*segmentEnd = *segmentStart;
-				j = i;
-			}
-			else if (dStart > m_epsilon && dEnd < m_epsilon)
-			{
-				*segmentStart = *segmentEnd;
-				j = i;
-			}
 		}
-
 		SURGSIM_ASSERT(j < 4) << "The clipping should have happened at least with the triangle plane.";
 		return j;
 	}
