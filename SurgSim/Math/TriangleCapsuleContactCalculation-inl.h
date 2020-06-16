@@ -186,7 +186,7 @@ private:
 	{
 		if (m_penetrationPointCapsuleAxis.isApprox(m_cvTop, m_epsilon) ||
 			m_penetrationPointCapsuleAxis.isApprox(m_cvBottom, m_epsilon) ||
-			isPointOnTriangleEdge(m_penetrationPointTriangle, m_tv0, m_tv1, m_tv2, m_tn))
+			isPointOnTriangleEdge(m_penetrationPointTriangle, m_tv0, m_tv1, m_tv2))
 		{
 			m_contactNormal = -m_tn;
 
