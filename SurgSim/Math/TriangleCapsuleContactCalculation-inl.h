@@ -143,7 +143,76 @@ public:
 		}
 	}
 
-private:
+	void toBytes(SurgSim::Math::Vector3d in, std::vector<uint8_t>* result)
+	{
+		auto ptr = reinterpret_cast<uint8_t*>(in.data());
+
+		auto bytes = in.size() * sizeof(double);
+
+		for (int i = 0; i < bytes; ++i)	result->push_back(ptr[i]);
+	}
+	size_t fromBytes(const std::vector<uint8_t>& bytes, SurgSim::Math::Vector3d* out, size_t start = 0)
+	{
+		auto ptr = reinterpret_cast<uint8_t*>(out->data());
+		auto count = sizeof(double) * out->size();
+		memcpy(ptr, bytes.data() + start, count);
+		return count;
+	}
+
+	void toBytes(double d, std::vector<uint8_t>* result)
+	{
+		auto ptr = reinterpret_cast<uint8_t*>(&d);
+		auto bytes = sizeof(double);
+		for (int i = 0; i < bytes; ++i) result->push_back(ptr[i]);
+	}
+
+	size_t fromBytes(const std::vector<uint8_t>& bytes, double* out, size_t start = 0)
+	{
+		auto ptr = reinterpret_cast<uint8_t*>(out);
+		memcpy(ptr, bytes.data() + start, sizeof(double));
+		return sizeof(double);
+	}
+
+	void toFile(const std::string& filename)
+	{
+		std::vector<uint8_t> bytes;
+		toBytes(m_tv0, &bytes);
+		toBytes(m_tv1, &bytes);
+		toBytes(m_tv2, &bytes);
+		toBytes(m_tn, &bytes);
+		toBytes(m_cvTop, &bytes);
+		toBytes(m_cvBottom, &bytes);
+		toBytes(m_cr, &bytes);
+
+		std::ofstream out(filename, std::ios_base::binary);
+		SURGSIM_ASSERT(out.is_open());
+		
+		for (auto b : bytes) out << b;
+	}
+
+	void fromFile(const std::string& filename)
+	{
+		// 6 Vector 3 doubles each + 1 double = 19 doubles
+		size_t size = sizeof(double) * 19;
+
+		std::ifstream in(filename,  std::ios_base::binary);
+		SURGSIM_ASSERT(in.is_open());
+	
+		std::vector<uint8_t> bytes(std::istreambuf_iterator<char>(in), {});
+
+		size_t start = 0;
+
+		start += fromBytes(bytes, &m_tv0, start);
+		start += fromBytes(bytes, &m_tv1, start);
+		start += fromBytes(bytes, &m_tv2, start);
+		start += fromBytes(bytes, &m_tn, start);
+		start += fromBytes(bytes, &m_cvTop, start);
+		start += fromBytes(bytes, &m_cvBottom, start);
+		start += fromBytes(bytes, &m_cr, start);
+	
+		SURGSIM_ASSERT(start == size);
+	}
+
 	/// This function handles the contact data calculation for the case where there is an intersection between the
 	/// capsule and the triangle, but the capsule axis does not intersect the triangle.
 	/// \return True, if the axis of the capsule is away from the triangle.

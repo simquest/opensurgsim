@@ -632,5 +632,33 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase47)
 			tri, c, true, false, Vector3d(), Vector3d()));
 }
 
+TEST_F(TriangleCapsuleContactCalculationTest, FileTest)
+{
+	auto tv0 = Vector3d(-0.0001463164258976192, -0.0002230732815911322, 0.0004572077078934273);
+	auto tv1 = Vector3d(-4.340778882491997e-05, 0.0003900046473060158, -0.000112293059937122);
+	auto tv2 = Vector3d(-5.698797769697528e-05, 0.0001870145299064479, 0.0001506273581337782);
+	auto cv0 = Vector3d(-0.0001421079719436742, 0.0001280347667781626, 0.0003048158910791373);
+	auto cv1 = Vector3d(0.0002648019331809418, 0.0004165889038605414, -0.0004404029045147011);
+	auto tn = tv0.cross(tv1).normalized();
+	double cr = 0.1234;
+
+	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<double, 0>
+		calc(tv0, tv1, tv2, tn, cv0, cv1, cr);
+
+	calc.toFile("test.bin");
+
+	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<double, 0>
+		other(Vector3d(), Vector3d(), Vector3d(), Vector3d(), Vector3d(), Vector3d(), 0.0);
+
+	other.fromFile("test.bin");
+
+	EXPECT_EQ(calc.m_tv0, other.m_tv0);
+	EXPECT_EQ(calc.m_tv1, other.m_tv1);
+	EXPECT_EQ(calc.m_tv2, other.m_tv2);
+	EXPECT_EQ(calc.m_cvTop, other.m_cvTop);
+	EXPECT_EQ(calc.m_cvBottom, other.m_cvBottom);
+	EXPECT_EQ(calc.m_cr, other.m_cr);
+}
+
 }
 }
