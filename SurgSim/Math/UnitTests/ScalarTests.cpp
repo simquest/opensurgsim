@@ -182,3 +182,62 @@ TEST(ScalarTests, TwoEntriesTests)
 }; // namespace Math
 
 }; // namespace SurgSim
+
+#include <vector>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
+
+std::vector<uint8_t> toBytes(SurgSim::Math::Vector3d in)
+{
+	std::vector<uint8_t> result;
+	auto ptr = reinterpret_cast<uint8_t*>(in.data());
+
+	auto bytes = in.size() * sizeof(double);
+
+	for (int i = 0; i < bytes; ++i)	result.push_back(ptr[i]);
+	return result;
+}
+void fromBytes(const std::vector<uint8_t>& bytes, SurgSim::Math::Vector3d* out)
+{
+	auto ptr = reinterpret_cast<uint8_t*>(out->data());
+	memcpy(ptr, bytes.data(), sizeof(double) * out->size());
+}
+
+std::vector<uint8_t> toBytes(double d)
+{
+	std::vector<uint8_t> result;
+	auto ptr = reinterpret_cast<uint8_t*>(&d);
+	auto bytes = sizeof(double);
+	for (int i = 0; i < bytes; ++i) result.push_back(ptr[i]);
+	return result;
+}
+
+void fromBytes(const std::vector<uint8_t>& bytes, double* out)
+{
+	auto ptr = reinterpret_cast<uint8_t*>(out);
+	memcpy(ptr, bytes.data(), sizeof(double));
+}
+
+
+TEST(BytesTest, Vector)
+{
+	SurgSim::Math::Vector3d a(1.23323, 1.0 / 3.0, M_PI);
+	SurgSim::Math::Vector3d b;
+	auto bytes = toBytes(a);
+	EXPECT_EQ(3 * sizeof(double), bytes.size());
+	EXPECT_NE(a, b);
+	fromBytes(bytes, &b);
+	EXPECT_EQ(a, b);
+}
+
+TEST(BytesTest, Double)
+{
+	double a = M_PI;
+	double b = 0.0;
+	auto bytes = toBytes(a);
+
+	EXPECT_EQ(sizeof(double), bytes.size());
+	EXPECT_NE(a, b);
+	fromBytes(bytes, &b);
+	EXPECT_EQ(a, b);
+}
