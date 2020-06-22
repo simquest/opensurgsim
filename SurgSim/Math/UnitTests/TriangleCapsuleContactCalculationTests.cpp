@@ -632,5 +632,54 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase47)
 			tri, c, true, false, Vector3d(), Vector3d()));
 }
 
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase48)
+{
+	auto tv0 = Vector3d(-0.01023277949520133, -0.04454891229892678, 0.01488728551939511);
+	auto tv1 = Vector3d(-0.001586838388016651, -0.04995930339204056, 0.000919558869388072);
+	auto tv2 = Vector3d(-0.07079318550178236, -0.06778670804100616, -0.03501230836229022);
+	auto cv0 = Vector3d(-0.06844722485600954, -0.03037643814190091, -0.03974413265465023);
+	auto cv1 = Vector3d(-0.02444552727137361, -0.1088261869880933, 0.003921321351440833);
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.0001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("Failing test case 9 (axisThroughTriangle, clips against one of the planes of the triangle, but not the plane containing all three vertices,  the sphere center is too far from the triangle edge plane.",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase49)
+{
+	auto tv0 = Vector3d(-0.027673875603792811445, -0.058749729629382428653, 0.0047307022604872565885);
+	auto tv1 = Vector3d(3.6997932627607504896e-05, -0.086299394297733131309, -0.026449209373083551466);
+	auto tv2 = Vector3d(0.0014003052138341388899, -0.082964262921552747732, -0.028184595037097793374);
+	auto cv0 = Vector3d(-0.0022352852292674904588, -0.082196326646012951578, -0.0035459525622264578826);
+	auto cv1 = Vector3d(-0.062126265204750931448, -0.027070996268276553698, -0.061619108622031494582);
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.0001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("Failing test case 10 (axisThroughTriangle, clips against one of the planes of the triangle, but not the plane containing all three vertices,  the sphere center is too far from the triangle edge plane.",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase50)
+{
+
+	//m_cr: 0.00010000000000000000479
+	//deepestPoint : -0.029269858409812360422 - 0.10706090015858360509 0.0018205865540117315785
+	//origin : -0.037384929849895082166 - 0.15377986276715424618 - 0.010049197725620025168
+	//j : 3
+	//planeN[j] : -0.65128817730500165872 - 0.078628044557607371101 0.75474587823437355727
+	auto tv0 = Vector3d(-0.025932017510265241433, -0.074799490940502602609, 0.0080618234695551543867);
+	auto tv1 = Vector3d(-0.015431696798536696791, -0.076996493652803796315, -0.0055057320084982586811);
+	auto tv2 = Vector3d(-0.037384929849895082166, -0.15377986276715424618, -0.010049197725620025168);
+	auto cv0 = Vector3d(-0.076827584926529191023, -0.044607650780085397746, -0.050854820537226314014);
+	auto cv1 = Vector3d(-0.026607132055857893316, -0.11066792900797475796, 0.0049274907658283517708);
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.0001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("Failing test case 11 (axisThroughTriangle, clips against one of the planes of the triangle, but not the plane containing all three vertices,  the sphere center is too far from the triangle edge plane.",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
+
 }
 }
