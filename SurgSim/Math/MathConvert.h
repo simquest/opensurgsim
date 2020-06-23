@@ -31,6 +31,12 @@ namespace SurgSim
 namespace Math
 {
 class Shape;
+
+void toBytes(double d, std::vector<uint8_t>* result);
+size_t fromBytes(const std::vector<uint8_t>& bytes, double* out, size_t start = 0);
+
+void toBytes(SurgSim::Math::Vector3d in, std::vector<uint8_t>* result);
+size_t fromBytes(const std::vector<uint8_t>& bytes, SurgSim::Math::Vector3d* out, size_t start = 0);
 }
 }
 
