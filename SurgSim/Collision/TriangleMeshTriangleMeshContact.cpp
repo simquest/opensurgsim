@@ -185,44 +185,54 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 				}
 
 				auto verticesB = meshB.getTrianglePositions(*j);
+				try
+				{
 
-				// Check if the triangles intersect.
-				if (Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
+					// Check if the triangles intersect.
+					if (Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
 						verticesB[0], verticesB[1], verticesB[2],
 						normalA, normalB, &depth,
 						&penetrationPointA, &penetrationPointB,
 						&normal))
-				{
+					{
 #ifdef SURGSIM_DEBUG_TRIANGLETRIANGLECONTACT
-					assertIsCoplanar(verticesA[0], verticesA[1], verticesA[2], penetrationPointA);
-					assertIsCoplanar(verticesB[0], verticesB[1], verticesB[2], penetrationPointB);
+						assertIsCoplanar(verticesA[0], verticesA[1], verticesA[2], penetrationPointA);
+						assertIsCoplanar(verticesB[0], verticesB[1], verticesB[2], penetrationPointB);
 
-					assertIsPointInsideTriangle(
-						penetrationPointA, verticesA[0], verticesA[1], verticesA[2], normalA);
-					assertIsPointInsideTriangle(penetrationPointB, verticesB[0], verticesB[1], verticesB[2], normalB);
+						assertIsPointInsideTriangle(
+							penetrationPointA, verticesA[0], verticesA[1], verticesA[2], normalA);
+						assertIsPointInsideTriangle(penetrationPointB, verticesB[0], verticesB[1], verticesB[2], normalB);
 
-					assertIsCorrectNormalAndDepth(normal, depth, verticesA[0], verticesA[1], verticesA[2],
-												  verticesB[0], verticesB[1], verticesB[2]);
+						assertIsCorrectNormalAndDepth(normal, depth, verticesA[0], verticesA[1], verticesA[2],
+							verticesB[0], verticesB[1], verticesB[2]);
 #endif
 
-					// Create the contact.
-					std::pair<Location, Location> penetrationPoints;
-					Vector3d barycentricCoordinate;
-					Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
-												 normalA, &barycentricCoordinate);
-					penetrationPoints.first.triangleMeshLocalCoordinate.setValue(
-						DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
-					Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
-												 normalB, &barycentricCoordinate);
-					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
-						DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
+						// Create the contact.
+						std::pair<Location, Location> penetrationPoints;
+						Vector3d barycentricCoordinate;
+						Math::barycentricCoordinates(penetrationPointA, verticesA[0], verticesA[1], verticesA[2],
+							normalA, &barycentricCoordinate);
+						penetrationPoints.first.triangleMeshLocalCoordinate.setValue(
+							DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
+						Math::barycentricCoordinates(penetrationPointB, verticesB[0], verticesB[1], verticesB[2],
+							normalB, &barycentricCoordinate);
+						penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
+							DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate));
 
-					penetrationPoints.first.rigidLocalPosition.setValue(meshAPose.inverse() * penetrationPointA);
-					penetrationPoints.second.rigidLocalPosition.setValue(meshBPose.inverse() * penetrationPointB);
+						penetrationPoints.first.rigidLocalPosition.setValue(meshAPose.inverse() * penetrationPointA);
+						penetrationPoints.second.rigidLocalPosition.setValue(meshBPose.inverse() * penetrationPointB);
 
-					contacts.emplace_back(std::make_shared<Contact>(
-											  COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth), 1.0,
-											  Vector3d::Zero(), normal, penetrationPoints));
+						contacts.emplace_back(std::make_shared<Contact>(
+							COLLISION_DETECTION_TYPE_DISCRETE, std::abs(depth), 1.0,
+							Vector3d::Zero(), normal, penetrationPoints));
+					}
+				}
+				catch (std::exception e)
+				{
+					SURGSIM_LOG_WARNING(Framework::Logger::getLogger("TriangleMeshTriangleMeshContact")) <<
+						__func__ << " " << __LINE__ << ": Failed calculateContactTriangleTriangle for triangleA ID: " <<
+						*i << " and triangleB ID: " << *j;
+					throw e;
 				}
 			}
 		}

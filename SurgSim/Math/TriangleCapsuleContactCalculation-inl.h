@@ -173,7 +173,7 @@ public:
 				axisThroughTriangle();
 
 			SURGSIM_ASSERT(result) << __func__ << " " << __LINE__ << "At this point, there must be an intersection." <<
-				std::setprecision(20) << "\nm_tv0: " << m_tv0.transpose() <<
+				std::setprecision(std::numeric_limits<T>::max_digits10) << "\nm_tv0: " << m_tv0.transpose() <<
 				"\nm_tv1: " << m_tv1.transpose() << "\nm_tv2: " << m_tv2.transpose() << "\nm_cr: " << m_cr <<
 				"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 
@@ -341,9 +341,10 @@ public:
 		SURGSIM_ASSERT(clipSegmentAgainstTriangle(&segmentStart, &segmentEnd, v, planeN, planeD, &j)) <<
 			"There is an intersection between a capsule and a triangle, and because the other checks returned " <<
 			"false there must be an intersection between capsule axis and one of planes of the swept prism, " <<
-			"but the axis did not clip against any of those planes." << std::setprecision(20) <<
-			"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() <<
-			"\nm_cr: " << m_cr << "\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
+			"but the axis did not clip against any of those planes." <<
+			std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv[0]: " << v[0].transpose() <<
+			"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
+			"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 
 		if (j == 0)
 		{
@@ -379,9 +380,10 @@ public:
 		SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, majorAxis, m_cr, m_cInverseTransform.getValue(),
 			&majorRadius, &deepestPoint)) << "There is an intersection between a capsule and a triangle, " <<
 			"and the capsule axis intersects one of planes of the swept prism, but there was a failure calculating " <<
-			"the major radius of the ellipse of the plane-capsule intersection." << std::setprecision(20) <<
-			"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() <<
-			"\nm_cr: " << m_cr << "\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
+			"the major radius of the ellipse of the plane-capsule intersection." <<
+			std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv[0]: " << v[0].transpose() <<
+			"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
+			"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 
 		if (std::abs(majorAxis.dot(triangleEdge)) > m_epsilon)
 		{
@@ -394,9 +396,9 @@ public:
 				&minorRadius)) << "There is an intersection between a capsule and a " <<
 				"triangle, and the capsule axis intersects one of planes of the swept prism, but there was a " <<
 				"failure calculating the major radius of the ellipse of the plane-capsule intersection." <<
-				std::setprecision(20) << "\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() <<
-				"\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr << "\nm_cvTop: " << m_cvTop.transpose() <<
-				"\nm_cvBottom: " << m_cvBottom.transpose();
+				std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv[0]: " << v[0].transpose() <<
+				"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
+				"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 
 			deepestPoint = pointWithTangentOnEllipse(center, majorAxis, minorAxis, majorRadius, minorRadius,
 				triangleEdge);
@@ -417,11 +419,11 @@ public:
 					"through the triangle.\nThe segment clips against one of the planes of the triangle, but " <<
 					"not the plane containing all three vertices.\nThe deepest point is not on the cylinder, " <<
 					"so it should be on the sphere at the end of the capsule, but the sphere center is too far " <<
-					"from the triangle edge plane." << std::setprecision(20) << "\nv[0]: " << v[0].transpose() <<
-					"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
-					"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose() <<
-					"\ndeepestPoint: " << deepestPoint.transpose() << "\norigin: " << origin.transpose() <<
-					"\nj: " << j << "\nplaneN[j]: " << planeN[j].transpose() <<
+					"from the triangle edge plane." << std::setprecision(std::numeric_limits<T>::max_digits10) <<
+					"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() <<
+					"\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr << "\nm_cvTop: " << m_cvTop.transpose() <<
+					"\nm_cvBottom: " << m_cvBottom.transpose() << "\ndeepestPoint: " << deepestPoint.transpose() <<
+					"\norigin: " << origin.transpose() << "\nj: " << j << "\nplaneN[j]: " << planeN[j].transpose() <<
 					"\nsphereCenterToXYPlane: " << sphereCenterToXYPlane << "\nm_epsilon: " << m_epsilon <<
 					"\nsegmentStart: " << segmentStart.transpose() << "\nsegmentEnd: " << segmentEnd.transpose() <<
 					"\ndist: " << dist << "\nstd::abs(dist - m_cr): " << std::abs(dist - m_cr) <<
@@ -433,7 +435,7 @@ public:
 					"the planes of the triangle, but not the plane containing all three vertices.\nThe deepest " <<
 					"point is not on the cylinder, so it should be on the sphere at the end of the capsule, but the " <<
 					"radius of the circle of intersection between the sphere and the plane is invalid." <<
-					std::setprecision(20) << "\nv[0]: " << v[0].transpose() <<
+					std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv[0]: " << v[0].transpose() <<
 					"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
 					"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 				Vector3 circleCenter = m_cvBottom - zAxis * sphereCenterToXYPlane;
@@ -464,10 +466,10 @@ public:
 				"through the triangle.\nThe segment has been clipped against one of the planes of the swept prism.  " <<
 				"The triangle-capsule intersection is an ellipse around that point.  That ellipse passes through " <<
 				"an edge of the swept prism, so the deepest point is on that edge, but the calculation failed to " <<
-				"find the intersection of the edge with the capsule." << std::setprecision(20) <<
-				"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() <<
-				"\nm_cr: " << m_cr << "\nm_cvTop: " << m_cvTop.transpose() <<
-				"\nm_cvBottom: " << m_cvBottom.transpose();
+				"find the intersection of the edge with the capsule." <<
+				std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv[0]: " << v[0].transpose() <<
+				"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
+				"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 		}
 
 		m_contactNormal = -m_tn;
@@ -512,11 +514,11 @@ public:
 			{
 				SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation"))
 					<< __func__ << " " << __LINE__ << "Failed to solve for intersection of line with a cylinder." <<
-					std::setprecision(20) << "\nlineStart: " << lineStart.transpose() <<
-					"\nlineDir: " << lineDir.transpose() << "\ncInverseTransform.linear(): " <<
-					cInverseTransform.linear() << "\ncInversTransform.translation(): " <<
-					cInverseTransform.translation().transpose() << "\nP: " << P.transpose() <<
-					"\nD: " << D.transpose() << "\ndiscriminant: " << discriminant;
+					std::setprecision(std::numeric_limits<T>::max_digits10) <<
+					"\nlineStart: " << lineStart.transpose() << "\nlineDir: " << lineDir.transpose() <<
+					"\ncInverseTransform.linear(): " << cInverseTransform.linear() <<
+					"\ncInversTransform.translation(): " << cInverseTransform.translation().transpose() <<
+					"\nP: " << P.transpose() << "\nD: " << D.transpose() << "\ndiscriminant: " << discriminant;
 				return false;
 			}
 		}
@@ -533,7 +535,7 @@ public:
 		}
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation"))
 			<< __func__ << " " << __LINE__ << "Failed to solve for intersection of line with a cylinder." <<
-			std::setprecision(20) << "\nlineStart: " << lineStart.transpose() <<
+			std::setprecision(std::numeric_limits<T>::max_digits10) << "\nlineStart: " << lineStart.transpose() <<
 			"\nlineDir: " << lineDir.transpose() << "\ncInverseTransform.linear(): " <<
 			cInverseTransform.linear() << "\ncInverseTransform.translation(): " <<
 			cInverseTransform.translation().transpose() << "\nP: " << P.transpose() << "\nD: " << D.transpose() <<
@@ -614,11 +616,11 @@ public:
 			{
 				SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation")) <<
 					__func__ << " " << __LINE__ << " Failed to solve for intersection of line with a sphere at end " <<
-					"of capsule." << std::setprecision(20) << "\ncvTop: " << cvTop.transpose() <<
-					"\ncAxis: " << cAxis.transpose() << "\ncLength: " << cLength << "\ncr: " << cr <<
-					"\nlineStart: " << lineStart.transpose() << "\nlineDir: " << lineDir.transpose() <<
-					"\nP: " << P.transpose() << "\nD: " << D.transpose() << "\ndiscriminant: " << discriminant <<
-					"\ndistance: " << *distance;
+					"of capsule." << std::setprecision(std::numeric_limits<T>::max_digits10) <<
+					"\ncvTop: " << cvTop.transpose() << "\ncAxis: " << cAxis.transpose() << "\ncLength: " << cLength <<
+					"\ncr: " << cr << "\nlineStart: " << lineStart.transpose() <<
+					"\nlineDir: " << lineDir.transpose() << "\nP: " << P.transpose() << "\nD: " << D.transpose() <<
+					"\ndiscriminant: " << discriminant << "\ndistance: " << *distance;
 				return false;
 			}
 			*point = lineStart + lineDir * (*distance);
@@ -733,9 +735,10 @@ public:
 				SURGSIM_ASSERT(farthestIntersectionLineSphere(v[i], v[i] - planeN[0], bottom, cr, &deepestPoint)) <<
 					"There is a Triangle-Capsule intersection, the axis touches the triangle, the bottom is within " <<
 					"radius of an edge on the swept prism, but there was a failure finding the intersection between " <<
-					"the edge and the sphere." << std::setprecision(20) << "\nv[0]: " << v[0].transpose() <<
-					"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ntop: " << top.transpose()
-					<< "\nbottom: " << bottom.transpose() << "\ncr: " << cr;
+					"the edge and the sphere." << std::setprecision(std::numeric_limits<T>::max_digits10) <<
+					"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() <<
+					"\nv[2]: " << v[2].transpose() << "\ntop: " << top.transpose() <<
+					"\nbottom: " << bottom.transpose() << "\ncr: " << cr;
 				if ((cInverseTransform * deepestPoint)[0] >= cLength)
 				{
 					*penetrationPointCapsuleAxis = bottom;
@@ -767,9 +770,9 @@ public:
 					&majorRadius, &deepestPoint)) << "There is an intersection between a capsule and a triangle, " <<
 					"and the capsule axis intersects one of planes of the swept prism, but there was a failure " <<
 					"calculating the major radius of the ellipse of the plane-capsule intersection." <<
-					std::setprecision(20) << "\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() <<
-					"\nv[2]: " << v[2].transpose() << "\ncr: " << cr << "\ntop: " << top.transpose() <<
-					"\nbottom: " << bottom.transpose();
+					std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv[0]: " << v[0].transpose() <<
+					"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ncr: " << cr <<
+					"\ntop: " << top.transpose() << "\nbottom: " << bottom.transpose();
 
 				if (std::abs(majorAxis.dot(triangleEdge)) > Geometry::DistanceEpsilon)
 				{ // majorRadius * majorAxis is not the deepest point because the ellipse is angled.
@@ -779,9 +782,9 @@ public:
 						&minorRadius)) << "There is an intersection between a capsule and a triangle, and the " <<
 						"capsule axis intersects one of planes of the swept prism, but there was a failure " <<
 						"calculating the minor radius of the ellipse of the plane-capsule intersection." <<
-						std::setprecision(20) << "\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() <<
-						"\nv[2]: " << v[2].transpose() << "\ncr: " << cr << "\ntop: " << top.transpose() <<
-						"\nbottom: " << bottom.transpose();
+						std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv[0]: " << v[0].transpose() <<
+						"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ncr: " << cr <<
+						"\ntop: " << top.transpose() << "\nbottom: " << bottom.transpose();
 					deepestPoint = pointWithTangentOnEllipse(center, majorAxis, minorAxis, majorRadius, minorRadius,
 						triangleEdge);
 				}
@@ -808,8 +811,8 @@ public:
 							"with the triangle edge plane gives an ellipse that is close to a triangle corner with " <<
 							"the deepest penetration point on the ellipse outside the triangle, but the " <<
 							"calculation failed to find the intersection of the swept prism edge with the capsule." <<
-							std::setprecision(20) << "\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() <<
-							"\nv[2]: " << v[2].transpose() << "\ncr: " << cr <<
+							std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv[0]: " << v[0].transpose() <<
+							"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ncr: " << cr <<
 							"\ntop: " << top.transpose() << "\nbottom: " << bottom.transpose();
 						return;
 					}
@@ -829,9 +832,9 @@ public:
 		SURGSIM_ASSERT(dist < cr + Geometry::DistanceEpsilon) << "There is a Triangle-Capsule intersection, " <<
 			"the axis touches the triangle, the bottom is further than radius from the the swept prism, and " <<
 			"the deepest point is not on the cylinder.  So the penetration point must be on the top endpoint, " <<
-			"but it is too far away." << std::setprecision(20) << "\nv[0]: " << v[0].transpose() <<
-			"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ntop: " << top.transpose() <<
-			"\nbottom: " << bottom.transpose() << "\ncr: " << cr;
+			"but it is too far away." << std::setprecision(std::numeric_limits<T>::max_digits10) <<
+			"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() <<
+			"\ntop: " << top.transpose() << "\nbottom: " << bottom.transpose() << "\ncr: " << cr;
 
 		SURGSIM_ASSERT(farthestIntersectionLineSphere(closestPoint, closestPoint - planeN[0], top, cr,
 			penetrationPointCapsule)) << "There is a Triangle-Capsule intersection, the axis touches the triangle, " <<
@@ -880,8 +883,9 @@ public:
 			{
 				SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation")) <<
 					__func__ << " " << __LINE__ << "Failed to solve for intersection of line with a sphere." <<
-					std::setprecision(20) << "\nv1: " << v1.transpose() << "\nv2: " << v2.transpose() <<
-					"\ncenter: " << center.transpose() << "\nradius: " << radius << "\ndiscriminant: " << discriminant;
+					std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv1: " << v1.transpose() <<
+					"\nv2: " << v2.transpose() << "\ncenter: " << center.transpose() << "\nradius: " << radius <<
+					"\ndiscriminant: " << discriminant;
 				return false;
 			}
 			discriminant = static_cast<T>(0);
@@ -896,9 +900,9 @@ public:
 		}
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation")) <<
 			__func__ << " " << __LINE__ << " Failed to solve for intersection of line with a sphere." <<
-			std::setprecision(20) << "\nv1: " << v1.transpose() << "\nv2: " << v2.transpose() <<
-			"\ncenter: " << center.transpose() << "\nradius: " << radius << "\ndiscriminant: " << discriminant <<
-			"\nd: " << d;
+			std::setprecision(std::numeric_limits<T>::max_digits10) << "\nv1: " << v1.transpose() <<
+			"\nv2: " << v2.transpose() << "\ncenter: " << center.transpose() << "\nradius: " << radius <<
+			"\ndiscriminant: " << discriminant << "\nd: " << d;
 		return false;
 	}
 

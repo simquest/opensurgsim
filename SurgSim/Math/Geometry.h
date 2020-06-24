@@ -1138,36 +1138,16 @@ T distanceLinePlane(
 {
 	Eigen::Matrix<T, 3, 1, MOpt> v01 = v1 - v0;
 	T v01dotN = v01.dot(n);
-
-	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Geometry")) << __func__ << " " << __LINE__ <<
-		std::setprecision(12) <<
-		"\nv1: " << v1.transpose() <<
-		"\nv0: " << v0.transpose() <<
-		"\nv01:" << v01.transpose() <<
-		"\nn: " << n.transpose() <<
-		"\nd: " << d <<
-		"\nv01dotN: " << v01dotN;
 	if (std::abs(n.dot(v01.normalized())) > Geometry::AngularEpsilon)
 	{
 		T lambda = (-d - v0.dot(n)) / v01dotN;
 		*intersectionPoint = v0 + lambda * v01;
-
-		SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Geometry")) << __func__ << " " << __LINE__ <<
-			std::setprecision(12) <<
-			"\nlambda: " << lambda <<
-			"\nintersectionPoint: " << intersectionPoint->transpose();
 		return 0;
 	}
 	T dist = std::abs(v0.dot(n) + d);
-	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Geometry")) << __func__ << " " << __LINE__ <<
-		std::setprecision(12) <<
-		"\ndist: " << dist;
 	if (dist < Geometry::DistanceEpsilon)
 	{
 		*intersectionPoint = v0;
-		SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Geometry")) << __func__ << " " << __LINE__ <<
-			std::setprecision(12) <<
-			"\nintersectionPoint = v0: " << intersectionPoint->transpose();
 		return 0;
 	}
 	return dist;

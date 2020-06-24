@@ -106,43 +106,53 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 			{
 				const auto& verticesSegment = segmentMeshShape.getEdgePositions(*j);
 
-				// Check if the triangle and capsule intersect.
-				if (SurgSim::Math::calculateContactTriangleCapsule(
+				try
+				{
+					// Check if the triangle and capsule intersect.
+					if (SurgSim::Math::calculateContactTriangleCapsule(
 						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
 						verticesSegment[0], verticesSegment[1], radius,
 						&depth, &penetrationPointTriangle, &penetrationPointCapsule, &normal,
 						&penetrationPointCapsuleAxis))
+					{
+						// Create the contact.
+						std::pair<Location, Location> penetrationPoints;
+						SurgSim::Math::Vector2d barycentricCoordinate2;
+						SurgSim::Math::barycentricCoordinates(penetrationPointCapsuleAxis,
+							verticesSegment[0],
+							verticesSegment[1],
+							&barycentricCoordinate2);
+						penetrationPoints.first.elementMeshLocalCoordinate.setValue(
+							SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate2));
+						penetrationPoints.first.rigidLocalPosition.setValue(
+							segmentMeshPose.inverse() * penetrationPointCapsuleAxis);
+
+						Vector3d barycentricCoordinate;
+						SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
+							verticesTriangle[0],
+							verticesTriangle[1],
+							verticesTriangle[2],
+							normalTriangle,
+							&barycentricCoordinate);
+
+						penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
+							SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
+						penetrationPoints.second.rigidLocalPosition.setValue(
+							triangleMeshPose.inverse() * penetrationPointTriangle);
+
+						// Create the contact.
+						contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE,
+							std::abs(depth) +
+							(penetrationPointCapsule - penetrationPointCapsuleAxis).dot(normal),
+							1.0, Vector3d::Zero(), -normal, penetrationPoints));
+					}
+				}
+				catch (std::exception e)
 				{
-					// Create the contact.
-					std::pair<Location, Location> penetrationPoints;
-					SurgSim::Math::Vector2d barycentricCoordinate2;
-					SurgSim::Math::barycentricCoordinates(penetrationPointCapsuleAxis,
-														  verticesSegment[0],
-														  verticesSegment[1],
-														  &barycentricCoordinate2);
-					penetrationPoints.first.elementMeshLocalCoordinate.setValue(
-						SurgSim::DataStructures::IndexedLocalCoordinate(*j, barycentricCoordinate2));
-					penetrationPoints.first.rigidLocalPosition.setValue(
-						segmentMeshPose.inverse() * penetrationPointCapsuleAxis);
-
-					Vector3d barycentricCoordinate;
-					SurgSim::Math::barycentricCoordinates(penetrationPointTriangle,
-														  verticesTriangle[0],
-														  verticesTriangle[1],
-														  verticesTriangle[2],
-														  normalTriangle,
-														  &barycentricCoordinate);
-
-					penetrationPoints.second.triangleMeshLocalCoordinate.setValue(
-						SurgSim::DataStructures::IndexedLocalCoordinate(*i, barycentricCoordinate));
-					penetrationPoints.second.rigidLocalPosition.setValue(
-						triangleMeshPose.inverse() * penetrationPointTriangle);
-
-					// Create the contact.
-					contacts.push_back(std::make_shared<Contact>(COLLISION_DETECTION_TYPE_DISCRETE,
-									   std::abs(depth) +
-									   (penetrationPointCapsule - penetrationPointCapsuleAxis).dot(normal),
-									   1.0, Vector3d::Zero(), -normal, penetrationPoints));
+					SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getLogger("Collision")) <<
+						__func__ << " " << __LINE__ << ": Failed calculateContactTriangleCapsule for triangle ID: " <<
+						*i << " and segment ID: " << *j;
+					throw e;
 				}
 			}
 		}
