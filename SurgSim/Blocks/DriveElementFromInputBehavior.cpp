@@ -41,6 +41,11 @@ DriveElementFromInputBehavior::DriveElementFromInputBehavior(const std::string& 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DriveElementFromInputBehavior, std::string, PoseName, getPoseName, setPoseName);
 }
 
+int DriveElementFromInputBehavior::getTargetManagerType() const
+{
+	return Framework::MANAGER_TYPE_PHYSICS;
+}
+
 void DriveElementFromInputBehavior::setSource(std::shared_ptr<SurgSim::Framework::Component> source)
 {
 	m_source = checkAndConvert<SurgSim::Input::InputComponent>(source, "SurgSim::Input::InputComponent");
