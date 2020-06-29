@@ -34,6 +34,8 @@ SURGSIM_STATIC_REGISTRATION(ReplayPoseDevice);
 ///
 /// This can be useful not only for writing tests, but also as a way to replace real hardware devices in situations
 /// where the simulator needs to be run but the hardware is not currently available.
+/// The pose file can be created manually, or via the RecordPose DeviceFilter.
+/// Only one ReplayPoseDevice can be initialized at a time.
 ///
 /// \par Application input provided by the device:
 ///   | type       | name                  |                                                      |

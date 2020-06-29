@@ -30,6 +30,7 @@ SURGSIM_STATIC_REGISTRATION(RecordPose);
 
 /// An input device filter that record the input pose along with the relative time. All entries in the DataGroup are
 /// passed through. For convenience, it is also an OutputProducerInterface that does no filtering of the ouput data.
+/// Once a file of timestamped poses has been created, the ReplayPoseDevice can use that file to replay the poses.
 class RecordPose : public DeviceFilter
 {
 public:

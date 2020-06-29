@@ -60,11 +60,8 @@ void RecordPose::initializeInput(const std::string& device, const DataStructures
 	if (!m_outputFile.is_open())
 	{
 		m_outputFile.open(m_fileName, std::ios::out | std::ios::trunc);
-		if (!m_outputFile.is_open())
-		{
-			SURGSIM_LOG_IF(!m_outputFile.is_open(), Framework::Logger::getLogger("Devices/RecordPose"), WARNING) <<
-				"File " << m_fileName << " could not be open to record device pose";
-		}
+		SURGSIM_LOG_IF(!m_outputFile.is_open(), Framework::Logger::getLogger("Devices/RecordPose"), WARNING) <<
+			"File " << m_fileName << " could not be open to record device pose";
 	}
 }
 
