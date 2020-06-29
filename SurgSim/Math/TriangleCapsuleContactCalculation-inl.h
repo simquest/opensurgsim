@@ -300,9 +300,7 @@ public:
 				m_cTransform.linear().col(2) = k;
 				m_cInverseTransform = m_cTransform.inverse();
 				Vector3 closestPointSegment = m_penetrationPointCapsuleAxis;
-				axisTouchingTriangleWithBottomOutside(m_cvTop, m_cvBottom, projectionCvBottom, closestPointSegment,
-					m_cAxis, m_cLength, m_cr, v, planeN, planeD, m_cTransform, m_cInverseTransform,
-					&m_penetrationPointCapsuleAxis, &m_penetrationPointCapsule);
+				axisTouchingTriangleWithBottomOutside(projectionCvBottom, closestPointSegment, v, planeN, planeD);
 			}
 			m_penetrationDepth = (m_tv0 - m_penetrationPointCapsule).dot(m_tn);
 			m_penetrationPointTriangle = m_penetrationPointCapsule + m_tn * m_penetrationDepth;
@@ -370,8 +368,8 @@ public:
 		m_cInverseTransform = m_cTransform.inverse();
 
 		T majorRadius;
-		SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, majorAxis, m_cr, m_cInverseTransform,
-			&majorRadius, &deepestPoint)) << "There is an intersection between a capsule and a triangle, " <<
+		SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, majorAxis, &majorRadius, &deepestPoint)) <<
+			"There is an intersection between a capsule and a triangle, " <<
 			"and the capsule axis intersects one of planes of the swept prism, but there was a failure calculating " <<
 			"the major radius of the ellipse of the plane-capsule intersection." <<
 			"\nv[0]: " << v[0].transpose() <<
@@ -385,8 +383,8 @@ public:
 			// triangleEdge.
 			Vector3 minorAxis = planeN[j].cross(majorAxis);
 			T minorRadius;
-			SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, minorAxis, m_cr, m_cInverseTransform,
-				&minorRadius)) << "There is an intersection between a capsule and a " <<
+			SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, minorAxis, &minorRadius)) <<
+				"There is an intersection between a capsule and a " <<
 				"triangle, and the capsule axis intersects one of planes of the swept prism, but there was a " <<
 				"failure calculating the major radius of the ellipse of the plane-capsule intersection." <<
 				"\nv[0]: " << v[0].transpose() <<
@@ -453,8 +451,8 @@ public:
 			// The triangle point to consider is edgeVertices[0] or edgeVertices[1].
 			Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
 			double d;
-			SURGSIM_ASSERT(farthestIntersectionLineCapsule(m_cvTop, m_cAxis, m_cLength, m_cr, edgeVertex, -m_tn,
-				m_cTransform, m_cInverseTransform, &d, &deepestPoint, &m_penetrationPointCapsuleAxis)) <<
+			SURGSIM_ASSERT(farthestIntersectionLineCapsule(edgeVertex, -m_tn,
+				&d, &deepestPoint, &m_penetrationPointCapsuleAxis)) <<
 				"There is an intersection between a capsule and a triangle, and the capsule axis may go " <<
 				"through the triangle.\nThe segment has been clipped against one of the planes of the swept prism.  " <<
 				"The triangle-capsule intersection is an ellipse around that point.  That ellipse passes through " <<
@@ -475,13 +473,11 @@ public:
 
 	/// \param lineStart The origin of the line
 	/// \param lineDir Unit directional vector of the line
-	/// \param cr The capsule radius.
-	/// \param cInverseTransform The rigid transform to cylinder coordinates.
 	/// \param[out] distance The distance of the point of intersection from the lineStart.
 	/// \param[out] point The point of intersection.
 	/// \return true if an intersection was calculated, false otherwise.
-	static bool farthestIntersectionLineCylinder(const Vector3& lineStart, const Vector3& lineDir, T cr,
-		const RigidTransform3& cInverseTransform, T* distance, Vector3* point = nullptr)
+	bool farthestIntersectionLineCylinder(const Vector3& lineStart, const Vector3& lineDir,
+		T* distance, Vector3* point = nullptr)
 	{
 		// Transform the problem in the cylinder space to solve the local cylinder equation y^2 + z^2 = r^2
 		// Point on ellipse should be on the line, P + t.(D)
@@ -490,11 +486,11 @@ public:
 		// Let a = (Dy^2 + Dz^2), b = (2.Py.Dy + 2.Pz.Dz), c = (Py^2 + Pz^2 - r^2):
 		// => t^2.a + t.b + c = 0, whose solution is:
 		// (-b +/- sqrt(b^2 - 4*a*c))/2*a
-		auto const P = (cInverseTransform * lineStart).eval();
-		auto const D = (cInverseTransform.linear() * lineDir).eval();
+		auto const P = (m_cInverseTransform * lineStart).eval();
+		auto const D = (m_cInverseTransform.linear() * lineDir).eval();
 		T a = D[1] * D[1] + D[2] * D[2];
 		T b = static_cast<T>(2) * (P[1] * D[1] + P[2] * D[2]);
-		T c = (P[1] * P[1] + P[2] * P[2] - cr * cr);
+		T c = (P[1] * P[1] + P[2] * P[2] - m_cr * m_cr);
 		T discriminant = b * b - static_cast<T>(4) * a * c;
 		if (discriminant < 0.0)
 		{
@@ -508,8 +504,8 @@ public:
 				SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation"))
 					<< __func__ << " " << __LINE__ << "Failed to solve for intersection of line with a cylinder." <<
 					"\nlineStart: " << lineStart.transpose() << "\nlineDir: " << lineDir.transpose() <<
-					"\ncInverseTransform.linear(): " << cInverseTransform.linear() <<
-					"\ncInversTransform.translation(): " << cInverseTransform.translation().transpose() <<
+					"\nm_cInverseTransform.linear(): " << m_cInverseTransform.linear() <<
+					"\ncInversTransform.translation(): " << m_cInverseTransform.translation().transpose() <<
 					"\nP: " << P.transpose() << "\nD: " << D.transpose() << "\ndiscriminant: " << discriminant;
 				return false;
 			}
@@ -528,32 +524,24 @@ public:
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation"))
 			<< __func__ << " " << __LINE__ << "Failed to solve for intersection of line with a cylinder." <<
 			"\nlineStart: " << lineStart.transpose() <<
-			"\nlineDir: " << lineDir.transpose() << "\ncInverseTransform.linear(): " <<
-			cInverseTransform.linear() << "\ncInverseTransform.translation(): " <<
-			cInverseTransform.translation().transpose() << "\nP: " << P.transpose() << "\nD: " << D.transpose() <<
+			"\nlineDir: " << lineDir.transpose() << "\nm_cInverseTransform.linear(): " <<
+			m_cInverseTransform.linear() << "\nm_cInverseTransform.translation(): " <<
+			m_cInverseTransform.translation().transpose() << "\nP: " << P.transpose() << "\nD: " << D.transpose() <<
 			"\ndiscriminant: " << discriminant;
 		return false;
 	}
 
-	/// \param cvTop The top endpoint of the capsule.
-	/// \param cAxis The capsule axis.
-	/// \param cLength The capsule length.
-	/// \param cr The capsule radius.
 	/// \param lineStart The start of the line segment
 	/// \param lineDir The direction of the line segment, must be normalized.
-	/// \param cTransform The rigid transform from cylinder coordinates.
-	/// \param cInversTransform The rigid transform to cylinder coordinates.
 	/// \param[out] The distance along the line from cvTop.
 	/// \param[out] point The point which is to be clipped.
 	/// \param[out] pointOnCapsuleAxis The recalculated point on the capsule axis.
-	/// \return true if an intersection was found, fale otherwise.
-	static bool farthestIntersectionLineCapsule(const Vector3& cvTop, const Vector3& cAxis, T cLength, T cr,
-		const Vector3& lineStart, const Vector& lineDir,
-		const RigidTransform3& cTransform, const RigidTransform3& cInverseTransform,
-		T* distance ,Vector3* point, Vector3* pointOnCapsuleAxis)
+	/// \return true if an intersection was found, false otherwise.
+	bool farthestIntersectionLineCapsule(const Vector3& lineStart, const Vector& lineDir,
+		T* distance, Vector3* point, Vector3* pointOnCapsuleAxis)
 	{
 		// Transform the problem into the capsule space to solve the local capsule equation. The capsule coordinate
-		// system has its origin on one the capsule ends (cvTop), the x axis is along the capsule axis (cAxis), and
+		// system has its origin on one the capsule ends (m_cvTop), the x axis is along the capsule axis (m_cAxis), and
 		// the y and z axes are any orthogonal vectors to the capsule axis. The equation of the capsule can be written
 		// as the following:
 		// x^2 + y^2 + z^2 = r^2				| x < 0				------ [1]
@@ -562,7 +550,7 @@ public:
 		// Point should be on the line, P + t.(D)
 
 		// First find the intersection with an infinite cylinder centered around the capsule axis.
-		if (!farthestIntersectionLineCylinder(lineStart, lineDir, cr, cInverseTransform, distance, point))
+		if (!farthestIntersectionLineCylinder(lineStart, lineDir, distance, point))
 		{
 			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation")) <<
 				__func__ << " " << __LINE__ << " Failed to solve for intersection of line with a cylinder " <<
@@ -581,17 +569,17 @@ public:
 		// Let a = (Dx^2 + Dy^2 + Dz^2),
 		//     b = (2.Px.Dx + 2.Py.Dy + 2.Pz.Dz - 2.Dx.l),
 		//     c = (Px^2 + Py^2 + Pz^2 + l^2 - 2.Px.l - r^2):
-		double x = ((*point) - cvTop).dot(cAxis);
-		if (x <= 0.0 || x >= cLength)
+		double x = ((*point) - m_cvTop).dot(m_cAxis);
+		if (x <= 0.0 || x >= m_cLength)
 		{
-			x = (x <= 0.0) ? 0.0 : cLength;
+			x = (x <= 0.0) ? 0.0 : m_cLength;
 
-			auto const P = (cInverseTransform * lineStart).eval();
-			auto const D = (cInverseTransform.linear() * lineDir).eval();
+			auto const P = (m_cInverseTransform * lineStart).eval();
+			auto const D = (m_cInverseTransform.linear() * lineDir).eval();
 
 			//T a = D[0] * D[0] + D[1] * D[1] + D[2] * D[2];  lineDir is normalized so this is 1.0
 			T b = static_cast<T>(2) * (P[0] * D[0] + P[1] * D[1] + P[2] * D[2] - D[0] * x);
-			T c = (P[0] * P[0] + P[1] * P[1] + P[2] * P[2] + x * x - static_cast<T>(2) * P[0] * x - cr * cr);
+			T c = (P[0] * P[0] + P[1] * P[1] + P[2] * P[2] + x * x - static_cast<T>(2) * P[0] * x - m_cr * m_cr);
 
 			// => t^2.a + t.b + c = 0, whose solution is:
 			// (-b +/- sqrt(b^2 - 4*a*c))/2*a ... where a = 1
@@ -608,9 +596,8 @@ public:
 			{
 				SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation")) <<
 					__func__ << " " << __LINE__ << " Failed to solve for intersection of line with a sphere at end " <<
-					"of capsule." <<
-					"\ncvTop: " << cvTop.transpose() << "\ncAxis: " << cAxis.transpose() << "\ncLength: " << cLength <<
-					"\ncr: " << cr << "\nlineStart: " << lineStart.transpose() <<
+					"of capsule." << "\nm_cvTop: " << m_cvTop.transpose() << "\nm_cAxis: " << m_cAxis.transpose() <<
+					"\nm_cLength: " << m_cLength << "\nm_cr: " << m_cr << "\nlineStart: " << lineStart.transpose() <<
 					"\nlineDir: " << lineDir.transpose() << "\nP: " << P.transpose() << "\nD: " << D.transpose() <<
 					"\ndiscriminant: " << discriminant << "\ndistance: " << *distance;
 				return false;
@@ -618,7 +605,7 @@ public:
 			*point = lineStart + lineDir * (*distance);
 		}
 
-		*pointOnCapsuleAxis = cTransform * Vector3(x, 0.0, 0.0);
+		*pointOnCapsuleAxis = m_cTransform * Vector3(x, 0.0, 0.0);
 		return true;
 	}
 
@@ -664,55 +651,43 @@ public:
 
 	/// This function calculates the deepest penetration point on the capsule, assuming that the axis touches the
 	/// triangle, and bottom endpoint projects outside of the triangle.
-	/// \param top The start of the line segment.
-	/// \param bottom The end of the line segment.
 	/// \param projectionBottom The projection of the bottom endpoint into the triangle plane.
 	/// \param closestPointSegment The closest point on the segment to the triangle.
-	/// \param cAxis The capsule axis.
-	/// \param cLength The capsule length.
-	/// \param cr The capsule radius.
 	/// \param v The vertices of the triangle.
 	/// \param planeN Normals of the triangle and each of the edge planes.
 	/// \param planeD d from plane equation for the plane of the triangle and each of the edge planes.
-	/// \param cTransform The rigid transform from cylinder coordinates.
-	/// \param cInverseTransform The rigid transform to cylinder coordinates.
-	/// \param[out] penetrationPointCapsuleAxis The point on the capsule axis used for the contact.
-	/// \param[out] penetrationPointCapsule The point on the capsule used for the contact.
 	/// \exception Asserts if does not find a contact.
-	static void axisTouchingTriangleWithBottomOutside(const Vector3& top, const Vector3& bottom,
-		const Vector3& projectionBottom, const Vector3& closestPointSegment, const Vector3& cAxis, T cLength, T cr,
-		Vector3* v, Vector3* planeN, T* planeD,
-		const RigidTransform3& cTransform, const RigidTransform3& cInverseTransform,
-		Vector3* penetrationPointCapsuleAxis, Vector3* penetrationPointCapsule)
+	void axisTouchingTriangleWithBottomOutside(const Vector3& projectionBottom, const Vector3& closestPointSegment,
+		Vector3* v, Vector3* planeN, T* planeD)
 	{
 		T bottomDistance[3]; // Distance from bottom to each edge plane.
 		for (int i = 0; i < 3; ++i)
 		{
-			bottomDistance[i] = bottom.dot(planeN[i + 1]) + planeD[i + 1];
+			bottomDistance[i] = m_cvBottom.dot(planeN[i + 1]) + planeD[i + 1];
 		}
 
 		if (bottomDistance[0] <= static_cast<T>(0) && bottomDistance[1] <= static_cast<T>(0) &&
 			bottomDistance[2] <= static_cast<T>(0))
 		{
-			*penetrationPointCapsuleAxis = bottom;
-			*penetrationPointCapsule = bottom - planeN[0] * cr;
+			m_penetrationPointCapsuleAxis = m_cvBottom;
+			m_penetrationPointCapsule = m_cvBottom - planeN[0] * m_cr;
 			return;
 		}
 
-		const T crSquared = cr * cr;
+		const T crSquared = m_cr * m_cr;
 		for (int i = 0; i < 3; ++i)
 		{
-			if (bottomDistance[i] > 0 && bottomDistance[i] <= cr)
+			if (bottomDistance[i] > 0 && bottomDistance[i] <= m_cr)
 			{ // bottom is within radius of an edge.
 				T depth = std::sqrt(crSquared - bottomDistance[i] * bottomDistance[i]);
-				Vector3 deepestPoint = bottom - bottomDistance[i] * planeN[i + 1] - planeN[0] * depth;
+				Vector3 deepestPoint = m_cvBottom - bottomDistance[i] * planeN[i + 1] - planeN[0] * depth;
 				if (isPointInsideTriangle(deepestPoint, v[0], v[1], v[2], planeN[0]))
 				{
 					// If the x-coordinate is less than the endpoint, then a point on the axis will contact deeper.
-					if ((cInverseTransform * deepestPoint)[0] >= cLength)
+					if ((m_cInverseTransform * deepestPoint)[0] >= m_cLength)
 					{
-						*penetrationPointCapsuleAxis = bottom;
-						*penetrationPointCapsule = deepestPoint;
+						m_penetrationPointCapsuleAxis = m_cvBottom;
+						m_penetrationPointCapsule = deepestPoint;
 						return;
 					}
 				}
@@ -724,59 +699,61 @@ public:
 			if ((projectionBottom - v[i]).squaredNorm() <= crSquared)
 			{ // bottom is within radius of a vertex.
 				Vector3 deepestPoint;
-				SURGSIM_ASSERT(farthestIntersectionLineSphere(v[i], v[i] - planeN[0], bottom, cr, &deepestPoint)) <<
+				SURGSIM_ASSERT(farthestIntersectionLineSphere(v[i], v[i] - planeN[0], m_cvBottom, m_cr,
+					&deepestPoint)) <<
 					"There is a Triangle-Capsule intersection, the axis touches the triangle, the bottom is within " <<
 					"radius of an edge on the swept prism, but there was a failure finding the intersection between " <<
 					"the edge and the sphere." <<
 					"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() <<
-					"\nv[2]: " << v[2].transpose() << "\ntop: " << top.transpose() <<
-					"\nbottom: " << bottom.transpose() << "\ncr: " << cr;
-				if ((cInverseTransform * deepestPoint)[0] >= cLength)
+					"\nv[2]: " << v[2].transpose() << "\nm_cvTop: " << m_cvTop.transpose() <<
+					"\nm_cvBottom: " << m_cvBottom.transpose() << "\nm_cr: " << m_cr;
+				if ((m_cInverseTransform * deepestPoint)[0] >= m_cLength)
 				{
-					*penetrationPointCapsuleAxis = bottom;
-					*penetrationPointCapsule = deepestPoint;
+					m_penetrationPointCapsuleAxis = m_cvBottom;
+					m_penetrationPointCapsule = deepestPoint;
 					return;
 				}
 			}
 		}
 
-		if (cLength < Geometry::DistanceEpsilon)
+		if (m_cLength < Geometry::DistanceEpsilon)
 		{
-			*penetrationPointCapsuleAxis = closestPointSegment;
-			*penetrationPointCapsule = closestPointSegment - cr * planeN[0];
+			m_penetrationPointCapsuleAxis = closestPointSegment;
+			m_penetrationPointCapsule = closestPointSegment - m_cr * planeN[0];
 			return;
 		}
 
 		for (int i = 0; i < 3; ++i)
 		{
-			if ((cInverseTransform.linear() * planeN[i + 1])[0] > Geometry::DistanceEpsilon)
+			if ((m_cInverseTransform.linear() * planeN[i + 1])[0] > Geometry::DistanceEpsilon)
 			{ // The cylinder moves in the direction of the plane normal. First, the capsule is treated as a cylinder.
 				Vector3 center; // Intersection of the line along the axis with the plane.
-				T dist = distanceLinePlane(top, bottom, planeN[i + 1], planeD[i + 1], &center);
+				T dist = distanceLinePlane(m_cvTop, m_cvBottom, planeN[i + 1], planeD[i + 1], &center);
 				Vector3 edgeVertices[2] = { v[i], v[(i + 1) % 3] };
 				Vector3 triangleEdge = (edgeVertices[1] - edgeVertices[0]).normalized();
-				Vector3 majorAxis = (triangleEdge * (triangleEdge.dot(cAxis)) + planeN[0] * (planeN[0].dot(cAxis))).normalized();
+				Vector3 majorAxis =
+					(triangleEdge * (triangleEdge.dot(m_cAxis)) + planeN[0] * (planeN[0].dot(m_cAxis))).normalized();
 				Vector3 deepestPoint; // The deepest point of penetration that has been found.
 				T majorRadius;
-				SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, majorAxis, cr, cInverseTransform,
-					&majorRadius, &deepestPoint)) << "There is an intersection between a capsule and a triangle, " <<
+				SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, majorAxis, &majorRadius, &deepestPoint)) <<
+					"There is an intersection between a capsule and a triangle, " <<
 					"and the capsule axis intersects one of planes of the swept prism, but there was a failure " <<
 					"calculating the major radius of the ellipse of the plane-capsule intersection." <<
 					"\nv[0]: " << v[0].transpose() <<
-					"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ncr: " << cr <<
-					"\ntop: " << top.transpose() << "\nbottom: " << bottom.transpose();
+					"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
+					"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 
 				if (std::abs(majorAxis.dot(triangleEdge)) > Geometry::DistanceEpsilon)
 				{ // majorRadius * majorAxis is not the deepest point because the ellipse is angled.
 					auto minorAxis = planeN[i + 1].cross(majorAxis);
 					T minorRadius;
-					SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, minorAxis, cr, cInverseTransform,
-						&minorRadius)) << "There is an intersection between a capsule and a triangle, and the " <<
+					SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, minorAxis, &minorRadius)) <<
+						"There is an intersection between a capsule and a triangle, and the " <<
 						"capsule axis intersects one of planes of the swept prism, but there was a failure " <<
 						"calculating the minor radius of the ellipse of the plane-capsule intersection." <<
 						"\nv[0]: " << v[0].transpose() <<
-						"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ncr: " << cr <<
-						"\ntop: " << top.transpose() << "\nbottom: " << bottom.transpose();
+						"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
+						"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 					deepestPoint = pointWithTangentOnEllipse(center, majorAxis, minorAxis, majorRadius, minorRadius,
 						triangleEdge);
 				}
@@ -790,53 +767,55 @@ public:
 					// that is close to a triangle corner and the deepest penetration point on the ellipse is
 					// actually outside the triangle.
 					Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
-					Vector3 bottomEdgeVertex = edgeVertex + planeN[0] * (bottom.dot(planeN[0]) + planeD[0]);
+					Vector3 bottomEdgeVertex = edgeVertex + planeN[0] * (m_cvBottom.dot(planeN[0]) + planeD[0]);
 					Vector3 pt0;
 					Vector3 pt1;
-					if (distanceSegmentSegment(top, bottom, edgeVertex, bottomEdgeVertex, &pt0, &pt1) <= cr)
+					if (distanceSegmentSegment(m_cvTop, m_cvBottom, edgeVertex, bottomEdgeVertex, &pt0, &pt1) <= m_cr)
 					{
 						T distance;
-						SURGSIM_ASSERT(farthestIntersectionLineCapsule(top, cAxis, cLength, cr, edgeVertex, -planeN[0],
-							cTransform, cInverseTransform, &distance, penetrationPointCapsule,
-							penetrationPointCapsuleAxis)) << "There is an intersection between a capsule and a " <<
+						SURGSIM_ASSERT(farthestIntersectionLineCapsule(edgeVertex, -planeN[0],
+							&distance, &m_penetrationPointCapsule, &m_penetrationPointCapsuleAxis)) <<
+							"There is an intersection between a capsule and a " <<
 							"triangle, and the capsule axis touches the triangle.\nThe intersection of the capsule " <<
 							"with the triangle edge plane gives an ellipse that is close to a triangle corner with " <<
 							"the deepest penetration point on the ellipse outside the triangle, but the " <<
 							"calculation failed to find the intersection of the swept prism edge with the capsule." <<
 							"\nv[0]: " << v[0].transpose() <<
-							"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ncr: " << cr <<
-							"\ntop: " << top.transpose() << "\nbottom: " << bottom.transpose();
+							"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
+							"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
 						return;
 					}
 				}
 
 				if (isPointInsideTriangle(deepestPoint, v[0], v[1], v[2], planeN[0]))
 				{
-					*penetrationPointCapsule = deepestPoint;
-					distancePointSegment(*penetrationPointCapsule, top, bottom, penetrationPointCapsuleAxis);
+					m_penetrationPointCapsule = deepestPoint;
+					distancePointSegment(m_penetrationPointCapsule, m_cvTop, m_cvBottom,
+						&m_penetrationPointCapsuleAxis);
 					return;
 				}
 			}
 		}
 
 		Vector3 closestPoint;
-		T dist = distancePointTriangle(top, v[0], v[1], v[2], &closestPoint);
-		SURGSIM_ASSERT(dist < cr + Geometry::DistanceEpsilon) << "There is a Triangle-Capsule intersection, " <<
+		T dist = distancePointTriangle(m_cvTop, v[0], v[1], v[2], &closestPoint);
+		SURGSIM_ASSERT(dist < m_cr + Geometry::DistanceEpsilon) << "There is a Triangle-Capsule intersection, " <<
 			"the axis touches the triangle, the bottom is further than radius from the the swept prism, and " <<
 			"the deepest point is not on the cylinder.  So the penetration point must be on the top endpoint, " <<
 			"but it is too far away." <<
 			"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() <<
-			"\ntop: " << top.transpose() << "\nbottom: " << bottom.transpose() << "\ncr: " << cr;
+			"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose() << "\nm_cr: " << m_cr;
 
-		SURGSIM_ASSERT(farthestIntersectionLineSphere(closestPoint, closestPoint - planeN[0], top, cr,
-			penetrationPointCapsule)) << "There is a Triangle-Capsule intersection, the axis touches the triangle, " <<
+		SURGSIM_ASSERT(farthestIntersectionLineSphere(closestPoint, closestPoint - planeN[0], m_cvTop, m_cr,
+			&m_penetrationPointCapsule)) <<
+			"There is a Triangle-Capsule intersection, the axis touches the triangle, " <<
 			"the bottom is further than radius from the the swept prism, and the deepest point is not on the " <<
 			"cylinder.  So the penetration point must be on the top endpoint, but there was a failure finding the " <<
 			"intersection between a line drawn from the closest point on the triangle along the triangle normal " <<
 			"and the sphere around the top endpoint." << std::setprecision(20) << "\nv[0]: " << v[0].transpose() <<
-			"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\ntop: " << top.transpose() <<
-			"\nbottom: " << bottom.transpose() << "\ncr: " << cr;
-		distancePointSegment(*penetrationPointCapsule, top, bottom, penetrationPointCapsuleAxis);
+			"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cvTop: " << m_cvTop.transpose() <<
+			"\nm_cvBottom: " << m_cvBottom.transpose() << "\nm_cr: " << m_cr;
+		distancePointSegment(m_penetrationPointCapsule, m_cvTop, m_cvBottom, &m_penetrationPointCapsuleAxis);
 	}
 
 	/// This function calculates the intersection of a line with a sphere, returning the point furthest along the vector
@@ -847,7 +826,7 @@ public:
 	/// \param radius The radius of the sphere.
 	/// \param[out] point The point of intersection. If there are two intersections, this is the one most positive along (v2 - v1).
 	/// \return true if an intersection is found, otherwise false.
-	static bool farthestIntersectionLineSphere(const Vector3& v1, const Vector3& v2, const Vector3& center, T radius,
+	bool farthestIntersectionLineSphere(const Vector3& v1, const Vector3& v2, const Vector3& center, T radius,
 		Vector3* point)
 	{
 		// sphere: (x - xc)^2 + (y - yc)^2  + (z - zc)^2 = r^2
