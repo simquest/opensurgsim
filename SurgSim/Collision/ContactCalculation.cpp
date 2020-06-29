@@ -173,7 +173,7 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 		catch (std::exception e)
 		{
 			SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getLogger("Collision")) << __func__ << " " << __LINE__ <<
-				": Failed doCalculateDcdContact:" << std::setprecision(std::numeric_limits<double>::max_digits10) <<
+				": Failed doCalculateDcdContact:" <<
 				"\npair->getFirst()->getFullName(): " << pair->getFirst()->getFullName() <<
 				"\npair->getFirst()->getLocalPose().linear():\n" << pair->getFirst()->getLocalPose().linear() <<
 				"\npair->getFirst()->getLocalPose().translation(): " << pair->getFirst()->getLocalPose().translation().transpose() <<
