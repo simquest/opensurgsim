@@ -957,19 +957,18 @@ bool calculateContactTriangleCapsule(
 {
 	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<T, MOpt>
 		calc(tv0, tv1, tv2, tn, cv0, cv1, cr);
-	try {
-
-
-	if (calc.isIntersecting())
+	try
 	{
-		calc.calculateContact(penetrationDepth, penetrationPointTriangle, penetrationPointCapsule,
-			contactNormal, penetrationPointCapsuleAxis);
-		return true;
-	}
+		if (calc.isIntersecting())
+		{
+			calc.calculateContact(penetrationDepth, penetrationPointTriangle, penetrationPointCapsule,
+				contactNormal, penetrationPointCapsuleAxis);
+			return true;
+		}
 	}
 	catch (std::exception e)
 	{
-		calc.toFile("faultycalc.bin");
+		calc.toFile("TriangleCapsuleContactException.bin");
 		throw e;
 	}
 	return false;

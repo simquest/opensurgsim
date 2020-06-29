@@ -271,6 +271,7 @@ bool calculateContactTriangleTriangle(
 		SURGSIM_ASSERT(out.is_open());
 
 		for (auto b : bytes) out << b;
+		throw e;
 	}
 
 	// Choose the lower penetration of the two as the contact.
