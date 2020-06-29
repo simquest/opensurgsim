@@ -286,21 +286,7 @@ public:
 			}
 			else
 			{
-				Vector3 v[3] = { m_tv0, m_tv1, m_tv2 };
-				Vector3 planeN[4] = { m_tn, (-m_tn.cross(m_tv1 - m_tv0)).normalized(),
-					(-m_tn.cross(m_tv2 - m_tv1)).normalized(), (-m_tn.cross(m_tv0 - m_tv2)).normalized() };
-				double planeD[4] = { -m_tv0.dot(planeN[0]), -m_tv0.dot(planeN[1]), -m_tv1.dot(planeN[2]),
-					-m_tv2.dot(planeN[3]) };
-
-				Vector3 j, k;
-				SurgSim::Math::buildOrthonormalBasis(&m_cAxis, &j, &k);
-				m_cTransform.translation() = m_cvTop;
-				m_cTransform.linear().col(0) = m_cAxis;
-				m_cTransform.linear().col(1) = j;
-				m_cTransform.linear().col(2) = k;
-				m_cInverseTransform = m_cTransform.inverse();
-				Vector3 closestPointSegment = m_penetrationPointCapsuleAxis;
-				axisTouchingTriangleWithBottomOutside(projectionCvBottom, closestPointSegment, v, planeN, planeD);
+				axisTouchingTriangleWithBottomOutside(projectionCvBottom, m_penetrationPointCapsuleAxis);
 			}
 			m_penetrationDepth = (m_tv0 - m_penetrationPointCapsule).dot(m_tn);
 			m_penetrationPointTriangle = m_penetrationPointCapsule + m_tn * m_penetrationDepth;
@@ -653,13 +639,15 @@ public:
 	/// triangle, and bottom endpoint projects outside of the triangle.
 	/// \param projectionBottom The projection of the bottom endpoint into the triangle plane.
 	/// \param closestPointSegment The closest point on the segment to the triangle.
-	/// \param v The vertices of the triangle.
-	/// \param planeN Normals of the triangle and each of the edge planes.
-	/// \param planeD d from plane equation for the plane of the triangle and each of the edge planes.
 	/// \exception Asserts if does not find a contact.
-	void axisTouchingTriangleWithBottomOutside(const Vector3& projectionBottom, const Vector3& closestPointSegment,
-		Vector3* v, Vector3* planeN, T* planeD)
+	void axisTouchingTriangleWithBottomOutside(const Vector3& projectionBottom, const Vector3& closestPointSegment)
 	{
+		Vector3 v[3] = { m_tv0, m_tv1, m_tv2 };
+		Vector3 planeN[4] = { m_tn, (-m_tn.cross(m_tv1 - m_tv0)).normalized(),
+			(-m_tn.cross(m_tv2 - m_tv1)).normalized(), (-m_tn.cross(m_tv0 - m_tv2)).normalized() };
+		double planeD[4] = { -m_tv0.dot(planeN[0]), -m_tv0.dot(planeN[1]), -m_tv1.dot(planeN[2]),
+			-m_tv2.dot(planeN[3]) };
+
 		T bottomDistance[3]; // Distance from bottom to each edge plane.
 		for (int i = 0; i < 3; ++i)
 		{
@@ -673,6 +661,14 @@ public:
 			m_penetrationPointCapsule = m_cvBottom - planeN[0] * m_cr;
 			return;
 		}
+
+		Vector3 j, k;
+		SurgSim::Math::buildOrthonormalBasis(&m_cAxis, &j, &k);
+		m_cTransform.translation() = m_cvTop;
+		m_cTransform.linear().col(0) = m_cAxis;
+		m_cTransform.linear().col(1) = j;
+		m_cTransform.linear().col(2) = k;
+		m_cInverseTransform = m_cTransform.inverse();
 
 		const T crSquared = m_cr * m_cr;
 		for (int i = 0; i < 3; ++i)
