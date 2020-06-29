@@ -166,6 +166,7 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
 	{
+#ifdef OSS_DEBUG
 		try
 		{
 			contacts = doCalculateDcdContact(pair->getFirst()->getPosedShape(), pair->getSecond()->getPosedShape());
@@ -190,6 +191,9 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 				"\npair->getSecond()->getPosedShape().getPose().translation(): " << pair->getSecond()->getPosedShape().getPose().translation().transpose();
 			throw e;
 		}
+#else
+		contacts = doCalculateDcdContact(pair->getFirst()->getPosedShape(), pair->getSecond()->getPosedShape());
+#endif OSS_DEBUG
 	}
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{

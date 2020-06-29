@@ -185,8 +185,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 				}
 
 				auto verticesB = meshB.getTrianglePositions(*j);
-				try
-				{
 
 					// Check if the triangles intersect.
 					if (Math::calculateContactTriangleTriangle(verticesA[0], verticesA[1], verticesA[2],
@@ -227,14 +225,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 							Vector3d::Zero(), normal, penetrationPoints));
 					}
 				}
-				catch (std::exception e)
-				{
-					SURGSIM_LOG_WARNING(Framework::Logger::getLogger("TriangleMeshTriangleMeshContact")) <<
-						__func__ << " " << __LINE__ << ": Failed calculateContactTriangleTriangle for triangleA ID: " <<
-						*i << " and triangleB ID: " << *j;
-					throw e;
-				}
-			}
 		}
 	}
 	return contacts;

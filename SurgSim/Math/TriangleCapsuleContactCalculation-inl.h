@@ -523,7 +523,7 @@ public:
 		}
 
 		// We have two solutions. We want the larger value.
-		*distance = (-b / (T{ 2 } *a)) + std::abs(std::sqrt(discriminant) / (T{ 2 } *a));
+		*distance = (-b / (T{ 2 } * a)) + std::abs(std::sqrt(discriminant) / (T{ 2 } * a));
 		if (isValid(*distance))
 		{
 			if (point != nullptr)
@@ -764,7 +764,7 @@ public:
 				Vector3 triangleEdge = (edgeVertices[1] - edgeVertices[0]).normalized();
 				Vector3 majorAxis = (triangleEdge * (triangleEdge.dot(cAxis)) + planeN[0] * (planeN[0].dot(cAxis))).normalized();
 				Vector3 deepestPoint; // The deepest point of penetration that has been found.
-				double majorRadius;
+				T majorRadius;
 				SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, majorAxis, cr, cInverseTransform,
 					&majorRadius, &deepestPoint)) << "There is an intersection between a capsule and a triangle, " <<
 					"and the capsule axis intersects one of planes of the swept prism, but there was a failure " <<
@@ -956,19 +956,11 @@ bool calculateContactTriangleCapsule(
 {
 	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<T, MOpt>
 		calc(tv0, tv1, tv2, tn, cv0, cv1, cr);
-	try
+	if (calc.isIntersecting())
 	{
-		if (calc.isIntersecting())
-		{
-			calc.calculateContact(penetrationDepth, penetrationPointTriangle, penetrationPointCapsule,
-				contactNormal, penetrationPointCapsuleAxis);
-			return true;
-		}
-	}
-	catch (std::exception e)
-	{
-		calc.toFile("TriangleCapsuleContactException.bin");
-		throw e;
+		calc.calculateContact(penetrationDepth, penetrationPointTriangle, penetrationPointCapsule,
+			contactNormal, penetrationPointCapsuleAxis);
+		return true;
 	}
 	return false;
 }

@@ -106,8 +106,6 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 			{
 				const auto& verticesSegment = segmentMeshShape.getEdgePositions(*j);
 
-				try
-				{
 					// Check if the triangle and capsule intersect.
 					if (SurgSim::Math::calculateContactTriangleCapsule(
 						verticesTriangle[0], verticesTriangle[1], verticesTriangle[2], normalTriangle,
@@ -147,14 +145,6 @@ std::list<std::shared_ptr<Contact>> SegmentMeshTriangleMeshContact::calculateDcd
 							1.0, Vector3d::Zero(), -normal, penetrationPoints));
 					}
 				}
-				catch (std::exception e)
-				{
-					SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getLogger("Collision")) <<
-						__func__ << " " << __LINE__ << ": Failed calculateContactTriangleCapsule for triangle ID: " <<
-						*i << " and segment ID: " << *j;
-					throw e;
-				}
-			}
 		}
 	}
 

@@ -16,8 +16,6 @@
 #ifndef SURGSIM_MATH_TRIANGLETRIANGLECONTACTCALCULATION_INL_H
 #define SURGSIM_MATH_TRIANGLETRIANGLECONTACTCALCULATION_INL_H
 
-#include "SurgSim/Math/MathConvert.h"
-
 namespace SurgSim
 {
 
@@ -247,32 +245,12 @@ bool calculateContactTriangleTriangle(
 	T penetrationDepths[2] = {T(0), T(0)};
 	Vector3 penetrationPoints[2][2];
 
-	try {
-		// Calculate deepest penetration for each of the triangle.
-		triangle1.findDeepestPenetrationWithTriangle(
-			triangle2, &penetrationDepths[0], &penetrationPoints[0][0], &penetrationPoints[0][1]);
+	// Calculate deepest penetration for each of the triangle.
+	triangle1.findDeepestPenetrationWithTriangle(
+		triangle2, &penetrationDepths[0], &penetrationPoints[0][0], &penetrationPoints[0][1]);
 
-		triangle2.findDeepestPenetrationWithTriangle(
-			triangle1, &penetrationDepths[1], &penetrationPoints[1][1], &penetrationPoints[1][0]);
-	}
-	catch (std::exception e)
-	{
-		std::vector<uint8_t> bytes;
-		toBytes(t0v0, &bytes);
-		toBytes(t0v1, &bytes);
-		toBytes(t0v2, &bytes);
-		toBytes(t0n, &bytes);
-		toBytes(t1v0, &bytes);
-		toBytes(t1v1, &bytes);
-		toBytes(t1v2, &bytes);
-		toBytes(t1n, &bytes);
-
-		std::ofstream out("TriangleTriangleContactException.bin", std::ios_base::binary);
-		SURGSIM_ASSERT(out.is_open());
-
-		for (auto b : bytes) out << b;
-		throw e;
-	}
+	triangle2.findDeepestPenetrationWithTriangle(
+		triangle1, &penetrationDepths[1], &penetrationPoints[1][1], &penetrationPoints[1][0]);
 
 	// Choose the lower penetration of the two as the contact.
 	if (penetrationDepths[0] < penetrationDepths[1])

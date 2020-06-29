@@ -25,9 +25,7 @@ namespace Math {
 void toBytes(SurgSim::Math::Vector3d in, std::vector<uint8_t>* result)
 {
 	auto ptr = reinterpret_cast<uint8_t*>(in.data());
-
 	auto bytes = in.size() * sizeof(double);
-
 	for (int i = 0; i < bytes; ++i)	result->push_back(ptr[i]);
 }
 
