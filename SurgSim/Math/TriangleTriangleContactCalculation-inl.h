@@ -267,7 +267,7 @@ bool calculateContactTriangleTriangle(
 		toBytes(t1v2, &bytes);
 		toBytes(t1n, &bytes);
 
-		std::ofstream out("triangletriangleerror.bin", std::ios_base::binary);
+		std::ofstream out("TriangleTriangleContactException.bin", std::ios_base::binary);
 		SURGSIM_ASSERT(out.is_open());
 
 		for (auto b : bytes) out << b;
