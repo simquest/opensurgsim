@@ -60,7 +60,6 @@ private:
 	struct DeviceData;
 
 	friend class TrakstarDevice;
-	friend class TrakstarThread;
 	friend struct StateData;
 
 	/// Checks if return code is an error.  Logs if it is.
