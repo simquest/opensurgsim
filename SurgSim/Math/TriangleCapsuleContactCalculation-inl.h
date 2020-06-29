@@ -292,20 +292,16 @@ public:
 				double planeD[4] = { -m_tv0.dot(planeN[0]), -m_tv0.dot(planeN[1]), -m_tv1.dot(planeN[2]),
 					-m_tv2.dot(planeN[3]) };
 
-				if (!m_cInverseTransform.hasValue())
-				{
-					Vector3 j, k;
-					SurgSim::Math::buildOrthonormalBasis(&m_cAxis, &j, &k);
-
-					m_cTransform.translation() = m_cvTop;
-					m_cTransform.linear().col(0) = m_cAxis;
-					m_cTransform.linear().col(1) = j;
-					m_cTransform.linear().col(2) = k;
-					m_cInverseTransform = m_cTransform.inverse();
-				}
+				Vector3 j, k;
+				SurgSim::Math::buildOrthonormalBasis(&m_cAxis, &j, &k);
+				m_cTransform.translation() = m_cvTop;
+				m_cTransform.linear().col(0) = m_cAxis;
+				m_cTransform.linear().col(1) = j;
+				m_cTransform.linear().col(2) = k;
+				m_cInverseTransform = m_cTransform.inverse();
 				Vector3 closestPointSegment = m_penetrationPointCapsuleAxis;
 				axisTouchingTriangleWithBottomOutside(m_cvTop, m_cvBottom, projectionCvBottom, closestPointSegment,
-					m_cAxis, m_cLength, m_cr, v, planeN, planeD, m_cTransform, m_cInverseTransform.getValue(),
+					m_cAxis, m_cLength, m_cr, v, planeN, planeD, m_cTransform, m_cInverseTransform,
 					&m_penetrationPointCapsuleAxis, &m_penetrationPointCapsule);
 			}
 			m_penetrationDepth = (m_tv0 - m_penetrationPointCapsule).dot(m_tn);
@@ -365,19 +361,16 @@ public:
 		// by vectors (edgeVertices[0] -> edgeVertices[0] - tn) and (edgeVertices[1] -> edgeVertices[1] - tn) is found.
 		Vector3 center = deepestPoint;
 		Vector3 majorAxis = (triangleEdge * (triangleEdge.dot(m_cAxis)) + m_tn * (m_tn.dot(m_cAxis))).normalized();
-		if (!m_cInverseTransform.hasValue())
-		{
-			Vector3 j, k;
-			SurgSim::Math::buildOrthonormalBasis(&m_cAxis, &j, &k);
+		Vector3 jAxis, kAxis;
+		SurgSim::Math::buildOrthonormalBasis(&m_cAxis, &jAxis, &kAxis);
+		m_cTransform.translation() = m_cvTop;
+		m_cTransform.linear().col(0) = m_cAxis;
+			m_cTransform.linear().col(1) = jAxis;
+			m_cTransform.linear().col(2) = kAxis;
+		m_cInverseTransform = m_cTransform.inverse();
 
-			m_cTransform.translation() = m_cvTop;
-			m_cTransform.linear().col(0) = m_cAxis;
-			m_cTransform.linear().col(1) = j;
-			m_cTransform.linear().col(2) = k;
-			m_cInverseTransform = m_cTransform.inverse();
-		}
 		T majorRadius;
-		SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, majorAxis, m_cr, m_cInverseTransform.getValue(),
+		SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, majorAxis, m_cr, m_cInverseTransform,
 			&majorRadius, &deepestPoint)) << "There is an intersection between a capsule and a triangle, " <<
 			"and the capsule axis intersects one of planes of the swept prism, but there was a failure calculating " <<
 			"the major radius of the ellipse of the plane-capsule intersection." <<
@@ -392,7 +385,7 @@ public:
 			// triangleEdge.
 			Vector3 minorAxis = planeN[j].cross(majorAxis);
 			T minorRadius;
-			SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, minorAxis, m_cr, m_cInverseTransform.getValue(),
+			SURGSIM_ASSERT(farthestIntersectionLineCylinder(center, minorAxis, m_cr, m_cInverseTransform,
 				&minorRadius)) << "There is an intersection between a capsule and a " <<
 				"triangle, and the capsule axis intersects one of planes of the swept prism, but there was a " <<
 				"failure calculating the major radius of the ellipse of the plane-capsule intersection." <<
@@ -461,7 +454,7 @@ public:
 			Vector3 edgeVertex = (deepestPointDotEdge < 0.0) ? edgeVertices[0] : edgeVertices[1];
 			double d;
 			SURGSIM_ASSERT(farthestIntersectionLineCapsule(m_cvTop, m_cAxis, m_cLength, m_cr, edgeVertex, -m_tn,
-				m_cTransform, m_cInverseTransform.getValue(), &d, &deepestPoint, &m_penetrationPointCapsuleAxis)) <<
+				m_cTransform, m_cInverseTransform, &d, &deepestPoint, &m_penetrationPointCapsuleAxis)) <<
 				"There is an intersection between a capsule and a triangle, and the capsule axis may go " <<
 				"through the triangle.\nThe segment has been clipped against one of the planes of the swept prism.  " <<
 				"The triangle-capsule intersection is an ellipse around that point.  That ellipse passes through " <<
@@ -933,7 +926,7 @@ public:
 	/// The transform of the capsule
 	RigidTransform3 m_cTransform;
 	/// The inverse transform of the capsule
-	SurgSim::DataStructures::OptionalValue<RigidTransform3> m_cInverseTransform;
+	RigidTransform3 m_cInverseTransform;
 	/// epsilon
 	T m_epsilon;
 };
