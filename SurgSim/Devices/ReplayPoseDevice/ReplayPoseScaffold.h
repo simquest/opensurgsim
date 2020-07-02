@@ -42,7 +42,7 @@ public:
 	/// Destructor.
 	~ReplayPoseScaffold();
 
-	/// Gets or creates the scaffold shared by all RawMultiAxisDevice instances.
+	/// Gets or creates the scaffold shared by all ReplayPoseDevice instances.
 	/// The scaffold is managed using a SharedInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<ReplayPoseScaffold> getOrCreateSharedInstance();

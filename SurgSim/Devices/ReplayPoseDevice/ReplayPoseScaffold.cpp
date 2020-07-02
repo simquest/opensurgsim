@@ -21,7 +21,9 @@
 
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/ReplayPoseDevice/ReplayPoseDevice.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/SharedInstance.h"
 
 namespace
@@ -175,11 +177,14 @@ private:
 
 		if (!inputFile.is_open())
 		{
-			SURGSIM_LOG_WARNING(logger) << "Could not find or open the file " << fileName <<
-										"; Replay will use Identity pose";
-			result = false;
+			std::string path;
+			if (SurgSim::Framework::Runtime::getApplicationData()->tryFindFile(fileName, &path))
+			{
+				inputFile.open(path, std::ios::in);
+			}
 		}
-		else
+
+		if (inputFile.is_open())
 		{
 			while (!inputFile.eof())
 			{
@@ -198,6 +203,12 @@ private:
 					"No poses could be properly loaded, Identity pose will be used";
 
 			inputFile.close();
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(logger) << "Could not find or open the file " << fileName <<
+				"\nReplay will use Identity pose.";
+			result = false;
 		}
 
 		return result;
