@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/UnitTests/MockCapsule.h"
 #include "SurgSim/Math/UnitTests/MockTriangle.h"
@@ -477,6 +478,204 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase35)
 
 	testTriangleCapsuleContactCalculation(
 		TriangleCapsuleTestCase("Failing test 4", t, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase36)
+{
+	auto penetration = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(0.0, 0.0, penetration);
+	auto cv1 = Vector3d(0.01, 0.01, -1.0);
+	Vector3d trianglePoint = { cv1.x(), cv1.y(), 0.0 };
+	Vector3d capsulePoint = { cv1.x(), cv1.y(), cv1.z() - 0.5 };
+	testTriangleCapsuleContactCalculation(
+		"Failing test 5 (Angled capsule axis penetrating triangle, less than DistanceEpsilon on positive side)",
+		cv0, cv1, true, true, trianglePoint, capsulePoint);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase37)
+{
+	auto offset = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(0.0, 0.0, offset);
+	auto cv1 = Vector3d(0.01, 0.01, offset * 0.1);
+	Vector3d trianglePoint = { cv1.x(), cv1.y(), 0.0 };
+	Vector3d capsulePoint = { cv1.x(), cv1.y(), cv1.z() - 0.5 };
+	testTriangleCapsuleContactCalculation(
+		"Failing test 6 (Angled capsule axis, both points less than DistanceEpsilon from face in positive direction)",
+		cv0, cv1, true, true, trianglePoint, capsulePoint);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase38)
+{
+	auto tv0 = Vector3d(97.391948688286129, 41.587250765721723, 6.4762957459524273);
+	auto tv1 = Vector3d(97.391945808859896, 41.587187360783867, 6.476308949921625);
+	auto tv2 = Vector3d(97.391932515918165, 41.587204342013217, 6.4762963528486324);
+	auto cv0 = Vector3d(97.391955981452543, 41.587241454620784, 6.4762810073613636);
+	auto cv1 = Vector3d(97.391937572450138, 41.58725489458393, 6.4763193175101549);
+
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.0001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("Failing test 7 (Capsule axis passes within epsilon of one edge)",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase39)
+{
+	auto offset = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(0.0, 0.0, -offset);
+	auto cv1 = Vector3d(-6.0, 0.0, -1.0);
+	Vector3d trianglePoint = { -2.52048079801, -0.040961596024, 0.0 };
+	Vector3d capsulePoint = { -2.52048079801, -0.040961596024, -0.925273150684 };
+	testTriangleCapsuleContactCalculation(
+		"Failing test 8 (cvTop touching underside of triangle, cvBottom projects outside of triangle)",
+		cv0, cv1, true, true, trianglePoint, capsulePoint);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase40)
+{
+	auto offset = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(0.0, 0.0, -offset);
+	auto cv1 = Vector3d(0.0, 10.0, -1.0);
+	Vector3d trianglePoint = { 0.0, 5.0, 0.0 };
+	Vector3d capsulePoint = { 0.0, 5.0, -1.00249378108 };
+	testTriangleCapsuleContactCalculation(
+		"cvTop touching underside of triangle, cvBottom projects outside of triangle at corner",
+		cv0, cv1, true, true, trianglePoint, capsulePoint);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase41)
+{
+	auto offset = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(1.0, 0.0, -offset);
+	auto cv1 = Vector3d(1.0, 10.0, -1.0);
+	Vector3d trianglePoint = { 0.9024099927097938, 3.195180014580413, 0.0 };
+	Vector3d capsulePoint = { 0.9024099927097938, 3.195180014580413, -0.81234753833176 };
+	testTriangleCapsuleContactCalculation(
+		"cvTop touching underside of triangle near corner, cvBottom projects outside nearby edge but would cross another edge",
+		cv0, cv1, true, true, trianglePoint, capsulePoint);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase42)
+{
+	auto offset = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(0.0, 4.0, -offset);
+	auto cv1 = Vector3d(0.0, 5.2, -1.0);
+	Vector3d trianglePoint = { 0.0, 5.0, 0.0 };
+	Vector3d capsulePoint = { 0.0, 5.0, -1.4582575695 };
+	testTriangleCapsuleContactCalculation(
+		"cvTop touching underside of triangle, cvBottom is outside one of the corners and is the axis penetration point",
+		cv0, cv1, true, true, trianglePoint, capsulePoint);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase43)
+{
+	auto offset = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(0.0, 4.0, -offset);
+	auto cv1 = Vector3d(0.0, 5.2, -1.0);
+	Vector3d trianglePoint = { 0.0, 5.0, 0.0 };
+	Vector3d capsulePoint = { 0.0, 5.0, -1.4582575695 };
+	testTriangleCapsuleContactCalculation(
+		"cvTop touching underside of triangle, cvBottom is outside one of the corners and is the axis penetration point",
+		cv0, cv1, true, true, trianglePoint, capsulePoint);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase44)
+{
+	auto offset = Geometry::DistanceEpsilon * 0.5;
+	auto cv0 = Vector3d(0.0, 0.0, -offset);
+	auto cv1 = Vector3d(0.0, -5.2, -1.0);
+	Vector3d trianglePoint = { 0.0, -5.0, 0.0 };
+	Vector3d capsulePoint = { 0.0, -5.0, -1.47070008827};
+	testTriangleCapsuleContactCalculation(
+		"cvTop touching underside of triangle, cvBottom is slightly more than radius from an edge, the intersection of the cylinder with the plane is not angled",
+		cv0, cv1, true, true, trianglePoint, capsulePoint);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase45)
+{
+	auto tv0 = Vector3d(-645.19016174767671, -948.40360069058988, 557.13683782102282);
+	auto tv1 = Vector3d(-645.19079664488879, -948.40351561976593, 557.1371785126388);
+	auto tv2 = Vector3d(-645.19085390115458, -948.40351914770122, 557.13641794930516);
+	auto cv0 = Vector3d(-645.19062914255881, -948.40354467068505, 557.13662574653279);
+	auto cv1 = Vector3d(-645.19007499326176, -948.4033066658659, 557.13640896655102);
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.0001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("axis touches triangle, bottom is not in triangle",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase46)
+{
+	auto tv0 = Vector3d(2.426500005027252, -59.28773167314293, -79.62747904307153);
+	auto tv1 = Vector3d(2.427152773252143, -59.28749935293187, -79.62723787298583);
+	auto tv2 = Vector3d(2.426744702798851, -59.28790033650574, -79.62779546198951);
+	auto cv0 = Vector3d(2.426759423757323, -59.28817822384058, -79.62776566361566);
+	auto cv1 = Vector3d(2.426787192879603, -59.28777390068916, -79.62760270556898);
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.0001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("axis touching triangle, bottom is outside of triangle on two sides, the penetration point is under a vertex on the cylinder",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase47)
+{
+	auto tv0 = Vector3d(-0.0001463164258976192, -0.0002230732815911322, 0.0004572077078934273);
+	auto tv1 = Vector3d(-4.340778882491997e-05, 0.0003900046473060158, -0.000112293059937122);
+	auto tv2 = Vector3d(-5.698797769697528e-05, 0.0001870145299064479, 0.0001506273581337782);
+	auto cv0 = Vector3d(-0.0001421079719436742, 0.0001280347667781626, 0.0003048158910791373);
+	auto cv1 = Vector3d(0.0002648019331809418, 0.0004165889038605414, -0.0004404029045147011);
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.0001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("axis touching triangle, bottom is outside of triangle on two sides, the penetration point is under a vertex (sometimes on bottom, sometimes on cylinder)",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, FileTest)
+{
+	auto tv0 = Vector3d(-0.0001463164258976192, -0.0002230732815911322, 0.0004572077078934273);
+	auto tv1 = Vector3d(-4.340778882491997e-05, 0.0003900046473060158, -0.000112293059937122);
+	auto tv2 = Vector3d(-5.698797769697528e-05, 0.0001870145299064479, 0.0001506273581337782);
+	auto cv0 = Vector3d(-0.0001421079719436742, 0.0001280347667781626, 0.0003048158910791373);
+	auto cv1 = Vector3d(0.0002648019331809418, 0.0004165889038605414, -0.0004404029045147011);
+	auto tn = tv0.cross(tv1).normalized();
+	double cr = 0.1234;
+
+	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<double, 0>
+		calc(tv0, tv1, tv2, tn, cv0, cv1, cr);
+
+	calc.toFile("test.bin");
+
+	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<double, 0>
+		other(Vector3d(), Vector3d(), Vector3d(), Vector3d(), Vector3d(), Vector3d(), 0.0);
+
+	other.fromFile("test.bin");
+
+	EXPECT_EQ(calc.m_tv0, other.m_tv0);
+	EXPECT_EQ(calc.m_tv1, other.m_tv1);
+	EXPECT_EQ(calc.m_tv2, other.m_tv2);
+	EXPECT_EQ(calc.m_cvTop, other.m_cvTop);
+	EXPECT_EQ(calc.m_cvBottom, other.m_cvBottom);
+	EXPECT_EQ(calc.m_cr, other.m_cr);
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestFromFile)
+{
+	SurgSim::Framework::ApplicationData data("config.txt");
+	std::string fileName = "TriangleCapsuleContactException.bin";
+	std::string path = data.findFile(fileName);
+	ASSERT_TRUE(!path.empty()) << "Can not locate file " << fileName;
+
+	TriangleCapsuleContactCalculation::TriangleCapsuleContactCalculation<double, 0>
+		test(Vector3d(), Vector3d(), Vector3d(), Vector3d(), Vector3d(), Vector3d(), 0.0);
+	test.fromFile(path);
+
+	MockTriangle tri(test.m_tv0, test.m_tv1, test.m_tv2, test.m_tn);
+	MockCapsule c(test.m_cvTop, test.m_cvBottom, test.m_cr);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("TestFromFile", tri, c, true, false, Vector3d(), Vector3d()));
 }
 
 }

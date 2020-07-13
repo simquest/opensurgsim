@@ -166,13 +166,40 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
 	{
+#ifdef OSS_DEBUG
+		try
+		{
+			contacts = doCalculateDcdContact(pair->getFirst()->getPosedShape(), pair->getSecond()->getPosedShape());
+		}
+		catch (std::exception e)
+		{
+			SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getLogger("Collision")) << __func__ << " " << __LINE__ <<
+				": Failed doCalculateDcdContact:" <<
+				"\npair->getFirst()->getFullName(): " << pair->getFirst()->getFullName() <<
+				"\npair->getFirst()->getLocalPose().linear():\n" << pair->getFirst()->getLocalPose().linear() <<
+				"\npair->getFirst()->getLocalPose().translation(): " << pair->getFirst()->getLocalPose().translation().transpose() <<
+				"\npair->getFirst()->getPose().linear():\n" << pair->getFirst()->getPose().linear() <<
+				"\npair->getFirst()->getPose().translation(): " << pair->getFirst()->getPose().translation().transpose() <<
+				"\npair->getFirst()->getPosedShape().getPose().linear():\n" << pair->getFirst()->getPosedShape().getPose().linear() <<
+				"\npair->getFirst()->getPosedShape().getPose().translation(): " << pair->getFirst()->getPosedShape().getPose().translation().transpose() <<
+				"\npair->getSecond()->getFullName(): " << pair->getSecond()->getFullName() <<
+				"\npair->getSecond()->getLocalPose().linear():\n" << pair->getSecond()->getLocalPose().linear() <<
+				"\npair->getSecond()->getLocalPose().translation(): " << pair->getSecond()->getLocalPose().translation().transpose() <<
+				"\npair->getSecond()->getPose().linear():\n" << pair->getSecond()->getPose().linear() <<
+				"\npair->getSecond()->getPose().translation(): " << pair->getSecond()->getPose().translation().transpose() <<
+				"\npair->getSecond()->getPosedShape().getPose().linear():\n" << pair->getSecond()->getPosedShape().getPose().linear() <<
+				"\npair->getSecond()->getPosedShape().getPose().translation(): " << pair->getSecond()->getPosedShape().getPose().translation().transpose();
+			throw e;
+		}
+#else
 		contacts = doCalculateDcdContact(pair->getFirst()->getPosedShape(), pair->getSecond()->getPosedShape());
+#endif OSS_DEBUG
 	}
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
 		contacts = doCalculateCcdContact(
-					   pair->getFirst()->getPosedShapeMotion(),
-					   pair->getSecond()->getPosedShapeMotion());
+			pair->getFirst()->getPosedShapeMotion(),
+			pair->getSecond()->getPosedShapeMotion());
 	}
 	else
 	{
