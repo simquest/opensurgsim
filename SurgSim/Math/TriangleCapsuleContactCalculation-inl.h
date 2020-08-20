@@ -278,11 +278,20 @@ public:
 		{
 			m_contactNormal = -m_tn;
 
+			// Three cases: the bottom projects inside the triangle,
+			// the axis is coplanar and the top projects inside the triangle,
+			// or the axis touches an edge and the bottom projects outside of the triangle.
 			auto projectionCvBottom = (m_cvBottom + m_tn * (m_tv0 - m_cvBottom).dot(m_tn)).eval();
 			if (SurgSim::Math::isPointInsideTriangle(projectionCvBottom, m_tv0, m_tv1, m_tv2, m_tn))
 			{
 				m_penetrationPointCapsule = m_cvBottom - m_tn * m_cr;
 				m_penetrationPointCapsuleAxis = m_cvBottom;
+			}
+			else if ((std::abs(m_tn.dot(m_cAxis)) < m_epsilon) &&
+				SurgSim::Math::isPointInsideTriangle(m_cvTop, m_tv0, m_tv1, m_tv2, m_tn))
+			{
+				m_penetrationPointCapsule = m_cvTop - m_tn * m_cr;
+				m_penetrationPointCapsuleAxis = m_cvTop;
 			}
 			else
 			{
@@ -488,10 +497,10 @@ public:
 			else
 			{
 				SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation"))
-					<< __func__ << " " << __LINE__ << "Failed to solve for intersection of line with a cylinder." <<
+					<< __func__ << " " << __LINE__ << " Failed to solve for intersection of line with a cylinder." <<
 					"\nlineStart: " << lineStart.transpose() << "\nlineDir: " << lineDir.transpose() <<
-					"\nm_cInverseTransform.linear(): " << m_cInverseTransform.linear() <<
-					"\ncInversTransform.translation(): " << m_cInverseTransform.translation().transpose() <<
+					"\nm_cInverseTransform.linear():\n" << m_cInverseTransform.linear() <<
+					"\ncInverseTransform.translation(): " << m_cInverseTransform.translation().transpose() <<
 					"\nP: " << P.transpose() << "\nD: " << D.transpose() << "\ndiscriminant: " << discriminant;
 				return false;
 			}
@@ -508,12 +517,11 @@ public:
 			return true;
 		}
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("TriangleCapsuleContactCalculation"))
-			<< __func__ << " " << __LINE__ << "Failed to solve for intersection of line with a cylinder." <<
-			"\nlineStart: " << lineStart.transpose() <<
-			"\nlineDir: " << lineDir.transpose() << "\nm_cInverseTransform.linear(): " <<
-			m_cInverseTransform.linear() << "\nm_cInverseTransform.translation(): " <<
-			m_cInverseTransform.translation().transpose() << "\nP: " << P.transpose() << "\nD: " << D.transpose() <<
-			"\ndiscriminant: " << discriminant;
+			<< __func__ << " " << __LINE__ << " Failed to solve for intersection of line with a cylinder." <<
+			"\nlineStart: " << lineStart.transpose() << "\nlineDir: " << lineDir.transpose() <<
+			"\nm_cInverseTransform.linear():\n" << m_cInverseTransform.linear() <<
+			"\nm_cInverseTransform.translation(): " << m_cInverseTransform.translation().transpose() <<
+			"\nP: " << P.transpose() << "\nD: " << D.transpose() << "\ndiscriminant: " << discriminant;
 		return false;
 	}
 
@@ -640,6 +648,7 @@ public:
 	/// \param projectionBottom The projection of the bottom endpoint into the triangle plane.
 	/// \param closestPointSegment The closest point on the segment to the triangle.
 	/// \exception Asserts if does not find a contact.
+	/// \exception May assert if the segment is co-planar with the triangle.
 	void axisTouchingTriangleWithBottomOutside(const Vector3& projectionBottom, const Vector3& closestPointSegment)
 	{
 		Vector3 v[3] = { m_tv0, m_tv1, m_tv2 };
@@ -735,9 +744,9 @@ public:
 					"There is an intersection between a capsule and a triangle, " <<
 					"and the capsule axis intersects one of planes of the swept prism, but there was a failure " <<
 					"calculating the major radius of the ellipse of the plane-capsule intersection." <<
-					"\nv[0]: " << v[0].transpose() <<
-					"\nv[1]: " << v[1].transpose() << "\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr <<
-					"\nm_cvTop: " << m_cvTop.transpose() << "\nm_cvBottom: " << m_cvBottom.transpose();
+					"\nv[0]: " << v[0].transpose() << "\nv[1]: " << v[1].transpose() <<
+					"\nv[2]: " << v[2].transpose() << "\nm_cr: " << m_cr << "\nm_cvTop: " << m_cvTop.transpose() <<
+					"\nm_cvBottom: " << m_cvBottom.transpose();
 
 				if (std::abs(majorAxis.dot(triangleEdge)) > Geometry::DistanceEpsilon)
 				{ // majorRadius * majorAxis is not the deepest point because the ellipse is angled.

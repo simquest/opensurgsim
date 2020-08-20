@@ -633,6 +633,34 @@ TEST_F(TriangleCapsuleContactCalculationTest, TestCase47)
 			tri, c, true, false, Vector3d(), Vector3d()));
 }
 
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase48)
+{
+	auto tv0 = Vector3d(-1, 0, 0);
+	auto tv1 = Vector3d(1, 0, 0);
+	auto tv2 = Vector3d(1, -1, 0);
+	auto cv0 = Vector3d(0, -0.1, 0);
+	auto cv1 = Vector3d(0, 1, 0);
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("axis coplanar with triangle, one endpoint in triangle",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
+TEST_F(TriangleCapsuleContactCalculationTest, TestCase49)
+{
+	auto tv0 = Vector3d(-1, 0, 0);
+	auto tv1 = Vector3d(1, 0, 0);
+	auto tv2 = Vector3d(1, -1, 0);
+	auto cv0 = Vector3d(0, 0, 0);
+	auto cv1 = Vector3d(0, 1, 0);
+	MockTriangle tri(tv0, tv1, tv2);
+	MockCapsule c(cv0, cv1, 0.001);
+	testTriangleCapsuleContactCalculation(
+		TriangleCapsuleTestCase("axis coplanar with triangle, one endpoint on triangle edge",
+			tri, c, true, false, Vector3d(), Vector3d()));
+}
+
 TEST_F(TriangleCapsuleContactCalculationTest, FileTest)
 {
 	auto tv0 = Vector3d(-0.0001463164258976192, -0.0002230732815911322, 0.0004572077078934273);
