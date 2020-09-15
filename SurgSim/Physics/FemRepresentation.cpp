@@ -37,10 +37,10 @@ namespace Physics
 
 FemRepresentation::FemRepresentation(const std::string& name) :
 	DeformableRepresentation(name),
-	m_useMassLumping(false),
 	m_useComplianceWarping(false),
 	m_isComplianceWarpingSynchronous(true),
-	m_isInitialComplianceMatrixComputed(false)
+	m_isInitialComplianceMatrixComputed(false),
+	m_useMassLumping(false)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
