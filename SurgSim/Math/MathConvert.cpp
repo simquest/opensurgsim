@@ -26,14 +26,14 @@ void toBytes(SurgSim::Math::Vector3d in, std::vector<uint8_t>* result)
 {
 	auto ptr = reinterpret_cast<uint8_t*>(in.data());
 	auto bytes = in.size() * sizeof(double);
-	for (int i = 0; i < bytes; ++i)	result->push_back(ptr[i]);
+	for (size_t i = 0; i < bytes; ++i)	result->push_back(ptr[i]);
 }
 
 void toBytes(double d, std::vector<uint8_t>* result)
 {
 	auto ptr = reinterpret_cast<uint8_t*>(&d);
 	auto bytes = sizeof(double);
-	for (int i = 0; i < bytes; ++i) result->push_back(ptr[i]);
+	for (size_t i = 0; i < bytes; ++i) result->push_back(ptr[i]);
 }
 
 size_t fromBytes(const std::vector<uint8_t>& bytes, SurgSim::Math::Vector3d* out, size_t start /*= 0*/)
