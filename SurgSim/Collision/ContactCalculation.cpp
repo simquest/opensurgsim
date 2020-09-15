@@ -193,7 +193,7 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 		}
 #else
 		contacts = doCalculateDcdContact(pair->getFirst()->getPosedShape(), pair->getSecond()->getPosedShape());
-#endif OSS_DEBUG
+#endif // OSS_DEBUG
 	}
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
