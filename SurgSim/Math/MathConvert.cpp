@@ -222,7 +222,7 @@ Node convert<boost::any>::encode(const boost::any rhs)
 				  tryConvert<SurgSim::Math::Matrix44d>(rhs, &result);
 
 	}
-	catch (std::exception e)
+	catch (std::exception&)
 	{
 		success = false;
 	}

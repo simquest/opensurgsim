@@ -111,7 +111,7 @@ OsgTextRepresentation::OsgTextRepresentation(const std::string& name) :
 	{
 		font->load("Fonts/Vera.ttf");
 	}
-	catch (std::exception e)
+	catch (std::exception&)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
 				<< "Could not set the font Fonts/Vera.ttf, the default will be used";

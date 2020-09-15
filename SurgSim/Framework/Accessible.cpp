@@ -173,7 +173,7 @@ void Accessible::decode(const YAML::Node& node, const std::vector<std::string>& 
 				{
 					functors->second.decoder(&temporary);
 				}
-				catch (std::exception e)
+				catch (const std::exception& e)
 				{
 					SURGSIM_FAILURE() << e.what() << " for value " << std::endl << temporary;
 				}

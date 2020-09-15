@@ -73,7 +73,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 				// the this will be set in initialize()
 				component->setSceneElement(shared_from_this());
 			}
-			catch (std::exception)
+			catch (std::exception&)
 			{
 				// intentionally empty
 			}
@@ -346,7 +346,7 @@ bool SceneElement::decode(const YAML::Node& node)
 					{
 						addComponent(nodeIt->as<std::shared_ptr<Component>>());
 					}
-					catch (YAML::Exception e)
+					catch (const YAML::Exception& e)
 					{
 						SURGSIM_FAILURE() << e.what() << "for " << std::endl << *nodeIt;
 					}
