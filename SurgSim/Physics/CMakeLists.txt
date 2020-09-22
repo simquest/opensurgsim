@@ -64,9 +64,11 @@ set(SURGSIM_PHYSICS_SOURCES
 	FreeMotion.cpp
 	LinearSpring.cpp
 	Localization.cpp
+	MassSpring1DPlyReaderDelegate.cpp
 	MassSpringConstraintFixedPoint.cpp
 	MassSpringConstraintFrictionlessContact.cpp
 	MassSpringLocalization.cpp
+	MassSpringPlyReaderDelegate.cpp
 	MassSpringRepresentation.cpp
 	MlcpPhysicsProblem.cpp
 	ParticleCollisionResponse.cpp
@@ -155,9 +157,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	LinearSpring.h
 	Localization.h
 	Mass.h
+	MassSpring1DPlyReaderDelegate.h
 	MassSpringConstraintFixedPoint.h
 	MassSpringConstraintFrictionlessContact.h
 	MassSpringLocalization.h
+	MassSpringPlyReaderDelegate.h
 	MassSpringRepresentation.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h

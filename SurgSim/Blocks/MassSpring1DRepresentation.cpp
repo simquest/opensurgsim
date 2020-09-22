@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
-#include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
 #include "SurgSim/Math/LinearSolveAndInverse.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
@@ -55,7 +54,7 @@ void MassSpring1DRepresentation::init1D(
 	{
 		for (size_t massId = 0; massId < nodes.size() - 1; massId++)
 		{
-			addSpring(createLinearSpring(state, massId, massId + 1, stiffnessStretching, dampingStretching));
+			addSpring(Physics::createLinearSpring(state, massId, massId + 1, stiffnessStretching, dampingStretching));
 		}
 	}
 
@@ -64,14 +63,14 @@ void MassSpring1DRepresentation::init1D(
 	{
 		for (size_t massId = 0; massId < nodes.size() - 2; massId++)
 		{
-			addSpring(createLinearSpring(state, massId, massId + 2, stiffnessBending, dampingBending));
+			addSpring(Physics::createLinearSpring(state, massId, massId + 2, stiffnessBending, dampingBending));
 		}
 	}
 
 	// Sets the boundary conditions
 	for (auto boundaryCondition = std::begin(nodeBoundaryConditions);
-		 boundaryCondition != std::end(nodeBoundaryConditions);
-		 boundaryCondition++)
+		boundaryCondition != std::end(nodeBoundaryConditions);
+		boundaryCondition++)
 	{
 		state->addBoundaryCondition(*boundaryCondition);
 	}

@@ -32,6 +32,19 @@ namespace SurgSim
 namespace Physics
 {
 
+std::shared_ptr<LinearSpring> createLinearSpring(const std::shared_ptr<Math::OdeState> state,
+	size_t nodeId0, size_t nodeId1, double stiffness, double damping)
+{
+	std::shared_ptr<LinearSpring> spring;
+	spring = std::make_shared<LinearSpring>(nodeId0, nodeId1);
+	spring->setStiffness(stiffness);
+	spring->setDamping(damping);
+	const Math::Vector3d& A = Math::getSubVector(state->getPositions(), nodeId0, 3);
+	const Math::Vector3d& B = Math::getSubVector(state->getPositions(), nodeId1, 3);
+	spring->setRestLength((B - A).norm());
+	return spring;
+}
+
 LinearSpring::LinearSpring(size_t nodeId0, size_t nodeId1) :
 	Spring(), m_restLength(-1.0), m_stiffness(-1.0), m_damping(0.0)
 {

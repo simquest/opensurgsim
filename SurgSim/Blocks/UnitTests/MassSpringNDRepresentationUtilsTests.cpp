@@ -19,7 +19,6 @@
 #include <memory>
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
@@ -39,7 +38,7 @@ TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
 		state->setNumDof(numDofPerNode, numNodes);
 
 		std::shared_ptr<LinearSpring> linearSpring;
-		linearSpring = SurgSim::Blocks::createLinearSpring(state, 3, 7, stiffness, damping);
+		linearSpring = SurgSim::Physics::createLinearSpring(state, 3, 7, stiffness, damping);
 		EXPECT_DOUBLE_EQ(damping, linearSpring->getDamping());
 		EXPECT_DOUBLE_EQ(stiffness, linearSpring->getStiffness());
 		EXPECT_DOUBLE_EQ(0.0, linearSpring->getRestLength());
@@ -65,7 +64,7 @@ TEST(MassSpringNDRepresentationUtilsTests, CreateLinearSpring)
 		}
 
 		std::shared_ptr<LinearSpring> linearSpring;
-		linearSpring = SurgSim::Blocks::createLinearSpring(state, 3, 7, stiffness, damping);
+		linearSpring = SurgSim::Physics::createLinearSpring(state, 3, 7, stiffness, damping);
 		EXPECT_DOUBLE_EQ(damping, linearSpring->getDamping());
 		EXPECT_DOUBLE_EQ(stiffness, linearSpring->getStiffness());
 		EXPECT_DOUBLE_EQ(4.0, linearSpring->getRestLength());

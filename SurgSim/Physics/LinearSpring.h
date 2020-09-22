@@ -136,6 +136,14 @@ private:
 	double m_damping;
 };
 
+/// Helper method to create a LinearSpring
+/// \param state The state to initialize the spring with (rest length calculation)
+/// \param nodeId0, nodeId1 Node ids of the 2 connected masses
+/// \param stiffness, damping The spring parameters
+/// \return The newly create spring
+std::shared_ptr<LinearSpring> createLinearSpring(const std::shared_ptr<Math::OdeState> state,
+	size_t nodeId0, size_t nodeId1, double stiffness, double damping);
+
 }; // namespace Physics
 
 }; // namespace SurgSim

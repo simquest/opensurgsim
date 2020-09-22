@@ -31,6 +31,8 @@ namespace SurgSim
 namespace Physics
 {
 
+class LinearSpring;
+
 /// MassSpring model is a deformable model (a set of masses connected by springs).
 /// \note A MassSpring is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v) with the particularity that M is diagonal
@@ -44,6 +46,18 @@ public:
 
 	/// Destructor
 	virtual ~MassSpringRepresentation();
+
+	struct SpringElement
+	{
+		std::vector<size_t> nodes;
+		double stiffness;
+		double damping;
+	};
+	struct MassElement
+	{
+		SurgSim::Math::Vector3d position;
+		double mass;
+	};
 
 	/// Adds a mass
 	/// \param mass The mass to add to the representation
@@ -107,6 +121,22 @@ public:
 	void beforeUpdate(double dt) override;
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
+
+	/// Initializes a 1D model.
+	/// \param masses The masses.
+	/// \param nodeBoundaryConditions The list of all nodeId being boundary conditions (fixed node)
+	/// \param springs The spring and/or damping parameters for each spring (edges).
+	/// \note Stretching springs are connecting neighbors, bending springs are connecting 1 node
+	/// \note to its 2nd degree neighbors, creating a bending force around the middle node.
+	/// \exception Asserts if masses or springs have already been added to the representation.
+	void init1D(const std::vector<MassElement>& masses, const std::vector<size_t>& nodeBoundaryConditions,
+		const std::vector<SpringElement>& springs);
+
+	/// Loads a 1D MassSpringRepresentation from a ply file.
+	/// \param filename The name of the file.
+	/// \return true if successful.
+	/// \exception Asserts if the runtime has not been created.
+	bool load1DMassSpringFile(const std::string & filename);
 
 protected:
 	/// Add the Rayleigh damping forces
