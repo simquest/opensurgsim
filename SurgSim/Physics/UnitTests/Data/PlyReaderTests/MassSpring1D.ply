@@ -1,16 +1,20 @@
 ply
 format ascii 1.0
-element mass 66
+element vertex 66
 property double x
 property double y
 property double z
 property double mass
-element 1d_spring 129
-property list uint uint mass_indices
+element 1d_element 65
+property list uint uint vertex_indices
 property double stiffness
 property double damping
-element boundary_condition 0
-property uint mass_index
+element bendingSpring 64
+property list uint uint vertex_indices
+property double stiffness
+property double damping
+element boundary_condition 10
+property uint vertex_index
 end_header
 -0.020006 0.014949 0.00004 1.65996e-05
 -0.01445 0.016846 0.000036 2.73551e-05
@@ -207,3 +211,13 @@ end_header
 2 61 63 0.1 0.0001
 2 62 64 0.1 0.0001
 2 63 65 0.1 0.0001
+1
+2
+3
+4
+5
+10
+12
+14
+15
+16

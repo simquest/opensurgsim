@@ -73,11 +73,11 @@ set(UNIT_TEST_SOURCES
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
-	MassSpring1DPlyReaderDelegateTests.cpp	
 	MassSpringConstraintFixedPointTest.cpp
 	MassSpringConstraintFrictionlessContactTest.cpp
 	MassSpringLocalizationTest.cpp
 	MassSpringMechanicalValidationTests.cpp
+	MassSpringPlyReaderDelegateTests.cpp	
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
 	MockObjects.cpp

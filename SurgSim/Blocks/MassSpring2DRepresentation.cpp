@@ -16,6 +16,7 @@
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/Mass.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Mass;

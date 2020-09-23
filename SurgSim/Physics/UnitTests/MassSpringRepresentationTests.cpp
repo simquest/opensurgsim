@@ -528,3 +528,30 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndDampingTest)
 			m_expectedDamping + m_expectedRayleighDamping + externalD, m_expectedStiffness + externalK);
 	}
 }
+
+TEST_F(MassSpringRepresentationTests, LoadTest)
+{
+	auto rep = std::make_shared<MassSpringRepresentation>("rep");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	rep->loadMassSpring("PlyReaderTests/MassSpring1D.ply");
+
+	// Vertices
+	SurgSim::Math::Vector3d vertex0(-0.020006, 0.014949, 0.00004);
+	SurgSim::Math::Vector3d vertex6(0.00018, 0.0002, 0);
+
+	auto state = rep->getInitialState();
+	EXPECT_TRUE(vertex0.isApprox(state->getPositions().segment<3>(0)));
+	EXPECT_TRUE(vertex6.isApprox(state->getPositions().segment<3>(rep->getNumDofPerNode() * 6)));
+	EXPECT_NEAR(rep->getMass(6)->getMass(), 2.64118e-05, 1e-6);
+
+	ASSERT_EQ(129u, rep->getNumSprings());
+	std::array<size_t, 2> spring0 = { 0, 1 };
+	std::array<size_t, 2> spring2 = { 2, 3 };
+	EXPECT_TRUE(std::equal(std::begin(spring0), std::end(spring0),
+		std::begin(rep->getSpring(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(spring2), std::end(spring2),
+		std::begin(rep->getSpring(2)->getNodeIds())));
+
+	// Boundary conditions
+	ASSERT_EQ(10u * rep->getNumDofPerNode(), state->getBoundaryConditions().size());
+}

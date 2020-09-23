@@ -33,7 +33,6 @@ namespace Physics
 {
 
 class FemElement;
-class FemPlyReaderDelegate;
 
 /// Finite Element Model (a.k.a FEM) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation), therefore it defines

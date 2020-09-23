@@ -33,6 +33,7 @@
 #include "SurgSim/Physics/Fem3DCorotationalTetrahedronRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/LinearSpring.h"

@@ -18,20 +18,24 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/Mass.h"
-#include "SurgSim/Physics/Spring.h"
-
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableRepresentation.h"
 
 namespace SurgSim
 {
+namespace Framework
+{
+class Asset;
+}
 
 namespace Physics
 {
+class Mass;
+class MassSpring;
+class Spring;
 
-class LinearSpring;
+SURGSIM_STATIC_REGISTRATION(MassSpringRepresentation);
 
 /// MassSpring model is a deformable model (a set of masses connected by springs).
 /// \note A MassSpring is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
@@ -47,17 +51,7 @@ public:
 	/// Destructor
 	virtual ~MassSpringRepresentation();
 
-	struct SpringElement
-	{
-		std::vector<size_t> nodes;
-		double stiffness;
-		double damping;
-	};
-	struct MassElement
-	{
-		SurgSim::Math::Vector3d position;
-		double mass;
-	};
+	SURGSIM_CLASSNAME(SurgSim::Physics::MassSpringRepresentation);
 
 	/// Adds a mass
 	/// \param mass The mass to add to the representation
@@ -122,21 +116,17 @@ public:
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
 
-	/// Initializes a 1D model.
-	/// \param masses The masses.
-	/// \param nodeBoundaryConditions The list of all nodeId being boundary conditions (fixed node)
-	/// \param springs The spring and/or damping parameters for each spring (edges).
-	/// \note Stretching springs are connecting neighbors, bending springs are connecting 1 node
-	/// \note to its 2nd degree neighbors, creating a bending force around the middle node.
-	/// \exception Asserts if masses or springs have already been added to the representation.
-	void init1D(const std::vector<MassElement>& masses, const std::vector<size_t>& nodeBoundaryConditions,
-		const std::vector<SpringElement>& springs);
-
-	/// Loads a 1D MassSpringRepresentation from a ply file.
+	/// Loads a MassSpringRepresentation from a ply file.
 	/// \param filename The name of the file.
-	/// \return true if successful.
-	/// \exception Asserts if the runtime has not been created.
-	bool load1DMassSpringFile(const std::string & filename);
+	void loadMassSpring(const std::string & filename);
+
+	/// Sets the mesh asset
+	/// \param mesh The mesh to assign to this representation
+	/// \exception SurgSim::Framework::AssertionFailure if mesh is nullptr or it's actual type is not MassSpring
+	void setMassSpring(std::shared_ptr<Framework::Asset> mesh);
+
+	/// \return The mesh asset as a MassSpring.
+	std::shared_ptr<MassSpring> getMassSpring() const;
 
 protected:
 	/// Add the Rayleigh damping forces
@@ -199,6 +189,9 @@ private:
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
+
+	/// The Representation's asset as a MassSpring
+	std::shared_ptr<MassSpring> m_mesh;
 };
 
 } // namespace Physics

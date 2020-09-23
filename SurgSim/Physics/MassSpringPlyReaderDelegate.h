@@ -25,52 +25,57 @@ namespace SurgSim
 {
 namespace Physics
 {
+class MassSpring;
 
 /// Common part of implementation of PlyReaderDelegate for MassSpringRepresentations.
-/// This is an abstract class and needs to be inherited.
+/// In order for the same ply file to load with TriangleMeshPlyReaderDelegate
+/// (e.g., to create the graphics for a SegmentMesh), there must be elements named (for example) 1d_element,
+/// that have appropriate vertex_indices.  This class reuses those elements to hold springs
+/// (which can have 0 stiffness and damping). Springs that are not between adjacent vertices are held in
+/// "bendingSpring" elements.
 class MassSpringPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
-	/// Constructor
+	/// Default constructor
 	MassSpringPlyReaderDelegate();
 
-protected:
-	// \return Name of the element (1/2/3D), which this delegate processes.
-	virtual std::string getElementName() const = 0;
+	/// Constructor
+	explicit MassSpringPlyReaderDelegate(std::shared_ptr<MassSpring> mesh);
 
+protected:
 	bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
 	bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
 
 	/// Callback for end of PlyReader::parseFile.
-	virtual void endParseFile() = 0;
+	virtual void endParseFile();
 
 	/// Callback function, begin the processing of vertices.
 	/// \param elementName Name of the element.
-	/// \param massCount Number of vertices.
+	/// \param vertexCount Number of vertices.
 	/// \return memory for mass data to the reader.
-	virtual void* beginMasses(const std::string& elementName, size_t massCount);
+	virtual void* beginVertices(const std::string& elementName, size_t vertexCount);
 
-	/// Callback function to process one mass.
+	/// Callback function to process one vertex.
 	/// \param elementName Name of the element.
-	virtual void processMass(const std::string& elementName) = 0;
+	virtual void processVertex(const std::string& elementName);
 
 	/// Callback function to finalize processing of vertices.
 	/// \param elementName Name of the element.
-	virtual void endMasses(const std::string& elementName);
+	virtual void endVertices(const std::string& elementName);
 
-	/// Callback function, begin the processing of SpringElements.
+	/// Callback function, begin the processing of Springs.
 	/// \param elementName Name of the element.
 	/// \param elementCount Number of elements.
-	/// \return memory for SpringElement data to the reader.
-	void* beginSpringElement(const std::string& elementName, size_t elementCount);
+	/// \return memory for Springs data to the reader.
+	void* beginSprings(const std::string& elementName, size_t elementCount);
 
-	/// Callback function to process one SpringElement.
+	/// Callback function to process one Spring.
 	/// \param elementName Name of the element.
-	virtual void processSpringElement(const std::string& elementName) = 0;
+	virtual void processSpring(const std::string& elementName);
 
-	/// Callback function to finalize processing of SpringElements.
+	/// Callback function to finalize processing of Springs.
 	/// \param elementName Name of the element.
-	void endSpringElement(const std::string& elementName);
+	void endSprings(const std::string& elementName);
 	
 	/// Callback function, begin the processing of boundary conditions.
 	/// \param elementName Name of the element.
@@ -80,7 +85,7 @@ protected:
 
 	/// Callback function to process one boundary condition.
 	/// \param elementName Name of the element.
-	virtual void processBoundaryCondition(const std::string& elementName) = 0;
+	virtual void processBoundaryCondition(const std::string& elementName);
 
 protected:
 	/// Mass data containing 3 translational dofs and mass
@@ -97,20 +102,21 @@ protected:
 	bool m_hasBoundaryConditions;
 
 	/// Internal data to receive the "boundary_condition" element
-	size_t m_boundaryConditionData;
+	unsigned int m_boundaryConditionData;
 
 	/// Internal data to receive the spring (stretching and bending) data
 	struct SpringData
 	{
 		int64_t overrun1; ///< Used to check for buffer overruns
-
 		unsigned int* indices;
-		unsigned int massCount;
+		unsigned int nodeCount;
 		int64_t overrun2; ///< Used to check for buffer overruns
-
 		double stiffness;
 		double damping;
 	} m_springData;
+
+	/// MassSpring to contain the ply file information
+	std::shared_ptr<MassSpring> m_mesh;
 };
 
 } // namespace Physics

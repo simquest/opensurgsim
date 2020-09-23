@@ -13,15 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Physics/MassSpring1DPlyReaderDelegate.h"
+#include "SurgSim/Physics/MassSpring.h"
+#include "SurgSim/Physics/Mass.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 
@@ -36,8 +33,11 @@ namespace SurgSim
 namespace Physics
 {
 
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MassSpringRepresentation, MassSpringRepresentation);
+
 MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
-	DeformableRepresentation(name)
+	DeformableRepresentation(name),
+	m_mesh(std::make_shared<MassSpring>())
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
@@ -469,65 +469,44 @@ std::shared_ptr<Localization> MassSpringRepresentation::createLocalization(
 	return result;
 }
 
-void MassSpringRepresentation::init1D(const std::vector<MassElement>& masses,
-	const std::vector<size_t>& nodeBoundaryConditions, const std::vector<SpringElement>& springs)
+void MassSpringRepresentation::loadMassSpring(const std::string& filename)
 {
-	SURGSIM_ASSERT(masses.size() > 0) << "Number of masses must be greater than zero.";
-	SURGSIM_ASSERT(getNumMasses() == 0) << "Cannot init1D after masses have been added.";
-	SURGSIM_ASSERT(getNumSprings() == 0) << "Cannot init1D after springs have been added.";
+	auto mesh = std::make_shared<MassSpring>();
+	mesh->load(filename);
+	setMassSpring(mesh);
+}
 
+void MassSpringRepresentation::setMassSpring(std::shared_ptr<Framework::Asset> mesh)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "The mesh cannot be set after initialization.";
+	SURGSIM_ASSERT(mesh != nullptr) << "Mesh for MassSpringRepresentation cannot be a nullptr.";
+	auto massSpring = std::dynamic_pointer_cast<MassSpring>(mesh);
+	SURGSIM_ASSERT(massSpring != nullptr) <<
+		"Mesh for MassSpringRepresentation needs to be a SurgSim::Physics::MassSpring.";
+	m_mesh = massSpring;
 	auto state = std::make_shared<Math::OdeState>();
-	state->setNumDof(getNumDofPerNode(), masses.size());
-
-	// Initialize the masses position, velocity and mass
-	// Note: no need to apply the initialPose here, initialize will take care of it !
-	for (size_t massId = 0; massId < masses.size(); ++massId)
+	state->setNumDof(getNumDofPerNode(), m_mesh->getNumVertices());
+	for (size_t i = 0; i < m_mesh->getNumVertices(); i++)
 	{
-		addMass(std::make_shared<Mass>(masses[massId].mass));
-		Math::setSubVector(masses[massId].position, massId, 3, &state->getPositions());
+		state->getPositions().segment<3>(getNumDofPerNode() * i) = m_mesh->getVertexPosition(i);
+		addMass(m_mesh->getMass(i));
 	}
-
-	// Initialize the springs
-	for (const auto& springElement : springs)
+	for (const auto& spring : m_mesh->getSprings())
 	{
-		addSpring(createLinearSpring(state, springElement.nodes[0], springElement.nodes[1],
-			springElement.stiffness, springElement.damping));
+		addSpring(spring);
 	}
-	
-	// Sets the boundary conditions
-	for (const auto& boundaryCondition : nodeBoundaryConditions)
+	for (const auto& boundaryCondition : m_mesh->getBoundaryConditions())
 	{
 		state->addBoundaryCondition(boundaryCondition);
 	}
 
-	// setInitialState: Initialize all the states + apply initialPose if any
+	// setInitialState: Initialize all the states + apply initialPose if any.
 	setInitialState(state);
 }
 
-bool MassSpringRepresentation::load1DMassSpringFile(const std::string& filename)
+std::shared_ptr<MassSpring> MassSpringRepresentation::getMassSpring() const
 {
-	SURGSIM_ASSERT(!filename.empty()) << "File name is empty.";
-	auto data = SurgSim::Framework::Runtime::getApplicationData();
-	SURGSIM_ASSERT(data != nullptr) << "Runtime must be created before calling load1DMassSpringFile.";
-	std::string path = data->findFile(filename);
-	SURGSIM_ASSERT(!path.empty()) << "Can not locate file " << filename;
-	SurgSim::DataStructures::PlyReader reader(path);
-	if (!reader.isValid())
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "'" << filename << "' is an invalid .ply file.";
-		return false;
-	}
-
-	auto delegate = std::make_shared<MassSpring1DPlyReaderDelegate>(this);
-	if (!reader.parseWithDelegate(delegate))
-	{
-		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "The input file '" << filename << "' does not have the property required by MassSpringRepresentation.";
-		return false;
-	}
-
-	return true;
+	return m_mesh;
 }
 
 } // namespace Physics
