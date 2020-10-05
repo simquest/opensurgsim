@@ -162,6 +162,54 @@ TEST(LinearSpringTests, Constructor)
 	ASSERT_NO_THROW({LinearSpring ls(0, 1);});
 	ASSERT_NO_THROW({LinearSpring* ls = new LinearSpring(0, 1); delete ls;});
 	ASSERT_NO_THROW({std::shared_ptr<LinearSpring> ls = std::make_shared<LinearSpring>(0, 1);});
+
+	const int numDofPerNode = 3;
+	const int numNodes = 10;
+	double stiffness = 14.54;
+	double damping = 4.398;
+
+	{
+		SCOPED_TRACE("Create linear spring with 0 rest-length");
+		std::shared_ptr<SurgSim::Math::OdeState> state;
+		state = std::make_shared<SurgSim::Math::OdeState>();
+		state->setNumDof(numDofPerNode, numNodes);
+
+		auto linearSpring = std::make_shared<LinearSpring>(state, 3, 7, stiffness, damping);
+		EXPECT_DOUBLE_EQ(damping, linearSpring->getDamping());
+		EXPECT_DOUBLE_EQ(stiffness, linearSpring->getStiffness());
+		EXPECT_DOUBLE_EQ(0.0, linearSpring->getRestLength());
+		EXPECT_EQ(2u, linearSpring->getNumNodes());
+		EXPECT_EQ(3u, linearSpring->getNodeId(0));
+		EXPECT_EQ(7u, linearSpring->getNodeId(1));
+		EXPECT_EQ(2u, linearSpring->getNodeIds().size());
+		EXPECT_EQ(3u, linearSpring->getNodeIds()[0]);
+		EXPECT_EQ(7u, linearSpring->getNodeIds()[1]);
+	}
+
+	{
+		SCOPED_TRACE("Create linear spring with non 0 rest-length");
+		std::shared_ptr<SurgSim::Math::OdeState> state;
+		state = std::make_shared<SurgSim::Math::OdeState>();
+		state->setNumDof(numDofPerNode, numNodes);
+		for (int nodeId = 0; nodeId < numNodes; nodeId++)
+		{
+			SurgSim::Math::Vector& x = state->getPositions();
+			SurgSim::Math::getSubVector(x, nodeId, numDofPerNode)[0] = static_cast<double>(nodeId) + 0.45009;
+			SurgSim::Math::getSubVector(x, nodeId, numDofPerNode)[1] = -4.5343;
+			SurgSim::Math::getSubVector(x, nodeId, numDofPerNode)[2] = 0.2325445;
+		}
+
+		auto linearSpring = std::make_shared<LinearSpring>(state, 3, 7, stiffness, damping);
+		EXPECT_DOUBLE_EQ(damping, linearSpring->getDamping());
+		EXPECT_DOUBLE_EQ(stiffness, linearSpring->getStiffness());
+		EXPECT_DOUBLE_EQ(4.0, linearSpring->getRestLength());
+		EXPECT_EQ(2u, linearSpring->getNumNodes());
+		EXPECT_EQ(3u, linearSpring->getNodeId(0));
+		EXPECT_EQ(7u, linearSpring->getNodeId(1));
+		EXPECT_EQ(2u, linearSpring->getNodeIds().size());
+		EXPECT_EQ(3u, linearSpring->getNodeIds()[0]);
+		EXPECT_EQ(7u, linearSpring->getNodeIds()[1]);
+	}
 }
 
 TEST(LinearSpringTests, SetGetMethods)

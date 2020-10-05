@@ -20,6 +20,7 @@
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/Asset.h"
+#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Mass.h"
 
 namespace SurgSim
@@ -32,12 +33,8 @@ class Spring;
 SURGSIM_STATIC_REGISTRATION(MassSpring);
 
 /// Base class for a data structure for holding MassSpring mesh data.
-///
-/// MassSpring itself should not be used directly itself as it contains no override for doLoad since the implementation
-/// is dependent on the dimension of the MassSpring you are trying to load. Each dimension overrides the doLoad function
-/// present in Asset using its own version of an MassSpringPlyReaderDelegate.
 class MassSpring : public SurgSim::DataStructures::Vertices<Mass>, public SurgSim::Framework::Asset,
-		public std::enable_shared_from_this<MassSpring>
+	public std::enable_shared_from_this<MassSpring> // Why use a Vertices here, instead of a mesh?
 {
 public:
 	/// Default constructor
@@ -51,7 +48,7 @@ public:
 	/// \note This mass will be associated with the node of same index in any associated OdeState
 	void addMass(const std::shared_ptr<Mass> mass);
 
-	/// Adds a spring
+	/// Adds a spring, and sets its rest length.
 	/// \param spring The spring to add to the representation
 	void addSpring(const std::shared_ptr<Spring> spring);
 
@@ -105,6 +102,30 @@ public:
 	/// \return The vertex id which has a boundary condition
 	size_t getBoundaryCondition(size_t id) const;
 
+	enum MassSpringType
+	{
+		SegmentMesh,
+		TriangleMesh,
+		TetrahedronMesh,
+		None
+	};
+
+	/// Stores an element's node ids, e.g., for a 2d shape this may store triangle nodes.
+	/// \param ids The vector of node ids (i.e., mass ids) for the new element.
+	/// \return The new size of the vector of elements.
+	size_t addElement(const std::vector<size_t>& nodeIds);
+
+	/// Get an element's node ids.
+	/// \param index The index of the element.
+	/// \return The vector of node ids.
+	const std::vector<size_t>& getNodeIds(size_t index) const;
+
+	/// \return The number of elements.
+	size_t getNumElements() const;
+
+	/// \return The number of nodes per element.
+	size_t getNumNodesPerElement() const;
+
 protected:
 	bool doLoad(const std::string& filePath) override;
 
@@ -116,6 +137,9 @@ protected:
 
 	/// Vector of vertex ids that have boundary conditions
 	std::vector<size_t> m_boundaryConditions;
+
+	/// The node ids for each element, e.g., for triangles it contains the three node ids for each triangle.
+	std::vector<std::vector<size_t>> m_nodeIds;
 };
 
 } // namespace Physics

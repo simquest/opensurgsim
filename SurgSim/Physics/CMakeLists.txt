@@ -66,6 +66,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Localization.cpp
 	MassSpring.cpp
 	MassSpringConstraintFixedPoint.cpp
+	MassSpringConstraintFrictionalSliding.cpp
 	MassSpringConstraintFrictionlessContact.cpp
 	MassSpringLocalization.cpp
 	MassSpringPlyReaderDelegate.cpp
@@ -158,6 +159,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Localization.h
 	Mass.h
 	MassSpring.h
+	MassSpringConstraintFrictionalSliding.h
 	MassSpringConstraintFixedPoint.h
 	MassSpringConstraintFrictionlessContact.h
 	MassSpringLocalization.h

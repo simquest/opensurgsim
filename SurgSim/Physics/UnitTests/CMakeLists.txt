@@ -74,6 +74,7 @@ set(UNIT_TEST_SOURCES
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
 	MassSpringConstraintFixedPointTest.cpp
+	MassSpringConstraintFrictionalSlidingTests.cpp
 	MassSpringConstraintFrictionlessContactTest.cpp
 	MassSpringLocalizationTest.cpp
 	MassSpringMechanicalValidationTests.cpp

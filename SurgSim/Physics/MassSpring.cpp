@@ -95,6 +95,32 @@ size_t MassSpring::getBoundaryCondition(size_t id) const
 	return m_boundaryConditions[id];
 }
 
+size_t MassSpring::addElement(const std::vector<size_t>& nodeIds)
+{
+	SURGSIM_ASSERT((m_nodeIds.size() == 0) || (nodeIds.size() == getNumNodesPerElement())) <<
+		"Cannot add an element with " << nodeIds.size() << " nodes to a MassSpring that already has an element with " <<
+		getNumNodesPerElement() << " nodes.";
+	m_nodeIds.push_back(nodeIds);
+	return m_nodeIds.size();
+}
+
+const std::vector<size_t>& MassSpring::getNodeIds(size_t index) const
+{
+	return m_nodeIds[index];
+}
+
+size_t MassSpring::getNumElements() const
+{
+	return m_nodeIds.size();
+}
+
+size_t MassSpring::getNumNodesPerElement() const
+{
+	SURGSIM_ASSERT(m_nodeIds.size() > 0) <<
+		"Cannot get the number of nodes per element of a MassSpring before adding elements.";
+	return m_nodeIds[0].size();
+}
+
 bool MassSpring::doLoad(const std::string & filePath)
 {
 	SurgSim::DataStructures::PlyReader reader(filePath);

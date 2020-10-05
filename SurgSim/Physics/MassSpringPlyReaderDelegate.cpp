@@ -51,25 +51,21 @@ bool MassSpringPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "mass", PlyReader::TYPE_DOUBLE, offsetof(MassData, mass));
 
 	reader->requestElement("1d_element",
-		std::bind(&MassSpringPlyReaderDelegate::beginSprings,
+		std::bind(&MassSpringPlyReaderDelegate::beginElements,
 			this,
 			std::placeholders::_1,
 			std::placeholders::_2),
-		std::bind(&MassSpringPlyReaderDelegate::processSpring, this, std::placeholders::_1),
-		std::bind(&MassSpringPlyReaderDelegate::endSprings, this, std::placeholders::_1));
+		std::bind(&MassSpringPlyReaderDelegate::processElement, this, std::placeholders::_1),
+		std::bind(&MassSpringPlyReaderDelegate::endElements, this, std::placeholders::_1));
 
 	reader->requestListProperty("1d_element",
 		"vertex_indices",
 		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(SpringData, indices),
+		offsetof(ElementData, indices),
 		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(SpringData, nodeCount));
-	reader->requestScalarProperty(
-		"1d_element", "stiffness", PlyReader::TYPE_DOUBLE, offsetof(SpringData, stiffness));
-	reader->requestScalarProperty(
-		"1d_element", "damping", PlyReader::TYPE_DOUBLE, offsetof(SpringData, damping));
+		offsetof(ElementData, nodeCount));
 
-	reader->requestElement("bendingSpring",
+	reader->requestElement("spring",
 		std::bind(&MassSpringPlyReaderDelegate::beginSprings,
 			this,
 			std::placeholders::_1,
@@ -77,16 +73,16 @@ bool MassSpringPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		std::bind(&MassSpringPlyReaderDelegate::processSpring, this, std::placeholders::_1),
 		std::bind(&MassSpringPlyReaderDelegate::endSprings, this, std::placeholders::_1));
 
-	reader->requestListProperty("bendingSpring",
+	reader->requestListProperty("spring",
 		"vertex_indices",
 		PlyReader::TYPE_UNSIGNED_INT,
 		offsetof(SpringData, indices),
 		PlyReader::TYPE_UNSIGNED_INT,
 		offsetof(SpringData, nodeCount));
 	reader->requestScalarProperty(
-		"bendingSpring", "stiffness", PlyReader::TYPE_DOUBLE, offsetof(SpringData, stiffness));
+		"spring", "stiffness", PlyReader::TYPE_DOUBLE, offsetof(SpringData, stiffness));
 	reader->requestScalarProperty(
-		"bendingSpring", "damping", PlyReader::TYPE_DOUBLE, offsetof(SpringData, damping));
+		"spring", "damping", PlyReader::TYPE_DOUBLE, offsetof(SpringData, damping));
 	
 	// Boundary Condition Processing
 	if (m_hasBoundaryConditions)
@@ -115,13 +111,22 @@ bool MassSpringPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 	result = result && reader.hasProperty("vertex", "mass");
-	result = result && reader.hasElement("1d_element");
-	result = result && reader.hasProperty("1d_element", "vertex_indices");
-	result = result && !reader.isScalar("1d_element", "vertex_indices");
-	result = result && reader.hasProperty("1d_element", "stiffness") && reader.hasProperty("1d_element", "damping");
-	result = result && (!reader.hasElement("bendingSpring") ||
-		(reader.hasProperty("bendingSpring", "vertex_indices") && !reader.isScalar("bendingSpring", "vertex_indices") &&
-			reader.hasProperty("bendingSpring", "stiffness") && reader.hasProperty("bendingSpring", "damping")));
+
+	// The file can have at most one of the three types of elements, though they are treated equivalently.
+	result = result && ((!reader.hasElement("1d_element") && !reader.hasElement("2d_element")) ||
+		(!reader.hasElement("1d_element") && !reader.hasElement("3d_element")) ||
+		(!reader.hasElement("2d_element") && !reader.hasElement("3d_element")));
+
+	result = result && (!reader.hasElement("1d_element")) ||
+		(reader.hasProperty("1d_element", "vertex_indices") && !reader.isScalar("1d_element", "vertex_indices"));
+	result = result && (!reader.hasElement("2d_element")) ||
+		(reader.hasProperty("2d_element", "vertex_indices") && !reader.isScalar("2d_element", "vertex_indices"));
+	result = result && (!reader.hasElement("3d_element")) ||
+		(reader.hasProperty("3d_element", "vertex_indices") && !reader.isScalar("3d_element", "vertex_indices"));
+
+	result = result && reader.hasElement("spring") && reader.hasProperty("spring", "vertex_indices") &&
+		!reader.isScalar("spring", "vertex_indices") && reader.hasProperty("spring", "stiffness") &&
+		reader.hasProperty("spring", "damping");
 	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
 
 	return result;
@@ -149,6 +154,33 @@ void MassSpringPlyReaderDelegate::endVertices(const std::string& elementName)
 			"has become corrupted.";
 }
 
+void* MassSpringPlyReaderDelegate::beginElements(const std::string & elementName, size_t elementCount)
+{
+	m_elementData.overrun1 = 0l;
+	m_elementData.overrun2 = 0l;
+	return &m_elementData;
+}
+
+void MassSpringPlyReaderDelegate::processElement(const std::string & elementName)
+{
+	SURGSIM_ASSERT(m_elementData.nodeCount > 0) << "Cannot process element with 0 nodes.";
+	std::vector<size_t> nodeIds(m_elementData.indices, m_elementData.indices + m_elementData.nodeCount);
+	for (const auto& id : nodeIds)
+	{
+		SURGSIM_ASSERT(m_mesh->getNumVertices() > id) << "processElement was given a element with a nodeId (" <<
+			id << ") that is not in the vertices.";
+	}
+	m_mesh->addElement(nodeIds);
+}
+
+void MassSpringPlyReaderDelegate::endElements(const std::string & elementName)
+{
+	SURGSIM_ASSERT(m_elementData.overrun1 == 0 && m_elementData.overrun2 == 0) <<
+		"There was an overrun while reading the element structures, it is likely that data " <<
+		"has become corrupted.";
+	m_elementData.indices = nullptr;
+}
+
 void* MassSpringPlyReaderDelegate::beginSprings(const std::string& elementName, size_t elementCount)
 {
 	m_springData.overrun1 = 0l;
@@ -159,10 +191,14 @@ void* MassSpringPlyReaderDelegate::beginSprings(const std::string& elementName, 
 void MassSpringPlyReaderDelegate::processSpring(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_springData.nodeCount == 2) << "Cannot process spring with " << m_springData.nodeCount << " nodes.";
-	auto spring = std::make_shared<LinearSpring>(m_springData.indices[0], m_springData.indices[1]);
-	spring->setStiffness(m_springData.stiffness);
-	spring->setDamping(m_springData.damping);
-	m_mesh->addSpring(spring);
+	SURGSIM_ASSERT(m_mesh->getNumVertices() > m_springData.indices[0]) <<
+		"processSpring was given a spring with a nodeId (" << m_springData.indices[0] <<
+		") that is not in the vertices.";
+	SURGSIM_ASSERT(m_mesh->getNumVertices() > m_springData.indices[1]) <<
+		"processSpring was given a spring with a nodeId (" << m_springData.indices[1] <<
+		") that is not in the vertices.";
+	m_mesh->addSpring(std::make_shared<LinearSpring>(m_mesh, m_springData.indices[0], m_springData.indices[1],
+		m_springData.stiffness, m_springData.damping));
 }
 
 void MassSpringPlyReaderDelegate::endSprings(const std::string& elementName)

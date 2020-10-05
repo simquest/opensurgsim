@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Physics/LinearSpring.h"
@@ -164,23 +165,66 @@ void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Local
 		const SurgSim::Math::Matrix& K,
 		const SurgSim::Math::Matrix& D)
 {
-	std::shared_ptr<MassSpringLocalization> localization3D =
-		std::dynamic_pointer_cast<MassSpringLocalization>(localization);
-	SURGSIM_ASSERT(localization3D != nullptr) <<
-		"Invalid localization type (not a MassSpringLocalization)";
+	auto typedLocalization = std::dynamic_pointer_cast<MassSpringLocalization>(localization);
+	SURGSIM_ASSERT(typedLocalization != nullptr) << "Invalid localization type (not a MassSpringLocalization)";
 
-	const size_t dofPerNode = getNumDofPerNode();
-
-	const size_t nodeId = localization3D->getLocalNode();
-	SURGSIM_ASSERT(nodeId >= 0 && nodeId < getNumMasses()) << "Invalid nodeId " << nodeId <<
-			". Valid range is {0.." << getNumMasses() << "}";
-
-	m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce;
-	Math::addSubMatrix(K, static_cast<Eigen::Index>(nodeId), static_cast<Eigen::Index>(nodeId),
-		&m_externalGeneralizedStiffness);
-	Math::addSubMatrix(D, static_cast<Eigen::Index>(nodeId), static_cast<Eigen::Index>(nodeId),
-		&m_externalGeneralizedDamping);
 	m_hasExternalGeneralizedForce = true;
+	const size_t dofPerNode = getNumDofPerNode();
+	if (typedLocalization->getLocalNode().hasValue())
+	{
+		const size_t nodeId = typedLocalization->getLocalNode().getValue();
+		SURGSIM_ASSERT(nodeId >= 0 && nodeId < getNumMasses()) << "Invalid nodeId " << nodeId <<
+				". Valid range is {0.." << getNumMasses() << "}";
+
+		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode).noalias() += generalizedForce;
+		Math::addSubMatrix(K, static_cast<Eigen::Index>(nodeId), static_cast<Eigen::Index>(nodeId),
+			&m_externalGeneralizedStiffness);
+		Math::addSubMatrix(D, static_cast<Eigen::Index>(nodeId), static_cast<Eigen::Index>(nodeId),
+			&m_externalGeneralizedDamping);
+	}
+	else if (typedLocalization->getLocalPosition().hasValue())
+	{
+		const auto& nodeIds = m_mesh->getNodeIds(typedLocalization->getLocalPosition().getValue().index);
+		const Math::Vector& coordinate = typedLocalization->getLocalPosition().getValue().coordinate;
+		size_t index = 0;
+		for (const auto& nodeId : nodeIds)
+		{
+			m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode).noalias() +=
+				generalizedForce * coordinate[index];
+			++index;
+		}
+
+		if (K.size() != 0 || D.size() != 0)
+		{
+			size_t index1 = 0;
+			for (auto nodeId1 : nodeIds)
+			{
+				size_t index2 = 0;
+				for (auto nodeId2 : nodeIds)
+				{
+					if (K.size() != 0)
+					{
+						Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K, nodeId1, nodeId2,
+							&m_externalGeneralizedStiffness);
+					}
+					if (D.size() != 0)
+					{
+						Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D, nodeId1, nodeId2,
+							&m_externalGeneralizedDamping);
+					}
+					++index2;
+				}
+				++index1;
+			}
+		}
+		m_externalGeneralizedStiffness.makeCompressed();
+		m_externalGeneralizedDamping.makeCompressed();
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "MassSpringRepresentation::addExternalGeneralizedForce passed a location without " <<
+			"either node or local position.";
+	}
 }
 
 void MassSpringRepresentation::beforeUpdate(double dt)
@@ -200,6 +244,9 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	SURGSIM_ASSERT(getNumSprings()) << "No springs specified yet, call addSpring() prior to running the simulation";
 	SURGSIM_ASSERT(getNumDof()) << "State has not been initialized yet, call setInitialState() " <<
 								"prior to running the simulation";
+
+	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Physics/MassSpringRepresentation")) <<
+		"beforeUpdate vertex positions:\n" << getCurrentState()->getPositions();
 }
 
 void MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
@@ -347,6 +394,11 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 		m_K += m_externalGeneralizedStiffness;
 		m_D += m_externalGeneralizedDamping;
 	}
+
+	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Physics/MassSpringRepresentation")) <<
+		"computeFMDK, m_f:\n" << m_f <<
+		"\nm_K:\n" << m_K <<
+		"\nm_D:\n" << m_D;
 }
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const SurgSim::Math::OdeState& state,
@@ -398,6 +450,9 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Surg
 			}
 		}
 	}
+
+	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Physics/MassSpringRepresentation")) <<
+		"rayleigh force:\n" << *force;
 }
 
 void MassSpringRepresentation::addSpringsForce(Vector* force, const SurgSim::Math::OdeState& state, double scale)
@@ -461,9 +516,14 @@ std::shared_ptr<Localization> MassSpringRepresentation::createLocalization(
 	{
 		result->setLocalNode(*location.index);
 	}
+	else if (location.elementMeshLocalCoordinate.hasValue())
+	{
+		result->setLocalPosition(location.elementMeshLocalCoordinate.getValue());
+	}
 	else
 	{
-		SURGSIM_FAILURE() << "Invalid location to create a MassSpringLocalization" << std::endl;
+		SURGSIM_FAILURE() << "Location passed to MassSpringRepresentation::createLocalization must have an index or " <<
+			"elementMeshLocalCoordinate." << "\nFor '" << getFullName() << "', at:\n" << location << std::endl;
 	}
 
 	return result;
@@ -486,7 +546,7 @@ void MassSpringRepresentation::setMassSpring(std::shared_ptr<Framework::Asset> m
 	m_mesh = massSpring;
 	auto state = std::make_shared<Math::OdeState>();
 	state->setNumDof(getNumDofPerNode(), m_mesh->getNumVertices());
-	for (size_t i = 0; i < m_mesh->getNumVertices(); i++)
+	for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
 	{
 		state->getPositions().segment<3>(getNumDofPerNode() * i) = m_mesh->getVertexPosition(i);
 		addMass(m_mesh->getMass(i));
@@ -507,6 +567,41 @@ void MassSpringRepresentation::setMassSpring(std::shared_ptr<Framework::Asset> m
 std::shared_ptr<MassSpring> MassSpringRepresentation::getMassSpring() const
 {
 	return m_mesh;
+}
+
+bool MassSpringRepresentation::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
+{
+	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
+		&& (naturalCoordinate.size() >= 0) && (m_mesh->getNumElements() > 0)
+		&& (static_cast<size_t>(naturalCoordinate.size()) == m_mesh->getNumNodesPerElement())
+		&& (-SurgSim::Math::Geometry::ScalarEpsilon <= naturalCoordinate.minCoeff() &&
+			naturalCoordinate.maxCoeff() <= 1.0 + SurgSim::Math::Geometry::ScalarEpsilon);
+}
+
+bool MassSpringRepresentation::isValidCoordinate(const DataStructures::IndexedLocalCoordinate& localCoordinate) const
+{
+	return (localCoordinate.index < m_mesh->getNumElements()) && isValidCoordinate(localCoordinate.coordinate);
+}
+
+Math::Vector3d MassSpringRepresentation::computeCartesianCoordinate(const Math::OdeState& state,
+	const DataStructures::IndexedLocalCoordinate& localCoordinate) const
+{
+	SURGSIM_ASSERT(isValidCoordinate(localCoordinate)) <<
+		"MassSpringRepresentation::computeCartesianCoordinate was passed an invalid localCoordinate:\n" <<
+		localCoordinate;
+	const Math::Vector& positions = state.getPositions();
+	const auto& nodeIds = m_mesh->getNodeIds(localCoordinate.index);
+	Math::Vector3d result = Math::Vector3d::Zero();
+	for (Eigen::Index i = 0; i < localCoordinate.coordinate.size(); ++i)
+	{
+		result += localCoordinate.coordinate(i) * Math::getSubVector(positions, nodeIds[i], 3).segment<3>(0);
+	}
+	return result;
+}
+
+const std::vector<size_t>& MassSpringRepresentation::getNodeIds(size_t index) const
+{
+	return m_mesh->getNodeIds(index);
 }
 
 } // namespace Physics

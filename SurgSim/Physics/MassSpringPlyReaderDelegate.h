@@ -29,10 +29,8 @@ class MassSpring;
 
 /// Common part of implementation of PlyReaderDelegate for MassSpringRepresentations.
 /// In order for the same ply file to load with TriangleMeshPlyReaderDelegate
-/// (e.g., to create the graphics for a SegmentMesh), there must be elements named (for example) 1d_element,
-/// that have appropriate vertex_indices.  This class reuses those elements to hold springs
-/// (which can have 0 stiffness and damping). Springs that are not between adjacent vertices are held in
-/// "bendingSpring" elements.
+/// (e.g., to create the graphics for a SegmentMesh or to match the shape in a CollisionRep),
+/// there must be elements named (for example) 1d_element, that have appropriate vertex_indices.
 class MassSpringPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
@@ -62,6 +60,20 @@ protected:
 	/// Callback function to finalize processing of vertices.
 	/// \param elementName Name of the element.
 	virtual void endVertices(const std::string& elementName);
+
+	/// Callback function, begin the processing of Elements.
+	/// \param elementName Name of the element.
+	/// \param elementCount Number of elements.
+	/// \return memory for Elements data to the reader.
+	void* beginElements(const std::string& elementName, size_t elementCount);
+
+	/// Callback function to process one Element.
+	/// \param elementName Name of the element.
+	virtual void processElement(const std::string& elementName);
+
+	/// Callback function to finalize processing of Elements.
+	/// \param elementName Name of the element.
+	void endElements(const std::string& elementName);
 
 	/// Callback function, begin the processing of Springs.
 	/// \param elementName Name of the element.
@@ -103,6 +115,15 @@ protected:
 
 	/// Internal data to receive the "boundary_condition" element
 	unsigned int m_boundaryConditionData;
+
+	/// Internal data to receive the spring (stretching and bending) data
+	struct ElementData
+	{
+		int64_t overrun1; ///< Used to check for buffer overruns
+		unsigned int* indices;
+		unsigned int nodeCount;
+		int64_t overrun2; ///< Used to check for buffer overruns
+	} m_elementData;
 
 	/// Internal data to receive the spring (stretching and bending) data
 	struct SpringData

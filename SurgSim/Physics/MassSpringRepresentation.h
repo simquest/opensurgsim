@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/DeformableRepresentation.h"
@@ -127,6 +128,28 @@ public:
 
 	/// \return The mesh asset as a MassSpring.
 	std::shared_ptr<MassSpring> getMassSpring() const;
+
+	/// Determines whether a given natural coordinate is valid.
+	/// \param naturalCoordinate Coordinate to check
+	/// \return True if valid, which requires element IDs to have been added.
+	bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const;
+
+	/// Determines whether a local coordinate is valid.
+	/// \param localCoordinate Coordinate to check.
+	/// \return True if valid, which requires element IDs to have been added.
+	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& localCoordinate) const;
+
+	/// Computes a given natural coordinate in cartesian coordinates.
+	/// \param state The state at which to transform coordinates.
+	/// \param localCoordinate The local coordinate to transform.
+	/// \return The resultant cartesian coordinates.
+	Math::Vector3d computeCartesianCoordinate(const Math::OdeState& state,
+		const DataStructures::IndexedLocalCoordinate& localCoordinate) const;
+
+	/// Get an element's node ids.
+	/// \param index The index of the element.
+	/// \return The vector of node ids.
+	const std::vector<size_t>& getNodeIds(size_t index) const;
 
 protected:
 	/// Add the Rayleigh damping forces

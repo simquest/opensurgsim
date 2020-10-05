@@ -161,7 +161,8 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	size_t index = 0;
 	for (auto nodeId : element->getNodeIds())
 	{
-		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce * coordinate[index];
+		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode).noalias() +=
+			generalizedForce * coordinate[index];
 		index++;
 	}
 
