@@ -104,17 +104,21 @@ SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
 	const Math::Vector& previousVelocities = femRepresentation->getPreviousState()->getVelocities();
 
 	auto& nodeIds = femElement->getNodeIds();
-	Vector3d previousVelocity =
-		naturalCoordinate(0) * Math::getSubVector(previousVelocities, nodeIds[0], 6).segment<3>(0) +
-		naturalCoordinate(1) * Math::getSubVector(previousVelocities, nodeIds[1], 6).segment<3>(0);
+	Vector3d previousVelocity = Vector3d::Zero();
+	for (Eigen::Index i = 0; i < naturalCoordinate.size(); ++i)
+	{
+		previousVelocity += naturalCoordinate(i) * Math::getSubVector(previousVelocities, nodeIds[i], 6).segment<3>(0);
+	}
 	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return previousVelocity;
 	}
 
-	Vector3d currentVelocity =
-		naturalCoordinate(0) * Math::getSubVector(currentVelocities, nodeIds[0], 6).segment<3>(0) +
-		naturalCoordinate(1) * Math::getSubVector(currentVelocities, nodeIds[1], 6).segment<3>(0);
+	Vector3d currentVelocity = Vector3d::Zero();
+	for (Eigen::Index i = 0; i < naturalCoordinate.size(); ++i)
+	{
+		currentVelocity += naturalCoordinate(i) * Math::getSubVector(currentVelocities, nodeIds[i], 6).segment<3>(0);
+	}
 	if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return currentVelocity;
