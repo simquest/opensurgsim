@@ -59,34 +59,40 @@ void MassSpringConstraintFrictionalSliding::doBuild(double dt,
 	directions[1] = constraintData.getNormals()[1];
 	directions[2] = constraintData.getTangent();
 
+	m_newH.resize(massSpring->getNumDof());
+
+	auto typedLocalization = std::static_pointer_cast<MassSpringLocalization>(localization);
 	Vector3d globalPosition = localization->calculatePosition();
 	std::vector<size_t> nodeIds;
 	Math::Vector coordinates;
 
-	auto typedLocalization = std::static_pointer_cast<MassSpringLocalization>(localization);
-	if (typedLocalization->getLocalNode().hasValue())
+	for (int i = 0; i < 3; ++i)
 	{
-		nodeIds.push_back(typedLocalization->getLocalNode().getValue());
-		coordinates.resize(1);
-		coordinates << 1.0;
-	}
-	else if (typedLocalization->getLocalPosition().hasValue())
-	{
-		const auto& coord = typedLocalization->getLocalPosition().getValue();
-		nodeIds = massSpring->getNodeIds(coord.index);
-		coordinates = coord.coordinate;
-	}
-	else
-	{
-		SURGSIM_FAILURE() <<
-			"MassSpringConstraintFrictionalSliding requires a localization with either a node or a local position.";
-	}
+		if ((i == 2) && (massSpring->getNodeIds(0).size() == 2))
+		{
+			typedLocalization =
+				std::static_pointer_cast<MassSpringLocalization>(constraintData.getPreviousFirstLocalization());
+			globalPosition = typedLocalization->calculatePosition();
+		}
+		if (typedLocalization->getLocalNode().hasValue())
+		{
+			nodeIds.push_back(typedLocalization->getLocalNode().getValue());
+			coordinates.resize(1);
+			coordinates << 1.0;
+		}
+		else if (typedLocalization->getLocalPosition().hasValue())
+		{
+			const auto& coord = typedLocalization->getLocalPosition().getValue();
+			nodeIds = massSpring->getNodeIds(coord.index);
+			coordinates = coord.coordinate;
+		}
+		else
+		{
+			SURGSIM_FAILURE() <<
+				"MassSpringConstraintFrictionalSliding requires a localization with either a node or a local position.";
+		}
+		m_newH.reserve(3 * nodeIds.size());
 
-	m_newH.resize(massSpring->getNumDof());
-	m_newH.reserve(3 * nodeIds.size());
-
-	for (size_t i = 0; i < 3; ++i)
-	{
 		// Update b with new violation
 		double violation = directions[i].dot(globalPosition);
 		mlcp->b[indexOfConstraint + i] += violation * scale;
@@ -102,7 +108,6 @@ void MassSpringConstraintFrictionalSliding::doBuild(double dt,
 		mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix() * m_newH.transpose(), indexOfRepresentation,
 			indexOfConstraint + i);
 	}
-
 	mlcp->mu[indexOfConstraint] = constraintData.getFrictionCoefficient();
 }
 

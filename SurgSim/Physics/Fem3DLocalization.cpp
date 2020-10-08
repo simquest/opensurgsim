@@ -45,6 +45,11 @@ bool Fem3DLocalization::isValidRepresentation(std::shared_ptr<Representation> re
 	return (femRepresentation != nullptr || representation == nullptr);
 }
 
+std::shared_ptr<Localization> Fem3DLocalization::doCopy() const
+{
+	return std::make_shared<Fem3DLocalization>(getRepresentation(), getLocalPosition());
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

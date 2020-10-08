@@ -17,11 +17,13 @@
 #define SURGSIM_PHYSICS_MASSSPRINGCONSTRAINTFRICTIONALSLIDING_H
 
 #include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 
 namespace SurgSim
 {
 namespace Physics
 {
+class MassSpringLocalization;
 
 /// Base class for all MassSpringRepresentation frictional sliding constraint implementation.
 class MassSpringConstraintFrictionalSliding: public ConstraintImplementation
@@ -45,6 +47,11 @@ private:
 		size_t indexOfRepresentation,
 		size_t indexOfConstraint,
 		ConstraintSideSign sign) override;
+
+	/// Helper function for doBuild.
+	void updateConstraint(double dt, const std::shared_ptr<MassSpringLocalization>& localization,
+		MlcpPhysicsProblem * mlcp, size_t indexOfRepresentation, size_t atomicIndexOfConstraint, double scale,
+		Math::Vector3d direction, const MassSpringRepresentation & massSpring, size_t numDofPerNode);
 };
 }; // namespace Physics
 }; // namespace SurgSim

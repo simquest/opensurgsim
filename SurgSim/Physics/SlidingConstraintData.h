@@ -25,6 +25,7 @@ namespace SurgSim
 
 namespace Physics
 {
+class Localization;
 
 /// Class for Frictionless sliding constraint (stores two planes, the intersection of which, is the sliding direction)
 class SlidingConstraintData : public ConstraintData
@@ -63,8 +64,10 @@ public:
 	/// \return The tangent (direction defined by the two planes).
 	const Math::Vector3d& getTangent() const;
 
-	/// \return The distance from origin of the planes direction (tangent).
-	const double getDistanceTangent() const;
+	/// \param loc The previous localization for the first representation.
+	void setPreviousFirstLocalization(std::shared_ptr<Localization> loc);
+	/// \return The previous localization for the first representation.
+	std::shared_ptr<Localization> getPreviousFirstLocalization() const;
 
 private:
 	/// The normals of the two planes.
@@ -84,6 +87,8 @@ private:
 
 	/// Friction coefficient for frictional constraint (unused for frictionless constraint).
 	double m_mu;
+
+	std::shared_ptr<Localization> m_previousFirstLocalization;
 };
 
 } // namespace Physics

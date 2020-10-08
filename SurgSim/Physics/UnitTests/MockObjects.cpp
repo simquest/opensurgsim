@@ -572,6 +572,11 @@ Vector3d MockLocalization::doCalculateVelocity(double time) const
 	return SurgSim::Math::Vector3d::Zero();
 }
 
+std::shared_ptr<Localization> MockLocalization::doCopy() const
+{
+	return std::make_shared<MockLocalization>(getRepresentation());
+}
+
 SurgSim::Physics::ConstraintType MockConstraintImplementation::getConstraintType() const
 {
 	return SurgSim::Physics::FIXED_3DPOINT;

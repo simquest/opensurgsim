@@ -60,7 +60,7 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 	directions[1] = constraintData.getNormals()[1];
 	directions[2] = constraintData.getTangent();
 
-	const DataStructures::IndexedLocalCoordinate& coord
+	DataStructures::IndexedLocalCoordinate coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
 	Vector3d globalPosition = localization->calculatePosition();
 
@@ -71,6 +71,16 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 
 	for (size_t i = 0; i < 3; ++i)
 	{
+		if ((i == 2) && (numNodes == 2))
+		{
+			auto previousLocalization = constraintData.getPreviousFirstLocalization();
+			coord = std::static_pointer_cast<FemLocalization>(previousLocalization)->getLocalPosition();
+			globalPosition = previousLocalization->calculatePosition();
+			m_newH.resize(fem->getNumDof());
+			femElement = fem->getFemElement(coord.index);
+			numNodes = fem->getFemElement(coord.index)->getNumNodes();
+			m_newH.reserve(numNodes * 3);
+		}
 		// Update b with new violation
 		double violation = directions[i].dot(globalPosition);
 		mlcp->b[indexOfConstraint + i] += violation * scale;

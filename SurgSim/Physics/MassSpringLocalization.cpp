@@ -225,6 +225,21 @@ bool MassSpringLocalization::moveClosestTo(const Math::Vector3d& point, bool* ha
 	return false;
 }
 
+std::shared_ptr<Localization> MassSpringLocalization::doCopy() const
+{
+	auto localization = std::make_shared<MassSpringLocalization>();
+	localization->setRepresentation(getRepresentation());
+	if (getLocalNode().hasValue())
+	{
+		localization->setLocalNode(getLocalNode().getValue());
+	}
+	if (getLocalPosition().hasValue())
+	{
+		localization->setLocalPosition(getLocalPosition().getValue());
+	}
+	return localization;
+}
+
 }; // Physics
 }; // SurgSim
 

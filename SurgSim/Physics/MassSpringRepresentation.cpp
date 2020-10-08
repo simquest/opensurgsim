@@ -244,9 +244,6 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	SURGSIM_ASSERT(getNumSprings()) << "No springs specified yet, call addSpring() prior to running the simulation";
 	SURGSIM_ASSERT(getNumDof()) << "State has not been initialized yet, call setInitialState() " <<
 								"prior to running the simulation";
-
-	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Physics/MassSpringRepresentation")) <<
-		"beforeUpdate vertex positions:\n" << getCurrentState()->getPositions();
 }
 
 void MassSpringRepresentation::computeF(const SurgSim::Math::OdeState& state)
@@ -394,11 +391,6 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 		m_K += m_externalGeneralizedStiffness;
 		m_D += m_externalGeneralizedDamping;
 	}
-
-	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Physics/MassSpringRepresentation")) <<
-		"computeFMDK, m_f:\n" << m_f <<
-		"\nm_K:\n" << m_K <<
-		"\nm_D:\n" << m_D;
 }
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const SurgSim::Math::OdeState& state,
@@ -450,9 +442,6 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Surg
 			}
 		}
 	}
-
-	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("Physics/MassSpringRepresentation")) <<
-		"rayleigh force:\n" << *force;
 }
 
 void MassSpringRepresentation::addSpringsForce(Vector* force, const SurgSim::Math::OdeState& state, double scale)

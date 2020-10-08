@@ -74,6 +74,8 @@ public:
 
 	bool moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd) override;
 
+	std::shared_ptr<Localization> doCopy() const override;
+
 private:
 	/// Calculates the global position of this localization.
 	/// \param time Interpolation parameter [0..1] for calcuting position between the previous state (0.0) and current

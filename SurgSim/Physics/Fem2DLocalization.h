@@ -48,6 +48,8 @@ public:
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
 
 	Math::RigidTransform3d getElementPose() override;
+
+	std::shared_ptr<Localization> doCopy() const override;
 };
 
 } // namespace Physics

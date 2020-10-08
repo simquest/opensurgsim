@@ -177,6 +177,14 @@ private:
 		return SurgSim::Math::interpolate(previousVelocity, currentVelocity, time);
 	}
 
+
+	std::shared_ptr<Localization> doCopy() const override
+	{
+		auto localization = std::make_shared<MockDeformableLocalization>(getRepresentation());
+		localization->setLocalNode(getLocalNode());
+		return localization;
+	}
+
 	size_t m_nodeID;
 };
 
@@ -417,6 +425,8 @@ private:
 	SurgSim::Math::Vector3d doCalculatePosition(double time) const override;
 
 	SurgSim::Math::Vector3d doCalculateVelocity(double time) const override;
+
+	std::shared_ptr<Localization> doCopy() const override;
 };
 
 class MockConstraintImplementation : public ConstraintImplementation

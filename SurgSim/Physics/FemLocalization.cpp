@@ -127,6 +127,11 @@ SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
 	return Math::interpolate(previousVelocity, currentVelocity, time);
 }
 
+std::shared_ptr<Localization> FemLocalization::doCopy() const
+{
+	return std::make_shared<FemLocalization>(getRepresentation(), getLocalPosition());
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

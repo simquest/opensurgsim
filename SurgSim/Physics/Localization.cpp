@@ -85,5 +85,10 @@ bool Localization::moveClosestTo(const Math::Vector3d& point, bool *hasReachedEn
 	return false;
 }
 
+std::shared_ptr<Localization> Localization::copy() const
+{
+	return doCopy();
+}
+
 }
 }

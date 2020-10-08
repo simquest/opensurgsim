@@ -53,9 +53,6 @@ TEST(SlidingConstraintDataTests, TestSetGet)
 	EXPECT_NEAR(0.0, direction.dot(normals[1]), epsilon);
 
 	const auto tangent = slidingConstraintData.getTangent();
-	const auto distanceTangent = slidingConstraintData.getDistanceTangent();
-
-	EXPECT_NEAR(0.0, point.dot(tangent) + distanceTangent, epsilon);
 	EXPECT_TRUE(direction.isApprox(tangent));
 
 	// Friction coefficient

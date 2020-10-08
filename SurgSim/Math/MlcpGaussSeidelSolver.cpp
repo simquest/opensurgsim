@@ -114,7 +114,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		*convergenceCriteria = *initialConvergenceCriteria;
 		return true;
 	}
-
+	
 	do
 	{
 		doOneIteration(problemSize, A, b, &initialGuessAndSolution, problem.mu, constraintsType,
@@ -628,6 +628,10 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 				{
 					// Complete the violation of the friction along t, with the missing terms...
 					double& Ft = (*initialGuessAndSolution)[currentAtomicIndex + 2];
+					// Ft is the initialGuess minus Ax+b/compliance, where x is the current force estimate, 
+					// A is the compliance row that turns the force estimate into a delta position for the tangent,
+					// and b is the initial tangent violation.
+					// So this force should counteract the violation.
 					Ft -= (b[currentAtomicIndex + 2] + A.row(currentAtomicIndex + 2) * (*initialGuessAndSolution)) /
 						  A(currentAtomicIndex + 2, currentAtomicIndex + 2);
 
