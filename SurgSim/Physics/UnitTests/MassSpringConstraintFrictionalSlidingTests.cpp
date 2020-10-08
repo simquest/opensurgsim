@@ -129,7 +129,7 @@ TEST_F(MassSpringConstraintFrictionalSlidingTests, ConstraintConstantsTest)
 	auto implementation = std::make_shared<MassSpringConstraintFrictionalSliding>();
 
 	EXPECT_EQ(SurgSim::Physics::FRICTIONAL_SLIDING, implementation->getConstraintType());
-	EXPECT_EQ(3u, implementation->getNumDof());
+	EXPECT_EQ(5u, implementation->getNumDof());
 }
 
 TEST_F(MassSpringConstraintFrictionalSlidingTests, BuildMlcpTest)
@@ -138,7 +138,7 @@ TEST_F(MassSpringConstraintFrictionalSlidingTests, BuildMlcpTest)
 	auto implementation = std::make_shared<MassSpringConstraintFrictionalSliding>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_massSpring->getNumDof(), 3, 1);
+	auto mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_massSpring->getNumDof(), implementation->getNumDof(), 1);
 
 	// Apply constraint purely to the first node.
 	setSlidingConstraintAt(0);
@@ -146,10 +146,12 @@ TEST_F(MassSpringConstraintFrictionalSlidingTests, BuildMlcpTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	Eigen::Matrix<double, 3, 15> H = Eigen::Matrix<double, 3, 15>::Zero();
+	Eigen::Matrix<double, 5, 15> H = Eigen::Matrix<double, 5, 15>::Zero();
 	H.block<1, 3>(0, 0) = (dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 0) = (dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 0) = (dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 0) = (dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 0) = (dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 0) = (dt * Vector3d::UnitZ()).eval();
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -172,7 +174,7 @@ TEST_F(MassSpringConstraintFrictionalSlidingTests, BuildMlcpCoordinateTest)
 	auto implementation = std::make_shared<MassSpringConstraintFrictionalSliding>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_massSpring->getNumDof(), 3, 1);
+	auto mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_massSpring->getNumDof(), implementation->getNumDof(), 1);
 
 	// Apply constraint to the second node.
 	setSlidingConstraintAt(1);
@@ -180,10 +182,12 @@ TEST_F(MassSpringConstraintFrictionalSlidingTests, BuildMlcpCoordinateTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	Eigen::Matrix<double, 3, 15> H = Eigen::Matrix<double, 3, 15>::Zero();
+	Eigen::Matrix<double, 5, 15> H = Eigen::Matrix<double, 5, 15>::Zero();
 	H.block<1, 3>(0, 3) = (dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 3) = (dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 3) = (dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 3) = (dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 3) = (dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 3) = (dt * Vector3d::UnitZ()).eval();
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -207,7 +211,8 @@ TEST_F(MassSpringConstraintFrictionalSlidingTests, BuildMlcpIndiciesTest)
 	auto implementation = std::make_shared<MassSpringConstraintFrictionalSliding>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_massSpring->getNumDof() + 5, 4, 2);
+	auto mlcpPhysicsProblem =
+		MlcpPhysicsProblem::Zero(m_massSpring->getNumDof() + 5, implementation->getNumDof() + 1, 2);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
 	Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t> localH;
@@ -253,21 +258,23 @@ TEST_F(MassSpringConstraintFrictionalSlidingTests, BuildMlcpIndiciesTest)
 		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint,
 		SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	Eigen::Matrix<double, 3, 15> H = Eigen::Matrix<double, 3, 15>::Zero();
+	Eigen::Matrix<double, 5, 15> H = Eigen::Matrix<double, 5, 15>::Zero();
 	H.block<1, 3>(0, 3) = (dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 3) = (dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 3) = (dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 3) = (dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 3) = (dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 3) = (dt * Vector3d::UnitZ()).eval();
 
-	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H.block(indexOfConstraint, indexOfRepresentation, 3, 15), epsilon);
+	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H.block(indexOfConstraint, indexOfRepresentation, 5, 15), epsilon);
 
 	m_massSpring->updateFMDK(*(m_massSpring->getPreviousState()), SurgSim::Math::ODEEQUATIONUPDATE_M);
 	Eigen::Matrix<double, 15, 15> C = dt * m_massSpring->getM().toDense().inverse();
 
 	EXPECT_NEAR_EIGEN(
-		C * H.transpose(), mlcpPhysicsProblem.CHt.block(indexOfRepresentation, indexOfConstraint, 15, 3), epsilon);
+		C * H.transpose(), mlcpPhysicsProblem.CHt.block(indexOfRepresentation, indexOfConstraint, 15, 5), epsilon);
 
 	EXPECT_NEAR_EIGEN(
-		H * C * H.transpose(), mlcpPhysicsProblem.A.block(indexOfConstraint, indexOfConstraint, 3, 3), epsilon);
+		H * C * H.transpose(), mlcpPhysicsProblem.A.block(indexOfConstraint, indexOfConstraint, 5, 5), epsilon);
 
 	EXPECT_DOUBLE_EQ(0.5, mlcpPhysicsProblem.mu[1]);
 

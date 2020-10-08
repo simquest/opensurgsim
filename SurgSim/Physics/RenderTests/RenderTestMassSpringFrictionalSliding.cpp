@@ -137,7 +137,7 @@ void addConstraint(std::shared_ptr<SurgSim::Framework::SceneElement> element,
 
 	auto constraintComponent = std::make_shared<SurgSim::Physics::ConstraintComponent>("SlidingConstraint");
 	auto constraintData = std::make_shared<SurgSim::Physics::SlidingConstraintData>();
-	constraintData->setFrictionCoefficient(0.25);
+	constraintData->setFrictionCoefficient(0.5);
 	SurgSim::DataStructures::Location first;
 	first.index = massSpringIndex;
 	SurgSim::DataStructures::Location second;

@@ -72,6 +72,9 @@ public:
 	/// \return the number of springs
 	size_t getNumSprings() const;
 
+	/// \return The number of elements.
+	size_t getNumElements() const;
+
 	/// Retrieves the mass of a given node
 	/// \param nodeId The node id for which the mass is requested
 	/// \return the mass attribute of a node

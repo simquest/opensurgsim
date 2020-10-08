@@ -118,6 +118,11 @@ size_t MassSpringRepresentation::getNumSprings() const
 	return m_springs.size();
 }
 
+size_t MassSpringRepresentation::getNumElements() const
+{
+	return m_mesh->getNumElements();
+}
+
 std::shared_ptr<Mass> MassSpringRepresentation::getMass(size_t nodeId)
 {
 	SURGSIM_ASSERT(nodeId < getNumMasses()) << "Invalid node id to request a mass from";

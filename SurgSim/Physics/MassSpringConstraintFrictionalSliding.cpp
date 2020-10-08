@@ -65,32 +65,26 @@ void MassSpringConstraintFrictionalSliding::doBuild(double dt,
 	Vector3d globalPosition = localization->calculatePosition();
 	std::vector<size_t> nodeIds;
 	Math::Vector coordinates;
-
-	for (int i = 0; i < 3; ++i)
+	if (typedLocalization->getLocalNode().hasValue())
 	{
-		if ((i == 2) && (massSpring->getNodeIds(0).size() == 2))
-		{
-			typedLocalization =
-				std::static_pointer_cast<MassSpringLocalization>(constraintData.getPreviousFirstLocalization());
-			globalPosition = typedLocalization->calculatePosition();
-		}
-		if (typedLocalization->getLocalNode().hasValue())
-		{
-			nodeIds.push_back(typedLocalization->getLocalNode().getValue());
-			coordinates.resize(1);
-			coordinates << 1.0;
-		}
-		else if (typedLocalization->getLocalPosition().hasValue())
-		{
-			const auto& coord = typedLocalization->getLocalPosition().getValue();
-			nodeIds = massSpring->getNodeIds(coord.index);
-			coordinates = coord.coordinate;
-		}
-		else
-		{
-			SURGSIM_FAILURE() <<
-				"MassSpringConstraintFrictionalSliding requires a localization with either a node or a local position.";
-		}
+		nodeIds.push_back(typedLocalization->getLocalNode().getValue());
+		coordinates.resize(1);
+		coordinates << 1.0;
+	}
+	else if (typedLocalization->getLocalPosition().hasValue())
+	{
+		const auto& coord = typedLocalization->getLocalPosition().getValue();
+		nodeIds = massSpring->getNodeIds(coord.index);
+		coordinates = coord.coordinate;
+	}
+	else
+	{
+		SURGSIM_FAILURE() <<
+			"MassSpringConstraintFrictionalSliding requires a localization with either a node or a local position.";
+	}
+
+	for (int i = 0; i < 2; ++i)
+	{
 		m_newH.reserve(3 * nodeIds.size());
 
 		// Update b with new violation
@@ -108,6 +102,43 @@ void MassSpringConstraintFrictionalSliding::doBuild(double dt,
 		mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix() * m_newH.transpose(), indexOfRepresentation,
 			indexOfConstraint + i);
 	}
+	
+	// The friction is like a bilateral 3d constraint.
+	if ((massSpring->getNumElements() > 0) && (massSpring->getNodeIds(0).size() == 2))
+	{
+		typedLocalization =
+			std::static_pointer_cast<MassSpringLocalization>(constraintData.getPreviousFirstLocalization());
+		if (typedLocalization->getLocalNode().hasValue())
+		{
+			nodeIds.clear();
+			nodeIds[0] = typedLocalization->getLocalNode().getValue();
+			coordinates.resize(1);
+			coordinates << 1.0;
+		}
+		else if (typedLocalization->getLocalPosition().hasValue())
+		{
+			const auto& coord = typedLocalization->getLocalPosition().getValue();
+			nodeIds = massSpring->getNodeIds(coord.index);
+			coordinates = coord.coordinate;
+		}
+		globalPosition = typedLocalization->calculatePosition();
+	}
+	auto numNodesToConstrain = (coordinates.array() != 0.0).count();
+	mlcp->b.segment<3>(indexOfConstraint + 2) += globalPosition * scale;
+	m_newH.reserve(3 * numNodesToConstrain);
+	for (size_t axis = 0; axis < 3; ++axis)
+	{
+		m_newH.setZero();
+		for (size_t index = 0; index < nodeIds.size(); ++index)
+		{
+			if (coordinates[index] != 0.0)
+			{
+				m_newH.insert(3 * nodeIds[index] + axis) = coordinates[index] * (dt * scale);
+			}
+		}
+		mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix() * m_newH.transpose(),
+			indexOfRepresentation, indexOfConstraint + axis + 2);
+	}
 	mlcp->mu[indexOfConstraint] = constraintData.getFrictionCoefficient();
 }
 
@@ -118,7 +149,7 @@ SurgSim::Physics::ConstraintType MassSpringConstraintFrictionalSliding::getConst
 
 size_t MassSpringConstraintFrictionalSliding::doGetNumDof() const
 {
-	return 3;
+	return 5;
 }
 
 }; //  namespace Physics
