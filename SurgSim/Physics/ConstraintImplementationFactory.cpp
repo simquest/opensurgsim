@@ -79,6 +79,7 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 	addImplementation(typeid(MassSpring1DRepresentation), std::make_shared<MassSpringConstraintFrictionalSliding>());
 	addImplementation(typeid(MassSpring2DRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
 	addImplementation(typeid(MassSpring2DRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
+	addImplementation(typeid(MassSpring2DRepresentation), std::make_shared<MassSpringConstraintFrictionalSliding>());
 	addImplementation(typeid(MassSpring3DRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
 	addImplementation(typeid(MassSpring3DRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
 }
