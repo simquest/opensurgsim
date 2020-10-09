@@ -154,6 +154,12 @@ public:
 	/// \return The vector of node ids.
 	const std::vector<size_t>& getNodeIds(size_t index) const;
 
+	/// Save the current MassSpring mesh to a ply file.
+	/// \param fileName Name of the file for writing.
+	/// \param physicsLength The radius or thickness (for 2 or 3-node elements), if not already in the MassSpring.
+	/// \return true if the file was written successfully.
+	bool saveMassSpring(const std::string& fileName, double physicsLength = 0.0) const;
+
 protected:
 	/// Add the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into

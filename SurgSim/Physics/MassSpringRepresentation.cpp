@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Physics/MassSpringRepresentation.h"
+
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
@@ -21,7 +23,6 @@
 #include "SurgSim/Physics/MassSpring.h"
 #include "SurgSim/Physics/Mass.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
-#include "SurgSim/Physics/MassSpringRepresentation.h"
 
 using SurgSim::DataStructures::Location;
 using SurgSim::Math::Vector;
@@ -596,6 +597,11 @@ Math::Vector3d MassSpringRepresentation::computeCartesianCoordinate(const Math::
 const std::vector<size_t>& MassSpringRepresentation::getNodeIds(size_t index) const
 {
 	return m_mesh->getNodeIds(index);
+}
+
+bool MassSpringRepresentation::saveMassSpring(const std::string & fileName, double physicsLength) const
+{
+	return m_mesh->save(fileName, physicsLength);
 }
 
 } // namespace Physics

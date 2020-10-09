@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/Framework/Asset.h"
 #include "SurgSim/Math/OdeState.h"
@@ -73,16 +74,14 @@ public:
 	/// Retrieves the mass of a given node
 	/// \param nodeId The node id for which the mass is requested
 	/// \return the mass attribute of a node
-	/// \note The mass is returned with read/write access
 	/// \note Out of range nodeId will raise an exception
-	std::shared_ptr<Mass> getMass(size_t nodeId);
+	const std::shared_ptr<Mass>& getMass(size_t nodeId) const;
 
 	/// Retrieves a given spring from its id
 	/// \param springId The spring id for which the spring is requested
 	/// \return the spring for the given springId
-	/// \note The spring is returned with read/write access
 	/// \note Out of range springId will raise an exception
-	std::shared_ptr<Spring> getSpring(size_t springId);
+	const std::shared_ptr<Spring>& getSpring(size_t springId) const;
 
 	/// Add boundary condition to mesh
 	/// \param boundaryCondition A vertex id that has a boundary condition
@@ -126,6 +125,22 @@ public:
 	/// \return The number of nodes per element.
 	size_t getNumNodesPerElement() const;
 
+	/// \param The radius to set.
+	void setRadius(double radius);
+	/// \return The radius.
+	const DataStructures::OptionalValue<double>& getRadius() const;
+
+	/// \param The thickness to set.
+	void setThickness(double thickness);
+	/// \return The thickness.
+	const DataStructures::OptionalValue<double>& getThickness() const;
+
+	/// Save the current MassSpring mesh to a ply file.
+	/// \param fileName Name of the file for writing.
+	/// \param physicsLength The radius or thickness (for 2 or 3-node elements), if not already in the MassSpring.
+	/// \return true if the file was written successfully.
+	bool save(const std::string& fileName, double physicsLength = 0.0) const;
+
 protected:
 	bool doLoad(const std::string& filePath) override;
 
@@ -140,6 +155,12 @@ protected:
 
 	/// The node ids for each element, e.g., for triangles it contains the three node ids for each triangle.
 	std::vector<std::vector<size_t>> m_nodeIds;
+
+	/// The radius, if any.
+	DataStructures::OptionalValue<double> m_radius;
+
+	/// The thickness, if any.
+	DataStructures::OptionalValue<double> m_thickness;
 };
 
 } // namespace Physics

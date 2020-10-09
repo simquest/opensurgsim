@@ -88,7 +88,7 @@ protected:
 	/// Callback function to finalize processing of Springs.
 	/// \param elementName Name of the element.
 	void endSprings(const std::string& elementName);
-	
+
 	/// Callback function, begin the processing of boundary conditions.
 	/// \param elementName Name of the element.
 	/// \param boundaryConditionCount Number of boundary conditions.
@@ -98,6 +98,26 @@ protected:
 	/// Callback function to process one boundary condition.
 	/// \param elementName Name of the element.
 	virtual void processBoundaryCondition(const std::string& elementName);
+
+	/// Callback function, begin the processing of radius.
+	/// \param elementName Name of the element.
+	/// \param radiusCount Number of radii.
+	/// \return memory for radius data to the reader.
+	void* beginRadius(const std::string& elementName, size_t radiusCount);
+
+	/// Callback function, end the processing of radius.
+	/// \param elementName Name of the element.
+	void endRadius(const std::string& elementName);
+
+	/// Callback function, begin the processing of thickness.
+	/// \param elementName Name of the element.
+	/// \param thicknessCount Number of radii.
+	/// \return memory for thickness data to the reader.
+	void* beginThickness(const std::string& elementName, size_t thicknessCount);
+
+	/// Callback function, end the processing of thickness.
+	/// \param elementName Name of the element.
+	void endThickness(const std::string& elementName);
 
 protected:
 	/// Mass data containing 3 translational dofs and mass
@@ -135,6 +155,16 @@ protected:
 		double stiffness;
 		double damping;
 	} m_springData;
+
+	/// Flag indicating if the associated file has a radius
+	bool m_hasRadius;
+	/// Radius information, if any.
+	double m_radius;
+
+	/// Flag indicating if the associated file has a thickness
+	bool m_hasThickness;
+	/// Thickness information, if any.
+	double m_thickness;
 
 	/// MassSpring to contain the ply file information
 	std::shared_ptr<MassSpring> m_mesh;

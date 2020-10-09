@@ -16,6 +16,7 @@
 #include "SurgSim/Physics/MassSpringPlyReaderDelegate.h"
 
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/MassSpring.h"
 
@@ -31,7 +32,7 @@ MassSpringPlyReaderDelegate::MassSpringPlyReaderDelegate()
 }
 
 MassSpringPlyReaderDelegate::MassSpringPlyReaderDelegate(std::shared_ptr<MassSpring> mesh):
-	m_mesh(mesh)
+	m_mesh(mesh), m_hasBoundaryConditions(false), m_hasRadius(false), m_hasThickness(false)
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "The mesh cannot be null.";
 	mesh->clear();
@@ -97,6 +98,30 @@ bool MassSpringPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 	}
 
+	if (m_hasRadius)
+	{
+		// Radius Processing
+		reader->requestElement(
+			"radius",
+			std::bind(
+				&MassSpringPlyReaderDelegate::beginRadius, this, std::placeholders::_1, std::placeholders::_2),
+			nullptr,
+			std::bind(&MassSpringPlyReaderDelegate::endRadius, this, std::placeholders::_1));
+		reader->requestScalarProperty("radius", "value", PlyReader::TYPE_DOUBLE, 0);
+	}
+
+	if (m_hasThickness)
+	{
+		// Thickness Processing
+		reader->requestElement(
+			"thickness",
+			std::bind(
+				&MassSpringPlyReaderDelegate::beginThickness, this, std::placeholders::_1, std::placeholders::_2),
+			nullptr,
+			std::bind(&MassSpringPlyReaderDelegate::endThickness, this, std::placeholders::_1));
+		reader->requestScalarProperty("thickness", "value", PlyReader::TYPE_DOUBLE, 0);
+	}
+
 	reader->setEndParseFileCallback(std::bind(&MassSpringPlyReaderDelegate::endParseFile, this));
 
 	return true;
@@ -128,6 +153,8 @@ bool MassSpringPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 		!reader.isScalar("spring", "vertex_indices") && reader.hasProperty("spring", "stiffness") &&
 		reader.hasProperty("spring", "damping");
 	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
+	m_hasRadius = reader.hasProperty("radius", "value");
+	m_hasThickness = reader.hasProperty("thickness", "value");
 
 	return result;
 }
@@ -218,6 +245,28 @@ void* MassSpringPlyReaderDelegate::beginBoundaryConditions(const std::string& el
 void MassSpringPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
 	m_mesh->addBoundaryCondition(static_cast<size_t>(m_boundaryConditionData));
+}
+
+void* MassSpringPlyReaderDelegate::beginRadius(const std::string& elementName, size_t radiusCount)
+{
+	return &m_radius;
+}
+
+void MassSpringPlyReaderDelegate::endRadius(const std::string& elementName)
+{
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_radius)) << "No radius information processed.";
+	m_mesh->setRadius(m_radius);
+}
+
+void* MassSpringPlyReaderDelegate::beginThickness(const std::string& elementName, size_t thicknessCount)
+{
+	return &m_thickness;
+}
+
+void MassSpringPlyReaderDelegate::endThickness(const std::string& elementName)
+{
+	SURGSIM_ASSERT(SurgSim::Math::isValid(m_thickness)) << "No thickness information processed.";
+	m_mesh->setThickness(m_thickness);
 }
 
 void MassSpringPlyReaderDelegate::endParseFile()

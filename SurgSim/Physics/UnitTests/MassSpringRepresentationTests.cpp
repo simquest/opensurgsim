@@ -529,7 +529,7 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndDampingTest)
 	}
 }
 
-TEST_F(MassSpringRepresentationTests, LoadTest)
+TEST_F(MassSpringRepresentationTests, LoadSaveTest)
 {
 	auto rep = std::make_shared<MassSpringRepresentation>("rep");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
@@ -554,4 +554,8 @@ TEST_F(MassSpringRepresentationTests, LoadTest)
 
 	// Boundary conditions
 	ASSERT_EQ(10u * rep->getNumDofPerNode(), state->getBoundaryConditions().size());
+
+	
+	std::string fileName = "./MassSpring1D-copy.ply";
+	EXPECT_TRUE(rep->saveMassSpring(fileName));
 }
