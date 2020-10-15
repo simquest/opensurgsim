@@ -18,6 +18,7 @@
 
 #include <array>
 #include <memory>
+#include <string>
 
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
 
