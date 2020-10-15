@@ -232,10 +232,10 @@ protected:
 	}
 
 	// Cube size
-	double m_cubeSize;
+	double m_cubeSize = std::numeric_limits<double>::signaling_NaN();
 
 	// Segment radius
-	double m_segmentRadius;
+	double m_segmentRadius = std::numeric_limits<double>::signaling_NaN();
 
 private:
 	// List of random transformations and a string to identify it.

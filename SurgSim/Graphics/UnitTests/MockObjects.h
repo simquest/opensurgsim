@@ -36,7 +36,7 @@ class MockGroup : public SurgSim::Graphics::Group
 public:
 	/// Constructor. The group is initially empty.
 	/// \param	name	Name of the group
-	explicit MockGroup(const std::string& name) : SurgSim::Graphics::Group(name)
+	explicit MockGroup(const std::string& name) : SurgSim::Graphics::Group(name), m_isVisible(false)
 	{
 	}
 

@@ -134,6 +134,7 @@ struct GlutImage : GlutRenderObject
 	/// \param bounds The bounds, in window coordinates ([-1..1], [-1..1]), to draw the image.
 	explicit GlutImage(const Eigen::AlignedBox<double, 2>& bounds) :
 		m_bounds(bounds),
+		m_texture(0),
 		m_firstRun(true)
 	{
 	}

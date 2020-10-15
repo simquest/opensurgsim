@@ -118,9 +118,11 @@ public:
 class MockDeformableLocalization : public SurgSim::Physics::Localization
 {
 public:
-	MockDeformableLocalization(){}
+	MockDeformableLocalization(): m_nodeID(0)
+	{
+	}
 
-	explicit MockDeformableLocalization(std::shared_ptr<Representation> representation) : Localization()
+	explicit MockDeformableLocalization(std::shared_ptr<Representation> representation) : Localization(), m_nodeID(0)
 	{
 		setRepresentation(representation);
 	}

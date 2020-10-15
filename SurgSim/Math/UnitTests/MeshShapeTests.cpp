@@ -87,13 +87,12 @@ class MeshShapeTest : public ::testing::Test
 public:
 	void SetUp()
 	{
-		m_numIterations = 100;
 		m_runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		srand((unsigned int)time(nullptr));
 	}
 
 	/// Number of iterations to test
-	int m_numIterations;
+	int m_numIterations = 100;
 	std::shared_ptr<SurgSim::Framework::Runtime> m_runtime;
 };
 
