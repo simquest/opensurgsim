@@ -79,9 +79,14 @@ const Math::Vector3d& SlidingConstraintData::getTangent() const
 	return m_tangent;
 }
 
-const double SlidingConstraintData::getDistanceTangent() const
+void SlidingConstraintData::setPreviousFirstLocalization(std::shared_ptr<Localization> loc)
 {
-	return m_distanceTangent;
+	m_previousFirstLocalization = loc;
+}
+
+std::shared_ptr<Localization> SlidingConstraintData::getPreviousFirstLocalization() const
+{
+	return m_previousFirstLocalization;
 }
 
 } // namespace Physics

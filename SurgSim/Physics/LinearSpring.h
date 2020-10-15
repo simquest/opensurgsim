@@ -20,9 +20,13 @@
 
 namespace SurgSim
 {
-
+namespace Math
+{
+class OdeState;
+}
 namespace Physics
 {
+class MassSpringModel;
 
 /// Linear spring connecting 2 nodes with a viscous term
 class LinearSpring : public Spring
@@ -31,6 +35,20 @@ public:
 	/// Constructor
 	/// \param nodeId0, nodeId1 The node ids on which the spring is attached
 	LinearSpring(size_t nodeId0, size_t nodeId1);
+
+	/// Constructor
+	/// \param state The state to initialize the spring with (rest length calculation)
+	/// \param nodeId0, nodeId1 Node ids of the 2 connected masses
+	/// \param stiffness, damping The spring parameters
+	explicit LinearSpring(const std::shared_ptr<Math::OdeState> state, size_t nodeId0, size_t nodeId1, double stiffness,
+		double damping);
+
+	/// Constructor
+	/// \param massSpring The MassSpringModel to initialize the spring's rest length with.
+	/// \param nodeId0, nodeId1 Node ids of the 2 connected masses
+	/// \param stiffness, damping The spring parameters
+	explicit LinearSpring(const std::shared_ptr<MassSpringModel> massSpring, size_t nodeId0, size_t nodeId1,
+		double stiffness, double damping);
 
 	void initialize(const SurgSim::Math::OdeState& state) override;
 

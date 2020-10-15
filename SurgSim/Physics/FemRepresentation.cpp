@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
-#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
@@ -24,7 +23,6 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/FemElement.h"
-#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 using SurgSim::Math::Matrix;

@@ -114,7 +114,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		*convergenceCriteria = *initialConvergenceCriteria;
 		return true;
 	}
-
+	
 	do
 	{
 		doOneIteration(problemSize, A, b, &initialGuessAndSolution, problem.mu, constraintsType,
@@ -268,7 +268,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(size_t problemSize, con
 				constraintConvergenceCriteria[constraintsType[constraint]] += criteria;
 
 				++nbNonContactConstraints;
-				currentAtomicIndex += 3;
+				currentAtomicIndex += 5;
 				break;
 			}
 
@@ -624,23 +624,20 @@ void MlcpGaussSeidelSolver::doOneIteration(size_t problemSize, const MlcpProblem
 					(*initialGuessAndSolution).segment<2>(currentAtomicIndex);
 				Fn -= m_rhsEnforcedLocalSystem.segment<2>(m_numEnforcedAtomicConstraints - 2);
 
+				const double maxFriction = frictionCoefs[currentAtomicIndex] * Fn.norm();
+				currentAtomicIndex += 2;
 				// No Signorini to verify here, it is NOT a unilateral constraint, but bilateral
+				auto Ft = (*initialGuessAndSolution).segment<3>(currentAtomicIndex);
+				Ft -= A.block<3, 3>(currentAtomicIndex, currentAtomicIndex).inverse() *
+					(b.segment<3>(currentAtomicIndex) +
+						A.block(currentAtomicIndex, 0, 3, problemSize) * (*initialGuessAndSolution));
+				const double ftNorm = Ft.norm();
+				if (ftNorm > maxFriction)
 				{
-					// Complete the violation of the friction along t, with the missing terms...
-					double& Ft = (*initialGuessAndSolution)[currentAtomicIndex + 2];
-					Ft -= (b[currentAtomicIndex + 2] + A.row(currentAtomicIndex + 2) * (*initialGuessAndSolution)) /
-						  A(currentAtomicIndex + 2, currentAtomicIndex + 2);
-
-					const double maxFriction = frictionCoefs[currentAtomicIndex] * Fn.norm();
-					const double ftNorm = fabs(Ft);
-					if (ftNorm > maxFriction)
-					{
-						// Here, the Friction is too strong, we keep the direction, but modulate its length
-						// to verify the Coulomb's law: |Ft| = mu |Fn|
-						Ft *= maxFriction / ftNorm;
-					}
+					// Here, the Friction is too strong, we keep the direction, but modulate its length
+					// to verify the Coulomb's law: |Ft| = mu |Fn|
+					Ft *= maxFriction / ftNorm;
 				}
-
 				currentAtomicIndex += 3;
 				break;
 			}
@@ -770,17 +767,17 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(size_t problemSize,
 
 			case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 			{
-				Vector3d violation = b.segment<3>(currentAtomicIndex) +
-									 A.block(currentAtomicIndex, 0, 3, problemSize) * initialGuessAndSolution;
+				Math::Vector violation = b.segment<5>(currentAtomicIndex) +
+					A.block(currentAtomicIndex, 0, 5, problemSize) * initialGuessAndSolution;
 				SURGSIM_LOG_INFO(m_logger) << "Constraint [" << constraint << "] of type " <<
 										   getMlcpConstraintTypeName(constraintsType[constraint]) <<
 										   std::endl << "\t with initial violation b=(" <<
-										   b.segment<3>(currentAtomicIndex).transpose() << ") " <<
+										   b.segment<5>(currentAtomicIndex).transpose() << ") " <<
 										   std::endl << "\t with final   violation b-Ax=(" <<
 										   violation.transpose() << ")" << std::endl <<
 										   "\t force=(" <<
-										   initialGuessAndSolution.segment<3>(currentAtomicIndex).transpose() << ")";
-				currentAtomicIndex += 3;
+										   initialGuessAndSolution.segment<5>(currentAtomicIndex).transpose() << ")";
+				currentAtomicIndex += 5;
 				break;
 			}
 

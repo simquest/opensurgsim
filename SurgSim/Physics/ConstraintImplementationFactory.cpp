@@ -32,6 +32,7 @@
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/MassSpringConstraintFixedPoint.h"
 #include "SurgSim/Physics/MassSpringConstraintFrictionlessContact.h"
+#include "SurgSim/Physics/MassSpringConstraintFrictionalSliding.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/RigidConstraintFixedPoint.h"
 #include "SurgSim/Physics/RigidConstraintFixedRotationVector.h"
@@ -72,10 +73,13 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 
 	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
 	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
+	addImplementation(typeid(MassSpringRepresentation), std::make_shared<MassSpringConstraintFrictionalSliding>());
 	addImplementation(typeid(MassSpring1DRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
 	addImplementation(typeid(MassSpring1DRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
+	addImplementation(typeid(MassSpring1DRepresentation), std::make_shared<MassSpringConstraintFrictionalSliding>());
 	addImplementation(typeid(MassSpring2DRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
 	addImplementation(typeid(MassSpring2DRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
+	addImplementation(typeid(MassSpring2DRepresentation), std::make_shared<MassSpringConstraintFrictionalSliding>());
 	addImplementation(typeid(MassSpring3DRepresentation), std::make_shared<MassSpringConstraintFrictionlessContact>());
 	addImplementation(typeid(MassSpring3DRepresentation), std::make_shared<MassSpringConstraintFixedPoint>());
 }

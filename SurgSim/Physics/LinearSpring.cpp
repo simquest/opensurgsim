@@ -18,6 +18,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
@@ -37,6 +38,26 @@ LinearSpring::LinearSpring(size_t nodeId0, size_t nodeId1) :
 {
 	m_nodeIds.push_back(nodeId0);
 	m_nodeIds.push_back(nodeId1);
+}
+
+LinearSpring::LinearSpring(const std::shared_ptr<Math::OdeState> state, size_t nodeId0, size_t nodeId1,
+	double stiffness, double damping) :
+	Spring(), m_stiffness(stiffness), m_damping(damping)
+{
+	m_nodeIds.push_back(nodeId0);
+	m_nodeIds.push_back(nodeId1);
+	const Math::Vector3d& A = Math::getSubVector(state->getPositions(), nodeId0, 3);
+	const Math::Vector3d& B = Math::getSubVector(state->getPositions(), nodeId1, 3);
+	setRestLength((B - A).norm());
+}
+
+LinearSpring::LinearSpring(const std::shared_ptr<MassSpringModel> massSpring, size_t nodeId0, size_t nodeId1,
+	double stiffness, double damping) :
+	Spring(), m_stiffness(stiffness), m_damping(damping)
+{
+	m_nodeIds.push_back(nodeId0);
+	m_nodeIds.push_back(nodeId1);
+	setRestLength((massSpring->getVertexPosition(nodeId1) - massSpring->getVertexPosition(nodeId0)).norm());
 }
 
 void LinearSpring::initialize(const OdeState& state)

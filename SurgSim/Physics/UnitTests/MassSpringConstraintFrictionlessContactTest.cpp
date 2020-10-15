@@ -151,45 +151,22 @@ TEST_F(MassSpringConstraintFrictionlessContactTest, BuildMlcpTest)
 	// defined the plane to intersect with p(0).  The constraint is
 	//      U(t) = n^t.p(t) >= 0
 	// U(1) = n^t.p(1)
-	const Vector3d newPosition = m_extremities[0] - Vector3d::UnitY() * 9.81 * dt * dt;
+	double mlcpNumericalPrecision = 1.0e-04; // The frictionless contact constraint does not move them out of contact.
+	const Vector3d newPosition = m_extremities[0] - Vector3d::UnitY() * 9.81 * dt * dt - m_n * mlcpNumericalPrecision;
 	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[0], epsilon);
 
-	// By definition, H = dU/dp.
-	//
-	// dU/dt = (dU/dp).(dp/dt)
-	//       = H.(dp/dt)
-	//
-	// dp = p(1) - p(0)
-	// => dp/dt = (p(1) - p(0)) / dt
-	//
-	// dU/dt = (U(1) - U(0)) / dt      [Note U(0) = 0]
-	//       = n^t.(p(1) - p(0)) / dt
-	//       = n^t.(dp/dt)
-	// => H = n^t
 	SurgSim::Math::Matrix h = mlcpPhysicsProblem.H;
-	EXPECT_NEAR(m_n[0], h(0, 0), epsilon);
-	EXPECT_NEAR(m_n[1], h(0, 1), epsilon);
-	EXPECT_NEAR(m_n[2], h(0, 2), epsilon);
+	EXPECT_NEAR(m_n[0] * dt, h(0, 0), epsilon);
+	EXPECT_NEAR(m_n[1] * dt, h(0, 1), epsilon);
+	EXPECT_NEAR(m_n[2] * dt, h(0, 2), epsilon);
 
-	// We define C as the matrix which transforms F -> v (which differs from treatments which define it as F -> p)
-	// v(1) = v(0) + a(0)*dt
-	//      = v(0) + 1/m*F(0)*dt
-	// => (v(1) - v(0)) = [dt/m] * F(0)
-	//
-	// Therefore C = dt/m
-	//
-	// We can directly calculate
-	// CHt = C * H^t
-	//     = (dt/m) * (nx, ny, nz)
-	EXPECT_NEAR(dt / m_massPerNode * m_n[0], mlcpPhysicsProblem.CHt(0, 0), epsilon);
-	EXPECT_NEAR(dt / m_massPerNode * m_n[1], mlcpPhysicsProblem.CHt(1, 0), epsilon);
-	EXPECT_NEAR(dt / m_massPerNode * m_n[2], mlcpPhysicsProblem.CHt(2, 0), epsilon);
+	EXPECT_NEAR(dt * dt / m_massPerNode * m_n[0], mlcpPhysicsProblem.CHt(0, 0), epsilon);
+	EXPECT_NEAR(dt * dt / m_massPerNode * m_n[1], mlcpPhysicsProblem.CHt(1, 0), epsilon);
+	EXPECT_NEAR(dt * dt / m_massPerNode * m_n[2], mlcpPhysicsProblem.CHt(2, 0), epsilon);
 
-	// And finally,
-	// HCHt = [nx ny nz] * (dt/m) * (nx, ny, nz)
-	//      = (dt/m) * (nx*nx + ny*ny + nz*nz)
 	double calculatedA = mlcpPhysicsProblem.A.block<1, 1>(0, 0)[0]; // VS intellisense error workaround
-	EXPECT_NEAR(dt / m_massPerNode * (m_n[0] * m_n[0] + m_n[1] * m_n[1] + m_n[2] * m_n[2]), calculatedA, epsilon);
+	EXPECT_NEAR(dt * dt * dt / m_massPerNode * (m_n[0] * m_n[0] + m_n[1] * m_n[1] + m_n[2] * m_n[2]), calculatedA,
+		epsilon);
 
 	// ConstraintTypes should contain 0 entry as it is setup by the constraint and not the ConstraintImplementation
 	// This way, the constraint can verify that both ConstraintImplementation are the same type
@@ -243,28 +220,31 @@ TEST_F(MassSpringConstraintFrictionlessContactTest, BuildMlcpIndiciesTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
+	double mlcpNumericalPrecision = 1.0e-04; // The frictionless contact constraint does not move them out of contact.
+
 	// b -> E -> [#constraints, 1]
-	const Vector3d newPosition = m_extremities[1] - Vector3d::UnitY() * 9.81 * dt * dt;
+	const Vector3d newPosition = m_extremities[1] - Vector3d::UnitY() * 9.81 * dt * dt - m_n * mlcpNumericalPrecision;
 	EXPECT_NEAR(newPosition.dot(m_n), mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
 
 	// H -> [#constraints, #dof]
 	SurgSim::Math::Matrix h = mlcpPhysicsProblem.H;
-	EXPECT_NEAR(m_n[0], h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 0), epsilon);
-	EXPECT_NEAR(m_n[1], h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 1), epsilon);
-	EXPECT_NEAR(m_n[2], h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 2), epsilon);
+	EXPECT_NEAR(m_n[0] * dt, h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 0), epsilon);
+	EXPECT_NEAR(m_n[1] * dt, h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 1), epsilon);
+	EXPECT_NEAR(m_n[2] * dt, h(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 2), epsilon);
 
 	// C -> [#dof, #dof]
 	// CHt -> [#dof, #constraints]
-	EXPECT_NEAR(dt / m_massPerNode * m_n[0],
+	EXPECT_NEAR(dt * dt / m_massPerNode * m_n[0],
 				mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 0, indexOfConstraint), epsilon);
-	EXPECT_NEAR(dt / m_massPerNode * m_n[1],
+	EXPECT_NEAR(dt * dt / m_massPerNode * m_n[1],
 				mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 1, indexOfConstraint), epsilon);
-	EXPECT_NEAR(dt / m_massPerNode * m_n[2],
+	EXPECT_NEAR(dt * dt / m_massPerNode * m_n[2],
 				mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 2, indexOfConstraint), epsilon);
 
 	// A -> HCHt -> [#constraints, #constraints]
 	double calculatedA = mlcpPhysicsProblem.A.block<1, 1>(indexOfConstraint, indexOfConstraint)[0];
-	EXPECT_NEAR(dt / m_massPerNode * (m_n[0] * m_n[0] + m_n[1] * m_n[1] + m_n[2] * m_n[2]), calculatedA, epsilon);
+	EXPECT_NEAR(dt * dt * dt / m_massPerNode * (m_n[0] * m_n[0] + m_n[1] * m_n[1] + m_n[2] * m_n[2]), calculatedA,
+		epsilon);
 }
 
 };  //  namespace Physics

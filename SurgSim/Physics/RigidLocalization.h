@@ -54,6 +54,8 @@ public:
 	/// \return	true if valid representation, false if not.
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
 
+	std::shared_ptr<Localization> doCopy() const override;
+
 private:
 	/// Calculates the global position of this localization.
 	/// \param time The time in [0..1] at which the position should be calculated.

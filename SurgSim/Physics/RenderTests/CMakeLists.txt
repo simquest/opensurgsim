@@ -31,6 +31,7 @@ set(UNIT_TEST_SOURCES
 	RenderTestFem3D.cpp
 	RenderTestFem3DCorotational.cpp
 	RenderTestMassSprings.cpp
+	RenderTestMassSpringFrictionalSliding.cpp
 	RenderTestRigidBodies.cpp
 )
 

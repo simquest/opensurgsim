@@ -43,18 +43,36 @@ void MassSpringConstraintFixedPoint::doBuild(double dt,
 										size_t indexOfConstraint,
 										ConstraintSideSign sign)
 {
-	std::shared_ptr<MassSpringRepresentation> massSpring
-		= std::static_pointer_cast<MassSpringRepresentation>(localization->getRepresentation());
+	auto massSpring = std::static_pointer_cast<MassSpringRepresentation>(localization->getRepresentation());
 
 	if (!massSpring->isActive())
 	{
 		return;
 	}
-
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
-	size_t nodeId = std::static_pointer_cast<MassSpringLocalization>(localization)->getLocalNode();
+	size_t numNodesToConstrain = 1;
+	std::vector<size_t> nodeIds;
+	Math::Vector coordinates;
 
-	Vector3d globalPosition = localization->calculatePosition();
+	auto typedLocalization = std::static_pointer_cast<MassSpringLocalization>(localization);
+	if (typedLocalization->getLocalNode().hasValue())
+	{
+		nodeIds.push_back(typedLocalization->getLocalNode().getValue());
+		coordinates.resize(1);
+		coordinates << 1.0;
+	}
+	else if (typedLocalization->getLocalPosition().hasValue())
+	{
+		const auto& coord = typedLocalization->getLocalPosition().getValue();
+		nodeIds = massSpring->getNodeIds(coord.index);
+		numNodesToConstrain = (coord.coordinate.array() != 0.0).count();
+		coordinates = coord.coordinate;
+	}
+	else
+	{
+		SURGSIM_FAILURE() <<
+			"MassSpringConstraintFixedPoint requires a localization with either a node or a local position.";
+	}
 
 	// Fixed point constraint in MCLP
 	//   n the number of dof in the Mass-Spring
@@ -82,23 +100,32 @@ void MassSpringConstraintFixedPoint::doBuild(double dt,
 	// (H 0  ) (-lambda)   (initial constraint violation)
 	//
 	// H = dC/dv
-	// The matrix H is of size 3xn (3 equations to fix each axis X-Y-Z relating to the n dof of the model)
-	// The constraint only involves the velocity of a single node (the constrained node), so the matrix H
+	// The matrix H is of size 3xn (3 equations to fix each axis X-Y-Z relating to the n dof of the model).
+	// If the localization contains a node, then:
+	// the constraint only involves the velocity of a single node (the constrained node), so the matrix H
 	// is full of zero except for a 3x3 part corresponding to the constrained node for which we have:
 	// dC/du' = du/du' = dt.Id(3x3)
+	// If the localization contains a local coordinate, each of the element's nodes are involved.
 
 	// Update b with new violation: P(free motion)
+	Vector3d globalPosition = localization->calculatePosition();
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
 
 	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
 	m_newH.resize(massSpring->getNumDof());
 	// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
-	m_newH.reserve(3);
+	m_newH.reserve(3 * numNodesToConstrain);
 
-	for (size_t axis = 0; axis < 3; axis++)
+	for (size_t axis = 0; axis < 3; ++axis)
 	{
 		m_newH.setZero();
-		m_newH.insert(3 * nodeId + axis) = dt * scale;
+		for (size_t index = 0; index < nodeIds.size(); ++index)
+		{
+			if (coordinates[index] != 0.0)
+			{
+				m_newH.insert(3 * nodeIds[index] + axis) = coordinates[index] * (dt * scale);
+			}
+		}
 		mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix() * m_newH.transpose(),
 			indexOfRepresentation, indexOfConstraint + axis);
 	}

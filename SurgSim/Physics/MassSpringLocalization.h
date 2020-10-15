@@ -16,14 +16,15 @@
 #ifndef SURGSIM_PHYSICS_MASSSPRINGLOCALIZATION_H
 #define SURGSIM_PHYSICS_MASSSPRINGLOCALIZATION_H
 
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/MassSpringRepresentation.h"
 
 namespace SurgSim
 {
-
 namespace Physics
 {
+class MassSpringRepresentation;
 
 /// Implementation of Localization for MassSpringRepresentation
 ///
@@ -33,8 +34,9 @@ namespace Physics
 /// contact.
 ///
 /// MassSpringLocalization stores a pointer to a MassSpringRepresentation in an abstract Representation
-/// object.  It tracks the ID of a node contained within the associated MassSpringRepresentation, and it provides a
-/// helper function MassSpringLocalization::calculatePosition to find the node's position in global
+/// object.  It tracks either the ID of a node contained within the associated MassSpringRepresentation, or the
+/// barycentric coordinates of an element (1D, 2D, or 3D) in that MassSpringRepresentation, and it provides a
+/// helper function MassSpringLocalization::calculatePosition to find the position in global
 /// coordinates in the current state.
 class MassSpringLocalization: public Localization
 {
@@ -55,12 +57,24 @@ public:
 
 	/// Gets the local node.
 	/// \return Node set for this localization.
-	const size_t& getLocalNode() const;
+	const DataStructures::OptionalValue<size_t>& getLocalNode() const;
+
+	/// Sets the local position.
+	/// \param localPosition The local position to set the localization at.
+	void setLocalPosition(const SurgSim::DataStructures::IndexedLocalCoordinate& localPosition);
+
+	/// Gets the local position.
+	/// \return The local position set for this localization.
+	const DataStructures::OptionalValue<SurgSim::DataStructures::IndexedLocalCoordinate>& getLocalPosition() const;
 
 	/// Queries whether Representation can be assigned to this class.
 	/// \param representation Representation to check.
 	/// \return	true if Representation is valid.
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
+
+	bool moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd) override;
+
+	std::shared_ptr<Localization> doCopy() const override;
 
 private:
 	/// Calculates the global position of this localization.
@@ -73,7 +87,9 @@ private:
 	SurgSim::Math::Vector3d doCalculateVelocity(double time) const override;
 
 	/// Node defining the localization.
-	size_t m_nodeID;
+	DataStructures::OptionalValue<size_t> m_nodeID;
+	/// Barycentric position in local coordinates
+	DataStructures::OptionalValue<DataStructures::IndexedLocalCoordinate> m_position;
 };
 
 };  // namespace Physics

@@ -84,6 +84,9 @@ public:
 	/// \return Whether the localization was moved or not.
 	virtual bool moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd);
 
+	/// \return A copy.
+	std::shared_ptr<Localization> copy() const;
+
 private:
 	/// Calculates the global position of this localization
 	/// \param time The time in [0..1] at which the position should be calculated
@@ -96,6 +99,9 @@ private:
 	/// \return The global velocity of the localization at the requested time
 	/// \note time can useful when dealing with CCD
 	virtual SurgSim::Math::Vector3d doCalculateVelocity(double time) const = 0;
+
+	/// \return A copy.
+	virtual std::shared_ptr<Localization> doCopy() const = 0;
 
 	/// The representation on which the localization is defined
 	std::shared_ptr<Representation> m_representation;

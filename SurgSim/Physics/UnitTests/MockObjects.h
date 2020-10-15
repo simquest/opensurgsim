@@ -33,6 +33,7 @@
 #include "SurgSim/Physics/Fem3DCorotationalTetrahedronRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/LinearSpring.h"
@@ -174,6 +175,14 @@ private:
 		const SurgSim::Math::Vector3d& previousVelocity = defRepresentation->getPreviousState()->getVelocity(m_nodeID);
 
 		return SurgSim::Math::interpolate(previousVelocity, currentVelocity, time);
+	}
+
+
+	std::shared_ptr<Localization> doCopy() const override
+	{
+		auto localization = std::make_shared<MockDeformableLocalization>(getRepresentation());
+		localization->setLocalNode(getLocalNode());
+		return localization;
 	}
 
 	size_t m_nodeID;
@@ -416,6 +425,8 @@ private:
 	SurgSim::Math::Vector3d doCalculatePosition(double time) const override;
 
 	SurgSim::Math::Vector3d doCalculateVelocity(double time) const override;
+
+	std::shared_ptr<Localization> doCopy() const override;
 };
 
 class MockConstraintImplementation : public ConstraintImplementation

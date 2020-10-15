@@ -23,6 +23,7 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/Mass.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::LinearSpring;
