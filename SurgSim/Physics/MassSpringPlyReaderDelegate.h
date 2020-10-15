@@ -32,6 +32,39 @@ class MassSpring;
 /// In order for the same ply file to load with TriangleMeshPlyReaderDelegate
 /// (e.g., to create the graphics for a SegmentMesh or to match the shape in a CollisionRep),
 /// there must be elements named (for example) 1d_element, that have appropriate vertex_indices.
+/// See MassSpringRepresentation::saveMassSpring() or MassSpring::saveMassSpring() to create a valid ply file.
+///
+/// Example file that can also be loaded into a SegmentMesh; the third spring resists bending about the middle vertex:
+/// ply
+/// format ascii 1.0
+/// element vertex 3
+/// property double x
+/// property double y
+/// property double z
+/// property double mass
+/// element 1d_element 2
+/// property list uint uint vertex_indices
+/// element spring 3
+/// property list uint uint vertex_indices
+/// property double stiffness
+/// property double damping
+/// element boundary_condition 0
+/// property uint vertex_index
+/// element radius 1
+/// property double value
+/// end_header
+/// -0.02 -0.04 -0.001 0.001
+/// -0.01 -0.03 -0.00075 0.002
+/// 0.0 0.0 0.0 0.002
+/// 2 0 1
+/// 2 1 2
+/// 2 0 1 5 10
+/// 2 1 2 5 10
+/// 2 0 2 3 10
+/// 0.001
+///
+/// This PlyReaderDelegate can load 1d_element, 2d_element, or 3d_element, passing the vectors of nodes to
+/// the MassSpring. Similarly, it can load radius or thickness.
 class MassSpringPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
@@ -137,7 +170,16 @@ protected:
 	/// Internal data to receive the "boundary_condition" element
 	unsigned int m_boundaryConditionData;
 
-	/// Internal data to receive the spring (stretching and bending) data
+	/// Flag indicating if the associated file has 1d elements
+	bool m_has1dElement = false;
+	
+	/// Flag indicating if the associated file has 2d elements
+	bool m_has2dElement = false;
+
+	/// Flag indicating if the associated file has 3d elements
+	bool m_has3dElement = false;
+
+	/// Internal data to receive the element (nodeId) data
 	struct ElementData
 	{
 		int64_t overrun1; ///< Used to check for buffer overruns

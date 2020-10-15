@@ -135,7 +135,7 @@ public:
 	/// \return The thickness.
 	const DataStructures::OptionalValue<double>& getThickness() const;
 
-	/// Save the current MassSpring mesh to a ply file.
+	/// Save the current MassSpring mesh to a ply file. See MassSpringPlyReaderDelegate for the file structure.
 	/// \param fileName Name of the file for writing.
 	/// \param physicsLength The radius or thickness (for 2 or 3-node elements), if not already in the MassSpring.
 	/// \return true if the file was written successfully.

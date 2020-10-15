@@ -164,19 +164,19 @@ bool MassSpring::save(const std::string& fileName, double physicsLength) const
 			else if (getNumNodesPerElement() == 3)
 			{
 				out << "element 2d_element " << getNumElements() << std::endl;
-				out << "property list uint uint uint vertex_indices" << std::endl;
+				out << "property list uint uint vertex_indices" << std::endl;
 				out << "element thickness 1" << std::endl;
 				out << "property double value" << std::endl;
 			}
 			else if (getNumNodesPerElement() == 4)
 			{
 				out << "element 3d_element " << getNumElements() << std::endl;
-				out << "property list uint uint uint uint vertex_indices" << std::endl;
+				out << "property list uint uint vertex_indices" << std::endl;
 			}
 			else if (getNumNodesPerElement() == 8)
 			{
 				out << "element 3d_element " << getNumElements() << std::endl;
-				out << "property list uint uint uint uint uint uint uint uint vertex_indices" << std::endl;
+				out << "property list uint uint vertex_indices" << std::endl;
 			}
 		}
 		bool hasLinearSprings = (getNumSprings() > 0) &&

@@ -51,20 +51,32 @@ bool MassSpringPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(MassData, z));
 	reader->requestScalarProperty("vertex", "mass", PlyReader::TYPE_DOUBLE, offsetof(MassData, mass));
 
-	reader->requestElement("1d_element",
-		std::bind(&MassSpringPlyReaderDelegate::beginElements,
-			this,
-			std::placeholders::_1,
-			std::placeholders::_2),
-		std::bind(&MassSpringPlyReaderDelegate::processElement, this, std::placeholders::_1),
-		std::bind(&MassSpringPlyReaderDelegate::endElements, this, std::placeholders::_1));
+	if (m_has1dElement || m_has2dElement || m_has3dElement)
+	{
+		std::string elementName = "1d_element";
+		if (m_has2dElement)
+		{
+			elementName = "2d_element";
+		}
+		else if (m_has3dElement)
+		{
+			elementName = "3d_element";
+		}
+		reader->requestElement(elementName,
+			std::bind(&MassSpringPlyReaderDelegate::beginElements,
+				this,
+				std::placeholders::_1,
+				std::placeholders::_2),
+			std::bind(&MassSpringPlyReaderDelegate::processElement, this, std::placeholders::_1),
+			std::bind(&MassSpringPlyReaderDelegate::endElements, this, std::placeholders::_1));
 
-	reader->requestListProperty("1d_element",
-		"vertex_indices",
-		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(ElementData, indices),
-		PlyReader::TYPE_UNSIGNED_INT,
-		offsetof(ElementData, nodeCount));
+		reader->requestListProperty(elementName,
+			"vertex_indices",
+			PlyReader::TYPE_UNSIGNED_INT,
+			offsetof(ElementData, indices),
+			PlyReader::TYPE_UNSIGNED_INT,
+			offsetof(ElementData, nodeCount));
+	}
 
 	reader->requestElement("spring",
 		std::bind(&MassSpringPlyReaderDelegate::beginSprings,
@@ -136,17 +148,19 @@ bool MassSpringPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 	result = result && reader.hasProperty("vertex", "mass");
-
+	
 	// The file can have at most one of the three types of elements, though they are treated equivalently.
-	result = result && ((!reader.hasElement("1d_element") && !reader.hasElement("2d_element")) ||
-		(!reader.hasElement("1d_element") && !reader.hasElement("3d_element")) ||
-		(!reader.hasElement("2d_element") && !reader.hasElement("3d_element")));
+	m_has1dElement = reader.hasElement("1d_element");
+	m_has2dElement = reader.hasElement("2d_element"); 
+	m_has3dElement = reader.hasElement("3d_element"); 
+	result = result && ((!m_has1dElement && !m_has2dElement) ||	(!m_has1dElement && !m_has3dElement) ||
+		(!m_has2dElement && !m_has3dElement));
 
-	result = result && (!reader.hasElement("1d_element")) ||
+	result = result && (!m_has1dElement) ||
 		(reader.hasProperty("1d_element", "vertex_indices") && !reader.isScalar("1d_element", "vertex_indices"));
-	result = result && (!reader.hasElement("2d_element")) ||
+	result = result && (!m_has2dElement) ||
 		(reader.hasProperty("2d_element", "vertex_indices") && !reader.isScalar("2d_element", "vertex_indices"));
-	result = result && (!reader.hasElement("3d_element")) ||
+	result = result && (!m_has3dElement) ||
 		(reader.hasProperty("3d_element", "vertex_indices") && !reader.isScalar("3d_element", "vertex_indices"));
 
 	result = result && reader.hasElement("spring") && reader.hasProperty("spring", "vertex_indices") &&

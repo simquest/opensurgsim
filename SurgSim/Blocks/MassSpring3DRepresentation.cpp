@@ -46,7 +46,8 @@ void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<P
 				for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + colOffset, stiffness, damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + colOffset, stiffness,
+						damping));
 				}
 			}
 		}
@@ -58,7 +59,8 @@ void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<P
 				for (size_t row = 0; row < numNodesPerDim[1] - 1; row++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + rowOffset, stiffness, damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + rowOffset, stiffness,
+						damping));
 				}
 			}
 		}
@@ -70,7 +72,8 @@ void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<P
 				for (size_t depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + depthOffset, stiffness, damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + depthOffset, stiffness,
+						damping));
 				}
 			}
 		}
@@ -95,7 +98,8 @@ void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Phys
 				for (size_t col = 0; col < numNodesPerDim[0] - 2; col++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + 2 * colOffset, stiffness, damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + 2 * colOffset, stiffness,
+						damping));
 				}
 			}
 		}
@@ -107,7 +111,8 @@ void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Phys
 				for (size_t row = 0; row < numNodesPerDim[1] - 2; row++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + 2 * rowOffset, stiffness, damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + 2 * rowOffset, stiffness,
+						damping));
 				}
 			}
 		}
@@ -119,7 +124,7 @@ void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Phys
 				for (size_t depth = 0; depth < numNodesPerDim[2] - 2; depth++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + 2 * depthOffset, stiffness,
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + 2 * depthOffset, stiffness,
 						damping));
 				}
 			}
@@ -145,10 +150,10 @@ void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr
 				for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + rowOffset + colOffset, stiffness,
-						damping));
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId + colOffset, nodeId + rowOffset, stiffness,
-						damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + rowOffset + colOffset,
+						stiffness, damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId + colOffset, nodeId + rowOffset,
+						stiffness, damping));
 				}
 			}
 		}
@@ -160,10 +165,10 @@ void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr
 				for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + depthOffset + colOffset, stiffness,
-						damping));
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId + colOffset, nodeId + depthOffset, stiffness,
-						damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + depthOffset + colOffset,
+						stiffness, damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId + colOffset, nodeId + depthOffset,
+						stiffness, damping));
 				}
 			}
 		}
@@ -175,10 +180,10 @@ void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr
 				for (size_t depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + depthOffset + rowOffset, stiffness,
-						damping));
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId + rowOffset, nodeId + depthOffset, stiffness,
-						damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + depthOffset + rowOffset,
+						stiffness, damping));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId + rowOffset, nodeId + depthOffset,
+						stiffness, damping));
 				}
 			}
 		}
@@ -206,14 +211,14 @@ void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_p
 				for (size_t depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 				{
 					size_t nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + depthOffset + rowOffset + colOffset,
-						s, d));
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId + colOffset, nodeId + depthOffset + rowOffset,
-						s, d));
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId + rowOffset, nodeId + depthOffset + colOffset,
-						s, d));
-					addSpring(std::make_shared<LinearSpring>(mesh, nodeId + rowOffset + colOffset, nodeId + depthOffset,
-						s, d));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId,
+						nodeId + depthOffset + rowOffset + colOffset, s, d));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId + colOffset,
+						nodeId + depthOffset + rowOffset, s, d));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId + rowOffset,
+						nodeId + depthOffset + colOffset, s, d));
+					mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId + rowOffset + colOffset,
+						nodeId + depthOffset, s, d));
 				}
 			}
 		}
