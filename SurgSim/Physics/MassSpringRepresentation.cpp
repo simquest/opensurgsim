@@ -15,14 +15,14 @@
 
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 
+#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
-#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Physics/MassSpring.h"
 #include "SurgSim/Physics/Mass.h"
 #include "SurgSim/Physics/MassSpringLocalization.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::DataStructures::Location;
 using SurgSim::Math::Vector;
@@ -39,7 +39,7 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Physics::MassSpringRepr
 
 MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
 	DeformableRepresentation(name),
-	m_mesh(std::make_shared<MassSpring>())
+	m_mesh(std::make_shared<MassSpringModel>())
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
@@ -524,20 +524,20 @@ std::shared_ptr<Localization> MassSpringRepresentation::createLocalization(
 	return result;
 }
 
-void MassSpringRepresentation::loadMassSpring(const std::string& filename)
+void MassSpringRepresentation::loadMassSpringModel(const std::string& filename)
 {
-	auto mesh = std::make_shared<MassSpring>();
+	auto mesh = std::make_shared<MassSpringModel>();
 	mesh->load(filename);
-	setMassSpring(mesh);
+	setMassSpringModel(mesh);
 }
 
-void MassSpringRepresentation::setMassSpring(std::shared_ptr<Framework::Asset> mesh)
+void MassSpringRepresentation::setMassSpringModel(std::shared_ptr<Framework::Asset> mesh)
 {
 	SURGSIM_ASSERT(!isInitialized()) << "The mesh cannot be set after initialization.";
 	SURGSIM_ASSERT(mesh != nullptr) << "Mesh for MassSpringRepresentation cannot be a nullptr.";
-	auto massSpring = std::dynamic_pointer_cast<MassSpring>(mesh);
+	auto massSpring = std::dynamic_pointer_cast<MassSpringModel>(mesh);
 	SURGSIM_ASSERT(massSpring != nullptr) <<
-		"Mesh for MassSpringRepresentation needs to be a SurgSim::Physics::MassSpring.";
+		"Mesh for MassSpringRepresentation needs to be a SurgSim::Physics::MassSpringModel.";
 	m_mesh = massSpring;
 	auto state = std::make_shared<Math::OdeState>();
 	state->setNumDof(getNumDofPerNode(), m_mesh->getNumVertices());
@@ -559,7 +559,7 @@ void MassSpringRepresentation::setMassSpring(std::shared_ptr<Framework::Asset> m
 	setInitialState(state);
 }
 
-std::shared_ptr<MassSpring> MassSpringRepresentation::getMassSpring() const
+std::shared_ptr<MassSpringModel> MassSpringRepresentation::getMassSpringModel() const
 {
 	return m_mesh;
 }
@@ -599,7 +599,7 @@ const std::vector<size_t>& MassSpringRepresentation::getNodeIds(size_t index) co
 	return m_mesh->getNodeIds(index);
 }
 
-bool MassSpringRepresentation::saveMassSpring(const std::string & fileName, double physicsLength) const
+bool MassSpringRepresentation::saveMassSpringModel(const std::string & fileName, double physicsLength) const
 {
 	return m_mesh->save(fileName, physicsLength);
 }

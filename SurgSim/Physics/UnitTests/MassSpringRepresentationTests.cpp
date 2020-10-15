@@ -533,7 +533,7 @@ TEST_F(MassSpringRepresentationTests, LoadSaveTest)
 {
 	auto rep = std::make_shared<MassSpringRepresentation>("rep");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
-	rep->loadMassSpring("PlyReaderTests/MassSpring1D.ply");
+	rep->loadMassSpringModel("PlyReaderTests/MassSpring1D.ply");
 
 	// Vertices
 	SurgSim::Math::Vector3d vertex0(-0.020006, 0.014949, 0.00004);
@@ -557,5 +557,5 @@ TEST_F(MassSpringRepresentationTests, LoadSaveTest)
 
 	
 	std::string fileName = "./MassSpring1D-copy.ply";
-	EXPECT_TRUE(rep->saveMassSpring(fileName));
+	EXPECT_TRUE(rep->saveMassSpringModel(fileName));
 }

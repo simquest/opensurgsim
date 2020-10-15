@@ -18,7 +18,7 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Physics/MassSpring.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
@@ -51,7 +51,7 @@ LinearSpring::LinearSpring(const std::shared_ptr<Math::OdeState> state, size_t n
 	setRestLength((B - A).norm());
 }
 
-LinearSpring::LinearSpring(const std::shared_ptr<MassSpring> massSpring, size_t nodeId0, size_t nodeId1,
+LinearSpring::LinearSpring(const std::shared_ptr<MassSpringModel> massSpring, size_t nodeId0, size_t nodeId1,
 	double stiffness, double damping) :
 	Spring(), m_stiffness(stiffness), m_damping(damping)
 {

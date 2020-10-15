@@ -33,13 +33,13 @@ class Asset;
 namespace Physics
 {
 class Mass;
-class MassSpring;
+class MassSpringModel;
 class Spring;
 
 SURGSIM_STATIC_REGISTRATION(MassSpringRepresentation);
 
 /// MassSpring model is a deformable model (a set of masses connected by springs).
-/// \note A MassSpring is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
+/// \note A MassSpringRepresentation is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v) with the particularity that M is diagonal
 /// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
 class MassSpringRepresentation : public DeformableRepresentation
@@ -122,15 +122,15 @@ public:
 
 	/// Loads a MassSpringRepresentation from a ply file.
 	/// \param filename The name of the file.
-	void loadMassSpring(const std::string & filename);
+	void loadMassSpringModel(const std::string & filename);
 
 	/// Sets the mesh asset
 	/// \param mesh The mesh to assign to this representation
 	/// \exception SurgSim::Framework::AssertionFailure if mesh is nullptr or it's actual type is not MassSpring
-	void setMassSpring(std::shared_ptr<Framework::Asset> mesh);
+	void setMassSpringModel(std::shared_ptr<Framework::Asset> mesh);
 
-	/// \return The mesh asset as a MassSpring.
-	std::shared_ptr<MassSpring> getMassSpring() const;
+	/// \return The mesh asset as a MassSpringModel.
+	std::shared_ptr<MassSpringModel> getMassSpringModel() const;
 
 	/// Determines whether a given natural coordinate is valid.
 	/// \param naturalCoordinate Coordinate to check
@@ -156,9 +156,9 @@ public:
 
 	/// Save the current MassSpring mesh to a ply file.  See MassSpringPlyReaderDelegate for the file structure.
 	/// \param fileName Name of the file for writing.
-	/// \param physicsLength The radius or thickness (for 2 or 3-node elements), if not already in the MassSpring.
+	/// \param physicsLength The radius or thickness (for 2 or 3-node elements), if not already in the MassSpringModel.
 	/// \return true if the file was written successfully.
-	bool saveMassSpring(const std::string& fileName, double physicsLength = 0.0) const;
+	bool saveMassSpringModel(const std::string& fileName, double physicsLength = 0.0) const;
 
 protected:
 	/// Add the Rayleigh damping forces
@@ -222,8 +222,8 @@ private:
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
 
-	/// The Representation's asset as a MassSpring
-	std::shared_ptr<MassSpring> m_mesh;
+	/// The Representation's asset as a MassSpringModel.
+	std::shared_ptr<MassSpringModel> m_mesh;
 };
 
 } // namespace Physics

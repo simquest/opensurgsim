@@ -18,7 +18,7 @@
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/LinearSpring.h"
-#include "SurgSim/Physics/MassSpring.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::DataStructures::PlyReader;
 
@@ -31,7 +31,7 @@ MassSpringPlyReaderDelegate::MassSpringPlyReaderDelegate()
 {
 }
 
-MassSpringPlyReaderDelegate::MassSpringPlyReaderDelegate(std::shared_ptr<MassSpring> mesh):
+MassSpringPlyReaderDelegate::MassSpringPlyReaderDelegate(std::shared_ptr<MassSpringModel> mesh):
 	m_mesh(mesh), m_hasBoundaryConditions(false), m_hasRadius(false), m_hasThickness(false)
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "The mesh cannot be null.";

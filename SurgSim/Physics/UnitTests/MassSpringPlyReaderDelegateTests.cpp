@@ -18,8 +18,8 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/MassSpring.h"
 #include "SurgSim/Physics/MassSpringPlyReaderDelegate.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 #include "SurgSim/Physics/Spring.h"
 
 namespace SurgSim
@@ -31,7 +31,7 @@ using SurgSim::DataStructures::PlyReader;
 
 TEST(MassSpringPlyReaderDelegateTests, DelegateTest1D)
 {
-	auto mesh = std::make_shared<MassSpring>();
+	auto mesh = std::make_shared<MassSpringModel>();
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	mesh->load("PlyReaderTests/MassSpring1D.ply");
 	// Vertices
@@ -61,7 +61,7 @@ TEST(MassSpringPlyReaderDelegateTests, DelegateTest1D)
 }
 TEST(MassSpringPlyReaderDelegateTests, DelegateTest2D)
 {
-	auto mesh = std::make_shared<MassSpring>();
+	auto mesh = std::make_shared<MassSpringModel>();
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	mesh->load("PlyReaderTests/MassSpring2D.ply");
 	// Vertices

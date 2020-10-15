@@ -63,22 +63,22 @@ public:
 
 private:
 	/// Helper method to initialize/add all stretching springs on a 2D structure
-	/// \param mesh The MassSpring to initialize the springs with.
+	/// \param mesh The MassSpringModel to initialize the springs with.
 	/// \param numNodesPerDim The number of nodes on the 2 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init2DStretchingSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+	void init2DStretchingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 		size_t numNodesPerDim[2], double stiffness, double damping);
 	/// Helper method to initialize/add all bending springs on a 2D structure
-	/// \param mesh The MassSpring to initialize the springs with (rest lengths calculation)
+	/// \param mesh The MassSpringModel to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 2 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init2DBendingSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+	void init2DBendingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 		size_t numNodesPerDim[2], double stiffness, double damping);
 	/// Helper method to initialize/add all face diagonal springs on a 2D structure
-	/// \param mesh The MassSpring to initialize the springs with (rest lengths calculation)
+	/// \param mesh The MassSpringModel to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 2 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init2DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+	void init2DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 		size_t numNodesPerDim[2], double stiffness, double damping);
 };
 

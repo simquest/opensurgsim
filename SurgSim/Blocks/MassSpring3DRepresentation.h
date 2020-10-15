@@ -68,28 +68,28 @@ public:
 
 private:
 	/// Helper method to initialize/add all stretching springs on a 3D structure
-	/// \param mesh The MassSpring to initialize the springs with (rest lengths calculation)
+	/// \param mesh The MassSpringModel to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init3DStretchingSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+	void init3DStretchingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 		size_t numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all bending springs on a 3D structure
-	/// \param mesh The MassSpring to initialize the springs with (rest lengths calculation)
+	/// \param mesh The MassSpringModel to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init3DBendingSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+	void init3DBendingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 		size_t numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all face diagonal springs on a 3D structure
-	/// \param mesh The MassSpring to initialize the springs with (rest lengths calculation)
+	/// \param mesh The MassSpringModel to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init3DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+	void init3DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 		size_t numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all volume diagonal springs on a 3D structure
-	/// \param mesh The MassSpring to initialize the springs with (rest lengths calculation)
+	/// \param mesh The MassSpringModel to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init3DVolumeDiagonalSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+	void init3DVolumeDiagonalSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 		size_t numNodesPerDim[3], double stiffness, double damping);
 };
 

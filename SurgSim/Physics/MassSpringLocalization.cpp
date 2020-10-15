@@ -18,7 +18,6 @@
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/MassSpring.h"
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 
 
@@ -174,18 +173,15 @@ bool MassSpringLocalization::moveClosestTo(const Math::Vector3d& point, bool* ha
 
 	auto massSpringRepresentation = std::static_pointer_cast<MassSpringRepresentation>(getRepresentation());
 	auto& currentState = massSpringRepresentation->getCurrentState();
-	auto massSpring = massSpringRepresentation->getMassSpring();
-	SURGSIM_ASSERT(massSpring != nullptr);
-
 	double closestDistance = std::numeric_limits<double>::max(), newDistance;
 	Math::Vector3d closestPoint, newPoint;
 	std::array<Math::Vector3d, 2> closestNodePositions;
 	size_t closestNodeIndex = std::numeric_limits<size_t>::max();
 
-	auto numElements = massSpring->getNumElements();
+	auto numElements = massSpringRepresentation->getNumElements();
 	for (size_t i = 0; i < numElements; ++i)
 	{
-		const auto& nodeIds = massSpring->getNodeIds(i);
+		const auto& nodeIds = massSpringRepresentation->getNodeIds(i);
 		SURGSIM_ASSERT(nodeIds.size() == 2) <<
 			"MassSpringLocalization::moveClosestTo is only defined for a MassSpring that has 2 nodes per element." <<
 			"\nInstead it got " << nodeIds.size() << " nodes.";

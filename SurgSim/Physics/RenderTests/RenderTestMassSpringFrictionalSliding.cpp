@@ -93,7 +93,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createMassSpring1D(const std::
 	auto physicsRepresentation = std::make_shared<MassSpringRepresentation>("Physics");
 	physicsRepresentation->setLocalPose(pose);
 	std::string fileName = "MassSpring1D.ply";
-	physicsRepresentation->loadMassSpring(fileName);
+	physicsRepresentation->loadMassSpringModel(fileName);
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(1e1);
 	physicsRepresentation->setRayleighDampingStiffness(1e-4);

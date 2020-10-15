@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/MassSpring.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Log.h"
@@ -26,122 +26,122 @@ namespace SurgSim
 namespace Physics
 {
 
-SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::MassSpring, MassSpring)
+SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Physics::MassSpringModel, MassSpringModel)
 
-MassSpring::MassSpring()
+MassSpringModel::MassSpringModel()
 {
 }
 
-void MassSpring::addMass(const std::shared_ptr<Mass> mass)
+void MassSpringModel::addMass(const std::shared_ptr<Mass> mass)
 {
 	m_masses.push_back(mass);
 }
 
-void MassSpring::addSpring(const std::shared_ptr<Spring> spring)
+void MassSpringModel::addSpring(const std::shared_ptr<Spring> spring)
 {
 	m_springs.push_back(spring);
 }
 
-size_t MassSpring::getNumMasses() const
+size_t MassSpringModel::getNumMasses() const
 {
 	return m_masses.size();
 }
 
-size_t MassSpring::getNumSprings() const
+size_t MassSpringModel::getNumSprings() const
 {
 	return m_springs.size();
 }
 
-const std::vector<std::shared_ptr<Mass>>& MassSpring::getMasses() const
+const std::vector<std::shared_ptr<Mass>>& MassSpringModel::getMasses() const
 {
 	return m_masses;
 }
 
-const std::vector<std::shared_ptr<Spring>>& MassSpring::getSprings() const
+const std::vector<std::shared_ptr<Spring>>& MassSpringModel::getSprings() const
 {
 	return m_springs;
 }
 
-const std::shared_ptr<Mass>& MassSpring::getMass(size_t nodeId) const
+const std::shared_ptr<Mass>& MassSpringModel::getMass(size_t nodeId) const
 {
 	SURGSIM_ASSERT(nodeId < getNumMasses()) << "Invalid node id to request a mass from";
 	return m_masses[nodeId];
 }
 
-const std::shared_ptr<Spring>& MassSpring::getSpring(size_t springId) const
+const std::shared_ptr<Spring>& MassSpringModel::getSpring(size_t springId) const
 {
 	SURGSIM_ASSERT(springId < getNumSprings()) << "Invalid spring id";
 	return m_springs[springId];
 }
 
-size_t MassSpring::addBoundaryCondition(size_t boundaryCondition)
+size_t MassSpringModel::addBoundaryCondition(size_t boundaryCondition)
 {
 	m_boundaryConditions.push_back(boundaryCondition);
 	return m_boundaryConditions.size() - 1;
 }
 
-const std::vector<size_t>& MassSpring::getBoundaryConditions() const
+const std::vector<size_t>& MassSpringModel::getBoundaryConditions() const
 {
 	return m_boundaryConditions;
 }
 
-std::vector<size_t>& MassSpring::getBoundaryConditions()
+std::vector<size_t>& MassSpringModel::getBoundaryConditions()
 {
 	return m_boundaryConditions;
 }
 
-size_t MassSpring::getBoundaryCondition(size_t id) const
+size_t MassSpringModel::getBoundaryCondition(size_t id) const
 {
 	return m_boundaryConditions[id];
 }
 
-size_t MassSpring::addElement(const std::vector<size_t>& nodeIds)
+size_t MassSpringModel::addElement(const std::vector<size_t>& nodeIds)
 {
 	SURGSIM_ASSERT((m_nodeIds.size() == 0) || (nodeIds.size() == getNumNodesPerElement())) <<
-		"Cannot add an element with " << nodeIds.size() << " nodes to a MassSpring that already has an element with " <<
-		getNumNodesPerElement() << " nodes.";
+		"Cannot add an element with " << nodeIds.size() << " nodes to a MassSpringModel that already has an " <<
+		"element with " << getNumNodesPerElement() << " nodes.";
 	m_nodeIds.push_back(nodeIds);
 	return m_nodeIds.size();
 }
 
-const std::vector<size_t>& MassSpring::getNodeIds(size_t index) const
+const std::vector<size_t>& MassSpringModel::getNodeIds(size_t index) const
 {
 	return m_nodeIds[index];
 }
 
-size_t MassSpring::getNumElements() const
+size_t MassSpringModel::getNumElements() const
 {
 	return m_nodeIds.size();
 }
 
-size_t MassSpring::getNumNodesPerElement() const
+size_t MassSpringModel::getNumNodesPerElement() const
 {
 	SURGSIM_ASSERT(m_nodeIds.size() > 0) <<
-		"Cannot get the number of nodes per element of a MassSpring before adding elements.";
+		"Cannot get the number of nodes per element of a MassSpringModel before adding elements.";
 	return m_nodeIds[0].size();
 }
 
-void MassSpring::setRadius(double radius)
+void MassSpringModel::setRadius(double radius)
 {
 	m_radius.setValue(radius);
 }
 
-const DataStructures::OptionalValue<double>& MassSpring::getRadius() const
+const DataStructures::OptionalValue<double>& MassSpringModel::getRadius() const
 {
 	return m_radius;
 }
 
-void MassSpring::setThickness(double thickness)
+void MassSpringModel::setThickness(double thickness)
 {
 	m_thickness.setValue(thickness);
 }
 
-const DataStructures::OptionalValue<double>& MassSpring::getThickness() const
+const DataStructures::OptionalValue<double>& MassSpringModel::getThickness() const
 {
 	return m_thickness;
 }
 
-bool MassSpring::save(const std::string& fileName, double physicsLength) const
+bool MassSpringModel::save(const std::string& fileName, double physicsLength) const
 {
 	std::fstream out(fileName, std::ios::out);
 
@@ -265,7 +265,7 @@ bool MassSpring::save(const std::string& fileName, double physicsLength) const
 	return true;
 }
 
-bool MassSpring::doLoad(const std::string & filePath)
+bool MassSpringModel::doLoad(const std::string & filePath)
 {
 	SurgSim::DataStructures::PlyReader reader(filePath);
 	if (!reader.isValid())
@@ -279,7 +279,7 @@ bool MassSpring::doLoad(const std::string & filePath)
 	if (!reader.parseWithDelegate(delegate))
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "The input file '" << filePath << "' does not have the property required by MassSpring.";
+			<< "The input file '" << filePath << "' does not have the property required by MassSpringModel.";
 		return false;
 	}
 

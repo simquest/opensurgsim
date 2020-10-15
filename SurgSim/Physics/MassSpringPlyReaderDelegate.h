@@ -26,13 +26,13 @@ namespace SurgSim
 {
 namespace Physics
 {
-class MassSpring;
+class MassSpringModel;
 
 /// Common part of implementation of PlyReaderDelegate for MassSpringRepresentations.
 /// In order for the same ply file to load with TriangleMeshPlyReaderDelegate
 /// (e.g., to create the graphics for a SegmentMesh or to match the shape in a CollisionRep),
 /// there must be elements named (for example) 1d_element, that have appropriate vertex_indices.
-/// See MassSpringRepresentation::saveMassSpring() or MassSpring::saveMassSpring() to create a valid ply file.
+/// See MassSpringRepresentation::saveMassSpringModel() or MassSpring::saveMassSpringModel() to create a valid ply file.
 ///
 /// Example file that can also be loaded into a SegmentMesh; the third spring resists bending about the middle vertex:
 /// ply
@@ -64,7 +64,7 @@ class MassSpring;
 /// 0.001
 ///
 /// This PlyReaderDelegate can load 1d_element, 2d_element, or 3d_element, passing the vectors of nodes to
-/// the MassSpring. Similarly, it can load radius or thickness.
+/// the MassSpringModel. Similarly, it can load radius or thickness.
 class MassSpringPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
@@ -72,7 +72,7 @@ public:
 	MassSpringPlyReaderDelegate();
 
 	/// Constructor
-	explicit MassSpringPlyReaderDelegate(std::shared_ptr<MassSpring> mesh);
+	explicit MassSpringPlyReaderDelegate(std::shared_ptr<MassSpringModel> mesh);
 
 protected:
 	bool registerDelegate(SurgSim::DataStructures::PlyReader* reader) override;
@@ -209,8 +209,8 @@ protected:
 	/// Thickness information, if any.
 	double m_thickness;
 
-	/// MassSpring to contain the ply file information
-	std::shared_ptr<MassSpring> m_mesh;
+	/// MassSpringModel to contain the ply file information
+	std::shared_ptr<MassSpringModel> m_mesh;
 };
 
 } // namespace Physics

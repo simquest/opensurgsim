@@ -16,7 +16,7 @@
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/Mass.h"
-#include "SurgSim/Physics/MassSpring.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::LinearSpring;
@@ -28,7 +28,7 @@ namespace SurgSim
 namespace Blocks
 {
 
-void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[2], double stiffness, double damping)
 {
 	const size_t rowOffset = numNodesPerDim[0];
@@ -58,7 +58,7 @@ void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<P
 	}
 }
 
-void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[2], double stiffness, double damping)
 {
 	const size_t rowOffset = numNodesPerDim[0];
@@ -90,7 +90,7 @@ void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<Phys
 	}
 }
 
-void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[2], double stiffness, double damping)
 {
 	const size_t rowOffset = numNodesPerDim[0];
@@ -125,7 +125,7 @@ void MassSpring2DRepresentation::init2D(
 	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes for dimension 1 is incorrect: " << numNodesPerDim[0];
 	SURGSIM_ASSERT(numNodesPerDim[1] > 0) << "Number of nodes for dimension 2 is incorrect: " << numNodesPerDim[1];
 
-	auto mesh = std::make_shared<Physics::MassSpring>();
+	auto mesh = std::make_shared<Physics::MassSpringModel>();
 
 	// Initialize the nodes position, velocity and mass
 	// Note: no need to apply the initialPose here, initialize will take care of it !
@@ -176,7 +176,7 @@ void MassSpring2DRepresentation::init2D(
 		mesh->addBoundaryCondition(boundaryCondition);
 	}
 
-	setMassSpring(std::dynamic_pointer_cast<Framework::Asset>(mesh));
+	setMassSpringModel(std::dynamic_pointer_cast<Framework::Asset>(mesh));
 }
 
 }; // namespace Blocks

@@ -16,7 +16,7 @@
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/Mass.h"
-#include "SurgSim/Physics/MassSpring.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Mass;
@@ -36,7 +36,7 @@ void MassSpring1DRepresentation::init1D(
 {
 	SURGSIM_ASSERT(nodes.size() > 0) << "Number of nodes incorrect: " << nodes.size();
 
-	auto mesh = std::make_shared<Physics::MassSpring>();
+	auto mesh = std::make_shared<Physics::MassSpringModel>();
 	// Initialize the nodes position, velocity and mass
 	// Note: no need to apply the initialPose here, initialize will take care of it !
 	for (size_t massId = 0; massId < nodes.size(); massId++)
@@ -78,7 +78,7 @@ void MassSpring1DRepresentation::init1D(
 		mesh->addBoundaryCondition(boundaryCondition);
 	}
 
-	setMassSpring(std::dynamic_pointer_cast<Framework::Asset>(mesh));
+	setMassSpringModel(std::dynamic_pointer_cast<Framework::Asset>(mesh));
 }
 
 }; // namespace Blocks

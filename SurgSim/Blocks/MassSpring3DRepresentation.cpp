@@ -16,7 +16,7 @@
 #include "SurgSim/Blocks/MassSpring3DRepresentation.h"
 #include "SurgSim/Physics/LinearSpring.h"
 #include "SurgSim/Physics/Mass.h"
-#include "SurgSim/Physics/MassSpring.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;
@@ -28,7 +28,7 @@ namespace SurgSim
 namespace Blocks
 {
 
-void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[3], double stiffness, double damping)
 {
 	const size_t depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
@@ -80,7 +80,7 @@ void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<P
 	}
 }
 
-void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[3], double stiffness, double damping)
 {
 	const size_t depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
@@ -132,7 +132,7 @@ void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Phys
 	}
 }
 
-void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[3], double stiffness, double damping)
 {
 	const size_t depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
@@ -190,7 +190,7 @@ void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr
 	}
 }
 
-void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_ptr<Physics::MassSpring> mesh,
+void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[3], double stiffness, double damping)
 {
 	const size_t depthOffset = numNodesPerDim[0] * numNodesPerDim[1];
@@ -255,7 +255,7 @@ void MassSpring3DRepresentation::init3D(
 	{(extremities[0][1][1] - extremities[0][1][0]) / static_cast<double>(numNodesPerDim[2] - 1) ,
 	(extremities[1][1][1] - extremities[1][1][0]) / static_cast<double>(numNodesPerDim[2] - 1)}};
 
-	auto mesh = std::make_shared<Physics::MassSpring>();
+	auto mesh = std::make_shared<Physics::MassSpringModel>();
 	size_t nodeId = 0;
 	for (size_t depth = 0; depth < numNodesPerDim[2]; depth++)
 	{
@@ -323,7 +323,7 @@ void MassSpring3DRepresentation::init3D(
 		mesh->addBoundaryCondition(*boundaryCondition);
 	}
 
-	setMassSpring(std::dynamic_pointer_cast<Framework::Asset>(mesh));
+	setMassSpringModel(std::dynamic_pointer_cast<Framework::Asset>(mesh));
 }
 
 }; // namespace Blocks

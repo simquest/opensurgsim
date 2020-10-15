@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_MASSSPRING_H
-#define SURGSIM_PHYSICS_MASSSPRING_H
+#ifndef SURGSIM_PHYSICS_MASSSPRINGMODEL_H
+#define SURGSIM_PHYSICS_MASSSPRINGMODEL_H
 
 #include <vector>
 
@@ -31,17 +31,17 @@ namespace Physics
 
 class Spring;
 
-SURGSIM_STATIC_REGISTRATION(MassSpring);
+SURGSIM_STATIC_REGISTRATION(MassSpringModel);
 
 /// Base class for a data structure for holding MassSpring mesh data.
-class MassSpring : public SurgSim::DataStructures::Vertices<Mass>, public SurgSim::Framework::Asset,
-	public std::enable_shared_from_this<MassSpring> // Why use a Vertices here, instead of a mesh?
+class MassSpringModel : public SurgSim::DataStructures::Vertices<Mass>, public SurgSim::Framework::Asset,
+	public std::enable_shared_from_this<MassSpringModel>
 {
 public:
 	/// Default constructor
-	MassSpring();
+	MassSpringModel();
 
-	SURGSIM_CLASSNAME(SurgSim::Physics::MassSpring);
+	SURGSIM_CLASSNAME(SurgSim::Physics::MassSpringModel);
 
 	/// Adds a mass
 	/// \param mass The mass to add to the representation
@@ -101,14 +101,6 @@ public:
 	/// \return The vertex id which has a boundary condition
 	size_t getBoundaryCondition(size_t id) const;
 
-	enum MassSpringType
-	{
-		SegmentMesh,
-		TriangleMesh,
-		TetrahedronMesh,
-		None
-	};
-
 	/// Stores an element's node ids, e.g., for a 2d shape this may store triangle nodes.
 	/// \param ids The vector of node ids (i.e., mass ids) for the new element.
 	/// \return The new size of the vector of elements.
@@ -137,7 +129,7 @@ public:
 
 	/// Save the current MassSpring mesh to a ply file. See MassSpringPlyReaderDelegate for the file structure.
 	/// \param fileName Name of the file for writing.
-	/// \param physicsLength The radius or thickness (for 2 or 3-node elements), if not already in the MassSpring.
+	/// \param physicsLength The radius or thickness (for 2 or 3-node elements), if not already in the MassSpringModel.
 	/// \return true if the file was written successfully.
 	bool save(const std::string& fileName, double physicsLength = 0.0) const;
 
@@ -166,4 +158,4 @@ protected:
 } // namespace Physics
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_MASSSPRING_H
+#endif // SURGSIM_PHYSICS_MASSSPRINGMODEL_H

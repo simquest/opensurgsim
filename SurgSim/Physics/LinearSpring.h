@@ -26,7 +26,7 @@ class OdeState;
 }
 namespace Physics
 {
-class MassSpring;
+class MassSpringModel;
 
 /// Linear spring connecting 2 nodes with a viscous term
 class LinearSpring : public Spring
@@ -44,10 +44,10 @@ public:
 		double damping);
 
 	/// Constructor
-	/// \param massSpring The massSpring to initialize the spring's rest length with.
+	/// \param massSpring The MassSpringModel to initialize the spring's rest length with.
 	/// \param nodeId0, nodeId1 Node ids of the 2 connected masses
 	/// \param stiffness, damping The spring parameters
-	explicit LinearSpring(const std::shared_ptr<MassSpring> massSpring, size_t nodeId0, size_t nodeId1,
+	explicit LinearSpring(const std::shared_ptr<MassSpringModel> massSpring, size_t nodeId0, size_t nodeId1,
 		double stiffness, double damping);
 
 	void initialize(const SurgSim::Math::OdeState& state) override;
