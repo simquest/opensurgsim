@@ -159,4 +159,15 @@ inline Eigen::Quaternion<T, QOpt> interpolate(const Eigen::Quaternion<T, QOpt>& 
 };  // namespace Math
 };  // namespace SurgSim
 
+namespace Eigen
+{
+
+template<typename T>
+::std::ostream& operator<<(::std::ostream& os, const Eigen::Quaternion<T>& quaternion)
+{
+	os << quaternion.coeffs().transpose();
+	return os;
+}
+};
+
 #endif // SURGSIM_MATH_QUATERNION_H

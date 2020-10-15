@@ -28,9 +28,15 @@ namespace Collision
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name),
 	m_logger(Framework::Logger::getLogger("Collision/Representation")),
+	m_oldVolume(0.0),
+	m_aabbThreshold(0.01),
+	m_previousDcdPose(Math::RigidTransform3d::Identity()),
 	m_collisionDetectionType(COLLISION_DETECTION_TYPE_DISCRETE),
 	m_selfCollisionDetectionType(COLLISION_DETECTION_TYPE_NONE)
 {
+	m_previousDcdPose.translation() = Math::Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
+	m_previousCcdCurrentPose.translation() = Math::Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
+
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Ignore, getIgnoring, setIgnoring);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>, Allow, getAllowing, setAllowing);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, CollisionDetectionType, CollisionDetectionType,
@@ -78,33 +84,9 @@ void Representation::setPosedShapeMotion(const Math::PosedShapeMotion<std::share
 	m_posedShapeMotion = posedShapeMotion;
 }
 
-std::shared_ptr<Math::Shape> Representation::getPosedShape()
+const Math::PosedShape<std::shared_ptr<Math::Shape>>& Representation::getPosedShape()
 {
-	if (getShape()->isTransformable())
-	{
-		// HS-3-mar-2016 This is still being used by all representations it will be superceded by
-		// local update functionality after ryans merge request goes in
-		// #todo get rid of this in favor of transforming the mesh shape
-		boost::unique_lock<boost::shared_mutex> lock(m_posedShapeMotionMutex);
-
-		Math::RigidTransform3d identity = Math::RigidTransform3d::Identity();
-		Math::RigidTransform3d pose = getPose();
-		if (pose.isApprox(identity))
-		{
-			Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape(), identity);
-			m_posedShapeMotion.second = newPosedShape;
-		}
-		else if (m_posedShapeMotion.second.getShape() == nullptr || !pose.isApprox(m_posedShapeMotion.second.getPose()))
-		{
-			Math::PosedShape<std::shared_ptr<Math::Shape>> newPosedShape(getShape()->getTransformed(pose), pose);
-			m_posedShapeMotion.second = newPosedShape;
-		}
-		return m_posedShapeMotion.second.getShape();
-	}
-	else
-	{
-		return getShape();
-	}
+	return m_posedShapeMotion.second;
 }
 
 void Representation::invalidatePosedShapeMotion()
@@ -285,13 +267,36 @@ void Representation::doRetire()
 
 Math::Aabbd Representation::getBoundingBox() const
 {
-	SURGSIM_ASSERT(getShape() != nullptr);
-	return Math::transformAabb(getPose(), getShape()->getBoundingBox());
+	const auto shape = getShape();
+	SURGSIM_ASSERT(shape != nullptr) << getFullName() << " does not have a shape! Cannot get bounding box.";
+	auto aabb = shape->getBoundingBox();
+	if (!shape->isTransformable())
+	{
+		aabb = Math::transformAabb(getPose(), aabb);
+	}
+	return aabb;
 }
 
 void Representation::updateDcdData()
 {
-
+	auto shape = getShape();
+	if (shape->isTransformable())
+	{
+		auto pose = getPose();
+		if (!pose.isApprox(m_previousDcdPose))
+		{
+			m_previousDcdPose = pose;
+			if (std::abs(m_oldVolume - shape->getBoundingBox().volume()) > m_oldVolume * m_aabbThreshold)
+			{
+				shape->updateShape();
+				m_oldVolume = shape->getBoundingBox().volume();
+			}
+			else
+			{
+				shape->updateShapePartial();
+			}
+		}
+	}
 }
 
 void Representation::updateCcdData(double timeOfImpact)
@@ -301,7 +306,20 @@ void Representation::updateCcdData(double timeOfImpact)
 
 void Representation::updateShapeData()
 {
-	getPosedShape();
+	auto posedShapeMotion = getPosedShapeMotion();
+	const Math::RigidTransform3d& pose = getPose();
+
+	if (!pose.isApprox(posedShapeMotion.second.getPose()))
+	{
+		auto shape = getShape();
+		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(shape, pose);
+		setPosedShapeMotion(Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>(posedShapeMotion.first, posedShape2));
+
+		if (shape->isTransformable())
+		{
+			shape->setPose(pose);
+		}
+	}
 }
 
 }; // namespace Collision

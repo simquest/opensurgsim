@@ -24,6 +24,7 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/VerticesShape.h"
 
 namespace SurgSim
 {
@@ -38,7 +39,7 @@ namespace Math
 SURGSIM_STATIC_REGISTRATION(ParticlesShape);
 
 /// Particles Shape: A shape consisting of a group of particles of equal radius
-class ParticlesShape : public Shape, public SurgSim::DataStructures::Vertices<DataStructures::EmptyData>
+class ParticlesShape : public VerticesShape, public SurgSim::DataStructures::Vertices<DataStructures::EmptyData>
 {
 public:
 	/// Constructor
@@ -87,9 +88,12 @@ public:
 
 	bool isValid() const override;
 
-	bool isTransformable() const override;
-
 	const Math::Aabbd& getBoundingBox() const override;
+
+	void setPose(const RigidTransform3d& pose) override;
+
+	void updateShape() override;
+	void updateShapePartial() override;
 
 private:
 	bool doUpdate() override;

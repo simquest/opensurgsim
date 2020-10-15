@@ -84,7 +84,7 @@ public:
 			const SurgSim::Math::Vector& cartesianCoordinate) const override;
 
 	/// \return the initial beam rotation
-	SurgSim::Math::Matrix33d getInitialRotation() const;
+	const SurgSim::Math::Matrix33d& getInitialRotation() const;
 
 protected:
 	/// Initializes variables needed before Initialize() is called
@@ -109,15 +109,12 @@ protected:
 	Eigen::Matrix<double, 12, 1> m_x0;
 
 	/// Initial rotation matrix for the element
-	Eigen::Matrix<double, 12, 12> m_R0;
+	SurgSim::Math::Matrix33d m_R0;
 
 	/// Stiffness matrix (in local coordinate frame)
 	Eigen::Matrix<double, 12, 12> m_MLocal;
 	/// Stiffness matrix (in local coordinate frame)
 	Eigen::Matrix<double, 12, 12> m_KLocal;
-
-	/// Physical shear modulus G = E/( 2(1+mu) )
-	double m_G;
 
 	/// Rest length
 	double m_restLength;
@@ -129,14 +126,6 @@ protected:
 	bool m_haveShear;
 	/// Shear factor (usually 5/8)
 	double m_shearFactor;
-	/// The shear area in the y and z directions (=0 => no shear) http://en.wikipedia.org/wiki/Timoshenko_beam_theory
-	double m_Asy, m_Asz;
-	/// Shear deformation parameters
-	/// Phi_y=12.E.Iz/(G.Asy.L^2) or 0 if As?=0
-	/// Phi_z=12.E.Iy/(G.Asz.L^2) or 0 if As?=0
-	double m_Phi_y, m_Phi_z;
-	/// Cross sectional moment of inertia
-	double m_Iy, m_Iz;
 	/// Polar moment of inertia
 	double m_J;
 };

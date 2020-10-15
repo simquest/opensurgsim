@@ -35,14 +35,14 @@ template <class T>
 int findRootsInRange01(const Polynomial<T, 3>& p, std::array<T, 3>* roots)
 {
 	int numberOfRoots = 0;
-	boost::math::tools::eps_tolerance<T> tolerance(std::numeric_limits<T>::digits - 3);
-	const T epsilon = 4 * std::numeric_limits<T>::epsilon();
+	static const boost::math::tools::eps_tolerance<T> tolerance(std::numeric_limits<T>::digits - 3);
+	static const T epsilon = 4 * std::numeric_limits<T>::epsilon();
 
 	// Is degenerate?
 	if (isNearZero(p.getCoefficient(3), epsilon))
 	{
 		Polynomial<T, 2> quadratic(p.getCoefficient(0), p.getCoefficient(1), p.getCoefficient(2));
-		PolynomialRoots<T, 2> quadraticRoots(quadratic, std::numeric_limits<T>::epsilon());
+		PolynomialRoots<T, 2> quadraticRoots(quadratic, epsilon);
 
 		for (int i = 0; i < quadraticRoots.getNumRoots(); ++i)
 		{

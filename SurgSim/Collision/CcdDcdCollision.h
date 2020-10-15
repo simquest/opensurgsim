@@ -36,6 +36,7 @@
 #include "SurgSim/Collision/SphereSphereContact.h"
 #include "SurgSim/Collision/TriangleMeshParticlesContact.h"
 #include "SurgSim/Collision/TriangleMeshPlaneContact.h"
+#include "SurgSim/Collision/TriangleMeshSphereContact.h"
 #include "SurgSim/Collision/TriangleMeshSurfaceMeshContact.h"
 #include "SurgSim/Collision/TriangleMeshTriangleMeshContact.h"
 

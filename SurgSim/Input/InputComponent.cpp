@@ -17,6 +17,8 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Input/DeviceInterface.h"
+#include "SurgSim/Math/MathConvert.h"
+
 
 namespace SurgSim
 {
@@ -26,10 +28,18 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::InputComponent, 
 
 InputComponent::InputComponent(const std::string& name) :
 	Representation(name),
-	m_hasInput(false)
+	m_hasInput(false),
+	m_toElementTransform(SurgSim::Math::RigidTransform3d::Identity())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(InputComponent, std::string, DeviceName,
 		getDeviceName, setDeviceName);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(InputComponent, SurgSim::Math::RigidTransform3d, ToElementTransform,
+		getToElementTransform, setToElementTransform);
+
+	// We are using the localPose for this, so this property should not be explicitly serialized
+	SURGSIM_ADD_RW_PROPERTY(InputComponent, SurgSim::Math::RigidTransform3d, ToDeviceTransform,
+		getToElementTransform, setToDeviceTransform);
 }
 
 InputComponent::~InputComponent()
@@ -75,6 +85,26 @@ void InputComponent::handleInput(const std::string& device, const SurgSim::DataS
 {
 	m_hasInput = true;
 	m_lastInput.set(inputData);
+}
+
+SurgSim::Math::RigidTransform3d InputComponent::getToDeviceTransform() const
+{
+	return getLocalPose();
+}
+
+void InputComponent::setToDeviceTransform(const SurgSim::Math::RigidTransform3d& val)
+{
+	setLocalPose(val);
+}
+
+SurgSim::Math::RigidTransform3d InputComponent::getToElementTransform() const
+{
+	return m_toElementTransform;
+}
+
+void InputComponent::setToElementTransform(const SurgSim::Math::RigidTransform3d& val)
+{
+	m_toElementTransform = val;
 }
 
 }; // namespace Input

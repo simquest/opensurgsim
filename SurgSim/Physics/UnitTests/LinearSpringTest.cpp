@@ -326,7 +326,7 @@ TEST(LinearSpringTests, computeMethods)
 	Matrix zeroBlock = Matrix::Zero(6, 6);
 	SparseMatrix K(6, 6);
 	K.setZero();
-	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &K, true);
+	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &K);
 	K.makeCompressed();
 
 	ls.addStiffness(state, &K);
@@ -346,7 +346,7 @@ TEST(LinearSpringTests, computeMethods)
 
 	SparseMatrix D(6, 6);
 	D.setZero();
-	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &D, true);
+	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &D);
 	D.makeCompressed();
 
 	ls.addDamping(state, &D);
@@ -466,7 +466,7 @@ TEST(LinearSpringTests, addStiffnessNumericalTest)
 	Matrix zeroBlock = Matrix::Zero(6, 6);
 	SparseMatrix K(6, 6);
 	K.setZero();
-	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &K, true);
+	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &K);
 	K.makeCompressed();
 
 	ls.addStiffness(state, &K);
@@ -504,7 +504,7 @@ TEST(LinearSpringTests, addDampingNumericalTest)
 	Matrix zeroBlock = Matrix::Zero(6, 6);
 	SparseMatrix D(6, 6);
 	D.setZero();
-	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &D, true);
+	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &D);
 	D.makeCompressed();
 
 	ls.addDamping(state, &D);
@@ -542,12 +542,12 @@ TEST(LinearSpringTests, addFDKNumericalTest)
 	Matrix zeroBlock = Matrix::Zero(6, 6);
 	SparseMatrix K(6, 6);
 	K.setZero();
-	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &K, true);
+	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &K);
 	K.makeCompressed();
 
 	SparseMatrix D(6, 6);
 	D.setZero();
-	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &D, true);
+	SurgSim::Math::addSubMatrix(zeroBlock, 0, 0, &D);
 	D.makeCompressed();
 
 	ls.addFDK(state, &F, &D, &K);

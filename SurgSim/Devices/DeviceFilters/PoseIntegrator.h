@@ -21,8 +21,8 @@
 
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Devices/DeviceFilters/DeviceFilter.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
@@ -75,6 +75,13 @@ public:
 	/// \exception Asserts if called after initialize.
 	void setReset(const std::string& name);
 
+protected:
+	/// Overridden from DeviceFilter
+	/// tries to see if "pose" was sent and resets itself to that pose
+	void filterOutput(const std::string& device, 
+					  const SurgSim::DataStructures::DataGroup& dataToFilter, 
+					  SurgSim::DataStructures::DataGroup* result) override;
+
 private:
 	/// The result of integrating the input poses.
 	PoseType m_poseResult;
@@ -87,6 +94,8 @@ private:
 
 	/// The name of the reset boolean (if any).
 	std::string m_resetName;
+
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::RigidTransform3d> m_resetPose;
 };
 
 

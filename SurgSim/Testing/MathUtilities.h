@@ -91,16 +91,6 @@ SurgSim::Math::RigidTransform3d interpolatePose(
 }
 
 
-namespace Eigen
-{
-
-template<class T, int Dim>
-::std::ostream& operator<<(::std::ostream& os, const Eigen::AlignedBox<T, Dim>& box)
-{
-	os << "[" << box.min().transpose() << ", " << box.max().transpose() << "]";
-	return os;
-}
-}
 #endif
 
 

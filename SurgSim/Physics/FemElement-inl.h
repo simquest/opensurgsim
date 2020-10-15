@@ -27,12 +27,12 @@ namespace SurgSim
 namespace Physics
 {
 
-template <typename DerivedSub, typename T, int Opt, typename Index>
-void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::vector<size_t>& blockIds,
-									  size_t blockSize, Eigen::SparseMatrix<T, Opt, Index>* matrix,
-									  bool initialize) const
+template <typename T, int Opt, typename StorageIndex>
+void FemElement::assembleMatrixBlocks(const Eigen::Ref<const Math::Matrix>& subMatrix,
+	const std::vector<size_t>& blockIds, size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix) const
 {
 	using SurgSim::Math::addSubMatrix;
+	using Eigen::Index;
 
 	const Index numBlocks = static_cast<Index>(blockIds.size());
 	for (Index block0 = 0; block0 < numBlocks; block0++)
@@ -42,9 +42,27 @@ void FemElement::assembleMatrixBlocks(const DerivedSub& subMatrix, const std::ve
 		{
 			Index subCol = static_cast<Index>(blockSize * block1);
 			addSubMatrix(subMatrix.block(subRow, subCol, blockSize, blockSize),
-						 static_cast<Index>(blockIds[block0]),
-						 static_cast<Index>(blockIds[block1]),
-						 matrix, initialize);
+				static_cast<Index>(blockIds[block0]), static_cast<Index>(blockIds[block1]), matrix);
+		}
+	}
+}
+
+template <typename T, int Opt, typename StorageIndex>
+void FemElement::assembleMatrixBlocksNoInitialize(const Eigen::Ref<const Math::Matrix>& subMatrix,
+	const std::vector<size_t>& blockIds, size_t blockSize, Eigen::SparseMatrix<T, Opt, StorageIndex>* matrix) const
+{
+	using SurgSim::Math::addSubMatrixNoInitialize;
+	using Eigen::Index;
+
+	const Index numBlocks = static_cast<Index>(blockIds.size());
+	for (Index block0 = 0; block0 < numBlocks; block0++)
+	{
+		Index subRow = static_cast<Index>(blockSize * block0);
+		for (Index block1 = 0; block1 < numBlocks; block1++)
+		{
+			Index subCol = static_cast<Index>(blockSize * block1);
+			addSubMatrixNoInitialize(subMatrix.block(subRow, subCol, blockSize, blockSize),
+				static_cast<Index>(blockIds[block0]), static_cast<Index>(blockIds[block1]), matrix);
 		}
 	}
 }

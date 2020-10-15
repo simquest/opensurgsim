@@ -84,7 +84,7 @@ public:
 		initialize(state);
 		computeShapeFunctions(state, &m_restvolume, &m_ai, &m_bi, &m_ci, &m_di);
 	}
-	
+
 private:
 	double m_restvolume;
 	std::array<double, 4> m_ai;
@@ -496,16 +496,13 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 	Matrix zeroMatrix = Matrix::Zero(tet.getNumDofPerNode() * tet.getNumNodes(),
 									 tet.getNumDofPerNode() * tet.getNumNodes());
 	massMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &massMatrix, true);
+	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &massMatrix);
 	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &dampingMatrix, true);
+	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &dampingMatrix);
 	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &stiffnessMatrix, true);
+	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &stiffnessMatrix);
 	stiffnessMatrix.makeCompressed();
 
 	// Make sure that the 2 ways of computing the expected stiffness matrix gives the same result

@@ -323,7 +323,7 @@ public:
 	{}
 
 protected:
-	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) override;
+	virtual void calculateComplianceWarpingTransformation(const SurgSim::Math::OdeState& state);
 };
 
 class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation
@@ -481,7 +481,7 @@ public:
 	explicit MockCollisionRepresentation(const std::string& name);
 
 	int getShapeType() const override;
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	std::shared_ptr<Math::Shape> getShape() const override;
 	void update(const double& dt) override;
 
 	/// \return The number of times update method has been invoked.

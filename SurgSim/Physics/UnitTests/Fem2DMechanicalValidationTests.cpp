@@ -121,7 +121,7 @@ public:
 	void addPunctualLoad(size_t nodeId, const Vector3d& f)
 	{
 		// Apply load at extremity
-		if (m_F.size() != static_cast<Vector::Index>(m_fem->getInitialState()->getNumDof()))
+		if (m_F.size() != static_cast<Eigen::Index>(m_fem->getInitialState()->getNumDof()))
 		{
 			m_F.setZero(m_fem->getInitialState()->getNumDof());
 		}

@@ -55,7 +55,6 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 			if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
 			{
 				auto pair = std::make_shared<Collision::CollisionPair>(*first, *second);
-
 				if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE && pair->mayIntersect())
 				{
 					pairs.push_back(pair);

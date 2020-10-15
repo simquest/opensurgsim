@@ -67,7 +67,7 @@ static const int cubeNumEdges = 12;
 static const int cubeEdges[12][2] =
 {
 	{0, 1}, {3, 2}, {4, 5}, {7, 6}, // +X
-	{0, 3}, {1, 2}, {4, 7}, {5 , 6}, // +Y
+	{0, 3}, {1, 2}, {4, 7}, {5, 6},  // +Y
 	{0, 4}, {1, 5}, {2, 6}, {3, 7}  // +Z
 };
 
@@ -146,10 +146,12 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 	EXPECT_TRUE(meshShape.getCenter().isZero());
 	EXPECT_TRUE(meshShape.getSecondMomentOfVolume().isZero());
 	EXPECT_TRUE(meshShape.isValid()); // An empty mesh is regarded as valid.
+	EXPECT_EQ(0, meshShape.getInitialVertices().getNumVertices());
 
 	MeshShape emptyMeshShape;
 	EXPECT_TRUE(emptyMeshShape.isValid());
 	EXPECT_TRUE(emptyMeshShape.getBoundingBox().isEmpty());
+	EXPECT_EQ(0, meshShape.getInitialVertices().getNumVertices());
 }
 
 TEST_F(MeshShapeTest, ValidMeshTest)
@@ -178,7 +180,6 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 		auto emptyMesh = std::make_shared<TriangleMeshPlain>();
 		auto meshShape = std::make_shared<MeshShape>(*emptyMesh);
 
-		std::shared_ptr<TriangleMeshPlain> invalidTriMesh = std::make_shared<TriangleMeshPlain>();
 		for (int i = 0; i < cubeNumPoints; i++)
 		{
 			Vector3d point(cubePoints[i][0], cubePoints[i][1], cubePoints[i][2]);
@@ -186,8 +187,55 @@ TEST_F(MeshShapeTest, ValidMeshTest)
 			meshShape->addVertex(vertex);
 		}
 
-
 		EXPECT_TRUE(meshShape->isValid());
+		ASSERT_EQ(0, meshShape->getInitialVertices().getNumVertices());
+		meshShape->setInitialVertices(*meshShape);
+		ASSERT_EQ(cubeNumPoints, meshShape->getInitialVertices().getNumVertices());
+		const auto& initial = meshShape->getInitialVertices();
+		for (size_t i = 0; i < meshShape->getNumVertices(); ++i)
+		{
+			EXPECT_TRUE(meshShape->getVertex(i).position.isApprox(initial.getVertex(i).position));
+		}
+	}
+}
+
+TEST_F(MeshShapeTest, GetPose)
+{
+	auto triangleMesh = std::make_shared<TriangleMeshPlain>();
+	for (int i = 0; i < cubeNumPoints; i++)
+	{
+		Vector3d point(cubePoints[i][0], cubePoints[i][1], cubePoints[i][2]);
+		TriangleMeshPlain::VertexType vertex(point);
+		triangleMesh->addVertex(vertex);
+	}
+
+	auto meshShape = std::make_shared<MeshShape>(*triangleMesh);
+	const auto& initial = meshShape->getInitialVertices();
+	for (size_t i = 0; i < meshShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(meshShape->getVertex(i).position.isApprox(initial.getVertex(i).position));
+	}
+
+	const auto pose = makeRigidTransform(makeRotationQuaternion(0.1, Vector3d(0.1, 0.2, -0.1)),
+										 Vector3d(3.0, 4.0, -5.0));
+	meshShape->setPose(pose);
+	for (size_t i = 0; i < meshShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(meshShape->getVertex(i).position.isApprox(pose * initial.getVertex(i).position));
+	}
+
+	meshShape->setPose(RigidTransform3d::Identity());
+	for (size_t i = 0; i < meshShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(meshShape->getVertex(i).position.isApprox(initial.getVertex(i).position));
+	}
+
+	meshShape->setPose(pose);
+	meshShape->setInitialVertices(*meshShape);
+	const auto& newInitial = meshShape->getInitialVertices();
+	for (size_t i = 0; i < meshShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(meshShape->getVertex(i).position.isApprox(newInitial.getVertex(i).position));
 	}
 }
 
@@ -392,6 +440,7 @@ TEST_F(MeshShapeTest, DoLoadTest)
 		auto meshShape = std::make_shared<MeshShape>();
 		EXPECT_NO_THROW(meshShape->load("Geometry/staple_collision.ply"));
 		EXPECT_TRUE(meshShape->isValid());
+		EXPECT_EQ(0, meshShape->getInitialVertices().getNumVertices());
 	}
 
 	{
@@ -410,7 +459,7 @@ TEST_F(MeshShapeTest, DoLoadTest)
 	}
 
 	{
-		SCOPED_TRACE("Load of non existant file should throw");
+		SCOPED_TRACE("Load of non existing file should throw");
 		auto fileName = std::string("Nonexistent file");
 		auto meshShape = std::make_shared<MeshShape>();
 		EXPECT_THROW(meshShape->load("Nonexistent file"), SurgSim::Framework::AssertionFailure);

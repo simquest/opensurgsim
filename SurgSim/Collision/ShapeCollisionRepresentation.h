@@ -32,7 +32,9 @@ namespace Collision
 SURGSIM_STATIC_REGISTRATION(ShapeCollisionRepresentation);
 
 /// Use a Shape as a Collision Representation, any SurgSim::Physics::Representation can
-/// be used as a backing representation
+/// be used as a backing representation.
+/// \note This does not directly interact with the physics representation, so the pose used by this collision
+///		representation is not directly a function of FreeMotion, and collisions with this will not create constraints.
 class ShapeCollisionRepresentation : public Representation
 {
 public:
@@ -52,7 +54,8 @@ public:
 	// \param shape Shape to be used in this representation.
 	void setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape);
 
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	std::shared_ptr<Math::Shape> getShape() const override;
+	void updateCcdData(double timeOfImpact) override;
 
 protected:
 	bool doInitialize() override;

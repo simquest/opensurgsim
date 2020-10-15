@@ -79,11 +79,15 @@ void doTriangleMeshSurfaceMeshTest(std::shared_ptr<MeshShape> meshA,
 		std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 0");
 	meshARep->setShape(meshA);
 	meshARep->setLocalPose(meshATransform);
+	meshARep->updateShapeData();
+	meshARep->updateDcdData();
 
 	std::shared_ptr<ShapeCollisionRepresentation> meshBRep =
 		std::make_shared<ShapeCollisionRepresentation>("Collision Mesh 1");
 	meshBRep->setShape(meshB);
 	meshBRep->setLocalPose(meshBTransform);
+	meshBRep->updateShapeData();
+	meshBRep->updateDcdData();
 
 	// Perform collision detection.
 	TriangleMeshSurfaceMeshContact calcContact;

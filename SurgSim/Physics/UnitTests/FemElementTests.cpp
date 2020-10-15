@@ -33,13 +33,13 @@ using SurgSim::Math::Matrix;
 
 void testSize(const Vector& v, size_t expectedSize)
 {
-	EXPECT_EQ(static_cast<Vector::Index>(expectedSize), v.size());
+	EXPECT_EQ(static_cast<Eigen::Index>(expectedSize), v.size());
 }
 
 void testSize(const Matrix& m, size_t expectedRows, size_t expectedCols)
 {
-	EXPECT_EQ(static_cast<Matrix::Index>(expectedRows), m.rows());
-	EXPECT_EQ(static_cast<Matrix::Index>(expectedCols), m.cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(expectedRows), m.rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(expectedCols), m.cols());
 }
 
 namespace SurgSim

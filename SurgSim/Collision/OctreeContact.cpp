@@ -19,7 +19,6 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Vector.h"

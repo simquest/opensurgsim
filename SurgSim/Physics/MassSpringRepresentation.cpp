@@ -66,9 +66,9 @@ bool MassSpringRepresentation::doInitialize()
 
 	// Precompute the sparsity pattern for the global arrays. M is diagonal, the
 	// rest need to be calculated.
-	m_M.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
-	m_D.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
-	m_K.resize(static_cast<SparseMatrix::Index>(getNumDof()), static_cast<SparseMatrix::Index>(getNumDof()));
+	m_M.resize(static_cast<Eigen::Index>(getNumDof()), static_cast<Eigen::Index>(getNumDof()));
+	m_D.resize(static_cast<Eigen::Index>(getNumDof()), static_cast<Eigen::Index>(getNumDof()));
+	m_K.resize(static_cast<Eigen::Index>(getNumDof()), static_cast<Eigen::Index>(getNumDof()));
 	for (auto& spring : m_springs)
 	{
 		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode(),
@@ -77,10 +77,10 @@ bool MassSpringRepresentation::doInitialize()
 		{
 			for (auto nodeId2 : spring->getNodeIds())
 			{
-				Math::addSubMatrix(block, static_cast<SparseMatrix::Index>(nodeId1),
-								   static_cast<SparseMatrix::Index>(nodeId2), &m_D, true);
-				Math::addSubMatrix(block, static_cast<SparseMatrix::Index>(nodeId1),
-								   static_cast<SparseMatrix::Index>(nodeId2), &m_K, true);
+				Math::addSubMatrix(block, static_cast<Eigen::Index>(nodeId1),
+					static_cast<Eigen::Index>(nodeId2), &m_D);
+				Math::addSubMatrix(block, static_cast<Eigen::Index>(nodeId1),
+					static_cast<Eigen::Index>(nodeId2), &m_K);
 			}
 		}
 	}
@@ -172,10 +172,10 @@ void MassSpringRepresentation::addExternalGeneralizedForce(std::shared_ptr<Local
 			". Valid range is {0.." << getNumMasses() << "}";
 
 	m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce;
-	Math::addSubMatrix(K, static_cast<SparseMatrix::Index>(nodeId), static_cast<SparseMatrix::Index>(nodeId),
-					   &m_externalGeneralizedStiffness, true);
-	Math::addSubMatrix(D, static_cast<SparseMatrix::Index>(nodeId), static_cast<SparseMatrix::Index>(nodeId),
-					   &m_externalGeneralizedDamping, true);
+	Math::addSubMatrix(K, static_cast<Eigen::Index>(nodeId), static_cast<Eigen::Index>(nodeId),
+		&m_externalGeneralizedStiffness);
+	Math::addSubMatrix(D, static_cast<Eigen::Index>(nodeId), static_cast<Eigen::Index>(nodeId),
+		&m_externalGeneralizedDamping);
 	m_hasExternalGeneralizedForce = true;
 }
 
@@ -222,7 +222,7 @@ void MassSpringRepresentation::computeM(const SurgSim::Math::OdeState& state)
 	// Make sure the mass matrix has been properly allocated
 	Math::clearMatrix(&m_M);
 
-	for (SparseMatrix::Index massId = 0; massId < static_cast<SparseMatrix::Index>(getNumMasses()); massId++)
+	for (Eigen::Index massId = 0; massId < static_cast<Eigen::Index>(getNumMasses()); massId++)
 	{
 		m_M.coeffRef(3 * massId, 3 * massId) = getMass(massId)->getMass();
 		m_M.coeffRef(3 * massId + 1, 3 * massId + 1) = getMass(massId)->getMass();
@@ -244,7 +244,7 @@ void MassSpringRepresentation::computeD(const SurgSim::Math::OdeState& state)
 	// D += rayleighMass.M
 	if (rayleighMass != 0.0)
 	{
-		for (SparseMatrix::Index massId = 0; massId < static_cast<SparseMatrix::Index>(getNumMasses()); massId++)
+		for (Eigen::Index massId = 0; massId < static_cast<Eigen::Index>(getNumMasses()); massId++)
 		{
 			double coef = rayleighMass * getMass(massId)->getMass();
 			m_D.coeffRef(3 * massId, 3 * massId) = coef;
@@ -294,8 +294,6 @@ void MassSpringRepresentation::computeK(const SurgSim::Math::OdeState& state)
 
 void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::addSubVector;
-
 	// Make sure the force vector has been properly allocated and zeroed out
 	m_f.setZero(state.getNumDof());
 
@@ -322,8 +320,7 @@ void MassSpringRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
 	{
-		for (SparseMatrix::Index diagonal = 0; diagonal < static_cast<SparseMatrix::Index>(state.getNumDof());
-			 ++diagonal)
+		for (Eigen::Index diagonal = 0; diagonal < static_cast<Eigen::Index>(state.getNumDof()); ++diagonal)
 		{
 			m_D.coeffRef(diagonal, diagonal) += m_M.coeff(diagonal, diagonal) * m_rayleighDamping.massCoefficient;
 		}

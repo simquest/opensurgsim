@@ -137,5 +137,11 @@ void KeyBehavior::logMap()
 	}
 }
 
+void KeyBehavior::clearKeyMap()
+{
+	boost::unique_lock<boost::mutex> lock(m_keyMapMutex);
+	m_keyMap.clear();
+}
+
 }; // namespace Blocks
 }; // namespace SurgSim

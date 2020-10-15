@@ -68,6 +68,10 @@ public:
 	/// Write the keymap out to the logger
 	static void logMap();
 
+	/// Clear the map
+	/// as its static it will survive teardown of this object
+	static void clearKeyMap();
+
 protected:
 	/// Implement to execute functionality on key press
 	/// \param key the value of the key hit

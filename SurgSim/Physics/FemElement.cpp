@@ -25,7 +25,7 @@ namespace Physics
 {
 
 FemElement::FemElement() : m_numDofPerNode(0), m_rho(0.0), m_E(0.0), m_nu(0.0),
-	m_useDamping(false), m_initializedFMDK(false)
+	m_useDamping(false)
 {}
 
 FemElement::~FemElement()
@@ -38,7 +38,8 @@ void FemElement::initialize(const SurgSim::Math::OdeState& state)
 	SURGSIM_ASSERT(m_nu != 0.0) << "Poisson ratio is not set. Did you call setPoissonRatio() ?";
 	SURGSIM_ASSERT(m_E != 0.0) << "Young modulus is not set. Did you call setYoungModulus() ?";
 	SURGSIM_ASSERT(m_rho > 0.0) << "Mass density (" << m_rho << ") is invalid, it should be positive";
-	SURGSIM_ASSERT(m_nu > 0.0 && m_nu < 0.5) << "Poisson ratio (" << m_nu << ") is invalid, it should be within [0 0.5)";
+	SURGSIM_ASSERT(m_nu > 0.0 && m_nu < 0.5) << "Poisson ratio (" << m_nu
+		<< ") is invalid, it should be within [0 0.5)";
 	SURGSIM_ASSERT(m_E > 0.0) << "Young modulus (" << m_E << ") is invalid, it should be positive";
 }
 
@@ -110,25 +111,48 @@ double FemElement::getMass(const SurgSim::Math::OdeState& state) const
 
 void FemElement::addForce(SurgSim::Math::Vector* F, double scale) const
 {
-	Math::addSubVector(m_f * scale, m_nodeIds, m_numDofPerNode, F);
+	Math::addSubVector<Math::Vector, Math::Vector>(m_f * scale, m_nodeIds, m_numDofPerNode, F);
+}
+
+void FemElement::addForce(SurgSim::Math::Vector* F) const
+{
+	Math::addSubVector<Math::Vector, Math::Vector>(m_f, m_nodeIds, m_numDofPerNode, F);
 }
 
 void FemElement::addMass(SurgSim::Math::SparseMatrix* M, double scale) const
 {
-	assembleMatrixBlocks(m_M * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), M, false);
+	assembleMatrixBlocksNoInitialize(m_M * scale, m_nodeIds, m_numDofPerNode, M);
+}
+
+void FemElement::addMass(SurgSim::Math::SparseMatrix* M) const
+{
+	assembleMatrixBlocksNoInitialize(m_M, m_nodeIds, m_numDofPerNode, M);
 }
 
 void FemElement::addDamping(SurgSim::Math::SparseMatrix* D, double scale) const
 {
 	if (m_useDamping)
 	{
-		assembleMatrixBlocks(m_D * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), D, false);
+		assembleMatrixBlocksNoInitialize(m_D * scale, m_nodeIds, m_numDofPerNode, D);
+	}
+}
+
+void FemElement::addDamping(SurgSim::Math::SparseMatrix* D) const
+{
+	if (m_useDamping)
+	{
+		assembleMatrixBlocksNoInitialize(m_D, m_nodeIds, m_numDofPerNode, D);
 	}
 }
 
 void FemElement::addStiffness(SurgSim::Math::SparseMatrix* K, double scale) const
 {
-	assembleMatrixBlocks(m_K * scale, m_nodeIds, static_cast<int>(m_numDofPerNode), K, false);
+	assembleMatrixBlocksNoInitialize(m_K * scale, m_nodeIds, m_numDofPerNode, K);
+}
+
+void FemElement::addStiffness(SurgSim::Math::SparseMatrix* K) const
+{
+	assembleMatrixBlocksNoInitialize(m_K, m_nodeIds, m_numDofPerNode, K);
 }
 
 void FemElement::addFMDK(SurgSim::Math::Vector* F,
@@ -183,7 +207,7 @@ void FemElement::addMatVec(double alphaM, double alphaD, double alphaK, const Su
 		(*accumulator).noalias() += alphaK * (m_K * (*extractedX));
 	}
 
-	addSubVector(*accumulator, m_nodeIds, m_numDofPerNode, F);
+	addSubVector<Math::Vector, Math::Vector>(*accumulator, m_nodeIds, m_numDofPerNode, F);
 }
 
 bool FemElement::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
@@ -202,9 +226,8 @@ void FemElement::updateFMDK(const Math::OdeState& state, int options)
 
 void FemElement::initializeFMDK()
 {
-	if (!m_initializedFMDK)
+	if (!m_f.size() != 0)
 	{
-		m_initializedFMDK = true;
 		doInitializeFMDK();
 	}
 }
