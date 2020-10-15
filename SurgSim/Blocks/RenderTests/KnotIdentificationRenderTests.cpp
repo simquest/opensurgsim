@@ -162,7 +162,7 @@ public:
 		/// Run the thread
 		runtime->start();
 
-		boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(static_cast<int>(miliseconds)));
 	}
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
