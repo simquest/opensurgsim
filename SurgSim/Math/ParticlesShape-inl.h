@@ -36,7 +36,6 @@ template <class V>
 ParticlesShape& ParticlesShape::operator=(const SurgSim::DataStructures::Vertices<V>& other)
 {
 	DataStructures::Vertices<DataStructures::EmptyData>::operator=(other);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
 	setInitialVertices(*this);
 	update();
 	return *this;
