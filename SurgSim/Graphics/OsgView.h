@@ -178,7 +178,7 @@ private:
 	std::array<int, 2> m_position;
 	/// Dimensions of the view on the screen (in pixels)
 	std::array<int, 2> m_dimensions;
-	std::array<int, 2> m_screenDimensions;
+	std::array<int, 2> m_screenDimensions = {};
 	/// Whether the view window has a border
 	bool m_isWindowBorderEnabled;
 

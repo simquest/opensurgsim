@@ -23,7 +23,7 @@ namespace Physics
 {
 
 ComputationGroup::ComputationGroup(bool copyState) :
-	Computation(copyState)
+	Computation(copyState), m_iterations(0)
 {
 
 }

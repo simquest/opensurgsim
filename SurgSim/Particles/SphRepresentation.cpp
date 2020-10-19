@@ -40,7 +40,13 @@ SphRepresentation::SphRepresentation(const std::string& name) :
 	m_friction(0.0),
 	m_gravity(Math::Vector3d(0.0, -9.81, 0.0)),
 	m_viscosity(0.0),
-	m_h(0.0)
+	m_h(0.0),
+	m_hSquared(std::numeric_limits<double>::signaling_NaN()),
+	m_kernelPoly6(std::numeric_limits<double>::signaling_NaN()),
+	m_kernelPoly6Gradient(std::numeric_limits<double>::signaling_NaN()),
+	m_kernelSpikyGradient(std::numeric_limits<double>::signaling_NaN()),
+	m_kernelViscosityLaplacian(std::numeric_limits<double>::signaling_NaN()),
+	m_kernelPoly6Laplacian(std::numeric_limits<double>::signaling_NaN())
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphRepresentation, double, MassPerParticle, getMassPerParticle,
 			setMassPerParticle);

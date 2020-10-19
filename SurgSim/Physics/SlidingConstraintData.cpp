@@ -23,7 +23,7 @@ namespace Physics
 {
 
 SlidingConstraintData::SlidingConstraintData() :
-	ConstraintData(), m_mu(0.5)
+	ConstraintData(), m_distanceTangent(std::numeric_limits<double>::signaling_NaN()), m_mu(0.5)
 {
 	m_normals[0].setZero();
 	m_normals[1].setZero();

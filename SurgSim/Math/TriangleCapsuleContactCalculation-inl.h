@@ -92,7 +92,7 @@ public:
 		const Vector3& cv0, const Vector3& cv1,
 		double cr)
 		: m_tv0(tv0), m_tv1(tv1), m_tv2(tv2), m_tn(tn),
-		  m_cvTop(cv0), m_cvBottom(cv1), m_cr(cr)
+		  m_cvTop(cv0), m_cvBottom(cv1), m_cr(cr), m_penetrationDepth(T(-1))
 	{
 		m_epsilon = static_cast<T>(Geometry::DistanceEpsilon);
 		m_distance = distanceSegmentTriangle(cv0, cv1, m_tv0, m_tv1, m_tv2, m_tn,

@@ -273,12 +273,6 @@ private:
 	/// Used Vtc damping parameter in angular mode (in N·m·s·rad-1)
 	double m_angularDamping;
 
-	/// Scaling factor for the forces sent to the OutputComponent
-	double m_outputForceScaling;
-
-	/// Scaling factor for the torques sent to the OutputComponent
-	double m_outputTorqueScaling;
-
 	/// The input's point of attachment in the local frame, i.e., the same frame in which the mass center is defined.
 	Math::Vector3d m_localAttachmentPoint;
 
