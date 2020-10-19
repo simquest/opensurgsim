@@ -24,7 +24,8 @@ namespace Graphics
 
 template <class V, class E, class T>
 Mesh::Mesh(const TriangleMesh<V, E, T>& other)
-	: DataStructures::TriangleMesh<VertexData, DataStructures::EmptyData, DataStructures::EmptyData>(other)
+	: DataStructures::TriangleMesh<VertexData, DataStructures::EmptyData, DataStructures::EmptyData>(other),
+	m_updateCount(1)
 {
 }
 

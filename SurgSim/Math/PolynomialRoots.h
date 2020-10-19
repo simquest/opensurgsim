@@ -72,10 +72,10 @@ protected:
 	PolynomialRootsCommon() {}
 
 	/// The number of roots available for the polynomial, or DEGENERATE if there are infinite roots
-	int m_numRoots;
+	int m_numRoots = -1;
 
 	/// An array of up to N roots for a degree N polynomial ordered ascendingly
-	std::array<T, N> m_roots;
+	std::array<T, N> m_roots = {};
 };
 
 /// PolynomialRoots<T, 1> specializes the PolynomialRoots class for degree 1 (linear polynomials)
