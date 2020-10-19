@@ -35,6 +35,9 @@ struct PlyReader::Data
 {
 	Data() :
 		plyFile(nullptr),
+		file_type(-1),
+		version(-1.0),
+		elementCount(-1),
 		elementNames(nullptr)
 	{
 		types[TYPE_INVALID] = PLY_START_TYPE;

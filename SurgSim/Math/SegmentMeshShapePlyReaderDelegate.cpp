@@ -22,6 +22,7 @@ namespace Math
 {
 
 SegmentMeshShapePlyReaderDelegate::SegmentMeshShapePlyReaderDelegate() :
+	m_hasRadius(false),
 	m_radius(0.0)
 {
 

@@ -157,18 +157,18 @@ protected:
 	/// Mass data containing 3 translational dofs and mass
 	struct MassData
 	{
-		double x;
-		double y;
-		double z;
-		double mass;
-		int64_t overrun1; ///< Used to check for buffer overruns
+		double x = std::numeric_limits<double>::signaling_NaN();
+		double y = std::numeric_limits<double>::signaling_NaN();
+		double z = std::numeric_limits<double>::signaling_NaN();
+		double mass = std::numeric_limits<double>::signaling_NaN();
+		int64_t overrun1 = -1; ///< Used to check for buffer overruns
 	} m_massData;
 
 	/// Flag indicating if the associated file has boundary conditions
-	bool m_hasBoundaryConditions;
+	bool m_hasBoundaryConditions = false;
 
 	/// Internal data to receive the "boundary_condition" element
-	unsigned int m_boundaryConditionData;
+	unsigned int m_boundaryConditionData = 0;
 
 	/// Flag indicating if the associated file has 1d elements
 	bool m_has1dElement = false;
@@ -182,32 +182,32 @@ protected:
 	/// Internal data to receive the element (nodeId) data
 	struct ElementData
 	{
-		int64_t overrun1; ///< Used to check for buffer overruns
-		unsigned int* indices;
-		unsigned int nodeCount;
-		int64_t overrun2; ///< Used to check for buffer overruns
+		int64_t overrun1 = -1; ///< Used to check for buffer overruns
+		unsigned int* indices = nullptr;
+		unsigned int nodeCount = 0;
+		int64_t overrun2 = -1; ///< Used to check for buffer overruns
 	} m_elementData;
 
 	/// Internal data to receive the spring (stretching and bending) data
 	struct SpringData
 	{
-		int64_t overrun1; ///< Used to check for buffer overruns
-		unsigned int* indices;
-		unsigned int nodeCount;
-		int64_t overrun2; ///< Used to check for buffer overruns
-		double stiffness;
-		double damping;
+		int64_t overrun1 = -1; ///< Used to check for buffer overruns
+		unsigned int* indices = nullptr;
+		unsigned int nodeCount = 0;
+		int64_t overrun2 = -1; ///< Used to check for buffer overruns
+		double stiffness = std::numeric_limits<double>::signaling_NaN();
+		double damping = std::numeric_limits<double>::signaling_NaN();
 	} m_springData;
 
 	/// Flag indicating if the associated file has a radius
-	bool m_hasRadius;
+	bool m_hasRadius = false;
 	/// Radius information, if any.
-	double m_radius;
+	double m_radius = std::numeric_limits<double>::signaling_NaN();
 
 	/// Flag indicating if the associated file has a thickness
-	bool m_hasThickness;
+	bool m_hasThickness = false;
 	/// Thickness information, if any.
-	double m_thickness;
+	double m_thickness = std::numeric_limits<double>::signaling_NaN();
 
 	/// MassSpringModel to contain the ply file information
 	std::shared_ptr<MassSpringModel> m_mesh;

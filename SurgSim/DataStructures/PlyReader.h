@@ -230,10 +230,10 @@ private:
 	struct PropertyInfo
 	{
 		std::string propertyName; ///< Name of the property.
-		int dataType; ///< Type of the receiving data.
-		int dataOffset; ///< Location for the receiving data.
-		int countType; ///< For lists, type of the receiving data for the count of listelements.
-		int countOffset; ///< For lists, location of the receiving data for the count.
+		int dataType = -1; ///< Type of the receiving data.
+		int dataOffset = -1; ///< Location for the receiving data.
+		int countType = -1; ///< For lists, type of the receiving data for the count of listelements.
+		int countOffset = -1; ///< For lists, location of the receiving data for the count.
 	};
 
 	/// Information about the element in the .ply file.
