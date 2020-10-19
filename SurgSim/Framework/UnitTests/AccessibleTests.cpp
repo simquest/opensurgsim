@@ -37,6 +37,7 @@ public:
 		normal(100),
 		readWrite(100.0),
 		readOnly(100),
+		serializableProperty(std::numeric_limits<float>::signaling_NaN()),
 		sharedPtr(std::make_shared<int>(4)),
 		serializableEnum(TEST_ENUM_A),
 		overloadedValue(200.0),

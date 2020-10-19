@@ -115,7 +115,7 @@ public:
 public:
 	std::array<Vector3d, 2> extremities;
 	std::vector<std::pair<size_t, size_t>> boundaryConditions; // <nodeId, dofId>
-	std::array<size_t, 1> nodesPerDimension;
+	std::array<size_t, 1> nodesPerDimension = {};
 	double massDensity;
 	double youngModulus;
 	double poissonRatio;

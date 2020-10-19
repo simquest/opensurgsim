@@ -137,29 +137,29 @@ public:
 
 	struct VertexData
 	{
-		double x;
-		double y;
-		double z;
-		int64_t overrun;
+		double x = std::numeric_limits<double>::signaling_NaN();
+		double y = std::numeric_limits<double>::signaling_NaN();
+		double z = std::numeric_limits<double>::signaling_NaN();
+		int64_t overrun = -1;
 	};
 
 	struct FaceData
 	{
-		unsigned int faceCount;
-		unsigned int* faces;
-		int extra;
-		unsigned int nature;
-		int64_t overrun;
+		unsigned int faceCount = 0;
+		unsigned int* faces = nullptr;
+		int extra = -1;
+		unsigned int nature = 0;
+		int64_t overrun = -1;
 	};
 
 	VertexData vertexData;
-	size_t vertexInitCount;
-	size_t vertexRunningCount;
-	bool endVerticesCalled;
+	size_t vertexInitCount = 0;
+	size_t vertexRunningCount = 0;
+	bool endVerticesCalled = false;
 
 	FaceData faceData;
-	size_t faceInitCount;
-	size_t faceRunningCount;
+	size_t faceInitCount = 0;
+	size_t faceRunningCount = 0;
 
 	std::vector<Vector3d> vertices;
 	std::vector<std::vector<unsigned int>> faces;

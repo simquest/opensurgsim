@@ -32,8 +32,8 @@ using SurgSim::Math::Vector3d;
 
 struct MockData
 {
-	int mockInt;
-	double mockDouble;
+	int mockInt = 0;
+	double mockDouble = std::numeric_limits<double>::signaling_NaN();
 	std::string mockString;
 };
 

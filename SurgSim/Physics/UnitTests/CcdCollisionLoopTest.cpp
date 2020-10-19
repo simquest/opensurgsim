@@ -40,7 +40,7 @@ TEST(CcdCollisionLoopTest, Setters)
 
 TEST(CcdCollisionLoopTest, FilterContacts)
 {
-	double toi;
+	double toi = -1.0;
 	auto rep1 = std::make_shared<RigidCollisionRepresentation>("One");
 	rep1->setSelfCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
 	auto pair = std::make_shared<Collision::CollisionPair>(rep1, rep1);
@@ -76,7 +76,7 @@ TEST(CcdCollisionLoopTest, FilterContacts)
 
 TEST(CcdCollisionLoopTest, FilterContactsWithEpsilon)
 {
-	double toi;
+	double toi = -1.0;
 	auto rep1 = std::make_shared<RigidCollisionRepresentation>("One");
 	rep1->setSelfCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
 	auto pair = std::make_shared<Collision::CollisionPair>(rep1, rep1);

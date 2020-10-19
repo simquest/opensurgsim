@@ -237,9 +237,9 @@ public:
 	}
 private:
 	/// Triangle's unique ID in its mesh
-	size_t m_id;
+	size_t m_id = 0;
 	/// The IDs of the triangle's edges in its mesh, in order: {vertex0->vertex1, vertex1->vertex2, vertex2->vertex3}
-	std::array<size_t, 3> m_edges;
+	std::array<size_t, 3> m_edges = {};
 };
 
 /// Tetrahedron data for testing, storing ID and edge IDs, triangle IDs
