@@ -14,10 +14,9 @@
 // limitations under the License.
 
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
-#include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
-#include "SurgSim/Math/LinearSolveAndInverse.h"
-#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/Mass.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::Mass;
@@ -35,19 +34,22 @@ void MassSpring1DRepresentation::init1D(
 	double stiffnessStretching, double dampingStretching,
 	double stiffnessBending, double dampingBending)
 {
-	std::shared_ptr<SurgSim::Math::OdeState> state;
-	state = std::make_shared<SurgSim::Math::OdeState>();
-	state->setNumDof(getNumDofPerNode(), nodes.size());
-
 	SURGSIM_ASSERT(nodes.size() > 0) << "Number of nodes incorrect: " << nodes.size();
 
+	auto mesh = std::make_shared<Physics::MassSpringModel>();
 	// Initialize the nodes position, velocity and mass
 	// Note: no need to apply the initialPose here, initialize will take care of it !
 	for (size_t massId = 0; massId < nodes.size(); massId++)
 	{
-		addMass(std::make_shared<Mass>(totalMass / static_cast<double>(nodes.size())));
+		auto mass = std::make_shared<Mass>(totalMass / static_cast<double>(nodes.size()));
+		mesh->addMass(mass);
+		mesh->addVertex(DataStructures::Vertices<Mass>::VertexType(nodes[massId], *mass));
+	}
 
-		SurgSim::Math::setSubVector(nodes[massId], massId, 3, &state->getPositions());
+	// Initialize the 1D elements, segments.
+	for (size_t massId = 0; massId < nodes.size() - 1; ++massId)
+	{
+		mesh->addElement({ massId, massId + 1 });
 	}
 
 	// Initialize the stretching springs
@@ -55,7 +57,8 @@ void MassSpring1DRepresentation::init1D(
 	{
 		for (size_t massId = 0; massId < nodes.size() - 1; massId++)
 		{
-			addSpring(createLinearSpring(state, massId, massId + 1, stiffnessStretching, dampingStretching));
+			mesh->addSpring(std::make_shared<Physics::LinearSpring>(mesh, massId, massId + 1, stiffnessStretching,
+				dampingStretching));
 		}
 	}
 
@@ -64,20 +67,18 @@ void MassSpring1DRepresentation::init1D(
 	{
 		for (size_t massId = 0; massId < nodes.size() - 2; massId++)
 		{
-			addSpring(createLinearSpring(state, massId, massId + 2, stiffnessBending, dampingBending));
+			mesh->addSpring(std::make_shared<Physics::LinearSpring>(mesh, massId, massId + 2, stiffnessBending,
+				dampingBending));
 		}
 	}
 
 	// Sets the boundary conditions
-	for (auto boundaryCondition = std::begin(nodeBoundaryConditions);
-		 boundaryCondition != std::end(nodeBoundaryConditions);
-		 boundaryCondition++)
+	for (const auto& boundaryCondition : nodeBoundaryConditions)
 	{
-		state->addBoundaryCondition(*boundaryCondition);
+		mesh->addBoundaryCondition(boundaryCondition);
 	}
 
-	// setInitialState: Initialize all the states + apply initialPose if any
-	setInitialState(state);
+	setMassSpringModel(std::dynamic_pointer_cast<Framework::Asset>(mesh));
 }
 
 }; // namespace Blocks

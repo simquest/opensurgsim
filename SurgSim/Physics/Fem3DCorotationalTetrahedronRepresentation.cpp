@@ -83,10 +83,9 @@ void Fem3DCorotationalTetrahedronRepresentation::setFemElementType(const std::st
 }
 
 Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
-		const Math::OdeState& state, size_t nodeId)
+		const Math::OdeState& state, size_t nodeId) const
 {
 	std::vector<Math::Matrix33d> elementRotations;
-	Math::Matrix33d R3x3;
 
 	for (auto const& element : m_femElements)
 	{
@@ -100,7 +99,7 @@ Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
 
 	SURGSIM_ASSERT(elementRotations.size() > 0) << "Node " << nodeId << " happens to not belong to any FemElements";
 
-	R3x3 = elementRotations[0];
+	Math::Matrix33d R3x3 = elementRotations[0];
 	for (size_t i = 2; i <= elementRotations.size(); i++)
 	{
 		double ai = 1.0 / static_cast<double>(i);
@@ -108,6 +107,39 @@ Math::Matrix Fem3DCorotationalTetrahedronRepresentation::getNodeTransformation(
 	}
 
 	return Math::Matrix(R3x3);
+}
+
+void Fem3DCorotationalTetrahedronRepresentation::calculateComplianceWarpingTransformation(
+	const SurgSim::Math::OdeState& state)
+{
+	const Eigen::Index numNodes = static_cast<Eigen::Index>(state.getNumNodes());
+	Math::Matrix33d R3x3;
+
+	for (Eigen::Index nodeId = 0; nodeId < numNodes; ++nodeId)
+	{
+		std::vector<Math::Matrix33d> elementRotations;
+
+		for (auto const& element : m_femElements)
+		{
+			auto node = std::find(element->getNodeIds().begin(), element->getNodeIds().end(), nodeId);
+			if (node != element->getNodeIds().end())
+			{
+				elementRotations.push_back(std::static_pointer_cast<Fem3DElementCorotationalTetrahedron>(element)->
+					getRotationMatrix());
+			}
+		}
+
+		SURGSIM_ASSERT(elementRotations.size() > 0) << "Node " << nodeId << " happens to not belong to any FemElements";
+
+		R3x3 = elementRotations[0];
+		for (size_t i = 2; i <= elementRotations.size(); i++)
+		{
+			double ai = 1.0 / static_cast<double>(i);
+			R3x3 = Eigen::Quaterniond(R3x3).slerp(1.0 - ai, Eigen::Quaterniond(elementRotations[i - 1]));
+		}
+
+		SurgSim::Math::assignSubMatrixNoInitialize(R3x3, nodeId, nodeId, &m_complianceWarpingTransformation);
+	}
 }
 
 } // namespace Physics

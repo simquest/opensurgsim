@@ -90,6 +90,7 @@ TEST(OdeEquationTests, ComputesTest)
 		SurgSim::Math::Matrix33d expectedK = SurgSim::Math::Matrix33d::Zero();
 		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_F);
 		EXPECT_TRUE(m.getF().isApprox(expectedF));
+
 		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
 		EXPECT_TRUE(m.getM().isApprox(expectedM));
 		m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_D);
@@ -104,4 +105,64 @@ TEST(OdeEquationTests, ComputesTest)
 			EXPECT_TRUE(m.getK().isApprox(expectedK));
 		}
 	}
+}
+
+
+TEST(OdeEquationTests, HasFMDKSingleMatrix)
+{
+	MassPoint m;
+	MassPointState state;
+	state.getPositions() = SurgSim::Math::Vector3d(1.0, 1.0, 1.0);
+	state.getVelocities() = SurgSim::Math::Vector3d(1.0, 1.0, 1.0);
+
+	EXPECT_FALSE(m.hasF());
+	EXPECT_FALSE(m.hasM());
+	EXPECT_FALSE(m.hasD());
+	EXPECT_FALSE(m.hasK());
+
+	m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_F);
+	EXPECT_TRUE(m.hasF());
+	EXPECT_FALSE(m.hasM());
+	EXPECT_FALSE(m.hasD());
+	EXPECT_FALSE(m.hasK());
+
+	m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_M);
+	EXPECT_TRUE(m.hasF());
+	EXPECT_TRUE(m.hasM());
+	EXPECT_FALSE(m.hasD());
+	EXPECT_FALSE(m.hasK());
+
+	m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_D);
+	EXPECT_TRUE(m.hasF());
+	EXPECT_TRUE(m.hasM());
+	EXPECT_TRUE(m.hasD());
+	EXPECT_FALSE(m.hasK());
+
+
+	m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_K);
+	EXPECT_TRUE(m.hasF());
+	EXPECT_TRUE(m.hasM());
+	EXPECT_TRUE(m.hasD());
+	EXPECT_TRUE(m.hasK());
+
+}
+
+TEST(OdeEquationTests, HasFMDKFullUpdate)
+{
+	MassPoint m;
+	MassPointState state;
+	state.getPositions() = SurgSim::Math::Vector3d(1.0, 1.0, 1.0);
+	state.getVelocities() = SurgSim::Math::Vector3d(1.0, 1.0, 1.0);
+
+	EXPECT_FALSE(m.hasF());
+	EXPECT_FALSE(m.hasM());
+	EXPECT_FALSE(m.hasD());
+	EXPECT_FALSE(m.hasK());
+
+	m.updateFMDK(state, SurgSim::Math::ODEEQUATIONUPDATE_FMDK);
+	EXPECT_TRUE(m.hasF());
+	EXPECT_TRUE(m.hasM());
+	EXPECT_TRUE(m.hasD());
+	EXPECT_TRUE(m.hasK());
+
 }

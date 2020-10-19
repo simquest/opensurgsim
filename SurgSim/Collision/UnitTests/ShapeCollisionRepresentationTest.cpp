@@ -51,20 +51,23 @@ TEST(ShapeCollisionRepresentationTest, MeshUpdateTest)
 	auto collisionRepresentation = std::make_shared<ShapeCollisionRepresentation>("Collision");
 	collisionRepresentation->setShape(originalMesh);
 	collisionRepresentation->setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
-	collisionRepresentation->update(dt);
+	collisionRepresentation->updateShapeData();
 
 	EXPECT_EQ(collisionRepresentation->getShapeType(), originalMesh->getType());
 
-	auto actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape());
+	auto actualMesh =
+		std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape().getShape());
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());
 	EXPECT_EQ(expectedMesh->getTriangles(), actualMesh->getTriangles());
 
 	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(Vector3d(4.3, 2.1, 6.5), Vector3d(-1.5, 7.5, -2.5),
 			Vector3d(8.7, -4.7, -3.1));
 	collisionRepresentation->setLocalPose(transform);
-	collisionRepresentation->update(dt);
+	collisionRepresentation->updateShapeData();
+	collisionRepresentation->updateDcdData();
 
-	actualMesh = std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape());
+	actualMesh =
+		std::static_pointer_cast<SurgSim::Math::MeshShape>(collisionRepresentation->getPosedShape().getShape());
 	expectedMesh->transform(transform);
 	EXPECT_TRUE(expectedMesh->update());
 	EXPECT_EQ(expectedMesh->getVertices(), actualMesh->getVertices());

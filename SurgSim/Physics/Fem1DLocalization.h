@@ -45,6 +45,8 @@ public:
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
 
 	bool moveClosestTo(const Math::Vector3d& point, bool *hasReachedEnd) override;
+
+	std::shared_ptr<Localization> doCopy() const override;
 };
 
 } // namespace Physics

@@ -337,19 +337,19 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, ExternalForceAPITest)
 	m_fem->setInitialState(m_initialState);
 
 	// Vector initialized (properly sized and zeroed)
-	Math::SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(m_fem->getNumDof()),
-								  static_cast<SparseMatrix::Index>(m_fem->getNumDof()));
+	Math::SparseMatrix zeroMatrix(static_cast<Eigen::Index>(m_fem->getNumDof()),
+								  static_cast<Eigen::Index>(m_fem->getNumDof()));
 	zeroMatrix.setZero();
 	EXPECT_NE(0, m_fem->getExternalGeneralizedForce().size());
 	EXPECT_NE(0, m_fem->getExternalGeneralizedStiffness().rows());
 	EXPECT_NE(0, m_fem->getExternalGeneralizedStiffness().cols());
 	EXPECT_NE(0, m_fem->getExternalGeneralizedDamping().rows());
 	EXPECT_NE(0, m_fem->getExternalGeneralizedDamping().cols());
-	EXPECT_EQ(static_cast<Math::Vector6d::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedForce().size());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedStiffness().cols());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedStiffness().rows());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedDamping().cols());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedDamping().rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedForce().size());
+	EXPECT_EQ(static_cast<Eigen::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedStiffness().cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedStiffness().rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedDamping().cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(m_fem->getNumDof()), m_fem->getExternalGeneralizedDamping().rows());
 	EXPECT_TRUE(m_fem->getExternalGeneralizedForce().isZero());
 	EXPECT_TRUE(m_fem->getExternalGeneralizedStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(m_fem->getExternalGeneralizedDamping().isApprox(zeroMatrix));
@@ -524,7 +524,7 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 		}
 
 		{
-			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			SCOPED_TRACE("After updates, relative rotation should not be identity (gravity and boundary conditions)");
 			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
 			{
 				auto transform = fem->getTransformation(i);
@@ -567,7 +567,7 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 		}
 
 		{
-			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			SCOPED_TRACE("After updates, relative rotation should not be identity (gravity and boundary conditions)");
 			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
 			{
 				auto transform = fem->getTransformation(i);
@@ -628,7 +628,7 @@ TEST_F(Fem3DCorotationalTetrahedronRepresentationTests, NodeTransformationTest)
 		}
 
 		{
-			SCOPED_TRACE("After few updates, the relative rotation should not be identity (under gravity and boundary conditions)");
+			SCOPED_TRACE("After updates, relative rotation should not be identity (gravity and boundary conditions)");
 			for (size_t i = 0; i < fem->getCurrentState()->getNumNodes(); i++)
 			{
 				auto transform = fem->getTransformation(i);

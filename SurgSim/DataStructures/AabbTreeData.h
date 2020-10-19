@@ -22,6 +22,7 @@
 
 #include <utility>
 #include <list>
+#include <vector>
 #include <memory>
 
 namespace SurgSim
@@ -36,6 +37,7 @@ class AabbTreeData : public TreeData
 public:
 
 	typedef std::pair<SurgSim::Math::Aabbd, size_t> Item;
+	typedef std::list<Item> ItemList;
 
 	/// Constructor
 	AabbTreeData();
@@ -44,10 +46,10 @@ public:
 	AabbTreeData(const AabbTreeData& data);
 
 	/// Constructor with list of items
-	explicit AabbTreeData(const std::list<Item>& data);
+	explicit AabbTreeData(const ItemList& data);
 
 	/// Constructor with moveable list of items
-	explicit AabbTreeData(std::list<Item>&& data);
+	explicit AabbTreeData(ItemList&& data);
 
 	/// Destructor
 	~AabbTreeData();
@@ -56,7 +58,7 @@ public:
 	/// Add an item to the data
 	/// \param aabb the AABB of the item
 	/// \param id an object identifier assigned by the user of this class
-	void add(const SurgSim::Math::Aabbd aabb, size_t id);
+	void add(const SurgSim::Math::Aabbd& aabb, size_t id);
 
 	/// \return the combined AABB of all the contained items
 	const SurgSim::Math::Aabbd& getAabb() const;
@@ -83,19 +85,26 @@ public:
 	/// to the list given as a parameter
 	/// \param aabb the bounding box being queried
 	/// \param [out] result list to be used for intersecting items
-	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::list<size_t>* result) const;
+	void getIntersections(const SurgSim::Math::Aabbd& aabb, std::vector<size_t>* result) const;
 
-private:
+	ItemList& getData()
+	{
+		return m_data;
+	}
+
 	/// Recalculate the aabb of this class, in case items where updated
 	void recalculateAabb();
 
+private:
+
 	bool isEqual(const TreeData* data) const override;
 
-	/// AABB containg all items
+	/// AABB containing all items
 	SurgSim::Math::Aabbd m_aabb;
 
 	/// The items that were added to this list
-	std::list<Item> m_data;
+
+	ItemList m_data;
 };
 
 }

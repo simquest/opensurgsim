@@ -173,7 +173,7 @@ void Messenger::sendEvent(const Event& event, const std::vector<Subscriber>& sub
 	for (const auto& subscriber : subscribers)
 	{
 		auto shared = subscriber.first.lock();
-		if (shared != nullptr)
+		if (shared != nullptr && shared->isActive())
 		{
 			subscriber.second(event);
 		}

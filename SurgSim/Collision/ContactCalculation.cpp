@@ -163,22 +163,43 @@ void ContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 				"Second Object, wrong type of object" << secondShapeType;
 	}
 
-	std::shared_ptr<Math::Shape> shape1 = pair->getFirst()->getPosedShape();
-
-	std::shared_ptr<Math::Shape> shape2 = pair->getSecond()->getPosedShape();
-
 	std::list<std::shared_ptr<Contact>> contacts;
 	if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_DISCRETE)
 	{
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape1(shape1, pair->getFirst()->getPose());
-		Math::PosedShape<std::shared_ptr<Math::Shape>> posedShape2(shape2, pair->getSecond()->getPose());
-		contacts = doCalculateDcdContact(posedShape1, posedShape2);
+#ifdef OSS_DEBUG
+		try
+		{
+			contacts = doCalculateDcdContact(pair->getFirst()->getPosedShape(), pair->getSecond()->getPosedShape());
+		}
+		catch (std::exception e)
+		{
+			SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getLogger("Collision")) << __func__ << " " << __LINE__ <<
+				": Failed doCalculateDcdContact:" <<
+				"\npair->getFirst()->getFullName(): " << pair->getFirst()->getFullName() <<
+				"\npair->getFirst()->getLocalPose().linear():\n" << pair->getFirst()->getLocalPose().linear() <<
+				"\npair->getFirst()->getLocalPose().translation(): " << pair->getFirst()->getLocalPose().translation().transpose() <<
+				"\npair->getFirst()->getPose().linear():\n" << pair->getFirst()->getPose().linear() <<
+				"\npair->getFirst()->getPose().translation(): " << pair->getFirst()->getPose().translation().transpose() <<
+				"\npair->getFirst()->getPosedShape().getPose().linear():\n" << pair->getFirst()->getPosedShape().getPose().linear() <<
+				"\npair->getFirst()->getPosedShape().getPose().translation(): " << pair->getFirst()->getPosedShape().getPose().translation().transpose() <<
+				"\npair->getSecond()->getFullName(): " << pair->getSecond()->getFullName() <<
+				"\npair->getSecond()->getLocalPose().linear():\n" << pair->getSecond()->getLocalPose().linear() <<
+				"\npair->getSecond()->getLocalPose().translation(): " << pair->getSecond()->getLocalPose().translation().transpose() <<
+				"\npair->getSecond()->getPose().linear():\n" << pair->getSecond()->getPose().linear() <<
+				"\npair->getSecond()->getPose().translation(): " << pair->getSecond()->getPose().translation().transpose() <<
+				"\npair->getSecond()->getPosedShape().getPose().linear():\n" << pair->getSecond()->getPosedShape().getPose().linear() <<
+				"\npair->getSecond()->getPosedShape().getPose().translation(): " << pair->getSecond()->getPosedShape().getPose().translation().transpose();
+			throw e;
+		}
+#else
+		contacts = doCalculateDcdContact(pair->getFirst()->getPosedShape(), pair->getSecond()->getPosedShape());
+#endif OSS_DEBUG
 	}
 	else if (pair->getType() == Collision::CollisionDetectionType::COLLISION_DETECTION_TYPE_CONTINUOUS)
 	{
 		contacts = doCalculateCcdContact(
-					   pair->getFirst()->getPosedShapeMotion(),
-					   pair->getSecond()->getPosedShapeMotion());
+			pair->getFirst()->getPosedShapeMotion(),
+			pair->getSecond()->getPosedShapeMotion());
 	}
 	else
 	{
@@ -236,6 +257,7 @@ void ContactCalculation::initializeTables()
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::SpherePlaneContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshParticlesContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshPlaneContact>());
+	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshSphereContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshSurfaceMeshContact>());
 	ContactCalculation::privateDcdRegister(std::make_shared<Collision::TriangleMeshTriangleMeshContact>());
 
@@ -263,9 +285,12 @@ void ContactCalculation::initializeTables()
 
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentSelfContact>());
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::SegmentMeshTriangleMeshContact>());
+	ContactCalculation::privateCcdRegister(std::make_shared<Collision::TriangleMeshTriangleMeshContact>());
 
 	ContactCalculation::privateCcdRegister(std::make_shared<Collision::CompoundShapeContact>(
 			std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_SEGMENTMESH)));
+	ContactCalculation::privateCcdRegister(std::make_shared<Collision::CompoundShapeContact>(
+		std::make_pair(Math::SHAPE_TYPE_COMPOUNDSHAPE, Math::SHAPE_TYPE_MESH)));
 }
 
 void ContactCalculation::privateDcdRegister(

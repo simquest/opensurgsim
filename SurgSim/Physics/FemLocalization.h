@@ -57,6 +57,8 @@ private:
 
 	SurgSim::Math::Vector3d doCalculateVelocity(double time) const override;
 
+	std::shared_ptr<Localization> doCopy() const override;
+
 	/// Barycentric position in local coordinates
 	SurgSim::DataStructures::IndexedLocalCoordinate m_position;
 };

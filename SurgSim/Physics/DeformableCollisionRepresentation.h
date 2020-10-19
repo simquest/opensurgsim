@@ -52,7 +52,7 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::DeformableCollisionRepresentation);
 
-	/// Set the shape for this collision representation, has to be a SurgSim::Math::MeshShape.
+	/// Set the shape for this collision representation, has to be a Mesh, SegmentMesh, or SurfaceMesh.
 	/// The vertices in the mesh need to be the same number as the vertices in the deformable representation.
 	/// \param shape The shape to be used.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
@@ -66,6 +66,10 @@ public:
 	/// \return The deformable that is used to update the contained mesh
 	const std::shared_ptr<SurgSim::Physics::DeformableRepresentation> getDeformableRepresentation() const;
 
+	void setCollisionDetectionType(Collision::CollisionDetectionType type) override;
+
+	void setSelfCollisionDetectionType(Collision::CollisionDetectionType type) override;
+
 	int getShapeType() const override;
 
 	void updateDcdData() override;
@@ -74,6 +78,8 @@ public:
 
 	void updateShapeData() override;
 
+	Math::Aabbd getBoundingBox() const override;
+
 private:
 	bool doInitialize() override;
 	bool doWakeUp() override;
@@ -81,8 +87,16 @@ private:
 	/// Shape used for collision detection
 	std::shared_ptr<SurgSim::Math::Shape> m_shape, m_previousShape;
 
+	/// Stores the bounding box for the shape.  If this collision rep uses CCD, the bounding box encompasses both
+	/// the previous state and the current state.
+	Math::Aabbd m_aabb;
+
 	/// Reference to the deformable driving changes to this mesh
 	std::weak_ptr<SurgSim::Physics::DeformableRepresentation> m_deformable;
+
+	double m_oldVolume;
+	double m_previousOldVolume;
+	double m_aabbThreshold;
 };
 
 } // namespace Physics

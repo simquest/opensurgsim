@@ -67,10 +67,12 @@ public:
 	}
 
 	/// Destructor, which may throw an exception if the failure behavior does
-#ifdef _MSC_VER
-	~AssertMessage() throw(...)  // Visual Studio does not support noexcept. The throw(...) is optional.
+	// As per https://docs.microsoft.com/en-us/cpp/cpp/exception-specifications-throw-cpp?view=vs-2019
+	// noexcept(false) has implementation from Visual Studio 2017 15.5
+#if defined(_MSC_VER) && _MSC_VER < 1912
+	~AssertMessage() throw(...) 
 #else
-	~AssertMessage() noexcept(false)  /// C++11 introduced noexcept
+	~AssertMessage() noexcept(false)
 #endif
 	{
 		flush();

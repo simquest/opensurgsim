@@ -57,6 +57,14 @@ bool ParticlesCollisionRepresentation::doWakeUp()
 
 	m_shape->getVertices().reserve(particleRepresentation->getMaxParticles());
 
+	if (m_shape->isTransformable())
+	{
+		m_shape->setPose(getPose());
+	}
+	Math::PosedShape<std::shared_ptr<Math::Shape>> posedShapeFirst(m_shape, getPose());
+	Math::PosedShapeMotion<std::shared_ptr<Math::Shape>> posedShapeMotion(posedShapeFirst, posedShapeFirst);
+	setPosedShapeMotion(posedShapeMotion);
+
 	update(0.0);
 	return true;
 }
@@ -101,7 +109,7 @@ double ParticlesCollisionRepresentation::getParticleRadius() const
 void ParticlesCollisionRepresentation::updateShapeData()
 {
 	*m_shape = getParticleRepresentation()->getParticles().unsafeGet();
-	invalidatePosedShapeMotion();
+	SurgSim::Collision::Representation::updateShapeData();
 }
 
 };

@@ -73,7 +73,7 @@ public:
 
 	/// Set the type of collision detection to use between this representation and other representations
 	/// \param type The collision detection type
-	void setCollisionDetectionType(CollisionDetectionType type);
+	virtual void setCollisionDetectionType(CollisionDetectionType type);
 
 	/// Get the type of collision detection used between this representation and other representations
 	/// \return The collision detection type
@@ -81,7 +81,7 @@ public:
 
 	/// Set the type of collision detection to use between this representation and itself
 	/// \param type The collision detection type
-	void setSelfCollisionDetectionType(CollisionDetectionType type);
+	virtual void setSelfCollisionDetectionType(CollisionDetectionType type);
 
 	/// Get the type of collision detection used between this representation and itself
 	/// \return The collision detection type
@@ -92,8 +92,8 @@ public:
 	virtual std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
 
 	/// Get the shape, posed
-	/// \return The shape transformed by the pose of this representation
-	virtual std::shared_ptr<SurgSim::Math::Shape> getPosedShape();
+	/// \return The shape transformed by the pose of this representation, and the pose.
+	virtual const Math::PosedShape<std::shared_ptr<Math::Shape>>& getPosedShape();
 
 	/// \return the posed shape motion
 	const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& getPosedShapeMotion() const;
@@ -217,6 +217,14 @@ protected:
 	void setPosedShapeMotion(const Math::PosedShapeMotion<std::shared_ptr<Math::Shape>>& posedShape);
 
 	std::shared_ptr<Framework::Logger> m_logger;
+
+	///@{
+	/// Used to optimize aabb tree updates.
+	double m_oldVolume;
+	double m_aabbThreshold;
+	Math::RigidTransform3d m_previousDcdPose;
+	Math::RigidTransform3d m_previousCcdCurrentPose;
+	///@}
 
 private:
 	/// The type of collision detection

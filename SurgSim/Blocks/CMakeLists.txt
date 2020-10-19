@@ -30,7 +30,6 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpring1DRepresentation.cpp
 	MassSpring2DRepresentation.cpp
 	MassSpring3DRepresentation.cpp
-	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
 	ShadowMapping.cpp
 	SingleKeyBehavior.cpp
@@ -56,7 +55,6 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h
-	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
 	ShadowMapping.h
 	SingleKeyBehavior.h

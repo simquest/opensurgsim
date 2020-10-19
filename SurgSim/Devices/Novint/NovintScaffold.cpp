@@ -142,7 +142,7 @@ public:
 				SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Devices/Novint")) <<
 					"No error during initializing device named: '" << info <<
 					"', but an invalid handle returned. Is that Novint device plugged in? " <<
-					"Did the HDAL find hdal.ini?  Is the initialization name in the hdal.ini?";
+					"Did the HDAL find hdal.ini?  Is the initialization name a header in the hdal.ini?";
 			}
 		}
 		else
@@ -267,9 +267,10 @@ struct NovintScaffold::DeviceData
 		maxForce(device->getMaxForce()),
 		antigrav(device->getAntigrav()),
 		isDeviceRollAxisReversed(false),
-		eulerAngleOffsetRoll(0.0),
-		eulerAngleOffsetYaw(0.0),
-		eulerAngleOffsetPitch(0.0),
+		eulerAngleOffsetRoll(device->getRollOffset()),
+		eulerAngleOffsetYaw(device->getYawOffset()),
+		eulerAngleOffsetPitch(device->getPitchOffset()),
+		offsetTool(device->getToolDofOffset()),
 		toolDof(0.0),
 		forwardPointingPoseThreshold(0.9),
 		torqueScale(Vector3d::Constant(1.0)),
@@ -326,6 +327,8 @@ struct NovintScaffold::DeviceData
 	double eulerAngleOffsetYaw;
 	/// The offset added to the pitch Euler angle.
 	double eulerAngleOffsetPitch;
+	/// The offset added to the tool dof angle.
+	double offsetTool;
 	/// The tool's degree-of-freedom, e.g., the handle's open/close angle.
 	double toolDof;
 	/// The threshold to determine if the device is pointing forwards before unlocking orientation.
@@ -743,20 +746,8 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			// HDL reported an error.  An error message was already logged.
 			return false;
 		}
-		info->eulerAngleOffsetRoll = 0.0;
-		bool leftHanded = (gripStatus[1] & 0x01) != 0;
-		if (leftHanded)
-		{
-			info->isDeviceRollAxisReversed = true;
-			info->eulerAngleOffsetYaw = -0.5;
-			info->eulerAngleOffsetPitch = -0.9;
-		}
-		else
-		{
-			info->isDeviceRollAxisReversed = false;
-			info->eulerAngleOffsetYaw = 0.3;
-			info->eulerAngleOffsetPitch = -0.7;
-		}
+
+		info->isDeviceRollAxisReversed = (gripStatus[1] & 0x01) != 0; // LeftHanded Device 
 
 		if (info->isOrientationHomed)
 		{
@@ -765,6 +756,8 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			// order to correctly generate joint torques.
 			double angles[4];
 			hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
+			SURGSIM_LOG_DEBUG(Framework::Logger::getLogger("Devices/Novint")) << info->deviceObject->getName() << 
+				" raw joint angles:" << angles[0] << ", " << angles[1] << ", " << angles[2] << ", " << angles[3];
 			fatalError = fatalError || isFatalError("hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
 
 			// The zero values are NOT the home orientation, and we are flipping some axes to map to our desired
@@ -790,7 +783,7 @@ bool NovintScaffold::updateDeviceInput(DeviceData* info)
 			   'angles[3]' has the value for the 7th Dof now (but it didn't on Nov 10's test).
 			   hdlGripGetAttributesd(HDL_GRIP_ANGLE, 3, &info->toolDof); should be kept in mind.
 			   */
-			info->toolDof = angles[3]; // Get the reading for 7th Dof, the open/close angle of the tool.
+			info->toolDof = angles[3] + info->offsetTool; // Get the reading for 7th Dof, the open/close angle of the tool.
 
 			// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles.
 			// The home position (identity orientation) is with the tool parallel to the ground with the handle pointed
@@ -1049,11 +1042,12 @@ bool NovintScaffold::createAllHandles()
 	// Then use hdlCatalogDevices to get the serial numbers for other connected devices not listed in device.yaml,
 	// and initialize them (by serial number).
 	// When registerDevice is called the name can be matched to a Handle created from a serial number.
-	// Note: initializaiton name is case insensitive.
+	// Note: initialization name is case insensitive.
 	for (const auto& item : m_state->nameToSerial)
 	{
 		std::string deviceName = item.first;
 		std::transform(deviceName.begin(), deviceName.end(), deviceName.begin(), tolower);
+		SURGSIM_LOG_INFO(m_state->logger) << "Creating handle for device name: " << deviceName;
 		if (deviceName == "default")
 		{
 			SURGSIM_LOG_INFO(m_state->logger) << "'" << item.first <<
@@ -1127,6 +1121,7 @@ std::map<std::string, std::string> NovintScaffold::getNameMap()
 		SURGSIM_LOG_DEBUG(m_state->logger) << "Found devices.yaml at '" << filePath << "'.";
 		YAML::Node node = YAML::LoadFile(filePath);
 		map = node["Novint"].as<std::map<std::string, std::string>>();
+		SURGSIM_LOG_INFO(m_state->logger) << "Devices.yaml file contained the name map:\n" << node["Novint"];
 	}
 	else
 	{

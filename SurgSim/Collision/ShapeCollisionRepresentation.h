@@ -55,6 +55,7 @@ public:
 	void setShape(const std::shared_ptr<SurgSim::Math::Shape>& shape);
 
 	std::shared_ptr<Math::Shape> getShape() const override;
+	void updateCcdData(double timeOfImpact) override;
 
 protected:
 	bool doInitialize() override;

@@ -63,6 +63,39 @@ TEST(AabbTreeTests, AddTest)
 	EXPECT_EQ(2u, tree->getRoot()->getNumChildren());
 }
 
+TEST(AabbTreeTests, UpdateTest)
+{
+	auto tree = std::make_shared<AabbTree>(3);
+
+	Aabbd bigBox;
+	for (int i = 0; i <= 6; ++i)
+	{
+		Aabbd aabb(Vector3d(static_cast<double>(i) - 0.01, -0.01, -0.01),
+				   Vector3d(static_cast<double>(i) + 0.01, 0.01, 0.01));
+		bigBox.extend(aabb);
+		tree->add(aabb, i);
+	}
+
+	EXPECT_TRUE(bigBox.isApprox(tree->getAabb())) << bigBox << ", " << tree->getAabb();
+
+	std::vector<Aabbd> newBoxes;
+
+	bigBox.setEmpty();
+	for (int i = 0; i <= 6; ++i)
+	{
+		Aabbd aabb(Vector3d(static_cast<double>(i) - 0.01, -0.02, -0.02),
+				   Vector3d(static_cast<double>(i) + 0.01, 0.02, 0.02));
+		bigBox.extend(aabb);
+		newBoxes.push_back(aabb);
+	}
+
+	tree->updateBounds(newBoxes);
+
+	EXPECT_TRUE(bigBox.isApprox(tree->getAabb())) << bigBox << ", " << tree->getAabb();
+
+}
+
+
 TEST(AabbTreeTests, BuildTest)
 {
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
@@ -201,7 +234,7 @@ public:
 };
 
 template <typename PairTypeLhs, typename PairTypeRhs>
-static typename std::list<PairTypeLhs>::const_iterator getEquivalentPair(const std::list<PairTypeLhs>& list,
+static typename std::vector<PairTypeLhs>::const_iterator getEquivalentPair(const std::vector<PairTypeLhs>& list,
 		const PairTypeRhs& item)
 {
 	return std::find_if(list.cbegin(), list.cend(),
@@ -246,7 +279,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 	std::static_pointer_cast<SurgSim::DataStructures::AabbTreeNode>(aabbB->getRoot())->accept(&leavesVisitorB);
 	auto& leavesB = leavesVisitorB.leaves;
 
-	std::list<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
+	std::vector<std::pair<SurgSim::DataStructures::AabbTreeNode*, SurgSim::DataStructures::AabbTreeNode*>>
 			expectedIntersection;
 	for (auto leafA = leavesA.begin(); leafA != leavesA.end(); ++leafA)
 	{
@@ -285,7 +318,7 @@ TEST(AabbTreeTests, SpatialJoinTest)
 			SurgSim::Math::makeAabb(Vector3d(-0.1, 0.3, 5.3), Vector3d(5.4, -5.8, 1.1), Vector3d(0, 0.5, 11)), 4543);
 
 		expectedIntersection.emplace_back(newNode.get(), expectedIntersection.front().second);
-		actualIntersection.emplace_back(newNode, actualIntersection.back().first);
+		actualIntersection.emplace_back(newNode.get(), actualIntersection.back().first);
 
 		ASSERT_GT(expectedIntersection.size(), 0u);
 		ASSERT_EQ(expectedIntersection.size(), actualIntersection.size());

@@ -14,11 +14,12 @@
 // limitations under the License.
 
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
-#include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
-#include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/Mass.h"
+#include "SurgSim/Physics/MassSpringModel.h"
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::Mass;
 
 namespace SurgSim
@@ -27,7 +28,7 @@ namespace SurgSim
 namespace Blocks
 {
 
-void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
+void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[2], double stiffness, double damping)
 {
 	const size_t rowOffset = numNodesPerDim[0];
@@ -42,7 +43,7 @@ void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<S
 			for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 			{
 				size_t nodeId = row * rowOffset + col * colOffset;
-				addSpring(createLinearSpring(state, nodeId, nodeId + colOffset, stiffness, damping));
+				mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + colOffset, stiffness, damping));
 			}
 		}
 		// ...along Y
@@ -51,13 +52,13 @@ void MassSpring2DRepresentation::init2DStretchingSprings(const std::shared_ptr<S
 			for (size_t row = 0; row < numNodesPerDim[1] - 1; row++)
 			{
 				size_t nodeId = row * rowOffset + col * colOffset;
-				addSpring(createLinearSpring(state, nodeId, nodeId + rowOffset, stiffness, damping));
+				mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + rowOffset, stiffness, damping));
 			}
 		}
 	}
 }
 
-void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
+void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[2], double stiffness, double damping)
 {
 	const size_t rowOffset = numNodesPerDim[0];
@@ -72,7 +73,8 @@ void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<Surg
 			for (size_t col = 0; col < numNodesPerDim[0] - 2; col++)
 			{
 				size_t nodeId = row * rowOffset + col * colOffset;
-				addSpring(createLinearSpring(state, nodeId, nodeId + 2 * colOffset, stiffness, damping));
+				mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + 2 * colOffset, stiffness,
+					damping));
 			}
 		}
 		// ... along Y
@@ -81,13 +83,14 @@ void MassSpring2DRepresentation::init2DBendingSprings(const std::shared_ptr<Surg
 			for (size_t row = 0; row < numNodesPerDim[1] - 2; row++)
 			{
 				size_t nodeId = row * rowOffset + col * colOffset;
-				addSpring(createLinearSpring(state, nodeId, nodeId + 2 * rowOffset, stiffness, damping));
+				mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + 2 * rowOffset, stiffness,
+					damping));
 			}
 		}
 	}
 }
 
-void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr<SurgSim::Math::OdeState> state,
+void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr<Physics::MassSpringModel> mesh,
 	size_t numNodesPerDim[2], double stiffness, double damping)
 {
 	const size_t rowOffset = numNodesPerDim[0];
@@ -101,8 +104,10 @@ void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr
 			for (size_t col = 0; col < numNodesPerDim[0] - 1; col++)
 			{
 				size_t nodeId = row * rowOffset + col * colOffset;
-				addSpring(createLinearSpring(state, nodeId, nodeId + rowOffset + colOffset, stiffness, damping));
-				addSpring(createLinearSpring(state, nodeId + colOffset, nodeId + rowOffset, stiffness, damping));
+				mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId, nodeId + rowOffset + colOffset, stiffness,
+					damping));
+				mesh->addSpring(std::make_shared<LinearSpring>(mesh, nodeId + colOffset, nodeId + rowOffset, stiffness,
+					damping));
 			}
 		}
 	}
@@ -117,12 +122,10 @@ void MassSpring2DRepresentation::init2D(
 	double stiffnessBending, double dampingBending,
 	double stiffnessFaceDiagonal, double dampingFaceDiagonal)
 {
-	std::shared_ptr<SurgSim::Math::OdeState> state;
-	state = std::make_shared<SurgSim::Math::OdeState>();
-	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0] * numNodesPerDim[1]);
-
 	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes for dimension 1 is incorrect: " << numNodesPerDim[0];
 	SURGSIM_ASSERT(numNodesPerDim[1] > 0) << "Number of nodes for dimension 2 is incorrect: " << numNodesPerDim[1];
+
+	auto mesh = std::make_shared<Physics::MassSpringModel>();
 
 	// Initialize the nodes position, velocity and mass
 	// Note: no need to apply the initialPose here, initialize will take care of it !
@@ -131,7 +134,6 @@ void MassSpring2DRepresentation::init2D(
 		(extremities[0][1] - extremities[0][0]) / static_cast<double>(numNodesPerDim[1] - 1) ,
 		(extremities[1][1] - extremities[1][0]) / static_cast<double>(numNodesPerDim[1] - 1)
 	};
-	size_t nodeId = 0;
 	for (size_t row = 0; row < numNodesPerDim[1]; row++)
 	{
 		Vector3d rowExtremities[2];
@@ -141,34 +143,40 @@ void MassSpring2DRepresentation::init2D(
 		Vector3d delta = (rowExtremities[1] - rowExtremities[0]) / static_cast<double>(numNodesPerDim[0] - 1);
 		for (size_t col = 0; col < numNodesPerDim[0]; col++)
 		{
-			addMass(std::make_shared<Mass>(totalMass / static_cast<double>(numNodesPerDim[0] * numNodesPerDim[1])));
-
+			auto mass = std::make_shared<Mass>(totalMass / static_cast<double>(numNodesPerDim[0] * numNodesPerDim[1]));
+			mesh->addMass(mass);
 			SurgSim::Math::Vector3d position(rowExtremities[0] + static_cast<double>(col) * delta);
-			SurgSim::Math::setSubVector(position, nodeId, 3, &state->getPositions());
-
-			nodeId++;
+			mesh->addVertex(DataStructures::Vertices<Mass>::VertexType(position, *mass));
+		}
+	}
+	
+	// Initialize the 2D elements, triangles.
+	for (size_t row = 0; row < numNodesPerDim[1] - 1; ++row)
+	{
+		for (size_t col = 0; col < numNodesPerDim[0] - 1; ++col)
+		{
+			size_t firstCorner = col + row * numNodesPerDim[0];
+			mesh->addElement({ firstCorner, firstCorner + numNodesPerDim[0], firstCorner + 1 });
+			mesh->addElement({ firstCorner + 1, firstCorner + numNodesPerDim[0], firstCorner + numNodesPerDim[0] + 1 });
 		}
 	}
 
 	// Initialize all the stretching springs
-	init2DStretchingSprings(state, numNodesPerDim, stiffnessStretching, dampingStretching);
+	init2DStretchingSprings(mesh, numNodesPerDim, stiffnessStretching, dampingStretching);
 
 	// Initialize all the bending springs
-	init2DBendingSprings(state, numNodesPerDim, stiffnessBending, dampingBending);
+	init2DBendingSprings(mesh, numNodesPerDim, stiffnessBending, dampingBending);
 
 	// Initialize all the face diagonal springs
-	init2DFaceDiagonalSprings(state, numNodesPerDim, stiffnessFaceDiagonal, dampingFaceDiagonal);
+	init2DFaceDiagonalSprings(mesh, numNodesPerDim, stiffnessFaceDiagonal, dampingFaceDiagonal);
 
 	// Sets the boundary conditions
-	for (auto boundaryCondition = std::begin(nodeBoundaryConditions);
-		boundaryCondition != std::end(nodeBoundaryConditions);
-		boundaryCondition++)
+	for (const auto& boundaryCondition : nodeBoundaryConditions)
 	{
-		state->addBoundaryCondition(*boundaryCondition);
+		mesh->addBoundaryCondition(boundaryCondition);
 	}
 
-	// setInitialState: Initialize all the states + apply initialPose if any
-	setInitialState(state);
+	setMassSpringModel(std::dynamic_pointer_cast<Framework::Asset>(mesh));
 }
 
 }; // namespace Blocks

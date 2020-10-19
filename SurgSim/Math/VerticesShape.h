@@ -32,10 +32,6 @@ class VerticesShape : public Shape
 public:
 	bool isTransformable() const override;
 
-	/// Replace the current vertex positions with the initial positions transformed by a pose.
-	/// \param pose The pose of the shape.
-	virtual void setPose(const RigidTransform3d& pose) = 0;
-
 	/// Set the initial Vertices.
 	/// \param vertices The initial vertices.
 	void setInitialVertices(const DataStructures::Vertices<DataStructures::EmptyData>& vertices);

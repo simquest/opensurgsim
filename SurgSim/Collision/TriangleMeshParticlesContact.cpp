@@ -53,11 +53,15 @@ std::list<std::shared_ptr<Contact>> TriangleMeshParticlesContact::calculateDcdCo
 	Vector3d coordinates;
 	const double particleRadius = particles.getRadius();
 
+	std::vector<size_t> candidateTriangles;
+	std::vector<size_t> candidateParticles;
+
 	auto intersections = mesh.getAabbTree()->spatialJoin(*particles.getAabbTree());
 	for (auto& intersection : intersections)
 	{
-		std::list<size_t> candidateTriangles;
-		std::list<size_t> candidateParticles;
+		candidateTriangles.clear();
+		candidateParticles.clear();
+
 		intersection.first->getIntersections(intersection.second->getAabb(), &candidateTriangles);
 		intersection.second->getIntersections(intersection.first->getAabb(), &candidateParticles);
 		for (auto& triangle : candidateTriangles)

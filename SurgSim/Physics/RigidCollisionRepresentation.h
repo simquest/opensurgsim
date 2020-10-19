@@ -44,8 +44,9 @@ public:
 
 	SURGSIM_CLASSNAME(SurgSim::Physics::RigidCollisionRepresentation);
 
-	/// Get the pose of the representation
-	/// \return The pose of this representation
+	bool doInitialize() override;
+	bool doWakeUp() override;
+
 	SurgSim::Math::RigidTransform3d getPose() const override;
 
 	/// Get the shape type id
@@ -60,6 +61,7 @@ public:
 	/// The default is to use the shape of the Rigid Representation, this
 	/// will override that shape.
 	/// \param shape The actual shape used for collision, if nullptr the Rigid Representation shape will be used.
+	/// \warning If the shape is a VerticesShape, it may be altered so provide a deep copy if necessary.
 	void setShape(std::shared_ptr<SurgSim::Math::Shape> shape);
 
 	/// Set rigid representation
@@ -71,7 +73,6 @@ public:
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> getRigidRepresentation();
 
 	void updateShapeData() override;
-	void updateDcdData() override;
 	void updateCcdData(double timeOfImpact) override;
 
 	Math::Aabbd getBoundingBox() const override;
@@ -80,6 +81,7 @@ private:
 	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 	Math::Aabbd m_aabb;
+	Math::RigidTransform3d m_previousCcdPreviousPose;
 };
 
 }; // namespace Collision

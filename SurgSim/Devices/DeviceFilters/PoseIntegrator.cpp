@@ -116,6 +116,14 @@ void PoseIntegrator::handleInput(const std::string& device, const DataStructures
 			pose.linear() = m_poseResult.linear().transpose();
 		}
 
+		SurgSim::Math::RigidTransform3d resetPose;
+		if (m_resetPose.hasValue())
+		{
+			m_poseResult.translation() = m_resetPose.getValue().translation();
+			m_poseResult.linear() = m_resetPose.getValue().linear();
+			m_resetPose.invalidate();
+		}
+
 		// Before updating the current pose, use it to calculate the angular velocity.
 		Vector3d rotationAxis;
 		double angle;
@@ -134,6 +142,21 @@ void PoseIntegrator::setReset(const std::string& name)
 		"PoseIntegrator::setReset cannot be called after the first call to initializeInput.";
 	m_resetName = name;
 }
+
+void PoseIntegrator::filterOutput(const std::string& device, 
+	const SurgSim::DataStructures::DataGroup& dataToFilter, 
+	SurgSim::DataStructures::DataGroup* result)
+{
+	SurgSim::Math::RigidTransform3d newPose;
+	if (dataToFilter.poses().hasData(SurgSim::DataStructures::Names::POSE))
+	{
+		dataToFilter.poses().get(SurgSim::DataStructures::Names::POSE, &newPose);
+		m_resetPose = newPose;
+	}
+	
+	*result = dataToFilter;
+}
+
 
 };  // namespace Devices
 };  // namespace SurgSim

@@ -34,7 +34,6 @@ template <typename T, class V>
 class PredicateAlwaysTrueVisitor
 {
 public:
-	typedef typename T::Index Index;
 	typedef typename T::Scalar Scalar;
 
 	PredicateAlwaysTrueVisitor() : m_result(true)
@@ -46,7 +45,7 @@ public:
 		return m_result;
 	}
 
-	inline void init(const Scalar& value, Index i, Index j)
+	inline void init(const Scalar& value, Eigen::Index i, Eigen::Index j)
 	{
 		if (! V::evaluate(value))
 		{
@@ -54,7 +53,7 @@ public:
 		}
 	}
 
-	inline void operator()(const Scalar& value, Index i, Index j)
+	inline void operator()(const Scalar& value, Eigen::Index i, Eigen::Index j)
 	{
 		if (! V::evaluate(value))
 		{
@@ -225,7 +224,7 @@ inline bool setSubnormalToZero(Eigen::DenseBase<T>* value)
 	// the lines of the implementation of Eigen::DenseBase<T>::visit().  Unfortunately, we can't just *use* Eigen's
 	// visitors here, because the visitor API doesn't allow modifying the values.
 
-	typedef typename Eigen::DenseBase<T>::Index Index;
+	using Eigen::Index;
 	const Index numColumns = value->cols();
 	const Index numRows = value->rows();
 

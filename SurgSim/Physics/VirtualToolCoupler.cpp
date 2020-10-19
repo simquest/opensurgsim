@@ -150,16 +150,16 @@ void VirtualToolCoupler::update(double dt)
 	inputData.vectors().cacheIndex(DataStructures::Names::LINEAR_VELOCITY, &m_linearVelocityIndex);
 	if (m_linearVelocityIndex < 0)
 	{
-		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not " <<
-											"contain a linear velocity vector named " << DataStructures::Names::LINEAR_VELOCITY <<
-											", so it will be estimated.";
+		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not "
+			<< "contain a linear velocity vector named " << DataStructures::Names::LINEAR_VELOCITY
+			<< ", so it will be estimated.";
 	}
 	inputData.vectors().cacheIndex(DataStructures::Names::ANGULAR_VELOCITY, &m_angularVelocityIndex);
 	if (m_angularVelocityIndex < 0)
 	{
-		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not " <<
-											"contain an angular velocity vector named " << DataStructures::Names::ANGULAR_VELOCITY <<
-											") so it will be estimated.";
+		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not "
+			<< "contain an angular velocity vector named " << DataStructures::Names::ANGULAR_VELOCITY
+			<< ") so it will be estimated.";
 	}
 
 	RigidTransform3d inputPose;
@@ -402,10 +402,10 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	SURGSIM_LOG_INFO(m_logger) <<
-							   "VirtualToolCoupler named '" << getName() << "' has linear stiffness " << m_linearStiffness <<
-							   ", linear damping " << m_linearDamping << ", angular stiffness " << m_angularStiffness <<
-							   ", and angular damping " << m_angularDamping << ". Its Physics Representation has mass " << m_rigid->getMass();
+	SURGSIM_LOG_INFO(m_logger) << "VirtualToolCoupler named '" << getName() <<
+		"' has linear stiffness " << m_linearStiffness << ", linear damping " << m_linearDamping
+		<< ", angular stiffness " << m_angularStiffness << ", and angular damping " << m_angularDamping
+		<< ". Its Physics Representation has mass " << m_rigid->getMass();
 	return true;
 }
 

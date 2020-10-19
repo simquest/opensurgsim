@@ -92,6 +92,9 @@ public:
 
 	void setPose(const RigidTransform3d& pose) override;
 
+	void updateShape() override;
+	void updateShapePartial() override;
+
 private:
 	bool doUpdate() override;
 

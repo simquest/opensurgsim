@@ -73,12 +73,20 @@ public:
 
 	void setPose(const RigidTransform3d& pose) override;
 
+	/// Build the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void buildAabbTree();
+
+	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
+	void updateAabbTree();
+
+	void updateShape() override;
+	void updateShapePartial() override;
+
 protected:
 	bool doUpdate() override;
 	bool doLoad(const std::string& fileName) override;
 
-	/// Update the AabbTree, which is an axis-aligned bounding box r-tree used to accelerate spatial searches
-	void updateAabbTree();
+
 
 private:
 	/// Segment radius
@@ -86,6 +94,7 @@ private:
 
 	/// The aabb tree used to accelerate collision detection against the mesh
 	std::shared_ptr<DataStructures::AabbTree> m_aabbTree;
+	std::vector<SurgSim::Math::Aabbd> m_aabbCache;
 
 	/// Half extent of the AABB of the sphere at one of the segment end.
 	Vector3d m_segmentEndBoundingBoxHalfExtent;

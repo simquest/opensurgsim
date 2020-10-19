@@ -15,6 +15,7 @@
 
 #include "SurgSim/Math/CompoundShape.h"
 #include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/MeshShape.h"
 
 namespace SurgSim
 {
@@ -24,7 +25,7 @@ namespace Math
 
 SURGSIM_REGISTER(SurgSim::Math::Shape, SurgSim::Math::CompoundShape, CompoundShape);
 
-CompoundShape::CompoundShape()
+CompoundShape::CompoundShape() : m_lastSetPose(RigidTransform3d::Identity())
 {
 	{
 		typedef std::vector<SubShape> PropertyType;
@@ -129,9 +130,9 @@ Matrix33d CompoundShape::getSecondMomentOfVolume() const
 					const auto& shape = subShape.first;
 					const auto& pose = subShape.second;
 					const auto& r = pose.linear();
-					Matrix33d skew = makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval());
+					Matrix33d skew = makeSkewSymmetricMatrix((center - pose * shape->getCenter()).eval()); /// check whether istransformable subshapes should multiply by pose (their localpose)
 					Matrix33d inertia =
-						r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew;
+						r * shape->getSecondMomentOfVolume() * r.transpose() - shape->getVolume() * skew * skew; /// check whether istransformable subshapes should multiply by r (the linear part of their localpose)
 
 					result += inertia;
 				}
@@ -184,7 +185,19 @@ void CompoundShape::invalidateData()
 size_t CompoundShape::addShape(const std::shared_ptr<Shape>& shape, const RigidTransform3d& pose)
 {
 	WriteLock lock(m_mutex);
-	m_shapes.emplace_back(shape, pose);
+	m_poses.push_back(pose);
+
+	const auto newPose = m_lastSetPose * pose;
+	if (shape->isTransformable())
+	{
+		shape->setPose(newPose);
+		m_shapes.emplace_back(shape, pose);
+	}
+	else
+	{
+		m_shapes.emplace_back(shape, newPose);
+	}
+
 	invalidateData();
 	return m_shapes.size() - 1;
 }
@@ -193,6 +206,20 @@ void CompoundShape::setShapes(const std::vector<SubShape>& shapes)
 {
 	WriteLock lock(m_mutex);
 	m_shapes = shapes;
+	m_poses.clear();
+	for (auto& shape : m_shapes)
+	{
+		m_poses.push_back(shape.second);
+		const auto newPose = m_lastSetPose * shape.second;
+		if (shape.first->isTransformable())
+		{
+			shape.first->setPose(newPose);
+		}
+		else
+		{
+			shape.second = newPose;
+		}
+	}
 	invalidateData();
 }
 
@@ -209,11 +236,24 @@ const std::shared_ptr<Shape>& CompoundShape::getShape(size_t index) const
 	return m_shapes[index].first;
 }
 
-RigidTransform3d CompoundShape::getPose(size_t index) const
+RigidTransform3d CompoundShape::getCompoundPose(size_t index) const
 {
 	ReadLock lock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
 	return m_shapes[index].second;
+}
+
+RigidTransform3d CompoundShape::getPose(size_t index) const
+{
+	ReadLock lock(m_mutex);
+	SURGSIM_ASSERT(index < m_poses.size()) << "Shape index out of range.";
+	return m_poses[index];
+}
+
+const std::vector<RigidTransform3d>& CompoundShape::getPoses() const
+{
+	ReadLock lock(m_mutex);
+	return m_poses;
 }
 
 void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
@@ -223,7 +263,18 @@ void CompoundShape::setPoses(const std::vector<RigidTransform3d>& poses)
 	size_t i = 0;
 	for (auto& shape : m_shapes)
 	{
-		shape.second = poses[i++];
+		const auto newPose = m_lastSetPose * poses[i];
+		if (shape.first->isTransformable())
+		{
+			shape.first->setPose(newPose);
+			shape.second = poses[i];
+		}
+		else
+		{
+			shape.second = newPose;
+		}
+		m_poses[i] = poses[i];
+		++i;
 	}
 	invalidateData();
 }
@@ -233,7 +284,18 @@ void CompoundShape::setPose(size_t index, const RigidTransform3d& pose)
 {
 	WriteLock(m_mutex);
 	SURGSIM_ASSERT(index < m_shapes.size()) << "Shape index out of range.";
-	m_shapes[index].second = pose;
+	m_poses[index] = pose;
+	auto& shape = m_shapes[index];
+	const auto newPose = m_lastSetPose * pose;
+	if (shape.first->isTransformable())
+	{
+		shape.first->setPose(newPose);
+		shape.second = pose;
+	}
+	else
+	{
+		shape.second = newPose;
+	}
 	invalidateData();
 }
 
@@ -257,22 +319,67 @@ bool CompoundShape::isTransformable() const
 
 std::shared_ptr<Shape> CompoundShape::getTransformed(const RigidTransform3d& pose) const
 {
+	ReadLock lock(m_mutex);
 	auto transformed = std::make_shared<CompoundShape>();
 	for (const auto& shape : m_shapes)
 	{
 		std::shared_ptr<Shape> newShape;
-		RigidTransform3d newPose = pose * shape.second;
+		RigidTransform3d newPose = pose * shape.second; // not sure what to do here...if we call setPose and then getTransformed
 		if (shape.first->isTransformable())
 		{
 			newShape = shape.first->getTransformed(newPose);
+			transformed->addShape(newShape, shape.second);
 		}
 		else
 		{
 			newShape = shape.first;
+			transformed->addShape(newShape, newPose);
 		}
-		transformed->addShape(newShape, newPose);
 	}
 	return transformed;
+}
+
+void CompoundShape::setPose(const RigidTransform3d& pose)
+{
+	WriteLock(m_mutex);
+	size_t index = 0;
+	for (auto& shape : m_shapes)
+	{
+		const auto& relativePose = m_poses[index++];
+		const auto newPose = pose * relativePose;
+		if (shape.first->isTransformable())
+		{
+			shape.first->setPose(newPose);
+			shape.second = relativePose;
+		}
+		else
+		{
+			shape.second = newPose;
+		}
+		//shape.second = newPose; //is this the problem?  When we setPose on the CompoundShape, maybe it shouldn't be in the pose for the subshapes.  Maybe the subshape's poses should always be local.
+		// but that's what we do in getTransformed
+		//test this change with the non-transformable subshapes...
+	}
+	m_lastSetPose = pose;
+	invalidateData();
+}
+
+void CompoundShape::updateShape()
+{
+	WriteLock(m_mutex);
+	for (auto& shape : m_shapes)
+	{
+		shape.first->updateShape();
+	}
+}
+
+void CompoundShape::updateShapePartial()
+{
+	WriteLock(m_mutex);
+	for (auto& shape : m_shapes)
+	{
+		shape.first->updateShapePartial();
+	}
 }
 
 }
