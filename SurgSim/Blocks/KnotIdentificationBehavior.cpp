@@ -86,14 +86,15 @@ bool KnotIdentificationBehavior::doInitialize()
 {
 	using Math::makeRigidTransform;
 	Math::Matrix33d projection;
+	m_projections.clear();
 	m_projections.push_back(Math::Matrix33d::Identity() * 100.0);
 	{
 		// #note JL (31-5-2017) This projection does not give a Identity matrix? Or X and Z are switched? 
-		projection = makeRigidTransform(Vector3d(0,0,0), Vector3d(0,0,1), Vector3d(0,1,0)).linear();
+		projection = makeRigidTransform(Vector3d(1,0,0), Vector3d(0,0,1), Vector3d(0,1,0)).linear();
 		m_projections.push_back(projection * 100.0);
 	}
 	{
-		projection = makeRigidTransform(Vector3d(0,0,0), Vector3d(0,1,0), Vector3d(0,0,1)).linear();
+		projection = makeRigidTransform(Vector3d(1,0,0), Vector3d(0,1,0), Vector3d(0,0,1)).linear();
 		m_projections.push_back(projection * 100.0);
 	}
 

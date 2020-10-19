@@ -21,6 +21,9 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/MathConvert.h"
+#include <random>
 
 namespace SurgSim
 {
@@ -74,7 +77,9 @@ public:
 
 	}
 
-	std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> makeFem1D(const std::string& filename)
+	std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> makeFem1D(
+		const std::string& filename,
+		SurgSim::Math::RigidTransform3d t = SurgSim::Math::RigidTransform3d::Identity())
 	{
 		auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 		auto physics = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Physics");
@@ -90,6 +95,162 @@ public:
 		return physics;
 	}
 
+	bool testKnot(std::string filename, std::string knotname)
+	{
+		KnotIdentificationBehavior knotId("Knot ID");
+
+		using SurgSim::Math::makeRigidTransform;
+		using SurgSim::Math::makeRotationMatrix;
+
+		SurgSim::Math::Vector3d axis = SurgSim::Math::Vector3d::UnitX();
+		for (int i = 0; i < 4; ++i)
+		{
+			double angle = 0.25 * i * M_PI * 2.0;
+			auto  t = makeRigidTransform(makeRotationMatrix(angle, axis), SurgSim::Math::Vector3d::Zero());
+			auto fem = makeFem1D(filename, t);
+			knotId.setFem1d(fem);
+			knotId.doInitialize();
+			knotId.update(0.0);
+			EXPECT_EQ(knotname, knotId.getKnotName());
+		}
+
+		axis = SurgSim::Math::Vector3d::UnitY();
+		for (int i = 0; i < 4; ++i)
+		{
+			double angle = 0.25 * i * M_PI * 2.0;
+			auto  t = makeRigidTransform(makeRotationMatrix(angle, axis), SurgSim::Math::Vector3d::Zero());
+			auto fem = makeFem1D(filename, t);
+			knotId.setFem1d(fem);
+			knotId.doInitialize();
+			knotId.update(0.0);
+			EXPECT_EQ(knotname, knotId.getKnotName());
+		}
+
+		axis = SurgSim::Math::Vector3d::UnitZ();
+		for (int i = 0; i < 4; ++i)
+		{
+			double angle = 0.25 * i * M_PI * 2.0;
+			auto  t = makeRigidTransform(makeRotationMatrix(angle, axis), SurgSim::Math::Vector3d::Zero());
+			auto fem = makeFem1D(filename, t);
+			knotId.setFem1d(fem);
+			knotId.doInitialize();
+			knotId.update(0.0);
+			EXPECT_EQ(knotname, knotId.getKnotName());
+		}
+		return true;
+	}
+
+	bool testKnotRandom(std::string filename, std::string knotname, int iterations = 1000, unsigned int seed = 1000)
+	{
+		std::default_random_engine generator;
+		std::uniform_real_distribution<double> distribution(0, 1);
+		
+		generator.seed(seed);
+
+		KnotIdentificationBehavior knotId("Knot ID");
+
+		using SurgSim::Math::makeRigidTransform;
+		using SurgSim::Math::makeRotationMatrix;
+
+		auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+		auto mesh = std::make_shared<SurgSim::Physics::Fem1D>();
+		mesh->load(filename);
+
+		std::cout << knotname << ":";
+		SurgSim::Math::Vector3d axis = SurgSim::Math::Vector3d::UnitX();
+		for (int i = 0; i < iterations; ++i)
+		{
+			if (i % 100 == 0) std::cout << "+";
+
+			double angle = distribution(generator) * i * M_PI * 2.0;
+			auto axis = SurgSim::Math::Vector3d
+			(distribution(generator), distribution(generator), distribution(generator));
+			axis.normalize();
+			auto  t = makeRigidTransform(makeRotationMatrix(angle, axis), SurgSim::Math::Vector3d::Zero());
+
+			auto fem = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Physics");
+			fem->setFemElementType("SurgSim::Physics::Fem1DElementBeam");
+			fem->setLocalPose(t);
+			fem->setFem(mesh);
+			fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT);
+			fem->setLinearSolver(SurgSim::Math::LINEARSOLVER_LU);
+			fem->setRayleighDampingMass(5.0);
+			fem->setRayleighDampingStiffness(0.001);
+			fem->setIsGravityEnabled(true);
+			fem->initialize(runtime);
+
+			knotId.setFem1d(fem);
+			knotId.doInitialize();
+			knotId.update(0.0);
+			if (knotname != knotId.getKnotName())
+			{
+				using SurgSim::Math::toBytes;
+				std::vector<uint8_t> bytes;
+				toBytes(angle, &bytes);
+				toBytes(axis, &bytes);
+
+				std::ofstream out(knotname + "error.bin", std::ios_base::binary);
+				SURGSIM_ASSERT(out.is_open());
+
+				for (auto b : bytes) out << b;
+				return false;
+			}
+		}
+
+		std::cout << "\n";
+		return true;
+	}
+
+
+	bool testKnotFromFailure(std::string filename, std::string knotname, std::string failureFile)
+	{
+
+		KnotIdentificationBehavior knotId("Knot ID");
+
+		using SurgSim::Math::makeRigidTransform;
+		using SurgSim::Math::makeRotationMatrix;
+
+		auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+		auto mesh = std::make_shared<SurgSim::Physics::Fem1D>();
+		mesh->load(filename);
+
+		double angle;
+		SurgSim::Math::Vector3d axis;
+
+		using SurgSim::Math::fromBytes;
+		std::ifstream in(failureFile, std::ios_base::binary);
+		EXPECT_TRUE(!in.bad());
+		std::vector<uint8_t> bytes;
+		uint8_t b;
+		while (!in.eof()) 
+		{
+			in >> b; 
+			bytes.push_back(b);
+		};
+
+		auto end = fromBytes(bytes, &angle);
+		end = fromBytes(bytes, &axis, end);
+		auto  t = makeRigidTransform(makeRotationMatrix(angle, axis), SurgSim::Math::Vector3d::Zero());
+
+		auto fem = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Physics");
+		fem->setFemElementType("SurgSim::Physics::Fem1DElementBeam");
+		fem->setLocalPose(t);
+		fem->setFem(mesh);
+		fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT);
+		fem->setLinearSolver(SurgSim::Math::LINEARSOLVER_LU);
+		fem->setRayleighDampingMass(5.0);
+		fem->setRayleighDampingStiffness(0.001);
+		fem->setIsGravityEnabled(true);
+		fem->initialize(runtime);
+
+		knotId.setFem1d(fem);
+		knotId.doInitialize();
+		knotId.update(0.0);
+		EXPECT_EQ(knotname, knotId.getKnotName());
+		return true;
+	}
 
 	void testReidmeisterMove1(std::vector<int> gaussCodeBefore, std::vector<int> gaussCodeAfter,
 							  std::vector<int> erased = std::vector<int>())
@@ -160,7 +321,7 @@ TEST_F(KnotIdentificationBehaviorTest, Constructor)
 {
 	EXPECT_NO_THROW(KnotIdentificationBehavior knotId("KnotId"));
 	EXPECT_NO_THROW(new KnotIdentificationBehavior("KnotId"));
-	EXPECT_NO_THROW(std::make_shared<KnotIdentificationBehavior>("KnotId"));
+	EXPECT_NO_THROW(auto x = std::make_shared<KnotIdentificationBehavior>("KnotId"));
 }
 
 TEST_F(KnotIdentificationBehaviorTest, GetSetFem1D)
@@ -336,31 +497,47 @@ TEST_F(KnotIdentificationBehaviorTest, Fem1DNoKnot)
 	EXPECT_EQ("No Knot", knotId.getKnotName());
 }
 
+
+
 TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoil)
 {
-	KnotIdentificationBehavior knotId("Knot ID");
-	knotId.setFem1d(makeFem1D("Geometry/trefoil_knot.ply"));
-	knotId.doInitialize();
-	knotId.update(0.0);
-	EXPECT_EQ("Trefoil Knot", knotId.getKnotName());
+	EXPECT_TRUE(testKnot("Geometry/trefoil_knot.ply", "Trefoil Knot"));
 }
 
 TEST_F(KnotIdentificationBehaviorTest, Fem1DSquare)
 {
-	KnotIdentificationBehavior knotId("Knot ID");
-	knotId.setFem1d(makeFem1D("Geometry/square_knot.ply"));
-	knotId.doInitialize();
-	knotId.update(0.0);
-	EXPECT_EQ("Square Knot", knotId.getKnotName());
+	EXPECT_TRUE(testKnot("Geometry/square_knot.ply", "Square Knot"));
 }
 
 TEST_F(KnotIdentificationBehaviorTest, Fem1DGranny)
 {
-	KnotIdentificationBehavior knotId("Knot ID");
-	knotId.setFem1d(makeFem1D("Geometry/granny_knot.ply"));
-	knotId.doInitialize();
-	knotId.update(0.0);
-	EXPECT_EQ("Granny Knot", knotId.getKnotName());
+	EXPECT_TRUE(testKnot("Geometry/granny_knot.ply", "Granny Knot"));
+}
+
+
+TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoilRandom)
+{
+	std::default_random_engine generator;
+	std::uniform_int_distribution<unsigned int> distribution;
+
+
+	for (;;)
+	{
+		auto seed = distribution(generator);
+
+		std::cout << seed << "\n";
+
+		//ASSERT_TRUE(testKnotRandom("Geometry/trefoil_knot.ply", "Trefoil Knot", 10000, seed));
+		ASSERT_TRUE(testKnotRandom("Geometry/square_knot.ply", "Square Knot", 10000, seed));
+		ASSERT_TRUE(testKnotRandom("Geometry/granny_knot.ply", "Granny Knot", 10000, seed));
+	}
+}
+
+TEST_F(KnotIdentificationBehaviorTest, ErrorFiles)
+{
+		//ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror1.bin"));
+		ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror2.bin"));
+		//ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror3.bin"));
 }
 
 }
