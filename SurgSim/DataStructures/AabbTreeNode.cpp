@@ -23,7 +23,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
-AabbTreeNode::AabbTreeNode()
+AabbTreeNode::AabbTreeNode() : m_axis(std::numeric_limits<size_t>::max())
 {
 }
 

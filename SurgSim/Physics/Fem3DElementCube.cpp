@@ -31,18 +31,20 @@ namespace Physics
 
 SURGSIM_REGISTER(SurgSim::Physics::FemElement, SurgSim::Physics::Fem3DElementCube, Fem3DElementCube)
 
-Fem3DElementCube::Fem3DElementCube()
+Fem3DElementCube::Fem3DElementCube() : m_restVolume(std::numeric_limits<double>::signaling_NaN())
 {
 	initializeMembers();
 }
 
-Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds)
+Fem3DElementCube::Fem3DElementCube(std::array<size_t, 8> nodeIds) :
+	m_restVolume(std::numeric_limits<double>::signaling_NaN())
 {
 	initializeMembers();
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
 }
 
-Fem3DElementCube::Fem3DElementCube(std::shared_ptr<FemElementStructs::FemElementParameter> elementData)
+Fem3DElementCube::Fem3DElementCube(std::shared_ptr<FemElementStructs::FemElementParameter> elementData) :
+	m_restVolume(std::numeric_limits<double>::signaling_NaN())
 {
 	initializeMembers();
 	auto element3DData = std::dynamic_pointer_cast<FemElementStructs::FemElement3DParameter>(elementData);

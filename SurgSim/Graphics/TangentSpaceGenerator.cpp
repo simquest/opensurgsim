@@ -194,7 +194,8 @@ TangentSpaceGenerator::TangentSpaceGenerator(int textureCoordUnit, int tangentAt
 	osg::NodeVisitor(),
 	m_textureCoordUnit(textureCoordUnit),
 	m_tangentAttribIndex(tangentAttribIndex),
-	m_bitangentAttribIndex(bitangentAttribIndex)
+	m_bitangentAttribIndex(bitangentAttribIndex),
+	m_createOrthonormalBasis(false)
 {
 	setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 }

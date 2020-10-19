@@ -47,6 +47,7 @@ namespace Physics
 DeformableRepresentation::DeformableRepresentation(const std::string& name) :
 	Representation(name),
 	SurgSim::Math::OdeEquation(),
+	m_hasExternalGeneralizedForce(false),
 	m_numDofPerNode(0),
 	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_EXPLICIT),
 	m_linearSolver(SurgSim::Math::LINEARSOLVER_LU)

@@ -32,7 +32,7 @@ Constraint::Constraint(ConstraintType constraintType,
 	const SurgSim::DataStructures::Location& location0,
 	std::shared_ptr<Representation> representation1,
 	const SurgSim::DataStructures::Location& location1)
-	: m_active(true)
+	: m_numDof(0), m_active(true)
 {
 	m_mlcpMap[FIXED_3DPOINT] = Math::MLCP_BILATERAL_3D_CONSTRAINT;
 	m_mlcpMap[FIXED_3DROTATION_VECTOR] = Math::MLCP_BILATERAL_3D_CONSTRAINT;

@@ -108,7 +108,7 @@ private:
 	Vector3d m_center;
 
 	/// Total volume of particles
-	double m_volume;
+	double m_volume = std::numeric_limits<double>::signaling_NaN();
 
 	/// Second moment of volume
 	Matrix33d m_secondMomentOfVolume;
