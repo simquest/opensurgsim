@@ -32,7 +32,7 @@ SlidingConstraintData::SlidingConstraintData() :
 
 SlidingConstraintData::SlidingConstraintData(const SurgSim::Math::Vector3d& point,
 											 const SurgSim::Math::Vector3d& direction) :
-	ConstraintData(), m_mu(0.5)
+	ConstraintData(), m_distanceTangent(std::numeric_limits<double>::signaling_NaN()), m_mu(0.5)
 {
 	setSlidingDirection(point, direction);
 }

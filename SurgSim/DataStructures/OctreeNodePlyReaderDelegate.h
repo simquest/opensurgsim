@@ -80,12 +80,12 @@ protected:
 	/// Data Structure to receive the bounds information
 	struct BoundsData
 	{
-		double xMin;
-		double yMin;
-		double zMin;
-		double xMax;
-		double yMax;
-		double zMax;
+		double xMin = std::numeric_limits<double>::signaling_NaN();
+		double yMin = std::numeric_limits<double>::signaling_NaN();
+		double zMin = std::numeric_limits<double>::signaling_NaN();
+		double xMax = std::numeric_limits<double>::signaling_NaN();
+		double yMax = std::numeric_limits<double>::signaling_NaN();
+		double zMax = std::numeric_limits<double>::signaling_NaN();
 	} m_bounds;
 
 	/// Bounding box, will be initialized from the file
@@ -94,29 +94,29 @@ protected:
 	/// Data structure to receive the spacing information from the file
 	struct SpacingData
 	{
-		double x;
-		double y;
-		double z;
+		double x = std::numeric_limits<double>::signaling_NaN();
+		double y = std::numeric_limits<double>::signaling_NaN();
+		double z = std::numeric_limits<double>::signaling_NaN();
 	} m_spacing;
 
 	/// Data structure to receive the dimension information from the file
 	struct DimensionData
 	{
-		unsigned int x;
-		unsigned int y;
-		unsigned int z;
+		unsigned int x = 0;
+		unsigned int y = 0;
+		unsigned int z = 0;
 	} m_dimension;
 
 	/// Data structure to receive the specific voxel information from the file
 	struct VoxelData
 	{
-		double x;
-		double y;
-		double z;
+		double x = std::numeric_limits<double>::signaling_NaN();
+		double y = std::numeric_limits<double>::signaling_NaN();
+		double z = std::numeric_limits<double>::signaling_NaN();
 	} m_voxel;
 
 	/// Calculated number of levels for the octree
-	int m_numLevels;
+	int m_numLevels = -1;
 
 	///@{
 	/// Check wether we actually received the appropriate information, if not we can't initialize the octree
