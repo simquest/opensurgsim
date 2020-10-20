@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2017, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -145,7 +145,7 @@ bool barycentricCoordinates(
 	return barycentricCoordinates(pt, tv0, tv1, tv2, tn, coordinates);
 }
 
-/// Check if a point is inside a triangle
+/// Check if a point projected into the plane of a triangle, is inside that triangle.
 /// \note Use barycentricCoordinates() if you need the coordinates
 /// \pre The normal must be unit length
 /// \pre The triangle vertices must be in counter clockwise order in respect to the normal
@@ -164,14 +164,16 @@ bool isPointInsideTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& tn)
 {
 	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
-	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, tn, &baryCoords);
-	return (result &&
-			baryCoords[0] >= -Geometry::ScalarEpsilon &&
-			baryCoords[1] >= -Geometry::ScalarEpsilon &&
-			baryCoords[2] >= -Geometry::ScalarEpsilon);
+	return (barycentricCoordinates(pt, tv0, tv1, tv2, tn, &baryCoords) &&
+		baryCoords[0] * (tv0 - (tv2 * static_cast<T>(0.5) + tv1 * static_cast<T>(0.5))).norm() >=
+		-Geometry::ScalarEpsilon &&
+		baryCoords[1] * (tv1 - (tv0 * static_cast<T>(0.5) + tv2 * static_cast<T>(0.5))).norm() >=
+		-Geometry::ScalarEpsilon &&
+		baryCoords[2] * (tv2 - (tv1 * static_cast<T>(0.5) + tv0 * static_cast<T>(0.5))).norm() >=
+		-Geometry::ScalarEpsilon);
 }
 
-/// Check if a point is inside a triangle.
+/// Check if a point projected into the plane of a triangle, is inside that triangle.
 /// \note Use barycentricCoordinates() if you need the coordinates.
 /// Please note that the normal will be calculated each time you use this call, if you are doing more than one
 /// test with the same triangle, precalculate the normal and pass it. Into the other version of this function
@@ -189,57 +191,13 @@ bool isPointInsideTriangle(
 {
 	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
 	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, &baryCoords);
-	return (result && baryCoords[0] >= -Geometry::ScalarEpsilon &&
-			baryCoords[1] >= -Geometry::ScalarEpsilon &&
-			baryCoords[2] >= -Geometry::ScalarEpsilon);
-}
-
-/// Check if a point is on the edge of a triangle.
-/// \note Use barycentricCoordinates() if you need the coordinates.
-/// \tparam T			Accuracy of the calculation, can usually be inferred.
-/// \tparam MOpt		Eigen Matrix options, can usually be inferred.
-/// \param pt			Vertex of the point.
-/// \param tv0, tv1, tv2 Vertices of the triangle, must be in CCW.
-/// \param tn			Normal of the triangle (must be of norm 1 and a,b,c CCW).
-/// \return true if pt lies on the edge of the triangle tv0, tv1, tv2, false otherwise.
-template <class T, int MOpt> inline
-bool isPointOnTriangleEdge(
-	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tn)
-{
-	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
-	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, tn, &baryCoords);
-	return (result && baryCoords[0] >= -Geometry::ScalarEpsilon &&
-		baryCoords[1] >= -Geometry::ScalarEpsilon &&
-		baryCoords[2] >= -Geometry::ScalarEpsilon &&
-		baryCoords.minCoeff() <= Geometry::ScalarEpsilon);
-}
-
-/// Check if a point is on the edge of a triangle.
-/// \note Use barycentricCoordinates() if you need the coordinates.
-/// Please note that the normal will be calculated each time you use this call, if you are doing more than one
-/// test with the same triangle, precalculate the normal and pass it. Into the other version of this function
-/// \tparam T			Accuracy of the calculation, can usually be inferred.
-/// \tparam MOpt		Eigen Matrix options, can usually be inferred.
-/// \param pt			Vertex of the point.
-/// \param tv0, tv1, tv2 Vertices of the triangle, must be in CCW.
-/// \return true if pt lies on the edge of the triangle tv0, tv1, tv2, false otherwise.
-template <class T, int MOpt> inline
-bool isPointOnTriangleEdge(
-	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv2)
-{
-	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
-	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, &baryCoords);
-	return (result && baryCoords[0] >= -Geometry::ScalarEpsilon &&
-		baryCoords[1] >= -Geometry::ScalarEpsilon &&
-		baryCoords[2] >= -Geometry::ScalarEpsilon &&
-		baryCoords.minCoeff() <= Geometry::ScalarEpsilon);
+	return (result &&
+		baryCoords[0] * (tv0 - (tv2 * static_cast<T>(0.5) + tv1 * static_cast<T>(0.5))).norm() >=
+		-Geometry::ScalarEpsilon &&
+		baryCoords[1] * (tv1 - (tv0 * static_cast<T>(0.5) + tv2 * static_cast<T>(0.5))).norm() >=
+		-Geometry::ScalarEpsilon &&
+		baryCoords[2] * (tv2 - (tv1 * static_cast<T>(0.5) + tv0 * static_cast<T>(0.5))).norm() >=
+		-Geometry::ScalarEpsilon);
 }
 
 /// Check whether the points are coplanar.
@@ -321,6 +279,25 @@ T distancePointSegment(
 		*result = sv0 + lambda * v01 / v01Norm2;
 	}
 	return (*result - pt).norm();
+}
+
+/// Check if a point is on the edge of a triangle.
+/// \tparam T			Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt		Eigen Matrix options, can usually be inferred.
+/// \param pt			Vertex of the point.
+/// \param tv0, tv1, tv2 Vertices of the triangle.
+/// \return true if pt lies on the edge of the triangle tv0, tv1, tv2, false otherwise.
+template <class T, int MOpt> inline
+bool isPointOnTriangleEdge(
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> pointOnSegment;
+	return (distancePointSegment(pt, tv0, tv1, &pointOnSegment) < Geometry::ScalarEpsilon) ||
+		(distancePointSegment(pt, tv1, tv2, &pointOnSegment) < Geometry::ScalarEpsilon) ||
+		(distancePointSegment(pt, tv2, tv0, &pointOnSegment) < Geometry::ScalarEpsilon);
 }
 
 /// Determine the distance between two lines
@@ -1142,6 +1119,39 @@ T distanceSegmentPlane(
 	}
 }
 
+/// Calculate the distance between a line and a plane.
+/// \pre n should be normalized
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param v0,v1	Two points on the line.
+/// \param n		Normal of the plane n (normalized).
+/// \param d		Constant d in n.x + d = 0.
+/// \param [out] intersectionPoint Point of intersection if any. If multiple, then v0.
+/// \return			The distance between the line and plane if they do not intersect, otherwise 0.
+template <class T, int MOpt> inline
+T distanceLinePlane(
+	const Eigen::Matrix<T, 3, 1, MOpt>& v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& n,
+	T d,
+	Eigen::Matrix<T, 3, 1, MOpt>* intersectionPoint)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> v01 = v1 - v0;
+	T v01dotN = v01.dot(n);
+	if (std::abs(n.dot(v01.normalized())) > Geometry::AngularEpsilon)
+	{
+		T lambda = (-d - v0.dot(n)) / v01dotN;
+		*intersectionPoint = v0 + lambda * v01;
+		return 0;
+	}
+	T dist = std::abs(v0.dot(n) + d);
+	if (dist < Geometry::DistanceEpsilon)
+	{
+		*intersectionPoint = v0;
+		return 0;
+	}
+	return dist;
+}
 
 /// Calculate the distance of a triangle to a plane.
 /// \pre n should be normalized.
@@ -1265,32 +1275,6 @@ bool doesIntersectPlanePlane(
 	return true;
 }
 
-
-/// Calculate the distance of a line segment to a triangle.
-/// Note that this version will calculate the normal of the triangle,
-/// if the normal is known use the other version of this function.
-/// \tparam T		Accuracy of the calculation, can usually be inferred.
-/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
-/// \param sv0,sv1	Extremities of the line segment.
-/// \param tv0, tv1, tv2 Triangle points.
-/// \param [out] segmentPoint Closest point on the segment.
-/// \param [out] trianglePoint Closest point on the triangle.
-/// \return the the distance between the two closest points, i.e. (trianglePoint - segmentPoint).norm().
-template <class T, int MOpt> inline
-T distanceSegmentTriangle(
-	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-	Eigen::Matrix<T, 3, 1, MOpt>* segmentPoint,
-	Eigen::Matrix<T, 3, 1, MOpt>* trianglePoint)
-{
-	Eigen::Matrix<T, 3, 1, MOpt> n = (tv1 - tv0).cross(tv2 - tv1);
-	n.normalize();
-	return distanceSegmentTriangle(sv0, sv1, tv0, tv1, tv2, n, segmentPoint, trianglePoint);
-}
-
 /// Calculate the distance of a line segment to a triangle.
 /// \pre n needs to be normalized.
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
@@ -1322,7 +1306,7 @@ T distanceSegmentTriangle(
 	// Degenerate case: Line and triangle plane parallel
 	const Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1 - sv0;
 	const T v01DotTn = n.dot(v01);
-	if (std::abs(v01DotTn) <= Geometry::AngularEpsilon)
+	if (std::abs(n.dot(v01.normalized())) <= Geometry::AngularEpsilon)
 	{
 		// Check if any of the points project onto the tri
 		// otherwise normal (non-parallel) processing will get the right result
@@ -1349,8 +1333,7 @@ T distanceSegmentTriangle(
 		if (lambda >= 0 && lambda <= 1)
 		{
 			*segmentPoint = *trianglePoint = sv0 + lambda * v01;
-			barycentricCoordinates(*trianglePoint, tv0, tv1, tv2, normal, &baryCoords);
-			if (baryCoords[0] >= 0 && baryCoords[1] >= 0 && baryCoords[2] >= 0)
+			if (isPointInsideTriangle(*trianglePoint, tv0, tv1, tv2, normal))
 			{
 				// Segment goes through the triangle
 				return 0;
@@ -1364,14 +1347,12 @@ T distanceSegmentTriangle(
 	T dst12 = distanceSegmentSegment(sv0, sv1, tv1, tv2, &segColPt12, &triColPt12);
 	Eigen::Matrix<T, 3, 1, MOpt> ptTriCol0, ptTriCol1;
 	T dstPtTri0 = std::abs(distancePointPlane(sv0, n, d, &ptTriCol0));
-	barycentricCoordinates(ptTriCol0, tv0, tv1, tv2, normal, &baryCoords);
-	if (baryCoords[0] < 0 || baryCoords[1] < 0 || baryCoords[2] < 0)
+	if (!isPointInsideTriangle(ptTriCol0, tv0, tv1, tv2, normal))
 	{
 		dstPtTri0 = std::numeric_limits<T>::max();
 	}
 	T dstPtTri1 = std::abs(distancePointPlane(sv1, n, d, &ptTriCol1));
-	barycentricCoordinates(ptTriCol1, tv0, tv1, tv2, normal, &baryCoords);
-	if (baryCoords[0] < 0 || baryCoords[1] < 0 || baryCoords[2] < 0)
+	if (!isPointInsideTriangle(ptTriCol1, tv0, tv1, tv2, normal))
 	{
 		dstPtTri1 = std::numeric_limits<T>::max();
 	}
@@ -1408,6 +1389,31 @@ T distanceSegmentTriangle(
 
 }
 
+
+/// Calculate the distance of a line segment to a triangle.
+/// Note that this version will calculate the normal of the triangle,
+/// if the normal is known use the other version of this function.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param sv0,sv1	Extremities of the line segment.
+/// \param tv0, tv1, tv2 Triangle points.
+/// \param [out] segmentPoint Closest point on the segment.
+/// \param [out] trianglePoint Closest point on the triangle.
+/// \return the the distance between the two closest points, i.e. (trianglePoint - segmentPoint).norm().
+template <class T, int MOpt> inline
+T distanceSegmentTriangle(
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	Eigen::Matrix<T, 3, 1, MOpt>* segmentPoint,
+	Eigen::Matrix<T, 3, 1, MOpt>* trianglePoint)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> n = (tv1 - tv0).cross(tv2 - tv1);
+	n.normalize();
+	return distanceSegmentTriangle(sv0, sv1, tv0, tv1, tv2, n, segmentPoint, trianglePoint);
+}
 
 /// Calculate the distance between two triangles
 /// \tparam T		Accuracy of the calculation, can usually be inferred.

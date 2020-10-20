@@ -17,6 +17,8 @@
 
 #include "SurgSim/DataStructures/AabbTree.h"
 #include "SurgSim/DataStructures/AabbTreeData.h"
+#include "SurgSim/DataStructures/AabbTreeNode.h"
+#include "SurgSim/DataStructures/TreeNode.h"
 #include "SurgSim/Framework/Assert.h"
 
 using SurgSim::DataStructures::EmptyData;
@@ -48,7 +50,8 @@ MeshShape::MeshShape(const MeshShape& other) :
 	m_volume(other.getVolume()),
 	m_secondMomentOfVolume(other.getSecondMomentOfVolume())
 {
-	updateAabbTree();
+	setInitialVertices(other.getInitialVertices());
+	buildAabbTree();
 }
 
 const SurgSim::Math::Vector3d& MeshShape::getNormal(size_t triangleId) const
@@ -82,9 +85,20 @@ bool MeshShape::calculateNormals()
 	return result;
 }
 
-bool MeshShape::doUpdate()
+void MeshShape::updateShape()
+{
+	doUpdate();
+}
+
+void MeshShape::updateShapePartial()
 {
 	updateAabbTree();
+	calculateNormals();
+}
+
+bool MeshShape::doUpdate()
+{
+	buildAabbTree();
 	computeVolumeIntegrals();
 	return calculateNormals();
 }
@@ -164,7 +178,7 @@ void MeshShape::computeVolumeIntegrals()
 		const Vector3d& v2 = getVertexPosition(triangle.verticesId[2]);
 
 		// get edges and cross product of edges
-		Vector3d normal = (v1 - v0).cross(v2 - v0);
+		Vector3d scaledNormal = (v1 - v0).cross(v2 - v0);
 
 		// compute integral terms
 		double f1x, f1y, f1z, f2x, f2y, f2z, f3x, f3y, f3z;
@@ -174,16 +188,16 @@ void MeshShape::computeVolumeIntegrals()
 		computeIntegralTerms(v0.z(), v1.z(), v2.z(), &f1z, &f2z, &f3z, &g0z, &g1z, &g2z);
 
 		// update integrals
-		integral[0] += normal[0] * f1x;
-		integral[1] += normal[0] * f2x;
-		integral[2] += normal[1] * f2y;
-		integral[3] += normal[2] * f2z;
-		integral[4] += normal[0] * f3x;
-		integral[5] += normal[1] * f3y;
-		integral[6] += normal[2] * f3z;
-		integral[7] += normal[0] * (v0.y() * g0x + v1.y() * g1x + v2.y() * g2x);
-		integral[8] += normal[1] * (v0.z() * g0y + v1.z() * g1y + v2.z() * g2y);
-		integral[9] += normal[2] * (v0.x() * g0z + v1.x() * g1z + v2.x() * g2z);
+		integral[0] += scaledNormal[0] * f1x;
+		integral[1] += scaledNormal[0] * f2x;
+		integral[2] += scaledNormal[1] * f2y;
+		integral[3] += scaledNormal[2] * f2z;
+		integral[4] += scaledNormal[0] * f3x;
+		integral[5] += scaledNormal[1] * f3y;
+		integral[6] += scaledNormal[2] * f3z;
+		integral[7] += scaledNormal[0] * (v0.y() * g0x + v1.y() * g1x + v2.y() * g2x);
+		integral[8] += scaledNormal[1] * (v0.z() * g0y + v1.z() * g1y + v2.z() * g2y);
+		integral[9] += scaledNormal[2] * (v0.x() * g0z + v1.x() * g1z + v2.x() * g2z);
 	}
 	integral = integral.cwiseProduct(multiplier);
 
@@ -216,7 +230,7 @@ void MeshShape::computeVolumeIntegrals()
 std::shared_ptr<Shape> MeshShape::getTransformed(const RigidTransform3d& pose) const
 {
 	auto transformed = std::make_shared<MeshShape>(*this);
-	transformed->transform(pose);
+	transformed->setPose(pose);
 	transformed->update();
 	return transformed;
 }
@@ -226,11 +240,11 @@ const std::shared_ptr<const SurgSim::DataStructures::AabbTree> MeshShape::getAab
 	return m_aabbTree;
 }
 
-void MeshShape::updateAabbTree()
+void MeshShape::buildAabbTree()
 {
 	m_aabbTree = std::make_shared<SurgSim::DataStructures::AabbTree>();
 
-	std::list<DataStructures::AabbTreeData::Item> items;
+	SurgSim::DataStructures::AabbTreeData::ItemList items;
 
 	auto const& triangles = getTriangles();
 
@@ -243,15 +257,46 @@ void MeshShape::updateAabbTree()
 		}
 	}
 	m_aabbTree->set(std::move(items));
-
 	m_aabb = m_aabbTree->getAabb();
 }
 
-bool MeshShape::isTransformable() const
+void MeshShape::setPose(const RigidTransform3d& pose)
 {
-	return true;
+	auto& vertices = getVertices();
+	const size_t numVertices = vertices.size();
+	const auto& initialVertices = m_initialVertices.getVertices();
+	m_aabb.setEmpty();
+
+	if (initialVertices.size() == 0)
+	{
+		setInitialVertices(*this);
+	}
+
+	SURGSIM_ASSERT(numVertices == initialVertices.size()) <<
+			"MeshShape cannot update vertices' positions because of mismatched size: currently " << numVertices <<
+			" vertices, vs initially " << initialVertices.size() << " vertices.";
+	for (size_t i = 0; i < numVertices; ++i)
+	{
+		vertices[i].position = pose * initialVertices[i].position;
+		m_aabb.extend(vertices[i].position);
+	}
 }
 
+void MeshShape::updateAabbTree()
+{
+	m_aabbCache.resize(getTriangles().size());
+	size_t i = 0;
+	for (const auto& triangle : getTriangles())
+	{
+		m_aabbCache[i++] = SurgSim::Math::makeAabb(
+							   getVertexPosition(triangle.verticesId[0]),
+							   getVertexPosition(triangle.verticesId[1]),
+							   getVertexPosition(triangle.verticesId[2]));
+	}
+
+	m_aabbTree->updateBounds(m_aabbCache);
+	m_aabb = m_aabbTree->getAabb();
+}
 
 }; // namespace Math
 }; // namespace SurgSim

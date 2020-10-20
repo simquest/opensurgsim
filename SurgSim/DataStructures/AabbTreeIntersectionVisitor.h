@@ -20,6 +20,7 @@
 #include "SurgSim/Math/Aabb.h"
 
 #include <list>
+#include <vector>
 
 namespace SurgSim
 {
@@ -59,12 +60,12 @@ public:
 	void setAabb(const SurgSim::Math::Aabbd& aabb);
 
 	/// \return a reference to the found intersections.
-	const std::list<size_t>& getIntersections() const;
+	const std::vector<size_t>& getIntersections() const;
 
 private:
 
 	/// List of ids found for intersections
-	std::list<size_t> m_intersections;
+	std::vector<size_t> m_intersections;
 
 	/// Bounding box used for intersection test
 	SurgSim::Math::Aabbd m_aabb;

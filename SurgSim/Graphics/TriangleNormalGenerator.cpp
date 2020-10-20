@@ -28,7 +28,8 @@ namespace Graphics
 
 TriangleNormalGenerator::TriangleNormalGenerator() :
 	m_vertexArray(nullptr),
-	m_normalArray(nullptr)
+	m_normalArray(nullptr),
+	m_size(0)
 {
 }
 

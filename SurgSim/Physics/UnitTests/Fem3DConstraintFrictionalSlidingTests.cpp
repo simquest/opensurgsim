@@ -130,7 +130,7 @@ TEST_F(Fem3DConstraintFrictionalSlidingTests, ConstraintConstantsTest)
 	auto implementation = std::make_shared<FemConstraintFrictionalSliding>();
 
 	EXPECT_EQ(SurgSim::Physics::FRICTIONAL_SLIDING, implementation->getConstraintType());
-	EXPECT_EQ(3u, implementation->getNumDof());
+	EXPECT_EQ(5u, implementation->getNumDof());
 }
 
 TEST_F(Fem3DConstraintFrictionalSlidingTests, BuildMlcpTest)
@@ -140,7 +140,7 @@ TEST_F(Fem3DConstraintFrictionalSlidingTests, BuildMlcpTest)
 	auto implementation = std::make_shared<FemConstraintFrictionalSliding>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 3, 1);
+	auto mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), implementation->getNumDof(), 1);
 
 	// Apply constraint purely to the first node of the 0th tetrahedron.
 	IndexedLocalCoordinate coord(0, Vector4d(1.0, 0.0, 0.0, 0.0));
@@ -149,10 +149,12 @@ TEST_F(Fem3DConstraintFrictionalSlidingTests, BuildMlcpTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	Eigen::Matrix<double, 3, 18> H = Eigen::Matrix<double, 3, 18>::Zero();
+	Eigen::Matrix<double, 5, 18> H = Eigen::Matrix<double, 5, 18>::Zero();
 	H.block<1, 3>(0, 0) = (dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 0) = (dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 0) = (dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 0) = (dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 0) = (dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 0) = (dt * Vector3d::UnitZ()).eval();
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -175,7 +177,7 @@ TEST_F(Fem3DConstraintFrictionalSlidingTests, BuildMlcpCoordinateTest)
 	auto implementation = std::make_shared<FemConstraintFrictionalSliding>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 3, 1);
+	auto mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), implementation->getNumDof(), 1);
 
 	// Apply constraint to the four nodes of the 0th tetrahedron.
 	auto barycentric = Vector4d(0.25, 0.33, 0.28, 0.14);
@@ -185,19 +187,27 @@ TEST_F(Fem3DConstraintFrictionalSlidingTests, BuildMlcpCoordinateTest)
 	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	Eigen::Matrix<double, 3, 18> H = Eigen::Matrix<double, 3, 18>::Zero();
+	Eigen::Matrix<double, 5, 18> H = Eigen::Matrix<double, 5, 18>::Zero();
 	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 0) = (barycentric[0] * dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 0) = (barycentric[0] * dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 0) = (barycentric[0] * dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 0) = (barycentric[0] * dt * Vector3d::UnitZ()).eval();
 	H.block<1, 3>(0, 3) = (barycentric[1] * dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 3) = (barycentric[1] * dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 3) = (barycentric[1] * dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 3) = (barycentric[1] * dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 3) = (barycentric[1] * dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 3) = (barycentric[1] * dt * Vector3d::UnitZ()).eval();
 	H.block<1, 3>(0, 6) = (barycentric[2] * dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 6) = (barycentric[2] * dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 6) = (barycentric[2] * dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 6) = (barycentric[2] * dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 6) = (barycentric[2] * dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 6) = (barycentric[2] * dt * Vector3d::UnitZ()).eval();
 	H.block<1, 3>(0, 9) = (barycentric[3] * dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 9) = (barycentric[3] * dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 9) = (barycentric[3] * dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 9) = (barycentric[3] * dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 9) = (barycentric[3] * dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 9) = (barycentric[3] * dt * Vector3d::UnitZ()).eval();
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -220,7 +230,7 @@ TEST_F(Fem3DConstraintFrictionalSlidingTests, BuildMlcpIndiciesTest)
 	auto implementation = std::make_shared<FemConstraintFrictionalSliding>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, 4, 2);
+	auto mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, implementation->getNumDof() + 1, 2);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
 	Eigen::SparseVector<double, Eigen::RowMajor, ptrdiff_t> localH;
@@ -268,30 +278,38 @@ TEST_F(Fem3DConstraintFrictionalSlidingTests, BuildMlcpIndiciesTest)
 		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint,
 		SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	Eigen::Matrix<double, 3, 18> H = Eigen::Matrix<double, 3, 18>::Zero();
+	Eigen::Matrix<double, 5, 18> H = Eigen::Matrix<double, 5, 18>::Zero();
 	H.block<1, 3>(0, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 0) = (barycentric[0] * dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 0) = (barycentric[0] * dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 0) = (barycentric[0] * dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 0) = (barycentric[0] * dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 0) = (barycentric[0] * dt * Vector3d::UnitZ()).eval();
 	H.block<1, 3>(0, 3) = (barycentric[1] * dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 3) = (barycentric[1] * dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 3) = (barycentric[1] * dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 3) = (barycentric[1] * dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 3) = (barycentric[1] * dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 3) = (barycentric[1] * dt * Vector3d::UnitZ()).eval();
 	H.block<1, 3>(0, 6) = (barycentric[2] * dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 6) = (barycentric[2] * dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 6) = (barycentric[2] * dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 6) = (barycentric[2] * dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 6) = (barycentric[2] * dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 6) = (barycentric[2] * dt * Vector3d::UnitZ()).eval();
 	H.block<1, 3>(0, 9) = (barycentric[3] * dt * m_constraintData.getNormals()[0]).eval();
 	H.block<1, 3>(1, 9) = (barycentric[3] * dt * m_constraintData.getNormals()[1]).eval();
-	H.block<1, 3>(2, 9) = (barycentric[3] * dt * m_slidingDirection).eval();
+	H.block<1, 3>(2, 9) = (barycentric[3] * dt * Vector3d::UnitX()).eval();
+	H.block<1, 3>(3, 9) = (barycentric[3] * dt * Vector3d::UnitY()).eval();
+	H.block<1, 3>(4, 9) = (barycentric[3] * dt * Vector3d::UnitZ()).eval();
 
-	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H.block(indexOfConstraint, indexOfRepresentation, 3, 18), epsilon);
+	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H.block(indexOfConstraint, indexOfRepresentation, 5, 18), epsilon);
 
 	m_fem->updateFMDK(*(m_fem->getPreviousState()), SurgSim::Math::ODEEQUATIONUPDATE_M);
 	Eigen::Matrix<double, 18, 18> C = dt * m_fem->getM().toDense().inverse();
 
 	EXPECT_NEAR_EIGEN(
-		C * H.transpose(), mlcpPhysicsProblem.CHt.block(indexOfRepresentation, indexOfConstraint, 18, 3), epsilon);
+		C * H.transpose(), mlcpPhysicsProblem.CHt.block(indexOfRepresentation, indexOfConstraint, 18, 5), epsilon);
 
 	EXPECT_NEAR_EIGEN(
-		H * C * H.transpose(), mlcpPhysicsProblem.A.block(indexOfConstraint, indexOfConstraint, 3, 3), epsilon);
+		H * C * H.transpose(), mlcpPhysicsProblem.A.block(indexOfConstraint, indexOfConstraint, 5, 5), epsilon);
 
 	EXPECT_DOUBLE_EQ(0.5, mlcpPhysicsProblem.mu[1]);
 

@@ -64,6 +64,9 @@ public:
 
 	void initialize(const SurgSim::Math::OdeState& state) override;
 
+	/// Gets the current rotation of the element
+	const SurgSim::Math::Matrix33d& getRotationMatrix() const;
+
 protected:
 	/// Compute the rotation, mass and stiffness matrices of the element from the given state
 	/// \param state The state to compute the rotation and jacobians from

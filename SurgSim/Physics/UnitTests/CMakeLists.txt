@@ -57,6 +57,7 @@ set(UNIT_TEST_SOURCES
 	Fem3DConstraintFrictionalSlidingTests.cpp
 	Fem3DConstraintFrictionlessContactTests.cpp
 	Fem3DConstraintFrictionlessSlidingTests.cpp
+	Fem3DCorotationalTetrahedronRepresentationTests.cpp
 	Fem3DElementCorotationalTetrahedronTests.cpp
 	Fem3DElementCubeTests.cpp
 	Fem3DElementTetrahedronTests.cpp
@@ -73,9 +74,11 @@ set(UNIT_TEST_SOURCES
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
 	MassSpringConstraintFixedPointTest.cpp
+	MassSpringConstraintFrictionalSlidingTests.cpp
 	MassSpringConstraintFrictionlessContactTest.cpp
 	MassSpringLocalizationTest.cpp
 	MassSpringMechanicalValidationTests.cpp
+	MassSpringPlyReaderDelegateTests.cpp	
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
 	MockObjects.cpp

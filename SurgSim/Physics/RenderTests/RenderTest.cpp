@@ -60,7 +60,34 @@ void RenderTests::runTest(const SurgSim::Math::Vector3d& cameraPosition, const S
 	/// Run the thread
 	runtime->start();
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(miliseconds));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(static_cast<int>(miliseconds)));
+}
+
+void RenderTests::runFixedFrameTest(const SurgSim::Math::Vector3d& cameraPosition,
+	const SurgSim::Math::Vector3d& cameraLookAt, size_t frameCount)
+{
+	using SurgSim::Graphics::OsgAxesRepresentation;
+
+	viewElement->enableManipulator(true);
+	viewElement->setManipulatorParameters(cameraPosition, cameraLookAt);
+
+	std::shared_ptr<OsgAxesRepresentation> axes = std::make_shared<OsgAxesRepresentation>("axes");
+	axes->setSize(1.0);
+	viewElement->addComponent(axes);
+
+	/// Run the thread
+	runtime->start(true);
+
+	runtime->step();
+	for (size_t i = 0; i < frameCount; ++i)
+	{
+		runtime->step();
+	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+	runtime->resume();
+
+
+	runtime->stop();
 }
 
 }; // namespace Physics

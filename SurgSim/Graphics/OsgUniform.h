@@ -51,6 +51,8 @@ public:
 	/// \return the value of the uniform
 	virtual const T& get() const;
 
+	const std::string getGlslType() const override;
+
 private:
 	/// Value of the uniform
 	T m_value;
@@ -92,6 +94,8 @@ public:
 	/// Gets the value of all of the uniform's elements
 	/// \return	Vector of values
 	virtual const std::vector<T>& get() const;
+
+	const std::string getGlslType() const override;
 
 private:
 	/// Vector containing the values of the uniform's elements

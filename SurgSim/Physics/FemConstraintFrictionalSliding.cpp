@@ -60,7 +60,7 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 	directions[1] = constraintData.getNormals()[1];
 	directions[2] = constraintData.getTangent();
 
-	const DataStructures::IndexedLocalCoordinate& coord
+	DataStructures::IndexedLocalCoordinate coord
 		= std::static_pointer_cast<FemLocalization>(localization)->getLocalPosition();
 	Vector3d globalPosition = localization->calculatePosition();
 
@@ -69,7 +69,7 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 	auto numNodes = fem->getFemElement(coord.index)->getNumNodes();
 	m_newH.reserve(numNodes * 3);
 
-	for (size_t i = 0; i < 3; ++i)
+	for (size_t i = 0; i < 2; ++i)
 	{
 		// Update b with new violation
 		double violation = directions[i].dot(globalPosition);
@@ -89,6 +89,35 @@ void FemConstraintFrictionalSliding::doBuild(double dt,
 			indexOfConstraint + i);
 	}
 
+	// The friction is like a bilateral 3d constraint.
+	if (numNodes == 2)
+	{
+		auto previousLocalization = constraintData.getPreviousFirstLocalization();
+		coord = std::static_pointer_cast<FemLocalization>(previousLocalization)->getLocalPosition();
+		globalPosition = previousLocalization->calculatePosition();
+	}
+	mlcp->b.segment<3>(indexOfConstraint + 2) += globalPosition * scale;
+	m_newH.resize(fem->getNumDof());
+	femElement = fem->getFemElement(coord.index);
+	numNodes = femElement->getNumNodes();
+	size_t numNodeToConstrain = (coord.coordinate.array() != 0.0).count();
+	m_newH.reserve(3 * numNodeToConstrain);
+
+	for (size_t axis = 0; axis < 3; axis++)
+	{
+		m_newH.setZero();
+		for (size_t index = 0; index < numNodes; index++)
+		{
+			if (coord.coordinate[index] != 0.0)
+			{
+				size_t nodeIndex = femElement->getNodeId(index);
+				m_newH.insert(numDofPerNode * nodeIndex + axis) = coord.coordinate[index] * (dt * scale);
+			}
+		}
+		mlcp->updateConstraint(m_newH, fem->getComplianceMatrix() * m_newH.transpose(),
+			indexOfRepresentation, indexOfConstraint + axis + 2);
+	}
+
 	mlcp->mu[indexOfConstraint] = constraintData.getFrictionCoefficient();
 }
 
@@ -99,7 +128,7 @@ SurgSim::Physics::ConstraintType FemConstraintFrictionalSliding::getConstraintTy
 
 size_t FemConstraintFrictionalSliding::doGetNumDof() const
 {
-	return 3;
+	return 5;
 }
 
 }; //  namespace Physics

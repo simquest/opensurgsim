@@ -43,19 +43,19 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 	endif()
 
-	# Enable support for C++0x/C++11 for G++ if available
+	# Enable support for C++0x/C++14 for G++ if available
 	include(CheckCXXCompilerFlag)
-	check_cxx_compiler_flag(-std=gnu++11 HAVE_FLAG_STD_GNUXX11)
-	if(HAVE_FLAG_STD_GNUXX11)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-	else(HAVE_FLAG_STD_GNUXX11)
-		check_cxx_compiler_flag(-std=gnu++0x HAVE_FLAG_STD_GNUXX0X)
+	check_cxx_compiler_flag(--std=gnu++14 HAVE_FLAG_STD_GNUXX14)
+	if(HAVE_FLAG_STD_GNUXX14)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=gnu++14")
+	else(HAVE_FLAG_STD_GNUXX14)
+		check_cxx_compiler_flag(--std=gnu++0x HAVE_FLAG_STD_GNUXX0X)
 		if(HAVE_FLAG_STD_GNUXX0X)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=gnu++0x")
 		else(HAVE_FLAG_STD_GNUXX0X)
-			message(WARNING "G++ is missing C++0x/C++11 support; trying anyway.")
+			message(WARNING "G++ is missing C++0x/C++14 support; trying anyway.")
 		endif(HAVE_FLAG_STD_GNUXX0X)
-	endif(HAVE_FLAG_STD_GNUXX11)
+	endif(HAVE_FLAG_STD_GNUXX14)
 
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
@@ -103,6 +103,16 @@ if(MSVC)
 		add_definitions( -D_VARIADIC_MAX=10 )
 	endif(MSVC_VERSION EQUAL 1700)
 
+	# Handle Error C2338 "You've instantiated std::aligned_storage<Len, Align> with an extended alignment (in other words, Align > alignof(max_align_t)).
+	# Before VS 2017 15.8, the member type would non-conformingly have an alignment of only alignof(max_align_t).
+	# VS 2017 15.8 was fixed to handle this correctly, but the fix inherently changes layout and breaks binary compatibility
+	# (*only* for uses of aligned_storage with extended alignments).
+	# Please define either (1) _ENABLE_EXTENDED_ALIGNED_STORAGE to acknowledge that you understand this message and that you actually want a type with an extended alignment,
+	# or (2) _DISABLE_EXTENDED_ALIGNED_STORAGE to silence this message and get the old non-conformant behavior.
+	if((MSVC_VERSION GREATER_EQUAL 1915) AND (MSVC_VERSION LESS 1920))
+		add_definitions( -D_ENABLE_EXTENDED_ALIGNED_STORAGE  )
+	endif((MSVC_VERSION GREATER_EQUAL 1915) AND (MSVC_VERSION LESS 1920))
+
 	if(BUILD_SHARED_LIBS)
 		message(FATAL_ERROR "Please turn off BUILD_SHARED_LIBS. Shared libraries on Windows is currently unsupported.")
 	endif()
@@ -117,11 +127,6 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -stdlib=libc++")
 endif()
-
-# Windows-specific settings
-if(WIN32)
-	add_definitions( -D_WIN32_WINNT=0x0501 )  # request compatibility with WinXP
-endif(WIN32)
 
 # Linux-specific settings
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

@@ -103,21 +103,21 @@ protected:
 	/// Provide space for standard ply vertex data, x/y/z and s/t
 	struct VertexData
 	{
-		double x;
-		double y;
-		double z;
-		int64_t overrun1; ///< Used to check for buffer overruns
-		double s;
-		double t;
-		int64_t overrun2; ///< Used to check for buffer overruns
+		double x = std::numeric_limits<double>::signaling_NaN();
+		double y = std::numeric_limits<double>::signaling_NaN();
+		double z = std::numeric_limits<double>::signaling_NaN();
+		int64_t overrun1 = -1; ///< Used to check for buffer overruns
+		double s = std::numeric_limits<double>::signaling_NaN();
+		double t = std::numeric_limits<double>::signaling_NaN();
+		int64_t overrun2 = -1; ///< Used to check for buffer overruns
 	} m_vertexData;
 
 	/// Internal structure, the received for data from the "face" element
 	struct ListData
 	{
-		unsigned int count;
-		unsigned int* indices;
-		int64_t overrun; ///< Used to check for buffer overruns
+		unsigned int count = 0;
+		unsigned int* indices = nullptr;
+		int64_t overrun = -1; ///< Used to check for buffer overruns
 	} m_listData;
 
 	/// The mesh that will be created
@@ -125,7 +125,7 @@ protected:
 
 	// Statically allocated index array to receive data for the faces
 	std::array<size_t, 3> m_face;
-	std::array<size_t, 2> m_edge;
+	std::array<size_t, 2> m_edge = {};
 
 private:
 	/// Set to true if s/t coordinates are found in the .ply file

@@ -54,6 +54,11 @@ enum OdeEquationUpdate
 class OdeEquation
 {
 public:
+
+	OdeEquation() : m_initState(0)
+	{
+
+	}
 	/// Virtual destructor
 	virtual ~OdeEquation() {}
 
@@ -61,9 +66,9 @@ public:
 	/// \return The initial state
 	const std::shared_ptr<OdeState> getInitialState() const;
 
-	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
-	/// applied. Note that this can be rewritten as (Bt)(M^-1)(B.b) = (Bt)((M^-1)(B.b)) = x,
-	/// where (M^-1)(B.b) = y is simply the solution to M.y = B.b and Bt.y = x.
+	/// Calculate the product \f$C.b\f$ where \f$C\f$ is the compliance matrix with boundary conditions
+	/// applied. Note that this can be rewritten as \f$(B^T)(M^{-1})(B.b) = (B^T)((M^{-1})(B.b)) = x\f$,
+	/// where \f$(M^{-1})(B.b) = y\f$ is simply the solution to \f$M.y = B.b\f$ and \f$B^T.y = x\f$.
 	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
 	/// \param b The input matrix
 	/// \return The matrix \f$C.b\f$
@@ -85,6 +90,14 @@ public:
 
 	/// \return The matrix \f$K = -\frac{\partial f}{\partial x}(x,v)\f$
 	const SparseMatrix& getK() const;
+
+	bool hasF()const;
+
+	bool hasM()const;
+
+	bool hasK()const;
+
+	bool hasD()const;
 
 protected:
 	/// Evaluation of the RHS function \f$f(x, v)\f$ for a given state
@@ -113,6 +126,8 @@ protected:
 	/// The initial state (which defines the ODE initial conditions \f$(x0, v0)\f$)
 	/// \note MUST be set by the derived classes
 	std::shared_ptr<OdeState> m_initialState;
+
+	unsigned int m_initState;
 
 	/// The vector containing \f$f(x, v)\f$
 	Vector m_f;

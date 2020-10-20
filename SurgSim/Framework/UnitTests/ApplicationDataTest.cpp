@@ -252,3 +252,16 @@ TEST(ApplicationDataTest, IsValidFilenameTest)
 	EXPECT_FALSE(data.isValidFilename(invalidFileName1));
 	EXPECT_FALSE(data.isValidFilename(invalidFileName2));
 }
+
+TEST(ApplicationDataTest, FindDirectory)
+{
+	ASSERT_TRUE(boost::filesystem::exists("Data"));
+
+	std::vector<std::string> paths;
+	paths.push_back("Data/ApplicationDataTest");
+	ApplicationData data(paths);
+
+	std::string result;
+	EXPECT_TRUE(data.tryFindFile("Directory1", &result));
+	EXPECT_TRUE(result.size() != 0);
+}

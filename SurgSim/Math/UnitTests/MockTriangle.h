@@ -39,6 +39,12 @@ public:
 		n = v0v1.cross(v0v2);
 		n.normalize();
 	}
+	// Constructor with normal.
+	MockTriangle(const Vector3d& vertex0, const Vector3d& vertex1, const Vector3d& vertex2, const Vector3d& normal) :
+		v0(vertex0), v1(vertex1), v2(vertex2), v0v1(vertex1 - vertex0), v0v2(vertex2 - vertex0),
+		v1v2(vertex2 - vertex1), n(normal)
+	{
+	}
 
 	// Find a point inside the triangle, given a pair of scaling factor for the edges (v0v1 and v0v2).
 	Vector3d pointInTriangle(double a, double b) const

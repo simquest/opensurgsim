@@ -294,17 +294,17 @@ TEST_F(MassSpringRepresentationTests, ExternalForceAPITest)
 	massSpring->addSpring(std::make_shared<SurgSim::Physics::LinearSpring>(0, 1));
 
 	// Vector initialized (properly sized and zeroed)
-	SparseMatrix zeroMatrix(static_cast<SparseMatrix::Index>(massSpring->getNumDof()),
-							static_cast<SparseMatrix::Index>(massSpring->getNumDof()));
+	SparseMatrix zeroMatrix(static_cast<Eigen::Index>(massSpring->getNumDof()),
+							static_cast<Eigen::Index>(massSpring->getNumDof()));
 	zeroMatrix.setZero();
 	EXPECT_NE(0, massSpring->getExternalForce().size());
 	EXPECT_NE(0, massSpring->getExternalStiffness().size());
 	EXPECT_NE(0, massSpring->getExternalDamping().size());
-	EXPECT_EQ(static_cast<Vector::Index>(massSpring->getNumDof()), massSpring->getExternalForce().size());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().cols());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().rows());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().cols());
-	EXPECT_EQ(static_cast<SparseMatrix::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalForce().size());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalStiffness().rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(massSpring->getNumDof()), massSpring->getExternalDamping().rows());
 	EXPECT_TRUE(massSpring->getExternalForce().isZero());
 	EXPECT_TRUE(massSpring->getExternalStiffness().isApprox(zeroMatrix));
 	EXPECT_TRUE(massSpring->getExternalDamping().isApprox(zeroMatrix));
@@ -527,4 +527,35 @@ TEST_F(MassSpringRepresentationTests, ComputesWithGravityAndDampingTest)
 		testOdeEquationUpdate(m_massSpring, *m_initialState, expectedForce + externalForce, m_expectedMass,
 			m_expectedDamping + m_expectedRayleighDamping + externalD, m_expectedStiffness + externalK);
 	}
+}
+
+TEST_F(MassSpringRepresentationTests, LoadSaveTest)
+{
+	auto rep = std::make_shared<MassSpringRepresentation>("rep");
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	rep->loadMassSpringModel("PlyReaderTests/MassSpring1D.ply");
+
+	// Vertices
+	SurgSim::Math::Vector3d vertex0(-0.020006, 0.014949, 0.00004);
+	SurgSim::Math::Vector3d vertex6(0.00018, 0.0002, 0);
+
+	auto state = rep->getInitialState();
+	EXPECT_TRUE(vertex0.isApprox(state->getPositions().segment<3>(0)));
+	EXPECT_TRUE(vertex6.isApprox(state->getPositions().segment<3>(rep->getNumDofPerNode() * 6)));
+	EXPECT_NEAR(rep->getMass(6)->getMass(), 2.64118e-05, 1e-6);
+
+	ASSERT_EQ(129u, rep->getNumSprings());
+	std::array<size_t, 2> spring0 = { 0, 1 };
+	std::array<size_t, 2> spring2 = { 2, 3 };
+	EXPECT_TRUE(std::equal(std::begin(spring0), std::end(spring0),
+		std::begin(rep->getSpring(0)->getNodeIds())));
+	EXPECT_TRUE(std::equal(std::begin(spring2), std::end(spring2),
+		std::begin(rep->getSpring(2)->getNodeIds())));
+
+	// Boundary conditions
+	ASSERT_EQ(10u * rep->getNumDofPerNode(), state->getBoundaryConditions().size());
+
+	
+	std::string fileName = "./MassSpring1D-copy.ply";
+	EXPECT_TRUE(rep->saveMassSpringModel(fileName));
 }

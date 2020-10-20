@@ -18,7 +18,6 @@
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Physics/Fem3DElementCorotationalTetrahedron.h"
 
-using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::getSubVector;
 
@@ -287,6 +286,11 @@ void Fem3DElementCorotationalTetrahedron::computeRotationMassAndStiffness(const 
 		}
 	}
 }
+
+	const SurgSim::Math::Matrix33d& Fem3DElementCorotationalTetrahedron::getRotationMatrix() const
+	{
+		return m_R;
+	}
 
 }; // namespace Physics
 

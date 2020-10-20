@@ -82,11 +82,13 @@ TEST (MassSpringLocalizationTest, CalculatePositionTest)
 	MassSpringLocalization localization = MassSpringLocalization(massSpring);
 
 	localization.setLocalNode(0);
-	ASSERT_EQ(0u, localization.getLocalNode());
+	ASSERT_TRUE(localization.getLocalNode().hasValue());
+	ASSERT_EQ(0u, localization.getLocalNode().getValue());
 	ASSERT_TRUE(localization.calculatePosition().isZero(epsilon));
 
 	localization.setLocalNode(1);
-	ASSERT_EQ(1u, localization.getLocalNode());
+	ASSERT_TRUE(localization.getLocalNode().hasValue());
+	ASSERT_EQ(1u, localization.getLocalNode().getValue());
 	ASSERT_TRUE(localization.calculatePosition().isApprox(Vector3d(1.0, 0.0, 0.0), epsilon));
 
 	// Out-Of-Range assertions
@@ -121,11 +123,13 @@ TEST(MassSpringLocalizationTest, CalculateVelocityTest)
 	MassSpringLocalization localization = MassSpringLocalization(massSpring);
 
 	localization.setLocalNode(0);
-	ASSERT_EQ(0u, localization.getLocalNode());
+	ASSERT_TRUE(localization.getLocalNode().hasValue());
+	ASSERT_EQ(0u, localization.getLocalNode().getValue());
 	ASSERT_TRUE(localization.calculateVelocity().isZero(epsilon));
 
 	localization.setLocalNode(1);
-	ASSERT_EQ(1u, localization.getLocalNode());
+	ASSERT_TRUE(localization.getLocalNode().hasValue());
+	ASSERT_EQ(1u, localization.getLocalNode().getValue());
 	ASSERT_TRUE(localization.calculateVelocity().isApprox(Vector3d(1.0, 0.0, 0.0), epsilon));
 
 	// Out-Of-Range assertions

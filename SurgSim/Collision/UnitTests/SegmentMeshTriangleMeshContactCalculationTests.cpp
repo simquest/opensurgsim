@@ -177,11 +177,15 @@ protected:
 				std::make_shared<ShapeCollisionRepresentation>("Collision Mesh - Segment");
 			segmentMeshRep->setShape(segmentMeshShape);
 			segmentMeshRep->setLocalPose(transform.first * segmentMeshShapeTransform);
+			segmentMeshRep->updateShapeData();
+			segmentMeshRep->updateDcdData();
 
 			std::shared_ptr<ShapeCollisionRepresentation> triangleMeshRep =
 				std::make_shared<ShapeCollisionRepresentation>("Collision Mesh - Triangle");
 			triangleMeshRep->setShape(meshShape);
 			triangleMeshRep->setLocalPose(transform.first * meshShapeTransform);
+			triangleMeshRep->updateShapeData();
+			triangleMeshRep->updateDcdData();
 
 			// Perform collision detection.
 			SegmentMeshTriangleMeshContact calcContact;
@@ -228,10 +232,10 @@ protected:
 	}
 
 	// Cube size
-	double m_cubeSize;
+	double m_cubeSize = std::numeric_limits<double>::signaling_NaN();
 
 	// Segment radius
-	double m_segmentRadius;
+	double m_segmentRadius = std::numeric_limits<double>::signaling_NaN();
 
 private:
 	// List of random transformations and a string to identify it.

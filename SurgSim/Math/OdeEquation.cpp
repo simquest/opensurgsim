@@ -48,32 +48,57 @@ const SparseMatrix& OdeEquation::getK() const
 	return m_K;
 }
 
+bool OdeEquation::hasF() const
+{
+	return (m_initState & static_cast<int>(ODEEQUATIONUPDATE_F)) != 0;
+}
+
+bool OdeEquation::hasM() const
+{
+	return (m_initState & static_cast<int>(ODEEQUATIONUPDATE_M)) != 0;
+}
+
+bool OdeEquation::hasK() const
+{
+	return (m_initState & static_cast<int>(ODEEQUATIONUPDATE_K)) != 0;
+}
+
+bool OdeEquation::hasD() const
+{
+	return (m_initState & static_cast<int>(ODEEQUATIONUPDATE_D)) != 0;
+}
+
 void OdeEquation::updateFMDK(const OdeState& state, int options)
 {
 	if (options == ODEEQUATIONUPDATE_FMDK)
 	{
 		computeFMDK(state);
+		m_initState |= static_cast<int>(ODEEQUATIONUPDATE_FMDK);
 	}
 	else
 	{
 		if (options & ODEEQUATIONUPDATE_F)
 		{
 			computeF(state);
+			m_initState |= static_cast<int>(ODEEQUATIONUPDATE_F);
 		}
 
 		if (options & ODEEQUATIONUPDATE_M)
 		{
 			computeM(state);
+			m_initState |= static_cast<int>(ODEEQUATIONUPDATE_M);
 		}
 
 		if (options & ODEEQUATIONUPDATE_D)
 		{
 			computeD(state);
+			m_initState |= static_cast<int>(ODEEQUATIONUPDATE_D);
 		}
 
 		if (options & ODEEQUATIONUPDATE_K)
 		{
 			computeK(state);
+			m_initState |= static_cast<int>(ODEEQUATIONUPDATE_K);
 		}
 	}
 }

@@ -83,6 +83,7 @@ public:
 		count(runCount),
 		totalTime(0.0),
 		didBeforeStop(false),
+		runIndefinetly(false),
 		didInitialize(false),
 		didStartUp(false)
 	{

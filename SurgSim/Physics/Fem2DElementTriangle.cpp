@@ -21,7 +21,6 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem2DElementTriangle.h"
 
-using SurgSim::Math::addSubVector;
 using SurgSim::Math::gaussQuadrature2DTriangle3Points;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::getSubVector;
@@ -309,17 +308,10 @@ SurgSim::Math::Vector Fem2DElementTriangle::computeCartesianCoordinate(
 		const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate)) << "naturalCoordinate must be normalized and length 3.";
-
-	Vector3d cartesianCoordinate(0.0, 0.0, 0.0);
-
 	const Vector& positions = state.getPositions();
-
-	for (int i = 0; i < 3; i++)
-	{
-		cartesianCoordinate += naturalCoordinate(i) * getSubVector(positions, m_nodeIds[i], 6).segment<3>(0);
-	}
-
-	return cartesianCoordinate;
+	return naturalCoordinate(0) * getSubVector(positions, m_nodeIds[0], 6).segment<3>(0) +
+		naturalCoordinate(1) * getSubVector(positions, m_nodeIds[1], 6).segment<3>(0) +
+		naturalCoordinate(2) * getSubVector(positions, m_nodeIds[2], 6).segment<3>(0);
 }
 
 SurgSim::Math::Vector Fem2DElementTriangle::computeNaturalCoordinate(
@@ -340,7 +332,7 @@ void Fem2DElementTriangle::doUpdateFMDK(const Math::OdeState& state, int options
 		// K.(x - x0) = F_ext
 		// 0 = F_ext + F_int, with F_int = -K.(x - x0)
 		getSubVector(state.getPositions(), m_nodeIds, 6, &x);
-		m_f = -m_K * (x - m_x0);
+		m_f.noalias() = -m_K * (x - m_x0);
 	}
 }
 

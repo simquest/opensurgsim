@@ -57,7 +57,7 @@ public:
 
 	double getRestVolume() const
 	{
-		return m_restVolume;
+		return m_restvolume;
 	}
 
 	void getShapeFunction(int i, double* ai, double* bi, double* ci, double* di) const
@@ -82,7 +82,16 @@ public:
 		setPoissonRatio(poissonRatio);
 		setYoungModulus(youngModulus);
 		initialize(state);
+		computeShapeFunctions(state, &m_restvolume, &m_ai, &m_bi, &m_ci, &m_di);
 	}
+
+private:
+	double m_restvolume;
+	std::array<double, 4> m_ai;
+	std::array<double, 4> m_bi;
+	std::array<double, 4> m_ci;
+	std::array<double, 4> m_di;
+
 };
 
 class Fem3DElementTetrahedronTests : public ::testing::Test
@@ -487,16 +496,13 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 	Matrix zeroMatrix = Matrix::Zero(tet.getNumDofPerNode() * tet.getNumNodes(),
 									 tet.getNumDofPerNode() * tet.getNumNodes());
 	massMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &massMatrix, true);
+	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &massMatrix);
 	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &dampingMatrix, true);
+	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &dampingMatrix);
 	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
-	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(),
-							 static_cast<SparseMatrix::Index>(tet.getNumDofPerNode()), &stiffnessMatrix, true);
+	tet.assembleMatrixBlocks(zeroMatrix, tet.getNodeIds(), tet.getNumDofPerNode(), &stiffnessMatrix);
 	stiffnessMatrix.makeCompressed();
 
 	// Make sure that the 2 ways of computing the expected stiffness matrix gives the same result
@@ -531,30 +537,33 @@ TEST_F(Fem3DElementTetrahedronTests, ForceAndMatricesTest)
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
 
+	SurgSim::Math::Vector extractedX;
+	SurgSim::Math::Vector accumulator;
+
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
-	tet.addMatVec(1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
+	tet.addMatVec(1.0, 0.0, 0.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 15; rowId++)
 	{
 		EXPECT_NEAR(m_expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	tet.addMatVec(0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
+	tet.addMatVec(0.0, 1.0, 0.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 15; rowId++)
 	{
 		EXPECT_NEAR(m_expectedDampingMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	tet.addMatVec(0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
+	tet.addMatVec(0.0, 0.0, 1.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 15; rowId++)
 	{
 		EXPECT_NEAR(m_expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	tet.addMatVec(1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
+	tet.addMatVec(1.0, 2.0, 3.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 15; rowId++)
 	{
 		double expectedCoef = 1.0 * m_expectedMassMatrix.row(rowId).sum() +

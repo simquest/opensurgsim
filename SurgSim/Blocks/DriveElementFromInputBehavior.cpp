@@ -41,6 +41,11 @@ DriveElementFromInputBehavior::DriveElementFromInputBehavior(const std::string& 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(DriveElementFromInputBehavior, std::string, PoseName, getPoseName, setPoseName);
 }
 
+int DriveElementFromInputBehavior::getTargetManagerType() const
+{
+	return Framework::MANAGER_TYPE_PHYSICS;
+}
+
 void DriveElementFromInputBehavior::setSource(std::shared_ptr<SurgSim::Framework::Component> source)
 {
 	m_source = checkAndConvert<SurgSim::Input::InputComponent>(source, "SurgSim::Input::InputComponent");
@@ -68,7 +73,7 @@ void DriveElementFromInputBehavior::update(double dt)
 	RigidTransform3d pose;
 	if (dataGroup.poses().get(m_poseName, &pose))
 	{
-		getPoseComponent()->setPose(m_source->getLocalPose() * pose);
+		getPoseComponent()->setPose(m_source->getToDeviceTransform() * pose * m_source->getToElementTransform());
 	}
 }
 

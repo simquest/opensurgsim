@@ -132,7 +132,7 @@ TEST_F(OsgCurveRepresentationRenderTests, DynamicRotate)
 		representation->setTension(interpolate(tensions.first, tensions.second, t));
 		representation->updateControlPoints(vertices);
 
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000.0 / 30.0));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(static_cast<int>(1000.0 / 30.0)));
 	}
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 

@@ -27,8 +27,9 @@ SegmentMeshShape::SegmentMeshShape(
 	const SurgSim::DataStructures::SegmentMesh<VertexData, EdgeData>& mesh,
 	double radius) : SurgSim::DataStructures::SegmentMeshPlain(mesh)
 {
+	setInitialVertices(mesh);
 	setRadius(radius);
-	updateAabbTree();
+	buildAabbTree();
 }
 
 }; // namespace Math

@@ -56,6 +56,7 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_localAttachmentPoint(Vector3d(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
 									std::numeric_limits<double>::quiet_NaN())),
 	m_calculateInertialTorques(false),
+	m_initializeRigidWithInputPose(true),
 	m_logger(SurgSim::Framework::Logger::getLogger("Physics/VirtualToolCoupler")),
 	m_hapticOutputOnlyWhenColliding(false),
 	m_previousInputPose(Math::RigidTransform3d::Identity()),
@@ -92,6 +93,9 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 									  Output, getOutput, setOutput);
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, std::shared_ptr<SurgSim::Framework::Component>,
 									  Representation, getRepresentation, setRepresentation);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(VirtualToolCoupler, bool, IntializeRigidWithInputPose,
+									  isInitializingRigidWithInputPose, setInitializeRigidWithInputPose);
 }
 
 VirtualToolCoupler::~VirtualToolCoupler()
@@ -146,16 +150,16 @@ void VirtualToolCoupler::update(double dt)
 	inputData.vectors().cacheIndex(DataStructures::Names::LINEAR_VELOCITY, &m_linearVelocityIndex);
 	if (m_linearVelocityIndex < 0)
 	{
-		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not " <<
-			"contain a linear velocity vector named " << DataStructures::Names::LINEAR_VELOCITY <<
-			", so it will be estimated.";
+		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not "
+			<< "contain a linear velocity vector named " << DataStructures::Names::LINEAR_VELOCITY
+			<< ", so it will be estimated.";
 	}
 	inputData.vectors().cacheIndex(DataStructures::Names::ANGULAR_VELOCITY, &m_angularVelocityIndex);
 	if (m_angularVelocityIndex < 0)
 	{
-		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not " <<
-			"contain an angular velocity vector named " << DataStructures::Names::ANGULAR_VELOCITY <<
-			") so it will be estimated.";
+		SURGSIM_LOG_ONCE(m_logger, WARNING) << getFullName() << " is receiving an input DataGroup that does not "
+			<< "contain an angular velocity vector named " << DataStructures::Names::ANGULAR_VELOCITY
+			<< ") so it will be estimated.";
 	}
 
 	RigidTransform3d inputPose;
@@ -179,6 +183,11 @@ void VirtualToolCoupler::update(double dt)
 
 		RigidTransform3d inputAlignment = m_input->getLocalPose();
 		inputPose = inputAlignment * inputPose;
+		if (m_initializeRigidWithInputPose)
+		{
+			m_initializeRigidWithInputPose = false;
+			setInitialInputPose(inputPose);
+		}
 		inputLinearVelocity = inputAlignment.linear() * inputLinearVelocity;
 		inputAngularVelocity = inputAlignment.rotation() * inputAngularVelocity;
 
@@ -204,11 +213,11 @@ void VirtualToolCoupler::update(double dt)
 		const Matrix33d identity3x3 = Matrix33d::Identity();
 		const Matrix33d zero3x3 = Matrix33d::Zero();
 		Matrix66d generalizedStiffness;
-		generalizedStiffness << m_linearStiffness * identity3x3, zero3x3,
-								zero3x3                        , m_angularStiffness * identity3x3;
+		generalizedStiffness << m_linearStiffness* identity3x3, zero3x3,
+							 zero3x3, m_angularStiffness* identity3x3;
 		Matrix66d generalizedDamping;
-		generalizedDamping << m_linearDamping * identity3x3, zero3x3,
-							  zero3x3                      , m_angularDamping * identity3x3;
+		generalizedDamping << m_linearDamping* identity3x3, zero3x3,
+						   zero3x3, m_angularDamping* identity3x3;
 
 		if (m_calculateInertialTorques)
 		{
@@ -313,7 +322,7 @@ bool VirtualToolCoupler::doWakeUp()
 	if (m_input == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(m_logger) <<
-			"VirtualToolCoupler named " << getName() << " does not have an Input Component.";
+									 "VirtualToolCoupler named " << getName() << " does not have an Input Component.";
 		return false;
 	}
 	if (m_rigid == nullptr)
@@ -393,16 +402,23 @@ bool VirtualToolCoupler::doWakeUp()
 		}
 	}
 
-	SURGSIM_LOG_INFO(m_logger) <<
-		"VirtualToolCoupler named '" << getName() << "' has linear stiffness " << m_linearStiffness <<
-		", linear damping " << m_linearDamping << ", angular stiffness " << m_angularStiffness <<
-		", and angular damping " << m_angularDamping << ". Its Physics Representation has mass " << m_rigid->getMass();
+	SURGSIM_LOG_INFO(m_logger) << "VirtualToolCoupler named '" << getName() <<
+		"' has linear stiffness " << m_linearStiffness << ", linear damping " << m_linearDamping
+		<< ", angular stiffness " << m_angularStiffness << ", and angular damping " << m_angularDamping
+		<< ". Its Physics Representation has mass " << m_rigid->getMass();
 	return true;
 }
 
 int VirtualToolCoupler::getTargetManagerType() const
 {
 	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
+}
+
+void VirtualToolCoupler::setInitialInputPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	RigidState state = m_rigid->getCurrentState();
+	state.setPose(pose);
+	m_rigid->setInitialState(state);
 }
 
 void VirtualToolCoupler::overrideLinearStiffness(double linearStiffness)
@@ -549,6 +565,11 @@ bool VirtualToolCoupler::getCalculateInertialTorques() const
 	return m_calculateInertialTorques;
 }
 
+void VirtualToolCoupler::setInitializeRigidWithInputPose(bool val)
+{
+	m_initializeRigidWithInputPose = val;
+}
+
 void VirtualToolCoupler::doRetire()
 {
 	m_outputData.resetAll();
@@ -569,6 +590,11 @@ bool VirtualToolCoupler::isHapticOutputOnlyWhenColliding() const
 void VirtualToolCoupler::setHapticOutputOnlyWhenColliding(bool hapticOutputOnlyWhenColliding)
 {
 	m_hapticOutputOnlyWhenColliding = hapticOutputOnlyWhenColliding;
+}
+
+bool VirtualToolCoupler::isInitializingRigidWithInputPose() const
+{
+	return m_initializeRigidWithInputPose;
 }
 
 }; /// Physics

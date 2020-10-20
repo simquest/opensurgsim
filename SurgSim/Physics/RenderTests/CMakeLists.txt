@@ -24,12 +24,14 @@ set(UNIT_TEST_SOURCES
 	Fem3DMeshRenderTest.cpp
 	Fem3DvsTruthCubeRenderTest.cpp
 	RenderTest.cpp
+	RenderTestCcd.cpp
 	RenderTestCcdSuture.cpp
 	RenderTestFem1D.cpp
 	RenderTestFem2D.cpp
 	RenderTestFem3D.cpp
 	RenderTestFem3DCorotational.cpp
 	RenderTestMassSprings.cpp
+	RenderTestMassSpringFrictionalSliding.cpp
 	RenderTestRigidBodies.cpp
 )
 

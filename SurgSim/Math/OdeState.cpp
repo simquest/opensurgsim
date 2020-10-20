@@ -211,10 +211,9 @@ void OdeState::applyBoundaryConditionsToMatrix(SparseMatrix* matrix, bool hasCom
 		 it != getBoundaryConditions().cend();
 		 ++it)
 	{
-		Math::zeroRow((*it), matrix);
-		Math::zeroColumn(static_cast<SparseMatrix::Index>((*it)), matrix);
-		(*matrix).coeffRef(static_cast<SparseMatrix::Index>(*it),
-						   static_cast<SparseMatrix::Index>(*it)) = complianceValue;
+		Math::zeroRow(static_cast<Eigen::Index>((*it)), matrix);
+		Math::zeroColumn(static_cast<Eigen::Index>((*it)), matrix);
+		(*matrix).coeffRef(static_cast<Eigen::Index>(*it), static_cast<Eigen::Index>(*it)) = complianceValue;
 	}
 }
 
@@ -246,6 +245,24 @@ void OdeState::changeBoundaryConditionStaticDof(size_t nodeId, double value)
 	{
 		bc->second = value;
 	}
+}
+
+void OdeState::setBoundaryConditionsStaticDof(const std::vector<std::pair<size_t, double>>& staticDof)
+{
+	SURGSIM_ASSERT(m_numDofPerNode != 0u) <<
+		"Number of dof per node = 0. Make sure to call setNumDof() " <<
+		"prior to setting boundary conditions.";
+
+	size_t i = 0;
+	for (auto staticDofOneByOne : staticDof)
+	{
+		SURGSIM_ASSERT(staticDofOneByOne.first < m_numNodes) <<
+			"Invalid boundary condition static dof #" << i << " with nodeId " << staticDofOneByOne.first <<
+			" when the number of nodes is " << m_numNodes;
+		i++;
+	}
+
+	m_boundaryConditionsStaticDof = staticDof;
 }
 
 bool OdeState::isValid() const

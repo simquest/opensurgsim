@@ -65,6 +65,8 @@ TEST(DcdCollisionTest, RigidRigidCollisionTest)
 
 	auto sphere1Collision = sphere1->getComponents<Collision::Representation>()[0];
 	auto sphere2Collision = sphere2->getComponents<Collision::Representation>()[0];
+	sphere1Collision->wakeUp();
+	sphere2Collision->wakeUp();
 	sphere1Collision->update(0.0);
 	sphere2Collision->update(0.0);
 	std::vector<std::shared_ptr<Collision::Representation>> collisionRepresentations;

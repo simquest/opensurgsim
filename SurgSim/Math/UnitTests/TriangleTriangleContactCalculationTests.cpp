@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/UnitTests/TriangleTriangleTestParameters.h"
 
@@ -178,6 +179,48 @@ TEST_F(TriangleTriangleContactCalculationTest, TestCases)
 	{
 		testTriangleTriangleContactCalculation(*it);
 	}
+}
+namespace
+{
+void fromFile(const std::string& filename, MockTriangle* t0, MockTriangle* t1)
+{
+	// 8 Vector 3 doubles = 24 doubles
+	size_t size = sizeof(double) * 24;
+
+	std::ifstream in(filename, std::ios_base::binary);
+	SURGSIM_ASSERT(in.is_open());
+
+	std::vector<uint8_t> bytes(std::istreambuf_iterator<char>(in), {});
+
+	size_t start = 0;
+
+	start += SurgSim::Math::fromBytes(bytes, &t0->v0, start);
+	start += SurgSim::Math::fromBytes(bytes, &t0->v1, start);
+	start += SurgSim::Math::fromBytes(bytes, &t0->v2, start);
+	start += SurgSim::Math::fromBytes(bytes, &t0->n, start);
+	start += SurgSim::Math::fromBytes(bytes, &t1->v0, start);
+	start += SurgSim::Math::fromBytes(bytes, &t1->v1, start);
+	start += SurgSim::Math::fromBytes(bytes, &t1->v2, start);
+	start += SurgSim::Math::fromBytes(bytes, &t1->n, start);
+
+	SURGSIM_ASSERT(start == size);
+}
+}
+
+TEST_F(TriangleTriangleContactCalculationTest, TestFromFile)
+{
+	SurgSim::Framework::ApplicationData data("config.txt");
+	std::string fileName = "TriangleTriangleContactException.bin";
+	std::string path = data.findFile(fileName);
+	ASSERT_TRUE(!path.empty()) << "Can not locate file " << fileName;
+	MockTriangle t0;
+	MockTriangle t1;
+	fromFile(path, &t0, &t1);
+
+	std::string scenario = "TestFromFile";
+	Vector3d t0p;
+	Vector3d t1p;
+	testTriangleTriangleContactCalculation(TriangleTriangleTestCase(scenario, t0, t1, false, false, t0p, t1p));
 }
 
 }

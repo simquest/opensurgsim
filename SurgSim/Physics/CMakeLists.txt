@@ -41,6 +41,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem2DPlyReaderDelegate.cpp
 	Fem2DRepresentation.cpp
 	Fem3D.cpp
+	Fem3DCorotationalTetrahedronRepresentation.cpp
 	Fem3DElementCorotationalTetrahedron.cpp
 	Fem3DElementCube.cpp
 	Fem3DElementTetrahedron.cpp
@@ -63,9 +64,12 @@ set(SURGSIM_PHYSICS_SOURCES
 	FreeMotion.cpp
 	LinearSpring.cpp
 	Localization.cpp
+	MassSpringModel.cpp
 	MassSpringConstraintFixedPoint.cpp
+	MassSpringConstraintFrictionalSliding.cpp
 	MassSpringConstraintFrictionlessContact.cpp
 	MassSpringLocalization.cpp
+	MassSpringPlyReaderDelegate.cpp
 	MassSpringRepresentation.cpp
 	MlcpPhysicsProblem.cpp
 	ParticleCollisionResponse.cpp
@@ -128,6 +132,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem2DPlyReaderDelegate.h
 	Fem2DRepresentation.h
 	Fem3D.h
+	Fem3DCorotationalTetrahedronRepresentation.h
 	Fem3DElementCorotationalTetrahedron.h
 	Fem3DElementCube.h
 	Fem3DElementTetrahedron.h
@@ -153,9 +158,12 @@ set(SURGSIM_PHYSICS_HEADERS
 	LinearSpring.h
 	Localization.h
 	Mass.h
+	MassSpringModel.h
+	MassSpringConstraintFrictionalSliding.h
 	MassSpringConstraintFixedPoint.h
 	MassSpringConstraintFrictionlessContact.h
 	MassSpringLocalization.h
+	MassSpringPlyReaderDelegate.h
 	MassSpringRepresentation.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h

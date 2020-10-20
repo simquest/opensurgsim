@@ -55,6 +55,9 @@ TEST(OutputComponentTest, Accessors)
 	ASSERT_TRUE(output.requestOutput("", &actualData));
 	ASSERT_TRUE(actualData.booleans().get(name, &result));
 	EXPECT_TRUE(result);
+
+	EXPECT_TRUE(output.getToDeviceTransform().isApprox(SurgSim::Math::RigidTransform3d::Identity()));
+	EXPECT_TRUE(output.getToElementTransform().isApprox(SurgSim::Math::RigidTransform3d::Identity()));
 }
 
 TEST(OutputComponentTest, Serialization)

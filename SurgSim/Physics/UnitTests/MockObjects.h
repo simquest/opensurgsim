@@ -30,8 +30,10 @@
 #include "SurgSim/Physics/DeformableRepresentation.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/Fem2DRepresentation.h"
+#include "SurgSim/Physics/Fem3DCorotationalTetrahedronRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/LinearSpring.h"
@@ -116,9 +118,11 @@ public:
 class MockDeformableLocalization : public SurgSim::Physics::Localization
 {
 public:
-	MockDeformableLocalization(){}
+	MockDeformableLocalization(): m_nodeID(0)
+	{
+	}
 
-	explicit MockDeformableLocalization(std::shared_ptr<Representation> representation) : Localization()
+	explicit MockDeformableLocalization(std::shared_ptr<Representation> representation) : Localization(), m_nodeID(0)
 	{
 		setRepresentation(representation);
 	}
@@ -173,6 +177,14 @@ private:
 		const SurgSim::Math::Vector3d& previousVelocity = defRepresentation->getPreviousState()->getVelocity(m_nodeID);
 
 		return SurgSim::Math::interpolate(previousVelocity, currentVelocity, time);
+	}
+
+
+	std::shared_ptr<Localization> doCopy() const override
+	{
+		auto localization = std::make_shared<MockDeformableLocalization>(getRepresentation());
+		localization->setLocalNode(getLocalNode());
+		return localization;
 	}
 
 	size_t m_nodeID;
@@ -322,7 +334,7 @@ public:
 	{}
 
 protected:
-	SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) override;
+	virtual void calculateComplianceWarpingTransformation(const SurgSim::Math::OdeState& state);
 };
 
 class MockFem1DRepresentation : public SurgSim::Physics::Fem1DRepresentation
@@ -341,6 +353,15 @@ public:
 	explicit MockFem2DRepresentation(const std::string& name);
 
 	double getMassPerNode(size_t nodeId);
+};
+
+class MockFem3DCorotationalTetrahedronRepresentation
+		: public SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation
+{
+public:
+	explicit MockFem3DCorotationalTetrahedronRepresentation(const std::string& name);
+
+	SurgSim::Math::Matrix getTransformation(size_t nodeId);
 };
 
 class MockFixedConstraintFixedPoint : public ConstraintImplementation
@@ -406,6 +427,8 @@ private:
 	SurgSim::Math::Vector3d doCalculatePosition(double time) const override;
 
 	SurgSim::Math::Vector3d doCalculateVelocity(double time) const override;
+
+	std::shared_ptr<Localization> doCopy() const override;
 };
 
 class MockConstraintImplementation : public ConstraintImplementation
@@ -471,7 +494,7 @@ public:
 	explicit MockCollisionRepresentation(const std::string& name);
 
 	int getShapeType() const override;
-	const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	std::shared_ptr<Math::Shape> getShape() const override;
 	void update(const double& dt) override;
 
 	/// \return The number of times update method has been invoked.

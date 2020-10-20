@@ -23,7 +23,7 @@ namespace Physics
 {
 
 SlidingConstraintData::SlidingConstraintData() :
-	ConstraintData(), m_mu(0.5)
+	ConstraintData(), m_distanceTangent(std::numeric_limits<double>::signaling_NaN()), m_mu(0.5)
 {
 	m_normals[0].setZero();
 	m_normals[1].setZero();
@@ -32,7 +32,7 @@ SlidingConstraintData::SlidingConstraintData() :
 
 SlidingConstraintData::SlidingConstraintData(const SurgSim::Math::Vector3d& point,
 											 const SurgSim::Math::Vector3d& direction) :
-	ConstraintData(), m_mu(0.5)
+	ConstraintData(), m_distanceTangent(std::numeric_limits<double>::signaling_NaN()), m_mu(0.5)
 {
 	setSlidingDirection(point, direction);
 }
@@ -79,9 +79,14 @@ const Math::Vector3d& SlidingConstraintData::getTangent() const
 	return m_tangent;
 }
 
-const double SlidingConstraintData::getDistanceTangent() const
+void SlidingConstraintData::setPreviousFirstLocalization(std::shared_ptr<Localization> loc)
 {
-	return m_distanceTangent;
+	m_previousFirstLocalization = loc;
+}
+
+std::shared_ptr<Localization> SlidingConstraintData::getPreviousFirstLocalization() const
+{
+	return m_previousFirstLocalization;
 }
 
 } // namespace Physics

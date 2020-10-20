@@ -30,7 +30,9 @@ PoseInterpolator::PoseInterpolator(const std::string& name) :
 	m_startingPose(RigidTransform3d::Identity()),
 	m_endingPose(RigidTransform3d::Identity()),
 	m_duration(1.0),
-	m_currentTime(0.0)
+	m_currentTime(0.0),
+	m_pingpong(false),
+	m_loop(false)
 {
 
 }

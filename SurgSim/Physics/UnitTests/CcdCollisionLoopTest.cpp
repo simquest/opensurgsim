@@ -13,23 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/CcdCollisionLoop.h"
-#include "SurgSim/Collision/CollisionPair.h"
-#include "SurgSim/Physics/RigidCollisionRepresentation.h"
-
 #include <gtest/gtest.h>
-#include "SurgSim/Math/Vector.h"
+
+#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/CcdCollisionLoop.h"
+#include "SurgSim/Physics/PushResults.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/SolveMlcp.h"
 
 namespace SurgSim
 {
-
 namespace Physics
 {
 
+TEST(CcdCollisionLoopTest, Setters)
+{
+	auto ccd = std::make_shared<CcdCollisionLoop>(false);
+	std::unique_ptr<SolveMlcp> solveMlcp(new SolveMlcp(false));
+	ccd->setSolveMlcp(std::move(solveMlcp));
+
+	std::unique_ptr<PushResults> pushResults(new PushResults(false));
+	ccd->setPushResults(std::move(pushResults));
+}
+
 TEST(CcdCollisionLoopTest, FilterContacts)
 {
-	double toi;
+	double toi = -1.0;
 	auto rep1 = std::make_shared<RigidCollisionRepresentation>("One");
 	rep1->setSelfCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
 	auto pair = std::make_shared<Collision::CollisionPair>(rep1, rep1);
@@ -65,7 +76,7 @@ TEST(CcdCollisionLoopTest, FilterContacts)
 
 TEST(CcdCollisionLoopTest, FilterContactsWithEpsilon)
 {
-	double toi;
+	double toi = -1.0;
 	auto rep1 = std::make_shared<RigidCollisionRepresentation>("One");
 	rep1->setSelfCollisionDetectionType(Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
 	auto pair = std::make_shared<Collision::CollisionPair>(rep1, rep1);

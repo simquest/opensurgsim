@@ -22,7 +22,6 @@ find_path(NOVINTHDALSDK_INCLUDE_DIR
 	NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 )
 
-# TODO(advornik): Shake down some usual suspects under Windows/Linux?
 find_path(NOVINTHDALSDK_INCLUDE_DIR
 	NAMES hdl/hdl.h
 	PATH_SUFFIXES "include"

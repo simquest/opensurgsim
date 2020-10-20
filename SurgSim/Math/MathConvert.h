@@ -20,6 +20,7 @@
 #include <Eigen/Geometry>
 
 #include <yaml-cpp/yaml.h>
+#include <boost/any.hpp>
 
 #include "SurgSim/Framework/Macros.h"
 #include "SurgSim/Math/LinearSparseSolveAndInverse.h"
@@ -30,6 +31,20 @@ namespace SurgSim
 namespace Math
 {
 class Shape;
+
+/// Writes the byte code for a double into a vector of bytes.
+void toBytes(double d, std::vector<uint8_t>* result);
+
+/// Fills a double from a vector of bytes.
+size_t fromBytes(const std::vector<uint8_t>& bytes, double* out, size_t start = 0);
+
+/// Writes the byte code for a Vector3d into a vector of bytes.
+/// TODO (ryanbeasley): Make a templated version when we need it.
+/// TODO (ryanbeasley): Consider moving into Vector.h or Vector.cpp.
+void toBytes(SurgSim::Math::Vector3d in, std::vector<uint8_t>* result);
+
+/// Fills a Vector3d from a vector of bytes.
+size_t fromBytes(const std::vector<uint8_t>& bytes, SurgSim::Math::Vector3d* out, size_t start = 0);
 }
 }
 
@@ -100,6 +115,16 @@ struct convert<SurgSim::Math::LinearSolver>
 	static Node encode(const SurgSim::Math::LinearSolver& rhs);
 	static bool decode(const Node& node, SurgSim::Math::LinearSolver& rhs); //NOLINT
 };
+
+template<class T>
+bool tryConvert(const boost::any& any, YAML::Node* node);
+
+template <>
+struct convert<boost::any>
+{
+	static Node encode(const boost::any rhs);
+};
+
 
 };
 

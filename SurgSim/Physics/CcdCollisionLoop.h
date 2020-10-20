@@ -58,6 +58,14 @@ public:
 	std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
 			const std::shared_ptr<PhysicsManagerState>& state) override;
 
+	/// Set the SolveMlcp Computation.  Useful when setting optional parameters on SolveMlcp.
+	/// \param computation A unique_ptr to the SolveMlcp...will be empty after the call.
+	void setSolveMlcp(std::unique_ptr<SolveMlcp> computation);
+
+	/// Set the PushResults Computation.  Useful when setting optional parameters on PushResults.
+	/// \param computation A unique_ptr to the PushResults...will be empty after the call.
+	void setPushResults(std::unique_ptr<PushResults> computation);
+
 	///@{
 	/// Test access
 	friend class CcdCollisionLoopTest_FilterContacts_Test;
