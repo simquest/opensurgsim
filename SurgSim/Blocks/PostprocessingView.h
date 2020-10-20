@@ -26,9 +26,10 @@ namespace SurgSim
 
 namespace Graphics
 {
-class OsgCamera;
-class OsgView;
-class OsgMaterial;
+	class OsgCamera;
+	class OsgView;
+	class OsgMaterial;
+	class Material;
 }
 
 namespace Blocks
@@ -38,6 +39,8 @@ class PostprocessingView : public Framework::SceneElement
 {
 public:
 	explicit PostprocessingView(const std::string& name);
+
+	std::shared_ptr<Graphics::Material> getMaterial();
 
 	void enableManipulator(bool val);
 

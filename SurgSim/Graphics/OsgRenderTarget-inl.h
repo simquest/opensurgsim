@@ -169,6 +169,8 @@ void OsgRenderTarget<T>::setupTexture(int type)
 		}
 		if (type >= TARGETTYPE_COLORBASE)
 		{
+			/// TODO HS 2020-oct-20 still need to add a switch to select float representations for 
+			/// render targets. This is just pre work for physically based rendering
 // 			osgTexture->setInternalFormat(GL_RGBA32F_ARB);
 // 			osgTexture->setSourceFormat(GL_RGBA);
 // 			osgTexture->setSourceType(GL_FLOAT);

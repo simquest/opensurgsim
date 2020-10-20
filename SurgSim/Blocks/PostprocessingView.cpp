@@ -17,6 +17,7 @@
 
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/Material.h"
 #include "SurgSim/Graphics/OsgRenderTarget.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
@@ -47,7 +48,7 @@ PostprocessingView::PostprocessingView(const std::string& name) :
 	m_defaultCamera->setRenderTarget(std::make_shared<Graphics::OsgRenderTarget2d>(dim[0], dim[1], 1.0, 1, true));
 	m_defaultCamera->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_IN_ORDER, 0);
 	m_defaultCamera->setMainCamera(true);
-	m_defaultCamera->getOsgCamera()->setClearColor(osg::Vec4(0.5, 0.5, 0.0, 1.0));
+	m_defaultCamera->getOsgCamera()->setClearColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
 	m_defaultCamera->getOsgCamera()->setReferenceFrame(osg::Transform::RELATIVE_RF);
 
 	// The default camera is the one that is the camera that carries the main information, the toScreenCamera is just
@@ -106,6 +107,12 @@ bool PostprocessingView::doInitialize()
 	m_material->getProgram()->setGlobalScope(true);
 
 	return true;
+}
+
+
+std::shared_ptr<SurgSim::Graphics::Material> PostprocessingView::getMaterial()
+{
+	return m_material;
 }
 
 }

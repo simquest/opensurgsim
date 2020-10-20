@@ -22,6 +22,8 @@
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/Material.h"
+#include "SurgSim/Graphics/Uniform.h"
 #include "SurgSim/Blocks/PostprocessingView.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -82,8 +84,31 @@ TEST(PostprocessingViewTest, BasicScene)
 		scene->addSceneElement(element);
 	}
 
+	auto material = display->getMaterial();
+	material->addUniform("float", "gamma");
+	material->addUniform("float", "exposure");
+
+	float exposure = 1.0;
+	float sign = -0.1;
+	material->setValue("gamma", 2.2f);
+	material->setValue("exposure", 1.0f);
+
 	runtime->start();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(40000));
+	for (int i = 0; i < 200; ++i)
+	{
+		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+		exposure = exposure + sign;
+		if (exposure < 0) {
+			exposure = 0.0;
+			sign = sign * -1;
+		}
+		else if (exposure > 2.0)
+		{
+			exposure = 2.0;
+			sign = sign * -1;
+		}
+		material->setValue("exposure", exposure);
+	}
 	manager->dumpDebugInfo();
 	runtime->stop();
 
