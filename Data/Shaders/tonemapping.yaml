@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 FragmentShaderSource: |
+    #version 330 core
     uniform sampler2D renderTarget;
     uniform float offset;
     varying vec2 texCoord;

@@ -51,7 +51,7 @@ TEST(PostprocessingViewTest, BasicScene)
 
 	auto display = std::make_shared<Blocks::PostprocessingView>("Display");
 	//auto display = std::make_shared<Graphics::OsgViewElement>("Display");
-	//display->enableManipulator(true);
+	display->enableManipulator(false);
 
 	auto pose =
 		Math::makeRigidTransform(Vector3d(2.0, 2.0, 2.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));

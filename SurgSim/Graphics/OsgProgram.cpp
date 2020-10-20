@@ -244,11 +244,11 @@ bool OsgProgram::doLoad(const std::string& filePath)
 	}
 	if (!map["FragmentShaderSource"].empty())
 	{
-		setVertexShaderSource(map["FragmentShaderSource"]);
+		setFragmentShaderSource(map["FragmentShaderSource"]);
 	}
 	if (!map["GeometryShaderSource"].empty())
 	{
-		setVertexShaderSource(map["GeometryShaderSource"]);
+		setGeometryShaderSource(map["GeometryShaderSource"]);
 	}
 
 	return true;

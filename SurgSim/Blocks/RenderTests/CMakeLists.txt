@@ -24,7 +24,7 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+#file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Configure the path for the data files
 configure_file(
