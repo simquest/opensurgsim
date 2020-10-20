@@ -94,7 +94,7 @@ bool KnotIdentificationBehavior::doInitialize()
 		m_projections.push_back(projection * 100.0);
 	}
 	{
-		projection = makeRigidTransform(Vector3d(1,0,0), Vector3d(0,1,0), Vector3d(0,0,1)).linear();
+		projection = makeRigidTransform(Vector3d(0,1,0), Vector3d(0,0,1), Vector3d(1,0,0)).linear();
 		m_projections.push_back(projection * 100.0);
 	}
 

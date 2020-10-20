@@ -147,7 +147,6 @@ public:
 		
 		generator.seed(seed);
 
-		KnotIdentificationBehavior knotId("Knot ID");
 
 		using SurgSim::Math::makeRigidTransform;
 		using SurgSim::Math::makeRotationMatrix;
@@ -161,9 +160,10 @@ public:
 		SurgSim::Math::Vector3d axis = SurgSim::Math::Vector3d::UnitX();
 		for (int i = 0; i < iterations; ++i)
 		{
+			KnotIdentificationBehavior knotId("Knot ID");
 			if (i % 100 == 0) std::cout << "+";
 
-			double angle = distribution(generator) * i * M_PI * 2.0;
+			double angle = distribution(generator) * M_PI * 2.0;
 			auto axis = SurgSim::Math::Vector3d
 			(distribution(generator), distribution(generator), distribution(generator));
 			axis.normalize();
@@ -183,6 +183,7 @@ public:
 			knotId.setFem1d(fem);
 			knotId.doInitialize();
 			knotId.update(0.0);
+			EXPECT_EQ(knotname, knotId.getKnotName()) << "Axis: " << axis.transpose() << " Angle: " << angle;
 			if (knotname != knotId.getKnotName())
 			{
 				using SurgSim::Math::toBytes;
@@ -190,7 +191,7 @@ public:
 				toBytes(angle, &bytes);
 				toBytes(axis, &bytes);
 
-				std::ofstream out(knotname + "error.bin", std::ios_base::binary);
+				std::ofstream out("knoterror.bin", std::ios_base::binary);
 				SURGSIM_ASSERT(out.is_open());
 
 				for (auto b : bytes) out << b;
@@ -222,16 +223,11 @@ public:
 		using SurgSim::Math::fromBytes;
 		std::ifstream in(failureFile, std::ios_base::binary);
 		EXPECT_TRUE(!in.bad());
-		std::vector<uint8_t> bytes;
-		uint8_t b;
-		while (!in.eof()) 
-		{
-			in >> b; 
-			bytes.push_back(b);
-		};
+		std::vector<uint8_t> bytes(std::istreambuf_iterator<char>(in), {});
 
 		auto end = fromBytes(bytes, &angle);
-		end = fromBytes(bytes, &axis, end);
+		end += fromBytes(bytes, &axis, end);
+		EXPECT_EQ(end, bytes.size());
 		auto  t = makeRigidTransform(makeRotationMatrix(angle, axis), SurgSim::Math::Vector3d::Zero());
 
 		auto fem = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Physics");
@@ -248,7 +244,7 @@ public:
 		knotId.setFem1d(fem);
 		knotId.doInitialize();
 		knotId.update(0.0);
-		EXPECT_EQ(knotname, knotId.getKnotName());
+		EXPECT_EQ(knotname, knotId.getKnotName()) << "Axis: " << axis.transpose() << " Angle: " << angle;
 		return true;
 	}
 
@@ -536,7 +532,7 @@ TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoilRandom)
 TEST_F(KnotIdentificationBehaviorTest, ErrorFiles)
 {
 		//ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror1.bin"));
-		ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror2.bin"));
+		ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror.bin"));
 		//ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror3.bin"));
 }
 
