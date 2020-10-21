@@ -59,7 +59,7 @@ public:
 	/// Default constructor
 	OsgRenderTarget();
 
-	/// Constructor set all the paramters for the render target
+	/// Constructor set all the parameters for the render target
 	/// \param	width, height	The width and height of the target textures.
 	/// \param	scale	  	(Optional) the scale, scales width and height by this factor.
 	/// \param	colorCount	(Optional) number of color textures to use.

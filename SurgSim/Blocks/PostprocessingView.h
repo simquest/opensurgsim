@@ -30,6 +30,7 @@ namespace Graphics
 	class OsgView;
 	class OsgMaterial;
 	class Material;
+	class Camera;
 }
 
 namespace Blocks
@@ -38,11 +39,17 @@ namespace Blocks
 class PostprocessingView : public Framework::SceneElement
 {
 public:
-	explicit PostprocessingView(const std::string& name);
+	explicit PostprocessingView(const std::string& name,
+		const std::string& shaderSource = "Shaders/postprocess/linearexposure.yaml");
 
-	std::shared_ptr<Graphics::Material> getMaterial();
+	std::shared_ptr<Graphics::Material> getPostProcessingMaterial();
+
+	void setPostprocessingMaterial(std::shared_ptr<Graphics::OsgMaterial> material);
 
 	void enableManipulator(bool val);
+
+	std::shared_ptr<Graphics::Camera> getCamera();
+	std::shared_ptr<Graphics::Camera> getPostProcessingCamera();
 
 private:
 	/// Camera to take the default content and render it i.e the main source of the post processing pipeline

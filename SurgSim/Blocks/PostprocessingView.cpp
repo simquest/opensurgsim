@@ -30,7 +30,9 @@ namespace Blocks
 {
 
 
-PostprocessingView::PostprocessingView(const std::string& name) :
+PostprocessingView::PostprocessingView(
+	const std::string& name,
+	const std::string& shaderSource) :
 	Framework::SceneElement(name),
 	m_defaultCamera(std::make_shared<Graphics::OsgCamera>("DefaultCamera")),
 	m_toScreenCamera(std::make_shared<Graphics::OsgCamera>("ToScreenCamera")),
@@ -45,7 +47,7 @@ PostprocessingView::PostprocessingView(const std::string& name) :
 	m_view->setCamera(m_defaultCamera);
 
 	m_defaultCamera->setRenderGroupReference(Graphics::Representation::DefaultGroupName);
-	m_defaultCamera->setRenderTarget(std::make_shared<Graphics::OsgRenderTarget2d>(dim[0], dim[1], 1.0, 1, true));
+	m_defaultCamera->setRenderTarget(std::make_shared<Graphics::OsgRenderTarget2d>(dim[0], dim[1], 1.0, 1, true, true));
 	m_defaultCamera->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_IN_ORDER, 0);
 	m_defaultCamera->setMainCamera(true);
 	m_defaultCamera->getOsgCamera()->setClearColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
@@ -58,6 +60,13 @@ PostprocessingView::PostprocessingView(const std::string& name) :
 
 	m_material->addUniform("sampler2D", "renderTarget", m_defaultCamera->getRenderTarget()->getColorTarget(0));
 	m_material->getUniform("renderTarget")->setValue("MinimumTextureUnit", static_cast<size_t>(8));
+	
+	// This is only for the default material
+	m_material->addUniform("float", "gamma", 0.9f);
+	m_material->addUniform("float", "exposure", 1.0f);
+
+	m_material->loadProgram(shaderSource);
+	m_material->getProgram()->setGlobalScope(true);
 
 	auto vertices = new osg::Vec3Array;
 	vertices->push_back(osg::Vec3(-1.0, -1.0, 0.0));
@@ -96,6 +105,16 @@ void PostprocessingView::enableManipulator(bool val)
 	// m_view->enableManipulator(true);
 }
 
+std::shared_ptr<SurgSim::Graphics::Camera> PostprocessingView::getCamera()
+{
+	return m_defaultCamera;
+}
+
+std::shared_ptr<SurgSim::Graphics::Camera> PostprocessingView::getPostProcessingCamera()
+{
+	return m_toScreenCamera;
+}
+
 bool PostprocessingView::doInitialize()
 {
 	addComponent(m_view);
@@ -103,16 +122,23 @@ bool PostprocessingView::doInitialize()
 	addComponent(m_material);
 	addComponent(m_toScreenCamera);
 
-	m_material->loadProgram("Shaders/tonemapping.yaml");
-	m_material->getProgram()->setGlobalScope(true);
-
 	return true;
 }
 
 
-std::shared_ptr<SurgSim::Graphics::Material> PostprocessingView::getMaterial()
+std::shared_ptr<SurgSim::Graphics::Material> PostprocessingView::getPostProcessingMaterial()
 {
 	return m_material;
+}
+
+void PostprocessingView::setPostprocessingMaterial(std::shared_ptr<Graphics::OsgMaterial> material)
+{
+	if (m_material != nullptr) {
+		removeComponent(m_material);
+	}
+	addComponent(material);
+	m_material = material;
+	m_toScreenCamera->setMaterial(m_material);
 }
 
 }

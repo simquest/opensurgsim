@@ -17,10 +17,10 @@ FragmentShaderSource: |
     #version 330 core
     uniform sampler2D renderTarget;
     uniform float offset;
-    uniform float exposure;
     varying vec2 texCoord;
     
-    float gamma = 0.9;
+    uniform float gamma;
+    uniform float exposure;
 
     vec3 linearToneMapping(vec3 color)
     {
