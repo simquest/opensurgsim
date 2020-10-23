@@ -29,7 +29,8 @@ using SurgSim::Math::Vector3d;
 
 namespace
 {
-std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& filename)
+std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& filename,
+	SurgSim::Math::RigidTransform3d transform = SurgSim::Math::RigidTransform3d::Identity())
 {
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Suture");
 
@@ -37,12 +38,13 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& 
 	auto physics = std::make_shared<SurgSim::Physics::Fem1DRepresentation>("Physics");
 	physics->setFemElementType("SurgSim::Physics::Fem1DElementBeam");
 	physics->setLocalPose(SurgSim::Math::RigidTransform3d::Identity());
+	physics->setLocalPose(transform);
 	physics->loadFem(filename);
 	physics->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EULER_IMPLICIT);
 	physics->setLinearSolver(SurgSim::Math::LINEARSOLVER_LU);
 	physics->setRayleighDampingMass(5.0);
 	physics->setRayleighDampingStiffness(0.001);
-	physics->setIsGravityEnabled(true);
+	physics->setIsGravityEnabled(false);
 	element->addComponent(physics);
 
 	// Graphics
@@ -50,6 +52,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeSuture(const std::string& 
 	graphics->setColor(SurgSim::Math::Vector4d(0.0, 0.0, 1.0, 1.0));
 	graphics->setAntiAliasing(true);
 	graphics->setWidth(0.9);
+	graphics->setTension(0.0);
 	element->addComponent(graphics);
 
 	auto collision = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("Collision");
@@ -224,6 +227,32 @@ TEST_F(KnotIdentificationRenderTests, GrannyKnot)
 	scene->addSceneElement(suture);
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
+	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
+	double miliseconds = 2000.0;
+
+	runTest(cameraPosition, cameraLookAt, miliseconds);
+}
+
+TEST_F(KnotIdentificationRenderTests, SquareKnotRotated)
+{
+	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRotationMatrix;
+	using SurgSim::Math::Vector3d;
+	Vector3d axis;
+	axis << 0.42621342245242971, 0.69680137496288352, 0.57689683858660712;
+	double angle = 4.3501990572973357;
+	auto suture = makeSuture("Geometry/square_knot.ply",
+		makeRigidTransform(makeRotationMatrix(angle, axis), Vector3d::Zero()));
+	auto knotId = std::make_shared<SurgSim::Blocks::KnotIdentificationBehavior>("KnotId");
+	knotId->setFem1d(suture->getComponent("Physics"));
+	suture->addComponent(knotId);
+	auto knotText = std::make_shared<KnotNameTextBehavior>("KnotNameTextBehavior");
+	knotText->setKnotIdBehavior(knotId);
+	suture->addComponent(knotText);
+
+	scene->addSceneElement(suture);
+
+	SurgSim::Math::Vector3d cameraPosition(0.0, 0.0, 0.25);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
 	double miliseconds = 2000.0;
 
