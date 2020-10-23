@@ -45,9 +45,24 @@ KnotIdentificationBehavior::KnotIdentificationBehavior(const std::string& name) 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(KnotIdentificationBehavior,
 		std::shared_ptr<SurgSim::Physics::Fem1DRepresentation>, Fem1d, getFem1d, setFem1d);
 
-	addKnownKnotCode("Trefoil Knot", boost::assign::list_of(1)(-2)(3)(-1)(2)(-3));
-	addKnownKnotCode("Granny Knot", boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3));
-	addKnownKnotCode("Square Knot", boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3));
+	addKnownKnotCode("Trefoil Knot", boost::assign::list_of(1)(-2)(3)(-1)(2)(-3),
+		boost::assign::list_of(1)(1)(1)(1)(1)(1));
+	addKnownKnotCode("Granny Knot", boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3),
+		boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1));
+	addKnownKnotCode("Granny Knot", boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3),
+		boost::assign::list_of(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1)(-1));
+	addKnownKnotCode("Granny Knot", boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3),
+		boost::assign::list_of(1)(1)(1)(1)(1)(1)(1)(1)(1)(1)(1)(1));
+	addKnownKnotCode("Granny Knot", boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3),
+		boost::assign::list_of(1)(1)(1)(1)(1)(1)(1)(1)(1)(1)(1)(1));
+	addKnownKnotCode("Square Knot", boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3),
+		boost::assign::list_of(-1)(-1)(-1)(1)(1)(1)(1)(1)(1)(-1)(-1)(-1));
+	addKnownKnotCode("Square Knot", boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3),
+		boost::assign::list_of(-1)(-1)(-1)(1)(1)(1)(1)(1)(1)(-1)(-1)(-1));
+	addKnownKnotCode("Square Knot", boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3),
+		boost::assign::list_of(1)(1)(1)(-1)(-1)(-1)(-1)(-1)(-1)(1)(1)(1));
+	addKnownKnotCode("Square Knot", boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3),
+		boost::assign::list_of(1)(1)(1)(-1)(-1)(-1)(-1)(-1)(-1)(1)(1)(1));
 }
 
 void KnotIdentificationBehavior::setFem1d(const std::shared_ptr<Framework::Component>& fem1d)
@@ -116,11 +131,27 @@ bool KnotIdentificationBehavior::doWakeUp()
 	return true;
 }
 
-void KnotIdentificationBehavior::addKnownKnotCode(const std::string& name, const std::vector<int>& code)
+void KnotIdentificationBehavior::addKnownKnotCode(const std::string& name, const std::vector<int>& code,
+	const std::vector<int>& signs)
 {
+	std::vector<Crossing> enhancedGaussCode;
+	auto codeLength = code.size();
+	SURGSIM_ASSERT(codeLength == signs.size()) << " " <<  getClassName() << "::" << __func__ <<
+		" passed a vector of signs that is not the same length as the code.";
+	for (size_t id = 0; id < codeLength; ++id)
+	{
+		enhancedGaussCode.push_back(Crossing(code[id], 0, 0.0, signs[id]));
+	}
 	if (m_knownLists.find(name) == m_knownLists.end())
 	{
-		m_knownLists[name] = code;
+		
+		auto v = std::vector<std::vector<Crossing>>();
+		v.push_back(enhancedGaussCode);
+		m_knownLists[name] = v;
+	}
+	else
+	{
+		m_knownLists[name].push_back(enhancedGaussCode);
 	}
 }
 
@@ -141,7 +172,7 @@ bool KnotIdentificationBehavior::detectAndIdentifyKnot(
 	return identifyKnot(gaussCode);
 }
 
-std::vector<int> KnotIdentificationBehavior::getGaussCode(
+std::vector<KnotIdentificationBehavior::Crossing> KnotIdentificationBehavior::getGaussCode(
 	const Math::Matrix33d& projection)
 {
 	std::vector<Vector3d> nodes3d;
@@ -154,22 +185,14 @@ std::vector<int> KnotIdentificationBehavior::getGaussCode(
 
 	if (crossings.empty())
 	{
-		return std::vector<int>();
+		return std::vector<Crossing>();
 	}
 
-	crossings.sort([](const Crossing& i, const Crossing& j)
+	std::sort(crossings.begin(), crossings.end(), [](const Crossing& i, const Crossing& j)
 	{
 		return (i.segmentId == j.segmentId) ? (i.segmentLocation < j.segmentLocation) : (i.segmentId < j.segmentId);
 	});
-
-	std::vector<int> gaussCode;
-	gaussCode.reserve(crossings.size());
-	for (const auto& cross : crossings)
-	{
-		gaussCode.push_back(cross.id);
-	}
-
-	return gaussCode;
+	return crossings;
 }
 
 void KnotIdentificationBehavior::buildNodeData(
@@ -210,13 +233,13 @@ void KnotIdentificationBehavior::buildNodeData(
 	}
 }
 
-std::list<KnotIdentificationBehavior::Crossing> KnotIdentificationBehavior::calculateCrossings(
+std::vector<KnotIdentificationBehavior::Crossing> KnotIdentificationBehavior::calculateCrossings(
 	const Math::Vector3d& projectionZ,
 	const std::vector<SurgSim::Math::Vector3d>& nodes3d,
 	const std::vector<SurgSim::Math::Vector2d>& nodes2d,
 	const std::vector<SurgSim::Math::Vector3d>& segments3d)
 {
-	std::list<Crossing> crossings;
+	std::vector<Crossing> crossings;
 	int crossingId = 1;
 	double s, t;
 	size_t numSegments = segments3d.size();
@@ -229,8 +252,21 @@ std::list<KnotIdentificationBehavior::Crossing> KnotIdentificationBehavior::calc
 				int sign =
 					((nodes3d[i] + segments3d[i] * s) - (nodes3d[j] + segments3d[j] * t)).dot(projectionZ) > 0.0
 					? 1 : -1;
-				crossings.push_back(Crossing(crossingId * sign, i, s));
-				crossings.push_back(Crossing(crossingId * -sign, j, t));
+				auto under = i;
+				auto over = j;
+				if (sign > 0)
+				{
+					under = j;
+					over = i;
+				}
+				SurgSim::Math::Vector2d segments2dUnder = nodes2d[under + 1] - nodes2d[under];
+				SurgSim::Math::Vector2d segments2dOver = nodes2d[over + 1] - nodes2d[over];
+				double dot = segments2dUnder.dot(segments2dOver);
+				double determinant = segments2dUnder.x() * segments2dOver.y() -
+					segments2dUnder.y() * segments2dOver.x();
+				int handedness = boost::math::sign(std::atan2(determinant, dot));
+				crossings.push_back(Crossing(crossingId * sign, i, s, handedness));
+				crossings.push_back(Crossing(crossingId * -sign, j, t, handedness));
 				crossingId++;
 			}
 		}
@@ -239,7 +275,7 @@ std::list<KnotIdentificationBehavior::Crossing> KnotIdentificationBehavior::calc
 	return crossings;
 }
 
-void KnotIdentificationBehavior::performReidmeisterMoves(std::vector<int>* gaussCode)
+void KnotIdentificationBehavior::performReidmeisterMoves(std::vector<Crossing>* gaussCode)
 {
 	if (gaussCode->empty())
 	{
@@ -260,10 +296,10 @@ void KnotIdentificationBehavior::performReidmeisterMoves(std::vector<int>* gauss
 			tryReidmeisterMove3(gaussCode, &move3Data);
 	} while (reidmeisterMovePerformed && !gaussCode->empty());
 
-	adjustGaussCodeForErasedCrossings(gaussCode, &erased);
+	adjustGaussCodeForErasedCrossings(gaussCode);
 }
 
-bool KnotIdentificationBehavior::tryReidmeisterMove1(std::vector<int>* gaussCode,
+bool KnotIdentificationBehavior::tryReidmeisterMove1(std::vector<Crossing>* gaussCode,
 													 std::vector<int>* erased)
 {
 	bool movePerformed = false;
@@ -274,7 +310,7 @@ bool KnotIdentificationBehavior::tryReidmeisterMove1(std::vector<int>* gaussCode
 		j = nextIndex(*gaussCode, i);
 		if (isSameCross(*gaussCode, i, j))
 		{
-			erased->push_back(std::abs((*gaussCode)[i]));
+			erased->push_back(std::abs((*gaussCode)[i].id));
 			erase(gaussCode, i, j);
 			movePerformed = true;
 		}
@@ -286,7 +322,7 @@ bool KnotIdentificationBehavior::tryReidmeisterMove1(std::vector<int>* gaussCode
 	return movePerformed;
 }
 
-bool KnotIdentificationBehavior::tryReidmeisterMove2(std::vector<int>* gaussCode,
+bool KnotIdentificationBehavior::tryReidmeisterMove2(std::vector<Crossing>* gaussCode,
 													 std::vector<int>* erased)
 {
 	size_t i = 0;
@@ -306,8 +342,8 @@ bool KnotIdentificationBehavior::tryReidmeisterMove2(std::vector<int>* gaussCode
 			{
 				if (doesOverlap(*gaussCode, i, j, k, l))
 				{
-					erased->push_back(std::abs((*gaussCode)[i]));
-					erased->push_back(std::abs((*gaussCode)[j]));
+					erased->push_back(std::abs((*gaussCode)[i].id));
+					erased->push_back(std::abs((*gaussCode)[j].id));
 					erase(gaussCode, i, j, k, l);
 					return true;
 				}
@@ -320,7 +356,7 @@ bool KnotIdentificationBehavior::tryReidmeisterMove2(std::vector<int>* gaussCode
 	return false;
 }
 
-bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<int>* gaussCode, ReidmeisterMove3Data* data)
+bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<Crossing>* gaussCode, ReidmeisterMove3Data* data)
 {
 	size_t i = 0;
 	size_t j;
@@ -368,28 +404,30 @@ bool KnotIdentificationBehavior::tryReidmeisterMove3(std::vector<int>* gaussCode
 	return false;
 }
 
-void KnotIdentificationBehavior::adjustGaussCodeForErasedCrossings(std::vector<int>* gaussCode,
-																   std::vector<int>* erased)
+void KnotIdentificationBehavior::adjustGaussCodeForErasedCrossings(std::vector<Crossing>* gaussCode)
 {
 	using boost::math::sign;
-
-	if (!gaussCode->empty() && !erased->empty())
-	{
-		std::sort(erased->begin(), erased->end(), std::greater<int>());
-		for (const auto& id : *erased)
-		{
+	std::map<int, int> oldToNew;
+	int next = 1;
 			for (auto& code : *gaussCode)
 			{
-				if (std::abs(code) > id)
+		const auto id = std::abs(code.id);
+		int newId;
+		if (oldToNew.find(id) == oldToNew.end())
 				{
-					code = sign(code) * (std::abs(code) - 1);
-				}
+			newId = next;
+			++next;
+			oldToNew[id] = newId;
 			}
+		else
+		{
+			newId = oldToNew[id];
 		}
+		code.id = sign(code.id) * newId;
 	}
 }
 
-bool KnotIdentificationBehavior::identifyKnot(const std::vector<int>& gaussCode)
+bool KnotIdentificationBehavior::identifyKnot(const std::vector<Crossing>& gaussCode)
 {
 	if (gaussCode.empty())
 	{
@@ -397,68 +435,71 @@ bool KnotIdentificationBehavior::identifyKnot(const std::vector<int>& gaussCode)
 		return false;
 	}
 
-	for (const auto& knot : m_knownLists)
+	for (const auto& knotVector : m_knownLists)
 	{
-		if (isSameCode(gaussCode, knot.second))
+		for (const auto& knot : knotVector.second)
+	{
+			if (isSameCode(gaussCode, knot))
 		{
-			m_knotName = knot.first;
+				m_knotName = knotVector.first;
 			return true;
 		}
+	}
 	}
 
 	m_knotName = "Unknown Knot";
 	return false;
 }
 
-size_t KnotIdentificationBehavior::nextIndex(const std::vector<int>& code, size_t i)
+size_t KnotIdentificationBehavior::nextIndex(const std::vector<Crossing>& code, size_t i)
 {
 	return (++i) % code.size();
 }
 
-size_t KnotIdentificationBehavior::prevIndex(const std::vector<int>& code, size_t i)
+size_t KnotIdentificationBehavior::prevIndex(const std::vector<Crossing>& code, size_t i)
 {
 	return (i + code.size() - 1) % code.size();
 }
 
-bool KnotIdentificationBehavior::isSameSign(const std::vector<int>& code, size_t i, size_t j)
+bool KnotIdentificationBehavior::isSameSign(const std::vector<Crossing>& code, size_t i, size_t j)
 {
 	using boost::math::sign;
-	return sign(code[i]) == sign(code[j]);
+	return sign(code[i].id) == sign(code[j].id);
 }
 
-bool KnotIdentificationBehavior::isSameCross(const std::vector<int>& code, size_t i, size_t j)
+bool KnotIdentificationBehavior::isSameCross(const std::vector<Crossing>& code, size_t i, size_t j)
 {
-	return code[i] == -code[j];
+	return code[i].id == -code[j].id;
 }
 
-bool KnotIdentificationBehavior::doesOverlap(const std::vector<int>& code, size_t i, size_t j, size_t k, size_t l)
+bool KnotIdentificationBehavior::doesOverlap(const std::vector<Crossing>& code, size_t i, size_t j, size_t k, size_t l)
 {
 	return isSameSign(code, i, j) && isSameSign(code, k, l) && !isSameSign(code, i, k) &&
 		   ((isSameCross(code, i, k) && isSameCross(code, j, l)) ||
 			(isSameCross(code, i, l) && isSameCross(code, j, k)));
 }
 
-void KnotIdentificationBehavior::erase(std::vector<int>* code, size_t i, size_t j)
+void KnotIdentificationBehavior::erase(std::vector<Crossing>* code, size_t i, size_t j)
 {
-	(*code)[i] = 0;
-	(*code)[j] = 0;
-	code->erase(std::remove(code->begin(), code->end(), 0), code->end());
+	code->erase(code->begin() + std::max(i, j));
+	code->erase(code->begin() + std::min(i, j));
 }
 
-void KnotIdentificationBehavior::erase(std::vector<int>* code, size_t i, size_t j, size_t k, size_t l)
+void KnotIdentificationBehavior::erase(std::vector<Crossing>* code, size_t i, size_t j, size_t k, size_t l)
 {
-	(*code)[i] = 0;
-	(*code)[j] = 0;
-	(*code)[k] = 0;
-	(*code)[l] = 0;
-	code->erase(std::remove(code->begin(), code->end(), 0), code->end());
+	std::vector<size_t> list = { i, j, k, l };
+	std::sort(list.begin(), list.end(), std::greater<size_t>());
+	code->erase(code->begin() + list[0]);
+	code->erase(code->begin() + list[1]);
+	code->erase(code->begin() + list[2]);
+	code->erase(code->begin() + list[3]);
 }
 
-size_t KnotIdentificationBehavior::getComplementCross(const std::vector<int>& code, size_t i)
+size_t KnotIdentificationBehavior::getComplementCross(const std::vector<Crossing>& code, size_t i)
 {
 	for (size_t j = 0; j < code.size(); ++j)
 	{
-		if (code[j] == -code[i])
+		if (code[j].id == -code[i].id)
 		{
 			return j;
 		}
@@ -467,7 +508,7 @@ size_t KnotIdentificationBehavior::getComplementCross(const std::vector<int>& co
 	return std::numeric_limits<size_t>::max();
 }
 
-bool KnotIdentificationBehavior::hasCommonNeighbor(const std::vector<int>& code, size_t i, size_t j,
+bool KnotIdentificationBehavior::hasCommonNeighbor(const std::vector<Crossing>& code, size_t i, size_t j,
 												   size_t* k, size_t* l)
 {
 	size_t iPrev = prevIndex(code, i);
@@ -503,7 +544,7 @@ bool KnotIdentificationBehavior::hasCommonNeighbor(const std::vector<int>& code,
 	return false;
 }
 
-bool KnotIdentificationBehavior::isSameCode(const std::vector<int>& code, const std::vector<int>& knot)
+bool KnotIdentificationBehavior::isSameCode(const std::vector<Crossing>& code, const std::vector<Crossing>& knot)
 {
 	if (code.size() != knot.size())
 	{
@@ -511,7 +552,7 @@ bool KnotIdentificationBehavior::isSameCode(const std::vector<int>& code, const 
 	}
 
 	size_t start = 0;
-	while (start < code.size() && code[0] != knot[start])
+	while (start < code.size() && code[0].id != knot[start].id)
 	{
 		++start;
 	}
@@ -525,7 +566,7 @@ bool KnotIdentificationBehavior::isSameCode(const std::vector<int>& code, const 
 	size_t j = start;
 	for (size_t i = 0; i < code.size() && isSame; ++i)
 	{
-		isSame = code[i] == knot[j];
+		isSame = (code[i].id == knot[j].id) && (code[i].sign == knot[j].sign);
 		j = nextIndex(knot, j);
 	}
 
@@ -533,7 +574,7 @@ bool KnotIdentificationBehavior::isSameCode(const std::vector<int>& code, const 
 	{
 		// Check if (code * -1) is the same as knot.
 		start = 0;
-		while (start < code.size() && -code[0] != knot[start])
+		while (start < code.size() && -code[0].id != knot[start].id)
 		{
 			++start;
 		}
@@ -542,7 +583,7 @@ bool KnotIdentificationBehavior::isSameCode(const std::vector<int>& code, const 
 		j = start;
 		for (size_t i = 0; i < code.size() && isSame; ++i)
 		{
-			isSame = -code[i] == knot[j];
+			isSame = (-code[i].id == knot[j].id) && (code[i].sign == knot[j].sign);
 			j = nextIndex(knot, j);
 		}
 	}

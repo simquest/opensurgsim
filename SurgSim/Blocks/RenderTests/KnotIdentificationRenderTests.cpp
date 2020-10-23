@@ -258,3 +258,29 @@ TEST_F(KnotIdentificationRenderTests, SquareKnotRotated)
 
 	runTest(cameraPosition, cameraLookAt, miliseconds);
 }
+
+TEST_F(KnotIdentificationRenderTests, GrannyKnotRotated)
+{
+	using SurgSim::Math::makeRigidTransform;
+	using SurgSim::Math::makeRotationMatrix;
+	using SurgSim::Math::Vector3d;
+	Vector3d axis;
+	axis << 0.69882389249458876, 0.14364554633107285, 0.7007218594406478;
+	double angle = 3.0412064700110828;
+	auto suture = makeSuture("Geometry/granny_knot.ply",
+		makeRigidTransform(makeRotationMatrix(angle, axis), Vector3d::Zero()));
+	auto knotId = std::make_shared<SurgSim::Blocks::KnotIdentificationBehavior>("KnotId");
+	knotId->setFem1d(suture->getComponent("Physics"));
+	suture->addComponent(knotId);
+	auto knotText = std::make_shared<KnotNameTextBehavior>("KnotNameTextBehavior");
+	knotText->setKnotIdBehavior(knotId);
+	suture->addComponent(knotText);
+
+	scene->addSceneElement(suture);
+
+	SurgSim::Math::Vector3d cameraPosition(0.0, 0.0, 0.25);
+	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
+	double miliseconds = 2000.0;
+
+	runTest(cameraPosition, cameraLookAt, miliseconds);
+}
