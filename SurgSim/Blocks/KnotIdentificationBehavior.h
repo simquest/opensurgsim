@@ -39,6 +39,7 @@ namespace Blocks
 /// The document below gives an overview of the algorithm used to detect the knot.
 /// https://docs.google.com/document/d/1a8hCCvtFuOapYsj81enORBiN9pcoCS7HIDioquto6LA
 /// This behavior may incorrectly identify knots, or fail to identify knots.
+/// It will always fail to identify knots with extra loops or crossings.
 class KnotIdentificationBehavior : public SurgSim::Framework::Behavior
 {
 public:

@@ -83,13 +83,39 @@ const std::string& KnotIdentificationBehavior::getKnotName()
 
 void KnotIdentificationBehavior::update(double dt)
 {
-	bool knotDetected = false;
-	auto projection = m_projections.begin();
-	do
+	std::vector<std::string> results;
+	for (const auto& projection : m_projections)
 	{
-		knotDetected = detectAndIdentifyKnot(*projection);
-		++projection;
-	} while (!knotDetected && projection != m_projections.end());
+		if (detectAndIdentifyKnot(projection))
+		{
+			results.push_back(m_knotName);
+		}
+	}
+	if (results.size() > 0)
+	{
+		m_knotName = results.back();
+		if (results.size() > 1)
+		{
+			std::vector<std::string> known;
+			for (const auto& r : results)
+			{
+				if (r != "Unknown Knot")
+				{
+					known.push_back(r);
+				}
+			}
+			ptrdiff_t maxCount = 0;
+			for (const auto& k : known)
+			{
+				auto count = std::count(known.begin(), known.end(), k);
+				if (count > maxCount)
+				{
+					maxCount = count;
+					m_knotName = k;
+				}
+			}
+		}
+	}
 }
 
 int KnotIdentificationBehavior::getTargetManagerType() const
@@ -409,16 +435,16 @@ void KnotIdentificationBehavior::adjustGaussCodeForErasedCrossings(std::vector<C
 	using boost::math::sign;
 	std::map<int, int> oldToNew;
 	int next = 1;
-			for (auto& code : *gaussCode)
-			{
+	for (auto& code : *gaussCode)
+	{
 		const auto id = std::abs(code.id);
 		int newId;
 		if (oldToNew.find(id) == oldToNew.end())
-				{
+		{
 			newId = next;
 			++next;
 			oldToNew[id] = newId;
-			}
+		}
 		else
 		{
 			newId = oldToNew[id];
@@ -438,13 +464,13 @@ bool KnotIdentificationBehavior::identifyKnot(const std::vector<Crossing>& gauss
 	for (const auto& knotVector : m_knownLists)
 	{
 		for (const auto& knot : knotVector.second)
-	{
-			if (isSameCode(gaussCode, knot))
 		{
+			if (isSameCode(gaussCode, knot))
+			{
 				m_knotName = knotVector.first;
-			return true;
+				return true;
+			}
 		}
-	}
 	}
 
 	m_knotName = "Unknown Knot";
@@ -551,40 +577,19 @@ bool KnotIdentificationBehavior::isSameCode(const std::vector<Crossing>& code, c
 		return false;
 	}
 
-	size_t start = 0;
-	while (start < code.size() && code[0].id != knot[start].id)
-	{
-		++start;
-	}
-
-	if (start == code.size())
-	{
-		return start == 0;
-	}
-
 	bool isSame = true;
-	size_t j = start;
 	for (size_t i = 0; i < code.size() && isSame; ++i)
 	{
-		isSame = (code[i].id == knot[j].id) && (code[i].sign == knot[j].sign);
-		j = nextIndex(knot, j);
+		isSame = (code[i].id == knot[i].id) && (code[i].sign == knot[i].sign);
 	}
 
 	if (!isSame)
 	{
 		// Check if (code * -1) is the same as knot.
-		start = 0;
-		while (start < code.size() && -code[0].id != knot[start].id)
-		{
-			++start;
-		}
-
 		isSame = true;
-		j = start;
 		for (size_t i = 0; i < code.size() && isSame; ++i)
 		{
-			isSame = (-code[i].id == knot[j].id) && (code[i].sign == knot[j].sign);
-			j = nextIndex(knot, j);
+			isSame = (-code[i].id == knot[i].id) && (code[i].sign == knot[i].sign);
 		}
 	}
 
