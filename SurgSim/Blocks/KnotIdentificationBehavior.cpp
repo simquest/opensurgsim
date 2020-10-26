@@ -148,6 +148,27 @@ bool KnotIdentificationBehavior::doInitialize()
 			1.0, 0.0, 0.0;
 		m_projections.push_back(projection * 100.0);
 	}
+	{
+		projection <<
+			0.0, -0.707107, -0.707107,
+			0.0, 0.707107, -0.707107,
+			1.0, 0.0, 0.0;
+		m_projections.push_back(projection * 100.0);
+	}
+	{
+		projection <<
+			-0.707107, 0.0, -0.707107,
+			0.0, 1.0, -0.0,
+			0.707107, -0.0, -0.707107;
+		m_projections.push_back(projection * 100.0);
+	}
+	{
+		projection <<
+			-1.0, 0.0, -0.0,
+			0.0, 0.707107, -0.707107,
+			0.0, -0.707107, -0.707107;
+		m_projections.push_back(projection * 100.0);
+	}
 	return true;
 }
 
