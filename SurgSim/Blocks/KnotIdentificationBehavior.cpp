@@ -229,9 +229,9 @@ void KnotIdentificationBehavior::buildNodeData(
 	std::vector<Vector3d>* segments3d)
 {
 	// Reserve the memory
-	nodes3d->reserve(m_fem1d->getNumFemElements() + 1);
-	nodes2d->reserve(m_fem1d->getNumFemElements() + 1);
-	segments3d->reserve(m_fem1d->getNumFemElements());
+	nodes3d->reserve(m_fem1d->getNumFemElements() + 2);
+	nodes2d->reserve(m_fem1d->getNumFemElements() + 2);
+	segments3d->reserve(m_fem1d->getNumFemElements() + 1);
 
 	const auto& finalState = m_fem1d->getFinalState();
 
@@ -257,6 +257,14 @@ void KnotIdentificationBehavior::buildNodeData(
 		nodes3d->push_back(node3d);
 		nodes2d->push_back(node2d);
 	}
+	const auto& lastNode = 
+		finalState->getPosition(m_fem1d->getFemElement(m_fem1d->getNumFemElements() - 1)->getNodeIds()[1]);
+	node3d = lastNode + 0.99 * (finalState->getPosition(m_fem1d->getFemElement(0)->getNodeIds()[0]) - lastNode);
+	node2d[0] = projectionX.dot(node3d);
+	node2d[1] = projectionY.dot(node3d);
+	segments3d->push_back(node3d - nodes3d->back());
+	nodes3d->push_back(node3d);
+	nodes2d->push_back(node2d);
 }
 
 std::vector<KnotIdentificationBehavior::Crossing> KnotIdentificationBehavior::calculateCrossings(
