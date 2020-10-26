@@ -86,6 +86,11 @@ public:
 		int sign; ///< also known as handedness. See documentation for addKnownKnotCode.
 		Crossing(int id, size_t segmentId, double segmentLocation, int sign)
 			: id(id), segmentId(segmentId), segmentLocation(segmentLocation), sign(sign) {}
+		bool operator==(const Crossing& rhs) const
+		{
+			return (id == rhs.id) && (segmentId == rhs.segmentId) && (segmentLocation == rhs.segmentLocation) &&
+				(sign == rhs.sign);
+		}
 	};
 
 protected:

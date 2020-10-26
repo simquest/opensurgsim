@@ -25,6 +25,24 @@
 #include "SurgSim/Math/MathConvert.h"
 #include <random>
 
+namespace
+{
+std::vector<SurgSim::Blocks::KnotIdentificationBehavior::Crossing> createGaussCode(const std::vector<int>& ids,
+	const std::vector<int>& signs = {})
+{
+	std::vector<SurgSim::Blocks::KnotIdentificationBehavior::Crossing> result;
+	for (size_t i = 0; i < ids.size(); ++i)
+	{
+		result.emplace_back(ids[i], 0, 0.0, 1);
+	}
+	for (size_t i = 0; i < std::min(signs.size(), result.size()); ++i)
+	{
+		result[i].sign = signs[i];
+	}
+	return result;
+}
+}
+
 namespace SurgSim
 {
 namespace Blocks
@@ -57,8 +75,7 @@ public:
 
 	std::string identifyKnot(const std::vector<Crossing>& gaussCode)
 	{
-		KnotIdentificationBehavior::identifyKnot(gaussCode);
-		return KnotIdentificationBehavior::getKnotName();
+		return KnotIdentificationBehavior::identifyKnot(gaussCode);
 	}
 
 	KnotIdentificationBehavior::ReidmeisterMove3Data data;
@@ -247,7 +264,7 @@ public:
 		EXPECT_EQ(knotname, knotId.getKnotName()) << "Axis: " << axis.transpose() << " Angle: " << angle;
 		return true;
 	}
-	/*
+	
 	void testReidmeisterMove1(std::vector<KnotIdentificationBehavior::Crossing> gaussCodeBefore,
 		std::vector<KnotIdentificationBehavior::Crossing> gaussCodeAfter,
 							  std::vector<int> erased = std::vector<int>())
@@ -312,7 +329,7 @@ public:
 			EXPECT_EQ("Unknown Knot", actual);
 		}
 	}
-	*/
+	
 	MockKnotIdentificationBehavior mockReidmeisterMove3Behavior;
 };
 
@@ -335,37 +352,37 @@ TEST_F(KnotIdentificationBehaviorTest, GetSetFem1D)
 	EXPECT_TRUE(knotId.doWakeUp());
 	EXPECT_EQ(fem1D->getName(), knotId.getFem1d()->getName());
 }
-/*
+
 TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove1)
 {
 	{
 		std::vector<int> input = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
 		std::vector<int> expected = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
-		testReidmeisterMove1(input, expected);
+		testReidmeisterMove1(createGaussCode(input), createGaussCode(expected));
 	}
 	{
 		std::vector<int> input = boost::assign::list_of(1)(-2)(3)(-3)(-1)(2);
 		std::vector<int> expected = boost::assign::list_of(1)(-2)(-1)(2);
 		std::vector<int> erased = boost::assign::list_of(3);
-		testReidmeisterMove1(input, expected, erased);
+		testReidmeisterMove1(createGaussCode(input), createGaussCode(expected), erased);
 	}
 	{
 		std::vector<int> input = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3);
 		std::vector<int> expected = boost::assign::list_of(1)(-2)(-1)(2);
 		std::vector<int> erased = boost::assign::list_of(3);
-		testReidmeisterMove1(input, expected, erased);
+		testReidmeisterMove1(createGaussCode(input), createGaussCode(expected), erased);
 	}
 	{
 		std::vector<int> input = boost::assign::list_of(3)(1)(4)(-4)(-2)(6)(-6)(-1)(-5)(5)(2)(-3);
 		std::vector<int> expected = boost::assign::list_of(1)(-2)(-1)(2);
 		std::vector<int> erased = boost::assign::list_of(3)(4)(5)(6);
-		testReidmeisterMove1(input, expected, erased);
+		testReidmeisterMove1(createGaussCode(input), createGaussCode(expected), erased);
 	}
 	{
 		std::vector<int> input = boost::assign::list_of(3)(1)(4)(-4)(-2)(6)(7)(-6)(-7)(-1)(-5)(5)(2)(-3);
 		std::vector<int> expected = boost::assign::list_of(1)(-2)(6)(7)(-6)(-7)(-1)(2);
 		std::vector<int> erased = boost::assign::list_of(3)(4)(5);
-		testReidmeisterMove1(input, expected, erased);
+		testReidmeisterMove1(createGaussCode(input), createGaussCode(expected), erased);
 	}
 }
 
@@ -375,19 +392,19 @@ TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove2)
 		std::vector<int> input = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3)(4)(5)(-4)(-5);
 		std::vector<int> expected = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3);
 		std::vector<int> erased = boost::assign::list_of(4)(5);
-		testReidmeisterMove2(input, expected, erased);
+		testReidmeisterMove2(createGaussCode(input), createGaussCode(expected), erased);
 	}
 	{
 		std::vector<int> input = boost::assign::list_of(-5)(3)(1)(-2)(-1)(2)(-3)(4)(5)(-4);
 		std::vector<int> expected = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3);
 		std::vector<int> erased = boost::assign::list_of(4)(5);
-		testReidmeisterMove2(input, expected, erased);
+		testReidmeisterMove2(createGaussCode(input), createGaussCode(expected), erased);
 	}
 	{
 		std::vector<int> input = boost::assign::list_of(3)(1)(-2)(7)(6)(-1)(2)(-3)(4)(5)(-7)(-6)(-4)(-5);
 		std::vector<int> expected = boost::assign::list_of(3)(1)(-2)(-1)(2)(-3)(4)(5)(-4)(-5);
 		std::vector<int> erased = boost::assign::list_of(6)(7);
-		testReidmeisterMove2(input, expected, erased);
+		testReidmeisterMove2(createGaussCode(input), createGaussCode(expected), erased);
 	}
 }
 
@@ -395,21 +412,21 @@ TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove3Test1)
 {
 	std::vector<int> input = boost::assign::list_of(-1)(-3)(-2)(1)(2)(3);
 	std::vector<int> expected = boost::assign::list_of(-1)(-3)(3)(-2)(1)(2);
-	testReidmeisterMove3(input, expected, true);
+	testReidmeisterMove3(createGaussCode(input), createGaussCode(expected), true);
 	std::vector<int> expected2 = boost::assign::list_of(2)(-3)(-2)(3)(1)(-1);
-	testReidmeisterMove3(expected, expected2, true);
+	testReidmeisterMove3(createGaussCode(expected), createGaussCode(expected2), true);
 	std::vector<int> expected3 = boost::assign::list_of(3)(-1)(-3)(1)(2)(-2);
-	testReidmeisterMove3(expected2, expected3, true);
+	testReidmeisterMove3(createGaussCode(expected2), createGaussCode(expected3), true);
 	std::vector<int> expected4 = boost::assign::list_of(-2)(-1)(1)(-3)(2)(3);
-	testReidmeisterMove3(expected3, expected4, true);
-	testReidmeisterMove3(expected4, input, false);
+	testReidmeisterMove3(createGaussCode(expected3), createGaussCode(expected4), true);
+	testReidmeisterMove3(createGaussCode(expected4), createGaussCode(input), false);
 }
 
 TEST_F(KnotIdentificationBehaviorTest, ReidmeisterMove3Test2)
 {
 	std::vector<int> input = boost::assign::list_of(3)(1)(-4)(-2)(-1)(-5)(2)(-3)(4)(5);
 	std::vector<int> expected = boost::assign::list_of(3)(1)(-4)(-3)(-2)(-5)(-1)(2)(4)(5);
-	testReidmeisterMove3(input, expected, true);
+	testReidmeisterMove3(createGaussCode(input), createGaussCode(expected), true);
 }
 
 TEST_F(KnotIdentificationBehaviorTest, AdjustGaussCodeForErasedCrossings)
@@ -418,75 +435,62 @@ TEST_F(KnotIdentificationBehaviorTest, AdjustGaussCodeForErasedCrossings)
 		std::vector<int> input = boost::assign::list_of(3)(-4)(5)(-3)(4)(-5);
 		std::vector<int> expected = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
 		std::vector<int> erased = boost::assign::list_of(1)(2);
-		testAdjustGaussCodeForErasedCrossings(input, expected, erased);
+		testAdjustGaussCodeForErasedCrossings(createGaussCode(input), createGaussCode(expected), erased);
 	}
 	{
 		std::vector<int> input = boost::assign::list_of(1)(-4)(5)(-1)(4)(-5);
 		std::vector<int> expected = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
 		std::vector<int> erased = boost::assign::list_of(2)(3);
-		testAdjustGaussCodeForErasedCrossings(input, expected, erased);
+		testAdjustGaussCodeForErasedCrossings(createGaussCode(input), createGaussCode(expected), erased);
 	}
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest1)
+TEST_F(KnotIdentificationBehaviorTest, IdentifyKnotTest1)
 {
-	testIdentifyKnot(std::vector<int>(), "No Knot");
+	testIdentifyKnot(createGaussCode(std::vector<int>()), "No Knot");
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest2)
+TEST_F(KnotIdentificationBehaviorTest, IdentifyKnotTest2)
 {
 	std::vector<int> input = boost::assign::list_of(1)(-4)(5)(-1)(4)(-5);
-	testIdentifyKnot(input, "Unknown Knot");
+	testIdentifyKnot(createGaussCode(input), "Unknown Knot");
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest3)
+TEST_F(KnotIdentificationBehaviorTest, IdentifyKnotTest3)
 {
-	std::vector<int> input = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
-	testIdentifyKnot(input, "Trefoil Knot");
+	std::vector<int> ids = boost::assign::list_of(1)(-2)(3)(-1)(2)(-3);
+	std::vector<int> signs = boost::assign::list_of(1)(1)(1)(1)(1)(1);
+	testIdentifyKnot(createGaussCode(ids, signs), "Trefoil Knot");
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest4)
+TEST_F(KnotIdentificationBehaviorTest, IdentifyKnotTest4)
 {
-	std::vector<int> input = boost::assign::list_of(-1)(2)(-3)(1)(-2)(3);
-	testIdentifyKnot(input, "Trefoil Knot");
+	std::vector<int> ids = boost::assign::list_of(-1)(2)(-3)(1)(-2)(3);
+	std::vector<int> signs = boost::assign::list_of(1)(1)(1)(1)(1)(1);
+	testIdentifyKnot(createGaussCode(ids, signs), "Trefoil Knot");
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest5)
+TEST_F(KnotIdentificationBehaviorTest, IdentifyKnotTest5)
 {
-	std::vector<int> input = boost::assign::list_of(-3)(1)(-2)(3)(-1)(2);
-	testIdentifyKnot(input, "Trefoil Knot");
+	std::vector<int> ids = boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3);
+	std::vector<int> signs = boost::assign::list_of(1)(1)(1)(1)(1)(1)(1)(1)(1)(1)(1)(1);
+	testIdentifyKnot(createGaussCode(ids, signs), "Granny Knot");
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest6)
+TEST_F(KnotIdentificationBehaviorTest, IdentifyKnotTest6)
 {
-	std::vector<int> input = boost::assign::list_of(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6)(-1)(2)(-3);
-	testIdentifyKnot(input, "Granny Knot");
+	std::vector<int> ids = boost::assign::list_of(-1)(2)(-3)(4)(-5)(6)(-4)(5)(-6)(1)(-2)(3);
+	std::vector<int> signs = boost::assign::list_of(1)(1)(1)(1)(1)(1)(1)(1)(1)(1)(1)(1);
+	testIdentifyKnot(createGaussCode(ids, signs), "Granny Knot");
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest7)
+TEST_F(KnotIdentificationBehaviorTest, IdentifyKnotTest7)
 {
-	std::vector<int> input = boost::assign::list_of(-1)(2)(-3)(1)(-2)(3)(-4)(5)(-6)(4)(-5)(6);
-	testIdentifyKnot(input, "Granny Knot");
+	std::vector<int> ids = boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3);
+	std::vector<int> signs = boost::assign::list_of(1)(1)(1)(-1)(-1)(-1)(-1)(-1)(-1)(1)(1)(1);
+	testIdentifyKnot(createGaussCode(ids, signs), "Square Knot");
 }
 
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest8)
-{
-	std::vector<int> input = boost::assign::list_of(4)(-5)(6)(-1)(2)(-3)(1)(-2)(3)(-4)(5)(-6);
-	testIdentifyKnot(input, "Granny Knot");
-}
-
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest9)
-{
-	std::vector<int> input = boost::assign::list_of(-1)(2)(-3)(4)(-5)(6)(-4)(5)(-6)(1)(-2)(3);
-	testIdentifyKnot(input, "Granny Knot");
-}
-
-TEST_F(KnotIdentificationBehaviorTest, IdentityKnotTest10)
-{
-	std::vector<int> input = boost::assign::list_of(1)(-2)(3)(4)(-5)(6)(-4)(5)(-6)(-1)(2)(-3);
-	testIdentifyKnot(input, "Square Knot");
-}
-*/
 TEST_F(KnotIdentificationBehaviorTest, Fem1DNoKnot)
 {
 	KnotIdentificationBehavior knotId("Knot ID");
@@ -495,8 +499,6 @@ TEST_F(KnotIdentificationBehaviorTest, Fem1DNoKnot)
 	knotId.update(0.0);
 	EXPECT_EQ("No Knot", knotId.getKnotName());
 }
-
-
 
 TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoil)
 {
@@ -513,12 +515,10 @@ TEST_F(KnotIdentificationBehaviorTest, Fem1DGranny)
 	EXPECT_TRUE(testKnot("Geometry/granny_knot.ply", "Granny Knot"));
 }
 
-
 TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoilRandom)
 {
 	std::default_random_engine generator;
 	std::uniform_int_distribution<unsigned int> distribution;
-
 
 	for (;;)
 	{
@@ -526,7 +526,7 @@ TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoilRandom)
 
 		std::cout << seed << "\n";
 
-		//ASSERT_TRUE(testKnotRandom("Geometry/trefoil_knot.ply", "Trefoil Knot", 10000, seed));
+		ASSERT_TRUE(testKnotRandom("Geometry/trefoil_knot.ply", "Trefoil Knot", 10000, seed));
 		ASSERT_TRUE(testKnotRandom("Geometry/square_knot.ply", "Square Knot", 10000, seed));
 		ASSERT_TRUE(testKnotRandom("Geometry/granny_knot.ply", "Granny Knot", 10000, seed));
 	}
