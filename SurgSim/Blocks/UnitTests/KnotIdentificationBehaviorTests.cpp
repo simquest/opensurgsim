@@ -515,6 +515,7 @@ TEST_F(KnotIdentificationBehaviorTest, Fem1DGranny)
 	EXPECT_TRUE(testKnot("Geometry/granny_knot.ply", "Granny Knot"));
 }
 
+/*
 TEST_F(KnotIdentificationBehaviorTest, Fem1DTrefoilRandom)
 {
 	std::default_random_engine generator;
@@ -538,6 +539,6 @@ TEST_F(KnotIdentificationBehaviorTest, ErrorFiles)
 		ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror.bin"));
 		//ASSERT_TRUE(testKnotFromFailure("Geometry/square_knot.ply", "Square Knot", "knoterror3.bin"));
 }
-
+*/
 }
 }
