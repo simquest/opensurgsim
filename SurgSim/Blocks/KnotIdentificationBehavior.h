@@ -93,8 +93,8 @@ protected:
 	std::map<std::string, std::vector<std::vector<Crossing>>> m_knownLists;
 
 	/// \param projection The projection matrix to be used.
-	/// \return True, if a knot was detected.
-	bool detectAndIdentifyKnot(const SurgSim::Math::Matrix33d& projection);
+	/// \return The name of the knot, "No Knot", or "Unknown Knot".
+	std::string detectAndIdentifyKnot(const SurgSim::Math::Matrix33d& projection);
 
 	/// \param projection The projection matrix to be used.
 	/// \return The gauss code of the knot projection diagram.
@@ -164,14 +164,17 @@ protected:
 
 	/// Identify the knot.
 	/// \param [in,out] gaussCode The reduced gauss code of the knot projection diagram.
-	/// \return True, if a knot was detected.
-	bool identifyKnot(const std::vector<Crossing>& gaussCode);
+	/// \return The name of the knot, "No Knot", or "Unknown Knot".
+	std::string identifyKnot(const std::vector<Crossing>& gaussCode);
 
 	/// The fem1d within which the knot is checked for.
 	std::shared_ptr<SurgSim::Physics::Fem1DRepresentation> m_fem1d;
 
 	/// The list of projection matrices to try.
 	std::vector<SurgSim::Math::Matrix33d> m_projections;
+
+	/// Mutex for the knot name.
+	boost::mutex m_mutex;
 
 	/// The name of the knot that was detected.
 	std::string m_knotName;

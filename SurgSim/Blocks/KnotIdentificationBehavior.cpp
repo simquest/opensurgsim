@@ -78,6 +78,7 @@ const std::shared_ptr<Physics::Fem1DRepresentation>& KnotIdentificationBehavior:
 
 const std::string& KnotIdentificationBehavior::getKnotName()
 {
+	boost::lock_guard<boost::mutex> lock(m_mutex);
 	return m_knotName;
 }
 
@@ -86,14 +87,16 @@ void KnotIdentificationBehavior::update(double dt)
 	std::vector<std::string> results;
 	for (const auto& projection : m_projections)
 	{
-		if (detectAndIdentifyKnot(projection))
+		const auto& knotName = detectAndIdentifyKnot(projection);
+		if (knotName != "No Knot")
 		{
-			results.push_back(m_knotName);
+			results.push_back(knotName);
 		}
 	}
+	std::string knotName = "No Knot";
 	if (results.size() > 0)
 	{
-		m_knotName = results.back();
+		knotName = results.back();
 		if (results.size() > 1)
 		{
 			std::vector<std::string> known;
@@ -111,11 +114,13 @@ void KnotIdentificationBehavior::update(double dt)
 				if (count > maxCount)
 				{
 					maxCount = count;
-					m_knotName = k;
+					knotName = k;
 				}
 			}
 		}
 	}
+	boost::lock_guard<boost::mutex> lock(m_mutex);
+	m_knotName = knotName;
 }
 
 int KnotIdentificationBehavior::getTargetManagerType() const
@@ -186,7 +191,7 @@ void KnotIdentificationBehavior::clearKnownKnotCodes()
 	m_knownLists.clear();
 }
 
-bool KnotIdentificationBehavior::detectAndIdentifyKnot(
+std::string KnotIdentificationBehavior::detectAndIdentifyKnot(
 	const Math::Matrix33d& projection)
 {
 	auto gaussCode = getGaussCode(projection);
@@ -461,12 +466,11 @@ void KnotIdentificationBehavior::adjustGaussCodeForErasedCrossings(std::vector<C
 	}
 }
 
-bool KnotIdentificationBehavior::identifyKnot(const std::vector<Crossing>& gaussCode)
+std::string KnotIdentificationBehavior::identifyKnot(const std::vector<Crossing>& gaussCode)
 {
 	if (gaussCode.empty())
 	{
-		m_knotName = "No Knot";
-		return false;
+		return "No Knot";
 	}
 
 	for (const auto& knotVector : m_knownLists)
@@ -475,14 +479,12 @@ bool KnotIdentificationBehavior::identifyKnot(const std::vector<Crossing>& gauss
 		{
 			if (isSameCode(gaussCode, knot))
 			{
-				m_knotName = knotVector.first;
-				return true;
+				return knotVector.first;
 			}
 		}
 	}
 
-	m_knotName = "Unknown Knot";
-	return false;
+	return "Unknown Knot";
 }
 
 size_t KnotIdentificationBehavior::nextIndex(const std::vector<Crossing>& code, size_t i)
