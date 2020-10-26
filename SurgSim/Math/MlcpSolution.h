@@ -71,9 +71,9 @@ struct MlcpSolution
 	/// The initial value of the convergence criteria, before the solver has done anything.
 	double initialConvergenceCriteria;
 	/// The final value of the convergence criteria for each of the constraint types.
-	double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
+	double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES] = {};
 	/// The initial value of the convergence criteria for each of the constraint types.
-	double initialConstraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
+	double initialConstraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES] = {};
 
 	// NB: We let the compiler generate the default code for the constructor, copy constructor and copy assignment,
 	// because we currently sometimes need to copy the solution (although we ought to minimize this).
