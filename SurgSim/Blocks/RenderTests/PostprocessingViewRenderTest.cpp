@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2017, SimQuest Solutions Inc.
+// Copyright 2013-2020, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@
 #include "SurgSim//Graphics/OsgMeshRepresentation.h"
 #include "SurgSim//Graphics/OsgProgram.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
-#include "../../Graphics/OsgLight.h"
+#include "SurgSim/Graphics/OsgLight.h"
+#include "SurgSim/Graphics/OsgView.h"
 
 
 using SurgSim::Math::Vector3d;
@@ -97,7 +98,7 @@ TEST(PostprocessingViewTest, BasicScene)
 	runtime->start();
 	for (int i = 0; i < 200; ++i)
 	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(30));
 		exposure = exposure + sign;
 		if (exposure < 0) {
 			exposure = 0.0;
@@ -110,13 +111,15 @@ TEST(PostprocessingViewTest, BasicScene)
 		}
 		material->setValue("exposure", exposure);
 	}
-	manager->dumpDebugInfo();
+
 	runtime->stop();
+
 
 }
 
 TEST(PostprocessingViewTest, OverExposureTest)
 {
+
 	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
 	auto manager = std::make_shared<Graphics::OsgManager>();
 	runtime->addManager(manager);
@@ -177,17 +180,9 @@ TEST(PostprocessingViewTest, OverExposureTest)
 	scene->addSceneElement(sceneElement);
 
 	auto viewElement = std::make_shared<Blocks::PostprocessingView>("Display");
-	//auto display = std::make_shared<Graphics::OsgViewElement>("Display");
 	viewElement->enableManipulator(false);
 
-	auto pose =
-		Math::makeRigidTransform(Vector3d(1.0, 1.0, 1.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0));
-	viewElement->setPose(pose);
-
-// 	viewElement->setPose(SurgSim::Math::makeRigidTransform(
-// 		Vector3d(-0.1, 0.1, -0.1),
-// 		Vector3d(0.0, 0.0, 0.0),
-// 		Vector3d(0.0, 0.0, 1.0)));
+	viewElement->getView()->setManipulatorParameters({ 0,0.5,0 }, { 0,0,0 });
 
 	viewElement->getCamera()->setAmbientColor(SurgSim::Math::Vector4d(0.2, 0.2, 0.2, 1.0));
 	viewElement->getCamera()->setMaterial(material);
@@ -195,18 +190,17 @@ TEST(PostprocessingViewTest, OverExposureTest)
 	viewElement->addComponent(light);
 
 	scene->addSceneElement(viewElement);
-	//std::dynamic_pointer_cast<SurgSim::Graphics::OsgView>(viewElement->getView())->setOsgMapsUniforms(true);
 
 	auto postprocess = viewElement->getPostProcessingMaterial();
 
 	float exposure = 1.0;
-	float sign = -0.1;
+	float sign = -0.01;
 	postprocess->setValue("gamma", 1.0f);
 
 	runtime->start();
-	for (int i = 0; i < 20000; ++i)
+	for (int i = 0; i < 300; ++i)
 	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(30));
 		exposure = exposure + sign;
 		if (exposure < 0) {
 			exposure = 0.0;

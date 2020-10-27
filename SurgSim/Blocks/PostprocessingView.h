@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2017, SimQuest Solutions Inc.
+// Copyright 2013-2020, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ public:
 
 	std::shared_ptr<Graphics::Camera> getCamera();
 	std::shared_ptr<Graphics::Camera> getPostProcessingCamera();
+	std::shared_ptr<Graphics::OsgView> getView();
 
 private:
 	/// Camera to take the default content and render it i.e the main source of the post processing pipeline

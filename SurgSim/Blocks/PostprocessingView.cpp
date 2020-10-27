@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2017, SimQuest Solutions Inc.
+// Copyright 2013-2020, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 #include "SurgSim/Graphics/OsgRenderTarget.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
-#include "../Graphics/OsgProgram.h"
-#include "../Framework/Runtime.h"
+#include "SurgSim/Graphics/OsgProgram.h"
+#include "SurgSim/Framework/Runtime.h"
 
 namespace SurgSim
 {
@@ -113,6 +113,11 @@ std::shared_ptr<SurgSim::Graphics::Camera> PostprocessingView::getCamera()
 std::shared_ptr<SurgSim::Graphics::Camera> PostprocessingView::getPostProcessingCamera()
 {
 	return m_toScreenCamera;
+}
+
+std::shared_ptr<SurgSim::Graphics::OsgView> PostprocessingView::getView()
+{
+	return m_view;
 }
 
 bool PostprocessingView::doInitialize()
