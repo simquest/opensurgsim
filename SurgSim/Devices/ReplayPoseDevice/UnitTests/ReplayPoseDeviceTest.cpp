@@ -112,7 +112,7 @@ TEST(ReplayPoseDeviceTest, Initialize)
 {
 	std::string fileName("FakeRecord.txt");
 	clearFakeRecord(fileName);
-	auto runtime(new SurgSim::Framework::Runtime());
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 
 	{
 		SCOPED_TRACE("Missing filename");
