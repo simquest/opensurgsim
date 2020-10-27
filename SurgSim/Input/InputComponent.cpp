@@ -28,8 +28,8 @@ SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Input::InputComponent, 
 
 InputComponent::InputComponent(const std::string& name) :
 	Representation(name),
-	m_hasInput(false),
-	m_toElementTransform(SurgSim::Math::RigidTransform3d::Identity())
+	m_toElementTransform(SurgSim::Math::RigidTransform3d::Identity()),
+	m_hasInput(false)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(InputComponent, std::string, DeviceName,
 		getDeviceName, setDeviceName);

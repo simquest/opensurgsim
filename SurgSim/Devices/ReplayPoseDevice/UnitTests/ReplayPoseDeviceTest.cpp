@@ -25,6 +25,7 @@
 
 #include "SurgSim/Devices/ReplayPoseDevice/ReplayPoseDevice.h"
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Timer.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
@@ -111,6 +112,7 @@ TEST(ReplayPoseDeviceTest, Initialize)
 {
 	std::string fileName("FakeRecord.txt");
 	clearFakeRecord(fileName);
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 
 	{
 		SCOPED_TRACE("Missing filename");
