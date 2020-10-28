@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,31 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories (
+include_directories(
 	${gtest_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
+	KnotIdentificationRenderTests.cpp
 	PostprocessingViewRenderTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
 )
 
-#file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-# Configure the path for the data files
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
 set(LIBS
-	SurgSimFramework
-	SurgSimGraphics
-	SurgSimMath
-	SurgSimTesting
 	SurgSimBlocks
+	SurgSimFramework
+	SurgSimGraphic
+	SurgSimMath
+	SurgSimTestins
 )
 
 surgsim_add_unit_tests(SurgSimBlocksRenderTest)

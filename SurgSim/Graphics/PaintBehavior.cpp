@@ -33,7 +33,9 @@ PaintBehavior::PaintBehavior(const std::string& name) :
 	m_width(0),
 	m_height(0),
 	m_radius(0),
-	m_antialias(false)
+	m_antialias(false),
+	m_brushOffsetX(0),
+	m_brushOffsetY(0)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(PaintBehavior, std::shared_ptr<Framework::Component>, Representation,
 									  getRepresentation, setRepresentation);

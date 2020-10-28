@@ -143,6 +143,37 @@ protected:
 	MockTriangle tri;
 };
 
+TEST_F(GeometryTest, IntersectSegmentSegment2D)
+{
+	typedef Eigen::Matrix<SizeType, 2, 1> Vector2;
+	double s, t;
+
+	EXPECT_TRUE(doesIntersectSegmentSegment(
+		Vector2(0.0, 0.0), Vector2(3.0, 0.0),
+		Vector2(0.0, -1.0), Vector2(1.0, 1.0), &s, &t));
+	EXPECT_NEAR(1.0 / 6.0, s, epsilon);
+	EXPECT_NEAR(0.5, t, epsilon);
+
+	EXPECT_TRUE(doesIntersectSegmentSegment(
+		Vector2(0.0, 0.0), Vector2(2.0, 2.0),
+		Vector2(1.0, -1.0), Vector2(1.0, 3.0), &s, &t));
+	EXPECT_NEAR(0.5, s, epsilon);
+	EXPECT_NEAR(0.5, t, epsilon);
+
+	EXPECT_TRUE(doesIntersectSegmentSegment(
+		Vector2(0.0, 0.0), Vector2(5.0, 5.0),
+		Vector2(1.0, -1.0), Vector2(1.0, 1.0), &s, &t));
+	EXPECT_NEAR(0.2, s, epsilon);
+	EXPECT_NEAR(1.0, t, epsilon);
+
+	EXPECT_FALSE(doesIntersectSegmentSegment(
+		Vector2(0.0, 0.0), Vector2(5.0, 5.0),
+		Vector2(1.0, -1.0), Vector2(1.0, -1.0), &s, &t));
+
+	EXPECT_FALSE(doesIntersectSegmentSegment(
+		Vector2(0.0, 0.0), Vector2(1.0, 1.0),
+		Vector2(1.0, -1.0), Vector2(2.0, 0.0), &s, &t));
+}
 
 TEST_F(GeometryTest, BaryCentricOfSegment)
 {

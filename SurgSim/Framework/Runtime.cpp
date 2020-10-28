@@ -460,7 +460,7 @@ bool tryLoadNode(const std::string& fileName, YAML::Node* node)
 			*node = YAML::LoadFile(path);
 			result = true;
 		}
-		catch (YAML::ParserException e)
+		catch (const YAML::ParserException& e)
 		{
 			SURGSIM_LOG_SEVERE(Logger::getLogger("Runtime")) << "Could not parse YAML File at " << path
 					<< " due to " << e.msg << " at line " << e.mark.line << " column " << e.mark.column;
@@ -484,12 +484,12 @@ bool Runtime::tryConvertElements(const std::string& filename, const YAML::Node& 
 			*elements = node.as<std::vector<std::shared_ptr<SceneElement>>>();
 			result = true;
 		}
-		catch (YAML::Exception e)
+		catch (const YAML::Exception& e)
 		{
 			SURGSIM_LOG_SEVERE(Logger::getLogger("Runtime"))
 					<< "File " << filename << " YAML conversion failed with exception: " + e.msg;
 		}
-		catch (SurgSim::Framework::AssertionFailure e)
+		catch (const SurgSim::Framework::AssertionFailure& e)
 		{
 			SURGSIM_LOG_CRITICAL(Logger::getLogger("Runtime"))
 					<< "File " << filename << " conversion failed.";

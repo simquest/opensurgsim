@@ -63,7 +63,7 @@ bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 			{
 				rhs.setValue(node[SurgSim::DataStructures::Convert::valueName].as<T>());
 			}
-			catch (YAML::RepresentationException)
+			catch (YAML::RepresentationException&)
 			{
 				result = false;
 				auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
@@ -81,7 +81,7 @@ bool YAML::convert<SurgSim::DataStructures::OptionalValue<T>>::decode(
 		{
 			rhs.setValue(node.as<T>());
 		}
-		catch (YAML::RepresentationException)
+		catch (YAML::RepresentationException&)
 		{
 			result = false;
 			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
@@ -117,7 +117,7 @@ bool YAML::convert<std::unordered_map<Key, T>>::decode(const Node& node, std::un
 		{
 			rhs[it->first.as<Key>()] = it->second.as<T>();
 		}
-		catch (YAML::RepresentationException)
+		catch (YAML::RepresentationException&)
 		{
 			result = false;
 			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);
@@ -153,7 +153,7 @@ bool YAML::convert<std::unordered_set<Value>>::decode(const Node& node, std::uno
 		{
 			rhs.insert(it->as<Value>());
 		}
-		catch (YAML::RepresentationException)
+		catch (YAML::RepresentationException&)
 		{
 			result = false;
 			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::DataStructures::Convert::serializeLogger);

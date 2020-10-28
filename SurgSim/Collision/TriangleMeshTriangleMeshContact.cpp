@@ -154,7 +154,6 @@ std::list<std::shared_ptr<Contact>> TriangleMeshTriangleMeshContact::calculateDc
 	std::vector<size_t> triangleListA;
 	std::vector<size_t> triangleListB;
 
-	size_t myInt = 0;
 	for (auto intersection = intersectionList.begin(); intersection != intersectionList.end(); ++intersection)
 	{
 		DataStructures::AabbTreeNode* nodeA = intersection->first;

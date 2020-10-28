@@ -124,12 +124,6 @@ private:
 	/// Size of the quad
 	osg::Vec3 m_scale;
 
-	///@{
-	/// Cached view extensions
-	int m_displayWidth;
-	int m_displayHeight;
-	///@}
-
 	/// Sets texture coordinates for the quad.
 	/// \param	left, bottom, right, top	The extents for the texture coordinates for the corners of the quad.
 	void setTextureCoordinates(float left, float bottom, float right, float top);

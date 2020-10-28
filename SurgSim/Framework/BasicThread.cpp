@@ -187,7 +187,7 @@ void BasicThread::operator()()
 
 		doBeforeStop();
 	}
-	catch (std::exception e)
+	catch (const std::exception& e)
 	{
 		doBeforeStop();
 		if (!m_ignoreExceptions) throw(e);

@@ -733,7 +733,7 @@ public:
 			if ((m_cInverseTransform.linear() * planeN[i + 1])[0] > Geometry::DistanceEpsilon)
 			{ // The cylinder moves in the direction of the plane normal. First, the capsule is treated as a cylinder.
 				Vector3 center; // Intersection of the line along the axis with the plane.
-				T dist = distanceLinePlane(m_cvTop, m_cvBottom, planeN[i + 1], planeD[i + 1], &center);
+				distanceLinePlane(m_cvTop, m_cvBottom, planeN[i + 1], planeD[i + 1], &center);
 				Vector3 edgeVertices[2] = { v[i], v[(i + 1) % 3] };
 				Vector3 triangleEdge = (edgeVertices[1] - edgeVertices[0]).normalized();
 				Vector3 majorAxis =
