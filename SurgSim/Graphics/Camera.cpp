@@ -176,8 +176,8 @@ std::array<int, 4> Camera::getViewport() const
 
 bool Camera::doInitialize()
 {
-	SURGSIM_ASSERT(!m_renderGroupReferences.empty())
-			<< "Can't have a camera without a RenderGroupReference.";
+// 	SURGSIM_ASSERT(!m_renderGroupReferences.empty())
+// 			<< getFullName() << " can't have a camera without a RenderGroupReference.";
 	return true;
 }
 

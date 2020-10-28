@@ -207,6 +207,13 @@ bool OsgMaterial::doWakeUp()
 	return true;
 }
 
+void OsgMaterial::loadProgram(const std::string& nameTuple)
+{
+	auto program = std::make_shared<OsgProgram>();
+	program->load(nameTuple);
+	setProgram(program);
+}
+
 osg::ref_ptr<osg::StateSet> OsgMaterial::getOsgStateSet() const
 {
 	return m_stateSet;

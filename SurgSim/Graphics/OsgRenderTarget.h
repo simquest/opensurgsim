@@ -59,13 +59,14 @@ public:
 	/// Default constructor
 	OsgRenderTarget();
 
-	/// Constructor set all the paramters for the render target
+	/// Constructor set all the parameters for the render target
 	/// \param	width, height	The width and height of the target textures.
 	/// \param	scale	  	(Optional) the scale, scales width and height by this factor.
 	/// \param	colorCount	(Optional) number of color textures to use.
 	/// \param	useDepth  	(Optional) whether to use a depth texture.
+	/// \param  useFloat	(Optional) whether to use float color buffers
 	OsgRenderTarget(int width, int height, double scale = 1.0,
-					int colorCount = 0, bool useDepth = false);
+		int colorCount = 0, bool useDepth = false, bool useFloat = false);
 	/// Destructor
 	~OsgRenderTarget();
 
@@ -77,7 +78,7 @@ public:
 	int getColorTargetCount() const override;
 
 	/// Generic accessor for a specific color target texture.
-	/// \param	index	Zero-based index of the texure.
+	/// \param	index	Zero-based index of the texture.
 	/// \return	The actual Texture.
 	std::shared_ptr<Texture> getColorTarget(int index) const override;
 
@@ -120,8 +121,9 @@ private:
 
 	/// Sets color target count.
 	/// \param	count	The number of color textures to use.
+	/// \param  floatColor Use float type for color textures 
 	/// \return	.
-	int setColorTargetCount(int count);
+	int setColorTargetCount(int count, bool floatColor);
 
 	/// Use depth target.
 	/// \param	val	true to value.
@@ -129,7 +131,8 @@ private:
 
 	/// Sets up the texture with a given target type (depth or color w/ index).
 	/// \param	type	The index of the texture to use.
-	void setupTexture(int type);
+	/// \param  floatColor	Use bool for float color textures 
+	void setupTexture(int type, bool floatColor);
 };
 
 ///@{

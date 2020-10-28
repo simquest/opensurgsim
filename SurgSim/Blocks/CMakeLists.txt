@@ -32,6 +32,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpring2DRepresentation.cpp
 	MassSpring3DRepresentation.cpp
 	PoseInterpolator.cpp
+	PostprocessingView.cpp
 	ShadowMapping.cpp
 	SingleKeyBehavior.cpp
 	SphereElement.cpp
@@ -58,6 +59,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h
 	PoseInterpolator.h
+	PostprocessingView.cpp
 	ShadowMapping.h
 	SingleKeyBehavior.h
 	SphereElement.h

@@ -29,7 +29,7 @@ class Texture;
 /// valid targets are a given number of color buffers, and an optional depth buffer. The buffers need to be
 /// made available as textures so they can be reused in another rendering step. The type of texture is not
 /// determined at this point and will depend on the concrete RenderTarget that is instantiated.
-/// The RenderTarget is consider immutable after construction.
+/// The RenderTarget is considered immutable after construction.
 class RenderTarget
 {
 public:

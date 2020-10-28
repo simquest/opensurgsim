@@ -19,6 +19,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	KnotIdentificationRenderTests.cpp
+	PostprocessingViewRenderTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -32,7 +33,9 @@ configure_file(
 set(LIBS
 	SurgSimBlocks
 	SurgSimFramework
-	SurgSimGraphics
+	SurgSimGraphic
+	SurgSimMath
+	SurgSimTestins
 )
 
 surgsim_add_unit_tests(SurgSimBlocksRenderTest)

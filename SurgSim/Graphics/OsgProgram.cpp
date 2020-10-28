@@ -16,16 +16,23 @@
 #include "SurgSim/Graphics/OsgProgram.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/DataStructures/DataStructuresConvert.h"
+
+#include <boost/algorithm/string.hpp>
 
 namespace
 {
 static const osg::Shader::Type OsgShaderTypes[3] = {osg::Shader::VERTEX, osg::Shader::FRAGMENT, osg::Shader::GEOMETRY};
 }
 
+
+
 namespace SurgSim
 {
 namespace Graphics
 {
+SURGSIM_REGISTER(SurgSim::Framework::Asset, SurgSim::Graphics::OsgProgram, OsgProgram);
+
 
 OsgProgram::OsgProgram() : Program(),
 	m_program(new osg::Program()),
@@ -214,13 +221,46 @@ osg::ref_ptr<osg::Shader> OsgProgram::getOrCreateOsgShader(int shaderType)
 	return result;
 }
 
+bool OsgProgram::doLoad(const std::string& filePath)
+{
+	YAML::Node node;
+	try
+	{
+		node = YAML::LoadFile(filePath);
+	}
+	catch (YAML::ParserException e)
+	{
+		SURGSIM_LOG_SEVERE(Framework::Logger::getLogger("Graphics/OsgProgram"))
+				<< "Could not parse YAML File at " << filePath
+				<< " due to " << e.msg << " at line " << e.mark.line << " column " << e.mark.column;
+		return false;
+	}
+
+	auto map = node.as<std::unordered_map<std::string, std::string>>();
+
+	if (!map["VertexShaderSource"].empty())
+	{
+		setVertexShaderSource(map["VertexShaderSource"]);
+	}
+	if (!map["FragmentShaderSource"].empty())
+	{
+		setFragmentShaderSource(map["FragmentShaderSource"]);
+	}
+	if (!map["GeometryShaderSource"].empty())
+	{
+		setGeometryShaderSource(map["GeometryShaderSource"]);
+	}
+
+	return true;
+}
+
 std::shared_ptr<OsgProgram> loadProgram(const SurgSim::Framework::ApplicationData& data, const std::string& name)
 {
 	return loadProgram(data, name + ".vert", name + ".frag");
 }
 
 std::shared_ptr<OsgProgram> loadProgram(const SurgSim::Framework::ApplicationData& data,
-		const std::string& vertexShaderName, const std::string& fragmentShaderName)
+										const std::string& vertexShaderName, const std::string& fragmentShaderName)
 {
 	std::string filename;
 
