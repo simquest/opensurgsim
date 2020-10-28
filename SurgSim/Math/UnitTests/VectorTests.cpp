@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2015, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
 /// Tests that exercise the functionality of our vector typedefs, which come
 /// straight from Eigen.
 
+#include <gtest/gtest.h>
+#include <math.h>
 #include <vector>
 
-#include <math.h>
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/MathConvert.h"
-#include "gtest/gtest.h"
+#include "SurgSim/Math/Vector.h"
 
 // Define test fixture class templates.
 // We don't really need fixtures as such, but the templatization encodes type.
@@ -284,7 +284,7 @@ TYPED_TEST(Vector2Tests, ShiftCommaInitialization)
 	Vector2 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
 	vector << static_cast<T>(1.1), static_cast<T>(1.2);
-	EXPECT_NEAR(2.3, vector.sum(), 1e-6) << "initialization was incorrect: " << vector;
+	EXPECT_NEAR(2.3, vector.sum(), 5e-6) << "initialization was incorrect: " << vector;
 }
 
 /// Test setting the vector using the << syntax.
@@ -296,7 +296,7 @@ TYPED_TEST(Vector3Tests, ShiftCommaInitialization)
 	Vector3 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
 	vector << static_cast<T>(1.1), static_cast<T>(1.2), static_cast<T>(1.3);
-	EXPECT_NEAR(3.6, vector.sum(), 1e-6) << "initialization was incorrect: " << vector;
+	EXPECT_NEAR(3.6, vector.sum(), 5e-6) << "initialization was incorrect: " << vector;
 }
 
 /// Test setting the vector using the << syntax.
@@ -308,7 +308,7 @@ TYPED_TEST(Vector4Tests, ShiftCommaInitialization)
 	Vector4 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
 	vector << static_cast<T>(1.1), static_cast<T>(1.2), static_cast<T>(1.3), static_cast<T>(1.4);
-	EXPECT_NEAR(5.0, vector.sum(), 1e-6) << "initialization was incorrect: " << vector;
+	EXPECT_NEAR(5.0, vector.sum(), 5e-6) << "initialization was incorrect: " << vector;
 }
 
 /// Test setting the vector using the << syntax.
@@ -321,7 +321,7 @@ TYPED_TEST(Vector6Tests, ShiftCommaInitialization)
 	// Initialize elements in order.  Do NOT put parentheses around the list!
 	vector << static_cast<T>(1.1), static_cast<T>(1.2), static_cast<T>(1.3), static_cast<T>(1.4),
 		   static_cast<T>(1.5), static_cast<T>(1.6);
-	EXPECT_NEAR(8.1, vector.sum(), 1e-6) << "initialization was incorrect: " << vector;
+	EXPECT_NEAR(8.1, vector.sum(), 5e-6) << "initialization was incorrect: " << vector;
 }
 
 /// Test getting a zero value usable in expressions.
@@ -416,7 +416,7 @@ TYPED_TEST(AllVectorTests, YamlConvert)
 	ASSERT_NO_THROW(node = original);
 
 	EXPECT_TRUE(node.IsSequence());
-	EXPECT_EQ(original.size(), node.size());
+	EXPECT_EQ(original.size(), static_cast<typename Vector::Index>(node.size()));
 
 	ASSERT_NO_THROW({Vector expected = node.as<Vector>();});
 	EXPECT_TRUE(original.isApprox(node.as<Vector>()));
@@ -466,7 +466,7 @@ TYPED_TEST(AllVectorTests, Negate)
 
 	Vector v(inputArray);
 	Vector n = -v;
-	EXPECT_NEAR(static_cast<T>(-expectedSum), n.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(-expectedSum), n.sum(), 5e-6);
 }
 
 /// Addition.
@@ -485,7 +485,7 @@ TYPED_TEST(AllVectorTests, Add)
 	Vector v(inputArray);
 	Vector w = v + Vector::Ones() + v;
 
-	EXPECT_NEAR(static_cast<T>(2 * expectedSum) + SIZE, w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(2 * expectedSum) + SIZE, w.sum(), 5e-6);
 }
 
 /// Subtraction.
@@ -504,7 +504,7 @@ TYPED_TEST(AllVectorTests, Subtract)
 	Vector v(inputArray);
 	Vector w = v - Vector::Ones();
 
-	EXPECT_NEAR(static_cast<T>(expectedSum) - SIZE, w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSum) - SIZE, w.sum(), 5e-6);
 }
 
 /// Incrementing by a value.
@@ -522,7 +522,7 @@ TYPED_TEST(AllVectorTests, AddTo)
 
 	Vector v(inputArray);
 	v += Vector::Ones();
-	EXPECT_NEAR(static_cast<T>(expectedSum) + SIZE, v.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSum) + SIZE, v.sum(), 5e-6);
 }
 
 /// Decrementing by a value.
@@ -540,7 +540,7 @@ TYPED_TEST(AllVectorTests, SubtractFrom)
 
 	Vector v(inputArray);
 	v -= Vector::Ones();
-	EXPECT_NEAR(static_cast<T>(expectedSum) - SIZE, v.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSum) - SIZE, v.sum(), 5e-6);
 }
 
 /// Vector-scalar multiplication.
@@ -559,7 +559,7 @@ TYPED_TEST(AllVectorTests, MultiplyVectorScalar)
 	Vector v(inputArray);
 	Vector w = v * static_cast<T>(1.23);
 
-	EXPECT_NEAR(static_cast<T>(1.23 * expectedSum), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(1.23 * expectedSum), w.sum(), 5e-6);
 }
 
 /// Scalar-vector multiplication.
@@ -578,7 +578,7 @@ TYPED_TEST(AllVectorTests, MultiplyScalarVector)
 	Vector v(inputArray);
 	Vector w = static_cast<T>(1.23) * v;
 
-	EXPECT_NEAR(static_cast<T>(1.23 * expectedSum), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(1.23 * expectedSum), w.sum(), 5e-6);
 }
 
 /// Division by scalar.
@@ -597,7 +597,7 @@ TYPED_TEST(AllVectorTests, DivideScalar)
 	Vector v(inputArray);
 	Vector w = v / static_cast<T>(1.23);
 
-	EXPECT_NEAR(static_cast<T>(expectedSum / 1.23), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSum / 1.23), w.sum(), 5e-6);
 }
 
 /// Component-wise multiplication.
@@ -616,10 +616,10 @@ TYPED_TEST(AllVectorTests, ComponentwiseMultiply)
 	Vector v(inputArray);
 	// use the component-wise Eigen matrix operation:
 	Vector w = v.cwiseProduct(v);
-	EXPECT_NEAR(static_cast<T>(expectedSumSquares), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSumSquares), w.sum(), 5e-6);
 	// OR, the same thing done via conversion to arrays:
 	w = v.array() * v.array();
-	EXPECT_NEAR(static_cast<T>(expectedSumSquares), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSumSquares), w.sum(), 5e-6);
 }
 
 /// Component-wise division.
@@ -637,10 +637,10 @@ TYPED_TEST(AllVectorTests, ComponentwiseDivide)
 	Vector u = static_cast<T>(2) * v;
 	// use the component-wise Eigen matrix operation:
 	Vector w = u.cwiseQuotient(v);
-	EXPECT_NEAR(static_cast<T>(2 * SIZE), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(2 * SIZE), w.sum(), 5e-6);
 	// OR, the same thing done via conversion to arrays:
 	w = u.array() / v.array();
-	EXPECT_NEAR(static_cast<T>(2 * SIZE), w.sum(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(2 * SIZE), w.sum(), 5e-6);
 }
 
 /// Dot product.
@@ -657,7 +657,7 @@ TYPED_TEST(AllVectorTests, DotProduct)
 	double expectedSumSquares = SIZE * (SIZE * (SIZE * 0.03 + 0.885) + 8.695);
 
 	Vector v(inputArray);
-	EXPECT_NEAR(static_cast<T>(expectedSumSquares), v.dot(v), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSumSquares), v.dot(v), 5e-6);
 }
 
 /// Cross product.
@@ -714,8 +714,8 @@ TYPED_TEST(AllVectorTests, NormAndSquared)
 	double expectedSumSquares = SIZE * (SIZE * (SIZE * 0.03 + 0.885) + 8.695);
 
 	Vector v(inputArray);
-	EXPECT_NEAR(static_cast<T>(expectedSumSquares), v.squaredNorm(), 1e-6);
-	EXPECT_NEAR(sqrt(static_cast<T>(expectedSumSquares)), v.norm(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSumSquares), v.squaredNorm(), 5e-6);
+	EXPECT_NEAR(sqrt(static_cast<T>(expectedSumSquares)), v.norm(), 5e-6);
 }
 
 /// L1 (Manhattan) norm and L_Infinity (largest absolute value) norm.
@@ -736,8 +736,8 @@ TYPED_TEST(AllVectorTests, L1NormAndLInfNorm)
 	// Ugh, "template" is required to get this to parse properly.  This is
 	// triggered because the test is a part of a template class; you don't
 	// need to do this in a non-template context.
-	EXPECT_NEAR(static_cast<T>(expectedSum), v.template lpNorm<1>(), 1e-6);
-	EXPECT_NEAR(static_cast<T>(expectedSum), w.template lpNorm<1>(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSum), v.template lpNorm<1>(), 5e-6);
+	EXPECT_NEAR(static_cast<T>(expectedSum), w.template lpNorm<1>(), 5e-6);
 	EXPECT_NEAR(inputArray[SIZE - 1], v.template lpNorm<Eigen::Infinity>(), 1e-6);
 	EXPECT_NEAR(inputArray[SIZE - 1], w.template lpNorm<Eigen::Infinity>(), 1e-6);
 }
@@ -756,16 +756,16 @@ TYPED_TEST(AllVectorTests, Normalize)
 	double expectedSumSquares = SIZE * (SIZE * (SIZE * 0.03 + 0.885) + 8.695);
 
 	Vector v(inputArray);
-	EXPECT_NEAR(sqrt(expectedSumSquares), v.norm(), 1e-6);
+	EXPECT_NEAR(sqrt(expectedSumSquares), v.norm(), 5e-6);
 
 	// normalized() RETURNS the normalized vector, leaving original unchanged.
 	Vector u = v.normalized();
-	EXPECT_NEAR(static_cast<T>(1), u.norm(), 1e-6);
-	EXPECT_NEAR(sqrt(static_cast<T>(expectedSumSquares)), v.norm(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(1), u.norm(), 5e-6);
+	EXPECT_NEAR(sqrt(static_cast<T>(expectedSumSquares)), v.norm(), 5e-6);
 	// normalize() NORMALIZES the vector, modifying it.
 	v.normalize();
-	EXPECT_NEAR(static_cast<T>(1), v.norm(), 1e-6);
-	EXPECT_NEAR(static_cast<T>(0), (u - v).norm(), 1e-6);
+	EXPECT_NEAR(static_cast<T>(1), v.norm(), 5e-6);
+	EXPECT_NEAR(static_cast<T>(0), (u - v).norm(), 5e-6);
 }
 
 /// Minimum and maximum elements.
@@ -802,7 +802,7 @@ TYPED_TEST(Vector2Tests, Extend2to3)
 	// class; you don't need to do this in a non-template context.
 	vector3.template head<2>() = vector2;
 	vector3[2] = static_cast<T>(0);
-	EXPECT_NEAR(2.3, vector3.sum(), 1e-6) << "extending was incorrect: " << vector3;
+	EXPECT_NEAR(2.3, vector3.sum(), 5e-6) << "extending was incorrect: " << vector3;
 }
 
 /// Extending vectors using the head(r) syntax.
@@ -818,7 +818,7 @@ TYPED_TEST(Vector2Tests, DynamicExtend2to3)
 	Vector3 vector3;
 	vector3.head(2) = vector2;
 	vector3[2] = static_cast<T>(0);
-	EXPECT_NEAR(2.3, vector3.sum(), 1e-6) << "extending was incorrect: " << vector3;
+	EXPECT_NEAR(2.3, vector3.sum(), 5e-6) << "extending was incorrect: " << vector3;
 }
 
 /// Extending vectors using the block<r,c>() syntax.
@@ -837,7 +837,7 @@ TYPED_TEST(Vector2Tests, BlockExtend2to3)
 	// class; you don't need to do this in a non-template context.
 	vector3.template block<2, 1>(0, 0) = vector2;
 	vector3(2, 0) = static_cast<T>(0);
-	EXPECT_NEAR(2.3, vector3.sum(), 1e-6) << "extending was incorrect: " << vector3;
+	EXPECT_NEAR(2.3, vector3.sum(), 5e-6) << "extending was incorrect: " << vector3;
 }
 
 /// Extending vectors using the block(i,j,r,c) syntax.
@@ -853,7 +853,7 @@ TYPED_TEST(Vector2Tests, DynamicBlockExtend2to3)
 	Vector3 vector3;
 	vector3.block(0, 0, 2, 1) = vector2;
 	vector3(2, 0) = static_cast<T>(0);
-	EXPECT_NEAR(2.3, vector3.sum(), 1e-6) << "extending was incorrect: " << vector3;
+	EXPECT_NEAR(2.3, vector3.sum(), 5e-6) << "extending was incorrect: " << vector3;
 }
 
 /// Shrinking vectors using the head<r>() syntax.
@@ -871,7 +871,7 @@ TYPED_TEST(Vector2Tests, Shrink3to2)
 	// properly.  This is triggered because the test is a part of a template
 	// class; you don't need to do this in a non-template context.
 	vector2 = vector3.template head<2>();
-	EXPECT_NEAR(2.3, vector2.sum(), 1e-6) << "shrinking was incorrect: " << vector2;
+	EXPECT_NEAR(2.3, vector2.sum(), 5e-6) << "shrinking was incorrect: " << vector2;
 }
 
 /// Extending vectors using the head<r>() syntax.
@@ -890,7 +890,7 @@ TYPED_TEST(Vector3Tests, Extend2to3)
 	// class; you don't need to do this in a non-template context.
 	vector3.template head<2>() = vector2;
 	vector3[2] = static_cast<T>(0);
-	EXPECT_NEAR(2.3, vector3.sum(), 1e-6) << "extending was incorrect: " << vector3;
+	EXPECT_NEAR(2.3, vector3.sum(), 5e-6) << "extending was incorrect: " << vector3;
 }
 
 /// Shrinking vectors using the head<r>() syntax.
@@ -908,7 +908,7 @@ TYPED_TEST(Vector3Tests, Shrink3to2)
 	// properly.  This is triggered because the test is a part of a template
 	// class; you don't need to do this in a non-template context.
 	vector2 = vector3.template head<2>();
-	EXPECT_NEAR(2.3, vector2.sum(), 1e-6) << "shrinking was incorrect" << vector2;
+	EXPECT_NEAR(2.3, vector2.sum(), 5e-6) << "shrinking was incorrect" << vector2;
 }
 
 /// Extending vectors using the head<r>() syntax.
@@ -927,7 +927,7 @@ TYPED_TEST(Vector3Tests, Extend3to4)
 	// class; you don't need to do this in a non-template context.
 	vector4.template head<3>() = vector3;
 	vector4[3] = static_cast<T>(0);
-	EXPECT_NEAR(3.6, vector4.sum(), 1e-6) << "extending was incorrect" << vector4;
+	EXPECT_NEAR(3.6, vector4.sum(), 5e-6) << "extending was incorrect" << vector4;
 }
 
 /// Shrinking vectors using the head<r>() syntax.
@@ -945,7 +945,7 @@ TYPED_TEST(Vector3Tests, Shrink4to3)
 	// properly.  This is triggered because the test is a part of a template
 	// class; you don't need to do this in a non-template context.
 	vector3 = vector4.template head<3>();
-	EXPECT_NEAR(3.6, vector3.sum(), 1e-6) << "shrinking was incorrect" << vector3;
+	EXPECT_NEAR(3.6, vector3.sum(), 5e-6) << "shrinking was incorrect" << vector3;
 }
 
 /// Extending vectors using the head<r>() syntax.
@@ -964,7 +964,7 @@ TYPED_TEST(Vector4Tests, Extend3to4)
 	// class; you don't need to do this in a non-template context.
 	vector4.template head<3>() = vector3;
 	vector4[3] = static_cast<T>(0);
-	EXPECT_NEAR(3.6, vector4.sum(), 1e-6) << "extending was incorrect" << vector4;
+	EXPECT_NEAR(3.6, vector4.sum(), 5e-6) << "extending was incorrect" << vector4;
 }
 
 /// Shrinking vectors using the head<r>() syntax.
@@ -982,7 +982,7 @@ TYPED_TEST(Vector4Tests, Shrink4to3)
 	// properly.  This is triggered because the test is a part of a template
 	// class; you don't need to do this in a non-template context.
 	vector3 = vector4.template head<3>();
-	EXPECT_NEAR(3.6, vector3.sum(), 1e-6) << "shrinking was incorrect" << vector3;
+	EXPECT_NEAR(3.6, vector3.sum(), 5e-6) << "shrinking was incorrect" << vector3;
 }
 
 /// Extend Euclidean N-vector [a_i] to homogeneous (N+1)-vector [a_i 1].
@@ -1232,7 +1232,7 @@ TYPED_TEST(AllDynamicVectorTests, addSubVectorBlocks)
 	nodeIds.push_back(3);
 	nodeIds.push_back(5);
 
-	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3, 15), nodeIds, 3, &v););
+	ASSERT_NO_THROW((SurgSim::Math::addSubVector<Vector, Vector>(v2.segment(3, 15), nodeIds, 3, &v)););
 	EXPECT_TRUE(v2.isApprox(v2Init));
 	EXPECT_FALSE(v.isApprox(vInit));
 	for (int dofId = 0; dofId < 3; dofId++)

@@ -18,8 +18,6 @@
 #include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Physics/Fem1DLocalization.h"
-#include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/SlidingConstraint.h"
 #include "SurgSim/Physics/SlidingConstraintData.h"
 
@@ -41,9 +39,9 @@ SlidingConstraint::SlidingConstraint(ConstraintType constraintType,
 	m_slidingConstraintData = std::dynamic_pointer_cast<SlidingConstraintData>(data);
 	SURGSIM_ASSERT(m_slidingConstraintData != nullptr) <<
 		"The data sent in for the sliding constraint is not of type SlidingConstraintData.";
+	m_slidingConstraintData->setPreviousFirstLocalization(m_localizations.first->copy());
 
-	Math::Vector3d directionEnd = m_localizations.second->calculatePosition() + slidingDirection;
-	m_directionEnd = m_localizations.second->getElementPose().inverse() * directionEnd;
+	m_localDirection = m_localizations.second->getElementPose().linear().inverse() * slidingDirection;
 }
 
 SlidingConstraint::~SlidingConstraint()
@@ -57,14 +55,15 @@ void SlidingConstraint::doBuild(double dt,
 	size_t indexOfRepresentation1,
 	size_t indexOfConstraint)
 {
-	// Update the SlidingConstraintData
-	Math::Vector3d pointOfConstraint = m_localizations.second->calculatePosition();
-	Math::Vector3d slidingDirection = m_localizations.second->getElementPose() * m_directionEnd - pointOfConstraint;
-	m_slidingConstraintData->setSlidingDirection(pointOfConstraint, slidingDirection);
-
 	// Update the representation0's localization (representation1's remains the same).
+	m_slidingConstraintData->setPreviousFirstLocalization(m_localizations.first->copy());
+	Math::Vector3d pointOfConstraint = m_localizations.second->calculatePosition();
 	bool hasReachedEnd = false;
 	m_localizations.first->moveClosestTo(pointOfConstraint, &hasReachedEnd);
+
+	// Update the SlidingConstraintData
+	Math::Vector3d slidingDirection = m_localizations.second->getElementPose().linear() * m_localDirection;
+	m_slidingConstraintData->setSlidingDirection(pointOfConstraint, slidingDirection);
 
 	if (hasReachedEnd)
 	{

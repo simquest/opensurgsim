@@ -19,6 +19,42 @@
 
 #include "SurgSim/Math/Shape.h"
 
+namespace SurgSim {
+namespace Math {
+
+void toBytes(SurgSim::Math::Vector3d in, std::vector<uint8_t>* result)
+{
+	auto ptr = reinterpret_cast<uint8_t*>(in.data());
+	auto bytes = in.size() * sizeof(double);
+	for (size_t i = 0; i < bytes; ++i)	result->push_back(ptr[i]);
+}
+
+void toBytes(double d, std::vector<uint8_t>* result)
+{
+	auto ptr = reinterpret_cast<uint8_t*>(&d);
+	auto bytes = sizeof(double);
+	for (size_t i = 0; i < bytes; ++i) result->push_back(ptr[i]);
+}
+
+size_t fromBytes(const std::vector<uint8_t>& bytes, SurgSim::Math::Vector3d* out, size_t start /*= 0*/)
+{
+	auto ptr = reinterpret_cast<uint8_t*>(out->data());
+	auto count = sizeof(double) * out->size();
+	memcpy(ptr, bytes.data() + start, count);
+	return count;
+}
+
+size_t fromBytes(const std::vector<uint8_t>& bytes, double* out, size_t start /*= 0*/)
+{
+	auto ptr = reinterpret_cast<uint8_t*>(out);
+	memcpy(ptr, bytes.data() + start, sizeof(double));
+	return sizeof(double);
+}
+
+
+}
+}
+
 namespace YAML
 {
 
@@ -158,5 +194,42 @@ bool convert<SurgSim::Math::LinearSolver>::decode(
 
 	return result;
 }
+
+Node convert<boost::any>::encode(const boost::any rhs)
+{
+	Node result;
+	bool success = false;
+	try
+	{
+		// Rely on bool shortcut evaluation, the attempts will stop as soon as tryConvert returns true
+		success = tryConvert<float>(rhs, &result) ||
+				  tryConvert<double>(rhs, &result) ||
+				  tryConvert<int>(rhs, &result) ||
+				  tryConvert<size_t>(rhs, &result) ||
+				  tryConvert<unsigned int>(rhs, &result) ||
+				  tryConvert<bool>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector2f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector2d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector3f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector3d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector4f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Vector4d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix22f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix22d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix33f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix33d>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix44f>(rhs, &result) ||
+				  tryConvert<SurgSim::Math::Matrix44d>(rhs, &result);
+
+	}
+	catch (std::exception&)
+	{
+		success = false;
+	}
+
+	SURGSIM_ASSERT(success) << "boost::any used with type that isn't known.";
+	return result;
+}
+
 
 }; // namespace YAML

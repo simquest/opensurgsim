@@ -125,7 +125,7 @@ public:
 
 protected:
 	/// Time step
-	double dt;
+	double dt = std::numeric_limits<double>::signaling_NaN();
 
 	/// Fixed representation to define constraint in fixed space
 	std::shared_ptr<Representation> m_fixedWorldRepresentation;

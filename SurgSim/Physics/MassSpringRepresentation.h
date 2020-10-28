@@ -18,21 +18,28 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/Mass.h"
-#include "SurgSim/Physics/Spring.h"
-
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/DeformableRepresentation.h"
 
 namespace SurgSim
 {
+namespace Framework
+{
+class Asset;
+}
 
 namespace Physics
 {
+class Mass;
+class MassSpringModel;
+class Spring;
+
+SURGSIM_STATIC_REGISTRATION(MassSpringRepresentation);
 
 /// MassSpring model is a deformable model (a set of masses connected by springs).
-/// \note A MassSpring is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
+/// \note A MassSpringRepresentation is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v) with the particularity that M is diagonal
 /// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
 class MassSpringRepresentation : public DeformableRepresentation
@@ -44,6 +51,8 @@ public:
 
 	/// Destructor
 	virtual ~MassSpringRepresentation();
+
+	SURGSIM_CLASSNAME(SurgSim::Physics::MassSpringRepresentation);
 
 	/// Adds a mass
 	/// \param mass The mass to add to the representation
@@ -62,6 +71,9 @@ public:
 	/// Gets the number of springs
 	/// \return the number of springs
 	size_t getNumSprings() const;
+
+	/// \return The number of elements.
+	size_t getNumElements() const;
 
 	/// Retrieves the mass of a given node
 	/// \param nodeId The node id for which the mass is requested
@@ -107,6 +119,46 @@ public:
 	void beforeUpdate(double dt) override;
 
 	std::shared_ptr<Localization> createLocalization(const SurgSim::DataStructures::Location& location) override;
+
+	/// Loads a MassSpringRepresentation from a ply file.
+	/// \param filename The name of the file.
+	void loadMassSpringModel(const std::string & filename);
+
+	/// Sets the mesh asset
+	/// \param mesh The mesh to assign to this representation
+	/// \exception SurgSim::Framework::AssertionFailure if mesh is nullptr or it's actual type is not MassSpring
+	void setMassSpringModel(std::shared_ptr<Framework::Asset> mesh);
+
+	/// \return The mesh asset as a MassSpringModel.
+	std::shared_ptr<MassSpringModel> getMassSpringModel() const;
+
+	/// Determines whether a given natural coordinate is valid.
+	/// \param naturalCoordinate Coordinate to check
+	/// \return True if valid, which requires element IDs to have been added.
+	bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const;
+
+	/// Determines whether a local coordinate is valid.
+	/// \param localCoordinate Coordinate to check.
+	/// \return True if valid, which requires element IDs to have been added.
+	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& localCoordinate) const;
+
+	/// Computes a given natural coordinate in cartesian coordinates.
+	/// \param state The state at which to transform coordinates.
+	/// \param localCoordinate The local coordinate to transform.
+	/// \return The resultant cartesian coordinates.
+	Math::Vector3d computeCartesianCoordinate(const Math::OdeState& state,
+		const DataStructures::IndexedLocalCoordinate& localCoordinate) const;
+
+	/// Get an element's node ids.
+	/// \param index The index of the element.
+	/// \return The vector of node ids.
+	const std::vector<size_t>& getNodeIds(size_t index) const;
+
+	/// Save the current MassSpring mesh to a ply file.  See MassSpringPlyReaderDelegate for the file structure.
+	/// \param fileName Name of the file for writing.
+	/// \param physicsLength The radius or thickness (for 2 or 3-node elements), if not already in the MassSpringModel.
+	/// \return true if the file was written successfully.
+	bool saveMassSpringModel(const std::string& fileName, double physicsLength = 0.0) const;
 
 protected:
 	/// Add the Rayleigh damping forces
@@ -169,6 +221,9 @@ private:
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
+
+	/// The Representation's asset as a MassSpringModel.
+	std::shared_ptr<MassSpringModel> m_mesh;
 };
 
 } // namespace Physics

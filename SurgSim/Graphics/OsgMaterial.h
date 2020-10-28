@@ -80,6 +80,8 @@ public:
 
 	bool hasUniform(const std::string& name) const override;
 
+	void loadProgram(const std::string& nameTuple) override;
+
 	/// Sets the shader used by this material
 	/// \param	program	Shader program
 	/// \return	True if program was set successfully, otherwise false
@@ -96,6 +98,7 @@ public:
 	bool doInitialize() override;
 
 	bool doWakeUp() override;
+
 
 private:
 	/// OSG state set which provides material properties in the scenegraph

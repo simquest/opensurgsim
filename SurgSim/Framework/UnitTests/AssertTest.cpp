@@ -65,7 +65,7 @@ public:
 
 	std::shared_ptr<MockOutput> logOutput;
 	std::shared_ptr<SurgSim::Framework::Logger> testLogger;
-	SurgSim::Framework::AssertMessage::DeathCallback savedCallback;
+	SurgSim::Framework::AssertMessage::DeathCallback savedCallback = nullptr;
 };
 
 typedef AssertTest AssertDeathTest;

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -574,7 +574,7 @@ TEST_F(Fem3DElementCubeTests, VolumeTest)
 
 		std::array<size_t, 8> nodeIds = {{0, 1, 3, 2, 4, 6, 7, 5}};
 		auto cube = getCubeElement(nodeIds);
-		ASSERT_THROW(cube->getVolume(m_restState), SurgSim::Framework::AssertionFailure);
+		ASSERT_THROW(cube->initialize(m_restState), SurgSim::Framework::AssertionFailure);
 	}
 
 	{
@@ -583,7 +583,7 @@ TEST_F(Fem3DElementCubeTests, VolumeTest)
 		// Copy the 1st 4 points over the 4 following points, so the cube degenerate to a square
 		m_restState.getPositions().segment<3 * 4>(12) = m_restState.getPositions().segment<3 * 4>(0);
 		auto cube = getCubeElement(m_nodeIds);
-		ASSERT_THROW(cube->getVolume(m_restState), SurgSim::Framework::AssertionFailure);
+		ASSERT_THROW(cube->initialize(m_restState), SurgSim::Framework::AssertionFailure);
 	}
 }
 
@@ -876,16 +876,13 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	Matrix zeroMatrix = Matrix::Zero(cube->getNumDofPerNode() * cube->getNumNodes(),
 									 cube->getNumDofPerNode() * cube->getNumNodes());
 	massMatrix.setZero();
-	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(),
-							   static_cast<SparseMatrix::Index>(cube->getNumDofPerNode()), &massMatrix, true);
+	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &massMatrix);
 	massMatrix.makeCompressed();
 	dampingMatrix.setZero();
-	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(),
-							   static_cast<SparseMatrix::Index>(cube->getNumDofPerNode()), &dampingMatrix, true);
+	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &dampingMatrix);
 	dampingMatrix.makeCompressed();
 	stiffnessMatrix.setZero();
-	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(),
-							   static_cast<SparseMatrix::Index>(cube->getNumDofPerNode()), &stiffnessMatrix, true);
+	cube->assembleMatrixBlocks(zeroMatrix, cube->getNodeIds(), cube->getNumDofPerNode(), &stiffnessMatrix);
 	stiffnessMatrix.makeCompressed();
 
 	// Update the internal f, M, D, K variables.
@@ -919,30 +916,33 @@ TEST_F(Fem3DElementCubeTests, ForceAndMatricesTest)
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix));
 
+	SurgSim::Math::Vector extractedX;
+	SurgSim::Math::Vector accumulator;
+
 	// Test addMatVec API with Mass component only
 	forceVector.setZero();
-	cube->addMatVec(1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(1.0, 0.0, 0.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
-	cube->addMatVec(0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(0.0, 1.0, 0.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedDampingMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with Stiffness component only
 	forceVector.setZero();
-	cube->addMatVec(0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(0.0, 0.0, 1.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		EXPECT_NEAR(m_expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
 	}
 	// Test addMatVec API with mix Mass/Damping/Stiffness components
 	forceVector.setZero();
-	cube->addMatVec(1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
+	cube->addMatVec(1.0, 2.0, 3.0, m_vectorOnes, &forceVector, &extractedX, &accumulator);
 	for (int rowId = 0; rowId < 3 * 8; rowId++)
 	{
 		double expectedCoef = 1.0 * m_expectedMassMatrix.row(rowId).sum() +

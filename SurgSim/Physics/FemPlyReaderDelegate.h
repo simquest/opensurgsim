@@ -98,14 +98,14 @@ protected:
 	/// Vertex data containing 6 dofs (3 translational and 3 rotational)
 	struct Vertex6DData
 	{
-		double x;
-		double y;
-		double z;
-		int64_t overrun1; ///< Used to check for buffer overruns
-		double thetaX;
-		double thetaY;
-		double thetaZ;
-		int64_t overrun2; ///< Used to check for buffer overruns
+		double x = std::numeric_limits<double>::signaling_NaN();
+		double y = std::numeric_limits<double>::signaling_NaN();
+		double z = std::numeric_limits<double>::signaling_NaN();
+		int64_t overrun1 = -1; ///< Used to check for buffer overruns
+		double thetaX = std::numeric_limits<double>::signaling_NaN();
+		double thetaY = std::numeric_limits<double>::signaling_NaN();
+		double thetaZ = std::numeric_limits<double>::signaling_NaN();
+		int64_t overrun2 = -1; ///< Used to check for buffer overruns
 	} m_vertexData;
 
 	/// Flag indicating if the associated file has boundary conditions
@@ -117,26 +117,27 @@ protected:
 	/// Internal data to receive the "material" data
 	struct MaterialData
 	{
-		double massDensity;
-		double poissonRatio;
-		double youngModulus;
-		int64_t overrun; ///< Used to check for buffer overruns
+		double massDensity = std::numeric_limits<double>::signaling_NaN();
+		double poissonRatio = std::numeric_limits<double>::signaling_NaN();
+		double youngModulus = std::numeric_limits<double>::signaling_NaN();
+		int64_t overrun = -1; ///< Used to check for buffer overruns
 	} m_materialData;
 
+	bool m_hasMaterial;
 	bool m_hasPerElementMaterial;
 
 	/// Internal data to receive the fem element
 	struct ElementData
 	{
-		unsigned int type;   // “LinearBeam”, “CorotationalTetrahedron”…
-		int64_t overrun1; ///< Used to check for buffer overruns
+		unsigned int type = 0;   // “LinearBeam”, “CorotationalTetrahedron”…
+		int64_t overrun1 = -1; ///< Used to check for buffer overruns
 
-		unsigned int* indices;
-		unsigned int vertexCount;
-		int64_t overrun2; ///< Used to check for buffer overruns
-		double massDensity;
-		double poissonRatio;
-		double youngModulus;
+		unsigned int* indices = nullptr;
+		unsigned int vertexCount = 0;
+		int64_t overrun2 = -1; ///< Used to check for buffer overruns
+		double massDensity = std::numeric_limits<double>::signaling_NaN();
+		double poissonRatio = std::numeric_limits<double>::signaling_NaN();
+		double youngModulus = std::numeric_limits<double>::signaling_NaN();
 	} m_elementData;
 	bool m_hasRotationDOF;
 };

@@ -79,6 +79,11 @@ std::vector<std::weak_ptr<ComponentManager>> Runtime::getManagers() const
 }
 
 
+SurgSim::Framework::Messenger& Runtime::getMessenger()
+{
+	return m_messenger;
+}
+
 std::shared_ptr<Scene> Runtime::getScene()
 {
 	if (m_scene == nullptr)
@@ -161,6 +166,16 @@ bool Runtime::start(bool paused)
 	m_isRunning = true;
 	m_isPaused = paused;
 
+	// Start Messenger Thread
+	m_messengerThread = boost::thread([this]()
+	{
+		while (this->m_isRunning)
+		{
+			m_messenger.update();
+			boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+		}
+	});
+
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	m_barrier.reset(new Barrier(m_managers.size() + 1));
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
@@ -202,6 +217,7 @@ bool Runtime::stop()
 
 	m_isRunning = false;
 
+
 	// Suspend updates on all threads
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
@@ -209,8 +225,13 @@ bool Runtime::stop()
 		(*it)->setIdle(true);
 	}
 
+	// Wait for the messenger to run through and deliver the last pending messages
+	m_messengerThread.join();
+	m_messenger.update();
+
 	// Give all threads time to run through update
 	boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+
 
 	// Now stop all threads
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
@@ -327,7 +348,13 @@ std::shared_ptr<const ApplicationData> Runtime::getApplicationData()
 
 std::shared_ptr<ThreadPool> Runtime::getThreadPool()
 {
-	static auto threadPool = std::make_shared<ThreadPool>();
+#ifdef THREADPOOL_SIZE
+	static auto threadPool = std::make_shared<ThreadPool>((static_cast<int>(THREADPOOL_SIZE) > 0) ?
+		static_cast<int>(THREADPOOL_SIZE) : static_cast<int>(std::ceil(boost::thread::hardware_concurrency() * 0.5)));
+#else
+	static auto threadPool =
+		std::make_shared<ThreadPool>(static_cast<int>(std::ceil(boost::thread::hardware_concurrency() * 0.5)));
+#endif
 	return threadPool;
 }
 
@@ -433,7 +460,7 @@ bool tryLoadNode(const std::string& fileName, YAML::Node* node)
 			*node = YAML::LoadFile(path);
 			result = true;
 		}
-		catch (YAML::ParserException e)
+		catch (const YAML::ParserException& e)
 		{
 			SURGSIM_LOG_SEVERE(Logger::getLogger("Runtime")) << "Could not parse YAML File at " << path
 					<< " due to " << e.msg << " at line " << e.mark.line << " column " << e.mark.column;
@@ -457,12 +484,12 @@ bool Runtime::tryConvertElements(const std::string& filename, const YAML::Node& 
 			*elements = node.as<std::vector<std::shared_ptr<SceneElement>>>();
 			result = true;
 		}
-		catch (YAML::Exception e)
+		catch (const YAML::Exception& e)
 		{
 			SURGSIM_LOG_SEVERE(Logger::getLogger("Runtime"))
 					<< "File " << filename << " YAML conversion failed with exception: " + e.msg;
 		}
-		catch (SurgSim::Framework::AssertionFailure e)
+		catch (const SurgSim::Framework::AssertionFailure& e)
 		{
 			SURGSIM_LOG_CRITICAL(Logger::getLogger("Runtime"))
 					<< "File " << filename << " conversion failed.";

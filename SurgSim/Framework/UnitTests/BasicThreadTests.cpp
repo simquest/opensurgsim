@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,6 +61,8 @@ TEST(BasicThreadTest, Stop)
 	EXPECT_TRUE(m.isRunning());
 	m.stop();
 
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
 	EXPECT_TRUE(m.didBeforeStop);
 	EXPECT_FALSE(m.isRunning());
 }
@@ -114,7 +116,7 @@ TEST(BasicThreadTest, DestructStoppedThread)
 
 	m->stop();
 
-	EXPECT_NO_THROW(m.release());
+	EXPECT_NO_THROW(m.reset());
 }
 
 TEST(BasicThreadTest, SynchronousThread)
@@ -310,6 +312,7 @@ public:
 	void TearDown()
 	{
 		m->stop();
+		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	}
 
 	std::shared_ptr<MockThread> m;

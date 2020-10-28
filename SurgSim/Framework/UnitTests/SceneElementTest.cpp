@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/any.hpp>
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
@@ -90,7 +91,7 @@ TEST(SceneElementTest, AddAndTestComponentsAssembly)
 	// Verify the component made it to the manager
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	ASSERT_EQ(1, manager->getComponents().size());
+	ASSERT_EQ(1u, manager->getComponents().size());
 	EXPECT_EQ(component, manager->getComponents()[0]);
 	runtime->stop();
 }
@@ -128,7 +129,7 @@ TEST(SceneElementTest, AddAndTestComponentsConstructor)
 	// Verify the component made it to the manager
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	ASSERT_EQ(1, manager->getComponents().size());
+	ASSERT_EQ(1u, manager->getComponents().size());
 	EXPECT_EQ(component, manager->getComponents()[0]);
 	runtime->stop();
 }
@@ -173,19 +174,19 @@ TEST(SceneElementTest, RemoveComponent)
 	runtime->getScene()->addSceneElement(element);
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(2, manager->getComponents().size());
+	EXPECT_EQ(2u, manager->getComponents().size());
 
 	EXPECT_TRUE(element->removeComponent("TestComponent2"));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent2"));
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(1, manager->getComponents().size());
+	EXPECT_EQ(1u, manager->getComponents().size());
 
 	EXPECT_TRUE(element->removeComponent(component1));
 	EXPECT_EQ(nullptr, element->getComponent("TestComponent1"));
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(0, manager->getComponents().size());
+	EXPECT_EQ(0u, manager->getComponents().size());
 
 	runtime->stop();
 }
@@ -206,12 +207,12 @@ TEST(SceneElementTest, RemoveComponents)
 	runtime->getScene()->addSceneElement(element);
 	runtime->start(true);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(2, manager->getComponents().size());
+	EXPECT_EQ(2u, manager->getComponents().size());
 
 	element->removeComponents();
 	runtime->step();
 	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
-	EXPECT_EQ(0, manager->getComponents().size());
+	EXPECT_EQ(0u, manager->getComponents().size());
 
 	runtime->stop();
 }
@@ -258,6 +259,37 @@ TEST(SceneElementTest, GetTypedComponentsTests)
 
 	element->removeComponent(component2);
 	EXPECT_EQ(0u, element->getComponents<MockComponent>().size());
+}
+
+TEST(SceneElementTest, GetSetValue)
+{
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+	std::shared_ptr<MockComponent> component(new MockComponent("Component"));
+	element->addComponent(component);
+
+	{
+		float value;
+		EXPECT_FALSE(element->getValue("Component", "MissingProperty", &value));
+		EXPECT_THROW(element->getValue("Component", "MissingProperty"), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(element->getValue<bool>("Component", "MissingProperty"), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(element->setValue("Component", "MissingProperty", value), SurgSim::Framework::AssertionFailure);
+	}
+	{
+		bool value = false;
+		component->succeedWithInit = true;
+		EXPECT_TRUE(element->getValue("Component", "SucceedWithInit", &value));
+		EXPECT_TRUE(value);
+		EXPECT_NO_THROW(element->getValue("Component", "SucceedWithInit"));
+		EXPECT_NO_THROW(element->getValue<bool>("Component", "SucceedWithInit"));
+		EXPECT_TRUE(boost::any_cast<bool>(element->getValue("Component", "SucceedWithInit")));
+		EXPECT_TRUE(element->getValue<bool>("Component", "SucceedWithInit"));
+	}
+	{
+		bool value = true;
+		component->succeedWithWakeUp = false;
+		EXPECT_NO_THROW(element->setValue("Component", "SucceedWithWakeUp", value));
+		EXPECT_TRUE(component->succeedWithWakeUp);
+	}
 }
 
 TEST(SceneElementTest, InitComponentTest)

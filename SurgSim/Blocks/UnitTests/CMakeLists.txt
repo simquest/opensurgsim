@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,13 +21,14 @@ include_directories (
 set(UNIT_TEST_SOURCES
 	CompoundShapeToGraphicsTests.cpp
 	DriveElementFromInputBehaviorTests.cpp
+	FunctionBehaviorTests.cpp
 	KeyBehaviorTests.cpp
 	KeyboardCallbackBehaviorTests.cpp
 	KeyboardTogglesComponentBehaviorTests.cpp
+	KnotIdentificationBehaviorTests.cpp
 	MassSpring1DRepresentationTests.cpp
 	MassSpring2DRepresentationTests.cpp
 	MassSpring3DRepresentationTests.cpp
-	MassSpringNDRepresentationUtilsTests.cpp
 	PoseInterpolatorTests.cpp
 	SingleKeyBehaviorTests.cpp
 	SpringTestUtils.cpp

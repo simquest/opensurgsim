@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,11 @@
 #ifndef SURGSIM_FRAMEWORK_REUSEFACTORY_H
 #define SURGSIM_FRAMEWORK_REUSEFACTORY_H
 
+#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/mutex.hpp>
 #include <memory>
 #include <stack>
+
 
 namespace SurgSim
 {
@@ -68,19 +71,17 @@ public:
 	/// \return Valid shared pointer to an object of class T
 	std::shared_ptr<T> getInstance()
 	{
-		std::shared_ptr<T> object;
-
-		if (m_unusedObjects.empty())
 		{
-			object = std::shared_ptr<T>(new T(), Deleter(this));
-		}
-		else
-		{
-			object = std::shared_ptr<T>(m_unusedObjects.top().release(), Deleter(this));
-			m_unusedObjects.pop();
+			boost::lock_guard<boost::mutex> lock(m_mutex);
+			if (!m_unusedObjects.empty())
+			{
+				auto object = std::shared_ptr<T>(m_unusedObjects.top().release(), Deleter(this));
+				m_unusedObjects.pop();
+				return object;
+			}
 		}
 
-		return object;
+		return std::shared_ptr<T>(new T(), Deleter(this));
 	}
 
 private:
@@ -109,11 +110,15 @@ private:
 	/// \param unusedObject Object that is no longer referenced by any shared pointers
 	void addUnused(T* unusedObject)
 	{
+		boost::lock_guard<boost::mutex> lock(m_mutex);
 		m_unusedObjects.push(std::unique_ptr<T>(unusedObject));
 	}
 
 	/// Stack of objects that are available for reuse.
 	std::stack<std::unique_ptr<T>> m_unusedObjects;
+
+	/// Lock for unused objects
+	boost::mutex m_mutex;
 };
 
 };  // namespace Framework

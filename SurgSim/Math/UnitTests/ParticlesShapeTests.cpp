@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,15 +46,17 @@ TEST(ParticlesShapeTests, CopyConstruct)
 		otherVertices.addVertex(DataStructures::Vertex<DataStructures::EmptyData>(Vector3d::Constant(3.0)));
 
 		ParticlesShape particles(otherVertices);
-		EXPECT_EQ(1, particles.getNumVertices());
+		EXPECT_EQ(1u, particles.getNumVertices());
 		EXPECT_TRUE(particles.getVertex(0).position.isApprox(Vector3d::Constant(3.0)));
+		EXPECT_EQ(1, particles.getInitialVertices().getNumVertices());
+		EXPECT_TRUE(particles.getInitialVertices().getVertex(0).position.isApprox(Vector3d::Constant(3.0)));
 	}
 	{
 		DataStructures::Vertices<DataStructures::NormalData> otherVertices;
 		otherVertices.addVertex(DataStructures::Vertex<DataStructures::NormalData>(Vector3d::Constant(3.0)));
 
 		ParticlesShape particles(otherVertices);
-		EXPECT_EQ(1, particles.getNumVertices());
+		EXPECT_EQ(1u, particles.getNumVertices());
 		EXPECT_TRUE(particles.getVertex(0).position.isApprox(Vector3d::Constant(3.0)));
 	}
 }
@@ -68,6 +70,7 @@ TEST(ParticlesShapeTests, DefaultProperties)
 	EXPECT_FALSE(isValid(particles.getCenter()));
 	EXPECT_TRUE(particles.getSecondMomentOfVolume().isZero());
 	EXPECT_NE(nullptr, particles.getAabbTree());
+	EXPECT_EQ(0, particles.getInitialVertices().getNumVertices());
 
 	EXPECT_TRUE(particles.isTransformable());
 }
@@ -145,6 +148,44 @@ TEST(ParticlesShapeTests, Serialization)
 	}
 }
 
+TEST(ParticlesShapeTests, GetPose)
+{
+	auto vertices = std::make_shared<SurgSim::DataStructures::Vertices<SurgSim::DataStructures::EmptyData>>();
+	const int numPoints = 10;
+	for (int i = 0; i < numPoints; i++)
+	{
+		vertices->addVertex(SurgSim::DataStructures::VerticesPlain::VertexType(Vector3d::Random()));
+	}
+
+	auto particlesShape = std::make_shared<ParticlesShape>(*vertices);
+	const auto& initial = particlesShape->getInitialVertices();
+	for (size_t i = 0; i < particlesShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(particlesShape->getVertex(i).position.isApprox(initial.getVertex(i).position));
+	}
+
+	const auto pose = makeRigidTransform(makeRotationQuaternion(0.1, Vector3d(0.1, 0.2, -0.1)),
+		Vector3d(3.0, 4.0, -5.0));
+	particlesShape->setPose(pose);
+	for (size_t i = 0; i < particlesShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(particlesShape->getVertex(i).position.isApprox(pose * initial.getVertex(i).position));
+	}
+
+	particlesShape->setPose(RigidTransform3d::Identity());
+	for (size_t i = 0; i < particlesShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(particlesShape->getVertex(i).position.isApprox(initial.getVertex(i).position));
+	}
+
+	particlesShape->setPose(pose);
+	particlesShape->setInitialVertices(*particlesShape);
+	const auto& newInitial = particlesShape->getInitialVertices();
+	for (size_t i = 0; i < particlesShape->getNumVertices(); ++i)
+	{
+		EXPECT_TRUE(particlesShape->getVertex(i).position.isApprox(newInitial.getVertex(i).position));
+	}
+}
 
 };
 };

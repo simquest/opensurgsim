@@ -47,14 +47,14 @@ void AabbTree::add(const SurgSim::Math::Aabbd& aabb, size_t objectId)
 	m_typedRoot->addData(aabb, objectId, m_maxObjectsPerNode);
 }
 
-void AabbTree::set(const std::list<AabbTreeData::Item>& items)
+void AabbTree::set(const AabbTreeData::ItemList& items)
 {
 	m_typedRoot = std::make_shared<AabbTreeNode>();
 	setRoot(m_typedRoot);
 	m_typedRoot->setData(items, m_maxObjectsPerNode);
 }
 
-void AabbTree::set(std::list<AabbTreeData::Item>&& items)
+void AabbTree::set(AabbTreeData::ItemList&& items)
 {
 	m_typedRoot = std::make_shared<AabbTreeNode>();
 	setRoot(m_typedRoot);
@@ -71,20 +71,19 @@ const SurgSim::Math::Aabbd& AabbTree::getAabb() const
 	return m_typedRoot->getAabb();
 }
 
-std::list<AabbTree::TreeNodePairType> AabbTree::spatialJoin(const AabbTree& otherTree) const
+std::vector<AabbTree::TreeNodePairType> AabbTree::spatialJoin(const AabbTree& otherTree) const
 {
-	std::list<TreeNodePairType> result;
+	std::vector<TreeNodePairType> result;
 
-	spatialJoin(std::static_pointer_cast<AabbTreeNode>(getRoot()),
-				std::static_pointer_cast<AabbTreeNode>(otherTree.getRoot()),
+	spatialJoin(static_cast<AabbTreeNode*>(getRoot().get()),
+				static_cast<AabbTreeNode*>(otherTree.getRoot().get()),
 				&result);
 
 	return result;
 }
 
-void AabbTree::spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
-						   std::shared_ptr<AabbTreeNode> rhsParent,
-						   std::list<TreeNodePairType>* result) const
+void AabbTree::spatialJoin(AabbTreeNode* lhsParent, AabbTreeNode* rhsParent,
+	std::vector<TreeNodePairType>* result) const
 {
 	if (!SurgSim::Math::doAabbIntersect(lhsParent->getAabb(), rhsParent->getAabb()))
 	{
@@ -99,7 +98,7 @@ void AabbTree::spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
 	{
 		for (size_t j = 0; j < rhsParent->getNumChildren(); j++)
 		{
-			auto rhs = std::static_pointer_cast<AabbTreeNode>(rhsParent->getChild(j));
+			auto rhs = static_cast<AabbTreeNode*>(rhsParent->getChild(j).get());
 			spatialJoin(lhsParent, rhs, result);
 		}
 	}
@@ -107,7 +106,7 @@ void AabbTree::spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
 	{
 		for (size_t i = 0; i < lhsParent->getNumChildren(); i++)
 		{
-			auto lhs = std::static_pointer_cast<AabbTreeNode>(lhsParent->getChild(i));
+			auto lhs = static_cast<AabbTreeNode*>(lhsParent->getChild(i).get());
 			spatialJoin(lhs, rhsParent, result);
 		}
 	}
@@ -115,14 +114,49 @@ void AabbTree::spatialJoin(std::shared_ptr<AabbTreeNode> lhsParent,
 	{
 		for (size_t i = 0; i < lhsParent->getNumChildren(); i++)
 		{
-			auto lhs = std::static_pointer_cast<AabbTreeNode>(lhsParent->getChild(i));
+			auto lhs = static_cast<AabbTreeNode*>(lhsParent->getChild(i).get());
 
 			for (size_t j = 0; j < rhsParent->getNumChildren(); j++)
 			{
-				auto rhs = std::static_pointer_cast<AabbTreeNode>(rhsParent->getChild(j));
+				auto rhs = static_cast<AabbTreeNode*>(rhsParent->getChild(j).get());
 				spatialJoin(lhs, rhs, result);
 			}
 		}
+	}
+}
+
+void AabbTree::updateBounds(const std::vector<Math::Aabbd>& bounds)
+{
+	updateNodeBounds(bounds, static_cast<SurgSim::DataStructures::AabbTreeNode*>(getRoot().get()));
+}
+
+void AabbTree::updateNodeBounds(const std::vector<Math::Aabbd>& bounds,
+								SurgSim::DataStructures::AabbTreeNode* node)
+{
+	const size_t numChildren = node->getNumChildren();
+	if (numChildren > 0)
+	{
+		auto* child = static_cast<SurgSim::DataStructures::AabbTreeNode*>(node->getChild(0).get());
+		updateNodeBounds(bounds, child);
+		auto aabb = child->getAabb();
+
+		for (size_t i = 1; i < numChildren; ++i)
+		{
+			auto* child = static_cast<SurgSim::DataStructures::AabbTreeNode*>(node->getChild(i).get());
+			updateNodeBounds(bounds, child);
+			aabb.extend(child->getAabb());
+		}
+		node->setAabb(aabb);
+	}
+	else
+	{
+		auto data = static_cast<SurgSim::DataStructures::AabbTreeData*>(node->getData().get());
+		for (auto& item : data->getData())
+		{
+			item.first = bounds[item.second];
+		}
+		data->recalculateAabb();
+		node->setAabb(data->getAabb());
 	}
 }
 

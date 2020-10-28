@@ -67,7 +67,7 @@ bool Fem2DPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 
 void Fem2DPlyReaderDelegate::endParseFile()
 {
-	if (!m_hasPerElementMaterial)
+	if (!m_hasPerElementMaterial && m_hasMaterial)
 	{
 		for (auto element : m_mesh->getElements())
 		{

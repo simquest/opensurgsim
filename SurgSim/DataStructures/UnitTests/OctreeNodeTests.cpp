@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ using SurgSim::Math::Vector3d;
 
 struct MockData
 {
-	int mockInt;
-	double mockDouble;
+	int mockInt = 0;
+	double mockDouble = std::numeric_limits<double>::signaling_NaN();
 	std::string mockString;
 };
 
@@ -357,7 +357,7 @@ TEST(OctreeNodeTests, NeighborhoodTestSimple)
 		EXPECT_NO_THROW(getNeighbor(path, direction));
 		auto result = getNeighbor(path, direction);
 		ASSERT_EQ(1u, result.size());
-		EXPECT_EQ(1, result[0]);
+		EXPECT_EQ(1u, result[0]);
 	}
 
 	{
@@ -373,7 +373,7 @@ TEST(OctreeNodeTests, NeighborhoodTestSimple)
 // This verifies the basic non-boundary crossing neighborhoods
 TEST(OctreeNodeTests, NeigborhoodPlainFaces)
 {
-	int testValues[24][3] =
+	size_t testValues[24][3] =
 	{
 		0, SYMBOL_RIGHT, 1,
 		0, SYMBOL_UP, 2,

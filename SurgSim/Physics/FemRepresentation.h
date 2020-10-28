@@ -16,6 +16,7 @@
 #ifndef SURGSIM_PHYSICS_FEMREPRESENTATION_H
 #define SURGSIM_PHYSICS_FEMREPRESENTATION_H
 
+#include <future>
 #include <memory>
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
@@ -32,7 +33,6 @@ namespace Physics
 {
 
 class FemElement;
-class FemPlyReaderDelegate;
 
 /// Finite Element Model (a.k.a FEM) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation), therefore it defines
@@ -42,7 +42,7 @@ class FemPlyReaderDelegate;
 /// \note  "Efficient Contact Modeling using Compliance Warping", G Saupin, C Duriez, S Cotin, L Grisoni;
 /// Computer %Graphics International (CGI), Istanbul, Turkey, june 2008.
 /// \note  To use compliance warping, it needs to be turned on by calling setComplianceWarping(true) and the method
-/// updateNodesRotations() needs to be overloaded properly.
+/// calculateComplianceWarpingTransformation() needs to be overloaded properly.
 class FemRepresentation : public DeformableRepresentation
 {
 public:
@@ -103,7 +103,7 @@ public:
 	/// Determines whether the associated coordinate is valid
 	/// \param coordinate Coordinate to check
 	/// \return True if coordinate is valid
-	bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const;
+	virtual bool isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -121,10 +121,26 @@ public:
 	/// \return True if compliance warping is used, False otherwise
 	bool getComplianceWarping() const;
 
-	/// Calculate the product C.b where C is the compliance matrix with boundary conditions
-	/// \param state \f$(x, v)\f$ the current position and velocity to evaluate the various terms with
-	/// \param b The input matrix b
-	/// \return Returns the matrix \f$C.b\f$
+	/// If using compliance warping, set the calculation to synchronous or asynchronous. Defaults to synchronous.
+	/// Synchronous calculation is slower, but after free motion the compliance matrix will be up-to-date,
+	/// which means the MLCP will be as accurate as possible. Asynchronous calculation is faster, but the compliance
+	/// matrix will be stale by at least one update.
+	/// \param complianceWarpingSynchronous True for synchronous computation of the compliance warping matrix.
+	/// \exception SurgSim::Framework::AssertionFailure If the call is done after initialization.
+	void setComplianceWarpingSynchronous(bool complianceWarpingSynchronous);
+
+	/// Get whether or not any compliance warping will be done synchronously. Default is synchronous.
+	/// \return True if compliance warping is calculated synchronously.
+	bool isComplianceWarpingSynchronous() const;
+
+	/// Enable mass lumping for the mass matrix, currently we use the row sum i.e.
+	/// \f$M_{ii}^{(lumped)} = \sum_{j} M_{ji}\f$
+	/// \param useMassLumping whether to enable or disable lumped masses
+	void setMassLumping(bool useMassLumping);
+
+	/// \return True if lumped masses are enabled
+	bool getMassLumping() const;
+
 	Math::Matrix applyCompliance(const Math::OdeState& state, const Math::Matrix& b) override;
 
 	const SurgSim::Math::Matrix& getComplianceMatrix() const override;
@@ -172,7 +188,11 @@ protected:
 	/// \param state The state to extract the node transformation from
 	/// \param nodeId The node to update the rotation for
 	/// \return The node transformation. i.e. a numDofPerNode x numDofPerNode matrix
-	virtual SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId);
+	virtual SurgSim::Math::Matrix getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId) const;
+
+	/// Calculates and stores the compliance warping transformation matrix.
+	/// \param state The state to extract the node transformation from
+	virtual void calculateComplianceWarpingTransformation(const SurgSim::Math::OdeState& state);
 
 	/// Gets the flag keeping track of the initial compliance matrix calculation (compliance warping case)
 	/// \return True if the initial compliance matrix has been computed, False otherwise
@@ -204,6 +224,24 @@ protected:
 	/// not need to define this type in the ply file, but rather is part of the Representation properties (YAML).
 	std::string m_femElementType;
 
+	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
+
+	/// Is the compliance warping computation be synchronous (slower but up-to-date results)?
+	bool m_isComplianceWarpingSynchronous;
+
+	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
+
+	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
+
+	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
+	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;
+
+	///@{
+	/// For the asynchronous compliance matrix multiplication.
+	Eigen::SparseMatrix<double> m_complianceWarpingTransformationForCalculation;
+	std::future<SurgSim::Math::Matrix> m_task;
+	///@}
+
 private:
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K
@@ -214,14 +252,7 @@ private:
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
 
-	bool m_useComplianceWarping; ///< Are we using Compliance Warping or not ?
-
-	bool m_isInitialComplianceMatrixComputed; ///< For compliance warping: Is the initial compliance matrix computed ?
-
-	SurgSim::Math::Matrix m_complianceWarpingMatrix; ///< The compliance warping matrix if compliance warping in use
-
-	/// The system-size transformation matrix. It contains nodes transformation on the diagonal blocks.
-	Eigen::SparseMatrix<double> m_complianceWarpingTransformation;
+	bool m_useMassLumping;
 };
 
 } // namespace Physics

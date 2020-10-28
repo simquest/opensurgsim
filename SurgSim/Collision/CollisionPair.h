@@ -179,12 +179,14 @@ template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator << (std::basic_ostream<charT, traits>& out,
 		const SurgSim::Collision::Contact& contact)
 {
-	out << "Normal: " << contact.normal.transpose() << std::endl;
+	out << "Type: " << contact.type << std::endl;
 	out << "Depth: " << contact.depth << std::endl;
 	out << "Time: " << contact.time << std::endl;
+	out << "Contact: " << contact.contact.transpose() << std::endl;
+	out << "Normal: " << contact.normal.transpose() << std::endl;
+	out << "Force: " << contact.force.transpose() << std::endl;
 	out << "Penetration Point 1 :" << contact.penetrationPoints.first << std::endl;
 	out << "Penetration Point 2 :" << contact.penetrationPoints.second << std::endl;
-
 	return out;
 }
 #endif

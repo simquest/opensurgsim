@@ -87,6 +87,7 @@ private:
 	/// \post m_isAwoken is set to true
 	virtual bool doWakeUp()
 	{
+		SurgSim::Graphics::OsgRepresentation::doWakeUp();
 		m_isAwoken = true;
 		return true;
 	}
@@ -112,7 +113,7 @@ public:
 		osg::setNotifyLevel(osg::DEBUG_FP);
 	}
 
-	void notify(osg::NotifySeverity severity, const char *message) override
+	void notify(osg::NotifySeverity severity, const char* message) override
 	{
 		reset();
 		if (severity <= osg::FATAL)

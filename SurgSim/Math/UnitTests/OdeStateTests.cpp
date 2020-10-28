@@ -54,7 +54,7 @@ TEST(OdeStateTest, AllocateTest)
 	EXPECT_EQ(0u, state.getNumDof());
 	EXPECT_EQ(0u, state.getNumNodes());
 	EXPECT_EQ(0u, state.getNumBoundaryConditions());
-	EXPECT_EQ(0, state.getBoundaryConditions().size());
+	EXPECT_EQ(0u, state.getBoundaryConditions().size());
 	EXPECT_EQ(0, state.getPositions().size());
 	EXPECT_EQ(0, state.getVelocities().size());
 
@@ -63,8 +63,8 @@ TEST(OdeStateTest, AllocateTest)
 	EXPECT_EQ(3u, state.getNumNodes());
 	EXPECT_EQ(9, state.getPositions().size());
 	EXPECT_EQ(9, state.getVelocities().size());
-	EXPECT_EQ(0u , state.getNumBoundaryConditions());
-	EXPECT_EQ(0 , state.getBoundaryConditions().size());
+	EXPECT_EQ(0u, state.getNumBoundaryConditions());
+	EXPECT_EQ(0u, state.getBoundaryConditions().size());
 }
 
 TEST(OdeStateTest, GetPositionsTest)
@@ -152,6 +152,18 @@ void testBoundaryConditions(const SurgSim::Math::OdeState& state, std::vector<si
 	EXPECT_TRUE(state.getPositions().isZero());
 	EXPECT_TRUE(state.getVelocities().isZero());
 }
+void testBoundaryConditionsStaticDof(const SurgSim::Math::OdeState& state,
+									 std::vector<std::pair<size_t, double>> expectedDofIds)
+{
+	EXPECT_EQ(6u, state.getNumDof());
+	EXPECT_EQ(expectedDofIds.size(), state.getNumBoundaryConditionsStaticDof());
+	ASSERT_EQ(expectedDofIds.size(), state.getBoundaryConditionsStaticDof().size());
+	for (size_t index = 0; index < expectedDofIds.size(); ++index)
+	{
+		EXPECT_EQ(expectedDofIds[index].first, state.getBoundaryConditionsStaticDof()[index].first);
+		EXPECT_EQ(expectedDofIds[index].second, state.getBoundaryConditionsStaticDof()[index].second);
+	}
+}
 }; // anonymous namespace
 
 TEST(OdeStateTest, AddGetIsBoundaryConditionsTest)
@@ -214,6 +226,64 @@ TEST(OdeStateTest, AddGetIsBoundaryConditionsTest)
 	}
 }
 
+TEST(OdeStateTest, AddGetSetBoundaryConditionsStaticDofTest)
+{
+	OdeState state;
+	std::vector<std::pair<size_t, double>> expected;
+
+	{
+		SCOPED_TRACE("Testing OdeState::setNumDof hasn't been called prior to adding a boundary condition");
+
+		// Assert trying to add/set boundary condition before setting the number of node and dof per node
+		ASSERT_THROW(state.addBoundaryConditionStaticDof(0u, 0.1), SurgSim::Framework::AssertionFailure);
+		ASSERT_THROW(state.setBoundaryConditionsStaticDof(expected), SurgSim::Framework::AssertionFailure);
+	}
+
+	state.setNumDof(3u, 2u); // Number of dof per node is 3
+
+	{
+		SCOPED_TRACE("Testing addBoundaryConditionStaticDof(size_t nodeId, double value)");
+
+		state.addBoundaryConditionStaticDof(0u, 0.1);
+		expected.push_back(std::make_pair(0u, 0.1)); // (node 0, value 0.1)
+		testBoundaryConditionsStaticDof(state, expected);
+
+		state.addBoundaryConditionStaticDof(1u, 2.6);
+		expected.push_back(std::make_pair(1u, 2.6)); // (node 1, value 2.6)
+		testBoundaryConditionsStaticDof(state, expected);
+	}
+
+	{
+		SCOPED_TRACE("Testing addBoundaryConditionStaticDof(size_t nodeId, double value)");
+
+		state.changeBoundaryConditionStaticDof(0u, 5.4);
+		expected.front().second = 5.4; // (node 0, value 5.4)
+		testBoundaryConditionsStaticDof(state, expected);
+	}
+
+	{
+		SCOPED_TRACE("Testing addBoundaryConditionStaticDof(size_t nodeId, double value) with invalid nodeId");
+
+		// Assert on wrong nodeId
+		ASSERT_THROW(state.addBoundaryConditionStaticDof(3u, 0.0), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("Testing setBoundaryConditionsStaticDof(vector<pair<size_t, double>>)");
+
+		expected.push_back(std::make_pair(1u, 1.4)); // (node 1, value 1.4)
+		expected.push_back(std::make_pair(0u, 0.9)); // (node 0, value 0.9)
+		state.setBoundaryConditionsStaticDof(expected);
+		testBoundaryConditionsStaticDof(state, expected);
+	}
+
+	{
+		SCOPED_TRACE("Testing setBoundaryConditionsStaticDof(vector<pair<size_t, double>>) with an invalid nodeId");
+		expected.push_back(std::make_pair(3u, 0.0)); // (node 3, value 0.0)
+		ASSERT_THROW(state.setBoundaryConditionsStaticDof(expected), SurgSim::Framework::AssertionFailure);
+	}
+}
+
 TEST(OdeStateTest, ResetTest)
 {
 	OdeState state1, state2;
@@ -235,7 +305,7 @@ TEST(OdeStateTest, ResetTest)
 	EXPECT_TRUE(state1.getPositions().isZero());
 	EXPECT_TRUE(state1.getVelocities().isZero());
 	EXPECT_EQ(0u, state1.getNumBoundaryConditions());
-	EXPECT_EQ(0, state1.getBoundaryConditions().size());
+	EXPECT_EQ(0u, state1.getBoundaryConditions().size());
 }
 
 TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
@@ -270,7 +340,7 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 
 		ASSERT_EQ(2u, stateCopied.getNumBoundaryConditions());
 		ASSERT_EQ(state.getNumBoundaryConditions(), stateCopied.getNumBoundaryConditions());
-		ASSERT_EQ(2, stateCopied.getBoundaryConditions().size());
+		ASSERT_EQ(2u, stateCopied.getBoundaryConditions().size());
 		ASSERT_EQ(state.getBoundaryConditions().size(), stateCopied.getBoundaryConditions().size());
 		ASSERT_EQ(0u, stateCopied.getBoundaryConditions()[0]);
 		ASSERT_EQ(state.getBoundaryConditions()[0], stateCopied.getBoundaryConditions()[0]);
@@ -298,7 +368,7 @@ TEST(OdeStateTest, CopyConstructorAndAssignmentTest)
 
 		ASSERT_EQ(2u, stateAssigned.getNumBoundaryConditions());
 		ASSERT_EQ(state.getNumBoundaryConditions(), stateAssigned.getNumBoundaryConditions());
-		ASSERT_EQ(2, stateAssigned.getBoundaryConditions().size());
+		ASSERT_EQ(2u, stateAssigned.getBoundaryConditions().size());
 		ASSERT_EQ(state.getBoundaryConditions().size(), stateAssigned.getBoundaryConditions().size());
 		ASSERT_EQ(0u, stateAssigned.getBoundaryConditions()[0]);
 		ASSERT_EQ(state.getBoundaryConditions()[0], stateAssigned.getBoundaryConditions()[0]);

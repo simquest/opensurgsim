@@ -31,9 +31,64 @@ Matrix LinearSparseSolveAndInverse::getInverse() const
 void LinearSparseSolveAndInverseLU::setMatrix(const SparseMatrix& matrix)
 {
 	SURGSIM_ASSERT(matrix.cols() == matrix.rows()) << "Cannot inverse a non square matrix";
-	m_solver.compute(matrix);
+	bool sameMatrix = false;
+
+	const auto* innerIndices = matrix.innerIndexPtr();
+	const auto* outerIndices = matrix.outerIndexPtr();
+	const auto* storedInnerIndices = m_matrix.innerIndexPtr();
+	const auto* storedOuterIndices = m_matrix.outerIndexPtr();
+	if ((matrix.outerSize() == m_matrix.outerSize()) && (matrix.innerSize() == m_matrix.innerSize()) &&
+		(matrix.outerSize() > 1))
+	{
+		sameMatrix = true;
+		for (Eigen::Index outerLoop = 0; outerLoop < matrix.outerSize() - 1; ++outerLoop)
+		{
+			if ((outerIndices[outerLoop] != storedOuterIndices[outerLoop]) ||
+				(outerIndices[outerLoop + 1] != storedOuterIndices[outerLoop + 1]))
+			{
+				sameMatrix = false;
+				break;
+			}
+			for (auto innerLoop = outerIndices[outerLoop];
+				innerLoop < outerIndices[outerLoop + 1];
+				++innerLoop)
+			{
+				if (innerIndices[innerLoop] != storedInnerIndices[innerLoop])
+				{
+					sameMatrix = false;
+					break;
+				}
+			}
+			if (!sameMatrix)
+			{
+				break;
+			}
+		}
+	}
+	
+	if (sameMatrix)
+	{
+		m_solver.factorize(matrix);
+	}
+	else
+	{
+		m_solver.compute(matrix);
+		m_matrix = matrix;
+	}
+
 	SURGSIM_ASSERT(m_solver.info() == Eigen::Success) << m_solver.lastErrorMessage();
-	m_matrix = matrix;
+
+	if (m_identity.cols() != matrix.cols() || m_identity.rows() != matrix.rows())
+	{
+		m_identity.resize(matrix.cols(), matrix.rows());
+		m_identity.setIdentity();
+	}
+}
+
+Matrix LinearSparseSolveAndInverseLU::getInverse() const
+{
+	// HS-5/24/2017 m_identity is Dense, if it sparse there is a reallocation when we return a dense matrix here
+	return m_solver.solve(m_identity);
 }
 
 Matrix LinearSparseSolveAndInverseLU::solve(const Matrix& b) const
@@ -51,12 +106,12 @@ double LinearSparseSolveAndInverseCG::getTolerance()
 	return m_solver.tolerance();
 }
 
-void LinearSparseSolveAndInverseCG::setMaxIterations(SparseMatrix::Index iterations)
+void LinearSparseSolveAndInverseCG::setMaxIterations(Eigen::Index iterations)
 {
 	m_solver.setMaxIterations(iterations);
 }
 
-SparseMatrix::Index LinearSparseSolveAndInverseCG::getMaxIterations()
+Eigen::Index LinearSparseSolveAndInverseCG::getMaxIterations()
 {
 	return m_solver.maxIterations();
 }

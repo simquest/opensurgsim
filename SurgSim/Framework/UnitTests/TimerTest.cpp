@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ TEST(TimerTest, Constructor)
 TEST(TimerTest, Starting)
 {
 	std::shared_ptr<Timer> timer = std::make_shared<Timer>();
-	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 0);
-	EXPECT_EQ(timer->getNumberOfClockFails(), 0);
+	EXPECT_EQ(0u, timer->getCurrentNumberOfFrames());
+	EXPECT_EQ(0u, timer->getNumberOfClockFails());
 	EXPECT_NO_THROW(timer->getCumulativeTime());
 	EXPECT_NEAR(0.0, timer->getCumulativeTime(), 1e-9);
 	EXPECT_THROW(timer->getAverageFramePeriod(), SurgSim::Framework::AssertionFailure);
@@ -41,21 +41,21 @@ TEST(TimerTest, SettingFrames)
 {
 	std::shared_ptr<Timer> timer = std::make_shared<Timer>();
 	timer->endFrame();
-	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 1);
+	EXPECT_EQ(1u, timer->getCurrentNumberOfFrames());
 	EXPECT_EQ(timer->getAverageFrameRate(), timer->getLastFrameRate());
 	EXPECT_EQ(timer->getAverageFramePeriod(), timer->getLastFramePeriod());
 	EXPECT_EQ(timer->getLastFramePeriod(), timer->getCumulativeTime());
 
 	timer->setMaxNumberOfFrames(3);
-	EXPECT_EQ(3, timer->getMaxNumberOfFrames());
+	EXPECT_EQ(3u, timer->getMaxNumberOfFrames());
 	timer->start();
 	for (auto i = 0; i < 5; ++i)
 	{
 		timer->markFrame();
 	}
-	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 3);
+	EXPECT_EQ(3u, timer->getCurrentNumberOfFrames());
 	timer->setMaxNumberOfFrames(2);
-	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 2);
+	EXPECT_EQ(2u, timer->getCurrentNumberOfFrames());
 	EXPECT_TRUE(timer->isBufferFull());
 }
 

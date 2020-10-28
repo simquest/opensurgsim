@@ -111,8 +111,6 @@ private:
 	std::shared_ptr<RenderTarget> m_renderTarget;	///< The camera's rendertarget
 	std::shared_ptr<Material> m_material;			///< The material, attached to the camera
 
-	int m_renderOrder;	///< The renderorder that is being used for this pass
-
 	std::shared_ptr<ScreenSpaceQuadRepresentation> m_debugColor;
 	std::shared_ptr<ScreenSpaceQuadRepresentation> m_debugDepth;
 

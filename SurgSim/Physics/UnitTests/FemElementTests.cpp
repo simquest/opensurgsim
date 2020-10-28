@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,13 +33,13 @@ using SurgSim::Math::Matrix;
 
 void testSize(const Vector& v, size_t expectedSize)
 {
-	EXPECT_EQ(expectedSize, v.size());
+	EXPECT_EQ(static_cast<Eigen::Index>(expectedSize), v.size());
 }
 
 void testSize(const Matrix& m, size_t expectedRows, size_t expectedCols)
 {
-	EXPECT_EQ(expectedRows, m.rows());
-	EXPECT_EQ(expectedCols, m.cols());
+	EXPECT_EQ(static_cast<Eigen::Index>(expectedRows), m.rows());
+	EXPECT_EQ(static_cast<Eigen::Index>(expectedCols), m.cols());
 }
 
 namespace SurgSim
@@ -55,7 +55,7 @@ TEST(FemElementTests, GetSetAddMethods)
 	// Initial setup (numDofPerNode set), no nodes defined yet, density = 0
 	EXPECT_EQ(3u, femElement.getNumDofPerNode());
 	EXPECT_EQ(0u, femElement.getNumNodes());
-	EXPECT_EQ(0, femElement.getNodeIds().size());
+	EXPECT_EQ(0u, femElement.getNodeIds().size());
 	EXPECT_DOUBLE_EQ(0.0, femElement.getMassDensity());
 	EXPECT_DOUBLE_EQ(0.0, femElement.getYoungModulus());
 	EXPECT_DOUBLE_EQ(0.0, femElement.getPoissonRatio());
@@ -91,19 +91,19 @@ TEST(FemElementTests, GetSetAddMethods)
 	femElement.addNode(0);
 	EXPECT_EQ(3u, femElement.getNumDofPerNode());
 	EXPECT_EQ(1u, femElement.getNumNodes());
-	EXPECT_EQ(1, femElement.getNodeIds().size());
-	EXPECT_EQ(0, femElement.getNodeIds()[0]);
-	EXPECT_EQ(0, femElement.getNodeId(0));
+	EXPECT_EQ(1u, femElement.getNodeIds().size());
+	EXPECT_EQ(0u, femElement.getNodeIds()[0]);
+	EXPECT_EQ(0u, femElement.getNodeId(0));
 
 	// Add 1 more node
 	femElement.addNode(9);
 	EXPECT_EQ(3u, femElement.getNumDofPerNode());
 	EXPECT_EQ(2u, femElement.getNumNodes());
-	EXPECT_EQ(2, femElement.getNodeIds().size());
-	EXPECT_EQ(0, femElement.getNodeIds()[0]);
-	EXPECT_EQ(0, femElement.getNodeId(0));
-	EXPECT_EQ(9, femElement.getNodeIds()[1]);
-	EXPECT_EQ(9, femElement.getNodeId(1));
+	EXPECT_EQ(2u, femElement.getNodeIds().size());
+	EXPECT_EQ(0u, femElement.getNodeIds()[0]);
+	EXPECT_EQ(0u, femElement.getNodeId(0));
+	EXPECT_EQ(9u, femElement.getNodeIds()[1]);
+	EXPECT_EQ(9u, femElement.getNodeId(1));
 }
 
 TEST(FemElementTests, InitializeMethods)

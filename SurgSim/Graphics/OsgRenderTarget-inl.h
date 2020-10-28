@@ -40,13 +40,14 @@ OsgRenderTarget<T>::OsgRenderTarget(
 	int height,
 	double scale,
 	int colorCount,
-	bool useDepth) :
-	m_width(width * scale),
-	m_height(height * scale),
+	bool useDepth,
+	bool useFloat) :
+	m_width(width* scale),
+	m_height(height* scale),
 	m_colorTargetCount(0),
 	m_textures(OsgSupportedTextureCount)
 {
-	setColorTargetCount(colorCount);
+	setColorTargetCount(colorCount, useFloat);
 	useDepthTarget(useDepth);
 }
 
@@ -64,7 +65,7 @@ void OsgRenderTarget<T>::getSize(int* width, int* height) const
 }
 
 template <class T>
-int OsgRenderTarget<T>::setColorTargetCount(int count)
+int OsgRenderTarget<T>::setColorTargetCount(int count, bool floatColor)
 {
 	int result = (count < 16) ? count : 16;
 
@@ -75,7 +76,7 @@ int OsgRenderTarget<T>::setColorTargetCount(int count)
 	// #memory
 	for (int i = m_colorTargetCount; i < result; ++i)
 	{
-		setupTexture(TARGETTYPE_COLORBASE + i);
+		setupTexture(TARGETTYPE_COLORBASE + i, floatColor);
 	}
 	m_colorTargetCount = result;
 	return result;
@@ -118,7 +119,7 @@ void OsgRenderTarget<T>::useDepthTarget(bool val)
 {
 	if (val)
 	{
-		setupTexture(TARGETTYPE_DEPTH);
+		setupTexture(TARGETTYPE_DEPTH, false);
 	}
 	else
 	{
@@ -145,7 +146,7 @@ std::shared_ptr<OsgTexture> OsgRenderTarget<T>::getDepthTargetOsg() const
 }
 
 template <class T>
-void OsgRenderTarget<T>::setupTexture(int type)
+void OsgRenderTarget<T>::setupTexture(int type, bool floatColor)
 {
 	if (m_textures[type] == nullptr)
 	{
@@ -169,9 +170,19 @@ void OsgRenderTarget<T>::setupTexture(int type)
 		}
 		if (type >= TARGETTYPE_COLORBASE)
 		{
-			osgTexture->setInternalFormat(GL_RGBA32F_ARB);
-			osgTexture->setSourceFormat(GL_RGBA);
-			osgTexture->setSourceType(GL_FLOAT);
+			if (floatColor)
+			{
+				/// TODO HS 2020-oct-20 still need to add a switch to select float representations for 
+				osgTexture->setInternalFormat(GL_RGBA32F_ARB);
+				osgTexture->setSourceFormat(GL_RGBA);
+				osgTexture->setSourceType(GL_FLOAT);
+			}
+			else
+			{
+				osgTexture->setInternalFormat(GL_RGBA);
+				osgTexture->setSourceFormat(GL_RGBA);
+				osgTexture->setSourceType(GL_BYTE);
+			}
 		}
 	}
 }

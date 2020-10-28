@@ -39,6 +39,7 @@
 #include "SurgSim/Physics/DeformableCollisionRepresentation.h"
 #include "SurgSim/Physics/Fem1DElementBeam.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -117,6 +118,35 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeRigid(const std::string& f
 	return element;
 }
 
+std::shared_ptr<SurgSim::Framework::SceneElement> makeFixed(const std::string& filename)
+{
+	SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTranslation(SurgSim::Math::Vector3d(0.0, -0.1, 0.0));
+
+	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("RigidMesh");
+	element->setPose(pose);
+	auto shape = std::make_shared<SurgSim::Math::MeshShape>();
+	shape->load(filename);
+
+	auto rigid = std::make_shared<SurgSim::Physics::FixedRepresentation>("Physics");
+	rigid->setIsGravityEnabled(false);
+	// http://www.engineeringtoolbox.com/wood-density-d_40.html
+	rigid->setDensity(100.0 * 5800.0); // Cedar of Lebanon wood density 5800.0 Kg/m-3
+	rigid->setShape(shape);
+	element->addComponent(rigid);
+
+	auto collision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Collision");
+	collision->setCollisionDetectionType(SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS);
+	rigid->setCollisionRepresentation(collision);
+	collision->setShape(shape);
+	element->addComponent(collision);
+
+	auto osgRepresentation = std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>("Graphics");
+	osgRepresentation->setShape(shape);
+	element->addComponent(osgRepresentation);
+
+	return element;
+}
+
 std::shared_ptr<SurgSim::Framework::SceneElement> makeCompound()
 {
 	auto element = std::make_shared<SurgSim::Framework::BasicSceneElement>("Compound");
@@ -153,7 +183,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> makeCompound()
 	transform = SurgSim::Math::makeRigidTransform(
 					SurgSim::Math::makeRotationQuaternion(-0.2, Vector3d(1.0, 0.0, 0.0)),
 					Vector3d(0.0, 0.0, 0.0));
-	shape->addShape(subShape, transform);
+	shape->addShape(subShape->getTransformed(SurgSim::Math::RigidTransform3d::Identity()), transform);  //should the identity be transform here???? .Fem1D*Compound
 
 	graphics = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("RightGraphics");
 	graphics->setLocalPose(transform);
@@ -185,7 +215,9 @@ public:
 		SurgSim::Physics::RenderTests::SetUp();
 		scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
-		SurgSim::Framework::Logger::getLoggerManager()->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
+		//SurgSim::Framework::Logger::getLoggerManager()->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
+		SurgSim::Framework::Logger::getLogger("Physics/PrepareCollisionPairs")->setThreshold(
+			SurgSim::Framework::LOG_LEVEL_DEBUG);
 		physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
 		physicsManager->setRate(150.0);
 	}
@@ -198,7 +230,18 @@ TEST_F(CcdSutureTest, SutureVsMeshedCylinder)
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.1);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
-	physicsManager->setRate(100.0);
+	double milliseconds = 5000.0;
+	runTest(cameraPosition, cameraLookAt, milliseconds);
+}
+
+TEST_F(CcdSutureTest, SutureVsFixedSuture)
+{
+	scene->addSceneElement(makeSuture("prolene 3.0.ply"));
+	scene->addSceneElement(makeFixed("thinCylinder.ply"));
+
+	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.1);
+	SurgSim::Math::Vector3d cameraLookAt(0.0, -0.1, 0.0);
+	physicsManager->setRate(200.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
@@ -209,18 +252,16 @@ TEST_F(CcdSutureTest, Fem1DHalfKnot)
 
 	SurgSim::Math::Vector3d cameraPosition(1.0, 0.0, 1.0);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	physicsManager->setRate(150.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
 
 TEST_F(CcdSutureTest, Fem1DLoop)
 {
-	scene->addSceneElement(makeSuture("loop.ply"));
+	scene->addSceneElement(makeSuture("Geometry/loop.ply"));
 
 	SurgSim::Math::Vector3d cameraPosition(0.25, 0.0, 0.25);
 	SurgSim::Math::Vector3d cameraLookAt(0.0, 0.0, 0.0);
-	physicsManager->setRate(50.0);
 	double milliseconds = 5000.0;
 	runTest(cameraPosition, cameraLookAt, milliseconds);
 }
@@ -241,7 +282,6 @@ TEST_F(CcdSutureTest, Fem1DBlock)
 	scene->addSceneElement(element);
 	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
 
-	physicsManager->setRate(100.0);
 	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
 	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
@@ -264,7 +304,6 @@ TEST_F(CcdSutureTest, Fem1DCompound)
 
 	scene->addSceneElement(makeSuture("prolene 3.0-fixedExtremity.ply"));
 
-	physicsManager->setRate(100.0);
 	physicsManager->setComputations(SurgSim::Physics::createCcdPipeline());
 	scene->addSceneElement(std::make_shared<SurgSim::Blocks::VisualizeConstraints>());
 
@@ -325,14 +364,16 @@ TEST_F(CcdSutureTest, Fem1DMovingCompound)
 							 SurgSim::Math::makeRotationQuaternion(angle, Vector3d(1.0, 0.0, 0.0)),
 							 Vector3d(0.0, offset, 0.0));
 		shape->setPose(0, transform);
-		leftGraphics->setLocalPose(transform);
+		//leftGraphics->setLocalPose(transform);
 
 		transform = SurgSim::Math::makeRigidTransform(
 						SurgSim::Math::makeRotationQuaternion(-angle, Vector3d(1.0, 0.0, 0.0)),
 						Vector3d(0.0, offset, 0.0));
 
+		//what's going on here?  We set the subshape's local pose with respect to the CompoundShape.
+		//Then we set the same thing on the graphics.  Then the graphics pulls the localpose from the CompoundShape via CompoundShapeToGraphics.
 		shape->setPose(1, transform);
-		rightGraphics->setLocalPose(transform);
+		//rightGraphics->setLocalPose(transform);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 	}
 }

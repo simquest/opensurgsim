@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -99,8 +99,8 @@ TEST(TransferPhysicsToPointCloudBehaviorTests, UpdateTest)
 	auto finalState = physics->getFinalState();
 	auto numNodes = finalState->getNumNodes();
 	auto target = pointCloud->getVertices();
-	ASSERT_NE(0, target->getNumVertices());
-	ASSERT_NE(0, numNodes);
+	ASSERT_NE(0u, target->getNumVertices());
+	ASSERT_NE(0u, numNodes);
 	ASSERT_EQ(numNodes, target->getNumVertices());
 
 	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)

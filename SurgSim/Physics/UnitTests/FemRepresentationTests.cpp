@@ -482,7 +482,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
-		// update() will call updateNodesRotations() which will raise an exception in this case.
+		// update() will call calculateComplianceWarpingTransformation() which will raise an exception in this case.
 		// This method has not been overridden.
 		EXPECT_THROW(fem->update(1e-3), SurgSim::Framework::AssertionFailure);
 	}
@@ -517,7 +517,7 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 		EXPECT_THROW(fem->setComplianceWarping(false), SurgSim::Framework::AssertionFailure);
 		EXPECT_THROW(fem->setComplianceWarping(true), SurgSim::Framework::AssertionFailure);
 
-		// update() will call updateNodesRotations() which will not raise an exception in this case.
+		// update() will call calculateComplianceWarpingTransformation() which will not raise an exception in this case.
 		// This method has been overridden.
 		EXPECT_NO_THROW(fem->update(1e-3));
 
@@ -525,6 +525,43 @@ TEST_F(FemRepresentationTests, ComplianceWarpingTest)
 									 initialState->getNumDof())) / 1e-3).isIdentity()));
 	}
 }
+
+TEST_F(FemRepresentationTests, MassLumpingTest)
+{
+		SCOPED_TRACE("MockFemRepresentation complete for compliance warping");
+		auto fem = std::make_shared<MockFemRepresentationValidComplianceWarping>("fem");
+
+		EXPECT_NO_THROW(EXPECT_FALSE(fem->getComplianceWarping()));
+		EXPECT_NO_THROW(fem->setComplianceWarping(true));
+		EXPECT_NO_THROW(EXPECT_TRUE(fem->getComplianceWarping()));
+
+		// Setup the initial state
+		auto initialState = std::make_shared<SurgSim::Math::OdeState>();
+		initialState->setNumDof(fem->getNumDofPerNode(), 3);
+		fem->setInitialState(initialState);
+
+		// Add one element
+		std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
+		element->setMassDensity(m_rho);
+		element->setPoissonRatio(m_nu);
+		element->setYoungModulus(m_E);
+		element->addNode(0);
+		element->addNode(1);
+		element->addNode(2);
+		fem->addFemElement(element);
+
+		EXPECT_FALSE(fem->getMassLumping());
+		fem->setMassLumping(true);
+		EXPECT_TRUE(fem->getMassLumping());
+
+		fem->initialize(std::make_shared<SurgSim::Framework::Runtime>());
+		fem->wakeUp();
+		EXPECT_NO_THROW(fem->update(1e-3));
+
+		ASSERT_TRUE(fem->hasM());
+		EXPECT_TRUE(fem->getM().toDense().isDiagonal());
+}
+
 
 TEST_F(FemRepresentationTests, SerializationTest)
 {

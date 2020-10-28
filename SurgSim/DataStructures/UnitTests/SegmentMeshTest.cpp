@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -552,7 +552,7 @@ TEST_F(SegmentMeshTest, CreateDefaultedges)
 	}
 
 	mesh.createDefaultEdges();
-	EXPECT_EQ(9, mesh.getNumEdges());
+	EXPECT_EQ(9u, mesh.getNumEdges());
 	for (size_t i = 0; i < mesh.getNumEdges(); ++i)
 	{
 		EXPECT_EQ(i, mesh.getEdge(i).verticesId[0]);

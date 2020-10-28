@@ -20,7 +20,10 @@
 #include <osg/PositionAttitudeTransform>
 #include <osgText/Text>
 
-#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgFont.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
@@ -33,10 +36,56 @@ using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
 
+
+
+
 namespace SurgSim
 {
 namespace Graphics
 {
+
+namespace
+{
+std::shared_ptr<Graphics::OsgMaterial> createDefaultMaterial()
+{
+	auto logger = Framework::Logger::getLogger("Graphics/OsgTextRepresentation");
+	auto material = Graphics::buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
+	if (material != nullptr)
+	{
+		material->setName("unlittext");
+		std::string path;
+
+		if (!Framework::Runtime::getApplicationData()->tryFindFile("Textures/white.png", &path))
+		{
+			SURGSIM_LOG_WARNING(logger) << "Could not find default texture for text background, text rectangles "
+										<< "might be compromised. (Textures/white.png)";
+			return material;
+		}
+
+		auto texture = std::make_shared<Graphics::OsgTexture2d>();
+		auto textureUniform = std::make_shared<Graphics::OsgTextureUniform<Graphics::OsgTexture2d>>("texture");
+		if (!texture->loadImage(path))
+		{
+			SURGSIM_LOG_WARNING(logger) << "Could not load default texture for text background, text rectangles "
+										<< "might be compromised. (" << path << ")";
+			return material;
+		}
+
+		textureUniform->set(texture);
+		material->addUniform(textureUniform);
+	}
+	else
+	{
+		SURGSIM_LOG_ONCE(Framework::Logger::getDefaultLogger(), WARNING)
+				<< "Could not find default shaders for text. Text display will be compromised.";
+		material = std::make_shared<Graphics::OsgMaterial>("unlittext");
+	}
+
+	return material;
+
+}
+
+}
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgTextRepresentation, OsgTextRepresentation);
 
@@ -63,11 +112,10 @@ OsgTextRepresentation::OsgTextRepresentation(const std::string& name) :
 	{
 		font->load("Fonts/Vera.ttf");
 	}
-	catch (std::exception e)
+	catch (std::exception&)
 	{
-		font = nullptr;
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
-				<< "Could not set default font Fonts/Vera.ttf";
+				<< "Could not set the font Fonts/Vera.ttf, the default will be used";
 	}
 
 	m_font = font;
@@ -129,19 +177,14 @@ void OsgTextRepresentation::doUpdate(double dt)
 
 bool OsgTextRepresentation::doInitialize()
 {
+
 	bool result = true;
 
 	// if the material was preassigned, don't create a default one
 	if (getMaterial() == nullptr)
 	{
-		result = false;
-		auto material = buildMaterial("Shaders/unlit_texture.vert", "Shaders/unlit_text.frag");
-		if (material != nullptr)
-		{
-			m_textNode->getOrCreateStateSet()->addUniform(new osg::Uniform("texture", 0));
-			setMaterial(material);
-			result = true;
-		}
+		setMaterial(OsgTextRepresentation::getDefaultMaterial());
+		m_textNode->getOrCreateStateSet()->addUniform(new osg::Uniform("texture", 0));
 	}
 
 	return result;
@@ -186,6 +229,13 @@ void OsgTextRepresentation::setOptionalMaximumWidth(SurgSim::DataStructures::Opt
 SurgSim::DataStructures::OptionalValue<double> OsgTextRepresentation::getOptionalMaximumWidth()
 {
 	return m_optionalWidth;
+}
+
+std::shared_ptr<SurgSim::Graphics::OsgMaterial> OsgTextRepresentation::getDefaultMaterial()
+{
+
+	static Framework::SharedInstance<OsgMaterial> shared(createDefaultMaterial);
+	return shared.get();
 }
 
 void OsgTextRepresentation::setDrawBackground(bool value)

@@ -59,6 +59,12 @@ void RenderTest::SetUp()
 void RenderTest::TearDown()
 {
 	runtime->stop();
+	camera = nullptr;
+	viewElement = nullptr;
+	scene = nullptr;
+	graphicsManager = nullptr;
+	applicationData = nullptr;
+	runtime = nullptr;
 }
 
 std::shared_ptr<ScreenSpaceQuadRepresentation> RenderTest::makeQuad(

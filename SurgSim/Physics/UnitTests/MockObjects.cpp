@@ -135,12 +135,10 @@ void MockDeformableRepresentation::addExternalGeneralizedForce(std::shared_ptr<L
 		std::dynamic_pointer_cast<MockDeformableLocalization>(localization);
 
 	m_externalGeneralizedForce.segment<3>(3 * loc->getLocalNode()) += generalizedForce;
-	Math::addSubMatrix(K, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
-					   static_cast<SparseMatrix::Index>(loc->getLocalNode()),
-					   &m_externalGeneralizedStiffness, true);
-	Math::addSubMatrix(D, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
-					   static_cast<SparseMatrix::Index>(loc->getLocalNode()),
-					   &m_externalGeneralizedDamping, true);
+	Math::addSubMatrix(K, static_cast<Eigen::Index>(loc->getLocalNode()),
+		static_cast<Eigen::Index>(loc->getLocalNode()), &m_externalGeneralizedStiffness);
+	Math::addSubMatrix(D, static_cast<Eigen::Index>(loc->getLocalNode()),
+		static_cast<Eigen::Index>(loc->getLocalNode()), &m_externalGeneralizedDamping);
 	m_hasExternalGeneralizedForce = true;
 }
 
@@ -204,7 +202,7 @@ void MockSpring::addNode(size_t nodeId)
 
 void MockSpring::addForce(const OdeState& state, Vector* F, double scale)
 {
-	SurgSim::Math::addSubVector(scale * m_F, m_nodeIds, 3, F);
+	SurgSim::Math::addSubVector<Vector, Vector>(scale * m_F, m_nodeIds, 3, F);
 }
 
 void MockSpring::addDamping(const OdeState& state, SparseMatrix* D, double scale)
@@ -218,9 +216,8 @@ void MockSpring::addDamping(const OdeState& state, SparseMatrix* D, double scale
 		int index2 = 0;
 		for (auto nodeId2 : m_nodeIds)
 		{
-			Math::addSubMatrix(scaledDense.block(3 * index1, 3 * index2, 3, 3),
-							   static_cast<SparseMatrix::Index>(nodeId1),
-							   static_cast<SparseMatrix::Index>(nodeId2), D, false);
+			Math::addSubMatrixNoInitialize(scaledDense.block(3 * index1, 3 * index2, 3, 3),
+				static_cast<Eigen::Index>(nodeId1), static_cast<Eigen::Index>(nodeId2), D);
 			++index2;
 		}
 		++index1;
@@ -239,9 +236,8 @@ void MockSpring::addStiffness(const SurgSim::Math::OdeState& state, SurgSim::Mat
 		int index2 = 0;
 		for (auto nodeId2 : m_nodeIds)
 		{
-			Math::addSubMatrix(scaledDense.block(3 * index1, 3 * index2, 3, 3),
-							   static_cast<SparseMatrix::Index>(nodeId1),
-							   static_cast<SparseMatrix::Index>(nodeId2), K, false);
+			Math::addSubMatrixNoInitialize(scaledDense.block(3 * index1, 3 * index2, 3, 3),
+				static_cast<Eigen::Index>(nodeId1), static_cast<Eigen::Index>(nodeId2), K);
 			++index2;
 		}
 		++index1;
@@ -260,7 +256,7 @@ void MockSpring::addMatVec(const OdeState& state, double alphaD, double alphaK, 
 	Vector xLocal(3 * m_nodeIds.size()), fLocal;
 	SurgSim::Math::getSubVector(x, m_nodeIds, 3, &xLocal);
 	fLocal = (alphaD * m_D + alphaK * m_K) * xLocal;
-	SurgSim::Math::addSubVector(fLocal, m_nodeIds, 3, F);
+	SurgSim::Math::addSubVector<Vector, Vector>(fLocal, m_nodeIds, 3, F);
 }
 
 MockMassSpring::MockMassSpring(const std::string& name,
@@ -427,12 +423,10 @@ void MockFemRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localiza
 
 	size_t numDofPerNode = getNumDofPerNode();
 	m_externalGeneralizedForce.segment(numDofPerNode * loc->getLocalNode(), numDofPerNode) += generalizedForce;
-	SurgSim::Math::addSubMatrix(K, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
-								static_cast<SparseMatrix::Index>(loc->getLocalNode()),
-								&m_externalGeneralizedStiffness, true);
-	SurgSim::Math::addSubMatrix(D, static_cast<SparseMatrix::Index>(loc->getLocalNode()),
-								static_cast<SparseMatrix::Index>(loc->getLocalNode()),
-								&m_externalGeneralizedDamping, true);
+	SurgSim::Math::addSubMatrix(K, static_cast<Eigen::Index>(loc->getLocalNode()),
+		static_cast<Eigen::Index>(loc->getLocalNode()), &m_externalGeneralizedStiffness);
+	SurgSim::Math::addSubMatrix(D, static_cast<Eigen::Index>(loc->getLocalNode()),
+		static_cast<Eigen::Index>(loc->getLocalNode()), &m_externalGeneralizedDamping);
 	m_hasExternalGeneralizedForce = true;
 }
 
@@ -448,6 +442,7 @@ const std::vector<double>& MockFemRepresentation::getMassPerNode() const
 
 void MockFemRepresentation::clearFMDK()
 {
+	m_initState = 0;
 	m_f.setZero();
 	SurgSim::Math::clearMatrix(&m_M);
 	SurgSim::Math::clearMatrix(&m_D);
@@ -463,10 +458,10 @@ bool MockFemRepresentation::hasSetInitialStateBeenCalled()
 	return m_setInitialStateCalled;
 }
 
-SurgSim::Math::Matrix
-MockFemRepresentationValidComplianceWarping::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
+void MockFemRepresentationValidComplianceWarping::calculateComplianceWarpingTransformation(
+	const SurgSim::Math::OdeState& state)
 {
-	return SurgSim::Math::Matrix::Identity(getNumDofPerNode(), getNumDofPerNode());
+	m_complianceWarpingTransformation.setIdentity();
 }
 
 MockFem1DRepresentation::MockFem1DRepresentation(const std::string& name) : SurgSim::Physics::Fem1DRepresentation(name)
@@ -490,6 +485,16 @@ MockFem2DRepresentation::MockFem2DRepresentation(const std::string& name) : Surg
 double MockFem2DRepresentation::getMassPerNode(size_t nodeId)
 {
 	return m_massPerNode[nodeId];
+}
+
+MockFem3DCorotationalTetrahedronRepresentation::MockFem3DCorotationalTetrahedronRepresentation(const std::string& name)
+		: SurgSim::Physics::Fem3DCorotationalTetrahedronRepresentation(name)
+{
+}
+
+SurgSim::Math::Matrix MockFem3DCorotationalTetrahedronRepresentation::getTransformation(size_t nodeId)
+{
+	return getNodeTransformation(*getCurrentState(), nodeId);
 }
 
 MockFixedConstraintFixedPoint::MockFixedConstraintFixedPoint() : ConstraintImplementation()
@@ -565,6 +570,11 @@ Vector3d MockLocalization::doCalculatePosition(double time) const
 Vector3d MockLocalization::doCalculateVelocity(double time) const
 {
 	return SurgSim::Math::Vector3d::Zero();
+}
+
+std::shared_ptr<Localization> MockLocalization::doCopy() const
+{
+	return std::make_shared<MockLocalization>(getRepresentation());
 }
 
 SurgSim::Physics::ConstraintType MockConstraintImplementation::getConstraintType() const
@@ -657,7 +667,7 @@ int MockCollisionRepresentation::getShapeType() const
 	return -1;
 }
 
-const std::shared_ptr<SurgSim::Math::Shape> MockCollisionRepresentation::getShape() const
+std::shared_ptr<Math::Shape> MockCollisionRepresentation::getShape() const
 {
 	return nullptr;
 }

@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2014, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,22 +13,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_directories(
+	${gtest_SOURCE_DIR}/include
+)
 
-# - Try to find the Google Mock Source directory
-#
-# Once done this will define
-#  GOOGLEMOCK_FOUND
-#  GOOGLEMOCK_DIR
-#
+set(UNIT_TEST_SOURCES
+	KnotIdentificationRenderTests.cpp
+	PostprocessingViewRenderTest.cpp
+)
 
-if(NOT GOOGLEMOCK_DIR)
-	find_path(GOOGLEMOCK_DIR
-		NAMES src/gmock.cc
-		PATHS "$ENV{GOOGLEMOCK_DIR}" "/usr/src/gmock/"
-	)
-endif(NOT GOOGLEMOCK_DIR)
+set(UNIT_TEST_HEADERS
+)
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(GoogleMock DEFAULT_MSG GOOGLEMOCK_DIR)
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
 
-mark_as_advanced(GOOGLEMOCK_DIR)
+set(LIBS
+	SurgSimBlocks
+	SurgSimFramework
+	SurgSimGraphic
+	SurgSimMath
+	SurgSimTestins
+)
+
+surgsim_add_unit_tests(SurgSimBlocksRenderTest)
+
+set_target_properties(SurgSimBlocksRenderTest PROPERTIES FOLDER "Blocks")

@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2012-2016, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,16 +21,18 @@ set(SURGSIM_BLOCKS_SOURCES
 	CompoundShapeToGraphics.cpp
 	DebugDumpBehavior.cpp
 	DriveElementFromInputBehavior.cpp
+	FunctionBehavior.cpp
 	GraphicsUtilities.cpp
 	ImplicitSurface.cpp
 	KeyBehavior.cpp
 	KeyboardCallbackBehavior.cpp
 	KeyboardTogglesComponentBehavior.cpp
+	KnotIdentificationBehavior.cpp
 	MassSpring1DRepresentation.cpp
 	MassSpring2DRepresentation.cpp
 	MassSpring3DRepresentation.cpp
-	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
+	PostprocessingView.cpp
 	ShadowMapping.cpp
 	SingleKeyBehavior.cpp
 	SphereElement.cpp
@@ -46,16 +48,18 @@ set(SURGSIM_BLOCKS_HEADERS
 	CompoundShapeToGraphics.h
 	DebugDumpBehavior.h
 	DriveElementFromInputBehavior.h
+	FunctionBehavior.h
 	GraphicsUtilities.h
 	ImplicitSurface.h
 	KeyBehavior.h
 	KeyboardCallbackBehavior.h
 	KeyboardTogglesComponentBehavior.h
+	KnotIdentificationBehavior.h
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h
-	MassSpringNDRepresentationUtils.h
 	PoseInterpolator.h
+	PostprocessingView.cpp
 	ShadowMapping.h
 	SingleKeyBehavior.h
 	SphereElement.h
@@ -86,6 +90,10 @@ target_link_libraries(SurgSimBlocks ${LIBS}
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
+endif()
+
+if(BUILD_RENDER_TESTING)
+	add_subdirectory(RenderTests)
 endif()
 
 # Put SurgSimBlocks into folder "Blocks"

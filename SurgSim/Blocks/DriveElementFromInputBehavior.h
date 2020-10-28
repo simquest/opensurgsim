@@ -35,6 +35,8 @@ SURGSIM_STATIC_REGISTRATION(DriveElementFromInputBehavior);
 /// Behavior to copy a pose from an input component to a SceneElement
 /// By adding this behavior to a SceneElement, that SceneElement will be moved
 /// in correspondance to the input.
+/// Defaults to updating in the PhysicsManager loop. An instance could run in the BehaviorManager if the SceneElement
+/// does not have any physics or collision representations.
 class DriveElementFromInputBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -43,6 +45,8 @@ public:
 	explicit DriveElementFromInputBehavior(const std::string& name);
 
 	SURGSIM_CLASSNAME(SurgSim::Blocks::DriveElementFromInputBehavior);
+
+	int getTargetManagerType() const override;
 
 	/// Set the InputComponent that provides the pose
 	/// \param	source A SurgSim::Input::InputComponent

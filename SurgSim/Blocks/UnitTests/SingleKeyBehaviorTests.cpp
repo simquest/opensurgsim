@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013 - 2016, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,9 +51,7 @@ TEST(SingleKeyBehaviorTest, SetAndGetKey)
 	int key = SurgSim::Devices::KeyCode::KEY_0;
 
 	EXPECT_NO_THROW(behavior->setKey(key));
-	int retrievedKey;
-	EXPECT_NO_THROW(retrievedKey = behavior->getKey());
-	EXPECT_EQ(key, retrievedKey);
+	EXPECT_EQ(key, behavior->getKey());
 }
 
 TEST(SingleKeyBehaviorTest, WakeUp)
@@ -93,12 +91,10 @@ TEST(SingleKeyBehaviorTest, AccessibleValues)
 
 	EXPECT_NO_THROW(behavior->setValue("ActionKey", key));
 	EXPECT_NO_THROW(behavior->setValue("InputComponent", input));
-	int retrievedKey;
-	std::shared_ptr<SurgSim::Framework::Component> retrievedInputComponent;
 
-	EXPECT_NO_THROW(retrievedKey = behavior->getValue<int>("ActionKey"));
-	EXPECT_NO_THROW(retrievedInputComponent =
-						behavior->getValue<std::shared_ptr<SurgSim::Input::InputComponent>>("InputComponent"));
+	int retrievedKey = behavior->getValue<int>("ActionKey");
+	std::shared_ptr<SurgSim::Framework::Component> retrievedInputComponent =
+						behavior->getValue<std::shared_ptr<SurgSim::Input::InputComponent>>("InputComponent");
 
 	EXPECT_EQ(key, retrievedKey);
 	EXPECT_EQ(input, retrievedInputComponent);

@@ -103,6 +103,11 @@ bool Fem1DLocalization::moveClosestTo(const Math::Vector3d& point, bool* hasReac
 	return false;
 }
 
+std::shared_ptr<Localization> Fem1DLocalization::doCopy() const
+{
+	return std::make_shared<Fem1DLocalization>(getRepresentation(), getLocalPosition());
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

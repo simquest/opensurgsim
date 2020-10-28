@@ -30,7 +30,7 @@ bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value)
 			*value = boost::any_cast<T>(functors->second.getter());
 			result = true;
 		}
-		catch (boost::bad_any_cast exception)
+		catch (boost::bad_any_cast&)
 		{
 
 		}
@@ -46,7 +46,7 @@ T SurgSim::Framework::Accessible::getValue(const std::string& name) const
 	{
 		result = boost::any_cast<T>(getValue(name));
 	}
-	catch (boost::bad_any_cast exception)
+	catch (const boost::bad_any_cast& exception)
 	{
 		SURGSIM_FAILURE() << "Failure to cast to the given type. <" << exception.what() << ">";
 		return T();

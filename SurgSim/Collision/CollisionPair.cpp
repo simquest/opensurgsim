@@ -25,12 +25,13 @@ namespace SurgSim
 namespace Collision
 {
 
-CollisionPair::CollisionPair()
+CollisionPair::CollisionPair() : m_type(MAX_COLLISION_DETECTION_TYPES), m_isSwapped(false)
 {
 }
 
 CollisionPair::CollisionPair(const std::shared_ptr<Representation>& first,
-							 const std::shared_ptr<Representation>& second)
+							 const std::shared_ptr<Representation>& second) :
+	m_type(MAX_COLLISION_DETECTION_TYPES), m_isSwapped(false)
 {
 	setRepresentations(first, second);
 }

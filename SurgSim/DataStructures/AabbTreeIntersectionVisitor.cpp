@@ -82,7 +82,7 @@ void AabbTreeIntersectionVisitor::setAabb(const SurgSim::Math::Aabbd& aabb)
 }
 
 
-const std::list<size_t>& AabbTreeIntersectionVisitor::getIntersections() const
+const std::vector<size_t>& AabbTreeIntersectionVisitor::getIntersections() const
 {
 	return m_intersections;
 }

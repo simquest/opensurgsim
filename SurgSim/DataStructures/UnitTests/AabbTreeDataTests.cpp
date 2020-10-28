@@ -145,7 +145,7 @@ TEST(AabbTreeDataTests, IntersectionTest)
 	Aabbd fourIntersections(Vector3d(-2.5, 0.0, 0.0), Vector3d(2.5, 0.0, 0.0));
 
 
-	std::list<size_t> results;
+	std::vector<size_t> results;
 	EXPECT_FALSE(data.hasIntersections(noIntersections));
 	data.getIntersections(noIntersections, &results);
 	EXPECT_EQ(0u, results.size());

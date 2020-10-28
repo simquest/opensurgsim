@@ -112,9 +112,9 @@ protected:
 	void setSize(size_t width, size_t height, size_t channels);
 
 private:
-	size_t m_width;
-	size_t m_height;
-	size_t m_channels;
+	size_t m_width = 0;
+	size_t m_height = 0;
+	size_t m_channels = 0;
 };
 
 };

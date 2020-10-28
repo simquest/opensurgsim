@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ TEST(FilteredDeviceTest, GetSetDevices)
 	ASSERT_ANY_THROW(filteredDevice->setDevices(devices));
 
 	auto actualDevices = filteredDevice->getDevices();
-	EXPECT_EQ(3, devices.size());
+	EXPECT_EQ(3u, devices.size());
 	EXPECT_EQ(subDeviceName, devices[0]->getName());
 	EXPECT_EQ("SurgSim::Devices::IdentityPoseDevice", devices[0]->getClassName());
 }

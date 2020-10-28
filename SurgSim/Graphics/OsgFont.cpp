@@ -29,7 +29,7 @@ namespace Graphics
 
 OsgFont::OsgFont()
 {
-
+	m_font = osgText::Font::getDefaultFont();
 }
 
 OsgFont::~OsgFont()
@@ -47,6 +47,7 @@ bool OsgFont::doLoad(const std::string& filePath)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
 				<< "The font could not be loaded from " << osgFilePath << ".";
+		m_font = osgText::Font::getDefaultFont();
 	}
 
 	return result;

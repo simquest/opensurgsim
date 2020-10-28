@@ -35,6 +35,8 @@ SURGSIM_STATIC_REGISTRATION(InputComponent);
 
 /// InputComponents connect devices to SceneElements, facilitating data transfer
 /// from a device to SceneElements and other Components.
+/// The actual Sceneelement pose is expected to be calculated like this
+/// ToDeviceTransform * pose * ToElementTransform
 class InputComponent : public SurgSim::Framework::Representation, public InputConsumerInterface
 {
 public:
@@ -68,12 +70,28 @@ public:
 
 	void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
+	/// \return the offset of the device pose to the scene 
+	SurgSim::Math::RigidTransform3d getToDeviceTransform() const;
+
+	/// Sets the offset of the device pose to the scene
+	/// \param val the actual offset
+	void setToDeviceTransform(const SurgSim::Math::RigidTransform3d& val);
+
+	/// \return the offset of the device to the element origin
+	SurgSim::Math::RigidTransform3d getToElementTransform() const;
+
+	/// Sets the offset of the device to the element origin
+	/// \param val the actual offset
+	void setToElementTransform(const SurgSim::Math::RigidTransform3d& val);
+
 private:
 	/// Name of the device to which this input component connects
 	std::string m_deviceName;
 
 	/// Thread safe container of most recent input data
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastInput;
+
+	SurgSim::Math::RigidTransform3d m_toElementTransform;
 
 	std::atomic<bool> m_hasInput;
 };

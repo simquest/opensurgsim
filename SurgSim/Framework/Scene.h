@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013-2015, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,8 +42,6 @@ class Runtime;
 class Scene : public std::enable_shared_from_this<Scene>
 {
 public:
-
-	typedef SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>> GroupsType;
 
 	/// Constructor.
 	/// \param runtime The runtime to be used.
@@ -92,13 +90,13 @@ public:
 	bool decode(const YAML::Node& node);
 
 	/// \return the groups of the scene
-	std::shared_ptr<GroupsType> getGroups();
+	SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>>& getGroups();
 
 private:
 
+	/// Get a shared pointer to Scene.
 	/// \return The shared pointer.
 	std::shared_ptr<Scene> getSharedPtr();
-
 	std::weak_ptr<Runtime> m_runtime;
 
 	std::vector<std::shared_ptr<SceneElement>> m_elements;
@@ -106,7 +104,7 @@ private:
 	// Used in a const function, need to declare mutable
 	mutable boost::mutex m_sceneElementsMutex;
 
-	std::shared_ptr<GroupsType> m_groups;
+	SurgSim::DataStructures::Groups<std::string, std::shared_ptr<SceneElement>> m_groups;
 
 	std::shared_ptr<Framework::Logger> m_logger;
 };

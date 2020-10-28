@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,8 +24,11 @@ namespace Math
 
 template <class V>
 ParticlesShape::ParticlesShape(const SurgSim::DataStructures::Vertices<V>& other) :
-	DataStructures::Vertices<DataStructures::EmptyData>(other)
+	DataStructures::Vertices<DataStructures::EmptyData>(other),
+	m_radius(0.0)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(ParticlesShape, double, Radius, getRadius, setRadius);
+	setInitialVertices(*this);
 	update();
 }
 
@@ -33,6 +36,7 @@ template <class V>
 ParticlesShape& ParticlesShape::operator=(const SurgSim::DataStructures::Vertices<V>& other)
 {
 	DataStructures::Vertices<DataStructures::EmptyData>::operator=(other);
+	setInitialVertices(*this);
 	update();
 	return *this;
 }

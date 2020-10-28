@@ -107,7 +107,10 @@ public:
 	void setBackgroundMargin(double margin) override;
 	double getBackgroundMargin() const override;
 
+	static std::shared_ptr<OsgMaterial> getDefaultMaterial();
+
 protected:
+
 	void doUpdate(double dt) override;
 	bool doInitialize() override;
 
@@ -128,7 +131,6 @@ private:
 
 	boost::mutex m_parameterMutex; ///< protect changes of parameters
 	bool m_needUpdate;	///< indicate whether parameters need to be updated
-	int m_anchor;
 
 	SurgSim::Math::Vector3d m_offset;
 };

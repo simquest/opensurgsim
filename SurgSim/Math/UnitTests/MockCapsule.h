@@ -29,7 +29,8 @@ class MockCapsule
 {
 public:
 	// Default constructor.
-	MockCapsule() {}
+	MockCapsule() : r(std::numeric_limits<double>::signaling_NaN())
+	{}
 
 	// Constructor.
 	MockCapsule(const Vector3d& vertex0, const Vector3d& vertex1, double radius) :

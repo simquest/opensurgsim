@@ -59,7 +59,7 @@ void TreeNode::setData(std::shared_ptr<TreeData> data)
 	m_data = data;
 }
 
-std::shared_ptr<TreeData> TreeNode::getData() const
+const std::shared_ptr<TreeData>& TreeNode::getData() const
 {
 	return m_data;
 }
@@ -90,7 +90,7 @@ void TreeNode::setChild(size_t index, const std::shared_ptr<TreeNode>& node)
 	m_children[index] = node;
 }
 
-std::shared_ptr<TreeNode> TreeNode::getChild(size_t index) const
+std::shared_ptr<TreeNode>& TreeNode::getChild(size_t index)
 {
 	SURGSIM_ASSERT(index < m_children.size()) << "getChild() with invalid index for child.";
 	return m_children[index];

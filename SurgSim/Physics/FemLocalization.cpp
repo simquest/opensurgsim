@@ -67,20 +67,18 @@ SurgSim::Math::Vector3d FemLocalization::doCalculatePosition(double time) const
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
-	Vector3d currentPosition;
-	Vector3d previousPosition;
-
 	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
-	currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
-		m_position.coordinate);
-	previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
+	Vector3d previousPosition = femElement->computeCartesianCoordinate(*femRepresentation->getPreviousState(),
 		m_position.coordinate);
 
 	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return previousPosition;
 	}
-	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
+
+	Vector3d currentPosition = femElement->computeCartesianCoordinate(*femRepresentation->getCurrentState(),
+		m_position.coordinate);
+	if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return currentPosition;
 	}
@@ -97,9 +95,6 @@ SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
 	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
 		" initialized";
 
-	Vector3d currentVelocity(0.0, 0.0, 0.0);
-	Vector3d previousVelocity(0.0, 0.0, 0.0);
-
 	const SurgSim::Math::Vector& naturalCoordinate = m_position.coordinate;
 
 	std::shared_ptr<FemElement> femElement = femRepresentation->getFemElement(m_position.index);
@@ -109,22 +104,32 @@ SurgSim::Math::Vector3d FemLocalization::doCalculateVelocity(double time) const
 	const Math::Vector& previousVelocities = femRepresentation->getPreviousState()->getVelocities();
 
 	auto& nodeIds = femElement->getNodeIds();
-	for (int i = 0; i < 2; i++)
+	Vector3d previousVelocity = Vector3d::Zero();
+	for (Eigen::Index i = 0; i < naturalCoordinate.size(); ++i)
 	{
-		currentVelocity += naturalCoordinate(i) * Math::getSubVector(currentVelocities, nodeIds[i], 6).segment<3>(0);
 		previousVelocity += naturalCoordinate(i) * Math::getSubVector(previousVelocities, nodeIds[i], 6).segment<3>(0);
 	}
-
 	if (time <= std::numeric_limits<double>::epsilon())
 	{
 		return previousVelocity;
 	}
-	else if (time >= 1.0 - std::numeric_limits<double>::epsilon())
+
+	Vector3d currentVelocity = Vector3d::Zero();
+	for (Eigen::Index i = 0; i < naturalCoordinate.size(); ++i)
+	{
+		currentVelocity += naturalCoordinate(i) * Math::getSubVector(currentVelocities, nodeIds[i], 6).segment<3>(0);
+	}
+	if (time >= 1.0 - std::numeric_limits<double>::epsilon())
 	{
 		return currentVelocity;
 	}
 
 	return Math::interpolate(previousVelocity, currentVelocity, time);
+}
+
+std::shared_ptr<Localization> FemLocalization::doCopy() const
+{
+	return std::make_shared<FemLocalization>(getRepresentation(), getLocalPosition());
 }
 
 } // namespace Physics

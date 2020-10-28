@@ -83,6 +83,7 @@ public:
 		count(runCount),
 		totalTime(0.0),
 		didBeforeStop(false),
+		runIndefinetly(false),
 		didInitialize(false),
 		didStartUp(false)
 	{
@@ -147,11 +148,14 @@ public:
 	bool getSucceedWithWakeUp() const;
 	void setSucceedWithWakeUp(bool val);
 
+	void eventCallback(const SurgSim::Framework::Messenger::Event& event);
+
 	bool succeedWithInit;
 	bool succeedWithWakeUp;
 	bool didWakeUp;
 	bool didInit;
 	bool didRetire;
+	bool didCallback;
 };
 
 class MockBehavior : public SurgSim::Framework::Behavior

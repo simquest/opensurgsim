@@ -86,6 +86,8 @@ public:
 	/// Returns the number of uniforms in this material.
 	virtual size_t getNumUniforms() const = 0;
 
+	virtual void loadProgram(const std::string& nameTuple) = 0;
+
 
 	/// Sets the program used by this material.
 	/// \param	program	Shader program.

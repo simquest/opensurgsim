@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2015, SimQuest Solutions Inc.
+// Copyright 2015-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,8 +56,8 @@ TEST(Fem2DRepresentationReaderTests, DelegateTest)
 	// Boundary conditions
 	ASSERT_EQ(2u, fem->getBoundaryConditions().size());
 
-	EXPECT_EQ(3, fem->getBoundaryCondition(0));
-	EXPECT_EQ(2, fem->getBoundaryCondition(1));
+	EXPECT_EQ(3u, fem->getBoundaryCondition(0));
+	EXPECT_EQ(2u, fem->getBoundaryCondition(1));
 
 	// Material
 	for (size_t i = 0; i < fem->getNumElements(); ++i)
@@ -84,6 +84,21 @@ TEST(Fem2DRepresentationReaderTests, PerElementMaterial)
 		EXPECT_DOUBLE_EQ(value++, element->massDensity);
 		EXPECT_DOUBLE_EQ(value++, element->poissonRatio);
 		EXPECT_DOUBLE_EQ(value++, element->youngModulus);
+	}
+}
+
+TEST(Fem2DRepresentationReaderTests, NoMaterials)
+{
+	auto fem = std::make_shared<Fem2D>();
+	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
+
+	ASSERT_NO_THROW(fem->load("PlyReaderTests/Fem2DNoMaterial.ply"));
+
+	for (auto element : fem->getElements())
+	{
+		EXPECT_DOUBLE_EQ(0.0, element->massDensity);
+		EXPECT_DOUBLE_EQ(0.0, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(0.0, element->youngModulus);
 	}
 }
 

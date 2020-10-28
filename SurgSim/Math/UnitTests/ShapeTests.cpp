@@ -62,7 +62,7 @@ public:
 	double m_length;
 
 	// Size (box)
-	double m_size[3];
+	double m_size[3] = {};
 };
 
 TEST_F(ShapeTest, EncodeEmptyShapeTest)

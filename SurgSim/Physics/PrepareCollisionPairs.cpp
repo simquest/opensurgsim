@@ -55,7 +55,6 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 			if (!(*first)->isIgnoring(*second) && !(*second)->isIgnoring(*first))
 			{
 				auto pair = std::make_shared<Collision::CollisionPair>(*first, *second);
-
 				if (pair->getType() != Collision::COLLISION_DETECTION_TYPE_NONE && pair->mayIntersect())
 				{
 					pairs.push_back(pair);
@@ -98,7 +97,7 @@ std::shared_ptr<PhysicsManagerState> PrepareCollisionPairs::doUpdate(
 				message += "\t" + std::get<0>(name) + " : " + std::get<1>(name) +
 						   (
 							   (std::get<2>(name) == SurgSim::Collision::COLLISION_DETECTION_TYPE_CONTINUOUS) ?
-							   " DCD" : " CCD"
+							   " CCD" : " DCD"
 						   ) + "\n";
 			}
 			SURGSIM_LOG_DEBUG(m_logger) << message;

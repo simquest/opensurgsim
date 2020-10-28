@@ -1,0 +1,18 @@
+/*!
+
+\page Trakstar trakSTAR: Electromagnetic tracker
+
+trakSTAR is one of the tracking systems sold by Northern Digital Incorporated (NDI).
+https://www.ndigital.com/
+
+Linux is not supported by the SDK.
+
+Supported devices:
+  - NDI's trakSTAR.  Possibly also driveBAY.
+
+Dependencies:
+  - Windows: Requires NDI's ATC 3DG SDK (a.k.a., Ascension Technology Corporation's 3D Guidance). Available from NDI's support page with login. https://support.ndigital.com/
+	- An environment variable named ATC3DG_SDK must be set to the directory containing <tt>ATC3DG.h</tt>
+	- Add the directory containing ATC3DG64.lib to the environment path.
+
+*/

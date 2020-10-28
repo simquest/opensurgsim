@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,8 +68,8 @@ static void solveAndCompareResult(const std::string& fileName,
 	// XXX set ratio to 1
 	mlcpSolver.solve(data->problem, &solution);
 
-	ASSERT_EQ(size, solution.x.rows());
-	ASSERT_EQ(size, data->expectedLambda.rows());
+	ASSERT_EQ(static_cast<Eigen::Index>(size), solution.x.rows());
+	ASSERT_EQ(static_cast<Eigen::Index>(size), data->expectedLambda.rows());
 	if (size > 0)
 	{
 		ASSERT_TRUE(isValid(solution.x)) << solution.x;

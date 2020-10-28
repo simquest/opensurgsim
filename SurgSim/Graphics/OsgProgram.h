@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@ class ApplicationData;
 namespace Graphics
 {
 
+SURGSIM_STATIC_REGISTRATION(OsgProgram);
+
 /// OSG-based implementation of a graphics shader.
 ///
 /// Wraps an osg::Program which manages the geometry, vertex, and fragment shaders.
@@ -46,6 +48,8 @@ public:
 	/// Constructor
 	/// \post	No shader code is set, so the fixed-function pipeline is used.
 	OsgProgram();
+
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgProgram);
 
 	bool hasVertexShader() const override;
 
@@ -140,13 +144,26 @@ private:
 	/// Is the shader supposed to be used globally
 	bool m_globalScope;
 
+protected:
+
+	bool doLoad(const std::string& filePath) override;
+
 };
 
 /// Utility function, load a program from a set of shader files
 /// \param data Application data object
 /// \param name the base name of the shader files to be used '.vert' and '.frag' will be added automatically
+/// \return a valid program if all the shaders are found, nullptr otherwise
 std::shared_ptr<SurgSim::Graphics::OsgProgram> loadProgram(const SurgSim::Framework::ApplicationData& data,
 		const std::string& name);
+
+/// Utility function, load a program from a set of shader files
+/// \param data Application data object
+/// \param vertexShaderName name of the vertex shader to be used
+/// \param fragmentShaderName name of the fragment shader to be used
+/// \return a valid program if all the shaders are found, nullptr otherwise
+std::shared_ptr<SurgSim::Graphics::OsgProgram> loadProgram(const SurgSim::Framework::ApplicationData& data,
+		const std::string& vertexShaderName, const std::string& fragmentShaderName);
 
 };  // namespace Graphics
 

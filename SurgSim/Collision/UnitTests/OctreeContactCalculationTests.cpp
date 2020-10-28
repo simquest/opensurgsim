@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/DataStructures/Location.h"
 #include "SurgSim/Collision/CcdDcdCollision.h"
 #include "SurgSim/Collision/OctreeCapsuleContact.h"
 #include "SurgSim/Collision/OctreeDoubleSidedPlaneContact.h"
 #include "SurgSim/Collision/OctreePlaneContact.h"
 #include "SurgSim/Collision/OctreeSphereContact.h"
+#include "SurgSim/Collision/OctreeTriangleMeshContact.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/DataStructures/Location.h"
+#include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -31,15 +33,16 @@
 #include "SurgSim/Math/Shapes.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::Location;
 using SurgSim::DataStructures::OctreeNode;
 using SurgSim::DataStructures::OctreePath;
-using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::Geometry::DistanceEpsilon;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
+using SurgSim::Math::MeshShape;
 using SurgSim::Math::OctreeShape;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Quaterniond;
@@ -69,14 +72,16 @@ std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
 								 ContactCalculation* calculator)
 {
 	std::shared_ptr<ShapeCollisionRepresentation> octreeRep =
-		std::make_shared<ShapeCollisionRepresentation>("Collision Octree 0");
+		std::make_shared<ShapeCollisionRepresentation>("Octree");
 	octreeRep->setShape(octree);
 	octreeRep->setLocalPose(makeRigidTransform(octreeQuat, octreeTrans));
 
 	std::shared_ptr<ShapeCollisionRepresentation> shapeRep =
-		std::make_shared<ShapeCollisionRepresentation>("Collision Capsule 0");
+		std::make_shared<ShapeCollisionRepresentation>("Shape");
 	shapeRep->setShape(shape);
 	shapeRep->setLocalPose(makeRigidTransform(shapeQuat, shapeTrans));
+	shapeRep->updateShapeData();
+	shapeRep->updateDcdData();
 
 	// Perform collision detection.
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(octreeRep, shapeRep);
@@ -172,7 +177,7 @@ TEST(OctreeContactCalculationTests, Capsule)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(0.0, 0.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -185,7 +190,7 @@ TEST(OctreeContactCalculationTests, Capsule)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(5.0, 3.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -250,7 +255,7 @@ TEST(OctreeContactCalculationTests, Plane)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(0.0, 0.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -322,7 +327,7 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(0.0, 0.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -379,7 +384,7 @@ TEST(OctreeContactCalculationTests, Sphere)
 					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(0.0, 0.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 
 	{
@@ -424,9 +429,73 @@ TEST(OctreeContactCalculationTests, Sphere)
 					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 					   Vector3d(8.0, 8.0, 0.0),
 					   &calculator);
-		EXPECT_EQ(0, contacts.size());
+		EXPECT_EQ(0u, contacts.size());
 	}
 }
+
+TEST(OctreeContactCalculationTests, TriangleMesh)
+{
+	auto octree = buildTestOctree();
+	auto octreeShape = std::make_shared<OctreeShape>(*octree);
+	auto meshShape = std::make_shared<MeshShape>();
+	OctreeTriangleMeshContact calculator;
+
+	Framework::ApplicationData applicationData("config.txt");
+	meshShape->load("Geometry/Cube.ply", applicationData);
+
+	std::list<std::shared_ptr<Contact>> contacts;
+	{
+		SCOPED_TRACE("No intersection, mesh outside octree");
+		contacts = doCollision(
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 10.0, 0.0),
+					   meshShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   &calculator);
+		EXPECT_EQ(0u, contacts.size());
+	}
+	{
+		SCOPED_TRACE("Intersection, mesh at center of octree");
+		contacts = doCollision(
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   meshShape,
+					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(8.5, 8.5, 8.5),
+					   &calculator);
+		checkContacts(contacts, octree);
+		EXPECT_TRUE(nodeInContacts("center", contacts, octree));
+	}
+	{
+		SCOPED_TRACE("No intersection, mesh inside octree, but not contacting active nodes");
+		contacts = doCollision(
+					   octreeShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 10.0, 0.0),
+					   meshShape,
+					   makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(8.0, 8.0, 0.0),
+					   &calculator);
+		EXPECT_EQ(0u, contacts.size());
+	}
+	{
+		SCOPED_TRACE("Intersection, octree rotated");
+		contacts = doCollision(
+					   octreeShape,
+					   makeRotationQuaternion(M_PI, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(0.0, 0.0, 0.0),
+					   meshShape,
+					   makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
+					   Vector3d(-16.0, 0.0, 0.0),
+					   &calculator);
+		checkContacts(contacts, octree);
+		EXPECT_TRUE(nodeInContacts("corner1", contacts, octree));
+	}
+}
+
 
 TEST(OctreeContactCalculationTests, CheckNumberOfContacts)
 {
@@ -448,8 +517,11 @@ TEST(OctreeContactCalculationTests, CheckNumberOfContacts)
 	calculator.calculateContact(pair);
 	pair->updateRepresentations();
 
-	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().size());
-	EXPECT_EQ(1, shapeRep->getCollisions().unsafeGet().count(octreeRep));
+	EXPECT_EQ(1u, shapeRep->getCollisions().unsafeGet().size());
+	EXPECT_EQ(1u, shapeRep->getCollisions().unsafeGet().count(octreeRep));
+
+	octreeRep->retire();
+	shapeRep->retire();
 }
 
 }; // namespace Collision

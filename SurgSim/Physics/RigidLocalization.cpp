@@ -118,5 +118,12 @@ bool RigidLocalization::isValidRepresentation(std::shared_ptr<Representation> re
 	return (rigidRepresentation != nullptr || representation == nullptr);
 }
 
+std::shared_ptr<Localization> RigidLocalization::doCopy() const
+{
+	auto localization = std::make_shared<RigidLocalization>(getRepresentation());
+	localization->setLocalPosition(getLocalPosition());
+	return localization;
+}
+
 }; // Physics
 }; // SurgSim

@@ -38,14 +38,12 @@ Mesh::Mesh() :
 {
 }
 
-Mesh::Mesh( const Mesh& other ) : BaseType(other)
+Mesh::Mesh( const Mesh& other ) : BaseType(other), m_updateCount(other.getUpdateCount())
 {
-
 }
 
-Mesh::Mesh( Mesh&& other ) : BaseType(std::move(other))
+Mesh::Mesh( Mesh&& other ) : BaseType(std::move(other)), m_updateCount(std::move(other.m_updateCount))
 {
-
 }
 
 void Mesh::initialize(

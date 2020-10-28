@@ -186,7 +186,8 @@ OsgSkeletonRepresentation::OsgSkeletonRepresentation(const std::string& name) :
 	OsgRepresentation(name),
 	SkeletonRepresentation(name),
 	m_logger(SurgSim::Framework::Logger::getLogger("Graphics/OsgSkeletonRepresentation")),
-	m_bones(std::make_shared<std::map<std::string, BoneData>>())
+	m_bones(std::make_shared<std::map<std::string, BoneData>>()),
+	m_frameCount(0)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(OsgSkeletonRepresentation, std::string,
 									  SkinningShaderFileName, getSkinningShaderFileName, setSkinningShaderFileName);

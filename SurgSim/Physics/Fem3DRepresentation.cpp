@@ -33,13 +33,11 @@ namespace
 void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform, SurgSim::Math::Vector* x,
 							   bool rotationOnly = false)
 {
-	typedef SurgSim::Math::Vector::Index IndexType;
-
-	IndexType numNodes = x->size() / 3;
+	Eigen::Index numNodes = x->size() / 3;
 	SURGSIM_ASSERT(numNodes * 3 == x->size())
 			<< "Unexpected number of dof in a Fem3D state vector (not a multiple of 3)";
 
-	for (IndexType nodeId = 0; nodeId < numNodes; nodeId++)
+	for (Eigen::Index nodeId = 0; nodeId < numNodes; nodeId++)
 	{
 		SurgSim::Math::Vector3d xi = x->segment<3>(3 * nodeId);
 		x->segment<3>(3 * nodeId) = (rotationOnly) ? transform.linear() * xi : transform * xi;
@@ -140,7 +138,7 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	using Math::SparseMatrix;
 
 	const size_t dofPerNode = getNumDofPerNode();
-	const Math::Matrix::Index expectedSize = static_cast<const Math::Matrix::Index>(dofPerNode);
+	const Eigen::Index expectedSize = static_cast<const Eigen::Index>(dofPerNode);
 
 	SURGSIM_ASSERT(localization != nullptr) << "Invalid localization (nullptr)";
 	SURGSIM_ASSERT(generalizedForce.size() == expectedSize) <<
@@ -163,7 +161,8 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 	size_t index = 0;
 	for (auto nodeId : element->getNodeIds())
 	{
-		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode) += generalizedForce * coordinate[index];
+		m_externalGeneralizedForce.segment(dofPerNode * nodeId, dofPerNode).noalias() +=
+			generalizedForce * coordinate[index];
 		index++;
 	}
 
@@ -178,16 +177,14 @@ void Fem3DRepresentation::addExternalGeneralizedForce(std::shared_ptr<Localizati
 				if (K.size() != 0)
 				{
 					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * K,
-									   static_cast<SparseMatrix::Index>(nodeId1),
-									   static_cast<SparseMatrix::Index>(nodeId2),
-									   &m_externalGeneralizedStiffness, true);
+						static_cast<Eigen::Index>(nodeId1), static_cast<Eigen::Index>(nodeId2),
+						&m_externalGeneralizedStiffness);
 				}
 				if (D.size() != 0)
 				{
 					Math::addSubMatrix(coordinate[index1] * coordinate[index2] * D,
-									   static_cast<SparseMatrix::Index>(nodeId1),
-									   static_cast<SparseMatrix::Index>(nodeId2),
-									   &m_externalGeneralizedDamping, true);
+						static_cast<Eigen::Index>(nodeId1), static_cast<Eigen::Index>(nodeId2),
+						&m_externalGeneralizedDamping);
 				}
 				index2++;
 			}

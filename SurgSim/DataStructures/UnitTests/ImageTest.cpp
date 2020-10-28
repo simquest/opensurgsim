@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2015, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,9 +93,9 @@ TYPED_TEST(ImageTests, Accessors)
 	typedef typename TestFixture::Scalar T;
 	{
 		Image<T> image;
-		EXPECT_EQ(0, image.getWidth());
-		EXPECT_EQ(0, image.getHeight());
-		EXPECT_EQ(0, image.getNumChannels());
+		EXPECT_EQ(0u, image.getWidth());
+		EXPECT_EQ(0u, image.getHeight());
+		EXPECT_EQ(0u, image.getNumChannels());
 		EXPECT_EQ(nullptr, image.getData());
 
 		std::array<size_t, 3> size = {0, 0, 0};
@@ -103,9 +103,9 @@ TYPED_TEST(ImageTests, Accessors)
 	}
 	{
 		Image<T> image(10, 20, 30);
-		EXPECT_EQ(10, image.getWidth());
-		EXPECT_EQ(20, image.getHeight());
-		EXPECT_EQ(30, image.getNumChannels());
+		EXPECT_EQ(10u, image.getWidth());
+		EXPECT_EQ(20u, image.getHeight());
+		EXPECT_EQ(30u, image.getNumChannels());
 
 		std::array<size_t, 3> size = {10, 20, 30};
 		EXPECT_EQ(size, image.getSize());
@@ -113,9 +113,9 @@ TYPED_TEST(ImageTests, Accessors)
 	{
 		T array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 		Image<T> image(3, 3, 1, array);
-		EXPECT_EQ(3, image.getWidth());
-		EXPECT_EQ(3, image.getHeight());
-		EXPECT_EQ(1, image.getNumChannels());
+		EXPECT_EQ(3u, image.getWidth());
+		EXPECT_EQ(3u, image.getHeight());
+		EXPECT_EQ(1u, image.getNumChannels());
 
 		std::array<size_t, 3> size = {3, 3, 1};
 		EXPECT_EQ(size, image.getSize());
@@ -138,14 +138,14 @@ TYPED_TEST(ImageTests, Move)
 
 		EXPECT_EQ(nullptr, oldImage.getData());
 		EXPECT_NE(dataPtr, oldImage.getData());
-		EXPECT_EQ(0, oldImage.getWidth());
-		EXPECT_EQ(0, oldImage.getHeight());
-		EXPECT_EQ(0, oldImage.getNumChannels());
+		EXPECT_EQ(0u, oldImage.getWidth());
+		EXPECT_EQ(0u, oldImage.getHeight());
+		EXPECT_EQ(0u, oldImage.getNumChannels());
 
 		EXPECT_EQ(dataPtr, newImage.getData());
-		EXPECT_EQ(3, newImage.getWidth());
-		EXPECT_EQ(3, newImage.getHeight());
-		EXPECT_EQ(1, newImage.getNumChannels());
+		EXPECT_EQ(3u, newImage.getWidth());
+		EXPECT_EQ(3u, newImage.getHeight());
+		EXPECT_EQ(1u, newImage.getNumChannels());
 	}
 	{
 		Image<T> oldImage(15, 25, 4);
@@ -153,14 +153,14 @@ TYPED_TEST(ImageTests, Move)
 		Image<T> newImage(std::move(oldImage));
 
 		EXPECT_EQ(nullptr, oldImage.getData());
-		EXPECT_EQ(0, oldImage.getWidth());
-		EXPECT_EQ(0, oldImage.getHeight());
-		EXPECT_EQ(0, oldImage.getNumChannels());
+		EXPECT_EQ(0u, oldImage.getWidth());
+		EXPECT_EQ(0u, oldImage.getHeight());
+		EXPECT_EQ(0u, oldImage.getNumChannels());
 
 		EXPECT_EQ(dataPtr, newImage.getData());
-		EXPECT_EQ(15, newImage.getWidth());
-		EXPECT_EQ(25, newImage.getHeight());
-		EXPECT_EQ(4, newImage.getNumChannels());
+		EXPECT_EQ(15u, newImage.getWidth());
+		EXPECT_EQ(25u, newImage.getHeight());
+		EXPECT_EQ(4u, newImage.getNumChannels());
 	}
 }
 

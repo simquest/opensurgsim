@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/LogOutput.h"
-#include "SurgSim/Framework/Logger.h"
-#include "SurgSim/Framework/Assert.h"
 
 #include <boost/thread/locks.hpp>
-
 #include <fstream>
+
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Logger.h"
+
 
 namespace SurgSim
 {
@@ -37,11 +38,6 @@ FileOutput::FileOutput(const std::string& filename) :
 	SURGSIM_ASSERT(! m_stream.fail()) << "Failed to open '" << m_filename << "'!";
 }
 
-FileOutput::~FileOutput()
-{
-	m_stream.close();
-}
-
 bool SurgSim::Framework::FileOutput::writeMessage(const std::string& message)
 {
 	SURGSIM_ASSERT(m_stream.is_open() && ! m_stream.fail()) <<
@@ -56,15 +52,6 @@ bool SurgSim::Framework::FileOutput::writeMessage(const std::string& message)
 
 StreamOutput::StreamOutput(std::ostream& ostream) : m_stream(ostream) //NOLINT
 {
-}
-
-StreamOutput::~StreamOutput()
-{
-	if (m_stream.fail())
-	{
-		//TODO(hscheirich) 2013-01-28: Still need to figure out default logging
-		throw("Default logging not implemented yet");
-	}
 }
 
 bool StreamOutput::writeMessage(const std::string& message)

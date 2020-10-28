@@ -65,6 +65,8 @@ TEST(DcdCollisionTest, RigidRigidCollisionTest)
 
 	auto sphere1Collision = sphere1->getComponents<Collision::Representation>()[0];
 	auto sphere2Collision = sphere2->getComponents<Collision::Representation>()[0];
+	sphere1Collision->wakeUp();
+	sphere2Collision->wakeUp();
 	sphere1Collision->update(0.0);
 	sphere2Collision->update(0.0);
 	std::vector<std::shared_ptr<Collision::Representation>> collisionRepresentations;
@@ -103,18 +105,18 @@ TEST(DcdCollisionTest, Deactivate)
 	scene->addSceneElement(element);
 
 	runtime->start(true);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 	runtime->step();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	runtime->step();
 	EXPECT_TRUE(sphere1->collidedWith(sphere2));
 	EXPECT_TRUE(sphere2->collidedWith(sphere1));
 
 	sphere1->setLocalActive(false);
 	runtime->step();
-	boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+	runtime->step();
 	EXPECT_FALSE(sphere1->collidedWith(sphere2));
 	EXPECT_FALSE(sphere2->collidedWith(sphere1));
 
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	runtime->stop();
 }
 

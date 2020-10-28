@@ -21,11 +21,13 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Runtime.h"
 
-#include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgGroup.h"
-#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
 #include "SurgSim/Graphics/OsgScreenSpacePass.h"
+#include "SurgSim/Graphics/OsgTextRepresentation.h"
+#include "SurgSim/Graphics/OsgView.h"
 
 #include <osgViewer/Scene>
 #include <osgDB/WriteFile>
@@ -209,6 +211,9 @@ bool OsgManager::removeView(std::shared_ptr<SurgSim::Graphics::View> view)
 bool OsgManager::doInitialize()
 {
 	m_hudElement = std::make_shared<OsgScreenSpacePass>(Representation::DefaultHudGroupName);
+
+	m_hudElement->addComponent(OsgTextRepresentation::getDefaultMaterial());
+
 	return true;
 }
 
@@ -267,7 +272,10 @@ osg::ref_ptr<osgViewer::CompositeViewer> OsgManager::getOsgCompositeViewer() con
 
 void SurgSim::Graphics::OsgManager::dumpDebugInfo() const
 {
-	osgDB::writeNodeFile(*m_viewer->getView(0)->getCamera(), "viewer_zero_camera.osgt");
+	if (m_viewer->getNumViews() > 0)
+	{
+		osgDB::writeNodeFile(*m_viewer->getView(0)->getCamera(), "viewer_zero_camera.osgt");
+	}
 }
 
 }

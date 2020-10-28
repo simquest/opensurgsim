@@ -53,6 +53,10 @@ public:
 	/// \return A point on the surface of the shape, shape is assumed to be located at the origin.
 	virtual SurgSim::Math::Vector3d pointOnShape(std::shared_ptr<SurgSim::Math::Shape> shape) = 0;
 
+	/// Set the seed to the given value
+	/// \param val the new seed for the random number generator
+	void seed(unsigned int val) { m_generator.seed(val); }
+
 protected:
 	///@{
 	/// Random number generator and some predefined distributions to be used by different shape point generators.

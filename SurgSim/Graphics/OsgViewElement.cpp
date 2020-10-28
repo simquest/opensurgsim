@@ -35,6 +35,7 @@ OsgViewElement::OsgViewElement(const std::string& name) :
 {
 	setView(std::make_shared<OsgView>("View"));
 	setCamera(std::make_shared<OsgCamera>("Camera"));
+
 	getCamera()->setRenderGroupReference(Representation::DefaultGroupName);
 }
 

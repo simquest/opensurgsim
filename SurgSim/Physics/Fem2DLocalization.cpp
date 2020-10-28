@@ -67,6 +67,11 @@ Math::RigidTransform3d Fem2DLocalization::getElementPose()
 	return Math::makeRigidTransform(rotation, (nodePositions[0] + nodePositions[1] + nodePositions[2]) / 3.0);
 }
 
+std::shared_ptr<Localization> Fem2DLocalization::doCopy() const
+{
+	return std::make_shared<Fem2DLocalization>(getRepresentation(), getLocalPosition());
+}
+
 } // namespace Physics
 
 } // namespace SurgSim

@@ -1,0 +1,26 @@
+ply
+format ascii 1.0
+comment Created by hand
+element vertex 6
+property double x
+property double y
+property double z
+element 2d_element 3
+property list uint uint vertex_indices
+element boundary_condition 2
+property uint vertex_index
+element thickness 1
+property double value
+end_header
+1.000000 1.000000 -1.000000
+1.000000 -1.000000 -1.000000
+-1.000000 -1.000000 -1.000000
+1.000000 0.999999 1.000000
+-1.000000 1.000000 1.000000
+0.999999 -1.000001 1.000000
+3 0 1 2
+3 1 2 4
+3 3 4 5
+3
+2
+0.1

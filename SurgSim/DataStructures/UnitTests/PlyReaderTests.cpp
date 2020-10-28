@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -137,29 +137,29 @@ public:
 
 	struct VertexData
 	{
-		double x;
-		double y;
-		double z;
-		int64_t overrun;
+		double x = std::numeric_limits<double>::signaling_NaN();
+		double y = std::numeric_limits<double>::signaling_NaN();
+		double z = std::numeric_limits<double>::signaling_NaN();
+		int64_t overrun = -1;
 	};
 
 	struct FaceData
 	{
-		unsigned int faceCount;
-		unsigned int* faces;
-		int extra;
-		unsigned int nature;
-		int64_t overrun;
+		unsigned int faceCount = 0;
+		unsigned int* faces = nullptr;
+		int extra = -1;
+		unsigned int nature = 0;
+		int64_t overrun = -1;
 	};
 
 	VertexData vertexData;
-	size_t vertexInitCount;
-	int vertexRunningCount;
-	bool endVerticesCalled;
+	size_t vertexInitCount = 0;
+	size_t vertexRunningCount = 0;
+	bool endVerticesCalled = false;
 
 	FaceData faceData;
-	size_t faceInitCount;
-	int faceRunningCount;
+	size_t faceInitCount = 0;
+	size_t faceRunningCount = 0;
 
 	std::vector<Vector3d> vertices;
 	std::vector<std::vector<unsigned int>> faces;
@@ -190,8 +190,8 @@ TEST_F(PlyReaderTests, ElementTwoPropertyTest)
 
 	ASSERT_NO_THROW(reader.parseFile());
 
-	EXPECT_EQ(11, testData.natures[0]);
-	EXPECT_EQ(0, testData.natures[8]);
+	EXPECT_EQ(11u, testData.natures[0]);
+	EXPECT_EQ(0u, testData.natures[8]);
 }
 
 TEST_F(PlyReaderTests, ScalarReadTest)
@@ -223,8 +223,8 @@ TEST_F(PlyReaderTests, ScalarReadTest)
 
 	ASSERT_NO_THROW(reader.parseFile());
 	EXPECT_EQ(0L, testData.vertexData.overrun);
-	EXPECT_EQ(4, testData.vertexInitCount);
-	EXPECT_EQ(4, testData.vertexRunningCount);
+	EXPECT_EQ(4u, testData.vertexInitCount);
+	EXPECT_EQ(4u, testData.vertexRunningCount);
 
 	EXPECT_EQ(4u, testData.vertices.size());
 	for (size_t i = 0; i < testData.vertices.size(); ++i)
@@ -257,8 +257,8 @@ TEST_F(PlyReaderTests, ListReadTest)
 
 	ASSERT_NO_THROW(reader.parseFile());
 	EXPECT_EQ(0L, testData.faceData.overrun);
-	EXPECT_EQ(4, testData.faceInitCount);
-	EXPECT_EQ(4, testData.faceRunningCount);
+	EXPECT_EQ(4u, testData.faceInitCount);
+	EXPECT_EQ(4u, testData.faceRunningCount);
 
 	EXPECT_EQ(4u, testData.faces.size());
 	EXPECT_EQ(4u, testData.extras.size());

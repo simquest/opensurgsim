@@ -145,9 +145,7 @@ void OdeSolverEulerImplicit::assembleLinearSystem(double dt, const OdeState& sta
 	const Vector& f = m_equation.getF();
 
 	// Computes the LHS systemMatrix
-	m_systemMatrix  = M * (1.0 / dt);
-	m_systemMatrix += D;
-	m_systemMatrix += K * dt;
+	m_systemMatrix = M * (1.0 / dt) + D + K * dt;
 	state.applyBoundaryConditionsToMatrix(&m_systemMatrix);
 
 	// Feed the systemMatrix to the linear solver, so it can be used after this call to solve or inverse the matrix

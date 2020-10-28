@@ -93,7 +93,7 @@ void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 	m_unit = availableUnit;
 
 	SURGSIM_ASSERT(m_texture != nullptr) << "Tried to add uniform " << getName() << " without a valid Texture";
-	if(m_texture->isPointSprite())
+	if (m_texture->isPointSprite())
 	{
 		osg::PointSprite* sprite = new osg::PointSprite();
 		stateSet->setTextureAttributeAndModes(m_unit, sprite, osg::StateAttribute::ON);
@@ -128,6 +128,13 @@ size_t OsgTextureUniform<T>::getMinimumTextureUnit() const
 {
 	return m_minimumTextureUnit;
 }
+
+template <class T>
+const std::string OsgTextureUniform<T>::getGlslType() const
+{
+	return SurgSim::Graphics::getGlslType<T>();
+}
+
 };  // namespace Graphics
 
 };  // namespace SurgSim

@@ -14,16 +14,15 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/IndexedLocalCoordinate.h"
-#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ThreadPool.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/OdeState.h"
 #include "SurgSim/Math/SparseMatrix.h"
 #include "SurgSim/Physics/FemElement.h"
-#include "SurgSim/Physics/FemPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 
 using SurgSim::Math::Matrix;
@@ -39,13 +38,18 @@ namespace Physics
 FemRepresentation::FemRepresentation(const std::string& name) :
 	DeformableRepresentation(name),
 	m_useComplianceWarping(false),
-	m_isInitialComplianceMatrixComputed(false)
+	m_isComplianceWarpingSynchronous(true),
+	m_isInitialComplianceMatrixComputed(false),
+	m_useMassLumping(false)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, ComplianceWarping,
 									  getComplianceWarping, setComplianceWarping);
+
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, bool, MassLumping,
+									  getMassLumping, setMassLumping);
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, std::string, FemElementType,
 									  getFemElementType, setFemElementType);
@@ -55,10 +59,16 @@ FemRepresentation::FemRepresentation(const std::string& name) :
 
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(FemRepresentation, double, RayleighDampingStiffness,
 									  getRayleighDampingStiffness, setRayleighDampingStiffness);
+
 }
+
 
 FemRepresentation::~FemRepresentation()
 {
+	//if (m_task.valid())
+	//{
+	//	m_task.get();
+	//}
 }
 
 void FemRepresentation::setFemElementType(const std::string& type)
@@ -96,27 +106,27 @@ bool FemRepresentation::doInitialize()
 	}
 
 	// Compute the entries of m_massPerNode from the FemElements mass information
-	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)
+	for (auto element = std::cbegin(m_femElements); element != std::cend(m_femElements); ++element)
 	{
 		double mass = (*element)->getMass(*m_initialState);
-		for (auto nodeId = std::begin((*element)->getNodeIds()); nodeId != std::end((*element)->getNodeIds()); nodeId++)
+		for (auto nodeId = std::cbegin((*element)->getNodeIds()); nodeId != std::cend((*element)->getNodeIds());
+			++nodeId)
 		{
 			m_massPerNode[*nodeId] += mass / (*element)->getNumNodes();
 		}
 	}
 
-	typedef SparseMatrix::Index Index;
+	using Eigen::Index;
 
 	// Precompute the sparsity pattern for the global arrays.
 	m_M.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
 	m_D.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
 	m_K.resize(static_cast<Index>(getNumDof()), static_cast<Index>(getNumDof()));
-	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
+	for (auto femElement = std::cbegin(m_femElements); femElement != std::cend(m_femElements); ++femElement)
 	{
 		Math::Matrix block = Math::Matrix::Zero(getNumDofPerNode() * (*femElement)->getNumNodes(),
 												getNumDofPerNode() * (*femElement)->getNumNodes());
-		(*femElement)->assembleMatrixBlocks(block, (*femElement)->getNodeIds(),
-											getNumDofPerNode(), &m_M, true);
+		(*femElement)->assembleMatrixBlocks(block, (*femElement)->getNodeIds(), getNumDofPerNode(), &m_M);
 	}
 	m_M.makeCompressed();
 	m_D = m_K = m_M;
@@ -136,7 +146,7 @@ bool FemRepresentation::doInitialize()
 
 		auto logger = SurgSim::Framework::Logger::getLogger("Physics/FemRepresentation");
 		SURGSIM_LOG_IF(numDofPerNode % 3 != 0, logger, SEVERE) << "Using compliance warping with representation " <<
-						getName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
+				getName() << " which has " << numDofPerNode << " dof per node (not a factor of 3)";
 
 		// Use a mask of 1 to setup the sparse matrix pattern
 		for (Index nodeId = 0; nodeId < static_cast<Index>(m_initialState->getNumNodes()); ++nodeId)
@@ -146,7 +156,7 @@ bool FemRepresentation::doInitialize()
 				for (Index j = 0; j < numDofPerNode; ++j)
 				{
 					m_complianceWarpingTransformation.insert(nodeId * numDofPerNode + i, nodeId * numDofPerNode + j) =
-							1.0;
+						1.0;
 				}
 			}
 		}
@@ -176,7 +186,7 @@ std::shared_ptr<FemElement> FemRepresentation::getFemElement(size_t femElementId
 bool FemRepresentation::isValidCoordinate(const SurgSim::DataStructures::IndexedLocalCoordinate& coordinate) const
 {
 	return (coordinate.index < m_femElements.size())
-			&& m_femElements[coordinate.index]->isValidCoordinate(coordinate.coordinate);
+		   && m_femElements[coordinate.index]->isValidCoordinate(coordinate.coordinate);
 }
 
 double FemRepresentation::getTotalMass() const
@@ -227,9 +237,9 @@ void FemRepresentation::update(double dt)
 	}
 
 	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
-											  "Ode solver has not been set yet. Did you call beforeUpdate() ?";
+										   "Ode solver has not been set yet. Did you call beforeUpdate() ?";
 	SURGSIM_ASSERT(m_initialState != nullptr) <<
-												 "Initial state has not been set yet. Did you call setInitialState() ?";
+			"Initial state has not been set yet. Did you call setInitialState() ?";
 
 	// Solve the ode and compute the requested compliance matrix
 	if (getComplianceWarping())
@@ -238,6 +248,24 @@ void FemRepresentation::update(double dt)
 		{
 			m_odeSolver->computeMatrices(dt, *m_initialState, true);
 			setIsInitialComplianceMatrixComputed(true);
+
+			if (!m_isComplianceWarpingSynchronous)
+			{
+				auto shared = std::dynamic_pointer_cast<FemRepresentation>(getSharedPtr());
+				auto calculation = [shared]()
+				{
+					return (shared->m_complianceWarpingTransformationForCalculation *
+						shared->m_odeSolver->getComplianceMatrix() *
+						shared->m_complianceWarpingTransformationForCalculation.transpose()).eval();
+				};
+
+				// Then, transform the initial compliance matrix to get the current compliance warping matrix
+				m_complianceWarpingMatrix.noalias() = m_complianceWarpingTransformation *
+					m_odeSolver->getComplianceMatrix() * m_complianceWarpingTransformation.transpose();
+
+				m_complianceWarpingTransformationForCalculation = m_complianceWarpingTransformation;
+				m_task = Framework::Runtime::getThreadPool()->enqueue<Math::Matrix>(calculation);
+			}
 		}
 		m_odeSolver->solve(dt, *m_currentState, m_newState.get(), false);
 
@@ -277,6 +305,27 @@ bool FemRepresentation::getComplianceWarping() const
 	return m_useComplianceWarping;
 }
 
+void FemRepresentation::setComplianceWarpingSynchronous(bool complianceWarpingSynchronous)
+{
+	SURGSIM_ASSERT(!isInitialized()) << "Compliance warping cannot be modified once the component is initialized";
+	m_isComplianceWarpingSynchronous = complianceWarpingSynchronous;
+}
+
+bool FemRepresentation::isComplianceWarpingSynchronous() const
+{
+	return m_isComplianceWarpingSynchronous;
+}
+
+
+void FemRepresentation::setMassLumping(bool useMassLumping) {
+	SURGSIM_ASSERT(!isInitialized()) << "Can't change mass lumping after initialization.";
+	m_useMassLumping = useMassLumping;
+}
+
+bool FemRepresentation::getMassLumping() const {
+	return m_useMassLumping;
+}
+
 Math::Matrix FemRepresentation::applyCompliance(const Math::OdeState& state, const Math::Matrix& b)
 {
 	SURGSIM_ASSERT(m_odeSolver) << "Ode solver not initialized, it should have been initialized on wake-up";
@@ -285,7 +334,7 @@ Math::Matrix FemRepresentation::applyCompliance(const Math::OdeState& state, con
 	{
 		// Then, update the compliance matrix using compliance warping
 		return (m_complianceWarpingTransformation * DeformableRepresentation::applyCompliance(state,
-																m_complianceWarpingTransformation.transpose() * b));
+				m_complianceWarpingTransformation.transpose() * b));
 	}
 	return DeformableRepresentation::applyCompliance(state, b);
 }
@@ -301,28 +350,47 @@ const SurgSim::Math::Matrix& FemRepresentation::getComplianceMatrix() const
 	return m_odeSolver->getComplianceMatrix();
 }
 
-SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Math::OdeState& state, size_t nodeId)
+SurgSim::Math::Matrix FemRepresentation::getNodeTransformation(const SurgSim::Math::OdeState& state,
+	size_t nodeId) const
 {
 	SURGSIM_FAILURE() << "Any representation using compliance warping should override this method to provide the " <<
-						 "proper nodes transformation";
+					  "proper nodes transformation";
 
 	return SurgSim::Math::Matrix();
 }
 
+void FemRepresentation::calculateComplianceWarpingTransformation(const SurgSim::Math::OdeState& state)
+{
+	SURGSIM_FAILURE() << "Any representation using compliance warping should override this method to calculate and " <<
+		"store the proper compliance warping transformation";
+}
+
 void FemRepresentation::updateComplianceMatrix(const SurgSim::Math::OdeState& state)
 {
-	using SurgSim::Math::assignSubMatrix;
+	calculateComplianceWarpingTransformation(state);
 
-	// Update the compliance warping transformation using all the nodes' transformation
-	for (size_t nodeId = 0; nodeId < state.getNumNodes(); ++nodeId)
+	if (m_isComplianceWarpingSynchronous)
 	{
-		assignSubMatrix(getNodeTransformation(state, nodeId), nodeId,
-			nodeId, &m_complianceWarpingTransformation, false);
+		m_complianceWarpingMatrix.noalias() = m_complianceWarpingTransformation *
+			m_odeSolver->getComplianceMatrix() * m_complianceWarpingTransformation.transpose();
 	}
+	else
+	{
+		auto shared = std::dynamic_pointer_cast<FemRepresentation>(getSharedPtr());
+		auto calculation = [shared]()
+		{
+			return (shared->m_complianceWarpingTransformationForCalculation *
+				shared->m_odeSolver->getComplianceMatrix() *
+				shared->m_complianceWarpingTransformationForCalculation.transpose()).eval();
+		};
 
-	// Then, transform the initial compliance matrix to get the current compliance warping matrix
-	m_complianceWarpingMatrix = m_complianceWarpingTransformation * m_odeSolver->getComplianceMatrix() *
-		m_complianceWarpingTransformation.transpose();
+		if (m_task.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+		{
+			m_complianceWarpingMatrix = m_task.get();
+			m_complianceWarpingTransformationForCalculation = m_complianceWarpingTransformation;
+			m_task = Framework::Runtime::getThreadPool()->enqueue<Math::Matrix>(calculation);
+		}
+	}
 }
 
 void FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
@@ -331,7 +399,7 @@ void FemRepresentation::computeF(const SurgSim::Math::OdeState& state)
 	m_f.setZero(state.getNumDof());
 
 	addGravityForce(&m_f, state);
-	addRayleighDampingForce(&m_f, state);
+	addRayleighDampingForce(&m_f, state, hasK(), hasF());
 	addFemElementsForce(&m_f, state);
 
 	// Add external generalized force
@@ -428,6 +496,17 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 		(*femElement)->addFMDK(&m_f, &m_M, &m_D, &m_K);
 	}
 
+	if (m_useMassLumping == true)
+	{
+		for (auto i = 0; i < m_M.rows(); i++)
+		{
+			double sum = m_M.row(i).sum();
+			Math::zeroRow(i, &m_M);
+			m_M.coeffRef(i, i) = sum;
+		}
+		m_M.makeCompressed();
+	}
+
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
 	{
@@ -442,7 +521,8 @@ void FemRepresentation::computeFMDK(const SurgSim::Math::OdeState& state)
 	addGravityForce(&m_f, state);
 
 	// Add the Rayleigh damping force to m_f
-	addRayleighDampingForce(&m_f, state, true, true);
+	// The mass matrix should exist, the stiffness matrix was set above in the addFMDK loop over the FemElements.
+	addRayleighDampingForce(&m_f, state, hasK(), true);
 
 	// Add external generalized force, stiffness and damping
 	if (m_previousHasExternalGeneralizedForce != m_hasExternalGeneralizedForce)
@@ -473,17 +553,30 @@ void FemRepresentation::updateFMDK(const SurgSim::Math::OdeState& state, int opt
 		(*femElement)->updateFMDK(state, options);
 	}
 
+// 	#pragma omp parallel for
+// 	for (int i = 0; i < m_femElements.size(); ++i)
+// 	{
+// 		m_femElements[i]->updateFMDK(state, options);
+// 	}
+
 	OdeEquation::updateFMDK(state, options);
 }
 
 void FemRepresentation::addRayleighDampingForce(
-		SurgSim::Math::Vector* force, const SurgSim::Math::OdeState& state,
-		bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
+	SurgSim::Math::Vector* force, const SurgSim::Math::OdeState& state,
+	bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	// Temporary variables for convenience
-	double& rayleighMass = m_rayleighDamping.massCoefficient;
-	double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
+	double rayleighMass = m_rayleighDamping.massCoefficient;
+	double rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const SurgSim::Math::Vector& v = state.getVelocities();
+
+	SurgSim::Math::Vector extractedX;
+	SurgSim::Math::Vector accumulator;
+
+	// #performance HS-20-apr-2017 The structure here is not ideal, I assume if raleighMass and raleighStiffness are
+	// both set we should be able to run through 1 calculation rather than doing two separate passes through all the
+	// fem elements
 
 	// Rayleigh damping mass: F = -rayleighMass.M.v(t)
 	if (rayleighMass != 0.0)
@@ -491,15 +584,24 @@ void FemRepresentation::addRayleighDampingForce(
 		// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
 		if (useGlobalMassMatrix)
 		{
-			Math::Vector tempForce = (scale * rayleighMass) * (m_M * v);
-			*force -= tempForce;
+			if (m_useMassLumping)
+			{
+				force->noalias() -= (scale * rayleighMass) * (m_M.diagonal().cwiseProduct(v));
+			}
+			else
+			{
+				force->noalias() -= (scale * rayleighMass) * (m_M * v);
+			}
 		}
 		else
 		{
+			size_t size = m_femElements[0]->getNumNodes() * m_femElements[0]->getNumDofPerNode();
+			extractedX.resize(size);
+			accumulator.resize(size);
 			// Otherwise, we loop through each fem element to compute its contribution
 			for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 			{
-				(*femElement)->addMatVec(- scale * rayleighMass, 0.0, 0.0, v, force);
+				(*femElement)->addMatVec(- scale * rayleighMass, 0.0, 0.0, v, force, &extractedX, &accumulator);
 			}
 		}
 	}
@@ -510,23 +612,25 @@ void FemRepresentation::addRayleighDampingForce(
 	{
 		if (useGlobalStiffnessMatrix)
 		{
-			Math::Vector tempForce = scale * rayleighStiffness * (m_K * v);
-			*force -= tempForce;
+			force->noalias() -= scale * rayleighStiffness * (m_K * v);
 		}
 		else
 		{
+			size_t size = m_femElements[0]->getNumNodes() * m_femElements[0]->getNumDofPerNode();
+			accumulator.resize(size);
+			extractedX.resize(size);
 			// Otherwise, we loop through each fem element to compute its contribution
-			for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
+			for (auto femElement = std::cbegin(m_femElements); femElement != std::cend(m_femElements); ++femElement)
 			{
-				(*femElement)->addMatVec(0.0, 0.0, - scale * rayleighStiffness, v, force);
+				(*femElement)->addMatVec(0.0, 0.0, - scale * rayleighStiffness, v, force, &extractedX, &accumulator);
 			}
 		}
 	}
 }
 
 void FemRepresentation::addFemElementsForce(SurgSim::Math::Vector* force,
-											const SurgSim::Math::OdeState& state,
-											double scale)
+		const SurgSim::Math::OdeState& state,
+		double scale)
 {
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
@@ -541,7 +645,7 @@ void FemRepresentation::addGravityForce(SurgSim::Math::Vector* f,
 	using SurgSim::Math::addSubVector;
 
 	SURGSIM_ASSERT(m_massPerNode.size() == state.getNumNodes()) <<
-					"Mass per node has not been properly allocated. Did you call Initialize() ?";
+			"Mass per node has not been properly allocated. Did you call Initialize() ?";
 
 	// Prepare a gravity vector of the proper size
 	SurgSim::Math::Vector gravitynD = SurgSim::Math::Vector::Zero(getNumDofPerNode());

@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Graphics/TangentSpaceGenerator.h"
+#include "SurgSim/Math/Geometry.h"
 
 #include <osg/TriangleIndexFunctor>
 #include <osg/Vec3>
@@ -165,7 +166,17 @@ void GenerateTangentSpaceTriangleIndexFunctor::operator()(unsigned int vertexInd
 	float t1 = w2.y() - w1.y();
 	float t2 = w3.y() - w1.y();
 
-	float r = 1.0f / (s1 * t2 - s2 * t1);
+	float denominator = (s1 * t2 - s2 * t1);
+	if (denominator == 0)
+	{
+		denominator = 1.0f;
+	}
+	else if (abs(denominator) < Math::Geometry::ScalarEpsilon)
+	{
+		denominator = Math::Geometry::ScalarEpsilon * ((denominator < 0) ? -1 : 1);
+	}
+
+	float r = 1.0f / denominator;
 	osg::Vec4 tangent((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r, 0.0f);
 	osg::Vec4 bitangent((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r, 0.0f);
 
@@ -183,7 +194,8 @@ TangentSpaceGenerator::TangentSpaceGenerator(int textureCoordUnit, int tangentAt
 	osg::NodeVisitor(),
 	m_textureCoordUnit(textureCoordUnit),
 	m_tangentAttribIndex(tangentAttribIndex),
-	m_bitangentAttribIndex(bitangentAttribIndex)
+	m_bitangentAttribIndex(bitangentAttribIndex),
+	m_createOrthonormalBasis(false)
 {
 	setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 }

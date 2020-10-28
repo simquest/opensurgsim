@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2012-2013, SimQuest Solutions Inc.
+// Copyright 2012-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,33 +16,32 @@
 /// \file
 /// Tests for the OsgCamera class.
 
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
-#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
+
+#include <gtest/gtest.h>
+#include <osg/Camera>
+#include <osg/ref_ptr>
+#include <random>
 
 #include "SurgSim/Framework/BasicSceneElement.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Graphics/OsgCamera.h"
 #include "SurgSim/Graphics/OsgGroup.h"
 #include "SurgSim/Graphics/OsgMatrixConversions.h"
-#include "SurgSim/Graphics/OsgTexture2d.h"
 #include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 #include "SurgSim/Math/Quaternion.h"
 
-#include <osg/Camera>
-#include <osg/ref_ptr>
-
-#include <gtest/gtest.h>
-
-#include <random>
-
 using SurgSim::Framework::BasicSceneElement;
+using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
-using SurgSim::Math::makeRigidTransform;
+
 
 namespace SurgSim
 {
@@ -70,7 +69,7 @@ TEST(OsgCameraTests, InitTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()))) <<
 			"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
 
-	EXPECT_EQ(0, camera->getRenderGroups().size());
+	EXPECT_EQ(0u, camera->getRenderGroups().size());
 }
 
 TEST(OsgCameraTests, OsgNodesTest)
@@ -118,7 +117,7 @@ TEST(OsgCameraTests, GroupTest)
 	std::shared_ptr<Camera> camera = osgCamera;
 	camera->addRenderGroupReference("test group");
 
-	EXPECT_EQ(0, camera->getRenderGroups().size());
+	EXPECT_EQ(0u, camera->getRenderGroups().size());
 
 	/// Adding an OsgGroup should succeed
 	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>(camera->getRenderGroupReferences().front());
@@ -271,8 +270,7 @@ TEST(OsgCameraTests, SetProjection)
 	Math::Matrix44d identity = Math::Matrix44d::Identity();
 
 	camera->setProjectionMatrix(identity);
-	auto osgCamera = new osg::Camera;
-
+	osg::ref_ptr<osg::Camera> osgCamera(new osg::Camera);
 
 	// Windows does not support initializer lists ...
 	std::array<double, 4> persp = {{90.0, 1.0, 0.01, 10.0}};
@@ -326,18 +324,18 @@ TEST(OsgCameraTests, MultipleRenderGroups)
 {
 	std::shared_ptr<OsgCamera> camera = std::make_shared<OsgCamera>("TestOsgCamera");
 
-	EXPECT_EQ(0, camera->getRenderGroupReferences().size());
+	EXPECT_EQ(0u, camera->getRenderGroupReferences().size());
 
 	camera->addRenderGroupReference("Group1");
 	camera->addRenderGroupReference("Group2");
-	EXPECT_EQ(2, camera->getRenderGroupReferences().size());
+	EXPECT_EQ(2u, camera->getRenderGroupReferences().size());
 
 	std::vector<std::string> references;
 	references.push_back("Group3");
 	references.push_back("Group4");
 	references.push_back("Group5");
 	camera->setRenderGroupReferences(references);
-	EXPECT_EQ(3, camera->getRenderGroupReferences().size());
+	EXPECT_EQ(3u, camera->getRenderGroupReferences().size());
 
 	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group3"));
 	camera->addRenderGroup(std::make_shared<Graphics::OsgGroup>("Group4"));

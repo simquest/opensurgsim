@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -167,7 +167,7 @@ protected:
 
 	void testSegmentMeshTriangleMeshDCD(std::string scenario, std::shared_ptr<SegmentMeshShape> segmentMeshShape,
 		RigidTransform3d segmentMeshShapeTransform, std::shared_ptr<MeshShape> meshShape,
-		RigidTransform3d meshShapeTransform, int expectedNumContacts = 0)
+		RigidTransform3d meshShapeTransform, size_t expectedNumContacts = 0)
 	{
 		for (const auto& transform : m_transforms)
 		{
@@ -177,11 +177,15 @@ protected:
 				std::make_shared<ShapeCollisionRepresentation>("Collision Mesh - Segment");
 			segmentMeshRep->setShape(segmentMeshShape);
 			segmentMeshRep->setLocalPose(transform.first * segmentMeshShapeTransform);
+			segmentMeshRep->updateShapeData();
+			segmentMeshRep->updateDcdData();
 
 			std::shared_ptr<ShapeCollisionRepresentation> triangleMeshRep =
 				std::make_shared<ShapeCollisionRepresentation>("Collision Mesh - Triangle");
 			triangleMeshRep->setShape(meshShape);
 			triangleMeshRep->setLocalPose(transform.first * meshShapeTransform);
+			triangleMeshRep->updateShapeData();
+			triangleMeshRep->updateDcdData();
 
 			// Perform collision detection.
 			SegmentMeshTriangleMeshContact calcContact;
@@ -222,16 +226,16 @@ protected:
 				calcContact.calculateContact(pair2);
 
 				// There should be no intersections.
-				EXPECT_EQ(0, pair2->getContacts().size());
+				EXPECT_EQ(0u, pair2->getContacts().size());
 			}
 		}
 	}
 
 	// Cube size
-	double m_cubeSize;
+	double m_cubeSize = std::numeric_limits<double>::signaling_NaN();
 
 	// Segment radius
-	double m_segmentRadius;
+	double m_segmentRadius = std::numeric_limits<double>::signaling_NaN();
 
 private:
 	// List of random transformations and a string to identify it.

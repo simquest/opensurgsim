@@ -48,6 +48,8 @@ public:
 	/// \param	representation	The representation.
 	/// \return	true if valid representation, false if not.
 	bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
+
+	std::shared_ptr<Localization> doCopy() const override;
 };
 
 } // namespace Physics

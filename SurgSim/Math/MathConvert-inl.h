@@ -32,12 +32,11 @@ template <class Type, int Rows, int Cols, int MOpt>
 YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode(
 			const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs)
 {
-	typedef typename Eigen::Matrix<Type, Rows, Cols, MOpt>::Index Index;
 	YAML::Node node;
 	node.SetStyle(YAML::EmitterStyle::Flow);
 	if (Cols == 1)
 	{
-		for (Index i = 0; i < rhs.size(); ++i)
+		for (Eigen::Index i = 0; i < rhs.size(); ++i)
 		{
 			node.push_back(rhs(i, 0));
 		}
@@ -77,7 +76,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 			{
 				rhs(i, 0) = node[i].as<Type>();
 			}
-			catch (YAML::RepresentationException)
+			catch (YAML::RepresentationException&)
 			{
 				rhs(i, 0) = std::numeric_limits<Type>::quiet_NaN();
 
@@ -101,7 +100,7 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 				{
 					rhs.row(row)[col] = rowNode[col].as<Type>();
 				}
-				catch (YAML::RepresentationException)
+				catch (YAML::RepresentationException&)
 				{
 					rhs.row(row)[col] = std::numeric_limits<Type>::quiet_NaN();
 					auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
@@ -215,7 +214,7 @@ bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
 		{
 			rhs.angle() = node["Angle"].as<Type>();
 		}
-		catch (RepresentationException)
+		catch (RepresentationException&)
 		{
 			rhs.angle() = std::numeric_limits<Type>::quiet_NaN();
 			auto logger = SurgSim::Framework::Logger::getLogger(serializeLogger);
@@ -225,5 +224,18 @@ bool YAML::convert<typename Eigen::AngleAxis<Type>>::decode(
 	}
 	return result;
 }
+
+template<class T>
+bool YAML::tryConvert(const boost::any& any, YAML::Node* node)
+{
+	if (typeid(T) == any.type())
+	{
+		*node = boost::any_cast<T>(any);
+		return true;
+	}
+	return false;
+}
+
+
 
 #endif // SURGSIM_MATH_MATHCONVERT_INL_H

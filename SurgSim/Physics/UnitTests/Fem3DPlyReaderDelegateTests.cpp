@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2015, SimQuest Solutions Inc.
+// Copyright 2015-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,17 +39,17 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	fem->load("PlyReaderTests/Tetrahedron.ply");
 
 	// Vertices
-	Vector3d vertex0(1.0, 1.0, -1.0);
-	Vector3d vertex25(-1.0, -1.0, 1.0);
+	Vector3d vertex0(-1.0, 0.0, 0.0);
+	Vector3d vertex25(1.0, 1.0, 1.0);
 
 	EXPECT_TRUE(vertex0.isApprox(fem->getVertex(0).position));
 	EXPECT_TRUE(vertex25.isApprox(fem->getVertex(25).position));
 
 	// Tetrahedrons
-	ASSERT_EQ(12u, fem->getNumElements());
+	ASSERT_EQ(44u, fem->getNumElements());
 
-	std::array<size_t, 4> tetrahedron0 = {0, 1, 2, 3};
-	std::array<size_t, 4> tetrahedron2 = {10, 25, 11, 9};
+	std::array<size_t, 4> tetrahedron0 = {16, 0, 7, 5};
+	std::array<size_t, 4> tetrahedron2 = {13, 14, 16, 2};
 
 	EXPECT_TRUE(std::equal(std::begin(tetrahedron0), std::end(tetrahedron0),
 						   std::begin(fem->getElement(0)->nodeIds)));
@@ -57,27 +57,23 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 						   std::begin(fem->getElement(11)->nodeIds)));
 
 	// Boundary conditions
-	ASSERT_EQ(8u, fem->getBoundaryConditions().size());
+	ASSERT_EQ(4u, fem->getBoundaryConditions().size());
 
-	EXPECT_EQ(8, fem->getBoundaryCondition(0));
-	EXPECT_EQ(5, fem->getBoundaryCondition(1));
-	EXPECT_EQ(3, fem->getBoundaryCondition(2));
-	EXPECT_EQ(2, fem->getBoundaryCondition(3));
-	EXPECT_EQ(7, fem->getBoundaryCondition(4));
-	EXPECT_EQ(1, fem->getBoundaryCondition(5));
-	EXPECT_EQ(6, fem->getBoundaryCondition(6));
-	EXPECT_EQ(11, fem->getBoundaryCondition(7));
+	EXPECT_EQ(19u, fem->getBoundaryCondition(0));
+	EXPECT_EQ(21u, fem->getBoundaryCondition(1));
+	EXPECT_EQ(23u, fem->getBoundaryCondition(2));
+	EXPECT_EQ(25u, fem->getBoundaryCondition(3));
 
 	// Material
 	auto fem2 = fem->getElement(2);
-	EXPECT_DOUBLE_EQ(0.1432, fem2->massDensity);
-	EXPECT_DOUBLE_EQ(0.224, fem2->poissonRatio);
-	EXPECT_DOUBLE_EQ(0.472, fem2->youngModulus);
+	EXPECT_DOUBLE_EQ(900.0, fem2->massDensity);
+	EXPECT_DOUBLE_EQ(0.45, fem2->poissonRatio);
+	EXPECT_DOUBLE_EQ(1750000000, fem2->youngModulus);
 
 	auto fem8 = fem->getElement(8);
-	EXPECT_DOUBLE_EQ(0.1432, fem8->massDensity);
-	EXPECT_DOUBLE_EQ(0.224, fem8->poissonRatio);
-	EXPECT_DOUBLE_EQ(0.472, fem8->youngModulus);
+	EXPECT_DOUBLE_EQ(900.0, fem8->massDensity);
+	EXPECT_DOUBLE_EQ(0.45, fem8->poissonRatio);
+	EXPECT_DOUBLE_EQ(1750000000, fem8->youngModulus);
 }
 
 TEST(Fem3DRepresentationReaderTests, CubeMeshDelegateTest)
@@ -106,8 +102,8 @@ TEST(Fem3DRepresentationReaderTests, CubeMeshDelegateTest)
 	// Boundary conditions
 	ASSERT_EQ(2u, fem->getBoundaryConditions().size());
 
-	EXPECT_EQ(9, fem->getBoundaryCondition(0));
-	EXPECT_EQ(5, fem->getBoundaryCondition(1));
+	EXPECT_EQ(9u, fem->getBoundaryCondition(0));
+	EXPECT_EQ(5u, fem->getBoundaryCondition(1));
 
 	// Material
 	auto fem2 = fem->getElement(2);
@@ -144,6 +140,21 @@ TEST(Fem3DRepresentationReaderTests, PerElementMaterial)
 		EXPECT_DOUBLE_EQ(value++, element->massDensity);
 		EXPECT_DOUBLE_EQ(value++, element->poissonRatio);
 		EXPECT_DOUBLE_EQ(value++, element->youngModulus);
+	}
+}
+
+TEST(Fem3DRepresentationReaderTests, NoMaterials)
+{
+	auto fem = std::make_shared<Fem3D>();
+	auto runtime = std::make_shared<Framework::Runtime>("config.txt");
+
+	ASSERT_NO_THROW(fem->load("PlyReaderTests/Fem3DCubeNoMaterial.ply"));
+
+	for (auto element : fem->getElements())
+	{
+		EXPECT_DOUBLE_EQ(0.0, element->massDensity);
+		EXPECT_DOUBLE_EQ(0.0, element->poissonRatio);
+		EXPECT_DOUBLE_EQ(0.0, element->youngModulus);
 	}
 }
 

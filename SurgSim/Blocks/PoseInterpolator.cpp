@@ -30,7 +30,9 @@ PoseInterpolator::PoseInterpolator(const std::string& name) :
 	m_startingPose(RigidTransform3d::Identity()),
 	m_endingPose(RigidTransform3d::Identity()),
 	m_duration(1.0),
-	m_currentTime(0.0)
+	m_currentTime(0.0),
+	m_pingpong(false),
+	m_loop(false)
 {
 
 }
@@ -77,6 +79,11 @@ bool PoseInterpolator::doInitialize()
 	return true;
 }
 
+void PoseInterpolator::doRetire()
+{
+	m_target = nullptr;
+}
+
 bool PoseInterpolator::doWakeUp()
 {
 	bool result = false;
@@ -118,7 +125,7 @@ void PoseInterpolator::update(double dt)
 		}
 	}
 
-	m_target->setPose(Math::interpolate(m_startingPose, m_endingPose, m_currentTime/m_duration));
+	m_target->setPose(Math::interpolate(m_startingPose, m_endingPose, m_currentTime / m_duration));
 }
 
 void PoseInterpolator::setLoop(bool val)

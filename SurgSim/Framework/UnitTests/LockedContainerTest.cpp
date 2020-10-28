@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -578,11 +578,12 @@ void testReaderAndWriters(int numWriters)
 
 	LockedContainer<BigData> data;
 
-	std::vector<DataWriter*> writers(numWriters);
+	std::vector<std::unique_ptr<DataWriter>> writers(numWriters);
 	for (size_t i = 0;  i < writers.size();  ++i)
 	{
 		// The step has been chosen so two writers can't ever produce the same value
-		writers[i] = new DataWriter(data, static_cast<int>(i), numWriters, NUM_TOTAL_WRITES/numWriters);
+		writers[i] = std::unique_ptr<DataWriter>(new DataWriter(data, static_cast<int>(i), numWriters,
+			NUM_TOTAL_WRITES / numWriters));
 	}
 	{
 		BigData value;

@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2013-2016, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ TEST(ComputationTests, CopyStateTest)
 TEST(ComputationTests, PreparePhysicsState)
 {
 	auto physicsState = std::make_shared<PhysicsManagerState>();
-	EXPECT_EQ(0, physicsState->getActiveConstraints().size());
+	EXPECT_EQ(0u, physicsState->getActiveConstraints().size());
 
 	// Setup the state.
 	std::vector<std::shared_ptr<Representation>> expectedRepresentations;
@@ -110,20 +110,20 @@ TEST(ComputationTests, PreparePhysicsState)
 	// Check the active representations list.
 	std::vector<std::shared_ptr<Representation>> actualRepresentations;
 	actualRepresentations = physicsState->getActiveRepresentations();
-	ASSERT_EQ(2, actualRepresentations.size());
+	ASSERT_EQ(2u, actualRepresentations.size());
 	EXPECT_EQ(rigid1, actualRepresentations.front());
 	EXPECT_EQ(rigid2, actualRepresentations.back());
 
 	// Check the active constraints list.
 	std::vector<std::shared_ptr<Constraint>> actualConstraints;
 	actualConstraints = physicsState->getActiveConstraints();
-	ASSERT_EQ(1, actualConstraints.size());
+	ASSERT_EQ(1u, actualConstraints.size());
 	EXPECT_EQ(expectedConstraints.front(), actualConstraints.front());
 
 	// Check the active collisions list.
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> actualCollisionRepresentations;
 	actualCollisionRepresentations = physicsState->getActiveCollisionRepresentations();
-	ASSERT_EQ(1, actualCollisionRepresentations.size());
+	ASSERT_EQ(1u, actualCollisionRepresentations.size());
 	EXPECT_EQ(collisionRepresentation, actualCollisionRepresentations.front());
 }
 
