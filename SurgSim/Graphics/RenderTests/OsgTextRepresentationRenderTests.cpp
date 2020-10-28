@@ -72,45 +72,51 @@ TEST_F(OsgTextRepresentationRenderTests, TwoText)
 	double x = 50;
 	double y = 50;
 
-	{
-		auto text = std::make_shared<OsgTextRepresentation>("1");
-		text->setText("HelloWorld One");
-		text->setDrawBackground(true);
-		text->setBackgroundMargin(5.0);
-		text->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 0.0));
-		text->setBackgroundColor(SurgSim::Math::Vector4d(0.0, 1.0, 0.0, 1.0));
-		text->setLocation(x, y);
-		viewElement->addComponent(text);
-	}
+	auto text1 = std::make_shared<OsgTextRepresentation>("1");
+	text1->setText("Loses background color");
+	text1->setDrawBackground(true);
+	text1->setBackgroundMargin(5.0);
+	text1->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 0.0));
+	text1->setBackgroundColor(SurgSim::Math::Vector4d(0.0, 1.0, 0.0, 1.0));
+	text1->setLocation(x, y);
+	viewElement->addComponent(text1);
 
-	{
-		auto text = std::make_shared<OsgTextRepresentation>("2");
-		text->setText("HelloWorld One");
-		text->setDrawBackground(true);
-		text->setBackgroundMargin(5.0);
-		text->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 1.0));
-		text->setBackgroundColor(SurgSim::Math::Vector4d(1.0, 0.0, 0.0, 1.0));
-		text->setLocation(x, y+50);
-		viewElement->addComponent(text);
-	}
+	auto text2 = std::make_shared<OsgTextRepresentation>("2");
+	text2->setText("Gains background color");
+	text2->setDrawBackground(false);
+	text2->setBackgroundMargin(5.0);
+	text2->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 1.0));
+	text2->setBackgroundColor(SurgSim::Math::Vector4d(1.0, 0.0, 0.0, 1.0));
+	text2->setLocation(x, y + 50);
+	viewElement->addComponent(text2);
 
+	auto text3 = std::make_shared<OsgTextRepresentation>("3");
+	text3->setText("Background grows");
+	text3->setDrawBackground(true);
+	text3->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 1.0));
+	text3->setBackgroundColor(SurgSim::Math::Vector4d(0.0, 0.0, 1.0, 1.0));
+	text3->setLocation(x, y + 100);
+	viewElement->addComponent(text3);
 
-	{
-		auto text = std::make_shared<OsgTextRepresentation>("3");
-		text->setText("HelloWorld One");
-		text->setDrawBackground(true);
-		//text->setBackgroundMargin(5.0);
-		text->setColor(SurgSim::Math::Vector4d(0.4, 0.1, 0.1, 1.0));
-		text->setBackgroundColor(SurgSim::Math::Vector4d(0.0, 0.0, 1.0, 1.0));
-		text->setLocation(x, y+100);
-		viewElement->addComponent(text);
-	}
+	auto text4 = std::make_shared<OsgTextRepresentation>("4");
+	text4->setText("Background changes color");
+	text4->setDrawBackground(true);
+	text4->setColor(SurgSim::Math::Vector4d(0.8, 0.1, 0.1, 1.0));
+	text4->setBackgroundColor(SurgSim::Math::Vector4d(0.0, 0.0, 1.0, 1.0));
+	text4->setLocation(x, y + 150);
+	viewElement->addComponent(text4);
 
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+	text1->setDrawBackground(false);
+	text2->setDrawBackground(true);
+	text3->setBackgroundMargin(10.0);
+	text4->setBackgroundColor(SurgSim::Math::Vector4d(0.5, 0.7, 0.7, 1.0));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 }
+
 TEST_F(OsgTextRepresentationRenderTests, Background)
 {
 	{
