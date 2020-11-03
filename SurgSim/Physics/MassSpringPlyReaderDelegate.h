@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_MASSSPRINGPLYREADERDELEGATE_H
 
 #include <array>
+#include <limits>
 #include <memory>
 #include <string>
 
