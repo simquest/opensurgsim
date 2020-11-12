@@ -43,6 +43,7 @@ std::shared_ptr<DeviceInterface> tryConvertDevice(const YAML::Node& possibleDevi
 		if (DeviceInterface::getFactory().isRegistered(className))
 		{
 			const YAML::Node& data = possibleDevice.begin()->second;
+			YAML::Node backup = data; // rkornheisl 3-nov-2020 This is to prevent the node going null on Linux at the subdevice for-loop
 			if (data.IsMap() && data[NamePropertyName].IsDefined())
 			{
 				SURGSIM_LOG_DEBUG(logger) << "Loading: " << std::endl << possibleDevice;
@@ -60,7 +61,7 @@ std::shared_ptr<DeviceInterface> tryConvertDevice(const YAML::Node& possibleDevi
 					if (data["Devices"].IsDefined() && data["Devices"].IsSequence())
 					{
 						std::vector<std::shared_ptr<SurgSim::Input::DeviceInterface>> subDevices;
-						for (const YAML::Node& deviceNode : data["Devices"])
+						for (YAML::Node deviceNode : data["Devices"]) // rkornheisl 3-nov-2020 data seems to go null here with DeviceFilter test
 						{
 							subDevices.push_back(tryConvertDevice(deviceNode, fileName));
 						}
@@ -71,7 +72,7 @@ std::shared_ptr<DeviceInterface> tryConvertDevice(const YAML::Node& possibleDevi
 					std::vector<std::string> ignoredProperties;
 					ignoredProperties.push_back(NamePropertyName);
 					ignoredProperties.push_back("Devices");
-					device->decode(data, ignoredProperties);
+					device->decode(backup, ignoredProperties); // rkornheisl 3-nov-2020 using backup to prevent invalid node exception from data being null
 				}
 				if (device->initialize())
 				{
