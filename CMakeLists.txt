@@ -168,7 +168,7 @@ install(FILES
 	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake"
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake"
 	DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-install(EXPORT ${PROJECT_NAME}Targets DESTINATION ${INSTALL_CMAKE_DIR} COMPONENT dev)
+install(TARGETS yaml-cpp EXPORT ${PROJECT_NAME}Targets DESTINATION ${INSTALL_CMAKE_DIR} COMPONENT dev)
 
 surgsim_cpplint_this_tree(cpplint)
 

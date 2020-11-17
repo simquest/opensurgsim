@@ -33,9 +33,9 @@ configure_file(
 set(LIBS
 	SurgSimBlocks
 	SurgSimFramework
-	SurgSimGraphic
+	SurgSimGraphics
 	SurgSimMath
-	SurgSimTestins
+	SurgSimTesting
 )
 
 surgsim_add_unit_tests(SurgSimBlocksRenderTest)
