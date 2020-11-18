@@ -46,6 +46,9 @@ public:
 class MockProgram : public Program
 {
 public:
+
+	SURGSIM_CLASSNAME("MockProgram");
+
 	MOCK_CONST_METHOD0(hasGeometryShader, bool());
 	MOCK_CONST_METHOD0(hasVertexShader, bool());
 	MOCK_CONST_METHOD0(hasFragmentShader, bool());
@@ -68,6 +71,8 @@ public:
 
 	MOCK_CONST_METHOD0(isGlobalScope, bool());
 	MOCK_METHOD1(setGlobalScope, void(bool)); //NOLINT
+
+	MOCK_METHOD1(doLoad, bool(const std::string&));
 };
 
 TEST(OsgMaterialTests, InitTest)
