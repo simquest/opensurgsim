@@ -91,3 +91,4 @@ build_*/
 /tests/unit_tests
 /tests/unit_tests.exe
 *.smproj
+Modules/Editor/imgui-master/

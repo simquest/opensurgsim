@@ -1,0 +1,7 @@
+This is a draft of an debugging and editing framework for OSS, the current component can be used to inspect a simulation at runtime. It is able to display all the elements of a scene and can visualize and change a limited set of properties. It utilizes the IMGUI framework. 
+
+The handler to call IMGUI drawing from OSG is copied from https://github.com/Tordan/imgui-osg it utilizes the opengl3 backend for imgui. This backend in turn requires glew to enable opengl function binding. 
+
+The actual OSS drawing is done in two stages, for each property type we need to register a conversion function that is keyed on the type name, this function casts the boost::any to the known type and then calls an overloaded funciton to actually display the value of the given type. This should fairly easy to extend. 
+
+For an actual editor there is more work to be done the my current ideas are that the editor would be its own application, to be able to work with the whole scene each scenelement would need to be a single yaml file. The editor would really only comprise of the graphics manager no other manager is running. Some components would need special icons so they can be visualized in space without the other managers running. To run a scene the editor can start the executable that is the simulation being edited. It loads and runs normally, this would make the editor invisible to the simulation. 

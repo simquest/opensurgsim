@@ -29,7 +29,7 @@ namespace SurgSim
 namespace Graphics
 {
 const std::string Representation::DefaultGroupName = "__OssDefault__";
-const std::string Representation::DefaultHudGroupName = "__OssDefaulHud__";
+const std::string Representation::DefaultHudGroupName = "__OssDefaultHud__";
 
 Representation::Representation(const std::string& name) :
 	SurgSim::Framework::Representation(name)
