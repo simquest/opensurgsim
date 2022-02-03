@@ -17,6 +17,7 @@
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESHPLYREADERDELEGATE_H
 
 #include <array>
+#include <limits>
 #include <memory>
 
 #include "SurgSim/DataStructures/EmptyData.h"
